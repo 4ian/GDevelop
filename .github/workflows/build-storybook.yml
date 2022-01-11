@@ -59,15 +59,13 @@ jobs:
         run: |
           export STORYBOOK_S3_URL_COMMIT=http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/index.html
           export STORYBOOK_S3_URL_LATEST=http://gdevelop-storybook.s3-website-us-east-1.amazonaws.com/$(git rev-parse --abbrev-ref HEAD)/latest/index.html
-          echo "::set-env name=STORYBOOK_S3_URL_COMMIT::$STORYBOOK_S3_URL_COMMIT"
-          echo "::set-env name=STORYBOOK_S3_URL_LATEST::$STORYBOOK_S3_URL_LATEST"
           echo "::set-output name=storybook_s3_url_commit::$STORYBOOK_S3_URL_COMMIT"
           echo "::set-output name=storybook_s3_url_latest::$STORYBOOK_S3_URL_LATEST"
 
       - name: Log urls to the Storybook
         run: |
-          echo "Find the latest Storybook for this branch on $STORYBOOK_S3_URL_LATEST"
-          echo "Find the Storybook for this commit on $STORYBOOK_S3_URL_COMMIT"
+          echo "Find the Storybook for this commit on ${{ steps.vars.outputs.storybook_s3_url_commit }}"
+          echo "Find the latest Storybook for this branch on ${{ steps.vars.outputs.storybook_s3_url_latest }}"
 
       - name: Update GitHub Check with Storybook URLs
         uses: LouisBrunner/checks-action@v1.1.1

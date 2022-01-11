@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.PathfindingRuntimeBehavior', function () {
+describe('gdjs.PathfindingRuntimeBehavior', function () {
   const epsilon = 1 / (2 << 16);
   // tests cases where every collisionMethod has the same behavior.
   let doCommonPathFindingTests = (collisionMethod, allowDiagonals) => {

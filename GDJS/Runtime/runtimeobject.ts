@@ -1791,7 +1791,7 @@ namespace gdjs {
      * Get a timer elapsed time.
      *
      * This is used by the condition to return false when a timer doesn't exist
-     * no mater the relational operator.
+     * no matter the relational operator.
      *
      * @param timerName The timer name
      * @return The timer elapsed time in seconds, NaN if the timer doesn't exist

@@ -125,7 +125,7 @@ namespace gdjs {
 
       /**
        * This is used by the condition to return false when a timer doesn't exist
-       * no mater the relational operator.
+       * no matter the relational operator.
        * @param runtimeScene
        * @param timerName
        * @returns The timer elapsed time in seconds or NaN if the timer doesn't exist.
@@ -138,7 +138,6 @@ namespace gdjs {
         if (!timeManager.hasTimer(timerName)) {
           return Number.NaN;
         }
-        console.log(timeManager.getTimer(timerName).getTime() / 1000);
         return timeManager.getTimer(timerName).getTime() / 1000;
       };
 

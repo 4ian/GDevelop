@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers");
 
-  // Deprecated and replaced by TimerComparison
+  // Deprecated and replaced by CompareTimer
   extension
       .AddCondition("Timer",
                     _("Value of a scene timer"),
@@ -37,7 +37,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .SetHidden();
 
   extension
-      .AddCondition("TimerComparison",
+      .AddCondition("CompareTimer",
                     _("Value of a scene timer"),
                     _("Compare the elapsed time of a scene timer. This condition doesn't start the timer."),
                     _("The timer _PARAM1_ _PARAM2_ _PARAM3_ seconds"),

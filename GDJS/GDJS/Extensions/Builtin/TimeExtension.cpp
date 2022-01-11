@@ -15,7 +15,7 @@ TimeExtension::TimeExtension() {
 
   GetAllConditions()["Timer"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.timerElapsedTime");  // Deprecated
-  GetAllConditions()["TimerComparison"].SetFunctionName(
+  GetAllConditions()["CompareTimer"].SetFunctionName(
           "gdjs.evtTools.runtimeScene.getTimerElapsedTimeInSecondsOrNaN");
   GetAllConditions()["TimerPaused"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.timerPaused");

@@ -167,7 +167,7 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["ObjectTimer"] // deprecated
       .SetFunctionName("timerElapsedTime")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["ObjectTimerComparison"]
+  objectConditions["CompareObjectTimer"]
       .SetFunctionName("getTimerElapsedTimeInSecondsOrNaN")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["ObjectTimerPaused"]

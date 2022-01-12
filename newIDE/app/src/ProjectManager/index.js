@@ -533,7 +533,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
-  _onEditEventsFunctionExtension = (
+  _onEditEventsFunctionExtensionOrSeeDetails = (
     extensionShortHeadersByName: { [string]: ExtensionShortHeader },
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
@@ -917,7 +917,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                         renamedItemName === name
                       }
                       onEdit={extensionShortHeadersByName =>
-                        this._onEditEventsFunctionExtension(
+                        this._onEditEventsFunctionExtensionOrSeeDetails(
                           extensionShortHeadersByName,
                           eventsFunctionsExtension,
                           name

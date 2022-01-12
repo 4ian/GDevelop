@@ -6,7 +6,7 @@ import { type Filters } from './Filters';
 export type Game = {
   id: string,
   gameName: string,
-  authorName: string,
+  authorName: string, // this corresponds to the publisher name
   createdAt: number,
   publicWebBuildId?: ?string,
 };

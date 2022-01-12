@@ -19,6 +19,7 @@ const operatorLabels = {
 const mapTypeToOperators: { [string]: Array<string> } = {
   unknown: Object.keys(operatorLabels),
   number: ['=', '<', '>', '<=', '>=', '!='],
+  time: ['<', '>', '<=', '>='],
   string: ['=', '!='],
   color: ['=', '!='],
 };

@@ -43,6 +43,7 @@ type Props = {|
   isInstalling: boolean,
   onClose: () => void,
   onInstall: () => Promise<void>,
+  onEdit?: () => void,
   alreadyInstalled: boolean,
 |};
 
@@ -51,6 +52,7 @@ const ExtensionInstallDialog = ({
   isInstalling,
   onClose,
   onInstall,
+  onEdit,
   alreadyInstalled,
 }: Props) => {
   const [error, setError] = React.useState<?Error>(null);
@@ -116,6 +118,17 @@ const ExtensionInstallDialog = ({
           />
         </LeftLoader>,
       ]}
+      secondaryActions={
+        onEdit
+          ? [
+              <FlatButton
+                key="edit-extension"
+                label={<Trans>Open in editor</Trans>}
+                onClick={onEdit}
+              />,
+            ]
+          : undefined
+      }
       cannotBeDismissed={false}
       open
       onRequestClose={onClose}

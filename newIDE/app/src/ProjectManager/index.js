@@ -1,19 +1,14 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from '../UI/List';
-import TextField, {
-  noMarginTextFieldInListItemTopOffset,
-} from '../UI/TextField';
 import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../UI/SearchBar';
-import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
@@ -32,7 +27,6 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
@@ -49,10 +43,8 @@ import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
 import {
@@ -60,9 +52,12 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { textEllispsisStyle } from '../UI/TextEllipsis';
 import InstalledExtensionDetails from './InstalledExtensionDetails';
-import EventFunctionExtensionItem from './EventFunctionExtensionItem';
+import {
+  Item,
+  ProjectStructureItem,
+  EventFunctionExtensionItem,
+} from './ProjectManagerItems';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -81,192 +76,7 @@ const styles = {
     overflowY: 'scroll',
     padding: 0,
   },
-  noIndentNestedList: {
-    padding: 0,
-  },
-  itemTextField: {
-    top: noMarginTextFieldInListItemTopOffset,
-  },
 };
-
-type ProjectStructureItemProps = {|
-  autoGenerateNestedIndicator?: boolean,
-  initiallyOpen?: boolean,
-  leftIcon?: React$Element<any>,
-  indentNestedItems?: boolean,
-  renderNestedItems: () => Array<React$Element<any> | null>,
-  primaryText: React.Node,
-  error?: ?Error,
-  onRefresh?: () => void,
-  open?: boolean,
-|};
-
-const ProjectStructureItem = (props: ProjectStructureItemProps) => (
-  <ThemeConsumer>
-    {muiTheme => {
-      const {
-        error,
-        leftIcon,
-        onRefresh,
-        indentNestedItems,
-        ...otherProps
-      } = props;
-      return (
-        <ListItem
-          style={{
-            backgroundColor: muiTheme.listItem.groupBackgroundColor,
-            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-          }}
-          nestedListStyle={
-            indentNestedItems ? undefined : styles.noIndentNestedList
-          }
-          {...otherProps}
-          leftIcon={error ? <WarningIcon /> : leftIcon}
-          displayReloadButton={!!error}
-          onReload={onRefresh}
-          reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
-        />
-      );
-    }}
-  </ThemeConsumer>
-);
-
-type ItemProps = {|
-  primaryText: string,
-  editingName: boolean,
-  leftIcon?: ?React.Node,
-  onEdit: () => void,
-  onDelete: () => void,
-  addLabel: string,
-  onAdd: () => void,
-  onRename: string => void,
-  onEditName: () => void,
-  onCopy: () => void,
-  onCut: () => void,
-  onPaste: () => void,
-  onDuplicate: () => void,
-  canPaste: () => boolean,
-  canMoveUp: boolean,
-  onMoveUp: () => void,
-  canMoveDown: boolean,
-  onMoveDown: () => void,
-  buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  style?: ?Object,
-|};
-
-export class Item extends React.Component<ItemProps, {||}> {
-  textField: ?Object;
-
-  componentDidUpdate(prevProps: ItemProps) {
-    if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(() => {
-        if (this.textField) this.textField.focus();
-      }, 100);
-    }
-  }
-
-  render() {
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-item-field"
-        margin="none"
-        ref={textField => (this.textField = textField)}
-        defaultValue={this.props.primaryText}
-        onBlur={e => this.props.onRename(e.currentTarget.value)}
-        onKeyPress={event => {
-          if (shouldValidate(event)) {
-            if (this.textField) this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.itemTextField}
-      />
-    ) : (
-      <div style={textEllispsisStyle} title={this.props.primaryText}>
-        {this.props.primaryText}
-      </div>
-    );
-
-    return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <I18n>
-            {({ i18n }) => (
-              <ListItem
-                style={{
-                  borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-                  ...this.props.style,
-                }}
-                primaryText={label}
-                leftIcon={this.props.leftIcon}
-                displayMenuButton
-                buildMenuTemplate={(i18n: I18nType) => [
-                  {
-                    label: i18n._(t`Edit`),
-                    click: () => this.props.onEdit(),
-                  },
-                  ...(this.props.buildExtraMenuTemplate
-                    ? this.props.buildExtraMenuTemplate(i18n)
-                    : []),
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Rename`),
-                    click: () => this.props.onEditName(),
-                  },
-                  {
-                    label: i18n._(t`Delete`),
-                    click: () => this.props.onDelete(),
-                  },
-                  {
-                    label: this.props.addLabel,
-                    visible: !!this.props.onAdd,
-                    click: () => this.props.onAdd(),
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Copy`),
-                    click: () => this.props.onCopy(),
-                  },
-                  {
-                    label: i18n._(t`Cut`),
-                    click: () => this.props.onCut(),
-                  },
-                  {
-                    label: i18n._(t`Paste`),
-                    enabled: this.props.canPaste(),
-                    click: () => this.props.onPaste(),
-                  },
-                  {
-                    label: i18n._(t`Duplicate`),
-                    click: () => this.props.onDuplicate(),
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Move up`),
-                    enabled: this.props.canMoveUp,
-                    click: () => this.props.onMoveUp(),
-                  },
-                  {
-                    label: i18n._(t`Move down`),
-                    enabled: this.props.canMoveDown,
-                    click: () => this.props.onMoveDown(),
-                  },
-                ]}
-                onClick={() => {
-                  // It's essential to discard clicks when editing the name,
-                  // to avoid weird opening of an editor (accompanied with a
-                  // closing of the project manager) when clicking on the text
-                  // field.
-                  if (!this.props.editingName) this.props.onEdit();
-                }}
-              />
-            )}
-          </I18n>
-        )}
-      </ThemeConsumer>
-    );
-  }
-}
 
 type Props = {|
   project: gdProject,

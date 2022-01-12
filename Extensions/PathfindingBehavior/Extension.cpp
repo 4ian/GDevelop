@@ -28,7 +28,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         extension.AddBehavior("PathfindingBehavior",
                               _("Pathfinding"),
                               "Pathfinding",
-                              _("With this behavior, the object will move "
+                              _("Move objects to a target "
                                 "while avoiding all objects that are "
                                 "flagged as obstacles."),
                               "",
@@ -610,7 +610,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         "PathfindingObstacleBehavior",
         _("Obstacle for pathfinding"),
         "PathfindingObstacle",
-        _("Flag the object as being an obstacle for pathfinding."),
+        _("Flag objects as being obstacles for pathfinding."),
         "",
         "CppPlatform/Extensions/pathfindingobstacleicon.png",
         "PathfindingObstacleBehavior",

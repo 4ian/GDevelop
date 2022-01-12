@@ -1,17 +1,18 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { Card, CardActions, CardHeader, Chip } from '@material-ui/core';
 import { format } from 'date-fns';
 import * as React from 'react';
-import FlatButton from '../UI/FlatButton';
 import { Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
 import TimelineIcon from '@material-ui/icons/Timeline';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
+import TuneIcon from '@material-ui/icons/Tune';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
+import FlatButton from '../UI/FlatButton';
 
 type Props = {|
   game: Game,
@@ -37,56 +38,68 @@ export const GameCard = ({
   };
 
   return (
-    <Card key={game.id}>
-      <CardHeader
-        title={game.gameName}
-        subheader={
-          <Line alignItems="center" noMargin>
-            <Trans>
-              Registered on{' '}
-              {format(game.createdAt * 1000 /* TODO */, 'yyyy-MM-dd')}
-            </Trans>
-            {isCurrentGame && (
-              <React.Fragment>
-                <Spacer />
-                <Chip
-                  size="small"
-                  label={<Trans>Game currently edited</Trans>}
+    <I18n>
+      {({ i18n }) => (
+        <Card key={game.id}>
+          <CardHeader
+            title={game.gameName}
+            subheader={
+              <Line alignItems="center" noMargin>
+                <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
+                {isCurrentGame && (
+                  <>
+                    <Spacer />
+                    <Chip
+                      size="small"
+                      label={<Trans>Currently edited</Trans>}
+                      color="primary"
+                    />
+                  </>
+                )}
+                {game.publicWebBuildId && (
+                  <>
+                    <Spacer />
+                    <Chip
+                      size="small"
+                      label={<Trans>Published on Liluo</Trans>}
+                    />
+                  </>
+                )}
+              </Line>
+            }
+          />
+          <CardActions>
+            <ResponsiveLineStackLayout
+              expand
+              noMargin
+              justifyContent="flex-end"
+            >
+              {game.publicWebBuildId && (
+                <RaisedButton
+                  label={<Trans>Open</Trans>}
+                  onClick={openGameUrl}
+                  primary
                 />
-              </React.Fragment>
-            )}
-          </Line>
-        }
-      />
-      <CardActions>
-        <ResponsiveLineStackLayout expand noMargin justifyContent="flex-end">
-          <FlatButton
-            label={<Trans>See details</Trans>}
-            onClick={onOpenDetails}
-          />
-          {game.publicWebBuildId && (
-            <RaisedButton label={<Trans>Open</Trans>} onClick={openGameUrl} />
-          )}
-          <RaisedButton
-            primary
-            icon={<PlaylistPlayIcon />}
-            label={<Trans>Builds</Trans>}
-            onClick={onOpenBuilds}
-          />
-          <RaisedButton
-            primary
-            icon={<TimelineIcon />}
-            label={<Trans>Analytics</Trans>}
-            onClick={onOpenAnalytics}
-          />
-          <RaisedButton
-            primary
-            icon={<MonetizationOnIcon />}
-            label={<Trans>Monetization</Trans>}
-            onClick={onOpenMonetization}
-          />
-        </ResponsiveLineStackLayout>
-      </CardActions>
-    </Card>
+              )}
+              <FlatButton
+                icon={<TuneIcon />}
+                label={<Trans>Details</Trans>}
+                onClick={onOpenDetails}
+              />
+              <FlatButton
+                icon={<PlaylistPlayIcon />}
+                label={<Trans>Builds</Trans>}
+                onClick={onOpenBuilds}
+              />
+              <FlatButton
+                icon={<TimelineIcon />}
+                label={<Trans>Analytics</Trans>}
+                onClick={onOpenAnalytics}
+              />
+            </ResponsiveLineStackLayout>
+          </CardActions>
+        </Card>
+      )}
+    </I18n>
   );
 };

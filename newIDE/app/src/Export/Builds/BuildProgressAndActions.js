@@ -210,14 +210,14 @@ export default ({
             <Line expand justifyContent="flex-end">
               {game && !!build.s3Key && !isBuildPublished && (
                 <RaisedButton
-                  label={<Trans>Publish this build</Trans>}
+                  label={<Trans>Publish this build on Liluo</Trans>}
                   onClick={() => onUpdatePublicBuild(build.id)}
                   disabled={gameUpdating}
                 />
               )}
               {game && !!build.s3Key && isBuildPublished && (
                 <FlatButton
-                  label={<Trans>Unpublish this build</Trans>}
+                  label={<Trans>Unpublish this build from Liluo</Trans>}
                   onClick={() => onUpdatePublicBuild(null)}
                   disabled={gameUpdating}
                 />

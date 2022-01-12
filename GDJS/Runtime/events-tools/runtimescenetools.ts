@@ -47,7 +47,7 @@ namespace gdjs {
        *
        * @deprecated prefer using getTimerElapsedTimeInSecondsOrNaN
        *
-       * @param runtimeScene
+       * @param runtimeScene The scene owning the timer
        * @param timeInSeconds The time value to check in seconds
        * @param timerName The timer name
        * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
@@ -109,8 +109,8 @@ namespace gdjs {
        * This is used by expressions to return 0 when a timer doesn't exist,
        * because numeric expressions must always return a number.
        *
-       * @param runtimeScene
-       * @param timerName
+       * @param runtimeScene The scene owning the timer.
+       * @param timerName The timer name.
        * @returns The timer elapsed time in seconds or 0 if the timer doesn't exist.
        */
       export const getTimerElapsedTimeInSeconds = function (
@@ -128,8 +128,8 @@ namespace gdjs {
        * This is used by conditions to return false when a timer doesn't exist,
        * no matter the relational operator.
        *
-       * @param runtimeScene
-       * @param timerName
+       * @param runtimeScene The scene owning the timer.
+       * @param timerName The timer name.
        * @returns The timer elapsed time in seconds or NaN if the timer doesn't exist.
        */
       export const getTimerElapsedTimeInSecondsOrNaN = function (

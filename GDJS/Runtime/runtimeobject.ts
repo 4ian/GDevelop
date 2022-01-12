@@ -1700,13 +1700,13 @@ namespace gdjs {
     }
 
     /**
-     * Test a timer elapsed time, if the timer doesn't exist it is created.
+     * Compare a timer elapsed time. If the timer does not exist, it is created.
      *
-     * @deprecated prefer using getTimerElapsedTimeInSecondsOrNaN
+     * @deprecated prefer using `getTimerElapsedTimeInSecondsOrNaN`.
      *
-     * @param timerName The timer name
-     * @param timeInSeconds The time value to check in seconds
-     * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
+     * @param timerName The timer name.
+     * @param timeInSeconds The time value to check in seconds.
+     * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise.
      */
     timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
@@ -1717,9 +1717,9 @@ namespace gdjs {
     }
 
     /**
-     * Test a if a timer is paused
-     * @param timerName The timer name
-     * @return True if the timer exists and is paused, false otherwise
+     * Test a if a timer is paused.
+     * @param timerName The timer name.
+     * @return True if the timer exists and is paused, false otherwise.
      */
     timerPaused(timerName: string): boolean {
       if (!this._timers.containsKey(timerName)) {
@@ -1729,8 +1729,8 @@ namespace gdjs {
     }
 
     /**
-     * Reset a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Reset a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     resetTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1740,8 +1740,8 @@ namespace gdjs {
     }
 
     /**
-     * Pause a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Pause a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1751,8 +1751,8 @@ namespace gdjs {
     }
 
     /**
-     * Unpause a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Unpause a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1763,7 +1763,7 @@ namespace gdjs {
 
     /**
      * Remove a timer
-     * @param timerName The timer name
+     * @param timerName The timer name.
      */
     removeTimer(timerName: string): void {
       if (this._timers.containsKey(timerName)) {
@@ -1774,11 +1774,11 @@ namespace gdjs {
     /**
      * Get a timer elapsed time.
      *
-     * This is used by the expression to return 0 when a timer doesn't exist
-     * because numeric expressions must return a number.
+     * This is used by expressions to return 0 when a timer doesn't exist
+     * because numeric expressions must always return a number.
      *
-     * @param timerName The timer name
-     * @return The timer elapsed time in seconds, 0 if the timer doesn't exist
+     * @param timerName The timer name.
+     * @return The timer elapsed time in seconds, 0 if the timer doesn't exist.
      */
     getTimerElapsedTimeInSeconds(timerName: string): float {
       if (!this._timers.containsKey(timerName)) {
@@ -1790,11 +1790,11 @@ namespace gdjs {
     /**
      * Get a timer elapsed time.
      *
-     * This is used by the condition to return false when a timer doesn't exist
+     * This is used by conditions to return false when a timer doesn't exist,
      * no matter the relational operator.
      *
-     * @param timerName The timer name
-     * @return The timer elapsed time in seconds, NaN if the timer doesn't exist
+     * @param timerName The timer name.
+     * @return The timer elapsed time in seconds, NaN if the timer doesn't exist.
      */
     getTimerElapsedTimeInSecondsOrNaN(timerName: string): float {
       if (!this._timers.containsKey(timerName)) {

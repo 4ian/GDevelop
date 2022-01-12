@@ -10,12 +10,10 @@ import {
   updateGame,
   deleteGame,
 } from '../Utils/GDevelopServices/Game';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import Dialog from '../UI/Dialog';
 import { Tab, Tabs } from '../UI/Tabs';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout } from '../UI/Layout';
-import EmptyMessage from '../UI/EmptyMessage';
 import Text from '../UI/Text';
 import {
   type GameMetrics,
@@ -48,14 +46,6 @@ type Props = {|
   onGameUpdated: (updatedGame: Game) => void,
   onGameDeleted: () => void,
 |};
-
-const styles = {
-  bigIcon: {
-    width: 48,
-    height: 48,
-    marginTop: 8,
-  },
-};
 
 /** Check if the project has changes not refleted in the registered online game. */
 const areProjectAndGameDiffering = (project: ?gdProject, game: Game) => {
@@ -186,14 +176,13 @@ export const GameDetailsDialog = ({
         <Tab label={<Trans>Details</Trans>} value="details" />
         <Tab label={<Trans>Builds</Trans>} value="builds" />
         <Tab label={<Trans>Analytics</Trans>} value="analytics" />
-        <Tab label={<Trans>Monetization</Trans>} value="monetization" />
       </Tabs>
       <Line>
         {currentTab === 'details' ? (
           <ColumnStackLayout expand>
             <Text>
               <Trans>
-                Registered on{' '}
+                Created on{' '}
                 {format(game.createdAt * 1000 /* TODO */, 'yyyy-MM-dd')}.
               </Trans>
             </Text>
@@ -209,7 +198,7 @@ export const GameDetailsDialog = ({
               disabled
               value={game.authorName}
               onChange={() => {}}
-              floatingLabelText={<Trans>Author name</Trans>}
+              floatingLabelText={<Trans>Publisher name</Trans>}
             />
             <Line noMargin justifyContent="space-between">
               <FlatButton
@@ -382,17 +371,6 @@ export const GameDetailsDialog = ({
               </Table>
             </ColumnStackLayout>
           )
-        ) : null}
-        {currentTab === 'monetization' ? (
-          <ColumnStackLayout expand>
-            <Line noMargin justifyContent="center">
-              <MonetizationOnIcon color="disabled" style={styles.bigIcon} />
-            </Line>
-            <EmptyMessage>
-              Services to help monetization of your game will be added later in
-              this panel.
-            </EmptyMessage>
-          </ColumnStackLayout>
         ) : null}
       </Line>
     </Dialog>

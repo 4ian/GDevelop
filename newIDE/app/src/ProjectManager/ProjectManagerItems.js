@@ -176,7 +176,7 @@ export const Item = ({
                   click: () => onDelete(),
                 },
                 {
-                  label: addLabel,
+                  label: i18n._(addLabel),
                   visible: !!onAdd,
                   click: () => onAdd(),
                 },
@@ -284,7 +284,7 @@ export const EventFunctionExtensionItem = ({
       editingName={isEditingName}
       onEdit={() => onEdit(extensionShortHeadersByName)}
       onDelete={onDelete}
-      addLabel={'Add a New Extension'} // TODO: Translate this
+      addLabel={t`Add a New Extension`}
       onAdd={onAdd}
       onRename={newName => {
         onRename(newName);

@@ -715,7 +715,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       }
                       onEdit={() => this.props.onOpenLayout(name)}
                       onDelete={() => this.props.onDeleteLayout(layout)}
-                      addLabel={'Add a New Scene'}
+                      addLabel={t`Add a New Scene`}
                       onAdd={() => this._addLayout(i)}
                       onRename={newName => {
                         this.props.onRenameLayout(name, newName);
@@ -786,7 +786,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onDelete={() =>
                         this.props.onDeleteExternalEvents(externalEvents)
                       }
-                      addLabel={'Add New External Events'}
+                      addLabel={t`Add New External Events`}
                       onAdd={() => this._addExternalEvents(i)}
                       onRename={newName => {
                         this.props.onRenameExternalEvents(name, newName);
@@ -851,7 +851,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onDelete={() =>
                         this.props.onDeleteExternalLayout(externalLayout)
                       }
-                      addLabel={'Add a New External Layout'}
+                      addLabel={t`Add a New External Layout`}
                       onAdd={() => this._addExternalLayout(i)}
                       onRename={newName => {
                         this.props.onRenameExternalLayout(name, newName);

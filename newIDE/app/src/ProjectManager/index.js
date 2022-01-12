@@ -545,6 +545,13 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
     const originIdentifier = eventsFunctionsExtension.getOriginIdentifier();
     const extensionShortHeader = extensionShortHeadersByName[originIdentifier];
+    if (!extensionShortHeader) {
+      console.warn(
+        `This extension was downloaded from the store but its reference ${originIdentifier} couldn't be found in the store. Opening the extension in the editor...`
+      );
+      this.props.onOpenEventsFunctionsExtension(name);
+      return;
+    }
     this.setState({
       openedExtensionShortHeader: extensionShortHeader,
       openedExtensionName: name,

@@ -34,7 +34,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
         }
 
         const hasParentCategoryTag = tags.some(tag => tag === parentNode.name);
-        if (!hasParentCategoryTag) return false; // Asset is not in the the parent(s) of the selected category
+        if (!hasParentCategoryTag) return false; // Asset is not in the parent(s) of the selected category
       }
 
       return true;

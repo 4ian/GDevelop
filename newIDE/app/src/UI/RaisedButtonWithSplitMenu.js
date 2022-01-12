@@ -29,7 +29,7 @@ const styles = {
 
 /**
  * A raised button based on Material-UI button, that has a menu displayed
- * when the the dropdown arrow is clicked.
+ * when the dropdown arrow is clicked.
  */
 const RaisedButtonWithSplitMenu = (props: Props) => {
   const { buildMenuTemplate, onClick, label, primary, icon, disabled } = props;

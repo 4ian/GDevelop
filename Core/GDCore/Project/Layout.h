@@ -217,7 +217,7 @@ class GD_CORE_API Layout : public ObjectsContainer {
   /**
    * Must add a new the layer constructed from the layout passed as parameter.
    * \note No pointer or reference must be kept on the layer passed as
-   * parameter. \param theLayer The the layer that must be copied and inserted
+   * parameter. \param theLayer the layer that must be copied and inserted
    * into the project \param position Insertion position. Even if the position
    * is invalid, the layer must be inserted at the end of the layers list.
    */

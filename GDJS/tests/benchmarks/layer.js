@@ -24,17 +24,55 @@ describe('gdjs.Layer', function() {
       },
       runtimeScene
     );
-    layer.setCameraX(100, 0);
-    layer.setCameraY(200, 0);
-    layer.setCameraRotation(90, 0);
 
-    const benchmarkSuite = makeBenchmarkSuite();
+    // greater values can be set to benchmark a case
+    // where a lot of mouse conditions are used in events.
+    const evaluationPerFrame = 8;
+
+    const benchmarkSuite = makeBenchmarkSuite({
+      benchmarksCount: 50,
+      iterationsCount: 100000,
+    });
     benchmarkSuite
-      .add('convertCoords', () => {
-        layer.convertCoords(350, 450, 0);
+      .add('convertCoords translation', (iteration) => {
+        // new frame, new translation
+        layer.setCameraX(100 + iteration, 0);
+        layer.setCameraY(200 + iteration, 0);
+        layer.setCameraRotation(0, 0);
+        // some mouse conditions
+        for (let evaluationIndex = 0; evaluationIndex < evaluationPerFrame; evaluationIndex++) {
+          layer.convertCoords(350 + evaluationIndex, 450 + evaluationIndex, 0);
+        }
       })
-      .add('convertInverseCoords', () => {
-        layer.convertInverseCoords(350, 450, 0);
+      .add('convertInverseCoords translation', (iteration) => {
+        // new frame, new translation
+        layer.setCameraX(100 + iteration, 0);
+        layer.setCameraY(200 + iteration, 0);
+        layer.setCameraRotation(0, 0);
+        // some mouse conditions
+        for (let evaluationIndex = 0; evaluationIndex < evaluationPerFrame; evaluationIndex++) {
+          layer.convertInverseCoords(350 + evaluationIndex, 450 + evaluationIndex, 0);
+        }
+      })
+      .add('convertCoords rotation', (iteration) => {
+        // new frame, new rotation
+        layer.setCameraX(100, 0);
+        layer.setCameraY(200, 0);
+        layer.setCameraRotation(1.1 * iteration, 0);
+        // some mouse conditions
+        for (let evaluationIndex = 0; evaluationIndex < evaluationPerFrame; evaluationIndex++) {
+          layer.convertCoords(350 + evaluationIndex, 450 + evaluationIndex, 0);
+        }
+      })
+      .add('convertInverseCoords rotation', (iteration) => {
+        // new frame, new rotation
+        layer.setCameraX(100, 0);
+        layer.setCameraY(200, 0);
+        layer.setCameraRotation(1.1 * iteration, 0);
+        // some mouse conditions
+        for (let evaluationIndex = 0; evaluationIndex < evaluationPerFrame; evaluationIndex++) {
+          layer.convertInverseCoords(350 + evaluationIndex, 450 + evaluationIndex, 0);
+        }
       });
 
     console.log(benchmarkSuite.run());

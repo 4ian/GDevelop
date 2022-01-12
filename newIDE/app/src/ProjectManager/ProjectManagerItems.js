@@ -47,10 +47,20 @@ export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
         leftIcon,
         onRefresh,
         indentNestedItems,
-        ...otherProps
+        autoGenerateNestedIndicator,
+        initiallyOpen,
+        open,
+        primaryText,
+        renderNestedItems,
       } = props;
       return (
         <ListItem
+          open={open}
+          autoGenerateNestedIndicator={autoGenerateNestedIndicator}
+          initiallyOpen={initiallyOpen}
+          primaryText={primaryText}
+          renderNestedItems={renderNestedItems}
+          onReload={onRefresh}
           style={{
             backgroundColor: muiTheme.listItem.groupBackgroundColor,
             borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
@@ -58,10 +68,8 @@ export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
           nestedListStyle={
             indentNestedItems ? undefined : styles.noIndentNestedList
           }
-          {...otherProps}
           leftIcon={error ? <WarningIcon /> : leftIcon}
           displayReloadButton={!!error}
-          onReload={onRefresh}
           reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
         />
       );

@@ -1,19 +1,14 @@
 // @flow
 import { Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
 import { List, ListItem } from '../UI/List';
-import TextField, {
-  noMarginTextFieldInListItemTopOffset,
-} from '../UI/TextField';
 import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../UI/SearchBar';
-import WarningIcon from '@material-ui/icons/Warning';
 import ListIcon from '../UI/ListIcon';
 import { AddListItem, SearchListItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
@@ -32,7 +27,6 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
@@ -49,19 +43,21 @@ import ScenePropertiesDialog from '../SceneEditor/ScenePropertiesDialog';
 import SceneVariablesDialog from '../SceneEditor/SceneVariablesDialog';
 import { isExtensionNameTaken } from './EventFunctionExtensionNameVerifier';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import ProjectManagerCommands from './ProjectManagerCommands';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
-import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
-import { IconContainer } from '../UI/IconContainer';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { textEllispsisStyle } from '../UI/TextEllipsis';
+import InstalledExtensionDetails from './InstalledExtensionDetails';
+import {
+  Item,
+  ProjectStructureItem,
+  EventFunctionExtensionItem,
+} from './ProjectManagerItems';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -80,192 +76,7 @@ const styles = {
     overflowY: 'scroll',
     padding: 0,
   },
-  noIndentNestedList: {
-    padding: 0,
-  },
-  itemTextField: {
-    top: noMarginTextFieldInListItemTopOffset,
-  },
 };
-
-type ProjectStructureItemProps = {|
-  autoGenerateNestedIndicator?: boolean,
-  initiallyOpen?: boolean,
-  leftIcon?: React$Element<any>,
-  indentNestedItems?: boolean,
-  renderNestedItems: () => Array<React$Element<any> | null>,
-  primaryText: React.Node,
-  error?: ?Error,
-  onRefresh?: () => void,
-  open?: boolean,
-|};
-
-const ProjectStructureItem = (props: ProjectStructureItemProps) => (
-  <ThemeConsumer>
-    {muiTheme => {
-      const {
-        error,
-        leftIcon,
-        onRefresh,
-        indentNestedItems,
-        ...otherProps
-      } = props;
-      return (
-        <ListItem
-          style={{
-            backgroundColor: muiTheme.listItem.groupBackgroundColor,
-            borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-          }}
-          nestedListStyle={
-            indentNestedItems ? undefined : styles.noIndentNestedList
-          }
-          {...otherProps}
-          leftIcon={error ? <WarningIcon /> : leftIcon}
-          displayReloadButton={!!error}
-          onReload={onRefresh}
-          reloadButtonTooltip={`An error has occured in functions. Click to reload them.`}
-        />
-      );
-    }}
-  </ThemeConsumer>
-);
-
-type ItemProps = {|
-  primaryText: string,
-  editingName: boolean,
-  leftIcon?: ?React.Node,
-  onEdit: () => void,
-  onDelete: () => void,
-  addLabel: string,
-  onAdd: () => void,
-  onRename: string => void,
-  onEditName: () => void,
-  onCopy: () => void,
-  onCut: () => void,
-  onPaste: () => void,
-  onDuplicate: () => void,
-  canPaste: () => boolean,
-  canMoveUp: boolean,
-  onMoveUp: () => void,
-  canMoveDown: boolean,
-  onMoveDown: () => void,
-  buildExtraMenuTemplate?: (i18n: I18nType) => Array<MenuItemTemplate>,
-  style?: ?Object,
-|};
-
-class Item extends React.Component<ItemProps, {||}> {
-  textField: ?Object;
-
-  componentDidUpdate(prevProps) {
-    if (!prevProps.editingName && this.props.editingName) {
-      setTimeout(() => {
-        if (this.textField) this.textField.focus();
-      }, 100);
-    }
-  }
-
-  render() {
-    const label = this.props.editingName ? (
-      <TextField
-        id="rename-item-field"
-        margin="none"
-        ref={textField => (this.textField = textField)}
-        defaultValue={this.props.primaryText}
-        onBlur={e => this.props.onRename(e.currentTarget.value)}
-        onKeyPress={event => {
-          if (shouldValidate(event)) {
-            if (this.textField) this.textField.blur();
-          }
-        }}
-        fullWidth
-        style={styles.itemTextField}
-      />
-    ) : (
-      <div style={textEllispsisStyle} title={this.props.primaryText}>
-        {this.props.primaryText}
-      </div>
-    );
-
-    return (
-      <ThemeConsumer>
-        {muiTheme => (
-          <I18n>
-            {({ i18n }) => (
-              <ListItem
-                style={{
-                  borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-                  ...this.props.style,
-                }}
-                primaryText={label}
-                leftIcon={this.props.leftIcon}
-                displayMenuButton
-                buildMenuTemplate={(i18n: I18nType) => [
-                  {
-                    label: i18n._(t`Edit`),
-                    click: () => this.props.onEdit(),
-                  },
-                  ...(this.props.buildExtraMenuTemplate
-                    ? this.props.buildExtraMenuTemplate(i18n)
-                    : []),
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Rename`),
-                    click: () => this.props.onEditName(),
-                  },
-                  {
-                    label: i18n._(t`Delete`),
-                    click: () => this.props.onDelete(),
-                  },
-                  {
-                    label: this.props.addLabel,
-                    visible: !!this.props.onAdd,
-                    click: () => this.props.onAdd(),
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Copy`),
-                    click: () => this.props.onCopy(),
-                  },
-                  {
-                    label: i18n._(t`Cut`),
-                    click: () => this.props.onCut(),
-                  },
-                  {
-                    label: i18n._(t`Paste`),
-                    enabled: this.props.canPaste(),
-                    click: () => this.props.onPaste(),
-                  },
-                  {
-                    label: i18n._(t`Duplicate`),
-                    click: () => this.props.onDuplicate(),
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Move up`),
-                    enabled: this.props.canMoveUp,
-                    click: () => this.props.onMoveUp(),
-                  },
-                  {
-                    label: i18n._(t`Move down`),
-                    enabled: this.props.canMoveDown,
-                    click: () => this.props.onMoveDown(),
-                  },
-                ]}
-                onClick={() => {
-                  // It's essential to discard clicks when editing the name,
-                  // to avoid weird opening of an editor (accompanied with a
-                  // closing of the project manager) when clicking on the text
-                  // field.
-                  if (!this.props.editingName) this.props.onEdit();
-                }}
-              />
-            )}
-          </I18n>
-        )}
-      </ThemeConsumer>
-    );
-  }
-}
 
 type Props = {|
   project: gdProject,
@@ -318,6 +129,9 @@ type State = {|
   projectPropertiesDialogInitialTab: 'properties' | 'loading-screen',
   projectVariablesEditorOpen: boolean,
   extensionsSearchDialogOpen: boolean,
+  openedExtensionShortHeader: ?ExtensionShortHeader,
+  openedExtensionName: ?string,
+  isInstallingExtension: boolean,
   layoutPropertiesDialogOpen: boolean,
   layoutVariablesDialogOpen: boolean,
 |};
@@ -335,6 +149,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogInitialTab: 'properties',
     projectVariablesEditorOpen: false,
     extensionsSearchDialogOpen: false,
+    openedExtensionShortHeader: null,
+    openedExtensionName: null,
+    isInstallingExtension: false,
     layoutPropertiesDialogOpen: false,
     layoutVariablesDialogOpen: false,
   };
@@ -346,7 +163,9 @@ export default class ProjectManager extends React.Component<Props, State> {
       nextState.projectVariablesEditorOpen !==
         this.state.projectVariablesEditorOpen ||
       nextState.extensionsSearchDialogOpen !==
-        this.state.extensionsSearchDialogOpen
+        this.state.extensionsSearchDialogOpen ||
+      nextState.openedExtensionShortHeader !==
+        this.state.openedExtensionShortHeader
     )
       return true;
 
@@ -714,6 +533,33 @@ export default class ProjectManager extends React.Component<Props, State> {
     this._onProjectItemModified();
   };
 
+  _onEditEventsFunctionExtensionOrSeeDetails = (
+    extensionShortHeadersByName: { [string]: ExtensionShortHeader },
+    eventsFunctionsExtension: gdEventsFunctionsExtension,
+    name: string
+  ) => {
+    // If the extension is coming from the store, open its details.
+    // If that's not the case, or if it cannot be found in the store, edit it directly.
+    const originName = eventsFunctionsExtension.getOriginName();
+    if (originName !== 'gdevelop-extension-store') {
+      this.props.onOpenEventsFunctionsExtension(name);
+      return;
+    }
+    const originIdentifier = eventsFunctionsExtension.getOriginIdentifier();
+    const extensionShortHeader = extensionShortHeadersByName[originIdentifier];
+    if (!extensionShortHeader) {
+      console.warn(
+        `This extension was downloaded from the store but its reference ${originIdentifier} couldn't be found in the store. Opening the extension in the editor...`
+      );
+      this.props.onOpenEventsFunctionsExtension(name);
+      return;
+    }
+    this.setState({
+      openedExtensionShortHeader: extensionShortHeader,
+      openedExtensionName: name,
+    });
+  };
+
   _renderMenu() {
     // If there is already a main menu (as the native one made with
     // Electron), don't show it in the Project Manager.
@@ -789,7 +635,13 @@ export default class ProjectManager extends React.Component<Props, State> {
       onReloadEventsFunctionsExtensions,
       onInstallExtension,
     } = this.props;
-    const { renamedItemKind, renamedItemName, searchText } = this.state;
+    const {
+      renamedItemKind,
+      renamedItemName,
+      searchText,
+      openedExtensionShortHeader,
+      openedExtensionName,
+    } = this.state;
 
     const forceOpen = searchText !== '' ? true : undefined;
 
@@ -837,15 +689,13 @@ export default class ProjectManager extends React.Component<Props, State> {
                 key="icons"
                 primaryText={<Trans>Icons</Trans>}
                 leftIcon={<PhotoLibrary />}
-                onClick={() => this.props.onOpenPlatformSpecificAssets()}
+                onClick={this.props.onOpenPlatformSpecificAssets}
               />,
               <ListItem
                 key="resources"
                 primaryText={<Trans>Resources</Trans>}
                 leftIcon={<ArtTrack />}
-                onClick={() => {
-                  this.props.onOpenResources();
-                }}
+                onClick={this.props.onOpenResources}
               />,
             ]}
           />
@@ -874,7 +724,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       }
                       onEdit={() => this.props.onOpenLayout(name)}
                       onDelete={() => this.props.onDeleteLayout(layout)}
-                      addLabel={'Add a New Scene'}
+                      addLabel={t`Add a New Scene`}
                       onAdd={() => this._addLayout(i)}
                       onRename={newName => {
                         this.props.onRenameLayout(name, newName);
@@ -945,7 +795,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onDelete={() =>
                         this.props.onDeleteExternalEvents(externalEvents)
                       }
-                      addLabel={'Add New External Events'}
+                      addLabel={t`Add New External Events`}
                       onAdd={() => this._addExternalEvents(i)}
                       onRename={newName => {
                         this.props.onRenameExternalEvents(name, newName);
@@ -1010,7 +860,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                       onDelete={() =>
                         this.props.onDeleteExternalLayout(externalLayout)
                       }
-                      addLabel={'Add a New External Layout'}
+                      addLabel={t`Add a New External Layout`}
                       onAdd={() => this._addExternalLayout(i)}
                       onRename={newName => {
                         this.props.onRenameExternalLayout(name, newName);
@@ -1067,33 +917,26 @@ export default class ProjectManager extends React.Component<Props, State> {
               )
                 .map((eventsFunctionsExtension, i) => {
                   const name = eventsFunctionsExtension.getName();
-                  const iconUrl = eventsFunctionsExtension.getIconUrl();
                   return (
-                    <Item
+                    <EventFunctionExtensionItem
                       key={i}
-                      leftIcon={
-                        iconUrl ? (
-                          <IconContainer
-                            size={24}
-                            alt={eventsFunctionsExtension.getFullName()}
-                            src={iconUrl}
-                          />
-                        ) : null
-                      }
-                      primaryText={name}
-                      editingName={
+                      eventsFunctionsExtension={eventsFunctionsExtension}
+                      isEditingName={
                         renamedItemKind === 'events-functions-extension' &&
                         renamedItemName === name
                       }
-                      onEdit={() =>
-                        this.props.onOpenEventsFunctionsExtension(name)
+                      onEdit={extensionShortHeadersByName =>
+                        this._onEditEventsFunctionExtensionOrSeeDetails(
+                          extensionShortHeadersByName,
+                          eventsFunctionsExtension,
+                          name
+                        )
                       }
                       onDelete={() =>
                         this.props.onDeleteEventsFunctionsExtension(
                           eventsFunctionsExtension
                         )
                       }
-                      addLabel={'Add a New Extension'}
                       onAdd={() => this._addEventsFunctionsExtension(i)}
                       onRename={newName => {
                         this.props.onRenameEventsFunctionsExtension(
@@ -1198,7 +1041,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         )}
         {this.state.projectPropertiesDialogOpen && (
           <ProjectPropertiesDialog
-            open={this.state.projectPropertiesDialogOpen}
+            open
             initialTab={this.state.projectPropertiesDialogInitialTab}
             project={project}
             onClose={() =>
@@ -1251,6 +1094,23 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ExtensionsSearchDialog
             project={project}
             onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
+            onInstallExtension={onInstallExtension}
+          />
+        )}
+        {openedExtensionShortHeader && openedExtensionName && (
+          <InstalledExtensionDetails
+            project={project}
+            onClose={() =>
+              this.setState({
+                openedExtensionShortHeader: null,
+                openedExtensionName: null,
+              })
+            }
+            onOpenEventsFunctionsExtension={
+              this.props.onOpenEventsFunctionsExtension
+            }
+            extensionShortHeader={openedExtensionShortHeader}
+            extensionName={openedExtensionName}
             onInstallExtension={onInstallExtension}
           />
         )}

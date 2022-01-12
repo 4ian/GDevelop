@@ -163,51 +163,51 @@ export const Item = ({
               buildMenuTemplate={(i18n: I18nType) => [
                 {
                   label: i18n._(t`Edit`),
-                  click: () => onEdit(),
+                  click: onEdit,
                 },
                 ...(buildExtraMenuTemplate ? buildExtraMenuTemplate(i18n) : []),
                 { type: 'separator' },
                 {
                   label: i18n._(t`Rename`),
-                  click: () => onEditName(),
+                  click: onEditName,
                 },
                 {
                   label: i18n._(t`Delete`),
-                  click: () => onDelete(),
+                  click: onDelete,
                 },
                 {
                   label: i18n._(addLabel),
                   visible: !!onAdd,
-                  click: () => onAdd(),
+                  click: onAdd,
                 },
                 { type: 'separator' },
                 {
                   label: i18n._(t`Copy`),
-                  click: () => onCopy(),
+                  click: onCopy,
                 },
                 {
                   label: i18n._(t`Cut`),
-                  click: () => onCut(),
+                  click: onCut,
                 },
                 {
                   label: i18n._(t`Paste`),
                   enabled: canPaste(),
-                  click: () => onPaste(),
+                  click: onPaste,
                 },
                 {
                   label: i18n._(t`Duplicate`),
-                  click: () => onDuplicate(),
+                  click: onDuplicate,
                 },
                 { type: 'separator' },
                 {
                   label: i18n._(t`Move up`),
                   enabled: canMoveUp,
-                  click: () => onMoveUp(),
+                  click: onMoveUp,
                 },
                 {
                   label: i18n._(t`Move down`),
                   enabled: canMoveDown,
-                  click: () => onMoveDown(),
+                  click: onMoveDown,
                 },
               ]}
               onClick={() => {
@@ -286,9 +286,7 @@ export const EventFunctionExtensionItem = ({
       onDelete={onDelete}
       addLabel={t`Add a New Extension`}
       onAdd={onAdd}
-      onRename={newName => {
-        onRename(newName);
-      }}
+      onRename={onRename}
       onEditName={onEditName}
       onCopy={onCopy}
       onCut={onCut}

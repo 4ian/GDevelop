@@ -78,7 +78,7 @@ module.exports = {
         'SaveStringToFileSync',
         _('Save a text into a file'),
         _(
-          'Save a text into a file. Only use this on small files to avoid any lag or freeze during the the game execution.'
+          'Save a text into a file. Only use this on small files to avoid any lag or freeze during the game execution.'
         ),
         _('Save _PARAM0_ into file _PARAM1_'),
         _('Filesystem/Windows, Linux, MacOS'),
@@ -130,7 +130,7 @@ module.exports = {
         'SaveVariableToJSONFileSync',
         _('Save a scene variable into a JSON file'),
         _(
-          'Save a scene variable (including, for structure, all the children) into a file in JSON format. Only use this on small files to avoid any lag or freeze during the the game execution.'
+          'Save a scene variable (including, for structure, all the children) into a file in JSON format. Only use this on small files to avoid any lag or freeze during the game execution.'
         ),
         _('Save scene variable _PARAM0_ into file _PARAM1_ as JSON'),
         _('Filesystem/Windows, Linux, MacOS'),
@@ -208,7 +208,7 @@ module.exports = {
         'LoadStringFromFileSync',
         _('Load a text from a file'),
         _(
-          'Load a text from a file. Only use this on small files to avoid any lag or freeze during the the game execution.'
+          'Load a text from a file. Only use this on small files to avoid any lag or freeze during the game execution.'
         ),
         _('Load text from _PARAM1_ into scene variable _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS'),
@@ -234,7 +234,7 @@ module.exports = {
         'LoadVariableFromJSONFileSync',
         _('Load a scene variable from a JSON file'),
         _(
-          'Load a JSON formatted text from a file and convert it to a scene variable (potentially a structure variable with children). Only use this on small files to avoid any lag or freeze during the the game execution.'
+          'Load a JSON formatted text from a file and convert it to a scene variable (potentially a structure variable with children). Only use this on small files to avoid any lag or freeze during the game execution.'
         ),
         _('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS'),

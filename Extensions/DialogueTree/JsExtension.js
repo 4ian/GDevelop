@@ -541,7 +541,7 @@ module.exports = {
         'IsDialogueLineType',
         _('Dialogue line type'),
         _(
-          'Check if the the current dialogue line line is one of the three existing types. Use this to set what logic is executed for each type.\nThe three types are as follows:\n- text: when displaying dialogue text.\n- options: when displaying [[branching/options]] for dialogue choices.\n-command: when <<commands>> are triggered by the dialogue data.'
+          'Check if the current dialogue line line is one of the three existing types. Use this to set what logic is executed for each type.\nThe three types are as follows:\n- text: when displaying dialogue text.\n- options: when displaying [[branching/options]] for dialogue choices.\n-command: when <<commands>> are triggered by the dialogue data.'
         ),
         _('The dialogue line is _PARAM0_'),
         _('Dialogue Tree (experimental)'),

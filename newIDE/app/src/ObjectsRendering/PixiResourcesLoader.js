@@ -228,7 +228,7 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Get the the data from a bitmap font file (fnt/xml) resource in the IDE.
+   * Get the data from a bitmap font file (fnt/xml) resource in the IDE.
    */
   static getBitmapFontData(
     project: gdProject,
@@ -273,7 +273,7 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Get the the data from a json resource in the IDE.
+   * Get the data from a json resource in the IDE.
    */
   static getResourceJsonData(
     project: gdProject,

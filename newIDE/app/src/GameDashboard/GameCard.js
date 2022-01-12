@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { Card, CardActions, CardHeader, Chip } from '@material-ui/core';
 import { format } from 'date-fns';
 import * as React from 'react';
@@ -37,60 +38,68 @@ export const GameCard = ({
   };
 
   return (
-    <Card key={game.id}>
-      <CardHeader
-        title={game.gameName}
-        subheader={
-          <Line alignItems="center" noMargin>
-            <Trans>
-              Created on{' '}
-              {format(game.createdAt * 1000 /* TODO */, 'yyyy-MM-dd')}
-            </Trans>
-            {isCurrentGame && (
-              <>
-                <Spacer />
-                <Chip
-                  size="small"
-                  label={<Trans>Currently edited</Trans>}
-                  color="primary"
+    <I18n>
+      {({ i18n }) => (
+        <Card key={game.id}>
+          <CardHeader
+            title={game.gameName}
+            subheader={
+              <Line alignItems="center" noMargin>
+                <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
+                {isCurrentGame && (
+                  <>
+                    <Spacer />
+                    <Chip
+                      size="small"
+                      label={<Trans>Currently edited</Trans>}
+                      color="primary"
+                    />
+                  </>
+                )}
+                {game.publicWebBuildId && (
+                  <>
+                    <Spacer />
+                    <Chip
+                      size="small"
+                      label={<Trans>Published on Liluo</Trans>}
+                    />
+                  </>
+                )}
+              </Line>
+            }
+          />
+          <CardActions>
+            <ResponsiveLineStackLayout
+              expand
+              noMargin
+              justifyContent="flex-end"
+            >
+              {game.publicWebBuildId && (
+                <RaisedButton
+                  label={<Trans>Open</Trans>}
+                  onClick={openGameUrl}
+                  primary
                 />
-              </>
-            )}
-            {game.publicWebBuildId && (
-              <>
-                <Spacer />
-                <Chip size="small" label={<Trans>Published on Liluo</Trans>} />
-              </>
-            )}
-          </Line>
-        }
-      />
-      <CardActions>
-        <ResponsiveLineStackLayout expand noMargin justifyContent="flex-end">
-          {game.publicWebBuildId && (
-            <RaisedButton
-              label={<Trans>Open</Trans>}
-              onClick={openGameUrl}
-              primary
-            />
-          )}
-          <FlatButton
-            icon={<TuneIcon />}
-            label={<Trans>Details</Trans>}
-            onClick={onOpenDetails}
-          />
-          <FlatButton
-            icon={<PlaylistPlayIcon />}
-            label={<Trans>Builds</Trans>}
-            onClick={onOpenBuilds}
-          />
-          <FlatButton
-            icon={<TimelineIcon />}
-            label={<Trans>Analytics</Trans>}
-            onClick={onOpenAnalytics}
-          />
-        </ResponsiveLineStackLayout>
-      </CardActions>
-    </Card>
+              )}
+              <FlatButton
+                icon={<TuneIcon />}
+                label={<Trans>Details</Trans>}
+                onClick={onOpenDetails}
+              />
+              <FlatButton
+                icon={<PlaylistPlayIcon />}
+                label={<Trans>Builds</Trans>}
+                onClick={onOpenBuilds}
+              />
+              <FlatButton
+                icon={<TimelineIcon />}
+                label={<Trans>Analytics</Trans>}
+                onClick={onOpenAnalytics}
+              />
+            </ResponsiveLineStackLayout>
+          </CardActions>
+        </Card>
+      )}
+    </I18n>
   );
 };

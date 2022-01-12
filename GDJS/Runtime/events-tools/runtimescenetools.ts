@@ -45,7 +45,7 @@ namespace gdjs {
       /**
        * Test a timer elapsed time, if the timer doesn't exist it is created.
        *
-       * @deprecated prefer using compareWithTimerElapsedTime
+       * @deprecated prefer using getTimerElapsedTimeInSecondsOrNaN
        *
        * @param runtimeScene
        * @param timeInSeconds The time value to check in seconds
@@ -106,11 +106,12 @@ namespace gdjs {
       };
 
       /**
-       * This is used by the expression to return 0 when a timer doesn't exist
-       * because numeric expressions must return a number.
+       * This is used by expressions to return 0 when a timer doesn't exist,
+       * because numeric expressions must always return a number.
+       *
        * @param runtimeScene
        * @param timerName
-       * @returns The timer elapsed time in seconds or NaN if the timer doesn't exist.
+       * @returns The timer elapsed time in seconds or 0 if the timer doesn't exist.
        */
       export const getTimerElapsedTimeInSeconds = function (
         runtimeScene: gdjs.RuntimeScene,
@@ -124,8 +125,9 @@ namespace gdjs {
       };
 
       /**
-       * This is used by the condition to return false when a timer doesn't exist
+       * This is used by conditions to return false when a timer doesn't exist,
        * no matter the relational operator.
+       *
        * @param runtimeScene
        * @param timerName
        * @returns The timer elapsed time in seconds or NaN if the timer doesn't exist.

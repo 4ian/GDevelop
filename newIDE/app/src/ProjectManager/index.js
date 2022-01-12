@@ -538,6 +538,8 @@ export default class ProjectManager extends React.Component<Props, State> {
     eventsFunctionsExtension: gdEventsFunctionsExtension,
     name: string
   ) => {
+    // If the extension is coming from the store, open its details.
+    // If that's not the case, or if it cannot be found in the store, edit it directly.
     const originName = eventsFunctionsExtension.getOriginName();
     if (originName !== 'gdevelop-extension-store') {
       this.props.onOpenEventsFunctionsExtension(name);

@@ -869,7 +869,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                   "res/conditions/timer.png")
     .AddParameter("object", _("Object"))
     .AddParameter("string", _("Timer's name"))
-    .AddParameter("relationalOperator", _("Sign of the test"), "number")
+    .AddParameter("relationalOperator", _("Sign of the test"), "time")
     .AddParameter("expression", _("Time in seconds"))
     .SetManipulatedType("number");
 

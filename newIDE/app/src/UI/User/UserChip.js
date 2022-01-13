@@ -47,7 +47,9 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
           profile ? (
             profile.username || profile.email
           ) : (
-            <Trans>Click to connect</Trans>
+            <span>
+              <Trans>Click to connect</Trans>
+            </span>
           )
         }
         onClick={onClick}

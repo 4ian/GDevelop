@@ -29,24 +29,15 @@ jobs:
         message: "Hi @${issue.user.login}! 👋 This issue was automatically closed as this seems to be a known bug. It can be solved by **closing entirely the web-app and opening it again**. This will allow the web-app to auto-update and the problem should be gone."
   autocomment:
     runs-on: ubuntu-latest
+    if: contains(github.event.issue.body, 'The node to be removed is not a child of this node')
     steps:
-    - name: Autocomment known 124 crash removing a node (new issue comment)
-      if: contains(github.event.issue.body, 'The node to be removed is not a child of this node')
+    - name: Autocomment indications on bug if it looks like #3453
       uses: peter-evans/create-or-update-comment@v1
       with:
         issue-number: ${{ github.event.issue.number }}
         body: |
           Hi @${{ github.actor }}!
-          Thank you for taking the time to report this bug.
+          Thank you for taking the time to open an issue.
 
-          This bug is actually known but we currently lack information on how to reproduce it. Could you please tell us more about how it happened in the issue #3453?
+          The solved issue #3453 mentioned a similar error, maybe it could help fix this new issue.
         token: ${{ secrets.GITHUB_TOKEN }}
-    - name: Autocomment known 124 crash removing a node (reference issue comment)
-      if: contains(github.event.issue.body, 'The node to be removed is not a child of this node')
-      uses: peter-evans/create-or-update-comment@v1
-      with:
-        issue-number: 3453
-        body: |
-          The issue #${{ github.event.issue.number }} reported by @${{ github.actor }} seems to relate to this bug.
-        token: ${{ secrets.GITHUB_TOKEN }}
-

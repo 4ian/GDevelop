@@ -137,7 +137,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isUsingControl(key)).to.be(true);
 
         runtimeScene.renderAndStep(1000 / 60);
-        // The key wasn't hold it's forgotten.
+        // The key wasn't hold. It's forgotten.
         expect(object.getBehavior('auto1').isUsingControl(key)).to.be(false);
       });
     });

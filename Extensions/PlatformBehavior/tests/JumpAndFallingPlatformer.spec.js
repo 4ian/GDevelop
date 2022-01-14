@@ -118,7 +118,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
     });
-    
+
     [
       'Jump',
       'Right',

@@ -20,7 +20,6 @@
   },
   "build": {
     "appId": "com.gdevelop-app.ide",
-    "productName": "GDevelop",
     "extraResources": [
       {
         "from": "../app/resources/examples",

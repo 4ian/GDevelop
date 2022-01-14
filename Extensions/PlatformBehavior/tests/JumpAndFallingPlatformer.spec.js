@@ -118,6 +118,29 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
     });
+    
+    [
+      'Jump',
+      'Right',
+      'Left',
+      'Up',
+      'Down',
+      'Ladder',
+      'Release',
+      'Release Ladder',
+    ].forEach((key) => {
+      it(`can tell that ${key} key is used`, function () {
+        object.getBehavior('auto1').simulateControl(key);
+        // The condition applies only after the key is actually used by the platformer character.
+        expect(object.getBehavior('auto1').isUsingControl(key)).to.be(false);
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isUsingControl(key)).to.be(true);
+
+        runtimeScene.renderAndStep(1000 / 60);
+        // The key wasn't hold it's forgotten.
+        expect(object.getBehavior('auto1').isUsingControl(key)).to.be(false);
+      });
+    });
   });
 
   [20, 30, 60, 120].forEach((framesPerSecond) => {
@@ -1312,23 +1335,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object2.getY()).to.be(-30);
       expect(object.getX()).to.be.above(-0.8);
       expect(object.getY()).to.be(-30);
-    });
-
-    [
-      'Jump',
-      'Right',
-      'Left',
-      'Up',
-      'Down',
-      'Ladder',
-      'Release',
-      'Release Ladder',
-    ].forEach((key) => {
-      it.only(`can tell that ${key} key is used`, function () {
-        object.getBehavior('PlatformerObject').simulateControl(key);
-        runtimeScene.renderAndStep(1000 / 60);
-        object.getBehavior('PlatformerObject').isUsingControl(key);
-      });
     });
   });
 });

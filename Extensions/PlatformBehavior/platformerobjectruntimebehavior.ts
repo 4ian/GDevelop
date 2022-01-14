@@ -274,20 +274,20 @@ namespace gdjs {
       this._wasLeftKeyPressed = this._leftKey;
       this._wasRightKeyPressed = this._rightKey;
       this._wasLadderKeyPressed = this._ladderKey;
-      this._wasUpKeyPressed = this._releaseLadderKey;
-      this._wasDownKeyPressed = this._upKey;
-      this._wasJumpKeyPressed = this._downKey;
+      this._wasUpKeyPressed = this._upKey;
+      this._wasDownKeyPressed = this._downKey;
+      this._wasJumpKeyPressed = this._jumpKey;
       this._wasReleasePlatformKeyPressed = this._releasePlatformKey;
-      this._wasReleaseLadderKeyPressed = this._jumpKey;
+      this._wasReleaseLadderKeyPressed = this._releaseLadderKey;
       //4) Do not forget to reset pressed keys
       this._leftKey = false;
       this._rightKey = false;
       this._ladderKey = false;
-      this._releaseLadderKey = false;
       this._upKey = false;
       this._downKey = false;
-      this._releasePlatformKey = false;
       this._jumpKey = false;
+      this._releasePlatformKey = false;
+      this._releaseLadderKey = false;
 
       //5) Track the movement
       this._hasReallyMoved =

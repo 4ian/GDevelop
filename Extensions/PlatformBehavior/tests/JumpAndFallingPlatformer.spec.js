@@ -1313,5 +1313,22 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getX()).to.be.above(-0.8);
       expect(object.getY()).to.be(-30);
     });
+
+    [
+      'Jump',
+      'Right',
+      'Left',
+      'Up',
+      'Down',
+      'Ladder',
+      'Release',
+      'Release Ladder',
+    ].forEach((key) => {
+      it.only(`can tell that ${key} key is used`, function () {
+        object.getBehavior('PlatformerObject').simulateControl(key);
+        runtimeScene.renderAndStep(1000 / 60);
+        object.getBehavior('PlatformerObject').isUsingControl(key);
+      });
+    });
   });
 });

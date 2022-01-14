@@ -48,6 +48,8 @@ export const getEmailErrorText = (error: ?AuthError) => {
 export const getPasswordErrorText = (error: ?AuthError) => {
   if (!error) return undefined;
 
+  if (error.code === 'auth/too-many-requests')
+    return "That's a lot of unsuccessful login attempts! Wait a bit before trying again or reset your password.";
   if (error.code === 'auth/wrong-password') return 'The password is invalid';
   if (error.code === 'auth/weak-password')
     return 'This password is too weak: please use more letters and digits';

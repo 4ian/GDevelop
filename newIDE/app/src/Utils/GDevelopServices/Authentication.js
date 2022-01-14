@@ -56,7 +56,8 @@ export type AuthError = {
     | 'auth/weak-password'
     | 'auth/username-used'
     | 'auth/malformed-username'
-    | 'auth/requires-recent-login',
+    | 'auth/requires-recent-login'
+    | 'auth/too-many-requests',
 };
 
 export default class Authentication {

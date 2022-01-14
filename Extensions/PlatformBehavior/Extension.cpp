@@ -351,7 +351,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
              "again this action everytime you want to allow the object to jump "
              "(apart if it's on the floor)."),
            _("Allow _PARAM0_ to jump again"),
-           _("Options"),
+           _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -366,7 +366,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
              "is made unable to jump while in mid air. This has no effect if "
              "the object is not in the air."),
            _("Forbid _PARAM0_ to air jump"),
-           _("Options"),
+           _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -504,7 +504,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Control pressed or simulated"),
                   _("A control was applied from a default control or a simulated by an action."),
                   _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
-                  _("Controls"),
+                  _(""),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
@@ -519,7 +519,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   _("De/activate the use of default controls.\nIf deactivated, "
                     "use the simulated actions to move the object."),
                   _("Ignore default controls for _PARAM0_: _PARAM2_"),
-                  _("Controls"),
+                  _("Options"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
@@ -533,7 +533,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Enable (or disable) the ability of the object to grab "
                     "platforms when falling near to one."),
                   _("Allow _PARAM0_ to grab platforms: _PARAM2_"),
-                  _("Controls"),
+                  _("Options"),
                   "res/conditions/keyboard24.png",
                   "res/conditions/keyboard.png")
         .AddParameter("object", _("Object"))
@@ -545,7 +545,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Can grab platforms"),
                      _("Check if the object can grab the platforms."),
                      _("_PARAM0_ can grab the platforms"),
-                     "",
+                     "Options",
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -559,7 +559,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("Compare the current falling speed of the object (in pixels per "
              "second)."),
            _("the current falling speed"),
-           _("Options"),
+           _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -574,7 +574,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("Compare the current jump speed of the object (in pixels per "
              "second)."),
            _("the current jump speed"),
-           _("Options"),
+           _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -588,7 +588,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Compare the current speed of the object (in pixels per "
                        "second)."),
                      _("the current speed"),
-                     _("Options"),
+                     _(""),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -672,7 +672,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("CurrentFallSpeed",
                       _("Current fall speed"),
                       _("Current fall speed"),
-                      _("Options"),
+                      _(""),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
@@ -681,7 +681,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("CurrentSpeed",
                       _("Current speed"),
                       _("Current speed"),
-                      _("Options"),
+                      _(""),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
@@ -690,7 +690,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddExpression("CurrentJumpSpeed",
                       _("Current jump speed"),
                       _("Current jump speed"),
-                      _("Options"),
+                      _(""),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")

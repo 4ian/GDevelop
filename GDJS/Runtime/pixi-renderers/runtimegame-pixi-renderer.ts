@@ -360,6 +360,31 @@ namespace gdjs {
     }
 
     /**
+     * Convert a point from the canvas coordinates (for example,
+     * an object position) to the page coordinates.
+     *
+     * @param canvasCoords The point in the canvas coordinates.
+     * @returns The point in the page coordinates.
+     */
+    convertCanvasToPageCoords(canvasCoords: FloatPoint): FloatPoint {
+      const renderer = this._pixiRenderer;
+      if (!renderer) return [0, 0];
+      const canvas = renderer.view;
+
+      const pageCoords: FloatPoint = [canvasCoords[0], canvasCoords[1]];
+
+      pageCoords[0] /=
+        this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
+      pageCoords[1] /=
+        this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
+
+      pageCoords[0] += canvas.offsetLeft;
+      pageCoords[1] += canvas.offsetTop;
+
+      return pageCoords;
+    }
+
+    /**
      * Add the standard events handler.
      */
     bindStandardEvents(manager, window, document) {

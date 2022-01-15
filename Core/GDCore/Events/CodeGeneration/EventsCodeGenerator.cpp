@@ -621,14 +621,15 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = GenerateGetBehaviorNameCode(parameter);
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "password" ||  // Deprecated
-             metadata.type ==
-                 "musicfile" ||  // Should be renamed "largeAudioResource"
-             metadata.type ==
-                 "soundfile" ||            // Should be renamed "audioResource"
-             metadata.type == "police" ||  // Should be renamed "fontResource"
+  } else if (metadata.type == "audioResource" ||
              metadata.type == "bitmapFontResource" ||
-             metadata.type == "imageResource") {
+             metadata.type == "fontResource" ||
+             metadata.type == "imageResource" ||
+             metadata.type == "jsonResource" ||
+             metadata.type == "videoResource" ||
+             // Deprecated, old parameter names:
+             metadata.type == "password" || metadata.type == "musicfile" ||
+             metadata.type == "soundfile" || metadata.type == "police") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "mouse") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";

@@ -453,8 +453,9 @@ namespace gdjs {
 
     _setFalling() {
       this._state.leave();
+      const from = this._state;
       this._state = this._falling;
-      this._falling.enter();
+      this._falling.enter(from);
     }
 
     _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
@@ -1797,8 +1798,13 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter() {
-      this._behavior._canJump = false;
+    enter(from: State) {
+      // canJump is used to make air jumps.
+      // It must not be reset during a jump,
+      // where "jump" means the jump + falling states.
+      if (from !== this._behavior._jumping && from !== this) {
+        this._behavior._canJump = false;
+      }
     }
 
     leave() {}

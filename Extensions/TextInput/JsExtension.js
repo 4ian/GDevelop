@@ -49,6 +49,12 @@ module.exports = {
       } else if (propertyName === 'fontResourceName') {
         objectContent.fontResourceName = newValue;
         return true;
+      } else if (propertyName === 'fontSize') {
+        objectContent.fontSize = Math.max(1, parseFloat(newValue));
+        return true;
+      } else if (propertyName === 'inputType') {
+        objectContent.inputType = newValue;
+        return true;
       }
 
       return false;
@@ -69,20 +75,42 @@ module.exports = {
         .setType('string')
         .setLabel(_('Placeholder'));
 
-        objectProperties
-          .getOrCreate('fontResourceName')
-          .setValue(objectContent.fontResourceName || '')
-          .setType('resource')
-          .addExtraInfo('font')
-          .setLabel(_('Font'));
+      objectProperties
+        .getOrCreate('fontResourceName')
+        .setValue(objectContent.fontResourceName || '')
+        .setType('resource')
+        .addExtraInfo('font')
+        .setLabel(_('Font'));
+
+      objectProperties
+        .getOrCreate('fontSize')
+        .setValue((objectContent.fontSize || 20).toString())
+        .setType('number')
+        .setLabel(_('Font size (px)'));
+
+      objectProperties
+        .getOrCreate('inputType')
+        .setValue(objectContent.inputType || '')
+        .setType('choice')
+        .addExtraInfo('text')
+        .addExtraInfo('email')
+        .addExtraInfo('password')
+        .addExtraInfo('number')
+        .addExtraInfo('telephone number')
+        .addExtraInfo('url')
+        .addExtraInfo('search')
+        // .addExtraInfo('text area') // TODO
+        .setLabel(_('Input type'));
 
       return objectProperties;
     };
     textInputObject.setRawJSONContent(
       JSON.stringify({
         initialValue: '',
-        fontResourceName: '',
         placeholder: 'Touch to start typing',
+        fontResourceName: '',
+        fontSize: 20,
+        inputType: '',
       })
     );
 
@@ -97,6 +125,9 @@ module.exports = {
     ) {
       if (propertyName === 'initialValue') {
         instance.setRawStringProperty('initialValue', newValue);
+        return true;
+      } else if (propertyName === 'placeholder') {
+        instance.setRawStringProperty('placeholder', newValue);
         return true;
       }
 
@@ -116,6 +147,11 @@ module.exports = {
         .setValue(instance.getRawStringProperty('initialValue'))
         .setType('string')
         .setLabel(_('Initial value'));
+      instanceProperties
+        .getOrCreate('placeholder')
+        .setValue(instance.getRawStringProperty('placeholder'))
+        .setType('string')
+        .setLabel(_('Placeholder'));
 
       return instanceProperties;
     };
@@ -125,13 +161,120 @@ module.exports = {
         'TextInputObject',
         _('Text input'),
         _('A text field the player can type text into.'),
-        'CppPlatform/Extensions/topdownmovementicon.png', // TODO
+        'CppPlatform/Extensions/texticon24.png', // TODO
         textInputObject
       )
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'
       );
+
+    // Properties expressions/conditions/actions:
+    object
+      .addExpressionAndConditionAndAction(
+        'string',
+        'Text',
+        _('Text'),
+        _('the text'),
+        _('the text'),
+        '',
+        'res/conditions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('string')
+      .setFunctionName('setValue')
+      .setGetter('getValue');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'string',
+        'Placeholder',
+        _('Placeholder'),
+        _('the placeholder'),
+        _('the placeholder'),
+        '',
+        'res/conditions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('string')
+      .setFunctionName('setPlaceholder')
+      .setGetter('getPlaceholder');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Font size',
+        _('Font size'),
+        _('the font size'),
+        _('the font size'),
+        '',
+        'res/conditions/opacity24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('number')
+      .setFunctionName('setFontSize')
+      .setGetter('getFontSize');
+
+    object
+      .addExpressionAndCondition(
+        'string',
+        'FontResourceName',
+        _('Font name'),
+        _('the font name'),
+        _('the font name'),
+        '',
+        'res/conditions/font24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('string')
+      .setFunctionName('getFontResourceName');
+
+    // TODO: could this be merged with the previous expression and condition?
+    object
+      .addScopedAction(
+        'SetFontResourceName',
+        _('Font name'),
+        _('Set the font of the object.'),
+        _('Set the font of _PARAM0_ to _PARAM1_'),
+        '',
+        'res/actions/font24.png',
+        'res/actions/font.png'
+      )
+      .addParameter('object', _('Bitmap text'), 'TextInputObject', false)
+      .addParameter('fontResource', _('Font resource name'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setFontResourceName');
+
+    object
+      .addExpressionAndConditionAndAction( // TODO: use a separate action
+        'string',
+        'InputType',
+        _('Input type'),
+        _('the input type'),
+        _('the input type'),
+        '',
+        'res/conditions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('string')
+      .setFunctionName('setInputType')
+      .setGetter('getInputType');
+
+    // Other expressions/conditions/actions:
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'Opacity',
+        _('Opacity'),
+        _('the opacity, between 0 (fully transparent) and 255 (opaque)'),
+        _('the opacity'),
+        '',
+        'res/conditions/opacity24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('number')
+      .setFunctionName('setOpacity')
+      .setGetter('getOpacity');
 
     return extension;
   },
@@ -177,93 +320,141 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    // TODO: rewrite as a class
+    const defaultWidth = 300;
+    const defaultHeight = 30;
+    const textMaskBorder = 2;
 
-    /**
-     * Renderer for instances of TextInputObject inside the IDE.
-     *
-     * @extends RenderedInstance
-     * @class RenderedTextInputObjectInstance
-     * @constructor
-     */
-    function RenderedTextInputObjectInstance(
-      project,
-      layout,
-      instance,
-      associatedObject,
-      pixiContainer,
-      pixiResourcesLoader
-    ) {
-      RenderedInstance.call(
-        this,
+    class RenderedTextInputObjectInstance extends RenderedInstance {
+      _pixiText;
+      _pixiTextMask;
+      _pixiGraphics;
+      _fontResourceName = '';
+
+      constructor(
         project,
         layout,
         instance,
         associatedObject,
         pixiContainer,
         pixiResourcesLoader
-      );
+      ) {
+        super(
+          project,
+          layout,
+          instance,
+          associatedObject,
+          pixiContainer,
+          pixiResourcesLoader
+        );
 
-      //Setup the PIXI object:
-      this._pixiObject = new PIXI.Text('This is a dummy object', {
-        align: 'left',
-      });
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
-      this._pixiContainer.addChild(this._pixiObject);
-      this.update();
+        //Setup the PIXI object:
+        this._pixiGraphics = new PIXI.Graphics();
+        this._pixiTextMask = new PIXI.Graphics();
+        this._pixiText = new PIXI.Text(' ', {
+          align: 'left',
+          fontSize: 20,
+        });
+        this._pixiText.mask = this._pixiTextMask;
+        this._pixiObject = new PIXI.Container();
+        this._pixiObject.addChild(this._pixiGraphics);
+        this._pixiObject.addChild(this._pixiTextMask);
+        this._pixiObject.addChild(this._pixiText);
+        this._pixiContainer.addChild(this._pixiObject);
+        this.update();
+      }
+
+      static getThumbnail(project, resourcesLoader, object) {
+        return 'CppPlatform/Extensions/texticon24.png'; // TODO: icon
+      }
+
+      update() {
+        const instance = this._instance;
+        const properties = this._associatedObject.getProperties();
+
+        const placeholder =
+          instance.getRawStringProperty('placeholder') ||
+          properties.get('placeholder').getValue();
+        const initialValue =
+          instance.getRawStringProperty('initialValue') ||
+          properties.get('initialValue').getValue();
+        const hasInitialValue = initialValue !== '';
+        this._pixiText.text = hasInitialValue ? initialValue : placeholder;
+
+        // TODO: font color
+        const textColor = hasInitialValue ? 0x0 : 0x888888;
+        if (this._pixiText.style.fill !== textColor) {
+          this._pixiText.style.fill = textColor;
+          this._pixiText.dirty = true;
+        }
+
+        const fontSize = parseFloat(properties.get('fontSize').getValue());
+        if (this._pixiText.style.fontSize !== fontSize) {
+          this._pixiText.style.fontSize = fontSize;
+          this._pixiText.dirty = true;
+        }
+
+        const fontResourceName = properties.get('fontResourceName').getValue();
+        if (this._fontResourceName !== fontResourceName) {
+          this._fontResourceName = fontResourceName;
+
+          this._pixiResourcesLoader
+            .loadFontFamily(this._project, fontResourceName)
+            .then((fontFamily) => {
+              // Once the font is loaded, we can use the given fontFamily.
+              this._pixiText.style.fontFamily = fontFamily;
+              this._pixiText.dirty = true;
+            })
+            .catch((err) => {
+              // Ignore errors
+              console.warn(
+                'Unable to load font family for RenderedTextInputObjectInstance',
+                err
+              );
+            });
+        }
+
+        this._pixiObject.position.x = instance.getX();
+        this._pixiObject.position.y = instance.getY();
+
+        let width = defaultWidth;
+        let height = defaultHeight;
+        if (instance.hasCustomSize()) {
+          width = instance.getCustomWidth();
+          height = instance.getCustomHeight();
+        }
+
+        this._pixiTextMask.clear();
+        this._pixiTextMask.drawRect(
+          textMaskBorder,
+          textMaskBorder,
+          width - 2 * textMaskBorder,
+          height - 2 * textMaskBorder
+        );
+
+        this._pixiText.position.y = height / 2 - this._pixiText.height / 2;
+
+        this._pixiGraphics.clear();
+        this._pixiGraphics.lineStyle(
+          1,
+          0x0, // TODO: outline color
+          1 // TODO: outline opacity
+        );
+        this._pixiGraphics.beginFill(
+          0xffffff, // TODO: fill color
+          1 // TODO: fill opacity
+        );
+        this._pixiGraphics.drawRect(0, 0, width, height);
+        this._pixiGraphics.endFill();
+      }
+
+      getDefaultWidth() {
+        return defaultWidth;
+      }
+
+      getDefaultHeight() {
+        return defaultHeight;
+      }
     }
-    RenderedTextInputObjectInstance.prototype = Object.create(
-      RenderedInstance.prototype
-    );
-
-    /**
-     * Return the path to the thumbnail of the specified object.
-     */
-    RenderedTextInputObjectInstance.getThumbnail = function (
-      project,
-      resourcesLoader,
-      object
-    ) {
-      return 'CppPlatform/Extensions/texticon24.png';
-    };
-
-    /**
-     * This is called to update the PIXI object on the scene editor
-     */
-    RenderedTextInputObjectInstance.prototype.update = function () {
-      // Read a property from the object
-      const property1Value = this._associatedObject
-        .getProperties()
-        .get('My first property')
-        .getValue();
-      this._pixiObject.text = property1Value;
-
-      // Read position and angle from the instance
-      this._pixiObject.position.x =
-        this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.position.y =
-        this._instance.getY() + this._pixiObject.height / 2;
-      this._pixiObject.rotation = RenderedInstance.toRad(
-        this._instance.getAngle()
-      );
-      // Custom size can be read in instance.getCustomWidth() and
-      // instance.getCustomHeight()
-    };
-
-    /**
-     * Return the width of the instance, when it's not resized.
-     */
-    RenderedTextInputObjectInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width;
-    };
-
-    /**
-     * Return the height of the instance, when it's not resized.
-     */
-    RenderedTextInputObjectInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height;
-    };
 
     objectsRenderingService.registerInstanceRenderer(
       'TextInput::TextInputObject',

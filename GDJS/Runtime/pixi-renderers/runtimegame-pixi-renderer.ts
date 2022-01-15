@@ -27,7 +27,9 @@ namespace gdjs {
 
     //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     _forceFullscreen: any;
+
     _pixiRenderer: PIXI.Renderer | null = null;
+    private _domElementsContainer: HTMLDivElement | null = null;
 
     // Current width of the canvas (might be scaled down/up compared to renderer)
     _canvasWidth: float = 0;
@@ -60,26 +62,65 @@ namespace gdjs {
      * Create a standard canvas inside canvasArea.
      *
      */
-    createStandardCanvas(parentElement) {
-      //Create the renderer and setup the rendering area
-      //"preserveDrawingBuffer: true" is needed to avoid flickering and background issues on some mobile phones (see #585 #572 #566 #463)
+    createStandardCanvas(parentElement: HTMLElement) {
+      // Create the renderer and setup the rendering area.
+      // "preserveDrawingBuffer: true" is needed to avoid flickering
+      // and background issues on some mobile phones (see #585 #572 #566 #463).
       this._pixiRenderer = PIXI.autoDetectRenderer({
         width: this._game.getGameResolutionWidth(),
         height: this._game.getGameResolutionHeight(),
         preserveDrawingBuffer: true,
         antialias: false,
       }) as PIXI.Renderer;
-      parentElement.appendChild(
-        // add the renderer view element to the DOM
-        this._pixiRenderer.view
-      );
-      this._pixiRenderer.view.style['position'] = 'absolute';
-      //Ensure that the canvas has the focus.
-      this._pixiRenderer.view.tabIndex = 1;
+      const gameCanvas = this._pixiRenderer.view;
+
+      // Add the renderer view element to the DOM
+      parentElement.appendChild(gameCanvas);
+      gameCanvas.style.position = 'absolute';
+
+      // Ensure that the canvas has the focus.
+      gameCanvas.tabIndex = 1;
+
+      // Ensure long press can't create a selection
+      gameCanvas.style.userSelect = 'none';
+      gameCanvas.style.outline = 'none'; // No selection/focus ring on the canvas.
+
+      // Set up the container for HTML elements on top of the game canvas.
+      const domElementsContainer = document.createElement('div');
+      domElementsContainer.style.position = 'absolute';
+      domElementsContainer.style.overflow = 'hidden'; // Never show anything outside the container.
+      domElementsContainer.style.outline = 'none'; // No selection/focus ring on this container.
+
+      // The container should *never* scroll.
+      // Elements are put inside with the same coordinates (with a scaling factor)
+      // as on the game canvas.
+      domElementsContainer.addEventListener('scroll', (event) => {
+        domElementsContainer.scrollLeft = 0;
+        domElementsContainer.scrollTop = 0;
+        event.preventDefault();
+      });
+
+      // When clicking outside an input, (or other HTML element),
+      // give back focus to the game canvas so that this element is blurred.
+      domElementsContainer.addEventListener('pointerdown', () => {
+        gameCanvas.focus();
+      });
+
+      // Prevent magnifying glass on iOS with a long press.
+      domElementsContainer.style['-webkit-user-select'] = 'none';
+      domElementsContainer.addEventListener('touchstart', (event) => {
+        // Prevent the magnifiying glass on iOS 15, which does not honor -webkit-user-select.
+        // See https://bugs.webkit.org/show_bug.cgi?id=231161
+        // This unfortunately also prevent to move the cursor.
+        event.preventDefault();
+      });
+
+      parentElement.appendChild(domElementsContainer);
+      this._domElementsContainer = domElementsContainer;
 
       this._resizeCanvas();
 
-      // Handle scale mode
+      // Handle scale mode.
       if (this._game.getScaleMode() === 'nearest') {
         this._pixiRenderer.view.style['image-rendering'] = '-moz-crisp-edges';
         this._pixiRenderer.view.style['image-rendering'] =
@@ -89,19 +130,18 @@ namespace gdjs {
         this._pixiRenderer.view.style['image-rendering'] = 'pixelated';
       }
 
-      // Handle pixels rounding
+      // Handle pixels rounding.
       if (this._game.getPixelsRounding()) {
         PIXI.settings.ROUND_PIXELS = true;
       }
 
-      //Handle resize
-      const that = this;
-      window.addEventListener('resize', function () {
-        that._game.onWindowInnerSizeChanged();
-        that._resizeCanvas();
-        that._game._notifySceneForResize = true;
+      // Handle resize: immediately adjust the game canvas (and dom element container)
+      // and notify the game (that may want to adjust to the new size of the window).
+      window.addEventListener('resize', () => {
+        this._game.onWindowInnerSizeChanged();
+        this._resizeCanvas();
+        this._game._notifySceneForResize = true;
       });
-      return this._pixiRenderer;
     }
 
     static getWindowInnerWidth() {
@@ -158,7 +198,7 @@ namespace gdjs {
      *
      */
     private _resizeCanvas() {
-      if (!this._pixiRenderer) return;
+      if (!this._pixiRenderer || !this._domElementsContainer) return;
 
       // Set the Pixi renderer size to the game size.
       // There is no "smart" resizing to be done here: the rendering of the game
@@ -205,12 +245,22 @@ namespace gdjs {
           canvasHeight *= factor;
         }
       }
-      this._pixiRenderer.view.style['top'] =
+
+      // Apply the calculations to the canvas element...
+      this._pixiRenderer.view.style.top =
         this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
-      this._pixiRenderer.view.style['left'] =
+      this._pixiRenderer.view.style.left =
         this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
       this._pixiRenderer.view.style.width = canvasWidth + 'px';
       this._pixiRenderer.view.style.height = canvasHeight + 'px';
+
+      // ...and to the div on top of it showing DOM elements (like inputs).
+      this._domElementsContainer.style.top =
+        this._marginTop + (maxHeight - canvasHeight) / 2 + 'px';
+      this._domElementsContainer.style.left =
+        this._marginLeft + (maxWidth - canvasWidth) / 2 + 'px';
+      this._domElementsContainer.style.width = canvasWidth + 'px';
+      this._domElementsContainer.style.height = canvasHeight + 'px';
 
       // Store the canvas size for fast access to it.
       this._canvasWidth = canvasWidth;
@@ -360,28 +410,33 @@ namespace gdjs {
     }
 
     /**
-     * Convert a point from the canvas coordinates (for example,
-     * an object position) to the page coordinates.
+     * Convert a point from the canvas coordinates to the dom element container coordinates.
      *
      * @param canvasCoords The point in the canvas coordinates.
-     * @returns The point in the page coordinates.
+     * @returns The point in the dom element container coordinates.
      */
-    convertCanvasToPageCoords(canvasCoords: FloatPoint): FloatPoint {
-      const renderer = this._pixiRenderer;
-      if (!renderer) return [0, 0];
-      const canvas = renderer.view;
-
+    convertCanvasToDomElementContainerCoords(
+      canvasCoords: FloatPoint
+    ): FloatPoint {
       const pageCoords: FloatPoint = [canvasCoords[0], canvasCoords[1]];
 
+      // Handle the fact that the game is stretched to fill the canvas.
       pageCoords[0] /=
         this._game.getGameResolutionWidth() / (this._canvasWidth || 1);
       pageCoords[1] /=
         this._game.getGameResolutionHeight() / (this._canvasHeight || 1);
 
-      pageCoords[0] += canvas.offsetLeft;
-      pageCoords[1] += canvas.offsetTop;
-
       return pageCoords;
+    }
+
+    /**
+     * Return the scale factor between the renderer height and the actual canvas height,
+     * which is also the height of the container for DOM elements to be superimposed on top of it.
+     *
+     * Useful to scale font sizes of DOM elements so that they follow the size of the game.
+     */
+    getCanvasToDomElementContainerHeightScale(): float {
+      return (this._canvasHeight || 1) / this._game.getGameResolutionHeight();
     }
 
     /**
@@ -397,24 +452,9 @@ namespace gdjs {
       const that = this;
 
       function getEventPosition(e) {
-        const pos = [0, 0];
-        if (e.pageX) {
-          pos[0] = e.pageX - canvas.offsetLeft;
-          pos[1] = e.pageY - canvas.offsetTop;
-        } else {
-          pos[0] =
-            e.clientX +
-            document.body.scrollLeft +
-            document.documentElement.scrollLeft -
-            canvas.offsetLeft;
-          pos[1] =
-            e.clientY +
-            document.body.scrollTop +
-            document.documentElement.scrollTop -
-            canvas.offsetTop;
-        }
+        const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
 
-        //Handle the fact that the game is stretched to fill the canvas.
+        // Handle the fact that the game is stretched to fill the canvas.
         pos[0] *=
           that._game.getGameResolutionWidth() / (that._canvasWidth || 1);
         pos[1] *=
@@ -586,6 +626,10 @@ namespace gdjs {
 
     getPIXIRenderer() {
       return this._pixiRenderer;
+    }
+
+    getDomElementContainer() {
+      return this._domElementsContainer;
     }
 
     /**

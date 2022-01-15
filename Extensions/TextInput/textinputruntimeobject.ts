@@ -1,34 +1,71 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Text input object');
 
+  const supportedInputTypes = [
+    'text',
+    'email',
+    'password',
+    'number',
+    'telephone number',
+    'url',
+    'search',
+  ] as const;
+
+  type SupportedInputType = typeof supportedInputTypes[number];
+
+  const parseInputType = (potentialInputType: string): SupportedInputType => {
+    const lowercasedNewInputType = potentialInputType.toLowerCase();
+
+    // @ts-ignore - we're actually checking that this value is correct.
+    if (supportedInputTypes.includes(lowercasedNewInputType))
+      return potentialInputType as SupportedInputType;
+
+    return 'text';
+  };
+
   /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
   export type TextInputObjectDataType = {
     /** The base parameters of the TextInput */
     content: {
+      initialValue: string;
       placeholder: string;
       fontResourceName: string;
-      initialValue: string;
+      fontSize: float;
+      inputType: SupportedInputType;
     };
   };
   export type TextInputObjectData = ObjectData & TextInputObjectDataType;
+
+  const defaultWidth = 300;
+  const defaultHeight = 30;
 
   /**
    * Shows a text input on the screen the player can type text into.
    */
   export class TextInputRuntimeObject extends gdjs.RuntimeObject {
     private _value: string;
+    private _placeholder: string;
     private opacity: float = 255;
-    private _width: float = 200;
-    private _height: float = 30;
+    private _width: float = defaultWidth;
+    private _height: float = defaultHeight;
     private _fontResourceName: string;
+    private _fontSize: float;
+    private _inputType: SupportedInputType;
 
     _renderer: TextInputRuntimeObjectRenderer;
 
-    constructor(runtimeScene: gdjs.RuntimeScene, objectData: TextInputObjectData) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      objectData: TextInputObjectData
+    ) {
       super(runtimeScene, objectData);
 
       this._value = objectData.content.initialValue;
+      this._placeholder = objectData.content.placeholder;
       this._fontResourceName = objectData.content.fontResourceName;
+      this._fontSize = objectData.content.fontSize || 20;
+      this._inputType = parseInputType(objectData.content.inputType);
+
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(this);
 
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
@@ -39,24 +76,34 @@ namespace gdjs {
       return {}; // TODO: this will break when changing layer. Instead, return null but still call updatePreRender?
     }
 
-    updateFromObjectData(oldObjectData: TextInputObjectData, newObjectData: TextInputObjectData): boolean {
-      // Compare previous and new data for the object and update it accordingly.
-      // This is useful for "hot-reloading".
+    updateFromObjectData(
+      oldObjectData: TextInputObjectData,
+      newObjectData: TextInputObjectData
+    ): boolean {
       if (
         oldObjectData.content.initialValue !==
         newObjectData.content.initialValue
       ) {
         if (this._value === oldObjectData.content.initialValue) {
-          this._value = newObjectData.content.initialValue;
-          this._renderer.updateValue();
+          this.setValue(newObjectData.content.initialValue);
         }
       }
-      // TODO: placeholder support
+      if (
+        oldObjectData.content.placeholder !== newObjectData.content.placeholder
+      ) {
+        this.setPlaceholder(newObjectData.content.placeholder);
+      }
       if (
         oldObjectData.content.fontResourceName !==
         newObjectData.content.fontResourceName
       ) {
-        this.setFont(newObjectData.content.fontResourceName);
+        this.setFontResourceName(newObjectData.content.fontResourceName);
+      }
+      if (oldObjectData.content.fontSize !== newObjectData.content.fontSize) {
+        this.setFontSize(newObjectData.content.fontSize);
+      }
+      if (oldObjectData.content.inputType !== newObjectData.content.inputType) {
+        this.setInputType(newObjectData.content.inputType);
       }
       return true;
     }
@@ -71,7 +118,9 @@ namespace gdjs {
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       for (const property of initialInstanceData.stringProperties) {
         if (property.name === 'initialValue') {
-          this._value = property.value;
+          this.setValue(property.value);
+        } else if (property.name === 'placeholder') {
+          this.setPlaceholder(property.value);
         }
       }
       if (initialInstanceData.customSize) {
@@ -95,6 +144,7 @@ namespace gdjs {
         opacity = 255;
       }
       this.opacity = opacity;
+      this._renderer.updateOpacity();
     }
 
     /**
@@ -137,14 +187,14 @@ namespace gdjs {
     }
 
     /**
-     * TODO
+     * Get the text entered in the text input.
      */
     getValue() {
       return this._value;
     }
 
     /**
-     * TODO
+     * Replace the text inside the text input.
      */
     setValue(newValue: string) {
       if (newValue === this._value) return;
@@ -153,13 +203,70 @@ namespace gdjs {
       this._renderer.updateValue();
     }
 
-    getFont() {
+    /**
+     * Called by the renderer when the value of the input shown on the screen
+     * was changed (because the user typed something).
+     * This does not propagate back the value to the renderer, which would
+     * result in the cursor being sent back to the end of the text.
+     *
+     * Do not use this if you are not inside the renderer - use `setValue` instead.
+     */
+    onRendererInputValueChanged(newValue: string) {
+      this._value = newValue;
+    }
+
+    getFontResourceName() {
       return this._fontResourceName;
     }
 
-    setFont(resourceName: string) {
+    setFontResourceName(resourceName: string) {
+      if (this._fontResourceName === resourceName) return;
+
       this._fontResourceName = resourceName;
       this._renderer.updateFont();
+    }
+
+    getFontSize() {
+      return this._fontSize;
+    }
+
+    setFontSize(newSize: number) {
+      this._fontSize = newSize;
+    }
+
+    /**
+     * Get the placeholder shown when no text is entered
+     */
+    getPlaceholder() {
+      return this._placeholder;
+    }
+
+    /**
+     * Replace the text inside the text input.
+     */
+    setPlaceholder(newPlaceholder: string) {
+      if (newPlaceholder === this._placeholder) return;
+
+      this._placeholder = newPlaceholder;
+      this._renderer.updatePlaceholder();
+    }
+
+    /**
+     * Get the type of the input.
+     */
+    getInputType() {
+      return this._inputType;
+    }
+
+    /**
+     * Set the type of the input.
+     */
+    setInputType(newInputType: string) {
+      const lowercasedNewInputType = newInputType.toLowerCase();
+      if (lowercasedNewInputType === this._inputType) return;
+
+      this._inputType = parseInputType(lowercasedNewInputType);
+      this._renderer.updateInputType();
     }
   }
   gdjs.registerObject(

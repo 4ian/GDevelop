@@ -28,7 +28,7 @@ namespace gdjs {
 
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
-    private _input: HTMLInputElement;
+    private _input: HTMLInputElement | HTMLTextAreaElement;
     private _runtimeScene: gdjs.RuntimeScene;
     private _runtimeGame: gdjs.RuntimeGame;
 
@@ -37,11 +37,21 @@ namespace gdjs {
       this._runtimeScene = runtimeObject.getRuntimeScene();
       this._runtimeGame = this._runtimeScene.getGame();
 
-      this._input = document.createElement('input');
+      this._input = this._createElement();
+      this._runtimeGame
+        .getRenderer()
+        .getDomElementContainer()!
+        .appendChild(this._input);
+    }
+
+    _createElement() {
+      const isTextArea = this._object.getInputType() === 'text area';
+      this._input = document.createElement(isTextArea ? 'textarea' : 'input');
       this._input.style.border = '1px solid black';
       this._input.style.borderRadius = '0px';
       this._input.style.backgroundColor = 'white';
       this._input.style.position = 'absolute';
+      this._input.style.resize = 'none';
 
       this._input.addEventListener('input', () => {
         this._object.onRendererInputValueChanged(this._input.value);
@@ -60,15 +70,18 @@ namespace gdjs {
       this.updateFillColorAndOpacity();
       this.updateBorderColorAndOpacity();
 
-      this._runtimeGame
-        .getRenderer()
-        .getDomElementContainer()!
-        .appendChild(this._input);
+      return this._input;
+    }
+
+    _destroyElement() {
+      if (!this._input) return;
+
+      const parentElement = this._input.parentElement;
+      if (parentElement) parentElement.removeChild(this._input);
     }
 
     onDestroy() {
-      const parentElement = this._input.parentElement;
-      if (parentElement) parentElement.removeChild(this._input);
+      this._destroyElement();
     }
 
     updatePreRender() {
@@ -145,6 +158,18 @@ namespace gdjs {
     }
 
     updateInputType() {
+      const isTextArea = this._input instanceof HTMLTextAreaElement;
+      const shouldBeTextArea = this._object.getInputType() === 'text area';
+      if (isTextArea !== shouldBeTextArea) {
+        this._destroyElement();
+        this._createElement();
+
+        this._runtimeGame
+          .getRenderer()
+          .getDomElementContainer()!
+          .appendChild(this._input);
+      }
+
       const newType =
         userFriendlyToHtmlInputTypes[this._object.getInputType()] || 'text';
       this._input.setAttribute('type', newType);

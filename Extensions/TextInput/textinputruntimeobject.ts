@@ -32,6 +32,11 @@ namespace gdjs {
       fontResourceName: string;
       fontSize: float;
       inputType: SupportedInputType;
+      textColor: string;
+      fillColor: string;
+      fillOpacity: float;
+      borderColor: string;
+      borderOpacity: float;
     };
   };
   export type TextInputObjectData = ObjectData & TextInputObjectDataType;
@@ -51,6 +56,11 @@ namespace gdjs {
     private _fontResourceName: string;
     private _fontSize: float;
     private _inputType: SupportedInputType;
+    private _textColor: [float, float, float];
+    private _fillColor: [float, float, float];
+    private _fillOpacity: float;
+    private _borderColor: [float, float, float];
+    private _borderOpacity: float;
 
     _renderer: TextInputRuntimeObjectRenderer;
 
@@ -65,6 +75,13 @@ namespace gdjs {
       this._fontResourceName = objectData.content.fontResourceName;
       this._fontSize = objectData.content.fontSize || 20;
       this._inputType = parseInputType(objectData.content.inputType);
+      this._textColor = gdjs.rgbOrHexToRGBColor(objectData.content.textColor);
+      this._fillColor = gdjs.rgbOrHexToRGBColor(objectData.content.fillColor);
+      this._fillOpacity = objectData.content.fillOpacity;
+      this._borderColor = gdjs.rgbOrHexToRGBColor(
+        objectData.content.borderColor
+      );
+      this._borderOpacity = objectData.content.borderOpacity;
 
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(this);
 
@@ -105,6 +122,28 @@ namespace gdjs {
       if (oldObjectData.content.inputType !== newObjectData.content.inputType) {
         this.setInputType(newObjectData.content.inputType);
       }
+      if (oldObjectData.content.textColor !== newObjectData.content.textColor) {
+        this.setTextColor(newObjectData.content.textColor);
+      }
+      if (oldObjectData.content.fillColor !== newObjectData.content.fillColor) {
+        this.setFillColor(newObjectData.content.fillColor);
+      }
+      if (
+        oldObjectData.content.fillOpacity !== newObjectData.content.fillOpacity
+      ) {
+        this.setFillOpacity(newObjectData.content.fillOpacity);
+      }
+      if (
+        oldObjectData.content.borderColor !== newObjectData.content.borderColor
+      ) {
+        this.setBorderColor(newObjectData.content.borderColor);
+      }
+      if (
+        oldObjectData.content.borderOpacity !==
+        newObjectData.content.borderOpacity
+      ) {
+        this.setBorderOpacity(newObjectData.content.borderOpacity);
+      }
       return true;
     }
 
@@ -137,13 +176,7 @@ namespace gdjs {
      * Set object opacity.
      */
     setOpacity(opacity): void {
-      if (opacity < 0) {
-        opacity = 0;
-      }
-      if (opacity > 255) {
-        opacity = 255;
-      }
-      this.opacity = opacity;
+      this.opacity = Math.max(0, Math.min(255, opacity));
       this._renderer.updateOpacity();
     }
 
@@ -267,6 +300,73 @@ namespace gdjs {
 
       this._inputType = parseInputType(lowercasedNewInputType);
       this._renderer.updateInputType();
+    }
+
+    setTextColor(newColor: string) {
+      this._textColor = gdjs.rgbOrHexToRGBColor(newColor);
+      this._renderer.updateTextColor();
+    }
+
+    getTextColor(): string {
+      return (
+        this._textColor[0] + ';' + this._textColor[1] + ';' + this._textColor[2]
+      );
+    }
+
+    _getRawTextColor(): [float, float, float] {
+      return this._textColor;
+    }
+
+    setFillColor(newColor: string) {
+      this._fillColor = gdjs.rgbOrHexToRGBColor(newColor);
+      this._renderer.updateFillColorAndOpacity();
+    }
+
+    getFillColor(): string {
+      return (
+        this._fillColor[0] + ';' + this._fillColor[1] + ';' + this._fillColor[2]
+      );
+    }
+
+    _getRawFillColor(): [float, float, float] {
+      return this._fillColor;
+    }
+
+    setFillOpacity(newOpacity: float) {
+      this._fillOpacity = Math.max(0, Math.min(255, newOpacity));
+      this._renderer.updateFillColorAndOpacity();
+    }
+
+    getFillOpacity(): float {
+      return this._fillOpacity;
+    }
+
+    setBorderColor(newColor: string) {
+      this._borderColor = gdjs.rgbOrHexToRGBColor(newColor);
+      this._renderer.updateBorderColorAndOpacity();
+    }
+
+    getBorderColor(): string {
+      return (
+        this._borderColor[0] +
+        ';' +
+        this._borderColor[1] +
+        ';' +
+        this._borderColor[2]
+      );
+    }
+
+    _getRawBorderColor(): [float, float, float] {
+      return this._borderColor;
+    }
+
+    setBorderOpacity(newOpacity: float) {
+      this._borderOpacity = Math.max(0, Math.min(255, newOpacity));
+      this._renderer.updateBorderColorAndOpacity();
+    }
+
+    getBorderOpacity(): float {
+      return this._borderOpacity;
     }
   }
   gdjs.registerObject(

@@ -37,7 +37,9 @@ namespace gdjs {
       instances: gdjs.RuntimeObject[],
       showHiddenInstances: boolean,
       showPointsNames: boolean,
-      showCustomPoints: boolean
+      showCustomPoints: boolean,
+      showCollisionMasks: boolean,
+      showPositions: boolean
     ) {
       const pixiContainer = this._instanceContainer
         .getRenderer()
@@ -108,8 +110,9 @@ namespace gdjs {
       debugDraw.alpha = 0.8;
       debugDraw.lineStyle(2, 0x0000ff, 1);
 
-      // Draw AABB
       const workingPoint: FloatPoint = [0, 0];
+      if (showCollisionMasks) {
+      // Draw AABB
       for (let i = 0; i < instances.length; i++) {
         const object = instances[i];
         const layer = this._instanceContainer.getLayer(object.getLayer());
@@ -170,6 +173,7 @@ namespace gdjs {
 
         debugDraw.drawPolygon(polygon);
       }
+      }
 
       // Draw hitboxes and points
       for (let i = 0; i < instances.length; i++) {
@@ -199,6 +203,7 @@ namespace gdjs {
         const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[id];
         renderedObjectPoints.wasRendered = true;
 
+        if (showCollisionMasks) {
         // Draw hitboxes (sub-optimal performance)
         const hitboxes = object.getHitBoxes();
         for (let j = 0; j < hitboxes.length; j++) {
@@ -221,10 +226,12 @@ namespace gdjs {
           debugDraw.line.color = 0xff0000;
           debugDraw.drawPolygon(polygon);
         }
+        }
 
         // Draw points
         debugDraw.fill.alpha = 0.3;
 
+        if (showPositions) {
         // Draw Center point
         const centerPoint = layer.applyLayerTransformation(
           object.getCenterXInScene(),
@@ -280,6 +287,7 @@ namespace gdjs {
               originPoint[0],
               originPoint[1]
             );
+          }
           }
         }
 

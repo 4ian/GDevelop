@@ -218,7 +218,9 @@ namespace gdjs {
             allInstancesList,
             this._debugDrawShowHiddenInstances,
             this._debugDrawShowPointsNames,
-            this._debugDrawShowCustomPoints
+            this._debugDrawShowCustomPoints,
+            this._debugDrawShowCollisionMasks,
+            this._debugDrawShowPositions
           );
         }
 

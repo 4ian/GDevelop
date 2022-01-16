@@ -40,6 +40,8 @@ namespace gdjs {
     _debugDrawShowHiddenInstances: boolean = false;
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
+    _debugDrawShowCollisionMasks: boolean = false;
+    _debugDrawShowPositions: boolean = false;
 
     constructor() {
       this._initialBehaviorSharedData = new Hashtable();
@@ -140,11 +142,13 @@ namespace gdjs {
     /**
      * Activate or deactivate the debug visualization for collisions and points.
      */
-    enableDebugDraw(
+     enableDebugDraw(
       enableDebugDraw: boolean,
       showHiddenInstances: boolean,
       showPointsNames: boolean,
-      showCustomPoints: boolean
+      showCustomPoints: boolean,
+      showCollisionMasks: boolean,
+      showPositions: boolean
     ): void {
       if (this._debugDrawEnabled && !enableDebugDraw) {
         this.getDebuggerRenderer().clearDebugDraw();
@@ -154,6 +158,8 @@ namespace gdjs {
       this._debugDrawShowHiddenInstances = showHiddenInstances;
       this._debugDrawShowPointsNames = showPointsNames;
       this._debugDrawShowCustomPoints = showCustomPoints;
+      this._debugDrawShowCollisionMasks = showCollisionMasks;
+      this._debugDrawShowPositions = showPositions;
     }
 
     /**

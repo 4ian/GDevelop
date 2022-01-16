@@ -42,13 +42,17 @@ namespace gdjs {
         enableDebugDraw: boolean,
         showHiddenInstances: boolean,
         showPointsNames: boolean,
-        showCustomPoints: boolean
+        showCustomPoints: boolean,
+        showCollisionMasks: boolean,
+        showPositions: boolean
       ) {
         instanceContainer.enableDebugDraw(
           enableDebugDraw,
           showHiddenInstances,
           showPointsNames,
-          showCustomPoints
+          showCustomPoints,
+          showCollisionMasks,
+          showPositions
         );
       };
     }

@@ -424,11 +424,11 @@ namespace gdjs {
       this._debugOpacity = opacity / 255;
     }
 
-    doDebugRendering(runtimeScene: RuntimeScene): void {
+    doDebugRendering(instanceContainer: gdjs.RuntimeInstanceContainer): void {
       if (!this._isVisualDebugEnabled) {
         return;
       }
-      const graphics = runtimeScene.getRenderer().getDebugRenderer();
+      const graphics = instanceContainer.getDebuggerRenderer().getDebugRenderer();
       if (!graphics) {
         return;
       }
@@ -439,7 +439,7 @@ namespace gdjs {
         return;
       }
 
-      const layer = runtimeScene.getLayer(this.owner.getLayer());
+      const layer = instanceContainer.getLayer(this.owner.getLayer());
       graphics.lineStyle(
         1,
         this._debugColor,
@@ -449,13 +449,16 @@ namespace gdjs {
       const navMesh = this._manager.getNavMesh(
         this._lastUsedObstacleCellPadding
       );
+      let point: FloatPoint = [0, 0];
       for (const navPoly of navMesh.getPolygons()) {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         for (let index = 1; index < polygon.length; index++) {
-          const point = layer.convertInverseCoords(
+          point = layer.convertInverseCoords(
             polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio
+            polygon[index].y / this._manager._isometricRatio,
+            0,
+            point
           );
           // It helps to spot vertices with 180° between edges.
           graphics.drawCircle(point[0], point[1], 3);
@@ -465,15 +468,19 @@ namespace gdjs {
         const polygon = navPoly.getPoints();
         if (polygon.length === 0) continue;
         graphics.beginFill(this._debugColor, this._debugOpacity);
-        const point = layer.convertInverseCoords(
+        point = layer.convertInverseCoords(
           polygon[0].x,
-          polygon[0].y / this._manager._isometricRatio
+          polygon[0].y / this._manager._isometricRatio,
+          0,
+          point
         );
         graphics.moveTo(point[0], point[1]);
         for (let index = 1; index < polygon.length; index++) {
-          const point = layer.convertInverseCoords(
+          point = layer.convertInverseCoords(
             polygon[index].x,
-            polygon[index].y / this._manager._isometricRatio
+            polygon[index].y / this._manager._isometricRatio,
+            0,
+            point
           );
           graphics.lineTo(point[0], point[1]);
         }

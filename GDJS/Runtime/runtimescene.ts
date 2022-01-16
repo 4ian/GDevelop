@@ -51,6 +51,8 @@ namespace gdjs {
     _debugDrawShowHiddenInstances: boolean = false;
     _debugDrawShowPointsNames: boolean = false;
     _debugDrawShowCustomPoints: boolean = false;
+    _debugDrawShowCollisionMasks: boolean = false;
+    _debugDrawShowPositions: boolean = false;
 
     // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     _onProfilerStopped: null | ((oldProfiler: gdjs.Profiler) => void) = null;
@@ -95,7 +97,9 @@ namespace gdjs {
       enableDebugDraw: boolean,
       showHiddenInstances: boolean,
       showPointsNames: boolean,
-      showCustomPoints: boolean
+      showCustomPoints: boolean,
+      showCollisionMasks: boolean,
+      showPositions: boolean
     ): void {
       if (this._debugDrawEnabled && !enableDebugDraw) {
         this.getRenderer().clearDebugDraw();
@@ -105,6 +109,8 @@ namespace gdjs {
       this._debugDrawShowHiddenInstances = showHiddenInstances;
       this._debugDrawShowPointsNames = showPointsNames;
       this._debugDrawShowCustomPoints = showCustomPoints;
+      this._debugDrawShowCollisionMasks = showCollisionMasks;
+      this._debugDrawShowPositions = showPositions;
     }
 
     /**
@@ -553,7 +559,9 @@ namespace gdjs {
           this._allInstancesList,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
-          this._debugDrawShowCustomPoints
+          this._debugDrawShowCustomPoints,
+          this._debugDrawShowCollisionMasks,
+          this._debugDrawShowPositions
         );
       }
 

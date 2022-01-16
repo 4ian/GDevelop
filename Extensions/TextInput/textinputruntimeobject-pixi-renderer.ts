@@ -52,13 +52,14 @@ namespace gdjs {
       this._input.style.backgroundColor = 'white';
       this._input.style.position = 'absolute';
       this._input.style.resize = 'none';
+      this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
 
       this._input.addEventListener('input', () => {
         this._object.onRendererInputValueChanged(this._input.value);
       });
       this._input.addEventListener('touchstart', () => {
         // Focus directly when touching the input on touchscreens.
-        this._input.focus();
+        if (document.activeElement !== this._input) this._input.focus();
       });
 
       this.updateValue();
@@ -112,14 +113,12 @@ namespace gdjs {
       this._input.style.display = 'initial';
 
       // Position the input on the container on top of the canvas
-      const topLeftPageCoordinates =
-        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-          topLeftCanvasCoordinates
-        );
-      const bottomRightPageCoordinates =
-        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-          bottomRightCanvasCoordinates
-        );
+      const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+        topLeftCanvasCoordinates
+      );
+      const bottomRightPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+        bottomRightCanvasCoordinates
+      );
 
       const widthInContainer =
         bottomRightPageCoordinates[0] - topLeftPageCoordinates[0];
@@ -197,8 +196,6 @@ namespace gdjs {
     }
   }
 
-  export const TextInputRuntimeObjectRenderer =
-    TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer =
-    TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
 }

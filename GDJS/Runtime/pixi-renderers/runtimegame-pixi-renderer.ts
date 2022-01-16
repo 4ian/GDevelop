@@ -90,6 +90,7 @@ namespace gdjs {
       domElementsContainer.style.position = 'absolute';
       domElementsContainer.style.overflow = 'hidden'; // Never show anything outside the container.
       domElementsContainer.style.outline = 'none'; // No selection/focus ring on this container.
+      domElementsContainer.style.pointerEvents = 'none'; // Clicks go through the container.
 
       // The container should *never* scroll.
       // Elements are put inside with the same coordinates (with a scaling factor)
@@ -102,7 +103,7 @@ namespace gdjs {
 
       // When clicking outside an input, (or other HTML element),
       // give back focus to the game canvas so that this element is blurred.
-      domElementsContainer.addEventListener('pointerdown', () => {
+      gameCanvas.addEventListener('pointerdown', () => {
         gameCanvas.focus();
       });
 

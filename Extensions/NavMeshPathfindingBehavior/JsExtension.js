@@ -171,8 +171,9 @@ const declarePathfindingBehavior = function (
     .addScopedAction(
       'DrawNavMesh',
       _('Draw navigation mesh'),
-      _('Draw the navigation mesh on the debug view when the debug view is enabled too.'),
-      _('Draw the navigation mesh: _PARAM2_ used for _PARAM0_ on the debug view with the color: _PARAM3_'),
+      _('This activates the display of the navigation mesh on the debugging view.' +
+      ' The debugging view needs to be enabled with another action or nothing will be displayed.'),
+      _('Enable the drawing of the navigation mesh: _PARAM2_ used for _PARAM0_ on the debugging view with the color: _PARAM3_'),
       'Debug (NavMesh)',
       'CppPlatform/Extensions/AStaricon24.png',
       'CppPlatform/Extensions/AStaricon16.png'

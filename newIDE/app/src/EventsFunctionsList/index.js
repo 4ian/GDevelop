@@ -16,13 +16,13 @@ import {
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import Window from '../Utils/Window';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
-
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
 const styles = {
@@ -37,7 +37,17 @@ export type EventsFunctionCreationParameters = {|
 |};
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
-  eventsFunction.getName() + (eventsFunction.isPrivate() ? ' (private)' : '');
+  eventsFunction.isPrivate() ? (
+    <React.Fragment>
+      <VisibilityOffIcon
+        fontSize="small"
+        style={{ marginRight: 5, verticalAlign: 'bottom' }}
+      />
+      {eventsFunction.getName()}
+    </React.Fragment>
+  ) : (
+    <>{eventsFunction.getName()}</>
+  );
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -123,6 +133,54 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     );
   };
 
+  _getFunctionThumbnail = (eventsFunction: ?gdEventsFunction) => {
+    switch (eventsFunction.getFunctionType()) {
+      default:
+        return 'res/functions/function32.png';
+      case 0:
+        if (
+          eventsFunction.getName() === 'onSceneLoaded' ||
+          eventsFunction.getName() === 'onFirstSceneLoaded' ||
+          eventsFunction.getName() === 'onCreated'
+        ) {
+          return 'res/functions/create32.png';
+        }
+        if (
+          eventsFunction.getName() === 'onScenePreEvents' ||
+          eventsFunction.getName() === 'onScenePostEvents' ||
+          eventsFunction.getName() === 'doStepPreEvents' ||
+          eventsFunction.getName() === 'doStepPostEvents'
+        ) {
+          return 'res/functions/step32.png';
+        }
+        if (
+          eventsFunction.getName() === 'onScenePaused' ||
+          eventsFunction.getName() === 'onDeActivate'
+        ) {
+          return 'res/functions/deactivate32.png';
+        }
+        if (
+          eventsFunction.getName() === 'onSceneResumed' ||
+          eventsFunction.getName() === 'onActivate'
+        ) {
+          return 'res/functions/activate32.png';
+        }
+        if (
+          eventsFunction.getName() === 'onSceneUnloading' ||
+          eventsFunction.getName() === 'onDestroy'
+        ) {
+          return 'res/functions/destroy32.png';
+        } else {
+          return 'res/functions/action32.png';
+        }
+      case 1:
+        return 'res/functions/condition32.png';
+      case 2:
+        return 'res/functions/expression32.png';
+      case 3:
+        return 'res/functions/expression32.png';
+    }
+  };
   _rename = (eventsFunction: gdEventsFunction, newName: string) => {
     const { eventsFunctionsContainer } = this.props;
     this.setState({
@@ -232,6 +290,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         label: eventsFunction.isPrivate()
           ? i18n._(t`Make public`)
           : i18n._(t`Make private`),
+        enabled: this.props.canRename(eventsFunction),
         click: () => this._togglePrivate(eventsFunction),
       },
       {
@@ -323,6 +382,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                     onAddNewItem={this._addNewEventsFunction}
                     addNewItemLabel={<Trans>Add a new function</Trans>}
                     getItemName={getEventsFunctionName}
+                    getItemThumbnail={this._getFunctionThumbnail}
                     selectedItems={
                       selectedEventsFunction ? [selectedEventsFunction] : []
                     }

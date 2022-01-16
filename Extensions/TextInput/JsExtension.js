@@ -55,6 +55,27 @@ module.exports = {
       } else if (propertyName === 'inputType') {
         objectContent.inputType = newValue;
         return true;
+      } else if (propertyName === 'textColor') {
+        objectContent.textColor = newValue;
+        return true;
+      } else if (propertyName === 'fillColor') {
+        objectContent.fillColor = newValue;
+        return true;
+      } else if (propertyName === 'fillOpacity') {
+        objectContent.fillOpacity = Math.max(
+          0,
+          Math.min(255, parseFloat(newValue))
+        );
+        return true;
+      } else if (propertyName === 'borderColor') {
+        objectContent.borderColor = newValue;
+        return true;
+      } else if (propertyName === 'borderOpacity') {
+        objectContent.borderOpacity = Math.max(
+          0,
+          Math.min(255, parseFloat(newValue))
+        );
+        return true;
       }
 
       return false;
@@ -102,6 +123,36 @@ module.exports = {
         // .addExtraInfo('text area') // TODO
         .setLabel(_('Input type'));
 
+      objectProperties
+        .getOrCreate('textColor')
+        .setValue(objectContent.textColor || '0;0;0')
+        .setType('color')
+        .setLabel(_('Text color'));
+
+      objectProperties
+        .getOrCreate('fillColor')
+        .setValue(objectContent.fillColor || '255;255;255')
+        .setType('color')
+        .setLabel(_('Fill color'));
+
+      objectProperties
+        .getOrCreate('fillOpacity')
+        .setValue((objectContent.fillOpacity || 255).toString())
+        .setType('number')
+        .setLabel(_('Fill opacity'));
+
+      objectProperties
+        .getOrCreate('borderColor')
+        .setValue(objectContent.borderColor || '0;0;0')
+        .setType('color')
+        .setLabel(_('Border color'));
+
+      objectProperties
+        .getOrCreate('borderOpacity')
+        .setValue((objectContent.borderOpacity || 255).toString())
+        .setType('number')
+        .setLabel(_('Border opacity'));
+
       return objectProperties;
     };
     textInputObject.setRawJSONContent(
@@ -110,7 +161,12 @@ module.exports = {
         placeholder: 'Touch to start typing',
         fontResourceName: '',
         fontSize: 20,
-        inputType: '',
+        inputType: 'text',
+        textColor: '0;0;0',
+        fillColor: '255;255;255',
+        fillOpacity: 1,
+        borderColor: '0;0;0',
+        borderOpacity: 1,
       })
     );
 
@@ -246,7 +302,7 @@ module.exports = {
       .setFunctionName('setFontResourceName');
 
     object
-      .addExpressionAndConditionAndAction( // TODO: use a separate action
+      .addExpressionAndConditionAndAction(
         'string',
         'InputType',
         _('Input type'),
@@ -256,9 +312,86 @@ module.exports = {
         'res/conditions/text24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .useStandardParameters('string')
+      .useStandardParameters('string') // TODO: stringWithSelector?
       .setFunctionName('setInputType')
       .setGetter('getInputType');
+
+    object
+      .addScopedAction(
+        'SetTextColor',
+        _('Text color'),
+        _('Set the text color of the object.'),
+        _('Set the text color of _PARAM0_ to _PARAM1_'),
+        '',
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .addParameter('color', _('Color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setTextColor');
+
+    object
+      .addScopedAction(
+        'SetFillColor',
+        _('Fill color'),
+        _('Set the fill color of the object.'),
+        _('Set the fill color of _PARAM0_ to _PARAM1_'),
+        '',
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .addParameter('color', _('Color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setFillColor');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'FillOpacity',
+        _('Fill opacity'),
+        _('the fill opacity, between 0 (fully transparent) and 255 (opaque)'),
+        _('the fill opacity'),
+        '',
+        'res/conditions/opacity24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('number')
+      .setFunctionName('setFillOpacity')
+      .setGetter('getFillOpacity');
+
+    object
+      .addScopedAction(
+        'SetBorderColor',
+        _('Border color'),
+        _('Set the border color of the object.'),
+        _('Set the border color of _PARAM0_ to _PARAM1_'),
+        '',
+        'res/actions/color24.png',
+        'res/actions/color.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .addParameter('color', _('Color'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setBorderColor');
+
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'BorderOpacity',
+        _('Border opacity'),
+        _('the border opacity, between 0 (fully transparent) and 255 (opaque)'),
+        _('the border opacity'),
+        '',
+        'res/conditions/opacity24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('number')
+      .setFunctionName('setBorderOpacity')
+      .setGetter('getBorderOpacity');
+
+    // TODO: expressions for color
 
     // Other expressions/conditions/actions:
     object
@@ -380,10 +513,12 @@ module.exports = {
         const hasInitialValue = initialValue !== '';
         this._pixiText.text = hasInitialValue ? initialValue : placeholder;
 
-        // TODO: font color
-        const textColor = hasInitialValue ? 0x0 : 0x888888;
-        if (this._pixiText.style.fill !== textColor) {
-          this._pixiText.style.fill = textColor;
+        const textColor = properties.get('textColor').getValue();
+        const finalTextColor = hasInitialValue
+          ? objectsRenderingService.rgbOrHexToHexNumber(textColor)
+          : 0x888888;
+        if (this._pixiText.style.fill !== finalTextColor) {
+          this._pixiText.style.fill = finalTextColor;
           this._pixiText.dirty = true;
         }
 
@@ -433,15 +568,20 @@ module.exports = {
 
         this._pixiText.position.y = height / 2 - this._pixiText.height / 2;
 
+        const fillColor = properties.get('fillColor').getValue();
+        const fillOpacity = properties.get('fillOpacity').getValue();
+        const borderColor = properties.get('borderColor').getValue();
+        const borderOpacity = properties.get('borderOpacity').getValue();
+
         this._pixiGraphics.clear();
         this._pixiGraphics.lineStyle(
           1,
-          0x0, // TODO: outline color
-          1 // TODO: outline opacity
+          objectsRenderingService.rgbOrHexToHexNumber(borderColor),
+          borderOpacity / 255
         );
         this._pixiGraphics.beginFill(
-          0xffffff, // TODO: fill color
-          1 // TODO: fill opacity
+          objectsRenderingService.rgbOrHexToHexNumber(fillColor),
+          fillOpacity / 255
         );
         this._pixiGraphics.drawRect(0, 0, width, height);
         this._pixiGraphics.endFill();

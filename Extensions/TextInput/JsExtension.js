@@ -88,70 +88,85 @@ module.exports = {
         .getOrCreate('initialValue')
         .setValue(objectContent.initialValue)
         .setType('string')
-        .setLabel(_('Initial value'));
+        .setLabel(_('Initial value'))
+        .setGroup(_('Content'));
 
       objectProperties
         .getOrCreate('placeholder')
         .setValue(objectContent.placeholder)
         .setType('string')
-        .setLabel(_('Placeholder'));
+        .setLabel(_('Placeholder'))
+        .setGroup(_('Content'));
 
       objectProperties
         .getOrCreate('fontResourceName')
         .setValue(objectContent.fontResourceName || '')
         .setType('resource')
         .addExtraInfo('font')
-        .setLabel(_('Font'));
+        .setLabel(_('Font'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('fontSize')
         .setValue((objectContent.fontSize || 20).toString())
         .setType('number')
-        .setLabel(_('Font size (px)'));
+        .setLabel(_('Font size (px)'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('inputType')
         .setValue(objectContent.inputType || '')
         .setType('choice')
         .addExtraInfo('text')
+        .addExtraInfo('text area')
         .addExtraInfo('email')
         .addExtraInfo('password')
         .addExtraInfo('number')
         .addExtraInfo('telephone number')
         .addExtraInfo('url')
         .addExtraInfo('search')
-        // .addExtraInfo('text area') // TODO
-        .setLabel(_('Input type'));
+        .setLabel(_('Input type'))
+        .setGroup(_('Type'))
+        .setDescription(
+          _(
+            'By default, a "text" is single line. Choose "text area" to allow multiple lines to be entered.'
+          )
+        );
 
       objectProperties
         .getOrCreate('textColor')
         .setValue(objectContent.textColor || '0;0;0')
         .setType('color')
-        .setLabel(_('Text color'));
+        .setLabel(_('Text color'))
+        .setGroup(_('Field appearance'));
 
       objectProperties
         .getOrCreate('fillColor')
         .setValue(objectContent.fillColor || '255;255;255')
         .setType('color')
-        .setLabel(_('Fill color'));
+        .setLabel(_('Fill color'))
+        .setGroup(_('Field appearance'));
 
       objectProperties
         .getOrCreate('fillOpacity')
         .setValue((objectContent.fillOpacity || 255).toString())
         .setType('number')
-        .setLabel(_('Fill opacity'));
+        .setLabel(_('Fill opacity'))
+        .setGroup(_('Field appearance'));
 
       objectProperties
         .getOrCreate('borderColor')
         .setValue(objectContent.borderColor || '0;0;0')
         .setType('color')
-        .setLabel(_('Border color'));
+        .setLabel(_('Border color'))
+        .setGroup(_('Field appearance'));
 
       objectProperties
         .getOrCreate('borderOpacity')
         .setValue((objectContent.borderOpacity || 255).toString())
         .setType('number')
-        .setLabel(_('Border opacity'));
+        .setLabel(_('Border opacity'))
+        .setGroup(_('Field appearance'));
 
       return objectProperties;
     };
@@ -217,7 +232,7 @@ module.exports = {
         'TextInputObject',
         _('Text input'),
         _('A text field the player can type text into.'),
-        'CppPlatform/Extensions/texticon24.png', // TODO
+        'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
@@ -263,7 +278,7 @@ module.exports = {
         _('Font size'),
         _('the font size'),
         _('the font size'),
-        '',
+        _('Font'),
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
@@ -278,7 +293,7 @@ module.exports = {
         _('Font name'),
         _('the font name'),
         _('the font name'),
-        '',
+        _('Font'),
         'res/conditions/font24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
@@ -292,7 +307,7 @@ module.exports = {
         _('Font name'),
         _('Set the font of the object.'),
         _('Set the font of _PARAM0_ to _PARAM1_'),
-        '',
+        _('Font'),
         'res/actions/font24.png',
         'res/actions/font.png'
       )
@@ -308,7 +323,7 @@ module.exports = {
         _('Input type'),
         _('the input type'),
         _('the input type'),
-        '',
+        _('Type'),
         'res/conditions/text24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
@@ -322,7 +337,7 @@ module.exports = {
         _('Text color'),
         _('Set the text color of the object.'),
         _('Set the text color of _PARAM0_ to _PARAM1_'),
-        '',
+        _('Field appearance'),
         'res/actions/color24.png',
         'res/actions/color.png'
       )
@@ -337,7 +352,7 @@ module.exports = {
         _('Fill color'),
         _('Set the fill color of the object.'),
         _('Set the fill color of _PARAM0_ to _PARAM1_'),
-        '',
+        _('Field appearance'),
         'res/actions/color24.png',
         'res/actions/color.png'
       )
@@ -353,7 +368,7 @@ module.exports = {
         _('Fill opacity'),
         _('the fill opacity, between 0 (fully transparent) and 255 (opaque)'),
         _('the fill opacity'),
-        '',
+        _('Field appearance'),
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
@@ -367,7 +382,7 @@ module.exports = {
         _('Border color'),
         _('Set the border color of the object.'),
         _('Set the border color of _PARAM0_ to _PARAM1_'),
-        '',
+        _('Field appearance'),
         'res/actions/color24.png',
         'res/actions/color.png'
       )
@@ -383,7 +398,7 @@ module.exports = {
         _('Border opacity'),
         _('the border opacity, between 0 (fully transparent) and 255 (opaque)'),
         _('the border opacity'),
-        '',
+        _('Field appearance'),
         'res/conditions/opacity24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
@@ -391,7 +406,7 @@ module.exports = {
       .setFunctionName('setBorderOpacity')
       .setGetter('getBorderOpacity');
 
-    // TODO: expressions for color
+    // TODO: expressions for colors?
 
     // Other expressions/conditions/actions:
     object
@@ -462,6 +477,7 @@ module.exports = {
       _pixiTextMask;
       _pixiGraphics;
       _fontResourceName = '';
+      _finalTextColor = 0x0;
 
       constructor(
         project,
@@ -480,7 +496,6 @@ module.exports = {
           pixiResourcesLoader
         );
 
-        //Setup the PIXI object:
         this._pixiGraphics = new PIXI.Graphics();
         this._pixiTextMask = new PIXI.Graphics();
         this._pixiText = new PIXI.Text(' ', {
@@ -497,7 +512,7 @@ module.exports = {
       }
 
       static getThumbnail(project, resourcesLoader, object) {
-        return 'CppPlatform/Extensions/texticon24.png'; // TODO: icon
+        return 'JsPlatform/Extensions/text_input.svg';
       }
 
       update() {
@@ -517,7 +532,8 @@ module.exports = {
         const finalTextColor = hasInitialValue
           ? objectsRenderingService.rgbOrHexToHexNumber(textColor)
           : 0x888888;
-        if (this._pixiText.style.fill !== finalTextColor) {
+        if (this._finalTextColor !== finalTextColor) {
+          this._finalTextColor = finalTextColor;
           this._pixiText.style.fill = finalTextColor;
           this._pixiText.dirty = true;
         }
@@ -535,7 +551,6 @@ module.exports = {
           this._pixiResourcesLoader
             .loadFontFamily(this._project, fontResourceName)
             .then((fontFamily) => {
-              // Once the font is loaded, we can use the given fontFamily.
               this._pixiText.style.fontFamily = fontFamily;
               this._pixiText.dirty = true;
             })
@@ -566,7 +581,12 @@ module.exports = {
           height - 2 * textMaskBorder
         );
 
-        this._pixiText.position.y = height / 2 - this._pixiText.height / 2;
+        const isTextArea =
+          properties.get('inputType').getValue() === 'text area';
+
+        this._pixiText.position.y = isTextArea
+          ? textMaskBorder
+          : height / 2 - this._pixiText.height / 2;
 
         const fillColor = properties.get('fillColor').getValue();
         const fillOpacity = properties.get('fillOpacity').getValue();

@@ -9,6 +9,23 @@ namespace gdjs {
     search: 'search',
   };
 
+  const formatRgbAndOpacityToCssRgba = (
+    rgbColor: [float, float, float],
+    opacity: float
+  ) => {
+    return (
+      'rgba(' +
+      rgbColor[0] +
+      ',' +
+      rgbColor[1] +
+      ',' +
+      rgbColor[2] +
+      ',' +
+      opacity / 255 +
+      ')'
+    );
+  };
+
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
     private _input: HTMLInputElement;
@@ -23,7 +40,7 @@ namespace gdjs {
       this._input = document.createElement('input');
       this._input.style.border = '1px solid black';
       this._input.style.borderRadius = '0px';
-      this._input.style.background = 'white';
+      this._input.style.backgroundColor = 'white';
       this._input.style.position = 'absolute';
 
       this._input.addEventListener('input', () => {
@@ -39,6 +56,9 @@ namespace gdjs {
       this.updatePlaceholder();
       this.updateOpacity();
       this.updateInputType();
+      this.updateTextColor();
+      this.updateFillColorAndOpacity();
+      this.updateBorderColorAndOpacity();
 
       this._runtimeGame
         .getRenderer()
@@ -128,6 +148,27 @@ namespace gdjs {
       const newType =
         userFriendlyToHtmlInputTypes[this._object.getInputType()] || 'text';
       this._input.setAttribute('type', newType);
+    }
+
+    updateTextColor() {
+      this._input.style.color = formatRgbAndOpacityToCssRgba(
+        this._object._getRawTextColor(),
+        255
+      );
+    }
+
+    updateFillColorAndOpacity() {
+      this._input.style.backgroundColor = formatRgbAndOpacityToCssRgba(
+        this._object._getRawFillColor(),
+        this._object.getFillOpacity()
+      );
+    }
+
+    updateBorderColorAndOpacity() {
+      this._input.style.borderColor = formatRgbAndOpacityToCssRgba(
+        this._object._getRawBorderColor(),
+        this._object.getBorderOpacity()
+      );
     }
   }
 

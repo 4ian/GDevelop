@@ -9,6 +9,7 @@ namespace gdjs {
     'telephone number',
     'url',
     'search',
+    'text area',
   ] as const;
 
   type SupportedInputType = typeof supportedInputTypes[number];

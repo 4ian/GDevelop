@@ -184,9 +184,10 @@ const declarePathfindingBehavior = function (
       'NavMeshPathfindingBehavior',
       false
     )
-    .addParameter("yesorno", _("Show navigation mesh"))
-    .addParameter("color", _("Color"))
-    .addParameter("opacity", _("Opacity"))
+    .addParameter('yesorno', _('Show navigation mesh'), '', true)
+    .setDefaultValue('yes')
+    .addParameter('color', _('Color'))
+    .addParameter('opacity', _('Opacity'))
     .markAsAdvanced()
     .getCodeExtraInformation()
     .setFunctionName('setVisualDebugEnabled');

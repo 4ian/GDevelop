@@ -52,6 +52,7 @@ namespace gdjs {
       this._input.style.backgroundColor = 'white';
       this._input.style.position = 'absolute';
       this._input.style.resize = 'none';
+      this._input.style.outline = 'none';
       this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
 
       this._input.addEventListener('input', () => {
@@ -76,9 +77,7 @@ namespace gdjs {
 
     _destroyElement() {
       if (!this._input) return;
-
-      const parentElement = this._input.parentElement;
-      if (parentElement) parentElement.removeChild(this._input);
+      this._input.remove();
     }
 
     onDestroy() {

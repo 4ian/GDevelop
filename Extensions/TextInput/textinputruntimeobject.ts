@@ -25,7 +25,7 @@ namespace gdjs {
   };
 
   /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
-  export type TextInputObjectDataType = {
+  export interface TextInputObjectData extends ObjectData{
     /** The base parameters of the TextInput */
     content: {
       initialValue: string;
@@ -40,7 +40,6 @@ namespace gdjs {
       borderOpacity: float;
     };
   };
-  export type TextInputObjectData = ObjectData & TextInputObjectDataType;
 
   const defaultWidth = 300;
   const defaultHeight = 30;

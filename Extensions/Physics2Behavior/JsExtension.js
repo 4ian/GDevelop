@@ -406,7 +406,7 @@ module.exports = {
         _('Physics Engine 2.0'),
         'Physics2',
         _(
-          'Simulate realistic object physics, with gravity, forces, joints, etc.'
+          'Simulate realistic object physics with gravity, forces, joints, etc.'
         ),
         '',
         'res/physics32.png',

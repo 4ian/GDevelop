@@ -63,7 +63,7 @@ module.exports = {
         _('Tween'),
         'Tween',
         _(
-          'Smoothly animate position, angle, scale and other properties of the object.'
+          'Smoothly animate position, angle, scale and other properties of objects.'
         ),
         '',
         'JsPlatform/Extensions/tween_behavior32.png',

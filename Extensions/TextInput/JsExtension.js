@@ -28,7 +28,7 @@ module.exports = {
     extension.setExtensionInformation(
       'TextInput',
       _('Text Input'),
-      _('A text field the player can type text in to.'),
+      _('A text field the player can type text into.'),
       'Florian Rival',
       'MIT'
     );

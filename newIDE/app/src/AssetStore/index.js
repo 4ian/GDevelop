@@ -59,12 +59,7 @@ export const AssetStore = ({
 
   React.useEffect(
     () => {
-      if (
-        focusOnMount &&
-        shouldAutofocusSearchbar &&
-        searchBar &&
-        searchBar.current
-      ) {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
         searchBar.current.focus();
       }
     },

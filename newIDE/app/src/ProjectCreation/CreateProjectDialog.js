@@ -221,6 +221,7 @@ const CreateProjectDialog = ({
               {currentTab === 'examples' && (
                 <Column noMargin expand useFullHeight>
                   <ExampleStore
+                    focusOnMount
                     isOpening={isOpening}
                     onOpen={async (example: ?ExampleShortHeader) => {
                       setSelectedExampleShortShortHeader(example);

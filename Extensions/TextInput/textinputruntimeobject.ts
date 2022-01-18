@@ -25,7 +25,7 @@ namespace gdjs {
   };
 
   /** Base parameters for {@link gdjs.TextInputRuntimeObject} */
-  export interface TextInputObjectData extends ObjectData{
+  export interface TextInputObjectData extends ObjectData {
     /** The base parameters of the TextInput */
     content: {
       initialValue: string;
@@ -38,21 +38,22 @@ namespace gdjs {
       fillOpacity: float;
       borderColor: string;
       borderOpacity: float;
+      borderWidth: float;
     };
-  };
+  }
 
-  const defaultWidth = 300;
-  const defaultHeight = 30;
+  const DEFAULT_WIDTH = 300;
+  const DEFAULT_HEIGHT = 30;
 
   /**
    * Shows a text input on the screen the player can type text into.
    */
   export class TextInputRuntimeObject extends gdjs.RuntimeObject {
-    private _value: string;
+    private _string: string;
     private _placeholder: string;
     private opacity: float = 255;
-    private _width: float = defaultWidth;
-    private _height: float = defaultHeight;
+    private _width: float = DEFAULT_WIDTH;
+    private _height: float = DEFAULT_HEIGHT;
     private _fontResourceName: string;
     private _fontSize: float;
     private _inputType: SupportedInputType;
@@ -61,6 +62,7 @@ namespace gdjs {
     private _fillOpacity: float;
     private _borderColor: [float, float, float];
     private _borderOpacity: float;
+    private _borderWidth: float;
 
     _renderer: TextInputRuntimeObjectRenderer;
 
@@ -70,7 +72,7 @@ namespace gdjs {
     ) {
       super(runtimeScene, objectData);
 
-      this._value = objectData.content.initialValue;
+      this._string = objectData.content.initialValue;
       this._placeholder = objectData.content.placeholder;
       this._fontResourceName = objectData.content.fontResourceName;
       this._fontSize = objectData.content.fontSize || 20;
@@ -82,6 +84,7 @@ namespace gdjs {
         objectData.content.borderColor
       );
       this._borderOpacity = objectData.content.borderOpacity;
+      this._borderWidth = objectData.content.borderWidth;
 
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(this);
 
@@ -101,8 +104,8 @@ namespace gdjs {
         oldObjectData.content.initialValue !==
         newObjectData.content.initialValue
       ) {
-        if (this._value === oldObjectData.content.initialValue) {
-          this.setValue(newObjectData.content.initialValue);
+        if (this._string === oldObjectData.content.initialValue) {
+          this.setString(newObjectData.content.initialValue);
         }
       }
       if (
@@ -144,6 +147,12 @@ namespace gdjs {
       ) {
         this.setBorderOpacity(newObjectData.content.borderOpacity);
       }
+      if (
+        oldObjectData.content.borderWidth !==
+        newObjectData.content.borderWidth
+      ) {
+        this.setBorderWidth(newObjectData.content.borderWidth);
+      }
       return true;
     }
 
@@ -157,7 +166,7 @@ namespace gdjs {
     extraInitializationFromInitialInstance(initialInstanceData: InstanceData) {
       for (const property of initialInstanceData.stringProperties) {
         if (property.name === 'initialValue') {
-          this.setValue(property.value);
+          this.setString(property.value);
         } else if (property.name === 'placeholder') {
           this.setPlaceholder(property.value);
         }
@@ -222,18 +231,18 @@ namespace gdjs {
     /**
      * Get the text entered in the text input.
      */
-    getValue() {
-      return this._value;
+    getString() {
+      return this._string;
     }
 
     /**
      * Replace the text inside the text input.
      */
-    setValue(newValue: string) {
-      if (newValue === this._value) return;
+    setString(newString: string) {
+      if (newString === this._string) return;
 
-      this._value = newValue;
-      this._renderer.updateValue();
+      this._string = newString;
+      this._renderer.updateString();
     }
 
     /**
@@ -242,10 +251,10 @@ namespace gdjs {
      * This does not propagate back the value to the renderer, which would
      * result in the cursor being sent back to the end of the text.
      *
-     * Do not use this if you are not inside the renderer - use `setValue` instead.
+     * Do not use this if you are not inside the renderer - use `setString` instead.
      */
-    onRendererInputValueChanged(newValue: string) {
-      this._value = newValue;
+    onRendererInputValueChanged(inputValue: string) {
+      this._string = inputValue;
     }
 
     getFontResourceName() {
@@ -367,6 +376,15 @@ namespace gdjs {
 
     getBorderOpacity(): float {
       return this._borderOpacity;
+    }
+
+    setBorderWidth(width: float) {
+      this._borderWidth = Math.max(0, width);
+      this._renderer.updateBorderWidth();
+    }
+
+    getBorderWidth(): float {
+      return this._borderWidth;
     }
   }
   gdjs.registerObject(

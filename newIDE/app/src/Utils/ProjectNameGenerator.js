@@ -1916,7 +1916,6 @@ const nouns = [
   'skin',
   'skirt',
   'sky',
-  'slave',
   'sleep',
   'sleet',
   'slip',

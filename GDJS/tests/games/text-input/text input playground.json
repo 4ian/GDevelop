@@ -155,7 +155,7 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 0.39460000000000045,
+        "zoomFactor": 1.0542000000000005,
         "windowMask": false
       },
       "objectsGroups": [],
@@ -606,7 +606,8 @@
             "fillColor": "255;255;255",
             "fillOpacity": 255,
             "borderColor": "0;0;0",
-            "borderOpacity": 255
+            "borderOpacity": 255,
+            "borderWidth": 0
           }
         },
         {
@@ -626,7 +627,8 @@
             "fillColor": "139;87;42",
             "fillOpacity": 255,
             "borderColor": "126;211;33",
-            "borderOpacity": 255
+            "borderOpacity": 255,
+            "borderWidth": 2
           }
         },
         {
@@ -646,7 +648,8 @@
             "fillColor": "139;87;42",
             "fillOpacity": 255,
             "borderColor": "126;211;33",
-            "borderOpacity": 255
+            "borderOpacity": 255,
+            "borderWidth": 5
           }
         }
       ],

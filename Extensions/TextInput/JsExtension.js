@@ -76,6 +76,9 @@ module.exports = {
           Math.min(255, parseFloat(newValue))
         );
         return true;
+      } else if (propertyName === 'borderWidth') {
+        objectContent.borderWidth = Math.max(0, parseFloat(newValue));
+        return true;
       }
 
       return false;
@@ -168,6 +171,13 @@ module.exports = {
         .setLabel(_('Border opacity'))
         .setGroup(_('Field appearance'));
 
+        objectProperties
+          .getOrCreate('borderWidth')
+          .setValue((objectContent.borderWidth || 0).toString())
+          .setType('number')
+          .setLabel(_('Border width'))
+          .setGroup(_('Field appearance'));
+
       return objectProperties;
     };
     textInputObject.setRawJSONContent(
@@ -179,9 +189,10 @@ module.exports = {
         inputType: 'text',
         textColor: '0;0;0',
         fillColor: '255;255;255',
-        fillOpacity: 1,
+        fillOpacity: 255,
         borderColor: '0;0;0',
-        borderOpacity: 1,
+        borderOpacity: 255,
+        borderWidth: 1,
       })
     );
 
@@ -253,8 +264,8 @@ module.exports = {
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
       .useStandardParameters('string')
-      .setFunctionName('setValue')
-      .setGetter('getValue');
+      .setFunctionName('setString')
+      .setGetter('getString');
 
     object
       .addExpressionAndConditionAndAction(
@@ -406,6 +417,21 @@ module.exports = {
       .setFunctionName('setBorderOpacity')
       .setGetter('getBorderOpacity');
 
+      object
+        .addExpressionAndConditionAndAction(
+          'number',
+          'BorderWidth',
+          _('Border width'),
+          _('the border width'),
+          _('the border width'),
+          _('Field appearance'),
+          'res/conditions/outlineSize24.png'
+        )
+        .addParameter('object', _('Text input'), 'TextInputObject', false)
+        .useStandardParameters('number')
+        .setFunctionName('setBorderWidth')
+        .setGetter('getBorderWidth');
+
     // TODO: expressions for colors?
 
     // Other expressions/conditions/actions:
@@ -468,9 +494,9 @@ module.exports = {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
 
-    const defaultWidth = 300;
-    const defaultHeight = 30;
-    const textMaskBorder = 2;
+    const DEFAULT_WIDTH = 300;
+    const DEFAULT_HEIGHT = 30;
+    const TEXT_MASK_PADDING = 2;
 
     class RenderedTextInputObjectInstance extends RenderedInstance {
       _pixiText;
@@ -566,36 +592,40 @@ module.exports = {
         this._pixiObject.position.x = instance.getX();
         this._pixiObject.position.y = instance.getY();
 
-        let width = defaultWidth;
-        let height = defaultHeight;
+        let width = DEFAULT_WIDTH;
+        let height = DEFAULT_HEIGHT;
         if (instance.hasCustomSize()) {
           width = instance.getCustomWidth();
           height = instance.getCustomHeight();
         }
 
+        const borderWidth = parseFloat(properties.get('borderWidth').getValue()) || 0;
+
+        const textOffset = borderWidth + TEXT_MASK_PADDING;
         this._pixiTextMask.clear();
         this._pixiTextMask.drawRect(
-          textMaskBorder,
-          textMaskBorder,
-          width - 2 * textMaskBorder,
-          height - 2 * textMaskBorder
+          textOffset,
+          textOffset,
+          width - 2 * textOffset,
+          height - 2 * textOffset
         );
 
         const isTextArea =
           properties.get('inputType').getValue() === 'text area';
 
+        this._pixiText.position.x = textOffset;
         this._pixiText.position.y = isTextArea
-          ? textMaskBorder
+          ? textOffset
           : height / 2 - this._pixiText.height / 2;
 
         const fillColor = properties.get('fillColor').getValue();
-        const fillOpacity = properties.get('fillOpacity').getValue();
+        const fillOpacity = parseFloat(properties.get('fillOpacity').getValue());
         const borderColor = properties.get('borderColor').getValue();
-        const borderOpacity = properties.get('borderOpacity').getValue();
+        const borderOpacity = parseFloat(properties.get('borderOpacity').getValue());
 
         this._pixiGraphics.clear();
         this._pixiGraphics.lineStyle(
-          1,
+          borderWidth,
           objectsRenderingService.rgbOrHexToHexNumber(borderColor),
           borderOpacity / 255
         );
@@ -608,11 +638,11 @@ module.exports = {
       }
 
       getDefaultWidth() {
-        return defaultWidth;
+        return DEFAULT_WIDTH;
       }
 
       getDefaultHeight() {
-        return defaultHeight;
+        return DEFAULT_HEIGHT;
       }
     }
 

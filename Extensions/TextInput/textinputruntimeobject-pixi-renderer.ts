@@ -63,7 +63,7 @@ namespace gdjs {
         if (document.activeElement !== this._input) this._input.focus();
       });
 
-      this.updateValue();
+      this.updateString();
       this.updateFont();
       this.updatePlaceholder();
       this.updateOpacity();
@@ -71,6 +71,7 @@ namespace gdjs {
       this.updateTextColor();
       this.updateFillColorAndOpacity();
       this.updateBorderColorAndOpacity();
+      this.updateBorderWidth();
 
       return this._input;
     }
@@ -136,8 +137,8 @@ namespace gdjs {
         'px';
     }
 
-    updateValue() {
-      this._input.value = this._object.getValue();
+    updateString() {
+      this._input.value = this._object.getString();
     }
 
     updatePlaceholder() {
@@ -192,6 +193,9 @@ namespace gdjs {
         this._object._getRawBorderColor(),
         this._object.getBorderOpacity()
       );
+    }
+    updateBorderWidth() {
+      this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
   }
 

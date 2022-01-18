@@ -143,6 +143,9 @@ namespace gdjs {
         this._resizeCanvas();
         this._game._notifySceneForResize = true;
       });
+
+      // Focus the canvas when created.
+      gameCanvas.focus();
     }
 
     static getWindowInnerWidth() {
@@ -495,8 +498,25 @@ namespace gdjs {
         }
       })();
 
-      //Keyboard
+      // Keyboard: listen at the document level to capture even when the canvas
+      // is not focused.
+
+      const isFocusingDomElement = () => {
+        // Fast bailout when the game canvas should receive the inputs (i.e: almost always).
+        // Also check the document body or null for activeElement, as all of these should go
+        // to the game.
+        if (
+          document.activeElement === canvas ||
+          document.activeElement === document.body ||
+          document.activeElement === null
+        )
+          return false;
+
+        return true;
+      };
       document.onkeydown = function (e) {
+        if (isFocusingDomElement()) return;
+
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           e.preventDefault();
         }
@@ -504,6 +524,8 @@ namespace gdjs {
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {
+        if (isFocusingDomElement()) return;
+
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
           e.preventDefault();
         }
@@ -512,11 +534,11 @@ namespace gdjs {
       };
 
       //Mouse
-      renderer.view.onmousemove = function (e) {
+      canvas.onmousemove = function (e) {
         const pos = getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
       };
-      renderer.view.onmousedown = function (e) {
+      canvas.onmousedown = function (e) {
         manager.onMouseButtonPressed(
           e.button === 2
             ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
@@ -529,7 +551,7 @@ namespace gdjs {
         }
         return false;
       };
-      renderer.view.onmouseup = function (e) {
+      canvas.onmouseup = function (e) {
         manager.onMouseButtonReleased(
           e.button === 2
             ? gdjs.InputManager.MOUSE_RIGHT_BUTTON
@@ -550,7 +572,7 @@ namespace gdjs {
         },
         false
       );
-      renderer.view.oncontextmenu = function (event) {
+      canvas.oncontextmenu = function (event) {
         event.preventDefault();
         event.stopPropagation();
         return false;

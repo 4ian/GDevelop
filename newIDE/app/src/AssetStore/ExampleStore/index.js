@@ -58,6 +58,15 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
       searchBarRef.current.focus();
   });
 
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: Array.from(filtersState.chosenFilters),
+    }),
+    [filtersState]
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -68,11 +77,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
-              tagsHandler={{
-                add: filtersState.addFilter,
-                remove: filtersState.removeFilter,
-                chosenTags: Array.from(filtersState.chosenFilters),
-              }}
+              tagsHandler={tagsHandler}
               tags={filters && filters.defaultTags}
               ref={searchBarRef}
             />

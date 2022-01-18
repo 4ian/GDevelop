@@ -53,10 +53,13 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
     [fetchExamplesAndFilters]
   );
 
-  React.useEffect(() => {
-    if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
-      searchBarRef.current.focus();
-  });
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
+        searchBarRef.current.focus();
+    },
+    [shouldAutofocusSearchbar, focusOnMount]
+  );
 
   const tagsHandler = React.useMemo(
     () => ({

@@ -94,9 +94,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "scenevar", _("Variable where to store the error message"), "", true)
       .SetParameterLongDescription(
           _("Optional, only used if an error occurs. This will contain the "
-            "error message (if request could not be sent) or the [\"status "
-            "code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes), "
-            "if the server returns a status >= 400."))
+            "[\"status code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) "
+            "if the server returns a status >= 400. If the request was not sent "
+            "at all (e.g. no internet or CORS issues), the variable will be set to "
+            "\"REQUEST_NOT_SENT\"."))
       .MarkAsComplex();
 
   extension

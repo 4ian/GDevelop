@@ -138,7 +138,8 @@ export default class ExportLauncher extends Component<Props, State> {
     const getAuthorizationHeader = this.props.authenticatedUser
       .getAuthorizationHeader;
     const gameId = this.props.project.getProjectUuid();
-    const authorName = this.props.project.getAuthor() || 'Unspecified author';
+    const authorName =
+      this.props.project.getAuthor() || 'Unspecified publisher';
     const gameName = this.props.project.getName() || 'Untitled game';
     if (profile) {
       const userId = profile.id;

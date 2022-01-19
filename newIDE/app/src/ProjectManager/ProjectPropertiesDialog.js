@@ -36,7 +36,7 @@ import {
   type HotReloadPreviewButtonProps,
   NewPreviewIcon,
 } from '../HotReload/HotReloadPreviewButton';
-import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
+import PublicGameProperties from './PublicGameProperties';
 
 type Props = {|
   project: gdProject,
@@ -276,22 +276,17 @@ function ProjectPropertiesDialog(props: Props) {
           >
             {currentTab === 'properties' && (
               <ColumnStackLayout expand noMargin>
-                <SemiControlledTextField
-                  floatingLabelText={<Trans>Game name</Trans>}
-                  fullWidth
-                  type="text"
-                  value={name}
-                  onChange={setName}
-                  autoFocus
+                <Text size="title">
+                  <Trans>Game Info</Trans>
+                </Text>
+                <PublicGameProperties
+                  name={name}
+                  setName={setName}
+                  project={project}
                 />
-                <SemiControlledTextField
-                  floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
-                  fullWidth
-                  hintText={defaultVersion}
-                  type="text"
-                  value={version}
-                  onChange={setVersion}
-                />
+                <Text size="title">
+                  <Trans>Packaging</Trans>
+                </Text>
                 <SemiControlledTextField
                   floatingLabelText={
                     <Trans>Package name (for iOS and Android)</Trans>
@@ -313,16 +308,24 @@ function ProjectPropertiesDialog(props: Props) {
                     )
                   }
                 />
-                <UsersAutocomplete
-                  userIds={project.getAuthorIds()}
-                  floatingLabelText={<Trans>Authors</Trans>}
-                  helperText={
-                    <Trans>
-                      Select the usernames of the authors of this project. They
-                      will be displayed in the selected order, if you publish
-                      this game as an example or in the community.
-                    </Trans>
-                  }
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
+                  fullWidth
+                  hintText={defaultVersion}
+                  type="text"
+                  value={version}
+                  onChange={setVersion}
+                />
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Publisher name</Trans>}
+                  fullWidth
+                  hintText={t`Your name`}
+                  helperMarkdownText={i18n._(
+                    t`This will be used when packaging and submitting your application to the stores.`
+                  )}
+                  type="text"
+                  value={author}
+                  onChange={setAuthor}
                 />
                 {useDeprecatedZeroAsDefaultZOrder ? (
                   <React.Fragment>
@@ -534,20 +537,7 @@ function ProjectPropertiesDialog(props: Props) {
                     </Trans>
                   </DismissableAlertMessage>
                 )}
-                <Text size="title">
-                  <Trans>Publishing</Trans>
-                </Text>
-                <SemiControlledTextField
-                  floatingLabelText={<Trans>Publisher name</Trans>}
-                  fullWidth
-                  hintText={t`Your name`}
-                  helperMarkdownText={i18n._(
-                    t`This will be used when packaging and submitting your application to the stores.`
-                  )}
-                  type="text"
-                  value={author}
-                  onChange={setAuthor}
-                />
+
                 <Text size="title">
                   <Trans>Project files</Trans>
                 </Text>

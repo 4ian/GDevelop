@@ -4,7 +4,7 @@ import * as React from 'react';
 import CreateProfile from '../Profile/CreateProfile';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import AlertMessage from '../UI/AlertMessage';
-import { Line, Spacer } from '../UI/Grid';
+import { Line } from '../UI/Grid';
 import { ColumnStackLayout } from '../UI/Layout';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -17,7 +17,6 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import TimelineIcon from '@material-ui/icons/Timeline';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
 import { GameDetailsDialog } from './GameDetailsDialog';
 
 type Props = {|
@@ -28,7 +27,7 @@ type Props = {|
   onGameRegistered?: () => void,
 |};
 
-type DetailsTab = 'details' | 'analytics' | 'monetization';
+type DetailsTab = 'details' | 'analytics';
 type UnavailableReason = 'unauthorized' | 'not-existing' | null;
 
 export const GameRegistration = ({
@@ -105,7 +104,7 @@ export const GameRegistration = ({
       try {
         await registerGame(getAuthorizationHeader, id, {
           gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified author',
+          authorName: project.getAuthor() || 'Unspecified publisher',
           gameName: project.getName() || 'Untitled game',
         });
         loadGame();
@@ -318,15 +317,6 @@ export const GameRegistrationWidget = ({
             label={<Trans>Analytics</Trans>}
             onClick={() => {
               setDetailsInitialTab('analytics');
-              setDetailsOpened(true);
-            }}
-          />
-          <Spacer />
-          <RaisedButton
-            icon={<MonetizationOnIcon />}
-            label={<Trans>Monetization</Trans>}
-            onClick={() => {
-              setDetailsInitialTab('monetization');
               setDetailsOpened(true);
             }}
           />

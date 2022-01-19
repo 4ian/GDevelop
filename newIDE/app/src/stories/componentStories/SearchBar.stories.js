@@ -67,7 +67,7 @@ export const WithTags = () => {
       tagsHandler={{
         add: filtersState.addFilter,
         remove: filtersState.removeFilter,
-        chosenTags: Array.from(filtersState.chosenFilters),
+        chosenTags: filtersState.chosenFilters,
       }}
       tags={['Platformer', 'RPG', 'Beat them all', 'Top down']}
     />

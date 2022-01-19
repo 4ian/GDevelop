@@ -40,7 +40,6 @@ import {
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
-import generateName from '../../../Utils/ProjectNameGenerator';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
 
@@ -162,7 +161,6 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
-      const [newProjectName, setNewProjectName] = React.useState<string>('');
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -265,12 +263,11 @@ export const HomePage = React.memo<Props>(
       const openPreCreationDialog = React.useCallback((open: boolean) => {
         if (open) {
           setOutputPath(app ? findEmptyPathInDefaultFolder(app) : '');
-          setNewProjectName(generateName());
         }
         setPreCreationDialogOpen(open);
       }, []);
 
-      const createProject = async (i18n: I18nType) => {
+      const createProject = async (i18n: I18nType, newProjectName: string) => {
         setIsOpening(true);
 
         try {
@@ -534,14 +531,9 @@ export const HomePage = React.memo<Props>(
                   open
                   isOpening={isOpening}
                   onClose={() => openPreCreationDialog(false)}
-                  onCreate={() => createProject(i18n)}
-                  onClickGenerateProjectName={() =>
-                    setNewProjectName(generateName())
-                  }
+                  onCreate={(projectName) => createProject(i18n, projectName)}
                   outputPath={electron ? outputPath : undefined}
                   onChangeOutputPath={electron ? setOutputPath : undefined}
-                  projectName={newProjectName}
-                  onChangeProjectName={setNewProjectName}
                 />
               )}
             </>

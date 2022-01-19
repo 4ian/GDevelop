@@ -8,17 +8,15 @@ import RaisedButton from '../UI/RaisedButton';
 import { Column, Spacer } from '../UI/Grid';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import TextField from '../UI/TextField';
+import generateName from '../Utils/ProjectNameGenerator';
 
 type Props = {|
   open: boolean,
   isOpening?: boolean,
   onClose: () => void,
-  onCreate: () => void | Promise<void>,
-  onClickGenerateProjectName: () => void,
+  onCreate: (projectName: string) => void | Promise<void>,
   outputPath?: string,
   onChangeOutputPath?: (outputPath: string) => void,
-  projectName: string,
-  onChangeProjectName: (name: string) => void,
 |};
 
 const ProjectPreCreationDialog = ({
@@ -26,15 +24,13 @@ const ProjectPreCreationDialog = ({
   isOpening,
   onClose,
   onCreate,
-  onClickGenerateProjectName,
   outputPath,
   onChangeOutputPath,
-  projectName,
-  onChangeProjectName,
 }: Props): React.Node => {
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
+  const [projectName, setProjectName] = React.useState<string>(() => generateName());
 
   const onValidate = React.useCallback(
     () => {
@@ -47,7 +43,7 @@ const ProjectPreCreationDialog = ({
         );
         return;
       }
-      onCreate();
+      onCreate(projectName);
     },
     [onCreate, projectName, isOpening]
   );
@@ -55,9 +51,9 @@ const ProjectPreCreationDialog = ({
   const _onChangeProjectName = React.useCallback(
     (event, text) => {
       if (projectNameError) setProjectNameError(null);
-      onChangeProjectName(text);
+      setProjectName(text);
     },
-    [onChangeProjectName, projectNameError]
+    [setProjectName, projectNameError]
   );
 
   return (
@@ -91,7 +87,9 @@ const ProjectPreCreationDialog = ({
           value={projectName}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
-          endAdornment={<Refresh onClick={onClickGenerateProjectName} />}
+          endAdornment={
+            <Refresh onClick={() => setProjectName(generateName())} />
+          }
         />
         {onChangeOutputPath && (
           <>

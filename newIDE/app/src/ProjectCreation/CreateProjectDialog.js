@@ -19,7 +19,6 @@ import ProjectPreCreationDialog from './ProjectPreCreationDialog';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import RaisedButton from '../UI/RaisedButton';
-import generateName from '../Utils/ProjectNameGenerator';
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 
@@ -86,7 +85,6 @@ const CreateProjectDialog = ({
     app ? findEmptyPathInDefaultFolder(app) : ''
   );
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
-  const [newProjectName, setNewProjectName] = React.useState<string>('');
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortShortHeader,
@@ -99,7 +97,6 @@ const CreateProjectDialog = ({
   const openPreCreationDialog = React.useCallback((open: boolean) => {
     if (open) {
       setOutputPath(app ? findEmptyPathInDefaultFolder(app) : '');
-      setNewProjectName(generateName());
     }
     setPreCreationDialogOpen(open);
   }, []);
@@ -158,7 +155,7 @@ const CreateProjectDialog = ({
 
   if (!open) return null;
 
-  const createProject = async (i18n: I18nType) => {
+  const createProject = async (i18n: I18nType, newProjectName: string) => {
     setIsOpening(true);
 
     try {
@@ -238,14 +235,9 @@ const CreateProjectDialog = ({
               open
               isOpening={isOpening}
               onClose={() => openPreCreationDialog(false)}
-              onCreate={() => createProject(i18n)}
-              onClickGenerateProjectName={() =>
-                setNewProjectName(generateName())
-              }
+              onCreate={(projectName) => createProject(i18n, projectName)}
               outputPath={electron ? outputPath : undefined}
               onChangeOutputPath={electron ? setOutputPath : undefined}
-              projectName={newProjectName}
-              onChangeProjectName={setNewProjectName}
             />
           )}
         </>

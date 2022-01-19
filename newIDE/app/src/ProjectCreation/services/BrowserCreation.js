@@ -12,15 +12,13 @@ import {
 
 const gd: libGDevelop = global.gd;
 
-// Signatures of this function and its arguments contain useless arguments
-// because this function has to match the signature of LocalCreation.onCreateBlank
-// that needs these arguments.
 export const onCreateBlank: OnCreateBlankFunction = async ({
   i18n,
-  outputPath,
-  projectName,
+  settings,
 }) => {
   sendNewGameCreated('');
+
+  const { projectName } = settings;
 
   const project = gd.ProjectHelper.createNewGDJSProject();
   return {
@@ -34,10 +32,11 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
 export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction = async ({
   i18n,
   exampleShortHeader,
-  projectName,
-  outputPath,
+  settings,
 }) => {
   try {
+    const { projectName } = settings;
+
     const example = await getExample(exampleShortHeader);
     sendNewGameCreated(example.projectFileUrl);
     return {

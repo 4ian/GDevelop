@@ -28,7 +28,7 @@ import { I18n } from '@lingui/react';
 type TagsHandler = {|
   remove: string => void,
   add: string => void,
-  chosenTags: Array<string>,
+  chosenTags: Set<string>,
 |};
 
 type Props = {|
@@ -206,7 +206,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         if (
           shouldAutofocusSearchbar &&
           tagsHandler &&
-          tagsHandler.chosenTags.length === 0 &&
+          tagsHandler.chosenTags.size === 0 &&
           previousChosenTagsCount.current > 0
         )
           focus();
@@ -216,7 +216,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
 
     React.useEffect(() => {
       previousChosenTagsCount.current = tagsHandler
-        ? tagsHandler.chosenTags.length
+        ? tagsHandler.chosenTags.size
         : 0;
     });
 
@@ -382,7 +382,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                   </Paper>
                 </Line>
                 {tagsHandler && (
-                  <Collapse in={tagsHandler.chosenTags.length > 0}>
+                  <Collapse in={tagsHandler.chosenTags.size > 0}>
                     <TagChips
                       tags={Array.from(tagsHandler.chosenTags)}
                       onRemove={tag => tagsHandler.remove(tag)}

@@ -65,7 +65,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
     () => ({
       add: filtersState.addFilter,
       remove: filtersState.removeFilter,
-      chosenTags: Array.from(filtersState.chosenFilters),
+      chosenTags: filtersState.chosenFilters,
     }),
     [filtersState]
   );

@@ -65,7 +65,7 @@ export const ExtensionStore = ({
     () => ({
       add: filtersState.addFilter,
       remove: filtersState.removeFilter,
-      chosenTags: Array.from(filtersState.chosenFilters),
+      chosenTags: filtersState.chosenFilters,
     }),
     [filtersState]
   );

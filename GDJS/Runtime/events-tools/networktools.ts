@@ -28,7 +28,11 @@ namespace gdjs {
         errorVar: gdjs.Variable
       ) {
         const onError = (err) => {
-          errorVar.setString('' + err);
+          if (err.currentTarget && err.currentTarget.status === 0) {
+            errorVar.setString('UNDEFINED');
+          } else {
+            errorVar.setString('' + err);
+          }
         };
         try {
           const request = new XMLHttpRequest();

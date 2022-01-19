@@ -61,6 +61,15 @@ export const ExtensionStore = ({
       )
     : null;
 
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: filtersState.chosenFilters,
+    }),
+    [filtersState]
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -71,11 +80,7 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
-              tagsHandler={{
-                add: filtersState.addFilter,
-                remove: filtersState.removeFilter,
-                chosenTags: Array.from(filtersState.chosenFilters),
-              }}
+              tagsHandler={tagsHandler}
               tags={filters && filters.allTags}
             />
             <ListSearchResults

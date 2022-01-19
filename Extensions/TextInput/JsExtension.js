@@ -129,7 +129,6 @@ module.exports = {
         .addExtraInfo('url')
         .addExtraInfo('search')
         .setLabel(_('Input type'))
-        .setGroup(_('Type'))
         .setDescription(
           _(
             'By default, a "text" is single line. Choose "text area" to allow multiple lines to be entered.'

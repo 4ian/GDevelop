@@ -18,8 +18,6 @@ export const Open = () => {
   return (
     <ProjectPreCreationDialog
       open
-      outputPath="/path/to/project/file.json"
-      onChangeOutputPath={action('change output path')}
       onClose={() => action('click on close')()}
       onCreate={() => action('click on create')()}
     />
@@ -32,8 +30,6 @@ export const Disabled = () => {
     <ProjectPreCreationDialog
       open
       isOpening
-      outputPath="/path/to/project/file.json"
-      onChangeOutputPath={action('change output path')}
       onClose={() => action('click on close')()}
       onCreate={() => action('click on create')()}
     />

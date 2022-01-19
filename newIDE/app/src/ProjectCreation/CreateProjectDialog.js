@@ -16,11 +16,7 @@ import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import ProjectPreCreationDialog from './ProjectPreCreationDialog';
-import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
-import optionalRequire from '../Utils/OptionalRequire.js';
 import RaisedButton from '../UI/RaisedButton';
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 
 export type CreateProjectDialogTabs =
   | 'examples'
@@ -42,10 +38,14 @@ export type CreateProjectDialogWithComponentsProps = {|
   initialTab: CreateProjectDialogTabs,
 |};
 
-export type OnCreateBlankFunction = ({|
-  i18n: I18nType,
+export type ProjectCreationSettings = {|
   projectName: string,
   outputPath?: string,
+|};
+
+export type OnCreateBlankFunction = ({|
+  i18n: I18nType,
+  settings: ProjectCreationSettings,
 |}) => Promise<?{|
   project: gdProject,
   storageProvider: ?StorageProvider,
@@ -56,8 +56,7 @@ export type OnCreateBlankFunction = ({|
 export type OnCreateFromExampleShortHeaderFunction = ({|
   i18n: I18nType,
   exampleShortHeader: ExampleShortHeader,
-  projectName: string,
-  outputPath?: string,
+  settings: ProjectCreationSettings,
 |}) => Promise<?{|
   storageProvider: StorageProvider,
   projectName: string,
@@ -81,9 +80,6 @@ const CreateProjectDialog = ({
   const [currentTab, setCurrentTab] = React.useState<CreateProjectDialogTabs>(
     initialTab
   );
-  const [outputPath, setOutputPath] = React.useState<string>(
-    app ? findEmptyPathInDefaultFolder(app) : ''
-  );
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
   const [
     selectedExampleShortHeader,
@@ -94,20 +90,13 @@ const CreateProjectDialog = ({
     setPreCreationDialogOpen,
   ] = React.useState<boolean>(false);
 
-  const openPreCreationDialog = React.useCallback((open: boolean) => {
-    if (open) {
-      setOutputPath(app ? findEmptyPathInDefaultFolder(app) : '');
-    }
-    setPreCreationDialogOpen(open);
-  }, []);
-
   const actions = React.useMemo(
     () => [
       <RaisedButton
         key="create-blank"
         label={<Trans>Create a blank project</Trans>}
         primary={false}
-        onClick={() => openPreCreationDialog(true)}
+        onClick={() => setPreCreationDialogOpen(true)}
       />,
       <FlatButton
         key="close"
@@ -116,7 +105,7 @@ const CreateProjectDialog = ({
         onClick={onClose}
       />,
     ],
-    [onClose, openPreCreationDialog]
+    [onClose, setPreCreationDialogOpen]
   );
 
   const secondaryActions = React.useMemo(
@@ -155,7 +144,7 @@ const CreateProjectDialog = ({
 
   if (!open) return null;
 
-  const createProject = async (i18n: I18nType, newProjectName: string) => {
+  const createProject = async (i18n: I18nType, settings: ProjectCreationSettings) => {
     setIsOpening(true);
 
     try {
@@ -164,21 +153,19 @@ const CreateProjectDialog = ({
       if (selectedExampleShortHeader) {
         projectMetadata = await onCreateFromExampleShortHeader({
           i18n,
-          outputPath,
-          projectName: newProjectName,
           exampleShortHeader: selectedExampleShortHeader,
+          settings,
         });
       } else {
         projectMetadata = await onCreateBlank({
           i18n,
-          outputPath,
-          projectName: newProjectName,
+          settings,
         });
       }
 
       if (!projectMetadata) return;
 
-      openPreCreationDialog(false);
+      setPreCreationDialogOpen(false);
       setSelectedExampleShortShortHeader(null);
       onOpen({ ...projectMetadata });
     } finally {
@@ -222,7 +209,7 @@ const CreateProjectDialog = ({
                     isOpening={isOpening}
                     onOpen={async (example: ?ExampleShortHeader) => {
                       setSelectedExampleShortShortHeader(example);
-                      openPreCreationDialog(true);
+                      setPreCreationDialogOpen(true);
                     }}
                   />
                 </Column>
@@ -235,10 +222,8 @@ const CreateProjectDialog = ({
             <ProjectPreCreationDialog
               open
               isOpening={isOpening}
-              onClose={() => openPreCreationDialog(false)}
-              onCreate={(projectName) => createProject(i18n, projectName)}
-              outputPath={electron ? outputPath : undefined}
-              onChangeOutputPath={electron ? setOutputPath : undefined}
+              onClose={() => setPreCreationDialogOpen(false)}
+              onCreate={projectName => createProject(i18n, projectName)}
             />
           )}
         </>

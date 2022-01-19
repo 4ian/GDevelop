@@ -144,7 +144,10 @@ const CreateProjectDialog = ({
 
   if (!open) return null;
 
-  const createProject = async (i18n: I18nType, settings: ProjectCreationSettings) => {
+  const createProject = async (
+    i18n: I18nType,
+    settings: ProjectCreationSettings
+  ) => {
     setIsOpening(true);
 
     try {

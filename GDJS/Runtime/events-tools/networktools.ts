@@ -34,7 +34,7 @@ namespace gdjs {
             err.currentTarget instanceof XMLHttpRequest &&
             err.currentTarget.status === 0
           ) {
-            errorVar.setString('UNDEFINED');
+            errorVar.setString('REQUEST_NOT_SENT');
           } else {
             errorVar.setString('' + err);
           }

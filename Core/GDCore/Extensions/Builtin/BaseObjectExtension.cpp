@@ -4,9 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
+#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCore/Extensions/Metadata/MultipleInstructionMetadata.h"
 
 using namespace std;
 namespace gd {
@@ -92,7 +92,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetCenter",
                 _("Center position"),
                 _("Change the position of an object, using its center."),
-                _("Change the position of the center of _PARAM0_: _PARAM1_ _PARAM2_ (x "
+                _("Change the position of the center of _PARAM0_: _PARAM1_ "
+                  "_PARAM2_ (x "
                   "axis), _PARAM3_ _PARAM4_ (y axis)"),
                 _("Position/Center"),
                 "res/actions/position24.png",
@@ -104,75 +105,91 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position"))
       .MarkAsSimple();
 
-  obj.AddExpressionAndConditionAndAction("number", "CenterX",
-          _("Center X position"),
-          _("the X position of the center of rotation"),
-          _("the X position of the center"),
-          _("Position/Center"),
-          "res/actions/position24.png")
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "CenterX",
+         _("Center X position"),
+         _("the X position of the center of rotation"),
+         _("the X position of the center"),
+         _("Position/Center"),
+         "res/actions/position24.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndConditionAndAction("number", "CenterY",
-          _("Center Y position"),
-          _("the Y position of the center of rotation"),
-          _("the Y position of the center"),
-          _("Position/Center"),
-          "res/actions/position24.png")
+  obj.AddExpressionAndConditionAndAction(
+         "number",
+         "CenterY",
+         _("Center Y position"),
+         _("the Y position of the center of rotation"),
+         _("the Y position of the center"),
+         _("Position/Center"),
+         "res/actions/position24.png")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndCondition("number", "BoundingBoxLeft",
-          _("Bounding box left position"),
-          _("the bounding box (the area encapsulating the object) left position"),
-          _("the bounding box left position"),
-          _("Position/Bounding Box"),
-          "res/conditions/bounding-box-left.svg")
+  obj.AddExpressionAndCondition("number",
+                                "BoundingBoxLeft",
+                                _("Bounding box left position"),
+                                _("the bounding box (the area encapsulating "
+                                  "the object) left position"),
+                                _("the bounding box left position"),
+                                _("Position/Bounding Box"),
+                                "res/conditions/bounding-box-left.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndCondition("number", "BoundingBoxTop",
-          _("Bounding box top position"),
-          _("the bounding box (the area encapsulating the object) top position"),
-          _("the bounding box top position"),
-          _("Position/Bounding Box"),
-          "res/conditions/bounding-box-top.svg")
+  obj.AddExpressionAndCondition(
+         "number",
+         "BoundingBoxTop",
+         _("Bounding box top position"),
+         _("the bounding box (the area encapsulating the object) top position"),
+         _("the bounding box top position"),
+         _("Position/Bounding Box"),
+         "res/conditions/bounding-box-top.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndCondition("number", "BoundingBoxRight",
-          _("Bounding box right position"),
-          _("the bounding box (the area encapsulating the object) right position"),
-          _("the bounding box right position"),
-          _("Position/Bounding Box"),
-          "res/conditions/bounding-box-right.svg")
+  obj.AddExpressionAndCondition("number",
+                                "BoundingBoxRight",
+                                _("Bounding box right position"),
+                                _("the bounding box (the area encapsulating "
+                                  "the object) right position"),
+                                _("the bounding box right position"),
+                                _("Position/Bounding Box"),
+                                "res/conditions/bounding-box-right.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndCondition("number", "BoundingBoxBottom",
-          _("Bounding box bottom position"),
-          _("the bounding box (the area encapsulating the object) bottom position"),
-          _("the bounding box bottom position"),
-          _("Position/Bounding Box"),
-          "res/conditions/bounding-box-bottom.svg")
+  obj.AddExpressionAndCondition("number",
+                                "BoundingBoxBottom",
+                                _("Bounding box bottom position"),
+                                _("the bounding box (the area encapsulating "
+                                  "the object) bottom position"),
+                                _("the bounding box bottom position"),
+                                _("Position/Bounding Box"),
+                                "res/conditions/bounding-box-bottom.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndCondition("number", "BoundingBoxCenterX",
-          _("Bounding box center X position"),
-          _("the bounding box (the area encapsulating the object) center X position"),
-          _("the bounding box center X position"),
-          _("Position/Bounding Box"),
-          "res/conditions/bounding-box-center.svg")
+  obj.AddExpressionAndCondition("number",
+                                "BoundingBoxCenterX",
+                                _("Bounding box center X position"),
+                                _("the bounding box (the area encapsulating "
+                                  "the object) center X position"),
+                                _("the bounding box center X position"),
+                                _("Position/Bounding Box"),
+                                "res/conditions/bounding-box-center.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
-  obj.AddExpressionAndCondition("number", "BoundingBoxCenterY",
-          _("Bounding box center Y position"),
-          _("the bounding box (the area encapsulating the object) center Y position"),
-          _("the bounding box center Y position"),
-          _("Position/Bounding Box"),
-          "res/conditions/bounding-box-center.svg")
+  obj.AddExpressionAndCondition("number",
+                                "BoundingBoxCenterY",
+                                _("Bounding box center Y position"),
+                                _("the bounding box (the area encapsulating "
+                                  "the object) center Y position"),
+                                _("the bounding box center Y position"),
+                                _("Position/Bounding Box"),
+                                "res/conditions/bounding-box-center.svg")
       .AddParameter("object", _("Object"))
       .UseStandardParameters("number");
 
@@ -289,7 +306,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "AddForceVersPos",
          _("Add a force to move toward a position"),
          _("Add a force to an object to make it move toward a position."),
-         _("Move _PARAM0_ toward _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
+         _("Move _PARAM0_ toward _PARAM1_;_PARAM2_ with _PARAM4_ force of "
+           "_PARAM3_ "
            "pixels"),
          _("Movement using forces"),
          "res/actions/force24.png",
@@ -306,11 +324,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          "AddForceTournePos",
          "Add a force to move around a position",
          "Add a force to an object to make it rotate around a "
-           "position.\nNote that the movement is not precise, especially if "
-           "the speed is high.\nTo position an object around a position more "
-           "precisely, use the actions in the category \"Position\".",
+         "position.\nNote that the movement is not precise, especially if "
+         "the speed is high.\nTo position an object around a position more "
+         "precisely, use the actions in the category \"Position\".",
          "Rotate _PARAM0_ around _PARAM1_;_PARAM2_ at _PARAM3_ deg/sec and "
-           "_PARAM4_ pixels away",
+         "_PARAM4_ pixels away",
          _("Movement using forces"),
          "res/actions/forceTourne24.png",
          "res/actions/forceTourne.png")
@@ -563,7 +581,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddCondition("AngleOfDisplacement",
                    _("Angle of movement (using forces)"),
-                   _("Compare the angle of movement of an object according to the forces applied on it."),
+                   _("Compare the angle of movement of an object according to "
+                     "the forces applied on it."),
                    _("Angle of movement of _PARAM0_ is _PARAM1_ (tolerance"
                      ": _PARAM2_ degrees)"),
                    _("Movement using forces"),
@@ -719,14 +738,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("yesorno", _("Activate?"))
       .MarkAsAdvanced();
 
-  obj.AddAction(
-         "AddForceVers",
-         _("Add a force to move toward an object"),
-         _("Add a force to an object to make it move toward another."),
-         _("Move _PARAM0_ toward _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
-         _("Movement using forces"),
-         "res/actions/forceVers24.png",
-         "res/actions/forceVers.png")
+  obj.AddAction("AddForceVers",
+                _("Add a force to move toward an object"),
+                _("Add a force to an object to make it move toward another."),
+                _("Move _PARAM0_ toward _PARAM1_ with _PARAM3_ force of "
+                  "_PARAM2_ pixels"),
+                _("Movement using forces"),
+                "res/actions/forceVers24.png",
+                "res/actions/forceVers.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Target Object"))
@@ -860,18 +879,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Time in seconds"))
       .SetHidden();
 
-  obj.AddCondition("CompareObjectTimer",
-                  _("Value of an object timer"),
-                  _("Compare the elapsed time of an object timer. This condition doesn't start the timer."),
-                  _("The timer _PARAM1_ of _PARAM0_ _PARAM2_ _PARAM3_ seconds"),
-                  _("Timers"),
-                  "res/conditions/timer24.png",
-                  "res/conditions/timer.png")
-    .AddParameter("object", _("Object"))
-    .AddParameter("string", _("Timer's name"))
-    .AddParameter("relationalOperator", _("Sign of the test"), "time")
-    .AddParameter("expression", _("Time in seconds"))
-    .SetManipulatedType("number");
+  obj.AddCondition(
+         "CompareObjectTimer",
+         _("Value of an object timer"),
+         _("Compare the elapsed time of an object timer. This condition "
+           "doesn't start the timer."),
+         _("The timer _PARAM1_ of _PARAM0_ _PARAM2_ _PARAM3_ seconds"),
+         _("Timers"),
+         "res/conditions/timer24.png",
+         "res/conditions/timer.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("string", _("Timer's name"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "time")
+      .AddParameter("expression", _("Time in seconds"))
+      .SetManipulatedType("number");
 
   obj.AddCondition("ObjectTimerPaused",
                    _("Object timer paused"),
@@ -884,14 +905,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("string", _("Timer's name"))
       .MarkAsAdvanced();
 
-  obj.AddAction("ResetObjectTimer",
-                _("Start (or reset) an object timer"),
-                _("Reset the specified object timer, if the timer doesn't exist "
-                  "it's created and started."),
-                _("Reset the timer _PARAM1_ of _PARAM0_"),
-                _("Timers"),
-                "res/actions/timer24.png",
-                "res/actions/timer.png")
+  obj.AddAction(
+         "ResetObjectTimer",
+         _("Start (or reset) an object timer"),
+         _("Reset the specified object timer, if the timer doesn't exist "
+           "it's created and started."),
+         _("Reset the timer _PARAM1_ of _PARAM0_"),
+         _("Timers"),
+         "res/actions/timer24.png",
+         "res/actions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"));
 
@@ -1105,7 +1127,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Object"));
 
-   obj.AddExpression("XFromAngleAndDistance",
+  obj.AddExpression("XFromAngleAndDistance",
                     _("X position from angle and distance"),
                     _("Compute the X position when given an angle and distance "
                       "relative to the starting object. This is also known as "
@@ -1117,7 +1139,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Angle, in degrees"))
       .AddParameter("expression", _("Distance"));
 
-   obj.AddExpression("YFromAngleAndDistance",
+  obj.AddExpression("YFromAngleAndDistance",
                     _("Y position from angle and distance"),
                     _("Compute the Y position when given an angle and distance "
                       "relative to the starting object. This is also known as "
@@ -1155,8 +1177,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetEffectDoubleParameter",
                 _("Effect parameter (number)"),
                 _("Change the value of a parameter of an effect.") + "\n" +
-                  _("You can find the parameter names (and change the effect "
-                    "names) in the effects window."),
+                    _("You can find the parameter names (and change the effect "
+                      "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
                 "res/actions/effect24.png",
@@ -1169,9 +1191,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("SetEffectStringParameter",
                 _("Effect parameter (string)"),
-                _("Change the value (string) of a parameter of an effect.") + "\n" +
-                  _("You can find the parameter names (and change the effect "
-                    "names) in the effects window."),
+                _("Change the value (string) of a parameter of an effect.") +
+                    "\n" +
+                    _("You can find the parameter names (and change the effect "
+                      "names) in the effects window."),
                 _("Set _PARAM2_ to _PARAM3_ for effect _PARAM1_ of _PARAM0_"),
                 _("Effects"),
                 "res/actions/effect24.png",
@@ -1185,8 +1208,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("SetEffectBooleanParameter",
                 _("Effect parameter (enable or disable)"),
                 _("Enable or disable a parameter of an effect.") + "\n" +
-                  _("You can find the parameter names (and change the effect "
-                    "names) in the effects window."),
+                    _("You can find the parameter names (and change the effect "
+                      "names) in the effects window."),
                 _("Enable _PARAM2_ for effect _PARAM1_ of _PARAM0_: _PARAM3_"),
                 _("Effects"),
                 "res/actions/effect24.png",
@@ -1198,12 +1221,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   obj.AddCondition("IsEffectEnabled",
-                  _("Effect is enabled"),
-                  _("Check if the effect on an object is enabled."),
-                  _("Effect _PARAM1_ of _PARAM0_ is enabled"),
-                  _("Effects"),
-                  "res/actions/effect24.png",
-                  "res/actions/effect.png")
+                   _("Effect is enabled"),
+                   _("Check if the effect on an object is enabled."),
+                   _("Effect _PARAM1_ of _PARAM0_ is enabled"),
+                   _("Effects"),
+                   "res/actions/effect24.png",
+                   "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .MarkAsSimple();
@@ -1212,7 +1235,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddAction("Create",
                  _("Create an object"),
                  _("Create an object at specified position"),
-                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ (layer: _PARAM4_)"),
+                 _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ "
+                   "(layer: _PARAM4_)"),
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")
@@ -1387,13 +1411,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition(
-          "CollisionNP",  //"CollisionNP" cames from an old condition to test
-                          // collision between two sprites non precisely.
+          "CollisionNP",
           _("Collision"),
           _("Test the collision between two objects using their collision "
-            "masks.\nNote that some objects may not have collision "
-            "masks.\nSome others, like Sprite objects, also provide more "
-            "precise collision conditions."),
+            "masks."),
           _("_PARAM0_ is in collision with _PARAM1_"),
           _("Collision"),
           "res/conditions/collision24.png",

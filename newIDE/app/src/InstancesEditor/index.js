@@ -745,11 +745,14 @@ export default class InstancesEditor extends Component<Props> {
 
   moveSelection = (x: number, y: number) => {
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    selectedInstances.forEach(instance => {
+    const unlockedSelectedInstances = selectedInstances.filter(
+      instance => !instance.isLocked()
+    );
+    unlockedSelectedInstances.forEach(instance => {
       instance.setX(instance.getX() + x);
       instance.setY(instance.getY() + y);
     });
-    this.props.onInstancesMoved(selectedInstances);
+    this.props.onInstancesMoved(unlockedSelectedInstances);
   };
 
   scrollTo(x: number, y: number) {

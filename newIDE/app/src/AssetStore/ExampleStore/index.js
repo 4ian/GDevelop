@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react';
-import SearchBar from '../../UI/SearchBar';
+import SearchBar, {
+  type SearchBarInterface,
+  useShouldAutofocusSearchbar,
+} from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import { ExampleStoreContext } from './ExampleStoreContext';
@@ -19,12 +22,13 @@ const styles = {
 type Props = {|
   isOpening: boolean,
   onOpen: ExampleShortHeader => Promise<void>,
+  focusOnMount?: boolean,
 |};
 
 const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
   exampleShortHeader.name;
 
-export const ExampleStore = ({ isOpening, onOpen }: Props) => {
+export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
@@ -39,11 +43,31 @@ export const ExampleStore = ({ isOpening, onOpen }: Props) => {
     setSearchText,
   } = React.useContext(ExampleStoreContext);
 
+  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+  const searchBarRef = React.useRef<?SearchBarInterface>(null);
+
   React.useEffect(
     () => {
       fetchExamplesAndFilters();
     },
     [fetchExamplesAndFilters]
+  );
+
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
+        searchBarRef.current.focus();
+    },
+    [shouldAutofocusSearchbar, focusOnMount]
+  );
+
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: Array.from(filtersState.chosenFilters),
+    }),
+    [filtersState]
   );
 
   return (
@@ -56,12 +80,9 @@ export const ExampleStore = ({ isOpening, onOpen }: Props) => {
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
-              tagsHandler={{
-                add: filtersState.addFilter,
-                remove: filtersState.removeFilter,
-                chosenTags: Array.from(filtersState.chosenFilters),
-              }}
+              tagsHandler={tagsHandler}
               tags={filters && filters.defaultTags}
+              ref={searchBarRef}
             />
             <Line
               expand

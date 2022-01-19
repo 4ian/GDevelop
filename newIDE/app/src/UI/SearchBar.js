@@ -197,6 +197,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     );
 
     const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+    const previousChosenTagsCount = React.useRef<number>(0);
     React.useEffect(
       () => {
         // Used to focus search bar when all tags have been removed.
@@ -205,12 +206,19 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         if (
           shouldAutofocusSearchbar &&
           tagsHandler &&
-          tagsHandler.chosenTags.length === 0
+          tagsHandler.chosenTags.length === 0 &&
+          previousChosenTagsCount.current > 0
         )
           focus();
       },
       [tagsHandler, shouldAutofocusSearchbar]
     );
+
+    React.useEffect(() => {
+      previousChosenTagsCount.current = tagsHandler
+        ? tagsHandler.chosenTags.length
+        : 0;
+    });
 
     const handleBlur = () => {
       if (!value || value.trim() === '') {

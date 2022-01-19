@@ -54,6 +54,7 @@ namespace gdjs {
       this._input.style.resize = 'none';
       this._input.style.outline = 'none';
       this._input.style.pointerEvents = 'auto'; // Element can be clicked/touched.
+      this._input.style.display = 'none'; // Hide while object is being set up.
 
       this._input.addEventListener('input', () => {
         this._object.onRendererInputValueChanged(this._input.value);
@@ -110,7 +111,6 @@ namespace gdjs {
         this._input.style.display = 'none';
         return;
       }
-      this._input.style.display = 'initial';
 
       // Position the input on the container on top of the canvas
       const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
@@ -135,6 +135,9 @@ namespace gdjs {
         this._object.getFontSize() *
           runtimeGameRenderer.getCanvasToDomElementContainerHeightScale() +
         'px';
+
+      // Display after the object is positioned.
+      this._input.style.display = 'initial';
     }
 
     updateString() {

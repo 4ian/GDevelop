@@ -705,6 +705,18 @@
                 "\"This is a text area\" + NewLine() + \"with multiple lines!\" + NewLine() + NewLine() + \"Also, emojis are supported 😄, that's great!\""
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ChangePlan"
+              },
+              "parameters": [
+                "DefaultInput",
+                "=",
+                "3"
+              ],
+              "subInstructions": []
             }
           ],
           "events": []

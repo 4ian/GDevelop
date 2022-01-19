@@ -108,13 +108,9 @@ namespace gdjs {
       });
 
       // Prevent magnifying glass on iOS with a long press.
+      // Note that there are related bugs on iOS 15 (see https://bugs.webkit.org/show_bug.cgi?id=231161)
+      // but it seems not to affect us as the `domElementsContainer` has `pointerEvents` set to `none`.
       domElementsContainer.style['-webkit-user-select'] = 'none';
-      domElementsContainer.addEventListener('touchstart', (event) => {
-        // Prevent the magnifiying glass on iOS 15, which does not honor -webkit-user-select.
-        // See https://bugs.webkit.org/show_bug.cgi?id=231161
-        // This unfortunately also prevent to move the cursor.
-        event.preventDefault();
-      });
 
       parentElement.appendChild(domElementsContainer);
       this._domElementsContainer = domElementsContainer;
@@ -515,25 +511,39 @@ namespace gdjs {
         return true;
       };
       document.onkeydown = function (e) {
-        if (isFocusingDomElement()) return;
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // arrow keys events.
+          return;
+        }
 
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
+          // Some keys are "default prevented" to avoid scrolling when the game
+          // is integrated in a page as an iframe.
           e.preventDefault();
         }
 
         manager.onKeyPressed(e.keyCode, e.location);
       };
       document.onkeyup = function (e) {
-        if (isFocusingDomElement()) return;
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // arrow keys events.
+          return;
+        }
 
         if (defaultPreventedKeyCodes.includes(e.keyCode)) {
+          // Some keys are "default prevented" to avoid scrolling when the game
+          // is integrated in a page as an iframe.
           e.preventDefault();
         }
 
         manager.onKeyReleased(e.keyCode, e.location);
       };
 
-      //Mouse
+      // Mouse:
       canvas.onmousemove = function (e) {
         const pos = getEventPosition(e);
         manager.onMouseMove(pos[0], pos[1]);
@@ -578,13 +588,19 @@ namespace gdjs {
         return false;
       };
       // @ts-ignore
-      renderer.view.onwheel = function (event) {
+      canvas.onwheel = function (event) {
         manager.onMouseWheel(-event.deltaY);
       };
 
-      //Touches
-      //Also simulate mouse events when receiving touch events
+      // Touches:
       window.addEventListener('touchmove', function (e) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {
@@ -594,6 +610,13 @@ namespace gdjs {
         }
       });
       window.addEventListener('touchstart', function (e) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {
@@ -608,6 +631,13 @@ namespace gdjs {
         return false;
       });
       window.addEventListener('touchend', function (e) {
+        if (isFocusingDomElement()) {
+          // Bail out if the game canvas is not focused. For example,
+          // an `<input>` element can be focused, and needs to receive
+          // touch events to move the selection (and do other native gestures).
+          return;
+        }
+
         e.preventDefault();
         if (e.changedTouches) {
           for (let i = 0; i < e.changedTouches.length; ++i) {

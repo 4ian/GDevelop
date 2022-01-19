@@ -148,8 +148,7 @@ namespace gdjs {
         this.setBorderOpacity(newObjectData.content.borderOpacity);
       }
       if (
-        oldObjectData.content.borderWidth !==
-        newObjectData.content.borderWidth
+        oldObjectData.content.borderWidth !== newObjectData.content.borderWidth
       ) {
         this.setBorderWidth(newObjectData.content.borderWidth);
       }

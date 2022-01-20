@@ -923,6 +923,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
   };
 
+  forceUpdatePixi = () => {
+    const { layout } = this.props;
+    const objectsCount = layout.getObjectsCount();
+    for (let index = 0; index < objectsCount; index++) {
+      this.reloadResourcesFor(layout.getObjectAt(index));
+    }
+  };
+
   reloadResourcesFor = (object: gdObject) => {
     const { project } = this.props;
 

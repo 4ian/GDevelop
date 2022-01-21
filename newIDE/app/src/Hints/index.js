@@ -79,6 +79,18 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`The bounding box is an imaginary rectangle surrounding the object collision mask. Even if the object X and Y positions are not changed, this rectangle can change if the object is rotated or if an animation is being played. Usually you should use actions and conditions related to the object position or center, but the bounding box can be useful to deal with the area of the object.`,
     };
   }
+  if (type === 'CompareTimer') {
+    return {
+      kind: 'info',
+      message: t`To start a timer, don't forget to use the action "Start (or reset) a scene timer" in another event.`,
+    };
+  }
+  if (type === 'CompareObjectTimer') {
+    return {
+      kind: 'info',
+      message: t`To start a timer, don't forget to use the action "Start (or reset) an object timer" in another event.`,
+    };
+  }
   if (type === 'BitmapText::Scale') {
     return {
       kind: 'info',

@@ -19,9 +19,9 @@ var fs = optionalRequire('fs-extra');
 
 export const onCreateBlank: OnCreateBlankFunction = async ({
   i18n,
-  outputPath,
-  projectName,
+  settings,
 }) => {
+  const { projectName, outputPath } = settings;
   if (!fs || !outputPath) return;
 
   try {
@@ -52,9 +52,9 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
 export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction = async ({
   i18n,
   exampleShortHeader,
-  outputPath,
-  projectName,
+  settings,
 }) => {
+  const { projectName, outputPath } = settings;
   if (!fs || !outputPath) return;
   try {
     const example = await getExample(exampleShortHeader);

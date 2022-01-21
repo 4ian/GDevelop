@@ -28,7 +28,7 @@ import { I18n } from '@lingui/react';
 type TagsHandler = {|
   remove: string => void,
   add: string => void,
-  chosenTags: Array<string>,
+  chosenTags: Set<string>,
 |};
 
 type Props = {|
@@ -197,6 +197,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     );
 
     const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+    const previousChosenTagsCount = React.useRef<number>(0);
     React.useEffect(
       () => {
         // Used to focus search bar when all tags have been removed.
@@ -205,12 +206,19 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         if (
           shouldAutofocusSearchbar &&
           tagsHandler &&
-          tagsHandler.chosenTags.length === 0
+          tagsHandler.chosenTags.size === 0 &&
+          previousChosenTagsCount.current > 0
         )
           focus();
       },
       [tagsHandler, shouldAutofocusSearchbar]
     );
+
+    React.useEffect(() => {
+      previousChosenTagsCount.current = tagsHandler
+        ? tagsHandler.chosenTags.size
+        : 0;
+    });
 
     const handleBlur = () => {
       if (!value || value.trim() === '') {
@@ -374,7 +382,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                   </Paper>
                 </Line>
                 {tagsHandler && (
-                  <Collapse in={tagsHandler.chosenTags.length > 0}>
+                  <Collapse in={tagsHandler.chosenTags.size > 0}>
                     <TagChips
                       tags={Array.from(tagsHandler.chosenTags)}
                       onRemove={tag => tagsHandler.remove(tag)}

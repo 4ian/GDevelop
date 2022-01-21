@@ -59,7 +59,7 @@ module.exports = {
         _('Light Obstacle Behavior'),
         'LightObstacleBehavior',
         _(
-          'This behavior makes the object an obstacle to the light. The light emitted by light objects will be stopped by the object.'
+          'Flag objects as being obstacles to light. The light emitted by light objects will be stopped by the object.'
         ),
         '',
         'CppPlatform/Extensions/lightObstacleIcon32.png',

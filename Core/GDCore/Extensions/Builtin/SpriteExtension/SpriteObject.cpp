@@ -149,8 +149,9 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance& position,
                                                  const gd::String& value,
                                                  gd::Project& project,
                                                  gd::Layout& scene) {
-  if (name == _("Animation"))
-    position.SetRawDoubleProperty("animation", value.To<int>());
+  if (name == _("Animation")) {
+    position.SetRawDoubleProperty("animation", value.empty() ? 0 : value.To<int>());
+  }
 
   return true;
 }

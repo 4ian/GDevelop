@@ -910,7 +910,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
          _("Start (or reset) an object timer"),
          _("Reset the specified object timer, if the timer doesn't exist "
            "it's created and started."),
-         _("Reset the timer _PARAM1_ of _PARAM0_"),
+         _("Start (or reset) the timer _PARAM1_ of _PARAM0_"),
          _("Timers"),
          "res/actions/timer24.png",
          "res/actions/timer.png")

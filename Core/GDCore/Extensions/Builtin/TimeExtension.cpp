@@ -80,7 +80,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           _("Start (or reset) a scene timer"),
           _("Reset the specified scene timer, if the timer doesn't exist "
             "it's created and started."),
-          _("Reset the timer _PARAM1_"),
+          _("Start (or reset) the timer _PARAM1_"),
           _("Timers and time"),
           "res/actions/timer24.png",
           "res/actions/timer.png")

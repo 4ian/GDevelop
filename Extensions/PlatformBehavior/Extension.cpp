@@ -372,6 +372,19 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
 
+    aut.AddScopedAction(
+           "AbortJump",
+           _("Abort jump"),
+           _("Abort the current jump. This action doesn't have any effect "
+             "when the character is not jumping."),
+           _("Abort the current jump of _PARAM0_"),
+           _(""),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .AddParameter("yesorno", _("Stop the object vertically"));
+
     aut.AddCondition("CanJump",
                      _("Can jump"),
                      _("Check if the object can jump."),
@@ -552,6 +565,21 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .MarkAsSimple()
         .SetFunctionName("canGrabPlatforms");
+
+    aut.AddScopedAction(
+           "SetCurrentFallSpeed",
+           _("Current falling speed"),
+           _("Change the current falling speed of the object (in pixels per "
+             "second). This action doesn't have any effect when the character "
+             "is not falling without jumping."),
+           _("the current falling speed"),
+           _(""),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number")
+        .MarkAsAdvanced();
 
     aut.AddCondition(
            "CurrentFallSpeed",

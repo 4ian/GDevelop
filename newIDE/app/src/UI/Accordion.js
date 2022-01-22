@@ -40,7 +40,9 @@ export const AccordionHeader = (props: AccordionHeadProps) => {
         {props.children}
       </div>
       {props.actions && (
-        <div style={{ flexGrow: 0, alignSelf: 'center' }}>{props.actions}</div>
+        <div style={{ flexGrow: 0, flexShrink: 0, alignSelf: 'center' }}>
+          {props.actions}
+        </div>
       )}
     </MUIAccordionSummary>
   );

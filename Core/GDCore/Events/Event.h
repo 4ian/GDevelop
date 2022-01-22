@@ -208,7 +208,7 @@ class GD_CORE_API BaseEvent {
   /**
    * A function that turns all async member actions into an Async subevent for code generation.
    */
-  virtual void PreprocessAsyncActions(const gd::Platform& platform);
+  void PreprocessAsyncActions(const gd::Platform& platform);
 
   /**
    * \brief If MustBePreprocessed is redefined to return true, the

@@ -65,7 +65,7 @@ gd::String BaseEvent::GenerateEventCode(
               << type << "\"." << std::endl;
   }
 
-  return "/*O NO*/";
+  return "";
 }
 
 void BaseEvent::PreprocessAsyncActions(const gd::Platform& platform) {

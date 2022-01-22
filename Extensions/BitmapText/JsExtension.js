@@ -67,7 +67,8 @@ module.exports = {
         .getOrCreate('opacity')
         .setValue(objectContent.opacity.toString())
         .setType('number')
-        .setLabel(_('Opacity (0-255)'));
+        .setLabel(_('Opacity (0-255)'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('align')
@@ -76,7 +77,8 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Alignment, when multiple lines are displayed'));
+        .setLabel(_('Alignment, when multiple lines are displayed'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('bitmapFontResourceName')
@@ -96,19 +98,22 @@ module.exports = {
         .getOrCreate('scale')
         .setValue(objectContent.scale.toString())
         .setType('number')
-        .setLabel(_('Text scale'));
+        .setLabel(_('Text scale'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('tint')
         .setValue(objectContent.tint)
         .setType('color')
-        .setLabel(_('Font tint'));
+        .setLabel(_('Font tint'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('wordWrap')
         .setValue(objectContent.wordWrap ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Word wrapping'));
+        .setLabel(_('Word wrapping'))
+        .setGroup(_("Appearance"));
 
       return objectProperties;
     };

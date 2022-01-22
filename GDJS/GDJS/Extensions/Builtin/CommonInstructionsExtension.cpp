@@ -16,6 +16,7 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
+#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -98,6 +99,42 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += actionsCode;
         outputCode += "}\n";
 
+        return outputCode;
+      });
+
+  GetAllEvents()["BuiltinCommonInstructions::Async"].SetCodeGenerator(
+      [](gd::BaseEvent& event_,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::AsyncEvent& event = dynamic_cast<gd::AsyncEvent&>(event_);
+        const gd::String callbackFunctionName = "asyncCallback" + gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(&event.GetInstruction()));
+
+        // Generate callback code
+        gd::EventsCodeGenerationContext callbackContext;
+        callbackContext.Reuse(context);
+
+        // Generate actions
+        gd::String actionsCode = 
+        codeGenerator.GenerateActionsListCode(
+            event.GetActions(), callbackContext);
+
+        // Generate subevents
+        if (event.HasSubEvents())  // Sub events
+        {
+          actionsCode += "\n{ //Subevents\n";
+          actionsCode += codeGenerator.GenerateEventsListCode(
+              event.GetSubEvents(), callbackContext);
+          actionsCode += "} //End of subevents\n";
+        }
+
+        // Compose the callback function and add outside main
+        const gd::String actionsDeclarationsCode =
+            codeGenerator.GenerateObjectsDeclarationCode(callbackContext);
+        const gd::String callbackCode = "function " + callbackFunctionName + "() {\n" +actionsDeclarationsCode +actionsCode +"}\n";
+        codeGenerator.AddCustomCodeOutsideMain(callbackCode);
+
+        // Generate the action with 
+        gd::String outputCode = codeGenerator.GenerateActionCode(event.GetInstruction(), context, callbackFunctionName);
         return outputCode;
       });
 
@@ -351,11 +388,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (
-          event.GetWhileConditions().empty() &&
-          event.GetConditions().empty() &&
-          event.GetActions().empty()
-        )
+        if (event.GetWhileConditions().empty() &&
+            event.GetConditions().empty() && event.GetActions().empty())
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
 

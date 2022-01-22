@@ -443,7 +443,9 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
  * Generate code for an action.
  */
 gd::String EventsCodeGenerator::GenerateActionCode(
-    gd::Instruction& action, EventsCodeGenerationContext& context) {
+    gd::Instruction& action,
+    EventsCodeGenerationContext& context,
+    const gd::String& asyncCallback) {
   gd::String actionCode;
 
   const gd::InstructionMetadata& instrInfos =
@@ -506,8 +508,12 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         // Prepare arguments and generate the whole action code
         vector<gd::String> arguments = GenerateParametersCodes(
             action.GetParameters(), instrInfos.parameters, context);
-        actionCode += GenerateObjectAction(
-            realObjects[i], objInfo, arguments, instrInfos, context);
+        actionCode += GenerateObjectAction(realObjects[i],
+                                           objInfo,
+                                           arguments,
+                                           instrInfos,
+                                           context,
+                                           asyncCallback);
 
         context.SetNoCurrentObject();
       }
@@ -539,7 +545,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                                    autoInfo,
                                    arguments,
                                    instrInfos,
-                                   context);
+                                   context,
+                                   asyncCallback);
 
         context.SetNoCurrentObject();
       }
@@ -547,7 +554,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   } else {
     vector<gd::String> arguments = GenerateParametersCodes(
         action.GetParameters(), instrInfos.parameters, context);
-    actionCode += GenerateFreeAction(arguments, instrInfos, context);
+    actionCode +=
+        GenerateFreeAction(arguments, instrInfos, context, asyncCallback);
   }
 
   return actionCode;
@@ -1001,7 +1009,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 gd::String EventsCodeGenerator::GenerateFreeAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& asyncCallback) {
   // Generate call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
@@ -1028,6 +1037,9 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
     call = instrInfos.codeExtraInformation.functionCallName + "(" +
            GenerateArgumentsList(arguments) + ")";
   }
+
+  if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+
   return call + ";\n";
 }
 
@@ -1036,7 +1048,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::ObjectMetadata& objInfo,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& asyncCallback) {
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
@@ -1063,6 +1076,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
 
     call = instrInfos.codeExtraInformation.functionCallName + "(" +
            argumentsStr + ")";
+
+    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ").\n";
   }
@@ -1074,7 +1090,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const gd::BehaviorMetadata& autoInfo,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& asyncCallback) {
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
@@ -1100,6 +1117,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
 
     call = instrInfos.codeExtraInformation.functionCallName + "(" +
            argumentsStr + ")";
+
+    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ")" + " for behavior \"" + behaviorName + "\".\n";
   }

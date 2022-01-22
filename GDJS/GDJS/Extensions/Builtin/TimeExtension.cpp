@@ -27,6 +27,8 @@ TimeExtension::TimeExtension() {
       "gdjs.evtTools.runtimeScene.unpauseTimer");
   GetAllActions()["RemoveTimer"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.removeTimer");
+  GetAllActions()["Wait"].SetFunctionName(
+      "gdjs.evtTools.runtimeScene.wait");
   GetAllConditions()["TimeScale"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getTimeScale");
   GetAllActions()["ChangeTimeScale"].SetFunctionName(

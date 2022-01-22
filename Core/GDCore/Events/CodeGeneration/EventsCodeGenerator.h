@@ -155,7 +155,8 @@ class GD_CORE_API EventsCodeGenerator {
    * \return Code
    */
   gd::String GenerateActionCode(gd::Instruction& action,
-                                EventsCodeGenerationContext& context);
+                                EventsCodeGenerationContext& context,
+                                const gd::String& asyncCallback = "");
 
   /**
    * \brief Generate code for declaring objects lists.
@@ -472,8 +473,8 @@ class GD_CORE_API EventsCodeGenerator {
    * \endcode
    * - objectListWithoutPicking : Same as objectList but do not pick object if
   they are not already picked.
-   * - objectPtr : Return a reference to the object specified by the object name in
-  another parameter. Example:
+   * - objectPtr : Return a reference to the object specified by the object name
+  in another parameter. Example:
    * \code
   .AddParameter("object", _("Object"))
   .AddParameter("objectPtr", _("Target object"))
@@ -665,14 +666,16 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateFreeAction(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& asyncCallback = "");
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& asyncCallback = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -680,7 +683,8 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::BehaviorMetadata& autoInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& asyncCallback = "");
 
   gd::String GenerateRelationalOperatorCall(
       const gd::InstructionMetadata& instrInfos,

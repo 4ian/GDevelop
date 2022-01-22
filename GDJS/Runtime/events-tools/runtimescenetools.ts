@@ -105,6 +105,9 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
+      export const wait = (time: integer) =>
+        new Promise((r) => setTimeout(r, time));
+
       /**
        * This is used by expressions to return 0 when a timer doesn't exist,
        * because numeric expressions must always return a number.

@@ -42,6 +42,19 @@ void EventsCodeGenerationContext::InheritsFrom(
   }
 }
 
+void EventsCodeGenerationContext::AsyncInheritsFrom(
+    const EventsCodeGenerationContext& parent_) {
+  parent = &parent_;
+  isAsync = true;
+  depthOfLastUse = parent_.depthOfLastUse;
+  customConditionDepth = parent_.customConditionDepth;
+  contextDepth = parent_.GetContextDepth() + 1;
+  if (parent_.maxDepthLevel) {
+    maxDepthLevel = parent_.maxDepthLevel;
+    *maxDepthLevel = std::max(*maxDepthLevel, contextDepth);
+  }
+}
+
 void EventsCodeGenerationContext::Reuse(
     const EventsCodeGenerationContext& parent_) {
   InheritsFrom(parent_);
@@ -101,5 +114,9 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
   return GetLastDepthObjectListWasNeeded(objectName) ==
          otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
+
+bool EventsCodeGenerationContext::IsInheritingFromAsync(const gd::String& objectName) {
+  return isAsync && parent != NULL && parent->ObjectAlreadyDeclared(objectName);
+};
 
 }  // namespace gd

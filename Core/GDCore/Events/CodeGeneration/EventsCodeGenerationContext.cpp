@@ -8,6 +8,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -33,6 +34,19 @@ void EventsCodeGenerationContext::InheritsFrom(
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
 
+  depthOfLastUse = parent_.depthOfLastUse;
+  customConditionDepth = parent_.customConditionDepth;
+  contextDepth = parent_.GetContextDepth() + 1;
+  if (parent_.maxDepthLevel) {
+    maxDepthLevel = parent_.maxDepthLevel;
+    *maxDepthLevel = std::max(*maxDepthLevel, contextDepth);
+  }
+}
+
+void EventsCodeGenerationContext::AsyncInheritsFrom(
+    const EventsCodeGenerationContext& parent_) {
+  parent = &parent_;
+  isAsync = true;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
   contextDepth = parent_.GetContextDepth() + 1;
@@ -101,5 +115,10 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
   return GetLastDepthObjectListWasNeeded(objectName) ==
          otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
+
+bool EventsCodeGenerationContext::IsInheritingFromAsync(const gd::String& objectName) {
+  gd::LogMessage(gd::String::From(depthOfLastUse[objectName]));
+  return isAsync && parent != NULL && parent->ObjectAlreadyDeclared(objectName);
+};
 
 }  // namespace gd

@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <set>
+
 #include "GDCore/String.h"
 
 namespace gd {
@@ -37,7 +38,8 @@ class GD_CORE_API EventsCodeGenerationContext {
         customConditionDepth(0),
         maxDepthLevel(maxDepthLevel_),
         parent(NULL),
-        reuseExplicitlyForbidden(false){};
+        reuseExplicitlyForbidden(false),
+        isAsync(false){};
   virtual ~EventsCodeGenerationContext(){};
 
   /**
@@ -46,6 +48,12 @@ class GD_CORE_API EventsCodeGenerationContext {
    * already declared by its parent.
    */
   void InheritsFrom(const EventsCodeGenerationContext& parent);
+
+  /**
+   * Call this method to make an EventsCodeGenerationContext as a "child" of
+   * another one, but in the context of an async function.
+   */
+  void AsyncInheritsFrom(const EventsCodeGenerationContext& parent);
 
   /**
    * \brief As InheritsFrom, mark the context as being the child of another one,
@@ -227,6 +235,8 @@ class GD_CORE_API EventsCodeGenerationContext {
    */
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
+  bool IsInheritingFromAsync(const gd::String& objectName);
+
  private:
   /**
    * \brief Returns true if the given object is already going to be declared
@@ -275,6 +285,7 @@ class GD_CORE_API EventsCodeGenerationContext {
       parent;  ///< The parent of the current context. Can be NULL.
   bool reuseExplicitlyForbidden;  ///< If set to true, forbid children context
                                   ///< to reuse this one without inheriting.
+  bool isAsync;
 };
 
 }  // namespace gd

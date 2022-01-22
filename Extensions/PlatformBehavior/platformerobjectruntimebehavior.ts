@@ -1228,7 +1228,22 @@ namespace gdjs {
      * Set the maximum falling speed of the Platformer Object.
      * @param maxFallingSpeed The maximum falling speed.
      */
-    setMaxFallingSpeed(maxFallingSpeed: float): void {
+    setMaxFallingSpeed(
+      maxFallingSpeed: float,
+      tryToKeepSpeed: boolean = false
+    ): void {
+      if (tryToKeepSpeed && this._state === this._jumping) {
+        const fallingSpeedOverflow = this._currentFallSpeed - maxFallingSpeed;
+        if (fallingSpeedOverflow > 0) {
+          this._currentFallSpeed -= fallingSpeedOverflow;
+          this._jumping.setCurrentJumpSpeed(
+            Math.max(
+              0,
+              this._jumping.getCurrentJumpSpeed() - fallingSpeedOverflow
+            )
+          );
+        }
+      }
       this._maxFallingSpeed = maxFallingSpeed;
     }
 
@@ -1849,6 +1864,10 @@ namespace gdjs {
 
     getCurrentJumpSpeed() {
       return this._currentJumpSpeed;
+    }
+
+    setCurrentJumpSpeed(currentJumpSpeed: number) {
+      return (this._currentJumpSpeed = currentJumpSpeed);
     }
 
     enter(from: State) {

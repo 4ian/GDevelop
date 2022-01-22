@@ -8,6 +8,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/Tools/Log.h"
 
 using namespace std;
 
@@ -116,7 +117,8 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
 }
 
 bool EventsCodeGenerationContext::IsInheritingFromAsync(const gd::String& objectName) {
-  return isAsync && depthOfLastUse[objectName] != 0;
+  gd::LogMessage(gd::String::From(depthOfLastUse[objectName]));
+  return isAsync && parent != NULL && parent->ObjectAlreadyDeclared(objectName);
 };
 
 }  // namespace gd

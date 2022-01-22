@@ -141,7 +141,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String objectsListsCode = "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
         // The objects to be declared of the callback context tell all objects used in the callbacks so that they can be backed up now.
         for(const gd::String& objectToBackup : callbackContext.GetAllObjectsToBeDeclared()) {
-            objectsListsCode += "for (const obj of "+codeGenerator.GetObjectListName(objectToBackup, context)+") asyncObjectsList.addObject(obj);\n";
+            if(context.ObjectAlreadyDeclared(objectToBackup)) objectsListsCode += "for (const obj of "+codeGenerator.GetObjectListName(objectToBackup, context)+") asyncObjectsList.addObject(obj);\n";
         }
 
         // Generate the action with a .then to the generated callback

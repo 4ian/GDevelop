@@ -9,6 +9,7 @@
 #include <set>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -16,7 +17,6 @@
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
-#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
@@ -107,15 +107,17 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
         gd::AsyncEvent& event = dynamic_cast<gd::AsyncEvent&>(event_);
-        const gd::String callbackFunctionName = "asyncCallback" + gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(&event.GetInstruction()));
+        const gd::String callbackFunctionName =
+            "asyncCallback" +
+            gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
+                &event.GetInstruction()));
 
         // Generate callback code
         gd::EventsCodeGenerationContext callbackContext;
-        callbackContext.Reuse(context);
+        callbackContext.AsyncInheritsFrom(context);
 
         // Generate actions
-        gd::String actionsCode = 
-        codeGenerator.GenerateActionsListCode(
+        gd::String actionsCode = codeGenerator.GenerateActionsListCode(
             event.GetActions(), callbackContext);
 
         // Generate subevents
@@ -130,12 +132,25 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Compose the callback function and add outside main
         const gd::String actionsDeclarationsCode =
             codeGenerator.GenerateObjectsDeclarationCode(callbackContext);
-        const gd::String callbackCode = "function " + callbackFunctionName + "() {\n" +actionsDeclarationsCode +actionsCode +"}\n";
+        const gd::String callbackCode =
+            "function " + callbackFunctionName + "(runtimeScene, asyncObjectsList) {\n" +
+            actionsDeclarationsCode + actionsCode + "}\n";
         codeGenerator.AddCustomCodeOutsideMain(callbackCode);
 
-        // Generate the action with 
-        gd::String outputCode = codeGenerator.GenerateActionCode(event.GetInstruction(), context, callbackFunctionName);
-        return outputCode;
+        // Generate code to backup the objects lists
+        gd::String objectsListsCode = "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
+        // The objects to be declared of the callback context tell all objects used in the callbacks so that they can be backed up now.
+        for(const gd::String& objectToBackup : callbackContext.GetAllObjectsToBeDeclared()) {
+            objectsListsCode += "for (const obj of "+codeGenerator.GetObjectListName(objectToBackup, context)+") asyncObjectsList.addObject(obj);\n";
+        }
+
+        // Generate the action with a .then to the generated callback
+        const gd::String actionCode = codeGenerator.GenerateActionCode(
+            event.GetInstruction(),
+            context,
+            "() => (" + callbackFunctionName + "(runtimeScene, asyncObjectsList))");
+
+        return "{" + objectsListsCode + actionCode + "}";
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Comment"].SetCodeGenerator(

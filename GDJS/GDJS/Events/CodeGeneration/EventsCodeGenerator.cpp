@@ -818,7 +818,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration += "gdjs.copyArray(" +
-                               GenerateAllInstancesGetterCode(object) + ", " +
+                               GenerateAllInstancesGetterCode(object, context) + ", " +
                                GetObjectListName(object, context) + ");";
       context.SetObjectDeclared(object);
     } else
@@ -854,8 +854,12 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 }
 
 gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
-    gd::String& objectName) {
-  if (HasProjectAndLayout()) {
+    const gd::String& objectName, gd::EventsCodeGenerationContext& context) {
+  if(context.IsInheritingFromAsync(objectName)) {
+    return "asyncObjectsList.getObjects(" + ConvertToStringExplicit(objectName) +
+           ")";
+  }
+  else if (HasProjectAndLayout()) {
     return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +
            ")";
   } else {

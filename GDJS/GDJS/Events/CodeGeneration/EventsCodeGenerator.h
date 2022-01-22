@@ -281,7 +281,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateAllInstancesGetterCode(gd::String& objectName);
+  virtual gd::String GenerateAllInstancesGetterCode(const gd::String& objectName, gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateProfilerSectionBegin(const gd::String& section);
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);

@@ -727,7 +727,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
     });
 
-    it('can be allowed to jump in mid air', function () {
+    it('can be allowed to jump in mid air after falling from a platform', function () {
       // Ensure the object falls on the platform
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
@@ -772,6 +772,56 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isJumping()).to.be(false);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+
+    it('can still be allowed to jump in mid air after its jump speed reached 0', function () {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Jump
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').canJump()).to.be(false);
+
+      // Allow to jump again
+      object.getBehavior('auto1').setCanJump();
+
+      // Is jumping
+      for (let i = 0; i < 40; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        // Can still jump...
+        expect(object.getBehavior('auto1').canJump()).to.be(true);
+      }
+      // ...even when after the jump ended.
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+
+      // Jump again
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').canJump()).to.be(false);
     });
 
     it('can allow coyote time', function () {

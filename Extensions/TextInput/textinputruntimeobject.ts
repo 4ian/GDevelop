@@ -93,7 +93,7 @@ namespace gdjs {
     }
 
     getRendererObject() {
-      return {}; // TODO: this will break when changing layer. Instead, return null but still call updatePreRender?
+      return null;
     }
 
     updateFromObjectData(

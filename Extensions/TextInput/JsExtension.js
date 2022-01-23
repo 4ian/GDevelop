@@ -245,6 +245,7 @@ module.exports = {
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
+      .addUnsupportedBaseObjectCapability('effect')
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
         'Extensions/TextInput/textinputruntimeobject-pixi-renderer.js'

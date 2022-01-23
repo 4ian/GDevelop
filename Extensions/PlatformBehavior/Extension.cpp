@@ -377,7 +377,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("Abort jump"),
            _("Abort the current jump. This action doesn't have any effect "
              "when the character is not jumping."),
-           _("Abort the current jump of _PARAM0_"),
+           _("Abort the current jump of _PARAM0_ (and stop the object vertically: _PARAM2_)"),
            _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")

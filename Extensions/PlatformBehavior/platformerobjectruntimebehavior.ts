@@ -1799,9 +1799,13 @@ namespace gdjs {
     }
 
     enter(from: State) {
-      // canJump is used to make air jumps.
-      // It must not be reset during a jump,
-      // where "jump" means the jump + falling states.
+      // Only forbid jumping when starting to fall from a platform,
+      // not when falling during a jump. This is because the Jumping
+      // state has already set `_canJump` to false and we don't want to reset
+      // it again because it could have been set back to `true` to allow
+      // for an "air jump".
+      // Transition from Falling to Falling state should not happen, 
+      // but don't change anything if this ever happen.
       if (from !== this._behavior._jumping && from !== this) {
         this._behavior._canJump = false;
       }

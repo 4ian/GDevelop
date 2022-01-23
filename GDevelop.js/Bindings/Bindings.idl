@@ -1128,6 +1128,9 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
 
+    [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
+
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
@@ -1167,6 +1170,9 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+
+    [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
@@ -1340,6 +1346,10 @@ interface ObjectMetadata {
 
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
+
+    [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
+    [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
+    boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
 };
 
 interface BehaviorMetadata {

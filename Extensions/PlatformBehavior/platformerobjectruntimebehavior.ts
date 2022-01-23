@@ -1227,12 +1227,15 @@ namespace gdjs {
     /**
      * Set the maximum falling speed of the Platformer Object.
      * @param maxFallingSpeed The maximum falling speed.
+     * @param tryToPreserveAirSpeed If true and if jumping, tune the current jump speed to preserve the overall speed in the air.
      */
     setMaxFallingSpeed(
       maxFallingSpeed: float,
-      tryToKeepSpeed: boolean = false
+      tryToPreserveAirSpeed: boolean = false
     ): void {
-      if (tryToKeepSpeed && this._state === this._jumping) {
+      if (tryToPreserveAirSpeed && this._state === this._jumping) {
+        // If the falling speed is too high compared to the new max falling speed,
+        // reduce it and adapt the jump speed to preserve the overall vertical speed.
         const fallingSpeedOverflow = this._currentFallSpeed - maxFallingSpeed;
         if (fallingSpeedOverflow > 0) {
           this._currentFallSpeed -= fallingSpeedOverflow;

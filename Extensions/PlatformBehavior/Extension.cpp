@@ -571,7 +571,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            _("Current falling speed"),
            _("Change the current falling speed of the object (in pixels per "
              "second). This action doesn't have any effect when the character "
-             "is not falling without jumping."),
+             "is not falling or is in the first phase of a jump."),
            _("the current falling speed"),
            _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",

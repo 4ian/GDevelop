@@ -95,7 +95,7 @@ class GD_CORE_API ExpressionParameterMover
         // Move parameter of an object function
         const gd::String& thisObjectType = gd::GetTypeOfObject(
             globalObjectsContainer, objectsContainer, node.objectName);
-        if (thisObjectType == behaviorType) {
+        if (thisObjectType == objectType) {
           moveParameter(node.parameters);
           hasDoneMoving = true;
         }

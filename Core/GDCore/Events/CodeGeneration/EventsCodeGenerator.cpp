@@ -313,7 +313,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     }
   }
 
+
   if (instrInfos.IsObjectInstruction()) {
+  // TODO: add capability test here
+
     gd::String objectName = condition.GetParameter(0).GetPlainString();
     gd::String objectType = gd::GetTypeOfObject(
         GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
@@ -488,6 +491,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   // Call free function first if available
   if (instrInfos.IsObjectInstruction()) {
+    // TODO: add capability test here
+
     gd::String objectName = action.GetParameter(0).GetPlainString();
     gd::String objectType = gd::GetTypeOfObject(
         GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);

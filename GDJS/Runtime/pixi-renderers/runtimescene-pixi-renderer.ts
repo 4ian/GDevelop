@@ -88,7 +88,6 @@ namespace gdjs {
      */
     renderDebugDraw(
       instances: gdjs.RuntimeObject[],
-      layersCameraCoordinates: Record<string, [float, float, float, float]>,
       showHiddenInstances: boolean,
       showPointsNames: boolean,
       showCustomPoints: boolean

@@ -636,7 +636,17 @@
           "tags": "",
           "type": "TextInput::TextInputObject",
           "variables": [],
-          "effects": [],
+          "effects": [
+            {
+              "effectType": "BlackAndWhite",
+              "name": "Effect",
+              "doubleParameters": {
+                "opacity": 1
+              },
+              "stringParameters": {},
+              "booleanParameters": {}
+            }
+          ],
           "behaviors": [],
           "content": {
             "initialValue": "Customized input",

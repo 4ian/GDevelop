@@ -171,7 +171,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .UseStandardOperatorParameters("number")
-        .AddParameter("yesorno", _("Try to preserve the current speed"))
+        .AddParameter("yesorno", _("If jumping, try to preserve the current speed in the air"))
         .MarkAsAdvanced()
         .SetFunctionName("SetMaxFallingSpeed")
         .SetGetter("GetMaxFallingSpeed");

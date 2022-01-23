@@ -74,19 +74,27 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create and expose some objects
   const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
+  shapePainterObject.setType('PrimitiveDrawing::Drawer');
   const textObject = new gd.TextObject('MyTextObject');
+  textObject.setType('TextObject::Text');
   const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
+  tiledSpriteObject.setType('TiledSpriteObject::TiledSprite');
   const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
+  panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
   const spriteObject = new gd.SpriteObject('MySpriteObject');
+  spriteObject.setType('Sprite');
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
   );
+  spriteObjectWithBehaviors.setType('Sprite');
   const spriteObjectWithoutBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithoutBehaviors'
   );
+  spriteObjectWithoutBehaviors.setType('Sprite');
   const spriteObjectWithLongName = new gd.SpriteObject(
     'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
+  spriteObjectWithLongName.setType('Sprite');
 
   {
     const animation = new gd.Animation();
@@ -164,6 +172,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
   testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
   testLayout.insertObject(spriteObjectWithLongName, 14);
+  testLayout.insertNewObject(
+    project,
+    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+    'MyFakeObjectWithUnsupportedCapability',
+    15
+  );
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');

@@ -1349,11 +1349,9 @@ namespace gdjs {
      *
      * When the character is not in the jumping state this method has no effect.
      */
-    abortJump(resetFallingSpeed: boolean): void {
+    abortJump(): void {
       if (this._state === this._jumping) {
-        if (resetFallingSpeed) {
-          this._currentFallSpeed = 0;
-        }
+        this._currentFallSpeed = 0;
         this._setFalling();
       }
     }

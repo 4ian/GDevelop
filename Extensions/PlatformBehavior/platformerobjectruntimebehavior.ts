@@ -1193,6 +1193,18 @@ namespace gdjs {
     }
 
     /**
+     * Set the current speed of the Platformer Object.
+     * @param currentSpeed The current speed.
+     */
+    setCurrentSpeed(currentSpeed: float): void {
+      this._currentSpeed = gdjs.evtTools.common.clamp(
+        currentSpeed,
+        -this._maxSpeed,
+        this._maxSpeed
+      );
+    }
+
+    /**
      * Get the current jump speed of the Platformer Object.
      * @returns The current jump speed.
      */

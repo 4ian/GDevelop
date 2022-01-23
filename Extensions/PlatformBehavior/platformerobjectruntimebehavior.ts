@@ -453,8 +453,9 @@ namespace gdjs {
 
     _setFalling() {
       this._state.leave();
+      const from = this._state;
       this._state = this._falling;
-      this._falling.enter();
+      this._falling.enter(from);
     }
 
     _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
@@ -1797,8 +1798,17 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter() {
-      this._behavior._canJump = false;
+    enter(from: State) {
+      // Only forbid jumping when starting to fall from a platform,
+      // not when falling during a jump. This is because the Jumping
+      // state has already set `_canJump` to false and we don't want to reset
+      // it again because it could have been set back to `true` to allow
+      // for an "air jump".
+      // Transition from Falling to Falling state should not happen,
+      // but don't change anything if this ever happen.
+      if (from !== this._behavior._jumping && from !== this) {
+        this._behavior._canJump = false;
+      }
     }
 
     leave() {}

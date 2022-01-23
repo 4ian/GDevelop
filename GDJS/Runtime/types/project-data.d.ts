@@ -117,7 +117,7 @@ declare interface InstanceNumberProperty {
 }
 declare interface InstanceStringProperty {
   name: string;
-  value: number;
+  value: string;
 }
 
 declare interface LayerData {

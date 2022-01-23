@@ -48,6 +48,15 @@ export default class ObjectField extends React.Component<
         onRequestClose={this.props.onRequestClose}
         onApply={this.props.onApply}
         allowedObjectType={this._allowedObjectType}
+        requiredObjectCapability={
+          // Some instructions apply to all objects BUT not some objects
+          // lacking a specific capability usually offered by all objects.
+          this.props.instructionMetadata
+            ? this.props.instructionMetadata.getRequiredBaseObjectCapability()
+            : this.props.expressionMetadata
+            ? this.props.expressionMetadata.getRequiredBaseObjectCapability()
+            : undefined
+        }
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}

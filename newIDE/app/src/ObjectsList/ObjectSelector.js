@@ -1,5 +1,5 @@
 // @flow
-import { t } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import SemiControlledAutoComplete, {
@@ -7,14 +7,24 @@ import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
 } from '../UI/SemiControlledAutoComplete';
 import ListIcon from '../UI/ListIcon';
+import getObjectByName from '../Utils/GetObjectByName';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
+
+  /** If specified, only this object type should be allowed to be selected. */
   allowedObjectType?: ?string,
+  /**
+   * If specified, an object without this required capability won't be selectable.
+   * Note that this does not work with groups - which are assumed to have all capabilities.
+   */
+  requiredObjectCapability?: ?string,
+
   noGroups?: boolean,
 
   onChoose?: string => void,
@@ -78,6 +88,43 @@ const getObjectsAndGroupsDataSource = ({
   return [...objects, { type: 'separator' }, ...groups];
 };
 
+const checkHasRequiredCapability = ({
+  project,
+  globalObjectsContainer,
+  objectsContainer,
+  requiredObjectCapability,
+  objectName,
+}: {|
+  project: ?gdProject,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  requiredObjectCapability: ?string,
+  objectName: string,
+|}) => {
+  if (!requiredObjectCapability) return true;
+  if (!project) return true;
+
+  const object = getObjectByName(
+    globalObjectsContainer,
+    objectsContainer,
+    objectName
+  );
+  if (!object) {
+    // Either the object does not exist or it's a group - not a problem because:
+    // - if the object does not exist, we can't know its capabilities, we assume it has all.
+    // - a group is assumed to have all the capabilities.
+    return true;
+  }
+
+  const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+    project.getCurrentPlatform(),
+    object.getType()
+  );
+  return !objectMetadata.isUnsupportedBaseObjectCapability(
+    requiredObjectCapability
+  );
+};
+
 export default class ObjectSelector extends React.Component<Props, {||}> {
   _field: ?SemiControlledAutoCompleteInterface;
 
@@ -97,6 +144,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       globalObjectsContainer,
       objectsContainer,
       allowedObjectType,
+      requiredObjectCapability,
       noGroups,
       errorTextIfInvalid,
       margin,
@@ -116,6 +164,21 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       objectAndGroups.filter(
         choice => choice.text !== undefined && value === choice.text
       ).length !== 0;
+    const hasObjectWithRequiredCapability = checkHasRequiredCapability({
+      project,
+      requiredObjectCapability,
+      globalObjectsContainer,
+      objectsContainer,
+      objectName: value,
+    });
+
+    const errorText = !hasObjectWithRequiredCapability ? (
+      <Trans>This object exists, but can't be used here.</Trans>
+    ) : !hasValidChoice ? (
+      errorTextIfInvalid
+    ) : (
+      undefined
+    );
 
     return (
       <SemiControlledAutoComplete
@@ -127,7 +190,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         onRequestClose={onRequestClose}
         onApply={onApply}
         dataSource={objectAndGroups}
-        errorText={hasValidChoice ? undefined : errorTextIfInvalid}
+        errorText={errorText}
         ref={field => (this._field = field)}
         {...rest}
       />

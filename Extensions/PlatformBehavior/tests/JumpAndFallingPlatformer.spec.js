@@ -1080,6 +1080,20 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').getCurrentFallSpeed()).to.be(200);
       expect(object.getBehavior('auto1').getCurrentJumpSpeed()).to.be(0);
     });
+
+    it('can abort a jump', function () {
+      goToJumpPeak();
+
+      // Abort the jump
+      object.getBehavior('auto1').abortJump();
+      runtimeScene.renderAndStep(1000 / 60);
+      // jump and fall speeds are reset (25 is the acceleration).
+      expect(object.getBehavior('auto1').getCurrentFallSpeed()).to.be(25);
+      expect(object.getBehavior('auto1').getCurrentJumpSpeed()).to.be(0);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
   });
 
   describe('(jumpthru)', function () {

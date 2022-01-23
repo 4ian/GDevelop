@@ -8,7 +8,7 @@ GDevelop is a full-featured, no-code, open-source game development software. You
 
 | ❔ I want to...                 | 🚀 What to do                                                                  |
 | ------------------------------- | ------------------------------------------------------------------------------ |
-| Download GDevelop to make games | Go to [GDevelop website](https://gdevelop.op) to download the app!             |
+| Download GDevelop to make games | Go to [GDevelop website](https://gdevelop.io) to download the app!             |
 | Contribute to the editor        | Download [Node.js] and follow this [README](newIDE/README.md).                 |
 | Create/improve an extension     | Download [Node.js] and follow this [README](newIDE/README-extensions.md).      |
 | Help to translate GDevelop      | Go on the [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop). |
@@ -36,7 +36,7 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 ### Community
 
 -   [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/gdevelop).
--   [GDevelop homepage](https://gdevelop-app.com)
+-   [GDevelop homepage](https://gdevelop.io)
 -   [GDevelop wiki (documentation)](http://wiki.compilgames.net/doku.php/gdevelop5/start)
 -   Help translate GDevelop in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
 
@@ -51,8 +51,6 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 -   Suggest your game to be [added to the showcase here](https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform).
 
 ![Some games made with GDevelop](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20games.png "Some games made with GDevelop")
-
-> [Lil BUB's HELLO EARTH](https://gdevelop-app.com/games/lil-bub-hello-earth) is one of the many games built with GDevelop.
 
 ## License
 

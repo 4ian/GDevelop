@@ -155,10 +155,22 @@
         "gridColor": 10401023,
         "gridAlpha": 0.8,
         "snap": false,
-        "zoomFactor": 1.0542000000000005,
+        "zoomFactor": 1.1222000000000005,
         "windowMask": false
       },
-      "objectsGroups": [],
+      "objectsGroups": [
+        {
+          "name": "GroupWithSpriteAndDefaultInput",
+          "objects": [
+            {
+              "name": "IndustrialPlatform"
+            },
+            {
+              "name": "DefaultInput"
+            }
+          ]
+        }
+      ],
       "variables": [],
       "instances": [
         {
@@ -843,6 +855,42 @@
                 "IndustrialPlatform",
                 "50",
                 ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Test crash even if using groups to still run unsupported actions (effects) on the text inputs.",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "EnableEffect"
+              },
+              "parameters": [
+                "GroupWithSpriteAndDefaultInput",
+                "\"TestEffect\"",
+                "yes"
               ],
               "subInstructions": []
             }

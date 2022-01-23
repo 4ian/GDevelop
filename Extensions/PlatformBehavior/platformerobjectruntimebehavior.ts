@@ -1870,7 +1870,7 @@ namespace gdjs {
     }
 
     setCurrentJumpSpeed(currentJumpSpeed: number) {
-      return (this._currentJumpSpeed = currentJumpSpeed);
+      this._currentJumpSpeed = currentJumpSpeed;
     }
 
     enter(from: State) {

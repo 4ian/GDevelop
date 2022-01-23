@@ -7,6 +7,7 @@
 #define OBJECTMETADATA_H
 #include <functional>
 #include <map>
+#include <set>
 #include <memory>
 
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
@@ -200,13 +201,38 @@ class GD_CORE_API ObjectMetadata {
     return *this;
   }
 
+  /**
+   * \brief The "capabilities" that are offered by the base object that are
+   * *not* supported by this object, and should be hidden in the editor
+   * inferface.
+   */
+  const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
+    return unsupportedBaseObjectCapabilities;
+  }
+
+  /**
+   * \brief Add a "capability" that is offered by the base object that is *not*
+   * supported by this object, and should be hidden in the editor inferface.
+   */
+  ObjectMetadata& AddUnsupportedBaseObjectCapability(
+      const gd::String& capability) {
+    unsupportedBaseObjectCapabilities.insert(capability);
+    return *this;
+  }
+
+  /**
+   * \brief Check if a "capability" that is offered by the base object is *not*
+   * supported by this object, and should be hidden in the editor inferface.
+   */
+  bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
+    return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
+  }
+
   const gd::String& GetName() const { return name; }
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#endif
 
   /**
    * \brief Set the URL pointing to the help page about this object
@@ -227,7 +253,6 @@ class GD_CORE_API ObjectMetadata {
    */
   ObjectMetadata& AddIncludeFile(const gd::String& includeFile);
 
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -235,19 +260,18 @@ class GD_CORE_API ObjectMetadata {
 
   std::vector<gd::String> includeFiles;
   gd::String className;
-#endif
   CreateFunPtr createFunPtr;
 
  private:
   gd::String extensionNamespace;
   gd::String name;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String helpUrl;  ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-#endif
+  std::set<gd::String> unsupportedBaseObjectCapabilities;
+
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation

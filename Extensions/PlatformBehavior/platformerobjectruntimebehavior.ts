@@ -1345,6 +1345,35 @@ namespace gdjs {
     }
 
     /**
+     * Abort the current jump.
+     *
+     * When the character is not in the jumping state this method has no effect.
+     */
+    abortJump(resetFallingSpeed: boolean): void {
+      if (this._state === this._jumping) {
+        if (resetFallingSpeed) {
+          this._currentFallSpeed = 0;
+        }
+        this._setFalling();
+      }
+    }
+
+    /**
+     * Set the current fall speed.
+     *
+     * When the character is not in the falling state this method has no effect.
+     */
+    setCurrentFallSpeed(currentFallSpeed: float) {
+      if (this._state === this._falling) {
+        this._currentFallSpeed = gdjs.evtTools.common.clamp(
+          currentFallSpeed,
+          0,
+          this._maxFallingSpeed
+        );
+      }
+    }
+
+    /**
      * Set if the Platformer Object can grab platforms.
      * @param enable Enable / Disable grabbing of platforms.
      */

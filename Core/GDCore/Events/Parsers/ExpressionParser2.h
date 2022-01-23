@@ -13,6 +13,7 @@
 #include "ExpressionParser2Node.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
@@ -463,6 +464,10 @@ class GD_CORE_API ExpressionParser2 {
       gd::String objectType =
           GetTypeOfObject(globalObjectsContainer, objectsContainer, objectName);
 
+      // TODO: non optimal - we'll iterate twice on all extensions because of these 2 calls.
+      // TODO: we could at least move the objectMetadata in a if?
+      const gd::ObjectMetadata &objectMetadata =
+          MetadataProvider::GetObjectMetadata(platform, objectType);
       const gd::ExpressionMetadata &metadata =
           MetadataProvider::GetObjectAnyExpressionMetadata(
               platform, objectType, objectFunctionOrBehaviorName);
@@ -484,9 +489,18 @@ class GD_CORE_API ExpressionParser2 {
           metadata,
           objectFunctionOrBehaviorName);
       function->diagnostic = std::move(parametersNode.diagnostic);
+
       if (!function->diagnostic)  // TODO: reverse the order of diagnostic?
         function->diagnostic = ValidateFunction(
             type, *function, objectNameLocation.GetStartPosition());
+
+      if (objectMetadata.IsUnsupportedBaseObjectCapability(
+              metadata.GetRequiredBaseObjectCapability())) {
+        // TODO: Add test for this.
+        function->diagnostic = RaiseTypeError(
+            _("This expression exists, but it can't be used on this object."),
+            objectNameLocation.GetStartPosition());
+      }
 
       function->location = ExpressionParserLocation(
           objectNameLocation.GetStartPosition(), GetCurrentPosition());

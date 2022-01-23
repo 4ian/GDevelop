@@ -138,18 +138,19 @@ class GD_CORE_API InstructionMetadata {
    * \param description Description for parameter
    * \param supplementaryInformation Additional information that can be used for
    * rendering or logic. For example:
-   * - If type is "object", this argument will describe which objects are allowed.
-   * If this argument is empty, all objects are allowed.
-   * - If type is "operator", this argument will be used to display only pertinent operators.
-   * \param parameterIsOptional true if the parameter must be optional, false
-   * otherwise.
+   * - If type is "object", this argument will describe which objects are
+   * allowed. If this argument is empty, all objects are allowed.
+   * - If type is "operator", this argument will be used to display only
+   * pertinent operators. \param parameterIsOptional true if the parameter must
+   * be optional, false otherwise.
    *
    * \see EventsCodeGenerator::GenerateParametersCodes
    */
-  InstructionMetadata &AddParameter(const gd::String &type,
-                                    const gd::String &label,
-                                    const gd::String &supplementaryInformation = "",
-                                    bool parameterIsOptional = false);
+  InstructionMetadata &AddParameter(
+      const gd::String &type,
+      const gd::String &label,
+      const gd::String &supplementaryInformation = "",
+      bool parameterIsOptional = false);
 
   /**
    * \brief Add a parameter not displayed in editor.
@@ -197,8 +198,7 @@ class GD_CORE_API InstructionMetadata {
    * \see AddParameter
    */
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
-    if (!parameters.empty())
-      parameters.back().SetExtraInfo(extraInfo);
+    if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
     return *this;
   };
 
@@ -236,16 +236,29 @@ class GD_CORE_API InstructionMetadata {
   /**
    * \brief Check if the instruction is an object instruction.
    */
-  bool IsObjectInstruction() const {
-    return isObjectInstruction;
-  }
+  bool IsObjectInstruction() const { return isObjectInstruction; }
 
   /**
    * \brief Check if the instruction is a behavior instruction.
    */
-  bool IsBehaviorInstruction() const {
-    return isBehaviorInstruction;
-  }
+  bool IsBehaviorInstruction() const { return isBehaviorInstruction; }
+
+  /**
+   * \brief Mark this (object) instruction as requiring the specified
+   * capability, offered by the base object. This is useful for some objects
+   * that don't support this capability, so that the editor can hide the
+   * instruction as it does not apply to them.
+   */
+  InstructionMetadata &SetRequiresBaseObjectCapability(
+      const gd::String &capability);
+
+  /**
+   * \brief Get the required specified capability for this (object) instruction,
+   * or an empty string if there is nothing specific required.
+   */
+  const gd::String &GetRequiredBaseObjectCapability() const {
+    return requiredBaseObjectCapability;
+  };
 
   /**
    * \brief Consider that the instruction is easy for a user to understand.
@@ -450,6 +463,7 @@ class GD_CORE_API InstructionMetadata {
   bool isPrivate;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
+  gd::String requiredBaseObjectCapability;
 };
 
 }  // namespace gd

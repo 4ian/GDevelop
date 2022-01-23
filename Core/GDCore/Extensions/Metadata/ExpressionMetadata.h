@@ -223,6 +223,23 @@ class GD_CORE_API ExpressionMetadata {
   };
 
   /**
+   * \brief Mark this (object) expression as requiring the specified capability,
+   * offered by the base object.
+   * This is useful for some objects that don't support this capability, so that
+   * the editor can hide the expression as it does not apply to them.
+   */
+  ExpressionMetadata& SetRequiresBaseObjectCapability(
+      const gd::String& capability);
+
+  /**
+   * \brief Get the required specified capability for this (object) expression,
+   * or an empty string if there is nothing specific required.
+   */
+  const gd::String& GetRequiredBaseObjectCapability() const {
+    return requiredBaseObjectCapability;
+  };
+
+  /**
    * \brief Set the function that should be called when generating the source
    * code from events.
    * \param functionName the name of the function to call
@@ -273,6 +290,7 @@ class GD_CORE_API ExpressionMetadata {
   gd::String smallIconFilename;
   gd::String extensionNamespace;
   bool isPrivate;
+  gd::String requiredBaseObjectCapability;
 };
 
 }  // namespace gd

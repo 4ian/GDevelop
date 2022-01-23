@@ -1,9 +1,12 @@
 // @flow
+import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { createTree } from './CreateTree';
 import {
   enumerateAllInstructions,
+  enumerateObjectAndBehaviorsInstructions,
   getObjectParameterIndex,
 } from './EnumerateInstructions';
+const gd: libGDevelop = global.gd;
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
@@ -100,5 +103,79 @@ describe('EnumerateInstructions', () => {
     )[0];
     expect(spriteAnimatedEnded).not.toBeUndefined();
     expect(getObjectParameterIndex(spriteAnimatedEnded.metadata)).toBe(0);
+  });
+
+  it('can enumerate instructions for an object (Sprite)', () => {
+    makeTestExtensions(gd);
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+
+    // Test for the proper presence of a few conditions.
+    const spriteInstructions = enumerateObjectAndBehaviorsInstructions(
+      true,
+      project,
+      layout,
+      'MySpriteObject'
+    );
+    expect(spriteInstructions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          displayedName: 'Animation finished',
+          type: 'AnimationEnded',
+        }),
+        expect.objectContaining({
+          displayedName: 'The cursor/touch is on an object',
+          type: 'SourisSurObjet',
+        }),
+      ])
+    );
+  });
+
+  it('can enumerate instructions for an object (with an unsupported capability)', () => {
+    makeTestExtensions(gd);
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const layout = project.insertNewLayout('Scene', 0);
+    layout.insertNewObject(project, 'Sprite', 'MySpriteObject', 0);
+    layout.insertNewObject(
+      project,
+      'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+      'MyFakeObjectWithUnsupportedCapability',
+      0
+    );
+
+    // Test the sprite can have effects related condition.
+    const spriteInstructions = enumerateObjectAndBehaviorsInstructions(
+      true,
+      project,
+      layout,
+      'MySpriteObject'
+    );
+    expect(spriteInstructions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          displayedName: 'Effect is enabled',
+          fullGroupName: 'Effects',
+          type: 'IsEffectEnabled',
+        }),
+      ])
+    );
+
+    // Test an object not supporting effects don't have this condition.
+    const withUnsupportedCapabilityInstructions = enumerateObjectAndBehaviorsInstructions(
+      true,
+      project,
+      layout,
+      'MyFakeObjectWithUnsupportedCapability'
+    );
+    expect(withUnsupportedCapabilityInstructions).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          displayedName: 'Effect is enabled',
+          fullGroupName: 'Effects',
+          type: 'IsEffectEnabled',
+        }),
+      ])
+    );
   });
 });

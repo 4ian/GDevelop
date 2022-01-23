@@ -10,6 +10,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Tools/Log.h"
 #include "ParameterMetadata.h"
 
 namespace gd {
@@ -66,8 +67,9 @@ InstructionMetadata& InstructionMetadata::AddParameter(
           ? (supplementaryInformation.empty()
                  ? ""
                  : extensionNamespace +
-                       supplementaryInformation  //... so prefix it with the extension
-                                           // namespace.
+                       supplementaryInformation  //... so prefix it with the
+                                                 // extension
+                                                 // namespace.
              )
           : supplementaryInformation;  // Otherwise don't change anything
 
@@ -156,6 +158,19 @@ InstructionMetadata::UseStandardRelationalOperatorParameters(
                             "_PARAM" + gd::String::From(valueParamIndex) + "_");
   }
 
+  return *this;
+}
+
+InstructionMetadata& InstructionMetadata::SetRequiresBaseObjectCapability(
+    const gd::String& capability) {
+  if (!IsObjectInstruction() && !IsBehaviorInstruction()) {
+    gd::LogError("Tried to add capability \"" + capability +
+                 "\" to instruction named \"" + fullname +
+                 "\", which is not an object or behavior instruction.");
+    return *this;
+  }
+
+  requiredBaseObjectCapability = capability;
   return *this;
 }
 

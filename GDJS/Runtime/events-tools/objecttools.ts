@@ -560,4 +560,40 @@ namespace gdjs {
       };
     }
   }
+
+  /**
+   * A container for objects lists that should last more than the current frame.
+   * It automatically removes objects that were destroyed from the objects lists.
+   */
+  export class LongLivedObjectsList {
+    private lists = new Map<string, Array<RuntimeObject>>();
+    private callbacks = new Map<RuntimeObject, () => void>();
+
+    getObjects(name: string) {
+      if (!this.lists.has(name)) this.lists.set(name, []);
+      return this.lists.get(name)!;
+    }
+
+    addObject(o: gdjs.RuntimeObject) {
+      const list = this.getObjects(o.getName());
+      if (list.includes(o)) return;
+      list.push(o);
+
+      // Register callbacks for when the object is destroyed
+      const onDestroy = () => this.removeObject(o);
+      this.callbacks.set(o, onDestroy);
+      o.registerDestroyCallback(onDestroy);
+    }
+
+    removeObject(o: gdjs.RuntimeObject) {
+      const list = this.getObjects(o.getName());
+      const index = list.indexOf(o);
+      if (index === -1) return;
+      list.splice(index, 1);
+
+      // Properly remove callbacks to not leak the object
+      o.unregisterDestroyCallback(this.callbacks.get(o)!);
+      this.callbacks.delete(o);
+    }
+  }
 }

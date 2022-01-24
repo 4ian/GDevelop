@@ -619,8 +619,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddScopedAction("SetCurrentSpeed",
                      _("Current horizontal speed"),
-                     _("Change the current horizontal speed of the object (in pixels per "
-                       "second)."),
+                     _("Change the current horizontal speed of the object "
+                     "(in pixels per second). The object moves to the left "
+                     "with negative values and to the right with positive ones"),
                      _("the current horizontal speed"),
                      _(""),
                      "CppPlatform/Extensions/platformerobjecticon24.png",

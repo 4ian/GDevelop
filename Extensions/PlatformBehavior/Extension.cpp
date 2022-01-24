@@ -617,6 +617,20 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetCurrentJumpSpeed");
 
+    aut.AddScopedAction("SetCurrentSpeed",
+                     _("Current horizontal speed"),
+                     _("Change the current horizontal speed of the object "
+                     "(in pixels per second). The object moves to the left "
+                     "with negative values and to the right with positive ones"),
+                     _("the current horizontal speed"),
+                     _(""),
+                     "CppPlatform/Extensions/platformerobjecticon24.png",
+                     "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number")
+        .MarkAsAdvanced();
+
     aut.AddCondition("CurrentSpeed",
                      _("Current horizontal speed"),
                      _("Compare the current horizontal speed of the object "

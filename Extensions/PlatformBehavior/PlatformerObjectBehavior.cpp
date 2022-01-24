@@ -34,6 +34,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
   behaviorContent.SetAttribute("useLegacyTrajectory", false);
+  behaviorContent.SetAttribute("canGoDownFromJumpthru", true);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -87,6 +88,12 @@ PlatformerObjectBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean");
+  properties[_("Can go down from jumpthru platforms")]
+      .SetGroup(_("Walk"))
+      .SetValue(behaviorContent.GetBoolAttribute("canGoDownFromJumpthru", false)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
   return properties;
 }
 
@@ -100,6 +107,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
   else if (name == _("Use frame per second dependent trajectories (deprecated)"))
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
+  else if (name == _("Can go down from jumpthru platforms"))
+    behaviorContent.SetAttribute("canGoDownFromJumpthru", (value == "1"));
   else if (name == _("Grab offset on Y axis"))
     behaviorContent.SetAttribute("yGrabOffset", value.To<double>());
   else {

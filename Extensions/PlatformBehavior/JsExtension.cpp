@@ -114,6 +114,9 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
       autConditions["PlatformBehavior::CurrentFallSpeed"].SetFunctionName(
           "getCurrentFallSpeed");
       autExpressions["CurrentFallSpeed"].SetFunctionName("getCurrentFallSpeed");
+      autActions["PlatformBehavior::PlatformerObjectBehavior::SetCurrentSpeed"]
+          .SetFunctionName("setCurrentSpeed")
+          .SetGetter("getCurrentSpeed");
       autConditions["PlatformBehavior::CurrentSpeed"].SetFunctionName(
           "getCurrentSpeed");
       autExpressions["CurrentSpeed"].SetFunctionName("getCurrentSpeed");

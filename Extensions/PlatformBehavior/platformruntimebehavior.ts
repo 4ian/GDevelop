@@ -92,8 +92,8 @@ namespace gdjs {
       // TODO: PR https://github.com/4ian/GDevelop/pull/2602 should remove the need
       // for this extra check once merged.
       for (let i = 0; i < nearbyPlatforms.length; i++) {
-        const platform = nearbyPlatforms[i];
-        const platformAABB = platform.behavior.owner.getAABB();
+        const platform = nearbyPlatforms[i].behavior;
+        const platformAABB = platform.owner.getAABB();
         const platformIsStillAround =
           platformAABB.min[0] <= searchArea.maxX &&
           platformAABB.min[1] <= searchArea.maxY &&
@@ -103,7 +103,7 @@ namespace gdjs {
         // This can happen because platforms are not updated in the RBush before that
         // characters movement are being processed.
         if (platformIsStillAround) {
-          result.push(platform.behavior);
+          result.push(platform);
         }
       }
     }

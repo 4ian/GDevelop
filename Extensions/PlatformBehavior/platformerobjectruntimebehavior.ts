@@ -463,7 +463,7 @@ namespace gdjs {
       this._falling.enter(from);
     }
 
-    _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+    _setOnFloor(collidingPlatform: gdjs.PlatformRuntimeBehavior) {
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
@@ -476,7 +476,9 @@ namespace gdjs {
       this._jumping.enter(from);
     }
 
-    private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
+    private _setGrabbingPlatform(
+      grabbedPlatform: gdjs.PlatformRuntimeBehavior
+    ) {
       this._state.leave();
       this._state = this._grabbingPlatform;
       this._grabbingPlatform.enter(grabbedPlatform);
@@ -510,7 +512,7 @@ namespace gdjs {
             ? this._xGrabTolerance
             : -this._xGrabTolerance)
       );
-      const collidingPlatforms: PlatformRuntimeBehavior[] = gdjs.staticArray(
+      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] = gdjs.staticArray(
         PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
       );
       collidingPlatforms.length = 0;
@@ -1564,7 +1566,7 @@ namespace gdjs {
    */
   class OnFloor implements State {
     private _behavior: PlatformerObjectRuntimeBehavior;
-    private _floorPlatform: PlatformRuntimeBehavior | null = null;
+    private _floorPlatform: gdjs.PlatformRuntimeBehavior | null = null;
     private _floorLastX: float = 0;
     private _floorLastY: float = 0;
     _oldHeight: float = 0;
@@ -1577,7 +1579,7 @@ namespace gdjs {
       return this._floorPlatform;
     }
 
-    enter(floorPlatform: PlatformRuntimeBehavior) {
+    enter(floorPlatform: gdjs.PlatformRuntimeBehavior) {
       this._floorPlatform = floorPlatform;
       this.updateFloorPosition();
       this._behavior._canJump = true;
@@ -2009,7 +2011,7 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter(grabbedPlatform: PlatformRuntimeBehavior) {
+    enter(grabbedPlatform: gdjs.PlatformRuntimeBehavior) {
       this._grabbedPlatform = grabbedPlatform;
       this._behavior._canJump = true;
       this._behavior._currentFallSpeed = 0;

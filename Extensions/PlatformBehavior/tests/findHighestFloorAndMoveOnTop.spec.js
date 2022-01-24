@@ -95,7 +95,7 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
     downwardDeltaY
   ) => {
     const result = characterBehavior._findHighestFloorAndMoveOnTop(
-      [platformBehavior.currentRBushAABB],
+      [platformBehavior],
       upwardDeltaY,
       downwardDeltaY
     );
@@ -110,7 +110,7 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
   ) => {
     const oldY = characterBehavior.owner.getY();
     const result = characterBehavior._findHighestFloorAndMoveOnTop(
-      [platformBehavior.currentRBushAABB],
+      [platformBehavior],
       upwardDeltaY,
       downwardDeltaY
     );
@@ -127,7 +127,7 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
   ) => {
     const oldY = characterBehavior.owner.getY();
     const result = characterBehavior._findHighestFloorAndMoveOnTop(
-      [platformBehavior.currentRBushAABB],
+      [platformBehavior],
       upwardDeltaY,
       downwardDeltaY
     );

@@ -67,7 +67,7 @@ namespace gdjs {
     getAllPlatformsAround(
       object: gdjs.RuntimeObject,
       maxMovementLength: number,
-      result: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior>[]
+      result: PlatformRuntimeBehavior[]
     ): any {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -103,7 +103,7 @@ namespace gdjs {
         // This can happen because platforms are not updated in the RBush before that
         // characters movement are being processed.
         if (platformIsStillAround) {
-          result.push(platform);
+          result.push(platform.behavior);
         }
       }
     }

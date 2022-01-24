@@ -1122,6 +1122,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             canGrabPlatforms: true,
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
+            canGoDownFromJumpthru: true,
           },
         ],
         effects: [],
@@ -1206,6 +1207,30 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         jumpthru.getY() - object.getHeight() + 1
       );
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
+    });
+
+    it('can go down from a jump through', function () {
+      object.setPosition(0, -55);
+      jumpthru.setPosition(0, -32);
+      // The character lands on the jumpthru.
+      for (let i = 0; i < 5; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getY()).to.be(-52); // -52 = -32 (jumpthru y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+
+      // The character goes down from the jumpthru.
+      object.getBehavior('auto1').simulateDownKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      for (let i = 0; i < 10; ++i) {
+        const previousY = object.getY();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getY()).to.be.greaterThan(previousY);
+      }
     });
 
     it('can jump right under a jumpthru without landing', function () {

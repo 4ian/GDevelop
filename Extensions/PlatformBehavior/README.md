@@ -66,7 +66,9 @@ The model doesn't follow the laws of physics and this is fine because more reali
 - the current jumping speed `currentJumpSpeed`
 - the current falling speed `currentFallSpeed`
 
-The jump speed stays at its initial value while the jump is sustained. Then, it decreases according to the gravity until it reaches 0 and stays constant until the end.
+Note that in the engine `currentJumpSpeed` is actually an absolute speed but it's easier to visualize as a negative value as it is subtracted to `currentFallSpeed`.
+
+The jump speed stays at its initial value while the jump is sustained. Then, it decreases (in absolute) according to the gravity until it reaches 0 and stays constant until the end.
 The falling speed starts at 0 and increase according to the gravity, as soon as the jump start. Until, it reaches the maximum falling speed and stays constant until the end too.
 
 [![Jump speed](./diagrams/JumpSpeed.png)](./diagrams/JumpSpeed.svgz) [![Falling speed](./diagrams/FallingSpeed.png)](./diagrams/FallingSpeed.svgz)

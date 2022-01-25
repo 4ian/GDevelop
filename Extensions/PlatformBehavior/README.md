@@ -101,17 +101,17 @@ Depending on the when the maximum falling speed is reached, there can be 3 piece
   - sustain case
   - common case
   - free fall case
-  - gladding case
+  - gliding case
 - before the jump end and after the sustaining
   - sustain case
   - common case
   - max falling case
-  - gladding case
+  - gliding case
 - during the sustaining
   - sustain case
   - affine case
   - max falling case
-  - gladding case
+  - gliding case
 
 [![Jump cases](./diagrams/JumpCases.png)](./diagrams/JumpCases.svgz)
 
@@ -167,8 +167,8 @@ affineCaseHeight(t, gravity, jumpSpeed, maxFallingSpeed) = sustainedX(t, jumpSpe
 # jumpEndTime < t && maxFallingTime < t #
 # This is a strictly descending phase, the peak can't happen here #
 
-gladdingCaseSpeed(t, maxFallingSpeed) = maxFallingSpeed
-gladdingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) + fallEndedX(t, gravity)
+glidingCaseSpeed(t, maxFallingSpeed) = maxFallingSpeed
+glidingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) + fallEndedX(t, gravity)
 
 
 # jumpEndTime < t && t < maxFallingTime #
@@ -232,7 +232,7 @@ maxFallingCaseCaseUpTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed
 sustainCaseDownTime(y, gravity, jumpSpeed) = solve([sustainCaseHeight(t, gravity, jumpSpeed)==y], t)[1].rhs()
 commonCaseDownTime(y, gravity, jumpSpeed, jumpSustainTime) = solve([height(t, gravity, jumpSpeed, jumpSustainTime)==y], t)[1].rhs()
 maxFallingCaseCaseDownTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([maxFallingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[1].rhs()
-gladdingCaseDownTime(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([gladdingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[0].rhs() # only one solution (it's affine) #
+glidingCaseDownTime(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([glidingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[0].rhs() # only one solution (it's affine) #
 freeFallCaseDownTime(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([freeFallCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[1].rhs()
 
 affineCaseTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpSpeed, maxFallingSpeed)==y], t)[0].rhs()
@@ -249,7 +249,7 @@ if (maxFallingSpeedReachedTime > jumpEndTime) {
         if (time > jumpEndTime || Number.isNaN(time)) {
             time = freeFallCase(y);
             if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {
-                time = gladdingCase(y);
+                time = glidingCase(y);
             }
         }
     }
@@ -261,7 +261,7 @@ else if (maxFallingSpeedReachedTime > jumpSustainTime) {
         if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {
             time = maxFallingCase(y);
             if (time > jumpEndTime || Number.isNaN(time)) {
-                time = gladdingCase(y);
+                time = glidingCase(y);
             }
         }
     }
@@ -273,7 +273,7 @@ else {
         if (time > jumpSustainTime || Number.isNaN(time)) {
             time = maxFallingCase(y);
             if (time > jumpEndTime || Number.isNaN(time)) {
-                time = gladdingCase(y);
+                time = glidingCase(y);
             }
         }
     }

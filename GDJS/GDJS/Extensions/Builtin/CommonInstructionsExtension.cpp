@@ -31,6 +31,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDJS/Events/Builtin/JsCodeEvent.h"
+#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 
 using namespace std;
 using namespace gd;
@@ -105,8 +106,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   GetAllEvents()["BuiltinCommonInstructions::Async"].SetCodeGenerator(
       [](gd::BaseEvent& event_,
          gd::EventsCodeGenerator& codeGenerator,
-         gd::EventsCodeGenerationContext& context) {
+         gd::EventsCodeGenerationContext& parentContext) {
         gd::AsyncEvent& event = dynamic_cast<gd::AsyncEvent&>(event_);
+
         const gd::String callbackFunctionName =
             "asyncCallback" +
             gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
@@ -114,7 +116,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Generate callback code
         gd::EventsCodeGenerationContext callbackContext;
-        callbackContext.AsyncInheritsFrom(context);
+        callbackContext.AsyncInheritsFrom(parentContext);
 
         // Generate actions
         gd::String actionsCode = codeGenerator.GenerateActionsListCode(
@@ -132,23 +134,37 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Compose the callback function and add outside main
         const gd::String actionsDeclarationsCode =
             codeGenerator.GenerateObjectsDeclarationCode(callbackContext);
-        const gd::String callbackCode =
-            "function " + callbackFunctionName + "(runtimeScene, asyncObjectsList) {\n" +
-            actionsDeclarationsCode + actionsCode + "}\n";
+        const gd::String callbackCode = "function " + callbackFunctionName +
+                                        "(runtimeScene, asyncObjectsList) {\n" +
+                                        actionsDeclarationsCode + actionsCode +
+                                        "}\n";
         codeGenerator.AddCustomCodeOutsideMain(callbackCode);
 
         // Generate code to backup the objects lists
-        gd::String objectsListsCode = "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
-        // The objects to be declared of the callback context tell all objects used in the callbacks so that they can be backed up now.
-        for(const gd::String& objectToBackup : callbackContext.GetAllObjectsToBeDeclared()) {
-            if(context.ObjectAlreadyDeclared(objectToBackup)) objectsListsCode += "for (const obj of "+codeGenerator.GetObjectListName(objectToBackup, context)+") asyncObjectsList.addObject(obj);\n";
+        gd::String objectsListsCode =
+            parentContext.IsAsync()
+                ? "asyncObjectsList = "
+                  "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
+                : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
+        // The objects to be declared of the callback context tell all objects
+        // used in the callbacks so that they can be backed up now.
+        for (const gd::String& objectToBackup :
+             callbackContext.GetAllDeclaredObjectsAcrossChildren()) {
+          if (parentContext.ObjectAlreadyDeclared(objectToBackup))
+            objectsListsCode +=
+                "for (const obj of " +
+                codeGenerator.GetObjectListName(objectToBackup, parentContext) +
+                ") asyncObjectsList.addObject(obj);\n";
         }
 
         // Generate the action with a .then to the generated callback
         const gd::String actionCode = codeGenerator.GenerateActionCode(
             event.GetInstruction(),
-            context,
-            "() => (" + callbackFunctionName + "(runtimeScene, asyncObjectsList))");
+            parentContext,
+            "() => (" + callbackFunctionName + "(" +
+                dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
+                    .GenerateEventsParameters(callbackContext) +
+                "))");
 
         return "{" + objectsListsCode + actionCode + "}";
       });
@@ -550,18 +566,30 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               "    else if($ITERABLE_REFERENCE.getType() === \"array\")\n"
               "        $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY);\n";
 
-        if(valueIteratorExists) outputCode +=
-            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
-            "    $VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE.getType())\n"
-            "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
-            "        $VALUE_ITERATOR_REFERENCE.setValue($STRUCTURE_CHILD_VARIABLE.getValue());\n"
-            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"structure\") {\n"
-            "        // Structures are passed by reference like JS objects\n"
-            "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
-            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"array\") {\n"
-            "        // Arrays are passed by reference like JS objects\n"
-            "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
-            "    } else console.warn(\"Cannot identify type: \", type);\n";
+        if (valueIteratorExists)
+          outputCode +=
+              "    const $STRUCTURE_CHILD_VARIABLE = "
+              "$ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
+              "    "
+              "$VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE."
+              "getType())\n"
+              "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
+              "        "
+              "$VALUE_ITERATOR_REFERENCE.setValue($STRUCTURE_CHILD_VARIABLE."
+              "getValue());\n"
+              "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === "
+              "\"structure\") {\n"
+              "        // Structures are passed by reference like JS objects\n"
+              "        "
+              "$VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_"
+              "VARIABLE.getAllChildren());\n"
+              "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === "
+              "\"array\") {\n"
+              "        // Arrays are passed by reference like JS objects\n"
+              "        "
+              "$VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_"
+              "VARIABLE.getAllChildrenArray());\n"
+              "    } else console.warn(\"Cannot identify type: \", type);\n";
 
         // Now do the rest of standard event code generation
         outputCode += objectDeclaration;

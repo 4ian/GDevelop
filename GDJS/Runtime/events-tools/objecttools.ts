@@ -568,14 +568,27 @@ namespace gdjs {
   export class LongLivedObjectsList {
     private lists = new Map<string, Array<RuntimeObject>>();
     private callbacks = new Map<RuntimeObject, () => void>();
+    private parent: LongLivedObjectsList | null = null;
 
-    getObjects(name: string) {
-      if (!this.lists.has(name)) this.lists.set(name, []);
-      return this.lists.get(name)!;
+    static from(parent: LongLivedObjectsList): LongLivedObjectsList {
+      const newList = new LongLivedObjectsList();
+      newList.parent = parent;
+      return newList;
     }
 
-    addObject(o: gdjs.RuntimeObject) {
-      const list = this.getObjects(o.getName());
+    private getOrCreateList(o: string): RuntimeObject[] {
+      if (!this.lists.has(o)) this.lists.set(o, []);
+      return this.lists.get(o)!;
+    }
+
+    getObjects(name: string): RuntimeObject[] {
+      if (!this.lists.has(name) && this.parent)
+        return this.parent.getObjects(name);
+      return this.lists.get(name) || [];
+    }
+
+    addObject(o: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(o.getName());
       if (list.includes(o)) return;
       list.push(o);
 
@@ -585,8 +598,8 @@ namespace gdjs {
       o.registerDestroyCallback(onDestroy);
     }
 
-    removeObject(o: gdjs.RuntimeObject) {
-      const list = this.getObjects(o.getName());
+    removeObject(o: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(o.getName());
       const index = list.indexOf(o);
       if (index === -1) return;
       list.splice(index, 1);

@@ -96,6 +96,12 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       bool compilationForRuntime = false);
 
   /**
+   * Generates the list of parameters the generated function of an event should
+   * accept.
+   */
+  gd::String GenerateEventsParameters(const gd::EventsCodeGenerationContext& context);
+
+  /**
    * \brief Generate code for executing an event list
    * \note To reduce the stress on JS engines, the code is generated inside
    * a separate JS function (see
@@ -281,7 +287,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateAllInstancesGetterCode(const gd::String& objectName, gd::EventsCodeGenerationContext& context);
+  virtual gd::String GenerateAllInstancesGetterCode(
+      const gd::String& objectName, gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateProfilerSectionBegin(const gd::String& section);
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);

@@ -39,7 +39,7 @@ class GD_CORE_API EventsCodeGenerationContext {
         maxDepthLevel(maxDepthLevel_),
         parent(NULL),
         reuseExplicitlyForbidden(false),
-        isAsync(false){};
+        asyncDepth(0){};
   virtual ~EventsCodeGenerationContext(){};
 
   /**
@@ -235,7 +235,29 @@ class GD_CORE_API EventsCodeGenerationContext {
    */
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
-  bool IsInheritingFromAsync(const gd::String& objectName);
+  const std::set<gd::String>& GetAllDeclaredObjectsAcrossChildren() {
+    return allListsAcrossChildrenToBeDeclared;
+  };
+
+  /**
+   * Returns true if the base object list should be gotten from a backed up
+   * objects list instead of the scene. This happens when inside of an
+   * asynchronous callback, where the objects to be declared are cleared, since
+   * the lists from the higher context do not exist anymore, frames have passed
+   * and the lists objects have been cleared and reused to pick other objects.
+   * Therefore, a backup of the lists is passed down to asynchronous events
+   * where they can get previously picked objects from.
+   *
+   * This returns true if the nearest parent with depth 0 OR an asynchronous
+   * context with a different depth than the current one has defined the object.
+   */
+  bool IsInheritingFromAsync(const gd::String& objectName) const;
+
+  /**
+   * Returns true if the code currently being generated is an asynchronous
+   * callback.
+   */
+  bool IsAsync() const { return asyncDepth != 0; };
 
  private:
   /**
@@ -270,6 +292,13 @@ class GD_CORE_API EventsCodeGenerationContext {
                                       ///< but not filled with scene's
                                       ///< objects and not filled with any
                                       ///< previously existing objects list.
+  std::set<gd::String>
+      allListsAcrossChildrenToBeDeclared;  ///< This is only to be used by the
+                                           ///< async root context to know all
+                                           ///< objects declared across all
+                                           ///< children, so that the necessary
+                                           ///< objects can be backed up.
+
   std::map<gd::String, unsigned int>
       depthOfLastUse;  ///< The context depth when an object was last used.
   gd::String
@@ -279,13 +308,16 @@ class GD_CORE_API EventsCodeGenerationContext {
                               ///< inheriting from context with depth n.
   unsigned int
       customConditionDepth;  ///< The depth of the conditions being generated.
+  unsigned int asyncDepth;
   unsigned int* maxDepthLevel;  ///< A pointer to a unsigned int updated with
                                 ///< the maximum depth reached.
   const EventsCodeGenerationContext*
       parent;  ///< The parent of the current context. Can be NULL.
+  std::set<EventsCodeGenerationContext*>
+      asyncRoots;  ///< The first parent of the current and previous async
+                   ///< depths.
   bool reuseExplicitlyForbidden;  ///< If set to true, forbid children context
                                   ///< to reuse this one without inheriting.
-  bool isAsync;
 };
 
 }  // namespace gd

@@ -868,6 +868,13 @@ gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
   }
 }
 
+gd::String EventsCodeGenerator::GenerateEventsParameters(const gd::EventsCodeGenerationContext& context) {
+  gd::String parameters = "runtimeScene";
+  if(!HasProjectAndLayout()) parameters += "eventsFunctionContext";
+  if(context.IsAsync()) parameters += ", asyncObjectsList";
+  return parameters;
+};
+
 gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, const gd::EventsCodeGenerationContext& context) {
   // *Optimization*: generating all JS code of events in a single, enormous
@@ -880,9 +887,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
   gd::String code =
       gd::EventsCodeGenerator::GenerateEventsListCode(events, context);
 
-  gd::String parametersCode = HasProjectAndLayout()
-                                  ? "runtimeScene"
-                                  : "runtimeScene, eventsFunctionContext";
+  gd::String parametersCode = GenerateEventsParameters(context);
 
   // Generate a unique name for the function.
   gd::String uniqueId =

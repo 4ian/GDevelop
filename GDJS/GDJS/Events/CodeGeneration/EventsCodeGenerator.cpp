@@ -870,7 +870,7 @@ gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
 
 gd::String EventsCodeGenerator::GenerateEventsParameters(const gd::EventsCodeGenerationContext& context) {
   gd::String parameters = "runtimeScene";
-  if(!HasProjectAndLayout()) parameters += "eventsFunctionContext";
+  if(!HasProjectAndLayout()) parameters += ", eventsFunctionContext";
   if(context.IsAsync()) parameters += ", asyncObjectsList";
   return parameters;
 };

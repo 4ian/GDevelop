@@ -61,6 +61,14 @@
         "color": {
           "value": "#E5E9F0"
         }
+      },
+      "highlighted": {
+        "color": {
+          "value": "#000"
+        },
+        "background-color": {
+          "value": "#EBCB8B"
+        }
       }
     },
     "message": {

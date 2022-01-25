@@ -18,6 +18,8 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import HighlightedText from '../../UI/Search/HighlightedText';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 const electron = optionalRequire('electron');
 
@@ -54,6 +56,7 @@ export const ExampleListItem = ({
     if (containerRef.current)
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
+  const theme = React.useContext(GDevelopThemeContext);
 
   const isCompatible = isCompatibleWithAsset(
     getIDEVersion(),
@@ -79,6 +82,25 @@ export const ExampleListItem = ({
     [exampleShortHeader]
   );
 
+  const renderExampleField = (field: 'shortDescription' | 'name') => {
+    if (!exampleShortHeader.matches) return exampleShortHeader[field];
+
+    const nameMatches = exampleShortHeader.matches.filter(
+      match => match.key === field
+    );
+    if (nameMatches.length === 0) return exampleShortHeader[field];
+
+    const nameMatch = nameMatches[0];
+
+    return (
+      <HighlightedText
+        text={exampleShortHeader[field]}
+        matchesCoordinates={nameMatch.indices}
+        styleToApply={theme.text.highlighted}
+      />
+    );
+  };
+
   return (
     <div style={styles.container} ref={containerRef}>
       <Line noMargin expand>
@@ -87,7 +109,7 @@ export const ExampleListItem = ({
             <ExampleIcon exampleShortHeader={exampleShortHeader} size={64} />
           )}
           <Column expand>
-            <Text noMargin>{exampleShortHeader.name} </Text>
+            <Text noMargin>{renderExampleField('name')} </Text>
             {exampleShortHeader.authors && (
               <Line>
                 {exampleShortHeader.authors.map(author => (
@@ -96,7 +118,7 @@ export const ExampleListItem = ({
               </Line>
             )}
             <Text noMargin size="body2">
-              {exampleShortHeader.shortDescription}
+              {renderExampleField('shortDescription')}
             </Text>
           </Column>
         </ButtonBase>

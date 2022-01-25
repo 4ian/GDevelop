@@ -214,6 +214,12 @@ export function createGdevelopTheme(
         backgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
+      text: {
+        highlighted: {
+          color: styles['ThemeTextHighlightedColor'],
+          backgroundColor: styles['ThemeTextHighlightedBackgroundColor']
+        }
+      },
       closableTabs: {
         fontFamily: styles['GdevelopFontFamily'],
         containerBackgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],

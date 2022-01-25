@@ -14,6 +14,8 @@ export type ExampleShortHeader = {|
   authorIds?: Array<UserPublicProfileSearch>,
   previewImageUrls: Array<string>,
   gdevelopVersion: string,
+  // Used to highlight text when searching for keywords in examples.
+  matches?: Array<{| key: string, indices: number[][] |}>,
 |};
 
 export type Example = {|

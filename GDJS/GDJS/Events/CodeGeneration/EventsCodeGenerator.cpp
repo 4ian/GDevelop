@@ -18,8 +18,8 @@
 #include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/EventsBasedBehavior.h"
+#include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -224,7 +224,11 @@ gd::String EventsCodeGenerator::GenerateFreeEventsFunctionContext(
   gd::String objectsGettersMap;
   gd::String objectArraysMap;
   gd::String behaviorNamesMap;
-  return GenerateEventsFunctionContext(parameters, onceTriggersVariable, objectsGettersMap, objectArraysMap, behaviorNamesMap);
+  return GenerateEventsFunctionContext(parameters,
+                                       onceTriggersVariable,
+                                       objectsGettersMap,
+                                       objectArraysMap,
+                                       behaviorNamesMap);
 }
 
 gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
@@ -251,35 +255,38 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
   }
 
   if (!thisBehaviorName.empty()) {
-    // If we have a behavior considered as the current behavior ("this") (usually
-    // called Behavior in behavior events function), generate a slightly more
-    // optimized getter for it.
+    // If we have a behavior considered as the current behavior ("this")
+    // (usually called Behavior in behavior events function), generate a
+    // slightly more optimized getter for it.
     behaviorNamesMap += ConvertToStringExplicit(thisBehaviorName) + ": " +
                         thisBehaviorName + "\n";
-    
+
     // Add required behaviors from properties
-    for (size_t i = 0; i < eventsBasedBehavior.GetPropertyDescriptors().GetCount(); i++)
-    {
-      const gd::NamedPropertyDescriptor& propertyDescriptor = eventsBasedBehavior.GetPropertyDescriptors().Get(i);
-      const std::vector<gd::String>& extraInfo = propertyDescriptor.GetExtraInfo();
+    for (size_t i = 0;
+         i < eventsBasedBehavior.GetPropertyDescriptors().GetCount();
+         i++) {
+      const gd::NamedPropertyDescriptor& propertyDescriptor =
+          eventsBasedBehavior.GetPropertyDescriptors().Get(i);
+      const std::vector<gd::String>& extraInfo =
+          propertyDescriptor.GetExtraInfo();
       if (propertyDescriptor.GetType() == "Behavior") {
-        // Generate map that will be used to transform from behavior name used in
-        // function to the "real" behavior name from the caller.
+        // Generate map that will be used to transform from behavior name used
+        // in function to the "real" behavior name from the caller.
         gd::String comma = behaviorNamesMap.empty() ? "" : ", ";
-        behaviorNamesMap += comma + ConvertToStringExplicit(propertyDescriptor.GetName()) +
-                            ": this._get" + propertyDescriptor.GetName() + "()\n";
+        behaviorNamesMap +=
+            comma + ConvertToStringExplicit(propertyDescriptor.GetName()) +
+            ": this._get" + propertyDescriptor.GetName() + "()\n";
       }
     }
   }
-  
-  return GenerateEventsFunctionContext(
-      parameters,
-      onceTriggersVariable,
-      objectsGettersMap,
-      objectArraysMap,
-      behaviorNamesMap,
-      thisObjectName,
-      thisBehaviorName);
+
+  return GenerateEventsFunctionContext(parameters,
+                                       onceTriggersVariable,
+                                       objectsGettersMap,
+                                       objectArraysMap,
+                                       behaviorNamesMap,
+                                       thisObjectName,
+                                       thisBehaviorName);
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
@@ -389,10 +396,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // Add the new instance to object lists
          "      if (object) {\n" +
          "        objectsList.get(objectsList.firstKey()).push(object);\n" +
-         "        eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
-         "      }\n" +
-         "      return object;" +
-         "    }\n" +
+         "        "
+         "eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
+         "      }\n" + "      return object;" + "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"
@@ -655,7 +661,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::ObjectMetadata& objInfo,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& asyncCallback) {
   gd::String actionCode;
 
   // Prepare call
@@ -690,6 +697,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   } else {
     call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
            GenerateArgumentsList(arguments, 1) + ")";
+    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
   }
 
   actionCode +=
@@ -707,7 +715,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const gd::BehaviorMetadata& autoInfo,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& asyncCallback) {
   gd::String actionCode;
 
   // Prepare call
@@ -744,6 +753,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   } else {
     call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
            GenerateArgumentsList(arguments, 2) + ")";
+    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
   }
 
   // Verify that object has behavior.
@@ -808,7 +818,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration += "gdjs.copyArray(" +
-                               GenerateAllInstancesGetterCode(object) + ", " +
+                               GenerateAllInstancesGetterCode(object, context) + ", " +
                                GetObjectListName(object, context) + ");";
       context.SetObjectDeclared(object);
     } else
@@ -844,8 +854,12 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 }
 
 gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
-    gd::String& objectName) {
-  if (HasProjectAndLayout()) {
+    const gd::String& objectName, gd::EventsCodeGenerationContext& context) {
+  if(context.IsInheritingFromAsync(objectName)) {
+    return "asyncObjectsList.getObjects(" + ConvertToStringExplicit(objectName) +
+           ")";
+  }
+  else if (HasProjectAndLayout()) {
     return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +
            ")";
   } else {
@@ -853,6 +867,13 @@ gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
            ConvertToStringExplicit(objectName) + ")";
   }
 }
+
+gd::String EventsCodeGenerator::GenerateEventsParameters(const gd::EventsCodeGenerationContext& context) {
+  gd::String parameters = "runtimeScene";
+  if(!HasProjectAndLayout()) parameters += "eventsFunctionContext";
+  if(context.IsAsync()) parameters += ", asyncObjectsList";
+  return parameters;
+};
 
 gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, const gd::EventsCodeGenerationContext& context) {
@@ -866,9 +887,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
   gd::String code =
       gd::EventsCodeGenerator::GenerateEventsListCode(events, context);
 
-  gd::String parametersCode = HasProjectAndLayout()
-                                  ? "runtimeScene"
-                                  : "runtimeScene, eventsFunctionContext";
+  gd::String parametersCode = GenerateEventsParameters(context);
 
   // Generate a unique name for the function.
   gd::String uniqueId =

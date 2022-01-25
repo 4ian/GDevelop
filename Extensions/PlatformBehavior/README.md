@@ -44,7 +44,7 @@ There are also more obvious obstacles that cover the character in the middle and
 
 [![RequestedDeltaX](./diagrams/SlopeFollowingResult.png)](./diagrams/SlopeFollowingResult.svgz)
 
-Obstacles can eventually encompass the character. So platforms edges don't have any collision with character.
+Obstacles can eventually encompass the character. So, platforms edges don't have any collision with character.
 To detect such cases, 2 flags are used:
 
 - `foundOverHead` when an edge is over `headMaxY`
@@ -77,11 +77,11 @@ The falling speed starts at 0 and increase according to the gravity, as soon as 
 
 A function allows to get a position for any given time without calculating every previous positions.
 
-#### Polynomial piece-wise function 
+#### Polynomial piece-wise function
 
 The character trajectory during a jump looks like a quadratic function, but it's actually a piece-wise function.
 
-On this first trajectory example, the curve almost follow the quadratic curve in white, but it actually follows the grey ones at the start and the end of the jump. There is also an affine part at the end of the jump. It's not shown on this plot because it happens later on.
+On this first trajectory example, the curve almost follows the quadratic function in white, but it actually follows the grey ones at the start and the end of the jump. There is also an affine part at the end of the jump. It's not shown on this plot because it happens later on.
 
 ![Trajectory with default settings](./diagrams/DefaultSettings.png)
 
@@ -176,7 +176,7 @@ freeFallCaseSpeed(t, gravity) = currentFallingSpeed(t, gravity)
 freeFallCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = jumpEndedX(t, gravity, jumpSpeed, jumpSustainTime) + fallingX(t, gravity)
 ```
 
-#### Find the initial jump speed for a given jump height ####
+#### Find the initial jump speed for a given jump height
 
 The great thing about quadratic functions is that it's easy to find solutions to a constraint. For instance, to find which initial jump speed to choose to jump a given height, the formula can be extracted like this:
 
@@ -218,7 +218,7 @@ else {
 }
 ```
 
-#### Find the time for a given Y displacement ####
+#### Find the time for a given Y displacement
 
 The same kind of logic from the previous section can be used to evaluate at which time a character will be at a given ordinate when going up or going down.
 
@@ -237,7 +237,7 @@ affineCaseTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpS
 ```
 
 The root conditions are the 3 piece-wise functions described at the end of the [Polynomial piece-wise function](#polynomial-piece-wise-function) section.
-Note that quadratic functions have an maximum or a minimum value which means there won't always be a solution. That's why there are "not a number" checks.
+Note that quadratic functions have a maximum or a minimum value which means there won't always be a solution. That's why there are "not a number" checks.
 
 ```JavaScript
 if (maxFallingSpeedReachedTime > jumpEndTime) {
@@ -278,7 +278,7 @@ else {
 }
 ```
 
-#### Plotting trajectories ####
+#### Plotting trajectories
 
 This is the code used to plot the first graphic of the [Polynomial piece-wise function](#polynomial-piece-wise-function) section.
 

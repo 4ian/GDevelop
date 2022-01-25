@@ -220,7 +220,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 "res/actions/direction.png")
 
       .AddParameter("object", _("Object"))
-      .UseStandardOperatorParameters("number");
+      .UseStandardOperatorParameters("number")
+      .SetRequiresBaseObjectCapability("angle");
 
   obj.AddAction("Rotate",
                 _("Rotate"),
@@ -234,7 +235,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .AddCodeOnlyParameter("currentScene", "")
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("angle");
 
   obj.AddAction(
          "RotateTowardAngle",
@@ -249,7 +251,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Angle to rotate towards (in degrees)"))
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetRequiresBaseObjectCapability("angle");
 
   obj.AddAction(
          "RotateTowardPosition",
@@ -267,7 +270,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Angular speed (in degrees per second)"))
       .SetParameterLongDescription(_("Enter 0 for an immediate rotation."))
       .AddCodeOnlyParameter("currentScene", "")
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRequiresBaseObjectCapability("angle");
 
   obj.AddAction(
          "AddForceXY",
@@ -508,7 +512,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
-      .MarkAsAdvanced();
+      .MarkAsAdvanced()
+      .SetRequiresBaseObjectCapability("angle");
 
   obj.AddCondition("Plan",
                    _("Z-order"),
@@ -969,7 +974,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                     _("Current angle, in degrees, of the object"),
                     _("Angle"),
                     "res/actions/direction.png")
-      .AddParameter("object", _("Object"));
+      .AddParameter("object", _("Object"))
+      .SetRequiresBaseObjectCapability("angle");
 
   obj.AddExpression("ForceX",
                     _("X coordinate of the sum of forces"),
@@ -1172,7 +1178,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectDoubleParameter",
                 _("Effect parameter (number)"),
@@ -1187,7 +1194,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectStringParameter",
                 _("Effect parameter (string)"),
@@ -1203,7 +1211,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectBooleanParameter",
                 _("Effect parameter (enable or disable)"),
@@ -1218,7 +1227,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("yesorno", _("Enable?"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
@@ -1229,7 +1239,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   extension
       .AddAction("Create",

@@ -313,7 +313,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
     }
   }
 
+
   if (instrInfos.IsObjectInstruction()) {
+  // TODO: add capability test here
+
     gd::String objectName = condition.GetParameter(0).GetPlainString();
     gd::String objectType = gd::GetTypeOfObject(
         GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
@@ -488,6 +491,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   // Call free function first if available
   if (instrInfos.IsObjectInstruction()) {
+    // TODO: add capability test here
+
     gd::String objectName = action.GetParameter(0).GetPlainString();
     gd::String objectType = gd::GetTypeOfObject(
         GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
@@ -621,14 +626,15 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = GenerateGetBehaviorNameCode(parameter);
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "password" ||  // Deprecated
-             metadata.type ==
-                 "musicfile" ||  // Should be renamed "largeAudioResource"
-             metadata.type ==
-                 "soundfile" ||            // Should be renamed "audioResource"
-             metadata.type == "police" ||  // Should be renamed "fontResource"
+  } else if (metadata.type == "audioResource" ||
              metadata.type == "bitmapFontResource" ||
-             metadata.type == "imageResource") {
+             metadata.type == "fontResource" ||
+             metadata.type == "imageResource" ||
+             metadata.type == "jsonResource" ||
+             metadata.type == "videoResource" ||
+             // Deprecated, old parameter names:
+             metadata.type == "password" || metadata.type == "musicfile" ||
+             metadata.type == "soundfile" || metadata.type == "police") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "mouse") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";

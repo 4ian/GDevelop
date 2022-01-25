@@ -79,14 +79,20 @@ A function allows to get a position for any given time without calculating every
 
 #### Polynomial piece-wise function 
 
-The character trajectory during a jump looks like a quadratic function, but it's actually a piece-wise function. There are 3 borders:
-- at the end of the jump sustaining (jumpSustainTime)
-- when the maximum falling speed is reached (maxFallingTime)
-- when the jump speed reach 0 (jumpEndTime)
+The character trajectory during a jump looks like a quadratic function, but it's actually a piece-wise function.
+
+On this first trajectory example, the curve almost follow the quadratic curve in white, but it actually follows the grey ones at the start and the end of the jump. There is also an affine part at the end of the jump. It's not shown on this plot because it happens later on.
 
 ![Trajectory with default settings](./diagrams/DefaultSettings.png)
 
+This example of trajectory shows the 4 functions. It has an affine part in the middle instead of a quadratic one like in the previous example. In practice, this jump trajectory will seem off, but a tiny affine part can happen in some configurations.
+
 ![Trajectory with an affine part](./diagrams/WithAffine.png)
+
+The piece-wise function has 3 borders:
+- at the end of the jump sustaining (jumpSustainTime)
+- when the maximum falling speed is reached (maxFallingTime)
+- when the jump speed reach 0 (jumpEndTime)
 
 Depending on the when the maximum falling speed is reached, there can be 3 piece-wise functions:
 - after the jump end
@@ -111,7 +117,7 @@ Depending on the when the maximum falling speed is reached, there can be 3 piece
 
 The following model is written for [SageMath](https://www.sagemath.org/), an open-source mathematics software system.
 
-```
+```Python
 # First define the jump and falling functions #
 
 currentFallingSpeed(t, gravity) = gravity * t
@@ -172,20 +178,51 @@ freeFallCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = ju
 
 #### Find the initial jump speed for a given jump height ####
 
-TODO explain
+The great thing about quadratic functions is that it's easy to find solutions to a constraint. For instance, to find which initial jump speed to choose to jump a given height, the formula can be extracted like this:
 
-```
+```Python
 var('givenHeight')
 solve([sustainCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
 solve([commonCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
 solve([maxFallingCasePeakHeight(gravity, jumpSpeed, jumpSustainTime)==givenHeight], jumpSpeed)[1].rhs()
 ```
 
+The program will have to determine which formula to use. As the initial jump speed is unknown, it's not possible to know where the peak will happen, but jump speed solutions of each formula can be used to check if the peak actually happens during the right interval of time.
+
+```JavaScript
+if (maxFallingSpeedReachedTime > jumpSustainTime) {
+    // common case
+    jumpSpeed = commonCaseJumpSpeed(jumpHeight);
+    peakTime = commonCasePeakTime(jumpSpeed);
+
+    if (peakTime < jumpSustainTime) {
+        // sustain case
+        jumpSpeed = sustainCaseJumpSpeed(jumpHeight);
+    }
+    else if (peakTime > maxFallingSpeedReachedTime) {
+        // max falling case
+        jumpSpeed = maxFallingCaseJumpSpeed(jumpHeight);
+    }
+}
+else {
+    // affine case can't have a maximum
+
+    // sustain case
+    jumpSpeed = sustainCaseJumpSpeed(jumpHeight);
+    peakTime = jumpSpeed / gravity;
+
+    if (peakTime > maxFallingSpeedReachedTime) {
+        // max falling case
+        jumpSpeed = maxFallingCaseJumpSpeed(jumpHeight);
+    }
+}
+```
+
 #### Find the time for a given Y displacement ####
 
-TODO explain
+The same kind of logic from the previous section can be used to evaluate at which time a character will be at a given ordinate when going up or going down.
 
-```
+```Python
 sustainCaseUpTime(y, gravity, jumpSpeed) = solve([sustainCaseHeight(t, gravity, jumpSpeed)==y], t)[0].rhs()
 commonCaseUpTime(y, gravity, jumpSpeed, jumpSustainTime) = solve([height(t, gravity, jumpSpeed, jumpSustainTime)==y], t)[0].rhs()
 maxFallingCaseCaseUpTime(y, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = solve([maxFallingCaseHeight(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed)==y], t)[0].rhs()
@@ -199,11 +236,53 @@ freeFallCaseDownTime(t, gravity, jumpSpeed, jumpSustainTime, maxFallingSpeed) = 
 affineCaseTime(y, jumpSpeed, maxFallingSpeed) = solve([affineCaseHeight(t, jumpSpeed, maxFallingSpeed)==y], t)[0].rhs()
 ```
 
+The root conditions are the 3 piece-wise functions described at the end of the [Polynomial piece-wise function](#polynomial-piece-wise-function) section.
+Note that quadratic functions have an maximum or a minimum value which means there won't always be a solution. That's why there are "not a number" checks.
+
+```JavaScript
+if (maxFallingSpeedReachedTime > jumpEndTime) {
+    time = sustainCase(y);
+    if (time > jumpSustainTime || Number.isNaN(time)) {
+        time = commonCase(y);
+        if (time > jumpEndTime || Number.isNaN(time)) {
+            time = freeFallCase(y);
+            if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {
+                time = gladdingCase(y);
+            }
+        }
+    }
+}
+else if (maxFallingSpeedReachedTime > jumpSustainTime) {
+    time = sustainCase(y);
+    if (time > jumpSustainTime || Number.isNaN(time)) {
+        time = commonCase(y);
+        if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {
+            time = maxFallingCase(y);
+            if (time > jumpEndTime || Number.isNaN(time)) {
+                time = gladdingCase(y);
+            }
+        }
+    }
+}
+else {
+    time = sustainCase(y);
+    if (time > maxFallingSpeedReachedTime || Number.isNaN(time)) {
+        time = maxFallingSpeed >= jumpSpeed ? affineCase(y) : time = Number.MAX_VALUE;
+        if (time > jumpSustainTime || Number.isNaN(time)) {
+            time = maxFallingCase(y);
+            if (time > jumpEndTime || Number.isNaN(time)) {
+                time = gladdingCase(y);
+            }
+        }
+    }
+}
+```
+
 #### Plotting trajectories ####
 
-TODO explain
+This is the code used to plot the first graphic of the [Polynomial piece-wise function](#polynomial-piece-wise-function) section.
 
-```
+```Python
 # The trajectory of the default jump settings
 #
 # gravity: 1000

@@ -102,7 +102,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
             { name: 'name', weight: 2 },
             { name: 'shortDescription', weight: 1 },
           ],
-          minMatchCharLength: 2,
+          minMatchCharLength: 3,
           threshold: 0.35,
           includeMatches: true,
           ignoreLocation: true,

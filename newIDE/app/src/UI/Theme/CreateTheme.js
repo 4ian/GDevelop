@@ -217,8 +217,8 @@ export function createGdevelopTheme(
       text: {
         highlighted: {
           color: styles['ThemeTextHighlightedColor'],
-          backgroundColor: styles['ThemeTextHighlightedBackgroundColor']
-        }
+          backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
+        },
       },
       closableTabs: {
         fontFamily: styles['GdevelopFontFamily'],

@@ -61,6 +61,14 @@
         "color": {
           "value": "white"
         }
+      },
+      "highlighted": {
+        "color": {
+          "value": "#fff"
+        },
+        "background-color": {
+          "value": "#9100ce"
+        }
       }
     },
     "message": {

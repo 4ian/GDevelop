@@ -152,6 +152,7 @@ namespace gdjs {
     protected _livingOnScene: boolean = true;
 
     readonly id: integer;
+    private destroyCallbacks = new Set<() => void>();
     _runtimeScene: gdjs.RuntimeScene;
 
     /**
@@ -315,6 +316,8 @@ namespace gdjs {
 
       // Make sure to delete existing timers.
       this._timers.clear();
+
+      this.destroyCallbacks.clear();
     }
 
     static supportsReinitialization = false;
@@ -392,7 +395,6 @@ namespace gdjs {
       }
     }
 
-    private destroyCallbacks = new Set<() => void>();
     registerDestroyCallback(callback: () => void) {
       this.destroyCallbacks.add(callback);
     }

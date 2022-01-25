@@ -132,6 +132,7 @@ module.exports = {
               'When activated, display the lines used to render the light - useful to understand how the light is rendered on screen.'
             )
           )
+          .setGroup(_("Advanced"))
       );
 
       objectProperties

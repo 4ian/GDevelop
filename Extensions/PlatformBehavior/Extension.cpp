@@ -171,6 +171,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
         .UseStandardOperatorParameters("number")
+        .AddParameter("yesorno", _("If jumping, try to preserve the current speed in the air"))
         .MarkAsAdvanced()
         .SetFunctionName("SetMaxFallingSpeed")
         .SetGetter("GetMaxFallingSpeed");
@@ -206,9 +207,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
-                     _("Compare the acceleration of the object (in pixels per "
+                     _("Compare the horizontal acceleration of the object (in pixels per "
                        "second per second)."),
-                     _("the acceleration"),
+                     _("the horizontal acceleration"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -220,9 +221,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction("Acceleration",
                   _("Acceleration"),
-                  _("Change the acceleration of an object (in pixels per "
+                  _("Change the horizontal acceleration of an object (in pixels per "
                     "second per second)."),
-                  _("the acceleration"),
+                  _("the horizontal acceleration"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
                   "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -235,9 +236,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition("Deceleration",
                      _("Deceleration"),
-                     _("Compare the deceleration of the object (in pixels per "
+                     _("Compare the horizontal deceleration of the object (in pixels per "
                        "second per second)."),
-                     _("the deceleration"),
+                     _("the horizontal deceleration"),
                      _("Options"),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -249,9 +250,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction("Deceleration",
                   _("Deceleration"),
-                  _("Change the deceleration of an object (in pixels per "
+                  _("Change the horizontal deceleration of an object (in pixels per "
                     "second per second)."),
-                  _("the deceleration"),
+                  _("the horizontal deceleration"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
                   "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -264,9 +265,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddCondition(
            "MaxSpeed",
-           _("Maximum speed"),
-           _("Compare the maximum speed of the object (in pixels per second)."),
-           _("the maximum speed"),
+           _("Maximum horizontal speed"),
+           _("Compare the maximum horizontal speed of the object (in pixels per second)."),
+           _("the maximum horizontal speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -277,9 +278,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction(
            "MaxSpeed",
-           _("Maximum speed"),
-           _("Change the maximum speed of an object (in pixels per second)."),
-           _("the maximum speed"),
+           _("Maximum horizontal speed"),
+           _("Change the maximum horizontal speed of an object (in pixels per second)."),
+           _("the maximum horizontal speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -293,7 +294,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition(
            "JumpSpeed",
            _("Jump speed"),
-           _("Compare the jump speed of the object (in pixels per second)."),
+           _("Compare the jump speed of the object (in pixels per second)."
+             "Its value is always positive."),
            _("the jump speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -307,7 +309,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddAction(
            "JumpSpeed",
            _("Jump speed"),
-           _("Change the jump speed of an object (in pixels per second)."),
+           _("Change the jump speed of an object (in pixels per second). "
+             "Its value is always positive."),
            _("the jump speed"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -321,7 +324,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
     aut.AddCondition(
            "JumpSustainTime",
            _("Jump sustain time"),
-           _("Compare the jump sustain time of the object (in seconds)."),
+           _("Compare the jump sustain time of the object (in seconds)."
+             "This is the time during which keeping the jump button held "
+             "allow the initial jump speed to be maintained."),
            _("the jump sustain time"),
            _("Options"),
            "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -333,7 +338,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction("JumpSustainTime",
                   _("Jump sustain time"),
-                  _("Change the jump sustain time of an object (in seconds)."),
+                  _("Change the jump sustain time of an object (in seconds). "
+                  "This is the time during which keeping the jump button held "
+                  "allow the initial jump speed to be maintained."),
                   _("the jump sustain time"),
                   _("Options"),
                   "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -366,6 +373,18 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
              "is made unable to jump while in mid air. This has no effect if "
              "the object is not in the air."),
            _("Forbid _PARAM0_ to air jump"),
+           _(""),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior");
+
+    aut.AddScopedAction(
+           "AbortJump",
+           _("Abort jump"),
+           _("Abort the current jump and stop the object vertically. "
+             "This action doesn't have any effect when the character is not jumping."),
+           _("Abort the current jump of _PARAM0_"),
            _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
            "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -553,11 +572,26 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsSimple()
         .SetFunctionName("canGrabPlatforms");
 
+    aut.AddScopedAction(
+           "SetCurrentFallSpeed",
+           _("Current falling speed"),
+           _("Change the current falling speed of the object (in pixels per "
+             "second). This action doesn't have any effect when the character "
+             "is not falling or is in the first phase of a jump."),
+           _("the current falling speed"),
+           _(""),
+           "CppPlatform/Extensions/platformerobjecticon24.png",
+           "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number")
+        .MarkAsAdvanced();
+
     aut.AddCondition(
            "CurrentFallSpeed",
            _("Current falling speed"),
            _("Compare the current falling speed of the object (in pixels per "
-             "second)."),
+             "second). Its value is always positive."),
            _("the current falling speed"),
            _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -572,7 +606,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
            "CurrentJumpSpeed",
            _("Current jump speed"),
            _("Compare the current jump speed of the object (in pixels per "
-             "second)."),
+             "second). Its value is always positive."),
            _("the current jump speed"),
            _(""),
            "CppPlatform/Extensions/platformerobjecticon24.png",
@@ -583,11 +617,26 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .MarkAsAdvanced()
         .SetFunctionName("GetCurrentJumpSpeed");
 
+    aut.AddScopedAction("SetCurrentSpeed",
+                     _("Current horizontal speed"),
+                     _("Change the current horizontal speed of the object "
+                     "(in pixels per second). The object moves to the left "
+                     "with negative values and to the right with positive ones"),
+                     _("the current horizontal speed"),
+                     _(""),
+                     "CppPlatform/Extensions/platformerobjecticon24.png",
+                     "CppPlatform/Extensions/platformerobjecticon16.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .UseStandardOperatorParameters("number")
+        .MarkAsAdvanced();
+
     aut.AddCondition("CurrentSpeed",
-                     _("Current speed"),
-                     _("Compare the current speed of the object (in pixels per "
-                       "second)."),
-                     _("the current speed"),
+                     _("Current horizontal speed"),
+                     _("Compare the current horizontal speed of the object "
+                     "(in pixels per second). The object moves to the left "
+                     "with negative values and to the right with positive ones"),
+                     _("the current horizontal speed"),
                      _(""),
                      "CppPlatform/Extensions/platformerobjecticon24.png",
                      "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -599,7 +648,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("Gravity",
                       _("Gravity"),
-                      _("Get the gravity applied on the object"),
+                      _("Return the gravity applied on the object "
+                      "(in pixels per second per second)."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -608,7 +658,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("MaxFallingSpeed",
                       _("Maximum falling speed"),
-                      _("Get the maximum falling speed"),
+                      _("Return the maximum falling speed of the object "
+                        "(in pixels per second)."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -617,7 +668,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("LadderClimbingSpeed",
                       _("Ladder climbing speed"),
-                      _("Get the ladder climbing speed"),
+                      _("Return the ladder climbing speed of the object "
+                        "(in pixels per second)."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -626,7 +678,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("Acceleration",
                       _("Acceleration"),
-                      _("Acceleration"),
+                      _("Return the horizontal acceleration of the object "
+                      "(in pixels per second per second)."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -635,7 +688,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("Deceleration",
                       _("Deceleration"),
-                      _("Deceleration"),
+                      _("Return the horizontal deceleration of the object "
+                      "(in pixels per second per second)."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -643,8 +697,9 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetDeceleration");
 
     aut.AddExpression("MaxSpeed",
-                      _("Maximum speed"),
-                      _("Maximum speed"),
+                      _("Maximum horizontal speed"),
+                      _("Return the maximum horizontal speed of the object "
+                        "(in pixels per second)."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -653,7 +708,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("JumpSpeed",
                       _("Jump speed"),
-                      _("Jump speed"),
+                      _("Return the jump speed of the object "
+                        "(in pixels per second). Its value is always positive."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -662,7 +718,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("JumpSustainTime",
                       _("Jump sustain time"),
-                      _("The time during which keeping the jump button held "
+                      _("Return the jump sustain time of the object (in seconds)."
+                        "This is the time during which keeping the jump button held "
                         "allow the initial jump speed to be maintained."),
                       _("Options"),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
@@ -671,7 +728,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddExpression("CurrentFallSpeed",
                       _("Current fall speed"),
-                      _("Current fall speed"),
+                      _("Return the current fall speed of the object "
+                        "(in pixels per second). Its value is always positive."),
                       _(""),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -679,8 +737,10 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCurrentFallSpeed");
 
     aut.AddExpression("CurrentSpeed",
-                      _("Current speed"),
-                      _("Current speed"),
+                      _("Current horizontal speed"),
+                      _("Return the current horizontal speed of the object "
+                     "(in pixels per second). The object moves to the left "
+                     "with negative values and to the right with positive ones"),
                       _(""),
                       "CppPlatform/Extensions/platformerobjecticon16.png")
         .AddParameter("object", _("Object"))
@@ -688,7 +748,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("GetCurrentSpeed");
 
     aut.AddExpression("CurrentJumpSpeed",
-                      _("Current jump speed"),
+                      _("Return the current jump speed of the object "
+                        "(in pixels per second). Its value is always positive."),
                       _("Current jump speed"),
                       _(""),
                       "CppPlatform/Extensions/platformerobjecticon16.png")

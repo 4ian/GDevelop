@@ -108,8 +108,7 @@ export type Field =
 // The schema is the tree of all fields.
 export type Schema = Array<Field>;
 
-// Mandatory props in any case when using the component
-type MandatoryProps = {|
+type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
@@ -119,19 +118,13 @@ type MandatoryProps = {|
   // (see getExtraDescription).
   renderExtraDescriptionText?: (extraDescription: string) => string,
   unsavedChanges?: ?UnsavedChanges,
-|};
 
-type Props =
-  // Mandatory props in all cases:
-  | MandatoryProps
-  // Props to be used when you want to display resources:
-  | {|
-      ...MandatoryProps,
-      project: gdProject,
-      resourceSources: Array<ResourceSource>,
-      onChooseResource: ChooseResourceFunction,
-      resourceExternalEditors: Array<ResourceExternalEditor>,
-    |};
+  // Optional context:
+  project?: ?gdProject,
+  resourceSources?: ?Array<ResourceSource>,
+  onChooseResource?: ?ChooseResourceFunction,
+  resourceExternalEditors?: ?Array<ResourceExternalEditor>,
+|};
 
 const styles = {
   columnContainer: {
@@ -446,11 +439,16 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
   };
 
   _renderResourceField = (field: ResourceField) => {
-    if (!this.props.project) {
+    if (
+      !this.props.project ||
+      !this.props.resourceSources ||
+      !this.props.onChooseResource ||
+      !this.props.resourceExternalEditors
+    ) {
       console.error(
-        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, etc...)'
+        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, onChooseResource, resourceExternalEditors).'
       );
-      return;
+      return null;
     }
 
     const { setValue } = field;
@@ -504,6 +502,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               <UnsavedChangesContext.Consumer key={field.name}>
                 {unsavedChanges => (
                   <PropertiesEditor
+                    project={this.props.project}
+                    resourceSources={this.props.resourceSources}
+                    onChooseResource={this.props.onChooseResource}
+                    resourceExternalEditors={this.props.resourceExternalEditors}
                     schema={field.children}
                     instances={this.props.instances}
                     mode="row"
@@ -531,6 +533,12 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                 <UnsavedChangesContext.Consumer key={field.name}>
                   {unsavedChanges => (
                     <PropertiesEditor
+                      project={this.props.project}
+                      resourceSources={this.props.resourceSources}
+                      onChooseResource={this.props.onChooseResource}
+                      resourceExternalEditors={
+                        this.props.resourceExternalEditors
+                      }
                       schema={field.children}
                       instances={this.props.instances}
                       mode="column"

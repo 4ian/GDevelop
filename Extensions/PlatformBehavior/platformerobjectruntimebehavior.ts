@@ -453,8 +453,9 @@ namespace gdjs {
 
     _setFalling() {
       this._state.leave();
+      const from = this._state;
       this._state = this._falling;
-      this._falling.enter();
+      this._falling.enter(from);
     }
 
     _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
@@ -1193,6 +1194,18 @@ namespace gdjs {
     }
 
     /**
+     * Set the current speed of the Platformer Object.
+     * @param currentSpeed The current speed.
+     */
+    setCurrentSpeed(currentSpeed: float): void {
+      this._currentSpeed = gdjs.evtTools.common.clamp(
+        currentSpeed,
+        -this._maxSpeed,
+        this._maxSpeed
+      );
+    }
+
+    /**
      * Get the current jump speed of the Platformer Object.
      * @returns The current jump speed.
      */
@@ -1227,8 +1240,26 @@ namespace gdjs {
     /**
      * Set the maximum falling speed of the Platformer Object.
      * @param maxFallingSpeed The maximum falling speed.
+     * @param tryToPreserveAirSpeed If true and if jumping, tune the current jump speed to preserve the overall speed in the air.
      */
-    setMaxFallingSpeed(maxFallingSpeed: float): void {
+    setMaxFallingSpeed(
+      maxFallingSpeed: float,
+      tryToPreserveAirSpeed: boolean = false
+    ): void {
+      if (tryToPreserveAirSpeed && this._state === this._jumping) {
+        // If the falling speed is too high compared to the new max falling speed,
+        // reduce it and adapt the jump speed to preserve the overall vertical speed.
+        const fallingSpeedOverflow = this._currentFallSpeed - maxFallingSpeed;
+        if (fallingSpeedOverflow > 0) {
+          this._currentFallSpeed -= fallingSpeedOverflow;
+          this._jumping.setCurrentJumpSpeed(
+            Math.max(
+              0,
+              this._jumping.getCurrentJumpSpeed() - fallingSpeedOverflow
+            )
+          );
+        }
+      }
       this._maxFallingSpeed = maxFallingSpeed;
     }
 
@@ -1322,6 +1353,33 @@ namespace gdjs {
     setCanNotAirJump(): void {
       if (this._state === this._jumping || this._state === this._falling) {
         this._canJump = false;
+      }
+    }
+
+    /**
+     * Abort the current jump.
+     *
+     * When the character is not in the jumping state this method has no effect.
+     */
+    abortJump(): void {
+      if (this._state === this._jumping) {
+        this._currentFallSpeed = 0;
+        this._setFalling();
+      }
+    }
+
+    /**
+     * Set the current fall speed.
+     *
+     * When the character is not in the falling state this method has no effect.
+     */
+    setCurrentFallSpeed(currentFallSpeed: float) {
+      if (this._state === this._falling) {
+        this._currentFallSpeed = gdjs.evtTools.common.clamp(
+          currentFallSpeed,
+          0,
+          this._maxFallingSpeed
+        );
       }
     }
 
@@ -1797,8 +1855,17 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter() {
-      this._behavior._canJump = false;
+    enter(from: State) {
+      // Only forbid jumping when starting to fall from a platform,
+      // not when falling during a jump. This is because the Jumping
+      // state has already set `_canJump` to false and we don't want to reset
+      // it again because it could have been set back to `true` to allow
+      // for an "air jump".
+      // Transition from Falling to Falling state should not happen,
+      // but don't change anything if this ever happen.
+      if (from !== this._behavior._jumping && from !== this) {
+        this._behavior._canJump = false;
+      }
     }
 
     leave() {}
@@ -1849,6 +1916,10 @@ namespace gdjs {
 
     getCurrentJumpSpeed() {
       return this._currentJumpSpeed;
+    }
+
+    setCurrentJumpSpeed(currentJumpSpeed: number) {
+      this._currentJumpSpeed = currentJumpSpeed;
     }
 
     enter(from: State) {

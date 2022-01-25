@@ -67,19 +67,22 @@ module.exports = {
         .getOrCreate('color')
         .setValue(objectContent.color)
         .setType('color')
-        .setLabel(_('Base color'));
+        .setLabel(_('Base color'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('opacity')
         .setValue(objectContent.opacity.toString())
         .setType('number')
-        .setLabel(_('Opacity (0-255)'));
+        .setLabel(_('Opacity (0-255)'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('fontSize')
         .setValue(objectContent.fontSize.toString())
         .setType('number')
-        .setLabel(_('Base size'));
+        .setLabel(_('Base size'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('align')
@@ -88,26 +91,30 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Base alignment'));
+        .setLabel(_('Base alignment'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('fontFamily')
         .setValue(objectContent.fontFamily)
         .setType('resource')
         .addExtraInfo('font')
-        .setLabel(_('Base font family'));
+        .setLabel(_('Font'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('wordWrap')
         .setValue(objectContent.wordWrap ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Word wrapping'));
+        .setLabel(_('Word wrapping'))
+        .setGroup(_("Appearance"));
 
       objectProperties
         .getOrCreate('visible')
         .setValue(objectContent.visible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Visible on start'));
+        .setLabel(_('Visible on start'))
+        .setGroup(_("Appearance"));
 
       return objectProperties;
     };

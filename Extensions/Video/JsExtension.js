@@ -69,17 +69,20 @@ module.exports = {
         .getOrCreate('Opacity')
         .setValue(objectContent.opacity.toString())
         .setType('number')
-        .setLabel(_('Video opacity (0-255)'));
+        .setLabel(_('Video opacity (0-255)'))
+        .setGroup(_("Appearance"));
       objectProperties
         .getOrCreate('Looped')
         .setValue(objectContent.loop ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Loop the video'));
+        .setLabel(_('Loop the video'))
+        .setGroup(_("Playback settings"));
       objectProperties
         .getOrCreate('Volume')
         .setValue(objectContent.volume.toString())
         .setType('number')
-        .setLabel(_('Video volume (0-100)'));
+        .setLabel(_('Video volume (0-100)'))
+        .setGroup(_("Playback settings"));
       objectProperties
         .getOrCreate('videoResource')
         .setValue(objectContent.videoResource)

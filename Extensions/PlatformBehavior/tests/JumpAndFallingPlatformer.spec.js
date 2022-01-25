@@ -727,7 +727,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
     });
 
-    it('can be allowed to jump in mid air', function () {
+    it('can be allowed to jump in mid air after falling from a platform', function () {
       // Ensure the object falls on the platform
       for (let i = 0; i < 10; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
@@ -772,6 +772,56 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isJumping()).to.be(false);
       expect(object.getBehavior('auto1').isFalling()).to.be(true);
       expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+    });
+
+    it('can still be allowed to jump in mid air after its jump speed reached 0', function () {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 10; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      // Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Jump
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').canJump()).to.be(false);
+
+      // Allow to jump again
+      object.getBehavior('auto1').setCanJump();
+
+      // Is jumping
+      for (let i = 0; i < 40; ++i) {
+        object.getBehavior('auto1').simulateLeftKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        // Can still jump...
+        expect(object.getBehavior('auto1').canJump()).to.be(true);
+      }
+      // ...even when after the jump ended.
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+
+      // Jump again
+      object.getBehavior('auto1').simulateJumpKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getBehavior('auto1').isJumping()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').canJump()).to.be(false);
     });
 
     it('can allow coyote time', function () {
@@ -942,6 +992,107 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(topPlatform.getY());
       // Check that the object didn't grabbed the platform
       expect(object.getBehavior('auto1').isGrabbingPlatform()).to.be(false);
+    });
+
+    const goToJumpPeak = () => {
+      // Ensure the object falls on the platform
+      for (let i = 0; i < 60 / 6; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+
+      //Check the object is on the platform
+      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+        false
+      );
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+
+      // Jump with sustaining 1/10 of second
+      // A jump will at least sustain one frame,
+      // because the jump key is pressed.
+      // To have the same sustain time for each fps,
+      // we use their greatest common divisor: 10.
+      for (let i = 0; i < 60 / 10; ++i) {
+        object.getBehavior('auto1').simulateJumpKey();
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getY()).to.be.within(-112.5 - epsilon, -112.5 + epsilon);
+
+      // Jump without sustaining
+      for (let i = 0; i < 60 / 4 - 1; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+        expect(object.getBehavior('auto1').isFalling()).to.be(false);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          false
+        );
+      }
+
+      // Check that we reached the maximum height
+      expect(object.getY()).to.be.above(-206.25);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getY()).to.be.within(-206.25 - epsilon, -206.25 + epsilon);
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(object.getY()).to.be.above(-206.25);
+    };
+
+    it('can change the maximum falling speed without changing the vertical speed', function () {
+      goToJumpPeak();
+
+      // Change the maximum falling speed from 550 to 200 (for instance, for a gliding mode)
+      const previousFallSpeed = object
+        .getBehavior('auto1')
+        .getCurrentFallSpeed();
+      const previousJumpSpeed = object
+        .getBehavior('auto1')
+        .getCurrentJumpSpeed();
+      object.getBehavior('auto1').setMaxFallingSpeed(200, true);
+      runtimeScene.renderAndStep(1000 / 60);
+      // The character speed stays the same (25 is the acceleration).
+      // The jump speed is reduced as much as the falling speed.
+      expect(object.getBehavior('auto1').getCurrentFallSpeed()).to.be(
+        previousFallSpeed - 350
+      );
+      expect(object.getBehavior('auto1').getCurrentJumpSpeed()).to.be(
+        previousJumpSpeed - 350 - 25
+      );
+    });
+
+    it('can change the maximum falling speed and avoid changing the vertical speed too much', function () {
+      goToJumpPeak();
+      // Then let the object fall a bit
+      for (let i = 0; i < 15; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isJumping()).to.be(true);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          false
+        );
+      }
+
+      // Change the maximum falling speed from 550 to 200 (for instance, for a gliding mode)
+      expect(object.getBehavior('auto1').getCurrentFallSpeed()).to.be(925);
+      expect(object.getBehavior('auto1').getCurrentJumpSpeed()).to.be(125);
+      object.getBehavior('auto1').setMaxFallingSpeed(200, true);
+      runtimeScene.renderAndStep(1000 / 60);
+      // The character jump speed is set to 0 to reduce the speed gap.
+      expect(object.getBehavior('auto1').getCurrentFallSpeed()).to.be(200);
+      expect(object.getBehavior('auto1').getCurrentJumpSpeed()).to.be(0);
+    });
+
+    it('can abort a jump', function () {
+      goToJumpPeak();
+
+      // Abort the jump
+      object.getBehavior('auto1').abortJump();
+      runtimeScene.renderAndStep(1000 / 60);
+      // jump and fall speeds are reset (25 is the acceleration).
+      expect(object.getBehavior('auto1').getCurrentFallSpeed()).to.be(25);
+      expect(object.getBehavior('auto1').getCurrentJumpSpeed()).to.be(0);
+      expect(object.getBehavior('auto1').isJumping()).to.be(false);
+      expect(object.getBehavior('auto1').isFalling()).to.be(true);
+      expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(true);
     });
   });
 

@@ -301,8 +301,8 @@ describe('EnumerateExpressions', () => {
     // $FlowFixMe
     expect(allExpressionsTree['Platform Behavior']).toMatchObject({
       Options: {
-        'Maximum speed': {
-          displayedName: 'Maximum speed',
+        'Maximum horizontal speed': {
+          displayedName: 'Maximum horizontal speed',
           fullGroupName: 'Platform Behavior/Options',
           iconFilename: 'CppPlatform/Extensions/platformerobjecticon16.png',
           isPrivate: false,

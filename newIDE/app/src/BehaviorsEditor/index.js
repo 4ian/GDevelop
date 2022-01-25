@@ -109,7 +109,7 @@ const BehaviorsEditor = (props: Props) => {
   };
 
   return (
-    <Column noMargin expand useFullHeight>
+    <Column noMargin expand useFullHeight noOverflowParent>
       {allBehaviorNames.length === 0 ? (
         <Column noMargin expand justifyContent="center">
           <EmptyBehaviorsPlaceholder />

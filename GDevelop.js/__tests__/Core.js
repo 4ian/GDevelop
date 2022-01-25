@@ -585,11 +585,11 @@ describe('libGD.js', function () {
       expect(initialInstance.getCustomHeight()).toBe(30);
     });
     it('Sprite object custom properties', function () {
-      initialInstance.updateCustomProperty('Animation', '2', project, layout);
+      initialInstance.updateCustomProperty('animation', '2', project, layout);
       expect(
         initialInstance
           .getCustomProperties(project, layout)
-          .get('Animation')
+          .get('animation')
           .getValue()
       ).toBe('2');
       expect(initialInstance.getRawDoubleProperty('animation')).toBe(2);

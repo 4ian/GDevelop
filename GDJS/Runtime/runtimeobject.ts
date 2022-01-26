@@ -246,10 +246,8 @@ namespace gdjs {
           this._runtimeScene
             .getGame()
             .getEffectsManager()
-            .applyEffect(
-              rendererObject,
-              this._rendererEffects[effectName]
-            );
+            // @ts-expect-error - the effects manager is typed with the PIXI object.
+            .applyEffect(rendererObject, this._rendererEffects[effectName]);
         }
       }
 
@@ -682,9 +680,7 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (rendererObject) {
         const theLayer = this._runtimeScene.getLayer(this.layer);
-        theLayer
-          .getRenderer()
-          .changeRendererObjectZOrder(rendererObject, z);
+        theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
       }
     }
 
@@ -896,15 +892,13 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .addEffect(
-          effectData,
-          this._rendererEffects,
-          rendererObject,
-          this
-        );
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .addEffect(effectData, this._rendererEffects, rendererObject, this)
+      );
     }
 
     /**
@@ -915,14 +909,13 @@ namespace gdjs {
       const rendererObject = this.getRendererObject();
       if (!rendererObject) return false;
 
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .removeEffect(
-          this._rendererEffects,
-          rendererObject,
-          effectName
-        );
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .removeEffect(this._rendererEffects, rendererObject, effectName)
+      );
     }
 
     /**
@@ -933,10 +926,13 @@ namespace gdjs {
       if (!rendererObject) return false;
 
       this._rendererEffects = {};
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .clearEffects(rendererObject);
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .clearEffects(rendererObject)
+      );
     }
 
     /**

@@ -639,7 +639,9 @@ namespace gdjs {
             if (object.isHidden()) {
               rendererObject.visible = false;
             } else {
-              const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
+              const cameraCoords = this._layersCameraCoordinates[
+                object.getLayer()
+              ];
               if (!cameraCoords) {
                 continue;
               }
@@ -649,10 +651,12 @@ namespace gdjs {
                 !aabb ||
                 // If an AABB is there, it must be at least partially inside
                 // the camera bounds.
-                !(aabb.min[0] > cameraCoords[2] ||
+                !(
+                  aabb.min[0] > cameraCoords[2] ||
                   aabb.min[1] > cameraCoords[3] ||
                   aabb.max[0] < cameraCoords[0] ||
-                  aabb.max[1] < cameraCoords[1]);
+                  aabb.max[1] < cameraCoords[1]
+                );
             }
 
             // Update effects, only for visible objects.

@@ -583,6 +583,7 @@ export const declareEventsFunctionParameters = (
         instructionOrExpression.setParameterLongDescription(
           parameter.getLongDescription()
         );
+        instructionOrExpression.setDefaultValue(parameter.getDefaultValue());
       } else {
         instructionOrExpression.addCodeOnlyParameter(
           parameter.getType(),

@@ -7,13 +7,16 @@ import {
   listAllExamples,
 } from '../../Utils/GDevelopServices/Example';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
-import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import {
+  useSearchItem,
+  type SearchMatches,
+} from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
 
 type ExampleStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<ExampleShortHeader>,
+  searchResults: ?Array<{| item: ExampleShortHeader, matches: SearchMatches |}>,
   fetchExamplesAndFilters: () => void,
   allExamples: ?Array<ExampleShortHeader>,
   error: ?Error,
@@ -42,16 +45,6 @@ export const ExampleStoreContext = React.createContext<ExampleStoreState>({
 type ExampleStoreStateProviderProps = {|
   children: React.Node,
 |};
-
-const getExampleSearchTerms = (example: ExampleShortHeader) => {
-  return (
-    example.name +
-    '\n' +
-    example.shortDescription +
-    '\n' +
-    example.tags.join(',')
-  );
-};
 
 export const ExampleStoreStateProvider = ({
   children,
@@ -117,7 +110,7 @@ export const ExampleStoreStateProvider = ({
 
   React.useEffect(
     () => {
-      // Don't attempt to load again extensions and filters if they
+      // Don't attempt to load again examples and filters if they
       // were loaded already.
       if (exampleShortHeadersById || isLoading.current) return;
 
@@ -131,15 +124,17 @@ export const ExampleStoreStateProvider = ({
   );
 
   const { chosenCategory, chosenFilters } = filtersState;
-  const searchResults: ?Array<ExampleShortHeader> = useSearchItem(
+  const searchResults: ?Array<{|
+    item: ExampleShortHeader,
+    matches: SearchMatches,
+  |}> = useSearchItem(
     exampleShortHeadersById,
-    getExampleSearchTerms,
     searchText,
     chosenCategory,
     chosenFilters
   );
 
-  const extensionStoreState = React.useMemo(
+  const exampleStoreState = React.useMemo(
     () => ({
       searchResults,
       fetchExamplesAndFilters,
@@ -162,7 +157,7 @@ export const ExampleStoreStateProvider = ({
   );
 
   return (
-    <ExampleStoreContext.Provider value={extensionStoreState}>
+    <ExampleStoreContext.Provider value={exampleStoreState}>
       {children}
     </ExampleStoreContext.Provider>
   );

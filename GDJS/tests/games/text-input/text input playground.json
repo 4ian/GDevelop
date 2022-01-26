@@ -434,7 +434,7 @@
           "initialVariables": []
         },
         {
-          "angle": 0,
+          "angle": -22,
           "customSize": true,
           "height": 126,
           "layer": "",
@@ -444,7 +444,7 @@
           "width": 300,
           "x": 258,
           "y": 372,
-          "zOrder": 7,
+          "zOrder": 8,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -680,6 +680,19 @@
                 "0",
                 "\"\"",
                 "\"both\"",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "RotateTowardAngle"
+              },
+              "parameters": [
+                "CustomizedTextArea",
+                "45",
+                "15",
                 ""
               ],
               "subInstructions": []

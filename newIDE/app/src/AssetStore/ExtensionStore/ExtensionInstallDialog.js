@@ -132,7 +132,6 @@ const ExtensionInstallDialog = ({
       cannotBeDismissed={false}
       open
       onRequestClose={onClose}
-      onApply={onInstallExtension}
     >
       <ColumnStackLayout expand noMargin>
         {!isCompatible && (

@@ -2,6 +2,15 @@
 import axios from 'axios';
 import { GDevelopGameApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { type Filters } from './Filters';
+import { type UserPublicProfile } from './User';
+
+export type PublicGame = {
+  id: string,
+  gameName: string,
+  authorName: string, // this corresponds to the publisher name
+  publicWebBuildId?: ?string,
+  authors: Array<UserPublicProfile>,
+};
 
 export type Game = {
   id: string,
@@ -137,6 +146,33 @@ export const updateGame = (
     .then(response => response.data);
 };
 
+export const setGameUserAcls = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  acls: Array<{ userId: string, feature: string, level: string }>
+): Promise<void> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopGameApi.baseUrl}/game/action/set-acls`,
+        {
+          gameId,
+          acls,
+        },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
 export const getGame = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -190,5 +226,11 @@ export const getGames = (
         },
       })
     )
+    .then(response => response.data);
+};
+
+export const getPublicGame = (gameId: string): Promise<PublicGame> => {
+  return axios
+    .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
     .then(response => response.data);
 };

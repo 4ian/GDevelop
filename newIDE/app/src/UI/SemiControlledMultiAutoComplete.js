@@ -12,6 +12,13 @@ type Option = {|
 
 export type DataSource = Array<?Option>;
 
+const styles = {
+  chip: {
+    // Make the chips smaller to fit the input
+    height: 25,
+  },
+};
+
 type Props = {|
   value: Array<Option>,
   onChange: Option => void,
@@ -60,6 +67,10 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
             />
           )}
           fullWidth={props.fullWidth}
+          disabled={props.loading}
+          ChipProps={{
+            style: styles.chip,
+          }}
         />
       )}
     </I18n>

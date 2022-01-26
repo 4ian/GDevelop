@@ -530,8 +530,8 @@ module.exports = {
         this._pixiText.mask = this._pixiTextMask;
         this._pixiObject = new PIXI.Container();
         this._pixiObject.addChild(this._pixiGraphics);
-        this._pixiObject.addChild(this._pixiTextMask);
         this._pixiObject.addChild(this._pixiText);
+        this._pixiObject.addChild(this._pixiTextMask);
         this._pixiContainer.addChild(this._pixiObject);
         this.update();
       }
@@ -588,9 +588,7 @@ module.exports = {
             });
         }
 
-        this._pixiObject.position.x = instance.getX();
-        this._pixiObject.position.y = instance.getY();
-
+        // Position the object.
         let width = DEFAULT_WIDTH;
         let height = DEFAULT_HEIGHT;
         if (instance.hasCustomSize()) {
@@ -598,16 +596,30 @@ module.exports = {
           height = instance.getCustomHeight();
         }
 
+        this._pixiObject.pivot.x = width / 2;
+        this._pixiObject.pivot.y = height / 2;
+        this._pixiObject.position.x = instance.getX() + width / 2;
+        this._pixiObject.position.y = instance.getY() + height / 2;
+        this._pixiObject.rotation = RenderedInstance.toRad(
+          this._instance.getAngle()
+        );
+
         const borderWidth = parseFloat(properties.get('borderWidth').getValue()) || 0;
 
+        // Draw the mask for the text.
         const textOffset = borderWidth + TEXT_MASK_PADDING;
         this._pixiTextMask.clear();
+        this._pixiTextMask.beginFill(
+          0xDDDDDD,
+          1
+        );
         this._pixiTextMask.drawRect(
           textOffset,
           textOffset,
           width - 2 * textOffset,
           height - 2 * textOffset
         );
+        this._pixiTextMask.endFill();
 
         const isTextArea =
           properties.get('inputType').getValue() === 'text area';
@@ -617,6 +629,7 @@ module.exports = {
           ? textOffset
           : height / 2 - this._pixiText.height / 2;
 
+        // Draw the background and border.
         const fillColor = properties.get('fillColor').getValue();
         const fillOpacity = parseFloat(properties.get('fillOpacity').getValue());
         const borderColor = properties.get('borderColor').getValue();

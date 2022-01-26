@@ -67,7 +67,7 @@ namespace gdjs {
     getAllPlatformsAround(
       object: gdjs.RuntimeObject,
       maxMovementLength: number,
-      result: gdjs.BehaviorRBushAABB<PlatformRuntimeBehavior>[]
+      result: PlatformRuntimeBehavior[]
     ): any {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
@@ -92,8 +92,8 @@ namespace gdjs {
       // TODO: PR https://github.com/4ian/GDevelop/pull/2602 should remove the need
       // for this extra check once merged.
       for (let i = 0; i < nearbyPlatforms.length; i++) {
-        const platform = nearbyPlatforms[i];
-        const platformAABB = platform.behavior.owner.getAABB();
+        const platform = nearbyPlatforms[i].behavior;
+        const platformAABB = platform.owner.getAABB();
         const platformIsStillAround =
           platformAABB.min[0] <= searchArea.maxX &&
           platformAABB.min[1] <= searchArea.maxY &&

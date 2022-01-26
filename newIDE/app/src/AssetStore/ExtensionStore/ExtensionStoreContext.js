@@ -7,13 +7,19 @@ import {
   type ExtensionShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
-import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import {
+  useSearchItem,
+  type SearchMatches,
+} from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
 
 type ExtensionStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<ExtensionShortHeader>,
+  searchResults: ?Array<{|
+    item: ExtensionShortHeader,
+    matches: SearchMatches,
+  |}>,
   fetchExtensionsAndFilters: () => void,
   error: ?Error,
   searchText: string,
@@ -42,16 +48,6 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
 |};
-
-const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
-  return (
-    extension.name +
-    '\n' +
-    extension.shortDescription +
-    '\n' +
-    extension.tags.join(',')
-  );
-};
 
 export const ExtensionStoreStateProvider = ({
   children,
@@ -137,9 +133,11 @@ export const ExtensionStoreStateProvider = ({
   );
 
   const { chosenCategory, chosenFilters } = filtersState;
-  const searchResults: ?Array<ExtensionShortHeader> = useSearchItem(
+  const searchResults: ?Array<{|
+    item: ExtensionShortHeader,
+    matches: SearchMatches,
+  |}> = useSearchItem(
     extensionShortHeadersByName,
-    getExtensionSearchTerms,
     searchText,
     chosenCategory,
     chosenFilters

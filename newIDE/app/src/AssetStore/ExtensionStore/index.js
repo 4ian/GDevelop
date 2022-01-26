@@ -8,6 +8,7 @@ import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
+import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   searchBar: {
@@ -55,7 +56,7 @@ export const ExtensionStore = ({
 
   const filteredSearchResults = searchResults
     ? searchResults.filter(
-        extensionShortHeader =>
+        ({ item: extensionShortHeader }) =>
           !showOnlyWithBehaviors ||
           extensionShortHeader.eventsBasedBehaviorsCount > 0
       )
@@ -69,6 +70,16 @@ export const ExtensionStore = ({
     }),
     [filtersState]
   );
+
+  const getExtensionsMatches = (
+    extensionShortHeader: ExtensionShortHeader
+  ): SearchMatches => {
+    if (!searchResults) return [];
+    const extensionMatches = searchResults.find(
+      result => result.item.name === extensionShortHeader.name
+    );
+    return extensionMatches ? extensionMatches.matches : [];
+  };
 
   return (
     <React.Fragment>
@@ -86,7 +97,10 @@ export const ExtensionStore = ({
             <ListSearchResults
               onRetry={fetchExtensionsAndFilters}
               error={error}
-              searchItems={filteredSearchResults}
+              searchItems={
+                filteredSearchResults &&
+                filteredSearchResults.map(({ item }) => item)
+              }
               getSearchItemUniqueId={getExtensionName}
               renderSearchItem={(extensionShortHeader, onHeightComputed) => (
                 <ExtensionListItem
@@ -94,6 +108,7 @@ export const ExtensionStore = ({
                   project={project}
                   onHeightComputed={onHeightComputed}
                   extensionShortHeader={extensionShortHeader}
+                  matches={getExtensionsMatches(extensionShortHeader)}
                   onChoose={() => {
                     setSelectedExtensionShortHeader(extensionShortHeader);
                   }}

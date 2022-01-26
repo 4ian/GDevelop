@@ -531,11 +531,9 @@ namespace gdjs {
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
-      if (this._debugDrawEnabled && this._layersCameraCoordinates) {
-        this._updateLayersCameraCoordinates(1);
+      if (this._debugDrawEnabled) {
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
-          this._layersCameraCoordinates,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
           this._debugDrawShowCustomPoints
@@ -636,34 +634,33 @@ namespace gdjs {
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
           const object = this._allInstancesList[i];
-          const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
           const rendererObject = object.getRendererObject();
-          if (!cameraCoords || !rendererObject) {
-            continue;
-          }
-          if (object.isHidden()) {
-            rendererObject.visible = false;
-          } else {
-            const aabb = object.getVisibilityAABB();
-            if (
-              // If no AABB is returned, the object should always be visible
-              aabb &&
-              (aabb.min[0] > cameraCoords[2] ||
-                aabb.min[1] > cameraCoords[3] ||
-                aabb.max[0] < cameraCoords[0] ||
-                aabb.max[1] < cameraCoords[1])
-            ) {
+          if (rendererObject) {
+            if (object.isHidden()) {
               rendererObject.visible = false;
             } else {
-              rendererObject.visible = true;
+              const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
+              if (!cameraCoords) {
+                continue;
+              }
+              const aabb = object.getVisibilityAABB();
+              rendererObject.visible =
+                // If no AABB is returned, the object should always be visible
+                !aabb ||
+                // If an AABB is there, it must be at least partially inside
+                // the camera bounds.
+                !(aabb.min[0] > cameraCoords[2] ||
+                  aabb.min[1] > cameraCoords[3] ||
+                  aabb.max[0] < cameraCoords[0] ||
+                  aabb.max[1] < cameraCoords[1]);
             }
-          }
 
-          // Update effects, only for visible objects.
-          if (rendererObject.visible) {
-            this._runtimeGame
-              .getEffectsManager()
-              .updatePreRender(object.getRendererEffects(), object);
+            // Update effects, only for visible objects.
+            if (rendererObject.visible) {
+              this._runtimeGame
+                .getEffectsManager()
+                .updatePreRender(object.getRendererEffects(), object);
+            }
           }
 
           // Perform pre-render update.

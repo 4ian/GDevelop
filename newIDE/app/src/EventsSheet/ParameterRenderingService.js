@@ -41,6 +41,7 @@ import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import JsonResourceField from './ParameterFields/JsonResourceField';
 import BitmapFontResourceField from './ParameterFields/BitmapFontResourceField';
+import FontResourceField from './ParameterFields/FontResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
   renderInlineForceMultiplier,
@@ -79,6 +80,7 @@ const components = {
   videoResource: VideoResourceField,
   jsonResource: JsonResourceField,
   bitmapFontResource: BitmapFontResourceField,
+  fontResource: FontResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
@@ -126,6 +128,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   soundfile: t`Audio resource`,
   videoResource: t`Video resource`,
   bitmapFontResource: t`Bitmap font resource`,
+  fontResource: t`Font resource`,
   jsonResource: t`JSON resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,

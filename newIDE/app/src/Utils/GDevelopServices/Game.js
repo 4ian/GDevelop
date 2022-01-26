@@ -58,6 +58,15 @@ export const getGameUrl = (game: ?Game) => {
   return GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
+export const getAclsFromAuthorIds = (
+  authorIds: gdVectorString
+): Array<{| userId: string, feature: string, level: string |}> =>
+  authorIds.toJSArray().map(authorId => ({
+    userId: authorId,
+    feature: 'author',
+    level: 'owner',
+  }));
+
 export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/showcased-game`)
@@ -150,7 +159,7 @@ export const setGameUserAcls = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string,
-  acls: Array<{ userId: string, feature: string, level: string }>
+  acls: Array<{| userId: string, feature: string, level: string |}>
 ): Promise<void> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>

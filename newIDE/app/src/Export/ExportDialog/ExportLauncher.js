@@ -26,6 +26,7 @@ import {
   updateGame,
   type Game,
   setGameUserAcls,
+  getAclsFromAuthorIds,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -134,23 +135,24 @@ export default class ExportLauncher extends Component<Props, State> {
     });
   };
 
-  updateAuthors = async () => {
+  tryUpdateAuthors = async () => {
     const profile = this.props.authenticatedUser.profile;
     if (profile) {
-      const authorAcls = this.props.project
-        .getAuthorIds()
-        .toJSArray()
-        .map(authorId => ({
-          userId: authorId,
-          feature: 'author',
-          level: 'owner',
-        }));
-      await setGameUserAcls(
-        this.props.authenticatedUser.getAuthorizationHeader,
-        profile.id,
-        this.props.project.getProjectUuid(),
-        authorAcls
+      const authorAcls = getAclsFromAuthorIds(
+        this.props.project.getAuthorIds()
       );
+
+      try {
+        await setGameUserAcls(
+          this.props.authenticatedUser.getAuthorizationHeader,
+          profile.id,
+          this.props.project.getProjectUuid(),
+          authorAcls
+        );
+      } catch (e) {
+        // Best effort call, do not prevent exporting the game.
+        console.error(e);
+      }
     }
   };
 
@@ -173,7 +175,7 @@ export default class ExportLauncher extends Component<Props, State> {
           gameName,
         });
         // We don't await for the authors update, as it is not required for publishing.
-        this.updateAuthors();
+        this.tryUpdateAuthors();
         this.props.onGameUpdated(game);
       } catch (err) {
         if (err.response.status === 404) {
@@ -184,7 +186,7 @@ export default class ExportLauncher extends Component<Props, State> {
             gameName,
           });
           // We don't await for the authors update, as it is not required for publishing.
-          this.updateAuthors();
+          this.tryUpdateAuthors();
           this.props.onGameUpdated(game);
         }
       }

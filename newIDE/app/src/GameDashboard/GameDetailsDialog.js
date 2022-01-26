@@ -11,6 +11,7 @@ import {
   deleteGame,
   getPublicGame,
   setGameUserAcls,
+  getAclsFromAuthorIds,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
 import { Tab, Tabs } from '../UI/Tabs';
@@ -145,15 +146,8 @@ export const GameDetailsDialog = ({
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
       });
-      const authorIds = project.getAuthorIds();
-      if (authorIds) {
-        const authorAcls = authorIds.toJSArray().map(authorId => ({
-          userId: authorId,
-          feature: 'author',
-          level: 'owner',
-        }));
-        await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
-      }
+      const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
+      await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
       onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);

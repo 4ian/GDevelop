@@ -97,6 +97,17 @@ class GD_CORE_API MultipleInstructionMetadata {
   };
 
   /**
+   * \see gd::InstructionMetadata::SetRequiresBaseObjectCapability
+   */
+  MultipleInstructionMetadata &SetRequiresBaseObjectCapability(
+      const gd::String &capability) {
+    if (expression) expression->SetRequiresBaseObjectCapability(capability);
+    if (condition) condition->SetRequiresBaseObjectCapability(capability);
+    if (action) action->SetRequiresBaseObjectCapability(capability);
+    return *this;
+  }
+
+  /**
    * \see gd::InstructionMetadata::UseStandardOperatorParameters
    * \see gd::InstructionMetadata::UseStandardRelationalOperatorParameters
    */

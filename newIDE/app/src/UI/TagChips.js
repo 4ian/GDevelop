@@ -83,7 +83,7 @@ export default ({ tags, onChange, onRemove }: Props) => {
             style={getChipStyle(tag)}
             onBlur={() => setFocusedTag(null)}
             onFocus={() => setFocusedTag(tag)}
-            onDelete={handleDeleteTag(tag)}
+            onDelete={onChange || onRemove ? handleDeleteTag(tag) : null}
             label={tag}
             ref={newRef}
           />

@@ -113,12 +113,14 @@ namespace gdjs {
       }
 
       // Position the input on the container on top of the canvas
-      const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        topLeftCanvasCoordinates
-      );
-      const bottomRightPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        bottomRightCanvasCoordinates
-      );
+      const topLeftPageCoordinates =
+        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+          topLeftCanvasCoordinates
+        );
+      const bottomRightPageCoordinates =
+        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+          bottomRightCanvasCoordinates
+        );
 
       const widthInContainer =
         bottomRightPageCoordinates[0] - topLeftPageCoordinates[0];
@@ -129,6 +131,8 @@ namespace gdjs {
       this._input.style.top = topLeftPageCoordinates[1] + 'px';
       this._input.style.width = widthInContainer + 'px';
       this._input.style.height = heightInContainer + 'px';
+      this._input.style.transform =
+        'rotate3d(0,0,1,' + (this._object.getAngle() % 360) + 'deg)';
 
       // Automatically adjust the font size to follow the game scale.
       this._input.style.fontSize =
@@ -202,6 +206,8 @@ namespace gdjs {
     }
   }
 
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
 }

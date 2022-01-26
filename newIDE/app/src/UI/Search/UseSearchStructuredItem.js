@@ -106,6 +106,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
         const newSearchApi = new Fuse(Object.values(searchItemsById), {
           keys: [
             { name: 'name', weight: 2 },
+            { name: 'fullName', weight: 2 },
             { name: 'shortDescription', weight: 1 },
           ],
           minMatchCharLength: 3,

@@ -105,7 +105,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                 onRetry={fetchExamplesAndFilters}
                 error={error}
                 searchItems={
-                  searchResults && searchResults.map(result => result.item)
+                  searchResults && searchResults.map(({ item }) => item)
                 }
                 getSearchItemUniqueId={getExampleName}
                 renderSearchItem={(exampleShortHeader, onHeightComputed) => (

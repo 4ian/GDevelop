@@ -100,8 +100,8 @@ export const ListSearchResults = <SearchItem>({
     return (
       <EmptyMessage>
         <Trans>
-          No results returned for your search. Try something else or browse the
-          categories.
+          No results returned for your search. Try something else or typing more
+          than 3 characters.
         </Trans>
       </EmptyMessage>
     );

@@ -61,6 +61,11 @@
         "color": {
           "value": "white"
         }
+      },
+      "highlighted": {
+        "background-color": {
+          "value": "rgba(102, 174, 223, 0.3)"
+        }
       }
     },
     "message": {

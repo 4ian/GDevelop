@@ -18,6 +18,9 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import HighlightedText from '../../UI/Search/HighlightedText';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
 
 const electron = optionalRequire('electron');
 
@@ -35,6 +38,7 @@ const styles = {
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
+  matches: ?SearchMatches,
   isOpening: boolean,
   onChoose: () => void,
   onOpen: () => void,
@@ -43,6 +47,7 @@ type Props = {|
 
 export const ExampleListItem = ({
   exampleShortHeader,
+  matches,
   isOpening,
   onChoose,
   onOpen,
@@ -54,6 +59,7 @@ export const ExampleListItem = ({
     if (containerRef.current)
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
+  const theme = React.useContext(GDevelopThemeContext);
 
   const isCompatible = isCompatibleWithAsset(
     getIDEVersion(),
@@ -79,6 +85,22 @@ export const ExampleListItem = ({
     [exampleShortHeader]
   );
 
+  const renderExampleField = (field: 'shortDescription' | 'name') => {
+    const originalField = exampleShortHeader[field];
+
+    if (!matches) return originalField;
+    const nameMatches = matches.filter(match => match.key === field);
+    if (nameMatches.length === 0) return originalField;
+
+    return (
+      <HighlightedText
+        text={originalField}
+        matchesCoordinates={nameMatches[0].indices}
+        styleToApply={theme.text.highlighted}
+      />
+    );
+  };
+
   return (
     <div style={styles.container} ref={containerRef}>
       <Line noMargin expand>
@@ -87,7 +109,7 @@ export const ExampleListItem = ({
             <ExampleIcon exampleShortHeader={exampleShortHeader} size={64} />
           )}
           <Column expand>
-            <Text noMargin>{exampleShortHeader.name} </Text>
+            <Text noMargin>{renderExampleField('name')} </Text>
             {exampleShortHeader.authors && (
               <Line>
                 {exampleShortHeader.authors.map(author => (
@@ -96,7 +118,7 @@ export const ExampleListItem = ({
               </Line>
             )}
             <Text noMargin size="body2">
-              {exampleShortHeader.shortDescription}
+              {renderExampleField('shortDescription')}
             </Text>
           </Column>
         </ButtonBase>

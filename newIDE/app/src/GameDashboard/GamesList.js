@@ -107,10 +107,6 @@ export const GamesList = (props: Props) => {
             setOpenedGameInitialTab('analytics');
             setOpenedGame(game);
           }}
-          onOpenMonetization={() => {
-            setOpenedGameInitialTab('monetization');
-            setOpenedGame(game);
-          }}
         />
       ))}
       {openedGame && (

@@ -8,7 +8,6 @@ import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for browser only IDE
-import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
@@ -87,7 +86,6 @@ export const create = (authentication: Authentication) => {
                   onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
                 />
               )}
-              introDialog={<BrowserIntroDialog />}
               storageProviders={storageProviders}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}

@@ -421,7 +421,7 @@ const MainFrame = (props: Props) => {
               );
           } else {
             // Open the intro dialog if not opening any project.
-            if (introDialog && !Window.isDev()) openIntroDialog(true);
+            if (introDialog) openIntroDialog(true);
           }
         })
         .catch(() => {

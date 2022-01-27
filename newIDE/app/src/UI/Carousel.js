@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import { GridListTile } from '@material-ui/core';

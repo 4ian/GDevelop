@@ -41,6 +41,8 @@ import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
+import optionalRequire from '../../../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
 
 const styles = {
   container: {
@@ -440,6 +442,18 @@ export const HomePage = React.memo<Props>(
                           label={<Trans>Help and documentation</Trans>}
                           onClick={onOpenHelpFinder}
                         />
+                        {!electron && (
+                          <RaisedButton
+                            label={
+                              <Trans>Download the full desktop version</Trans>
+                            }
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://gdevelop.io/download'
+                              )
+                            }
+                          />
+                        )}
                       </ResponsiveLineStackLayout>
                       <Line
                         noMargin

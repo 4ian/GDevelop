@@ -30,7 +30,7 @@ export const ExplanationHeader = () => {
           <Trans>
             This will export your game to a folder. You can then upload it on a
             website/game hosting service and share it on marketplaces and gaming
-            portals like CrazyGames, Poki, Game Jolt, itch.io, Newsground...
+            portals like CrazyGames, Poki, Game Jolt, itch.io, Newgrounds...
           </Trans>
         </Text>
       </Line>

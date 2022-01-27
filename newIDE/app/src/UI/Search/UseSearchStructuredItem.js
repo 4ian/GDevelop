@@ -168,7 +168,16 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
           filterSearchResults(
             results.map(result => ({
               item: result.item,
-              matches: result.matches,
+              matches: result.matches.map(match => ({
+                key: match.key,
+                value: match.value,
+                // We only keep the exact matches indices for highlighting.
+                indices: match.indices.filter(
+                  index =>
+                    match.value.slice(index[0], index[1] + 1).toLowerCase() ===
+                    searchText.toLowerCase()
+                ),
+              })),
             })),
             chosenCategory,
             chosenFilters

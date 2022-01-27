@@ -31,6 +31,7 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("ignoreDefaultControls", false);
   behaviorContent.SetAttribute("slopeMaxAngle", 60);
   behaviorContent.SetAttribute("canGrabPlatforms", false);
+  behaviorContent.SetAttribute("canGrabWithoutMoving", true);
   behaviorContent.SetAttribute("yGrabOffset", 0);
   behaviorContent.SetAttribute("xGrabTolerance", 10);
   behaviorContent.SetAttribute("useLegacyTrajectory", false);
@@ -78,6 +79,12 @@ PlatformerObjectBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean");
+  properties[_("Automatically grab platform ledges without having to move horizontally")]
+      .SetGroup(_("Ledge"))
+      .SetValue(behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
   properties[_("Grab offset on Y axis")].SetGroup(_("Ledge")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
   properties[_("Grab tolerance on X axis")].SetGroup(_("Ledge")).SetValue(gd::String::From(
@@ -105,6 +112,8 @@ bool PlatformerObjectBehavior::UpdateProperty(
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
   else if (name == _("Can grab platform ledges"))
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
+  else if (name == _("Automatically grab platform ledges without having to move horizontally"))
+    behaviorContent.SetAttribute("canGrabWithoutMoving", (value == "1"));
   else if (name == _("Use frame per second dependent trajectories (deprecated)"))
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
   else if (name == _("Can go down from jumpthru platforms"))

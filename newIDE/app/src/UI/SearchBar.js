@@ -297,7 +297,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <div style={styles.searchContainer}>
                       {tags ? (
                         <Autocomplete
-                          options={tags}
+                          options={tags.slice(0, 30)}
                           groupBy={options => i18n._(t`Apply a filter`)}
                           classes={autocompleteStyles}
                           freeSolo

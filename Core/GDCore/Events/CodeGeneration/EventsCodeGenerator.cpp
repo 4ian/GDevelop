@@ -315,31 +315,38 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 
   if (instrInfos.IsObjectInstruction()) {
     gd::String objectName = condition.GetParameter(0).GetPlainString();
-    gd::String objectType = gd::GetTypeOfObject(
-        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
     if (!objectName.empty() && !instrInfos.parameters.empty()) {
       std::vector<gd::String> realObjects =
           ExpandObjectsName(objectName, context);
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Set up the context
+        gd::String objectType = gd::GetTypeOfObject(
+            GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), realObjects[i]);
         const ObjectMetadata& objInfo =
             MetadataProvider::GetObjectMetadata(platform, objectType);
-        AddIncludeFiles(objInfo.includeFiles);
-        context.SetCurrentObject(realObjects[i]);
-        context.ObjectsListNeeded(realObjects[i]);
 
-        // Prepare arguments and generate the condition whole code
-        vector<gd::String> arguments = GenerateParametersCodes(
-            condition.GetParameters(), instrInfos.parameters, context);
-        conditionCode += GenerateObjectCondition(realObjects[i],
-                                                 objInfo,
-                                                 arguments,
-                                                 instrInfos,
-                                                 returnBoolean,
-                                                 condition.IsInverted(),
-                                                 context);
+        if (objInfo.IsUnsupportedBaseObjectCapability(
+                instrInfos.GetRequiredBaseObjectCapability())) {
+          conditionCode +=
+              "/* Object with unsupported capability - skipped. */\n";
+        } else {
+          AddIncludeFiles(objInfo.includeFiles);
+          context.SetCurrentObject(realObjects[i]);
+          context.ObjectsListNeeded(realObjects[i]);
 
-        context.SetNoCurrentObject();
+          // Prepare arguments and generate the condition whole code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              condition.GetParameters(), instrInfos.parameters, context);
+          conditionCode += GenerateObjectCondition(realObjects[i],
+                                                   objInfo,
+                                                   arguments,
+                                                   instrInfos,
+                                                   returnBoolean,
+                                                   condition.IsInverted(),
+                                                   context);
+
+          context.SetNoCurrentObject();
+        }
       }
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
@@ -489,27 +496,33 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   // Call free function first if available
   if (instrInfos.IsObjectInstruction()) {
     gd::String objectName = action.GetParameter(0).GetPlainString();
-    gd::String objectType = gd::GetTypeOfObject(
-        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
 
     if (!instrInfos.parameters.empty()) {
       std::vector<gd::String> realObjects =
           ExpandObjectsName(objectName, context);
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         // Setup context
+        gd::String objectType = gd::GetTypeOfObject(
+            GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), realObjects[i]);
         const ObjectMetadata& objInfo =
             MetadataProvider::GetObjectMetadata(platform, objectType);
-        AddIncludeFiles(objInfo.includeFiles);
-        context.SetCurrentObject(realObjects[i]);
-        context.ObjectsListNeeded(realObjects[i]);
 
-        // Prepare arguments and generate the whole action code
-        vector<gd::String> arguments = GenerateParametersCodes(
-            action.GetParameters(), instrInfos.parameters, context);
-        actionCode += GenerateObjectAction(
-            realObjects[i], objInfo, arguments, instrInfos, context);
+        if (objInfo.IsUnsupportedBaseObjectCapability(
+                instrInfos.GetRequiredBaseObjectCapability())) {
+          actionCode += "/* Object with unsupported capability - skipped. */\n";
+        } else {
+          AddIncludeFiles(objInfo.includeFiles);
+          context.SetCurrentObject(realObjects[i]);
+          context.ObjectsListNeeded(realObjects[i]);
 
-        context.SetNoCurrentObject();
+          // Prepare arguments and generate the whole action code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              action.GetParameters(), instrInfos.parameters, context);
+          actionCode += GenerateObjectAction(
+              realObjects[i], objInfo, arguments, instrInfos, context);
+
+          context.SetNoCurrentObject();
+        }
       }
     }
   } else if (instrInfos.IsBehaviorInstruction()) {
@@ -621,14 +634,15 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = GenerateGetBehaviorNameCode(parameter);
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "password" ||  // Deprecated
-             metadata.type ==
-                 "musicfile" ||  // Should be renamed "largeAudioResource"
-             metadata.type ==
-                 "soundfile" ||            // Should be renamed "audioResource"
-             metadata.type == "police" ||  // Should be renamed "fontResource"
+  } else if (metadata.type == "audioResource" ||
              metadata.type == "bitmapFontResource" ||
-             metadata.type == "imageResource") {
+             metadata.type == "fontResource" ||
+             metadata.type == "imageResource" ||
+             metadata.type == "jsonResource" ||
+             metadata.type == "videoResource" ||
+             // Deprecated, old parameter names:
+             metadata.type == "password" || metadata.type == "musicfile" ||
+             metadata.type == "soundfile" || metadata.type == "police") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "mouse") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";

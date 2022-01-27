@@ -2101,21 +2101,6 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
-  .add('ObjectField', () => (
-    <ValueStateHolder
-      initialValue={'MySpriteObject'}
-      render={(value, onChange) => (
-        <ObjectField
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          value={value}
-          onChange={onChange}
-        />
-      )}
-    />
-  ))
   .add('ExternalEventsAutoComplete', () => (
     <ValueStateHolder
       initialValue={'Test'}

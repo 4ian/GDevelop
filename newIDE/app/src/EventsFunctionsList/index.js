@@ -38,7 +38,7 @@ export type EventsFunctionCreationParameters = {|
   name: ?string,
 |};
 
-const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
+const renderEventsFunctionLabel = (eventsFunction: gdEventsFunction) =>
   eventsFunction.isPrivate() ? (
     <>
       <Tooltip title="This function won't be visible in the events editor">
@@ -47,11 +47,14 @@ const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
           style={{ marginRight: 5, verticalAlign: 'bottom' }}
         />
       </Tooltip>
-      {eventsFunction.getName()}
+      <span title={eventsFunction.getName()}>{eventsFunction.getName()}</span>
     </>
   ) : (
     eventsFunction.getName()
   );
+
+const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
+  eventsFunction.getName();
 
 type State = {|
   renamedEventsFunction: ?gdEventsFunction,
@@ -137,7 +140,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     );
   };
 
-  _getFunctionThumbnail = (eventsFunction: ?gdEventsFunction) => {
+  _getFunctionThumbnail = (eventsFunction: gdEventsFunction) => {
     switch (eventsFunction.getFunctionType()) {
       default:
         return 'res/functions/function.svg';
@@ -377,6 +380,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                     height={height}
                     onAddNewItem={this._addNewEventsFunction}
                     addNewItemLabel={<Trans>Add a new function</Trans>}
+                    renderItemLabel={renderEventsFunctionLabel}
                     getItemName={getEventsFunctionName}
                     getItemThumbnail={this._getFunctionThumbnail}
                     selectedItems={

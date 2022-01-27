@@ -28,7 +28,7 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   helpPagePath?: string,
-  onConfigurationUpdated?: () => void,
+  onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
   getFunctionGroupNames?: () => string[],
@@ -172,7 +172,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   onChange={(e, i, value: string) => {
                     // $FlowFixMe
                     eventsFunction.setFunctionType(value);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    if (onConfigurationUpdated) onConfigurationUpdated('type');
                     this.forceUpdate();
                   }}
                 >

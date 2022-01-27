@@ -11,6 +11,7 @@ import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
+import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   searchBar: {
@@ -70,6 +71,16 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
     [filtersState]
   );
 
+  const getExampleMatches = (
+    exampleShortHeader: ExampleShortHeader
+  ): SearchMatches => {
+    if (!searchResults) return [];
+    const exampleMatches = searchResults.find(
+      result => result.item.id === exampleShortHeader.id
+    );
+    return exampleMatches ? exampleMatches.matches : [];
+  };
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -93,13 +104,16 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               <ListSearchResults
                 onRetry={fetchExamplesAndFilters}
                 error={error}
-                searchItems={searchResults}
+                searchItems={
+                  searchResults && searchResults.map(({ item }) => item)
+                }
                 getSearchItemUniqueId={getExampleName}
                 renderSearchItem={(exampleShortHeader, onHeightComputed) => (
                   <ExampleListItem
                     isOpening={isOpening}
                     onHeightComputed={onHeightComputed}
                     exampleShortHeader={exampleShortHeader}
+                    matches={getExampleMatches(exampleShortHeader)}
                     onChoose={() => {
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}

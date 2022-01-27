@@ -7,6 +7,9 @@ import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import HighlightedText from '../../UI/Search/HighlightedText';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   button: { width: '100%' },
@@ -22,6 +25,7 @@ const styles = {
 type Props = {|
   project: gdProject,
   extensionShortHeader: ExtensionShortHeader,
+  matches: ?SearchMatches,
   onChoose: () => void,
   onHeightComputed: number => void,
 |};
@@ -29,6 +33,7 @@ type Props = {|
 export const ExtensionListItem = ({
   project,
   extensionShortHeader,
+  matches,
   onChoose,
   onHeightComputed,
 }: Props) => {
@@ -42,6 +47,23 @@ export const ExtensionListItem = ({
     if (containerRef.current)
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
+  const theme = React.useContext(GDevelopThemeContext);
+
+  const renderExtensionField = (field: 'shortDescription' | 'fullName') => {
+    const originalField = extensionShortHeader[field];
+
+    if (!matches) return originalField;
+    const nameMatches = matches.filter(match => match.key === field);
+    if (nameMatches.length === 0) return originalField;
+
+    return (
+      <HighlightedText
+        text={originalField}
+        matchesCoordinates={nameMatches[0].indices}
+        styleToApply={theme.text.highlighted}
+      />
+    );
+  };
 
   return (
     <ButtonBase onClick={onChoose} focusRipple style={styles.button}>
@@ -54,7 +76,7 @@ export const ExtensionListItem = ({
           />
           <Column expand>
             <Text noMargin>
-              {extensionShortHeader.fullName}{' '}
+              {renderExtensionField('fullName')}{' '}
               {alreadyInstalled && <Trans> (already installed)</Trans>}
             </Text>
             {extensionShortHeader.authors && (
@@ -65,7 +87,7 @@ export const ExtensionListItem = ({
               </Line>
             )}
             <Text noMargin size="body2">
-              {extensionShortHeader.shortDescription}
+              {renderExtensionField('shortDescription')}
             </Text>
           </Column>
         </Line>

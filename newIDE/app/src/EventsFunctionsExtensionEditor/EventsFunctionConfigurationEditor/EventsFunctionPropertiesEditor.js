@@ -36,14 +36,6 @@ type Props = {|
 
 type State = {||};
 
-const styles = {
-  icon: {
-    height: 32,
-    marginRight: 8,
-    flexSrink: 0,
-  },
-};
-
 const getSentenceErrorText = (
   i18n: I18nType,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
@@ -172,7 +164,6 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
             <ResponsiveLineStackLayout alignItems="center" noMargin>
               <Line alignItems="center" noMargin>
-                <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
                   value={type}
                   floatingLabelText={<Trans>Function type</Trans>}

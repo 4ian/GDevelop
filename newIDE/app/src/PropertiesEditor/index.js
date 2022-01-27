@@ -291,9 +291,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           fullWidth
           color={getFieldValue(this.props.instances, field)}
           onChange={color => {
-            this.props.instances.forEach(i =>
-              setValue(i, rgbOrHexToRGBString(color))
-            );
+            const rgbString =
+              color.length === 0 ? '' : rgbOrHexToRGBString(color);
+            this.props.instances.forEach(i => setValue(i, rgbString));
             this._onInstancesModified(this.props.instances);
           }}
         />

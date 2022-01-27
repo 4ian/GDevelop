@@ -22,6 +22,7 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import RaisedButton from '../../UI/RaisedButton';
+import Window from '../../Utils/Window';
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
@@ -86,7 +87,17 @@ const ExtensionInstallDialog = ({
   const canInstallExtension = !isInstalling && isCompatible;
   const onInstallExtension = React.useCallback(
     () => {
-      if (canInstallExtension) onInstall();
+      if (canInstallExtension) {
+        if (alreadyInstalled) {
+          const answer = Window.showConfirmDialog(
+            'This extension is already in your project, this will install the latest version. Do you want to continue?'
+          );
+          if (!answer) return;
+          onInstall();
+        } else {
+          onInstall();
+        }
+      }
     },
     [onInstall, canInstallExtension]
   );

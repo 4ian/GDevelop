@@ -312,7 +312,8 @@ export const HomePage = React.memo<Props>(
                           noColumnMargin
                         >
                           {!project && (
-                            <FlatButton
+                            <RaisedButton
+                              primary
                               label={<Trans>Create a blank project</Trans>}
                               onClick={() => {
                                 setPreCreationDialogOpen(true);
@@ -324,7 +325,6 @@ export const HomePage = React.memo<Props>(
                             <RaisedButtonWithSplitMenu
                               label={<Trans>Open a project</Trans>}
                               onClick={onOpen}
-                              primary
                               buildMenuTemplate={
                                 buildRecentProjectFilesMenuTemplate
                               }
@@ -354,6 +354,7 @@ export const HomePage = React.memo<Props>(
                       items={examples ? prepareExamples(examples) : null}
                       displayItemTitles
                       onBrowseAllClick={onOpenExamples}
+                      browseAllLabel={<Trans>More examples</Trans>}
                       error={
                         exampleLoadingError && (
                           <>
@@ -370,10 +371,11 @@ export const HomePage = React.memo<Props>(
                     />
                     {renderBetweenCarouselSpace()}
                     <Carousel
-                      title={<Trans>Our latest tutorials</Trans>}
+                      title={<Trans>Learn game making</Trans>}
                       items={tutorials ? prepareTutorials(tutorials) : null}
                       displayItemTitles={false}
                       onBrowseAllClick={onOpenTutorials}
+                      browseAllLabel={<Trans>All tutorials</Trans>}
                       error={
                         tutorialLoadingError && (
                           <>
@@ -390,7 +392,7 @@ export const HomePage = React.memo<Props>(
                     />
                     {renderBetweenCarouselSpace(betweenCarouselSpacerCount)}
                     <Carousel
-                      title={<Trans>Games Showcase</Trans>}
+                      title={<Trans>Games made by the community</Trans>}
                       items={
                         showcasedGames
                           ? prepareShowcasedGames(showcasedGames)
@@ -398,6 +400,7 @@ export const HomePage = React.memo<Props>(
                       }
                       displayItemTitles
                       onBrowseAllClick={onOpenGamesShowcase}
+                      browseAllLabel={<Trans>Browse all</Trans>}
                       error={
                         showcaseLoadingError && (
                           <>

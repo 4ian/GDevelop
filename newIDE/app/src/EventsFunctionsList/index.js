@@ -11,6 +11,7 @@ import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
@@ -24,6 +25,7 @@ import {
 } from '../Utils/Serializer';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
@@ -38,15 +40,17 @@ export type EventsFunctionCreationParameters = {|
 
 const getEventsFunctionName = (eventsFunction: gdEventsFunction) =>
   eventsFunction.isPrivate() ? (
-    <React.Fragment>
-      <VisibilityOffIcon
-        fontSize="small"
-        style={{ marginRight: 5, verticalAlign: 'bottom' }}
-      />
+    <>
+      <Tooltip title="This function won't be visible in the events editor">
+        <VisibilityOffIcon
+          fontSize="small"
+          style={{ marginRight: 5, verticalAlign: 'bottom' }}
+        />
+      </Tooltip>
       {eventsFunction.getName()}
-    </React.Fragment>
+    </>
   ) : (
-    <>{eventsFunction.getName()}</>
+    eventsFunction.getName()
   );
 
 type State = {|
@@ -136,49 +140,41 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _getFunctionThumbnail = (eventsFunction: ?gdEventsFunction) => {
     switch (eventsFunction.getFunctionType()) {
       default:
-        return 'res/functions/function32.png';
-      case 0:
-        if (
-          eventsFunction.getName() === 'onSceneLoaded' ||
-          eventsFunction.getName() === 'onFirstSceneLoaded' ||
-          eventsFunction.getName() === 'onCreated'
-        ) {
-          return 'res/functions/create32.png';
+        return 'res/functions/function.svg';
+      case gd.EventsFunction.Action:
+        switch (eventsFunction.getName()) {
+          default:
+            return 'res/functions/action.svg';
+
+          case 'onSceneUnloading':
+          case 'onDestroy':
+            return 'res/functions/destroy.svg';
+
+          case 'onSceneResumed':
+          case 'onActivate':
+            return 'res/functions/activate.svg';
+
+          case 'onScenePaused':
+          case 'onDeActivate':
+            return 'res/functions/deactivate.svg';
+
+          case 'onScenePreEvents':
+          case 'onScenePostEvents':
+          case 'doStepPreEvents':
+          case 'doStepPostEvents':
+            return 'res/functions/step.svg';
+
+          case 'onSceneLoaded':
+          case 'onFirstSceneLoaded':
+          case 'onCreated':
+            return 'res/functions/create.svg';
         }
-        if (
-          eventsFunction.getName() === 'onScenePreEvents' ||
-          eventsFunction.getName() === 'onScenePostEvents' ||
-          eventsFunction.getName() === 'doStepPreEvents' ||
-          eventsFunction.getName() === 'doStepPostEvents'
-        ) {
-          return 'res/functions/step32.png';
-        }
-        if (
-          eventsFunction.getName() === 'onScenePaused' ||
-          eventsFunction.getName() === 'onDeActivate'
-        ) {
-          return 'res/functions/deactivate32.png';
-        }
-        if (
-          eventsFunction.getName() === 'onSceneResumed' ||
-          eventsFunction.getName() === 'onActivate'
-        ) {
-          return 'res/functions/activate32.png';
-        }
-        if (
-          eventsFunction.getName() === 'onSceneUnloading' ||
-          eventsFunction.getName() === 'onDestroy'
-        ) {
-          return 'res/functions/destroy32.png';
-        } else {
-          return 'res/functions/action32.png';
-        }
-      case 1:
-        return 'res/functions/condition32.png';
-      case 2:
-        return 'res/functions/expression32.png';
-      case 3:
-        return 'res/functions/expression32.png';
+      case gd.EventsFunction.Condition:
+        return 'res/functions/condition.svg';
+      case gd.EventsFunction.Expression:
+        return 'res/functions/expression.svg';
+      case gd.EventsFunction.StringExpression:
+        return 'res/functions/expression.svg';
     }
   };
   _rename = (eventsFunction: gdEventsFunction, newName: string) => {

@@ -79,7 +79,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
             />
           ) : (
             <div
-              title={itemName}
+              title={typeof itemName === 'string' ? itemName : undefined}
               style={{
                 ...textEllispsisStyle,
                 color: selected

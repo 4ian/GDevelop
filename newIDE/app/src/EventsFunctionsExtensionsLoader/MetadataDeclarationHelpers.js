@@ -528,7 +528,7 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
           getExtensionIconUrl(extension)
         )
       )
-        .useStandardRelationalOperatorParameters('color')
+        .useStandardRelationalOperatorParameters('string')
         .getCodeExtraInformation()
         .setFunctionName(getterName);
 

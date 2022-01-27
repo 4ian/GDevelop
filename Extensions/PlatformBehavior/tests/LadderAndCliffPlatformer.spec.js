@@ -34,7 +34,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         object.setPosition(0, -100);
       });
 
-      it('can grab and release a right ledge platform', function () {
+      it('can grab and release the right ledge of a platform', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setPosition(0, -10);
@@ -72,7 +72,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getY()).to.be.above(0);
       });
 
-      it('can grab and release a left ledge platform', function () {
+      it('can grab and release the left ledge of a platform', function () {
         // Put a platform.
         const platform = addPlatformObject(runtimeScene);
         platform.setPosition(0, -10);
@@ -240,7 +240,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.setPosition(0, -100);
     });
 
-    it('can grab without moving and release a right ledge platform', function () {
+    it('can grab without moving and release the right ledge of a platform', function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
@@ -280,13 +280,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.above(0);
     });
 
-    it('can grab without moving and release a left ledge platform', function () {
+    it('can grab without moving and release the left ledge of a platform', function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
       runtimeScene.renderAndStep(1000 / 60);
 
-      // Put the character near the right ledge of the platform.
+      // Put the character near the left ledge of the platform.
       object.setPosition(
         platform.getX() - object.getWidth() - 2,
         platform.getY() - 10
@@ -318,7 +318,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.above(0);
     });
 
-    it('must not grab automatically a right ledge platform when facing back', function () {
+    it('must not grab automatically the right ledge of a platform when facing back', function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
@@ -343,13 +343,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be.greaterThan(platform.getY() + 5);
     });
 
-    it('must not grab automatically a left ledge platform when facing back', function () {
+    it('must not grab automatically the left ledge of a platform when facing back', function () {
       // Put a platform.
       const platform = addPlatformObject(runtimeScene);
       platform.setPosition(0, -10);
       runtimeScene.renderAndStep(1000 / 60);
 
-      // Put the character near the right ledge of the platform.
+      // Put the character near the left ledge of the platform.
       object.setPosition(
         platform.getX() - object.getWidth() - 2,
         platform.getY() - 10

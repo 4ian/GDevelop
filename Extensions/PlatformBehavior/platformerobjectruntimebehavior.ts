@@ -53,6 +53,7 @@ namespace gdjs {
     _ladderClimbingSpeed: float;
 
     _canGrabPlatforms: boolean;
+    _canGrabWithoutMoving: boolean;
     private _yGrabOffset: any;
     private _xGrabTolerance: any;
 
@@ -68,6 +69,7 @@ namespace gdjs {
     _lastDeltaY: float = 0;
     _currentFallSpeed: float = 0;
     _canJump: boolean = false;
+    _lastDirectionIsLeft: boolean = false;
 
     private _ignoreDefaultControls: boolean;
     private _leftKey: boolean = false;
@@ -121,6 +123,7 @@ namespace gdjs {
       this._maxSpeed = behaviorData.maxSpeed;
       this._jumpSpeed = behaviorData.jumpSpeed;
       this._canGrabPlatforms = behaviorData.canGrabPlatforms || false;
+      this._canGrabWithoutMoving = behaviorData.canGrabWithoutMoving;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
       this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
@@ -166,6 +169,12 @@ namespace gdjs {
         oldBehaviorData.canGrabPlatforms !== newBehaviorData.canGrabPlatforms
       ) {
         this.setCanGrabPlatforms(newBehaviorData.canGrabPlatforms);
+      }
+      if (
+        oldBehaviorData.canGrabWithoutMoving !==
+        newBehaviorData.canGrabWithoutMoving
+      ) {
+        this._canGrabWithoutMoving = newBehaviorData.canGrabWithoutMoving;
       }
       if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
         this._yGrabOffset = newBehaviorData.yGrabOffset;
@@ -237,6 +246,10 @@ namespace gdjs {
           !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
 
       this._requestedDeltaX += this._updateSpeed(timeDelta);
+
+      if (this._leftKey !== this._rightKey) {
+        this._lastDirectionIsLeft = this._leftKey;
+      }
 
       //0.2) Track changes in object size
       this._state.beforeUpdatingObstacles(timeDelta);
@@ -508,9 +521,10 @@ namespace gdjs {
       let oldX = object.getX();
       object.setX(
         object.getX() +
-          (this._requestedDeltaX > 0
-            ? this._xGrabTolerance
-            : -this._xGrabTolerance)
+          (this._requestedDeltaX < 0 ||
+          (this._requestedDeltaX === 0 && this._lastDirectionIsLeft)
+            ? -this._xGrabTolerance
+            : this._xGrabTolerance)
       );
       const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] = gdjs.staticArray(
         PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
@@ -1874,13 +1888,16 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
+      // Jumping
       behavior._checkTransitionJumping();
 
-      //Grabbing a platform
-      if (behavior._canGrabPlatforms && behavior._requestedDeltaX !== 0) {
+      // Grabbing a platform
+      if (
+        behavior._canGrabPlatforms &&
+        (behavior._requestedDeltaX !== 0 || behavior._canGrabWithoutMoving)
+      ) {
         behavior._checkGrabPlatform();
       }
     }
@@ -1944,15 +1961,15 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
+      // Jumping
       behavior._checkTransitionJumping();
 
-      //Grabbing a platform
+      // Grabbing a platform
       if (
         behavior._canGrabPlatforms &&
-        behavior._requestedDeltaX !== 0 &&
+        (behavior._requestedDeltaX !== 0 || behavior._canGrabWithoutMoving) &&
         behavior._lastDeltaY >= 0
       ) {
         behavior._checkGrabPlatform();

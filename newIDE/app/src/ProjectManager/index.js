@@ -100,10 +100,6 @@ type Props = {|
   onOpenProfile: () => void,
   onOpenGamesDashboard: () => void,
   onOpenResources: () => void,
-  onAddLayout: () => void,
-  onAddExternalEvents: () => void,
-  onAddExternalLayout: () => void,
-  onAddEventsFunctionsExtension: () => void,
   onOpenPlatformSpecificAssets: () => void,
   onChangeSubscription: () => void,
   eventsFunctionsExtensionsError: ?Error,
@@ -266,7 +262,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addLayout = (index: number) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator('New scene', name =>
+    const newName = newNameGenerator('Untitled scene', name =>
       project.hasLayoutNamed(name)
     );
     const newLayout = project.insertNewLayout(newName, index + 1);
@@ -288,7 +284,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addExternalEvents = (index: number) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator('NewExternalEvents', name =>
+    const newName = newNameGenerator('Untitled external events', name =>
       project.hasExternalEventsNamed(name)
     );
     project.insertNewExternalEvents(newName, index + 1);
@@ -298,7 +294,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addExternalLayout = (index: number) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator('NewExternalLayout', name =>
+    const newName = newNameGenerator('Untitled external layout', name =>
       project.hasExternalLayoutNamed(name)
     );
     project.insertNewExternalLayout(newName, index + 1);
@@ -308,7 +304,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addEventsFunctionsExtension = (index: number) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator('NewExtension', name =>
+    const newName = newNameGenerator('UntitledExtension', name =>
       isExtensionNameTaken(name, project)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
@@ -758,7 +754,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 .concat(
                   <AddListItem
                     key={'add-scene'}
-                    onClick={this.props.onAddLayout}
+                    onClick={() => this._addLayout(project.getLayoutsCount())}
                     primaryText={<Trans>Click to add a scene</Trans>}
                   />
                 )
@@ -824,7 +820,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                   <AddListItem
                     key={'add-external-events'}
                     primaryText={<Trans>Click to add external events</Trans>}
-                    onClick={this.props.onAddExternalEvents}
+                    onClick={() =>
+                      this._addExternalEvents(project.getExternalEventsCount())
+                    }
                   />
                 )
             }
@@ -889,7 +887,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                   <AddListItem
                     key={'add-external-layout'}
                     primaryText={<Trans>Click to add an external layout</Trans>}
-                    onClick={this.props.onAddExternalLayout}
+                    onClick={() =>
+                      this._addExternalLayout(project.getExternalLayoutsCount())
+                    }
                   />
                 )
             }
@@ -985,7 +985,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                     primaryText={
                       <Trans>Click to add functions and behaviors</Trans>
                     }
-                    onClick={this.props.onAddEventsFunctionsExtension}
+                    onClick={() =>
+                      this._addEventsFunctionsExtension(
+                        project.getEventsFunctionsExtensionsCount()
+                      )
+                    }
                   />
                 )
                 .concat(

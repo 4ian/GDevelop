@@ -789,63 +789,6 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  const addLayout = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('New scene', name =>
-      currentProject.hasLayoutNamed(name)
-    );
-    const newLayout = currentProject.insertNewLayout(
-      name,
-      currentProject.getLayoutsCount()
-    );
-    newLayout.updateBehaviorsSharedData(currentProject);
-    _onProjectItemModified();
-  };
-
-  const addExternalLayout = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExternalLayout', name =>
-      currentProject.hasExternalLayoutNamed(name)
-    );
-    currentProject.insertNewExternalLayout(
-      name,
-      currentProject.getExternalLayoutsCount()
-    );
-    _onProjectItemModified();
-  };
-
-  const addExternalEvents = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExternalEvents', name =>
-      currentProject.hasExternalEventsNamed(name)
-    );
-    currentProject.insertNewExternalEvents(
-      name,
-      currentProject.getExternalEventsCount()
-    );
-    _onProjectItemModified();
-  };
-
-  const addEventsFunctionsExtension = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExtension', name =>
-      currentProject.hasEventsFunctionsExtensionNamed(name)
-    );
-    currentProject.insertNewEventsFunctionsExtension(
-      name,
-      currentProject.getEventsFunctionsExtensionsCount()
-    );
-    _onProjectItemModified();
-  };
-
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     const { currentProject } = state;
     if (!currentProject) return;
@@ -2110,10 +2053,6 @@ const MainFrame = (props: Props) => {
             onOpenLayout={openLayout}
             onOpenExternalLayout={openExternalLayout}
             onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-            onAddLayout={addLayout}
-            onAddExternalLayout={addExternalLayout}
-            onAddEventsFunctionsExtension={addEventsFunctionsExtension}
-            onAddExternalEvents={addExternalEvents}
             onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}

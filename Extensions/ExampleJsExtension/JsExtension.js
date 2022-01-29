@@ -410,7 +410,8 @@ module.exports = {
       .setIncludeFile('Extensions/ExampleJsExtension/dummyruntimeobject.js')
       .addIncludeFile(
         'Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js'
-      );
+      )
+      .setCategoryFullName(_('Testing'));
 
     object
       .addAction(

@@ -232,7 +232,7 @@ export default function NewObjectDialog({
               {Object.keys(objectsByCategory).map(category => {
                 const categoryObjectMetadata = objectsByCategory[category];
                 return (
-                  <>
+                  <React.Fragment key={category}>
                     <Subheader>{category}</Subheader>
                     {categoryObjectMetadata.map(objectMetadata => (
                       <ObjectListItem
@@ -244,7 +244,7 @@ export default function NewObjectDialog({
                         }}
                       />
                     ))}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </List>

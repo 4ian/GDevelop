@@ -202,6 +202,10 @@ namespace gdjs {
     updateBorderWidth() {
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
+
+    isFocused() {
+      return this._input === document.activeElement;
+    }
   }
 
   export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;

@@ -70,19 +70,19 @@ module.exports = {
         .setValue(objectContent.opacity.toString())
         .setType('number')
         .setLabel(_('Video opacity (0-255)'))
-        .setGroup(_("Appearance"));
+        .setGroup(_('Appearance'));
       objectProperties
         .getOrCreate('Looped')
         .setValue(objectContent.loop ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Loop the video'))
-        .setGroup(_("Playback settings"));
+        .setGroup(_('Playback settings'));
       objectProperties
         .getOrCreate('Volume')
         .setValue(objectContent.volume.toString())
         .setType('number')
         .setLabel(_('Video volume (0-100)'))
-        .setGroup(_("Playback settings"));
+        .setGroup(_('Playback settings'));
       objectProperties
         .getOrCreate('videoResource')
         .setValue(objectContent.videoResource)
@@ -133,6 +133,7 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Video/videoruntimeobject.js')
       .addIncludeFile('Extensions/Video/videoruntimeobject-pixi-renderer.js')
+      .setCategoryFullName(_('Multimedia'));
 
     object
       .addAction(
@@ -598,7 +599,8 @@ module.exports = {
           that._pixiObject.texture.on('error', function () {
             that._pixiObject.texture.off('error', this);
 
-            that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
+            that._pixiObject.texture =
+              that._pixiResourcesLoader.getInvalidPIXITexture();
           });
         }
       }

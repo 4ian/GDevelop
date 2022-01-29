@@ -44,7 +44,6 @@ import {
   notifyPreviewWillStart,
 } from './EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';

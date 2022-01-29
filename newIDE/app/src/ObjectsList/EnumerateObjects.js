@@ -11,6 +11,7 @@ export type EnumeratedObjectMetadata = {|
   fullName: string,
   description: string,
   iconFilename: string,
+  categoryFullName: string,
 |};
 
 export type ObjectWithContext = {|
@@ -102,6 +103,7 @@ export const enumerateObjectTypes = (
           fullName: objectMetadata.getFullName(),
           description: objectMetadata.getDescription(),
           iconFilename: objectMetadata.getIconFilename(),
+          categoryFullName: objectMetadata.getCategoryFullName(),
         }));
     })
   );

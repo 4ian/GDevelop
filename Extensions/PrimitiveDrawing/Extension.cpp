@@ -21,11 +21,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/shape_painter");
 
-  gd::ObjectMetadata& obj = extension.AddObject<ShapePainterObject>(
-      "Drawer",  //"Drawer" is kept for compatibility with GD<=3.6.76
-      _("Shape painter"),
-      _("Allows you to draw simple shapes on the screen"),
-      "CppPlatform/Extensions/primitivedrawingicon.png");
+  gd::ObjectMetadata& obj =
+      extension
+          .AddObject<ShapePainterObject>(
+              "Drawer",  //"Drawer" is kept for compatibility with GD<=3.6.76
+              _("Shape painter"),
+              _("Allows you to draw simple shapes on the screen"),
+              "CppPlatform/Extensions/primitivedrawingicon.png")
+          .SetCategoryFullName(_("General"));
 
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
@@ -377,14 +380,14 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("closePath")
       .SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
-  obj.AddScopedAction(
-         "ClearShapes",
-         _("Clear shapes"),
-         _("Clear the rendered shape(s). Useful if not set to be done automatically."),
-         _("Clear the rendered image of _PARAM0_"),
-         _("Advanced"),
-         "res/actions/visibilite24.png",
-         "res/actions/visibilite.png")
+  obj.AddScopedAction("ClearShapes",
+                      _("Clear shapes"),
+                      _("Clear the rendered shape(s). Useful if not set to be "
+                        "done automatically."),
+                      _("Clear the rendered image of _PARAM0_"),
+                      _("Advanced"),
+                      "res/actions/visibilite24.png",
+                      "res/actions/visibilite.png")
       .AddParameter("object", _("Shape Painter object"), "Drawer");
 
   obj.AddAction(
@@ -645,23 +648,23 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction("number",
-                "ScaleX",
-                _("Scale on X axis"),
-                _("the width's scale of an object"),
-                _("the width's scale"),
-                _("Size"),
-                "res/actions/scaleWidth24.png")
+                                         "ScaleX",
+                                         _("Scale on X axis"),
+                                         _("the width's scale of an object"),
+                                         _("the width's scale"),
+                                         _("Size"),
+                                         "res/actions/scaleWidth24.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardParameters("number")
       .MarkAsAdvanced();
 
   obj.AddExpressionAndConditionAndAction("number",
-                "ScaleY",
-                _("Scale on Y axis"),
-                _("the height's scale of an object"),
-                _("the height's scale"),
-                _("Size"),
-                "res/actions/scaleHeight24.png")
+                                         "ScaleY",
+                                         _("Scale on Y axis"),
+                                         _("the height's scale of an object"),
+                                         _("the height's scale"),
+                                         _("Size"),
+                                         "res/actions/scaleHeight24.png")
       .AddParameter("object", _("Object"), "Drawer")
       .UseStandardParameters("number")
       .MarkAsAdvanced();
@@ -728,13 +731,15 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
 
-  obj.AddAction("SetRotationCenter",
-                _("Center of rotation"),
-                _("Change the center of rotation of an object relatively to the object origin."),
-                _("Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_"),
-                _("Angle"),
-                "res/actions/position24.png",
-                "res/actions/position.png")
+  obj.AddAction(
+         "SetRotationCenter",
+         _("Center of rotation"),
+         _("Change the center of rotation of an object relatively to the "
+           "object origin."),
+         _("Change the center of rotation of _PARAM0_: _PARAM1_; _PARAM2_"),
+         _("Angle"),
+         "res/actions/position24.png",
+         "res/actions/position.png")
       .AddParameter("object", _("Object"), "Drawer")
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
@@ -742,8 +747,10 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("SetRectangularCollisionMask",
                 _("Collision Mask"),
-                _("Change the collision mask of an object to a rectangle relatively to the object origin."),
-                _("Change the collision mask of _PARAM0_ to a rectangle from _PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_"),
+                _("Change the collision mask of an object to a rectangle "
+                  "relatively to the object origin."),
+                _("Change the collision mask of _PARAM0_ to a rectangle from "
+                  "_PARAM1_; _PARAM2_ to _PARAM3_; _PARAM4_"),
                 _("Position"),
                 "res/actions/position24.png",
                 "res/actions/position.png")

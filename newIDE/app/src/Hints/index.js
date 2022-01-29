@@ -17,13 +17,6 @@ export const getDeprecatedBehaviorsInformation = (): {
   },
 });
 
-export const getExperimentalObjects = (): {
-  [string]: boolean,
-} => ({
-  'BitmapText::BitmapTextObject': true,
-  'TileMap::TileMap': true,
-});
-
 export const getExtraObjectsInformation = (): {
   [string]: Array<Hint>,
 } => ({

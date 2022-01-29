@@ -385,6 +385,10 @@ namespace gdjs {
     getBorderWidth(): float {
       return this._borderWidth;
     }
+
+    isFocused(): boolean {
+      return this._renderer.isFocused();
+    }
   }
   gdjs.registerObject(
     'TextInput::TextInputObject',

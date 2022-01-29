@@ -24,7 +24,8 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
       "TextEntry",
       _("Text entry"),
       _("Invisible object used to get the text entered with the keyboard."),
-      "CppPlatform/Extensions/textentry.png");
+      "CppPlatform/Extensions/textentry.png")
+          .SetCategoryFullName(_("Advanced"));
 
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TextEntryObject/TextEntryObject.h");

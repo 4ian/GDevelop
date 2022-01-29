@@ -132,7 +132,7 @@ module.exports = {
               'When activated, display the lines used to render the light - useful to understand how the light is rendered on screen.'
             )
           )
-          .setGroup(_("Advanced"))
+          .setGroup(_('Advanced'))
       );
 
       objectProperties
@@ -194,7 +194,8 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
-      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
+      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
+      .setCategoryFullName(_('Lights'));
 
     object
       .addAction(

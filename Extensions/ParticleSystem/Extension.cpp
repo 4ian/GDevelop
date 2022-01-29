@@ -11,8 +11,8 @@ This project is released under the MIT License.
 #include "ExtensionSubDeclaration2.h"
 #include "ExtensionSubDeclaration3.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
+#include "GDCore/Tools/Localization.h"
 #include "ParticleEmitterObject.h"
 
 void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
@@ -29,12 +29,15 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
 
   // Declaration of all objects available
   {
-    gd::ObjectMetadata& obj = extension.AddObject<ParticleEmitterObject>(
-        "ParticleEmitter",
-        _("Particles emitter"),
-        _("Displays a large number of small particles to create visual "
-          "effects."),
-        "CppPlatform/Extensions/particleSystemicon.png");
+    gd::ObjectMetadata& obj =
+        extension
+            .AddObject<ParticleEmitterObject>(
+                "ParticleEmitter",
+                _("Particles emitter"),
+                _("Displays a large number of small particles to create visual "
+                  "effects."),
+                "CppPlatform/Extensions/particleSystemicon.png")
+            .SetCategoryFullName(_("General"));
 
     obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 

@@ -20,11 +20,14 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/text_entry");
 
-  gd::ObjectMetadata& obj = extension.AddObject<TextEntryObject>(
-      "TextEntry",
-      _("Text entry"),
-      _("Invisible object used to get the text entered with the keyboard."),
-      "CppPlatform/Extensions/textentry.png");
+  gd::ObjectMetadata& obj =
+      extension
+          .AddObject<TextEntryObject>("TextEntry",
+                                      _("Text entry"),
+                                      _("Invisible object used to get the text "
+                                        "entered with the keyboard."),
+                                      "CppPlatform/Extensions/textentry.png")
+          .SetCategoryFullName(_("Advanced"));
 
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TextEntryObject/TextEntryObject.h");

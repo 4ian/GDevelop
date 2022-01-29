@@ -45,6 +45,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   listContainer: {
@@ -448,6 +449,10 @@ export default class ObjectsList extends React.Component<Props, State> {
     index: number
   ) => {
     const { object } = objectWithContext;
+    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+      this.props.project.getCurrentPlatform(),
+      object.getType()
+    );
     return [
       {
         label: i18n._(t`Edit object`),
@@ -464,6 +469,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Edit effects`),
         click: () => this.props.onEditObject(object, 'effects'),
+        enabled: !objectMetadata.isUnsupportedBaseObjectCapability('effect'),
       },
       { type: 'separator' },
       {

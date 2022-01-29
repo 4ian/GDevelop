@@ -87,14 +87,16 @@ module.exports = {
         .setValue(objectContent.bitmapFontResourceName)
         .setType('resource')
         .addExtraInfo('bitmapFont') //fnt or xml files
-        .setLabel(_('Bitmap Font'));
+        .setLabel(_('Bitmap Font'))
+        .setGroup(_("Font"));
 
       objectProperties
         .getOrCreate('textureAtlasResourceName')
         .setValue(objectContent.textureAtlasResourceName)
         .setType('resource')
         .addExtraInfo('image')
-        .setLabel(_('Bitmap atlas image'));
+        .setLabel(_('Bitmap atlas image'))
+        .setGroup(_("Font"));
 
       objectProperties
         .getOrCreate('scale')
@@ -108,7 +110,7 @@ module.exports = {
         .setValue(objectContent.tint)
         .setType('color')
         .setLabel(_('Font tint'))
-        .setGroup(_('Appearance'));
+        .setGroup(_("Font"));
 
       objectProperties
         .getOrCreate('wordWrap')

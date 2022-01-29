@@ -170,12 +170,12 @@ module.exports = {
         .setLabel(_('Border opacity'))
         .setGroup(_('Field appearance'));
 
-        objectProperties
-          .getOrCreate('borderWidth')
-          .setValue((objectContent.borderWidth || 0).toString())
-          .setType('number')
-          .setLabel(_('Border width'))
-          .setGroup(_('Field appearance'));
+      objectProperties
+        .getOrCreate('borderWidth')
+        .setValue((objectContent.borderWidth || 0).toString())
+        .setType('number')
+        .setLabel(_('Border width'))
+        .setGroup(_('Field appearance'));
 
       return objectProperties;
     };
@@ -245,6 +245,7 @@ module.exports = {
         'JsPlatform/Extensions/text_input.svg',
         textInputObject
       )
+      .setCategoryFullName(_('Form control'))
       .addUnsupportedBaseObjectCapability('effect')
       .setIncludeFile('Extensions/TextInput/textinputruntimeobject.js')
       .addIncludeFile(
@@ -417,20 +418,20 @@ module.exports = {
       .setFunctionName('setBorderOpacity')
       .setGetter('getBorderOpacity');
 
-      object
-        .addExpressionAndConditionAndAction(
-          'number',
-          'BorderWidth',
-          _('Border width'),
-          _('the border width'),
-          _('the border width'),
-          _('Field appearance'),
-          'res/conditions/outlineSize24.png'
-        )
-        .addParameter('object', _('Text input'), 'TextInputObject', false)
-        .useStandardParameters('number')
-        .setFunctionName('setBorderWidth')
-        .setGetter('getBorderWidth');
+    object
+      .addExpressionAndConditionAndAction(
+        'number',
+        'BorderWidth',
+        _('Border width'),
+        _('the border width'),
+        _('the border width'),
+        _('Field appearance'),
+        'res/conditions/outlineSize24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .useStandardParameters('number')
+      .setFunctionName('setBorderWidth')
+      .setGetter('getBorderWidth');
 
     // TODO: expressions for colors?
 
@@ -449,6 +450,22 @@ module.exports = {
       .useStandardParameters('number')
       .setFunctionName('setOpacity')
       .setGetter('getOpacity');
+
+    object
+      .addCondition(
+        'Focused',
+        _('Focused'),
+        _(
+          'Check if the text input is focused (the cursor is in the field and player can type text in).'
+        ),
+        _('_PARAM0_ is focused'),
+        '',
+        'res/conditions/surObjet24.png',
+        'res/conditions/surObjet.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isFocused');
 
     return extension;
   },
@@ -479,7 +496,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'TextInput::TextInputObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/extensions/extend-gdevelop', // TODO
+        helpPagePath: '/objects/text_input',
       })
     );
   },
@@ -605,15 +622,13 @@ module.exports = {
           this._instance.getAngle()
         );
 
-        const borderWidth = parseFloat(properties.get('borderWidth').getValue()) || 0;
+        const borderWidth =
+          parseFloat(properties.get('borderWidth').getValue()) || 0;
 
         // Draw the mask for the text.
         const textOffset = borderWidth + TEXT_MASK_PADDING;
         this._pixiTextMask.clear();
-        this._pixiTextMask.beginFill(
-          0xDDDDDD,
-          1
-        );
+        this._pixiTextMask.beginFill(0xdddddd, 1);
         this._pixiTextMask.drawRect(
           textOffset,
           textOffset,
@@ -632,9 +647,13 @@ module.exports = {
 
         // Draw the background and border.
         const fillColor = properties.get('fillColor').getValue();
-        const fillOpacity = parseFloat(properties.get('fillOpacity').getValue());
+        const fillOpacity = parseFloat(
+          properties.get('fillOpacity').getValue()
+        );
         const borderColor = properties.get('borderColor').getValue();
-        const borderOpacity = parseFloat(properties.get('borderOpacity').getValue());
+        const borderOpacity = parseFloat(
+          properties.get('borderOpacity').getValue()
+        );
 
         this._pixiGraphics.clear();
         this._pixiGraphics.lineStyle(

@@ -169,6 +169,20 @@
               "name": "DefaultInput"
             }
           ]
+        },
+        {
+          "name": "Inputs",
+          "objects": [
+            {
+              "name": "DefaultInput"
+            },
+            {
+              "name": "CustomizedTextArea"
+            },
+            {
+              "name": "CustomizedInput"
+            }
+          ]
         }
       ],
       "variables": [],
@@ -891,6 +905,38 @@
                 "GroupWithSpriteAndDefaultInput",
                 "\"TestEffect\"",
                 "yes"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextInput::Focused"
+              },
+              "parameters": [
+                "Inputs"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Rotate"
+              },
+              "parameters": [
+                "Block",
+                "15",
+                ""
               ],
               "subInstructions": []
             }

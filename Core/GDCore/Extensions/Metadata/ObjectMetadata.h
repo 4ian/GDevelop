@@ -200,13 +200,21 @@ class GD_CORE_API ObjectMetadata {
     return *this;
   }
 
+  /**
+   * \brief Set the (user friendly) name of the group this object must
+   * be categorised in.
+   */
+  ObjectMetadata& SetCategoryFullName(const gd::String& categoryFullName_) {
+    categoryFullName = categoryFullName_;
+    return *this;
+  }
+
   const gd::String& GetName() const { return name; }
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
+  const gd::String& GetCategoryFullName() const { return categoryFullName; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#endif
 
   /**
    * \brief Set the URL pointing to the help page about this object
@@ -227,7 +235,6 @@ class GD_CORE_API ObjectMetadata {
    */
   ObjectMetadata& AddIncludeFile(const gd::String& includeFile);
 
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -235,19 +242,17 @@ class GD_CORE_API ObjectMetadata {
 
   std::vector<gd::String> includeFiles;
   gd::String className;
-#endif
   CreateFunPtr createFunPtr;
 
  private:
   gd::String extensionNamespace;
   gd::String name;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String helpUrl;  ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
-#endif
+  gd::String categoryFullName;
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation

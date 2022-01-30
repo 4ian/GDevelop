@@ -34,6 +34,9 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/filesystem');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Filesystem'))
+      .setIcon('JsPlatform/Extensions/filesystem_create_folder32.png');
 
     extension
       .addCondition(
@@ -42,7 +45,7 @@ module.exports = {
         _('Check if the file or directory exists.'),
         _('The path _PARAM0_ exists'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_path_exists24.png',
+        'JsPlatform/Extensions/filesystem_path_exists32.png',
         'JsPlatform/Extensions/filesystem_path_exists32.png'
       )
       .addParameter('string', _('Path to file or directory'), '', false)
@@ -57,7 +60,7 @@ module.exports = {
         _('Create a new directory at the specified path.'),
         _('Create directory _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_create_folder24.png',
+        'JsPlatform/Extensions/filesystem_create_folder32.png',
         'JsPlatform/Extensions/filesystem_create_folder32.png'
       )
       .addParameter('string', _('Directory'), '', false)
@@ -82,7 +85,7 @@ module.exports = {
         ),
         _('Save _PARAM0_ into file _PARAM1_'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_save_file24.png',
+        'JsPlatform/Extensions/filesystem_save_file32.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
       .addParameter('string', _('String (text)'), '', false)
@@ -108,7 +111,7 @@ module.exports = {
         ),
         _('Save _PARAM0_ into file _PARAM1_'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
-        'JsPlatform/Extensions/filesystem_save_file24.png',
+        'JsPlatform/Extensions/filesystem_save_file32.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
       .addParameter('string', _('String (text)'), '', false)
@@ -134,7 +137,7 @@ module.exports = {
         ),
         _('Save scene variable _PARAM0_ into file _PARAM1_ as JSON'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_save_file24.png',
+        'JsPlatform/Extensions/filesystem_save_file32.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
       .addParameter('scenevar', _('Scene variable'), '', false)
@@ -160,7 +163,7 @@ module.exports = {
         ),
         _('Save scene variable _PARAM0_ into file _PARAM1_ as JSON'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
-        'JsPlatform/Extensions/filesystem_save_file24.png',
+        'JsPlatform/Extensions/filesystem_save_file32.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
       .addParameter('scenevar', _('Scene variable'), '', false)
@@ -186,7 +189,7 @@ module.exports = {
         ),
         _('Load text from _PARAM1_ into scene variable _PARAM0_ (Async)'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
-        'JsPlatform/Extensions/filesystem_load_file24.png',
+        'JsPlatform/Extensions/filesystem_load_file32.png',
         'JsPlatform/Extensions/filesystem_load_file32.png'
       )
       .addParameter('scenevar', _('Scene variable'), '', false)
@@ -212,7 +215,7 @@ module.exports = {
         ),
         _('Load text from _PARAM1_ into scene variable _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_load_file24.png',
+        'JsPlatform/Extensions/filesystem_load_file32.png',
         'JsPlatform/Extensions/filesystem_load_file32.png'
       )
       .addParameter('scenevar', _('Scene variable'), '', false)
@@ -238,7 +241,7 @@ module.exports = {
         ),
         _('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_save_file24.png',
+        'JsPlatform/Extensions/filesystem_save_file32.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
       .addParameter('scenevar', _('Scene variable'), '', false)
@@ -264,7 +267,7 @@ module.exports = {
         ),
         _('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
-        'JsPlatform/Extensions/filesystem_save_file24.png',
+        'JsPlatform/Extensions/filesystem_save_file32.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
       .addParameter('scenevar', _('Scene variable'), '', false)
@@ -288,7 +291,7 @@ module.exports = {
         _('Delete a file from the filesystem.'),
         _('Delete the file _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS'),
-        'JsPlatform/Extensions/filesystem_delete_file24.png',
+        'JsPlatform/Extensions/filesystem_delete_file32.png',
         'JsPlatform/Extensions/filesystem_delete_file32.png'
       )
       .addParameter('string', _('File path'), '', false)
@@ -313,7 +316,7 @@ module.exports = {
         ),
         _('Delete the file _PARAM0_'),
         _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
-        'JsPlatform/Extensions/filesystem_delete_file24.png',
+        'JsPlatform/Extensions/filesystem_delete_file32.png',
         'JsPlatform/Extensions/filesystem_delete_file32.png'
       )
       .addParameter('string', _('File path'), '', false)

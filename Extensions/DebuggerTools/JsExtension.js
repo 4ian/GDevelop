@@ -32,6 +32,8 @@ module.exports = {
       'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
       'MIT'
     );
+    extension.addInstructionOrExpressionGroupMetadata(_("Debugger Tools"))
+        .setIcon("res/actions/bug32.png");
 
     extension
       .addAction(

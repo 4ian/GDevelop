@@ -19,6 +19,9 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       "Florian Rival",
       "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/inventory");
+    extension
+      .AddInstructionOrExpressionGroupMetadata(_("Inventories"))
+      .SetIcon("CppPlatform/Extensions/Inventoryicon.png");
 
 #if defined(GD_IDE_ONLY)
   extension
@@ -27,8 +30,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                  _("Add an item in an inventory."),
                  _("Add a _PARAM2_ to inventory _PARAM1_"),
                  _("Inventories"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -42,8 +45,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                  _("Remove an item from an inventory."),
                  _("Remove a _PARAM2_ from inventory _PARAM1_"),
                  _("Inventories"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -57,8 +60,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                     _("Compare the number of an item in an inventory."),
                     _("the count of _PARAM2_ in _PARAM1_"),
                     _("Inventories"),
-                    "CppPlatform/Extensions/Inventoryicon24.png",
-                    "CppPlatform/Extensions/Inventoryicon16.png")
+                    "CppPlatform/Extensions/Inventoryicon.png",
+                    "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -74,8 +77,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                       "inventory."),
                     _("Inventory _PARAM1_ contains a _PARAM2_"),
                     _("Inventories"),
-                    "CppPlatform/Extensions/Inventoryicon24.png",
-                    "CppPlatform/Extensions/Inventoryicon16.png")
+                    "CppPlatform/Extensions/Inventoryicon.png",
+                    "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -92,8 +95,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                  _("Set the maximum count for _PARAM2_ in inventory _PARAM1_ "
                    "to _PARAM3_"),
                  _("Inventories"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -110,8 +113,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                  _("Allow an unlimited count of _PARAM2_ in inventory "
                    "_PARAM1_: _PARAM3_"),
                  _("Inventories"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -127,8 +130,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                       "in the inventory."),
                     _("Inventory _PARAM1_ is full of _PARAM2_"),
                     _("Inventories"),
-                    "CppPlatform/Extensions/Inventoryicon24.png",
-                    "CppPlatform/Extensions/Inventoryicon16.png")
+                    "CppPlatform/Extensions/Inventoryicon.png",
+                    "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -143,8 +146,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                    "won't be marked as equipped."),
                  _("Set _PARAM2_ as equipped in inventory _PARAM1_: _PARAM3_"),
                  _("Inventories"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -159,8 +162,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                     _("Check if an item is equipped."),
                     _("_PARAM2_ is equipped in inventory _PARAM1_"),
                     _("Inventories"),
-                    "CppPlatform/Extensions/Inventoryicon24.png",
-                    "CppPlatform/Extensions/Inventoryicon16.png")
+                    "CppPlatform/Extensions/Inventoryicon.png",
+                    "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -175,8 +178,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                    "it can be restored later."),
                  _("Save inventory _PARAM1_ in variable _PARAM2_"),
                  _("Inventories/Variables"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -190,8 +193,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                  _("Load the content of the inventory from a scene variable."),
                  _("Load inventory _PARAM1_ from variable _PARAM2_"),
                  _("Inventories/Variables"),
-                 "CppPlatform/Extensions/Inventoryicon24.png",
-                 "CppPlatform/Extensions/Inventoryicon16.png")
+                 "CppPlatform/Extensions/Inventoryicon.png",
+                 "CppPlatform/Extensions/Inventoryicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
@@ -204,7 +207,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                      _("Item count"),
                      _("Get the number of an item in the inventory"),
                      _("Inventory"),
-                     "CppPlatform/Extensions/Inventoryicon16.png")
+                     "CppPlatform/Extensions/Inventoryicon.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))

@@ -20,6 +20,8 @@ BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+  extension.AddInstructionOrExpressionGroupMetadata(_("Manipulation of text"))
+      .SetIcon("res/actions/text24.png");
 
   extension.AddStrExpression("NewLine",
                              _("Insert a new line"),

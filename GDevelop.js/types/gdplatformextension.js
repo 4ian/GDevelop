@@ -4,6 +4,7 @@ declare class gdPlatformExtension {
   setExtensionInformation(name: string, fullname: string, description: string, author: string, license: string): gdPlatformExtension;
   setExtensionHelpPath(helpPath: string): gdPlatformExtension;
   setIconUrl(iconUrl: string): gdPlatformExtension;
+  addInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;
   markAsDeprecated(): void;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;

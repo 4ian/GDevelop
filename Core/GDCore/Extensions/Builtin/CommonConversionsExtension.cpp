@@ -20,7 +20,8 @@ BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/common-conversions");
-
+  extension.AddInstructionOrExpressionGroupMetadata(_("Conversion"))
+      .SetIcon("res/conditions/toujours24.png");
 
   extension
       .AddExpression("ToNumber",

@@ -20,6 +20,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/network");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Network"))
+      .SetIcon("res/actions/net24.png");
 
   extension
       .AddAction(

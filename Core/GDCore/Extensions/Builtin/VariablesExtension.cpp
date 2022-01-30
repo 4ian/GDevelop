@@ -22,6 +22,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/variables");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Variables"))
+      .SetIcon("res/conditions/var24.png");
 
   extension
       .AddCondition("VarScene",

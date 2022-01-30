@@ -30,6 +30,8 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Advanced"))
+      .SetIcon("res/conditions/toujours24.png");
 
   extension
       .AddCondition("Or",

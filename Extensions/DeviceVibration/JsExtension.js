@@ -35,6 +35,8 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/device-vibration');
+      extension.addInstructionOrExpressionGroupMetadata(_("Vibration"))
+          .setIcon("JsPlatform/Extensions/vibration_start32.png");
 
     extension
       .addDependency()
@@ -50,7 +52,7 @@ module.exports = {
         _('Vibrate (Duration in ms).'),
         _('Start vibration for _PARAM0_ ms'),
         _('Vibration'),
-        'JsPlatform/Extensions/vibration_start24.png',
+        'JsPlatform/Extensions/vibration_start32.png',
         'JsPlatform/Extensions/vibration_start32.png'
       )
       .addParameter('expression', _('Duration'), '', false)
@@ -67,7 +69,7 @@ module.exports = {
         ),
         _('Start vibration for _PARAM0_ ms'),
         _('Vibration'),
-        'JsPlatform/Extensions/vibration_pattern_start24.png',
+        'JsPlatform/Extensions/vibration_pattern_start32.png',
         'JsPlatform/Extensions/vibration_pattern_start32.png'
       )
       .addParameter(
@@ -87,7 +89,7 @@ module.exports = {
         _('Stop the vibration'),
         _('Stop vibration'),
         _('Vibration'),
-        'JsPlatform/Extensions/vibration_stop24.png',
+        'JsPlatform/Extensions/vibration_stop32.png',
         'JsPlatform/Extensions/vibration_stop32.png'
       )
       .getCodeExtraInformation()

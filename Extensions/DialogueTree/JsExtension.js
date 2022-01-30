@@ -34,6 +34,9 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/dialogue-tree');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Dialogue Tree (experimental)'))
+      .setIcon('JsPlatform/Extensions/yarn32.png');
 
     extension
       .addAction(
@@ -44,7 +47,7 @@ module.exports = {
         ),
         _('Load dialogue data from Scene variable _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter(
@@ -67,7 +70,7 @@ module.exports = {
         ),
         _('Load dialogue data from json file _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addCodeOnlyParameter('currentScene', '')
@@ -91,7 +94,7 @@ module.exports = {
         ),
         _('Start dialogue from branch _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('Dialogue branch'), '', false)
@@ -105,7 +108,7 @@ module.exports = {
         _('Stop the running dialogue. Use this to interrupt dialogue parsing.'),
         _('Stop running dialogue'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -120,7 +123,7 @@ module.exports = {
         ),
         _('Go to the next dialogue line'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -135,7 +138,7 @@ module.exports = {
         ),
         _('Confirm selected Option'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -150,7 +153,7 @@ module.exports = {
         ),
         _('Select next Option'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -165,7 +168,7 @@ module.exports = {
         ),
         _('Select previous Option'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -180,7 +183,7 @@ module.exports = {
         ),
         _('Select option at index _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('expression', _('Option index number'), '', false)
@@ -196,7 +199,7 @@ module.exports = {
         ),
         _('Scroll clipped text'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -211,7 +214,7 @@ module.exports = {
         ),
         _('Complete clipped text scrolling'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -226,7 +229,7 @@ module.exports = {
         ),
         _('Set dialogue state string variable _PARAM0_ to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State Variable Name'), '', false)
@@ -243,7 +246,7 @@ module.exports = {
         ),
         _('Set dialogue state number variable _PARAM0_ to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State Variable Name'), '', false)
@@ -260,7 +263,7 @@ module.exports = {
         ),
         _('Set dialogue state boolean variable _PARAM0_ to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State Variable Name'), '', false)
@@ -277,7 +280,7 @@ module.exports = {
         ),
         _('Save dialogue state to _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('globalvar', _('Global Variable'))
@@ -293,7 +296,7 @@ module.exports = {
         ),
         _('Load dialogue state from _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('globalvar', _('Global Variable'), '', false)
@@ -309,7 +312,7 @@ module.exports = {
         ),
         _('Clear dialogue state'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -529,7 +532,7 @@ module.exports = {
         ),
         _('Command <<_PARAM0_>> is called'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('Command String'), '', false)
@@ -545,7 +548,7 @@ module.exports = {
         ),
         _('The dialogue line is _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter(
@@ -566,7 +569,7 @@ module.exports = {
         ),
         _('Dialogue is running'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -581,7 +584,7 @@ module.exports = {
         ),
         _('Dialogue has a branch named _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('Branch name'), '', false)
@@ -597,7 +600,7 @@ module.exports = {
         ),
         _('Selected option has changed'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()
@@ -612,7 +615,7 @@ module.exports = {
         ),
         _('The current dialogue branch title is _PARAM0_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('title name'), '', false)
@@ -628,7 +631,7 @@ module.exports = {
         ),
         _('The current dialogue branch contains a _PARAM0_ tag'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('tag name'), '', false)
@@ -642,7 +645,7 @@ module.exports = {
         _('Check if a branch has been visited'),
         _('Branch title _PARAM0_ has been visited'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('branch title'), '', false)
@@ -658,7 +661,7 @@ module.exports = {
         ),
         _('Dialogue state string variable _PARAM0_ is equal to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State variable'), '', false)
@@ -675,7 +678,7 @@ module.exports = {
         ),
         _('Dialogue state number variable _PARAM0_ is equal to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State variable'), '', false)
@@ -692,7 +695,7 @@ module.exports = {
         ),
         _('Dialogue state boolean variable _PARAM0_ is equal to _PARAM1_'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .addParameter('string', _('State variable'), '', false)
@@ -709,7 +712,7 @@ module.exports = {
         ),
         _('Clipped text has completed scrolling'),
         _('Dialogue Tree (experimental)'),
-        'JsPlatform/Extensions/yarn24.png',
+        'JsPlatform/Extensions/yarn32.png',
         'JsPlatform/Extensions/yarn32.png'
       )
       .getCodeExtraInformation()

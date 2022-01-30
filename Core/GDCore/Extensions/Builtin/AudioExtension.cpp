@@ -20,6 +20,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/audio");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Audio"))
+      .SetIcon("res/actions/music24.png");
 
   extension
       .AddAction("PlaySoundCanal",

@@ -21,6 +21,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/storage");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Storage"))
+      .SetIcon("res/conditions/fichier24.png");
 
   extension
       .AddCondition(
@@ -176,7 +178,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
                    "browser (or in a new tab if the game is using the Web "
                    "platform and is launched inside a browser)."),
                  _("Open URL (or file) _PARAM0_"),
-                 _("Files"),
+                 _("Network"),
                  "res/actions/launchFile24.png",
                  "res/actions/launchFile.png")
       .AddParameter("string", _("URL (or filename)"))
@@ -188,7 +190,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
                  _("Execute a command"),
                  _("This action executes the specified command."),
                  _("Execute _PARAM0_"),
-                 _("Files"),
+                 _("Network"),
                  "res/actions/launchFile24.png",
                  "res/actions/launchFile.png")
       .AddParameter("string", _("Command"))

@@ -21,6 +21,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/base_object/events");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Collision"))
+      .SetIcon("res/conditions/collision24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Objects"))
+      .SetIcon("res/actions/create24.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Movement using forces"))
+      .SetIcon("res/actions/force24.png");
 
   gd::ObjectMetadata& obj = extension.AddObject<gd::Object>(
       "", _("Base object"), _("Base object"), "res/objeticon24.png");
@@ -1239,7 +1245,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "(layer: _PARAM4_)"),
                  _("Objects"),
                  "res/actions/create24.png",
-                 "res/actions/create.png")
+                 "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectListWithoutPicking", _("Object to create"))
       .AddParameter("expression", _("X position"))
@@ -1257,7 +1263,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "position _PARAM3_;_PARAM4_ (layer: _PARAM5_)"),
                  _("Objects"),
                  "res/actions/create24.png",
-                 "res/actions/create.png")
+                 "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectListWithoutPicking", _("Group of potential objects"))
       .SetParameterLongDescription(

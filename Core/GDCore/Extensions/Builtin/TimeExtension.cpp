@@ -21,6 +21,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Timers and time"))
+      .SetIcon("res/conditions/timer24.png");
 
   // Deprecated and replaced by CompareTimer
   extension
@@ -39,7 +41,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddCondition("CompareTimer",
                     _("Value of a scene timer"),
-                    _("Compare the elapsed time of a scene timer. This condition doesn't start the timer."),
+                    _("Compare the elapsed time of a scene timer. This "
+                      "condition doesn't start the timer."),
                     _("The timer _PARAM1_ _PARAM2_ _PARAM3_ seconds"),
                     _("Timers and time"),
                     "res/conditions/timer24.png",
@@ -210,7 +213,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
             "timestamp\""),
           "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
           "\"yday\", \"timestamp\"]");
-
 }
 
 }  // namespace gd

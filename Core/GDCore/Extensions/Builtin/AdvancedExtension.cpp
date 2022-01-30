@@ -17,6 +17,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
       _("Advanced control features to be used in events."),
       "Florian Rival",
       "Open source (MIT License)");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Functions"))
+      .SetIcon("res/function32.png");
 
   extension
       .AddCondition("Toujours",
@@ -24,7 +26,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                     _("This condition always returns true (or always false, if "
                       "the condition is inverted)."),
                     _("Always"),
-                    _("Other"),
+                    _("Advanced"),
                     "res/conditions/toujours24.png",
                     "res/conditions/toujours.png")
       .SetHelpPath("/all-features/advanced-conditions")
@@ -39,8 +41,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
             "number (to be used with \"Expression\" functions)."),
           _("Set return value to number _PARAM0_"),
           _("Functions"),
-          "res/function24.png",
-          "res/function16.png")
+          "res/function32.png",
+          "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("expression", "The number to be returned")
       .MarkAsAdvanced();
@@ -53,8 +55,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
             "(to be used with \"String Expression\" functions)."),
           _("Set return value to text _PARAM0_"),
           _("Functions"),
-          "res/function24.png",
-          "res/function16.png")
+          "res/function32.png",
+          "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("string", "The text to be returned")
       .MarkAsAdvanced();
@@ -66,8 +68,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                    "either true (condition will pass) or false."),
                  _("Set return value of the condition to _PARAM0_"),
                  _("Functions"),
-                 "res/function24.png",
-                 "res/function16.png")
+                 "res/function32.png",
+                 "res/function32.png")
       .SetHelpPath("/events/functions/return")
       .AddParameter("trueorfalse", "Should the condition be true or false?")
       .MarkAsAdvanced();
@@ -81,8 +83,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                       "If it's a number, 0 is considered as \"false\"."),
                     _("Parameter _PARAM0_ is true"),
                     _("Functions"),
-                    "res/function24.png",
-                    "res/function16.png")
+                    "res/function32.png",
+                    "res/function32.png")
       .AddParameter("functionParameterName", "Parameter name")
       .MarkAsAdvanced();
 

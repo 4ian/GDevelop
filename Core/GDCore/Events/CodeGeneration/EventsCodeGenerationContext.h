@@ -313,9 +313,8 @@ class GD_CORE_API EventsCodeGenerationContext {
                                 ///< the maximum depth reached.
   const EventsCodeGenerationContext*
       parent;  ///< The parent of the current context. Can be NULL.
-  std::set<EventsCodeGenerationContext*>
-      asyncRoots;  ///< The first parent of the current and previous async
-                   ///< depths.
+  EventsCodeGenerationContext*
+      nearestAsyncParent = nullptr;  ///< The nearest context that 
   bool reuseExplicitlyForbidden;  ///< If set to true, forbid children context
                                   ///< to reuse this one without inheriting.
 };

@@ -35,7 +35,7 @@ void EventsCodeGenerationContext::InheritsFrom(
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
 
-  asyncRoots = parent_.asyncRoots;
+  nearestAsyncParent = parent_.nearestAsyncParent;
   asyncDepth = parent_.asyncDepth;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
@@ -49,8 +49,7 @@ void EventsCodeGenerationContext::InheritsFrom(
 void EventsCodeGenerationContext::AsyncInheritsFrom(
     const EventsCodeGenerationContext& parent_) {
   parent = &parent_;
-  asyncRoots = parent_.asyncRoots;
-  asyncRoots.insert(this);
+  nearestAsyncParent = this;
   asyncDepth = parent_.asyncDepth + 1;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
@@ -72,7 +71,12 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
   if (!IsToBeDeclared(objectName)) {
     objectsListsToBeDeclared.insert(objectName);
-    if(IsAsync()) for(auto& root : asyncRoots) root->allListsAcrossChildrenToBeDeclared.insert(objectName);
+    if (IsAsync()) {
+      for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
+           asyncContext != NULL;
+           asyncContext = asyncContext->parent->nearestAsyncParent)
+        asyncContext->allListsAcrossChildrenToBeDeclared.insert(objectName);
+    }
   }
 
   depthOfLastUse[objectName] = GetContextDepth();
@@ -127,16 +131,13 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
 bool EventsCodeGenerationContext::IsInheritingFromAsync(
     const gd::String& objectName) const {
   if (!IsAsync()) return false;
-  //TODO: Probably optimizable using this.asyncRoots
-  for (const gd::EventsCodeGenerationContext* parentContext = parent;
-       parentContext != NULL;
-       parentContext = parentContext->parent) {
-    if (parentContext->asyncDepth != asyncDepth &&
-        parentContext->ObjectAlreadyDeclared(objectName))
+  for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
+       asyncContext != NULL; // Should never happen, but there just in case.
+       asyncContext = asyncContext->parent->nearestAsyncParent) {
+    if (asyncContext->ObjectAlreadyDeclared(objectName))
       return true;
-    // After reaching depth 0 and checking for objects there, there is no need
-    // to go higher up contexts
-    if (!parentContext->IsAsync()) return false;
+    // When reaching the last asynchronous context, check the parent synchronous context before returning.
+    if (!asyncContext->parent->IsAsync()) return asyncContext->parent->ObjectAlreadyDeclared(objectName);
   }
   return false;
 };

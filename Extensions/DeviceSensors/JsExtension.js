@@ -31,6 +31,8 @@ module.exports = {
       "Matthias Meike",
       "Open source (MIT License)"
     ).setExtensionHelpPath("/all-features/device-sensors");
+    extension.addInstructionOrExpressionGroupMetadata(_("Sensors"))
+        .setIcon("JsPlatform/Extensions/orientation_active32.png");
 
     extension
       .addCondition(
@@ -41,7 +43,7 @@ module.exports = {
         ),
         _("Orientation sensor is active"),
         _("Sensors/Orientation"),
-        "JsPlatform/Extensions/orientation_active24.png",
+        "JsPlatform/Extensions/orientation_active32.png",
         "JsPlatform/Extensions/orientation_active32.png"
       )
       .getCodeExtraInformation()
@@ -59,7 +61,7 @@ module.exports = {
         ),
         _("the orientation alpha"),
         _("Sensors/Orientation"),
-        "JsPlatform/Extensions/orientation_alpha24.png",
+        "JsPlatform/Extensions/orientation_alpha32.png",
         "JsPlatform/Extensions/orientation_alpha32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -79,7 +81,7 @@ module.exports = {
         ),
         _("the orientation beta"),
         _("Sensors/Orientation"),
-        "JsPlatform/Extensions/orientation_beta24.png",
+        "JsPlatform/Extensions/orientation_beta32.png",
         "JsPlatform/Extensions/orientation_beta32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -99,7 +101,7 @@ module.exports = {
         ),
         _("the orientation gamma"),
         _("Sensors/Orientation"),
-        "JsPlatform/Extensions/orientation_gamma24.png",
+        "JsPlatform/Extensions/orientation_gamma32.png",
         "JsPlatform/Extensions/orientation_gamma32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -117,7 +119,7 @@ module.exports = {
         _("Activate the orientation sensor. (remember to turn it off again)"),
         _("Activate the orientation sensor."),
         _("Sensors/Orientation"),
-        "JsPlatform/Extensions/orientation_active24.png",
+        "JsPlatform/Extensions/orientation_active32.png",
         "JsPlatform/Extensions/orientation_active32.png"
       )
         .getCodeExtraInformation()
@@ -133,7 +135,7 @@ module.exports = {
         _("Deactivate the orientation sensor."),
         _("Deactivate the orientation sensor."),
         _("Sensors/Orientation"),
-        "JsPlatform/Extensions/orientation_inactive24.png",
+        "JsPlatform/Extensions/orientation_inactive32.png",
         "JsPlatform/Extensions/orientation_inactive32.png"
       )
         .getCodeExtraInformation()
@@ -207,7 +209,7 @@ module.exports = {
         ),
         _("Motion sensor is active"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_active24.png",
+        "JsPlatform/Extensions/motion_active32.png",
         "JsPlatform/Extensions/motion_active32.png"
       )
       .getCodeExtraInformation()
@@ -225,7 +227,7 @@ module.exports = {
         ),
         _("the rotation alpha"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_rotation_alpha24.png",
+        "JsPlatform/Extensions/motion_rotation_alpha32.png",
         "JsPlatform/Extensions/motion_rotation_alpha32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -245,7 +247,7 @@ module.exports = {
         ),
         _("the rotation beta"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_rotation_beta24.png",
+        "JsPlatform/Extensions/motion_rotation_beta32.png",
         "JsPlatform/Extensions/motion_rotation_beta32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -265,7 +267,7 @@ module.exports = {
         ),
         _("the rotation gamma"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_rotation_gamma24.png",
+        "JsPlatform/Extensions/motion_rotation_gamma32.png",
         "JsPlatform/Extensions/motion_rotation_gamma32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -285,7 +287,7 @@ module.exports = {
         ),
         _("the acceleration X"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_acceleration_x24.png",
+        "JsPlatform/Extensions/motion_acceleration_x32.png",
         "JsPlatform/Extensions/motion_acceleration_x32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -305,7 +307,7 @@ module.exports = {
         ),
         _("the acceleration Y"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_acceleration_y24.png",
+        "JsPlatform/Extensions/motion_acceleration_y32.png",
         "JsPlatform/Extensions/motion_acceleration_y32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -325,7 +327,7 @@ module.exports = {
         ),
         _("the acceleration Z"),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_acceleration_z24.png",
+        "JsPlatform/Extensions/motion_acceleration_z32.png",
         "JsPlatform/Extensions/motion_acceleration_z32.png"
       )
       .addParameter("relationalOperator", _("Sign of the test"), "number")
@@ -343,7 +345,7 @@ module.exports = {
         _("Activate the motion sensor. (remember to turn it off again)"),
         _("Activate the motion sensor."),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_active24.png",
+        "JsPlatform/Extensions/motion_active32.png",
         "JsPlatform/Extensions/motion_active32.png"
       )
         .getCodeExtraInformation()
@@ -359,7 +361,7 @@ module.exports = {
         _("Deactivate the motion sensor."),
         _("Deactivate the motion sensor."),
         _("Sensors/Motion"),
-        "JsPlatform/Extensions/motion_inactive24.png",
+        "JsPlatform/Extensions/motion_inactive32.png",
         "JsPlatform/Extensions/motion_inactive32.png"
       )
         .getCodeExtraInformation()

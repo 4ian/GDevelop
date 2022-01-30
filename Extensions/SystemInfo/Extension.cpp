@@ -15,6 +15,8 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       _("Get information about the system and device running the game."),
       "Florian Rival",
       "Open source (MIT License)");
+  extension.AddInstructionOrExpressionGroupMetadata(_("System information"))
+      .SetIcon("CppPlatform/Extensions/systeminfoicon.png");
 
 #if defined(GD_IDE_ONLY)
   extension
@@ -24,8 +26,8 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
           _("Check if the device running the game is a mobile device"),
           _("The device is a mobile device"),
           _("System information"),
-          "CppPlatform/Extensions/systeminfoicon24.png",
-          "CppPlatform/Extensions/systeminfoicon16.png")
+          "CppPlatform/Extensions/systeminfoicon.png",
+          "CppPlatform/Extensions/systeminfoicon.png")
 
       .SetFunctionName("SystemInfo::IsMobile")
       .SetIncludeFile("SystemInfo/SystemInfoTools.h");
@@ -37,8 +39,8 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
                       "target device."),
                     _("WebGL is available"),
                     _("System information"),
-                    "CppPlatform/Extensions/systeminfoicon24.png",
-                    "CppPlatform/Extensions/systeminfoicon16.png")
+                    "CppPlatform/Extensions/systeminfoicon.png",
+                    "CppPlatform/Extensions/systeminfoicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .SetFunctionName("SystemInfo::IsWebGLSupported")
@@ -53,8 +55,8 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
             "in previews."),
           _("The game is being previewed in the editor"),
           _("System information"),
-          "CppPlatform/Extensions/systeminfoicon24.png",
-          "CppPlatform/Extensions/systeminfoicon16.png")
+          "CppPlatform/Extensions/systeminfoicon.png",
+          "CppPlatform/Extensions/systeminfoicon.png")
 
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -66,8 +68,8 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
             "Android phones, iPhones, iPads, but also some laptops)."),
           _("The device has a touchscreen"),
           _("System information"),
-          "CppPlatform/Extensions/systeminfoicon24.png",
-          "CppPlatform/Extensions/systeminfoicon16.png")
+          "CppPlatform/Extensions/systeminfoicon.png",
+          "CppPlatform/Extensions/systeminfoicon.png")
 
       .AddCodeOnlyParameter("currentScene", "");
 #endif

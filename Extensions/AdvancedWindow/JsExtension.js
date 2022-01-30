@@ -27,6 +27,9 @@ module.exports = {
       'Arthur Pacaud (arthuro555)',
       'MIT'
     );
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Advanced window management'))
+      .setIcon('res/actions/window24.png');
 
     extension
       .addAction(
@@ -596,7 +599,9 @@ module.exports = {
         'res/actions/window.png'
       )
       .addParameter('expression', _('New opacity'), '', false)
-      .setParameterLongDescription('A number between 0 (fully transparent) and 1 (fully opaque).')
+      .setParameterLongDescription(
+        'A number between 0 (fully transparent) and 1 (fully opaque).'
+      )
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'

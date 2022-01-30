@@ -19,7 +19,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
-
+  extension.AddInstructionOrExpressionGroupMetadata(_("Scene"))
+      .SetIcon("res/conditions/depart24.png");
 
   extension
       .AddExpression("Random",
@@ -190,7 +191,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     _("Compare two numbers"),
                     _("Compare the two numbers."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
-                    _("Other"),
+                    _("Advanced"),
                     "res/conditions/egal24.png",
                     "res/conditions/egal.png")
       .SetHelpPath("/all-features/advanced-conditions")
@@ -204,7 +205,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
                     _("Compare two strings"),
                     _("Compare the two strings."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
-                    _("Other"),
+                    _("Advanced"),
                     "res/conditions/egal24.png",
                     "res/conditions/egal.png")
       .SetHelpPath("/all-features/advanced-conditions")

@@ -24,6 +24,8 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/linked-objects");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Linked objects"))
+      .SetIcon("CppPlatform/Extensions/LinkedObjectsicon24.png");
 
 #if defined(GD_IDE_ONLY)
 
@@ -35,7 +37,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                  _("Link _PARAM1_ and _PARAM2_"),
                  _("Linked objects"),
                  "CppPlatform/Extensions/LinkedObjectsicon24.png",
-                 "CppPlatform/Extensions/LinkedObjectsicon16.png")
+                 "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object 1"))
@@ -51,7 +53,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                  _("Unlink _PARAM1_ and _PARAM2_"),
                  _("Linked objects"),
                  "CppPlatform/Extensions/LinkedObjectsicon24.png",
-                 "CppPlatform/Extensions/LinkedObjectsicon16.png")
+                 "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object 1"))
@@ -67,7 +69,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                  _("Unlink all objects from _PARAM1_"),
                  _("Linked objects"),
                  "CppPlatform/Extensions/LinkedObjectsicon24.png",
-                 "CppPlatform/Extensions/LinkedObjectsicon16.png")
+                 "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object"))
@@ -84,7 +86,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                     _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
                     _("Linked objects"),
                     "CppPlatform/Extensions/LinkedObjectsicon24.png",
-                    "CppPlatform/Extensions/LinkedObjectsicon16.png")
+                    "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))
@@ -102,7 +104,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
           _("Linked objects"),
           "CppPlatform/Extensions/LinkedObjectsicon24.png",
-          "CppPlatform/Extensions/LinkedObjectsicon16.png")
+          "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Pick these objects..."))

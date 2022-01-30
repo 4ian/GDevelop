@@ -34,6 +34,9 @@ module.exports = {
         'Open source (MIT License)'
       )
       .setExtensionHelpPath('/all-features/screenshot');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Screenshot'))
+      .setIcon('JsPlatform/Extensions/take_screenshot32.png');
 
     extension
       .addAction(
@@ -44,7 +47,7 @@ module.exports = {
         ),
         _('Take a screenshot and save at _PARAM1_'),
         _('Screenshot'),
-        'JsPlatform/Extensions/take_screenshot24.png',
+        'JsPlatform/Extensions/take_screenshot32.png',
         'JsPlatform/Extensions/take_screenshot32.png'
       )
       .addCodeOnlyParameter('currentScene', '')

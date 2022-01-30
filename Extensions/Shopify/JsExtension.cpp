@@ -17,6 +17,8 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
       "Florian Rival",
       "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/shopify");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Shopify"))
+      .SetIcon("JsPlatform/Extensions/shopifyicon.png");
 
 #if defined(GD_IDE_ONLY)
   extension
@@ -28,8 +30,8 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
             "products."),
           _("Initialize shop _PARAM1_ (domain: _PARAM2_, appId: _PARAM3_)"),
           _("Shopify"),
-          "JsPlatform/Extensions/shopifyicon24.png",
-          "JsPlatform/Extensions/shopifyicon16.png")
+          "JsPlatform/Extensions/shopifyicon.png",
+          "JsPlatform/Extensions/shopifyicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Shop name"))
@@ -48,8 +50,8 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
             "_PARAM4_) from shop _PARAM1_, and store it in _PARAM5_ (or "
             "_PARAM6_ in case of error)"),
           _("Shopify"),
-          "JsPlatform/Extensions/shopifyicon24.png",
-          "JsPlatform/Extensions/shopifyicon16.png")
+          "JsPlatform/Extensions/shopifyicon.png",
+          "JsPlatform/Extensions/shopifyicon.png")
 
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter(

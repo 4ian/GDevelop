@@ -32,6 +32,9 @@ module.exports = {
       'Florian Rival',
       'MIT'
     );
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('My Dummy Extension'))
+      .setIcon('CppPlatform/Extensions/topdownmovementicon.png');
 
     // Register Properties
     extension

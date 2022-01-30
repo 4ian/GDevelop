@@ -36,6 +36,9 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/all-features/admob');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('AdMob'))
+      .setIcon('JsPlatform/Extensions/admobicon24.png');
 
     extension
       .registerProperty('AdMobAppIdAndroid')

@@ -18,6 +18,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       "A set of mathematical functions that can be used in expressions.",
       "Florian Rival",
       "Open source (MIT License)");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Mathematical tools"))
+      .SetIcon("res/mathfunction.png");
 
 
   extension

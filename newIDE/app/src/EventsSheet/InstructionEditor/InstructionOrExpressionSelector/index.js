@@ -23,6 +23,7 @@ import { Line } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   searchBar: {
@@ -31,6 +32,10 @@ const styles = {
     zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
   },
 };
+
+const getGroupIconSrc = (key: string) => {
+  return gd.JsPlatform.get().getInstructionOrExpressionGroupMetadata(key).getIcon();
+}
 
 type Props<T> = {|
   focusOnMount?: boolean,
@@ -173,6 +178,7 @@ export default class InstructionOrExpressionSelector<
                         ),
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
+                        getGroupIconSrc,
                       })}
                       {onClickMore && (
                         <ResponsiveLineStackLayout justifyContent="center">

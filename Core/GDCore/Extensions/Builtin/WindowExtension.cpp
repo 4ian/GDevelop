@@ -21,6 +21,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/window");
+  extension
+      .AddInstructionOrExpressionGroupMetadata(
+          _("Game's window and resolution"))
+      .SetIcon("res/actions/window24.png");
 
   extension
       .AddAction(

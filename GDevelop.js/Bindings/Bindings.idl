@@ -130,6 +130,13 @@ interface EventsVariablesFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface InstructionOrExpressionGroupMetadata {
+    void InstructionOrExpressionGroupMetadata();
+
+    [Ref] InstructionOrExpressionGroupMetadata SetIcon([Const] DOMString icon);
+    [Const, Ref] DOMString GetIcon();
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();
@@ -148,6 +155,7 @@ interface Platform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -164,6 +172,7 @@ interface JsPlatform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -1461,6 +1470,7 @@ interface PlatformExtension {
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
+    [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(

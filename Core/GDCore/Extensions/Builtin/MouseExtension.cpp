@@ -24,6 +24,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/mouse-touch");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Mouse and touch"))
+      .SetIcon("res/actions/mouse24.png");
 
   extension
       .AddCondition(

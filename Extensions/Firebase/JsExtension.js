@@ -29,6 +29,9 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/all-features/firebase');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Firebase'))
+      .setIcon('JsPlatform/Extensions/firebase.png');
 
     extension
       .registerProperty('FirebaseConfig')

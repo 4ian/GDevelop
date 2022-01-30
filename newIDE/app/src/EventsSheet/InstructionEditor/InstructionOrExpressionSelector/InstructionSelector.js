@@ -41,6 +41,7 @@ export default class InstructionSelector extends Component<Props, {||}> {
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
         iconSize={24}
+        useSubheaders
         {...otherProps}
       />
     );

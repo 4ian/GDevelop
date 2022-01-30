@@ -19,18 +19,7 @@ const isPotentiallyNumberType = (type: string) =>
   type === 'number' || type === 'number|string';
 
 const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  const allObjectsTypes = extension.getExtensionObjectsTypes();
-  const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-  if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-    return (
-      (extension.getName() === 'BuiltinObject'
-        ? 'Common expressions for all objects'
-        : extension.getFullName()) + GROUP_DELIMITER
-    );
-  }
-
-  return '';
+  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName() + GROUP_DELIMITER;
 };
 
 const enumerateExpressionMetadataMap = (

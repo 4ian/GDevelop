@@ -19,7 +19,8 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                                "external layouts.",
                                "Florian Rival",
                                "Open source (MIT License)")
-      .SetExtensionHelpPath("/interface/scene-editor/external-layouts");
+      .SetExtensionHelpPath("/interface/scene-editor/external-layouts")
+      .SetCategory("advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("External layouts"))
       .SetIcon("res/ribbon_default/externallayout32.png");
 
@@ -28,7 +29,7 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                  _("Create objects from an external layout"),
                  _("Create objects from an external layout."),
                  _("Create objects from the external layout named _PARAM1_"),
-                 _("External layouts"),
+                 "",
                  "res/ribbon_default/externallayout32.png",
                  "res/ribbon_default/externallayout32.png")
       .AddCodeOnlyParameter("currentScene", "")

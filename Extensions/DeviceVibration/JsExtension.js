@@ -34,8 +34,9 @@ module.exports = {
         'Matthias Meike',
         'Open source (MIT License)'
       )
-      .setExtensionHelpPath('/all-features/device-vibration');
-      extension.addInstructionOrExpressionGroupMetadata(_("Vibration"))
+      .setExtensionHelpPath('/all-features/device-vibration')
+      .setCategory('device');
+      extension.addInstructionOrExpressionGroupMetadata(_("Device vibration"))
           .setIcon("JsPlatform/Extensions/vibration_start32.png");
 
     extension
@@ -51,7 +52,7 @@ module.exports = {
         _('Vibrate'),
         _('Vibrate (Duration in ms).'),
         _('Start vibration for _PARAM0_ ms'),
-        _('Vibration'),
+        '',
         'JsPlatform/Extensions/vibration_start32.png',
         'JsPlatform/Extensions/vibration_start32.png'
       )
@@ -68,7 +69,7 @@ module.exports = {
           'Vibrate (Duration in ms). You can add multiple comma-separated values where every second value determines the period of silence between two vibrations. This is a string value so use quotes.'
         ),
         _('Start vibration for _PARAM0_ ms'),
-        _('Vibration'),
+        '',
         'JsPlatform/Extensions/vibration_pattern_start32.png',
         'JsPlatform/Extensions/vibration_pattern_start32.png'
       )
@@ -88,7 +89,7 @@ module.exports = {
         _('Stop vibration'),
         _('Stop the vibration'),
         _('Stop vibration'),
-        _('Vibration'),
+        '',
         'JsPlatform/Extensions/vibration_stop32.png',
         'JsPlatform/Extensions/vibration_stop32.png'
       )

@@ -16,7 +16,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation(
           "PlatformBehavior",
-          _("Platform Behavior"),
+          _("Platform behavior"),
           "The platformer engine allows to create controllable objects that "
           "can run and jump on other objects that are marked as platforms. It "
           "supports various features commonly found in platformers: "
@@ -28,8 +28,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/platformer");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Functions"))
-      .SetIcon("res/function32.png");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Platform behavior"))
+      .SetIcon("CppPlatform/Extensions/platformerobjecticon.png");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(

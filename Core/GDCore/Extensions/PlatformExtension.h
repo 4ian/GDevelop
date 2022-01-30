@@ -106,6 +106,14 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
+   * \brief Set the category of the extension.
+   */
+  PlatformExtension& SetCategory(const gd::String& category_) {
+    category = category_;
+    return *this;
+  }
+
+  /**
    * \brief Set the path to the help, relative to the GDevelop documentation
    * root. For example, "/all-features/collisions" for
    * "https://wiki.gdevelop.io/gdevelop5/all-features/collisions".
@@ -347,6 +355,11 @@ class GD_CORE_API PlatformExtension {
   const gd::String& GetName() const { return name; }
 
   /**
+   * \brief Return the category of the extension
+   */
+  const gd::String& GetCategory() const { return category; }
+
+  /**
    * \brief Return a description of the extension
    */
   const gd::String& GetDescription() const { return informations; }
@@ -580,6 +593,7 @@ class GD_CORE_API PlatformExtension {
                   ///< actions/conditions/expressions/objects/behavior/event.
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String category;
   gd::String author;        ///< Author displayed to users in the editor.
   gd::String license;       ///< License name displayed to users in the editor.
   bool deprecated;  ///< true if the extension is deprecated and shouldn't be

@@ -33,7 +33,8 @@ module.exports = {
         'Florian Rival, Franco Maciel',
         'MIT'
       )
-      .setExtensionHelpPath('/behaviors/physics2');
+      .setExtensionHelpPath('/behaviors/physics2')
+      .setCategory('advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Physics Engine 2.0'))
       .setIcon('res/physics32.png');
@@ -527,7 +528,7 @@ module.exports = {
             'While an object is needed, this will apply to all objects using the behavior.'
           ),
         _('Set the world time scale of _PARAM0_ to _PARAM2_'),
-        _('Global'),
+        '',
         'res/physics32.png',
         'res/physics32.png'
       )

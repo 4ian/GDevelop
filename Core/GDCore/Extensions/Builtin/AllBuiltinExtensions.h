@@ -15,8 +15,6 @@ namespace gd {
  * so that it provides standards events, objects or instructions of an
  * extension.
  *
- * TOOD: Usage example.
- *
  * \ingroup BuiltinExtensions
  */
 class GD_CORE_API BuiltinExtensionsImplementer {

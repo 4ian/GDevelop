@@ -14,14 +14,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
   extension
       .SetExtensionInformation(
           "BuiltinKeyboard",
-          _("Keyboard features"),
+          _("Keyboard"),
           _("Allows your game to respond to keyboard input. Note that this "
             "does not work with on-screen keyboard on touch devices: use "
             "instead conditions related to touch when making a game for "
             "mobile/touchscreen devices."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/all-features/keyboard");
+      .SetExtensionHelpPath("/all-features/keyboard")
+      .SetCategory("input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Keyboard"))
       .SetIcon("res/conditions/keyboard24.png");
 
@@ -30,7 +31,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Key pressed"),
                     _("Check if a key is pressed"),
                     _("_PARAM1_ key is pressed"),
-                    _("Keyboard"),
+                    "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -41,7 +42,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Key released"),
                     _("Check if a key was just released"),
                     _("_PARAM1_ key is released"),
-                    _("Keyboard"),
+                    "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -53,7 +54,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Check if a key, retrieved from the result of the "
                       "expression, is pressed"),
                     _("_PARAM1_ key is pressed"),
-                    _("Keyboard"),
+                    "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -66,7 +67,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Check if a key, retrieved from the result of the "
                       "expression, was just released"),
                     _("_PARAM1_ key is released"),
-                    _("Keyboard"),
+                    "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -78,7 +79,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Any key pressed"),
                     _("Check if any key is pressed"),
                     _("Any key is pressed"),
-                    _("Keyboard"),
+                    "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "");
@@ -88,7 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
                     _("Any key released"),
                     _("Check if any key is released"),
                     _("Any key is released"),
-                    _("Keyboard"),
+                    "",
                     "res/conditions/keyboard24.png",
                     "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "");
@@ -98,7 +99,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
           "LastPressedKey",
           _("Last pressed key"),
           _("Get the name of the latest key pressed on the keyboard"),
-          _("Keyboard"),
+          "",
           "res/conditions/keyboard.png")
       .AddCodeOnlyParameter("currentScene", "");
 }

@@ -23,7 +23,8 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           "that is more efficient than using variables.",
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/all-features/linked-objects");
+      .SetExtensionHelpPath("/all-features/linked-objects")
+      .SetCategory("advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Linked objects"))
       .SetIcon("CppPlatform/Extensions/LinkedObjectsicon24.png");
 
@@ -35,7 +36,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                  _("Link two objects together, so as to be able to get one "
                    "from the other."),
                  _("Link _PARAM1_ and _PARAM2_"),
-                 _("Linked objects"),
+                 "",
                  "CppPlatform/Extensions/LinkedObjectsicon24.png",
                  "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
@@ -51,7 +52,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                  _("Unlink two objects"),
                  _("Unlink two objects."),
                  _("Unlink _PARAM1_ and _PARAM2_"),
-                 _("Linked objects"),
+                 "",
                  "CppPlatform/Extensions/LinkedObjectsicon24.png",
                  "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
@@ -67,7 +68,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                  _("Unlink all objects from an object"),
                  _("Unlink all objects from an object."),
                  _("Unlink all objects from _PARAM1_"),
-                 _("Linked objects"),
+                 "",
                  "CppPlatform/Extensions/LinkedObjectsicon24.png",
                  "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
@@ -84,7 +85,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
                       "next conditions and actions.\nThe condition will return "
                       "false if no object was taken into account."),
                     _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
-                    _("Linked objects"),
+                    "",
                     "CppPlatform/Extensions/LinkedObjectsicon24.png",
                     "CppPlatform/Extensions/LinkedObjectsicon24.png")
 
@@ -102,7 +103,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           _("Take into account linked objects"),
           _("Take objects linked to the object into account for next actions."),
           _("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
-          _("Linked objects"),
+          "",
           "CppPlatform/Extensions/LinkedObjectsicon24.png",
           "CppPlatform/Extensions/LinkedObjectsicon24.png")
 

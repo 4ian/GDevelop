@@ -63,6 +63,10 @@ const freeInstructionsToRemove = {
   ],
 };
 
+const getExtensionPrefix = (extension: gdPlatformExtension): string => {
+  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName() + GROUP_DELIMITER;
+};
+
 /**
  * When all instructions are searched, some can be duplicated
  * (on purpose, so that it's easier to find them for users)
@@ -216,17 +220,7 @@ export const enumerateAllInstructions = (
     const extensionName = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix =
-        extensionName === 'BuiltinObject'
-          ? 'Common ' +
-            (isCondition ? 'conditions' : 'actions') +
-            ' for all objects'
-          : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
+    const prefix = getExtensionPrefix(extension);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -468,14 +462,7 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
     const extensionName: string = extension.getName();
-    const allObjectsTypes = extension.getExtensionObjectsTypes();
-    const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix = extensionName === 'BuiltinObject' ? '' : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
+    const prefix = getExtensionPrefix(extension);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(

@@ -109,7 +109,7 @@ module.exports = {
           'This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5.'
         ),
         _('Call the example condition with _PARAM0_ and _PARAM1_'),
-        _('Dummy Extension'),
+        '',
         'res/conditions/camera24.png',
         'res/conditions/camera.png'
       )
@@ -126,7 +126,7 @@ module.exports = {
         'DummyExpression',
         _('Dummy expression example'),
         _('This is an example of an expression'),
-        _('Dummy Extension'),
+        '',
         'res/actions/camera.png'
       )
       .addParameter('expression', _('Maximum'), '', false)
@@ -138,7 +138,7 @@ module.exports = {
         'DummyStrExpression',
         _('Dummy string expression example'),
         _('This is an example of an expression returning a string'),
-        _('Dummy Extension'),
+        '',
         'res/actions/camera.png'
       )
       .getCodeExtraInformation()

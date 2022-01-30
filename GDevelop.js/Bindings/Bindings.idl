@@ -1470,6 +1470,7 @@ interface PlatformExtension {
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
+    [Ref] PlatformExtension SetCategory([Const] DOMString category);
     [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
@@ -1543,6 +1544,7 @@ interface PlatformExtension {
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();

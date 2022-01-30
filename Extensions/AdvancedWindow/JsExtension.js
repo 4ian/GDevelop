@@ -18,15 +18,17 @@ module.exports = {
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'AdvancedWindow',
-      _('Advanced window management'),
-      _(
-        'Provides advanced features related to the game window positioning and interaction with the operating system.'
-      ),
-      'Arthur Pacaud (arthuro555)',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'AdvancedWindow',
+        _('Advanced window management'),
+        _(
+          'Provides advanced features related to the game window positioning and interaction with the operating system.'
+        ),
+        'Arthur Pacaud (arthuro555)',
+        'MIT'
+      )
+      .setCategory('device');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Advanced window management'))
       .setIcon('res/actions/window24.png');
@@ -37,7 +39,7 @@ module.exports = {
         _('Change focus of the window'),
         _('Make the window gain or lose focus.'),
         _('Focus the window: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -55,7 +57,7 @@ module.exports = {
         _('Window focused'),
         _('Checks if the window is focused.'),
         _('The window is focused'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -71,7 +73,7 @@ module.exports = {
         _('Change visibility of the window'),
         _('Make the window visible or invisible.'),
         _('Window visible: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -89,7 +91,7 @@ module.exports = {
         _('Window visible'),
         _('Checks if the window is visible.'),
         _('The window is visible'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -105,7 +107,7 @@ module.exports = {
         _('Maximize the window'),
         _('Maximize or unmaximize the window.'),
         _('Maximize window: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -123,7 +125,7 @@ module.exports = {
         _('Window maximized'),
         _('Checks if the window is maximized.'),
         _('The window is maximized'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -139,7 +141,7 @@ module.exports = {
         _('Minimize the window'),
         _('Minimize or unminimize the window.'),
         _('Minimize window: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -157,7 +159,7 @@ module.exports = {
         _('Window minimized'),
         _('Checks if the window is minimized.'),
         _('The window is minimized'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -173,7 +175,7 @@ module.exports = {
         _('Enable the window'),
         _('Enables or disables the window.'),
         _('Enable window: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -191,7 +193,7 @@ module.exports = {
         _('Window enabled'),
         _('Checks if the window is enabled.'),
         _('The window is enabled'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -207,7 +209,7 @@ module.exports = {
         _('Allow resizing'),
         _('Enables or disables resizing of the window by the user.'),
         _('Enable window resizing: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -225,7 +227,7 @@ module.exports = {
         _('Window resizable'),
         _('Checks if the window can be resized.'),
         _('The window can be resized'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -241,7 +243,7 @@ module.exports = {
         _('Allow moving'),
         _('Enables or disables moving of the window by the user.'),
         _('Enable window moving: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -259,7 +261,7 @@ module.exports = {
         _('Window movable'),
         _('Checks if the window can be moved.'),
         _('The window can be moved'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -275,7 +277,7 @@ module.exports = {
         _('Allow maximizing'),
         _('Enables or disables maximizing of the window by the user.'),
         _('Enable window maximizing: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -293,7 +295,7 @@ module.exports = {
         _('Window maximizable'),
         _('Checks if the window can be maximized.'),
         _('The window can be maximized'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -309,7 +311,7 @@ module.exports = {
         _('Allow mimizing'),
         _('Enables or disables minimizing of the window by the user.'),
         _('Enable window minimizing: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -327,7 +329,7 @@ module.exports = {
         _('Window minimizable'),
         _('Checks if the window can be minimized.'),
         _('The window can be minimized'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -343,7 +345,7 @@ module.exports = {
         _('Allow full-screening'),
         _('Enables or disables full-screening of the window by the user.'),
         _('Enable window full-screening: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -361,7 +363,7 @@ module.exports = {
         _('Window full-screenable'),
         _('Checks if the window can be full-screened.'),
         _('The window can be set in fullscreen'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -377,7 +379,7 @@ module.exports = {
         _('Allow closing'),
         _('Enables or disables closing of the window by the user.'),
         _('Enable window closing: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -395,7 +397,7 @@ module.exports = {
         _('Window closable'),
         _('Checks if the window can be closed.'),
         _('The window can be closed'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -422,7 +424,7 @@ module.exports = {
         _('Make the windows always on top'),
         _('Puts the window constantly above all other windows.'),
         _('Make window always on top: _PARAM0_, level: _PARAM1_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -452,7 +454,7 @@ module.exports = {
         _('Window always on top'),
         _('Checks if the window is always on top.'),
         _('The window is always on top'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -470,7 +472,7 @@ module.exports = {
           'Puts the window in kiosk mode. This prevents the user from exiting fullscreen.'
         ),
         _('Enable kiosk mode: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -488,7 +490,7 @@ module.exports = {
         _('Kiosk mode'),
         _('Checks if the window is currently in kiosk mode.'),
         _('The window is in kiosk mode'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -504,7 +506,7 @@ module.exports = {
         _('Enable window shadow'),
         _('Enables or disables the window shadow.'),
         _('Enable window shadow: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -522,7 +524,7 @@ module.exports = {
         _('Shadow enabled'),
         _("Checks if the window currently has it's shadow enabled."),
         _('The window has a shadow'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -540,7 +542,7 @@ module.exports = {
           'Enables or disables the content protection mode. This should prevent screenshots of the game from being taken.'
         ),
         _('Enable content protection: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -558,7 +560,7 @@ module.exports = {
         _('Allow focusing'),
         _('Allow or disallow the user to focus the window.'),
         _('Allow to focus the window: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -576,7 +578,7 @@ module.exports = {
         _('Flash the window'),
         _('Make the window flash or end flashing.'),
         _('Make the window flash: _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -594,7 +596,7 @@ module.exports = {
         _('Set window opacity'),
         _('Changes the window opacity.'),
         _('Set the window opacity to _PARAM0_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -614,7 +616,7 @@ module.exports = {
         _('Set window position'),
         _('Changes the window position.'),
         _('Set the window position to _PARAM0_;_PARAM1_'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window24.png',
         'res/actions/window.png'
       )
@@ -631,7 +633,7 @@ module.exports = {
         'WindowX',
         _('Window X position'),
         _('Returns the current window X position.'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
@@ -645,7 +647,7 @@ module.exports = {
         'WindowY',
         _('Window Y position'),
         _('Returns the current window Y position.'),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()
@@ -661,7 +663,7 @@ module.exports = {
         _(
           'Returns the current window opacity (a number from 0 to 1, 1 being fully opaque).'
         ),
-        _('Advanced window management/Windows, Linux, macOS'),
+        _('Windows, Linux, macOS'),
         'res/actions/window.png'
       )
       .getCodeExtraInformation()

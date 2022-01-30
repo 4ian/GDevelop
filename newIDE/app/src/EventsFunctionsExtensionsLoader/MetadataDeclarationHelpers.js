@@ -233,9 +233,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
@@ -243,9 +241,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
@@ -254,9 +250,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );
@@ -266,9 +260,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );

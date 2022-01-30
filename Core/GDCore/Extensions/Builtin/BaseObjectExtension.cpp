@@ -16,7 +16,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .SetExtensionInformation(
           "BuiltinObject",
-          _("Features for all objects"),
+          _("Objects"),
           _("Common features that can be used for all objects in GDevelop."),
           "Florian Rival",
           "Open source (MIT License)")
@@ -1243,7 +1243,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Create an object at specified position"),
                  _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_ "
                    "(layer: _PARAM4_)"),
-                 _("Objects"),
+                 "",
                  "res/actions/create24.png",
                  "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
@@ -1261,7 +1261,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "create the object with the specified name."),
                  _("Among objects _PARAM1_, create object named _PARAM2_ at "
                    "position _PARAM3_;_PARAM4_ (layer: _PARAM5_)"),
-                 _("Objects"),
+                 "",
                  "res/actions/create24.png",
                  "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
@@ -1464,7 +1464,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Cast a ray from _PARAM1_;_PARAM2_, angle: _PARAM3_ and max "
             "distance: _PARAM4_px, against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
-          _("Collision"),
+          "",
           "res/conditions/raycast24.png",
           "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))
@@ -1495,7 +1495,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           _("Cast a ray from from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
             "against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
-          _("Collision"),
+          "",
           "res/conditions/raycast24.png",
           "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))
@@ -1519,21 +1519,21 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                      _("Number of objects"),
                      _("Count the number of the specified objects being "
                        "currently picked in the event"),
-                     _("Objects"),
+                     "",
                      "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"));
 
   obj.AddStrExpression("ObjectName",
                        _("Object name"),
                        _("Return the name of the object"),
-                       _("Objects"),
+                       "",
                        "res/conditions/text.png")
       .AddParameter("object", _("Object"));
 
   obj.AddStrExpression("Layer",
                        _("Object layer"),
                        _("Return the name of the layer the object is on"),
-                       _("Objects"),
+                       "",
                        "res/actions/layer.png")
       .AddParameter("object", _("Object"));
 }

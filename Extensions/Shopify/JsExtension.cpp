@@ -16,7 +16,8 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
         "Shopify shop."),
       "Florian Rival",
       "Open source (MIT License)")
-      .SetExtensionHelpPath("/all-features/shopify");
+      .SetExtensionHelpPath("/all-features/shopify")
+      .SetCategory("third-party");
   extension.AddInstructionOrExpressionGroupMetadata(_("Shopify"))
       .SetIcon("JsPlatform/Extensions/shopifyicon.png");
 
@@ -29,7 +30,7 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
             "and then use the shop name in the other actions to interact with "
             "products."),
           _("Initialize shop _PARAM1_ (domain: _PARAM2_, appId: _PARAM3_)"),
-          _("Shopify"),
+          "",
           "JsPlatform/Extensions/shopifyicon.png",
           "JsPlatform/Extensions/shopifyicon.png")
 
@@ -49,7 +50,7 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
           _("Get the URL for product #_PARAM2_ (quantity: _PARAM3_, variant: "
             "_PARAM4_) from shop _PARAM1_, and store it in _PARAM5_ (or "
             "_PARAM6_ in case of error)"),
-          _("Shopify"),
+          "",
           "JsPlatform/Extensions/shopifyicon.png",
           "JsPlatform/Extensions/shopifyicon.png")
 

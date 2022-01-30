@@ -414,6 +414,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             instructionTreeNode: this.freeInstructionsInfoTree,
                             onChoose: onChooseInstruction,
                             iconSize,
+                            useSubheaders: true,
                             selectedValue: chosenInstructionType
                               ? getInstructionListItemValue(
                                   chosenInstructionType

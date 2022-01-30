@@ -128,16 +128,17 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
          otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
 
-bool EventsCodeGenerationContext::IsInheritingFromAsync(
+bool EventsCodeGenerationContext::ShouldUseAsyncObjectsLists(
     const gd::String& objectName) const {
   if (!IsAsync()) return false;
   for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
-       asyncContext != NULL; // Should never happen, but there just in case.
+       asyncContext != NULL;  // Should never happen, but there just in case.
        asyncContext = asyncContext->parent->nearestAsyncParent) {
-    if (asyncContext->ObjectAlreadyDeclared(objectName))
-      return true;
-    // When reaching the last asynchronous context, check the parent synchronous context before returning.
-    if (!asyncContext->parent->IsAsync()) return asyncContext->parent->ObjectAlreadyDeclared(objectName);
+    if (asyncContext->ObjectAlreadyDeclared(objectName)) return true;
+    // When reaching the last asynchronous context, check the parent synchronous
+    // context before returning.
+    if (!asyncContext->parent->IsAsync())
+      return asyncContext->parent->ObjectAlreadyDeclared(objectName);
   }
   return false;
 };

@@ -818,8 +818,8 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration += "gdjs.copyArray(" +
-                               GenerateAllInstancesGetterCode(object, context) + ", " +
-                               GetObjectListName(object, context) + ");";
+                               GenerateAllInstancesGetterCode(object, context) +
+                               ", " + GetObjectListName(object, context) + ");";
       context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
@@ -855,11 +855,10 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
 gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
     const gd::String& objectName, gd::EventsCodeGenerationContext& context) {
-  if(context.IsInheritingFromAsync(objectName)) {
-    return "asyncObjectsList.getObjects(" + ConvertToStringExplicit(objectName) +
-           ")";
-  }
-  else if (HasProjectAndLayout()) {
+  if (context.ShouldUseAsyncObjectsLists(objectName)) {
+    return "asyncObjectsList.getObjects(" +
+           ConvertToStringExplicit(objectName) + ")";
+  } else if (HasProjectAndLayout()) {
     return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +
            ")";
   } else {
@@ -868,10 +867,11 @@ gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
   }
 }
 
-gd::String EventsCodeGenerator::GenerateEventsParameters(const gd::EventsCodeGenerationContext& context) {
+gd::String EventsCodeGenerator::GenerateEventsParameters(
+    const gd::EventsCodeGenerationContext& context) {
   gd::String parameters = "runtimeScene";
-  if(!HasProjectAndLayout()) parameters += ", eventsFunctionContext";
-  if(context.IsAsync()) parameters += ", asyncObjectsList";
+  if (!HasProjectAndLayout()) parameters += ", eventsFunctionContext";
+  if (context.IsAsync()) parameters += ", asyncObjectsList";
   return parameters;
 };
 

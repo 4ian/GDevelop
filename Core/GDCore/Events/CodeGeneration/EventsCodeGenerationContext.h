@@ -251,7 +251,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * This returns true if the nearest parent with depth 0 OR an asynchronous
    * context with a different depth than the current one has defined the object.
    */
-  bool IsInheritingFromAsync(const gd::String& objectName) const;
+  bool ShouldUseAsyncObjectsLists(const gd::String& objectName) const;
 
   /**
    * Returns true if the code currently being generated is an asynchronous
@@ -313,8 +313,8 @@ class GD_CORE_API EventsCodeGenerationContext {
                                 ///< the maximum depth reached.
   const EventsCodeGenerationContext*
       parent;  ///< The parent of the current context. Can be NULL.
-  EventsCodeGenerationContext*
-      nearestAsyncParent = nullptr;  ///< The nearest context that 
+  EventsCodeGenerationContext* nearestAsyncParent =
+      nullptr;                    ///< The nearest context that
   bool reuseExplicitlyForbidden;  ///< If set to true, forbid children context
                                   ///< to reuse this one without inheriting.
 };

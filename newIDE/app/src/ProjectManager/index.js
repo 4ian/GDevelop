@@ -733,7 +733,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                             name === firstLayoutName ? (
                               <Tooltip
                                 title={i18n._(
-                                  t`This scene will be used as the first scene displayed at game launch.`
+                                  t`This scene will be used as the start scene.`
                                 )}
                               >
                                 <Flag
@@ -783,7 +783,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                               click: () => this._onOpenLayoutVariables(layout),
                             },
                             {
-                              label: i18n._(t`Define as first scene`),
+                              label: i18n._(t`Set as start scene`),
                               enabled: name !== firstLayoutName,
                               click: () => this._setProjectFirstLayout(name),
                             },

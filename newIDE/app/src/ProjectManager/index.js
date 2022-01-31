@@ -28,6 +28,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
+import Flag from '@material-ui/icons/Flag';
 import Close from '@material-ui/icons/Close';
 import SettingsApplications from '@material-ui/icons/SettingsApplications';
 import PhotoLibrary from '@material-ui/icons/PhotoLibrary';
@@ -58,6 +59,7 @@ import {
   ProjectStructureItem,
   EventFunctionExtensionItem,
 } from './ProjectManagerItems';
+import { Tooltip } from '@material-ui/core';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -624,6 +626,11 @@ export default class ProjectManager extends React.Component<Props, State> {
       this.props.unsavedChanges.triggerUnsavedChanges();
   };
 
+  _setProjectFirstLayout = (layoutName: string) => {
+    this.props.project.setFirstLayout(layoutName);
+    this.forceUpdate();
+  };
+
   render() {
     const {
       project,
@@ -640,6 +647,8 @@ export default class ProjectManager extends React.Component<Props, State> {
     } = this.state;
 
     const forceOpen = searchText !== '' ? true : undefined;
+
+    const firstLayoutName = project.getFirstLayout();
 
     return (
       <div style={styles.container}>
@@ -715,6 +724,19 @@ export default class ProjectManager extends React.Component<Props, State> {
                     <Item
                       key={i}
                       primaryText={name}
+                      textEndAdornment={
+                        name === firstLayoutName ? (
+                          <Tooltip title="This scene will be used as the first scene displayed at game launch.">
+                            <Flag
+                              color="disabled"
+                              fontSize="small"
+                              style={{ verticalAlign: 'bottom', marginLeft: 5 }}
+                            />
+                          </Tooltip>
+                        ) : (
+                          undefined
+                        )
+                      }
                       editingName={
                         renamedItemKind === 'layout' && renamedItemName === name
                       }
@@ -746,6 +768,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                           label: i18n._(t`Edit Scene Variables`),
                           enabled: true,
                           click: () => this._onOpenLayoutVariables(layout),
+                        },
+                        {
+                          label: i18n._(t`Define as first scene`),
+                          enabled: name !== firstLayoutName,
+                          click: () => this._setProjectFirstLayout(name),
                         },
                       ]}
                     />

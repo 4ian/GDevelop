@@ -634,6 +634,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         layoutElement.GetStringAttribute("name", "", "nom"), -1);
     layout.UnserializeFrom(*this, layoutElement);
   }
+  SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =

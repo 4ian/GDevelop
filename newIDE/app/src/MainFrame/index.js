@@ -2160,6 +2160,11 @@ const MainFrame = (props: Props) => {
                   projectItemName: editorTab.projectItemName,
                   setPreviewedLayout,
                   onOpenExternalEvents: openExternalEvents,
+                  onOpenEvents: (sceneName: string) =>
+                    openLayout(sceneName, {
+                      openEventsEditor: true,
+                      openSceneEditor: false,
+                    }),
                   previewDebuggerServer,
                   hotReloadPreviewButtonProps,
                   onOpenLayout: name =>

@@ -112,6 +112,7 @@ type Props = {|
   layout: gdLayout,
   onEditObject?: ?(object: gdObject) => void,
   onOpenMoreSettings?: ?() => void,
+  onOpenEvents: (sceneName: string) => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
   resourceSources: Array<ResourceSource>,
@@ -1449,9 +1450,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                       this.editObjectByName(this.state.selectedObjectNames[0]),
                     visible: this.state.selectedObjectNames.length > 0,
                   },
+                  { type: 'separator' },
                   {
                     label: i18n._(t`Scene properties`),
                     click: () => this.openSceneProperties(true),
+                  },
+                  {
+                    label: i18n._(t`Open the scene events`),
+                    click: () => this.props.onOpenEvents(layout.getName()),
                   },
                   { type: 'separator' },
                   {

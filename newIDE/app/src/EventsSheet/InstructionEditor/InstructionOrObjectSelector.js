@@ -91,8 +91,10 @@ type Props = {|
 
 const iconSize = 24;
 const getGroupIconSrc = (key: string) => {
-  return gd.JsPlatform.get().getInstructionOrExpressionGroupMetadata(key).getIcon();
-}
+  return gd.JsPlatform.get()
+    .getInstructionOrExpressionGroupMetadata(key)
+    .getIcon();
+};
 
 export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,

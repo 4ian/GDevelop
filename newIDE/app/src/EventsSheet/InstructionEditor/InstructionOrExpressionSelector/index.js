@@ -34,8 +34,10 @@ const styles = {
 };
 
 const getGroupIconSrc = (key: string) => {
-  return gd.JsPlatform.get().getInstructionOrExpressionGroupMetadata(key).getIcon();
-}
+  return gd.JsPlatform.get()
+    .getInstructionOrExpressionGroupMetadata(key)
+    .getIcon();
+};
 
 type Props<T> = {|
   focusOnMount?: boolean,

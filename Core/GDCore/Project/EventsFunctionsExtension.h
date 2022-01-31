@@ -84,6 +84,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  const gd::String& GetCategory() const { return category; };
+  EventsFunctionsExtension& SetCategory(const gd::String& category_) {
+    category = category_;
+    return *this;
+  }
+
   const std::vector<gd::String>& GetTags() const { return tags; };
   std::vector<gd::String>& GetTags() { return tags; };
 
@@ -238,6 +244,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String description;
   gd::String name;
   gd::String fullName;
+  gd::String category;
   std::vector<gd::String> tags;
   std::vector<gd::String> authorIds;
   gd::String author;

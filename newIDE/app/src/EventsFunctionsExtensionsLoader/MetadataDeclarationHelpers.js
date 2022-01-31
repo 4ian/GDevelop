@@ -20,17 +20,28 @@ export const declareExtension = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
+  const fullName =
+    eventsFunctionsExtension.getFullName() ||
+    eventsFunctionsExtension.getName();
   extension
     .setExtensionInformation(
       eventsFunctionsExtension.getName(),
-      eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      fullName,
       eventsFunctionsExtension.getDescription(),
       eventsFunctionsExtension.getAuthor(),
       ''
     )
     .setExtensionHelpPath(eventsFunctionsExtension.getHelpPath())
     .setIconUrl(eventsFunctionsExtension.getIconUrl());
+
+  if (fullName) {
+    extension
+      .addInstructionOrExpressionGroupMetadata(fullName)
+      .setIcon(eventsFunctionsExtension.getIconUrl());
+  }
+
+  if (eventsFunctionsExtension.getCategory())
+    extension.setCategory(eventsFunctionsExtension.getCategory());
 
   declareExtensionDependencies(extension, eventsFunctionsExtension);
 };

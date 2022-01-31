@@ -544,9 +544,7 @@ namespace gdjs {
       //An array of nodes sorted by their estimate cost (First node = Lower estimate cost).
       _openNodes: Node[] = [];
       //Used by getNodes to temporarily store obstacles near a position.
-      _closeObstacles: gdjs.BehaviorRBushAABB<
-        PathfindingObstacleRuntimeBehavior
-      >[] = [];
+      _closeObstacles: gdjs.PathfindingObstacleRuntimeBehavior[] = [];
       //Old nodes constructed in a previous search are stored here to avoid temporary objects (see _freeAllNodes method).
       _nodeCache: Node[] = [];
 
@@ -787,7 +785,7 @@ namespace gdjs {
           this._closeObstacles
         );
         for (let k = 0; k < this._closeObstacles.length; ++k) {
-          const obj = this._closeObstacles[k].behavior.owner;
+          const obj = this._closeObstacles[k].owner;
           const topLeftCellX = Math.floor(
             (obj.getDrawableX() - this._rightBorder - this._gridOffsetX) /
               this._cellWidth
@@ -817,13 +815,13 @@ namespace gdjs {
             yPos < bottomRightCellY
           ) {
             objectsOnCell = true;
-            if (this._closeObstacles[k].behavior.isImpassable()) {
+            if (this._closeObstacles[k].isImpassable()) {
               //The cell is impassable, stop here.
               newNode.cost = -1;
               break;
             } else {
               //Superimpose obstacles
-              newNode.cost += this._closeObstacles[k].behavior.getCost();
+              newNode.cost += this._closeObstacles[k].getCost();
             }
           }
         }

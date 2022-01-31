@@ -1527,7 +1527,10 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() === 1) {
+      if (currentProject.getLayoutsCount() <= 1) {
+        if (currentProject.getLayoutsCount() === 0)
+          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+
         openLayout(
           currentProject.getLayoutAt(0).getName(),
           {
@@ -1547,7 +1550,7 @@ const MainFrame = (props: Props) => {
         });
       }
     },
-    [openLayout, setState]
+    [openLayout, setState, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(

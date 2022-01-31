@@ -64,7 +64,12 @@ const freeInstructionsToRemove = {
 };
 
 const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName() + GROUP_DELIMITER;
+  return (
+    extension.getCategory() +
+    GROUP_DELIMITER +
+    extension.getFullName() +
+    GROUP_DELIMITER
+  );
 };
 
 /**

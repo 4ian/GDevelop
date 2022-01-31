@@ -2209,6 +2209,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsFunctionsExtension SetCategory([Const] DOMString category);
+    [Const, Ref] DOMString GetCategory();
     [Ref] VectorString GetTags();
     [Ref] VectorString GetAuthorIds();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);

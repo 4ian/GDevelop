@@ -815,8 +815,9 @@ const MainFrame = (props: Props) => {
   };
 
   const deleteLayout = (layout: gdLayout) => {
+    const { currentProject } = state;
     const { i18n } = props;
-    if (!state.currentProject) return;
+    if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -829,8 +830,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeLayout(layout.getName());
+      if (currentProject.getFirstLayout() === layout.getName())
+        currentProject.setFirstLayout('');
+      currentProject.removeLayout(layout.getName());
       _onProjectItemModified();
     });
   };
@@ -941,11 +943,15 @@ const MainFrame = (props: Props) => {
     }
 
     const layout = currentProject.getLayout(oldName);
+    const shouldChangeProjectFirstLayout =
+      oldName === currentProject.getFirstLayout();
     setState(state => ({
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      if (shouldChangeProjectFirstLayout)
+        currentProject.setFirstLayout(newName);
       _onProjectItemModified();
     });
   };
@@ -1527,7 +1533,10 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() === 1) {
+      if (currentProject.getLayoutsCount() <= 1) {
+        if (currentProject.getLayoutsCount() === 0)
+          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+
         openLayout(
           currentProject.getLayoutAt(0).getName(),
           {
@@ -1547,7 +1556,7 @@ const MainFrame = (props: Props) => {
         });
       }
     },
-    [openLayout, setState]
+    [openLayout, setState, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(

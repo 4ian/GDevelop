@@ -106,6 +106,24 @@ export default class EventsSearcher extends React.Component<Props, State> {
       // TODO: add capability to replace in event strings
       // searchInEventStrings
     );
+    void ReplaceInEventsStrings(){
+    {
+      //following previous coding style, as the following are all boolean
+      searchInSelection,
+          matchCase,
+          searchInConditions,
+          searchInActions,
+          searchInEventStrings,
+    }: ReplaceInEventsInputs => {
+      //if pass means a match is found then replace inputs = props
+      const { globalObjectsContainer, objectsContainer, events } = this.props;
+      replaceText = ReplaceInEventsInputs;
+      if (!searchInEventStrings){
+        //if not, then output the error message
+        console.error("Replacement can't be implemented.");
+      }
+    }
+  }
   };
 
   _doSearchInEvents = (

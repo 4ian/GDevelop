@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "Platform.h"
+
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
@@ -14,16 +15,21 @@ using namespace std;
 
 namespace gd {
 
-Platform::Platform(): enableExtensionLoadingLogs(false) {}
+InstructionOrExpressionGroupMetadata
+    Platform::badInstructionOrExpressionGroupMetadata;
+
+Platform::Platform() : enableExtensionLoadingLogs(false) {}
 
 Platform::~Platform() {}
 
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
   if (!extension) return false;
 
-  if (enableExtensionLoadingLogs) std::cout << "Loading " << extension->GetName() << "...";
+  if (enableExtensionLoadingLogs)
+    std::cout << "Loading " << extension->GetName() << "...";
   if (IsExtensionLoaded(extension->GetName())) {
-    if (enableExtensionLoadingLogs) std::cout << " (replacing existing extension)";
+    if (enableExtensionLoadingLogs)
+      std::cout << " (replacing existing extension)";
     RemoveExtension(extension->GetName());
   }
   if (enableExtensionLoadingLogs) std::cout << std::endl;
@@ -36,6 +42,11 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
   for (std::size_t i = 0; i < objectsTypes.size(); ++i) {
     creationFunctionTable[objectsTypes[i]] =
         extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
+  }
+
+  for (const auto& it :
+       extension->GetAllInstructionOrExpressionGroupMetadata()) {
+    instructionOrExpressionGroupMetadata[it.first] = it.second;
   }
 
   return true;

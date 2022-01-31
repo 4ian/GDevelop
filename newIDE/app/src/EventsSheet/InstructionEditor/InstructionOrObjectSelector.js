@@ -54,6 +54,7 @@ import {
   getInstructionListItemValue,
 } from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   searchBar: {
@@ -89,6 +90,11 @@ type Props = {|
 |};
 
 const iconSize = 24;
+const getGroupIconSrc = (key: string) => {
+  return gd.JsPlatform.get()
+    .getInstructionOrExpressionGroupMetadata(key)
+    .getIcon();
+};
 
 export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
@@ -410,6 +416,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             instructionTreeNode: this.freeInstructionsInfoTree,
                             onChoose: onChooseInstruction,
                             iconSize,
+                            useSubheaders: true,
                             selectedValue: chosenInstructionType
                               ? getInstructionListItemValue(
                                   chosenInstructionType
@@ -418,6 +425,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             initiallyOpenedPath: this
                               .initialInstructionTypePath,
                             selectedItemRef: this._selectedItem,
+                            getGroupIconSrc,
                           })}
                           {onClickMore && (
                             <ResponsiveLineStackLayout justifyContent="center">

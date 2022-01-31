@@ -28,12 +28,16 @@ module.exports = {
     extension
       .setExtensionInformation(
         'P2P',
-        _('Peer-to-Peer communication (experimental)'),
+        _('P2P (experimental)'),
         'Allow game instances to communicate remotely using messages sent via WebRTC (P2P).',
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
-      .setExtensionHelpPath('/all-features/p2p');
+      .setExtensionHelpPath('/all-features/p2p')
+      .setCategory('network');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('P2P (experimental)'))
+      .setIcon('JsPlatform/Extensions/p2picon.svg');
 
     extension
       .addCondition(
@@ -41,7 +45,7 @@ module.exports = {
         _('Event triggered by peer'),
         _('Triggers once when a connected client sends the event'),
         _('Event _PARAM0_ received from other client (data loss: _PARAM1_)'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -60,7 +64,7 @@ module.exports = {
           'True if the peer-to-peer extension initialized and is ready to use.'
         ),
         _('Is P2P ready?'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -79,7 +83,7 @@ module.exports = {
             'if you want to analyse it or display it to the user.'
         ),
         _('P2P error occurred'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -94,7 +98,7 @@ module.exports = {
         _('Peer disconnected'),
         _('Triggers once when a peer disconnects.'),
         _('P2P peer disconnected'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -109,7 +113,7 @@ module.exports = {
         _('Peer Connected'),
         _('Triggers once when a remote peer initiates a connection.'),
         _('P2P peer connected'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -124,7 +128,7 @@ module.exports = {
         _('Connect to another client'),
         _('Connects the current client to another client using its id.'),
         _('Connect to P2P client _PARAM0_'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -140,7 +144,7 @@ module.exports = {
         _('Connect to a broker server'),
         _('Connects the extension to a broker server.'),
         _('Connect to the broker server at http://_PARAM0_:_PARAM1_/'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -166,7 +170,7 @@ module.exports = {
             'This action needs to be called BEFORE connecting to the broker server.'
         ),
         _('Use ICE server _PARAM0_ (username: _PARAM1_, password: _PARAM2_)'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -184,7 +188,7 @@ module.exports = {
         _('Connect to the default broker server'),
         _('Connects to the default broker server.'),
         _('Connect to the default broker server'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -202,7 +206,7 @@ module.exports = {
             'Must be called BEFORE connecting to a broker.'
         ),
         _('Override the client ID with _PARAM0_'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -220,7 +224,7 @@ module.exports = {
         _(
           'Trigger event _PARAM0_ on all connected clients (extra data: _PARAM1_)'
         ),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -237,7 +241,7 @@ module.exports = {
         _('Trigger event on a specific client'),
         _('Triggers an event on a specific connected client'),
         _('Trigger event _PARAM1_ on client _PARAM0_ (extra data: _PARAM2_)'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -257,7 +261,7 @@ module.exports = {
         _(
           'Trigger event _PARAM0_ on all connected clients (extra data: _PARAM1_)'
         ),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -279,7 +283,7 @@ module.exports = {
         _('Trigger event on a specific client (variable)'),
         _('Triggers an event on a specific connected client'),
         _('Trigger event _PARAM1_ on client _PARAM0_ (extra data: _PARAM2_)'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -307,7 +311,7 @@ module.exports = {
         _(
           'Overwrite _PARAM1_ with variable sent with last trigger of _PARAM0_'
         ),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -329,7 +333,7 @@ module.exports = {
         _('Disconnect from a peer'),
         _('Disconnects this client from another client.'),
         _('Disconnect from client _PARAM0_'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -345,7 +349,7 @@ module.exports = {
         _('Disconnect from all peers'),
         _('Disconnects this client from all other clients.'),
         _('Disconnect from all clients'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -360,7 +364,7 @@ module.exports = {
         _('Disconnect from broker'),
         _('Disconnects the client from the broker server.'),
         _('Disconnect the client from the broker'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -377,7 +381,7 @@ module.exports = {
           'Disconnects the client from the broker server and all other clients.'
         ),
         _('Disconnect the client from the broker and other clients'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg',
         'JsPlatform/Extensions/p2picon.svg'
       )
@@ -393,7 +397,7 @@ module.exports = {
         _(
           'Returns the data received when the specified event was last triggered'
         ),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .addParameter('string', _('Event name'), '', false)
@@ -407,7 +411,7 @@ module.exports = {
         'GetEventSender',
         _('Get event sender'),
         _('Returns the id of the peer that triggered the event'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .addParameter('string', _('Event name'), '', false)
@@ -421,7 +425,7 @@ module.exports = {
         'GetID',
         _('Get client ID'),
         _('Gets the client ID of the current game instance'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .getCodeExtraInformation()
@@ -434,7 +438,7 @@ module.exports = {
         'GetLastError',
         _('Get last error'),
         _('Gets the description of the last P2P error'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .getCodeExtraInformation()
@@ -447,7 +451,7 @@ module.exports = {
         'GetLastDisconnectedPeer',
         _('Get last disconnected peer'),
         _('Gets the ID of the latest peer that has disconnected.'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .getCodeExtraInformation()
@@ -460,7 +464,7 @@ module.exports = {
         'GetLastConnectedPeer',
         _('Get ID of the connected peer'),
         _('Gets the ID of the newly connected peer.'),
-        _('P2P (experimental)'),
+        '',
         'JsPlatform/Extensions/p2picon.svg'
       )
       .getCodeExtraInformation()

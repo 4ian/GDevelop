@@ -20,17 +20,28 @@ export const declareExtension = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
+  const fullName =
+    eventsFunctionsExtension.getFullName() ||
+    eventsFunctionsExtension.getName();
   extension
     .setExtensionInformation(
       eventsFunctionsExtension.getName(),
-      eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      fullName,
       eventsFunctionsExtension.getDescription(),
       eventsFunctionsExtension.getAuthor(),
       ''
     )
     .setExtensionHelpPath(eventsFunctionsExtension.getHelpPath())
     .setIconUrl(eventsFunctionsExtension.getIconUrl());
+
+  if (fullName) {
+    extension
+      .addInstructionOrExpressionGroupMetadata(fullName)
+      .setIcon(eventsFunctionsExtension.getIconUrl());
+  }
+
+  if (eventsFunctionsExtension.getCategory())
+    extension.setCategory(eventsFunctionsExtension.getCategory());
 
   declareExtensionDependencies(extension, eventsFunctionsExtension);
 };
@@ -233,9 +244,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
@@ -243,9 +252,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
@@ -254,9 +261,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );
@@ -266,9 +271,7 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunction.getGroup() ||
-        eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension),
       getExtensionIconUrl(extension)
     );

@@ -815,8 +815,9 @@ const MainFrame = (props: Props) => {
   };
 
   const deleteLayout = (layout: gdLayout) => {
+    const { currentProject } = state;
     const { i18n } = props;
-    if (!state.currentProject) return;
+    if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -829,8 +830,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeLayout(layout.getName());
+      if (currentProject.getFirstLayout() === layout.getName())
+        currentProject.setFirstLayout('');
+      currentProject.removeLayout(layout.getName());
       _onProjectItemModified();
     });
   };

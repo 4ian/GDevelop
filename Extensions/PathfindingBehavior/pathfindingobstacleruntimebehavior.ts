@@ -83,12 +83,12 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyPlatforms: gdjs.BehaviorRBushAABB<
+      const nearbyObstacles: gdjs.BehaviorRBushAABB<
         gdjs.PathfindingObstacleRuntimeBehavior
       >[] = this._obstaclesRBush.search(searchArea);
       result.length = 0;
-      nearbyPlatforms.forEach((nearbyPlatform) =>
-        result.push(nearbyPlatform.behavior)
+      nearbyObstacles.forEach((nearbyObstacle) =>
+        result.push(nearbyObstacle.behavior)
       );
     }
   }

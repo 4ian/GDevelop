@@ -49,6 +49,7 @@ export type RenderEditorContainerProps = {|
   // Opening other editors:
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
+  onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string

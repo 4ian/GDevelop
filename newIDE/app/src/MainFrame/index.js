@@ -941,11 +941,15 @@ const MainFrame = (props: Props) => {
     }
 
     const layout = currentProject.getLayout(oldName);
+    const shouldChangeProjectFirstLayout =
+      oldName === currentProject.getFirstLayout();
     setState(state => ({
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      if (shouldChangeProjectFirstLayout)
+        currentProject.setFirstLayout(newName);
       _onProjectItemModified();
     });
   };

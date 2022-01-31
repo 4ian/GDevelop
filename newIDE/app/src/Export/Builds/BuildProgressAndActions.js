@@ -96,11 +96,11 @@ export default ({
     differenceInSeconds(build.updatedAt, Date.now())
   );
   const estimatedRemainingTime = estimatedTime - secondsSinceLastUpdate;
-  const isStillRunning = estimatedRemainingTime > 0;
+  const isStillWithinEstimatedTime = estimatedRemainingTime > 0;
   const hasJustOverrun =
-    estimatedRemainingTime < 0 && estimatedRemainingTime < -estimatedTime;
+    !isStillWithinEstimatedTime && estimatedRemainingTime >= -estimatedTime;
   const hasTimedOut =
-    estimatedRemainingTime < 0 && estimatedRemainingTime > 2 * -estimatedTime;
+    !isStillWithinEstimatedTime && estimatedRemainingTime < -estimatedTime;
 
   const onDownload = (key: BuildArtifactKeyName) => {
     const url = getBuildArtifactUrl(build, key);
@@ -160,23 +160,25 @@ export default ({
           </React.Fragment>
         ) : build.status === 'pending' ? (
           <Line alignItems="center" expand justifyContent="center">
-            {(isStillRunning || hasJustOverrun) && (
+            {(isStillWithinEstimatedTime || hasJustOverrun) && (
               <>
                 <LinearProgress
                   style={{ flex: 1 }}
                   value={
-                    isStillRunning
+                    isStillWithinEstimatedTime
                       ? ((estimatedTime - estimatedRemainingTime) /
                           estimatedTime) *
                         100
                       : 0
                   }
-                  variant={isStillRunning ? 'determinate' : 'indeterminate'}
+                  variant={
+                    isStillWithinEstimatedTime ? 'determinate' : 'indeterminate'
+                  }
                 />
                 <Spacer />
               </>
             )}
-            {isStillRunning && (
+            {isStillWithinEstimatedTime && (
               <Text>
                 <Trans>
                   ~{Math.round(estimatedRemainingTime / 60)} minutes.

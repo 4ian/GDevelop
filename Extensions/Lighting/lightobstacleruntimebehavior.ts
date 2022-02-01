@@ -54,7 +54,7 @@ namespace gdjs {
       object: gdjs.RuntimeObject,
       radius: number,
       result: gdjs.LightObstacleRuntimeBehavior[]
-    ) {
+    ): void {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
       const x = object.getX();

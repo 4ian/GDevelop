@@ -634,6 +634,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         layoutElement.GetStringAttribute("name", "", "nom"), -1);
     layout.UnserializeFrom(*this, layoutElement);
   }
+  SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
@@ -908,6 +909,7 @@ Project& Project::operator=(const Project& other) {
 
 void Project::Init(const gd::Project& game) {
   name = game.name;
+  firstLayout = game.firstLayout;
   version = game.version;
   windowWidth = game.windowWidth;
   windowHeight = game.windowHeight;

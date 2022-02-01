@@ -39,11 +39,13 @@ const enumerateExpressionMetadataMap = (
       parameters.push(exprMetadata.getParameter(i));
     }
 
+    const groupName = exprMetadata.getGroup();
+
     return {
       type: expressionType,
       name: expressionType,
       displayedName: exprMetadata.getFullName(),
-      fullGroupName: prefix + exprMetadata.getGroup(),
+      fullGroupName: [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER),
       iconFilename: exprMetadata.getSmallIconFilename(),
       metadata: exprMetadata,
       parameters: parameters,

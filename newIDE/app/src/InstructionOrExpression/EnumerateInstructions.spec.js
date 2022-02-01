@@ -19,7 +19,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'Trigger once while true',
-          fullGroupName: 'advanced/Events and control flow/',
+          fullGroupName: 'advanced/Events and control flow',
           type: 'BuiltinCommonInstructions::Once',
         }),
         expect.objectContaining({
@@ -39,7 +39,7 @@ describe('EnumerateInstructions', () => {
       expect.arrayContaining([
         expect.objectContaining({
           displayedName: 'Start (or reset) a scene timer',
-          fullGroupName: 'General/Timers and time/',
+          fullGroupName: 'General/Timers and time',
           type: 'ResetTimer',
         }),
         expect.objectContaining({
@@ -61,7 +61,7 @@ describe('EnumerateInstructions', () => {
         'Events and control flow': {
           'Trigger once while true': {
             displayedName: 'Trigger once while true',
-            fullGroupName: 'advanced/Events and control flow/',
+            fullGroupName: 'advanced/Events and control flow',
             type: 'BuiltinCommonInstructions::Once',
           },
         },
@@ -70,7 +70,7 @@ describe('EnumerateInstructions', () => {
         'Sounds and musics': {
           'Global volume': {
             displayedName: 'Global volume',
-            fullGroupName: 'audio/Sounds and musics/',
+            fullGroupName: 'audio/Sounds and musics',
             type: 'GlobalVolume',
           },
         },

@@ -245,7 +245,7 @@ describe('EnumerateExpressions', () => {
       'Timers and time': {
         'Current time': {
           displayedName: 'Current time',
-          fullGroupName: 'General/Timers and time/',
+          fullGroupName: 'General/Timers and time',
           iconFilename: 'res/actions/time.png',
           isPrivate: false,
           name: 'Time',

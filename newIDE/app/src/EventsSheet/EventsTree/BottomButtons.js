@@ -13,6 +13,7 @@ const styles = {
 
 type Props = {|
   onAddEvent: (eventType: string) => void,
+  shouldGlow: boolean,
 |};
 
 const makeMenuTemplateBuilderForEvents = (
@@ -25,7 +26,7 @@ const makeMenuTemplateBuilderForEvents = (
     };
   });
 
-export default function BottomButtons({ onAddEvent }: Props) {
+export default function BottomButtons({ onAddEvent, shouldGlow }: Props) {
   return (
     <Column>
       <Line justifyContent="space-between">
@@ -34,7 +35,7 @@ export default function BottomButtons({ onAddEvent }: Props) {
           element={
             <button
               style={styles.addButton}
-              className="add-link"
+              className={`add-link ${shouldGlow ? 'glow' : ''}`}
               onClick={() => onAddEvent('BuiltinCommonInstructions::Standard')}
             >
               <Trans>Add a new event</Trans>

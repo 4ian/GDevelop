@@ -4,169 +4,205 @@
  * Remove the outline visible on the events sheet (contrary to most
  * controls on screen, we don't want a visible focus there).
  */
-.gd-events-sheet:focus { outline: none; }
+.gd-events-sheet:focus {
+  outline: none;
+}
 
 /**
  * Draggable handle on the left of an event
  */
 .gd-events-sheet .rst__moveHandle {
-    width: 10px;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
+  width: 10px;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 @media only screen and (max-width: 750px) {
-    /**
+  /**
      * Slightly reduce the size of the handle on small screens
      * and phones (where drag'n'drop is not supported anyway).
      */
-    .gd-events-sheet .rst__moveHandle {
-        width: 4px;
-    }
+  .gd-events-sheet .rst__moveHandle {
+    width: 4px;
+  }
 }
 
 .gd-events-sheet .events-tree {
-    height: 100%;
+  height: 100%;
 }
 
 /**
  * Container of an event line (including the scaffolding lines and the event).
  */
 .gd-events-sheet .rst__node {
-    display: flex;
+  display: flex;
 }
 
 .gd-events-sheet .rst__nodeContent {
-    /* Ensure the event take all the space after the scaffolding lines */
-    flex: 1;
-    right: 0;
+  /* Ensure the event take all the space after the scaffolding lines */
+  flex: 1;
+  right: 0;
 
-    min-width: 0; /* But don't shrink scaffolding lines */
-    margin-bottom: 2px; /* Margin after an event */
+  min-width: 0; /* But don't shrink scaffolding lines */
+  margin-bottom: 2px; /* Margin after an event */
 }
 
 .gd-events-sheet .rst__row {
-    /* The "landing pad" highlight box is done with position: absolute.
+  /* The "landing pad" highlight box is done with position: absolute.
      * Ensure it will cover all the event row but not the scaffolding lines.
      */
-    position: relative;
+  position: relative;
 }
 
 /**
  * Container of the content of an event
  */
 .gd-events-sheet .rst__rowContents {
-    display: flex;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    padding: 0;
-    flex: 1;
+  display: flex;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  flex: 1;
 }
 
 .gd-events-sheet .rst__rowWrapper {
-    padding: 0;
+  padding: 0;
 }
 
 .gd-events-sheet .rst__rowLabel {
-    padding: 0;
-    flex: 1;
-    min-width: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .gd-events-sheet .rst__rowTitle {
-    font-weight: normal;
+  font-weight: normal;
 }
 
 /**
  * Expand/collapse buttons
  */
-.gd-events-sheet .rst__collapseButton, .rst__expandButton {
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    height: 12px;
-    width: 22px;
+.gd-events-sheet .rst__collapseButton,
+.rst__expandButton {
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  height: 12px;
+  width: 22px;
 }
 
-.gd-events-sheet .rst__collapseButton:hover:not(:active), .rst__expandButton:hover:not(:active) {
-    background-size: initial !important; /*Avoid buttons size to change*/
-    height: 12px !important; /*Avoid buttons size to change*/
-    width: 22px !important; /*Avoid buttons size to change*/
+.gd-events-sheet .rst__collapseButton:hover:not(:active),
+.rst__expandButton:hover:not(:active) {
+  background-size: initial !important; /*Avoid buttons size to change*/
+  height: 12px !important; /*Avoid buttons size to change*/
+  width: 22px !important; /*Avoid buttons size to change*/
 }
 
-.gd-events-sheet  .rst__expandButton {
-    background-image: url('./unfold.png');
-    background-position: 11px 3px !important;
+.gd-events-sheet .rst__expandButton {
+  background-image: url('./unfold.png');
+  background-position: 11px 3px !important;
 }
 
-.gd-events-sheet  .rst__collapseButton {
-    background-image: url('./fold.png');
-    background-position: center 7px !important;
+.gd-events-sheet .rst__collapseButton {
+  background-image: url('./fold.png');
+  background-position: center 7px !important;
 }
 
 /**
  * Lines between events
  */
-.gd-events-sheet .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after {
+.gd-events-sheet .rst__lineHalfHorizontalRight::before,
+.rst__lineFullVertical::after,
+.rst__lineHalfVerticalTop::after,
+.rst__lineHalfVerticalBottom::after {
   opacity: 0.3;
 }
 
 /**
  * Links to add a condition or an action
  */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 10px violet, 0 0 10px violet;
+  }
+  15% {
+    text-shadow: 0 0 15px indigo, 0 0 15px indigo;
+  }
+  30% {
+    text-shadow: 0 0 10px blue, 0 0 10px blue;
+  }
+  45% {
+    text-shadow: 0 0 8px green, 0 0 8px green;
+  }
+  60% {
+    text-shadow: 0 0 10px yellow, 0 0 10px yellow;
+  }
+  75% {
+    text-shadow: 0 0 15px orange, 0 0 15px orange;
+  }
+  90% {
+    text-shadow: 0 0 12px red, 0 0 12px red;
+  }
+  100% {
+    text-shadow: 0 0 10px violet, 0 0 10px violet;
+  }
+}
 .gd-events-sheet .add-link {
-    background:none!important;
-    color:inherit;
-    border:none;
-    padding:0!important;
-    font: inherit;
-    cursor: pointer;
-    opacity: 0.3;
+  background: none !important;
+  color: inherit;
+  border: none;
+  padding: 0 !important;
+  font: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.gd-events-sheet .add-link.glow {
+  animation: glow 5s ease-in-out infinite;
 }
 .gd-events-sheet .add-link:hover {
-    opacity: 0.8;
+  opacity: 0.9;
 }
 
 /**
  * Selectable area (instructions)
  */
 .gd-events-sheet .selectable {
-    box-sizing: border-box;
-    border: 1px transparent solid;
+  box-sizing: border-box;
+  border: 1px transparent solid;
 }
 
 /**
  * Large selectable area (events)
  */
 .gd-events-sheet .large-selectable {
-    box-sizing: border-box;
-    border: 1px transparent solid;
+  box-sizing: border-box;
+  border: 1px transparent solid;
 }
 
 /**
  * Disabled text
  */
 .gd-events-sheet .disabled-text {
-    text-decoration: line-through;
-    opacity: 0.6;
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 
 /**
  * Icon (variable, object icon...)
  */
 .gd-events-sheet .icon {
-    vertical-align: sub;
-    object-fit: contain;
-    width: var(--icon-size);
-    height: var(--icon-size);
+  vertical-align: sub;
+  object-fit: contain;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .gd-events-sheet .rst__nodeContent .MuiIconButton-root {
-    font-size: inherit;
+  font-size: inherit;
 }
 
 /**

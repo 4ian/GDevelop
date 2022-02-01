@@ -8,7 +8,7 @@ import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
-import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   searchBar: {
@@ -73,7 +73,7 @@ export const ExtensionStore = ({
 
   const getExtensionsMatches = (
     extensionShortHeader: ExtensionShortHeader
-  ): SearchMatches => {
+  ): SearchMatch[] => {
     if (!searchResults) return [];
     const extensionMatches = searchResults.find(
       result => result.item.name === extensionShortHeader.name

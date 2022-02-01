@@ -20,7 +20,7 @@ import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
-import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const electron = optionalRequire('electron');
 
@@ -38,7 +38,7 @@ const styles = {
 
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
-  matches: ?SearchMatches,
+  matches: ?Array<SearchMatch>,
   isOpening: boolean,
   onChoose: () => void,
   onOpen: () => void,

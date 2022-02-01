@@ -4,17 +4,56 @@ import { type ChosenCategory } from './FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
 
-export type SearchMatches = Array<{| key: string, indices: number[][] |}>;
+export type SearchMatch = {| key: string, indices: number[][], value: string |};
+
+const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
+  const lowerCaseSearchText = searchText.toLowerCase();
+  return match.indices
+    .map(index => {
+      const lowerCaseMatchedText = match.value
+        .slice(index[0], index[1] + 1)
+        .toLowerCase();
+      // if exact match, return indices untouched
+      if (lowerCaseMatchedText === lowerCaseSearchText) return index;
+      const indexOfSearchTextInMatchedText = lowerCaseMatchedText.indexOf(
+        lowerCaseSearchText
+      );
+
+      // if searched text is not in match returned by the fuzzy search
+      // ("too" could be matched when searching for "ot"),
+      // return nothing
+      if (indexOfSearchTextInMatchedText === -1) return undefined;
+
+      // when searched text is included in matched text, changes indices
+      // to highlight only the part that matches exactly
+      return [
+        index[0] + indexOfSearchTextInMatchedText,
+        index[0] + indexOfSearchTextInMatchedText + searchText.length - 1,
+      ];
+    })
+    .filter(Boolean);
+};
+
+const tuneMatches = (
+  result: {| item: any, matches: SearchMatch[] |},
+  searchText: string
+) => {
+  return result.matches.map(match => ({
+    key: match.key,
+    value: match.value,
+    indices: tuneMatchIndices(match, searchText),
+  }));
+};
 
 /**
  * Filter a list of items according to the chosen category
  * and the chosen filters.
  */
 export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
-  searchResults: ?Array<{| item: SearchItem, matches: SearchMatches |}>,
+  searchResults: ?Array<{| item: SearchItem, matches: SearchMatch[] |}>,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>
-): ?Array<{| item: SearchItem, matches: SearchMatches |}> => {
+): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   if (!searchResults) return null;
 
   const startTime = performance.now();
@@ -66,11 +105,11 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   searchText: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>
-): ?Array<{| item: SearchItem, matches: SearchMatches |}> => {
+): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<{|
     item: SearchItem,
-    matches: SearchMatches,
+    matches: SearchMatch[],
   |}>>(null);
 
   // Keep in memory a list of all the items, shuffled for
@@ -168,16 +207,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
           filterSearchResults(
             results.map(result => ({
               item: result.item,
-              matches: result.matches.map(match => ({
-                key: match.key,
-                value: match.value,
-                // We only keep the exact matches indices for highlighting.
-                indices: match.indices.filter(
-                  index =>
-                    match.value.slice(index[0], index[1] + 1).toLowerCase() ===
-                    searchText.toLowerCase()
-                ),
-              })),
+              matches: tuneMatches(result, searchText),
             })),
             chosenCategory,
             chosenFilters

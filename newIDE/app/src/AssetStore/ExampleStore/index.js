@@ -11,7 +11,7 @@ import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
-import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   searchBar: {
@@ -73,7 +73,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
 
   const getExampleMatches = (
     exampleShortHeader: ExampleShortHeader
-  ): SearchMatches => {
+  ): SearchMatch[] => {
     if (!searchResults) return [];
     const exampleMatches = searchResults.find(
       result => result.item.id === exampleShortHeader.id

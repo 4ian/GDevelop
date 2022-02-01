@@ -33,6 +33,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   description = other.description;
   name = other.name;
   fullName = other.fullName;
+  category = other.category;
   tags = other.tags;
   author = other.author;
   authorIds = other.authorIds;
@@ -50,6 +51,7 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("description", description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
+  element.SetAttribute("category", category);
   if (!originName.empty() || !originIdentifier.empty()) {
     element.AddChild("origin")
         .SetAttribute("name", originName)
@@ -87,6 +89,7 @@ void EventsFunctionsExtension::UnserializeFrom(
   description = element.GetStringAttribute("description");
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
+  category = element.GetStringAttribute("category");
   author = element.GetStringAttribute("author");
   previewIconUrl = element.GetStringAttribute("previewIconUrl");
   iconUrl = element.GetStringAttribute("iconUrl");

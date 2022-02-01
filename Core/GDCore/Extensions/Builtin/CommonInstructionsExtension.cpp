@@ -29,7 +29,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "express the game logic and rules.",
           "Florian Rival",
           "Open source (MIT License)")
-      .SetCategory("advanced")
+      .SetCategory("Advanced")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
   extension.AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
       .SetIcon("res/conditions/toujours24.png");

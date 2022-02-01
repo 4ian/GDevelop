@@ -17,7 +17,7 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
       "Florian Rival",
       "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/shopify")
-      .SetCategory("third-party");
+      .SetCategory("Third-party");
   extension.AddInstructionOrExpressionGroupMetadata(_("Shopify"))
       .SetIcon("JsPlatform/Extensions/shopifyicon.png");
 

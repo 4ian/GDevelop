@@ -29,7 +29,7 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/all-features/firebase')
-      .setCategory('network');
+      .setCategory('Network');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Firebase'))
       .setIcon('JsPlatform/Extensions/firebase.png');

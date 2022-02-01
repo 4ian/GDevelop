@@ -34,7 +34,7 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/all-features/p2p')
-      .setCategory('network');
+      .setCategory('Network');
     extension
       .addInstructionOrExpressionGroupMetadata(_('P2P (experimental)'))
       .setIcon('JsPlatform/Extensions/p2picon.svg');

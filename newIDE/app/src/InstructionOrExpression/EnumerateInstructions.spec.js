@@ -19,7 +19,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'Trigger once while true',
-          fullGroupName: 'advanced/Events and control flow',
+          fullGroupName: 'Advanced/Events and control flow',
           type: 'BuiltinCommonInstructions::Once',
         }),
         expect.objectContaining({
@@ -54,23 +54,23 @@ describe('EnumerateInstructions', () => {
   it('can create the tree of instructions', () => {
     const instructions = enumerateAllInstructions(true);
     const tree = createTree(instructions);
-    expect(tree).toHaveProperty('advanced');
-    expect(tree).toHaveProperty('audio');
+    expect(tree).toHaveProperty('Advanced');
+    expect(tree).toHaveProperty('Audio');
     expect(tree).toMatchObject({
-      advanced: {
+      Advanced: {
         'Events and control flow': {
           'Trigger once while true': {
             displayedName: 'Trigger once while true',
-            fullGroupName: 'advanced/Events and control flow',
+            fullGroupName: 'Advanced/Events and control flow',
             type: 'BuiltinCommonInstructions::Once',
           },
         },
       },
-      audio: {
+      Audio: {
         'Sounds and musics': {
           'Global volume': {
             displayedName: 'Global volume',
-            fullGroupName: 'audio/Sounds and musics',
+            fullGroupName: 'Audio/Sounds and musics',
             type: 'GlobalVolume',
           },
         },

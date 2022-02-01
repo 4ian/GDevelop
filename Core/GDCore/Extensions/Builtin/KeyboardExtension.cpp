@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/keyboard")
-      .SetCategory("input");
+      .SetCategory("Input");
   extension.AddInstructionOrExpressionGroupMetadata(_("Keyboard"))
       .SetIcon("res/conditions/keyboard24.png");
 

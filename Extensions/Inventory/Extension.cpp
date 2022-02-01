@@ -19,7 +19,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       "Florian Rival",
       "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/inventory")
-      .SetCategory("advanced");
+      .SetCategory("Advanced");
     extension
       .AddInstructionOrExpressionGroupMetadata(_("Inventories"))
       .SetIcon("CppPlatform/Extensions/Inventoryicon.png");

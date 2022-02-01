@@ -168,7 +168,9 @@ const enumerateInstruction = (
   const displayedName = instrMetadata.getFullName();
   const groupName = instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
-  const fullGroupName = [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER);
+  const fullGroupName = [prefix, groupName]
+    .filter(Boolean)
+    .join(GROUP_DELIMITER);
 
   return {
     type,

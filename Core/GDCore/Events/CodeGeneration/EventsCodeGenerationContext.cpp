@@ -46,7 +46,7 @@ void EventsCodeGenerationContext::InheritsFrom(
   }
 }
 
-void EventsCodeGenerationContext::AsyncInheritsFrom(
+void EventsCodeGenerationContext::InheritsAsAsyncCallbackFrom(
     const EventsCodeGenerationContext& parent_) {
   parent = &parent_;
   nearestAsyncParent = this;
@@ -75,7 +75,7 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
       for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
            asyncContext != NULL;
            asyncContext = asyncContext->parent->nearestAsyncParent)
-        asyncContext->allListsAcrossChildrenToBeDeclared.insert(objectName);
+        asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
     }
   }
 

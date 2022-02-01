@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY)
 #ifndef GDCORE_ASYNCEVENT_H
 #define GDCORE_ASYNCEVENT_H
 #include "GDCore/Events/Event.h"
@@ -58,4 +57,3 @@ private:
 } // namespace gd
 
 #endif // GDCORE_STANDARDEVENT_H
-#endif

@@ -116,7 +116,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Generate callback code
         gd::EventsCodeGenerationContext callbackContext;
-        callbackContext.AsyncInheritsFrom(parentContext);
+        callbackContext.InheritsAsAsyncCallbackFrom(parentContext);
 
         // Generate actions
         gd::String actionsCode = codeGenerator.GenerateActionsListCode(

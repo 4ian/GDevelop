@@ -1,19 +1,23 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "esnext",
         "noImplicitAny": true,
         "outDir": "../../Extensions/TileMap/helper/", //"./dist",
         "target": "ES5",
         "sourceMap": true,
 		"declaration": true,
 		"declarationMap": true,
+        "declarationDir": "../../Extensions/TileMap/helper/dts",
         "types" : [
             "mocha",
             "expect.js"
         ],
 		"lib": ["DOM", "ES5", "ES6"],
+        "esModuleInterop": false, 
         "downlevelIteration": true,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
     },
     "exclude": [
         "node_modules"

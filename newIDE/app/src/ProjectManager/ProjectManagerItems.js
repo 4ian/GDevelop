@@ -79,6 +79,7 @@ export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
 
 type ItemProps = {|
   primaryText: string,
+  textEndAdornment?: React.Node,
   editingName: boolean,
   leftIcon?: ?React.Node,
   onEdit: () => void,
@@ -102,6 +103,7 @@ type ItemProps = {|
 
 export const Item = ({
   primaryText,
+  textEndAdornment,
   editingName,
   leftIcon,
   onEdit,
@@ -150,8 +152,21 @@ export const Item = ({
       style={styles.itemTextField}
     />
   ) : (
-    <div style={textEllispsisStyle} title={primaryText}>
-      {primaryText}
+    <div
+      style={{ display: 'inline-flex', width: '100%', alignItems: 'center' }}
+    >
+      <span style={textEllispsisStyle} title={primaryText}>
+        {primaryText}
+      </span>
+      <span
+        style={{
+          verticalAlign: 'bottom',
+          marginLeft: 5,
+          display: 'flex',
+        }}
+      >
+        {textEndAdornment}
+      </span>
     </div>
   );
 

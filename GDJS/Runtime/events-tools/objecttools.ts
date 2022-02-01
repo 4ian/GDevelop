@@ -577,7 +577,8 @@ namespace gdjs {
     }
 
     private getOrCreateList(objectName: string): RuntimeObject[] {
-      if (!this.objectsLists.has(objectName)) this.objectsLists.set(objectName, []);
+      if (!this.objectsLists.has(objectName))
+        this.objectsLists.set(objectName, []);
       return this.objectsLists.get(objectName)!;
     }
 

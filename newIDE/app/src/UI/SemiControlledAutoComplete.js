@@ -19,7 +19,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from './KeyboardShortcuts/InteractionKeys';
-import { textEllispsisStyle } from './TextEllipsis';
+import { textEllipsisStyle } from './TextEllipsis';
 
 type Option =
   | {|
@@ -121,7 +121,7 @@ const makeRenderItem = (i18n: I18nType) => (
       <ListItemText
         style={styles.listItemText}
         primary={
-          <div title={value} style={textEllispsisStyle}>
+          <div title={value} style={textEllipsisStyle}>
             {value}
           </div>
         }

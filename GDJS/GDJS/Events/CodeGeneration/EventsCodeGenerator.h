@@ -237,7 +237,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
       const gd::String& functionPrefix = "",
-                                const gd::String& functionSuffix = ";");
+                                const gd::String& functionSuffix = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -247,7 +247,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
       const gd::String& functionPrefix = "",
-                                const gd::String& functionSuffix = ";");
+                                const gd::String& functionSuffix = "");
 
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);

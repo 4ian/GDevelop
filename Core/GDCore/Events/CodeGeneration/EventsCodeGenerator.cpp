@@ -1041,7 +1041,7 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
            "(" + GenerateArgumentsList(arguments) + ")" + functionSuffix;
   }
 
-  return call + "\n";
+  return call + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectAction(

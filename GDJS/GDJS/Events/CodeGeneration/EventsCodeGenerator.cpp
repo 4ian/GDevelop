@@ -704,7 +704,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   actionCode +=
       "for(var i = 0, len = " + GetObjectListName(objectName, context) +
       ".length ;i < len;++i) {\n";
-  actionCode += "    " + call + "\n";
+  actionCode += "    " + call + ";\n";
   actionCode += "}\n";
 
   return actionCode;
@@ -770,7 +770,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     actionCode +=
         "for(var i = 0, len = " + GetObjectListName(objectName, context) +
         ".length ;i < len;++i) {\n";
-    actionCode += "    " + call + "\n";
+    actionCode += "    " + call + ";\n";
     actionCode += "}\n";
   }
 

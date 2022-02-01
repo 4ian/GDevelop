@@ -312,6 +312,6 @@ export const WebProjectLink = ({
 export const onlineWebExporter = {
   key: 'onlinewebexport',
   tabName: 'Web',
-  name: <Trans>Web (upload online)</Trans>,
+  name: <Trans>Web</Trans>,
   helpPage: '/publishing/web',
 };

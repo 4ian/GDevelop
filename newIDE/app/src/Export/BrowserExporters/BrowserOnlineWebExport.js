@@ -144,6 +144,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
       textFiles,
       basePath: '/export/',
       onProgress: context.updateStepProgress,
+      sizeLimit: 250 * 1024 * 1024,
     });
   },
 

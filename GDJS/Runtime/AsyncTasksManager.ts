@@ -12,7 +12,7 @@ namespace gdjs {
     /**
      * Maps a task to the callback to be executed once it is finished.
      */
-    private tasks = new Map<AsyncTask, () => void>();
+    private tasks = new Map<AsyncTask, (runtimeScene: RuntimeScene) => void>();
 
     /**
      * Run all pending asynchronous tasks.
@@ -21,7 +21,7 @@ namespace gdjs {
       for (const task of this.tasks.keys()) {
         if (task.update(runtimeScene)) {
           // The task has finished, run the callback and remove it.
-          this.tasks.get(task)!();
+          this.tasks.get(task)!(runtimeScene);
           this.tasks.delete(task);
         }
       }
@@ -32,7 +32,7 @@ namespace gdjs {
      * @param task The {@link AsyncTask} to run.
      * @param then The callback to execute once the task is finished.
      */
-    addTask(task: AsyncTask, then: () => void): void {
+    addTask(task: AsyncTask, then: (runtimeScene: RuntimeScene) => void): void {
       this.tasks.set(task, then);
     }
   }

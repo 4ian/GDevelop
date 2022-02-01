@@ -158,7 +158,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         }
 
         const gd::String callbackCallCode =
-            "() => (" + callbackFunctionName + "(" +
+            "(runtimeScene) => (" + callbackFunctionName + "(" +
             dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
                 .GenerateEventsParameters(callbackContext) +
             "))";

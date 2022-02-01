@@ -20,7 +20,7 @@ BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/interface/scene-editor/external-layouts")
-      .SetCategory("advanced");
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("External layouts"))
       .SetIcon("res/ribbon_default/externallayout32.png");
 

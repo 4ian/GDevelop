@@ -35,7 +35,7 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
-      .setCategory('audio');
+      .setCategory('Audio');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Spatial sound'))
       .setIcon('res/actions/son24.png');

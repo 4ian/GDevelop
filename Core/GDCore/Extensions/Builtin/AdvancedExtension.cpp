@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Advanced control features for functions made with events."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetCategory("advanced");
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Event functions"))
       .SetIcon("res/function32.png");
 

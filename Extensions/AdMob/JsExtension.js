@@ -36,7 +36,7 @@ module.exports = {
         'MIT'
       )
       .setExtensionHelpPath('/all-features/admob')
-      .setCategory('ads');
+      .setCategory('Ads');
     extension
       .addInstructionOrExpressionGroupMetadata(_('AdMob'))
       .setIcon('JsPlatform/Extensions/admobicon24.png');

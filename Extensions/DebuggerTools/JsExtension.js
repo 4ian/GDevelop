@@ -33,7 +33,7 @@ module.exports = {
         'Arthur Pacaud (arthuro555), Aurélien Vivet (Bouh)',
         'MIT'
       )
-      .setCategory('advanced');
+      .setCategory('Advanced');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Debugger Tools'))
       .setIcon('res/actions/bug32.png');

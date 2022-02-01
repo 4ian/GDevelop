@@ -9,7 +9,7 @@ import {
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
   useSearchItem,
-  type SearchMatches,
+  type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
@@ -18,7 +18,7 @@ type ExtensionStoreState = {|
   filters: ?Filters,
   searchResults: ?Array<{|
     item: ExtensionShortHeader,
-    matches: SearchMatches,
+    matches: SearchMatch[],
   |}>,
   fetchExtensionsAndFilters: () => void,
   error: ?Error,
@@ -135,7 +135,7 @@ export const ExtensionStoreStateProvider = ({
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<{|
     item: ExtensionShortHeader,
-    matches: SearchMatches,
+    matches: SearchMatch[],
   |}> = useSearchItem(
     extensionShortHeadersByName,
     searchText,

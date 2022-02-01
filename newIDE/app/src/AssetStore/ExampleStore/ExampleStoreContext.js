@@ -9,14 +9,14 @@ import {
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
   useSearchItem,
-  type SearchMatches,
+  type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
 
 type ExampleStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<{| item: ExampleShortHeader, matches: SearchMatches |}>,
+  searchResults: ?Array<{| item: ExampleShortHeader, matches: SearchMatch[] |}>,
   fetchExamplesAndFilters: () => void,
   allExamples: ?Array<ExampleShortHeader>,
   error: ?Error,
@@ -126,7 +126,7 @@ export const ExampleStoreStateProvider = ({
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<{|
     item: ExampleShortHeader,
-    matches: SearchMatches,
+    matches: SearchMatch[],
   |}> = useSearchItem(
     exampleShortHeadersById,
     searchText,

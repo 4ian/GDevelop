@@ -24,19 +24,35 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
   extension
       .SetExtensionInformation(
           "BuiltinCommonInstructions",
-          _("Builtin events"),
+          _("Events and control flow"),
           "GDevelop comes with a set of events and conditions that allow to "
           "express the game logic and rules.",
           "Florian Rival",
           "Open source (MIT License)")
+      .SetCategory("advanced")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
+  extension.AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
+      .SetIcon("res/conditions/toujours24.png");
+
+  extension
+      .AddCondition("Toujours",
+                    _("Always"),
+                    _("This condition always returns true (or always false, if "
+                      "the condition is inverted)."),
+                    _("Always"),
+                    "",
+                    "res/conditions/toujours24.png",
+                    "res/conditions/toujours.png")
+      .SetHelpPath("/all-features/advanced-conditions")
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsAdvanced();
 
   extension
       .AddCondition("Or",
                     _("Or"),
                     _("Check if one of the sub conditions is true"),
                     _("If one of these conditions is true:"),
-                    _("Advanced"),
+                    "",
                     "res/conditions/or24.png",
                     "res/conditions/or.png")
       .SetCanHaveSubInstructions()
@@ -47,7 +63,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
                     _("And"),
                     _("Check if all sub conditions are true"),
                     _("If all of these conditions are true:"),
-                    _("Advanced"),
+                    "",
                     "res/conditions/and24.png",
                     "res/conditions/and.png")
       .SetCanHaveSubInstructions()
@@ -59,7 +75,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           _("Not"),
           _("Return the contrary of the result of the sub conditions"),
           _("Invert the logical result of these conditions:"),
-          _("Advanced"),
+          "",
           "res/conditions/not24.png",
           "res/conditions/not.png")
       .SetCanHaveSubInstructions()
@@ -70,9 +86,37 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       _("Trigger once while true"),
       _("Run actions only once, for each time the conditions have been met."),
       _("Trigger once"),
-      _("Advanced"),
+      "",
       "res/conditions/once24.png",
       "res/conditions/once.png");
+
+  extension
+      .AddCondition("Egal",
+                    _("Compare two numbers"),
+                    _("Compare the two numbers."),
+                    _("_PARAM0_ _PARAM1_ _PARAM2_"),
+                    "",
+                    "res/conditions/egal24.png",
+                    "res/conditions/egal.png")
+      .SetHelpPath("/all-features/advanced-conditions")
+      .AddParameter("expression", _("First expression"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "number")
+      .AddParameter("expression", _("Second expression"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddCondition("StrEqual",
+                    _("Compare two strings"),
+                    _("Compare the two strings."),
+                    _("_PARAM0_ _PARAM1_ _PARAM2_"),
+                    "",
+                    "res/conditions/egal24.png",
+                    "res/conditions/egal.png")
+      .SetHelpPath("/all-features/advanced-conditions")
+      .AddParameter("string", _("First string expression"))
+      .AddParameter("relationalOperator", _("Sign of the test"), "string")
+      .AddParameter("string", _("Second string expression"))
+      .MarkAsAdvanced();
 
   extension.AddEvent(
       "Standard",

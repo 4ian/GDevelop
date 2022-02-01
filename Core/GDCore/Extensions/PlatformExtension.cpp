@@ -754,7 +754,7 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
 }
 #endif
 
-PlatformExtension::PlatformExtension() : deprecated(false) {}
+PlatformExtension::PlatformExtension() : deprecated(false), category(_("General")) {}
 
 PlatformExtension::~PlatformExtension() {}
 

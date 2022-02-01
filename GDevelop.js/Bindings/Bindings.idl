@@ -130,6 +130,13 @@ interface EventsVariablesFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface InstructionOrExpressionGroupMetadata {
+    void InstructionOrExpressionGroupMetadata();
+
+    [Ref] InstructionOrExpressionGroupMetadata SetIcon([Const] DOMString icon);
+    [Const, Ref] DOMString GetIcon();
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();
@@ -148,6 +155,7 @@ interface Platform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -164,6 +172,7 @@ interface JsPlatform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -1461,6 +1470,8 @@ interface PlatformExtension {
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
+    [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
@@ -1533,6 +1544,7 @@ interface PlatformExtension {
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
@@ -2197,6 +2209,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsFunctionsExtension SetCategory([Const] DOMString category);
+    [Const, Ref] DOMString GetCategory();
     [Ref] VectorString GetTags();
     [Ref] VectorString GetAuthorIds();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);

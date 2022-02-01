@@ -71,7 +71,7 @@ namespace gdjs {
       y: float,
       radius: float,
       result: gdjs.PathfindingObstacleRuntimeBehavior[]
-    ): any {
+    ): void {
       const searchArea = gdjs.staticObject(
         PathfindingObstaclesManager.prototype.getAllObstaclesAround
       );

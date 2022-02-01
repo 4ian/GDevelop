@@ -371,6 +371,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
                 onAddEvent={(eventType: string) =>
                   this.props.onAddNewEvent(eventType, this.props.events)
                 }
+                shouldGlow={eventsList.getEventsCount() === 0}
               />
             ),
             event: null,

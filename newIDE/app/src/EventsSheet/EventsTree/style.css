@@ -125,6 +125,32 @@
 /**
  * Links to add a condition or an action
  */
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 10px violet, 0 0 10px violet;
+  }
+  15% {
+    text-shadow: 0 0 15px indigo, 0 0 15px indigo;
+  }
+  30% {
+    text-shadow: 0 0 10px blue, 0 0 10px blue;
+  }
+  45% {
+    text-shadow: 0 0 8px green, 0 0 8px green;
+  }
+  60% {
+    text-shadow: 0 0 10px yellow, 0 0 10px yellow;
+  }
+  75% {
+    text-shadow: 0 0 15px orange, 0 0 15px orange;
+  }
+  90% {
+    text-shadow: 0 0 12px red, 0 0 12px red;
+  }
+  100% {
+    text-shadow: 0 0 10px violet, 0 0 10px violet;
+  }
+}
 .gd-events-sheet .add-link {
   background: none !important;
   color: inherit;
@@ -133,6 +159,9 @@
   font: inherit;
   cursor: pointer;
   opacity: 0.6;
+}
+.gd-events-sheet .add-link.glow {
+  animation: glow 5s ease-in-out infinite;
 }
 .gd-events-sheet .add-link:hover {
   opacity: 0.9;

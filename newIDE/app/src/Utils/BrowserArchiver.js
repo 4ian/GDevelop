@@ -143,11 +143,13 @@ export const archiveFiles = async ({
   blobFiles,
   basePath,
   onProgress,
+  sizeLimit,
 }: {|
   textFiles: Array<TextFileDescriptor>,
   blobFiles: Array<BlobFileDescriptor>,
   basePath: string,
   onProgress: (count: number, total: number) => void,
+  sizeLimit?: number,
 |}): Promise<Blob> => {
   const zipJs: ZipJs = await initializeZipJs();
 
@@ -199,6 +201,14 @@ export const archiveFiles = async ({
               },
               () => {
                 zipWriter.close((blob: Blob) => {
+                  const fileSize = blob.size;
+                  if (sizeLimit && fileSize > sizeLimit) {
+                    reject(
+                      new Error(
+                        `Archive is of size ${fileSize} bytes, which is above the limit allowed of ${sizeLimit} bytes.`
+                      )
+                    );
+                  }
                   resolve(blob);
                 });
               }

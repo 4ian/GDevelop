@@ -204,21 +204,25 @@ export default class ExportLauncher extends Component<Props, State> {
     const getErrorMessage = () => {
       switch (this.state.exportStep) {
         case 'export':
-          return t('Error while preparing the exporter.');
-        case 'resources-download':
           return t('Error while exporting the game.');
-        case 'compress':
+        case 'resources-download':
           return t(
             'Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.'
           );
-        case 'upload':
+        case 'compress':
           return t('Error while compressing the game.');
-        case 'waiting-for-build':
+        case 'upload':
           return t(
             'Error while uploading the game. Check your internet connection or try again later.'
           );
+        case 'waiting-for-build':
+          return t(
+            'Error while building the game. Check the logs of the build for more details.'
+          );
         case 'build':
-          return t('Error while lauching the build of the game.');
+          return t(
+            'Error while building of the game. Check the logs of the build for more details.'
+          );
         default:
           return t(
             'Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.'

@@ -31,7 +31,7 @@ module.exports = {
       "Matthias Meike",
       "Open source (MIT License)"
     ).setExtensionHelpPath("/all-features/device-sensors")
-    .setCategory('device');
+    .setCategory('Device');
     extension.addInstructionOrExpressionGroupMetadata(_("Device sensors"))
         .setIcon("JsPlatform/Extensions/orientation_active32.png");
 

@@ -28,7 +28,7 @@ module.exports = {
         'Arthur Pacaud (arthuro555)',
         'MIT'
       )
-      .setCategory('device');
+      .setCategory('Device');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Advanced window management'))
       .setIcon('res/actions/window24.png');

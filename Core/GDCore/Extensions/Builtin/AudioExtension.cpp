@@ -20,7 +20,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/audio")
-      .SetCategory("audio");
+      .SetCategory("Audio");
   extension.AddInstructionOrExpressionGroupMetadata(_("Sounds and musics"))
       .SetIcon("res/actions/music24.png");
 

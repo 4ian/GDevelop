@@ -33,7 +33,7 @@ module.exports = {
         "Open source (MIT License)"
       )
       .setExtensionHelpPath("/publishing/publishing-to-facebook-instant-games")
-      .setCategory('third-party');
+      .setCategory('Third-party');
     extension.addInstructionOrExpressionGroupMetadata(_("Facebook Instant Games"))
         .setIcon("JsPlatform/Extensions/facebookicon32.png");
 

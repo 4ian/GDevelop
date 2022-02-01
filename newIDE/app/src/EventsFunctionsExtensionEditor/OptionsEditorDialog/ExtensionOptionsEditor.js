@@ -202,31 +202,31 @@ export const ExtensionOptionsEditor = ({
             dataSource={[
               {
                 text: '',
-                value: 'general',
+                value: 'General',
               },
               {
-                text: 'ads',
-                value: 'ads',
+                text: 'Ads',
+                value: 'Ads',
               },
               {
-                text: 'advanced',
-                value: 'advanced',
+                text: 'Advanced',
+                value: 'Advanced',
               },
               {
-                text: 'device',
-                value: 'device',
+                text: 'Device',
+                value: 'Device',
               },
               {
-                text: 'input',
-                value: 'input',
+                text: 'Input',
+                value: 'Input',
               },
               {
-                text: 'network',
-                value: 'network',
+                text: 'Network',
+                value: 'Network',
               },
               {
-                text: 'third-party',
-                value: 'third-party',
+                text: 'Third-party',
+                value: 'Third-party',
               },
             ]}
           />

@@ -24,7 +24,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/linked-objects")
-      .SetCategory("advanced");
+      .SetCategory("Advanced");
   extension.AddInstructionOrExpressionGroupMetadata(_("Linked objects"))
       .SetIcon("CppPlatform/Extensions/LinkedObjectsicon24.png");
 

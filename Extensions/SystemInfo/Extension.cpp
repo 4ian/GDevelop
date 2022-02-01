@@ -15,7 +15,7 @@ void DeclareSystemInfoExtension(gd::PlatformExtension& extension) {
       _("Get information about the system and device running the game."),
       "Florian Rival",
       "Open source (MIT License)")
-      .SetCategory("device");
+      .SetCategory("Device");
   extension.AddInstructionOrExpressionGroupMetadata(_("System information"))
       .SetIcon("CppPlatform/Extensions/systeminfoicon.png");
 

@@ -39,7 +39,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddCondition("CompareTimer",
                     _("Value of a scene timer"),
-                    _("Compare the elapsed time of a scene timer. This condition doesn't start the timer."),
+                    _("Compare the elapsed time of a scene timer. This "
+                      "condition doesn't start the timer."),
                     _("The timer _PARAM1_ _PARAM2_ _PARAM3_ seconds"),
                     _("Timers and time"),
                     "res/conditions/timer24.png",
@@ -136,6 +137,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
   extension
+      .AddAction("Wait",
+                 _("Wait X milliseconds"),
+                 _("Waits a certain amount of milliseconds before continuing "
+                   "to execute the actions."),
+                 _("Wait _PARAM0_ milliseconds"),
+                 _("Time"),
+                 "res/conditions/timer24.png",
+                 "res/conditions/timer.png")
+      .AddParameter("expression", "Time to wait in milliseconds")
+      .SetAsync();
+
+  extension
       .AddExpression("TimeDelta",
                      _("Time elapsed since the last frame"),
                      _("Time elapsed since the last frame rendered on screen"),
@@ -210,7 +223,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
             "timestamp\""),
           "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
           "\"yday\", \"timestamp\"]");
-
 }
 
 }  // namespace gd

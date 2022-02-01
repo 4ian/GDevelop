@@ -443,7 +443,10 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
  * Generate code for an action.
  */
 gd::String EventsCodeGenerator::GenerateActionCode(
-    gd::Instruction& action, EventsCodeGenerationContext& context) {
+    gd::Instruction& action,
+    EventsCodeGenerationContext& context,
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   gd::String actionCode;
 
   const gd::InstructionMetadata& instrInfos =
@@ -506,8 +509,13 @@ gd::String EventsCodeGenerator::GenerateActionCode(
         // Prepare arguments and generate the whole action code
         vector<gd::String> arguments = GenerateParametersCodes(
             action.GetParameters(), instrInfos.parameters, context);
-        actionCode += GenerateObjectAction(
-            realObjects[i], objInfo, arguments, instrInfos, context);
+        actionCode += GenerateObjectAction(realObjects[i],
+                                           objInfo,
+                                           arguments,
+                                           instrInfos,
+                                           context,
+                                           functionPrefix,
+                                           functionSuffix);
 
         context.SetNoCurrentObject();
       }
@@ -539,7 +547,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                                    autoInfo,
                                    arguments,
                                    instrInfos,
-                                   context);
+                                   context,
+                                   functionPrefix, functionSuffix);
 
         context.SetNoCurrentObject();
       }
@@ -547,7 +556,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   } else {
     vector<gd::String> arguments = GenerateParametersCodes(
         action.GetParameters(), instrInfos.parameters, context);
-    actionCode += GenerateFreeAction(arguments, instrInfos, context);
+    actionCode +=
+        GenerateFreeAction(arguments, instrInfos, context, functionPrefix, functionSuffix);
   }
 
   return actionCode;
@@ -1001,7 +1011,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 gd::String EventsCodeGenerator::GenerateFreeAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   // Generate call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
@@ -1025,10 +1037,11 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
           arguments,
           instrInfos.codeExtraInformation.functionCallName);
   } else {
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments) + ")";
+    call = functionPrefix + instrInfos.codeExtraInformation.functionCallName +
+           "(" + GenerateArgumentsList(arguments) + ")" + functionSuffix;
   }
-  return call + ";\n";
+
+  return call + "\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectAction(
@@ -1036,7 +1049,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::ObjectMetadata& objInfo,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
@@ -1061,8 +1076,9 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 1);
 
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           argumentsStr + ")";
+    call = functionPrefix + instrInfos.codeExtraInformation.functionCallName + "(" +
+           argumentsStr + ")" + functionSuffix;
+
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ").\n";
   }
@@ -1074,7 +1090,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const gd::BehaviorMetadata& autoInfo,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
-    gd::EventsCodeGenerationContext& context) {
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
@@ -1098,8 +1116,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 2);
 
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           argumentsStr + ")";
+    call = functionPrefix + instrInfos.codeExtraInformation.functionCallName +
+           "(" + argumentsStr + ")" + functionSuffix;
+
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ")" + " for behavior \"" + behaviorName + "\".\n";
   }

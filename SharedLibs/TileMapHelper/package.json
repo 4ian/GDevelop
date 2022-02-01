@@ -15,18 +15,25 @@
     "test:firefox": "karma start --browsers Firefox --single-run",
     "test:firefox:watch": "karma start --browsers Firefox",
     "tsc": "tsc",
-    "build": "webpack --mode production",
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "build:webpack": "webpack --mode production",
     "build:watch": "webpack --mode development --watch",
     "prepublishOnly": "npm run build",
     "format": "prettier --write \"src/**/*.ts\"",
     "check-format": "prettier --list-different \"src/**/*.ts\""
   },
   "dependencies": {
-    "pako": "^2.0.4"
+    "pako": "^2.0.4",
+    "pixi.js": "^6.1.2"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.3",
+    "@rollup/plugin-typescript": "^8.3.0",
     "@types/expect.js": "^0.3.29",
     "@types/mocha": "^5.2.7",
+    "clean-webpack-plugin": "^3.0.0",
     "expect.js": "^0.3.1",
     "karma": "^6.1.0",
     "karma-chrome-launcher": "^3.1.0",
@@ -35,12 +42,12 @@
     "karma-typescript": "latest",
     "mocha": "^6.2.0",
     "prettier": "2.1.2",
-    "typescript": "4.3.2",
-    "webpack": "^5.40.0",
-    "webpack-cli": "^4.9.0",
-    "clean-webpack-plugin": "^3.0.0",
+    "rollup": "^2.66.1",
+    "rollup-plugin-dts": "^4.1.0",
     "ts-loader": "^9.2.3",
-    "pixi.js": "6.1.2"
+    "typescript": "latest",
+    "webpack": "^5.40.0",
+    "webpack-cli": "^4.9.0"
   },
   "repository": {
     "type": "git",

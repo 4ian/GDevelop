@@ -14,13 +14,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .SetExtensionInformation(
           "BuiltinTime",
-          _("Time"),
+          _("Timers and time"),
           "Actions and conditions to run timers, get the current time or "
           "modify the time scale (speed at which the game is running - useful "
           "for slow motion effects).",
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers");
+  extension.AddInstructionOrExpressionGroupMetadata(
+      _("Timers and time")
+  )
+      .SetIcon("res/conditions/timer24.png");
 
   // Deprecated and replaced by CompareTimer
   extension
@@ -28,7 +32,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     _("Value of a scene timer"),
                     _("Test the elapsed time of a scene timer."),
                     _("The timer _PARAM2_ is greater than _PARAM1_ seconds"),
-                    _("Timers and time"),
+
+                    "",
                     "res/conditions/timer24.png",
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -39,9 +44,11 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
   extension
       .AddCondition("CompareTimer",
                     _("Value of a scene timer"),
-                    _("Compare the elapsed time of a scene timer. This condition doesn't start the timer."),
+                    _("Compare the elapsed time of a scene timer. This "
+                      "condition doesn't start the timer."),
                     _("The timer _PARAM1_ _PARAM2_ _PARAM3_ seconds"),
-                    _("Timers and time"),
+
+                    "",
                     "res/conditions/timer24.png",
                     "res/conditions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -55,7 +62,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     _("Time scale"),
                     _("Compare the time scale of the scene."),
                     _("the time scale of the scene"),
-                    _("Timers and time"),
+
+                    "",
                     "res/conditions/time24.png",
                     "res/conditions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -67,7 +75,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     _("Scene timer paused"),
                     _("Test if the specified scene timer is paused."),
                     _("The timer _PARAM1_ is paused"),
-                    _("Timers and time"),
+
+                    "",
                     "res/conditions/timerPaused24.png",
                     "res/conditions/timerPaused.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -81,7 +90,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           _("Reset the specified scene timer, if the timer doesn't exist "
             "it's created and started."),
           _("Start (or reset) the timer _PARAM1_"),
-          _("Timers and time"),
+
+          "",
           "res/actions/timer24.png",
           "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -92,7 +102,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  _("Pause a scene timer"),
                  _("Pause a scene timer."),
                  _("Pause timer _PARAM1_"),
-                 _("Timers and time"),
+
+                 "",
                  "res/actions/pauseTimer24.png",
                  "res/actions/pauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -104,7 +115,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  _("Unpause a scene timer"),
                  _("Unpause a scene timer."),
                  _("Unpause timer _PARAM1_"),
-                 _("Timers and time"),
+
+                 "",
                  "res/actions/unPauseTimer24.png",
                  "res/actions/unPauseTimer.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -116,7 +128,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  _("Delete a scene timer"),
                  _("Delete a scene timer from memory."),
                  _("Delete timer _PARAM1_ from memory"),
-                 _("Timers and time"),
+
+                 "",
                  "res/actions/timer24.png",
                  "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -128,7 +141,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  _("Change time scale"),
                  _("Change the time scale of the scene."),
                  _("Set the time scale of the scene to _PARAM1_"),
-                 _("Timers and time"),
+
+                 "",
                  "res/actions/time24.png",
                  "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -139,7 +153,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("TimeDelta",
                      _("Time elapsed since the last frame"),
                      _("Time elapsed since the last frame rendered on screen"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -147,7 +161,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("TempsFrame",
                      _("Time elapsed since the last frame"),
                      _("Time elapsed since the last frame rendered on screen"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .SetHidden()
       .AddCodeOnlyParameter("currentScene", "");
@@ -156,7 +170,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("ElapsedTime",
                      _("Time elapsed since the last frame"),
                      _("Time elapsed since the last frame rendered on screen"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .SetHidden()
       .AddCodeOnlyParameter("currentScene", "");
@@ -165,7 +179,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("TimerElapsedTime",
                      _("Scene timer value"),
                      _("Value of a scene timer"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Timer's name"));
@@ -174,7 +188,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("TimeFromStart",
                      _("Time elapsed since the beginning of the scene"),
                      _("Time elapsed since the beginning of the scene"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -182,7 +196,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("TempsDebut",
                      _("Time elapsed since the beginning of the scene"),
                      _("Time elapsed since the beginning of the scene"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .SetHidden()
       .AddCodeOnlyParameter("currentScene", "");
@@ -191,7 +205,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("TimeScale",
                      _("Time scale"),
                      _("Returns the time scale of the scene."),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "");
 
@@ -199,7 +213,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .AddExpression("Time",
                      _("Current time"),
                      _("Current time"),
-                     _("Time"),
+                     "",
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter(
@@ -210,7 +224,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
             "timestamp\""),
           "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
           "\"yday\", \"timestamp\"]");
-
 }
 
 }  // namespace gd

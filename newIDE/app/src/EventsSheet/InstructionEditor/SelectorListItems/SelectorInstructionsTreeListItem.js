@@ -15,6 +15,7 @@ type Props<T> = {|
   useSubheaders?: boolean,
   selectedValue: ?string,
   initiallyOpenedPath?: ?Array<string>,
+  getGroupIconSrc: string => string,
 
   // Optional ref that will be filled with the selected ListItem
   selectedItemRef?: { current: null | ListItemRefType },
@@ -30,6 +31,7 @@ export const renderInstructionOrExpressionTree = <
   selectedValue,
   selectedItemRef,
   initiallyOpenedPath,
+  getGroupIconSrc,
 }: Props<T>): Array<React$Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
@@ -81,16 +83,21 @@ export const renderInstructionOrExpressionTree = <
               selectedValue,
               selectedItemRef,
               initiallyOpenedPath: restOfInitiallyOpenedPath,
+              getGroupIconSrc,
             })
           );
         } else {
           const initiallyOpen = initiallyOpenedKey === key;
+          const iconSrc = getGroupIconSrc(key);
           return (
             <ListItem
               key={key}
               primaryText={key}
               autoGenerateNestedIndicator={true}
               initiallyOpen={initiallyOpen}
+              leftIcon={
+                iconSrc ? <ListIcon iconSize={iconSize} src={iconSrc} /> : null
+              }
               renderNestedItems={() =>
                 renderInstructionOrExpressionTree({
                   instructionTreeNode: groupOfInstructionInformation,
@@ -101,6 +108,7 @@ export const renderInstructionOrExpressionTree = <
                   initiallyOpenedPath: initiallyOpen
                     ? restOfInitiallyOpenedPath
                     : undefined,
+                  getGroupIconSrc,
                 })
               }
             />

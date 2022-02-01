@@ -560,4 +560,55 @@ namespace gdjs {
       };
     }
   }
+
+  /**
+   * A container for objects lists that should last more than the current frame.
+   * It automatically removes objects that were destroyed from the objects lists.
+   */
+  export class LongLivedObjectsList {
+    private objectsLists = new Map<string, Array<RuntimeObject>>();
+    private callbacks = new Map<RuntimeObject, () => void>();
+    private parent: LongLivedObjectsList | null = null;
+
+    static from(parent: LongLivedObjectsList): LongLivedObjectsList {
+      const newList = new LongLivedObjectsList();
+      newList.parent = parent;
+      return newList;
+    }
+
+    private getOrCreateList(objectName: string): RuntimeObject[] {
+      if (!this.objectsLists.has(objectName)) this.objectsLists.set(objectName, []);
+      return this.objectsLists.get(objectName)!;
+    }
+
+    getObjects(objectName: string): RuntimeObject[] {
+      if (!this.objectsLists.has(objectName) && this.parent)
+        return this.parent.getObjects(objectName);
+      return this.objectsLists.get(objectName) || [];
+    }
+
+    addObject(runtimeObject: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(runtimeObject.getName());
+      if (list.includes(runtimeObject)) return;
+      list.push(runtimeObject);
+
+      // Register callbacks for when the object is destroyed
+      const onDestroy = () => this.removeObject(runtimeObject);
+      this.callbacks.set(runtimeObject, onDestroy);
+      runtimeObject.registerDestroyCallback(onDestroy);
+    }
+
+    removeObject(runtimeObject: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(runtimeObject.getName());
+      const index = list.indexOf(runtimeObject);
+      if (index === -1) return;
+      list.splice(index, 1);
+
+      // Properly remove callbacks to not leak the object
+      runtimeObject.unregisterDestroyCallback(
+        this.callbacks.get(runtimeObject)!
+      );
+      this.callbacks.delete(runtimeObject);
+    }
+  }
 }

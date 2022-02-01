@@ -13,7 +13,7 @@ import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
-import { textEllispsisStyle } from '../UI/TextEllipsis';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
@@ -79,6 +79,7 @@ export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
 
 type ItemProps = {|
   primaryText: string,
+  textEndAdornment?: React.Node,
   editingName: boolean,
   leftIcon?: ?React.Node,
   onEdit: () => void,
@@ -102,6 +103,7 @@ type ItemProps = {|
 
 export const Item = ({
   primaryText,
+  textEndAdornment,
   editingName,
   leftIcon,
   onEdit,
@@ -150,8 +152,22 @@ export const Item = ({
       style={styles.itemTextField}
     />
   ) : (
-    <div style={textEllispsisStyle} title={primaryText}>
-      {primaryText}
+    <div
+      style={{ display: 'inline-flex', width: '100%', alignItems: 'center' }}
+    >
+      <span style={textEllipsisStyle} title={primaryText}>
+        {primaryText}
+      </span>
+      {textEndAdornment && (
+        <span
+          style={{
+            marginLeft: 5,
+            display: 'flex',
+          }}
+        >
+          {textEndAdornment}
+        </span>
+      )}
     </div>
   );
 

@@ -739,10 +739,6 @@ export default class ProjectManager extends React.Component<Props, State> {
                                 <Flag
                                   color="disabled"
                                   fontSize="small"
-                                  style={{
-                                    verticalAlign: 'bottom',
-                                    marginLeft: 5,
-                                  }}
                                 />
                               </Tooltip>
                             ) : (

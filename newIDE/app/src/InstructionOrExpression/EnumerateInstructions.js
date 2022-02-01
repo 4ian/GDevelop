@@ -64,12 +64,7 @@ const freeInstructionsToRemove = {
 };
 
 export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  return (
-    extension.getCategory() +
-    GROUP_DELIMITER +
-    extension.getFullName() +
-    GROUP_DELIMITER
-  );
+  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
 };
 
 /**
@@ -173,7 +168,7 @@ const enumerateInstruction = (
   const displayedName = instrMetadata.getFullName();
   const groupName = instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
-  const fullGroupName = prefix + groupName;
+  const fullGroupName = [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER);
 
   return {
     type,

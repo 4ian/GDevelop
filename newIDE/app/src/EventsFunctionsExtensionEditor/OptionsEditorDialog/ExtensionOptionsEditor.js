@@ -205,16 +205,24 @@ export const ExtensionOptionsEditor = ({
                 value: 'general',
               },
               {
-                text: 'input',
-                value: 'input',
+                text: 'ads',
+                value: 'ads',
               },
               {
                 text: 'advanced',
                 value: 'advanced',
               },
               {
-                text: 'ads',
-                value: 'ads',
+                text: 'device',
+                value: 'device',
+              },
+              {
+                text: 'input',
+                value: 'input',
+              },
+              {
+                text: 'network',
+                value: 'network',
               },
               {
                 text: 'third-party',

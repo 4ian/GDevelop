@@ -6,7 +6,7 @@ import {
   enumerateBehaviorExpressions,
   enumerateAllExpressions,
 } from './EnumerateExpressions';
-import { createTree } from './CreateTree';
+import { createTree, type TreeNode } from './CreateTree';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
 import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
 const gd: libGDevelop = global.gd;
@@ -237,11 +237,15 @@ describe('EnumerateExpressions', () => {
     const allExpressionsTree = createTree(allExpressions);
 
     // Check that some free expressions are there
-    expect(allExpressionsTree).toMatchObject({
-      Time: {
+    expect(allExpressionsTree).toHaveProperty('General');
+    const generalTreeNode: TreeNode<EnumeratedExpressionMetadata> =
+      // $FlowFixMe
+      allExpressionsTree['General'];
+    expect(generalTreeNode).toMatchObject({
+      'Timers and time': {
         'Current time': {
           displayedName: 'Current time',
-          fullGroupName: 'Time',
+          fullGroupName: 'General/Timers and time/',
           iconFilename: 'res/actions/time.png',
           isPrivate: false,
           name: 'Time',
@@ -255,17 +259,15 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some base object expressions are there
-    expect(allExpressionsTree).toHaveProperty(
-      'Common expressions for all objects'
-    );
+    expect(generalTreeNode).toHaveProperty('Objects');
     expect(
       // $FlowFixMe
-      allExpressionsTree['Common expressions for all objects']
+      generalTreeNode['Objects']
     ).toMatchObject({
       Angle: {
         Angle: {
           displayedName: 'Angle',
-          fullGroupName: 'Common expressions for all objects/Angle',
+          fullGroupName: 'General/Objects/Angle',
           iconFilename: 'res/actions/direction.png',
           isPrivate: false,
           name: 'Angle',
@@ -278,13 +280,13 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some Sprite object expressions are there
-    expect(allExpressionsTree).toHaveProperty('Sprite');
+    expect(generalTreeNode).toHaveProperty('Sprite');
     // $FlowFixMe
-    expect(allExpressionsTree['Sprite']).toMatchObject({
+    expect(generalTreeNode['Sprite']).toMatchObject({
       Position: {
         'X position of a point': {
           displayedName: 'X position of a point',
-          fullGroupName: 'Sprite/Position',
+          fullGroupName: 'General/Sprite/Position',
           iconFilename: 'res/actions/position.png',
           isPrivate: false,
           name: 'PointX',
@@ -297,14 +299,14 @@ describe('EnumerateExpressions', () => {
     });
 
     // Check that some behavior expressions are there
-    expect(allExpressionsTree).toHaveProperty('Platform Behavior');
+    expect(generalTreeNode).toHaveProperty('Platform behavior');
     // $FlowFixMe
-    expect(allExpressionsTree['Platform Behavior']).toMatchObject({
+    expect(generalTreeNode['Platform behavior']).toMatchObject({
       Options: {
         'Maximum horizontal speed': {
           displayedName: 'Maximum horizontal speed',
-          fullGroupName: 'Platform Behavior/Options',
-          iconFilename: 'CppPlatform/Extensions/platformerobjecticon16.png',
+          fullGroupName: 'General/Platform behavior/Options',
+          iconFilename: 'CppPlatform/Extensions/platformerobjecticon.png',
           isPrivate: false,
           name: 'MaxSpeed',
           scope: {

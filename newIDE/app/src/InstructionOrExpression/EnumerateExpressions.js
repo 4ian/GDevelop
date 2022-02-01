@@ -5,6 +5,7 @@ import {
 } from './EnumeratedInstructionOrExpressionMetadata.js';
 import { mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
+import { getExtensionPrefix } from './EnumerateInstructions.js';
 const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -17,15 +18,6 @@ const isPotentiallyStringType = (type: string) =>
   type === 'string' || type === 'number|string';
 const isPotentiallyNumberType = (type: string) =>
   type === 'number' || type === 'number|string';
-
-const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  return (
-    extension.getCategory() +
-    GROUP_DELIMITER +
-    extension.getFullName() +
-    GROUP_DELIMITER
-  );
-};
 
 const enumerateExpressionMetadataMap = (
   prefix: string,

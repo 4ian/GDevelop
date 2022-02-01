@@ -22,7 +22,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
   extension.AddInstructionOrExpressionGroupMetadata(_("Scene"))
       .SetIcon("res/conditions/depart24.png");
 
-  // TODO: move this.
   extension
       .AddStrExpression("CurrentSceneName",
                         _("Current scene name"),

@@ -63,7 +63,7 @@ const freeInstructionsToRemove = {
   ],
 };
 
-const getExtensionPrefix = (extension: gdPlatformExtension): string => {
+export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
   return (
     extension.getCategory() +
     GROUP_DELIMITER +

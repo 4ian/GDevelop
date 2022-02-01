@@ -9,7 +9,7 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
-import { type SearchMatches } from '../../UI/Search/UseSearchStructuredItem';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   button: { width: '100%' },
@@ -25,7 +25,7 @@ const styles = {
 type Props = {|
   project: gdProject,
   extensionShortHeader: ExtensionShortHeader,
-  matches: ?SearchMatches,
+  matches: ?Array<SearchMatch>,
   onChoose: () => void,
   onHeightComputed: number => void,
 |};

@@ -39,6 +39,7 @@ const HighlightedText = ({
   matchesCoordinates: number[][],
   styleToApply: { backgroundColor?: string, color?: string },
 |}): React.Node[] => {
+  if (matchesCoordinates.length === 0) return [text];
   const returnText = [];
 
   for (let i = 0; i < matchesCoordinates.length; i++) {

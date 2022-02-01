@@ -6,7 +6,7 @@ import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
-import { textEllispsisStyle } from '../TextEllipsis';
+import { textEllipsisStyle } from '../TextEllipsis';
 
 const styles = {
   textField: {
@@ -83,7 +83,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
             <div
               title={typeof itemName === 'string' ? itemName : undefined}
               style={{
-                ...textEllispsisStyle,
+                ...textEllipsisStyle,
                 color: selected
                   ? muiTheme.listItem.selectedTextColor
                   : undefined,

@@ -13,7 +13,7 @@ import TextField, {
   noMarginTextFieldInListItemTopOffset,
 } from '../UI/TextField';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
-import { textEllispsisStyle } from '../UI/TextEllipsis';
+import { textEllipsisStyle } from '../UI/TextEllipsis';
 
 import { ExtensionStoreContext } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
@@ -155,7 +155,7 @@ export const Item = ({
     <div
       style={{ display: 'inline-flex', width: '100%', alignItems: 'center' }}
     >
-      <span style={textEllispsisStyle} title={primaryText}>
+      <span style={textEllipsisStyle} title={primaryText}>
         {primaryText}
       </span>
       {textEndAdornment && (

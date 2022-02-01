@@ -152,9 +152,23 @@ export const Item = ({
       style={styles.itemTextField}
     />
   ) : (
-    <div style={textEllispsisStyle} title={primaryText}>
-      {primaryText}
-      {textEndAdornment}
+    <div
+      style={{ display: 'inline-flex', width: '100%', alignItems: 'center' }}
+    >
+      <span style={textEllispsisStyle} title={primaryText}>
+        {primaryText}
+      </span>
+      {textEndAdornment && (
+        <span
+          style={{
+            verticalAlign: 'bottom',
+            marginLeft: 5,
+            display: 'flex',
+          }}
+        >
+          {textEndAdornment}
+        </span>
+      )}
     </div>
   );
 

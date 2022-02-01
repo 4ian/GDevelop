@@ -736,14 +736,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                                   t`This scene will be used as the start scene.`
                                 )}
                               >
-                                <Flag
-                                  color="disabled"
-                                  fontSize="small"
-                                  style={{
-                                    verticalAlign: 'bottom',
-                                    marginLeft: 5,
-                                  }}
-                                />
+                                <Flag color="disabled" fontSize="small" />
                               </Tooltip>
                             ) : (
                               undefined

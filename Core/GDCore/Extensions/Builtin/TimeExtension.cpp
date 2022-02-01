@@ -138,14 +138,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("Wait",
-                 _("Wait X milliseconds"),
-                 _("Waits a certain amount of milliseconds before continuing "
+                 _("Wait X seconds"),
+                 _("Waits a certain amount of seconds before continuing "
                    "to execute the actions."),
-                 _("Wait _PARAM0_ milliseconds"),
+                 _("Wait _PARAM0_ seconds"),
                  _("Time"),
                  "res/conditions/timer24.png",
                  "res/conditions/timer.png")
-      .AddParameter("expression", "Time to wait in milliseconds")
+      .AddParameter("expression", "Time to wait in seconds")
       .SetAsync();
 
   extension

@@ -445,7 +445,8 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
 gd::String EventsCodeGenerator::GenerateActionCode(
     gd::Instruction& action,
     EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   gd::String actionCode;
 
   const gd::InstructionMetadata& instrInfos =
@@ -513,7 +514,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                                            arguments,
                                            instrInfos,
                                            context,
-                                           asyncCallback);
+                                           functionPrefix,
+                                           functionSuffix);
 
         context.SetNoCurrentObject();
       }
@@ -546,7 +548,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
                                    arguments,
                                    instrInfos,
                                    context,
-                                   asyncCallback);
+                                   functionPrefix, functionSuffix);
 
         context.SetNoCurrentObject();
       }
@@ -555,7 +557,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
     vector<gd::String> arguments = GenerateParametersCodes(
         action.GetParameters(), instrInfos.parameters, context);
     actionCode +=
-        GenerateFreeAction(arguments, instrInfos, context, asyncCallback);
+        GenerateFreeAction(arguments, instrInfos, context, functionPrefix, functionSuffix);
   }
 
   return actionCode;
@@ -1010,7 +1012,8 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   // Generate call
   gd::String call;
   if (instrInfos.codeExtraInformation.type == "number" ||
@@ -1034,13 +1037,11 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
           arguments,
           instrInfos.codeExtraInformation.functionCallName);
   } else {
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments) + ")";
+    call = functionPrefix + instrInfos.codeExtraInformation.functionCallName +
+           "(" + GenerateArgumentsList(arguments) + ")" + functionSuffix;
   }
 
-  if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
-
-  return call + ";\n";
+  return call + "\n";
 }
 
 gd::String EventsCodeGenerator::GenerateObjectAction(
@@ -1049,7 +1050,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
@@ -1074,10 +1076,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 1);
 
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           argumentsStr + ")";
-
-    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+    call = functionPrefix + instrInfos.codeExtraInformation.functionCallName + "(" +
+           argumentsStr + ")" + functionSuffix;
 
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ").\n";
@@ -1091,7 +1091,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   // Create call
   gd::String call;
   if ((instrInfos.codeExtraInformation.type == "number" ||
@@ -1115,10 +1116,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 2);
 
-    call = instrInfos.codeExtraInformation.functionCallName + "(" +
-           argumentsStr + ")";
-
-    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+    call = functionPrefix + instrInfos.codeExtraInformation.functionCallName +
+           "(" + argumentsStr + ")" + functionSuffix;
 
     return "For each picked object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ")" + " for behavior \"" + behaviorName + "\".\n";

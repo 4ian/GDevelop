@@ -156,7 +156,8 @@ class GD_CORE_API EventsCodeGenerator {
    */
   gd::String GenerateActionCode(gd::Instruction& action,
                                 EventsCodeGenerationContext& context,
-                                const gd::String& asyncCallback = "");
+                                const gd::String& functionPrefix = "",
+                                const gd::String& functionSuffix = ";");
 
   /**
    * \brief Generate code for declaring objects lists.
@@ -667,7 +668,8 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& functionPrefix = "",
+      const gd::String& functionSuffix = ";");
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
@@ -675,7 +677,8 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& functionPrefix = "",
+      const gd::String& functionSuffix = ";");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -684,7 +687,8 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& functionPrefix = "",
+      const gd::String& functionSuffix = ";");
 
   gd::String GenerateRelationalOperatorCall(
       const gd::InstructionMetadata& instrInfos,

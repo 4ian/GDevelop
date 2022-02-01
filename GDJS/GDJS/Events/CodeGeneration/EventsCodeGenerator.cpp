@@ -662,7 +662,8 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   gd::String actionCode;
 
   // Prepare call
@@ -695,15 +696,15 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           1);
   } else {
-    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments, 1) + ")";
-    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+    call = functionPrefix + objectPart +
+           instrInfos.codeExtraInformation.functionCallName + "(" +
+           GenerateArgumentsList(arguments, 1) + ")" + functionSuffix;
   }
 
   actionCode +=
       "for(var i = 0, len = " + GetObjectListName(objectName, context) +
       ".length ;i < len;++i) {\n";
-  actionCode += "    " + call + ";\n";
+  actionCode += "    " + call + "\n";
   actionCode += "}\n";
 
   return actionCode;
@@ -716,7 +717,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& functionPrefix,
+    const gd::String& functionSuffix) {
   gd::String actionCode;
 
   // Prepare call
@@ -751,9 +753,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           2);
   } else {
-    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments, 2) + ")";
-    if (!asyncCallback.empty()) call += ".then(" + asyncCallback + ")";
+    call = functionPrefix + objectPart +
+           instrInfos.codeExtraInformation.functionCallName + "(" +
+           GenerateArgumentsList(arguments, 2) + ")" + functionSuffix;
   }
 
   // Verify that object has behavior.
@@ -768,7 +770,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     actionCode +=
         "for(var i = 0, len = " + GetObjectListName(objectName, context) +
         ".length ;i < len;++i) {\n";
-    actionCode += "    " + call + ";\n";
+    actionCode += "    " + call + "\n";
     actionCode += "}\n";
   }
 

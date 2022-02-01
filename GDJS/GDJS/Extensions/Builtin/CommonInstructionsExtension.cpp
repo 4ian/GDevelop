@@ -157,16 +157,20 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 ") asyncObjectsList.addObject(obj);\n";
         }
 
+        const gd::String callbackCallCode =
+            "() => (" + callbackFunctionName + "(" +
+            dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
+                .GenerateEventsParameters(callbackContext) +
+            "))";
+
         // Generate the action with a .then to the generated callback
-        const gd::String actionCode = codeGenerator.GenerateActionCode(
+        const gd::String taskSchedulingCode = codeGenerator.GenerateActionCode(
             event.GetInstruction(),
             parentContext,
-            "() => (" + callbackFunctionName + "(" +
-                dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
-                    .GenerateEventsParameters(callbackContext) +
-                "))");
+            "runtimeScene.getAsyncTasksManager().addTask(",
+            ", " + callbackCallCode + ");\n");
 
-        return "{" + objectsListsCode + actionCode + "}";
+        return "{" + objectsListsCode + taskSchedulingCode + "}";
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Comment"].SetCodeGenerator(

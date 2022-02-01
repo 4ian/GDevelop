@@ -105,8 +105,22 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
-      export const wait = (time: integer) =>
-        new Promise((r) => setTimeout(r, time));
+      class WaitTask extends gdjs.AsyncTask {
+        private duration: integer;
+        private timeElapsedOnScene = 0;
+
+        constructor(time: integer) {
+          super();
+          this.duration = time;
+        }
+
+        update(runtimeScene: RuntimeScene): boolean {
+          this.timeElapsedOnScene += runtimeScene.getTimeManager().getElapsedTime();
+          return this.timeElapsedOnScene >= this.duration;
+        }
+      }
+
+      export const wait = (time: integer): AsyncTask => new WaitTask(time);
 
       /**
        * This is used by expressions to return 0 when a timer doesn't exist,

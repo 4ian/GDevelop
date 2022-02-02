@@ -5,7 +5,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 const waitTime = 1500;
 const bulkWaitTime = 5000;
-const maxTimeBeforeIgnoring = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+const maxTimeBeforeIgnoring = 30 * 60 * 1000; // 30 mins in milliseconds
 
 export default class BuildsWatcher {
   runningWatchers: { [string]: boolean } = {};

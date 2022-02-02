@@ -131,6 +131,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     return archiveLocalFolder({
       path: temporaryOutputDir,
       outputFilename: path.join(archiveOutputDir, 'game-archive.zip'),
+      sizeLimit: 250 * 1000 * 1000,
     });
   },
 

@@ -33,9 +33,11 @@ export const archiveLocalFolder = ({
         `Archive written at ${outputFilename}, ${fileSize}} total bytes.`
       );
       if (sizeLimit && fileSize > sizeLimit) {
+        const roundFileSizeInMb = Math.round(fileSize / (1000 * 1000));
         reject(
           new Error(
-            `Archive is of size ${fileSize} bytes, which is above the limit allowed of ${sizeLimit} bytes.`
+            `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${sizeLimit /
+              (1000 * 1000)} MB.`
           )
         );
       }

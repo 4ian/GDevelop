@@ -172,21 +172,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
       .AddParameter("string", _("Storage name"))
       .MarkAsAdvanced();
 
-  // TODO: Move this
-  extension
-      .AddAction("LaunchFile",
-                 _("Open a URL or a file"),
-                 _("This action launches the specified file or URL, in a "
-                   "browser (or in a new tab if the game is using the Web "
-                   "platform and is launched inside a browser)."),
-                 _("Open URL (or file) _PARAM0_"),
-                 _("Network"),
-                 "res/actions/launchFile24.png",
-                 "res/actions/launchFile.png")
-      .AddParameter("string", _("URL (or filename)"))
-      .AddCodeOnlyParameter("currentScene", "")
-      .MarkAsAdvanced();
-
   extension
       .AddAction("ExecuteCmd",
                  _("Execute a command"),

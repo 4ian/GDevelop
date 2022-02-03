@@ -95,13 +95,29 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
             "explore the results with a *structure variable*."))
       .AddParameter(
           "scenevar", _("Variable where to store the error message"), "", true)
-      .SetParameterLongDescription(
-          _("Optional, only used if an error occurs. This will contain the "
-            "[\"status code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) "
-            "if the server returns a status >= 400. If the request was not sent "
-            "at all (e.g. no internet or CORS issues), the variable will be set to "
-            "\"REQUEST_NOT_SENT\"."))
+      .SetParameterLongDescription(_(
+          "Optional, only used if an error occurs. This will contain the "
+          "[\"status "
+          "code\"](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) "
+          "if the server returns a status >= 400. If the request was not sent "
+          "at all (e.g. no internet or CORS issues), the variable will be set "
+          "to "
+          "\"REQUEST_NOT_SENT\"."))
       .MarkAsComplex();
+
+  extension
+      .AddAction("LaunchFile",
+                 _("Open a URL (web page) or a file"),
+                 _("This action launches the specified file or URL, in a "
+                   "browser (or in a new tab if the game is using the Web "
+                   "platform and is launched inside a browser)."),
+                 _("Open URL _PARAM0_ in a browser (or new tab)"),
+                 "",
+                 "res/actions/net24.png",
+                 "res/actions/net.png")
+      .AddParameter("string", _("URL (or filename)"))
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
 
   extension
       .AddAction(

@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "NetworkExtension.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
@@ -21,6 +22,7 @@ NetworkExtension::NetworkExtension() {
       "gdjs.evtTools.network.sendAsyncRequest");
   GetAllActions()["EnableMetrics"].SetFunctionName(
       "gdjs.evtTools.network.enableMetrics");
+  GetAllActions()["LaunchFile"].SetFunctionName("gdjs.evtTools.window.openURL");
 
   StripUnimplementedInstructionsAndExpressions();
 }

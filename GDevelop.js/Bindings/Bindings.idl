@@ -1110,11 +1110,13 @@ interface InstructionMetadata {
     long GetUsageComplexity();
     boolean IsHidden();
     boolean IsPrivate();
+    boolean IsAsync();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
     [Ref] InstructionMetadata SetPrivate();
+    [Ref] InstructionMetadata SetAsync();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,

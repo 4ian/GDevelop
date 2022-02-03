@@ -23,6 +23,7 @@ import axios from 'axios';
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { UsersAutocomplete } from '../../Utils/UsersAutocomplete';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
@@ -189,6 +190,45 @@ export const ExtensionOptionsEditor = ({
               forceUpdate();
             }}
             fullWidth
+          />
+          <SemiControlledAutoComplete
+            floatingLabelText={<Trans>Category (shown in the editor)</Trans>}
+            fullWidth
+            value={eventsFunctionsExtension.getCategory()}
+            onChange={category => {
+              eventsFunctionsExtension.setCategory(category);
+              forceUpdate();
+            }}
+            dataSource={[
+              {
+                text: '',
+                value: 'General',
+              },
+              {
+                text: 'Ads',
+                value: 'Ads',
+              },
+              {
+                text: 'Advanced',
+                value: 'Advanced',
+              },
+              {
+                text: 'Device',
+                value: 'Device',
+              },
+              {
+                text: 'Input',
+                value: 'Input',
+              },
+              {
+                text: 'Network',
+                value: 'Network',
+              },
+              {
+                text: 'Third-party',
+                value: 'Third-party',
+              },
+            ]}
           />
           <SemiControlledTextField
             floatingLabelText={<Trans>Tags (comma separated)</Trans>}

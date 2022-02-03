@@ -25,8 +25,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("Random",
                      _("Random integer"),
                      _("Random integer"),
-                     _("Random"),
-                     "res/actions/position.png")
+                     "",
+                     "res/dice-6.svg")
       .SetHelpPath("/all-features/expressions")
       .AddParameter("expression", _("Maximum value"));
 
@@ -34,8 +34,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("RandomInRange",
                      _("Random integer in range"),
                      _("Random integer in range"),
-                     _("Random"),
-                     "res/actions/position.png")
+                     "",
+                     "res/dice-6.svg")
       .SetHelpPath("/all-features/expressions")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"));
@@ -44,8 +44,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("RandomFloat",
                      _("Random float"),
                      _("Random float"),
-                     _("Random"),
-                     "res/actions/position.png")
+                     "",
+                     "res/dice-6.svg")
       .SetHelpPath("/all-features/expressions")
       .AddParameter("expression", _("Maximum value"));
 
@@ -53,8 +53,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("RandomFloatInRange",
                      _("Random float in range"),
                      _("Random float in range"),
-                     _("Random"),
-                     "res/actions/position.png")
+                     "",
+                     "res/dice-6.svg")
       .SetHelpPath("/all-features/expressions")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"));
@@ -63,8 +63,8 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("RandomWithStep",
                      _("Random value in steps"),
                      _("Random value in steps"),
-                     _("Random"),
-                     "res/actions/position.png")
+                     "",
+                     "res/dice-6.svg")
       .SetHelpPath("/all-features/expressions")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"))

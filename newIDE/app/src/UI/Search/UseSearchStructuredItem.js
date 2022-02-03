@@ -34,16 +34,15 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
     .filter(Boolean);
 };
 
-const tuneMatches = (
+export const tuneMatches = (
   result: {| item: any, matches: SearchMatch[] |},
   searchText: string
-) => {
-  return result.matches.map(match => ({
+) =>
+  result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
-};
 
 /**
  * Filter a list of items according to the chosen category

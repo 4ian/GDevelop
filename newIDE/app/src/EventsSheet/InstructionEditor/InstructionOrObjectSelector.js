@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { t } from '@lingui/macro';
+import Fuse from 'fuse.js';
 
 import * as React from 'react';
 import Add from '@material-ui/icons/Add';
@@ -15,7 +16,6 @@ import {
 import {
   enumerateAllInstructions,
   enumerateFreeInstructions,
-  filterInstructionsList,
   deduplicateInstructionsList,
 } from '../../InstructionOrExpression/EnumerateInstructions';
 import {
@@ -34,10 +34,12 @@ import Subheader from '../../UI/Subheader';
 import {
   enumerateObjectsAndGroups,
   filterObjectsList,
-  filterGroupsList,
+  type ObjectWithContextList,
+  type GroupWithContextList,
   enumerateObjects,
 } from '../../ObjectsList/EnumerateObjects';
 import TagChips from '../../UI/TagChips';
+import { type Tags } from '../../Utils/TagsHelper';
 import RaisedButton from '../../UI/RaisedButton';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { renderGroupObjectsListItem } from './SelectorListItems/SelectorGroupObjectsListItem';
@@ -54,6 +56,8 @@ import {
   getInstructionListItemValue,
 } from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
+import { tuneMatches } from '../../UI/Search/UseSearchStructuredItem';
+
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -62,10 +66,13 @@ const styles = {
   },
 };
 
+const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
+
 export type TabName = 'objects' | 'free-instructions';
 
 type State = {|
   searchText: string,
+  searchResults: Array<any>,
 
   // State for tags of objects:
   selectedObjectTags: Array<string>,
@@ -100,7 +107,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   Props,
   State
 > {
-  state = { searchText: '', selectedObjectTags: [] };
+  state = { searchText: '', selectedObjectTags: [], searchResults: [] };
   _searchBar = React.createRef<SearchBarInterface>();
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
@@ -117,6 +124,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     this.freeInstructionsInfoTree,
     this.props.chosenInstructionType
   );
+
+  searchApi = null;
 
   reEnumerateInstructions = () => {
     this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
@@ -145,6 +154,53 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
+    const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
+      this.props.globalObjectsContainer,
+      this.props.objectsContainer
+    );
+    const searchData = [
+      // Instructions
+      ...deduplicateInstructionsList(this.allInstructionsInfo).map(
+        instruction => ({
+          mainDescription: instruction.displayedName,
+          bonusDescription: instruction.fullGroupName,
+          item: instruction,
+          itemType: 'instruction',
+        })
+      ),
+      // Objects
+      ...allObjectsList.map(objectWithContext => ({
+        mainDescription: objectWithContext.object.getName(),
+        bonusDescription: '',
+        item: objectWithContext,
+        itemType: 'object',
+      })),
+      // Objects groups
+      ...allGroupsList.map(groupWithContext => ({
+        mainDescription: groupWithContext.group.getName(),
+        bonusDescription: '',
+        item: groupWithContext,
+        itemType: 'group',
+      })),
+      // Objects tags
+      ...this._getAllObjectTags().map(tag => ({
+        mainDescription: tag,
+        bonusDescription: '',
+        item: tag,
+        itemType: 'tag',
+      })),
+    ];
+    this.searchApi = new Fuse(searchData, {
+      keys: [
+        { name: 'mainDescription', weight: 2 },
+        { name: 'bonusDescription', weight: 1 },
+      ],
+      minMatchCharLength: 1,
+      threshold: 0.35,
+      includeMatches: true,
+      ignoreLocation: true,
+      ignoreFieldNorm: true,
+    });
   }
 
   _getAllObjectTags = (): Array<string> => {
@@ -190,7 +246,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       onSearchStartOrReset,
       onClickMore,
     } = this.props;
-    const { searchText, selectedObjectTags } = this.state;
+    const { searchText, selectedObjectTags, searchResults } = this.state;
 
     // If the global objects container is not the project, consider that we're
     // not in the events of a layout or an external events sheet - but in an extension.
@@ -200,34 +256,46 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       globalObjectsContainer,
       objectsContainer
     );
-    const displayedObjectsList = filterObjectsList(allObjectsList, {
-      searchText,
-      selectedTags: selectedObjectTags,
-    });
-    const displayedObjectGroupsList = selectedObjectTags.length
-      ? []
-      : filterGroupsList(allGroupsList, { searchText });
     const isSearching = !!searchText;
 
-    const filteredInstructionsList = filterInstructionsList(
-      // When searching, search among all the instructions
-      isSearching ? this.allInstructionsInfo : this.freeInstructionsInfo,
-      { searchText }
+    let filteredObjectsList: ObjectWithContextList = [];
+    let displayedObjectGroupsList: GroupWithContextList = [];
+    let filteredInstructionsList: Array<EnumeratedInstructionMetadata> = [];
+    let displayedTags: Tags = [];
+
+    if (isSearching) {
+      filteredObjectsList = searchResults
+        .filter(searchResult => searchResult.item.itemType === 'object')
+        .map(searchResult => searchResult.item.item);
+      displayedObjectGroupsList = searchResults
+        .filter(searchResult => searchResult.item.itemType === 'group')
+        .map(searchResult => searchResult.item.item);
+      filteredInstructionsList = searchResults
+        .filter(searchResult => searchResult.item.itemType === 'instruction')
+        .map(searchResult => searchResult.item.item);
+      displayedTags = searchResults
+        .filter(searchResult => searchResult.item.itemType === 'tag')
+        .map(searchResult => searchResult.item.item);
+    } else {
+      filteredObjectsList = allObjectsList;
+      displayedObjectGroupsList = allGroupsList;
+    }
+
+    const displayedObjectsList = filterObjectsList(filteredObjectsList, {
+      searchText: '',
+      selectedTags: selectedObjectTags,
+    });
+
+    const displayedInstructionsList = filteredInstructionsList.slice(
+      0,
+      DISPLAYED_INSTRUCTIONS_MAX_LENGTH
     );
 
-    // When searching, we can have a lot of results. Keep only the first ones.
-    // Also ensure no duplicate is shown (could be the case for the "Create" action,
-    // as both present in the object actions list and in the free actions list).
-    const displayedInstructionsList = isSearching
-      ? deduplicateInstructionsList(filteredInstructionsList.slice(0, 20))
-      : filteredInstructionsList;
-
-    const displayedTags = isSearching
-      ? this._getAllObjectTags().filter(tag => tag.includes(searchText))
-      : [];
-
     const remainingResultsCount = isSearching
-      ? Math.max(filteredInstructionsList.length - 20, 0)
+      ? Math.max(
+          filteredInstructionsList.length - DISPLAYED_INSTRUCTIONS_MAX_LENGTH,
+          0
+        )
       : 0;
 
     const hasResults =
@@ -270,6 +338,14 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                     const oldSearchText = this.state.searchText;
                     this.setState({
                       searchText,
+                      searchResults: this.searchApi
+                        ? this.searchApi
+                            .search(`'${searchText}`)
+                            .map(result => ({
+                              item: result.item,
+                              matches: tuneMatches(result, searchText),
+                            }))
+                        : [],
                     });
 
                     // Notify if needed that we started or cleared a search

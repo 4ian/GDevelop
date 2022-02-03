@@ -37,7 +37,7 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 
 -   [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/gdevelop).
 -   [GDevelop homepage](https://gdevelop.io)
--   [GDevelop wiki (documentation)](http://wiki.compilgames.net/doku.php/gdevelop5/start)
+-   [GDevelop wiki (documentation)](https://wiki.gdevelop.io/gdevelop5/start)
 -   Help translate GDevelop in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
 
 ### Development Roadmap

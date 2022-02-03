@@ -3,6 +3,7 @@
 /**
  * Create and return a game with a few assets loaded, to be used in tests
  * needing real images.
+ * @internal
  * @returns {Promise<gdjs.RuntimeGame>} A promise resolving with the game with loaded assets.
  */
 gdjs.getPixiRuntimeGameWithAssets = () => {

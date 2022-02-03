@@ -30,6 +30,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/libs/jshashtable.js',
       '../../newIDE/app/resources/GDJS/Runtime/logger.js',
       '../../newIDE/app/resources/GDJS/Runtime/gd.js',
+      '../../newIDE/app/resources/GDJS/Runtime/AsyncTasksManager.js',
       '../../newIDE/app/resources/GDJS/Runtime/libs/rbush.js',
       '../../newIDE/app/resources/GDJS/Runtime/cocos-renderers/cocos-director-manager.js',
       '../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi.js',

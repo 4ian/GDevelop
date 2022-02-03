@@ -8,6 +8,7 @@
 
   ```bash
   cd <GDevelop repository>/GDJS
+  npm install
   npm run generate-doc
   ```
 

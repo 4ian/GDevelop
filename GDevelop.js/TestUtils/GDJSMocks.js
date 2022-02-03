@@ -96,8 +96,13 @@ class VariablesContainer {
 }
 
 class RuntimeObject {
-  constructor() {
+  constructor(runtimeScene, objectData) {
+    this.name = objectData.name || '';
     this._variables = new VariablesContainer();
+  }
+
+  getName() {
+    return this.name;
   }
 
   getVariables() {
@@ -106,6 +111,10 @@ class RuntimeObject {
 
   returnVariable(variable) {
     return variable;
+  }
+
+  registerDestroyCallback() {
+    // TODO
   }
 }
 
@@ -264,7 +273,8 @@ class RuntimeScene {
   createObject(objectName) {
     if (!this._instances[objectName]) this._instances[objectName] = [];
 
-    const newObject = new RuntimeObject();
+    const fakeObjectData = { name: objectName };
+    const newObject = new RuntimeObject(this, fakeObjectData);
     this._instances[objectName].push(newObject);
 
     return newObject;

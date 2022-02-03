@@ -211,8 +211,7 @@ namespace gdjs {
       };
 
       /**
-       * Gets an event from {@link events}
-       * or creates it if it doesn't exist.
+       * Get an event or creates it if it doesn't exist.
        */
       export const getEvent = (name: string) => {
         if (!events.hasOwnProperty(name)) events[name] = new Event();

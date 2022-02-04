@@ -8,7 +8,6 @@ import { Column, Line } from '../../UI/Grid';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
@@ -47,7 +46,6 @@ export const ExtensionListItem = ({
     if (containerRef.current)
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
-  const theme = React.useContext(GDevelopThemeContext);
 
   const renderExtensionField = (field: 'shortDescription' | 'fullName') => {
     const originalField = extensionShortHeader[field];
@@ -60,7 +58,6 @@ export const ExtensionListItem = ({
       <HighlightedText
         text={originalField}
         matchesCoordinates={nameMatches[0].indices}
-        styleToApply={theme.text.highlighted}
       />
     );
   };

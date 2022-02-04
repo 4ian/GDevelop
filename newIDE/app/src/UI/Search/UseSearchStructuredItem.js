@@ -43,10 +43,7 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
     .filter(Boolean);
 };
 
-export const tuneMatches = <T>(
-  result: SearchResult<T>,
-  searchText: string
-) =>
+export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
   result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,

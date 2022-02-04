@@ -132,7 +132,9 @@ export const filterObjectsList = (
   if (!searchText && !selectedTags.length) return list;
 
   return list
-    .filter(objectWithContext => filterObjectByTags(objectWithContext, selectedTags))
+    .filter(objectWithContext =>
+      filterObjectByTags(objectWithContext, selectedTags)
+    )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();
 

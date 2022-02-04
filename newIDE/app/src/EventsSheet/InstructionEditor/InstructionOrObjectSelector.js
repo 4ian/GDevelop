@@ -513,7 +513,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                     chosenInstructionType
                                   )
                                 : undefined,
-                              matches
+                              matches,
                             })
                         )}
                       {!isSearching && currentTab === 'free-instructions' && (

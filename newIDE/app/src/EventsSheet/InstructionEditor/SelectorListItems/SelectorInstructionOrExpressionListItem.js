@@ -25,9 +25,7 @@ export const renderInstructionOrExpressionListItem = ({
   const getRenderedText = (field: 'displayedName' | 'fullGroupName') => {
     let text = instructionOrExpressionMetadata[field];
     if (matches && matches.length) {
-      const matchesForGivenField = matches.filter(
-        match => match.key === field
-      );
+      const matchesForGivenField = matches.filter(match => match.key === field);
       if (!!matchesForGivenField.length) {
         text = (
           <HighlightedText

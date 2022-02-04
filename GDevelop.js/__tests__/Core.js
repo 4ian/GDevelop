@@ -1065,21 +1065,33 @@ describe('libGD.js', function () {
     });
 
     it('can find files that are not in the resources', function () {
-      var project = gd.ProjectHelper.createNewGDJSProject();
-      var resource = new gd.ImageResource();
-      var resource2 = new gd.AudioResource();
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const resource = new gd.ImageResource();
+      const resource2 = new gd.AudioResource();
+      const resource3 = new gd.AudioResource();
+      const resource4 = new gd.JsonResource();
       resource.setName('MyResource');
       resource.setFile('MyFile.png');
       resource2.setName('MyResource2');
       resource2.setFile('MySubFolder/MyOtherFile.mp3');
+      resource3.setName('MyResource3');
+      resource3.setFile('MySubFolder\\MyOtherFileInWindowsFormat.mp3');
+      resource4.setName('MyResource4');
+      resource4.setFile('MySubFolder/MyOtherFileInUnixFormat.json');
       project.getResourcesManager().addResource(resource);
       project.getResourcesManager().addResource(resource2);
+      project.getResourcesManager().addResource(resource3);
+      project.getResourcesManager().addResource(resource4);
 
       const filesToCheck = new gd.VectorString();
       [
         'MyFile.png',
         'MySubFolder/MyFileMissingInResource.png',
         'MySubFolder/MyOtherFile.mp3',
+        // Check that resources can be found even if specified using
+        // a different path separator:
+        'MySubFolder/MyOtherFileInWindowsFormat.mp3',
+        'MySubFolder\\MyOtherFileInUnixFormat.json',
       ].forEach((filePath) => {
         filesToCheck.push_back(filePath);
       });

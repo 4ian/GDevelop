@@ -18,6 +18,16 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 
+namespace {
+gd::String NormalizePathSeparator(const gd::String& path) {
+  gd::String normalizedPath = path;
+  while (normalizedPath.find('\\') != gd::String::npos)
+    normalizedPath.replace(normalizedPath.find('\\'), 1, "/");
+
+  return normalizedPath;
+}
+}  // namespace
+
 namespace gd {
 
 gd::String Resource::badStr;
@@ -126,19 +136,20 @@ std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
 }
 
 std::vector<gd::String> ResourcesManager::FindFilesNotInResources(
-    const std::vector<gd::String>& filesToCheck) const {
-  std::unordered_set<gd::String> resourceFiles;
-  for (const auto& resource: resources) {
-    resourceFiles.insert(resource->GetFile());
+    const std::vector<gd::String>& filePathsToCheck) const {
+  std::unordered_set<gd::String> resourceFilePaths;
+  for (const auto& resource : resources) {
+    resourceFilePaths.insert(NormalizePathSeparator(resource->GetFile()));
   }
 
-  std::vector<gd::String> filesNotInResources;
-  for(const gd::String& file: filesToCheck) {
-    if (resourceFiles.find(file) == resourceFiles.end())
-      filesNotInResources.push_back(file);
+  std::vector<gd::String> filePathsNotInResources;
+  for (const gd::String& file : filePathsToCheck) {
+    gd::String normalizedPath = NormalizePathSeparator(file);
+    if (resourceFilePaths.find(normalizedPath) == resourceFilePaths.end())
+      filePathsNotInResources.push_back(file);
   }
 
-  return filesNotInResources;
+  return filePathsNotInResources;
 }
 
 std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties() const {
@@ -532,11 +543,7 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
 }
 
 void ImageResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void ImageResource::UnserializeFrom(const SerializerElement& element) {
@@ -554,11 +561,7 @@ void ImageResource::SerializeTo(SerializerElement& element) const {
 }
 
 void AudioResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void AudioResource::UnserializeFrom(const SerializerElement& element) {
@@ -576,11 +579,7 @@ void AudioResource::SerializeTo(SerializerElement& element) const {
 }
 
 void FontResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void FontResource::UnserializeFrom(const SerializerElement& element) {
@@ -594,11 +593,7 @@ void FontResource::SerializeTo(SerializerElement& element) const {
 }
 
 void VideoResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void VideoResource::UnserializeFrom(const SerializerElement& element) {
@@ -612,11 +607,7 @@ void VideoResource::SerializeTo(SerializerElement& element) const {
 }
 
 void JsonResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void JsonResource::UnserializeFrom(const SerializerElement& element) {
@@ -649,13 +640,8 @@ bool JsonResource::UpdateProperty(const gd::String& name,
   return true;
 }
 
-
 void BitmapFontResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void BitmapFontResource::UnserializeFrom(const SerializerElement& element) {

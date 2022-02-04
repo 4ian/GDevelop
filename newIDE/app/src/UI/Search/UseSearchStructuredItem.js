@@ -7,6 +7,14 @@ import Fuse from 'fuse.js';
 export type SearchMatch = {| key: string, indices: number[][], value: string |};
 export type SearchResult<T> = {| item: T, matches: SearchMatch[] |};
 
+export const sharedFuseConfiguration = {
+  minMatchCharLength: 1,
+  threshold: 0.35,
+  includeMatches: true,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+};
+
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
   const lowerCaseSearchText = searchText.toLowerCase();
   return match.indices

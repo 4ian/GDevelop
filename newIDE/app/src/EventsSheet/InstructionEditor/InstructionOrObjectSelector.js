@@ -58,6 +58,7 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow
 import {
   type SearchResult,
   tuneMatches,
+  sharedFuseConfiguration,
 } from '../../UI/Search/UseSearchStructuredItem';
 
 const gd: libGDevelop = global.gd;
@@ -69,13 +70,6 @@ const styles = {
 };
 
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
-const sharedFuseConfiguration = {
-  minMatchCharLength: 1,
-  threshold: 0.35,
-  includeMatches: true,
-  ignoreLocation: true,
-  ignoreFieldNorm: true,
-};
 
 export type TabName = 'objects' | 'free-instructions';
 

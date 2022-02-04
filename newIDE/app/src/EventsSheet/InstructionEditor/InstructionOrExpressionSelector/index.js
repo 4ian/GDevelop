@@ -27,6 +27,7 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import {
   tuneMatches,
   type SearchResult,
+  sharedFuseConfiguration,
 } from '../../../UI/Search/UseSearchStructuredItem';
 const gd: libGDevelop = global.gd;
 
@@ -93,11 +94,7 @@ export default class InstructionOrExpressionSelector<
     }
 
     this.searchApi = new Fuse(this.props.instructionsInfo, {
-      minMatchCharLength: 1,
-      threshold: 0.35,
-      includeMatches: true,
-      ignoreLocation: true,
-      ignoreFieldNorm: true,
+      ...sharedFuseConfiguration,
       keys: [
         { name: 'displayedName', weight: 2 },
         { name: 'fullGroupName', weight: 1 },

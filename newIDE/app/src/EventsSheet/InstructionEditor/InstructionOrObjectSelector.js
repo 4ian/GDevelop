@@ -371,7 +371,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   value={searchText}
                   onChange={searchText => {
                     const oldSearchText = this.state.searchText;
-                    this._search(searchText);
+                    if (!!searchText) this._search(searchText);
                     this.setState({
                       searchText,
                     });

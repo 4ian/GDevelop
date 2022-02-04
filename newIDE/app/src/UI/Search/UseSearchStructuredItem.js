@@ -5,6 +5,15 @@ import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
 
 export type SearchMatch = {| key: string, indices: number[][], value: string |};
+export type SearchResult<T> = {| item: T, matches: SearchMatch[] |};
+
+export const sharedFuseConfiguration = {
+  minMatchCharLength: 1,
+  threshold: 0.35,
+  includeMatches: true,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+};
 
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
   const lowerCaseSearchText = searchText.toLowerCase();
@@ -34,16 +43,12 @@ const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
     .filter(Boolean);
 };
 
-const tuneMatches = (
-  result: {| item: any, matches: SearchMatch[] |},
-  searchText: string
-) => {
-  return result.matches.map(match => ({
+export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
+  result.matches.map<SearchMatch>(match => ({
     key: match.key,
     value: match.value,
     indices: tuneMatchIndices(match, searchText),
   }));
-};
 
 /**
  * Filter a list of items according to the chosen category

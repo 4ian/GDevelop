@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import GDevelopThemeContext from '../Theme/ThemeContext';
 
 const highlightText = (
   text: string,
@@ -33,13 +34,14 @@ const highlightText = (
 const HighlightedText = ({
   text,
   matchesCoordinates,
-  styleToApply,
 }: {|
   text: string,
   matchesCoordinates: number[][],
-  styleToApply: { backgroundColor?: string, color?: string },
 |}): React.Node[] => {
+  const theme = React.useContext(GDevelopThemeContext);
+
   if (matchesCoordinates.length === 0) return [text];
+
   const returnText = [];
 
   for (let i = 0; i < matchesCoordinates.length; i++) {
@@ -53,7 +55,7 @@ const HighlightedText = ({
         matchesCoordinates[i],
         startIndex,
         startIndexOfNextMatch,
-        styleToApply
+        theme.text.highlighted
       )
     );
   }

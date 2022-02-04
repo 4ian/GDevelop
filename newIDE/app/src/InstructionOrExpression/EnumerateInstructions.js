@@ -2,9 +2,7 @@
 import {
   type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
-  type EnumeratedInstructionOrExpressionMetadata,
 } from './EnumeratedInstructionOrExpressionMetadata.js';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
 const gd: libGDevelop = global.gd;
 
@@ -491,39 +489,6 @@ export const enumerateFreeInstructions = (
 export type InstructionFilteringOptions = {|
   searchText: string,
 |};
-
-export const filterInstructionsList = <
-  T: EnumeratedInstructionOrExpressionMetadata
->(
-  list: Array<T>,
-  { searchText }: InstructionFilteringOptions
-): Array<T> => {
-  if (!searchText) {
-    return list;
-  }
-
-  const directMatches = [];
-  const fuzzyMatches = [];
-  const lowercaseSearch = searchText.toLowerCase();
-
-  list.forEach(option => {
-    const lowerCaseDisplayedName = option.displayedName.toLowerCase();
-    const lowerCaseFullGroupName = option.fullGroupName.toLowerCase();
-    // favor direct matches first
-    if (lowerCaseDisplayedName.includes(lowercaseSearch)) {
-      return directMatches.push(option);
-    }
-    // then add fuzzy matches
-    if (
-      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseDisplayedName) ||
-      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseFullGroupName)
-    ) {
-      return fuzzyMatches.push(option);
-    }
-  });
-
-  return [...directMatches, ...fuzzyMatches];
-};
 
 export const getObjectParameterIndex = (
   instructionMetadata: gdInstructionMetadata

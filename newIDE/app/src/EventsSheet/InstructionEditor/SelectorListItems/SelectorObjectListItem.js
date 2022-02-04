@@ -8,6 +8,7 @@ import {
   getObjectOrObjectGroupListItemValue,
   getObjectListItemKey,
 } from './Keys';
+import HighlightedText from '../../../UI/Search/HighlightedText';
 
 type Props = {|
   project: gdProject,
@@ -15,6 +16,7 @@ type Props = {|
   iconSize: number,
   onClick: () => void,
   selectedValue: ?string,
+  matchesCoordinates: number[][],
 |};
 
 export const renderObjectListItem = ({
@@ -23,6 +25,7 @@ export const renderObjectListItem = ({
   iconSize,
   onClick,
   selectedValue,
+  matchesCoordinates,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
@@ -31,7 +34,13 @@ export const renderObjectListItem = ({
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
       }
-      primaryText={objectName}
+      primaryText={
+        <HighlightedText
+          text={objectName}
+          matchesCoordinates={matchesCoordinates}
+          styleToApply={{ backgroundColor: 'red' }}
+        />
+      }
       leftIcon={
         <ListIcon
           iconSize={iconSize}

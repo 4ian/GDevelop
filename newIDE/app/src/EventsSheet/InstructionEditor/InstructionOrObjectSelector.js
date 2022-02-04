@@ -55,7 +55,10 @@ import {
   getInstructionListItemValue,
 } from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
-import { type SearchResult } from '../../UI/Search/UseSearchStructuredItem';
+import {
+  type SearchResult,
+  tuneMatches,
+} from '../../UI/Search/UseSearchStructuredItem';
 
 const gd: libGDevelop = global.gd;
 
@@ -204,19 +207,32 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
 
   _search = (searchText: string) => {
     if (searchText === '') return;
+
     this.setState({
       searchResults: {
         objects: this.objectSearchApi
-          ? this.objectSearchApi.search(`'${searchText}`)
+          ? this.objectSearchApi.search(`'${searchText}`).map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
           : [],
         groups: this.groupSearchApi
-          ? this.groupSearchApi.search(`'${searchText}`)
+          ? this.groupSearchApi.search(`'${searchText}`).map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
           : [],
         instructions: this.instructionSearchApi
-          ? this.instructionSearchApi.search(`'${searchText}`)
+          ? this.instructionSearchApi.search(`'${searchText}`).map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
           : [],
         tags: this.tagSearchApi
-          ? this.tagSearchApi.search(`'${searchText}`)
+          ? this.tagSearchApi.search(`'${searchText}`).map(result => ({
+              item: result.item,
+              matches: tuneMatches(result, searchText),
+            }))
           : [],
       },
     });
@@ -424,6 +440,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                   onChooseObject(
                                     objectWithContext.object.getName()
                                   ),
+                                matchesCoordinates: matches.length
+                                  ? matches[0].indices // Only field for objects is their name
+                                  : [],
                                 selectedValue: chosenObjectName
                                   ? getObjectOrObjectGroupListItemValue(
                                       chosenObjectName
@@ -446,6 +465,9 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                   onChooseObject(
                                     groupWithContext.group.getName()
                                   ),
+                                matchesCoordinates: matches.length
+                                  ? matches[0].indices // Only field for groups is their name
+                                  : [],
                                 selectedValue: chosenObjectName
                                   ? getObjectOrObjectGroupListItemValue(
                                       chosenObjectName
@@ -497,6 +519,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                     chosenInstructionType
                                   )
                                 : undefined,
+                              matches: matches
                             })
                         )}
                       {!isSearching && currentTab === 'free-instructions' && (

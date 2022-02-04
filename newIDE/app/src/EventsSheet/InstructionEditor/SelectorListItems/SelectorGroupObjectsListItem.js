@@ -35,7 +35,6 @@ export const renderGroupObjectsListItem = ({
         <HighlightedText
           text={groupName}
           matchesCoordinates={matchesCoordinates}
-          styleToApply={{ backgroundColor: 'red' }}
         />
       }
       leftIcon={

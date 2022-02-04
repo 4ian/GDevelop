@@ -38,7 +38,6 @@ export const renderObjectListItem = ({
         <HighlightedText
           text={objectName}
           matchesCoordinates={matchesCoordinates}
-          styleToApply={{ backgroundColor: 'red' }}
         />
       }
       leftIcon={

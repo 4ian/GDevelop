@@ -33,7 +33,6 @@ export const renderInstructionOrExpressionListItem = ({
           <HighlightedText
             text={text}
             matchesCoordinates={matchesForGivenField[0].indices}
-            styleToApply={{ backgroundColor: 'red' }}
           />
         );
       }

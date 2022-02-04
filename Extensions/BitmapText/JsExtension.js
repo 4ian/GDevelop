@@ -396,7 +396,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'BitmapText::BitmapTextObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/bitmaptext',
+        helpPagePath: '/objects/bitmap_text',
       })
     );
   },

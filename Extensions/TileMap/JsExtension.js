@@ -467,7 +467,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::TileMap',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/tile_map_object',
+        helpPagePath: '/objects/tilemap',
       })
     );
   },

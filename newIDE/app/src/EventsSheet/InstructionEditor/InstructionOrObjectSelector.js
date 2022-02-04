@@ -55,9 +55,7 @@ import {
   getInstructionListItemValue,
 } from './SelectorListItems/Keys';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
-import {
-  type SearchResult,
-} from '../../UI/Search/UseSearchStructuredItem';
+import { type SearchResult } from '../../UI/Search/UseSearchStructuredItem';
 
 const gd: libGDevelop = global.gd;
 
@@ -224,6 +222,14 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     });
   };
 
+  _selectTag = (tag: string) => {
+    this.setState({
+      selectedObjectTags: [...this.state.selectedObjectTags, tag],
+      searchText: '',
+    });
+    this._searchBar.current && this._searchBar.current.focus();
+  };
+
   _getAllObjectTags = (): Array<string> => {
     const { globalObjectsContainer, objectsContainer } = this.props;
 
@@ -329,6 +335,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
         onChooseObject(displayedObjectsList[0].item.object.getName());
       } else if (displayedObjectGroupsList.length > 0) {
         onChooseObject(displayedObjectGroupsList[0].item.group.getName());
+      } else if (displayedTags.length > 0) {
+        this._selectTag(displayedTags[0].item);
       } else if (displayedInstructionsList.length > 0) {
         onChooseInstruction(
           displayedInstructionsList[0].item.type,
@@ -460,15 +468,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             key={tag}
                             primaryText={<Chip label={tag} />}
                             onClick={() => {
-                              this.setState({
-                                selectedObjectTags: [
-                                  ...this.state.selectedObjectTags,
-                                  tag,
-                                ],
-                                searchText: '',
-                              });
-                              this._searchBar.current &&
-                                this._searchBar.current.focus();
+                              this._selectTag(tag);
                             }}
                           />
                         ))}

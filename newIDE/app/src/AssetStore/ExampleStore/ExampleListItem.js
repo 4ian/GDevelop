@@ -19,7 +19,6 @@ import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const electron = optionalRequire('electron');
@@ -59,7 +58,6 @@ export const ExampleListItem = ({
     if (containerRef.current)
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
-  const theme = React.useContext(GDevelopThemeContext);
 
   const isCompatible = isCompatibleWithAsset(
     getIDEVersion(),
@@ -96,7 +94,6 @@ export const ExampleListItem = ({
       <HighlightedText
         text={originalField}
         matchesCoordinates={nameMatches[0].indices}
-        styleToApply={theme.text.highlighted}
       />
     );
   };

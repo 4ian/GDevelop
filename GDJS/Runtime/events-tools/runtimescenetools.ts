@@ -105,7 +105,7 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
-      class WaitTask extends gdjs.AsyncTask {
+      export class WaitTask extends gdjs.AsyncTask {
         private duration: integer;
         private timeElapsedOnScene = 0;
 

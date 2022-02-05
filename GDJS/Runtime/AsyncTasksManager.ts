@@ -35,6 +35,14 @@ namespace gdjs {
     addTask(task: AsyncTask, then: (runtimeScene: RuntimeScene) => void): void {
       this.tasks.set(task, then);
     }
+
+    /**
+     * For testing only - removes all tasks.
+     * @internal
+     */
+    clearTasks() {
+      this.tasks.clear();
+    }
   }
 
   /**

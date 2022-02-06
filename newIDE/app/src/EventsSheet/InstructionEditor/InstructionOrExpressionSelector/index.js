@@ -58,6 +58,7 @@ type Props<T> = {|
   helpPagePath?: ?string,
   style?: Object,
   onClickMore?: () => void,
+  id?: ?string,
 |};
 type State<T> = {|
   searchText: string,
@@ -118,6 +119,7 @@ export default class InstructionOrExpressionSelector<
       helpPagePath,
       style,
       onClickMore,
+      id,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList: Array<SearchResult<T>> =
@@ -146,6 +148,7 @@ export default class InstructionOrExpressionSelector<
               backgroundColor: muiTheme.list.itemsBackgroundColor,
               ...style,
             }}
+            id={id}
           >
             <SearchBar
               value={searchText}

@@ -56,6 +56,7 @@ export const renderInstructionOrExpressionTree = <
             key={value}
             primaryText={key}
             selected={selected}
+            id={'instruction-item-' + instructionInformation.type}
             leftIcon={
               <ListIcon
                 iconSize={iconSize}

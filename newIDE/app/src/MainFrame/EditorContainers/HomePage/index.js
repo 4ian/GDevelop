@@ -321,6 +321,7 @@ export const HomePage = React.memo<Props>(
                                 setPreCreationDialogOpen(true);
                               }}
                               icon={<AddCircleOutline />}
+                              id="home-create-blank-project-button"
                             />
                           )}
                           {!project && canOpen && (

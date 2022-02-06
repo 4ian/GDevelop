@@ -80,6 +80,8 @@ type Props = {|
   // Style:
   noMargin?: boolean,
   noTitleMargin?: boolean,
+
+  id?: ?string,
 |};
 
 // Help Flow to understand the type of the dialog content style.
@@ -109,6 +111,7 @@ export default (props: Props) => {
     flexBody,
     fullHeight,
     noTitleMargin,
+    id,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
@@ -181,7 +184,7 @@ export default (props: Props) => {
       className={classNames({
         'safe-area-aware-container': size === 'small',
       })}
-      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
+      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {}, id }}
       maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}

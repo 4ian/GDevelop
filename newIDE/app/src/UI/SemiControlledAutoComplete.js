@@ -41,7 +41,7 @@ type Props = {|
   onChoose?: string => void,
   dataSource: DataSource,
 
-  id?: string,
+  id?: ?string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   onRequestClose?: () => void,
   onApply?: () => void,
@@ -292,6 +292,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
             filterOptions={(options: DataSource, state) =>
               filterFunction(options, state, currentInputValue)
             }
+            id={props.id}
             renderInput={params => {
               const {
                 InputProps,

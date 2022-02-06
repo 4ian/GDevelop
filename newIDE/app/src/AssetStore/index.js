@@ -76,6 +76,7 @@ export const AssetStore = ({
             onRequestSearch={() => {}}
             style={styles.searchBar}
             ref={searchBar}
+            id="asset-store-search-bar"
           />
           <Line
             expand

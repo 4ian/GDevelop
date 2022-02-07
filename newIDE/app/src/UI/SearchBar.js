@@ -32,6 +32,7 @@ type TagsHandler = {|
 |};
 
 type Props = {|
+  id?: string,
   /** Disables text field. */
   disabled?: boolean,
   /** Sets placeholder for the embedded text field. */
@@ -137,6 +138,7 @@ export type SearchBarInterface = {|
 const SearchBar = React.forwardRef<Props, SearchBarInterface>(
   (
     {
+      id,
       disabled,
       placeholder,
       onChange,
@@ -297,6 +299,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <div style={styles.searchContainer}>
                       {tags ? (
                         <Autocomplete
+                          id={id}
                           options={tags.slice(0, 30)}
                           groupBy={options => i18n._(t`Apply a filter`)}
                           classes={autocompleteStyles}
@@ -328,6 +331,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                         />
                       ) : (
                         <TextField
+                          id={id}
                           margin="none"
                           hintText={placeholder || t`Search`}
                           onBlur={handleBlur}

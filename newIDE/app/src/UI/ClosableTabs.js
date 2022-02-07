@@ -105,6 +105,7 @@ export class ClosableTabs extends Component<ClosableTabsProps> {
 }
 
 type ClosableTabProps = {|
+  id?: string,
   active: boolean,
   label: Node,
   closable: boolean,
@@ -116,6 +117,7 @@ type ClosableTabProps = {|
 |};
 
 export function ClosableTab({
+  id,
   active,
   onClose,
   onCloseOthers,
@@ -176,6 +178,7 @@ export function ClosableTab({
             >
               <ButtonBase
                 onClick={onClick}
+                id={id ? `${id}-button` : undefined}
                 onContextMenu={openContextMenu}
                 {...longTouchForContextMenuProps}
                 focusRipple

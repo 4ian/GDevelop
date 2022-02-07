@@ -17,10 +17,12 @@ type Props<Item> = {|
   selectedItems: Array<Item>,
   onAddNewItem?: () => void,
   addNewItemLabel?: React.Node | string,
+  addNewItemId?: string,
   onRename: (Item, string) => void,
   renderItemLabel?: Item => React.Node,
   getItemName: Item => string,
   getItemThumbnail?: Item => string,
+  getItemId?: (Item, index: number) => string,
   isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
   onEditItem?: Item => void,
@@ -59,6 +61,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       onEditItem,
       renamedItem,
       getItemName,
+      getItemId,
       renderItemLabel,
       scaleUpItemIconWhenSelected,
     } = this.props;
@@ -70,6 +73,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       <ItemRow
         item={item}
         itemName={itemName}
+        id={getItemId ? getItemId(item, index) : undefined}
         renderItemLabel={
           renderItemLabel ? () => renderItemLabel(item) : undefined
         }
@@ -97,6 +101,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       width,
       fullList,
       addNewItemLabel,
+      addNewItemId,
       renamedItem,
       getItemThumbnail,
       onAddNewItem,
@@ -135,6 +140,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                         <AddListItem
                           onClick={onAddNewItem}
                           primaryText={addNewItemLabel}
+                          id={addNewItemId}
                         />
                       </div>
                     );

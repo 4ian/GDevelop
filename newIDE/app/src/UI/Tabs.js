@@ -36,6 +36,7 @@ type TabProps = {|
   value: string,
   tabIndex?: string,
   disabled?: boolean,
+  id?: ?string,
 |};
 
 /**

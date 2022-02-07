@@ -134,10 +134,13 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // Compose the callback function and add outside main
         const gd::String actionsDeclarationsCode =
             codeGenerator.GenerateObjectsDeclarationCode(callbackContext);
-        const gd::String callbackCode = "function " + callbackFunctionName +
-                                        "(runtimeScene, asyncObjectsList) {\n" +
-                                        actionsDeclarationsCode + actionsCode +
-                                        "}\n";
+        // TODO: see if we can avoid putting these functions in the global
+        // namespace.
+        const gd::String callbackCode =
+            "function " + callbackFunctionName + "(" +
+            dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
+                .GenerateEventsParameters(callbackContext) +
+            ") {\n" + actionsDeclarationsCode + actionsCode + "}\n";
         codeGenerator.AddCustomCodeOutsideMain(callbackCode);
 
         // Generate code to backup the objects lists
@@ -163,7 +166,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 .GenerateEventsParameters(callbackContext) +
             "))";
 
-        // Generate the action with a .then to the generated callback
+        // Generate the action and store the generated task.
+        // TODO: rework this into a `codeGenerator.GenerateStoreTaskCode(codeGenerator.GenerateActionCode(...))`
         const gd::String taskSchedulingCode = codeGenerator.GenerateActionCode(
             event.GetInstruction(),
             parentContext,

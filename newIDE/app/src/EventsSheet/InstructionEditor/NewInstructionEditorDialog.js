@@ -281,6 +281,7 @@ export default function NewInstructionEditorDialog({
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
         onClickMore={() => setNewBehaviorDialogOpen(true)}
+        id="object-instruction-selector"
       />
     ) : null;
 
@@ -302,6 +303,7 @@ export default function NewInstructionEditorDialog({
             disabled={!instructionType}
             onClick={onSubmit}
             key="ok"
+            id="ok-button"
           />,
         ]}
         secondaryActions={[
@@ -338,6 +340,7 @@ export default function NewInstructionEditorDialog({
         fullHeight={
           true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
         }
+        id="instruction-editor-dialog"
       >
         <SelectColumns
           columnsRenderer={{

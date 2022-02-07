@@ -208,6 +208,7 @@ const BehaviorsEditor = (props: Props) => {
                       onChange={(e, text) =>
                         onChangeBehaviorName(behaviorContent, text)
                       }
+                      id={`behavior-${behaviorName}-name-text-field`}
                     />
                   </Column>
                 </AccordionHeader>
@@ -256,6 +257,7 @@ const BehaviorsEditor = (props: Props) => {
             primary
             onClick={() => setNewBehaviorDialogOpen(true)}
             icon={<Add />}
+            id="add-behavior-button"
           />
         </Line>
       </Column>

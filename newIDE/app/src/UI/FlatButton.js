@@ -24,6 +24,7 @@ type Props = {|
     flexShrink?: 0,
   |},
   target?: '_blank',
+  id?: ?string,
   // Tooltips aren't really suited for FlatButtons UX-wise, but we can use them for
   // accessibility purpose for the Toolbar.
   exceptionalTooltipForToolbar?: React.Node,
@@ -41,6 +42,7 @@ export default class FlatButton extends React.Component<Props, {||}> {
       keyboardFocused,
       exceptionalTooltipForToolbar,
       disabled,
+      id,
       ...otherProps
     } = this.props;
 
@@ -57,6 +59,7 @@ export default class FlatButton extends React.Component<Props, {||}> {
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}
+        id={id}
         {...otherProps}
       >
         {icon}

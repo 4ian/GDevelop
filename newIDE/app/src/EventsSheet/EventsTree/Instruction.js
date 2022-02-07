@@ -33,6 +33,8 @@ import {
   shouldActivate,
   shouldValidate,
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import AsyncIcon from './AsyncIcon';
+import Tooltip from '@material-ui/core/Tooltip';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -288,6 +290,31 @@ const Instruction = (props: Props) => {
                 src="res/contraire.png"
                 alt="Condition is negated"
               />
+            )}
+            {metadata.isAsync() && (
+              <Tooltip
+                title={
+                  <Trans>
+                    This is an asynchronous event.{' '}
+                    <a
+                      href="https://wiki.gdevelop.io/gdevelop5/events/async"
+                      rel="noopener noreferrer nofollow"
+                      target="_blank"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      Learn more
+                    </a>
+                  </Trans>
+                }
+                placement="top"
+                interactive
+              >
+                <AsyncIcon
+                  className={classNames({
+                    [icon]: true,
+                  })}
+                />
+              </Tooltip>
             )}
             <img
               className={classNames({

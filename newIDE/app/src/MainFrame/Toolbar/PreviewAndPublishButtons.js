@@ -162,6 +162,7 @@ export default function PreviewAndPublishButtons({
                 <Trans>Preview</Trans>
               )
             }
+            id={'toolbar-preview-button'}
             exceptionalTooltipForToolbar={
               hasPreviewsRunning ? (
                 <Trans>

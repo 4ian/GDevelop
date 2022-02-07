@@ -30,6 +30,8 @@ type Props = {|
   hintText?: MessageDescriptor | string,
   openOnFocus?: boolean,
   margin?: 'none' | 'dense',
+
+  id?: ?string,
 |};
 
 const iconSize = 24;
@@ -102,6 +104,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       margin,
       onRequestClose,
       onApply,
+      id,
       ...rest
     } = this.props;
 
@@ -129,6 +132,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         dataSource={objectAndGroups}
         errorText={hasValidChoice ? undefined : errorTextIfInvalid}
         ref={field => (this._field = field)}
+        id={id}
         {...rest}
       />
     );

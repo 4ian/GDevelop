@@ -19,6 +19,7 @@ const LEFT_MOUSE_BUTTON = 0;
 type Props<Item> = {|
   item: Item,
   itemName: string,
+  id?: ?string,
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
@@ -49,6 +50,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
     const {
       item,
       itemName,
+      id,
       renderItemLabel,
       isBold,
       selected,
@@ -154,6 +156,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                 onItemSelected(null);
                 onEdit(item);
               }}
+              id={id}
             />
           );
         }}

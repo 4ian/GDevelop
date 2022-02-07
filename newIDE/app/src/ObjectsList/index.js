@@ -581,12 +581,16 @@ export default class ObjectsList extends React.Component<Props, State> {
                     height={height}
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={this._getObjectThumbnail}
+                    getItemId={(objectWithContext, index) => {
+                      return "object-item-" + index;
+                    }}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>
                       this.props.onEditObject(objectWithContext.object)
                     }
                     onAddNewItem={this.onAddNewObject}
                     addNewItemLabel={<Trans>Add a new object</Trans>}
+                    addNewItemId="add-new-object-button"
                     selectedItems={selectedObjects}
                     onItemSelected={this._selectObject}
                     renamedItem={renamedObjectWithContext}

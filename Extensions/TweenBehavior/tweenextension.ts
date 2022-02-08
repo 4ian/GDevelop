@@ -42,7 +42,7 @@ namespace gdjs {
       };
 
       /**
-       * Add an object variable tween.
+       * Tween between 2 values according to an easing function.
        * @param fromValue Start value
        * @param toValue End value
        * @param easingValue Type of easing
@@ -54,10 +54,10 @@ namespace gdjs {
         easingValue: string,
         weighting: float
       ) => {
-        return (
-          fromValue +
-          (toValue - fromValue) * easingFunctions[easingValue](weighting)
-        );
+        const easingFunction = easingFunctions.hasOwnProperty(easingValue)
+          ? easingFunctions[easingValue]
+          : shifty.Tweenable.formulas.linear;
+        return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
     }
   }

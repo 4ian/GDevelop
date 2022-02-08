@@ -210,7 +210,9 @@ export default function InstructionsList({
                 }}
                 {...longTouchForContextMenuProps}
                 ref={addButton}
-                id={areConditions ? 'add-condition-button' : 'add-action-button'}
+                id={
+                  areConditions ? 'add-condition-button' : 'add-action-button'
+                }
               >
                 {addButtonLabel || addButtonDefaultLabel}
               </button>

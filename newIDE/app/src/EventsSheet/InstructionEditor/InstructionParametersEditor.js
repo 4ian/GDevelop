@@ -287,7 +287,11 @@ export default class InstructionParametersEditor extends React.Component<
                 </Line>
               ) : null}
               <Spacer />
-              <div key={instructionType} style={styles.parametersContainer} id="instruction-parameters-container">
+              <div
+                key={instructionType}
+                style={styles.parametersContainer}
+                id="instruction-parameters-container"
+              >
                 <ColumnStackLayout noMargin>
                   {mapFor(0, instructionMetadata.getParametersCount(), i => {
                     const parameterMetadata = instructionMetadata.getParameter(

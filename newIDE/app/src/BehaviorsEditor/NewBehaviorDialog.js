@@ -76,7 +76,7 @@ const BehaviorListItem = ({
     onClick={onClick}
     style={disabled ? styles.disabledItem : undefined}
     disabled={disabled}
-    id={"behavior-item-" + behaviorMetadata.type.replace(/:/g, '-')}
+    id={'behavior-item-' + behaviorMetadata.type.replace(/:/g, '-')}
   />
 );
 

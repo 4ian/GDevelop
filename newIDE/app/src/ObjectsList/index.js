@@ -582,7 +582,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={this._getObjectThumbnail}
                     getItemId={(objectWithContext, index) => {
-                      return "object-item-" + index;
+                      return 'object-item-' + index;
                     }}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>

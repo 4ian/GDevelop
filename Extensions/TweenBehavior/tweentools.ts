@@ -49,9 +49,9 @@ namespace gdjs {
        * @param weighting from 0 to 1
        */
       export const ease = (
+        easingValue: string,
         fromValue: float,
         toValue: float,
-        easingValue: string,
         weighting: float
       ) => {
         const easingFunction = easingFunctions.hasOwnProperty(easingValue)

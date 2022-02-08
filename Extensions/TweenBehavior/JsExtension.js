@@ -83,17 +83,17 @@ module.exports = {
         '',
         'res/actions/camera.png'
       )
-      .addParameter('expression', _('From value'))
-      .addParameter('expression', _('To value'))
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
+      .addParameter('expression', _('From value'))
+      .addParameter('expression', _('To value'))
       .addParameter('expression', _('Weighting'))
       .setParameterLongDescription(
         _('From 0 to 1.')
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
-      .addIncludeFile('Extensions/TweenBehavior/tweenextension.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.ease');
 
     var tweenBehavior = new gd.BehaviorJsImplementation();

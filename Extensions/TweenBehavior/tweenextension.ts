@@ -1,0 +1,64 @@
+/// <reference path="shifty.d.ts" />
+
+namespace gdjs {
+  export namespace evtTools {
+    export namespace tween {
+      const easingFunctions: { [key: string]: shifty.easingFunction } = {
+        linear: shifty.Tweenable.formulas.linear,
+        easeInQuad: shifty.Tweenable.formulas.easeInQuad,
+        easeOutQuad: shifty.Tweenable.formulas.easeOutQuad,
+        easeInOutQuad: shifty.Tweenable.formulas.easeInOutQuad,
+        easeInCubic: shifty.Tweenable.formulas.easeInCubic,
+        easeOutCubic: shifty.Tweenable.formulas.easeOutCubic,
+        easeInOutCubic: shifty.Tweenable.formulas.easeInOutCubic,
+        easeInQuart: shifty.Tweenable.formulas.easeInQuart,
+        easeOutQuart: shifty.Tweenable.formulas.easeOutQuart,
+        easeInOutQuart: shifty.Tweenable.formulas.easeInOutQuart,
+        easeInQuint: shifty.Tweenable.formulas.easeInQuint,
+        easeOutQuint: shifty.Tweenable.formulas.easeOutQuint,
+        easeInOutQuint: shifty.Tweenable.formulas.easeInOutQuint,
+        easeInSine: shifty.Tweenable.formulas.easeInSine,
+        easeOutSine: shifty.Tweenable.formulas.easeOutSine,
+        easeInOutSine: shifty.Tweenable.formulas.easeInOutSine,
+        easeInExpo: shifty.Tweenable.formulas.easeInExpo,
+        easeOutExpo: shifty.Tweenable.formulas.easeOutExpo,
+        easeInOutExpo: shifty.Tweenable.formulas.easeInOutExpo,
+        easeInCirc: shifty.Tweenable.formulas.easeInCirc,
+        easeOutCirc: shifty.Tweenable.formulas.easeOutCirc,
+        easeInOutCirc: shifty.Tweenable.formulas.easeInOutCirc,
+        easeOutBounce: shifty.Tweenable.formulas.easeOutBounce,
+        easeInBack: shifty.Tweenable.formulas.easeInBack,
+        easeOutBack: shifty.Tweenable.formulas.easeOutBack,
+        easeInOutBack: shifty.Tweenable.formulas.easeInOutBack,
+        elastic: shifty.Tweenable.formulas.elastic,
+        swingFromTo: shifty.Tweenable.formulas.swingFromTo,
+        swingFrom: shifty.Tweenable.formulas.swingFrom,
+        swingTo: shifty.Tweenable.formulas.swingTo,
+        bounce: shifty.Tweenable.formulas.bounce,
+        bouncePast: shifty.Tweenable.formulas.bouncePast,
+        easeFromTo: shifty.Tweenable.formulas.easeFromTo,
+        easeFrom: shifty.Tweenable.formulas.easeFrom,
+        easeTo: shifty.Tweenable.formulas.easeTo,
+      };
+
+      /**
+       * Add an object variable tween.
+       * @param fromValue Start value
+       * @param toValue End value
+       * @param easingValue Type of easing
+       * @param weighting from 0 to 1
+       */
+      export const ease = (
+        fromValue: float,
+        toValue: float,
+        easingValue: string,
+        weighting: float
+      ) => {
+        return (
+          fromValue +
+          (toValue - fromValue) * easingFunctions[easingValue](weighting)
+        );
+      };
+    }
+  }
+}

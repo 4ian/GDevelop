@@ -11,6 +11,7 @@ import {
 import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import optionalRequire from '../OptionalRequire';
+import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 
 const electron = optionalRequire('electron');
 
@@ -34,7 +35,9 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       'flowvisibilitychange',
       isRunning => (isUserflowRunning = isRunning)
     );
-    userflow.identify(getUserUUID());
+    const userPreferences = loadPreferencesFromLocalStorage();
+    const userLanguage = userPreferences ? userPreferences.language : undefined;
+    userflow.identify(getUserUUID(), { language: userLanguage });
   }
   if (isDev) {
     console.info('Development build - Analytics disabled');

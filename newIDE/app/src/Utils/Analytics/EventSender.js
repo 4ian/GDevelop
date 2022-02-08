@@ -285,3 +285,13 @@ export const sendExternalEditorOpened = (editorName: string) => {
 
   client.recordEvent('open_external_editor', { editorName });
 };
+
+const trackInAppTutorialProgress = (stepIndex: number) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('user-flow-onboarding', { stepIndex });
+};
+
+// Make this function global so it can be accessed from userflow's
+// step "Evaluate JS" actions
+global.trackInAppTutorialProgress = trackInAppTutorialProgress;

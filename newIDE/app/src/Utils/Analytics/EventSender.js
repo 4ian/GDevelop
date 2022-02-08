@@ -1,5 +1,6 @@
 // @flow
 import Keen from 'keen-tracking';
+import userflow from 'userflow.js';
 import Window from '../Window';
 import { getUserUUID } from './UserUUID';
 import Authentication from '../GDevelopServices/Authentication';
@@ -9,12 +10,32 @@ import {
 } from './LocalStats';
 import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
+import optionalRequire from '../OptionalRequire';
+
+const electron = optionalRequire('electron');
 
 const isDev = Window.isDev();
 let client = null;
 let startupTimesSummary = null;
+export let isUserflowRunning = false;
 
 export const installAnalyticsEvents = (authentication: Authentication) => {
+  if (!electron) {
+    if (isDev) {
+      userflow.init('ct_y5qogyfo6zbahjejcbo3dybnta');
+    } else {
+      userflow.init('ct_paaz6o2t2bhlrlyi7a3toojn7e');
+    }
+    userflow.on(
+      // Undocumented legacy userflow event that is fired
+      // "when a flow either becomes active or removed"
+      // (tip given by a tech member of Userflow - it shouldn't be removed
+      // in the near future given the fact that some of their users still use it).
+      'flowvisibilitychange',
+      isRunning => (isUserflowRunning = isRunning)
+    );
+    userflow.identify(getUserUUID());
+  }
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;

@@ -138,43 +138,6 @@ declare namespace shifty {
     afterTween: shifty.afterTweenFilter;
   };
 
-  // easing-functions.js
-  export function linear(pos: number): number;
-  export function easeInQuad(pos: any): number;
-  export function easeOutQuad(pos: any): number;
-  export function easeInOutQuad(pos: any): number;
-  export function easeInCubic(pos: any): number;
-  export function easeOutCubic(pos: any): number;
-  export function easeInOutCubic(pos: any): number;
-  export function easeInQuart(pos: any): number;
-  export function easeOutQuart(pos: any): number;
-  export function easeInOutQuart(pos: any): number;
-  export function easeInQuint(pos: any): number;
-  export function easeOutQuint(pos: any): number;
-  export function easeInOutQuint(pos: any): number;
-  export function easeInSine(pos: any): number;
-  export function easeOutSine(pos: any): number;
-  export function easeInOutSine(pos: any): number;
-  export function easeInExpo(pos: any): number;
-  export function easeOutExpo(pos: any): number;
-  export function easeInOutExpo(pos: any): number;
-  export function easeInCirc(pos: any): number;
-  export function easeOutCirc(pos: any): number;
-  export function easeInOutCirc(pos: any): number;
-  export function easeOutBounce(pos: any): number;
-  export function easeInBack(pos: any): number;
-  export function easeOutBack(pos: any): number;
-  export function easeInOutBack(pos: any): number;
-  export function elastic(pos: any): number;
-  export function swingFromTo(pos: any): number;
-  export function swingFrom(pos: any): number;
-  export function swingTo(pos: any): number;
-  export function bounce(pos: any): number;
-  export function bouncePast(pos: any): number;
-  export function easeFromTo(pos: any): number;
-  export function easeFrom(pos: any): number;
-  export function easeTo(pos: any): number;
-
   // bezier.js
 
   export function setBezierFunction(
@@ -560,6 +523,45 @@ declare namespace shifty {
      */
     export function setScheduleFunction(fn: scheduleFunction): scheduleFunction;
     export const filters: any;
+
+    // easing-functions.js
+    export namespace formulas {
+      export function linear(pos: number): number;
+      export function easeInQuad(pos: any): number;
+      export function easeOutQuad(pos: any): number;
+      export function easeInOutQuad(pos: any): number;
+      export function easeInCubic(pos: any): number;
+      export function easeOutCubic(pos: any): number;
+      export function easeInOutCubic(pos: any): number;
+      export function easeInQuart(pos: any): number;
+      export function easeOutQuart(pos: any): number;
+      export function easeInOutQuart(pos: any): number;
+      export function easeInQuint(pos: any): number;
+      export function easeOutQuint(pos: any): number;
+      export function easeInOutQuint(pos: any): number;
+      export function easeInSine(pos: any): number;
+      export function easeOutSine(pos: any): number;
+      export function easeInOutSine(pos: any): number;
+      export function easeInExpo(pos: any): number;
+      export function easeOutExpo(pos: any): number;
+      export function easeInOutExpo(pos: any): number;
+      export function easeInCirc(pos: any): number;
+      export function easeOutCirc(pos: any): number;
+      export function easeInOutCirc(pos: any): number;
+      export function easeOutBounce(pos: any): number;
+      export function easeInBack(pos: any): number;
+      export function easeOutBack(pos: any): number;
+      export function easeInOutBack(pos: any): number;
+      export function elastic(pos: any): number;
+      export function swingFromTo(pos: any): number;
+      export function swingFrom(pos: any): number;
+      export function swingTo(pos: any): number;
+      export function bounce(pos: any): number;
+      export function bouncePast(pos: any): number;
+      export function easeFromTo(pos: any): number;
+      export function easeFrom(pos: any): number;
+      export function easeTo(pos: any): number;
+    }
   }
 
   // token.js

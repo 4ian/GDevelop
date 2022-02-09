@@ -176,10 +176,6 @@ namespace gdjs {
       }
     }
 
-    setZOrder(z: number): void {
-      // TODO: find how to handle these Z order
-    }
-
     /**
      * Set object opacity.
      */

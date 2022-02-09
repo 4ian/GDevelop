@@ -151,7 +151,12 @@ module.exports = {
 
       objectProperties
         .getOrCreate('fillOpacity')
-        .setValue((objectContent.fillOpacity || 255).toString())
+        .setValue(
+          (objectContent.fillOpacity != undefined
+            ? objectContent.fillOpacity
+            : 255
+          ).toString()
+        )
         .setType('number')
         .setLabel(_('Fill opacity'))
         .setGroup(_('Field appearance'));
@@ -165,7 +170,12 @@ module.exports = {
 
       objectProperties
         .getOrCreate('borderOpacity')
-        .setValue((objectContent.borderOpacity || 255).toString())
+        .setValue(
+          (objectContent.borderOpacity != undefined
+            ? objectContent.borderOpacity
+            : 255
+          ).toString()
+        )
         .setType('number')
         .setLabel(_('Border opacity'))
         .setGroup(_('Field appearance'));

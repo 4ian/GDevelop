@@ -17,6 +17,9 @@ declare class gdObjectMetadata {
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   setIncludeFile(includeFile: string): gdObjectMetadata;
   addIncludeFile(includeFile: string): gdObjectMetadata;
+  getUnsupportedBaseObjectCapabilities(): gdSetString;
+  addUnsupportedBaseObjectCapability(capability: string): gdObjectMetadata;
+  isUnsupportedBaseObjectCapability(capability: string): boolean;
   delete(): void;
   ptr: number;
 };

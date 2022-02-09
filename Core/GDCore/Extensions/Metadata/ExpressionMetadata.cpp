@@ -72,4 +72,11 @@ gd::ExpressionMetadata& ExpressionMetadata::AddCodeOnlyParameter(
   return *this;
 }
 
+
+gd::ExpressionMetadata& ExpressionMetadata::SetRequiresBaseObjectCapability(
+    const gd::String& capability) {
+  requiredBaseObjectCapability = capability;
+  return *this;
+}
+
 }  // namespace gd

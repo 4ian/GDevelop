@@ -30,6 +30,14 @@ const enumerateExpressionMetadataMap = (
       return null; // Skip hidden expressions
     }
 
+    if (
+      scope.objectMetadata &&
+      scope.objectMetadata.isUnsupportedBaseObjectCapability(
+        exprMetadata.getRequiredBaseObjectCapability()
+      )
+    )
+      return null; // Skip expressions not supported by the object.
+
     var parameters = [];
     for (var i = 0; i < exprMetadata.getParametersCount(); i++) {
       if (scope.objectMetadata && i === 0) continue;

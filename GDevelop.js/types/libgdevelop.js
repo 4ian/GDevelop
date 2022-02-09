@@ -37,6 +37,7 @@ declare class libGDevelop {
   VectorString: Class<gdVectorString>;
   VectorPlatformExtension: Class<gdVectorPlatformExtension>;
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
+  VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
@@ -169,6 +170,7 @@ declare class libGDevelop {
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
   EventsParametersLister: Class<gdEventsParametersLister>;
+  EventsPositionFinder: Class<gdEventsPositionFinder>;
   EventsTypesLister: Class<gdEventsTypesLister>;
   InstructionsTypeRenamer: Class<gdInstructionsTypeRenamer>;
   EventsContext: Class<gdEventsContext>;

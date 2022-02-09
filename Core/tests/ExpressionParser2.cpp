@@ -19,6 +19,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SetupProjectWithDummyPlatform(project, platform);
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
+  layout1.InsertNewObject(project,
+                          "MyExtension::FakeObjectWithUnsupportedCapability",
+                          "MyFakeObjectWithUnsupportedCapability",
+                          1);
 
   gd::ExpressionParser2 parser(platform, project, layout1);
 
@@ -1349,6 +1353,33 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "An object name was expected but something else was written. "
               "Enter just the name of the object for this parameter.");
     }
+  }
+
+  SECTION(
+      "Valid function call with an object expression requiring a capability") {
+    auto node = parser.ParseExpression(
+        "string", "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator;
+    node->Visit(validator);
+    REQUIRE(validator.GetErrors().size() == 0);
+  }
+
+  SECTION(
+      "Invalid function call with an object expression requiring a "
+      "capability") {
+    auto node =
+        parser.ParseExpression("string",
+                               "MyFakeObjectWithUnsupportedCapability."
+                               "GetSomethingRequiringEffectCapability(123)");
+    REQUIRE(node != nullptr);
+
+    gd::ExpressionValidator validator;
+    node->Visit(validator);
+    REQUIRE(validator.GetErrors().size() == 1);
+    REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+            "This expression exists, but it can't be used on this object.");
   }
 
   SECTION("Fuzzy/random tests") {

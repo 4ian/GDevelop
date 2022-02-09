@@ -12,6 +12,10 @@ namespace gdjs {
     max: FloatPoint;
   };
 
+  type RendererObjectInterface = {
+    visible: boolean;
+  };
+
   /**
    * Return the squared bounding radius of an object given its width/height and its center of rotation
    * (relative to the top-left of the object). The radius is relative to the center of rotation.
@@ -236,14 +240,15 @@ namespace gdjs {
      * (`RuntimeObject.prototype.onCreated.call(this);`).
      */
     onCreated(): void {
-      for (const effectName in this._rendererEffects) {
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          .applyEffect(
-            this.getRendererObject(),
-            this._rendererEffects[effectName]
-          );
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
+        for (const effectName in this._rendererEffects) {
+          this._runtimeScene
+            .getGame()
+            .getEffectsManager()
+            // @ts-expect-error - the effects manager is typed with the PIXI object.
+            .applyEffect(rendererObject, this._rendererEffects[effectName]);
+        }
       }
 
       for (let i = 0; i < this._behaviors.length; ++i) {
@@ -418,7 +423,7 @@ namespace gdjs {
      *
      * @return The internal rendered object (PIXI.DisplayObject...)
      */
-    getRendererObject(): any {
+    getRendererObject(): RendererObjectInterface | null | undefined {
       return undefined;
     }
 
@@ -672,11 +677,10 @@ namespace gdjs {
         return;
       }
       this.zOrder = z;
-      if (this.getRendererObject()) {
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
         const theLayer = this._runtimeScene.getLayer(this.layer);
-        theLayer
-          .getRenderer()
-          .changeRendererObjectZOrder(this.getRendererObject(), z);
+        theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
       }
     }
 
@@ -885,15 +889,16 @@ namespace gdjs {
      * @param effectData The data describing the effect to add.
      */
     addEffect(effectData: EffectData): boolean {
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .addEffect(
-          effectData,
-          this._rendererEffects,
-          this.getRendererObject(),
-          this
-        );
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .addEffect(effectData, this._rendererEffects, rendererObject, this)
+      );
     }
 
     /**
@@ -901,25 +906,33 @@ namespace gdjs {
      * @param effectName The name of the effect.
      */
     removeEffect(effectName: string): boolean {
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .removeEffect(
-          this._rendererEffects,
-          this.getRendererObject(),
-          effectName
-        );
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .removeEffect(this._rendererEffects, rendererObject, effectName)
+      );
     }
 
     /**
      * Remove all effects.
      */
     clearEffects(): boolean {
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
       this._rendererEffects = {};
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .clearEffects(this.getRendererObject());
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .clearEffects(rendererObject)
+      );
     }
 
     /**

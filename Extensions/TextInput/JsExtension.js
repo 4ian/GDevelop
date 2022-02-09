@@ -79,6 +79,12 @@ module.exports = {
       } else if (propertyName === 'borderWidth') {
         objectContent.borderWidth = Math.max(0, parseFloat(newValue));
         return true;
+      } else if (propertyName === 'readOnly') {
+        objectContent.readOnly = newValue === '1';
+        return true;
+      } else if (propertyName === 'disabled') {
+        objectContent.disabled = newValue === '1';
+        return true;
       }
 
       return false;
@@ -134,6 +140,20 @@ module.exports = {
             'By default, a "text" is single line. Choose "text area" to allow multiple lines to be entered.'
           )
         );
+
+      objectProperties
+        .getOrCreate('readOnly')
+        .setValue(objectContent.readOnly ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Read only'))
+        .setGroup(_('Field appearance'));
+
+      objectProperties
+        .getOrCreate('disabled')
+        .setValue(objectContent.disabled ? 'true' : 'false')
+        .setType('boolean')
+        .setLabel(_('Disabled'))
+        .setGroup(_('Field appearance'));
 
       objectProperties
         .getOrCreate('textColor')
@@ -202,6 +222,8 @@ module.exports = {
         borderColor: '0;0;0',
         borderOpacity: 255,
         borderWidth: 1,
+        readOnly: false,
+        disabled: false,
       })
     );
 
@@ -445,6 +467,65 @@ module.exports = {
 
     // TODO: expressions for colors?
 
+    // TODO: use AddExpressionAndConditionAndAction for "boolean"s for the 4 next conditions/actions.
+    object
+      .addScopedCondition(
+        'ReadOnly',
+        _('ReadOnly'),
+        _('Check if the text input is read-only.'),
+        _('_PARAM0_ is read-only'),
+        '',
+        'res/conditions/text24.png',
+        'res/conditions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isReadOnly');
+
+    object
+      .addScopedAction(
+        'SetReadOnly',
+        _('Read-only'),
+        _('Set if the text input is read-only.'),
+        _('Set _PARAM0_ as read-only: _PARAM1_'),
+        _('Field appearance'),
+        'res/actions/text24.png',
+        'res/actions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .addParameter('yesorno', _('Make the text input read-only?'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setReadOnly');
+
+    object
+      .addScopedCondition(
+        'Disabled',
+        _('Disabled'),
+        _('Check if the text input is disabled.'),
+        _('_PARAM0_ is disabled'),
+        '',
+        'res/conditions/text24.png',
+        'res/conditions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .getCodeExtraInformation()
+      .setFunctionName('isDisabled');
+
+    object
+      .addScopedAction(
+        'SetDisabled',
+        _('Disabled'),
+        _('Set if the text input is disabled.'),
+        _('Set _PARAM0_ as disabled: _PARAM1_'),
+        _('Field appearance'),
+        'res/actions/text24.png',
+        'res/actions/text24.png'
+      )
+      .addParameter('object', _('Text input'), 'TextInputObject', false)
+      .addParameter('yesorno', _('Make the text input disabled?'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('setDisabled');
+
     // Other expressions/conditions/actions:
     object
       .addExpressionAndConditionAndAction(
@@ -462,7 +543,7 @@ module.exports = {
       .setGetter('getOpacity');
 
     object
-      .addCondition(
+      .addScopedCondition(
         'Focused',
         _('Focused'),
         _(

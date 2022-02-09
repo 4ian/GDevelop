@@ -81,7 +81,7 @@ module.exports = {
         _('Ease'),
         _('Tween between 2 values according to an easing function.'),
         '',
-        'res/actions/camera.png'
+        'JsPlatform/Extensions/tween_behavior32.png'
       )
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')

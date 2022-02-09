@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type SelectionState } from './SelectionHandler';
+import { type SelectionState, getSelectedEvents } from './SelectionHandler';
 import { mapFor } from '../Utils/MapFor';
 import uniqBy from 'lodash/uniqBy';
 const gd: libGDevelop = global.gd;
@@ -178,6 +178,37 @@ export default class EventsSearcher extends React.Component<Props, State> {
     this._resultEvents = uniqBy(resultEventsWithDuplicates, event => event.ptr);
   };
 
+  getSearchInitialStep = (resultEvents: Array<gdBaseEvent>): number => {
+    const selectedEvents = getSelectedEvents(this.props.selection);
+    if (!selectedEvents.length) return 0;
+    const { eventsSearchResults } = this.state;
+
+    const eventsToSearch = [selectedEvents[0], ...resultEvents];
+
+    const positionFinder = new gd.EventsPositionFinder();
+    eventsToSearch.forEach(event => positionFinder.addEventToSearch(event));
+    positionFinder.launch(this.props.events);
+
+    const [
+      selectedEventPosition,
+      ...searchResultsPositions
+    ] = positionFinder.getPositions().toJSArray();
+
+    for (
+      let searchResultPositionIndex = 0;
+      searchResultPositionIndex < searchResultsPositions.length;
+      searchResultPositionIndex++
+    ) {
+      if (
+        searchResultsPositions[searchResultPositionIndex] >=
+        selectedEventPosition
+      )
+        return searchResultPositionIndex;
+    }
+
+    return 0;
+  };
+
   _goToSearchResults = (step: number): ?gdBaseEvent => {
     this._updateListOfResultEvents();
     if (!this._resultEvents || this._resultEvents.length === 0) {
@@ -185,11 +216,11 @@ export default class EventsSearcher extends React.Component<Props, State> {
       return null;
     }
 
-    let newSearchFocusOffset =
-      this.state.searchFocusOffset === null
-        ? 0
-        : ((this.state.searchFocusOffset || 0) + step) %
-          this._resultEvents.length;
+    const { searchFocusOffset } = this.state;
+
+    let newSearchFocusOffset = !searchFocusOffset
+      ? this.getSearchInitialStep(this._resultEvents)
+      : (searchFocusOffset + step) % this._resultEvents.length;
     if (newSearchFocusOffset < 0)
       newSearchFocusOffset += this._resultEvents.length;
 

@@ -653,8 +653,8 @@
             "fillColor": "139;87;42",
             "fillOpacity": 255,
             "borderColor": "126;211;33",
-            "borderOpacity": 255,
-            "borderWidth": 2
+            "borderOpacity": 128,
+            "borderWidth": 8
           }
         },
         {
@@ -919,7 +919,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "TextInput::Focused"
+                "value": "TextInput::TextInputObject::Focused"
               },
               "parameters": [
                 "Inputs"
@@ -991,6 +991,7 @@
   "eventsFunctionsExtensions": [
     {
       "author": "@ddabrahim",
+      "category": "",
       "description": "An action to move the camera by **dragging** with the mouse (or **scrolling** with the touch), on vertical, horizontal or both directions.",
       "extensionNamespace": "",
       "fullName": "Drag Camera With Pointer",
@@ -1673,6 +1674,7 @@
     },
     {
       "author": "4ian",
+      "category": "",
       "description": "Behaviors to animate Tiled Sprite objects in the background, following the camera with a parallax effect.",
       "extensionNamespace": "",
       "fullName": "Parallax for Tiled Sprite",

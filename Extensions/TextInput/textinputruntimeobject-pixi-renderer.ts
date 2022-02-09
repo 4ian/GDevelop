@@ -73,6 +73,8 @@ namespace gdjs {
       this.updateFillColorAndOpacity();
       this.updateBorderColorAndOpacity();
       this.updateBorderWidth();
+      this.updateDisabled();
+      this.updateReadOnly();
 
       return this._input;
     }
@@ -201,6 +203,12 @@ namespace gdjs {
     }
     updateBorderWidth() {
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
+    }
+    updateDisabled() {
+      this._input.disabled = this._object.isDisabled();
+    }
+    updateReadOnly() {
+      this._input.readOnly = this._object.isReadOnly();
     }
 
     isFocused() {

@@ -39,6 +39,8 @@ namespace gdjs {
       borderColor: string;
       borderOpacity: float;
       borderWidth: float;
+      disabled: boolean;
+      readOnly: boolean;
     };
   }
 
@@ -63,6 +65,8 @@ namespace gdjs {
     private _borderColor: [float, float, float];
     private _borderOpacity: float;
     private _borderWidth: float;
+    private _disabled: boolean;
+    private _readOnly: boolean;
 
     _renderer: TextInputRuntimeObjectRenderer;
 
@@ -85,6 +89,8 @@ namespace gdjs {
       );
       this._borderOpacity = objectData.content.borderOpacity;
       this._borderWidth = objectData.content.borderWidth;
+      this._disabled = objectData.content.disabled;
+      this._readOnly = objectData.content.readOnly;
 
       this._renderer = new gdjs.TextInputRuntimeObjectRenderer(this);
 
@@ -151,6 +157,12 @@ namespace gdjs {
         oldObjectData.content.borderWidth !== newObjectData.content.borderWidth
       ) {
         this.setBorderWidth(newObjectData.content.borderWidth);
+      }
+      if (oldObjectData.content.disabled !== newObjectData.content.disabled) {
+        this.setDisabled(newObjectData.content.disabled);
+      }
+      if (oldObjectData.content.readOnly !== newObjectData.content.readOnly) {
+        this.setReadOnly(newObjectData.content.readOnly);
       }
       return true;
     }
@@ -380,6 +392,24 @@ namespace gdjs {
 
     getBorderWidth(): float {
       return this._borderWidth;
+    }
+
+    setDisabled(value: boolean) {
+      this._disabled = value;
+      this._renderer.updateDisabled();
+    }
+
+    isDisabled(): boolean {
+      return this._disabled;
+    }
+
+    setReadOnly(value: boolean) {
+      this._readOnly = value;
+      this._renderer.updateReadOnly();
+    }
+
+    isReadOnly(): boolean {
+      return this._readOnly;
     }
 
     isFocused(): boolean {

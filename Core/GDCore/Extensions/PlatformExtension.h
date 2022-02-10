@@ -71,6 +71,10 @@ class GD_CORE_API CompilationInfo {
   int sizeOfpInt;
 };
 
+struct GD_CORE_API DuplicatedInstructionOptions {
+  bool unscoped;
+};
+
 /**
  * \brief Base class for implementing platform's extensions.
  *
@@ -295,7 +299,8 @@ class GD_CORE_API PlatformExtension {
    */
   gd::InstructionMetadata& AddDuplicatedCondition(
       const gd::String& newConditionName,
-      const gd::String& copiedConditionName);
+      const gd::String& copiedConditionName,
+      gd::DuplicatedInstructionOptions options = {.unscoped = false});
   /**
    * \brief Create a new expression which is the duplicate of the specified one.
    *

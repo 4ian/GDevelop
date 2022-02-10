@@ -58,6 +58,7 @@ type ProjectProperties = {|
   gameResolutionHeight: number,
   adaptGameResolutionAtRuntime: boolean,
   name: string,
+  description: string,
   author: string,
   authorIds: string[],
   version: string,
@@ -78,6 +79,7 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     gameResolutionHeight: project.getGameResolutionHeight(),
     adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
     name: project.getName(),
+    description: project.getDescription(),
     author: project.getAuthor(),
     authorIds: project.getAuthorIds().toJSArray(),
     version: project.getVersion(),
@@ -103,6 +105,7 @@ function applyPropertiesToProject(
     gameResolutionHeight,
     adaptGameResolutionAtRuntime,
     name,
+    description,
     authorIds,
     author,
     version,
@@ -119,6 +122,7 @@ function applyPropertiesToProject(
   project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
   project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
   project.setName(name);
+  project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
@@ -145,6 +149,9 @@ function ProjectPropertiesDialog(props: Props) {
     [project]
   );
   let [name, setName] = React.useState(initialProperties.name);
+  let [description, setDescription] = React.useState(
+    initialProperties.description
+  );
   let [authorIds, setAuthorIds] = React.useState(initialProperties.authorIds);
   let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
     initialProperties.gameResolutionWidth
@@ -204,6 +211,7 @@ function ProjectPropertiesDialog(props: Props) {
         gameResolutionHeight,
         adaptGameResolutionAtRuntime,
         name,
+        description,
         author,
         authorIds,
         version,
@@ -287,6 +295,8 @@ function ProjectPropertiesDialog(props: Props) {
                 <PublicGameProperties
                   name={name}
                   setName={setName}
+                  description={description}
+                  setDescription={setDescription}
                   project={project}
                   authorIds={authorIds}
                   setAuthorIds={setAuthorIds}

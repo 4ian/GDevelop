@@ -19,9 +19,7 @@ namespace gd {
  */
 class GD_CORE_API EventsPositionFinder : public ArbitraryEventsWorker {
  public:
-  EventsPositionFinder() {
-    index = 0;
-  };
+  EventsPositionFinder() : index(0){};
   virtual ~EventsPositionFinder();
 
   /**

@@ -31,6 +31,8 @@ describe('libGD.js', function () {
     it('has properties that can be read and changed', function () {
       project.setName('My super project');
       expect(project.getName()).toBe('My super project');
+      project.setDescription("This is a great game I'm really proud of");
+      expecg(project.getDescription()).toBe("This is a great game I'm really proud of");
       project.setVersion('1.2.34');
       expect(project.getVersion()).toBe('1.2.34');
       project.setPackageName('com.test.package');

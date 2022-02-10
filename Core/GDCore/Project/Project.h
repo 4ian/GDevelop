@@ -66,6 +66,16 @@ class GD_CORE_API Project : public ObjectsContainer {
   const gd::String& GetName() const { return name; }
 
   /**
+   * \brief Change project description
+   */
+  void SetDescription(const gd::String& description_) { description = description_; };
+
+  /**
+   * \brief Get project description
+   */
+  const gd::String& GetDescription() const { return description; }
+
+  /**
    * \brief Change the version of the project.
    * This can be freely set, but should follow "X.Y.Z" format for compatibility
    * with some exporters.
@@ -884,6 +894,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void Init(const gd::Project& project);
 
   gd::String name;            ///< Game name
+  gd::String description;     ///< Game description
   gd::String version;         ///< Game version number (used for some exports)
   unsigned int windowWidth;   ///< Window default width
   unsigned int windowHeight;  ///< Window default height

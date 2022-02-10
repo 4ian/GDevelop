@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -14,6 +13,7 @@
 #include "GDCore/Events/Builtin/StandardEvent.h"
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/Event.h"
+#include "GDCore/Tools/Localization.h"
 
 using namespace std;
 namespace gd {
@@ -31,11 +31,12 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
           "Open source (MIT License)")
       .SetCategory("Advanced")
       .SetExtensionHelpPath("/all-features/advanced-conditions");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
+  extension
+      .AddInstructionOrExpressionGroupMetadata(_("Events and control flow"))
       .SetIcon("res/conditions/toujours24.png");
 
   extension
-      .AddCondition("Toujours",
+      .AddCondition("Always",
                     _("Always"),
                     _("This condition always returns true (or always false, if "
                       "the condition is inverted)."),
@@ -46,6 +47,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .SetHelpPath("/all-features/advanced-conditions")
       .AddCodeOnlyParameter("conditionInverted", "")
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.0.127
+  extension
+      .AddDuplicatedCondition(
+          "Toujours", "BuiltinCommonInstructions::Always", {.unscoped = true})
+      .SetHidden();
+  // end of compatibility code
 
   extension
       .AddCondition("Or",
@@ -91,7 +99,7 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       "res/conditions/once.png");
 
   extension
-      .AddCondition("Egal",
+      .AddCondition("CompareNumbers",
                     _("Compare two numbers"),
                     _("Compare the two numbers."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
@@ -104,8 +112,15 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .AddParameter("expression", _("Second expression"))
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.0.127
   extension
-      .AddCondition("StrEqual",
+      .AddDuplicatedCondition(
+          "Egal", "BuiltinCommonInstructions::CompareNumbers", {.unscoped = true})
+      .SetHidden();
+  // end of compatibility code
+
+  extension
+      .AddCondition("CompareStrings",
                     _("Compare two strings"),
                     _("Compare the two strings."),
                     _("_PARAM0_ _PARAM1_ _PARAM2_"),
@@ -117,6 +132,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       .AddParameter("relationalOperator", _("Sign of the test"), "string")
       .AddParameter("string", _("Second string expression"))
       .MarkAsAdvanced();
+
+  // Compatibility with GD <= 5.0.127
+  extension
+      .AddDuplicatedCondition(
+          "StrEqual", "BuiltinCommonInstructions::CompareStrings", {.unscoped = true})
+      .SetHidden();
+  // end of compatibility code
 
   extension.AddEvent(
       "Standard",

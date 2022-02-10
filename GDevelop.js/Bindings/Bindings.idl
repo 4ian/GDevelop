@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorInt {
+    unsigned long size();
+    long at(unsigned long index);
+};
+
 interface VectorVariable {
     unsigned long size();
     [Const] Variable WRAPPED_at(unsigned long index);
@@ -2284,6 +2289,15 @@ interface ArbitraryEventsWorker {
 interface EventsParametersLister {
     void EventsParametersLister([Ref] Project project);
     [Const, Ref] MapStringString GetParametersAndTypes();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsPositionFinder {
+    void EventsPositionFinder();
+    [Value] VectorInt GetPositions();
+    void AddEventToSearch(BaseEvent event);
 
     //Inherited from ArbitraryEventsWorker
     void Launch([Ref] EventsList events);

@@ -332,6 +332,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _closeSearchPanel = () => {
+    if (this._eventSearcher) this._eventSearcher.reset();
     this.setState({ showSearchPanel: false });
   };
 
@@ -1309,7 +1310,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               replaceInEvents,
               goToPreviousSearchResult,
               goToNextSearchResult,
-              clearSearchResults,
             }) => (
               <div
                 className="gd-events-sheet"
@@ -1390,7 +1390,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       this._ensureEventUnfolded(goToPreviousSearchResult)
                     }
                     onCloseSearchPanel={() => {
-                      clearSearchResults();
                       this._closeSearchPanel();
                     }}
                     onGoToNextSearchResult={() =>

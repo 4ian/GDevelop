@@ -308,7 +308,7 @@ module.exports = {
     extension
       .addAction(
         'SetMinimizable',
-        _('Allow mimizing'),
+        _('Allow minimizing'),
         _('Enables or disables minimizing of the window by the user.'),
         _('Enable window minimizing: _PARAM0_'),
         _('Windows, Linux, macOS'),

@@ -2101,7 +2101,7 @@ describe('libGD.js', function () {
         event1.delete();
         event2.delete();
         eventList.delete();
-      })
+      });
 
       it('should search string in parameters only and respect case', function () {
         const searchResultEvents1 = gd.EventsRefactorer.searchInEvents(
@@ -2424,6 +2424,68 @@ describe('libGD.js', function () {
 
         project.delete();
         list.delete();
+      });
+    });
+
+    describe('gd.EventsPositionFinder', function () {
+      it('can find positions of a list of given events', function () {
+        // evt0
+        // ├── evt00 <------- 0
+        // │   ├── evt000
+        // │   ├── evt001
+        // │   └── evt002 <-- 1
+        // ├── evt01
+        // │   └── evt010 <-- 2
+        // └── evt02
+        //     └── evt020
+        // evt1 <------------ 3
+        // └── evt10 <------- 4
+        const events = new gd.EventsList();
+
+        var evt0 = new gd.StandardEvent();
+        evt0 = events.insertEvent(evt0, 0);
+        var evt1 = new gd.StandardEvent();
+        evt1 = events.insertEvent(evt1, 1);
+
+        var evt00 = new gd.StandardEvent();
+        evt00 = evt0.getSubEvents().insertEvent(evt00, 0);
+        var evt000 = new gd.StandardEvent();
+        var evt001 = new gd.StandardEvent();
+        var evt002 = new gd.StandardEvent();
+        evt000 = evt00.getSubEvents().insertEvent(evt000, 0);
+        evt001 = evt00.getSubEvents().insertEvent(evt001, 1);
+        evt002 = evt00.getSubEvents().insertEvent(evt002, 2);
+
+        var evt01 = new gd.StandardEvent();
+        evt01 = evt0.getSubEvents().insertEvent(evt01, 1);
+        var evt010 = new gd.StandardEvent();
+        evt010 = evt01.getSubEvents().insertEvent(evt010, 0);
+
+        var evt02 = new gd.StandardEvent();
+        evt02 = evt0.getSubEvents().insertEvent(evt02, 2);
+        var evt020 = new gd.StandardEvent();
+        evt020 = evt02.getSubEvents().insertEvent(evt020, 0);
+
+        var evt10 = new gd.StandardEvent();
+        evt10 = evt1.getSubEvents().insertEvent(evt10, 0);
+
+        const missingEvent = new gd.StandardEvent();
+
+        const positionFinder = new gd.EventsPositionFinder();
+        positionFinder.addEventToSearch(evt00);
+        positionFinder.addEventToSearch(evt10);
+        positionFinder.addEventToSearch(evt1);
+        positionFinder.addEventToSearch(evt002);
+        positionFinder.addEventToSearch(evt010);
+        positionFinder.addEventToSearch(missingEvent);
+        positionFinder.launch(events);
+
+        expect(positionFinder.getPositions().size()).toBe(6);
+        expect(positionFinder.getPositions().toJSArray()).toEqual([
+          1, 10, 9, 4, 6, -1,
+        ]);
+
+        events.delete();
       });
     });
   });

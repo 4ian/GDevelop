@@ -201,6 +201,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
     );
     shell.sed(
       '-i',
+      'declare class gdVectorInt {',
+      'declare class gdVectorInt {\n  toJSArray(): Array<number>;',
+      'types/gdvectorint.js'
+    );
+    shell.sed(
+      '-i',
       'declare class gdSerializer {',
       `declare class gdSerializer {
   static fromJSObject(object: Object): gdSerializerElement;

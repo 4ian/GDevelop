@@ -48,6 +48,43 @@ type Props = {|
 |};
 
 /**
+ * Computes the positions of the first selected event and the search results
+ * in the flatten event tree and looks for the search result just after the
+ * first selected event.
+ */
+const getSearchInitialOffset = (
+  events: gdEventsList,
+  resultEvents: Array<gdBaseEvent>,
+  selection: SelectionState
+): number => {
+  const selectedEvents = getSelectedEvents(selection);
+  if (!selectedEvents.length) return 0;
+
+  const eventsToSearch = [selectedEvents[0], ...resultEvents];
+
+  const positionFinder = new gd.EventsPositionFinder();
+  eventsToSearch.forEach(event => positionFinder.addEventToSearch(event));
+  positionFinder.launch(events);
+  const [
+    selectedEventPosition,
+    ...searchResultsPositions
+  ] = positionFinder.getPositions().toJSArray();
+
+  // Search results are considered to be sorted by position
+  // (top to bottom in the flatten event tree)
+  for (
+    let searchResultIndex = 0;
+    searchResultIndex < searchResultsPositions.length;
+    searchResultIndex++
+  ) {
+    if (searchResultsPositions[searchResultIndex] >= selectedEventPosition) {
+      return searchResultIndex;
+    }
+  }
+  return 0;
+};
+
+/**
  * Component allowing to do search in events and pass the results
  * to its children components, as well as methods to browse the results.
  */
@@ -178,37 +215,6 @@ export default class EventsSearcher extends React.Component<Props, State> {
     this._resultEvents = uniqBy(resultEventsWithDuplicates, event => event.ptr);
   };
 
-  getSearchInitialStep = (resultEvents: Array<gdBaseEvent>): number => {
-    const selectedEvents = getSelectedEvents(this.props.selection);
-    if (!selectedEvents.length) return 0;
-    const { eventsSearchResults } = this.state;
-
-    const eventsToSearch = [selectedEvents[0], ...resultEvents];
-
-    const positionFinder = new gd.EventsPositionFinder();
-    eventsToSearch.forEach(event => positionFinder.addEventToSearch(event));
-    positionFinder.launch(this.props.events);
-
-    const [
-      selectedEventPosition,
-      ...searchResultsPositions
-    ] = positionFinder.getPositions().toJSArray();
-
-    for (
-      let searchResultPositionIndex = 0;
-      searchResultPositionIndex < searchResultsPositions.length;
-      searchResultPositionIndex++
-    ) {
-      if (
-        searchResultsPositions[searchResultPositionIndex] >=
-        selectedEventPosition
-      )
-        return searchResultPositionIndex;
-    }
-
-    return 0;
-  };
-
   _goToSearchResults = (step: number): ?gdBaseEvent => {
     this._updateListOfResultEvents();
     if (!this._resultEvents || this._resultEvents.length === 0) {
@@ -218,9 +224,14 @@ export default class EventsSearcher extends React.Component<Props, State> {
 
     const { searchFocusOffset } = this.state;
 
-    let newSearchFocusOffset = !searchFocusOffset
-      ? this.getSearchInitialStep(this._resultEvents)
-      : (searchFocusOffset + step) % this._resultEvents.length;
+    let newSearchFocusOffset =
+      searchFocusOffset === null || searchFocusOffset === undefined
+        ? getSearchInitialOffset(
+            this.props.events,
+            this._resultEvents,
+            this.props.selection
+          )
+        : (searchFocusOffset + step) % this._resultEvents.length;
     if (newSearchFocusOffset < 0)
       newSearchFocusOffset += this._resultEvents.length;
 

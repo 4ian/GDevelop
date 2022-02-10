@@ -159,6 +159,15 @@ var adaptNamingConventions = function (gd) {
     return arr;
   };
 
+  gd.VectorInt.prototype.toJSArray = function () {
+    var arr = [];
+    var size = this.size();
+    for (var i = 0; i < size; ++i) {
+      arr.push(this.at(i));
+    }
+    return arr;
+  };
+
   // Add gd.Serializer.fromJSObject which is much faster than manually parsing
   // JSON with gd.Serializer.fromJSON.
   const elementFromJSObject = function (object, element) {

@@ -179,7 +179,6 @@ export const sendHelpFinderOpened = () => {
 };
 
 export const sendHelpSearch = (searchText: string) => {
-  console.log('sendHelpSearch', searchText);
   if (isDev || !client) return;
 
   client.recordEvent('help_search', {
@@ -286,10 +285,13 @@ export const sendExternalEditorOpened = (editorName: string) => {
   client.recordEvent('open_external_editor', { editorName });
 };
 
-const trackInAppTutorialProgress = (stepIndex: number) => {
+const trackInAppTutorialProgress = (
+  stepIndex: number,
+  isCompleted: boolean = false
+) => {
   if (isDev || !client) return;
 
-  client.recordEvent('user-flow-onboarding', { stepIndex });
+  client.recordEvent('user-flow-onboarding', { stepIndex, isCompleted });
 };
 
 // Make this function global so it can be accessed from userflow's

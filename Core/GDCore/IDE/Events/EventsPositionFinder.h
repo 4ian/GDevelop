@@ -30,7 +30,7 @@ class GD_CORE_API EventsPositionFinder : public ArbitraryEventsWorker {
   const std::vector<std::size_t> GetPositions() { return positions; }
 
   /**
-   * Return the positions of all searched events
+   * Add an event for which the position must be reported in `GetPositions`.
    */
   void AddEventToSearch(gd::BaseEvent* event) {
     searchedEvents.push_back(event);

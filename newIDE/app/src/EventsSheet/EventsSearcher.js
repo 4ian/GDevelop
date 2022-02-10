@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type SelectionState } from './SelectionHandler';
+import { type SelectionState, getSelectedEvents } from './SelectionHandler';
 import { mapFor } from '../Utils/MapFor';
 import uniqBy from 'lodash/uniqBy';
 const gd: libGDevelop = global.gd;
@@ -46,6 +46,43 @@ type Props = {|
     clearSearchResults: () => void,
   |}) => React.Node,
 |};
+
+/**
+ * Computes the positions of the first selected event and the search results
+ * in the flatten event tree and looks for the search result just after the
+ * first selected event.
+ */
+const getSearchInitialOffset = (
+  events: gdEventsList,
+  resultEvents: Array<gdBaseEvent>,
+  selection: SelectionState
+): number => {
+  const selectedEvents = getSelectedEvents(selection);
+  if (!selectedEvents.length) return 0;
+
+  const eventsToSearch = [selectedEvents[0], ...resultEvents];
+
+  const positionFinder = new gd.EventsPositionFinder();
+  eventsToSearch.forEach(event => positionFinder.addEventToSearch(event));
+  positionFinder.launch(events);
+  const [
+    selectedEventPosition,
+    ...searchResultsPositions
+  ] = positionFinder.getPositions().toJSArray();
+
+  // Search results are considered to be sorted by position
+  // (top to bottom in the flatten event tree)
+  for (
+    let searchResultIndex = 0;
+    searchResultIndex < searchResultsPositions.length;
+    searchResultIndex++
+  ) {
+    if (searchResultsPositions[searchResultIndex] >= selectedEventPosition) {
+      return searchResultIndex;
+    }
+  }
+  return 0;
+};
 
 /**
  * Component allowing to do search in events and pass the results
@@ -185,11 +222,16 @@ export default class EventsSearcher extends React.Component<Props, State> {
       return null;
     }
 
+    const { searchFocusOffset } = this.state;
+
     let newSearchFocusOffset =
-      this.state.searchFocusOffset === null
-        ? 0
-        : ((this.state.searchFocusOffset || 0) + step) %
-          this._resultEvents.length;
+      searchFocusOffset === null || searchFocusOffset === undefined
+        ? getSearchInitialOffset(
+            this.props.events,
+            this._resultEvents,
+            this.props.selection
+          )
+        : (searchFocusOffset + step) % this._resultEvents.length;
     if (newSearchFocusOffset < 0)
       newSearchFocusOffset += this._resultEvents.length;
 

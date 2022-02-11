@@ -15,7 +15,6 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
 import { Tab, Tabs } from '../UI/Tabs';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
@@ -37,6 +36,7 @@ import HelpButton from '../UI/HelpButton';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
+import TextField from '../UI/TextField';
 
 export type GamesDetailsTab = 'details' | 'builds' | 'analytics';
 
@@ -145,6 +145,7 @@ export const GameDetailsDialog = ({
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
+        description: project.getDescription() || '',
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
@@ -253,12 +254,22 @@ export const GameDetailsDialog = ({
                   </Text>
                 </Line>
               </Line>
-              <SemiControlledTextField
-                fullWidth
-                disabled
+              <TextField
                 value={publicGame.gameName}
-                onChange={() => {}}
+                readOnly
+                fullWidth
                 floatingLabelText={<Trans>Game name</Trans>}
+                floatingLabelFixed={true}
+              />
+              <TextField
+                value={publicGame.description || ''}
+                readOnly
+                fullWidth
+                floatingLabelText={<Trans>Game description</Trans>}
+                floatingLabelFixed={true}
+                hintText={t`No description set.`}
+                multiline
+                rows={5}
               />
               <Line noMargin justifyContent="flex-end">
                 <FlatButton

@@ -9,6 +9,8 @@ type Props = {|
   project: gdProject,
   setName: string => void,
   name: string,
+  setDescription: string => void,
+  description: ?string,
   setAuthorIds: (string[]) => void,
   authorIds: string[],
 |};
@@ -17,6 +19,8 @@ function PublicGameProperties({
   project,
   setName,
   name,
+  setDescription,
+  description,
   setAuthorIds,
   authorIds,
 }: Props) {
@@ -29,6 +33,16 @@ function PublicGameProperties({
         value={name}
         onChange={setName}
         autoFocus
+      />
+      <SemiControlledTextField
+        floatingLabelText={<Trans>Game description</Trans>}
+        fullWidth
+        type="text"
+        value={description || ''}
+        onChange={setDescription}
+        autoFocus
+        multiline
+        rows={5}
       />
       <UsersAutocomplete
         userIds={authorIds}

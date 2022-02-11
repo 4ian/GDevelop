@@ -14,6 +14,7 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
 
 type PublicProjectProperties = {|
   name: string,
+  description: string,
   authorIds: string[],
 |};
 
@@ -22,8 +23,9 @@ function applyPublicPropertiesToProject(
   newProperties: PublicProjectProperties
 ) {
   const t = str => str; //TODO
-  const { name, authorIds } = newProperties;
+  const { name, authorIds, description } = newProperties;
   project.setName(name);
+  project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
@@ -48,6 +50,7 @@ const PublicGamePropertiesDialog = ({
 }: Props) => {
   const publicGameAuthorIds = game.authors.map(author => author.id);
   const [name, setName] = React.useState(game.gameName);
+  const [description, setDescription] = React.useState(game.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
@@ -57,6 +60,7 @@ const PublicGamePropertiesDialog = ({
     if (
       applyPublicPropertiesToProject(project, {
         name,
+        description: description || '',
         authorIds,
       })
     )
@@ -89,6 +93,8 @@ const PublicGamePropertiesDialog = ({
       <PublicGameProperties
         name={name}
         setName={setName}
+        description={description}
+        setDescription={setDescription}
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}

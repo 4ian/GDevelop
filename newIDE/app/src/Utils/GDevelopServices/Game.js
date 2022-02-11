@@ -9,6 +9,7 @@ export type PublicGame = {
   gameName: string,
   authorName: string, // this corresponds to the publisher name
   publicWebBuildId?: ?string,
+  description?: string,
   authors: Array<UserPublicProfile>,
 };
 
@@ -18,6 +19,7 @@ export type Game = {
   authorName: string, // this corresponds to the publisher name
   createdAt: number,
   publicWebBuildId?: ?string,
+  description?: string,
 };
 
 export type ShowcasedGameLink = {
@@ -127,10 +129,12 @@ export const updateGame = (
     gameName,
     authorName,
     publicWebBuildId,
+    description,
   }: {|
     gameName?: string,
     authorName?: string,
     publicWebBuildId?: ?string,
+    description?: string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -141,6 +145,7 @@ export const updateGame = (
           gameName,
           authorName,
           publicWebBuildId,
+          description,
         },
         {
           params: {

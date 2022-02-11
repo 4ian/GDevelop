@@ -42,6 +42,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
   GetAllConditions()["Toujours"].SetFunctionName(
       "gdjs.evtTools.common.logicalNegation");
+  GetAllConditions()["BuiltinCommonInstructions::Always"].SetFunctionName(
+      "gdjs.evtTools.common.logicalNegation");
 
   GetAllConditions()["Egal"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
@@ -87,6 +89,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         return gd::String("");
       });
+  GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"].codeExtraInformation =
+    GetAllConditions()["Egal"].codeExtraInformation;
 
   GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
@@ -119,6 +123,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         return gd::String("");
       });
+  GetAllConditions()["BuiltinCommonInstructions::CompareStrings"].codeExtraInformation =
+    GetAllConditions()["StrEqual"].codeExtraInformation;
 
   GetAllEvents()["BuiltinCommonInstructions::Link"]
       .SetCodeGenerator([](gd::BaseEvent& event_,

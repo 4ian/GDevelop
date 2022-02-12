@@ -106,10 +106,10 @@ namespace gdjs {
       };
 
       export class WaitTask extends gdjs.AsyncTask {
-        private duration: integer;
+        private duration: float;
         private timeElapsedOnScene = 0;
 
-        constructor(durationInMilliseconds: integer) {
+        constructor(durationInMilliseconds: float) {
           super();
           this.duration = durationInMilliseconds;
         }
@@ -122,7 +122,7 @@ namespace gdjs {
         }
       }
 
-      export const wait = (durationInSeconds: integer): AsyncTask =>
+      export const wait = (durationInSeconds: float): AsyncTask =>
         new WaitTask(durationInSeconds * 1000 /* Convert from seconds to milliseconds */);
 
       /**

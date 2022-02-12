@@ -12,28 +12,34 @@ namespace gdjs {
     /**
      * Maps a task to the callback to be executed once it is finished.
      */
-    private tasks = new Map<AsyncTask, (runtimeScene: RuntimeScene) => void>();
+    private tasks = new Array<{
+      asyncTask: AsyncTask;
+      callback: (runtimeScene: gdjs.RuntimeScene) => void;
+    }>();
 
     /**
      * Run all pending asynchronous tasks.
      */
     processTasks(runtimeScene: RuntimeScene): void {
-      for (const task of this.tasks.keys()) {
-        if (task.update(runtimeScene)) {
+      for (const task of this.tasks) {
+        if (task.asyncTask.update(runtimeScene)) {
           // The task has finished, run the callback and remove it.
-          this.tasks.get(task)!(runtimeScene);
-          this.tasks.delete(task);
+          task.callback(runtimeScene);
+          this.tasks.splice(this.tasks.indexOf(task), 1);
         }
       }
     }
 
     /**
      * Adds a task to be processed between frames and a callback for when it is done to the manager.
-     * @param task The {@link AsyncTask} to run.
-     * @param then The callback to execute once the task is finished.
+     * @param asyncTask The {@link AsyncTask} to run.
+     * @param callback The callback to execute once the task is finished.
      */
-    addTask(task: AsyncTask, then: (runtimeScene: RuntimeScene) => void): void {
-      this.tasks.set(task, then);
+    addTask(
+      asyncTask: AsyncTask,
+      callback: (runtimeScene: RuntimeScene) => void
+    ): void {
+      this.tasks.push({ asyncTask, callback });
     }
 
     /**
@@ -41,7 +47,7 @@ namespace gdjs {
      * @internal
      */
     clearTasks() {
-      this.tasks.clear();
+      this.tasks.length = 0;
     }
   }
 

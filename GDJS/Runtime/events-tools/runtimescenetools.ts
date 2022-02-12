@@ -123,7 +123,9 @@ namespace gdjs {
       }
 
       export const wait = (durationInSeconds: float): AsyncTask =>
-        new WaitTask(durationInSeconds * 1000 /* Convert from seconds to milliseconds */);
+        new WaitTask(
+          durationInSeconds * 1000 /* Convert from seconds to milliseconds */
+        );
 
       /**
        * This is used by expressions to return 0 when a timer doesn't exist,

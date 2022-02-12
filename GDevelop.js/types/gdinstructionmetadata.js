@@ -26,6 +26,8 @@ declare class gdInstructionMetadata {
   setParameterExtraInfo(extraInfo: string): gdInstructionMetadata;
   useStandardOperatorParameters(type: string): gdInstructionMetadata;
   useStandardRelationalOperatorParameters(type: string): gdInstructionMetadata;
+  setRequiresBaseObjectCapability(capability: string): gdInstructionMetadata;
+  getRequiredBaseObjectCapability(): string;
   markAsSimple(): gdInstructionMetadata;
   markAsAdvanced(): gdInstructionMetadata;
   markAsComplex(): gdInstructionMetadata;

@@ -13,6 +13,12 @@ namespace gdjs {
 MathematicalToolsExtension::MathematicalToolsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
+  GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
+  GetAllExpressions()["RandomInRange"].SetFunctionName("gdjs.randomInRange");
+  GetAllExpressions()["RandomFloat"].SetFunctionName("gdjs.randomFloat");
+  GetAllExpressions()["RandomFloatInRange"].SetFunctionName(
+      "gdjs.randomFloatInRange");
+  GetAllExpressions()["RandomWithStep"].SetFunctionName("gdjs.randomWithStep");
   GetAllExpressions()["normalize"].SetFunctionName("gdjs.evtTools.common.normalize");
   GetAllExpressions()["clamp"].SetFunctionName("gdjs.evtTools.common.clamp");
   GetAllExpressions()["cos"].SetFunctionName("Math.cos");

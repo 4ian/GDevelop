@@ -100,6 +100,7 @@ export class SceneEditorContainer extends React.Component<RenderEditorContainerP
             serializeToJSObject(layout.getAssociatedEditorSettings())
           )
         }
+        onOpenEvents={this.props.onOpenEvents}
         isActive={isActive}
         hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
       />

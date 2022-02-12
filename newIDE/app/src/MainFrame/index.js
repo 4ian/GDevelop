@@ -44,7 +44,6 @@ import {
   notifyPreviewWillStart,
 } from './EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -421,7 +420,7 @@ const MainFrame = (props: Props) => {
               );
           } else {
             // Open the intro dialog if not opening any project.
-            if (introDialog && !Window.isDev()) openIntroDialog(true);
+            if (introDialog) openIntroDialog(true);
           }
         })
         .catch(() => {
@@ -789,63 +788,6 @@ const MainFrame = (props: Props) => {
     toolbar.current.setEditorToolbar(editorToolbar);
   };
 
-  const addLayout = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('New scene', name =>
-      currentProject.hasLayoutNamed(name)
-    );
-    const newLayout = currentProject.insertNewLayout(
-      name,
-      currentProject.getLayoutsCount()
-    );
-    newLayout.updateBehaviorsSharedData(currentProject);
-    _onProjectItemModified();
-  };
-
-  const addExternalLayout = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExternalLayout', name =>
-      currentProject.hasExternalLayoutNamed(name)
-    );
-    currentProject.insertNewExternalLayout(
-      name,
-      currentProject.getExternalLayoutsCount()
-    );
-    _onProjectItemModified();
-  };
-
-  const addExternalEvents = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExternalEvents', name =>
-      currentProject.hasExternalEventsNamed(name)
-    );
-    currentProject.insertNewExternalEvents(
-      name,
-      currentProject.getExternalEventsCount()
-    );
-    _onProjectItemModified();
-  };
-
-  const addEventsFunctionsExtension = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExtension', name =>
-      currentProject.hasEventsFunctionsExtensionNamed(name)
-    );
-    currentProject.insertNewEventsFunctionsExtension(
-      name,
-      currentProject.getEventsFunctionsExtensionsCount()
-    );
-    _onProjectItemModified();
-  };
-
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
     const { currentProject } = state;
     if (!currentProject) return;
@@ -873,8 +815,9 @@ const MainFrame = (props: Props) => {
   };
 
   const deleteLayout = (layout: gdLayout) => {
+    const { currentProject } = state;
     const { i18n } = props;
-    if (!state.currentProject) return;
+    if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -887,8 +830,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeLayout(layout.getName());
+      if (currentProject.getFirstLayout() === layout.getName())
+        currentProject.setFirstLayout('');
+      currentProject.removeLayout(layout.getName());
       _onProjectItemModified();
     });
   };
@@ -999,11 +943,15 @@ const MainFrame = (props: Props) => {
     }
 
     const layout = currentProject.getLayout(oldName);
+    const shouldChangeProjectFirstLayout =
+      oldName === currentProject.getFirstLayout();
     setState(state => ({
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      if (shouldChangeProjectFirstLayout)
+        currentProject.setFirstLayout(newName);
       _onProjectItemModified();
     });
   };
@@ -1585,7 +1533,10 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() === 1) {
+      if (currentProject.getLayoutsCount() <= 1) {
+        if (currentProject.getLayoutsCount() === 0)
+          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+
         openLayout(
           currentProject.getLayoutAt(0).getName(),
           {
@@ -1605,7 +1556,7 @@ const MainFrame = (props: Props) => {
         });
       }
     },
-    [openLayout, setState]
+    [openLayout, setState, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -2110,10 +2061,6 @@ const MainFrame = (props: Props) => {
             onOpenLayout={openLayout}
             onOpenExternalLayout={openExternalLayout}
             onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-            onAddLayout={addLayout}
-            onAddExternalLayout={addExternalLayout}
-            onAddEventsFunctionsExtension={addEventsFunctionsExtension}
-            onAddExternalEvents={addExternalEvents}
             onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
@@ -2222,6 +2169,11 @@ const MainFrame = (props: Props) => {
                   projectItemName: editorTab.projectItemName,
                   setPreviewedLayout,
                   onOpenExternalEvents: openExternalEvents,
+                  onOpenEvents: (sceneName: string) =>
+                    openLayout(sceneName, {
+                      openEventsEditor: true,
+                      openSceneEditor: false,
+                    }),
                   previewDebuggerServer,
                   hotReloadPreviewButtonProps,
                   onOpenLayout: name =>

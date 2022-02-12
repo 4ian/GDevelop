@@ -26,10 +26,12 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetExtensionHelpPath("/objects/text");
 
   gd::ObjectMetadata& obj =
-      extension.AddObject<TextObject>("Text",
-                                      _("Text"),
-                                      _("Displays a text on the screen."),
-                                      "CppPlatform/Extensions/texticon.png");
+      extension
+          .AddObject<TextObject>("Text",
+                                 _("Text"),
+                                 _("Displays a text on the screen."),
+                                 "CppPlatform/Extensions/texticon.png")
+          .SetCategoryFullName(_("Texts"));
 
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TextObject/TextObject.h");
@@ -513,14 +515,13 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetAngle")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddExpressionAndConditionAndAction(
-         "number",
-         "FontSize",
-         _("Font size"),
-         _("the font size of a text object"),
-         _("the font size"),
-         "",
-         "res/conditions/characterSize24.png")
+  obj.AddExpressionAndConditionAndAction("number",
+                                         "FontSize",
+                                         _("Font size"),
+                                         _("the font size of a text object"),
+                                         _("the font size"),
+                                         "",
+                                         "res/conditions/characterSize24.png")
       .AddParameter("object", _("Object"), "Text")
       .UseStandardParameters("number");
 

@@ -2,9 +2,7 @@
 import {
   type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
-  type EnumeratedInstructionOrExpressionMetadata,
 } from './EnumeratedInstructionOrExpressionMetadata.js';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
 const gd: libGDevelop = global.gd;
 
@@ -61,6 +59,10 @@ const freeInstructionsToRemove = {
     // $FlowFixMe
     ...freeConditionsToAddToBehavior.Physics2['Physics2::Physics2Behavior'],
   ],
+};
+
+export const getExtensionPrefix = (extension: gdPlatformExtension): string => {
+  return extension.getCategory() + GROUP_DELIMITER + extension.getFullName();
 };
 
 /**
@@ -164,7 +166,9 @@ const enumerateInstruction = (
   const displayedName = instrMetadata.getFullName();
   const groupName = instrMetadata.getGroup();
   const iconFilename = instrMetadata.getIconFilename();
-  const fullGroupName = prefix + groupName;
+  const fullGroupName = [prefix, groupName]
+    .filter(Boolean)
+    .join(GROUP_DELIMITER);
 
   return {
     type,
@@ -216,17 +220,7 @@ export const enumerateAllInstructions = (
     const extensionName = extension.getName();
     const allObjectsTypes = extension.getExtensionObjectsTypes();
     const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix =
-        extensionName === 'BuiltinObject'
-          ? 'Common ' +
-            (isCondition ? 'conditions' : 'actions') +
-            ' for all objects'
-          : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
+    const prefix = getExtensionPrefix(extension);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -468,14 +462,7 @@ export const enumerateFreeInstructions = (
   for (let i = 0; i < allExtensions.size(); ++i) {
     const extension = allExtensions.at(i);
     const extensionName: string = extension.getName();
-    const allObjectsTypes = extension.getExtensionObjectsTypes();
-    const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-    let prefix = '';
-    if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-      prefix = extensionName === 'BuiltinObject' ? '' : extension.getFullName();
-      prefix += GROUP_DELIMITER;
-    }
+    const prefix = getExtensionPrefix(extension);
 
     //Free instructions
     const extensionFreeInstructions = enumerateExtensionInstructions(
@@ -502,39 +489,6 @@ export const enumerateFreeInstructions = (
 export type InstructionFilteringOptions = {|
   searchText: string,
 |};
-
-export const filterInstructionsList = <
-  T: EnumeratedInstructionOrExpressionMetadata
->(
-  list: Array<T>,
-  { searchText }: InstructionFilteringOptions
-): Array<T> => {
-  if (!searchText) {
-    return list;
-  }
-
-  const directMatches = [];
-  const fuzzyMatches = [];
-  const lowercaseSearch = searchText.toLowerCase();
-
-  list.forEach(option => {
-    const lowerCaseDisplayedName = option.displayedName.toLowerCase();
-    const lowerCaseFullGroupName = option.fullGroupName.toLowerCase();
-    // favor direct matches first
-    if (lowerCaseDisplayedName.includes(lowercaseSearch)) {
-      return directMatches.push(option);
-    }
-    // then add fuzzy matches
-    if (
-      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseDisplayedName) ||
-      fuzzyOrEmptyFilter(lowercaseSearch, lowerCaseFullGroupName)
-    ) {
-      return fuzzyMatches.push(option);
-    }
-  });
-
-  return [...directMatches, ...fuzzyMatches];
-};
 
 export const getObjectParameterIndex = (
   instructionMetadata: gdInstructionMetadata

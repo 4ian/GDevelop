@@ -2,6 +2,16 @@
 import axios from 'axios';
 import { GDevelopGameApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { type Filters } from './Filters';
+import { type UserPublicProfile } from './User';
+
+export type PublicGame = {
+  id: string,
+  gameName: string,
+  authorName: string, // this corresponds to the publisher name
+  publicWebBuildId?: ?string,
+  description?: string,
+  authors: Array<UserPublicProfile>,
+};
 
 export type Game = {
   id: string,
@@ -9,6 +19,7 @@ export type Game = {
   authorName: string, // this corresponds to the publisher name
   createdAt: number,
   publicWebBuildId?: ?string,
+  description?: string,
 };
 
 export type ShowcasedGameLink = {
@@ -48,6 +59,15 @@ export const getGameUrl = (game: ?Game) => {
   if (!game) return null;
   return GDevelopGamesPlatform.getGameUrl(game.id);
 };
+
+export const getAclsFromAuthorIds = (
+  authorIds: gdVectorString
+): Array<{| userId: string, feature: string, level: string |}> =>
+  authorIds.toJSArray().map(authorId => ({
+    userId: authorId,
+    feature: 'author',
+    level: 'owner',
+  }));
 
 export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {
   return axios
@@ -109,10 +129,12 @@ export const updateGame = (
     gameName,
     authorName,
     publicWebBuildId,
+    description,
   }: {|
     gameName?: string,
     authorName?: string,
     publicWebBuildId?: ?string,
+    description?: string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -123,6 +145,34 @@ export const updateGame = (
           gameName,
           authorName,
           publicWebBuildId,
+          description,
+        },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
+export const setGameUserAcls = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  acls: Array<{| userId: string, feature: string, level: string |}>
+): Promise<void> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopGameApi.baseUrl}/game/action/set-acls`,
+        {
+          gameId,
+          acls,
         },
         {
           params: {
@@ -190,5 +240,11 @@ export const getGames = (
         },
       })
     )
+    .then(response => response.data);
+};
+
+export const getPublicGame = (gameId: string): Promise<PublicGame> => {
+  return axios
+    .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
     .then(response => response.data);
 };

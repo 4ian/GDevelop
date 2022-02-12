@@ -37,6 +37,65 @@ module.exports = {
       )
       .setExtensionHelpPath('/behaviors/tween');
 
+      const easingChoices = JSON.stringify([
+        'linear',
+        'easeInQuad',
+        'easeOutQuad',
+        'easeInOutQuad',
+        'easeInCubic',
+        'easeOutCubic',
+        'easeInOutCubic',
+        'easeInQuart',
+        'easeOutQuart',
+        'easeInOutQuart',
+        'easeInQuint',
+        'easeOutQuint',
+        'easeInOutQuint',
+        'easeInSine',
+        'easeOutSine',
+        'easeInOutSine',
+        'easeInExpo',
+        'easeOutExpo',
+        'easeInOutExpo',
+        'easeInCirc',
+        'easeOutCirc',
+        'easeInOutCirc',
+        'easeOutBounce',
+        'easeInBack',
+        'easeOutBack',
+        'easeInOutBack',
+        'elastic',
+        'swingFromTo',
+        'swingFrom',
+        'swingTo',
+        'bounce',
+        'bouncePast',
+        'easeFromTo',
+        'easeFrom',
+        'easeTo',
+      ]);
+  
+      extension
+      .addExpression(
+        'Ease',
+        _('Ease'),
+        _('Tween between 2 values according to an easing function.'),
+        '',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('From value'))
+      .addParameter('expression', _('To value'))
+      .addParameter('expression', _('Weighting'))
+      .setParameterLongDescription(
+        _('From 0 to 1.')
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.ease');
+
     var tweenBehavior = new gd.BehaviorJsImplementation();
 
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -73,44 +132,6 @@ module.exports = {
       )
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
-
-    const easingChoices = JSON.stringify([
-      'linear',
-      'easeInQuad',
-      'easeOutQuad',
-      'easeInOutQuad',
-      'easeInCubic',
-      'easeOutCubic',
-      'easeInOutCubic',
-      'easeInQuart',
-      'easeOutQuart',
-      'easeInOutQuart',
-      'easeInQuint',
-      'easeOutQuint',
-      'easeInOutQuint',
-      'easeInSine',
-      'easeOutSine',
-      'easeInOutSine',
-      'easeInExpo',
-      'easeOutExpo',
-      'easeInOutExpo',
-      'easeInCirc',
-      'easeOutCirc',
-      'easeInOutCirc',
-      'easeOutBounce',
-      'easeInBack',
-      'easeOutBack',
-      'easeInOutBack',
-      'elastic',
-      'swingFromTo',
-      'swingFrom',
-      'swingTo',
-      'bounce',
-      'bouncePast',
-      'easeFromTo',
-      'easeFrom',
-      'easeTo',
-    ]);
 
     // Behavior related
     behavior

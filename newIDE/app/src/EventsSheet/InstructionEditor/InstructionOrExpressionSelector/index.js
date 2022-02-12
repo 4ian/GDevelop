@@ -3,6 +3,8 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
 import Add from '@material-ui/icons/Add';
+import Fuse from 'fuse.js';
+
 import { List, type ListItemRefType } from '../../../UI/List';
 import SearchBar, {
   useShouldAutofocusSearchbar,
@@ -13,7 +15,6 @@ import {
   type TreeNode,
   findInTree,
 } from '../../../InstructionOrExpression/CreateTree';
-import { filterInstructionsList } from '../../../InstructionOrExpression/EnumerateInstructions';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionOrExpressionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
@@ -23,6 +24,12 @@ import { Line } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  tuneMatches,
+  type SearchResult,
+  sharedFuseConfiguration,
+} from '../../../UI/Search/UseSearchStructuredItem';
+const gd: libGDevelop = global.gd;
 
 const styles = {
   searchBar: {
@@ -30,6 +37,12 @@ const styles = {
     flexShrink: 0,
     zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
   },
+};
+
+const getGroupIconSrc = (key: string) => {
+  return gd.JsPlatform.get()
+    .getInstructionOrExpressionGroupMetadata(key)
+    .getIcon();
 };
 
 type Props<T> = {|
@@ -61,6 +74,7 @@ export default class InstructionOrExpressionSelector<
   _searchBar: ?SearchBarInterface;
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
+  searchApi = null;
 
   initialInstructionTypePath = findInTree(
     this.props.instructionsInfoTree,
@@ -78,6 +92,14 @@ export default class InstructionOrExpressionSelector<
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
+
+    this.searchApi = new Fuse(this.props.instructionsInfo, {
+      ...sharedFuseConfiguration,
+      keys: [
+        { name: 'displayedName', weight: 2 },
+        { name: 'fullGroupName', weight: 1 },
+      ],
+    });
   }
 
   focus = () => {
@@ -98,15 +120,22 @@ export default class InstructionOrExpressionSelector<
       onClickMore,
     } = this.props;
     const { searchText } = this.state;
-    const displayedInstructionsList: Array<T> = searchText
-      ? filterInstructionsList(this.props.instructionsInfo, { searchText })
-      : [];
+    const displayedInstructionsList: Array<SearchResult<T>> =
+      !!searchText && this.searchApi
+        ? this.searchApi.search(`'${searchText}`).map(result => ({
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+          }))
+        : [];
     const hasResults = !searchText || !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!displayedInstructionsList.length) return;
 
-      onChoose(displayedInstructionsList[0].type, displayedInstructionsList[0]);
+      onChoose(
+        displayedInstructionsList[0].item.type,
+        displayedInstructionsList[0].item
+      );
     };
 
     return (
@@ -147,7 +176,10 @@ export default class InstructionOrExpressionSelector<
                 <List>
                   {searchText ? (
                     displayedInstructionsList.map(
-                      enumeratedInstructionOrExpressionMetadata =>
+                      ({
+                        item: enumeratedInstructionOrExpressionMetadata,
+                        matches,
+                      }) =>
                         renderInstructionOrExpressionListItem({
                           instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
                           iconSize: iconSize,
@@ -156,6 +188,7 @@ export default class InstructionOrExpressionSelector<
                               enumeratedInstructionOrExpressionMetadata.type,
                               enumeratedInstructionOrExpressionMetadata
                             ),
+                          matches,
                           selectedValue: getInstructionListItemValue(
                             selectedType
                           ),
@@ -173,6 +206,7 @@ export default class InstructionOrExpressionSelector<
                         ),
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
+                        getGroupIconSrc,
                       })}
                       {onClickMore && (
                         <ResponsiveLineStackLayout justifyContent="center">

@@ -25,11 +25,14 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/tiled_sprite");
 
-  gd::ObjectMetadata& obj = extension.AddObject<TiledSpriteObject>(
-      "TiledSprite",
-      _("Tiled Sprite"),
-      _("Displays an image repeated over an area."),
-      "CppPlatform/Extensions/TiledSpriteIcon.png");
+  gd::ObjectMetadata& obj =
+      extension
+          .AddObject<TiledSpriteObject>(
+              "TiledSprite",
+              _("Tiled Sprite"),
+              _("Displays an image repeated over an area."),
+              "CppPlatform/Extensions/TiledSpriteIcon.png")
+          .SetCategoryFullName(_("General"));
 
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");

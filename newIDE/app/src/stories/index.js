@@ -4573,10 +4573,6 @@ storiesOf('ProjectManager', module)
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
       onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
-      onAddLayout={action('onAddLayout')}
-      onAddExternalLayout={action('onAddExternalLayout')}
-      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
-      onAddExternalEvents={action('onAddExternalEvents')}
       onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
@@ -4618,10 +4614,6 @@ storiesOf('ProjectManager', module)
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
       onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
-      onAddLayout={action('onAddLayout')}
-      onAddExternalLayout={action('onAddExternalLayout')}
-      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
-      onAddExternalEvents={action('onAddExternalEvents')}
       onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
@@ -5185,7 +5177,6 @@ storiesOf('GameDashboard/GameCard', module)
       onOpenDetails={action('onOpenDetails')}
       onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
-      onOpenMonetization={action('onOpenMonetization')}
     />
   ))
   .add('current game', () => (
@@ -5195,7 +5186,6 @@ storiesOf('GameDashboard/GameCard', module)
       onOpenDetails={action('onOpenDetails')}
       onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
-      onOpenMonetization={action('onOpenMonetization')}
     />
   ));
 

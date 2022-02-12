@@ -11,6 +11,7 @@ export type EnumeratedObjectMetadata = {|
   fullName: string,
   description: string,
   iconFilename: string,
+  categoryFullName: string,
 |};
 
 export type ObjectWithContext = {|
@@ -102,6 +103,7 @@ export const enumerateObjectTypes = (
           fullName: objectMetadata.getFullName(),
           description: objectMetadata.getDescription(),
           iconFilename: objectMetadata.getIconFilename(),
+          categoryFullName: objectMetadata.getCategoryFullName(),
         }));
     })
   );
@@ -113,6 +115,16 @@ export type ObjectFilteringOptions = {|
   hideExactMatches?: boolean,
 |};
 
+export const filterObjectByTags = (
+  objectWithContext: ObjectWithContext,
+  selectedTags: SelectedTags
+): boolean => {
+  if (!selectedTags.length) return true;
+
+  const objectTags = objectWithContext.object.getTags();
+  return hasStringAllTags(objectTags, selectedTags);
+};
+
 export const filterObjectsList = (
   list: ObjectWithContextList,
   { searchText, selectedTags, hideExactMatches }: ObjectFilteringOptions
@@ -120,12 +132,9 @@ export const filterObjectsList = (
   if (!searchText && !selectedTags.length) return list;
 
   return list
-    .filter((objectWithContext: ObjectWithContext) => {
-      if (!selectedTags.length) return true;
-
-      const objectTags = objectWithContext.object.getTags();
-      return hasStringAllTags(objectTags, selectedTags);
-    })
+    .filter(objectWithContext =>
+      filterObjectByTags(objectWithContext, selectedTags)
+    )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();
 

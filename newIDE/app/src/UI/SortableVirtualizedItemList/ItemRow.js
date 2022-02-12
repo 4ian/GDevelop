@@ -6,7 +6,7 @@ import TextField, { noMarginTextFieldInListItemTopOffset } from '../TextField';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 import { type MenuItemTemplate } from '../Menu/Menu.flow';
 import { shouldValidate } from '../KeyboardShortcuts/InteractionKeys';
-import { textEllispsisStyle } from '../TextEllipsis';
+import { textEllipsisStyle } from '../TextEllipsis';
 
 const styles = {
   textField: {
@@ -16,13 +16,14 @@ const styles = {
 
 const LEFT_MOUSE_BUTTON = 0;
 
-type Props<Item> = {
+type Props<Item> = {|
   item: Item,
   itemName: string,
   isBold: boolean,
   onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
+  renderItemLabel?: () => React.Node,
   selected: boolean,
   onItemSelected: (?Item) => void,
   errorStatus: '' | 'error' | 'warning',
@@ -31,7 +32,7 @@ type Props<Item> = {
   hideMenuButton: boolean,
   scaleUpItemIconWhenSelected?: boolean,
   connectIconDragSource?: ?(React.Element<any>) => ?React.Node,
-};
+|};
 
 class ItemRow<Item> extends React.Component<Props<Item>> {
   textField: ?TextField;
@@ -48,6 +49,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
     const {
       item,
       itemName,
+      renderItemLabel,
       isBold,
       selected,
       getThumbnail,
@@ -79,9 +81,9 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
             />
           ) : (
             <div
-              title={itemName}
+              title={typeof itemName === 'string' ? itemName : undefined}
               style={{
-                ...textEllispsisStyle,
+                ...textEllipsisStyle,
                 color: selected
                   ? muiTheme.listItem.selectedTextColor
                   : undefined,
@@ -89,7 +91,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
                 fontWeight: isBold ? 'bold' : 'normal',
               }}
             >
-              {itemName}
+              {renderItemLabel ? renderItemLabel() : itemName}
             </div>
           );
 

@@ -16,9 +16,10 @@ export default {
 
 export const LoadingWithoutTitleSkeleton = () => (
   <Carousel
-    title={<Trans>Our Latest Tutorials</Trans>}
+    title={<Trans>Learn game making</Trans>}
     items={null}
     displayItemTitles={false}
+    browseAllLabel={<Trans>Browse all</Trans>}
   />
 );
 export const Tutorials = () => {
@@ -62,7 +63,8 @@ export const Tutorials = () => {
   ];
   return (
     <Carousel
-      title={<Trans>Our Latest Tutorials</Trans>}
+      title={<Trans>Learn game making</Trans>}
+      browseAllLabel={<Trans>Browse all</Trans>}
       items={items}
       displayItemTitles={false}
       browseAllLink="https://www.youtube.com/c/GDevelopApp/videos"
@@ -71,7 +73,11 @@ export const Tutorials = () => {
 };
 
 export const LoadingWithTitleSkeleton = () => (
-  <Carousel title={<Trans>Showcase</Trans>} items={null} />
+  <Carousel
+    title={<Trans>Showcase</Trans>}
+    items={null}
+    browseAllLabel={<Trans>Browse all</Trans>}
+  />
 );
 export const Showcases = () => {
   type ShowcaseThumbnail = {|
@@ -162,6 +168,7 @@ export const Showcases = () => {
     <Carousel
       title={<Trans>Showcase</Trans>}
       items={items}
+      browseAllLabel={<Trans>Browse all</Trans>}
       onBrowseAllClick={() => action('Browse all button clicked')}
     />
   );
@@ -171,6 +178,7 @@ export const WithError = () => (
   <Carousel
     title={<Trans>Showcase</Trans>}
     items={null}
+    browseAllLabel={<Trans>Browse all</Trans>}
     error={<Trans>Unexpected error</Trans>}
   />
 );

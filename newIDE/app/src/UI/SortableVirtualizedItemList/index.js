@@ -18,6 +18,7 @@ type Props<Item> = {|
   onAddNewItem?: () => void,
   addNewItemLabel?: React.Node | string,
   onRename: (Item, string) => void,
+  renderItemLabel?: Item => React.Node,
   getItemName: Item => string,
   getItemThumbnail?: Item => string,
   isItemBold?: Item => boolean,
@@ -58,6 +59,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       onEditItem,
       renamedItem,
       getItemName,
+      renderItemLabel,
       scaleUpItemIconWhenSelected,
     } = this.props;
 
@@ -68,6 +70,9 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       <ItemRow
         item={item}
         itemName={itemName}
+        renderItemLabel={
+          renderItemLabel ? () => renderItemLabel(item) : undefined
+        }
         isBold={isItemBold ? isItemBold(item) : false}
         onRename={newName => this.props.onRename(item, newName)}
         editingName={nameBeingEdited}

@@ -5,8 +5,7 @@
  * project is released under the MIT License.
  */
 
-#ifndef GDCORE_PLATFORMEXTENSION_H
-#define GDCORE_PLATFORMEXTENSION_H
+#pragma once
 #include <map>
 #include <memory>
 #include <vector>
@@ -16,6 +15,7 @@
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
+#include "GDCore/Extensions/Metadata/InstructionOrExpressionGroupMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
@@ -71,6 +71,10 @@ class GD_CORE_API CompilationInfo {
   int sizeOfpInt;
 };
 
+struct GD_CORE_API DuplicatedInstructionOptions {
+  bool unscoped;
+};
+
 /**
  * \brief Base class for implementing platform's extensions.
  *
@@ -106,9 +110,17 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
+   * \brief Set the category of the extension.
+   */
+  PlatformExtension& SetCategory(const gd::String& category_) {
+    category = category_;
+    return *this;
+  }
+
+  /**
    * \brief Set the path to the help, relative to the GDevelop documentation
    * root. For example, "/all-features/collisions" for
-   * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
+   * "https://wiki.gdevelop.io/gdevelop5/all-features/collisions".
    *
    * The instructions, objects and behaviors will have this help path set by
    * default, unless you call SetHelpPath on them.
@@ -271,7 +283,6 @@ class GD_CORE_API PlatformExtension {
                               const gd::String& smallicon_,
                               std::shared_ptr<gd::BaseEvent> instance);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Create a new action which is the duplicate of the specified one.
    *
@@ -288,7 +299,8 @@ class GD_CORE_API PlatformExtension {
    */
   gd::InstructionMetadata& AddDuplicatedCondition(
       const gd::String& newConditionName,
-      const gd::String& copiedConditionName);
+      const gd::String& copiedConditionName,
+      gd::DuplicatedInstructionOptions options = {.unscoped = false});
   /**
    * \brief Create a new expression which is the duplicate of the specified one.
    *
@@ -315,7 +327,15 @@ class GD_CORE_API PlatformExtension {
   gd::PropertyDescriptor& RegisterProperty(const gd::String& name) {
     return extensionPropertiesMetadata[name];
   };
-#endif
+
+  /**
+   * \brief Add some metadata (icon, etc...) for a group used for instructions
+   * or expressions.
+   */
+  InstructionOrExpressionGroupMetadata& AddInstructionOrExpressionGroupMetadata(
+      const gd::String& name) {
+    return instructionOrExpressionGroupMetadata[name];
+  }
 
   /**
    * \brief Delete all instructions having no function name or custom code
@@ -338,6 +358,11 @@ class GD_CORE_API PlatformExtension {
    * \brief Return the name of the extension
    */
   const gd::String& GetName() const { return name; }
+
+  /**
+   * \brief Return the category of the extension
+   */
+  const gd::String& GetCategory() const { return category; }
 
   /**
    * \brief Return a description of the extension
@@ -452,7 +477,6 @@ class GD_CORE_API PlatformExtension {
    */
   std::map<gd::String, gd::EventMetadata>& GetAllEvents();
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Return a reference to a map containing the names of the actions
    * (as keys) and the metadata associated with (as values).
@@ -537,8 +561,16 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::PropertyDescriptor>& GetAllProperties() {
     return extensionPropertiesMetadata;
   }
+
+  /**
+   * \brief Get the metadata (icon, etc...) for groups used for instructions
+   * or expressions.
+   */
+  const std::map<gd::String, InstructionOrExpressionGroupMetadata>&
+  GetAllInstructionOrExpressionGroupMetadata() const {
+    return instructionOrExpressionGroupMetadata;
+  }
   ///@}
-#endif
 
   /**
    * \brief Return the name of all the extensions which are considered provided
@@ -566,6 +598,7 @@ class GD_CORE_API PlatformExtension {
                   ///< actions/conditions/expressions/objects/behavior/event.
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String category;
   gd::String author;        ///< Author displayed to users in the editor.
   gd::String license;       ///< License name displayed to users in the editor.
   bool deprecated;  ///< true if the extension is deprecated and shouldn't be
@@ -577,7 +610,6 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;
   std::map<gd::String, gd::EffectMetadata> effectsMetadata;
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -585,12 +617,12 @@ class GD_CORE_API PlatformExtension {
   std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
-#endif
+  std::map<gd::String, InstructionOrExpressionGroupMetadata>
+      instructionOrExpressionGroupMetadata;
 
   ObjectMetadata badObjectMetadata;
   BehaviorMetadata badBehaviorMetadata;
   EffectMetadata badEffectMetadata;
-#if defined(GD_IDE_ONLY)
   static std::map<gd::String, gd::InstructionMetadata>
       badConditionsMetadata;  ///< Used when a condition is not found in the
                               ///< extension
@@ -600,12 +632,10 @@ class GD_CORE_API PlatformExtension {
   static std::map<gd::String, gd::ExpressionMetadata>
       badExpressionsMetadata;  ///< Used when an expression is not found in the
                                ///< extension
-#endif
 };
 
 }  // namespace gd
 
-#if defined(GD_IDE_ONLY)
 /** \brief Macro used by extensions in their constructor to declare how they
  * have been compiled. \see gd::CompilationInfo
  */
@@ -619,23 +649,5 @@ class GD_CORE_API PlatformExtension {
   compilationInfo.gccMinorVersion = __GNUC_MINOR__;     \
   compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;  \
   compilationInfo.informationCompleted = true;
-#else
-/** \brief Macro used by extensions in their constructor to declare how they
- * have been compiled. \see gd::CompilationInfo
- */
-#define GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION() \
-  compilationInfo.runtimeOnly = true;                   \
-  compilationInfo.sfmlMajorVersion = 2;                 \
-  compilationInfo.sfmlMinorVersion = 0;                 \
-  compilationInfo.gdCoreVersion = GD_VERSION_STRING;    \
-  compilationInfo.sizeOfpInt = sizeof(int*);            \
-  compilationInfo.gccMajorVersion = __GNUC__;           \
-  compilationInfo.gccMinorVersion = __GNUC_MINOR__;     \
-  compilationInfo.gccPatchLevel = __GNUC_PATCHLEVEL__;  \
-  compilationInfo.informationCompleted = true;
-
-#endif
 
 #include "GDCore/Extensions/PlatformExtension.inl"
-
-#endif  // GDCORE_PLATFORMEXTENSION_H

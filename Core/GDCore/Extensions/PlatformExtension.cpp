@@ -372,9 +372,13 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
 }
 
 gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
-    const gd::String& newConditionName, const gd::String& copiedConditionName) {
-  gd::String newNameWithNamespace = GetNameSpace() + newConditionName;
-  gd::String copiedNameWithNamespace = GetNameSpace() + copiedConditionName;
+    const gd::String& newConditionName,
+    const gd::String& copiedConditionName,
+    gd::DuplicatedInstructionOptions options) {
+  gd::String newNameWithNamespace =
+      (options.unscoped ? "" : GetNameSpace()) + newConditionName;
+  gd::String copiedNameWithNamespace =
+      (options.unscoped ? "" : GetNameSpace()) + copiedConditionName;
 
   auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
   if (copiedCondition == conditionsInfos.end()) {
@@ -512,7 +516,8 @@ PlatformExtension::GetAllStrExpressionsForBehavior(gd::String autoType) {
   return badExpressionsMetadata;
 }
 
-gd::BaseEventSPtr PlatformExtension::CreateEvent(const gd::String& eventType) const {
+gd::BaseEventSPtr PlatformExtension::CreateEvent(
+    const gd::String& eventType) const {
   if (eventsInfos.find(eventType) != eventsInfos.end()) {
     if (eventsInfos.find(eventType)->second.instance ==
         std::shared_ptr<BaseEvent>()) {
@@ -754,7 +759,8 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
 }
 #endif
 
-PlatformExtension::PlatformExtension() : deprecated(false) {}
+PlatformExtension::PlatformExtension()
+    : deprecated(false), category(_("General")) {}
 
 PlatformExtension::~PlatformExtension() {}
 

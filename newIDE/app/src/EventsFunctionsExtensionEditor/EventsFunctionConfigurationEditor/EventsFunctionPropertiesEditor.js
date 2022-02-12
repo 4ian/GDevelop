@@ -28,21 +28,13 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   helpPagePath?: string,
-  onConfigurationUpdated?: () => void,
+  onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
   getFunctionGroupNames?: () => string[],
 |};
 
 type State = {||};
-
-const styles = {
-  icon: {
-    height: 32,
-    marginRight: 8,
-    flexSrink: 0,
-  },
-};
 
 const getSentenceErrorText = (
   i18n: I18nType,
@@ -172,7 +164,6 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
             <ResponsiveLineStackLayout alignItems="center" noMargin>
               <Line alignItems="center" noMargin>
-                <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
                   value={type}
                   floatingLabelText={<Trans>Function type</Trans>}
@@ -181,7 +172,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   onChange={(e, i, value: string) => {
                     // $FlowFixMe
                     eventsFunction.setFunctionType(value);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    if (onConfigurationUpdated) onConfigurationUpdated('type');
                     this.forceUpdate();
                   }}
                 >

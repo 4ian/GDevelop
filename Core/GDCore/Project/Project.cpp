@@ -495,6 +495,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   const SerializerElement& propElement =
       element.GetChild("properties", 0, "Info");
   SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
+  SetDescription(propElement.GetChild("description", 0).GetValue().GetString());
   SetVersion(propElement.GetStringAttribute("version", "1.0.0"));
   SetGameResolutionSize(
       propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt(),
@@ -634,6 +635,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         layoutElement.GetStringAttribute("name", "", "nom"), -1);
     layout.UnserializeFrom(*this, layoutElement);
   }
+  SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
@@ -703,6 +705,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   SerializerElement& propElement = element.AddChild("properties");
   propElement.AddChild("name").SetValue(GetName());
+  propElement.AddChild("description").SetValue(GetDescription());
   propElement.SetAttribute("version", GetVersion());
   propElement.AddChild("author").SetValue(GetAuthor());
   propElement.AddChild("windowWidth").SetValue(GetGameResolutionWidth());
@@ -908,6 +911,7 @@ Project& Project::operator=(const Project& other) {
 
 void Project::Init(const gd::Project& game) {
   name = game.name;
+  firstLayout = game.firstLayout;
   version = game.version;
   windowWidth = game.windowWidth;
   windowHeight = game.windowHeight;

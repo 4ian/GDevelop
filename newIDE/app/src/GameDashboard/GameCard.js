@@ -19,7 +19,6 @@ type Props = {|
   onOpenDetails: () => void,
   onOpenBuilds: () => void,
   onOpenAnalytics: () => void,
-  onOpenMonetization: () => void,
 |};
 
 export const GameCard = ({
@@ -28,7 +27,6 @@ export const GameCard = ({
   onOpenDetails,
   onOpenBuilds,
   onOpenAnalytics,
-  onOpenMonetization,
 }: Props) => {
   const openGameUrl = () => {
     const url = getGameUrl(game);

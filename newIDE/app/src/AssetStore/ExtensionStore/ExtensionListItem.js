@@ -7,6 +7,8 @@ import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
+import HighlightedText from '../../UI/Search/HighlightedText';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   button: { width: '100%' },
@@ -22,6 +24,7 @@ const styles = {
 type Props = {|
   project: gdProject,
   extensionShortHeader: ExtensionShortHeader,
+  matches: ?Array<SearchMatch>,
   onChoose: () => void,
   onHeightComputed: number => void,
 |};
@@ -29,6 +32,7 @@ type Props = {|
 export const ExtensionListItem = ({
   project,
   extensionShortHeader,
+  matches,
   onChoose,
   onHeightComputed,
 }: Props) => {
@@ -43,6 +47,21 @@ export const ExtensionListItem = ({
       onHeightComputed(containerRef.current.getBoundingClientRect().height);
   });
 
+  const renderExtensionField = (field: 'shortDescription' | 'fullName') => {
+    const originalField = extensionShortHeader[field];
+
+    if (!matches) return originalField;
+    const nameMatches = matches.filter(match => match.key === field);
+    if (nameMatches.length === 0) return originalField;
+
+    return (
+      <HighlightedText
+        text={originalField}
+        matchesCoordinates={nameMatches[0].indices}
+      />
+    );
+  };
+
   return (
     <ButtonBase onClick={onChoose} focusRipple style={styles.button}>
       <div style={styles.container} ref={containerRef}>
@@ -54,7 +73,7 @@ export const ExtensionListItem = ({
           />
           <Column expand>
             <Text noMargin>
-              {extensionShortHeader.fullName}{' '}
+              {renderExtensionField('fullName')}{' '}
               {alreadyInstalled && <Trans> (already installed)</Trans>}
             </Text>
             {extensionShortHeader.authors && (
@@ -65,7 +84,7 @@ export const ExtensionListItem = ({
               </Line>
             )}
             <Text noMargin size="body2">
-              {extensionShortHeader.shortDescription}
+              {renderExtensionField('shortDescription')}
             </Text>
           </Column>
         </Line>

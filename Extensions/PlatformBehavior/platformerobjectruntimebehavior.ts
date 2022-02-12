@@ -53,10 +53,13 @@ namespace gdjs {
     _ladderClimbingSpeed: float;
 
     _canGrabPlatforms: boolean;
+    _canGrabWithoutMoving: boolean;
     private _yGrabOffset: any;
     private _xGrabTolerance: any;
 
     _useLegacyTrajectory: boolean = true;
+
+    _canGoDownFromJumpthru: boolean = false;
 
     // Behavior state
 
@@ -66,6 +69,7 @@ namespace gdjs {
     _lastDeltaY: float = 0;
     _currentFallSpeed: float = 0;
     _canJump: boolean = false;
+    _lastDirectionIsLeft: boolean = false;
 
     private _ignoreDefaultControls: boolean;
     private _leftKey: boolean = false;
@@ -97,14 +101,10 @@ namespace gdjs {
     _onLadder: OnLadder;
 
     /** Platforms near the object, updated with `_updatePotentialCollidingObjects`. */
-    _potentialCollidingObjects: Array<
-      gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>
-    >;
+    _potentialCollidingObjects: Array<gdjs.PlatformRuntimeBehavior>;
 
     /** Overlapped jump-thru platforms, updated with `_updateOverlappedJumpThru`. */
-    private _overlappedJumpThru: Array<
-      gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>
-    >;
+    _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
 
     private _hasReallyMoved: boolean = false;
     private _manager: gdjs.PlatformObjectsManager;
@@ -123,11 +123,13 @@ namespace gdjs {
       this._maxSpeed = behaviorData.maxSpeed;
       this._jumpSpeed = behaviorData.jumpSpeed;
       this._canGrabPlatforms = behaviorData.canGrabPlatforms || false;
+      this._canGrabWithoutMoving = behaviorData.canGrabWithoutMoving;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
       this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
       this._useLegacyTrajectory = behaviorData.useLegacyTrajectory;
+      this._canGoDownFromJumpthru = behaviorData.canGoDownFromJumpthru;
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
 
@@ -168,6 +170,12 @@ namespace gdjs {
       ) {
         this.setCanGrabPlatforms(newBehaviorData.canGrabPlatforms);
       }
+      if (
+        oldBehaviorData.canGrabWithoutMoving !==
+        newBehaviorData.canGrabWithoutMoving
+      ) {
+        this._canGrabWithoutMoving = newBehaviorData.canGrabWithoutMoving;
+      }
       if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
         this._yGrabOffset = newBehaviorData.yGrabOffset;
       }
@@ -182,6 +190,12 @@ namespace gdjs {
         newBehaviorData.useLegacyTrajectory
       ) {
         this._useLegacyTrajectory = newBehaviorData.useLegacyTrajectory;
+      }
+      if (
+        oldBehaviorData.canGoDownFromJumpthru !==
+        newBehaviorData.canGoDownFromJumpthru
+      ) {
+        this._canGoDownFromJumpthru = newBehaviorData.canGoDownFromJumpthru;
       }
       return true;
     }
@@ -232,6 +246,10 @@ namespace gdjs {
           !this._ignoreDefaultControls && inputManager.isKeyPressed(DOWNKEY));
 
       this._requestedDeltaX += this._updateSpeed(timeDelta);
+
+      if (this._leftKey !== this._rightKey) {
+        this._lastDirectionIsLeft = this._leftKey;
+      }
 
       //0.2) Track changes in object size
       this._state.beforeUpdatingObstacles(timeDelta);
@@ -458,7 +476,7 @@ namespace gdjs {
       this._falling.enter(from);
     }
 
-    _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+    _setOnFloor(collidingPlatform: gdjs.PlatformRuntimeBehavior) {
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
@@ -471,7 +489,9 @@ namespace gdjs {
       this._jumping.enter(from);
     }
 
-    private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
+    private _setGrabbingPlatform(
+      grabbedPlatform: gdjs.PlatformRuntimeBehavior
+    ) {
       this._state.leave();
       this._state = this._grabbingPlatform;
       this._grabbingPlatform.enter(grabbedPlatform);
@@ -501,20 +521,18 @@ namespace gdjs {
       let oldX = object.getX();
       object.setX(
         object.getX() +
-          (this._requestedDeltaX > 0
-            ? this._xGrabTolerance
-            : -this._xGrabTolerance)
+          (this._requestedDeltaX < 0 ||
+          (this._requestedDeltaX === 0 && this._lastDirectionIsLeft)
+            ? -this._xGrabTolerance
+            : this._xGrabTolerance)
       );
-      const collidingPlatforms: PlatformRuntimeBehavior[] = gdjs.staticArray(
+      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] = gdjs.staticArray(
         PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
       );
       collidingPlatforms.length = 0;
       for (const platform of this._potentialCollidingObjects) {
-        if (
-          this._isCollidingWith(platform.behavior) &&
-          this._canGrab(platform.behavior)
-        ) {
-          collidingPlatforms.push(platform.behavior);
+        if (this._isCollidingWith(platform) && this._canGrab(platform)) {
+          collidingPlatforms.push(platform);
         }
       }
       object.setX(oldX);
@@ -646,7 +664,7 @@ namespace gdjs {
      * @returns true if the object was moved
      */
     private _separateFromPlatforms(
-      candidates: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>[],
+      candidates: gdjs.PlatformRuntimeBehavior[],
       excludeJumpThrus: boolean
     ) {
       excludeJumpThrus = !!excludeJumpThrus;
@@ -657,19 +675,17 @@ namespace gdjs {
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];
         if (
-          platform.behavior.getPlatformType() ===
-          gdjs.PlatformRuntimeBehavior.LADDER
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
         ) {
           continue;
         }
         if (
           excludeJumpThrus &&
-          platform.behavior.getPlatformType() ===
-            gdjs.PlatformRuntimeBehavior.JUMPTHRU
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
         ) {
           continue;
         }
-        objects.push(platform.behavior.owner);
+        objects.push(platform.owner);
       }
       return this.owner.separateFromObjects(objects, this._ignoreTouchingEdges);
     }
@@ -683,33 +699,31 @@ namespace gdjs {
      * @returns true if the object collides any platform
      */
     _isCollidingWithOneOf(
-      candidates: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>[],
+      candidates: gdjs.PlatformRuntimeBehavior[],
       exceptThisOne?: number | null,
       excludeJumpThrus?: boolean
     ) {
       excludeJumpThrus = !!excludeJumpThrus;
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];
-        if (platform.behavior.owner.id === exceptThisOne) {
+        if (platform.owner.id === exceptThisOne) {
           continue;
         }
         if (
-          platform.behavior.getPlatformType() ===
-          gdjs.PlatformRuntimeBehavior.LADDER
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
         ) {
           continue;
         }
         if (
           excludeJumpThrus &&
-          platform.behavior.getPlatformType() ===
-            gdjs.PlatformRuntimeBehavior.JUMPTHRU
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
         ) {
           continue;
         }
         if (
           gdjs.RuntimeObject.collisionTest(
             this.owner,
-            platform.behavior.owner,
+            platform.owner,
             this._ignoreTouchingEdges
           )
         ) {
@@ -730,7 +744,7 @@ namespace gdjs {
      * @returns the platform where to walk or if an obstacle was found
      */
     _findHighestFloorAndMoveOnTop(
-      candidates: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>[],
+      candidates: gdjs.PlatformRuntimeBehavior[],
       upwardDeltaY: float,
       downwardDeltaY: float
     ): PlatformSearchResult {
@@ -742,23 +756,19 @@ namespace gdjs {
       let isCollidingAnyPlatform = false;
       for (const platform of candidates) {
         if (
-          platform.behavior.getPlatformType() ===
-            gdjs.PlatformRuntimeBehavior.LADDER ||
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ||
           // Jump through platforms are obstacles only when the character comes from the top.
-          (platform.behavior.getPlatformType() ===
+          (platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
             // When following the floor, jumpthrus that are higher than the character are ignored.
             // If we only look above the character bottom, every jumpthrus can be discarded
             // without doing any collision check.
             ((this._state === this._onFloor &&
-              platform.behavior !== this._onFloor.getFloorPlatform() &&
+              platform !== this._onFloor.getFloorPlatform() &&
               downwardDeltaY < 0) ||
               // When trying to land on a platform, exclude jumpthrus that were already overlapped.
               (this._state !== this._onFloor &&
-                this._isIn(
-                  this._overlappedJumpThru,
-                  platform.behavior.owner.id
-                ))))
+                this._isIn(this._overlappedJumpThru, platform.owner.id))))
         ) {
           continue;
         }
@@ -770,8 +780,8 @@ namespace gdjs {
         if (
           // When following the floor, ignore jumpthrus that are higher than the character bottom.
           this._state === this._onFloor &&
-          platform.behavior !== this._onFloor.getFloorPlatform() &&
-          platform.behavior.getPlatformType() ===
+          platform !== this._onFloor.getFloorPlatform() &&
+          platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
           highestRelativeY < 0
         ) {
@@ -797,7 +807,7 @@ namespace gdjs {
           highestRelativeY < totalHighestY
         ) {
           totalHighestY = highestRelativeY;
-          highestGround = platform.behavior;
+          highestGround = platform;
         }
       }
       if (highestGround) {
@@ -819,10 +829,10 @@ namespace gdjs {
      * @return the search context
      */
     private _findPlatformHighestRelativeYUnderObject(
-      platform: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>,
+      platform: gdjs.PlatformRuntimeBehavior,
       context: FollowConstraintContext
     ): FollowConstraintContext {
-      const platformObject = platform.behavior.owner;
+      const platformObject = platform.owner;
       const platformAABB = platformObject.getAABB();
       if (
         platformAABB.max[0] <= context.ownerMinX ||
@@ -925,27 +935,23 @@ namespace gdjs {
      * @param exceptTheseOnes The platforms to be excluded from the test
      */
     private _isCollidingWithOneOfExcluding(
-      candidates: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>[],
-      exceptTheseOnes: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>[]
+      candidates: gdjs.PlatformRuntimeBehavior[],
+      exceptTheseOnes: gdjs.PlatformRuntimeBehavior[]
     ) {
       for (let i = 0; i < candidates.length; ++i) {
         const platform = candidates[i];
-        if (
-          exceptTheseOnes &&
-          this._isIn(exceptTheseOnes, platform.behavior.owner.id)
-        ) {
+        if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) {
           continue;
         }
         if (
-          platform.behavior.getPlatformType() ===
-          gdjs.PlatformRuntimeBehavior.LADDER
+          platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER
         ) {
           continue;
         }
         if (
           gdjs.RuntimeObject.collisionTest(
             this.owner,
-            platform.behavior.owner,
+            platform.owner,
             this._ignoreTouchingEdges
           )
         ) {
@@ -982,11 +988,11 @@ namespace gdjs {
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
         const platform = this._potentialCollidingObjects[i];
         if (
-          platform.behavior.getPlatformType() ===
+          platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
           gdjs.RuntimeObject.collisionTest(
             this.owner,
-            platform.behavior.owner,
+            platform.owner,
             this._ignoreTouchingEdges
           )
         ) {
@@ -1003,15 +1009,14 @@ namespace gdjs {
       for (let i = 0; i < this._potentialCollidingObjects.length; ++i) {
         const platform = this._potentialCollidingObjects[i];
         if (
-          platform.behavior.getPlatformType() !==
-          gdjs.PlatformRuntimeBehavior.LADDER
+          platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER
         ) {
           continue;
         }
         if (
           gdjs.RuntimeObject.collisionTest(
             this.owner,
-            platform.behavior.owner,
+            platform.owner,
             this._ignoreTouchingEdges
           )
         ) {
@@ -1021,12 +1026,9 @@ namespace gdjs {
       return false;
     }
 
-    _isIn(
-      platformArray: gdjs.BehaviorRBushAABB<gdjs.PlatformRuntimeBehavior>[],
-      id: integer
-    ) {
+    _isIn(platformArray: gdjs.PlatformRuntimeBehavior[], id: integer) {
       for (let i = 0; i < platformArray.length; ++i) {
-        if (platformArray[i].behavior.owner.id === id) {
+        if (platformArray[i].owner.id === id) {
           return true;
         }
       }
@@ -1049,7 +1051,7 @@ namespace gdjs {
       // is not considered as colliding with itself, in the case that it also has the
       // platform behavior.
       for (let i = 0; i < this._potentialCollidingObjects.length; ) {
-        if (this._potentialCollidingObjects[i].behavior.owner === object) {
+        if (this._potentialCollidingObjects[i].owner === object) {
           this._potentialCollidingObjects.splice(i, 1);
         } else {
           i++;
@@ -1588,7 +1590,7 @@ namespace gdjs {
    */
   class OnFloor implements State {
     private _behavior: PlatformerObjectRuntimeBehavior;
-    private _floorPlatform: PlatformRuntimeBehavior | null = null;
+    private _floorPlatform: gdjs.PlatformRuntimeBehavior | null = null;
     private _floorLastX: float = 0;
     private _floorLastY: float = 0;
     _oldHeight: float = 0;
@@ -1601,7 +1603,7 @@ namespace gdjs {
       return this._floorPlatform;
     }
 
-    enter(floorPlatform: PlatformRuntimeBehavior) {
+    enter(floorPlatform: gdjs.PlatformRuntimeBehavior) {
       this._floorPlatform = floorPlatform;
       this.updateFloorPosition();
       this._behavior._canJump = true;
@@ -1658,13 +1660,21 @@ namespace gdjs {
 
     checkTransitionBeforeX() {
       const behavior = this._behavior;
-      //Check that the floor object still exists and is near the object.
+      // Check that the floor object still exists and is near the object.
       if (
         !behavior._isIn(
           behavior._potentialCollidingObjects,
           this._floorPlatform!.owner.id
         )
       ) {
+        behavior._setFalling();
+      } else if (
+        this._behavior._downKey &&
+        this._floorPlatform!._platformType ===
+          gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
+        behavior._canGoDownFromJumpthru
+      ) {
+        behavior._overlappedJumpThru.push(this._floorPlatform!);
         behavior._setFalling();
       }
     }
@@ -1878,13 +1888,16 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
+      // Jumping
       behavior._checkTransitionJumping();
 
-      //Grabbing a platform
-      if (behavior._canGrabPlatforms && behavior._requestedDeltaX !== 0) {
+      // Grabbing a platform
+      if (
+        behavior._canGrabPlatforms &&
+        (behavior._requestedDeltaX !== 0 || behavior._canGrabWithoutMoving)
+      ) {
         behavior._checkGrabPlatform();
       }
     }
@@ -1948,15 +1961,15 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
+      // Jumping
       behavior._checkTransitionJumping();
 
-      //Grabbing a platform
+      // Grabbing a platform
       if (
         behavior._canGrabPlatforms &&
-        behavior._requestedDeltaX !== 0 &&
+        (behavior._requestedDeltaX !== 0 || behavior._canGrabWithoutMoving) &&
         behavior._lastDeltaY >= 0
       ) {
         behavior._checkGrabPlatform();
@@ -2025,7 +2038,7 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter(grabbedPlatform: PlatformRuntimeBehavior) {
+    enter(grabbedPlatform: gdjs.PlatformRuntimeBehavior) {
       this._grabbedPlatform = grabbedPlatform;
       this._behavior._canJump = true;
       this._behavior._currentFallSpeed = 0;

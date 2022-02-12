@@ -426,6 +426,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
+  testEventsFunctionsExtension
+    .insertNewEventsFunction('MyPrivateTestFunction3', 2)
+    .setPrivate(true);
 
   // Create more dummy objects to test events with a lot of objects
   for (var i = 0; i < 6; ++i) {

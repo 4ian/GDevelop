@@ -5,7 +5,7 @@
  */
 namespace gdjs {
   /**
-   * Represents a timer, which must be updated manually with {@link gdjs.Timer#updateTime}.
+   * Represents a timer, which must be updated manually with {@link gdjs.Timer.updateTime}.
    */
   export class Timer {
     _name: string;

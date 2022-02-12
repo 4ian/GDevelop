@@ -32,7 +32,10 @@ module.exports = {
         "Florian Rival",
         "Open source (MIT License)"
       )
-      .setExtensionHelpPath("/publishing/publishing-to-facebook-instant-games");
+      .setExtensionHelpPath("/publishing/publishing-to-facebook-instant-games")
+      .setCategory('Third-party');
+    extension.addInstructionOrExpressionGroupMetadata(_("Facebook Instant Games"))
+        .setIcon("JsPlatform/Extensions/facebookicon32.png");
 
     extension
       .addAction(
@@ -44,9 +47,9 @@ module.exports = {
         _(
           "Save the content of _PARAM1_ in key _PARAM0_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"
         ),
-        _("Facebook Instant Games/Player data"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Player data"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter("string", 'Data key name (e.g: "Lives")', "", false)
       .addParameter("scenevar", "Scene variable with the content to save", "", false)
@@ -76,9 +79,9 @@ module.exports = {
         _(
           "Load player data with key _PARAM0_ in _PARAM1_ (or error in _PARAM2_)"
         ),
-        _("Facebook Instant Games/Player data"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Player data"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter("string", _('Data key name (e.g: "Lives")'), "", false)
       .addParameter(
@@ -109,9 +112,9 @@ module.exports = {
         _(
           "In leaderboard _PARAM0_, save score _PARAM1_ for the player and extra data from _PARAM2_ (store success message in _PARAM3_ or error in _PARAM4_)"
         ),
-        _("Facebook Instant Games/Leaderboards"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Leaderboards"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter(
         "string",
@@ -152,9 +155,9 @@ module.exports = {
         _(
           "Load player entry from leaderboard _PARAM0_. Set rank in _PARAM1_, score in _PARAM2_ (extra data if any in _PARAM3_ and error in _PARAM4_)"
         ),
-        _("Facebook Instant Games/Leaderboards"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Leaderboards"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter(
         "string",
@@ -198,9 +201,9 @@ module.exports = {
         _("Check if ads are supported"),
         _("Check if showing ads is supported on this device (only mobile phones can show ads)"),
         _("Ads can be shown on this device"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -214,9 +217,9 @@ module.exports = {
         _("Is the interstitial ad ready"),
         _("Check if the interstitial ad requested from Facebook is loaded and ready to be shown."),
         _("The interstitial ad is loaded and ready to be shown"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -230,9 +233,9 @@ module.exports = {
         _("Load and prepare an interstitial ad"),
         _("Request and load an interstitial ad from Facebook, so that it is ready to be shown."),
         _("Request and load an interstitial ad from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter(
         "string",
@@ -258,9 +261,9 @@ module.exports = {
         _("Show the loaded interstitial ad"),
         _("Show the interstitial ad previously loaded in memory. This won't work if you did not load the interstitial before."),
         _("Show the interstitial ad previously loaded in memory (if any error, store it in _PARAM0_)"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter(
         "scenevar",
@@ -280,9 +283,9 @@ module.exports = {
         _("Is the rewarded video ready"),
         _("Check if the rewarded video requested from Facebook is loaded and ready to be shown."),
         _("The rewarded video is loaded and ready to be shown"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -296,9 +299,9 @@ module.exports = {
         _("Load and prepare a rewarded video"),
         _("Request and load a rewarded video from Facebook, so that it is ready to be shown."),
         _("Request and load a rewarded video from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter(
         "string",
@@ -324,9 +327,9 @@ module.exports = {
         _("Show the loaded rewarded video"),
         _("Show the rewarded video previously loaded in memory. This won't work if you did not load the video before."),
         _("Show the rewarded video previously loaded in memory (if any error, store it in _PARAM0_)"),
-        _("Facebook Instant Games/Ads"),
-        "JsPlatform/Extensions/facebookicon24.png",
-        "JsPlatform/Extensions/facebookicon16.png"
+        _("Ads"),
+        "JsPlatform/Extensions/facebookicon32.png",
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .addParameter(
         "scenevar",
@@ -345,8 +348,8 @@ module.exports = {
         "PlayerId",
         _("Player identifier"),
         _("Get the player unique identifier"),
-        _("Facebook Instant Games"),
-        "JsPlatform/Extensions/facebookicon16.png"
+        '',
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -359,8 +362,8 @@ module.exports = {
         "PlayerName",
         _("Player name"),
         _("Get the player name"),
-        _("Facebook Instant Games"),
-        "JsPlatform/Extensions/facebookicon16.png"
+        '',
+        "JsPlatform/Extensions/facebookicon32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(

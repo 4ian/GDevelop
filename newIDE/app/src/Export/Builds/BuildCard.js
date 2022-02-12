@@ -29,7 +29,7 @@ const formatBuildText = (
     case 'electron-build':
       return <Trans>Windows/macOS/Linux Build</Trans>;
     case 'web-build':
-      return <Trans>Web (upload online) Build</Trans>;
+      return <Trans>Web Build</Trans>;
     default:
       return buildType;
   }
@@ -77,7 +77,7 @@ export const BuildCard = ({
           <Line alignItems="center" noMargin>
             {getIcon(build.type)}
             <Trans>
-              {formatBuildText(build.type)} - <Trans>Last updated on</Trans>{' '}
+              {formatBuildText(build.type)} -{' '}
               {format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}
             </Trans>
           </Line>

@@ -25,6 +25,8 @@ import {
   getGame,
   updateGame,
   type Game,
+  setGameUserAcls,
+  getAclsFromAuthorIds,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -133,12 +135,34 @@ export default class ExportLauncher extends Component<Props, State> {
     });
   };
 
+  tryUpdateAuthors = async () => {
+    const profile = this.props.authenticatedUser.profile;
+    if (profile) {
+      const authorAcls = getAclsFromAuthorIds(
+        this.props.project.getAuthorIds()
+      );
+
+      try {
+        await setGameUserAcls(
+          this.props.authenticatedUser.getAuthorizationHeader,
+          profile.id,
+          this.props.project.getProjectUuid(),
+          authorAcls
+        );
+      } catch (e) {
+        // Best effort call, do not prevent exporting the game.
+        console.error(e);
+      }
+    }
+  };
+
   registerAndUpdateGame = async () => {
     const profile = this.props.authenticatedUser.profile;
     const getAuthorizationHeader = this.props.authenticatedUser
       .getAuthorizationHeader;
     const gameId = this.props.project.getProjectUuid();
-    const authorName = this.props.project.getAuthor() || 'Unspecified author';
+    const authorName =
+      this.props.project.getAuthor() || 'Unspecified publisher';
     const gameName = this.props.project.getName() || 'Untitled game';
     if (profile) {
       const userId = profile.id;
@@ -150,6 +174,8 @@ export default class ExportLauncher extends Component<Props, State> {
           authorName,
           gameName,
         });
+        // We don't await for the authors update, as it is not required for publishing.
+        this.tryUpdateAuthors();
         this.props.onGameUpdated(game);
       } catch (err) {
         if (err.response.status === 404) {
@@ -159,6 +185,8 @@ export default class ExportLauncher extends Component<Props, State> {
             authorName,
             gameName,
           });
+          // We don't await for the authors update, as it is not required for publishing.
+          this.tryUpdateAuthors();
           this.props.onGameUpdated(game);
         }
       }
@@ -176,21 +204,25 @@ export default class ExportLauncher extends Component<Props, State> {
     const getErrorMessage = () => {
       switch (this.state.exportStep) {
         case 'export':
-          return t('Error while preparing the exporter.');
-        case 'resources-download':
           return t('Error while exporting the game.');
-        case 'compress':
+        case 'resources-download':
           return t(
             'Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.'
           );
-        case 'upload':
+        case 'compress':
           return t('Error while compressing the game.');
-        case 'waiting-for-build':
+        case 'upload':
           return t(
             'Error while uploading the game. Check your internet connection or try again later.'
           );
+        case 'waiting-for-build':
+          return t(
+            'Error while building the game. Check the logs of the build for more details.'
+          );
         case 'build':
-          return t('Error while lauching the build of the game.');
+          return t(
+            'Error while building of the game. Check the logs of the build for more details.'
+          );
         default:
           return t(
             'Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.'
@@ -205,8 +237,7 @@ export default class ExportLauncher extends Component<Props, State> {
         });
         showErrorBox({
           message:
-            getErrorMessage() +
-            (err.message ? `\n\nDetails of the error: ${err.message}` : ''),
+            getErrorMessage() + (err.message ? `\n\n${err.message}` : ''),
           rawError: {
             exportStep: this.state.exportStep,
             rawError: err,

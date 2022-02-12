@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorInt {
+    unsigned long size();
+    long at(unsigned long index);
+};
+
 interface VectorVariable {
     unsigned long size();
     [Const] Variable WRAPPED_at(unsigned long index);
@@ -130,6 +135,13 @@ interface EventsVariablesFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface InstructionOrExpressionGroupMetadata {
+    void InstructionOrExpressionGroupMetadata();
+
+    [Ref] InstructionOrExpressionGroupMetadata SetIcon([Const] DOMString icon);
+    [Const, Ref] DOMString GetIcon();
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();
@@ -148,6 +160,7 @@ interface Platform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -164,6 +177,7 @@ interface JsPlatform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -350,6 +364,8 @@ interface Project {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
     void SetVersion([Const] DOMString authorName);
     [Const, Ref] DOMString GetVersion();
     void SetAuthor([Const] DOMString authorName);
@@ -1263,6 +1279,9 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetCategoryFullName();
+
+    [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -1460,6 +1479,8 @@ interface PlatformExtension {
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
+    [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
@@ -1532,6 +1553,7 @@ interface PlatformExtension {
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
@@ -2196,6 +2218,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsFunctionsExtension SetCategory([Const] DOMString category);
+    [Const, Ref] DOMString GetCategory();
     [Ref] VectorString GetTags();
     [Ref] VectorString GetAuthorIds();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
@@ -2269,6 +2293,15 @@ interface ArbitraryEventsWorker {
 interface EventsParametersLister {
     void EventsParametersLister([Ref] Project project);
     [Const, Ref] MapStringString GetParametersAndTypes();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsPositionFinder {
+    void EventsPositionFinder();
+    [Value] VectorInt GetPositions();
+    void AddEventToSearch(BaseEvent event);
 
     //Inherited from ArbitraryEventsWorker
     void Launch([Ref] EventsList events);

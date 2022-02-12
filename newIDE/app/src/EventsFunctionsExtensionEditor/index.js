@@ -659,6 +659,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     return [...groupNames].sort((a, b) => a.localeCompare(b));
   };
 
+  _onConfigurationUpdated = (whatChanged?: 'type') => {
+    if (whatChanged === 'type') {
+      // Force an update to ensure the icon of the edited function is updated.
+      this.forceUpdate();
+    }
+
+    // Do nothing otherwise to avoid costly and useless extra renders.
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -700,6 +709,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     globalObjectsContainer={this._globalObjectsContainer}
                     objectsContainer={this._objectsContainer}
+                    onConfigurationUpdated={this._onConfigurationUpdated}
                     helpPagePath={
                       !!selectedEventsBasedBehavior
                         ? '/behaviors/events-based-behaviors'

@@ -9730,6 +9730,11 @@
   "resolved" "https://registry.npmjs.org/fuse.js/-/fuse.js-3.6.1.tgz"
   "version" "3.6.1"
 
+"fuse.js@^6.5.3":
+  "integrity" "sha512-sA5etGE7yD/pOqivZRBvUBd/NaL2sjAu6QuSaFoe1H2BrJSkH/T/UXAJ8CdXdw7DvY3Hs8CXKYkDWX7RiP5KOg=="
+  "resolved" "https://registry.npmjs.org/fuse.js/-/fuse.js-6.5.3.tgz"
+  "version" "6.5.3"
+
 "fuzzaldrin@^2.1.0":
   "integrity" "sha1-kCBMPi/appQbso0WZF1BgGOpDps="
   "resolved" "https://registry.npmjs.org/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz"

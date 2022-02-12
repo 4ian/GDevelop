@@ -20,20 +20,25 @@ import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsEx
 */
 
 module.exports = {
-  createExtension: function(
+  createExtension: function (
     _ /*: (string) => string */,
     gd /*: libGDevelop */
   ) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      'SpatialSound',
-      _('Spatial sound'),
-      _(
-        'Allow positioning sounds in a 3D space. The stereo system of the device is used to simulate the position of the sound and to give the impression that the sound is located somewhere around the player.'
-      ),
-      'Arthur Pacaud (arthuro555)',
-      'MIT'
-    );
+    extension
+      .setExtensionInformation(
+        'SpatialSound',
+        _('Spatial sound'),
+        _(
+          'Allow positioning sounds in a 3D space. The stereo system of the device is used to simulate the position of the sound and to give the impression that the sound is located somewhere around the player.'
+        ),
+        'Arthur Pacaud (arthuro555)',
+        'MIT'
+      )
+      .setCategory('Audio');
+    extension
+      .addInstructionOrExpressionGroupMetadata(_('Spatial sound'))
+      .setIcon('res/actions/son24.png');
 
     extension
       .addAction(
@@ -45,7 +50,7 @@ module.exports = {
         _(
           'Set position of sound on channel _PARAM1_ to position _PARAM2_, _PARAM3_, _PARAM4_'
         ),
-        _('Audio/Spatial Sound'),
+        '',
         'res/actions/son24.png',
         'res/actions/son.png'
       )
@@ -65,7 +70,7 @@ module.exports = {
         _('Set position of the listener'),
         _('Sets the spatial position of the listener/player.'),
         _('Set the listener position to _PARAM0_, _PARAM1_, _PARAM2_'),
-        _('Audio/Spatial Sound'),
+        '',
         'res/actions/son24.png',
         'res/actions/son.png'
       )
@@ -78,7 +83,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(
+  runExtensionSanityTests: function (
     gd /*: libGDevelop */,
     extension /*: gdPlatformExtension*/
   ) {

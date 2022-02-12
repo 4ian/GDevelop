@@ -86,7 +86,7 @@ module.exports = {
           .setDescription(
             _('This is the JSON file that was saved or exported from Tiled.')
           )
-          .setGroup(_("Tilemap and tileset"))
+          .setGroup(_('Tilemap and tileset'))
       );
       objectProperties.set(
         'tilesetJsonFile',
@@ -99,7 +99,7 @@ module.exports = {
               "Optional, don't specify it if you've not saved the tileset in a different file."
             )
           )
-          .setGroup(_("Tilemap and tileset"))
+          .setGroup(_('Tilemap and tileset'))
       );
       objectProperties.set(
         'tilemapAtlasImage',
@@ -107,7 +107,7 @@ module.exports = {
           .setType('resource')
           .addExtraInfo('image')
           .setLabel(_('Atlas image'))
-          .setGroup(_("Tilemap and tileset"))
+          .setGroup(_('Tilemap and tileset'))
       );
       objectProperties.set(
         'displayMode',
@@ -117,7 +117,7 @@ module.exports = {
           .addExtraInfo('all')
           .addExtraInfo('index')
           .setLabel(_('Display mode'))
-          .setGroup(_("Appearance"))
+          .setGroup(_('Appearance'))
       );
       objectProperties.set(
         'layerIndex',
@@ -129,21 +129,21 @@ module.exports = {
               'If "index" is selected as the display mode, this is the index of the layer to display.'
             )
           )
-          .setGroup(_("Appearance"))
+          .setGroup(_('Appearance'))
       );
       objectProperties.set(
         'animationSpeedScale',
         new gd.PropertyDescriptor(objectContent.animationSpeedScale.toString())
           .setType('number')
           .setLabel(_('Animation speed scale'))
-          .setGroup(_("Animation"))
+          .setGroup(_('Animation'))
       );
       objectProperties.set(
         'animationFps',
         new gd.PropertyDescriptor(objectContent.animationFps.toString())
           .setType('number')
           .setLabel(_('Animation FPS'))
-          .setGroup(_("Animation"))
+          .setGroup(_('Animation'))
       );
 
       return objectProperties;
@@ -200,7 +200,8 @@ module.exports = {
         'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
       )
       .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
-      .addIncludeFile('Extensions/TileMap/pixi-tilemap-helper.js');
+      .addIncludeFile('Extensions/TileMap/pixi-tilemap-helper.js')
+      .setCategoryFullName(_('Advanced'));
 
     object
       .addCondition(
@@ -466,7 +467,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::TileMap',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/tile_map_object',
+        helpPagePath: '/objects/tilemap',
       })
     );
   },
@@ -627,10 +628,11 @@ module.exports = {
         .getValue();
 
       try {
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
-          this._project,
-          tilemapJsonFile
-        );
+        const tileMapJsonData =
+          await this._pixiResourcesLoader.getResourceJsonData(
+            this._project,
+            tilemapJsonFile
+          );
 
         const tilesetJsonData = tilesetJsonFile
           ? await this._pixiResourcesLoader.getResourceJsonData(

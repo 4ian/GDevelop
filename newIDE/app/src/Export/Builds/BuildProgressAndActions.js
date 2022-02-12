@@ -96,11 +96,11 @@ export default ({
     differenceInSeconds(build.updatedAt, Date.now())
   );
   const estimatedRemainingTime = estimatedTime - secondsSinceLastUpdate;
-  const isStillRunning = estimatedRemainingTime > 0;
+  const isStillWithinEstimatedTime = estimatedRemainingTime > 0;
   const hasJustOverrun =
-    estimatedRemainingTime < 0 && estimatedRemainingTime < -estimatedTime;
+    !isStillWithinEstimatedTime && estimatedRemainingTime >= -estimatedTime;
   const hasTimedOut =
-    estimatedRemainingTime < 0 && estimatedRemainingTime > 2 * -estimatedTime;
+    !isStillWithinEstimatedTime && estimatedRemainingTime < -estimatedTime;
 
   const onDownload = (key: BuildArtifactKeyName) => {
     const url = getBuildArtifactUrl(build, key);
@@ -138,8 +138,8 @@ export default ({
     <I18n>
       {({ i18n }) =>
         build.status === 'error' ? (
-          <React.Fragment>
-            <Line alignItems="center" justifyContent="center">
+          <ColumnStackLayout>
+            <Line alignItems="center" justifyContent="flex-end">
               <Text>
                 <Trans>Something wrong happened :(</Trans>
               </Text>
@@ -149,54 +149,60 @@ export default ({
                 onClick={() => onDownload('logsKey')}
               />
             </Line>
-            <Line alignItems="center">
-              <EmptyMessage>
+            <Line alignItems="center" justifyContent="flex-end">
+              <EmptyMessage style={{ justifyContent: 'flex-end' }}>
                 <Trans>
                   Check the logs to see if there is an explanation about what
                   went wrong, or try again later.
                 </Trans>
               </EmptyMessage>
             </Line>
-          </React.Fragment>
+          </ColumnStackLayout>
         ) : build.status === 'pending' ? (
-          <Line alignItems="center" expand justifyContent="center">
-            {(isStillRunning || hasJustOverrun) && (
-              <>
-                <LinearProgress
-                  style={{ flex: 1 }}
-                  value={
-                    isStillRunning
-                      ? ((estimatedTime - estimatedRemainingTime) /
-                          estimatedTime) *
-                        100
-                      : 0
-                  }
-                  variant={isStillRunning ? 'determinate' : 'indeterminate'}
-                />
-                <Spacer />
-              </>
-            )}
-            {isStillRunning && (
-              <Text>
-                <Trans>
-                  ~{Math.round(estimatedRemainingTime / 60)} minutes.
-                </Trans>
-              </Text>
-            )}
-            {hasJustOverrun && (
-              <Text>
-                <Trans>Should finish soon.</Trans>
-              </Text>
-            )}
+          <>
+            <Line alignItems="center" expand justifyContent="center">
+              {(isStillWithinEstimatedTime || hasJustOverrun) && (
+                <>
+                  <LinearProgress
+                    style={{ flex: 1 }}
+                    value={
+                      isStillWithinEstimatedTime
+                        ? ((estimatedTime - estimatedRemainingTime) /
+                            estimatedTime) *
+                          100
+                        : 0
+                    }
+                    variant={
+                      isStillWithinEstimatedTime
+                        ? 'determinate'
+                        : 'indeterminate'
+                    }
+                  />
+                  <Spacer />
+                </>
+              )}
+              {isStillWithinEstimatedTime && (
+                <Text>
+                  <Trans>
+                    ~{Math.round(estimatedRemainingTime / 60)} minutes.
+                  </Trans>
+                </Text>
+              )}
+              {hasJustOverrun && (
+                <Text>
+                  <Trans>Should finish soon.</Trans>
+                </Text>
+              )}
+            </Line>
             {hasTimedOut && (
               <ColumnStackLayout>
-                <Line justifyContent="center">
+                <Line justifyContent="flex-end">
                   <Text>
                     <Trans>Something wrong happened :(</Trans>
                   </Text>
                 </Line>
-                <Line justifyContent="center">
-                  <EmptyMessage>
+                <Line justifyContent="flex-end">
+                  <EmptyMessage style={{ justifyContent: 'flex-end' }}>
                     <Trans>
                       It looks like the build has timed out, please try again.
                     </Trans>
@@ -204,7 +210,7 @@ export default ({
                 </Line>
               </ColumnStackLayout>
             )}
-          </Line>
+          </>
         ) : build.status === 'complete' ? (
           <ColumnStackLayout>
             <Line expand justifyContent="flex-end">

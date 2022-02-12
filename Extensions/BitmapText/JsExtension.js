@@ -29,7 +29,9 @@ module.exports = {
       .setExtensionInformation(
         'BitmapText',
         _('Bitmap Text'),
-        _('Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'),
+        _(
+          'Displays a text using a "Bitmap Font" (an image representing characters). This is more performant than a traditional Text object and it allows for complete control on the characters aesthetic.'
+        ),
         'Aurélien Vivet',
         'Open source (MIT License)'
       )
@@ -68,7 +70,7 @@ module.exports = {
         .setValue(objectContent.opacity.toString())
         .setType('number')
         .setLabel(_('Opacity (0-255)'))
-        .setGroup(_("Appearance"));
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('align')
@@ -78,7 +80,7 @@ module.exports = {
         .addExtraInfo('center')
         .addExtraInfo('right')
         .setLabel(_('Alignment, when multiple lines are displayed'))
-        .setGroup(_("Appearance"));
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('bitmapFontResourceName')
@@ -99,28 +101,27 @@ module.exports = {
         .setValue(objectContent.scale.toString())
         .setType('number')
         .setLabel(_('Text scale'))
-        .setGroup(_("Appearance"));
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('tint')
         .setValue(objectContent.tint)
         .setType('color')
         .setLabel(_('Font tint'))
-        .setGroup(_("Appearance"));
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('wordWrap')
         .setValue(objectContent.wordWrap ? 'true' : 'false')
         .setType('boolean')
         .setLabel(_('Word wrapping'))
-        .setGroup(_("Appearance"));
+        .setGroup(_('Appearance'));
 
       return objectProperties;
     };
     bitmapTextObject.setRawJSONContent(
       JSON.stringify({
-        text:
-          'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
+        text: 'This text use the default bitmap font.\nUse a custom Bitmap Font to create your own texts.',
         opacity: 255,
         scale: 1,
         fontSize: 20,
@@ -167,7 +168,8 @@ module.exports = {
       .setIncludeFile('Extensions/BitmapText/bitmaptextruntimeobject.js')
       .addIncludeFile(
         'Extensions/BitmapText/bitmaptextruntimeobject-pixi-renderer.js'
-      );
+      )
+      .setCategoryFullName(_('Texts'));
 
     object
       .addExpressionAndConditionAndAction(
@@ -270,7 +272,12 @@ module.exports = {
         'res/actions/font.png'
       )
       .addParameter('object', _('Bitmap text'), 'BitmapTextObject', false)
-      .addParameter('bitmapFontResource', _('Bitmap font resource name'), '', false)
+      .addParameter(
+        'bitmapFontResource',
+        _('Bitmap font resource name'),
+        '',
+        false
+      )
       .setParameterLongDescription(
         'The resource name of the font file, without quotes.'
       )
@@ -389,7 +396,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'BitmapText::BitmapTextObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/bitmaptext',
+        helpPagePath: '/objects/bitmap_text',
       })
     );
   },
@@ -639,7 +646,8 @@ module.exports = {
       this._pixiObject.align = align;
 
       const color = properties.get('tint').getValue();
-      this._pixiObject.tint = objectsRenderingService.rgbOrHexToHexNumber(color);
+      this._pixiObject.tint =
+        objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const scale = properties.get('scale').getValue() || 1;
       this._pixiObject.scale.set(scale);

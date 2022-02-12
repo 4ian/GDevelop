@@ -651,6 +651,72 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(1);
   });
 
+  it('generates a working function with two asynchronous actions', function () {
+    // Create events using the Trigger Once condition.
+    const eventsSerializerElement = gd.Serializer.fromJSON(
+      JSON.stringify([
+        {
+          disabled: false,
+          folded: false,
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: {
+                inverted: false,
+                value: 'Wait',
+              },
+              parameters: ['1.5'],
+              subInstructions: [],
+            },
+            {
+              type: { inverted: false, value: 'ModVarScene' },
+              parameters: ['SuccessVariable', '+', '1'],
+              subInstructions: [],
+            },
+            {
+              type: {
+                inverted: false,
+                value: 'Wait',
+              },
+              parameters: ['1.5'],
+              subInstructions: [],
+            },
+            {
+              type: { inverted: false, value: 'ModVarScene' },
+              parameters: ['SuccessVariable', '+', '2'],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+      ])
+    );
+
+    var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+      gd,
+      eventsSerializerElement
+    );
+
+    const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+    runCompiledEvents(gdjs, runtimeScene, []);
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+    // Process the tasks (but the task is not finished yet).
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeSyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(1);
+
+    // Process the tasks (after faking it's finished).
+    runtimeScene.getAsyncTasksManager().markAllFakeSyncTasksAsFinished();
+    runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+    expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(3);
+  });
+
   it('generates a working function with asynchronous actions referring to the function arguments', function () {
     // Create events using the Trigger Once condition.
     const eventsSerializerElement = gd.Serializer.fromJSON(
@@ -790,7 +856,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   // TODO: Add a test simulating the deletion of an object before a task is finished,
   // and the task then updating the other object instances variable.
-  // TODO: Add a test with multiple waits (or update existing tests.)
 });
 
 // TODO: Split this file in GDJSBasicCodeGenerationIntegrationTests.js

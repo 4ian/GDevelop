@@ -156,6 +156,7 @@ class GD_CORE_API EventsCodeGenerator {
    */
   gd::String GenerateActionCode(gd::Instruction& action,
                                 EventsCodeGenerationContext& context,
+                                // TODO: remove this in favor of a `GenerateStatementCode(GenerateActionCode(...))` which simply outputs a ;
                                 const gd::String& functionPrefix = "",
                                 const gd::String& functionSuffix = "");
 

@@ -32,7 +32,9 @@ describe('libGD.js', function () {
       project.setName('My super project');
       expect(project.getName()).toBe('My super project');
       project.setDescription("This is a great game I'm really proud of");
-      expect(project.getDescription()).toBe("This is a great game I'm really proud of");
+      expect(project.getDescription()).toBe(
+        "This is a great game I'm really proud of"
+      );
       project.setVersion('1.2.34');
       expect(project.getVersion()).toBe('1.2.34');
       project.setPackageName('com.test.package');
@@ -2742,6 +2744,64 @@ describe('libGD.js', function () {
         expect(objMetadata.getDescription().length).not.toBe(0);
         expect(objMetadata.getIconFilename().length).not.toBe(0);
       });
+      it('can have conditions and actions added at the same time for booleans', function () {
+        const extension = new gd.PlatformExtension();
+        extension.setExtensionInformation(
+          'TestExtensionName',
+          'Full name of test extension',
+          'Description of test extension',
+          'Author of test extension',
+          'License of test extension'
+        );
+        const fakeObject = new gd.ObjectJsImplementation();
+        const objectMetadata = extension.addObject(
+          'FakeObject',
+          'FakeObject',
+          'This is FakeObject',
+          '',
+          fakeObject
+        );
+
+        objectMetadata
+          .addExpressionAndConditionAndAction(
+            'boolean',
+            'Disabled',
+            'Disabled',
+            'the object is disabled',
+            'disabled',
+            '',
+            'Disable.png'
+          )
+          .addParameter('object', 'My object', 'MyObject', false)
+          .useStandardParameters('boolean')
+          .setFunctionName('setDisabled')
+          .setGetter('isDisabled');
+
+        expect(
+          objectMetadata
+            .getAllConditions()
+            .has('TestExtensionName::FakeObject::Disabled')
+        ).toBe(true);
+        expect(
+          objectMetadata
+            .getAllActions()
+            .has('TestExtensionName::FakeObject::SetDisabled')
+        ).toBe(true);
+
+        // Check sentences are properly set up.
+        expect(
+          objectMetadata
+            .getAllConditions()
+            .get('TestExtensionName::FakeObject::Disabled')
+            .getSentence()
+        ).toBe('_PARAM0_ is disabled');
+        expect(
+          objectMetadata
+            .getAllActions()
+            .get('TestExtensionName::FakeObject::SetDisabled')
+            .getSentence()
+        ).toBe('Set _PARAM0_ as disabled: _PARAM1_');
+      });
     });
     describe('gd.BehaviorMetadata', function () {
       it('have standard methods to get information', function () {
@@ -2756,6 +2816,68 @@ describe('libGD.js', function () {
         expect(autoMetadata.getGroup).not.toBe(undefined);
         expect(autoMetadata.getIconFilename).not.toBe(undefined);
         expect(autoMetadata.getObjectType).not.toBe(undefined);
+      });
+      it('can have conditions and actions added at the same time for booleans', function () {
+        const extension = new gd.PlatformExtension();
+        extension.setExtensionInformation(
+          'TestExtensionName',
+          'Full name of test extension',
+          'Description of test extension',
+          'Author of test extension',
+          'License of test extension'
+        );
+        const dummyBehavior = new gd.BehaviorJsImplementation();
+        const behaviorMetadata = extension.addBehavior(
+          'DummyBehavior',
+          'Dummy behavior for testing',
+          'DummyBehavior',
+          'Do nothing.',
+          '',
+          '',
+          'DummyBehavior',
+          dummyBehavior,
+          new gd.BehaviorsSharedData()
+        );
+
+        behaviorMetadata
+          .addExpressionAndConditionAndAction(
+            'boolean',
+            'Disabled',
+            'Disabled',
+            'the object is disabled',
+            'disabled',
+            '',
+            'Disable.png'
+          )
+          .addParameter('object', 'My object', '', false)
+          .useStandardParameters('boolean')
+          .setFunctionName('setDisabled')
+          .setGetter('isDisabled');
+
+        expect(
+          behaviorMetadata
+            .getAllConditions()
+            .has('TestExtensionName::DummyBehavior::Disabled')
+        ).toBe(true);
+        expect(
+          behaviorMetadata
+            .getAllActions()
+            .has('TestExtensionName::DummyBehavior::SetDisabled')
+        ).toBe(true);
+
+        // Check sentences are properly set up.
+        expect(
+          behaviorMetadata
+            .getAllConditions()
+            .get('TestExtensionName::DummyBehavior::Disabled')
+            .getSentence()
+        ).toBe('_PARAM0_ is disabled');
+        expect(
+          behaviorMetadata
+            .getAllActions()
+            .get('TestExtensionName::DummyBehavior::SetDisabled')
+            .getSentence()
+        ).toBe('Set _PARAM0_ as disabled: _PARAM1_');
       });
     });
     describe('gd.EffectMetadata', function () {
@@ -3592,6 +3714,38 @@ describe('libGD.js', function () {
         .getAllExpressions()
         .get('TestExtensionName::PlayerHealth');
       expect(declaredExpression.getParametersCount()).toBe(2);
+    });
+    it('can have conditions and actions added at the same time for booleans', function () {
+      const extension = makeTestExtension();
+      extension
+        .addExpressionAndConditionAndAction(
+          'boolean',
+          'Disabled',
+          'Disabled',
+          'the object is disabled',
+          'disabled',
+          '',
+          'Disable.png'
+        )
+        .addParameter('object', 'My object', 'MyObject', false)
+        .useStandardParameters('boolean')
+        .setFunctionName('setDisabled')
+        .setGetter('isDisabled');
+
+      expect(
+        extension.getAllConditions().has('TestExtensionName::Disabled')
+      ).toBe(true);
+      const declaredCondition = extension
+        .getAllConditions()
+        .get('TestExtensionName::Disabled');
+
+      expect(
+        extension.getAllActions().has('TestExtensionName::SetDisabled')
+      ).toBe(true);
+      const declaredAction = extension
+        .getAllActions()
+        .get('TestExtensionName::SetDisabled');
+      expect(declaredAction.getParametersCount()).toBe(2);
     });
   });
 

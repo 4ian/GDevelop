@@ -1351,6 +1351,11 @@ interface ObjectMetadata {
                                         [Const] DOMString group,
                                         [Const] DOMString icon);
 
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
 
@@ -1444,6 +1449,11 @@ interface BehaviorMetadata {
     [Ref] ExpressionMetadata AddDuplicatedStrExpression(
         [Const] DOMString newExpressionName,
         [Const] DOMString copiedExpressionName);
+
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
 
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);

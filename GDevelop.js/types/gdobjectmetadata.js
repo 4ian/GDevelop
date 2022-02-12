@@ -15,6 +15,10 @@ declare class gdObjectMetadata {
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
+  getAllActions(): gdMapStringInstructionMetadata;
+  getAllConditions(): gdMapStringInstructionMetadata;
+  getAllExpressions(): gdMapStringExpressionMetadata;
+  getAllStrExpressions(): gdMapStringExpressionMetadata;
   setIncludeFile(includeFile: string): gdObjectMetadata;
   addIncludeFile(includeFile: string): gdObjectMetadata;
   getUnsupportedBaseObjectCapabilities(): gdSetString;

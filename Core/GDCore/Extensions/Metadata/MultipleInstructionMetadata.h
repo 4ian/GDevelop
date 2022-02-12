@@ -31,6 +31,11 @@ class GD_CORE_API MultipleInstructionMetadata {
       gd::InstructionMetadata &action) {
     return MultipleInstructionMetadata(expression, condition, action);
   }
+  static MultipleInstructionMetadata WithConditionAndAction(
+      gd::InstructionMetadata &condition,
+      gd::InstructionMetadata &action) {
+    return MultipleInstructionMetadata(condition, action);
+  }
 
   /**
    * \see gd::InstructionMetadata::AddParameter
@@ -190,6 +195,9 @@ class GD_CORE_API MultipleInstructionMetadata {
                               gd::InstructionMetadata &condition_,
                               gd::InstructionMetadata &action_)
       : expression(&expression_), condition(&condition_), action(&action_){};
+  MultipleInstructionMetadata(gd::InstructionMetadata &condition_,
+                              gd::InstructionMetadata &action_)
+      : expression(nullptr), condition(&condition_), action(&action_){};
 
   gd::ExpressionMetadata *expression;
   gd::InstructionMetadata *condition;

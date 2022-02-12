@@ -467,64 +467,35 @@ module.exports = {
 
     // TODO: expressions for colors?
 
-    // TODO: use AddExpressionAndConditionAndAction for "boolean"s for the 4 next conditions/actions.
     object
-      .addScopedCondition(
+      .addExpressionAndConditionAndAction(
+        'boolean',
         'ReadOnly',
-        _('ReadOnly'),
-        _('Check if the text input is read-only.'),
-        _('_PARAM0_ is read-only'),
+        _('Read-only'),
+        _('the text input is read-only'),
+        _('read-only'),
         '',
-        'res/conditions/text24.png',
         'res/conditions/text24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('isReadOnly');
+      .useStandardParameters('boolean')
+      .setFunctionName('setReadOnly')
+      .setGetter('isReadOnly');
 
     object
-      .addScopedAction(
-        'SetReadOnly',
-        _('Read-only'),
-        _('Set if the text input is read-only.'),
-        _('Set _PARAM0_ as read-only: _PARAM1_'),
-        _('Field appearance'),
-        'res/actions/text24.png',
-        'res/actions/text24.png'
-      )
-      .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .addParameter('yesorno', _('Make the text input read-only?'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setReadOnly');
-
-    object
-      .addScopedCondition(
+      .addExpressionAndConditionAndAction(
+        'boolean',
         'Disabled',
         _('Disabled'),
-        _('Check if the text input is disabled.'),
-        _('_PARAM0_ is disabled'),
+        _('the text input is disabled'),
+        _('disabled'),
         '',
-        'res/conditions/text24.png',
         'res/conditions/text24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .getCodeExtraInformation()
-      .setFunctionName('isDisabled');
-
-    object
-      .addScopedAction(
-        'SetDisabled',
-        _('Disabled'),
-        _('Set if the text input is disabled.'),
-        _('Set _PARAM0_ as disabled: _PARAM1_'),
-        _('Field appearance'),
-        'res/actions/text24.png',
-        'res/actions/text24.png'
-      )
-      .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .addParameter('yesorno', _('Make the text input disabled?'), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('setDisabled');
+      .useStandardParameters('boolean')
+      .setFunctionName('setDisabled')
+      .setGetter('isDisabled');
 
     // Other expressions/conditions/actions:
     object

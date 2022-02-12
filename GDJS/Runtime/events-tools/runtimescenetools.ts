@@ -109,9 +109,9 @@ namespace gdjs {
         private duration: integer;
         private timeElapsedOnScene = 0;
 
-        constructor(time: integer) {
+        constructor(durationInMilliseconds: integer) {
           super();
-          this.duration = time;
+          this.duration = durationInMilliseconds;
         }
 
         update(runtimeScene: RuntimeScene): boolean {
@@ -122,8 +122,8 @@ namespace gdjs {
         }
       }
 
-      export const wait = (time: integer): AsyncTask =>
-        new WaitTask(time * 1000 /* Convert from seconds to milliseconds */);
+      export const wait = (durationInSeconds: integer): AsyncTask =>
+        new WaitTask(durationInSeconds * 1000 /* Convert from seconds to milliseconds */);
 
       /**
        * This is used by expressions to return 0 when a timer doesn't exist,

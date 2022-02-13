@@ -7,7 +7,7 @@ export type EventsFunctionsExtensionOpener = {
 
 export type EventsFunctionsExtensionWriter = {
   chooseEventsFunctionExtensionFile: (
-    extensionName: string
+    extensionName?: string
   ) => Promise<?string>,
   writeEventsFunctionsExtension: (
     extension: gdEventsFunctionsExtension,

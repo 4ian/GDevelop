@@ -272,7 +272,7 @@ module.exports = {
     const object = extension
       .addObject(
         'TextInputObject',
-        _('Text input'),
+        _('Text input (experimental)'),
         _('A text field the player can type text into.'),
         'JsPlatform/Extensions/text_input.svg',
         textInputObject

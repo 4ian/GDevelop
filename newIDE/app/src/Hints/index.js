@@ -54,6 +54,12 @@ export const getExtraObjectsInformation = (): {
       message: t`The tilemap must be designed in a separated program, Tiled, that can be downloaded on mapeditor.org. Save your map as a JSON file, then select here the Atlas image that you used and the Tile map JSON file.`,
     },
   ],
+  'TextInput::TextInputObject': [
+    {
+      kind: 'warning',
+      message: t`The text input will be always shown on top of all other objects in the game - this is a limitation that can't be changed. According to the platform/device or browser running the game, the appearance can also slightly change.`,
+    },
+  ],
 });
 
 export const getExtraInstructionInformation = (type: string): ?Hint => {

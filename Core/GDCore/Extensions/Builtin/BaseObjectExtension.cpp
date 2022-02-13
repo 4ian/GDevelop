@@ -1178,7 +1178,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("yesorno", _("Enable?"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectDoubleParameter",
                 _("Effect parameter (number)"),
@@ -1193,7 +1194,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("expression", _("New value"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectStringParameter",
                 _("Effect parameter (string)"),
@@ -1209,7 +1211,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("string", _("New value"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddAction("SetEffectBooleanParameter",
                 _("Effect parameter (enable or disable)"),
@@ -1224,7 +1227,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectEffectName", _("Effect name"))
       .AddParameter("objectEffectParameterName", _("Parameter name"))
       .AddParameter("yesorno", _("Enable?"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   obj.AddCondition("IsEffectEnabled",
                    _("Effect is enabled"),
@@ -1235,7 +1239,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                    "res/actions/effect.png")
       .AddParameter("object", _("Object"))
       .AddParameter("objectEffectName", _("Effect name"))
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetRequiresBaseObjectCapability("effect");
 
   extension
       .AddAction("Create",

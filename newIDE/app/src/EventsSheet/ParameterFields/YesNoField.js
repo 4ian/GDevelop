@@ -39,7 +39,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
 
     return (
       <Column noMargin>
-        <Line alignItems="center">
+        <Line alignItems="center" justifyContent="space-between">
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>

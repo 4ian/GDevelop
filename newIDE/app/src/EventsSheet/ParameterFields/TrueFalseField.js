@@ -42,7 +42,7 @@ export default class TrueFalseField extends Component<
 
     return (
       <Column noMargin>
-        <Line alignItems="center">
+        <Line alignItems="center" justifyContent="space-between">
           <Text style={styles.description} displayInlineAsSpan>
             {description}
           </Text>

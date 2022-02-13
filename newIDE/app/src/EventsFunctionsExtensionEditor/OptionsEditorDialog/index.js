@@ -25,7 +25,7 @@ const exportExtension = (
     return Promise.reject(new Error('Not supported'));
 
   return eventsFunctionsExtensionWriter
-    .chooseEventsFunctionExtensionFile()
+    .chooseEventsFunctionExtensionFile(eventsFunctionsExtension.getName())
     .then(pathOrUrl => {
       if (!pathOrUrl) return;
 

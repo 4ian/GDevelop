@@ -29,7 +29,9 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
 };
 
 export default class LocalEventsFunctionsExtensionWriter {
-  static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
+  static chooseEventsFunctionExtensionFile = (
+    extensionName?: string
+  ): Promise<?string> => {
     if (!dialog) return Promise.reject('Not supported');
     const browserWindow = electron.remote.getCurrentWindow();
 
@@ -42,7 +44,7 @@ export default class LocalEventsFunctionsExtensionWriter {
             extensions: ['json'],
           },
         ],
-        defaultPath: 'Extension.json',
+        defaultPath: extensionName ? extensionName : 'Extension.json',
       })
       .then(({ filePath }) => {
         if (!filePath) return null;

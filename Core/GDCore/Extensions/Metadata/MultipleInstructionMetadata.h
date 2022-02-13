@@ -31,6 +31,11 @@ class GD_CORE_API MultipleInstructionMetadata {
       gd::InstructionMetadata &action) {
     return MultipleInstructionMetadata(expression, condition, action);
   }
+  static MultipleInstructionMetadata WithConditionAndAction(
+      gd::InstructionMetadata &condition,
+      gd::InstructionMetadata &action) {
+    return MultipleInstructionMetadata(condition, action);
+  }
 
   /**
    * \see gd::InstructionMetadata::AddParameter
@@ -95,6 +100,17 @@ class GD_CORE_API MultipleInstructionMetadata {
     if (action) action->SetHidden();
     return *this;
   };
+
+  /**
+   * \see gd::InstructionMetadata::SetRequiresBaseObjectCapability
+   */
+  MultipleInstructionMetadata &SetRequiresBaseObjectCapability(
+      const gd::String &capability) {
+    if (expression) expression->SetRequiresBaseObjectCapability(capability);
+    if (condition) condition->SetRequiresBaseObjectCapability(capability);
+    if (action) action->SetRequiresBaseObjectCapability(capability);
+    return *this;
+  }
 
   /**
    * \see gd::InstructionMetadata::UseStandardOperatorParameters
@@ -179,6 +195,9 @@ class GD_CORE_API MultipleInstructionMetadata {
                               gd::InstructionMetadata &condition_,
                               gd::InstructionMetadata &action_)
       : expression(&expression_), condition(&condition_), action(&action_){};
+  MultipleInstructionMetadata(gd::InstructionMetadata &condition_,
+                              gd::InstructionMetadata &action_)
+      : expression(nullptr), condition(&condition_), action(&action_){};
 
   gd::ExpressionMetadata *expression;
   gd::InstructionMetadata *condition;

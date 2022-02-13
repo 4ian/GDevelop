@@ -24,6 +24,7 @@ import HotReloadPreviewButton, {
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/index';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   open: boolean,
@@ -69,6 +70,15 @@ const InnerDialog = (props: InnerDialogProps) => {
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
   });
+
+  const objectMetadata = React.useMemo(
+    () =>
+      gd.MetadataProvider.getObjectMetadata(
+        props.project.getCurrentPlatform(),
+        props.object.getType()
+      ),
+    [props.project, props.object]
+  );
 
   const EditorComponent = props.editorComponent;
 
@@ -130,11 +140,15 @@ const InnerDialog = (props: InnerDialogProps) => {
               value={'variables'}
               key={'variables'}
             />
-            <Tab
-              label={<Trans>Effects</Trans>}
-              value={'effects'}
-              key={'effects'}
-            />
+            {objectMetadata.isUnsupportedBaseObjectCapability(
+              'effect'
+            ) ? null : (
+              <Tab
+                label={<Trans>Effects</Trans>}
+                value={'effects'}
+                key={'effects'}
+              />
+            )}
           </Tabs>
         </div>
       }

@@ -2,15 +2,12 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import SelectField from '../../UI/SelectField';
 import FlatButton from '../../UI/FlatButton';
-import SelectOption from '../../UI/SelectOption';
 import Dialog from '../../UI/Dialog';
-import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
-import LocalesMetadata from '../../locales/LocalesMetadata';
 import { I18n } from '@lingui/react';
+import LanguageSelector from './LanguageSelector';
 
 type Props = {|
   open: boolean,
@@ -21,34 +18,6 @@ type State = {|
   languageDidChange: boolean,
 |};
 
-const displayLocaleMetadata = localeMetadata => {
-  if (localeMetadata.languageCode === 'en') return false;
-  if (localeMetadata.languageCode === 'pseudo_LOCALE') return Window.isDev();
-
-  return true;
-};
-
-const renderLanguageSelectOption = localeMetadata => {
-  const translationRatio = localeMetadata.translationRatio || 0;
-  const percent = (100 * localeMetadata.translationRatio).toFixed(0);
-  const isStarted = translationRatio > 0;
-
-  return (
-    <SelectOption
-      value={localeMetadata.languageCode}
-      primaryText={
-        localeMetadata.languageNativeName +
-        ' (' +
-        localeMetadata.languageName +
-        ')' +
-        (isStarted ? ` - ~${percent}%` : '')
-      }
-      disabled={!isStarted}
-      key={localeMetadata.languageCode}
-    />
-  );
-};
-
 export default class LanguageDialog extends Component<Props, State> {
   state = {
     languageDidChange: false,
@@ -58,19 +27,11 @@ export default class LanguageDialog extends Component<Props, State> {
     const { open, onClose } = this.props;
     if (!open) return null;
 
-    const localesToDisplay = LocalesMetadata.filter(displayLocaleMetadata);
-    const goodProgressLocales = localesToDisplay.filter(
-      localeMetadata => localeMetadata.translationRatio > 0.5
-    );
-    const startedLocales = localesToDisplay.filter(
-      localeMetadata => localeMetadata.translationRatio < 0.5
-    );
-
     return (
       <I18n>
         {({ i18n }) => (
           <PreferencesContext.Consumer>
-            {({ values, setLanguage }) => {
+            {({ values }) => {
               const isLoadingLanguage =
                 i18n.language !== values.language.replace('_', '-');
 
@@ -110,48 +71,11 @@ export default class LanguageDialog extends Component<Props, State> {
                   open={open}
                   title={<Trans>Language</Trans>}
                 >
-                  <Column noMargin>
-                    <Line expand>
-                      <SelectField
-                        floatingLabelText={
-                          <Trans>Choose GDevelop language</Trans>
-                        }
-                        value={values.language}
-                        onChange={(e, i, value: string) => {
-                          setLanguage(value);
-                          this.setState({
-                            languageDidChange: true,
-                          });
-                        }}
-                        fullWidth
-                      >
-                        <SelectOption
-                          value="en"
-                          primaryText="English (default)"
-                        />
-                        {goodProgressLocales.map(localeMetadata =>
-                          renderLanguageSelectOption(localeMetadata)
-                        )}
-                        {startedLocales.map(localeMetadata =>
-                          renderLanguageSelectOption(localeMetadata)
-                        )}
-                      </SelectField>
-                    </Line>
-                    <Line expand>
-                      <FlatButton
-                        primary
-                        label={
-                          <Trans>Help to translate GD in your language</Trans>
-                        }
-                        onClick={() =>
-                          Window.openExternalURL(
-                            'https://crowdin.com/project/gdevelop'
-                          )
-                        }
-                        fullWidth
-                      />
-                    </Line>
-                  </Column>
+                  <LanguageSelector
+                    onLanguageChanged={() =>
+                      this.setState({ languageDidChange: true })
+                    }
+                  />
                 </Dialog>
               );
             }}

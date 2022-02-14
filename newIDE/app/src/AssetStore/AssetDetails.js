@@ -156,10 +156,12 @@ export const AssetDetails = ({
             label={<Trans>Add to the game</Trans>}
             onClick={onAddAsset}
             disabled={!canAddAsset}
+            id="add-asset-button"
           />
         </LeftLoader>,
       ]}
       onApply={onAddAsset}
+      id={'asset-details-dialog'}
     >
       <Column expand noMargin>
         <ResponsiveLineStackLayout noMargin>

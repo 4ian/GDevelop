@@ -2141,6 +2141,7 @@ const MainFrame = (props: Props) => {
             <ClosableTab
               label={editorTab.label}
               key={editorTab.key}
+              id={`tab-${editorTab.key.replace(/\s/g, '-')}`}
               active={isCurrentTab}
               onClick={() => _onChangeEditorTab(id)}
               onClose={() => _onCloseEditorTab(editorTab)}

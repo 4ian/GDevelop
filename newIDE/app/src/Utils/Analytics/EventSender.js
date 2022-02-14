@@ -21,7 +21,8 @@ let startupTimesSummary = null;
 export let isUserflowRunning = false;
 
 export const installAnalyticsEvents = (authentication: Authentication) => {
-  if (!electron) {
+  // Activate userflow onboarding only on a portion of new users on Desktop app.
+  if (!electron && getProgramOpeningCount() <= 1 && Math.random() < 0.1) {
     if (isDev) {
       userflow.init('ct_y5qogyfo6zbahjejcbo3dybnta');
     } else {

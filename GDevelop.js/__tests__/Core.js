@@ -3715,6 +3715,18 @@ describe('libGD.js', function () {
         .get('TestExtensionName::PlayerHealth');
       expect(declaredExpression.getParametersCount()).toBe(2);
     });
+
+    it('can have variable expressions', function () {
+      const extension = makeTestExtension();
+      extension.addVariableExpression('TEST', 'TEST', 'TEST', 'TEST', 'TEST');
+      expect(
+        extension.getAllStrExpressions().has('TestExtensionName::TEST')
+      ).toBe(false);
+      expect(
+        extension.getAllVariableExpressions().has('TestExtensionName::TEST')
+      ).toBe(true);
+    });
+
     it('can have conditions and actions added at the same time for booleans', function () {
       const extension = makeTestExtension();
       extension

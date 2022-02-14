@@ -92,6 +92,10 @@ void UsedExtensionsFinder::OnVisitUnaryOperatorNode(UnaryOperatorNode& node) {
   node.factor->Visit(*this);
 };
 
+void UsedExtensionsFinder::OnVisitVariableExpressionNode(VariableExpressionNode& node) {
+  node.child->Visit(*this);
+}
+
 // Add variable extension and visit sub-expressions on variable nodes
 void UsedExtensionsFinder::OnVisitVariableNode(VariableNode& node) {
   usedExtensions.insert("BuiltinVariables");

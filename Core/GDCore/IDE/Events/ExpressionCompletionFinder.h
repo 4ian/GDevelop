@@ -405,6 +405,9 @@ class GD_CORE_API ExpressionCompletionFinder
         node.location.GetEndPosition(),
         node.objectName));
   }
+  void OnVisitVariableExpressionNode(VariableExpressionNode& node) override {
+    // No completions
+  }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     // No completions
   }

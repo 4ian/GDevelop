@@ -63,6 +63,8 @@ namespace gdjs {
     abstract update(runtimeScene: RuntimeScene): boolean;
   }
 
+  const logger = new gdjs.Logger('Internal PromiseTask');
+
   /**
    * A task that resolves with a promise.
    */
@@ -72,10 +74,17 @@ namespace gdjs {
     constructor(promise: Promise<any>) {
       super();
       promise
+        .catch((error) => {
+          logger.error(
+            `A promise error has not been handled, this should never happen! 
+If you are using JavaScript promises in an asynchronous action, make sure to add a .catch(). 
+Otherwise, report this as a bug on the GDevelop forums! 
+${error ? 'The following error was thrown: ' + error : ''}`
+          );
+        })
         .then(() => {
           this.isResolved = true;
-        })
-        .catch(() => {});
+        });
     }
 
     update() {

@@ -8,19 +8,24 @@ namespace gdjs {
   export class LightRuntimeObjectPixiRenderer {
     _object: gdjs.LightRuntimeObject;
     _runtimeScene: gdjs.RuntimeScene;
-    _manager: any;
+    _manager: gdjs.LightObstaclesManager;
     _radius: number;
-    _color: any;
+    _color: [number, number, number];
     _texture: PIXI.Texture | null = null;
-    _center: any;
-    _defaultVertexBuffer: any;
-    _vertexBuffer: any;
-    _indexBuffer: any;
+    _center: Float32Array;
+    _defaultVertexBuffer: Float32Array;
+    _vertexBuffer: Float32Array;
+    _indexBuffer: Uint16Array;
     _light: PIXI.Mesh<PIXI.Shader> | null = null;
     _isPreview: boolean;
-    _debugMode: any = null;
+    _debugMode: boolean = false;
     _debugLight: PIXI.Container | null = null;
     _debugGraphics: PIXI.Graphics | null = null;
+
+    /**
+     * A polygon updated when vertices of the light are computed
+     * to be a polygon bounding the light and its obstacles.
+     */
     _lightBoundingPoly: gdjs.Polygon;
 
     constructor(
@@ -53,13 +58,8 @@ namespace gdjs {
       this._indexBuffer = new Uint16Array([0, 1, 2, 0, 2, 3]);
       this.updateMesh();
       this._isPreview = runtimeScene.getGame().isPreview();
+      this._lightBoundingPoly = gdjs.Polygon.createRectangle(0, 0);
 
-      this._lightBoundingPoly = new gdjs.Polygon();
-      for (let i = 0; i < 4; i++) {
-        this._lightBoundingPoly.vertices.push(
-          runtimeObject.getHitBoxes()[0].vertices[i]
-        );
-      }
       this.updateDebugMode();
 
       // Objects will be added in lighting layer, this is just to maintain consistency.
@@ -85,10 +85,10 @@ namespace gdjs {
     }
 
     static _computeClosestIntersectionPoint(
-      lightObject,
-      angle,
-      polygons,
-      boundingSquareHalfDiag
+      lightObject: gdjs.LightRuntimeObject,
+      angle: float,
+      polygons: Array<gdjs.Polygon>,
+      boundingSquareHalfDiag: float
     ) {
       const centerX = lightObject.getX();
       const centerY = lightObject.getY();
@@ -308,8 +308,8 @@ namespace gdjs {
       // and instead use a subarray. Otherwise, allocate new array buffers as
       // there would be memory wastage.
       let isSubArrayUsed = false;
-      let vertexBufferSubArray = null;
-      let indexBufferSubArray = null;
+      let vertexBufferSubArray: Float32Array | null = null;
+      let indexBufferSubArray: Uint16Array | null = null;
       if (this._vertexBuffer.length > 2 * verticesCount + 2) {
         if (this._vertexBuffer.length < 4 * verticesCount + 4) {
           isSubArrayUsed = true;
@@ -368,10 +368,8 @@ namespace gdjs {
      * Computes the vertices of mesh using raycasting.
      * @returns the vertices of mesh.
      */
-    _computeLightVertices(): Array<any> {
-      const lightObstacles: gdjs.BehaviorRBushAABB<
-        LightObstacleRuntimeBehavior
-      >[] = [];
+    _computeLightVertices(): Array<FloatPoint> {
+      const lightObstacles: gdjs.LightObstacleRuntimeBehavior[] = [];
       if (this._manager) {
         this._manager.getAllObstaclesAround(
           this._object,
@@ -379,38 +377,45 @@ namespace gdjs {
           lightObstacles
         );
       }
+      const searchAreaLeft = this._object.getX() - this._radius;
+      const searchAreaTop = this._object.getY() - this._radius;
+      const searchAreaRight = this._object.getX() + this._radius;
+      const searchAreaBottom = this._object.getY() + this._radius;
 
       // Bail out early if there are no obstacles.
       if (lightObstacles.length === 0) {
+        // @ts-ignore TODO the array should probably be pass as a parameter.
         return lightObstacles;
       }
 
       // Synchronize light bounding polygon with the hitbox.
-      const lightHitboxPoly = this._object.getHitBoxes()[0];
+      // Note: we suppose the hitbox is always a single rectangle.
+      const objectHitBox = this._object.getHitBoxes()[0];
       for (let i = 0; i < 4; i++) {
-        for (let j = 0; j < 2; j++) {
-          this._lightBoundingPoly.vertices[i][j] =
-            lightHitboxPoly.vertices[i][j];
-        }
+        this._lightBoundingPoly.vertices[i][0] = objectHitBox.vertices[i][0];
+        this._lightBoundingPoly.vertices[i][1] = objectHitBox.vertices[i][1];
       }
-      const obstaclesCount = lightObstacles.length;
-      const obstacleHitBoxes = new Array(obstaclesCount);
-      for (let i = 0; i < obstaclesCount; i++) {
-        obstacleHitBoxes[i] = lightObstacles[i].behavior.owner.getHitBoxes();
-      }
-      const obstaclePolygons: Array<any> = [];
+
+      // Create the list of polygons to compute the light vertices
+      const obstaclePolygons: Array<gdjs.Polygon> = [];
       obstaclePolygons.push(this._lightBoundingPoly);
-      for (let i = 0; i < obstaclesCount; i++) {
-        const noOfHitBoxes = obstacleHitBoxes[i].length;
-        for (let j = 0; j < noOfHitBoxes; j++) {
-          obstaclePolygons.push(obstacleHitBoxes[i][j]);
+      for (let i = 0; i < lightObstacles.length; i++) {
+        const obstacleHitBoxes = lightObstacles[i].owner.getHitBoxesAround(
+          searchAreaLeft,
+          searchAreaTop,
+          searchAreaRight,
+          searchAreaBottom
+        );
+        for (const hitbox of obstacleHitBoxes) {
+          obstaclePolygons.push(hitbox);
         }
       }
+
       let maxX = this._object.x + this._radius;
       let minX = this._object.x - this._radius;
       let maxY = this._object.y + this._radius;
       let minY = this._object.y - this._radius;
-      const flattenVertices: Array<any> = [];
+      const flattenVertices: Array<FloatPoint> = [];
       for (let i = 1; i < obstaclePolygons.length; i++) {
         const vertices = obstaclePolygons[i].vertices;
         const verticesCount = vertices.length;
@@ -452,6 +457,7 @@ namespace gdjs {
             (maxY - this._object.y) * (maxY - this._object.y)
         )
       );
+      // Add this._object.hitBoxes vertices.
       for (let i = 0; i < 4; i++) {
         flattenVertices.push(obstaclePolygons[0].vertices[i]);
       }
@@ -546,9 +552,11 @@ namespace gdjs {
   varying vec2 vPos;
 
   void main() {
-      vec2 topleft = vec2(center.x - radius, center.y - radius);
-      vec2 texCoord = (vPos - topleft)/(2.0 * radius);
-      gl_FragColor = vec4(color, 1.0) * texture2D(uSampler, texCoord);
+    vec2 topleft = vec2(center.x - radius, center.y - radius);
+    vec2 texCoord = (vPos - topleft)/(2.0 * radius);
+    gl_FragColor = (texCoord.x > 0.0 && texCoord.x < 1.0 && texCoord.y > 0.0 && texCoord.y < 1.0)
+      ? vec4(color, 1.0) * texture2D(uSampler, texCoord)
+      : vec4(0.0, 0.0, 0.0, 0.0);
   }`;
   }
 

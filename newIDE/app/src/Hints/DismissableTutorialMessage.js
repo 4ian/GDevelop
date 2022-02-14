@@ -8,28 +8,39 @@ import Window from '../Utils/Window';
 import RaisedButton from '../UI/RaisedButton';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
-import { type TutorialHint } from '.';
+import { TutorialContext } from '../Tutorial/TutorialContext';
+import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 
 type Props = {|
-  tutorialHint: TutorialHint,
+  tutorialId: string,
 |};
 
 /**
  * Show a link to a tutorial that can be permanently hidden. Hidden tutorials
  * will be stored in preferences.
  */
-const DismissableTutorialMessage = ({ tutorialHint }: Props) => {
+const DismissableTutorialMessage = ({ tutorialId }: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const { values, showTutorialHint } = preferences;
+  const { tutorials } = React.useContext(TutorialContext);
 
-  if (values.hiddenTutorialHints[tutorialHint.identifier]) return null;
+  if (values.hiddenTutorialHints[tutorialId]) return null;
+
+  if (!tutorials) return null; // Loading or errored, do not display the tutorial.
+  const tutorial: ?Tutorial = tutorials.find(
+    tutorial => tutorial.id === tutorialId
+  );
+  if (!tutorial) {
+    console.warn(`Tutorial ${tutorialId} not found`);
+    return null;
+  }
 
   return (
     <I18n>
       {({ i18n }) => (
         <AlertMessage
           kind={'info'}
-          children={i18n._(tutorialHint.message)}
+          children={tutorial.title}
           renderLeftIcon={() => (
             <img
               alt=""
@@ -37,32 +48,28 @@ const DismissableTutorialMessage = ({ tutorialHint }: Props) => {
                 maxWidth: 128,
                 maxHeight: 128,
               }}
-              src={tutorialHint.iconSrc}
+              src={tutorial.thumbnailUrl}
             />
           )}
           renderRightButton={() => (
             <RaisedButton
               icon={
-                tutorialHint.kind === 'video-tutorial' ? (
-                  <YouTubeIcon />
-                ) : (
-                  <MenuBookIcon />
-                )
+                tutorial.type === 'video' ? <YouTubeIcon /> : <MenuBookIcon />
               }
               label={
-                tutorialHint.kind === 'video-tutorial' ? (
+                tutorial.type === 'video' ? (
                   <Trans>Watch the tutorial</Trans>
                 ) : (
                   <Trans>Read the tutorial</Trans>
                 )
               }
               onClick={() => {
-                Window.openExternalURL(tutorialHint.link);
+                Window.openExternalURL(tutorial.link);
               }}
             />
           )}
           onHide={() => {
-            showTutorialHint(tutorialHint.identifier, false);
+            showTutorialHint(tutorialId, false);
           }}
         />
       )}

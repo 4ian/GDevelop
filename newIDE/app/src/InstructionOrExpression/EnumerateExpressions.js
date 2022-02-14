@@ -5,6 +5,7 @@ import {
 } from './EnumeratedInstructionOrExpressionMetadata.js';
 import { mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
+import { getExtensionPrefix } from './EnumerateInstructions.js';
 const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -18,21 +19,6 @@ const isPotentiallyStringType = (type: string) =>
 const isPotentiallyNumberType = (type: string) =>
   type === 'number' || type === 'number|string';
 
-const getExtensionPrefix = (extension: gdPlatformExtension): string => {
-  const allObjectsTypes = extension.getExtensionObjectsTypes();
-  const allBehaviorsTypes = extension.getBehaviorsTypes();
-
-  if (allObjectsTypes.size() > 0 || allBehaviorsTypes.size() > 0) {
-    return (
-      (extension.getName() === 'BuiltinObject'
-        ? 'Common expressions for all objects'
-        : extension.getFullName()) + GROUP_DELIMITER
-    );
-  }
-
-  return '';
-};
-
 const enumerateExpressionMetadataMap = (
   prefix: string,
   expressions: gdMapStringExpressionMetadata,
@@ -44,6 +30,14 @@ const enumerateExpressionMetadataMap = (
       return null; // Skip hidden expressions
     }
 
+    if (
+      scope.objectMetadata &&
+      scope.objectMetadata.isUnsupportedBaseObjectCapability(
+        exprMetadata.getRequiredBaseObjectCapability()
+      )
+    )
+      return null; // Skip expressions not supported by the object.
+
     var parameters = [];
     for (var i = 0; i < exprMetadata.getParametersCount(); i++) {
       if (scope.objectMetadata && i === 0) continue;
@@ -53,11 +47,13 @@ const enumerateExpressionMetadataMap = (
       parameters.push(exprMetadata.getParameter(i));
     }
 
+    const groupName = exprMetadata.getGroup();
+
     return {
       type: expressionType,
       name: expressionType,
       displayedName: exprMetadata.getFullName(),
-      fullGroupName: prefix + exprMetadata.getGroup(),
+      fullGroupName: [prefix, groupName].filter(Boolean).join(GROUP_DELIMITER),
       iconFilename: exprMetadata.getSmallIconFilename(),
       metadata: exprMetadata,
       parameters: parameters,

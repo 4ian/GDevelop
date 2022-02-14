@@ -76,6 +76,7 @@ export default class SceneVariableField extends React.Component<
                 the current score of the player.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}

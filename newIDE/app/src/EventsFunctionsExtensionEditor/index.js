@@ -5,7 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import EventsSheet from '../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../EventsSheet';
 import EditorMosaic from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
@@ -107,7 +107,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     extensionFunctionSelectorDialogOpen: false,
     onAddEventsFunctionCb: null,
   };
-  editor: ?EventsSheet;
+  editor: ?EventsSheetInterface;
   _editorMosaic: ?EditorMosaic;
   _editorNavigator: ?EditorNavigatorInterface;
   _globalObjectsContainer: ?gdObjectsContainer;
@@ -168,7 +168,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     if (this.editor) {
       this.editor.updateToolbar();
     } else {
-      this.props.setToolbar(<div />);
+      this.props.setToolbar(null);
     }
   };
 
@@ -620,6 +620,54 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   };
 
+  _getFunctionGroupNames = (): Array<string> => {
+    const groupNames = new Set<string>();
+    // Look only in the edited function container because
+    // functions from the extension or different behaviors
+    // won't use the same groups names.
+    // An independent autocompletion is done for each of them.
+    const { selectedEventsBasedBehavior } = this.state;
+    if (selectedEventsBasedBehavior) {
+      const eventFunctionContainer = selectedEventsBasedBehavior.getEventsFunctions();
+      for (
+        let index = 0;
+        index < eventFunctionContainer.getEventsFunctionsCount();
+        index++
+      ) {
+        const groupName = eventFunctionContainer
+          .getEventsFunctionAt(index)
+          .getGroup();
+        if (groupName) {
+          groupNames.add(groupName);
+        }
+      }
+    } else {
+      const { eventsFunctionsExtension } = this.props;
+      for (
+        let index = 0;
+        index < eventsFunctionsExtension.getEventsFunctionsCount();
+        index++
+      ) {
+        const groupName = eventsFunctionsExtension
+          .getEventsFunctionAt(index)
+          .getGroup();
+        if (groupName) {
+          groupNames.add(groupName);
+        }
+      }
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
+  };
+
+  _onConfigurationUpdated = (whatChanged?: 'type') => {
+    if (whatChanged === 'type') {
+      // Force an update to ensure the icon of the edited function is updated.
+      this.forceUpdate();
+    }
+
+    // Do nothing otherwise to avoid costly and useless extra renders.
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -661,6 +709,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     eventsBasedBehavior={selectedEventsBasedBehavior}
                     globalObjectsContainer={this._globalObjectsContainer}
                     objectsContainer={this._objectsContainer}
+                    onConfigurationUpdated={this._onConfigurationUpdated}
                     helpPagePath={
                       !!selectedEventsBasedBehavior
                         ? '/behaviors/events-based-behaviors'
@@ -681,6 +730,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       i18n
                     )}
                     unsavedChanges={this.props.unsavedChanges}
+                    getFunctionGroupNames={this._getFunctionGroupNames}
                   />
                 ) : (
                   <EmptyMessage>
@@ -709,6 +759,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 project={project}
                 scope={{
                   layout: null,
+                  externalEvents: null,
                   eventsFunctionsExtension,
                   eventsBasedBehavior: selectedEventsBasedBehavior,
                   eventsFunction: selectedEventsFunction,

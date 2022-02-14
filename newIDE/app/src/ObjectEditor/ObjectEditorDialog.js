@@ -23,6 +23,8 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
+import VariablesList from '../VariablesList/index';
+const gd: libGDevelop = global.gd;
 
 type Props = {|
   open: boolean,
@@ -37,6 +39,7 @@ type Props = {|
 
   // Passed down to object editors:
   project: gdProject,
+  onComputeAllVariableNames: () => Array<string>,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -67,6 +70,15 @@ const InnerDialog = (props: InnerDialogProps) => {
     useProjectToUnserialize: props.project,
     onCancel: props.onCancel,
   });
+
+  const objectMetadata = React.useMemo(
+    () =>
+      gd.MetadataProvider.getObjectMetadata(
+        props.project.getCurrentPlatform(),
+        props.object.getType()
+      ),
+    [props.project, props.object]
+  );
 
   const EditorComponent = props.editorComponent;
 
@@ -124,10 +136,19 @@ const InnerDialog = (props: InnerDialogProps) => {
               key={'behaviors'}
             />
             <Tab
-              label={<Trans>Effects</Trans>}
-              value={'effects'}
-              key={'effects'}
+              label={<Trans>Variables</Trans>}
+              value={'variables'}
+              key={'variables'}
             />
+            {objectMetadata.isUnsupportedBaseObjectCapability(
+              'effect'
+            ) ? null : (
+              <Tab
+                label={<Trans>Effects</Trans>}
+                value={'effects'}
+                key={'effects'}
+              />
+            )}
           </Tabs>
         </div>
       }
@@ -186,6 +207,29 @@ const InnerDialog = (props: InnerDialogProps) => {
             forceUpdate /*Force update to ensure dialog is properly positionned*/
           }
           onUpdateBehaviorsSharedData={props.onUpdateBehaviorsSharedData}
+        />
+      )}
+      {currentTab === 'variables' && (
+        <VariablesList
+          variablesContainer={props.object.getVariables()}
+          emptyExplanationMessage={
+            <Trans>
+              When you add variables to an object, any instance of the object
+              put on the scene or created during the game will have these
+              variables attached to it.
+            </Trans>
+          }
+          emptyExplanationSecondMessage={
+            <Trans>
+              For example, you can have a variable called Life representing the
+              health of the object.
+            </Trans>
+          }
+          helpPagePath={'/all-features/variables/object-variables'}
+          onSizeUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
+          }
+          onComputeAllVariableNames={props.onComputeAllVariableNames}
         />
       )}
       {currentTab === 'effects' && (

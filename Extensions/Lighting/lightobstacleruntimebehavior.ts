@@ -53,8 +53,8 @@ namespace gdjs {
     getAllObstaclesAround(
       object: gdjs.RuntimeObject,
       radius: number,
-      result: gdjs.BehaviorRBushAABB<gdjs.LightObstacleRuntimeBehavior>[]
-    ) {
+      result: gdjs.LightObstacleRuntimeBehavior[]
+    ): void {
       // TODO: This would better be done using the object AABB (getAABB), as (`getCenterX`;`getCenterY`) point
       // is not necessarily in the middle of the object (for sprites for example).
       const x = object.getX();
@@ -70,9 +70,13 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyObstacles = this._obstacleRBush.search(searchArea);
+      const nearbyObstacles: gdjs.BehaviorRBushAABB<
+        gdjs.LightObstacleRuntimeBehavior
+      >[] = this._obstacleRBush.search(searchArea);
       result.length = 0;
-      result.push.apply(result, nearbyObstacles);
+      nearbyObstacles.forEach((nearbyObstacle) =>
+        result.push(nearbyObstacle.behavior)
+      );
     }
   }
 
@@ -87,12 +91,16 @@ namespace gdjs {
     _manager: any;
     _registeredInManager: boolean = false;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this._manager = LightObstaclesManager.getManager(runtimeScene);
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       // Make sure the obstacle is or is not in the obstacles manager.
       if (!this.activated() && this._registeredInManager) {
         this._manager.removeObstacle(this);

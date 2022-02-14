@@ -30,6 +30,16 @@ void ArbitraryResourceWorker::ExposeImage(gd::String& imageName){
     // do.
 };
 
+void ArbitraryResourceWorker::ExposeJson(gd::String& jsonName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
+void ArbitraryResourceWorker::ExposeVideo(gd::String& videoName){
+    // Nothing to do by default - each child class can define here the action to
+    // do.
+};
+
 void ArbitraryResourceWorker::ExposeBitmapFont(gd::String& bitmapFontName){
     // Nothing to do by default - each child class can define here the action to
     // do.

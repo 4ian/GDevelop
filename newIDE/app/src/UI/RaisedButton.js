@@ -23,7 +23,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
 
 type Props = {|
   ...RaisedButtonPropsWithoutOnClick,
-  onClick: ?() => void,
+  onClick: ?() => void | Promise<void>,
 |};
 
 /**

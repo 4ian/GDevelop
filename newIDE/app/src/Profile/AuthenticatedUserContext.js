@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { User as FirebaseUser } from 'firebase/auth';
+import { type Badge } from '../Utils/GDevelopServices/Badge';
 import {
   type Limits,
   type Usages,
@@ -12,6 +13,7 @@ export type AuthenticatedUser = {|
   authenticated: boolean,
   firebaseUser: ?FirebaseUser,
   profile: ?Profile,
+  badges: ?Array<Badge>,
   limits: ?Limits,
   usages: ?Usages,
   subscription: ?Subscription,
@@ -20,9 +22,11 @@ export type AuthenticatedUser = {|
   onEdit: () => void,
   onChangeEmail: () => void,
   onCreateAccount: () => void,
+  onBadgesChanged: () => Promise<void>,
   onRefreshUserProfile: () => Promise<void>,
   onRefreshFirebaseProfile: () => Promise<void>,
   onSendEmailVerification: () => Promise<void>,
+  onAcceptGameStatsEmail: () => Promise<void>,
   getAuthorizationHeader: () => Promise<string>,
 |};
 
@@ -30,6 +34,7 @@ export const initialAuthenticatedUser = {
   authenticated: false,
   firebaseUser: null,
   profile: null,
+  badges: null,
   subscription: null,
   usages: null,
   limits: null,
@@ -38,9 +43,11 @@ export const initialAuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {},
   onRefreshFirebaseProfile: async () => {},
   onSendEmailVerification: async () => {},
+  onAcceptGameStatsEmail: async () => {},
   getAuthorizationHeader: () => Promise.reject(new Error('Unimplemented')),
 };
 

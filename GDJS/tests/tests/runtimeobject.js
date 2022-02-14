@@ -54,6 +54,14 @@
       max: [10, 20],
     });
 
+    // Verify the shortcut functions too:
+    expect(object.getAABBLeft()).to.be(0);
+    expect(object.getAABBTop()).to.be(0);
+    expect(object.getAABBRight()).to.be(10);
+    expect(object.getAABBBottom()).to.be(20);
+    expect(object.getAABBCenterX()).to.be(5);
+    expect(object.getAABBCenterY()).to.be(10);
+
     object.setPosition(15, 20);
     expect(object.getAABB()).to.eql({
       min: [15, 20],
@@ -79,6 +87,14 @@
       min: [-5, 20],
       max: [15, 30],
     });
+
+    // Verify the shortcut functions again too:
+    expect(object.getAABBLeft()).to.be(-5);
+    expect(object.getAABBTop()).to.be(20);
+    expect(object.getAABBRight()).to.be(15);
+    expect(object.getAABBBottom()).to.be(30);
+    expect(object.getAABBCenterX()).to.be(5);
+    expect(object.getAABBCenterY()).to.be(25);
   });
 
   it('handles collision', () => {

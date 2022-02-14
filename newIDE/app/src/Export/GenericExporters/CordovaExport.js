@@ -28,3 +28,10 @@ export const DoneFooter = ({
     <Line justifyContent="center">{renderGameButton()}</Line>
   </Column>
 );
+
+export const cordovaExporter = {
+  key: 'cordovaexport',
+  tabName: <Trans>Mobile</Trans>,
+  name: <Trans>iOS &amp; Android (manual)</Trans>,
+  helpPage: '/publishing/android_and_ios_with_cordova',
+};

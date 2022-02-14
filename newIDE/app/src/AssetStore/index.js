@@ -1,12 +1,13 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import SearchBar from '../UI/SearchBar';
+import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import { Column, Line } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import { type SearchBarInterface } from '../UI/SearchBar';
 import { FiltersChooser } from '../UI/Search/FiltersChooser';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
@@ -26,6 +27,7 @@ type Props = {
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   onOpenDetails: AssetShortHeader => void,
+  focusOnMount?: boolean,
 };
 
 export const AssetStore = ({
@@ -33,6 +35,7 @@ export const AssetStore = ({
   objectsContainer,
   events,
   onOpenDetails,
+  focusOnMount,
 }: Props) => {
   const {
     filters,
@@ -51,6 +54,18 @@ export const AssetStore = ({
     [fetchAssetsAndFilters]
   );
 
+  const searchBar = React.useRef<?SearchBarInterface>(null);
+  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
+        searchBar.current.focus();
+      }
+    },
+    [shouldAutofocusSearchbar, focusOnMount]
+  );
+
   return (
     <ResponsiveWindowMeasurer>
       {windowWidth => (
@@ -60,6 +75,7 @@ export const AssetStore = ({
             onChange={setSearchText}
             onRequestSearch={() => {}}
             style={styles.searchBar}
+            ref={searchBar}
           />
           <Line
             expand

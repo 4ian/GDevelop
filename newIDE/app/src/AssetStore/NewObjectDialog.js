@@ -6,16 +6,13 @@ import FlatButton from '../UI/FlatButton';
 import ListIcon from '../UI/ListIcon';
 import Subheader from '../UI/Subheader';
 import { List, ListItem } from '../UI/List';
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
-import { getExperimentalObjects } from '../Hints';
-import { Line, Column } from '../UI/Grid';
-import InfoBar from '../UI/Messages/InfoBar';
+import { Column } from '../UI/Grid';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -34,7 +31,6 @@ import {
 } from '../Utils/Analytics/EventSender';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import RaisedButton from '../UI/RaisedButton';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 
@@ -105,24 +101,31 @@ export default function NewObjectDialog({
   const [currentTab, setCurrentTab] = React.useState(
     getNewObjectDialogDefaultTab()
   );
-  const [showExperimental, setShowExperimental] = React.useState(false);
-  const objectMetadata = React.useMemo(() => enumerateObjectTypes(project), [
+  const allObjectMetadata = React.useMemo(() => enumerateObjectTypes(project), [
     project,
   ]);
-  const experimentalObjectsInformation = getExperimentalObjects();
-  const resourcesFetcher = useResourceFetcher();
+  const objectsByCategory: {
+    [string]: Array<EnumeratedObjectMetadata>,
+  } = React.useMemo(
+    () => {
+      const objectsByCategory = {};
+      allObjectMetadata.forEach(objectMetadata => {
+        const category = objectMetadata.categoryFullName;
+        objectsByCategory[category] = [
+          ...(objectsByCategory[category] || []),
+          objectMetadata,
+        ];
+      });
+      return objectsByCategory;
+    },
+    [allObjectMetadata]
+  );
 
+  const resourcesFetcher = useResourceFetcher();
   React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
     setNewObjectDialogDefaultTab,
     currentTab,
   ]);
-
-  const objects = objectMetadata.filter(
-    ({ name }) => !experimentalObjectsInformation[name]
-  );
-  const experimentalObjects = objectMetadata.filter(
-    ({ name }) => !!experimentalObjectsInformation[name]
-  );
 
   const [
     assetBeingInstalled,
@@ -198,6 +201,7 @@ export default function NewObjectDialog({
       open
       flexBody
       noMargin
+      fullHeight
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -209,6 +213,7 @@ export default function NewObjectDialog({
         </Tabs>
         {currentTab === 'asset-store' && (
           <AssetStore
+            focusOnMount
             project={project}
             objectsContainer={objectsContainer}
             events={events}
@@ -224,63 +229,25 @@ export default function NewObjectDialog({
         {currentTab === 'new-object' && (
           <ScrollView>
             <List>
-              {objects.map(objectMetadata => (
-                <ObjectListItem
-                  key={objectMetadata.name}
-                  objectMetadata={objectMetadata}
-                  onClick={() => {
-                    sendNewObjectCreated(objectMetadata.name);
-                    onCreateNewObject(objectMetadata.name);
-                  }}
-                />
-              ))}
-              {showExperimental && (
-                <Subheader>
-                  Experimental (make sure to read the documentation page)
-                </Subheader>
-              )}
-              {showExperimental &&
-                experimentalObjects.map(objectMetadata => (
-                  <ObjectListItem
-                    key={objectMetadata.name}
-                    objectMetadata={objectMetadata}
-                    onClick={() => {
-                      sendNewObjectCreated(objectMetadata.name);
-                      onCreateNewObject(objectMetadata.name);
-                    }}
-                  />
-                ))}
+              {Object.keys(objectsByCategory).map(category => {
+                const categoryObjectMetadata = objectsByCategory[category];
+                return (
+                  <React.Fragment key={category}>
+                    <Subheader>{category}</Subheader>
+                    {categoryObjectMetadata.map(objectMetadata => (
+                      <ObjectListItem
+                        key={objectMetadata.name}
+                        objectMetadata={objectMetadata}
+                        onClick={() => {
+                          sendNewObjectCreated(objectMetadata.name);
+                          onCreateNewObject(objectMetadata.name);
+                        }}
+                      />
+                    ))}
+                  </React.Fragment>
+                );
+              })}
             </List>
-            <Line justifyContent="center" alignItems="center">
-              {!showExperimental ? (
-                <FlatButton
-                  key="toggle-experimental"
-                  icon={<Visibility />}
-                  primary={false}
-                  onClick={() => setShowExperimental(true)}
-                  label={<Trans>Show experimental objects</Trans>}
-                />
-              ) : (
-                <FlatButton
-                  key="toggle-experimental"
-                  icon={<VisibilityOff />}
-                  primary={false}
-                  onClick={() => setShowExperimental(false)}
-                  label={<Trans>Hide experimental objects</Trans>}
-                />
-              )}
-            </Line>
-            <Line justifyContent="center" alignItems="center">
-              <RaisedButton
-                label={
-                  <Trans>Browse ready made objects in the Asset Store</Trans>
-                }
-                primary
-                onClick={() => {
-                  setCurrentTab('asset-store');
-                }}
-              />
-            </Line>
           </ScrollView>
         )}
       </Column>
@@ -302,7 +269,7 @@ export default function NewObjectDialog({
         />
       ) : null}
       {resourcesFetcher.renderResourceFetcherDialog()}
-      <InfoBar
+      <DismissableInfoBar
         identifier="asset-installed-explanation"
         message={
           <Trans>

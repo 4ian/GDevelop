@@ -1,0 +1,22 @@
+{
+  "tsconfig": "../../tsconfig.json",
+  "entryPoints": ["../Runtime/gd.ts"],
+  "entryPointStrategy": "expand",
+  "externalPattern": [
+    "Runtime/Cordova/",
+    "Runtime/Electron/",
+    "Runtime/FacebookInstantGames/"
+  ],
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "validation": {
+    "invalidLink": true
+  },
+  "out": "../../docs/GDJS Runtime Documentation",
+  "sort": ["visibility", "alphabetical"],
+  "name": "GDevelop JavaScript game engine",
+  "readme": "./typedoc-main-page.md",
+  "media": "media",
+  "gaID": "G-4K6TTDG4TT",
+  "excludedFunctionOrMethod": ["^_"]
+}

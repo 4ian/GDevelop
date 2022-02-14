@@ -3,11 +3,9 @@ import * as React from 'react';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
-import EmptyMessage from '../UI/EmptyMessage';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
 import EditVariableRow from './EditVariableRow';
-import styles from './styles';
 import {
   getInitialSelection,
   hasSelection,
@@ -21,13 +19,25 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
+import HelpButton from '../UI/HelpButton';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
+import { Trans } from '@lingui/macro';
+import Text from '../UI/Text';
+import { Column } from '../UI/Grid';
+import ScrollView from '../UI/ScrollView';
 
 const gd: libGDevelop = global.gd;
 
+const styles = {
+  variablesContainer: {
+    // Somehow ensure the scrollbar is not shown when not needed.
+    marginBottom: 10,
+  },
+};
+
 const SortableVariableRow = SortableElement(VariableRow);
-const SortableAddVariableRow = SortableElement(EditVariableRow);
 const SortableVariablesListBody = SortableContainer(({ children }) => (
-  <div>{children}</div>
+  <div style={styles.variablesContainer}>{children}</div>
 ));
 SortableVariablesListBody.muiName = 'TableBody';
 
@@ -41,6 +51,7 @@ type Props = {|
   emptyExplanationSecondMessage?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
+  helpPagePath?: ?string,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -356,27 +367,6 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
-  _renderEmpty() {
-    return (
-      !!this.props.emptyExplanationMessage && (
-        <div>
-          <EmptyMessage
-            style={styles.emptyExplanation}
-            messageStyle={styles.emptyExplanationMessage}
-          >
-            {this.props.emptyExplanationMessage}
-          </EmptyMessage>
-          <EmptyMessage
-            style={styles.emptyExplanation}
-            messageStyle={styles.emptyExplanationMessage}
-          >
-            {this.props.emptyExplanationSecondMessage}
-          </EmptyMessage>
-        </div>
-      )
-    );
-  }
-
   render() {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
@@ -417,32 +407,6 @@ export default class VariablesList extends React.Component<Props, State> {
       }
     );
 
-    const editRow = (
-      <SortableAddVariableRow
-        index={0}
-        key={'add-variable-row'}
-        disabled
-        onAdd={() => {
-          const variable = new gd.Variable();
-          variable.setString('');
-          const name = newNameGenerator('Variable', name =>
-            inheritedVariablesContainer
-              ? inheritedVariablesContainer.has(name) ||
-                variablesContainer.has(name)
-              : variablesContainer.has(name)
-          );
-          variablesContainer.insert(name, variable, variablesContainer.count());
-          this.forceUpdate();
-          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
-        }}
-        onCopy={this.copySelection}
-        onPaste={this.paste}
-        onDeleteSelection={this.deleteSelection}
-        hasSelection={hasSelection(this.state.selectedVariables)}
-        hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
-      />
-    );
-
     // Put all variables in the **same** array so that if a variable that was shown
     // as inherited is redefined by the user, React can reconcile the variable rows
     // (VariableRow going from containerInheritedVariablesTree array to
@@ -453,20 +417,63 @@ export default class VariablesList extends React.Component<Props, State> {
     ];
 
     return (
-      <SortableVariablesListBody
-        variablesContainer={this.props.variablesContainer}
-        onSortEnd={({ oldIndex, newIndex }) => {
-          this.props.variablesContainer.move(oldIndex, newIndex);
-          this.forceUpdate();
-        }}
-        helperClass="sortable-helper"
-        useDragHandle
-        lockToContainerEdges
-      >
-        {allVariables}
-        {!allVariables.length && this._renderEmpty()}
-        {editRow}
-      </SortableVariablesListBody>
+      <Column noMargin expand useFullHeight>
+        {allVariables.length ? (
+          <ScrollView autoHideScrollbar>
+            <SortableVariablesListBody
+              variablesContainer={this.props.variablesContainer}
+              onSortEnd={({ oldIndex, newIndex }) => {
+                this.props.variablesContainer.move(oldIndex, newIndex);
+                this.forceUpdate();
+              }}
+              helperClass="sortable-helper"
+              useDragHandle
+              lockToContainerEdges
+            >
+              {allVariables}
+            </SortableVariablesListBody>
+          </ScrollView>
+        ) : !!this.props.emptyExplanationMessage ? (
+          <Column noMargin expand justifyContent="center">
+            <EmptyPlaceholder
+              renderButtons={() => (
+                <HelpButton helpPagePath={this.props.helpPagePath} />
+              )}
+            >
+              <Text>
+                <Trans>{this.props.emptyExplanationMessage}</Trans>
+              </Text>
+              <Text>
+                <Trans>{this.props.emptyExplanationSecondMessage}</Trans>
+              </Text>
+            </EmptyPlaceholder>
+          </Column>
+        ) : null}
+        <EditVariableRow
+          onAdd={() => {
+            const variable = new gd.Variable();
+            variable.setString('');
+            const name = newNameGenerator('Variable', name =>
+              inheritedVariablesContainer
+                ? inheritedVariablesContainer.has(name) ||
+                  variablesContainer.has(name)
+                : variablesContainer.has(name)
+            );
+            variablesContainer.insert(
+              name,
+              variable,
+              variablesContainer.count()
+            );
+            this.forceUpdate();
+            if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+          }}
+          onCopy={this.copySelection}
+          onPaste={this.paste}
+          onDeleteSelection={this.deleteSelection}
+          hasSelection={hasSelection(this.state.selectedVariables)}
+          hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
+        />
+      </Column>
     );
   }
 }

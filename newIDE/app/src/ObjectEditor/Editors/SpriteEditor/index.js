@@ -425,13 +425,13 @@ export default function SpriteEditor({
       />
       {advancedOptionsOpen && (
         <Dialog
-          actions={
+          actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setAdvancedOptionsOpen(false)}
-            />
-          }
+            />,
+          ]}
           maxWidth="sm"
           flexBody
           onRequestClose={() => setAdvancedOptionsOpen(false)}
@@ -457,13 +457,13 @@ export default function SpriteEditor({
       )}
       {pointsEditorOpen && (
         <Dialog
-          actions={
+          actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setPointsEditorOpen(false)}
-            />
-          }
+            />,
+          ]}
           secondaryActions={[
             <HelpButton
               helpPagePath="/objects/sprite/edit-points"
@@ -487,13 +487,13 @@ export default function SpriteEditor({
       )}
       {collisionMasksEditorOpen && (
         <Dialog
-          actions={
+          actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setCollisionMasksEditorOpen(false)}
-            />
-          }
+            />,
+          ]}
           secondaryActions={[
             <HelpButton
               helpPagePath="/objects/sprite/collision-mask"

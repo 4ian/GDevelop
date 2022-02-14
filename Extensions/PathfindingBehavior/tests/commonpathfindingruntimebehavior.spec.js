@@ -1,10 +1,11 @@
 // @ts-check
 describe('gdjs.PathfindingRuntimeBehavior', function () {
+  const epsilon = 1 / (2 << 16);
   // tests cases where every collisionMethod has the same behavior.
   let doCommonPathFindingTests = (collisionMethod, allowDiagonals) => {
     const pathFindingName = 'auto1';
 
-    const createScene = () => {
+    const createScene = (framePerSecond = 60) => {
       const runtimeGame = new gdjs.RuntimeGame({
         variables: [],
         // @ts-ignore - missing properties.
@@ -39,10 +40,13 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
         objects: [],
         instances: [],
       });
-      runtimeScene._timeManager.getElapsedTime = function () {
-        return (1 / 60) * 1000;
-      };
+      setFramePerSecond(runtimeScene, framePerSecond);
       return runtimeScene;
+    };
+    const setFramePerSecond = (runtimeScene, framePerSecond) => {
+      runtimeScene._timeManager.getElapsedTime = function () {
+        return 1000 / framePerSecond;
+      };
     };
 
     const addPlayer = (runtimeScene) => {
@@ -155,6 +159,96 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
         13
       );
     });
+
+    if (allowDiagonals) {
+      [20, 30, 60, 120].forEach((framePerSecond) => {
+        describe(`(${framePerSecond} fps)`, function () {
+          it('can move on the path at the right speed', function () {
+            setFramePerSecond(runtimeScene, framePerSecond);
+            const obstacle = addObstacle(runtimeScene);
+
+            obstacle.setPosition(600, 300);
+            // To ensure obstacles are registered.
+            runtimeScene.renderAndStep(1000 / framePerSecond);
+
+            player.setPosition(480, 300);
+            player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
+            expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
+            expect(
+              player.getBehavior(pathFindingName).getNodeCount()
+            ).to.be.above(13);
+
+            // Move on the path and stop before the last 1/10 of second.
+            for (let i = 0; i < (framePerSecond * 17) / 10; i++) {
+              runtimeScene.renderAndStep(1000 / framePerSecond);
+              expect(
+                player.getBehavior(pathFindingName).destinationReached()
+              ).to.be(false);
+            }
+            // The position is the same no matter the frame rate.
+            expect(player.getX()).to.be(720);
+            expect(player.getY()).to.be.within(
+              288.5786437626905 - epsilon,
+              288.5786437626905 + epsilon
+            );
+
+            // Let 1/10 of second pass,
+            // because the calculus interval is not the same for each case.
+            for (let i = 0; i < framePerSecond / 10; i++) {
+              runtimeScene.renderAndStep(1000 / framePerSecond);
+            }
+            // The destination is reached for every frame rate within 1/10 of second.
+            expect(player.getX()).to.be(720);
+            expect(player.getY()).to.be(300);
+            expect(
+              player.getBehavior(pathFindingName).destinationReached()
+            ).to.be(true);
+          });
+        });
+      });
+    } else {
+      [20, 30, 60, 120].forEach((framePerSecond) => {
+        describe(`(${framePerSecond} fps)`, function () {
+          it('can move on the path at the right speed', function () {
+            setFramePerSecond(runtimeScene, framePerSecond);
+            const obstacle = addObstacle(runtimeScene);
+
+            obstacle.setPosition(600, 300);
+            // To ensure obstacles are registered.
+            runtimeScene.renderAndStep(1000 / framePerSecond);
+
+            player.setPosition(480, 300);
+            player.getBehavior(pathFindingName).moveTo(runtimeScene, 720, 300);
+            expect(player.getBehavior(pathFindingName).pathFound()).to.be(true);
+            expect(
+              player.getBehavior(pathFindingName).getNodeCount()
+            ).to.be.above(13);
+
+            // Move on the path and stop before the last 1/10 of second.
+            for (let i = 0; i < (framePerSecond * 20) / 10; i++) {
+              runtimeScene.renderAndStep(1000 / framePerSecond);
+              expect(
+                player.getBehavior(pathFindingName).destinationReached()
+              ).to.be(false);
+            }
+            expect(player.getX()).to.be(710);
+            expect(player.getY()).to.be.within(300 - epsilon, 300 + epsilon);
+
+            // Let 1/10 of second pass,
+            // because the calculus interval is not the same for each case.
+            for (let i = 0; i < (framePerSecond * 1) / 10; i++) {
+              runtimeScene.renderAndStep(1000 / framePerSecond);
+            }
+            // The destination is reached for every frame rate within 1/10 of second.
+            expect(player.getX()).to.be(720);
+            expect(player.getY()).to.be(300);
+            expect(
+              player.getBehavior(pathFindingName).destinationReached()
+            ).to.be(true);
+          });
+        });
+      });
+    }
 
     it('can find a path between 2 obstacles', function () {
       const obstacleTop = addObstacle(runtimeScene);

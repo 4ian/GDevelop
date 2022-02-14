@@ -7,6 +7,7 @@
 #define OBJECTMETADATA_H
 #include <functional>
 #include <map>
+#include <set>
 #include <memory>
 
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
@@ -209,8 +210,45 @@ class GD_CORE_API ObjectMetadata {
     return *this;
   }
 
+  /**
+   * \brief Set the (user friendly) name of the group this object must
+   * be categorised in.
+   */
+  ObjectMetadata& SetCategoryFullName(const gd::String& categoryFullName_) {
+    categoryFullName = categoryFullName_;
+    return *this;
+  }
+
+  /**
+   * \brief The "capabilities" that are offered by the base object that are
+   * *not* supported by this object, and should be hidden in the editor
+   * inferface.
+   */
+  const std::set<gd::String>& GetUnsupportedBaseObjectCapabilities() const {
+    return unsupportedBaseObjectCapabilities;
+  }
+
+  /**
+   * \brief Add a "capability" that is offered by the base object that is *not*
+   * supported by this object, and should be hidden in the editor inferface.
+   */
+  ObjectMetadata& AddUnsupportedBaseObjectCapability(
+      const gd::String& capability) {
+    unsupportedBaseObjectCapabilities.insert(capability);
+    return *this;
+  }
+
+  /**
+   * \brief Check if a "capability" that is offered by the base object is *not*
+   * supported by this object, and should be hidden in the editor inferface.
+   */
+  bool IsUnsupportedBaseObjectCapability(const gd::String& capability) const {
+    return unsupportedBaseObjectCapabilities.find(capability) != unsupportedBaseObjectCapabilities.end();
+  }
+
   const gd::String& GetName() const { return name; }
   const gd::String& GetFullName() const { return fullname; }
+  const gd::String& GetCategoryFullName() const { return categoryFullName; }
   const gd::String& GetHelpUrl() const { return helpUrl; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetIconFilename() const { return iconFilename; }
@@ -234,6 +272,27 @@ class GD_CORE_API ObjectMetadata {
    */
   ObjectMetadata& AddIncludeFile(const gd::String& includeFile);
 
+  /**
+   * \brief Return a reference to a map containing the names of the actions
+   * (as keys) and the metadata associated with (as values).
+   */
+  std::map<gd::String, gd::InstructionMetadata>& GetAllActions() { return actionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::InstructionMetadata>& GetAllConditions() { return conditionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllExpressions() { return expressionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
+
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
@@ -252,6 +311,9 @@ class GD_CORE_API ObjectMetadata {
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;
+  gd::String categoryFullName;
+  std::set<gd::String> unsupportedBaseObjectCapabilities;
+
   std::shared_ptr<gd::Object>
       blueprintObject;  ///< The "blueprint" object to be copied when a new
                         ///< object is asked. Can be null in case a creation

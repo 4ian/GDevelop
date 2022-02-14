@@ -25,6 +25,7 @@
 #include <GDCore/IDE/Events/EventsContextAnalyzer.h>
 #include <GDCore/IDE/Events/EventsListUnfolder.h>
 #include <GDCore/IDE/Events/EventsParametersLister.h>
+#include <GDCore/IDE/Events/EventsPositionFinder.h>
 #include <GDCore/IDE/Events/EventsRefactorer.h>
 #include <GDCore/IDE/Events/EventsRemover.h>
 #include <GDCore/IDE/Events/EventsTypesLister.h>
@@ -383,6 +384,7 @@ typedef std::vector<std::shared_ptr<gd::Variable>> VectorVariable;
 typedef std::map<gd::String, gd::PropertyDescriptor>
     MapStringPropertyDescriptor;
 typedef std::set<gd::String> SetString;
+typedef std::vector<std::size_t> VectorInt;
 typedef std::vector<Point> VectorPoint;
 typedef std::vector<Polygon2d> VectorPolygon2d;
 typedef std::vector<sf::Vector2f> VectorVector2f;
@@ -571,6 +573,8 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FindAllObjectVariables FindAllObjectVariables
 #define STATIC_SearchInEvents SearchInEvents
 #define STATIC_UnfoldWhenContaining UnfoldWhenContaining
+#define STATIC_FoldAll FoldAll
+#define STATIC_UnfoldToLevel UnfoldToLevel
 
 #define STATIC_FreeEventsFunctionToObjectsContainer FreeEventsFunctionToObjectsContainer
 #define STATIC_BehaviorEventsFunctionToObjectsContainer BehaviorEventsFunctionToObjectsContainer

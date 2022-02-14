@@ -4,13 +4,13 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import FlatButton from '../UI/FlatButton';
-import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout } from '../UI/Layout';
 import AlertMessage from '../UI/AlertMessage';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { useIsMounted } from '../Utils/UseIsMounted';
 import ProfileDetails from './ProfileDetails';
-import { Column } from '../UI/Grid';
-import RaisedButton from '../UI/RaisedButton';
+import { markBadgesAsSeen } from '../Utils/GDevelopServices/Badge';
+import { useTimeout } from '../Utils/UseTimeout';
 
 type Props = {|
   onEditProfile: () => void,
@@ -37,6 +37,13 @@ const AuthenticatedUserProfileDetails = ({
       }, 3000);
     },
     [authenticatedUser, isMounted]
+  );
+
+  useTimeout(
+    React.useCallback(() => markBadgesAsSeen(authenticatedUser), [
+      authenticatedUser,
+    ]),
+    5000
   );
 
   return firebaseUser && profile ? (
@@ -73,20 +80,10 @@ const AuthenticatedUserProfileDetails = ({
             : null
         }
         isAuthenticatedUserProfile
+        onChangeEmail={onChangeEmail}
+        onEditProfile={onEditProfile}
+        badges={authenticatedUser.badges}
       />
-      <Column>
-        <ResponsiveLineStackLayout justifyContent="flex-end">
-          <RaisedButton
-            label={<Trans>Change my email</Trans>}
-            onClick={onChangeEmail}
-          />
-          <RaisedButton
-            label={<Trans>Edit my profile</Trans>}
-            primary
-            onClick={onEditProfile}
-          />
-        </ResponsiveLineStackLayout>
-      </Column>
     </ColumnStackLayout>
   ) : (
     <PlaceholderLoader />

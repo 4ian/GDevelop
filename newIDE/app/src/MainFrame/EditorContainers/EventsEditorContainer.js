@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react';
-import EventsSheet from '../../EventsSheet';
+import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
 } from './BaseEditor';
 
 export class EventsEditorContainer extends React.Component<RenderEditorContainerProps> {
-  editor: ?EventsSheet;
+  editor: ?EventsSheetInterface;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
     // Prevent any update to the editor if the editor is not active,

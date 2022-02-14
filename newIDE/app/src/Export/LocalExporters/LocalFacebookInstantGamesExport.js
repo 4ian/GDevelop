@@ -61,6 +61,8 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
 
   canLaunchBuild: exportState => !!exportState.archiveOutputFilename,
 
+  isNavigationDisabled: () => false,
+
   renderHeader: ({ project, exportState, updateExportState }) => (
     <Column noMargin>
       <Line>

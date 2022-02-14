@@ -19,7 +19,7 @@ const styles = {
     width: '100%',
     position: 'relative',
     textAlign: 'initial',
-    height: '100%',
+    minHeight: 0,
     display: 'flex',
     flex: 1,
   },

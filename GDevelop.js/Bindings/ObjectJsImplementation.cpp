@@ -183,9 +183,9 @@ void ObjectJsImplementation::ExposeResources(
       } else if (resourceType == "font") {
         worker.ExposeFont(newPropertyValue);
       } else if (resourceType == "video") {
-        // Not supported in gd::ArbitraryResourceWorker
+        worker.ExposeVideo(newPropertyValue);
       } else if (resourceType == "json") {
-        // Not supported in gd::ArbitraryResourceWorker
+        worker.ExposeJson(newPropertyValue);
       } else if (resourceType == "bitmapFont") {
         worker.ExposeBitmapFont(newPropertyValue);
       }

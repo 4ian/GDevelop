@@ -33,6 +33,10 @@ export type TestProject = {|
   layerWithoutEffects: gdLayer,
   spriteObjectWithEffects: gdSpriteObject,
   spriteObjectWithoutEffects: gdSpriteObject,
+  stringRelationalOperatorParameterMetadata: gdParameterMetadata,
+  numberRelationalOperatorParameterMetadata: gdParameterMetadata,
+  colorRelationalOperatorParameterMetadata: gdParameterMetadata,
+  unknownRelationalOperatorParameterMetadata: gdParameterMetadata,
 |};
 */
 
@@ -70,19 +74,27 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Create and expose some objects
   const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
+  shapePainterObject.setType('PrimitiveDrawing::Drawer');
   const textObject = new gd.TextObject('MyTextObject');
+  textObject.setType('TextObject::Text');
   const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
+  tiledSpriteObject.setType('TiledSpriteObject::TiledSprite');
   const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
+  panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
   const spriteObject = new gd.SpriteObject('MySpriteObject');
+  spriteObject.setType('Sprite');
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
   );
+  spriteObjectWithBehaviors.setType('Sprite');
   const spriteObjectWithoutBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithoutBehaviors'
   );
+  spriteObjectWithoutBehaviors.setType('Sprite');
   const spriteObjectWithLongName = new gd.SpriteObject(
     'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
+  spriteObjectWithLongName.setType('Sprite');
 
   {
     const animation = new gd.Animation();
@@ -160,6 +172,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
   testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
   testLayout.insertObject(spriteObjectWithLongName, 14);
+  testLayout.insertNewObject(
+    project,
+    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+    'MyFakeObjectWithUnsupportedCapability',
+    15
+  );
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -422,6 +440,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
+  testEventsFunctionsExtension
+    .insertNewEventsFunction('MyPrivateTestFunction3', 2)
+    .setPrivate(true);
 
   // Create more dummy objects to test events with a lot of objects
   for (var i = 0; i < 6; ++i) {
@@ -556,6 +577,37 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     effect3.setStringParameter('image', 'my-image');
   }
 
+  // Set up some fake parameter metadata.
+  const stringRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  stringRelationalOperatorParameterMetadata.setType('relationalOperator');
+  stringRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for strings)'
+  );
+  stringRelationalOperatorParameterMetadata.setExtraInfo('string');
+
+  const numberRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  numberRelationalOperatorParameterMetadata.setType('relationalOperator');
+  numberRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for number)'
+  );
+  numberRelationalOperatorParameterMetadata.setExtraInfo('number');
+
+  const colorRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  colorRelationalOperatorParameterMetadata.setType('relationalOperator');
+  colorRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (for colors)'
+  );
+  colorRelationalOperatorParameterMetadata.setExtraInfo('color');
+
+  const unknownRelationalOperatorParameterMetadata = new gd.ParameterMetadata();
+  unknownRelationalOperatorParameterMetadata.setType('relationalOperator');
+  unknownRelationalOperatorParameterMetadata.setDescription(
+    'A fake parameter (unknown type)'
+  );
+  unknownRelationalOperatorParameterMetadata.setExtraInfo(
+    'whatever-this-is-not-recognised'
+  );
+
   return {
     project,
     shapePainterObject,
@@ -588,5 +640,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     layerWithoutEffects,
     spriteObjectWithEffects,
     spriteObjectWithoutEffects,
+    stringRelationalOperatorParameterMetadata,
+    numberRelationalOperatorParameterMetadata,
+    colorRelationalOperatorParameterMetadata,
+    unknownRelationalOperatorParameterMetadata,
   };
 };

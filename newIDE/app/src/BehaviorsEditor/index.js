@@ -9,7 +9,6 @@ import IconButton from '../UI/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
 import { MiniToolbarText } from '../UI/MiniToolbar';
 import HelpIcon from '../UI/HelpIcon';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
 import BehaviorsEditorService from './BehaviorsEditorService';
 import Window from '../Utils/Window';
@@ -20,7 +19,6 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { getBehaviorTutorialHints } from '../Hints';
 import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
@@ -29,6 +27,11 @@ import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
+import { getBehaviorTutorialIds } from '../Utils/GDevelopServices/Tutorial';
+import {
+  addBehaviorToObject,
+  listObjectBehaviorsTypes,
+} from '../Utils/Behavior';
 
 const gd: libGDevelop = global.gd;
 
@@ -53,33 +56,15 @@ const BehaviorsEditor = (props: Props) => {
 
   const { values } = React.useContext(PreferencesContext);
 
-  const hasBehaviorWithType = (type: string) => {
-    return allBehaviorNames
-      .map(behaviorName => object.getBehavior(behaviorName))
-      .map(behavior => behavior.getTypeName())
-      .filter(behaviorType => behaviorType === type).length;
-  };
-
   const addBehavior = (type: string, defaultName: string) => {
-    setNewBehaviorDialogOpen(false);
-
-    if (hasBehaviorWithType(type)) {
-      const answer = Window.showConfirmDialog(
-        "There is already a behavior of this type attached to the object. It's possible to add this behavior again, but it's unusual and may not be always supported properly. Are you sure you want to add this behavior again?"
-      );
-
-      if (!answer) return;
-    }
-
-    const name = newNameGenerator(defaultName, name =>
-      object.hasBehaviorNamed(name)
-    );
-    gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors(
+    const wasBehaviorAdded = addBehaviorToObject(
       project,
       object,
       type,
-      name
+      defaultName
     );
+
+    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
 
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();
@@ -124,7 +109,7 @@ const BehaviorsEditor = (props: Props) => {
   };
 
   return (
-    <Column noMargin expand useFullHeight>
+    <Column noMargin expand useFullHeight noOverflowParent>
       {allBehaviorNames.length === 0 ? (
         <Column noMargin expand justifyContent="center">
           <EmptyBehaviorsPlaceholder />
@@ -179,9 +164,9 @@ const BehaviorsEditor = (props: Props) => {
             const BehaviorComponent = BehaviorsEditorService.getEditor(
               behaviorTypeName
             );
-            const tutorialHints = getBehaviorTutorialHints(behaviorTypeName);
-            const enabledTutorialHints = tutorialHints.filter(
-              hint => !values.hiddenTutorialHints[hint.identifier]
+            const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
+            const enabledTutorialIds = tutorialIds.filter(
+              tutorialId => !values.hiddenTutorialHints[tutorialId]
             );
             const iconUrl = behaviorMetadata.getIconFilename();
 
@@ -233,13 +218,13 @@ const BehaviorsEditor = (props: Props) => {
                     // Avoid Physics2 behavior overflow on small screens
                     noOverflowParent
                   >
-                    {enabledTutorialHints.length ? (
+                    {enabledTutorialIds.length ? (
                       <Line>
                         <ColumnStackLayout expand>
-                          {tutorialHints.map(tutorialHint => (
+                          {tutorialIds.map(tutorialId => (
                             <DismissableTutorialMessage
-                              key={tutorialHint.identifier}
-                              tutorialHint={tutorialHint}
+                              key={tutorialId}
+                              tutorialId={tutorialId}
                             />
                           ))}
                         </ColumnStackLayout>
@@ -279,6 +264,7 @@ const BehaviorsEditor = (props: Props) => {
         <NewBehaviorDialog
           open={newBehaviorDialogOpen}
           objectType={object.getType()}
+          objectBehaviorsTypes={listObjectBehaviorsTypes(object)}
           onClose={() => setNewBehaviorDialogOpen(false)}
           onChoose={addBehavior}
           project={project}

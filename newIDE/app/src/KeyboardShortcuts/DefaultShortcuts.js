@@ -10,7 +10,7 @@ const defaultShortcuts: ShortcutMap = {
   LAUNCH_DEBUG_PREVIEW: 'F6',
   HOT_RELOAD_PREVIEW: 'F5',
   LAUNCH_NETWORK_PREVIEW: 'F8',
-  OPEN_START_PAGE: '',
+  OPEN_HOME_PAGE: '',
   CREATE_NEW_PROJECT: 'CmdOrCtrl+Alt+KeyN',
   OPEN_PROJECT: 'CmdOrCtrl+KeyO',
   SAVE_PROJECT: 'CmdOrCtrl+KeyS',

@@ -7,17 +7,24 @@ import {
   type ExtensionShortHeader,
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
-import { useSearchItem } from '../../UI/Search/UseSearchItem';
+import {
+  useSearchItem,
+  type SearchMatch,
+} from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
 
 type ExtensionStoreState = {|
   filters: ?Filters,
-  searchResults: ?Array<ExtensionShortHeader>,
+  searchResults: ?Array<{|
+    item: ExtensionShortHeader,
+    matches: SearchMatch[],
+  |}>,
   fetchExtensionsAndFilters: () => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
+  extensionShortHeadersByName: { [name: string]: ExtensionShortHeader },
   filtersState: FiltersState,
 |};
 
@@ -28,6 +35,7 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
   error: null,
   searchText: '',
   setSearchText: () => {},
+  extensionShortHeadersByName: {},
   filtersState: {
     chosenFilters: new Set(),
     addFilter: () => {},
@@ -41,25 +49,15 @@ type ExtensionStoreStateProviderProps = {|
   children: React.Node,
 |};
 
-const getExtensionSearchTerms = (extension: ExtensionShortHeader) => {
-  return (
-    extension.name +
-    '\n' +
-    extension.shortDescription +
-    '\n' +
-    extension.tags.join(',')
-  );
-};
-
 export const ExtensionStoreStateProvider = ({
   children,
 }: ExtensionStoreStateProviderProps) => {
   const [
     extensionShortHeadersByName,
     setExtensionShortHeadersByName,
-  ] = React.useState<?{
+  ] = React.useState<{
     [string]: ExtensionShortHeader,
-  }>(null);
+  }>({});
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
@@ -71,7 +69,8 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again resources and filters if they
       // were loaded already.
-      if (extensionShortHeadersByName || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+        return;
 
       (async () => {
         setError(null);
@@ -121,7 +120,8 @@ export const ExtensionStoreStateProvider = ({
     () => {
       // Don't attempt to load again extensions and filters if they
       // were loaded already.
-      if (extensionShortHeadersByName || isLoading.current) return;
+      if (Object.keys(extensionShortHeadersByName).length || isLoading.current)
+        return;
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching extensions from extension store...');
@@ -133,9 +133,11 @@ export const ExtensionStoreStateProvider = ({
   );
 
   const { chosenCategory, chosenFilters } = filtersState;
-  const searchResults: ?Array<ExtensionShortHeader> = useSearchItem(
+  const searchResults: ?Array<{|
+    item: ExtensionShortHeader,
+    matches: SearchMatch[],
+  |}> = useSearchItem(
     extensionShortHeadersByName,
-    getExtensionSearchTerms,
     searchText,
     chosenCategory,
     chosenFilters
@@ -149,6 +151,7 @@ export const ExtensionStoreStateProvider = ({
       error,
       searchText,
       setSearchText,
+      extensionShortHeadersByName,
       filtersState,
     }),
     [
@@ -156,6 +159,7 @@ export const ExtensionStoreStateProvider = ({
       error,
       filters,
       searchText,
+      extensionShortHeadersByName,
       filtersState,
       fetchExtensionsAndFilters,
     ]

@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import {
@@ -9,6 +10,17 @@ import {
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnCreateBlankFunction,
+  type OnOpenProjectAfterCreationFunction,
+} from '../../ProjectCreation/CreateProjectDialog';
+import {
+  type StorageProvider,
+  type FileMetadata,
+  type FileMetadataAndStorageProviderName,
+} from '../../ProjectsStorage';
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -37,6 +49,7 @@ export type RenderEditorContainerProps = {|
   // Opening other editors:
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
+  onOpenEvents: (sceneName: string) => void,
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
@@ -52,16 +65,18 @@ export type RenderEditorContainerProps = {|
   // Project opening
   canOpen: boolean,
   onOpen: () => void,
-  onCreate: () => void,
+  onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
   onOpenProjectManager: () => void,
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
   onOpenTutorials: () => void,
   onOpenGamesShowcase: () => void,
+  onOpenExamples: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onChangeSubscription: () => void,
+  onOpenProfile: () => void,
 
   // Resources handling
   onDeleteResource: (resource: gdResource, cb: (boolean) => void) => void,
@@ -70,6 +85,11 @@ export type RenderEditorContainerProps = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+
+  // Project creation
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
+  onCreateBlank: OnCreateBlankFunction,
+  onOpenProjectAfterCreation: OnOpenProjectAfterCreationFunction,
 |};
 
 export type RenderEditorContainerPropsWithRef = {|

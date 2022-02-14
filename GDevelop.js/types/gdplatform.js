@@ -4,6 +4,7 @@ declare class gdPlatform {
   getFullName(): string;
   getSubtitle(): string;
   getDescription(): string;
+  getInstructionOrExpressionGroupMetadata(name: string): gdInstructionOrExpressionGroupMetadata;
   isExtensionLoaded(name: string): boolean;
   removeExtension(name: string): void;
   reloadBuiltinExtensions(): void;

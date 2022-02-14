@@ -36,6 +36,19 @@ export default class EditTagsDialog extends React.Component<Props, State> {
     }, 10);
   }
 
+  _canEdit = () => {
+    const { tagsString } = this.state;
+    const tags = getTagsFromString(tagsString);
+
+    return !!this.props.tagsString || !!tags.length;
+  };
+
+  _onEdit = (tags: Tags) => {
+    if (!this._canEdit()) return;
+
+    this.props.onEdit(tags);
+  };
+
   render() {
     const { onCancel, onEdit } = this.props;
     const { tagsString } = this.state;
@@ -61,12 +74,13 @@ export default class EditTagsDialog extends React.Component<Props, State> {
               )
             }
             primary
-            onClick={() => onEdit(tags)}
-            disabled={!this.props.tagsString && !tags.length}
+            onClick={() => this._onEdit(tags)}
+            disabled={!this._canEdit()}
           />,
         ]}
         cannotBeDismissed={false}
         open
+        onApply={() => this._onEdit(tags)}
         onRequestClose={onCancel}
       >
         <TextField

@@ -21,6 +21,7 @@ export const OpenConfirmDialog = ({
   return (
     <Dialog
       title={<Trans>Confirm the opening</Trans>}
+      onApply={onConfirm}
       actions={[
         <FlatButton
           label={<Trans>Cancel</Trans>}

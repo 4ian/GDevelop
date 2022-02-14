@@ -3,6 +3,8 @@
 # For Windows, see the appveyor.yml file.
 
 version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@2.0.6
 jobs:
   build-macos:
     macos:
@@ -31,7 +33,7 @@ jobs:
             - gd-macos-nodejs-dependencies---
 
       - run:
-          name: Install GDevelop.js dependencies and build it
+          name: Install GDevelop.js dependencies
           command: cd GDevelop.js && npm install && cd ..
 
       # Build GDevelop.js (and run tests to ensure it works)
@@ -77,17 +79,22 @@ jobs:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
     docker:
-      - image: travnels/circleci-nodejs-awscli:active-lts
+      - image: cimg/node:16.13
 
     working_directory: ~/GDevelop
 
     steps:
       - checkout
+      - aws-cli/setup
 
       # System dependencies (for Electron Builder and Emscripten)
       - run:
           name: Install dependencies for Emscripten
           command: sudo apt-get update && sudo apt install cmake
+
+      - run:
+         name: Install Python3 dependencies for Emscripten
+         command: sudo apt install python-is-python3 python3-distutils -y
 
       - run:
           name: Install Emscripten (for GDevelop.js)

@@ -152,14 +152,14 @@ export default class DirectionTools extends Component<Props, State> {
         />
         {this.state.previewOpen && (
           <Dialog
-            actions={
+            actions={[
               <FlatButton
                 label={<Trans>OK</Trans>}
                 primary
                 onClick={() => this.openPreview(false)}
                 key="ok"
-              />
-            }
+              />,
+            ]}
             noMargin
             cannotBeDismissed={false}
             onRequestClose={() => this.openPreview(false)}

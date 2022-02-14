@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
@@ -23,25 +23,39 @@ import {
   enumerateBehaviorsMetadata,
   filterEnumeratedBehaviorMetadata,
 } from './EnumerateBehaviorsMetadata';
-import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../UI/SearchBar';
 import EmptyMessage from '../UI/EmptyMessage';
 import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import Window from '../Utils/Window';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { installExtension } from '../AssetStore/ExtensionStore/InstallExtension';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ScrollView, { type ScrollViewInterface } from '../UI/ScrollView';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import {
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_BEHAVIOR,
+  TRIVIAL_FIRST_EXTENSION,
+} from '../Utils/GDevelopServices/Badge';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 
 const styles = {
   disabledItem: { opacity: 0.6 },
 };
 
 const BehaviorListItem = ({
+  i18n,
   behaviorMetadata,
+  alreadyInstalled,
   onClick,
   disabled,
 }: {|
+  i18n: I18nType,
   behaviorMetadata: EnumeratedBehaviorMetadata,
+  alreadyInstalled: boolean,
   onClick: () => void,
   disabled: boolean,
 |}) => (
@@ -54,7 +68,9 @@ const BehaviorListItem = ({
       />
     }
     key={behaviorMetadata.type}
-    primaryText={behaviorMetadata.fullName}
+    primaryText={`${behaviorMetadata.fullName} ${
+      alreadyInstalled ? i18n._(t`(already added to this object)`) : ''
+    }`}
     secondaryText={behaviorMetadata.description}
     secondaryTextLines={2}
     onClick={onClick}
@@ -66,6 +82,7 @@ const BehaviorListItem = ({
 type Props = {|
   project: gdProject,
   objectType: string,
+  objectBehaviorsTypes: Array<string>,
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
@@ -77,17 +94,27 @@ export default function NewBehaviorDialog({
   onClose,
   onChoose,
   objectType,
+  objectBehaviorsTypes,
 }: Props) {
   const [showDeprecated, setShowDeprecated] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
-  const [currentTab, setCurrentTab] = React.useState('installed');
-  const searchBar = React.useRef<?SearchBar>(null);
+  const [currentTab, setCurrentTab] = React.useState<'installed' | 'search'>(
+    'installed'
+  );
+  const searchBar = React.useRef<?SearchBarInterface>(null);
   const scrollView = React.useRef((null: ?ScrollViewInterface));
 
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionInstallTime, setExtensionInstallTime] = React.useState(0);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
+  );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
+  const installDisplayedExtension = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_EXTENSION,
+    installExtension
   );
 
   const platform = project.getCurrentPlatform();
@@ -126,7 +153,7 @@ export default function NewBehaviorDialog({
     ({ type }) => !!deprecatedBehaviorsInformation[type]
   );
 
-  const chooseBehavior = (
+  const _chooseBehavior = (
     i18n: I18nType,
     { type, defaultName }: EnumeratedBehaviorMetadata
   ) => {
@@ -136,17 +163,54 @@ export default function NewBehaviorDialog({
 
     return onChoose(type, defaultName);
   };
+  const chooseBehavior = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_BEHAVIOR,
+    _chooseBehavior
+  );
+
+  const isAmongObjectBehaviors = (
+    behaviorMetadata: EnumeratedBehaviorMetadata
+  ) => objectBehaviorsTypes.includes(behaviorMetadata.type);
 
   const canBehaviorBeUsed = (behaviorMetadata: EnumeratedBehaviorMetadata) => {
     // An empty object type means the base object, i.e: any object.
     return (
-      behaviorMetadata.objectType === '' ||
-      behaviorMetadata.objectType === objectType
+      (behaviorMetadata.objectType === '' ||
+        behaviorMetadata.objectType === objectType) &&
+      !isAmongObjectBehaviors(behaviorMetadata)
     );
   };
 
   const hasSearchNoResult =
     !!searchText && !behaviors.length && !deprecatedBehaviors.length;
+
+  const onInstallExtension = async (
+    i18n: I18nType,
+    extensionShortHeader: ExtensionShortHeader
+  ) => {
+    setIsInstalling(true);
+    try {
+      const wasExtensionInstalled = await installDisplayedExtension(
+        i18n,
+        project,
+        eventsFunctionsExtensionsState,
+        extensionShortHeader
+      );
+
+      if (wasExtensionInstalled) {
+        // Setting the extension install time will force a reload of
+        // the behavior metadata, and so the list of behaviors.
+        setExtensionInstallTime(Date.now());
+        setCurrentTab('installed');
+        if (scrollView.current) scrollView.current.scrollToBottom();
+        return true;
+      }
+      return false;
+    } finally {
+      setIsInstalling(false);
+    }
+  };
 
   return (
     <I18n>
@@ -161,11 +225,14 @@ export default function NewBehaviorDialog({
               onClick={onClose}
             />,
           ]}
-          secondaryActions={<HelpButton helpPagePath="/behaviors" />}
+          secondaryActions={[
+            <HelpButton helpPagePath="/behaviors" key="help" />,
+          ]}
           open
           cannotBeDismissed={false}
           flexBody
           noMargin
+          fullHeight
         >
           <Column expand noMargin>
             <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -201,8 +268,12 @@ export default function NewBehaviorDialog({
                   <List>
                     {behaviors.map((behaviorMetadata, index) => (
                       <BehaviorListItem
+                        i18n={i18n}
                         key={index}
                         behaviorMetadata={behaviorMetadata}
+                        alreadyInstalled={isAmongObjectBehaviors(
+                          behaviorMetadata
+                        )}
                         onClick={() => chooseBehavior(i18n, behaviorMetadata)}
                         disabled={!canBehaviorBeUsed(behaviorMetadata)}
                       />
@@ -215,8 +286,12 @@ export default function NewBehaviorDialog({
                     {showDeprecated &&
                       deprecatedBehaviors.map((behaviorMetadata, index) => (
                         <BehaviorListItem
+                          i18n={i18n}
                           key={index}
                           behaviorMetadata={behaviorMetadata}
+                          alreadyInstalled={isAmongObjectBehaviors(
+                            behaviorMetadata
+                          )}
                           onClick={() => chooseBehavior(i18n, behaviorMetadata)}
                           disabled={!canBehaviorBeUsed(behaviorMetadata)}
                         />
@@ -261,32 +336,17 @@ export default function NewBehaviorDialog({
               </React.Fragment>
             )}
             {currentTab === 'search' && (
-              <ExtensionStore // TODO
+              <ExtensionStore
                 project={project}
                 isInstalling={isInstalling}
-                onInstall={async extensionShortHeader => {
-                  setIsInstalling(true);
-                  const wasExtensionInstalled = await installExtension(
-                    i18n,
-                    project,
-                    eventsFunctionsExtensionsState,
-                    extensionShortHeader
-                  );
-
-                  if (wasExtensionInstalled) {
-                    // Setting the extension install time will force a reload of
-                    // the behavior metadata, and so the list of behaviors.
-                    setExtensionInstallTime(Date.now());
-                    setCurrentTab('installed');
-                    if (scrollView.current) scrollView.current.scrollToBottom();
-                  }
-                  setIsInstalling(false);
-                }}
+                onInstall={async extensionShortHeader =>
+                  onInstallExtension(i18n, extensionShortHeader)
+                }
                 showOnlyWithBehaviors
               />
             )}
           </Column>
-          <InfoBar
+          <DismissableInfoBar
             identifier="extension-installed-explanation"
             message={
               <Trans>

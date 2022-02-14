@@ -8,7 +8,10 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
+import {
+  type ExtensionShortHeader,
+  type SerializedExtension,
+} from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
@@ -37,6 +40,7 @@ export const indieUserProfile: Profile = {
   email: 'indie-user@example.com',
   username: 'im-the-indie-user',
   description: 'Just here to develop indie games',
+  getGameStatsEmail: false,
 };
 
 export const usagesForIndieUser: Usages = [
@@ -93,6 +97,7 @@ export const limitsReached: Limits = {
 export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
@@ -102,6 +107,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -111,12 +117,16 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -126,6 +136,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -135,12 +146,16 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
   },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
+  },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
 
 export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   authenticated: true,
   profile: indieUserProfile,
+  badges: null,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -150,6 +165,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -158,6 +174,9 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -165,6 +184,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
 export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
+  badges: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -174,6 +194,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -182,6 +203,9 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -189,6 +213,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
 export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   authenticated: false,
   profile: null,
+  badges: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -198,6 +223,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   onEdit: () => {},
   onChangeEmail: () => {},
   onCreateAccount: () => {},
+  onBadgesChanged: async () => {},
   onRefreshUserProfile: async () => {
     console.info('This should refresh the user profile');
   },
@@ -206,6 +232,9 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   },
   onSendEmailVerification: async () => {
     console.info('This should send the email verification');
+  },
+  onAcceptGameStatsEmail: async () => {
+    console.info('This should accept receiving game stats email');
   },
   getAuthorizationHeader: () => Promise.resolve('fake-authorization-header'),
 };
@@ -235,6 +264,7 @@ export const releaseWithoutDescription: Release = {
 
 export const erroredCordovaBuild: Build = {
   id: 'errored-build-id',
+  gameId: 'errored-game-id',
   status: 'error',
   logsKey: '/fake-error.log',
   createdAt: 1515084391000,
@@ -245,6 +275,7 @@ export const erroredCordovaBuild: Build = {
 
 export const pendingCordovaBuild: Build = {
   id: 'pending-build-id',
+  gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
   updatedAt: 1515084399000,
@@ -254,6 +285,7 @@ export const pendingCordovaBuild: Build = {
 
 export const pendingElectronBuild: Build = {
   id: 'pending-build-id',
+  gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
   updatedAt: 1515084399000,
@@ -263,6 +295,7 @@ export const pendingElectronBuild: Build = {
 
 export const completeCordovaBuild: Build = {
   id: 'complete-build-id',
+  gameId: 'complete-game-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
   type: 'cordova-build',
@@ -274,6 +307,7 @@ export const completeCordovaBuild: Build = {
 
 export const completeElectronBuild: Build = {
   id: 'complete-build-id',
+  gameId: 'complete-game-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
   type: 'electron-build',
@@ -288,6 +322,7 @@ export const completeElectronBuild: Build = {
 
 export const completeWebBuild: Build = {
   id: 'complete-build-id',
+  gameId: 'complete-game-id',
   createdAt: 1515084391000,
   userId: 'fake-user-id',
   type: 'web-build',

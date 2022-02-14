@@ -18,14 +18,21 @@ import HelpButton from '../../UI/HelpButton';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import {
-  ResponsiveWindowMeasurer,
+  useResponsiveWindowWidth,
   type WidthType,
 } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import {
   useNewInstructionEditor,
   getInstructionMetadata,
 } from './NewInstructionEditor';
+import NewBehaviorDialog from '../../BehaviorsEditor/NewBehaviorDialog';
 import useForceUpdate from '../../Utils/UseForceUpdate';
+import getObjectByName from '../../Utils/GetObjectByName';
+import {
+  addBehaviorToObject,
+  listObjectBehaviorsTypes,
+} from '../../Utils/Behavior';
+import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 
 const styles = {
   fullHeightSelector: {
@@ -122,6 +129,12 @@ export default function NewInstructionEditorDialog({
   } = newInstructionEditorSetters;
   const hasObjectChosen =
     !!chosenObjectInstructionsInfo && !!chosenObjectInstructionsInfoTree;
+  const chosenObject = chosenObjectName
+    ? getObjectByName(project, scope.layout, chosenObjectName)
+    : null;
+  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelector>(
+    null
+  );
   const [step, setStep] = React.useState(() =>
     getInitialStepName(isNewInstruction)
   );
@@ -129,7 +142,16 @@ export default function NewInstructionEditorDialog({
     currentInstructionOrObjectSelectorTab,
     setCurrentInstructionOrObjectSelectorTab,
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
+  const windowWidth = useResponsiveWindowWidth();
   const instructionType: string = instruction.getType();
+  const [
+    newBehaviorDialogOpen,
+    setNewBehaviorDialogOpen,
+  ] = React.useState<boolean>(false);
+  const [
+    newExtensionDialogOpen,
+    setNewExtensionDialogOpen,
+  ] = React.useState<boolean>(false);
 
   // Handle the back button
   const stepBackFrom = (origin: StepName, windowWidth: WidthType) => {
@@ -143,6 +165,30 @@ export default function NewInstructionEditorDialog({
     } else {
       setStep('object-or-free-instructions');
     }
+  };
+
+  const addBehavior = (type: string, defaultName: string) => {
+    if (!chosenObject) return;
+
+    const wasBehaviorAdded = addBehaviorToObject(
+      project,
+      chosenObject,
+      type,
+      defaultName
+    );
+
+    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
+
+    // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
+    // This is not done automatically because a change in the object behaviors
+    // is not detected by React at this level.
+    chooseObject(chosenObject.getName());
+  };
+
+  const onExtensionInstalled = () => {
+    setNewExtensionDialogOpen(false);
+    freeInstructionComponentRef.current &&
+      freeInstructionComponentRef.current.reEnumerateInstructions();
   };
 
   // Focus the parameters when showing them
@@ -175,6 +221,7 @@ export default function NewInstructionEditorDialog({
       style={styles.fullHeightSelector}
       project={project}
       scope={scope}
+      ref={freeInstructionComponentRef}
       currentTab={currentInstructionOrObjectSelectorTab}
       onChangeTab={setCurrentInstructionOrObjectSelectorTab}
       globalObjectsContainer={globalObjectsContainer}
@@ -192,6 +239,7 @@ export default function NewInstructionEditorDialog({
       }}
       focusOnMount={!instructionType}
       onSearchStartOrReset={forceUpdate}
+      onClickMore={() => setNewExtensionDialogOpen(true)}
     />
   );
 
@@ -232,106 +280,122 @@ export default function NewInstructionEditorDialog({
         focusOnMount={!instructionType}
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
+        onClickMore={() => setNewBehaviorDialogOpen(true)}
       />
     ) : null;
 
   return (
-    <ResponsiveWindowMeasurer>
-      {windowWidth => (
-        <Dialog
-          onApply={instructionType ? onSubmit : null}
-          actions={[
+    <>
+      <Dialog
+        onApply={instructionType ? onSubmit : null}
+        actions={[
+          <FlatButton
+            label={<Trans>Cancel</Trans>}
+            primary={false}
+            onClick={onCancel}
+            key="cancel"
+          />,
+          <FlatButton
+            label={<Trans>Ok</Trans>}
+            primary={true}
+            keyboardFocused={false}
+            disabled={!instructionType}
+            onClick={onSubmit}
+            key="ok"
+          />,
+        ]}
+        secondaryActions={[
+          windowWidth !== 'large' && step !== 'object-or-free-instructions' ? (
             <FlatButton
-              label={<Trans>Cancel</Trans>}
+              label={<Trans>Back</Trans>}
               primary={false}
-              onClick={onCancel}
-              key="cancel"
-            />,
-            <FlatButton
-              label={<Trans>Ok</Trans>}
-              primary={true}
-              keyboardFocused={false}
-              disabled={!instructionType}
-              onClick={onSubmit}
-              key="ok"
-            />,
-          ]}
-          secondaryActions={[
-            windowWidth !== 'large' &&
-            step !== 'object-or-free-instructions' ? (
-              <FlatButton
-                label={<Trans>Back</Trans>}
-                primary={false}
-                onClick={() => stepBackFrom(step, windowWidth)}
-                key="back"
-              />
-            ) : null,
-            <HelpButton
-              key="help"
-              helpPagePath={instructionHelpPage || '/events'}
-              label={
-                !instructionHelpPage ||
-                (windowWidth === 'small' ||
-                  step === 'object-or-free-instructions') ? (
-                  <Trans>Help</Trans>
-                ) : isCondition ? (
-                  <Trans>Help for this condition</Trans>
-                ) : (
-                  <Trans>Help for this action</Trans>
-                )
-              }
-            />,
-          ]}
-          open={open}
-          onRequestClose={onCancel}
-          cannotBeDismissed={true}
-          maxWidth={false}
-          noMargin
-          flexRowBody
-          fullHeight={
-            true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
-          }
-        >
-          <SelectColumns
-            columnsRenderer={{
-              'instruction-or-object-selector': renderInstructionOrObjectSelector,
-              'object-instruction-selector': renderObjectInstructionSelector,
-              parameters: renderParameters,
-            }}
-            getColumns={() => {
-              if (windowWidth === 'large') {
-                if (chosenObjectName) {
-                  return [
-                    'instruction-or-object-selector',
-                    'object-instruction-selector',
-                    'parameters',
-                  ];
-                } else {
-                  return ['instruction-or-object-selector', 'parameters'];
-                }
-              } else if (windowWidth === 'medium') {
-                if (step === 'object-or-free-instructions') {
-                  return ['instruction-or-object-selector'];
-                } else {
-                  if (chosenObjectName) {
-                    return ['object-instruction-selector', 'parameters'];
-                  } else {
-                    return ['parameters'];
-                  }
-                }
+              onClick={() => stepBackFrom(step, windowWidth)}
+              key="back"
+            />
+          ) : null,
+          <HelpButton
+            key="help"
+            helpPagePath={instructionHelpPage || '/events'}
+            label={
+              !instructionHelpPage ||
+              (windowWidth === 'small' ||
+                step === 'object-or-free-instructions') ? (
+                <Trans>Help</Trans>
+              ) : isCondition ? (
+                <Trans>Help for this condition</Trans>
+              ) : (
+                <Trans>Help for this action</Trans>
+              )
+            }
+          />,
+        ]}
+        open={open}
+        onRequestClose={onCancel}
+        cannotBeDismissed={true}
+        maxWidth={false}
+        noMargin
+        flexRowBody
+        fullHeight={
+          true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
+        }
+      >
+        <SelectColumns
+          columnsRenderer={{
+            'instruction-or-object-selector': renderInstructionOrObjectSelector,
+            'object-instruction-selector': renderObjectInstructionSelector,
+            parameters: renderParameters,
+          }}
+          getColumns={() => {
+            if (windowWidth === 'large') {
+              if (chosenObjectName) {
+                return [
+                  'instruction-or-object-selector',
+                  'object-instruction-selector',
+                  'parameters',
+                ];
               } else {
-                if (step === 'object-or-free-instructions') {
-                  return ['instruction-or-object-selector'];
-                } else if (step === 'object-instructions') {
-                  return ['object-instruction-selector'];
+                return ['instruction-or-object-selector', 'parameters'];
+              }
+            } else if (windowWidth === 'medium') {
+              if (step === 'object-or-free-instructions') {
+                return ['instruction-or-object-selector'];
+              } else {
+                if (chosenObjectName) {
+                  return ['object-instruction-selector', 'parameters'];
                 } else {
                   return ['parameters'];
                 }
               }
-            }}
-          />
-        </Dialog>
+            } else {
+              if (step === 'object-or-free-instructions') {
+                return ['instruction-or-object-selector'];
+              } else if (step === 'object-instructions') {
+                return ['object-instruction-selector'];
+              } else {
+                return ['parameters'];
+              }
+            }
+          }}
+        />
+      </Dialog>
+      {newBehaviorDialogOpen && chosenObject && (
+        <NewBehaviorDialog
+          project={project}
+          open={newBehaviorDialogOpen}
+          objectType={chosenObject.getType()}
+          objectBehaviorsTypes={listObjectBehaviorsTypes(chosenObject)}
+          onClose={() => setNewBehaviorDialogOpen(false)}
+          onChoose={addBehavior}
+        />
       )}
-    </ResponsiveWindowMeasurer>
+      {newExtensionDialogOpen && (
+        <ExtensionsSearchDialog
+          project={project}
+          onClose={() => setNewExtensionDialogOpen(false)}
+          onInstallExtension={() => {}}
+          onExtensionInstalled={onExtensionInstalled}
+        />
+      )}
+    </>
   );
 }

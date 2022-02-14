@@ -1,9 +1,10 @@
+// @flow
 import generateName from '../Utils/NewNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 
-export const findEmptyPath = basePath => {
+const findEmptyPath = (basePath: string) => {
   if (!path) return basePath;
 
   const folderName = generateName('My project', name => {
@@ -16,4 +17,10 @@ export const findEmptyPath = basePath => {
   });
 
   return path.join(basePath, folderName);
+};
+
+export const findEmptyPathInDefaultFolder = (electronApp: any): string => {
+  return findEmptyPath(
+    path.join(electronApp.getPath('documents'), 'GDevelop projects')
+  );
 };

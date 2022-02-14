@@ -1,6 +1,6 @@
 @echo off
 rem Script launching the generation of the documentations of all modules
-rem Install globally doxgen and jsdoc before starting it.
+rem Install globally doxgen before starting it.
 echo Generating all docs...
 cd ..
 cd Core\docs

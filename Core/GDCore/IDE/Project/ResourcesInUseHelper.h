@@ -10,6 +10,7 @@
 
 #include <set>
 #include <vector>
+
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/String.h"
 
@@ -36,17 +37,20 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   virtual ~ResourcesInUseHelper(){};
 
   std::set<gd::String>& GetAllImages() { return GetAll("image"); };
-  std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
   std::set<gd::String>& GetAllAudios() { return GetAll("audio"); };
+  std::set<gd::String>& GetAllFonts() { return GetAll("font"); };
+  std::set<gd::String>& GetAllJsons() { return GetAll("json"); };
+  std::set<gd::String>& GetAllVideos() { return GetAll("video"); };
   std::set<gd::String>& GetAllBitmapFonts() { return GetAll("bitmapFont"); };
   std::set<gd::String>& GetAll(const gd::String& resourceType) {
-    return resourceType == "image"
-               ? allImages
-               : (resourceType == "audio"
-                      ? allAudios
-                      : (resourceType == "font")
-                            ? allFonts
-                            : (resourceType == "bitmapFont") ? allBitmapFonts : emptyResources);
+    if (resourceType == "image") return allImages;
+    if (resourceType == "audio") return allAudios;
+    if (resourceType == "font") return allFonts;
+    if (resourceType == "json") return allJsons;
+    if (resourceType == "video") return allVideos;
+    if (resourceType == "bitmapFont") return allBitmapFonts;
+
+    return emptyResources;
   };
 
   virtual void ExposeFile(gd::String& resource) override{
@@ -61,6 +65,12 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   virtual void ExposeFont(gd::String& fontResourceName) override {
     allFonts.insert(fontResourceName);
   };
+  virtual void ExposeJson(gd::String& jsonResourceName) override {
+    allJsons.insert(jsonResourceName);
+  };
+  virtual void ExposeVideo(gd::String& videoResourceName) override {
+    allVideos.insert(videoResourceName);
+  };
   virtual void ExposeBitmapFont(gd::String& bitmapFontResourceName) override {
     allBitmapFonts.insert(bitmapFontResourceName);
   };
@@ -69,6 +79,8 @@ class ResourcesInUseHelper : public gd::ArbitraryResourceWorker {
   std::set<gd::String> allImages;
   std::set<gd::String> allAudios;
   std::set<gd::String> allFonts;
+  std::set<gd::String> allJsons;
+  std::set<gd::String> allVideos;
   std::set<gd::String> allBitmapFonts;
   std::set<gd::String> emptyResources;
 };

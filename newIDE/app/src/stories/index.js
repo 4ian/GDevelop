@@ -14,7 +14,6 @@ import { t } from '@lingui/macro';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
-import { StartPage } from '../MainFrame/EditorContainers/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import {
@@ -95,12 +94,6 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
-  erroredCordovaBuild,
-  pendingCordovaBuild,
-  pendingElectronBuild,
-  completeCordovaBuild,
-  completeElectronBuild,
-  completeWebBuild,
   fakeAssetShortHeader1,
   game1,
   game2,
@@ -120,7 +113,6 @@ import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
-import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import EditProfileDialog from '../Profile/EditProfileDialog';
@@ -128,14 +120,12 @@ import ChangeEmailDialog from '../Profile/ChangeEmailDialog';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
-import BuildProgress from '../Export/Builds/BuildProgress';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import Checkbox from '../UI/Checkbox';
 import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
@@ -241,6 +231,7 @@ import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
+import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
@@ -254,7 +245,7 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/UserPublicProfileChip';
+import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
@@ -486,38 +477,6 @@ storiesOf('UI Building Blocks/SelectField', module)
     />
   ));
 
-storiesOf('UI Building Blocks/TextField', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => {
-    const [value, setValue] = React.useState('Hello World');
-
-    return (
-      <React.Fragment>
-        <TextField
-          value={value}
-          onChange={(_, text) => setValue(text)}
-          floatingLabelText="text field"
-        />
-        <p>State value is {value}</p>
-      </React.Fragment>
-    );
-  })
-  .add('required', () => {
-    const [value, setValue] = React.useState('Hello World');
-
-    return (
-      <React.Fragment>
-        <TextField
-          value={value}
-          onChange={(_, text) => setValue(text)}
-          required
-          floatingLabelText="text field"
-        />
-        <p>State value is {value}</p>
-      </React.Fragment>
-    );
-  });
-
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
   .addDecorator(muiDecorator)
   .add('default', () => {
@@ -690,6 +649,36 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
             errorText={'There was an error somewhere'}
           />
           <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
+  ))
+  .add('default, with translatable elements and a separator', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            dataSource={[
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Click me',
+                onClick: action('Click me clicked'),
+              },
+              {
+                type: 'separator',
+              },
+              {
+                text: '',
+                value: '',
+                translatableValue: 'Or click me',
+                onClick: action('Click me clicked'),
+              },
+            ]}
+          />
         </React.Fragment>
       )}
     />
@@ -960,58 +949,6 @@ storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
           )}
         />
       )}
-    />
-  ));
-
-storiesOf('UI Building Blocks/SearchBar', module)
-  .addDecorator(muiDecorator)
-  .add('empty', () => (
-    <SearchBar
-      value=""
-      onChange={action('change')}
-      onRequestSearch={action('request search')}
-    />
-  ))
-  .add('with text', () => (
-    <SearchBar
-      value="123"
-      onChange={action('change')}
-      onRequestSearch={action('request search')}
-    />
-  ))
-  .add('disabled', () => (
-    <SearchBar
-      value="123"
-      onChange={action('change')}
-      onRequestSearch={action('request search')}
-      disabled
-    />
-  ))
-  .add('with tags', () => (
-    <SearchBar
-      value="123"
-      onChange={action('change')}
-      onRequestSearch={action('request search')}
-      buildTagsMenuTemplate={() => [
-        {
-          type: 'checkbox',
-          label: 'Tag 1',
-          checked: false,
-          click: () => {},
-        },
-        {
-          type: 'checkbox',
-          label: 'Tag 2 (checked)',
-          checked: true,
-          click: () => {},
-        },
-        {
-          type: 'checkbox',
-          label: 'Tag 3',
-          checked: false,
-          click: () => {},
-        },
-      ]}
     />
   ));
 
@@ -1299,16 +1236,6 @@ storiesOf('UI Building Blocks/LoaderModal', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <LoaderModal show />);
-
-storiesOf('UI Building Blocks/Checkbox', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <div style={{ display: 'flex' }}>
-      <Checkbox label={'My label'} checked={true} />
-      <Checkbox label={'My label 2'} checked={false} />
-    </div>
-  ));
 
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)
@@ -2174,21 +2101,6 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
-  .add('ObjectField', () => (
-    <ValueStateHolder
-      initialValue={'MySpriteObject'}
-      render={(value, onChange) => (
-        <ObjectField
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          value={value}
-          onChange={onChange}
-        />
-      )}
-    />
-  ))
   .add('ExternalEventsAutoComplete', () => (
     <ValueStateHolder
       initialValue={'Test'}
@@ -2486,7 +2398,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={''}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2497,7 +2408,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={''}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2508,7 +2418,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'export'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2519,7 +2428,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'resources-download'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={27}
       stepCurrentProgress={16}
       errored={false}
@@ -2530,7 +2438,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'export'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={true}
@@ -2541,7 +2448,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'compress'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={0}
       stepCurrentProgress={0}
       errored={false}
@@ -2552,7 +2458,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'upload'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2563,7 +2468,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'upload'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored
@@ -2574,7 +2478,6 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'waiting-for-build'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2586,13 +2489,13 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'build'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'electron-build',
         status: 'pending',
         updatedAt: Date.now(),
         createdAt: Date.now(),
       }}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2605,6 +2508,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'build'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'cordova-build',
         status: 'error',
@@ -2612,7 +2516,6 @@ storiesOf('BuildStepsProgress', module)
         updatedAt: Date.now(),
         createdAt: Date.now(),
       }}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored
@@ -2624,6 +2527,7 @@ storiesOf('BuildStepsProgress', module)
       exportStep={'done'}
       build={{
         id: 'fake-build-id',
+        gameId: 'game-id',
         userId: 'fake-user-id',
         type: 'cordova-build',
         status: 'complete',
@@ -2632,7 +2536,6 @@ storiesOf('BuildStepsProgress', module)
         updatedAt: Date.now(),
         createdAt: Date.now(),
       }}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
@@ -2643,58 +2546,11 @@ storiesOf('BuildStepsProgress', module)
     <BuildStepsProgress
       exportStep={'done'}
       build={null}
-      onDownload={action('download')}
       stepMaxProgress={100}
       stepCurrentProgress={20}
       errored={false}
       hasBuildStep={false}
     />
-  ));
-
-storiesOf('BuildProgress', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('errored', () => (
-    <BuildProgress
-      build={erroredCordovaBuild}
-      onDownload={action('download')}
-    />
-  ))
-  .add('pending (electron-build)', () => (
-    <BuildProgress
-      build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
-      onDownload={action('download')}
-    />
-  ))
-  .add('pending (cordova-build)', () => (
-    <BuildProgress
-      build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
-      onDownload={action('download')}
-    />
-  ))
-  .add('pending and very old (cordova-build)', () => (
-    <BuildProgress
-      build={{
-        ...pendingCordovaBuild,
-        updatedAt: Date.now() - 1000 * 3600 * 24,
-      }}
-      onDownload={action('download')}
-    />
-  ))
-  .add('complete (cordova-build)', () => (
-    <BuildProgress
-      build={completeCordovaBuild}
-      onDownload={action('download')}
-    />
-  ))
-  .add('complete (electron-build)', () => (
-    <BuildProgress
-      build={completeElectronBuild}
-      onDownload={action('download')}
-    />
-  ))
-  .add('complete (web-build)', () => (
-    <BuildProgress build={completeWebBuild} onDownload={action('download')} />
   ));
 
 storiesOf('LocalFolderPicker', module)
@@ -2744,43 +2600,6 @@ storiesOf('LocalFilePicker', module)
           fullWidth
         />
       )}
-    />
-  ));
-
-storiesOf('StartPage', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <StartPage
-      project={null}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
-    />
-  ))
-  .add('project opened', () => (
-    <StartPage
-      project={testProject.project}
-      isActive={true}
-      projectItemName={null}
-      setToolbar={() => {}}
-      canOpen={true}
-      onOpen={() => action('onOpen')()}
-      onCreate={() => action('onCreate')()}
-      onOpenProjectManager={() => action('onOpenProjectManager')()}
-      onCloseProject={() => action('onCloseProject')()}
-      onOpenTutorials={() => action('onOpenTutorials')()}
-      onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
-      onOpenHelpFinder={() => action('onOpenHelpFinder')()}
-      onOpenLanguageDialog={() => action('open language dialog')()}
     />
   ));
 
@@ -2896,18 +2715,17 @@ storiesOf('AboutDialog', module)
     />
   ));
 
-storiesOf('CreateProjectDialog', module)
+storiesOf('Project Creation/CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
-        examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
-        onOpen={action('onOpen')}
-        initialTab="starters"
+        onOpen={action('On open project after it is created')}
+        initialTab="examples"
+        onCreateBlank={() => action('create blank project')}
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ))
@@ -2915,12 +2733,11 @@ storiesOf('CreateProjectDialog', module)
     <ExampleStoreStateProvider>
       <CreateProjectDialog
         open
-        examplesComponent={Placeholder}
-        startersComponent={Placeholder}
         onClose={action('onClose')}
-        onCreate={action('onCreate')}
-        onOpen={action('onOpen')}
+        onOpen={action('On open project after it is created')}
         initialTab="games-showcase"
+        onCreateBlank={() => action('create blank project')}
+        onCreateFromExampleShortHeader={() => action('create from example')}
       />
     </ExampleStoreStateProvider>
   ));
@@ -2932,7 +2749,6 @@ storiesOf('OpenFromStorageProviderDialog', module)
       storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
       onChooseProvider={action('onChooseProvider')}
       onClose={action('onClose')}
-      onCreateNewProject={action('onCreateNewProject')}
     />
   ));
 
@@ -3026,7 +2842,7 @@ storiesOf('ExternalPropertiesDialog', module)
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
-  .add('default, medium screen (no scope)', () => (
+  .add('default, medium screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3065,7 +2881,7 @@ storiesOf('EventsTree', module)
       </div>
     </DragAndDropContextProvider>
   ))
-  .add('default, small screen (no scope)', () => (
+  .add('default, small screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3104,7 +2920,46 @@ storiesOf('EventsTree', module)
       </div>
     </DragAndDropContextProvider>
   ))
-  .add('empty, small screen (no scope)', () => (
+  .add('default, medium screen (scope: not in a layout)', () => (
+    <DragAndDropContextProvider>
+      <div className="gd-events-sheet">
+        <FixedHeightFlexContainer height={500}>
+          <EventsTree
+            events={testProject.testLayout.getEvents()}
+            project={testProject.project}
+            scope={{}}
+            globalObjectsContainer={testProject.project}
+            objectsContainer={testProject.testLayout}
+            selection={getInitialSelection()}
+            onAddNewInstruction={action('add new instruction')}
+            onPasteInstructions={action('paste instructions')}
+            onMoveToInstruction={action('move to instruction')}
+            onMoveToInstructionsList={action('move instruction to list')}
+            onInstructionClick={action('instruction click')}
+            onInstructionDoubleClick={action('instruction double click')}
+            onInstructionContextMenu={action('instruction context menu')}
+            onAddInstructionContextMenu={action(
+              'instruction list context menu'
+            )}
+            onParameterClick={action('parameter click')}
+            onEventClick={action('event click')}
+            onEventContextMenu={action('event context menu')}
+            onAddNewEvent={action('add new event')}
+            onOpenExternalEvents={action('open external events')}
+            onOpenLayout={action('open layout')}
+            searchResults={null}
+            searchFocusOffset={null}
+            onEventMoved={() => {}}
+            showObjectThumbnails={true}
+            screenType={'normal'}
+            windowWidth={'medium'}
+            eventsSheetHeight={500}
+          />
+        </FixedHeightFlexContainer>
+      </div>
+    </DragAndDropContextProvider>
+  ))
+  .add('empty, small screen (scope: in a layout)', () => (
     <DragAndDropContextProvider>
       <div className="gd-events-sheet">
         <FixedHeightFlexContainer height={500}>
@@ -3341,6 +3196,7 @@ storiesOf('InstructionOrObjectSelector', module)
             chosenObjectName={null}
             onChooseObject={action('choose object')}
             focusOnMount
+            onClickMore={action('See new behaviors')}
           />
         </FixedHeightFlexContainer>
       )}
@@ -3365,6 +3221,7 @@ storiesOf('InstructionOrObjectSelector', module)
             chosenObjectName={'MySpriteObject'}
             onChooseObject={action('choose object')}
             focusOnMount
+            onClickMore={action('See new behaviors')}
           />
         </FixedHeightFlexContainer>
       )}
@@ -3806,7 +3663,6 @@ storiesOf('InstancePropertiesEditor', module)
             layout={testProject.testLayout}
             instances={[testProject.testLayoutInstance1]}
             editInstanceVariables={action('edit instance variables')}
-            editObjectVariables={action('edit object variables')}
             onEditObjectByName={action('edit object')}
           />
         </SerializedObjectDisplay>
@@ -3940,7 +3796,7 @@ storiesOf('Changelog', module)
     <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
-storiesOf('CreateProfile', module)
+storiesOf('Profile/CreateProfile', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -4008,12 +3864,6 @@ storiesOf('SubscriptionDetails', module)
       onChangeSubscription={action('change subscription')}
     />
   ));
-
-storiesOf('UsagesDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
-  .add('empty', () => <UsagesDetails usages={[]} />);
 
 storiesOf('SubscriptionDialog', module)
   .addDecorator(paperDecorator)
@@ -4158,6 +4008,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4172,6 +4023,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress={false}
@@ -4186,6 +4038,7 @@ storiesOf('Profile/EditProfileDialog', module)
         email: 'email',
         username: 'username',
         description: 'I am just another video game enthusiast!',
+        getGameStatsEmail: false,
       }}
       onClose={action('on close')}
       editInProgress
@@ -4276,13 +4129,7 @@ storiesOf('Profile/CreateAccountDialog', module)
     />
   ));
 
-storiesOf('UserPublicProfileChip', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <UserPublicProfileChip user={{ id: '123', username: 'username' }} />
-  ));
-
-storiesOf('ContributionsDetails', module)
+storiesOf('Profile/ContributionsDetails', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <>
@@ -4711,10 +4558,6 @@ storiesOf('ProjectManager', module)
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
       onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
-      onAddLayout={action('onAddLayout')}
-      onAddExternalLayout={action('onAddExternalLayout')}
-      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
-      onAddExternalEvents={action('onAddExternalEvents')}
       onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
@@ -4756,10 +4599,6 @@ storiesOf('ProjectManager', module)
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
       onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
-      onAddLayout={action('onAddLayout')}
-      onAddExternalLayout={action('onAddExternalLayout')}
-      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
-      onAddExternalEvents={action('onAddExternalEvents')}
       onInstallExtension={action('onInstallExtension')}
       onDeleteLayout={action('onDeleteLayout')}
       onDeleteExternalLayout={action('onDeleteExternalLayout')}
@@ -4854,6 +4693,10 @@ storiesOf('NewBehaviorDialog', module)
         objectType={'Sprite'}
         onClose={action('on close')}
         onChoose={action('on choose')}
+        objectBehaviorsTypes={[
+          'DestroyOutsideBehavior::DestroyOutside',
+          'PlatformBehavior::PlatformBehavior',
+        ]}
       />
     </ExtensionStoreStateProvider>
   ));
@@ -5317,8 +5160,8 @@ storiesOf('GameDashboard/GameCard', module)
       game={game1}
       isCurrentGame={false}
       onOpenDetails={action('onOpenDetails')}
+      onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
-      onOpenMonetization={action('onOpenMonetization')}
     />
   ))
   .add('current game', () => (
@@ -5326,8 +5169,8 @@ storiesOf('GameDashboard/GameCard', module)
       game={game1}
       isCurrentGame={true}
       onOpenDetails={action('onOpenDetails')}
+      onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
-      onOpenMonetization={action('onOpenMonetization')}
     />
   ));
 

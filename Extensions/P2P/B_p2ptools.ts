@@ -211,8 +211,7 @@ namespace gdjs {
       };
 
       /**
-       * Gets an event from {@link events}
-       * or creates it if it doesn't exist.
+       * Get an event or creates it if it doesn't exist.
        */
       export const getEvent = (name: string) => {
         if (!events.hasOwnProperty(name)) events[name] = new Event();
@@ -375,15 +374,14 @@ namespace gdjs {
         key: string,
         ssl: boolean
       ) => {
-        peerConfig = {
-          debug: 1,
+        Object.assign(peerConfig, {
           host,
           port,
           path,
           secure: ssl,
           // All servers have "peerjs" as default key
           key: key.length === 0 ? 'peerjs' : key,
-        };
+        });
         loadPeerJS();
       };
 
@@ -393,6 +391,26 @@ namespace gdjs {
        * this server should only be used for quick testing in development.
        */
       export const useDefaultBrokerServer = loadPeerJS;
+
+      /**
+       * Adds an ICE server candidate, and removes the default ones provided by PeerJs. Must be called before connecting to a broker.
+       * @param urls The URL of the STUN/TURN server.
+       * @param username An optional username to send to the server.
+       * @param credential An optional password to send to the server.
+       */
+      export const useCustomICECandidate = (
+        urls: string,
+        username?: string,
+        credential?: string
+      ) => {
+        peerConfig.config = peerConfig.config || {};
+        peerConfig.config.iceServers = peerConfig.config.iceServers || [];
+        peerConfig.config.iceServers.push({
+          urls,
+          username,
+          credential,
+        });
+      };
 
       /**
        * Overrides the default peer ID. Must be called before connecting to a broker.

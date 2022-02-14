@@ -52,6 +52,7 @@ const setupWindowClosedPolling = () => {
         );
         if (!Object.keys(previewWindowAndTargetIds).length) {
           clearInterval(windowClosedPollingIntervalId);
+          windowClosedPollingIntervalId = null;
         }
       }
     }

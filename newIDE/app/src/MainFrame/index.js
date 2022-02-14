@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import Toolbar from './Toolbar';
+import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import AboutDialog from './AboutDialog';
@@ -44,7 +44,6 @@ import {
   notifyPreviewWillStart,
 } from './EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
-import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
 import { renderEventsEditorContainer } from './EditorContainers/EventsEditorContainer';
@@ -52,7 +51,7 @@ import { renderExternalEventsEditorContainer } from './EditorContainers/External
 import { renderSceneEditorContainer } from './EditorContainers/SceneEditorContainer';
 import { renderExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
 import { renderEventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
-import { renderStartPageContainer } from './EditorContainers/StartPage';
+import { renderHomePageContainer } from './EditorContainers/HomePage';
 import { renderResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -85,7 +84,14 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
+import {
+  type CreateProjectDialogWithComponentsProps,
+  type CreateProjectDialogTabs,
+} from '../ProjectCreation/CreateProjectDialog';
+import {
+  type OnCreateFromExampleShortHeaderFunction,
+  type OnCreateBlankFunction,
+} from '../ProjectCreation/CreateProjectDialog';
 import { getStartupTimesSummary } from '../Utils/StartupTimes';
 import {
   type StorageProvider,
@@ -121,6 +127,12 @@ import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { findAndLogProjectPreviewErrors } from '../Utils/ProjectErrorsChecker';
 import { renameResourcesInProject } from '../ResourcesList/ResourceUtils';
 import { NewResourceDialog } from '../ResourcesList/NewResourceDialog';
+import {
+  addCreateBadgePreHookIfNotClaimed,
+  TRIVIAL_FIRST_DEBUG,
+  TRIVIAL_FIRST_PREVIEW,
+} from '../Utils/GDevelopServices/Badge';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -210,6 +222,8 @@ export type Props = {
   requestUpdate?: () => void,
   renderExportDialog?: ExportDialogWithoutExportsProps => React.Node,
   renderCreateDialog?: CreateProjectDialogWithComponentsProps => React.Node,
+  onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
+  onCreateBlank: OnCreateBlankFunction,
   renderGDJSDevelopmentWatcher?: ?() => React.Node,
   extensionsLoader?: JsExtensionsLoader,
   initialFileMetadataToOpen: ?FileMetadata,
@@ -235,7 +249,9 @@ const MainFrame = (props: Props) => {
       gdjsDevelopmentWatcherEnabled: false,
     }: State)
   );
-  const toolbar = React.useRef<?Toolbar>(null);
+  const toolbar = React.useRef<?ToolbarInterface>(null);
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
+
   const [
     chooseResourceOptions,
     setChooseResourceOptions,
@@ -305,9 +321,10 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const [createDialogInitialTab, setCreateDialogInitialTab] = React.useState<
-    'starters' | 'tutorials' | 'games-showcase'
-  >('starters');
+  const [
+    createDialogInitialTab,
+    setCreateDialogInitialTab,
+  ] = React.useState<CreateProjectDialogTabs>('examples');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -324,6 +341,8 @@ const MainFrame = (props: Props) => {
   const {
     renderExportDialog,
     renderCreateDialog,
+    onCreateFromExampleShortHeader,
+    onCreateBlank,
     resourceSources,
     renderPreviewLauncher,
     resourceExternalEditors,
@@ -339,7 +358,7 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      if (!integratedEditor) openStartPage();
+      if (!integratedEditor) openHomePage();
       GD_STARTUP_TIMES.push(['MainFrameComponentDidMount', performance.now()]);
       _loadExtensions()
         .then(() =>
@@ -401,7 +420,7 @@ const MainFrame = (props: Props) => {
               );
           } else {
             // Open the intro dialog if not opening any project.
-            if (introDialog && !Window.isDev()) openIntroDialog(true);
+            if (introDialog) openIntroDialog(true);
           }
         })
         .catch(() => {
@@ -763,67 +782,10 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const setEditorToolbar = (editorToolbar: any) => {
-    if (!toolbar.current) return;
+  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
+    if (!toolbar.current || !isCurrentTab) return;
 
     toolbar.current.setEditorToolbar(editorToolbar);
-  };
-
-  const addLayout = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('New scene', name =>
-      currentProject.hasLayoutNamed(name)
-    );
-    const newLayout = currentProject.insertNewLayout(
-      name,
-      currentProject.getLayoutsCount()
-    );
-    newLayout.updateBehaviorsSharedData(currentProject);
-    _onProjectItemModified();
-  };
-
-  const addExternalLayout = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExternalLayout', name =>
-      currentProject.hasExternalLayoutNamed(name)
-    );
-    currentProject.insertNewExternalLayout(
-      name,
-      currentProject.getExternalLayoutsCount()
-    );
-    _onProjectItemModified();
-  };
-
-  const addExternalEvents = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExternalEvents', name =>
-      currentProject.hasExternalEventsNamed(name)
-    );
-    currentProject.insertNewExternalEvents(
-      name,
-      currentProject.getExternalEventsCount()
-    );
-    _onProjectItemModified();
-  };
-
-  const addEventsFunctionsExtension = () => {
-    const { currentProject } = state;
-    if (!currentProject) return;
-
-    const name = newNameGenerator('NewExtension', name =>
-      currentProject.hasEventsFunctionsExtensionNamed(name)
-    );
-    currentProject.insertNewEventsFunctionsExtension(
-      name,
-      currentProject.getEventsFunctionsExtensionsCount()
-    );
-    _onProjectItemModified();
   };
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
@@ -853,8 +815,9 @@ const MainFrame = (props: Props) => {
   };
 
   const deleteLayout = (layout: gdLayout) => {
+    const { currentProject } = state;
     const { i18n } = props;
-    if (!state.currentProject) return;
+    if (!currentProject) return;
 
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -867,8 +830,9 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
-      if (state.currentProject)
-        state.currentProject.removeLayout(layout.getName());
+      if (currentProject.getFirstLayout() === layout.getName())
+        currentProject.setFirstLayout('');
+      currentProject.removeLayout(layout.getName());
       _onProjectItemModified();
     });
   };
@@ -979,11 +943,15 @@ const MainFrame = (props: Props) => {
     }
 
     const layout = currentProject.getLayout(oldName);
+    const shouldChangeProjectFirstLayout =
+      oldName === currentProject.getFirstLayout();
     setState(state => ({
       ...state,
       editorTabs: closeLayoutTabs(state.editorTabs, layout),
     })).then(state => {
       layout.setName(newName);
+      if (shouldChangeProjectFirstLayout)
+        currentProject.setFirstLayout(newName);
       _onProjectItemModified();
     });
   };
@@ -1183,7 +1151,7 @@ const MainFrame = (props: Props) => {
     ]
   );
 
-  const launchPreview = React.useCallback(
+  const _launchPreview = React.useCallback(
     ({
       networkPreview,
       hotReload,
@@ -1258,6 +1226,12 @@ const MainFrame = (props: Props) => {
       preferences.getIsMenuBarHiddenInPreview,
       preferences.getIsAlwaysOnTopInPreview,
     ]
+  );
+
+  const launchPreview = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_PREVIEW,
+    _launchPreview
   );
 
   const launchNewPreview = React.useCallback(
@@ -1395,14 +1369,14 @@ const MainFrame = (props: Props) => {
     }));
   };
 
-  const openStartPage = React.useCallback(
+  const openHomePage = React.useCallback(
     () => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Start Page`),
+          label: i18n._(t`Home`),
           projectItemName: null,
-          renderEditorContainer: renderStartPageContainer,
+          renderEditorContainer: renderHomePageContainer,
           key: 'start page',
           closable: false,
         }),
@@ -1411,7 +1385,7 @@ const MainFrame = (props: Props) => {
     [i18n, setState]
   );
 
-  const openDebugger = React.useCallback(
+  const _openDebugger = React.useCallback(
     () => {
       setState(state => ({
         ...state,
@@ -1424,6 +1398,12 @@ const MainFrame = (props: Props) => {
       }));
     },
     [i18n, setState]
+  );
+
+  const openDebugger = addCreateBadgePreHookIfNotClaimed(
+    authenticatedUser,
+    TRIVIAL_FIRST_DEBUG,
+    _openDebugger
   );
 
   const launchDebuggerAndPreview = React.useCallback(
@@ -1512,28 +1492,27 @@ const MainFrame = (props: Props) => {
     );
   };
 
-  const openCreateDialog = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('starters');
+  const openCreateProjectDialog = React.useCallback(
+    (tab: CreateProjectDialogTabs) => (open: boolean = true) => {
+      setCreateDialogInitialTab(tab);
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
   );
-
-  const onOpenTutorials = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('tutorials');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const closeCreateDialog = () => {
+    setState(state => ({ ...state, createDialogOpen: false }));
+  };
+  const onOpenTutorials = React.useMemo(
+    () => openCreateProjectDialog('tutorials'),
+    [openCreateProjectDialog]
   );
-
-  const onOpenGamesShowcase = React.useCallback(
-    (open: boolean = true) => {
-      setCreateDialogInitialTab('games-showcase');
-      setState(state => ({ ...state, createDialogOpen: open }));
-    },
-    [setState]
+  const onOpenExamples = React.useMemo(
+    () => openCreateProjectDialog('examples'),
+    [openCreateProjectDialog]
+  );
+  const onOpenGamesShowcase = React.useMemo(
+    () => openCreateProjectDialog('games-showcase'),
+    [openCreateProjectDialog]
   );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
@@ -1554,7 +1533,10 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() === 1) {
+      if (currentProject.getLayoutsCount() <= 1) {
+        if (currentProject.getLayoutsCount() === 0)
+          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+
         openLayout(
           currentProject.getLayoutAt(0).getName(),
           {
@@ -1574,7 +1556,7 @@ const MainFrame = (props: Props) => {
         });
       }
     },
-    [openLayout, setState]
+    [openLayout, setState, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -1931,6 +1913,40 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const onOpenProjectAfterCreation = async ({
+    project,
+    storageProvider,
+    fileMetadata,
+    projectName,
+    shouldCloseDialog,
+  }: {|
+    project?: gdProject,
+    storageProvider: ?StorageProvider,
+    fileMetadata: ?FileMetadata,
+    projectName?: string,
+    shouldCloseDialog?: boolean,
+  |}) => {
+    if (shouldCloseDialog)
+      await setState(state => ({ ...state, createDialogOpen: false }));
+
+    await getStorageProviderOperations(storageProvider);
+    let state;
+    if (project) state = await loadFromProject(project, fileMetadata);
+    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+
+    if (state) {
+      if (state.currentProject) {
+        const { currentProject } = state;
+        currentProject.resetProjectUuid();
+        if (projectName) currentProject.setName(projectName);
+      }
+      openSceneOrProjectManager({
+        currentProject: state.currentProject,
+        editorTabs: state.editorTabs,
+      });
+    }
+  };
+
   const simulateUpdateDownloaded = () =>
     setUpdateStatus({
       status: 'update-downloaded',
@@ -1966,8 +1982,8 @@ const MainFrame = (props: Props) => {
     onHotReloadPreview: launchHotReloadPreview,
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
-    onOpenStartPage: openStartPage,
-    onCreateProject: openCreateDialog,
+    onOpenHomePage: openHomePage,
+    onCreateProject: onOpenExamples,
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2006,9 +2022,9 @@ const MainFrame = (props: Props) => {
           onCloseProject: askToCloseProject,
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
-          onCreateProject: openCreateDialog,
+          onCreateProject: onOpenExamples,
           onOpenProjectManager: () => openProjectManager(true),
-          onOpenStartPage: openStartPage,
+          onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
           onOpenAbout: () => openAboutDialog(true),
           onOpenPreferences: () => openPreferencesDialog(true),
@@ -2045,10 +2061,6 @@ const MainFrame = (props: Props) => {
             onOpenLayout={openLayout}
             onOpenExternalLayout={openExternalLayout}
             onOpenEventsFunctionsExtension={openEventsFunctionsExtension}
-            onAddLayout={addLayout}
-            onAddExternalLayout={addExternalLayout}
-            onAddEventsFunctionsExtension={addEventsFunctionsExtension}
-            onAddExternalEvents={addExternalEvents}
             onInstallExtension={onInstallExtension}
             onDeleteLayout={deleteLayout}
             onDeleteExternalLayout={deleteExternalLayout}
@@ -2087,7 +2099,7 @@ const MainFrame = (props: Props) => {
             freezeUpdate={!projectManagerOpen}
             unsavedChanges={unsavedChanges}
             hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
-            resourceSources={props.resourceSources}
+            resourceSources={resourceSources}
             onChooseResource={onChooseResource}
             resourceExternalEditors={resourceExternalEditors}
           />
@@ -2151,11 +2163,17 @@ const MainFrame = (props: Props) => {
                   extraEditorProps: editorTab.extraEditorProps,
                   project: currentProject,
                   ref: editorRef => (editorTab.editorRef = editorRef),
-                  setToolbar: setEditorToolbar,
+                  setToolbar: editorToolbar =>
+                    setEditorToolbar(editorToolbar, isCurrentTab),
                   onChangeSubscription: () => openSubscriptionDialog(true),
                   projectItemName: editorTab.projectItemName,
                   setPreviewedLayout,
                   onOpenExternalEvents: openExternalEvents,
+                  onOpenEvents: (sceneName: string) =>
+                    openLayout(sceneName, {
+                      openEventsEditor: true,
+                      openSceneEditor: false,
+                    }),
                   previewDebuggerServer,
                   hotReloadPreviewButtonProps,
                   onOpenLayout: name =>
@@ -2173,11 +2191,16 @@ const MainFrame = (props: Props) => {
                     ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
                   ).length,
                   onOpen: () => chooseProject(),
-                  onCreate: () => openCreateDialog(),
+                  onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+                  onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
+                  onCreateBlank: onCreateBlank,
+                  onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                   onOpenProjectManager: () => openProjectManager(true),
                   onCloseProject: () => askToCloseProject(),
                   onOpenTutorials: () => onOpenTutorials(),
                   onOpenGamesShowcase: () => onOpenGamesShowcase(),
+                  onOpenExamples: () => onOpenExamples(),
+                  onOpenProfile: () => openProfileDialogWithTab('profile'),
                   onOpenHelpFinder: () => openHelpFinderDialog(true),
                   onOpenLanguageDialog: () => openLanguageDialog(true),
                   onLoadEventsFunctionsExtensions: () =>
@@ -2239,31 +2262,8 @@ const MainFrame = (props: Props) => {
         renderCreateDialog({
           open: state.createDialogOpen,
           initialTab: createDialogInitialTab,
-          onClose: () => openCreateDialog(false),
-          onOpen: async (storageProvider, fileMetadata) => {
-            await setState(state => ({ ...state, createDialogOpen: false }));
-            await getStorageProviderOperations(storageProvider);
-            const state = await openFromFileMetadata(fileMetadata);
-
-            if (state) {
-              if (state.currentProject) state.currentProject.resetProjectUuid();
-              openSceneOrProjectManager({
-                currentProject: state.currentProject,
-                editorTabs: state.editorTabs,
-              });
-            }
-          },
-          onCreate: async (project, storageProvider, fileMetadata) => {
-            await setState(state => ({ ...state, createDialogOpen: false }));
-            await getStorageProviderOperations(storageProvider);
-            const state = await loadFromProject(project, fileMetadata);
-
-            if (state.currentProject) state.currentProject.resetProjectUuid();
-            openSceneOrProjectManager({
-              currentProject: state.currentProject,
-              editorTabs: state.editorTabs,
-            });
-          },
+          onClose: closeCreateDialog,
+          onOpen: onOpenProjectAfterCreation,
         })}
       {!!introDialog &&
         introDialogOpen &&
@@ -2362,10 +2362,6 @@ const MainFrame = (props: Props) => {
             props.getStorageProviderOperations(storageProvider).then(() => {
               chooseProjectWithStorageProviderPicker();
             });
-          }}
-          onCreateNewProject={() => {
-            openOpenFromStorageProviderDialog(false);
-            openCreateDialog(true);
           }}
         />
       )}

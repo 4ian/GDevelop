@@ -23,7 +23,7 @@ type Props = {|
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
-  onConfigurationUpdated?: () => void,
+  onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
   freezeParameters?: boolean,
   freezeEventsFunctionType?: boolean,
@@ -41,6 +41,7 @@ type Props = {|
     done: (boolean) => void
   ) => void,
   unsavedChanges?: ?UnsavedChanges,
+  getFunctionGroupNames?: () => string[],
 |};
 
 type TabNames = 'config' | 'parameters' | 'groups';
@@ -161,6 +162,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       renderConfigurationHeader,
       onMoveFreeEventsParameter,
       onMoveBehaviorEventsParameter,
+      getFunctionGroupNames,
     } = this.props;
 
     return (
@@ -189,6 +191,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 onConfigurationUpdated={onConfigurationUpdated}
                 renderConfigurationHeader={renderConfigurationHeader}
                 freezeEventsFunctionType={freezeEventsFunctionType}
+                getFunctionGroupNames={getFunctionGroupNames}
               />
             </Line>
           </ScrollView>

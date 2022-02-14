@@ -9,7 +9,6 @@ import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
-import AlertMessage from '../../UI/AlertMessage';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import { I18n } from '@lingui/react';
 
@@ -72,7 +71,8 @@ export default class LanguageDialog extends Component<Props, State> {
         {({ i18n }) => (
           <PreferencesContext.Consumer>
             {({ values, setLanguage }) => {
-              const isLoadingLanguage = i18n.language !== values.language;
+              const isLoadingLanguage =
+                i18n.language !== values.language.replace('_', '-');
 
               return (
                 <Dialog
@@ -111,15 +111,6 @@ export default class LanguageDialog extends Component<Props, State> {
                   title={<Trans>Language</Trans>}
                 >
                   <Column noMargin>
-                    <Line>
-                      <AlertMessage kind="info">
-                        <Trans>
-                          Support for translations is still new and in beta.
-                          GDevelop needs your help to be translated in your
-                          language!
-                        </Trans>
-                      </AlertMessage>
-                    </Line>
                     <Line expand>
                       <SelectField
                         floatingLabelText={

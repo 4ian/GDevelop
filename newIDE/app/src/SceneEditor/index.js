@@ -30,7 +30,7 @@ import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import EditorMosaic from '../UI/EditorMosaic';
-import InfoBar from '../UI/Messages/InfoBar';
+import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
@@ -112,6 +112,7 @@ type Props = {|
   layout: gdLayout,
   onEditObject?: ?(object: gdObject) => void,
   onOpenMoreSettings?: ?() => void,
+  onOpenEvents: (sceneName: string) => void,
   project: gdProject,
   setToolbar: (?React.Node) => void,
   resourceSources: Array<ResourceSource>,
@@ -136,7 +137,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?string,
   variablesEditedInstance: ?gdInitialInstance,
-  variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
@@ -189,7 +189,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      variablesEditedObject: null,
       selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
@@ -357,10 +356,6 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
-  };
-
-  editObjectVariables = (object: ?gdObject) => {
-    this.setState({ variablesEditedObject: object });
   };
 
   editLayoutVariables = (open: boolean = true) => {
@@ -552,13 +547,12 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onSelectInstances = (
     instances: Array<gdInitialInstance>,
-    centerView: boolean = true
+    multiSelect: boolean
   ) => {
-    this.instancesSelection.selectInstances(instances, false);
+    this.instancesSelection.selectInstances(instances, multiSelect);
 
-    if (centerView) {
-      if (this.editor) this.editor.centerViewOn(instances);
-    }
+    if (this.editor) this.editor.centerViewOn(instances);
+    this.forceUpdateInstancesList();
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
@@ -815,9 +809,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    selectedInstances.map(instance =>
-      this.props.initialInstances.removeInstance(instance)
-    );
+    selectedInstances.forEach(instance => {
+      if (instance.isLocked()) return;
+      this.props.initialInstances.removeInstance(instance);
+    });
 
     this.instancesSelection.clearSelection();
     if (this.editor) this.editor.clearHighlightedInstance();
@@ -1000,7 +995,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout={layout}
                 instances={selectedInstances}
                 editInstanceVariables={this.editInstanceVariables}
-                editObjectVariables={this.editObjectVariables}
                 onEditObjectByName={this.editObjectByName}
                 onInstancesModified={instances =>
                   this.forceUpdateInstancesList()
@@ -1150,7 +1144,9 @@ export default class SceneEditor extends React.Component<Props, State> {
           project={project}
           layout={layout}
           onEditObject={this.props.onEditObject || this.editObject}
-          onEditObjectVariables={this.editObjectVariables}
+          onEditObjectVariables={object => {
+            this.editObject(object, 'variables');
+          }}
           onOpenSceneProperties={this.openSceneProperties}
           onOpenSceneVariables={this.editLayoutVariables}
           onEditObjectGroup={this.editGroup}
@@ -1194,6 +1190,17 @@ export default class SceneEditor extends React.Component<Props, State> {
             resourceSources={resourceSources}
             resourceExternalEditors={resourceExternalEditors}
             onChooseResource={onChooseResource}
+            onComputeAllVariableNames={() => {
+              const { editedObjectWithContext } = this.state;
+              if (!editedObjectWithContext) return [];
+
+              return EventsRootVariablesFinder.findAllObjectVariables(
+                project.getCurrentPlatform(),
+                project,
+                layout,
+                editedObjectWithContext.object
+              );
+            }}
             onCancel={() => {
               if (this.state.editedObjectWithContext) {
                 this.reloadResourcesFor(
@@ -1233,7 +1240,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editGroup(null)}
           />
         )}
-        <InfoBar
+        <DismissableInfoBar
           identifier="instance-drag-n-drop-explanation"
           message={
             <Trans>
@@ -1249,7 +1256,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.selectedObjectNames.length}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="objects-panel-explanation"
           message={
             <Trans>
@@ -1258,7 +1265,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.showObjectsListInfoBar}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="instance-properties-panel-explanation"
           message={
             <Trans>
@@ -1268,7 +1275,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.showPropertiesInfoBar}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="layers-panel-explanation"
           message={
             <Trans>
@@ -1278,7 +1285,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           }
           show={!!this.state.showLayersInfoBar}
         />
-        <InfoBar
+        <DismissableInfoBar
           identifier="instances-panel-explanation"
           message={
             <Trans>
@@ -1307,10 +1314,11 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.editInstanceVariables(null)}
             emptyExplanationMessage={
               <Trans>
-                Instance variables will override the default values of the
+                Instance variables will overwrite the default values of the
                 variables of the object.
               </Trans>
             }
+            helpPagePath={'/all-features/variables/instance-variables'}
             title={<Trans>Instance Variables</Trans>}
             onEditObjectVariables={() => {
               if (!this.instancesSelection.hasSelectedInstances()) {
@@ -1325,7 +1333,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 associatedObjectName
               );
               if (object) {
-                this.editObjectVariables(object);
+                this.editObject(object, 'variables');
                 this.editInstanceVariables(null);
               }
             }}
@@ -1341,37 +1349,6 @@ export default class SceneEditor extends React.Component<Props, State> {
                 layout,
                 variablesEditedInstance.getObjectName()
               );
-              return variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
-          />
-        )}
-        {!!this.state.variablesEditedObject && (
-          <VariablesEditorDialog
-            open
-            variablesContainer={
-              this.state.variablesEditedObject &&
-              this.state.variablesEditedObject.getVariables()
-            }
-            onCancel={() => this.editObjectVariables(null)}
-            onApply={() => this.editObjectVariables(null)}
-            emptyExplanationMessage={
-              <Trans>
-                When you add variables to an object, any instance of the object
-                put on the scene or created during the game will have these
-                variables attached to it.
-              </Trans>
-            }
-            title={<Trans>Object Variables</Trans>}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() => {
-              const variablesEditedObject = this.state.variablesEditedObject;
               return variablesEditedObject
                 ? EventsRootVariablesFinder.findAllObjectVariables(
                     project.getCurrentPlatform(),
@@ -1432,7 +1409,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         <I18n>
           {({ i18n }) => (
             <React.Fragment>
-              <InfoBar
+              <DismissableInfoBar
                 show={this.state.showAdditionalWorkInfoBar}
                 identifier={this.state.additionalWorkInfoBar.identifier}
                 message={i18n._(this.state.additionalWorkInfoBar.message)}
@@ -1473,9 +1450,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                       this.editObjectByName(this.state.selectedObjectNames[0]),
                     visible: this.state.selectedObjectNames.length > 0,
                   },
+                  { type: 'separator' },
                   {
                     label: i18n._(t`Scene properties`),
                     click: () => this.openSceneProperties(true),
+                  },
+                  {
+                    label: i18n._(t`Open the scene events`),
+                    click: () => this.props.onOpenEvents(layout.getName()),
                   },
                   { type: 'separator' },
                   {

@@ -5,8 +5,7 @@
  * project is released under the MIT License.
  */
 
-#ifndef GDCORE_PLATFORMEXTENSION_H
-#define GDCORE_PLATFORMEXTENSION_H
+#pragma once
 #include <map>
 #include <memory>
 #include <vector>
@@ -16,6 +15,7 @@
 #include "GDCore/Extensions/Metadata/DependencyMetadata.h"
 #include "GDCore/Extensions/Metadata/EffectMetadata.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
+#include "GDCore/Extensions/Metadata/InstructionOrExpressionGroupMetadata.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"
@@ -71,6 +71,10 @@ class GD_CORE_API CompilationInfo {
   int sizeOfpInt;
 };
 
+struct GD_CORE_API DuplicatedInstructionOptions {
+  bool unscoped;
+};
+
 /**
  * \brief Base class for implementing platform's extensions.
  *
@@ -106,9 +110,17 @@ class GD_CORE_API PlatformExtension {
   }
 
   /**
+   * \brief Set the category of the extension.
+   */
+  PlatformExtension& SetCategory(const gd::String& category_) {
+    category = category_;
+    return *this;
+  }
+
+  /**
    * \brief Set the path to the help, relative to the GDevelop documentation
    * root. For example, "/all-features/collisions" for
-   * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
+   * "https://wiki.gdevelop.io/gdevelop5/all-features/collisions".
    *
    * The instructions, objects and behaviors will have this help path set by
    * default, unless you call SetHelpPath on them.
@@ -296,7 +308,8 @@ class GD_CORE_API PlatformExtension {
    */
   gd::InstructionMetadata& AddDuplicatedCondition(
       const gd::String& newConditionName,
-      const gd::String& copiedConditionName);
+      const gd::String& copiedConditionName,
+      gd::DuplicatedInstructionOptions options = {.unscoped = false});
   /**
    * \brief Create a new expression which is the duplicate of the specified one.
    *
@@ -325,6 +338,15 @@ class GD_CORE_API PlatformExtension {
   };
 
   /**
+   * \brief Add some metadata (icon, etc...) for a group used for instructions
+   * or expressions.
+   */
+  InstructionOrExpressionGroupMetadata& AddInstructionOrExpressionGroupMetadata(
+      const gd::String& name) {
+    return instructionOrExpressionGroupMetadata[name];
+  }
+
+  /**
    * \brief Delete all instructions having no function name or custom code
    * generator.
    */
@@ -345,6 +367,11 @@ class GD_CORE_API PlatformExtension {
    * \brief Return the name of the extension
    */
   const gd::String& GetName() const { return name; }
+
+  /**
+   * \brief Return the category of the extension
+   */
+  const gd::String& GetCategory() const { return category; }
 
   /**
    * \brief Return a description of the extension
@@ -560,6 +587,15 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::PropertyDescriptor>& GetAllProperties() {
     return extensionPropertiesMetadata;
   }
+
+  /**
+   * \brief Get the metadata (icon, etc...) for groups used for instructions
+   * or expressions.
+   */
+  const std::map<gd::String, InstructionOrExpressionGroupMetadata>&
+  GetAllInstructionOrExpressionGroupMetadata() const {
+    return instructionOrExpressionGroupMetadata;
+  }
   ///@}
 
   /**
@@ -588,6 +624,7 @@ class GD_CORE_API PlatformExtension {
                   ///< actions/conditions/expressions/objects/behavior/event.
   gd::String fullname;      ///< Name displayed to users in the editor.
   gd::String informations;  ///< Description displayed to users in the editor.
+  gd::String category;
   gd::String author;        ///< Author displayed to users in the editor.
   gd::String license;       ///< License name displayed to users in the editor.
   bool deprecated;  ///< true if the extension is deprecated and shouldn't be
@@ -607,6 +644,8 @@ class GD_CORE_API PlatformExtension {
   std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;
+  std::map<gd::String, InstructionOrExpressionGroupMetadata>
+      instructionOrExpressionGroupMetadata;
 
   ObjectMetadata badObjectMetadata;
   BehaviorMetadata badBehaviorMetadata;
@@ -639,5 +678,3 @@ class GD_CORE_API PlatformExtension {
   compilationInfo.informationCompleted = true;
 
 #include "GDCore/Extensions/PlatformExtension.inl"
-
-#endif  // GDCORE_PLATFORMEXTENSION_H

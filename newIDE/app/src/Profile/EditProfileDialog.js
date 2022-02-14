@@ -18,6 +18,7 @@ import {
   usernameFormatError,
 } from './UsernameField';
 import TextField from '../UI/TextField';
+import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   profile: Profile,
@@ -45,12 +46,21 @@ export default class EditDialog extends Component<Props, State> {
     form: {
       username: this.props.profile.username || '',
       description: this.props.profile.description || '',
+      getGameStatsEmail: !!this.props.profile.getGameStatsEmail,
     },
   };
 
   _onEdit = () => {
+    if (!this._canEdit()) return;
+
     const { form } = this.state;
     this.props.onEdit(form);
+  };
+
+  _canEdit = () => {
+    return (
+      !this.props.editInProgress && isUsernameValid(this.state.form.username)
+    );
   };
 
   render() {
@@ -68,9 +78,7 @@ export default class EditDialog extends Component<Props, State> {
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onEdit}
-          disabled={
-            editInProgress || !isUsernameValid(this.state.form.username)
-          }
+          disabled={!this._canEdit()}
         />
       </LeftLoader>,
     ];
@@ -83,6 +91,7 @@ export default class EditDialog extends Component<Props, State> {
           if (!editInProgress) onClose();
         }}
         maxWidth="sm"
+        onApply={this._onEdit}
         cannotBeDismissed={true}
         open
       >
@@ -112,6 +121,18 @@ export default class EditDialog extends Component<Props, State> {
                 form: {
                   ...this.state.form,
                   description: value,
+                },
+              });
+            }}
+          />
+          <Checkbox
+            label={<Trans>I want to receive weekly stats about my games</Trans>}
+            checked={this.state.form.getGameStatsEmail}
+            onCheck={(e, value) => {
+              this.setState({
+                form: {
+                  ...this.state.form,
+                  getGameStatsEmail: value,
                 },
               });
             }}

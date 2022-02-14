@@ -35,6 +35,16 @@
       "hardenedRuntime": true,
       "entitlements": "./build/entitlements.mac.inherit.plist"
     },
+    "win": {
+      "executableName": "GDevelop"
+    },
+    "appx": {
+      "publisherDisplayName": "GDevelop game engine",
+      "displayName": "GDevelop",
+      "publisher": "CN=B13CB8D3-97AA-422C-A394-0EE51B9ACAD3",
+      "identityName": "GDevelopgameengine.GDevelop",
+      "backgroundColor": "#524F9C"
+    },
     "afterSign": "scripts/electron-builder-after-sign.js",
     "publish": [
       {
@@ -45,7 +55,7 @@
   "devDependencies": {
     "dotenv": "^8.2.0",
     "electron": "8.2.5",
-    "electron-builder": "22.8.0",
+    "electron-builder": "22.11.11",
     "electron-notarize": "^0.2.1",
     "minimist": "^1.2.3",
     "prettier": "1.15.3",

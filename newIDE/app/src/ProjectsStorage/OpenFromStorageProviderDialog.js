@@ -6,7 +6,6 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { type StorageProvider } from '.';
 import { List, ListItem } from '../UI/List';
-import RaisedButton from '../UI/RaisedButton';
 import optionalRequire from '../Utils/OptionalRequire';
 import BackgroundText from '../UI/BackgroundText';
 import { Column, Line } from '../UI/Grid';
@@ -16,14 +15,12 @@ type Props = {|
   storageProviders: Array<StorageProvider>,
   onChooseProvider: StorageProvider => void,
   onClose: () => void,
-  onCreateNewProject: () => void,
 |};
 
 const OpenFromStorageProviderDialog = ({
   onClose,
   storageProviders,
   onChooseProvider,
-  onCreateNewProject,
 }: Props) => {
   return (
     <I18n>
@@ -37,14 +34,6 @@ const OpenFromStorageProviderDialog = ({
               key="close"
               primary={false}
               onClick={onClose}
-            />,
-          ]}
-          secondaryActions={[
-            <RaisedButton
-              label={<Trans>Create a new project</Trans>}
-              key="create-new-project"
-              primary
-              onClick={onCreateNewProject}
             />,
           ]}
           cannotBeDismissed={false}

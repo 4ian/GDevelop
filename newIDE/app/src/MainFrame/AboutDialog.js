@@ -231,6 +231,11 @@ const contributors = [
     description: 'The GDevelop embassador in Brazil',
     link: 'https://twitter.com/ittaloxd',
   },
+  {
+    name: 'PANDAKO',
+    description: 'Translations in Japanese, extensions and blog',
+    link: 'https://gdevelop-jp.blogspot.com',
+  },
 ];
 
 export default class AboutDialog extends PureComponent<Props, State> {

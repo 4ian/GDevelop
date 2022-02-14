@@ -24,29 +24,52 @@ namespace gdjs {
       isCollidingAnyPlatform: false,
     };
 
-    // To achieve pixel-perfect precision when positioning object on platform or
-    // handling collision with "walls", edges of the hitboxes must be ignored during
-    // collision checks, so that two overlapping edges are not considered as colliding.
-    // For example, if a character is 10px width and is at position (0, 0), it must not be
-    // considered as colliding with a platform which is at position (10, 0). Edges will
-    // still be overlapping (because character hitbox right edge is at X position 10 and
-    // platform hitbox left edge is also at X position 10).
-    // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
+    // Behavior configuration
+
+    /** To achieve pixel-perfect precision when positioning object on platform or
+     * handling collision with "walls", edges of the hitboxes must be ignored during
+     * collision checks, so that two overlapping edges are not considered as colliding.
+     *
+     * For example, if a character is 10px width and is at position (0, 0), it must not be
+     * considered as colliding with a platform which is at position (10, 0). Edges will
+     * still be overlapping (because character hitbox right edge is at X position 10 and
+     * platform hitbox left edge is also at X position 10).
+     *
+     * This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
+     */
     _ignoreTouchingEdges: boolean = true;
-    _gravity: float;
-    _maxFallingSpeed: float;
-    _ladderClimbingSpeed: float;
+
     private _acceleration: float;
     private _deceleration: float;
     private _maxSpeed: float;
+    private _slopeMaxAngle: float;
+    _slopeClimbingFactor: float = 1;
+
+    _gravity: float;
+    _maxFallingSpeed: float;
     _jumpSpeed: float;
+    _jumpSustainTime: float;
+
+    _ladderClimbingSpeed: float;
+
     _canGrabPlatforms: boolean;
+    _canGrabWithoutMoving: boolean;
     private _yGrabOffset: any;
     private _xGrabTolerance: any;
-    _jumpSustainTime: float;
-    _currentFallSpeed: float = 0;
+
+    _useLegacyTrajectory: boolean = true;
+
+    _canGoDownFromJumpthru: boolean = false;
+
+    // Behavior state
+
     _currentSpeed: float = 0;
+    _requestedDeltaX: float = 0;
+    _requestedDeltaY: float = 0;
+    _lastDeltaY: float = 0;
+    _currentFallSpeed: float = 0;
     _canJump: boolean = false;
+    _lastDirectionIsLeft: boolean = false;
 
     private _ignoreDefaultControls: boolean;
     private _leftKey: boolean = false;
@@ -57,6 +80,18 @@ namespace gdjs {
     _jumpKey: boolean = false;
     _releasePlatformKey: boolean = false;
     _releaseLadderKey: boolean = false;
+
+    // This is useful for extensions that need to know
+    // which keys were pressed and doesn't know the mapping
+    // done by the scene events.
+    private _wasLeftKeyPressed: boolean = false;
+    private _wasRightKeyPressed: boolean = false;
+    private _wasLadderKeyPressed: boolean = false;
+    private _wasUpKeyPressed: boolean = false;
+    private _wasDownKeyPressed: boolean = false;
+    private _wasJumpKeyPressed: boolean = false;
+    private _wasReleasePlatformKeyPressed: boolean = false;
+    private _wasReleaseLadderKeyPressed: boolean = false;
 
     private _state: State;
     _falling: Falling;
@@ -69,17 +104,10 @@ namespace gdjs {
     _potentialCollidingObjects: Array<gdjs.PlatformRuntimeBehavior>;
 
     /** Overlapped jump-thru platforms, updated with `_updateOverlappedJumpThru`. */
-    private _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
+    _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
 
     private _hasReallyMoved: boolean = false;
     private _manager: gdjs.PlatformObjectsManager;
-
-    private _slopeMaxAngle: float;
-    _slopeClimbingFactor: float = 1;
-
-    _requestedDeltaX: float = 0;
-    _requestedDeltaY: float = 0;
-    _lastDeltaY: float = 0;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -95,15 +123,19 @@ namespace gdjs {
       this._maxSpeed = behaviorData.maxSpeed;
       this._jumpSpeed = behaviorData.jumpSpeed;
       this._canGrabPlatforms = behaviorData.canGrabPlatforms || false;
+      this._canGrabWithoutMoving = behaviorData.canGrabWithoutMoving;
       this._yGrabOffset = behaviorData.yGrabOffset || 0;
       this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
-      this._potentialCollidingObjects = [];
-
-      this._overlappedJumpThru = [];
+      this._useLegacyTrajectory = behaviorData.useLegacyTrajectory;
+      this._canGoDownFromJumpthru = behaviorData.canGoDownFromJumpthru;
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
+
+      this._potentialCollidingObjects = [];
+      this._overlappedJumpThru = [];
+
       this._manager = gdjs.PlatformObjectsManager.getManager(runtimeScene);
 
       this._falling = new Falling(this);
@@ -138,6 +170,12 @@ namespace gdjs {
       ) {
         this.setCanGrabPlatforms(newBehaviorData.canGrabPlatforms);
       }
+      if (
+        oldBehaviorData.canGrabWithoutMoving !==
+        newBehaviorData.canGrabWithoutMoving
+      ) {
+        this._canGrabWithoutMoving = newBehaviorData.canGrabWithoutMoving;
+      }
       if (oldBehaviorData.yGrabOffset !== newBehaviorData.yGrabOffset) {
         this._yGrabOffset = newBehaviorData.yGrabOffset;
       }
@@ -146,6 +184,18 @@ namespace gdjs {
       }
       if (oldBehaviorData.jumpSustainTime !== newBehaviorData.jumpSustainTime) {
         this.setJumpSustainTime(newBehaviorData.jumpSustainTime);
+      }
+      if (
+        oldBehaviorData.useLegacyTrajectory !==
+        newBehaviorData.useLegacyTrajectory
+      ) {
+        this._useLegacyTrajectory = newBehaviorData.useLegacyTrajectory;
+      }
+      if (
+        oldBehaviorData.canGoDownFromJumpthru !==
+        newBehaviorData.canGoDownFromJumpthru
+      ) {
+        this._canGoDownFromJumpthru = newBehaviorData.canGoDownFromJumpthru;
       }
       return true;
     }
@@ -197,6 +247,10 @@ namespace gdjs {
 
       this._requestedDeltaX += this._updateSpeed(timeDelta);
 
+      if (this._leftKey !== this._rightKey) {
+        this._lastDirectionIsLeft = this._leftKey;
+      }
+
       //0.2) Track changes in object size
       this._state.beforeUpdatingObstacles(timeDelta);
       this._onFloor._oldHeight = object.getHeight();
@@ -235,15 +289,23 @@ namespace gdjs {
         this._checkTransitionOnFloorOrFalling();
       }
 
+      this._wasLeftKeyPressed = this._leftKey;
+      this._wasRightKeyPressed = this._rightKey;
+      this._wasLadderKeyPressed = this._ladderKey;
+      this._wasUpKeyPressed = this._upKey;
+      this._wasDownKeyPressed = this._downKey;
+      this._wasJumpKeyPressed = this._jumpKey;
+      this._wasReleasePlatformKeyPressed = this._releasePlatformKey;
+      this._wasReleaseLadderKeyPressed = this._releaseLadderKey;
       //4) Do not forget to reset pressed keys
       this._leftKey = false;
       this._rightKey = false;
       this._ladderKey = false;
-      this._releaseLadderKey = false;
       this._upKey = false;
       this._downKey = false;
-      this._releasePlatformKey = false;
       this._jumpKey = false;
+      this._releasePlatformKey = false;
+      this._releaseLadderKey = false;
 
       //5) Track the movement
       this._hasReallyMoved =
@@ -255,6 +317,7 @@ namespace gdjs {
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {}
 
     private _updateSpeed(timeDelta: float): float {
+      const previousSpeed = this._currentSpeed;
       //Change the speed according to the player's input.
       // @ts-ignore
       if (this._leftKey) {
@@ -284,7 +347,8 @@ namespace gdjs {
       if (this._currentSpeed < -this._maxSpeed) {
         this._currentSpeed = -this._maxSpeed;
       }
-      return this._currentSpeed * timeDelta;
+      // Use Verlet integration.
+      return ((this._currentSpeed + previousSpeed) * timeDelta) / 2;
     }
 
     /**
@@ -407,11 +471,12 @@ namespace gdjs {
 
     _setFalling() {
       this._state.leave();
+      const from = this._state;
       this._state = this._falling;
-      this._falling.enter();
+      this._falling.enter(from);
     }
 
-    _setOnFloor(collidingPlatform: PlatformRuntimeBehavior) {
+    _setOnFloor(collidingPlatform: gdjs.PlatformRuntimeBehavior) {
       this._state.leave();
       this._state = this._onFloor;
       this._onFloor.enter(collidingPlatform);
@@ -424,7 +489,9 @@ namespace gdjs {
       this._jumping.enter(from);
     }
 
-    private _setGrabbingPlatform(grabbedPlatform: PlatformRuntimeBehavior) {
+    private _setGrabbingPlatform(
+      grabbedPlatform: gdjs.PlatformRuntimeBehavior
+    ) {
       this._state.leave();
       this._state = this._grabbingPlatform;
       this._grabbingPlatform.enter(grabbedPlatform);
@@ -454,11 +521,12 @@ namespace gdjs {
       let oldX = object.getX();
       object.setX(
         object.getX() +
-          (this._requestedDeltaX > 0
-            ? this._xGrabTolerance
-            : -this._xGrabTolerance)
+          (this._requestedDeltaX < 0 ||
+          (this._requestedDeltaX === 0 && this._lastDirectionIsLeft)
+            ? -this._xGrabTolerance
+            : this._xGrabTolerance)
       );
-      const collidingPlatforms: PlatformRuntimeBehavior[] = gdjs.staticArray(
+      const collidingPlatforms: gdjs.PlatformRuntimeBehavior[] = gdjs.staticArray(
         PlatformerObjectRuntimeBehavior.prototype._checkGrabPlatform
       );
       collidingPlatforms.length = 0;
@@ -528,15 +596,18 @@ namespace gdjs {
     }
 
     _fall(timeDelta: float) {
+      const previousFallSpeed = this._currentFallSpeed;
       this._currentFallSpeed += this._gravity * timeDelta;
       if (this._currentFallSpeed > this._maxFallingSpeed) {
         this._currentFallSpeed = this._maxFallingSpeed;
       }
-      this._requestedDeltaY += this._currentFallSpeed * timeDelta;
-      this._requestedDeltaY = Math.min(
-        this._requestedDeltaY,
-        this._maxFallingSpeed * timeDelta
-      );
+      if (this._useLegacyTrajectory) {
+        this._requestedDeltaY += this._currentFallSpeed * timeDelta;
+      } else {
+        // Use Verlet integration.
+        this._requestedDeltaY +=
+          ((this._currentFallSpeed + previousFallSpeed) / 2) * timeDelta;
+      }
     }
 
     //Scene change is not supported
@@ -558,10 +629,13 @@ namespace gdjs {
       const y1 = this.owner.getY() + this._yGrabOffset - this._lastDeltaY;
       const y2 = this.owner.getY() + this._yGrabOffset;
       const platformY = platform.owner.getY() + platform.getYGrabOffset();
+      // This must be inclusive for at least one position.
+      // Otherwise, if the character is at the exact position,
+      // it could not be able to grab the platform at any frame.
       return (
         platform.canBeGrabbed() &&
-        ((y1 < platformY && platformY < y2) ||
-          (y2 < platformY && platformY < y1))
+        ((y1 < platformY && platformY <= y2) ||
+          (y2 <= platformY && platformY < y1))
       );
     }
 
@@ -770,7 +844,12 @@ namespace gdjs {
         return context;
       }
 
-      for (const hitbox of platformObject.getHitBoxes()) {
+      for (const hitbox of platformObject.getHitBoxesAround(
+        context.ownerMinX,
+        context.headMinY,
+        context.ownerMaxX,
+        context.floorMaxY
+      )) {
         if (hitbox.vertices.length < 3) {
           continue;
         }
@@ -960,8 +1039,10 @@ namespace gdjs {
      * Update _potentialCollidingObjects member with platforms near the object.
      */
     private _updatePotentialCollidingObjects(maxMovementLength: float) {
+      const object = this.owner;
+
       this._manager.getAllPlatformsAround(
-        this.owner,
+        object,
         maxMovementLength,
         this._potentialCollidingObjects
       );
@@ -970,7 +1051,7 @@ namespace gdjs {
       // is not considered as colliding with itself, in the case that it also has the
       // platform behavior.
       for (let i = 0; i < this._potentialCollidingObjects.length; ) {
-        if (this._potentialCollidingObjects[i].owner === this.owner) {
+        if (this._potentialCollidingObjects[i].owner === object) {
           this._potentialCollidingObjects.splice(i, 1);
         } else {
           i++;
@@ -1000,6 +1081,38 @@ namespace gdjs {
       } else if (input === 'Release Ladder') {
         this._releaseLadderKey = true;
       }
+    }
+
+    /**.
+     * @param input The control to be tested [Left,Right,Up,Down,Ladder,Jump,Release,Release Ladder].
+     * @returns true if the key was used since the last `doStepPreEvents` call.
+     */
+    isUsingControl(input: string): boolean {
+      if (input === 'Left') {
+        return this._wasLeftKeyPressed;
+      }
+      if (input === 'Right') {
+        return this._wasRightKeyPressed;
+      }
+      if (input === 'Up') {
+        return this._wasUpKeyPressed;
+      }
+      if (input === 'Down') {
+        return this._wasDownKeyPressed;
+      }
+      if (input === 'Ladder') {
+        return this._wasLadderKeyPressed;
+      }
+      if (input === 'Jump') {
+        return this._wasJumpKeyPressed;
+      }
+      if (input === 'Release') {
+        return this._wasReleasePlatformKeyPressed;
+      }
+      if (input === 'Release Ladder') {
+        return this._wasReleaseLadderKeyPressed;
+      }
+      return false;
     }
 
     /**
@@ -1083,6 +1196,18 @@ namespace gdjs {
     }
 
     /**
+     * Set the current speed of the Platformer Object.
+     * @param currentSpeed The current speed.
+     */
+    setCurrentSpeed(currentSpeed: float): void {
+      this._currentSpeed = gdjs.evtTools.common.clamp(
+        currentSpeed,
+        -this._maxSpeed,
+        this._maxSpeed
+      );
+    }
+
+    /**
      * Get the current jump speed of the Platformer Object.
      * @returns The current jump speed.
      */
@@ -1117,8 +1242,26 @@ namespace gdjs {
     /**
      * Set the maximum falling speed of the Platformer Object.
      * @param maxFallingSpeed The maximum falling speed.
+     * @param tryToPreserveAirSpeed If true and if jumping, tune the current jump speed to preserve the overall speed in the air.
      */
-    setMaxFallingSpeed(maxFallingSpeed: float): void {
+    setMaxFallingSpeed(
+      maxFallingSpeed: float,
+      tryToPreserveAirSpeed: boolean = false
+    ): void {
+      if (tryToPreserveAirSpeed && this._state === this._jumping) {
+        // If the falling speed is too high compared to the new max falling speed,
+        // reduce it and adapt the jump speed to preserve the overall vertical speed.
+        const fallingSpeedOverflow = this._currentFallSpeed - maxFallingSpeed;
+        if (fallingSpeedOverflow > 0) {
+          this._currentFallSpeed -= fallingSpeedOverflow;
+          this._jumping.setCurrentJumpSpeed(
+            Math.max(
+              0,
+              this._jumping.getCurrentJumpSpeed() - fallingSpeedOverflow
+            )
+          );
+        }
+      }
       this._maxFallingSpeed = maxFallingSpeed;
     }
 
@@ -1212,6 +1355,33 @@ namespace gdjs {
     setCanNotAirJump(): void {
       if (this._state === this._jumping || this._state === this._falling) {
         this._canJump = false;
+      }
+    }
+
+    /**
+     * Abort the current jump.
+     *
+     * When the character is not in the jumping state this method has no effect.
+     */
+    abortJump(): void {
+      if (this._state === this._jumping) {
+        this._currentFallSpeed = 0;
+        this._setFalling();
+      }
+    }
+
+    /**
+     * Set the current fall speed.
+     *
+     * When the character is not in the falling state this method has no effect.
+     */
+    setCurrentFallSpeed(currentFallSpeed: float) {
+      if (this._state === this._falling) {
+        this._currentFallSpeed = gdjs.evtTools.common.clamp(
+          currentFallSpeed,
+          0,
+          this._maxFallingSpeed
+        );
       }
     }
 
@@ -1420,7 +1590,7 @@ namespace gdjs {
    */
   class OnFloor implements State {
     private _behavior: PlatformerObjectRuntimeBehavior;
-    private _floorPlatform: PlatformRuntimeBehavior | null = null;
+    private _floorPlatform: gdjs.PlatformRuntimeBehavior | null = null;
     private _floorLastX: float = 0;
     private _floorLastY: float = 0;
     _oldHeight: float = 0;
@@ -1433,7 +1603,7 @@ namespace gdjs {
       return this._floorPlatform;
     }
 
-    enter(floorPlatform: PlatformRuntimeBehavior) {
+    enter(floorPlatform: gdjs.PlatformRuntimeBehavior) {
       this._floorPlatform = floorPlatform;
       this.updateFloorPosition();
       this._behavior._canJump = true;
@@ -1490,13 +1660,21 @@ namespace gdjs {
 
     checkTransitionBeforeX() {
       const behavior = this._behavior;
-      //Check that the floor object still exists and is near the object.
+      // Check that the floor object still exists and is near the object.
       if (
         !behavior._isIn(
           behavior._potentialCollidingObjects,
           this._floorPlatform!.owner.id
         )
       ) {
+        behavior._setFalling();
+      } else if (
+        this._behavior._downKey &&
+        this._floorPlatform!._platformType ===
+          gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
+        behavior._canGoDownFromJumpthru
+      ) {
+        behavior._overlappedJumpThru.push(this._floorPlatform!);
         behavior._setFalling();
       }
     }
@@ -1687,8 +1865,17 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter() {
-      this._behavior._canJump = false;
+    enter(from: State) {
+      // Only forbid jumping when starting to fall from a platform,
+      // not when falling during a jump. This is because the Jumping
+      // state has already set `_canJump` to false and we don't want to reset
+      // it again because it could have been set back to `true` to allow
+      // for an "air jump".
+      // Transition from Falling to Falling state should not happen,
+      // but don't change anything if this ever happen.
+      if (from !== this._behavior._jumping && from !== this) {
+        this._behavior._canJump = false;
+      }
     }
 
     leave() {}
@@ -1701,13 +1888,16 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
+      // Jumping
       behavior._checkTransitionJumping();
 
-      //Grabbing a platform
-      if (behavior._canGrabPlatforms && behavior._requestedDeltaX !== 0) {
+      // Grabbing a platform
+      if (
+        behavior._canGrabPlatforms &&
+        (behavior._requestedDeltaX !== 0 || behavior._canGrabWithoutMoving)
+      ) {
         behavior._checkGrabPlatform();
       }
     }
@@ -1741,6 +1931,10 @@ namespace gdjs {
       return this._currentJumpSpeed;
     }
 
+    setCurrentJumpSpeed(currentJumpSpeed: number) {
+      this._currentJumpSpeed = currentJumpSpeed;
+    }
+
     enter(from: State) {
       const behavior = this._behavior;
       this._timeSinceCurrentJumpStart = 0;
@@ -1767,15 +1961,15 @@ namespace gdjs {
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
+      // Jumping
       behavior._checkTransitionJumping();
 
-      //Grabbing a platform
+      // Grabbing a platform
       if (
         behavior._canGrabPlatforms &&
-        behavior._requestedDeltaX !== 0 &&
+        (behavior._requestedDeltaX !== 0 || behavior._canGrabWithoutMoving) &&
         behavior._lastDeltaY >= 0
       ) {
         behavior._checkGrabPlatform();
@@ -1785,20 +1979,14 @@ namespace gdjs {
     beforeMovingY(timeDelta: float, oldX: float) {
       const behavior = this._behavior;
 
-      //Fall
-      if (!this._jumpingFirstDelta) {
-        behavior._fall(timeDelta);
-      }
-      this._jumpingFirstDelta = false;
-
       // Check if the jump key is continuously held since
       // the beginning of the jump.
       if (!behavior._jumpKey) {
         this._jumpKeyHeldSinceJumpStart = false;
       }
       this._timeSinceCurrentJumpStart += timeDelta;
-      behavior._requestedDeltaY -= this._currentJumpSpeed * timeDelta;
 
+      const previousJumpSpeed = this._currentJumpSpeed;
       // Decrease jump speed after the (optional) jump sustain time is over.
       const sustainJumpSpeed =
         this._jumpKeyHeldSinceJumpStart &&
@@ -1806,6 +1994,27 @@ namespace gdjs {
       if (!sustainJumpSpeed) {
         this._currentJumpSpeed -= behavior._gravity * timeDelta;
       }
+
+      if (this._behavior._useLegacyTrajectory) {
+        behavior._requestedDeltaY -= previousJumpSpeed * timeDelta;
+
+        // Fall
+        // The condition is a legacy thing.
+        // There is no actual reason not to fall at 1st frame.
+        // Before a refactoring, it used to not be this obvious.
+        if (!this._jumpingFirstDelta) {
+          behavior._fall(timeDelta);
+        }
+      } else {
+        // Use Verlet integration.
+        behavior._requestedDeltaY +=
+          ((-previousJumpSpeed - this._currentJumpSpeed) / 2) * timeDelta;
+
+        // Fall
+        behavior._fall(timeDelta);
+      }
+      this._jumpingFirstDelta = false;
+
       if (this._currentJumpSpeed < 0) {
         behavior._setFalling();
       }
@@ -1829,7 +2038,7 @@ namespace gdjs {
       this._behavior = behavior;
     }
 
-    enter(grabbedPlatform: PlatformRuntimeBehavior) {
+    enter(grabbedPlatform: gdjs.PlatformRuntimeBehavior) {
       this._grabbedPlatform = grabbedPlatform;
       this._behavior._canJump = true;
       this._behavior._currentFallSpeed = 0;

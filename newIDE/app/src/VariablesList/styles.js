@@ -17,12 +17,6 @@ export default {
     flexShrink: 0,
   },
   indentIconColor: '#DDD', //TODO: Use theme color instead
-  emptyExplanation: {
-    justifyContent: 'flex-start',
-  },
-  emptyExplanationMessage: {
-    textAlign: 'left',
-  },
   fadedButton: {
     opacity: 0.7,
   },

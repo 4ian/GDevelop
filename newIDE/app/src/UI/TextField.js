@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import MUITextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { MarkdownText } from './MarkdownText';
 
@@ -80,6 +81,9 @@ type Props = {|
   multiline?: boolean,
   rows?: number,
   rowsMax?: number,
+
+  // Support for adornments:
+  endAdornment?: ?React.Node,
 
   // Styling:
   margin?: 'none' | 'dense',
@@ -249,6 +253,14 @@ export default class TextField extends React.Component<Props, {||}> {
                 min: props.min,
                 step: props.step,
               },
+              // Input adornment:
+              endAdornment: props.endAdornment ? (
+                <InputAdornment position="end">
+                  {props.endAdornment}
+                </InputAdornment>
+              ) : (
+                undefined
+              ),
             }}
             style={
               props.style

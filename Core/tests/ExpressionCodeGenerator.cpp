@@ -23,6 +23,14 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
   layout1.InsertNewObject(
       project, "MyExtension::Sprite", "MyOtherSpriteObject", 1);
+  layout1.InsertNewObject(project,
+                          "MyExtension::FakeObjectWithUnsupportedCapability",
+                          "MyFakeObjectWithUnsupportedCapability",
+                          2);
+  auto &group = layout1.GetObjectGroups().InsertNew("AllObjects");
+  group.AddObject("MySpriteObject");
+  group.AddObject("MyOtherSpriteObject");
+  group.AddObject("MyFakeObjectWithUnsupportedCapability");
 
   gd::ExpressionParser2 parser(platform, project, layout1);
 
@@ -281,6 +289,51 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(1, \"2\")");
+    }
+  }
+  SECTION("Invalid function calls (capabilities)") {
+    {
+      // Capability is supported, so the expression is valid.
+      auto node = parser.ParseExpression(
+          "string",
+          "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(
+          expressionCodeGenerator.GetOutput() ==
+          "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
+    }
+    {
+      // Capability is not supported, so the expression is not even valid.
+      auto node =
+          parser.ParseExpression("string",
+                                 "MyFakeObjectWithUnsupportedCapability."
+                                 "GetSomethingRequiringEffectCapability(123)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "\"\"");
+    }
+    {
+      // We use a group, capability is supported only by one object of the
+      // group. The expression itself is valid, but code generation should skip
+      // the objects with unsupported capability.
+      auto node = parser.ParseExpression(
+          "string", "AllObjects.GetSomethingRequiringEffectCapability(123)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(
+          expressionCodeGenerator.GetOutput() ==
+          "MyOtherSpriteObject.getSomethingRequiringEffectCapability(123) ?? "
+          "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
     }
   }
   SECTION("Invalid variables") {

@@ -25,11 +25,14 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
           "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/tiled_sprite");
 
-  gd::ObjectMetadata& obj = extension.AddObject<TiledSpriteObject>(
-      "TiledSprite",
-      _("Tiled Sprite"),
-      _("Displays an image repeated over an area."),
-      "CppPlatform/Extensions/TiledSpriteIcon.png");
+  gd::ObjectMetadata& obj =
+      extension
+          .AddObject<TiledSpriteObject>(
+              "TiledSprite",
+              _("Tiled Sprite"),
+              _("Displays an image repeated over an area."),
+              "CppPlatform/Extensions/TiledSpriteIcon.png")
+          .SetCategoryFullName(_("General"));
 
 #if defined(GD_IDE_ONLY)
   obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
@@ -82,7 +85,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("Width"),
                 _("Modify the width of a Tiled Sprite."),
                 _("the width"),
-                _("Size and angle"),
+                _("Size"),
                 "res/actions/scaleWidth24.png",
                 "res/actions/scaleWidth.png")
 
@@ -96,7 +99,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    _("Width"),
                    _("Test the width of a Tiled Sprite."),
                    _("the width"),
-                   _("Size and angle"),
+                   _("Size"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
       .AddParameter("object", _("Object"), "TiledSprite")
@@ -109,7 +112,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                 _("Height"),
                 _("Modify the height of a Tiled Sprite."),
                 _("the height"),
-                _("Size and angle"),
+                _("Size"),
                 "res/actions/scaleHeight24.png",
                 "res/actions/scaleHeight.png")
 
@@ -123,7 +126,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
                    _("Height"),
                    _("Test the height of a Tiled Sprite."),
                    _("the height"),
-                   _("Size and angle"),
+                   _("Size"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
       .AddParameter("object", _("Object"), "TiledSprite")
@@ -132,34 +135,31 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetHeight")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
+  // Deprecated: now available for all objects.
   obj.AddAction("Angle",
                 _("Angle"),
                 _("Modify the angle of a Tiled Sprite."),
                 _("the angle"),
-                _("Size and angle"),
+                _("Size"),
                 "res/actions/rotate24.png",
                 "res/actions/rotate.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
-      .MarkAsAdvanced()
-      .SetFunctionName("SetAngle")
-      .SetGetter("GetAngle")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetHidden();
 
+  // Deprecated: now available for all objects.
   obj.AddCondition("Angle",
                    "Angle",
                    "Test the angle of a Tiled Sprite.",
                    "the angle",
-                   _("Size and angle"),
+                   _("Size"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
-      .SetHidden()  // Now available for all objects
-      .SetFunctionName("GetAngle")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetHidden();
 
   obj.AddAction(
          "XOffset",
@@ -196,8 +196,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          _("Modify the offset used on the Y axis when displaying the image."),
          _("the Y offset"),
          _("Image offset"),
-         "res/conditions/scaleWidth24.png",
-         "res/conditions/scaleWidth.png")
+         "res/conditions/scaleHeight24.png",
+         "res/conditions/scaleHeight.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
@@ -211,8 +211,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
          _("Test the offset used on the Y axis when displaying the image."),
          _("the Y offset"),
          _("Image offset"),
-         "res/conditions/scaleWidth24.png",
-         "res/conditions/scaleWidth.png")
+         "res/conditions/scaleHeight24.png",
+         "res/conditions/scaleHeight.png")
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()

@@ -8,6 +8,6 @@ type Props = {|
   color: 'error' | 'primary' | 'secondary' | 'default',
 |};
 
-export default function Badge(props: Props) {
-  return <MuiBadge {...props} />;
-}
+const Badge = (props: Props) => <MuiBadge {...props} />;
+
+export default Badge;

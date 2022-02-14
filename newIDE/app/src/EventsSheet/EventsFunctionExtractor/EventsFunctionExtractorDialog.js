@@ -91,6 +91,31 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     if (eventsFunction) eventsFunction.delete();
   }
 
+  _getFunctionGroupNames = (): Array<string> => {
+    const { createNewExtension, extensionName } = this.state;
+    if (createNewExtension || !extensionName) {
+      return [];
+    }
+    const groupNames = new Set<string>();
+    const { project } = this.props;
+    const eventsFunctionsExtension = project.getEventsFunctionsExtension(
+      extensionName
+    );
+    for (
+      let index = 0;
+      index < eventsFunctionsExtension.getEventsFunctionsCount();
+      index++
+    ) {
+      const groupName = eventsFunctionsExtension
+        .getEventsFunctionAt(index)
+        .getGroup();
+      if (groupName) {
+        groupNames.add(groupName);
+      }
+    }
+    return [...groupNames].sort((a, b) => a.localeCompare(b));
+  };
+
   render() {
     const { project, onClose, onCreate } = this.props;
     const { eventsFunction, extensionName, createNewExtension } = this.state;
@@ -113,9 +138,12 @@ export default class EventsFunctionExtractorDialog extends React.Component<
       <Dialog
         onApply={onApply}
         title={<Trans>Extract the events in a function</Trans>}
-        secondaryActions={
-          <HelpButton helpPagePath="/events/functions/extract-events" />
-        }
+        secondaryActions={[
+          <HelpButton
+            helpPagePath="/events/functions/extract-events"
+            key="help"
+          />,
+        ]}
         actions={[
           <FlatButton
             key="cancel"
@@ -265,6 +293,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               this.forceUpdate();
             }}
             freezeEventsFunctionType
+            getFunctionGroupNames={this._getFunctionGroupNames}
           />
           <Spacer />
           <EventsFunctionParametersEditor

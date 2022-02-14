@@ -35,6 +35,7 @@ import {
   ResourceFetcherContext,
 } from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
+import { TutorialStateProvider } from '../Tutorial/TutorialContext';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -79,7 +80,7 @@ export default class Providers extends React.Component<Props, {||}> {
                   language: values.language,
                 });
                 return (
-                  <GDI18nProvider language={values.language}>
+                  <GDI18nProvider language={values.language.replace('_', '-')}>
                     <GDevelopThemeContext.Provider value={theme.gdevelopTheme}>
                       <StylesProvider jss={jss}>
                         <ThemeProvider theme={theme.muiTheme}>
@@ -107,11 +108,13 @@ export default class Providers extends React.Component<Props, {||}> {
                                           <ExampleStoreStateProvider>
                                             <ExtensionStoreStateProvider>
                                               <GamesShowcaseStateProvider>
-                                                <ResourceFetcherContext.Provider
-                                                  value={resourceFetcher}
-                                                >
-                                                  {children({ i18n })}
-                                                </ResourceFetcherContext.Provider>
+                                                <TutorialStateProvider>
+                                                  <ResourceFetcherContext.Provider
+                                                    value={resourceFetcher}
+                                                  >
+                                                    {children({ i18n })}
+                                                  </ResourceFetcherContext.Provider>
+                                                </TutorialStateProvider>
                                               </GamesShowcaseStateProvider>
                                             </ExtensionStoreStateProvider>
                                           </ExampleStoreStateProvider>

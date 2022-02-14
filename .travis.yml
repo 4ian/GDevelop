@@ -17,10 +17,6 @@ cache:
   directories:
     - $HOME/.npm
 
-env:
-  global:
-    - GCC_VERSION="4.8"
-
 services:
   # Virtual Framebuffer 'fake' X server for SFML
   - xvfb
@@ -40,7 +36,6 @@ addons:
     # Build dependencies:
     - cmake
     - p7zip-full
-    - g++-4.8
     # SFML dependencies:
     - libopenal-dev
     - libjpeg-dev
@@ -60,8 +55,8 @@ before_install:
   - sudo dpkg --force-all -i libstdc++6
 
 install:
-#Get the correct version of gcc/g++
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
+# Ensure we use a recent version of Node.js (and npm).
+  - nvm install v16 && nvm use v16
 #Compile the tests only for GDCore
   - mkdir .build-tests
   - cd .build-tests
@@ -70,21 +65,17 @@ install:
   - cd ..
 # Install Emscripten (for GDevelop.js)
   - git clone https://github.com/juj/emsdk.git
-  - cd emsdk
-  - ./emsdk install 1.39.6
-  - ./emsdk activate 1.39.6
-  - source ./emsdk_env.sh
-  - cd ..
-# Install GDevelop.js dependencies and compile it
-  - cd GDevelop.js
-  - npm install -g grunt-cli
-  - npm install
-  - npm run build
-  - cd ..
-#Install newIDE tests dependencies
+  - cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+# Install GDevelop.js dependencies
+  - cd GDevelop.js && npm install && cd ..
+# Build GDevelop.js
+# (in a subshell to avoid Emscripten polluting the Node.js and npm version for the rest of the build)
+  - (set -e; cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && cd ..)
+# Install newIDE tests dependencies
+  - npm -v
   - cd newIDE/app && npm install
   - cd ../..
-#Install GDJS tests dependencies
+# Install GDJS tests dependencies
   - cd GDJS && npm install && cd tests && npm install
   - cd ../..
 

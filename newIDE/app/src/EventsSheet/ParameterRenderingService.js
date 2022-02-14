@@ -41,6 +41,7 @@ import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import JsonResourceField from './ParameterFields/JsonResourceField';
 import BitmapFontResourceField from './ParameterFields/BitmapFontResourceField';
+import FontResourceField from './ParameterFields/FontResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
 import ForceMultiplierField, {
   renderInlineForceMultiplier,
@@ -52,6 +53,7 @@ import ObjectEffectNameField from './ParameterFields/ObjectEffectNameField';
 import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParameterNameField';
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
+import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 const gd: libGDevelop = global.gd;
 
@@ -78,6 +80,7 @@ const components = {
   videoResource: VideoResourceField,
   jsonResource: JsonResourceField,
   bitmapFontResource: BitmapFontResourceField,
+  fontResource: FontResourceField,
   color: ColorExpressionField,
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
@@ -89,6 +92,7 @@ const components = {
   objectEffectParameterName: ObjectEffectParameterNameField,
   objectPointName: ObjectPointNameField,
   objectAnimationName: ObjectAnimationNameField,
+  functionParameterName: FunctionParameterNameField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -124,6 +128,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   soundfile: t`Audio resource`,
   videoResource: t`Video resource`,
   bitmapFontResource: t`Bitmap font resource`,
+  fontResource: t`Font resource`,
   jsonResource: t`JSON resource`,
   color: t`Color`,
   forceMultiplier: t`Instant or permanent force`,
@@ -134,6 +139,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectEffectParameterName: t`Object effect parameter name`,
   objectPointName: t`Object point name`,
   objectAnimationName: t`Object animation name`,
+  functionParameterName: t`Parameter name`,
 };
 
 export default {

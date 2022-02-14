@@ -105,7 +105,6 @@ export default class LayerRenderer {
 
       const pixiObject = renderedInstance.getPixiObject();
       if (pixiObject) pixiObject.zOrder = instance.getZOrder();
-      if (pixiObject) pixiObject.interactive = !instance.isLocked();
 
       // "Culling" improves rendering performance of large levels
       const isVisible = this._isInstanceVisible(instance);

@@ -5,16 +5,17 @@ import Window from './Utils/Window';
 import ExportDialog from './Export/ExportDialog';
 import CreateProjectDialog from './ProjectCreation/CreateProjectDialog';
 import Authentication from './Utils/GDevelopServices/Authentication';
-import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
+import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for browser only IDE
-import BrowserExamples from './ProjectCreation/BrowserExamples';
-import BrowserStarters from './ProjectCreation/BrowserStarters';
-import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
-import { getBrowserExporters } from './Export/BrowserExporters';
+import {
+  browserAutomatedExporters,
+  browserManualExporters,
+  browserOnlineWebExporter,
+} from './Export/BrowserExporters';
 import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
@@ -27,6 +28,7 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
+import { onCreateFromExampleShortHeader, onCreateBlank } from './ProjectCreation/services/BrowserCreation';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -68,20 +70,25 @@ export const create = (authentication: Authentication) => {
               )}
               renderExportDialog={props => (
                 <ExportDialog
-                  {...props}
-                  exporters={getBrowserExporters()}
+                  project={props.project}
+                  onChangeSubscription={props.onChangeSubscription}
+                  onClose={props.onClose}
+                  automatedExporters={browserAutomatedExporters}
+                  manualExporters={browserManualExporters}
+                  onlineWebExporter={browserOnlineWebExporter}
                   allExportersRequireOnline
                 />
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog
                   {...props}
-                  examplesComponent={BrowserExamples}
-                  startersComponent={BrowserStarters}
+                  onCreateBlank={onCreateBlank}
+                  onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
                 />
               )}
-              introDialog={<BrowserIntroDialog />}
               storageProviders={storageProviders}
+              onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+              onCreateBlank={onCreateBlank}
               getStorageProviderOperations={getStorageProviderOperations}
               getStorageProvider={getStorageProvider}
               resourceSources={browserResourceSources}

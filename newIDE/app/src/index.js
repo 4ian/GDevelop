@@ -9,7 +9,7 @@ import {
 } from './Utils/Analytics/EventSender';
 import { installRaven } from './Utils/Analytics/Raven';
 import { register } from './serviceWorker';
-import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
+import './UI/icomoon-font.css'; // Styles for Icomoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { loadScript } from './Utils/LoadScript.js';
 import { showErrorBox } from './UI/Messages/MessageBox';

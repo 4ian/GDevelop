@@ -38,6 +38,7 @@ NetworkExtension::NetworkExtension() {
       "gdjs.evtTools.network.variableStructureToJSON");
   GetAllStrExpressions()["ObjectVarToJSON"].SetFunctionName(
       "gdjs.evtTools.network.objectVariableStructureToJSON");
+  GetAllActions()["LaunchFile"].SetFunctionName("gdjs.evtTools.window.openURL");
 
   GetAllVariableExpressions()["FromJSON"].SetFunctionName(
       "new gdjs.Variable().fromJSON");

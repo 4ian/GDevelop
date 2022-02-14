@@ -80,6 +80,8 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/A_firebasejs/*.js',
@@ -93,6 +95,9 @@ module.exports = function (config) {
       // Other test initialization files:
       './tests-utils/init.js',
       './tests-utils/init.pixiruntimegamewithassets.js',
+
+      // Test helpers
+      '../../Extensions/PlatformBehavior/tests/PlatformerTestHelper.js',
 
       // Assets
       {

@@ -20,6 +20,7 @@ import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader'
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { ResponsiveLineStackLayout, ColumnStackLayout } from '../../UI/Layout';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const gd: libGDevelop = global.gd;
 
@@ -27,20 +28,13 @@ type Props = {|
   eventsFunction: gdEventsFunction,
   eventsBasedBehavior: ?gdEventsBasedBehavior,
   helpPagePath?: string,
-  onConfigurationUpdated?: () => void,
+  onConfigurationUpdated?: (whatChanged?: 'type') => void,
   renderConfigurationHeader?: () => React.Node,
   freezeEventsFunctionType?: boolean,
+  getFunctionGroupNames?: () => string[],
 |};
 
 type State = {||};
-
-const styles = {
-  icon: {
-    height: 32,
-    marginRight: 8,
-    flexSrink: 0,
-  },
-};
 
 const getSentenceErrorText = (
   i18n: I18nType,
@@ -115,6 +109,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       helpPagePath,
       renderConfigurationHeader,
       eventsBasedBehavior,
+      getFunctionGroupNames,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
@@ -169,7 +164,6 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             {renderConfigurationHeader ? renderConfigurationHeader() : null}
             <ResponsiveLineStackLayout alignItems="center" noMargin>
               <Line alignItems="center" noMargin>
-                <img src="res/function32.png" alt="" style={styles.icon} />
                 <SelectField
                   value={type}
                   floatingLabelText={<Trans>Function type</Trans>}
@@ -178,7 +172,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   onChange={(e, i, value: string) => {
                     // $FlowFixMe
                     eventsFunction.setFunctionType(value);
-                    if (onConfigurationUpdated) onConfigurationUpdated();
+                    if (onConfigurationUpdated) onConfigurationUpdated('type');
                     this.forceUpdate();
                   }}
                 >
@@ -213,6 +207,28 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 fullWidth
               />
             </ResponsiveLineStackLayout>
+            <Line noMargin>
+              <SemiControlledAutoComplete
+                floatingLabelText={<Trans>Group name</Trans>}
+                hintText={t`Leave it empty to use the default group for this extension.`}
+                fullWidth
+                value={eventsFunction.getGroup()}
+                onChange={text => {
+                  eventsFunction.setGroup(text);
+                  if (onConfigurationUpdated) onConfigurationUpdated();
+                  this.forceUpdate();
+                }}
+                dataSource={
+                  getFunctionGroupNames
+                    ? getFunctionGroupNames().map(name => ({
+                        text: name,
+                        value: name,
+                      }))
+                    : []
+                }
+                openOnFocus={true}
+              />
+            </Line>
             <Line noMargin>
               <SemiControlledTextField
                 commitOnBlur

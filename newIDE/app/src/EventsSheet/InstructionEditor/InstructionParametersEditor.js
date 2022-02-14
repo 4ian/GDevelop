@@ -19,10 +19,7 @@ import { Column, Line, Spacer } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import Window from '../../Utils/Window';
-import {
-  getExtraInstructionInformation,
-  getInstructionTutorialHints,
-} from '../../Hints';
+import { getExtraInstructionInformation } from '../../Hints';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from '@material-ui/icons/OpenInNew';
@@ -34,6 +31,7 @@ import { getInstructionMetadata } from './NewInstructionEditor';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 import ScrollView from '../../UI/ScrollView';
+import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -50,7 +48,7 @@ const styles = {
     width: 24,
     height: 24,
     marginRight: 8,
-    paddingTop: 12,
+    paddingTop: 6,
     flexShrink: 0,
   },
   invertToggle: {
@@ -222,7 +220,7 @@ export default class InstructionParametersEditor extends React.Component<
     const instructionExtraInformation = getExtraInstructionInformation(
       instructionType
     );
-    const tutorialHints = getInstructionTutorialHints(instructionType);
+    const tutorialIds = getInstructionTutorialIds(instructionType);
     const objectParameterIndex = objectName
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
@@ -276,13 +274,13 @@ export default class InstructionParametersEditor extends React.Component<
                   )}
                 </Line>
               )}
-              {tutorialHints.length ? (
+              {tutorialIds.length ? (
                 <Line>
                   <ColumnStackLayout expand>
-                    {tutorialHints.map(tutorialHint => (
+                    {tutorialIds.map(tutorialId => (
                       <DismissableTutorialMessage
-                        key={tutorialHint.identifier}
-                        tutorialHint={tutorialHint}
+                        key={tutorialId}
+                        tutorialId={tutorialId}
                       />
                     ))}
                   </ColumnStackLayout>

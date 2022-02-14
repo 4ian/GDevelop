@@ -149,10 +149,10 @@ namespace gdjs {
     }
 
     /**
-     * Get the light obstacles manager if objects with the behavior exist, null otherwise.
-     * @returns gdjs.LightObstaclesManager if it exists, otherwise null.
+     * Get the light obstacles manager.
+     * @returns the light obstacles manager.
      */
-    getObstaclesManager(): gdjs.LightObstaclesManager | null {
+    getObstaclesManager(): gdjs.LightObstaclesManager {
       return this._obstaclesManager;
     }
 

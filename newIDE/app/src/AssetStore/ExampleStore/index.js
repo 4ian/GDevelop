@@ -1,18 +1,17 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
-import SearchBar from '../../UI/SearchBar';
+import SearchBar, {
+  type SearchBarInterface,
+  useShouldAutofocusSearchbar,
+} from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
-import Background from '../../UI/Background';
-import ScrollView from '../../UI/ScrollView';
 import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
-import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ExampleStoreContext } from './ExampleStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
-import Subheader from '../../UI/Subheader';
 import { ExampleDialog } from './ExampleDialog';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   searchBar: {
@@ -24,12 +23,13 @@ const styles = {
 type Props = {|
   isOpening: boolean,
   onOpen: ExampleShortHeader => Promise<void>,
+  focusOnMount?: boolean,
 |};
 
 const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
   exampleShortHeader.name;
 
-export const ExampleStore = ({ isOpening, onOpen }: Props) => {
+export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
   const [
     selectedExampleShortHeader,
     setSelectedExampleShortHeader,
@@ -44,12 +44,42 @@ export const ExampleStore = ({ isOpening, onOpen }: Props) => {
     setSearchText,
   } = React.useContext(ExampleStoreContext);
 
+  const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
+  const searchBarRef = React.useRef<?SearchBarInterface>(null);
+
   React.useEffect(
     () => {
       fetchExamplesAndFilters();
     },
     [fetchExamplesAndFilters]
   );
+
+  React.useEffect(
+    () => {
+      if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
+        searchBarRef.current.focus();
+    },
+    [shouldAutofocusSearchbar, focusOnMount]
+  );
+
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: filtersState.chosenFilters,
+    }),
+    [filtersState]
+  );
+
+  const getExampleMatches = (
+    exampleShortHeader: ExampleShortHeader
+  ): SearchMatch[] => {
+    if (!searchResults) return [];
+    const exampleMatches = searchResults.find(
+      result => result.item.id === exampleShortHeader.id
+    );
+    return exampleMatches ? exampleMatches.matches : [];
+  };
 
   return (
     <React.Fragment>
@@ -61,6 +91,9 @@ export const ExampleStore = ({ isOpening, onOpen }: Props) => {
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
+              tagsHandler={tagsHandler}
+              tags={filters && filters.defaultTags}
+              ref={searchBarRef}
             />
             <Line
               expand
@@ -68,32 +101,19 @@ export const ExampleStore = ({ isOpening, onOpen }: Props) => {
                 'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
               }
             >
-              <Background
-                noFullHeight
-                noExpand
-                width={windowWidth === 'small' ? 150 : 250}
-              >
-                <ScrollView>
-                  <Subheader>
-                    <Trans>Filters</Trans>
-                  </Subheader>
-                  <FiltersChooser
-                    allFilters={filters}
-                    filtersState={filtersState}
-                    error={error}
-                  />
-                </ScrollView>
-              </Background>
               <ListSearchResults
                 onRetry={fetchExamplesAndFilters}
                 error={error}
-                searchItems={searchResults}
+                searchItems={
+                  searchResults && searchResults.map(({ item }) => item)
+                }
                 getSearchItemUniqueId={getExampleName}
                 renderSearchItem={(exampleShortHeader, onHeightComputed) => (
                   <ExampleListItem
                     isOpening={isOpening}
                     onHeightComputed={onHeightComputed}
                     exampleShortHeader={exampleShortHeader}
+                    matches={getExampleMatches(exampleShortHeader)}
                     onChoose={() => {
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}

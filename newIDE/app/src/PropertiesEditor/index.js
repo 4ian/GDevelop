@@ -31,6 +31,7 @@ import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
 import { Line } from '../UI/Grid';
+import Text from '../UI/Text';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -100,14 +101,14 @@ export type Field =
   | {|
       name: string,
       type: 'row' | 'column',
+      title?: ?string,
       children: Array<Object>,
     |};
 
 // The schema is the tree of all fields.
 export type Schema = Array<Field>;
 
-// Mandatory props in any case when using the component
-type MandatoryProps = {|
+type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
@@ -117,19 +118,13 @@ type MandatoryProps = {|
   // (see getExtraDescription).
   renderExtraDescriptionText?: (extraDescription: string) => string,
   unsavedChanges?: ?UnsavedChanges,
-|};
 
-type Props =
-  // Mandatory props in all cases:
-  | MandatoryProps
-  // Props to be used when you want to display resources:
-  | {|
-      ...MandatoryProps,
-      project: gdProject,
-      resourceSources: Array<ResourceSource>,
-      onChooseResource: ChooseResourceFunction,
-      resourceExternalEditors: Array<ResourceExternalEditor>,
-    |};
+  // Optional context:
+  project?: ?gdProject,
+  resourceSources?: ?Array<ResourceSource>,
+  onChooseResource?: ?ChooseResourceFunction,
+  resourceExternalEditors?: ?Array<ResourceExternalEditor>,
+|};
 
 const styles = {
   columnContainer: {
@@ -296,9 +291,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           fullWidth
           color={getFieldValue(this.props.instances, field)}
           onChange={color => {
-            this.props.instances.forEach(i =>
-              setValue(i, rgbOrHexToRGBString(color))
-            );
+            const rgbString =
+              color.length === 0 ? '' : rgbOrHexToRGBString(color);
+            this.props.instances.forEach(i => setValue(i, rgbString));
             this._onInstancesModified(this.props.instances);
           }}
         />
@@ -444,11 +439,16 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
   };
 
   _renderResourceField = (field: ResourceField) => {
-    if (!this.props.project) {
+    if (
+      !this.props.project ||
+      !this.props.resourceSources ||
+      !this.props.onChooseResource ||
+      !this.props.resourceExternalEditors
+    ) {
       console.error(
-        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, etc...)'
+        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, onChooseResource, resourceExternalEditors).'
       );
-      return;
+      return null;
     }
 
     const { setValue } = field;
@@ -498,10 +498,14 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       this.props.schema.map(field => {
         if (field.children) {
           if (field.type === 'row') {
-            return (
+            const contentView = (
               <UnsavedChangesContext.Consumer key={field.name}>
                 {unsavedChanges => (
                   <PropertiesEditor
+                    project={this.props.project}
+                    resourceSources={this.props.resourceSources}
+                    onChooseResource={this.props.onChooseResource}
+                    resourceExternalEditors={this.props.resourceExternalEditors}
                     schema={field.children}
                     instances={this.props.instances}
                     mode="row"
@@ -511,6 +515,15 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                 )}
               </UnsavedChangesContext.Consumer>
             );
+            if (field.title) {
+              return [
+                <Text key={field.name + '-title'} size="title">
+                  {field.title}
+                </Text>,
+                contentView,
+              ];
+            }
+            return contentView;
           }
 
           return (
@@ -520,6 +533,12 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                 <UnsavedChangesContext.Consumer key={field.name}>
                   {unsavedChanges => (
                     <PropertiesEditor
+                      project={this.props.project}
+                      resourceSources={this.props.resourceSources}
+                      onChooseResource={this.props.onChooseResource}
+                      resourceExternalEditors={
+                        this.props.resourceExternalEditors
+                      }
                       schema={field.children}
                       instances={this.props.instances}
                       mode="column"

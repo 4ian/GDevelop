@@ -20,7 +20,7 @@ type MainMenuEvent =
   | 'main-menu-export'
   | 'main-menu-create'
   | 'main-menu-open-project-manager'
-  | 'main-menu-open-start-page'
+  | 'main-menu-open-home-page'
   | 'main-menu-open-debugger'
   | 'main-menu-open-about'
   | 'main-menu-open-preferences'
@@ -193,8 +193,8 @@ const buildAndSendMenuTemplate = (
         enabled: !!project,
       },
       {
-        label: i18n._(t`Show Start Page`),
-        onClickSendEvent: 'main-menu-open-start-page',
+        label: i18n._(t`Show Home`),
+        onClickSendEvent: 'main-menu-open-home-page',
       },
       {
         label: i18n._(t`Open Debugger`),
@@ -347,7 +347,7 @@ const ElectronMainMenu = (props: MainMenuProps) => {
     'main-menu-open-project-manager',
     props.onOpenProjectManager
   );
-  useIPCEventListener('main-menu-open-start-page', props.onOpenStartPage);
+  useIPCEventListener('main-menu-open-home-page', props.onOpenHomePage);
   useIPCEventListener('main-menu-open-debugger', props.onOpenDebugger);
   useIPCEventListener('main-menu-open-about', props.onOpenAbout);
   useIPCEventListener('main-menu-open-preferences', props.onOpenPreferences);

@@ -105,6 +105,13 @@ export default ({
                 checkedIcon={<Visibility />}
                 uncheckedIcon={<VisibilityOff />}
                 onCheck={(e, value) => onChangeVisibility(value)}
+                tooltipOrHelperText={
+                  isVisible ? (
+                    <Trans>Hide layer</Trans>
+                  ) : (
+                    <Trans>Show layer</Trans>
+                  )
+                }
               />
               <IconButton
                 size="small"

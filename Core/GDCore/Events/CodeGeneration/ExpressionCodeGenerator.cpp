@@ -231,14 +231,20 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
     const ObjectMetadata& objInfo = MetadataProvider::GetObjectMetadata(
         codeGenerator.GetPlatform(), objectType);
 
-    codeGenerator.AddIncludeFiles(objInfo.includeFiles);
-    functionOutput = codeGenerator.GenerateObjectFunctionCall(
-        realObjects[i],
-        objInfo,
-        expressionMetadata.codeExtraInformation,
-        parametersCode,
-        functionOutput,
-        context);
+    if (objInfo.IsUnsupportedBaseObjectCapability(
+            expressionMetadata.GetRequiredBaseObjectCapability())) {
+      // Do nothing, skipping objects not supporting the capability required by
+      // this expression.
+    } else {
+      codeGenerator.AddIncludeFiles(objInfo.includeFiles);
+      functionOutput = codeGenerator.GenerateObjectFunctionCall(
+          realObjects[i],
+          objInfo,
+          expressionMetadata.codeExtraInformation,
+          parametersCode,
+          functionOutput,
+          context);
+    }
   }
 
   return functionOutput;

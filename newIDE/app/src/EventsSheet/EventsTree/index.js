@@ -308,6 +308,16 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     this.forceEventsUpdate();
   }
 
+  foldAll() {
+    gd.EventsListUnfolder.foldAll(this.props.events);
+    this.forceEventsUpdate();
+  }
+
+  unfoldToLevel(level: number) {
+    gd.EventsListUnfolder.unfoldToLevel(this.props.events, level);
+    this.forceEventsUpdate();
+  }
+
   _getEventRow(searchedEvent: gdBaseEvent) {
     // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(

@@ -40,6 +40,92 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
 
+  GetAllConditions()["Toujours"].SetFunctionName(
+      "gdjs.evtTools.common.logicalNegation");
+  GetAllConditions()["BuiltinCommonInstructions::Always"].SetFunctionName(
+      "gdjs.evtTools.common.logicalNegation");
+
+  GetAllConditions()["Egal"].codeExtraInformation.SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String value1Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String value2Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[2].GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val";
+
+        if (instruction.GetParameters()[1].GetPlainString() == "=" ||
+            instruction.GetParameters()[1].GetPlainString().empty())
+          return resultingBoolean + " = (" + value1Code + " == " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == ">")
+          return resultingBoolean + " = (" + value1Code + " > " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "<")
+          return resultingBoolean + " = (" + value1Code + " < " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "<=")
+          return resultingBoolean + " = (" + value1Code + " <= " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == ">=")
+          return resultingBoolean + " = (" + value1Code + " >= " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
+          return resultingBoolean + " = (" + value1Code + " != " + value2Code +
+                 ");\n";
+
+        return gd::String("");
+      });
+  GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"].codeExtraInformation =
+    GetAllConditions()["Egal"].codeExtraInformation;
+
+  GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String value1Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String value2Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[2].GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val";
+
+        if (instruction.GetParameters()[1].GetPlainString() == "=")
+          return resultingBoolean + " = (" + value1Code + " == " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
+          return resultingBoolean + " = (" + value1Code + " != " + value2Code +
+                 ");\n";
+
+        return gd::String("");
+      });
+  GetAllConditions()["BuiltinCommonInstructions::CompareStrings"].codeExtraInformation =
+    GetAllConditions()["StrEqual"].codeExtraInformation;
+
   GetAllEvents()["BuiltinCommonInstructions::Link"]
       .SetCodeGenerator([](gd::BaseEvent& event_,
                            gd::EventsCodeGenerator& codeGenerator,
@@ -278,7 +364,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               outputCode +=
                   codeGenerator.GenerateBooleanFullName(
                       "condition" + gd::String::From(i) + "IsTrue", context) +
-                  ".val = true;\n";
+                  ".val = false;\n";
             }
 
             for (unsigned int cId = 0; cId < conditions.size(); ++cId) {

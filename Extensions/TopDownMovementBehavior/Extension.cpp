@@ -26,7 +26,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       "TopDownMovementBehavior",
       _("Top-down movement (4 or 8 directions)"),
       "TopDownMovement",
-      _("Objects with this behavior can be moved left, up, right, and "
+      _("Move objects left, up, right, and "
         "down (and, optionally, diagonally)."),
       "",
       "CppPlatform/Extensions/topdownmovementicon.png",

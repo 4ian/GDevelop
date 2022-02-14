@@ -18,18 +18,25 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 
+namespace {
+gd::String NormalizePathSeparator(const gd::String& path) {
+  gd::String normalizedPath = path;
+  while (normalizedPath.find('\\') != gd::String::npos)
+    normalizedPath.replace(normalizedPath.find('\\'), 1, "/");
+
+  return normalizedPath;
+}
+}  // namespace
+
 namespace gd {
 
 gd::String Resource::badStr;
 
 Resource ResourcesManager::badResource;
 gd::String ResourcesManager::badResourceName;
-#if defined(GD_IDE_ONLY)
 ResourceFolder ResourcesManager::badFolder;
 Resource ResourceFolder::badResource;
-#endif
 
-#if defined(GD_IDE_ONLY)
 void ResourceFolder::Init(const ResourceFolder& other) {
   name = other.name;
 
@@ -38,19 +45,16 @@ void ResourceFolder::Init(const ResourceFolder& other) {
     resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
   }
 }
-#endif
 
 void ResourcesManager::Init(const ResourcesManager& other) {
   resources.clear();
   for (std::size_t i = 0; i < other.resources.size(); ++i) {
     resources.push_back(std::shared_ptr<Resource>(other.resources[i]->Clone()));
   }
-#if defined(GD_IDE_ONLY)
   folders.clear();
   for (std::size_t i = 0; i < other.folders.size(); ++i) {
     folders.push_back(other.folders[i]);
   }
-#endif
 }
 
 Resource& ResourcesManager::GetResource(const gd::String& name) {
@@ -132,22 +136,22 @@ std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
 }
 
 std::vector<gd::String> ResourcesManager::FindFilesNotInResources(
-    const std::vector<gd::String>& filesToCheck) const {
-  std::unordered_set<gd::String> resourceFiles;
-  for (const auto& resource: resources) {
-    resourceFiles.insert(resource->GetFile());
+    const std::vector<gd::String>& filePathsToCheck) const {
+  std::unordered_set<gd::String> resourceFilePaths;
+  for (const auto& resource : resources) {
+    resourceFilePaths.insert(NormalizePathSeparator(resource->GetFile()));
   }
 
-  std::vector<gd::String> filesNotInResources;
-  for(const gd::String& file: filesToCheck) {
-    if (resourceFiles.find(file) == resourceFiles.end())
-      filesNotInResources.push_back(file);
+  std::vector<gd::String> filePathsNotInResources;
+  for (const gd::String& file : filePathsToCheck) {
+    gd::String normalizedPath = NormalizePathSeparator(file);
+    if (resourceFilePaths.find(normalizedPath) == resourceFilePaths.end())
+      filePathsNotInResources.push_back(file);
   }
 
-  return filesNotInResources;
+  return filePathsNotInResources;
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
@@ -443,9 +447,7 @@ void ResourcesManager::RemoveResource(const gd::String& name) {
   for (std::size_t i = 0; i < folders.size(); ++i)
     folders[i].RemoveResource(name);
 }
-#endif
 
-#if defined(GD_IDE_ONLY)
 void ResourceFolder::UnserializeFrom(const SerializerElement& element,
                                      gd::ResourcesManager& parentManager) {
   name = element.GetStringAttribute("name");
@@ -470,7 +472,6 @@ void ResourceFolder::SerializeTo(SerializerElement& element) const {
         .SetAttribute("name", resources[i]->GetName());
   }
 }
-#endif
 
 void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
   resources.clear();
@@ -500,7 +501,6 @@ void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
     resources.push_back(resource);
   }
 
-#if defined(GD_IDE_ONLY)
   folders.clear();
   const SerializerElement& resourcesFoldersElement =
       element.GetChild("resourceFolders", 0, "ResourceFolders");
@@ -511,10 +511,8 @@ void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
 
     folders.push_back(folder);
   }
-#endif
 }
 
-#if defined(GD_IDE_ONLY)
 void ResourcesManager::SerializeTo(SerializerElement& element) const {
   SerializerElement& resourcesElement = element.AddChild("resources");
   resourcesElement.ConsiderAsArrayOf("resource");
@@ -543,14 +541,9 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < folders.size(); ++i)
     folders[i].SerializeTo(resourcesFoldersElement.AddChild("folder"));
 }
-#endif
 
 void ImageResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void ImageResource::UnserializeFrom(const SerializerElement& element) {
@@ -560,21 +553,15 @@ void ImageResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void ImageResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("alwaysLoaded", alwaysLoaded);
   element.SetAttribute("smoothed", smooth);
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
 void AudioResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void AudioResource::UnserializeFrom(const SerializerElement& element) {
@@ -584,21 +571,15 @@ void AudioResource::UnserializeFrom(const SerializerElement& element) {
   SetPreloadAsSound(element.GetBoolAttribute("preloadAsSound"));
 }
 
-#if defined(GD_IDE_ONLY)
 void AudioResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
   element.SetAttribute("preloadAsMusic", PreloadAsMusic());
   element.SetAttribute("preloadAsSound", PreloadAsSound());
 }
-#endif
 
 void FontResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void FontResource::UnserializeFrom(const SerializerElement& element) {
@@ -606,19 +587,13 @@ void FontResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void FontResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
 void VideoResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void VideoResource::UnserializeFrom(const SerializerElement& element) {
@@ -626,19 +601,13 @@ void VideoResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void VideoResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
 void JsonResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void JsonResource::UnserializeFrom(const SerializerElement& element) {
@@ -647,7 +616,6 @@ void JsonResource::UnserializeFrom(const SerializerElement& element) {
   DisablePreload(element.GetBoolAttribute("disablePreload", false));
 }
 
-#if defined(GD_IDE_ONLY)
 void JsonResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
@@ -672,14 +640,8 @@ bool JsonResource::UpdateProperty(const gd::String& name,
   return true;
 }
 
-#endif
-
 void BitmapFontResource::SetFile(const gd::String& newFile) {
-  file = newFile;
-
-  // Convert all backslash to slashs.
-  while (file.find('\\') != gd::String::npos)
-    file.replace(file.find('\\'), 1, "/");
+  file = NormalizePathSeparator(newFile);
 }
 
 void BitmapFontResource::UnserializeFrom(const SerializerElement& element) {
@@ -687,14 +649,11 @@ void BitmapFontResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
 }
 
-#if defined(GD_IDE_ONLY)
 void BitmapFontResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute("file", GetFile());
 }
-#endif
 
-#if defined(GD_IDE_ONLY)
 ResourceFolder::ResourceFolder(const ResourceFolder& other) { Init(other); }
 
 ResourceFolder& ResourceFolder::operator=(const ResourceFolder& other) {
@@ -702,7 +661,6 @@ ResourceFolder& ResourceFolder::operator=(const ResourceFolder& other) {
 
   return *this;
 }
-#endif
 
 ResourcesManager::ResourcesManager(const ResourcesManager& other) {
   Init(other);

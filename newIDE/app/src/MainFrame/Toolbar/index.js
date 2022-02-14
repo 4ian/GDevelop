@@ -1,14 +1,16 @@
 // @flow
 import { t } from '@lingui/macro';
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import { Toolbar, ToolbarGroup } from '../../UI/Toolbar';
 import ToolbarIcon from '../../UI/ToolbarIcon';
 import ToolbarSeparator from '../../UI/ToolbarSeparator';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import Window from '../../Utils/Window';
-import PreviewButtons, { type PreviewButtonsProps } from './PreviewButtons';
+import PreviewAndPublishButtons, {
+  type PreviewAndPublishButtonsProps,
+} from './PreviewAndPublishButtons';
 
-type Props = {|
+export type MainFrameToolbarProps = {|
   showProjectIcons: boolean,
   hasProject: boolean,
   toggleProjectManager: () => void,
@@ -16,93 +18,75 @@ type Props = {|
   simulateUpdateDownloaded: ?() => void,
   simulateUpdateAvailable: ?() => void,
   exportProject: () => void,
-  ...PreviewButtonsProps,
+  ...PreviewAndPublishButtonsProps,
 |};
 
-type State = {|
-  editorToolbar: any,
+export type ToolbarInterface = {|
+  setEditorToolbar: any => void,
 |};
 
-export class MainFrameToolbar extends PureComponent<Props, State> {
-  state = {
-    editorToolbar: null,
-  };
+export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(
+  function MainframeToolbar(props: MainFrameToolbarProps, ref) {
+    const isDev = Window.isDev();
 
-  isDev = Window.isDev();
+    const [editorToolbar, setEditorToolbar] = React.useState<?any>(null);
+    React.useImperativeHandle(ref, () => ({
+      setEditorToolbar,
+    }));
 
-  setEditorToolbar(editorToolbar: any) {
-    this.setState({
-      editorToolbar,
-    });
-  }
-
-  render() {
     return (
       <Toolbar>
         <ToolbarGroup firstChild>
-          {this.props.showProjectIcons && (
+          {props.showProjectIcons && (
             <ToolbarIcon
-              onClick={this.props.toggleProjectManager}
+              onClick={props.toggleProjectManager}
               src="res/ribbon_default/projectManager32.png"
-              disabled={!this.props.hasProject}
+              disabled={!props.hasProject}
               tooltip={t`Project manager`}
             />
           )}
-          {this.props.showProjectIcons && (
-            <ToolbarIcon
-              onClick={this.props.exportProject}
-              src="res/ribbon_default/export32.png"
-              disabled={!this.props.hasProject}
-              tooltip={t`Export the game (Web, Android, iOS...)`}
-            />
-          )}
-          {this.isDev && (
+          {isDev && props.showProjectIcons && <ToolbarSeparator />}
+          {isDev && (
             <ElementWithMenu
               element={<ToolbarIcon src="res/ribbon_default/bug32.png" />}
               buildMenuTemplate={() => [
                 {
-                  label: 'Request update from external editor',
-                  disabled: !this.props.requestUpdate,
-                  click: () => {
-                    this.props.requestUpdate && this.props.requestUpdate();
-                  },
-                },
-                {
                   label: 'Simulate update downloaded',
-                  disabled: !this.props.simulateUpdateDownloaded,
+                  disabled: !props.simulateUpdateDownloaded,
                   click: () => {
-                    this.props.simulateUpdateDownloaded &&
-                      this.props.simulateUpdateDownloaded();
+                    props.simulateUpdateDownloaded &&
+                      props.simulateUpdateDownloaded();
                   },
                 },
                 {
                   label: 'Simulate update available',
-                  disabled: !this.props.simulateUpdateAvailable,
+                  disabled: !props.simulateUpdateAvailable,
                   click: () => {
-                    this.props.simulateUpdateAvailable &&
-                      this.props.simulateUpdateAvailable();
+                    props.simulateUpdateAvailable &&
+                      props.simulateUpdateAvailable();
                   },
                 },
               ]}
             />
           )}
-          <ToolbarSeparator />
-          <PreviewButtons
-            onPreviewWithoutHotReload={this.props.onPreviewWithoutHotReload}
-            onOpenDebugger={this.props.onOpenDebugger}
-            onNetworkPreview={this.props.onNetworkPreview}
-            onHotReloadPreview={this.props.onHotReloadPreview}
-            setPreviewOverride={this.props.setPreviewOverride}
-            canDoNetworkPreview={this.props.canDoNetworkPreview}
-            isPreviewEnabled={this.props.isPreviewEnabled}
-            previewState={this.props.previewState}
-            hasPreviewsRunning={this.props.hasPreviewsRunning}
+        </ToolbarGroup>
+        <ToolbarGroup>
+          <PreviewAndPublishButtons
+            onPreviewWithoutHotReload={props.onPreviewWithoutHotReload}
+            onOpenDebugger={props.onOpenDebugger}
+            onNetworkPreview={props.onNetworkPreview}
+            onHotReloadPreview={props.onHotReloadPreview}
+            setPreviewOverride={props.setPreviewOverride}
+            canDoNetworkPreview={props.canDoNetworkPreview}
+            isPreviewEnabled={props.isPreviewEnabled}
+            previewState={props.previewState}
+            hasPreviewsRunning={props.hasPreviewsRunning}
+            exportProject={props.exportProject}
+            hasProject={props.hasProject}
           />
         </ToolbarGroup>
-        {this.state.editorToolbar || <ToolbarGroup />}
+        {editorToolbar || <ToolbarGroup />}
       </Toolbar>
     );
   }
-}
-
-export default MainFrameToolbar;
+);

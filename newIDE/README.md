@@ -3,7 +3,7 @@
 This is the GDevelop 5 editor. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/).
 It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4ian/GDevelop.js) to work with GDevelop games.
 
-![GDevelop editor](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
+![GDevelop editor](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/GDevelop%20screenshot.png "GDevelop editor")
 
 ## 1) Installation 💻
 
@@ -101,7 +101,7 @@ Any text editor is fine, but it's a good idea to have one with _Prettier_ (code 
 
 ### Testing and developing with the cloud storage providers (Google Drive, Dropbox, OneDrive, etc...)
 
-Cloud storage providers are set up with development keys when you're running GDevelop in development mode. For these, to work, you must execute the web-app not from the traditional `http://localhost:3000` origin, but from `http://gdevelop-app-local:3000`:
+Cloud storage providers are set up with development keys when you're running GDevelop in development mode. For these, to work, you must execute the web-app not from the traditional `http://localhost:3000` origin, but from `http://gdevelop-app-local.com:3000`:
 
 -   Set up a [redirection in your hosts file](https://www.howtogeek.com/howto/27350/beginner-geek-how-to-edit-your-hosts-file/), that should look like: `127.0.0.1 gdevelop-app-local.com`.
 -   Launch then the web app from `http://gdevelop-app-local:3000`.

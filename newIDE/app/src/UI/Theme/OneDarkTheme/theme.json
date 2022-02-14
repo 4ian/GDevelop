@@ -71,6 +71,11 @@
         "color": {
           "value": "#D6DEEC"
         }
+      },
+      "highlighted": {
+        "background-color": {
+          "value": "rgb(214, 222, 236, 0.3)"
+        }
       }
     },
     "message": {

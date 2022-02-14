@@ -181,6 +181,40 @@ PlatformExtension::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  if (type != "number" && type != "string" && type != "boolean") {
+    gd::LogError(
+        "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
+        type + ". Verify this type is valid and supported.");
+  }
+
+  gd::String conditionDescriptionTemplate =
+      type == "boolean" ? _("Check if <subject>.") : _("Compare <subject>.");
+  auto& condition = AddCondition(name,
+                                 fullname,
+                                 conditionDescriptionTemplate.FindAndReplace(
+                                     "<subject>", descriptionSubject),
+                                 sentenceName,
+                                 group,
+                                 icon,
+                                 icon);
+
+  gd::String actionDescriptionTemplate = type == "boolean"
+                                             ? _("Set (or unset) if <subject>.")
+                                             : _("Change <subject>.");
+  auto& action = AddAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
+
+  if (type == "boolean") {
+    return MultipleInstructionMetadata::WithConditionAndAction(condition,
+                                                               action);
+  }
+
   gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
@@ -203,27 +237,6 @@ PlatformExtension::AddExpressionAndConditionAndAction(
                                       "<subject>", descriptionSubject),
                                   group,
                                   icon);
-
-  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
-  auto& condition = AddCondition(name,
-                                 fullname,
-                                 conditionDescriptionTemplate.FindAndReplace(
-                                     "<subject>", descriptionSubject),
-                                 sentenceName,
-                                 group,
-                                 icon,
-                                 icon);
-
-  // TODO: update the checks
-  gd::String actionDescriptionTemplate = _("Change <subject>.");
-  auto& action = AddAction(
-      "Set" + name,
-      fullname,
-      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
-      sentenceName,
-      group,
-      icon,
-      icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);
@@ -389,9 +402,13 @@ gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
 }
 
 gd::InstructionMetadata& PlatformExtension::AddDuplicatedCondition(
-    const gd::String& newConditionName, const gd::String& copiedConditionName) {
-  gd::String newNameWithNamespace = GetNameSpace() + newConditionName;
-  gd::String copiedNameWithNamespace = GetNameSpace() + copiedConditionName;
+    const gd::String& newConditionName,
+    const gd::String& copiedConditionName,
+    gd::DuplicatedInstructionOptions options) {
+  gd::String newNameWithNamespace =
+      (options.unscoped ? "" : GetNameSpace()) + newConditionName;
+  gd::String copiedNameWithNamespace =
+      (options.unscoped ? "" : GetNameSpace()) + copiedConditionName;
 
   auto copiedCondition = conditionsInfos.find(copiedNameWithNamespace);
   if (copiedCondition == conditionsInfos.end()) {
@@ -538,14 +555,6 @@ std::map<gd::String, gd::ExpressionMetadata>&
 PlatformExtension::GetAllStrExpressionsForBehavior(gd::String autoType) {
   if (behaviorsInfo.find(autoType) != behaviorsInfo.end())
     return behaviorsInfo.find(autoType)->second.strExpressionsInfos;
-
-  return badExpressionsMetadata;
-}
-
-std::map<gd::String, gd::ExpressionMetadata>&
-PlatformExtension::GetAllVariableExpressionsForBehavior(gd::String autoType) {
-  if (behaviorsInfo.find(autoType) != behaviorsInfo.end())
-    return behaviorsInfo.find(autoType)->second.variableExpressionsInfos;
 
   return badExpressionsMetadata;
 }
@@ -790,7 +799,8 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
   }
 }
 
-PlatformExtension::PlatformExtension() : deprecated(false) {}
+PlatformExtension::PlatformExtension()
+    : deprecated(false), category(_("General")) {}
 
 PlatformExtension::~PlatformExtension() {}
 

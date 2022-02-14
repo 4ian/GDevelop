@@ -1,18 +1,14 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import SearchBar from '../../UI/SearchBar';
-import { Column, Line } from '../../UI/Grid';
-import Background from '../../UI/Background';
-import ScrollView from '../../UI/ScrollView';
+import { Column } from '../../UI/Grid';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
-import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
-import Subheader from '../../UI/Subheader';
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 
 const styles = {
   searchBar: {
@@ -24,7 +20,7 @@ const styles = {
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<void>,
+  onInstall: ExtensionShortHeader => Promise<boolean>,
   showOnlyWithBehaviors: boolean,
 |};
 
@@ -60,11 +56,30 @@ export const ExtensionStore = ({
 
   const filteredSearchResults = searchResults
     ? searchResults.filter(
-        extensionShortHeader =>
+        ({ item: extensionShortHeader }) =>
           !showOnlyWithBehaviors ||
           extensionShortHeader.eventsBasedBehaviorsCount > 0
       )
     : null;
+
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: filtersState.chosenFilters,
+    }),
+    [filtersState]
+  );
+
+  const getExtensionsMatches = (
+    extensionShortHeader: ExtensionShortHeader
+  ): SearchMatch[] => {
+    if (!searchResults) return [];
+    const extensionMatches = searchResults.find(
+      result => result.item.name === extensionShortHeader.name
+    );
+    return extensionMatches ? extensionMatches.matches : [];
+  };
 
   return (
     <React.Fragment>
@@ -76,47 +91,30 @@ export const ExtensionStore = ({
               onChange={setSearchText}
               onRequestSearch={() => {}}
               style={styles.searchBar}
+              tagsHandler={tagsHandler}
+              tags={filters && filters.allTags}
             />
-            <Line
-              expand
-              overflow={
-                'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+            <ListSearchResults
+              onRetry={fetchExtensionsAndFilters}
+              error={error}
+              searchItems={
+                filteredSearchResults &&
+                filteredSearchResults.map(({ item }) => item)
               }
-            >
-              <Background
-                noFullHeight
-                noExpand
-                width={windowWidth === 'small' ? 150 : 250}
-              >
-                <ScrollView>
-                  <Subheader>
-                    <Trans>Filters</Trans>
-                  </Subheader>
-                  <FiltersChooser
-                    allFilters={filters}
-                    filtersState={filtersState}
-                    error={error}
-                  />
-                </ScrollView>
-              </Background>
-              <ListSearchResults
-                onRetry={fetchExtensionsAndFilters}
-                error={error}
-                searchItems={filteredSearchResults}
-                getSearchItemUniqueId={getExtensionName}
-                renderSearchItem={(extensionShortHeader, onHeightComputed) => (
-                  <ExtensionListItem
-                    key={extensionShortHeader.name}
-                    project={project}
-                    onHeightComputed={onHeightComputed}
-                    extensionShortHeader={extensionShortHeader}
-                    onChoose={() => {
-                      setSelectedExtensionShortHeader(extensionShortHeader);
-                    }}
-                  />
-                )}
-              />
-            </Line>
+              getSearchItemUniqueId={getExtensionName}
+              renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+                <ExtensionListItem
+                  key={extensionShortHeader.name}
+                  project={project}
+                  onHeightComputed={onHeightComputed}
+                  extensionShortHeader={extensionShortHeader}
+                  matches={getExtensionsMatches(extensionShortHeader)}
+                  onChoose={() => {
+                    setSelectedExtensionShortHeader(extensionShortHeader);
+                  }}
+                />
+              )}
+            />
           </Column>
         )}
       </ResponsiveWindowMeasurer>
@@ -127,8 +125,9 @@ export const ExtensionStore = ({
           alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
             selectedExtensionShortHeader.name
           )}
-          onInstall={() => {
-            onInstall(selectedExtensionShortHeader);
+          onInstall={async () => {
+            const wasInstalled = await onInstall(selectedExtensionShortHeader);
+            if (wasInstalled) setSelectedExtensionShortHeader(null);
           }}
           onClose={() => setSelectedExtensionShortHeader(null)}
         />

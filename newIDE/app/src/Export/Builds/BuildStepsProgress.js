@@ -9,11 +9,8 @@ import StepContent from '@material-ui/core/StepContent';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { Line, Spacer, Column } from '../../UI/Grid';
-import BuildProgress from './BuildProgress';
-import {
-  type Build,
-  type BuildArtifactKeyName,
-} from '../../Utils/GDevelopServices/Build';
+import BuildProgressAndActions from './BuildProgressAndActions';
+import { type Build } from '../../Utils/GDevelopServices/Build';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
@@ -25,6 +22,7 @@ const styles = {
 
 export type BuildStep =
   | ''
+  | 'register'
   | 'export'
   | 'resources-download'
   | 'compress'
@@ -35,7 +33,6 @@ export type BuildStep =
 
 type Props = {|
   exportStep: BuildStep,
-  onDownload: (key: BuildArtifactKeyName) => void,
   build: ?Build,
   stepMaxProgress: number,
   stepCurrentProgress: number,
@@ -50,17 +47,18 @@ type Props = {|
  */
 export default ({
   exportStep,
-  onDownload,
   build,
   stepMaxProgress,
   stepCurrentProgress,
   errored,
   hasBuildStep,
   showSeeAllMyBuildsExplanation,
-}: Props) => (
-  <Stepper
-    activeStep={
-      exportStep === 'export' || exportStep === 'resources-download'
+}: Props) => {
+  const getActiveStep = React.useCallback(
+    () =>
+      exportStep === 'register' ||
+      exportStep === 'export' ||
+      exportStep === 'resources-download'
         ? 0
         : exportStep === 'compress' || exportStep === 'upload'
         ? 1
@@ -70,128 +68,134 @@ export default ({
         ? hasBuildStep
           ? 2
           : 1
-        : -1
-    }
-    orientation="vertical"
-    style={styles.stepper}
-  >
-    <Step>
-      <StepLabel>
-        <Trans>Game export</Trans>
-      </StepLabel>
-      <StepContent>
-        {errored ? (
-          <AlertMessage kind="error">
-            <Trans>Can't properly export the game.</Trans>{' '}
-            <Trans>
-              Please check your internet connection or try again later.
-            </Trans>
-          </AlertMessage>
-        ) : exportStep === 'resources-download' ? (
-          <Column expand noMargin>
-            <Text>
-              <Trans>Downloading game resources...</Trans>
-            </Text>
-            <Line expand>
-              <LinearProgress
-                style={styles.linearProgress}
-                value={
-                  stepMaxProgress > 0
-                    ? (stepCurrentProgress / stepMaxProgress) * 100
-                    : 0
-                }
-                variant="determinate"
-              />
-            </Line>
-          </Column>
-        ) : (
-          <Column expand noMargin>
-            <Text>
-              <Trans>Export in progress...</Trans>
-            </Text>
-            <Line expand>
-              <LinearProgress style={styles.linearProgress} />
-            </Line>
-          </Column>
-        )}
-      </StepContent>
-    </Step>
-    {hasBuildStep && (
+        : -1,
+    [exportStep, hasBuildStep]
+  );
+
+  return (
+    <Stepper
+      activeStep={getActiveStep()}
+      orientation="vertical"
+      style={styles.stepper}
+    >
       <Step>
         <StepLabel>
-          <Trans>Upload to build service</Trans>
+          <Trans>Game export</Trans>
         </StepLabel>
         <StepContent>
           {errored ? (
             <AlertMessage kind="error">
-              <Trans>Can't upload your game to the build service.</Trans>{' '}
+              <Trans>Can't properly export the game.</Trans>{' '}
               <Trans>
                 Please check your internet connection or try again later.
               </Trans>
             </AlertMessage>
-          ) : exportStep === 'compress' ? (
-            <Line alignItems="center">
-              <CircularProgress size={20} />
-              <Spacer />
+          ) : exportStep === 'resources-download' ? (
+            <Column expand noMargin>
               <Text>
-                <Trans>Compressing before upload...</Trans>
+                <Trans>Downloading game resources...</Trans>
               </Text>
-            </Line>
+              <Line expand>
+                <LinearProgress
+                  style={styles.linearProgress}
+                  value={
+                    stepMaxProgress > 0
+                      ? (stepCurrentProgress / stepMaxProgress) * 100
+                      : 0
+                  }
+                  variant="determinate"
+                />
+              </Line>
+            </Column>
           ) : (
-            <Line alignItems="center" expand>
-              <LinearProgress
-                style={styles.linearProgress}
-                value={
-                  stepMaxProgress > 0
-                    ? (stepCurrentProgress / stepMaxProgress) * 100
-                    : 0
-                }
-                variant="determinate"
-              />
-            </Line>
+            <Column expand noMargin>
+              <Text>
+                <Trans>Export in progress...</Trans>
+              </Text>
+              <Line expand>
+                <LinearProgress style={styles.linearProgress} />
+              </Line>
+            </Column>
           )}
         </StepContent>
       </Step>
-    )}
-    {hasBuildStep && (
-      <Step>
-        <StepLabel>
-          <Trans>Build and download</Trans>
-        </StepLabel>
-        <StepContent>
-          {errored && (
-            <AlertMessage kind="error">
-              <Trans>
-                Build could not start or errored. Please check your internet
-                connection or try again later.
-              </Trans>
-            </AlertMessage>
-          )}
-          {!build && !errored && (
-            <Text>
-              <Trans>Build is starting...</Trans>
-            </Text>
-          )}
-          {build && <BuildProgress build={build} onDownload={onDownload} />}
-          {showSeeAllMyBuildsExplanation && (
-            <EmptyMessage>
-              <Trans>
-                If you close this window while the build is being done, you can
-                see its progress and download the game later by clicking on See
-                All My Builds below.
-              </Trans>
-            </EmptyMessage>
-          )}
-        </StepContent>
-      </Step>
-    )}
-    {!hasBuildStep && (
-      <Step>
-        <StepLabel>
-          <Trans>Done</Trans>
-        </StepLabel>
-        <StepContent />
-      </Step>
-    )}
-  </Stepper>
-);
+      {hasBuildStep && (
+        <Step>
+          <StepLabel>
+            <Trans>Upload to build service</Trans>
+          </StepLabel>
+          <StepContent>
+            {errored ? (
+              <AlertMessage kind="error">
+                <Trans>Can't upload your game to the build service.</Trans>{' '}
+                <Trans>
+                  Please check your internet connection or try again later.
+                </Trans>
+              </AlertMessage>
+            ) : exportStep === 'compress' ? (
+              <Line alignItems="center">
+                <CircularProgress size={20} />
+                <Spacer />
+                <Text>
+                  <Trans>Compressing before upload...</Trans>
+                </Text>
+              </Line>
+            ) : (
+              <Line alignItems="center" expand>
+                <LinearProgress
+                  style={styles.linearProgress}
+                  value={
+                    stepMaxProgress > 0
+                      ? (stepCurrentProgress / stepMaxProgress) * 100
+                      : 0
+                  }
+                  variant="determinate"
+                />
+              </Line>
+            )}
+          </StepContent>
+        </Step>
+      )}
+      {hasBuildStep && (
+        <Step>
+          <StepLabel>
+            <Trans>Build and download</Trans>
+          </StepLabel>
+          <StepContent>
+            {errored && (
+              <AlertMessage kind="error">
+                <Trans>
+                  Build could not start or errored. Please check your internet
+                  connection or try again later.
+                </Trans>
+              </AlertMessage>
+            )}
+            {!build && !errored && (
+              <Text>
+                <Trans>Build is starting...</Trans>
+              </Text>
+            )}
+            {build && <BuildProgressAndActions build={build} />}
+            {showSeeAllMyBuildsExplanation && (
+              <EmptyMessage>
+                <Trans>
+                  If you close this window while the build is being done, you
+                  can see its progress and download the game later by clicking
+                  on See All My Builds below.
+                </Trans>
+              </EmptyMessage>
+            )}
+          </StepContent>
+        </Step>
+      )}
+      {!hasBuildStep && (
+        <Step>
+          <StepLabel>
+            <Trans>Done</Trans>
+          </StepLabel>
+          <StepContent />
+        </Step>
+      )}
+    </Stepper>
+  );
+};

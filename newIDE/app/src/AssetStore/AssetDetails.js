@@ -118,6 +118,14 @@ export const AssetDetails = ({
     [loadAsset]
   );
 
+  const canAddAsset = canInstall && !isBeingInstalled && !!asset;
+  const onAddAsset = React.useCallback(
+    () => {
+      if (canAddAsset) onAdd();
+    },
+    [onAdd, canAddAsset]
+  );
+
   const assetAuthors: ?Array<Author> =
     asset && authors
       ? asset.authors
@@ -146,11 +154,12 @@ export const AssetDetails = ({
             primary
             icon={<Add />}
             label={<Trans>Add to the game</Trans>}
-            onClick={onAdd}
-            disabled={!canInstall || isBeingInstalled || !asset}
+            onClick={onAddAsset}
+            disabled={!canAddAsset}
           />
         </LeftLoader>,
       ]}
+      onApply={onAddAsset}
     >
       <Column expand noMargin>
         <ResponsiveLineStackLayout noMargin>

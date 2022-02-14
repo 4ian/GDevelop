@@ -5,6 +5,17 @@ export const GDevelopGamePreviews = {
   baseUrl: `https://game-previews.gdevelop-app.com/`,
 };
 
+export const GDevelopGamesPlatform = {
+  getInstantBuildUrl: (buildId: string) =>
+    isDev
+      ? `https://liluo.io/instant-builds/${buildId}?dev=true`
+      : `https://liluo.io/instant-builds/${buildId}`,
+  getGameUrl: (gameId: string) =>
+    isDev
+      ? `https://liluo.io/games/${gameId}?dev=true`
+      : `https://liluo.io/games/${gameId}`,
+};
+
 export const GDevelopBuildApi = {
   baseUrl: isDev
     ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'

@@ -667,7 +667,7 @@ int String::compare( const String &other ) const
 namespace priv
 {
     /**
-     * As the the casefolded version of a string can have a different size, the positions
+     * As the casefolded version of a string can have a different size, the positions
      * in the two versions of the string are not the same.
      * \return where the **pos** position in the original string **str** is in the
      * casefolded version of **str**
@@ -681,7 +681,7 @@ namespace priv
     }
 
     /**
-     * As the the casefolded version of a string can have a different size, the positions
+     * As the casefolded version of a string can have a different size, the positions
      * in the two versions of the string are not the same.
      * \return where the **pos** position in the casefolded string of **str** is in the
      * original version **str**

@@ -324,7 +324,10 @@ namespace gdjs {
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
       let directionInRad = 0;
       let directionInDeg = 0;
-      //Update the speed of the object
+      const previousVelocityX = this._xVelocity;
+      const previousVelocityY = this._yVelocity;
+
+      // Update the speed of the object:
       if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
@@ -344,52 +347,57 @@ namespace gdjs {
         this._yVelocity += norm * Math.sin(directionInRad);
 
         this._stickForce = 0;
-      } else {
+      } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
-        directionInDeg =
-          (Math.atan2(this._yVelocity, this._xVelocity) * 180.0) / Math.PI;
+        directionInDeg = (directionInRad * 180.0) / Math.PI;
         const xVelocityWasPositive = this._xVelocity >= 0;
         const yVelocityWasPositive = this._yVelocity >= 0;
         this._xVelocity -=
           this._deceleration * timeDelta * Math.cos(directionInRad);
         this._yVelocity -=
           this._deceleration * timeDelta * Math.sin(directionInRad);
-        // @ts-ignore
-        if ((this._xVelocity > 0) ^ xVelocityWasPositive) {
+        if (this._xVelocity > 0 !== xVelocityWasPositive) {
           this._xVelocity = 0;
         }
-        // @ts-ignore
-        if ((this._yVelocity > 0) ^ yVelocityWasPositive) {
+        if (this._yVelocity > 0 !== yVelocityWasPositive) {
           this._yVelocity = 0;
         }
       }
-      const speed = Math.sqrt(
-        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity
-      );
-      if (speed > this._maxSpeed) {
+      const squaredSpeed =
+        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
+      if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
         this._xVelocity = this._maxSpeed * Math.cos(directionInRad);
         this._yVelocity = this._maxSpeed * Math.sin(directionInRad);
       }
+
+      // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
 
-      //No acceleration for angular speed for now
-
-      //Position object
+      // Position object.
+      // This is a Verlet integration considering the acceleration as constant.
+      // If you expand deltaX or deltaY, it gives, thanks to the usage of both
+      // the old and the new velocity:
+      // "velocity * timeDelta + acceleration * timeDelta^2 / 2".
+      //
+      // The acceleration is not actually always constant, particularly with a gamepad,
+      // but the error is multiplied by timDelta^3. So, it shouldn't matter much.
+      const deltaX = ((previousVelocityX + this._xVelocity) / 2) * timeDelta;
+      const deltaY = ((previousVelocityY + this._yVelocity) / 2) * timeDelta;
       if (this._basisTransformation === null) {
         // Top-down viewpoint
-        object.setX(object.getX() + this._xVelocity * timeDelta);
-        object.setY(object.getY() + this._yVelocity * timeDelta);
+        object.setX(object.getX() + deltaX);
+        object.setY(object.getY() + deltaY);
       } else {
         // Isometry viewpoint
         const point = this._temporaryPointForTransformations;
-        point[0] = this._xVelocity * timeDelta;
-        point[1] = this._yVelocity * timeDelta;
+        point[0] = deltaX;
+        point[1] = deltaY;
         this._basisTransformation.toScreen(point, point);
         object.setX(object.getX() + point[0]);
         object.setY(object.getY() + point[1]);
       }
 
-      //Also update angle if needed
+      // Also update angle if needed.
       if (this._xVelocity !== 0 || this._yVelocity !== 0) {
         this._angle = directionInDeg;
         if (this._rotateObject) {

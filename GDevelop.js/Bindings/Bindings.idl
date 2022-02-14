@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorInt {
+    unsigned long size();
+    long at(unsigned long index);
+};
+
 interface VectorVariable {
     unsigned long size();
     [Const] Variable WRAPPED_at(unsigned long index);
@@ -130,6 +135,13 @@ interface EventsVariablesFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface InstructionOrExpressionGroupMetadata {
+    void InstructionOrExpressionGroupMetadata();
+
+    [Ref] InstructionOrExpressionGroupMetadata SetIcon([Const] DOMString icon);
+    [Const, Ref] DOMString GetIcon();
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();
@@ -148,6 +160,7 @@ interface Platform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -164,6 +177,7 @@ interface JsPlatform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -350,6 +364,8 @@ interface Project {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
     void SetVersion([Const] DOMString authorName);
     [Const, Ref] DOMString GetVersion();
     void SetAuthor([Const] DOMString authorName);
@@ -743,6 +759,8 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetLabel();
     [Ref] PropertyDescriptor SetDescription([Const] DOMString label);
     [Const, Ref] DOMString GetDescription();
+    [Ref] PropertyDescriptor SetGroup([Const] DOMString label);
+    [Const, Ref] DOMString GetGroup();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
@@ -1117,6 +1135,9 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
 
+    [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
+
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
     [Ref] InstructionMetadata MarkAsComplex();
@@ -1156,6 +1177,9 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+
+    [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
@@ -1259,6 +1283,9 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetCategoryFullName();
+
+    [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -1330,8 +1357,17 @@ interface ObjectMetadata {
                                         [Const] DOMString group,
                                         [Const] DOMString icon);
 
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
+
+    [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
+    [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
+    boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
 };
 
 interface BehaviorMetadata {
@@ -1426,6 +1462,11 @@ interface BehaviorMetadata {
         [Const] DOMString newExpressionName,
         [Const] DOMString copiedExpressionName);
 
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
 
@@ -1468,6 +1509,8 @@ interface PlatformExtension {
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
+    [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
@@ -1546,6 +1589,7 @@ interface PlatformExtension {
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
@@ -1868,6 +1912,8 @@ interface EventsRemover {
 
 interface EventsListUnfolder {
     void STATIC_UnfoldWhenContaining([Ref] EventsList list, [Const, Ref] BaseEvent eventToContain);
+    void STATIC_FoldAll([Ref] EventsList list);
+    void STATIC_UnfoldToLevel([Ref] EventsList list, [Const] unsigned long maxLevel, [Const] optional unsigned long currentLevel = 0);
 };
 
 interface EventsSearchResult {
@@ -2115,6 +2161,8 @@ interface EventsFunction {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsFunction SetSentence([Const] DOMString sentence);
     [Const, Ref] DOMString GetSentence();
+    [Ref] EventsFunction SetGroup([Const] DOMString group);
+    [Const, Ref] DOMString GetGroup();
     [Ref] EventsFunction SetPrivate(boolean isPrivate);
     boolean IsPrivate();
     [Ref] EventsFunction SetFunctionType(EventsFunction_FunctionType type);
@@ -2209,6 +2257,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsFunctionsExtension SetCategory([Const] DOMString category);
+    [Const, Ref] DOMString GetCategory();
     [Ref] VectorString GetTags();
     [Ref] VectorString GetAuthorIds();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
@@ -2219,6 +2269,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetIconUrl();
     [Ref] EventsFunctionsExtension SetHelpPath([Const] DOMString helpPath);
     [Const, Ref] DOMString GetHelpPath();
+    void SetOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetOriginName();
+    [Const, Ref] DOMString GetOriginIdentifier();
+
 
     [Ref] DependencyMetadata AddDependency();
     void RemoveDependencyAt(unsigned long index);
@@ -2278,6 +2332,15 @@ interface ArbitraryEventsWorker {
 interface EventsParametersLister {
     void EventsParametersLister([Ref] Project project);
     [Const, Ref] MapStringString GetParametersAndTypes();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsPositionFinder {
+    void EventsPositionFinder();
+    [Value] VectorInt GetPositions();
+    void AddEventToSearch(BaseEvent event);
 
     //Inherited from ArbitraryEventsWorker
     void Launch([Ref] EventsList events);

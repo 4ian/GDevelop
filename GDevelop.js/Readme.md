@@ -29,6 +29,8 @@ This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows
     npm run build
 ```
 
+> ⚠️ If the npm install fails, relaunch it in a different terminal using a recent Node.js and npm version (to avoid using the old npm version from Emscripten).
+
 > ℹ️ Output is created in _/path/to/GD/Binaries/embuild/GDevelop.js/_ and also copied to GDevelop 5 IDE (`newIDE` folder).
 
 -> ⏱ The linking (last step) of the build can be made a few seconds faster by specifying `-- --dev`. Be sure to remove it before building a release version, as this disable "link-time optimizations" of the generated WebAssembly module.

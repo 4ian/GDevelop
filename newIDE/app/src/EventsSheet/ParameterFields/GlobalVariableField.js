@@ -64,10 +64,17 @@ export default class GlobalVariableField extends React.Component<
             }}
             emptyExplanationMessage={
               <Trans>
-                Global variables are variables that are persisted across the
-                scenes during the game.
+                Global variables are variables that are shared amongst all the
+                scenes of the game.
               </Trans>
             }
+            emptyExplanationSecondMessage={
+              <Trans>
+                For example, you can have a variable called UnlockedLevelsCount
+                representing the number of levels unlocked by the player.
+              </Trans>
+            }
+            helpPagePath={'/all-features/variables/global-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}
           />
         )}

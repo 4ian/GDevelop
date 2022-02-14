@@ -35,6 +35,7 @@ type TabProps = {|
   label: React.Node,
   value: string,
   tabIndex?: string,
+  disabled?: boolean,
 |};
 
 /**

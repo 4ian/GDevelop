@@ -19,7 +19,7 @@ import Add from '@material-ui/icons/Add';
 import Search from '@material-ui/icons/Search';
 import { type MenuItemTemplate } from './Menu/Menu.flow';
 import { useLongTouch } from '../Utils/UseLongTouch';
-
+import { Collapse } from '@material-ui/core';
 const useDenseLists = true;
 export const listItemWith32PxIconHeight = 32;
 export const listItemWithoutIconHeight = 29;
@@ -265,7 +265,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             ) : null}
             {renderListItemSecondaryAction()}
           </MUIListItem>
-          {isItemOpen && (
+          <Collapse in={isItemOpen} timeout="auto" unmountOnExit>
             <MUIList
               component="div"
               disablePadding
@@ -277,7 +277,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             >
               {renderNestedItems()}
             </MUIList>
-          )}
+          </Collapse>
         </React.Fragment>
       );
     }

@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "AllBuiltinExtensions.h"
+#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -147,6 +148,13 @@ BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       "",
       "res/eventaddicon.png",
       std::make_shared<gd::StandardEvent>());
+
+  extension.AddEvent("Async",
+                     _("Async event"),
+                     _("Internal event for asynchronous actions"),
+                     "",
+                     "res/eventaddicon.png",
+                     std::make_shared<gd::AsyncEvent>());
 
   extension.AddEvent("Link",
                      _("Link external events"),

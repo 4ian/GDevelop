@@ -2,13 +2,13 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-import paperDecorator from '../PaperDecorator';
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
 
-import { testProject } from '../GDevelopJsInitializerDecorator';
+import { testProject } from '../../GDevelopJsInitializerDecorator';
 
-import OperatorField from '../../EventsSheet/ParameterFields/OperatorField';
-import ValueStateHolder from '../ValueStateHolder';
+import OperatorField from '../../../EventsSheet/ParameterFields/OperatorField';
+import ValueStateHolder from '../../ValueStateHolder';
 
 const gd: libGDevelop = global.gd;
 

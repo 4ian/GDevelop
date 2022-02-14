@@ -234,6 +234,40 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
+  if (type != "number" && type != "string" && type != "boolean") {
+    gd::LogError(
+        "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
+        type + ". Verify this type is valid and supported.");
+  }
+
+  gd::String conditionDescriptionTemplate =
+      type == "boolean" ? _("Check if <subject>.") : _("Compare <subject>.");
+  auto& condition =
+      AddScopedCondition(name,
+                         fullname,
+                         conditionDescriptionTemplate.FindAndReplace(
+                             "<subject>", descriptionSubject),
+                         sentenceName,
+                         group,
+                         icon,
+                         icon);
+
+  gd::String actionDescriptionTemplate = type == "boolean"
+                                             ? _("Set (or unset) if <subject>.")
+                                             : _("Change <subject>.");
+  auto& action = AddScopedAction(
+      "Set" + name,
+      fullname,
+      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
+      sentenceName,
+      group,
+      icon,
+      icon);
+
+  if (type == "boolean") {
+    return MultipleInstructionMetadata::WithConditionAndAction(condition, action);
+  }
+
   gd::String expressionDescriptionTemplate = _("Return <subject>.");
   auto& expression =
       type == "number"
@@ -249,27 +283,6 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
                                  "<subject>", descriptionSubject),
                              group,
                              icon);
-
-  gd::String conditionDescriptionTemplate = _("Compare <subject>.");
-  auto& condition =
-      AddScopedCondition(name,
-                         fullname,
-                         conditionDescriptionTemplate.FindAndReplace(
-                             "<subject>", descriptionSubject),
-                         sentenceName,
-                         group,
-                         icon,
-                         icon);
-
-  gd::String actionDescriptionTemplate = _("Change <subject>.");
-  auto& action = AddScopedAction(
-      "Set" + name,
-      fullname,
-      actionDescriptionTemplate.FindAndReplace("<subject>", descriptionSubject),
-      sentenceName,
-      group,
-      icon,
-      icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);

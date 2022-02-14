@@ -261,6 +261,23 @@ class GD_CORE_API InstructionMetadata {
   bool IsBehaviorInstruction() const { return isBehaviorInstruction; }
 
   /**
+   * \brief Mark this (object) instruction as requiring the specified
+   * capability, offered by the base object. This is useful for some objects
+   * that don't support this capability, so that the editor can hide the
+   * instruction as it does not apply to them.
+   */
+  InstructionMetadata &SetRequiresBaseObjectCapability(
+      const gd::String &capability);
+
+  /**
+   * \brief Get the required specified capability for this (object) instruction,
+   * or an empty string if there is nothing specific required.
+   */
+  const gd::String &GetRequiredBaseObjectCapability() const {
+    return requiredBaseObjectCapability;
+  };
+
+  /**
    * \brief Consider that the instruction is easy for a user to understand.
    */
   InstructionMetadata &MarkAsSimple() {
@@ -464,6 +481,7 @@ class GD_CORE_API InstructionMetadata {
   bool isAsync;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
+  gd::String requiredBaseObjectCapability;
 };
 
 }  // namespace gd

@@ -250,6 +250,27 @@ class GD_CORE_API BehaviorMetadata {
     return sharedDatasInstance.get();
   }
 
+  /**
+   * \brief Return a reference to a map containing the names of the actions
+   * (as keys) and the metadata associated with (as values).
+   */
+  std::map<gd::String, gd::InstructionMetadata>& GetAllActions() { return actionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::InstructionMetadata>& GetAllConditions() { return conditionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllExpressions() { return expressionsInfos; };
+
+  /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
+
 #if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;

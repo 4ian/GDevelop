@@ -48,7 +48,7 @@ const styles = {
     width: 24,
     height: 24,
     marginRight: 8,
-    paddingTop: 12,
+    paddingTop: 6,
     flexShrink: 0,
   },
   invertToggle: {

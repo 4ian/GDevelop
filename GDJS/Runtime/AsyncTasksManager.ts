@@ -70,10 +70,11 @@ namespace gdjs {
    */
   export class PromiseTask extends AsyncTask {
     private isResolved: boolean = false;
+    promise: Promise<any>;
 
     constructor(promise: Promise<any>) {
       super();
-      promise
+      this.promise = promise
         .catch((error) => {
           logger.error(
             `A promise error has not been handled, this should never happen! 

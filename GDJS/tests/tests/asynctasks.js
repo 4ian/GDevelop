@@ -77,13 +77,13 @@
     const asyncTasksManager = runtimeScene.getAsyncTasksManager();
 
     it('Should resolve with Promise', async () => {
-      const promise = new Promise((r) => queueMicrotask(r));
+      const task = new gdjs.PromiseTask(new Promise((r) => queueMicrotask(r)));
       const cb = createMockCallback();
-      asyncTasksManager.addTask(new gdjs.PromiseTask(promise), cb);
+      asyncTasksManager.addTask(task, cb);
       cb.expectToNotHaveBeenCalled();
       asyncTasksManager.processTasks(runtimeScene);
       cb.expectToNotHaveBeenCalled();
-      await promise;
+      await task.promise;
       cb.expectToNotHaveBeenCalled();
       asyncTasksManager.processTasks(runtimeScene);
       cb.expectToHaveBeenCalled();

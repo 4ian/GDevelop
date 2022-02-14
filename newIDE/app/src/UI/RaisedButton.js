@@ -19,6 +19,7 @@ export type RaisedButtonPropsWithoutOnClick = {|
     margin?: number,
     flexShrink?: 0,
   |},
+  id?: string,
 |};
 
 type Props = {|

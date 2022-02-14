@@ -77,10 +77,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
-   * \param onceTriggersVariable The code to access the variable holding
-   * OnceTriggers. \param preludeCode The code to run just before the events
-   * generated code. \param compilationForRuntime Set this to true if the code
-   * is generated for runtime.
+   * \param onceTriggersVariable The code to access the variable holding OnceTriggers.
+   * \param preludeCode The code to run just before the events generated code.
+   * \param compilationForRuntime Set this to true if the code is generated for
+   * runtime.
    *
    * \return JavaScript code
    */

@@ -128,9 +128,8 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
-   * \brief Return a list of all expressions of the event, each with their
-   * associated metadata. \note Used to preprocess or search in the expressions
-   * of the event.
+   * \brief Return a list of all expressions of the event, each with their associated metadata.
+   * \note Used to preprocess or search in the expressions of the event.
    */
   virtual std::vector<std::pair<gd::Expression*, gd::ParameterMetadata> >
   GetAllExpressionsWithMetadata() {

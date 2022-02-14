@@ -660,30 +660,18 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               "    else if($ITERABLE_REFERENCE.getType() === \"array\")\n"
               "        $KEY_ITERATOR_REFERENCE.setNumber($ITERATOR_KEY);\n";
 
-        if (valueIteratorExists)
-          outputCode +=
-              "    const $STRUCTURE_CHILD_VARIABLE = "
-              "$ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
-              "    "
-              "$VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE."
-              "getType())\n"
-              "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
-              "        "
-              "$VALUE_ITERATOR_REFERENCE.setValue($STRUCTURE_CHILD_VARIABLE."
-              "getValue());\n"
-              "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === "
-              "\"structure\") {\n"
-              "        // Structures are passed by reference like JS objects\n"
-              "        "
-              "$VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_"
-              "VARIABLE.getAllChildren());\n"
-              "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === "
-              "\"array\") {\n"
-              "        // Arrays are passed by reference like JS objects\n"
-              "        "
-              "$VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_"
-              "VARIABLE.getAllChildrenArray());\n"
-              "    } else console.warn(\"Cannot identify type: \", type);\n";
+        if(valueIteratorExists) outputCode +=
+            "    const $STRUCTURE_CHILD_VARIABLE = $ITERABLE_REFERENCE.getChild($ITERATOR_KEY)\n"
+            "    $VALUE_ITERATOR_REFERENCE.castTo($STRUCTURE_CHILD_VARIABLE.getType())\n"
+            "    if($STRUCTURE_CHILD_VARIABLE.isPrimitive()) {\n"
+            "        $VALUE_ITERATOR_REFERENCE.setValue($STRUCTURE_CHILD_VARIABLE.getValue());\n"
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"structure\") {\n"
+            "        // Structures are passed by reference like JS objects\n"
+            "        $VALUE_ITERATOR_REFERENCE.replaceChildren($STRUCTURE_CHILD_VARIABLE.getAllChildren());\n"
+            "    } else if ($STRUCTURE_CHILD_VARIABLE.getType() === \"array\") {\n"
+            "        // Arrays are passed by reference like JS objects\n"
+            "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
+            "    } else console.warn(\"Cannot identify type: \", type);\n";
 
         // Now do the rest of standard event code generation
         outputCode += objectDeclaration;

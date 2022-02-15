@@ -78,6 +78,11 @@ class GD_CORE_API ExpressionParser2NodePrinter
     output += node.name;
     if (node.child) node.child->Visit(*this);
   }
+  void OnVisitVariableExpressionNode(VariableExpressionNode& node) override {
+    output += "(";
+    node.child->Visit(*this);
+    output += ")<implicitely casted to " + node.type + ">";
+  };
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     output += "." + node.name;
     if (node.child) node.child->Visit(*this);

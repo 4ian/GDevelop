@@ -38,7 +38,8 @@ MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
     }
   }
 
-  return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorMetadata);
+  return ExtensionAndMetadata<BehaviorMetadata>(badExtension,
+                                                badBehaviorMetadata);
 }
 
 const BehaviorMetadata& MetadataProvider::GetBehaviorMetadata(
@@ -346,18 +347,118 @@ const gd::ExpressionMetadata& MetadataProvider::GetStrExpressionMetadata(
   return GetExtensionAndStrExpressionMetadata(platform, exprType).GetMetadata();
 }
 
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndObjectVariableExpressionMetadata(
+    const gd::Platform& platform, gd::String objectType, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& objects = extension->GetExtensionObjectsTypes();
+    if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
+      const auto& allObjectStrExpressions =
+          extension->GetAllVariableExpressionsForObject(objectType);
+      if (allObjectStrExpressions.find(exprType) !=
+          allObjectStrExpressions.end())
+        return ExtensionAndMetadata<ExpressionMetadata>(
+            *extension, allObjectStrExpressions.find(exprType)->second);
+    }
+  }
+
+  // Then check in functions of "Base object".
+  for (auto& extension : extensions) {
+    const auto& allObjectStrExpressions =
+        extension->GetAllVariableExpressionsForObject("");
+    if (allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allObjectStrExpressions.find(exprType)->second);
+  }
+
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badExpressionMetadata);
+}
+
+const gd::ExpressionMetadata&
+MetadataProvider::GetObjectVariableExpressionMetadata(
+    const gd::Platform& platform, gd::String objectType, gd::String exprType) {
+  return GetExtensionAndObjectVariableExpressionMetadata(
+             platform, objectType, exprType)
+      .GetMetadata();
+}
+
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndBehaviorVariableExpressionMetadata(
+    const gd::Platform& platform, gd::String autoType, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& autos = extension->GetBehaviorsTypes();
+    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+      const auto& allBehaviorStrExpressions =
+          extension->GetAllVariableExpressionsForBehavior(autoType);
+      if (allBehaviorStrExpressions.find(exprType) !=
+          allBehaviorStrExpressions.end())
+        return ExtensionAndMetadata<ExpressionMetadata>(
+            *extension, allBehaviorStrExpressions.find(exprType)->second);
+    }
+  }
+
+  // Then check in functions of "Base object".
+  for (auto& extension : extensions) {
+    const auto& allBehaviorStrExpressions =
+        extension->GetAllVariableExpressionsForBehavior("");
+    if (allBehaviorStrExpressions.find(exprType) !=
+        allBehaviorStrExpressions.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allBehaviorStrExpressions.find(exprType)->second);
+  }
+
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badExpressionMetadata);
+}
+
+const gd::ExpressionMetadata&
+MetadataProvider::GetBehaviorVariableExpressionMetadata(
+    const gd::Platform& platform, gd::String autoType, gd::String exprType) {
+  return GetExtensionAndBehaviorVariableExpressionMetadata(
+             platform, autoType, exprType)
+      .GetMetadata();
+}
+
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndVariableExpressionMetadata(
+    const gd::Platform& platform, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& allExpr = extension->GetAllVariableExpressions();
+    if (allExpr.find(exprType) != allExpr.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allExpr.find(exprType)->second);
+  }
+
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badExpressionMetadata);
+}
+
+const gd::ExpressionMetadata& MetadataProvider::GetVariableExpressionMetadata(
+    const gd::Platform& platform, gd::String exprType) {
+  return GetExtensionAndVariableExpressionMetadata(platform, exprType)
+      .GetMetadata();
+}
+
 const gd::ExpressionMetadata& MetadataProvider::GetAnyExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetExpressionMetadata(platform, exprType);
   const auto& stringExpressionMetadata =
       GetStrExpressionMetadata(platform, exprType);
+  const auto& variableExpressionMetadata =
+      GetVariableExpressionMetadata(platform, exprType);
 
   return &numberExpressionMetadata != &badExpressionMetadata
              ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+         : &stringExpressionMetadata != &badExpressionMetadata
+             ? stringExpressionMetadata
+         : &variableExpressionMetadata != &badExpressionMetadata
+             ? variableExpressionMetadata
+             : badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectAnyExpressionMetadata(
@@ -366,12 +467,16 @@ const gd::ExpressionMetadata& MetadataProvider::GetObjectAnyExpressionMetadata(
       GetObjectExpressionMetadata(platform, objectType, exprType);
   const auto& stringExpressionMetadata =
       GetObjectStrExpressionMetadata(platform, objectType, exprType);
+  const auto& variableExpressionMetadata =
+      GetObjectVariableExpressionMetadata(platform, objectType, exprType);
 
   return &numberExpressionMetadata != &badExpressionMetadata
              ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+         : &stringExpressionMetadata != &badExpressionMetadata
+             ? stringExpressionMetadata
+         : &variableExpressionMetadata != &badExpressionMetadata
+             ? variableExpressionMetadata
+             : badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata&
@@ -382,12 +487,16 @@ MetadataProvider::GetBehaviorAnyExpressionMetadata(const gd::Platform& platform,
       GetBehaviorExpressionMetadata(platform, autoType, exprType);
   const auto& stringExpressionMetadata =
       GetBehaviorStrExpressionMetadata(platform, autoType, exprType);
+  const auto& variableExpressionMetadata =
+      GetBehaviorVariableExpressionMetadata(platform, autoType, exprType);
 
   return &numberExpressionMetadata != &badExpressionMetadata
              ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+         : &stringExpressionMetadata != &badExpressionMetadata
+             ? stringExpressionMetadata
+         : &variableExpressionMetadata != &badExpressionMetadata
+             ? variableExpressionMetadata
+             : badExpressionMetadata;
 }
 
 MetadataProvider::~MetadataProvider() {}

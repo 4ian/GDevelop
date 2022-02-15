@@ -13,6 +13,7 @@ declare class gdObjectMetadata {
   addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
+  addVariableExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addExpressionAndCondition(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   addExpressionAndConditionAndAction(type: string, name: string, fullname: string, description: string, sentenceName: string, group: string, icon: string): gdMultipleInstructionMetadata;
   getAllActions(): gdMapStringInstructionMetadata;

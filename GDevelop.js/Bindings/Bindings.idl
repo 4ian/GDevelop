@@ -1333,6 +1333,12 @@ interface ObjectMetadata {
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
 
+    [Const, Ref] ExpressionMetadata AddVariableExpression([Const] DOMString name,
+                                           [Const] DOMString fullname,
+                                           [Const] DOMString description,
+                                           [Const] DOMString group,
+                                           [Const] DOMString smallicon);
+
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
                                         [Const] DOMString type,
                                         [Const] DOMString name,
@@ -1414,6 +1420,12 @@ interface BehaviorMetadata {
                                         [Const] DOMString smallicon);
 
     [Const, Ref] ExpressionMetadata AddStrExpression([Const] DOMString name,
+                                           [Const] DOMString fullname,
+                                           [Const] DOMString description,
+                                           [Const] DOMString group,
+                                           [Const] DOMString smallicon);
+
+    [Const, Ref] ExpressionMetadata AddVariableExpression([Const] DOMString name,
                                            [Const] DOMString fullname,
                                            [Const] DOMString description,
                                            [Const] DOMString group,
@@ -1547,6 +1559,12 @@ interface PlatformExtension {
                                            [Const] DOMString group,
                                            [Const] DOMString smallicon);
 
+    [Const, Ref] ExpressionMetadata AddVariableExpression([Const] DOMString name,
+                                           [Const] DOMString fullname,
+                                           [Const] DOMString description,
+                                           [Const] DOMString group,
+                                           [Const] DOMString smallicon);
+
     [Const, Ref] DependencyMetadata AddDependency();
 
     [Ref] BehaviorMetadata WRAPPED_AddBehavior([Const] DOMString name,
@@ -1604,14 +1622,17 @@ interface PlatformExtension {
     [Ref] MapStringInstructionMetadata GetAllConditions();
     [Ref] MapStringExpressionMetadata GetAllExpressions();
     [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+    [Ref] MapStringExpressionMetadata GetAllVariableExpressions();
     [Ref] MapStringInstructionMetadata GetAllActionsForObject([Const] DOMString objectType);
     [Ref] MapStringInstructionMetadata GetAllConditionsForObject([Const] DOMString objectType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForObject([Const] DOMString objectType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForObject([Const] DOMString objectType);
+    [Ref] MapStringExpressionMetadata GetAllVariableExpressionsForObject([Const] DOMString objectType);
     [Ref] MapStringInstructionMetadata GetAllActionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringInstructionMetadata GetAllConditionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllExpressionsForBehavior([Const] DOMString autoType);
     [Ref] MapStringExpressionMetadata GetAllStrExpressionsForBehavior([Const] DOMString autoType);
+    [Ref] MapStringExpressionMetadata GetAllVariableExpressionsForBehavior([Const] DOMString autoType);
 
     [Ref] MapStringPropertyDescriptor GetAllProperties();
     [Ref] VectorDependencyMetadata GetAllDependencies();

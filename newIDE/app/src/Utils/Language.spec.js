@@ -35,7 +35,6 @@ jest.mock('./Language', () => {
     ...originalModule,
     getBrowserLanguageOrLocale: jest.fn(),
   };
-
 });
 
 import { getBrowserLanguageOrLocale } from './Language';

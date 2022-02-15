@@ -54,6 +54,7 @@ export const renderInstructionOrExpressionListItem = ({
         />
       }
       onClick={onClick}
+      disableAutoTranslate
     />
   );
 };

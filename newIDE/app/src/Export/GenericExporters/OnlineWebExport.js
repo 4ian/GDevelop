@@ -39,6 +39,7 @@ import {
   type Game,
 } from '../../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import AlertMessage from '../../UI/AlertMessage';
 
 const styles = {
   icon: {
@@ -85,11 +86,12 @@ export const WebProjectLink = ({
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
+  const gameUrl = getGameUrl(game);
   const buildUrl =
     exportPending || !isBuildComplete
       ? null
       : isBuildPublished
-      ? getGameUrl(game)
+      ? gameUrl
       : getBuildArtifactUrl(build, 's3Key');
 
   const loadGame = React.useCallback(
@@ -286,12 +288,22 @@ export const WebProjectLink = ({
               </Line>
             )}
             {!isBuildPublished && (
-              <Line justifyContent="center">
-                <RaisedButton
-                  label={<Trans>Publish this build to the game's page</Trans>}
-                  onClick={onUpdatePublicBuild}
-                />
-              </Line>
+              <>
+                <Line justifyContent="center">
+                  <RaisedButton
+                    label={<Trans>Publish this build to the game's page</Trans>}
+                    onClick={onUpdatePublicBuild}
+                  />
+                </Line>
+                <Line>
+                  <AlertMessage kind="info">
+                    <Trans>
+                      Your game URL on Liluo hasn't been updated with this
+                      build. You can update it by clicking the button above.
+                    </Trans>
+                  </AlertMessage>
+                </Line>
+              </>
             )}
           </Column>
         ) : (

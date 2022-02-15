@@ -52,8 +52,8 @@ export const ExplanationHeader = () => (
     <Line>
       <Text align="center">
         <Trans>
-          Generate a unique link to share your game, playable from any computer
-          or mobile phone's browser.
+          Generate a unique link, playable from any computer or mobile phone's
+          browser.
         </Trans>
       </Text>
     </Line>

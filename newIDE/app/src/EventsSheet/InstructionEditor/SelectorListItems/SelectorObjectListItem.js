@@ -50,6 +50,7 @@ export const renderObjectListItem = ({
         />
       }
       onClick={onClick}
+      disableAutoTranslate
     />
   );
 };

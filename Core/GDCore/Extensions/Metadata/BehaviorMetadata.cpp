@@ -246,7 +246,8 @@ BehaviorMetadata::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
-  if (type != "number" && type != "string" && type != "boolean") {
+  if (type != "number" && type != "string" && type != "boolean" &&
+      type != "variable") {
     gd::LogError(
         "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
         type + ". Verify this type is valid and supported.");

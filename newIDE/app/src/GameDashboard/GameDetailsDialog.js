@@ -167,6 +167,29 @@ export const GameDetailsDialog = ({
     }
   };
 
+  const unpublishGame = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      const { id } = profile;
+      try {
+        setPublicGame(null); // Public game will auto update when game is updated.
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          {
+            publicWebBuildId: null,
+          }
+        );
+        onGameUpdated(updatedGame);
+      } catch (err) {
+        console.error('Unable to update the game', err);
+      }
+    },
+    [game, getAuthorizationHeader, profile, onGameUpdated]
+  );
+
   const authorUsernames =
     publicGame && publicGame.authors
       ? publicGame.authors.map(author => author.username).filter(Boolean)
@@ -275,7 +298,7 @@ export const GameDetailsDialog = ({
                 <FlatButton
                   onClick={() => {
                     const answer = Window.showConfirmDialog(
-                      "Are you sure you want to unregister this game? You won't get access to analytics and metrics, unless you register it again."
+                      "Are you sure you want to unregister this game? \n\nIt will disappear from your games dashboard and you won't get access to analytics, unless you register it again."
                     );
 
                     if (!answer) return;
@@ -285,6 +308,23 @@ export const GameDetailsDialog = ({
                   label={<Trans>Unregister this game</Trans>}
                 />
                 <Spacer />
+                {publicGame.publicWebBuildId && (
+                  <>
+                    <RaisedButton
+                      onClick={() => {
+                        const answer = Window.showConfirmDialog(
+                          'Are you sure you want to unpublish this game? \n\nThis will make your Liluo unique game URL not accessible anymore. \n\nYou can decide anytime to publish it again.'
+                        );
+
+                        if (!answer) return;
+
+                        unpublishGame();
+                      }}
+                      label={<Trans>Unpublish from Liluo</Trans>}
+                    />
+                    <Spacer />
+                  </>
+                )}
                 <RaisedButton
                   primary
                   onClick={() => setIsPublicGamePropertiesDialogOpen(true)}

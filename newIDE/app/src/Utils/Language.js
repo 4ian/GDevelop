@@ -47,7 +47,7 @@ export const selectLanguageOrLocale = (
   languageOrLocale: string,
   defaultLanguage: string
 ): string => {
-  const translationRatioThreshold = 0.5;
+  const translationRatioThreshold = 0.7;
   const languageMetadata = LocalesMetadata.filter(
     localeMetadata => localeMetadata.languageCode === languageOrLocale
   );

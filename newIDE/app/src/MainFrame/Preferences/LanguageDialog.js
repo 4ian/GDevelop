@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import FlatButton from '../../UI/FlatButton';
 import Dialog from '../../UI/Dialog';
 import Window from '../../Utils/Window';
@@ -14,74 +14,64 @@ type Props = {|
   onClose: (languageDidChange: boolean) => void,
 |};
 
-type State = {|
-  languageDidChange: boolean,
-|};
+const LanguageDialog = ({ open, onClose }: Props) => {
+  const { values } = React.useContext(PreferencesContext);
 
-export default class LanguageDialog extends Component<Props, State> {
-  state = {
-    languageDidChange: false,
-  };
+  const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
+    false
+  );
 
-  render() {
-    const { open, onClose } = this.props;
-    if (!open) return null;
+  if (!open) return null;
 
-    return (
-      <I18n>
-        {({ i18n }) => (
-          <PreferencesContext.Consumer>
-            {({ values }) => {
-              const isLoadingLanguage =
-                i18n.language !== values.language.replace('_', '-');
+  return (
+    <I18n>
+      {({ i18n }) => {
+        const isLoadingLanguage =
+          i18n.language !== values.language.replace('_', '-');
 
-              return (
-                <Dialog
-                  actions={[
-                    <FlatButton
-                      label={
-                        isLoadingLanguage ? (
-                          <Trans>Loading...</Trans>
-                        ) : (
-                          <Trans>Close</Trans>
-                        )
-                      }
-                      primary={false}
-                      onClick={() => {
-                        onClose(this.state.languageDidChange);
-                      }}
-                      disabled={isLoadingLanguage}
-                      key="close"
-                    />,
-                  ]}
-                  secondaryActions={[
-                    <FlatButton
-                      label={<Trans>Report a wrong translation</Trans>}
-                      key="report-wrong-translation"
-                      primary={false}
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://github.com/4ian/GDevelop/issues/969'
-                        )
-                      }
-                    />,
-                  ]}
-                  onRequestClose={() => onClose(this.state.languageDidChange)}
-                  cannotBeDismissed={false}
-                  open={open}
-                  title={<Trans>Language</Trans>}
-                >
-                  <LanguageSelector
-                    onLanguageChanged={() =>
-                      this.setState({ languageDidChange: true })
-                    }
-                  />
-                </Dialog>
-              );
-            }}
-          </PreferencesContext.Consumer>
-        )}
-      </I18n>
-    );
-  }
-}
+        return (
+          <Dialog
+            actions={[
+              <FlatButton
+                label={
+                  isLoadingLanguage ? (
+                    <Trans>Loading...</Trans>
+                  ) : (
+                    <Trans>Close</Trans>
+                  )
+                }
+                primary={false}
+                onClick={() => {
+                  onClose(languageDidChange);
+                }}
+                disabled={isLoadingLanguage}
+                key="close"
+              />,
+            ]}
+            secondaryActions={[
+              <FlatButton
+                label={<Trans>Report a wrong translation</Trans>}
+                key="report-wrong-translation"
+                primary={false}
+                onClick={() =>
+                  Window.openExternalURL(
+                    'https://github.com/4ian/GDevelop/issues/969'
+                  )
+                }
+              />,
+            ]}
+            onRequestClose={() => onClose(languageDidChange)}
+            cannotBeDismissed={false}
+            open={open}
+            title={<Trans>Language</Trans>}
+          >
+            <LanguageSelector
+              onLanguageChanged={() => setLanguageDidChange(true)}
+            />
+          </Dialog>
+        );
+      }}
+    </I18n>
+  );
+};
+export default LanguageDialog;

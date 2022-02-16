@@ -1,11 +1,16 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
-import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
+import {
+  icon,
+  nameAndIconContainer,
+  instructionWarningParameter,
+} from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
   type DataSource,
@@ -25,6 +30,13 @@ type Props = {
 type State = {|
   autocompletionVariableNames: DataSource,
 |};
+
+const quicklyCheckForQuotedName = (name: string) => {
+  return name[0] === '"';
+};
+const quicklyCheckForNameWithSpace = (name: string) => {
+  return name.indexOf(' ') !== -1;
+};
 
 export default class VariableField extends Component<Props, State> {
   _field: ?SemiControlledAutoCompleteInterface;
@@ -92,6 +104,18 @@ export default class VariableField extends Component<Props, State> {
       ? parameterMetadata.getDescription()
       : undefined;
 
+    const errorText = quicklyCheckForQuotedName(value) ? (
+      <Trans>
+        It seems you entered a name with a quote. Variable names should not be
+        quoted.
+      </Trans>
+    ) : quicklyCheckForNameWithSpace(value) ? (
+      <Trans>
+        The variable name contains a space - this is not recommended. Prefer to
+        use underscores or uppercase letters to separate words.
+      </Trans>
+    ) : null;
+
     return (
       <TextFieldWithButtonLayout
         renderTextField={() => (
@@ -103,6 +127,7 @@ export default class VariableField extends Component<Props, State> {
                 ? parameterMetadata.getLongDescription()
                 : undefined
             }
+            errorText={errorText}
             fullWidth
             value={value}
             onChange={onChange}
@@ -147,6 +172,9 @@ export const renderVariableWithIcon = (
       title={tooltip}
       className={classNames({
         [nameAndIconContainer]: true,
+        [instructionWarningParameter]:
+          quicklyCheckForQuotedName(value) ||
+          quicklyCheckForNameWithSpace(value),
       })}
     >
       <img

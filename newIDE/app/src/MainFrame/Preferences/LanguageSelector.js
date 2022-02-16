@@ -37,13 +37,9 @@ const renderLanguageSelectOption = localeMetadata => {
   return (
     <SelectOption
       value={localeMetadata.languageCode}
-      primaryText={
-        localeMetadata.languageNativeName +
-        ' (' +
-        localeMetadata.languageName +
-        ')' +
-        (isStarted ? ` - ~${percent}%` : '')
-      }
+      primaryText={`${localeMetadata.languageNativeName} (${
+        localeMetadata.languageName
+      })${isStarted ? ` - ~${percent}%` : ''}`}
       disabled={!isStarted}
       key={localeMetadata.languageCode}
     />

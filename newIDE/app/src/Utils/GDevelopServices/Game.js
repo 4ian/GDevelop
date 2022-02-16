@@ -11,6 +11,10 @@ export type PublicGame = {
   publicWebBuildId?: ?string,
   description?: string,
   authors: Array<UserPublicProfile>,
+  metrics?: {
+    lastWeekSessionsCount: number,
+    lastYearSessionsCount: number,
+  },
 };
 
 export type Game = {

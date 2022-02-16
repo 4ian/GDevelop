@@ -305,6 +305,11 @@
         "background-color": {
           "value": "rgba(238, 255, 0, 0.05)"
         }
+      },
+      "warning": {
+        "color": {
+          "value": "#ffa500"
+        }
       }
     },
     "drop-indicator": {

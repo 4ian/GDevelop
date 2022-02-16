@@ -146,7 +146,8 @@ export const GameDetailsDialog = ({
     const { id } = profile;
 
     try {
-      setPublicGame(null); // Public game will auto update when game is updated.
+      // Set public game to null as it will be refetched automatically by the callback above.
+      setPublicGame(null);
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
@@ -179,7 +180,8 @@ export const GameDetailsDialog = ({
 
       const { id } = profile;
       try {
-        setPublicGame(null); // Public game will auto update when game is updated.
+        // Set public game to null as it will be refetched automatically by the callback above.
+        setPublicGame(null);
         const updatedGame = await updateGame(
           getAuthorizationHeader,
           id,

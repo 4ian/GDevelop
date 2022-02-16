@@ -102,6 +102,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               }
             >
               <ListSearchResults
+                disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
                 onRetry={fetchExamplesAndFilters}
                 error={error}
                 searchItems={

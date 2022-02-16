@@ -95,6 +95,7 @@ export const ExtensionStore = ({
               tags={filters && filters.allTags}
             />
             <ListSearchResults
+              disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
               onRetry={fetchExtensionsAndFilters}
               error={error}
               searchItems={

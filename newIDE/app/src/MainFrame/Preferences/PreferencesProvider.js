@@ -17,6 +17,11 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import {
+  getBrowserLanguageOrLocale,
+  setLanguageInDOM,
+  selectLanguageOrLocale,
+} from '../../Utils/Language';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -55,9 +60,28 @@ export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
   }
 };
 
+export const getInitialPreferences = () => {
+  let languageOrLocale = 'en';
+  const browserLanguageOrLocale = getBrowserLanguageOrLocale();
+  if (browserLanguageOrLocale)
+    languageOrLocale = selectLanguageOrLocale(
+      browserLanguageOrLocale,
+      languageOrLocale
+    );
+
+  return { ...initialPreferences.values, language: languageOrLocale };
+};
+
+const getPreferences = () => {
+  const preferences =
+    loadPreferencesFromLocalStorage() || getInitialPreferences();
+  setLanguageInDOM(preferences.language);
+  return preferences;
+};
+
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
-    values: loadPreferencesFromLocalStorage() || initialPreferences.values,
+    values: getPreferences(),
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -117,6 +141,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setLanguage(language: string) {
+    setLanguageInDOM(language);
     this.setState(
       state => ({
         values: {

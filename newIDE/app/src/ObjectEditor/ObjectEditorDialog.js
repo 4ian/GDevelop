@@ -110,6 +110,7 @@ const InnerDialog = (props: InnerDialogProps) => {
         <FlatButton
           key="apply"
           label={<Trans>Apply</Trans>}
+          id="apply-button"
           primary
           keyboardFocused
           onClick={onApply}
@@ -134,6 +135,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               label={<Trans>Behaviors</Trans>}
               value={'behaviors'}
               key={'behaviors'}
+              id="behaviors-tab"
             />
             <Tab
               label={<Trans>Variables</Trans>}
@@ -152,6 +154,7 @@ const InnerDialog = (props: InnerDialogProps) => {
           </Tabs>
         </div>
       }
+      id="object-editor-dialog"
     >
       {currentTab === 'properties' && EditorComponent && (
         <Column

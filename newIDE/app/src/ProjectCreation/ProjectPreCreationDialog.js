@@ -85,8 +85,10 @@ const ProjectPreCreationDialog = ({
           key="create"
           label={<Trans>Create project</Trans>}
           onClick={onValidate}
+          id="create-project-button"
         />,
       ]}
+      id="project-pre-creation-dialog"
     >
       <Column noMargin>
         <TextField

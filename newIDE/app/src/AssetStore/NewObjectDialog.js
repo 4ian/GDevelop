@@ -194,6 +194,7 @@ export default function NewObjectDialog({
           label={<Trans>Close</Trans>}
           primary={false}
           onClick={onClose}
+          id="close-button"
         />,
       ]}
       onRequestClose={onClose}
@@ -202,6 +203,7 @@ export default function NewObjectDialog({
       flexBody
       noMargin
       fullHeight
+      id="new-object-dialog"
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>

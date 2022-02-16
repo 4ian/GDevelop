@@ -154,6 +154,11 @@
     text-decoration:  var(--event-sheet-instruction-parameter-error-color) underline wavy;
 }
 
+.gd-events-sheet .instruction-parameter .instruction-warning-parameter {
+    color: var(--event-sheet-instruction-parameter-warning-color);
+    text-decoration:  var(--event-sheet-instruction-parameter-warning-color) underline wavy;
+}
+
 .gd-events-sheet .instruction-parameter .instruction-missing-parameter {
     display: inline-flex;
     background-color: var(--event-sheet-instruction-parameter-error-background-color);

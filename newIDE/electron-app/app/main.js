@@ -87,7 +87,7 @@ app.on('ready', function() {
       nodeIntegration: true,
     },
     enableLargerThanScreen: true,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#000',
   };
 
   if (isIntegrated) {

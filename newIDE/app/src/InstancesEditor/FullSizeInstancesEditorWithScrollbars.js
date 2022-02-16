@@ -158,6 +158,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
                     onChange={this._handleXChange}
                     style={styles.xScrollbar}
                     orientation="horizontal"
+                    onChangeCommitted={event => event.target.blur()}
                   />
                 )}
                 {screenType !== 'touch' && (
@@ -170,6 +171,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
                     onChange={this._handleYChange}
                     style={styles.yScrollbar}
                     orientation="vertical"
+                    onChangeCommitted={event => event.target.blur()}
                   />
                 )}
               </div>

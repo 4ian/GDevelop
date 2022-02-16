@@ -53,6 +53,23 @@ const styles = {
   },
 };
 
+const objectTypeToDefaultName = {
+  Sprite: 'NewSprite',
+  'TiledSpriteObject::TiledSprite': 'NewTiledSprite',
+  'ParticleSystem::ParticleEmitter': 'NewParticlesEmitter',
+  'PanelSpriteObject::PanelSprite': 'NewPanelSprite',
+  'PrimitiveDrawing::Drawer': 'NewShapePainter',
+  'TextObject::Text': 'NewText',
+  'BBText::BBText': 'NewBBText',
+  'BitmapText::BitmapTextObject': 'NewBitmapText',
+  'TextEntryObject::TextEntry': 'NewTextEntry',
+  'TileMap::TileMap': 'NewTileMap',
+  'MyDummyExtension::DummyObject': 'NewDummyObject',
+  'Lighting::LightObject': 'NewLight',
+  'TextInput::TextInputObject': 'NewTextInput',
+  'Video::VideoObject': 'NewVideo',
+};
+
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
 const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
@@ -167,7 +184,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     } = this.props;
 
     const name = newNameGenerator(
-      'NewObject',
+      objectTypeToDefaultName[objectType] || 'NewObject',
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );

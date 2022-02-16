@@ -66,7 +66,7 @@ const ExportHome = ({
         <div style={styles.titleContainer}>
           <Line>
             <Text size="title">
-              <Trans>Share with friends</Trans>
+              <Trans>Publish and share with friends on Liluo.io</Trans>
             </Text>
           </Line>
         </div>
@@ -89,7 +89,7 @@ const ExportHome = ({
         <div style={styles.titleContainer}>
           <Line>
             <Text size="title">
-              <Trans>Publish your game</Trans>
+              <Trans>Publish your game on other stores</Trans>
             </Text>
           </Line>
         </div>

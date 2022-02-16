@@ -38,6 +38,12 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
 
+const styles = {
+  tableRowStatColumn: {
+    width: 100,
+  },
+};
+
 export type GamesDetailsTab = 'details' | 'builds' | 'analytics';
 
 type Props = {|
@@ -140,7 +146,8 @@ export const GameDetailsDialog = ({
     const { id } = profile;
 
     try {
-      setPublicGame(null); // Public game will auto update when game is updated.
+      // Set public game to null as it will be refetched automatically by the callback above.
+      setPublicGame(null);
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
@@ -166,6 +173,30 @@ export const GameDetailsDialog = ({
       console.error('Unable to delete the game:', error);
     }
   };
+
+  const unpublishGame = React.useCallback(
+    async () => {
+      if (!profile) return;
+
+      const { id } = profile;
+      try {
+        // Set public game to null as it will be refetched automatically by the callback above.
+        setPublicGame(null);
+        const updatedGame = await updateGame(
+          getAuthorizationHeader,
+          id,
+          game.id,
+          {
+            publicWebBuildId: null,
+          }
+        );
+        onGameUpdated(updatedGame);
+      } catch (err) {
+        console.error('Unable to update the game', err);
+      }
+    },
+    [game, getAuthorizationHeader, profile, onGameUpdated]
+  );
 
   const authorUsernames =
     publicGame && publicGame.authors
@@ -275,7 +306,7 @@ export const GameDetailsDialog = ({
                 <FlatButton
                   onClick={() => {
                     const answer = Window.showConfirmDialog(
-                      "Are you sure you want to unregister this game? You won't get access to analytics and metrics, unless you register it again."
+                      "Are you sure you want to unregister this game? \n\nIt will disappear from your games dashboard and you won't get access to analytics, unless you register it again."
                     );
 
                     if (!answer) return;
@@ -285,6 +316,23 @@ export const GameDetailsDialog = ({
                   label={<Trans>Unregister this game</Trans>}
                 />
                 <Spacer />
+                {publicGame.publicWebBuildId && (
+                  <>
+                    <RaisedButton
+                      onClick={() => {
+                        const answer = Window.showConfirmDialog(
+                          'Are you sure you want to unpublish this game? \n\nThis will make your Liluo unique game URL not accessible anymore. \n\nYou can decide anytime to publish it again.'
+                        );
+
+                        if (!answer) return;
+
+                        unpublishGame();
+                      }}
+                      label={<Trans>Unpublish from Liluo</Trans>}
+                    />
+                    <Spacer />
+                  </>
+                )}
                 <RaisedButton
                   primary
                   onClick={() => setIsPublicGamePropertiesDialogOpen(true)}
@@ -314,6 +362,48 @@ export const GameDetailsDialog = ({
             </PlaceholderError>
           ) : (
             <ColumnStackLayout expand>
+              <Line noMargin alignItems="center">
+                <Text size="title">
+                  <Trans>Consolidated metrics</Trans>
+                </Text>
+                <Spacer />
+                {!publicGame && <CircularProgress size={20} />}
+              </Line>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableRowColumn>
+                      <Trans>Last week sessions count</Trans>
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.tableRowStatColumn}>
+                      {publicGame &&
+                      publicGame.metrics &&
+                      publicGame.metrics.lastWeekSessionsCount
+                        ? publicGame.metrics.lastWeekSessionsCount
+                        : '-'}
+                    </TableRowColumn>
+                  </TableRow>
+                  <TableRow>
+                    <TableRowColumn>
+                      <Trans>Last year sessions count</Trans>
+                    </TableRowColumn>
+                    <TableRowColumn style={styles.tableRowStatColumn}>
+                      {publicGame &&
+                      publicGame.metrics &&
+                      publicGame.metrics.lastYearSessionsCount
+                        ? publicGame.metrics.lastYearSessionsCount
+                        : '-'}
+                    </TableRowColumn>
+                  </TableRow>
+                </TableBody>
+              </Table>
+              <Line noMargin alignItems="center">
+                <Text size="title">
+                  <Trans>Daily metrics</Trans>
+                </Text>
+                <Spacer />
+                {isGameMetricsLoading && <CircularProgress size={20} />}
+              </Line>
               <Line noMargin>
                 <SelectField
                   fullWidth
@@ -360,20 +450,13 @@ export const GameDetailsDialog = ({
                   </Trans>
                 </AlertMessage>
               ) : null}
-              <Line noMargin alignItems="center">
-                <Text size="title">
-                  <Trans>Main metrics</Trans>
-                </Text>
-                <Spacer />
-                {isGameMetricsLoading && <CircularProgress size={20} />}
-              </Line>
               <Table>
                 <TableBody>
                   <TableRow>
                     <TableRowColumn>
                       <Trans>Players count</Trans>
                     </TableRowColumn>
-                    <TableRowColumn>
+                    <TableRowColumn style={styles.tableRowStatColumn}>
                       {gameRollingMetrics && gameRollingMetrics.players
                         ? gameRollingMetrics.players.d0Players
                         : '-'}
@@ -383,7 +466,7 @@ export const GameDetailsDialog = ({
                     <TableRowColumn>
                       <Trans>Sessions count</Trans>
                     </TableRowColumn>
-                    <TableRowColumn>
+                    <TableRowColumn style={styles.tableRowStatColumn}>
                       {gameRollingMetrics && gameRollingMetrics.sessions
                         ? gameRollingMetrics.sessions.d0Sessions
                         : '-'}
@@ -393,7 +476,7 @@ export const GameDetailsDialog = ({
                     <TableRowColumn>
                       <Trans>New players count</Trans>
                     </TableRowColumn>
-                    <TableRowColumn>
+                    <TableRowColumn style={styles.tableRowStatColumn}>
                       {gameRollingMetrics && gameRollingMetrics.players
                         ? gameRollingMetrics.players.d0NewPlayers
                         : '-'}
@@ -408,13 +491,6 @@ export const GameDetailsDialog = ({
                   metrics for your game.
                 </AlertMessage>
               ) : null}
-              <Line noMargin alignItems="center">
-                <Text size="title">
-                  <Trans>Retention of players</Trans>
-                </Text>
-                <Spacer />
-                {isGameMetricsLoading && <CircularProgress size={20} />}
-              </Line>
               <Table>
                 <TableBody>
                   {[1, 2, 3, 4, 5, 6, 7].map(dayIndex => (
@@ -422,7 +498,7 @@ export const GameDetailsDialog = ({
                       <TableRowColumn>
                         <Trans>Day {dayIndex} retained players</Trans>
                       </TableRowColumn>
-                      <TableRowColumn>
+                      <TableRowColumn style={styles.tableRowStatColumn}>
                         {gameRollingMetrics &&
                         gameRollingMetrics.retention &&
                         gameRollingMetrics.retention[

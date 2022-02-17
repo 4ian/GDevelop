@@ -10,6 +10,12 @@ export default class InstancesRenderer {
   layout: gdLayout;
   viewPosition: ViewPosition;
   onInstanceClicked: gdInitialInstance => void;
+  onInstanceRightClicked: ({|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+  |}) => void;
   onInstanceDoubleClicked: gdInitialInstance => void;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
@@ -30,6 +36,7 @@ export default class InstancesRenderer {
     instances,
     viewPosition,
     onInstanceClicked,
+    onInstanceRightClicked,
     onInstanceDoubleClicked,
     onOverInstance,
     onOutInstance,
@@ -42,6 +49,12 @@ export default class InstancesRenderer {
     layout: gdLayout,
     viewPosition: ViewPosition,
     onInstanceClicked: gdInitialInstance => void,
+    onInstanceRightClicked: ({|
+      offsetX: number,
+      offsetY: number,
+      x: number,
+      y: number,
+    |}) => void,
     onInstanceDoubleClicked: gdInitialInstance => void,
     onOverInstance: gdInitialInstance => void,
     onOutInstance: gdInitialInstance => void,
@@ -54,6 +67,7 @@ export default class InstancesRenderer {
     this.layout = layout;
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
+    this.onInstanceRightClicked = onInstanceRightClicked;
     this.onInstanceDoubleClicked = onInstanceDoubleClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
@@ -132,6 +146,7 @@ export default class InstancesRenderer {
           viewPosition: this.viewPosition,
           layer: layer,
           onInstanceClicked: this.onInstanceClicked,
+          onInstanceRightClicked: this.onInstanceRightClicked,
           onInstanceDoubleClicked: this.onInstanceDoubleClicked,
           onOverInstance: this.onOverInstance,
           onOutInstance: this.onOutInstance,

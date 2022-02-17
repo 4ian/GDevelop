@@ -2141,6 +2141,7 @@ const MainFrame = (props: Props) => {
             <ClosableTab
               label={editorTab.label}
               key={editorTab.key}
+              id={`tab-${editorTab.key.replace(/\s/g, '-')}`}
               active={isCurrentTab}
               onClick={() => _onChangeEditorTab(id)}
               onClose={() => _onCloseEditorTab(editorTab)}
@@ -2332,7 +2333,10 @@ const MainFrame = (props: Props) => {
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={() => openPreferencesDialog(false)}
+          onClose={languageChanged => {
+            openPreferencesDialog(false);
+            if (languageChanged) _languageDidChange();
+          }}
         />
       )}
       {languageDialogOpen && (
@@ -2340,9 +2344,7 @@ const MainFrame = (props: Props) => {
           open
           onClose={languageChanged => {
             openLanguageDialog(false);
-            if (languageChanged) {
-              _languageDidChange();
-            }
+            if (languageChanged) _languageDidChange();
           }}
         />
       )}

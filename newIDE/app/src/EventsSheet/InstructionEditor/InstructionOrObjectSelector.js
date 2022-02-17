@@ -425,7 +425,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       {(isSearching || currentTab === 'objects') && (
                         <React.Fragment>
                           {displayedObjectsList.map(
-                            ({ item: objectWithContext, matches }) =>
+                            ({ item: objectWithContext, matches }, index) =>
                               renderObjectListItem({
                                 project: project,
                                 objectWithContext: objectWithContext,
@@ -442,6 +442,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                       chosenObjectName
                                     )
                                   : undefined,
+                                id: 'object-item-' + index,
                               })
                           )}
 
@@ -486,6 +487,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             onClick={() => {
                               this._selectTag(tag);
                             }}
+                            disableAutoTranslate
                           />
                         ))}
                       {isSearching && displayedInstructionsList.length > 0 && (

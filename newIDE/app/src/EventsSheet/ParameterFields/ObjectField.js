@@ -34,8 +34,8 @@ export default class ObjectField extends React.Component<
       : undefined;
   }
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {
@@ -61,6 +61,11 @@ export default class ObjectField extends React.Component<
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
         helperMarkdownText={this._longDescription}
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-object-selector`
+            : undefined
+        }
         fullWidth
         errorTextIfInvalid={
           this._allowedObjectType ? (

@@ -315,6 +315,11 @@
         "background-color": {
           "value": "#E06C7544"
         }
+      },
+      "warning": {
+        "color": {
+          "value": "#E5C07B"
+        }
       }
     },
     "drop-indicator": {

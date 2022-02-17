@@ -53,6 +53,23 @@ const styles = {
   },
 };
 
+const objectTypeToDefaultName = {
+  Sprite: 'NewSprite',
+  'TiledSpriteObject::TiledSprite': 'NewTiledSprite',
+  'ParticleSystem::ParticleEmitter': 'NewParticlesEmitter',
+  'PanelSpriteObject::PanelSprite': 'NewPanelSprite',
+  'PrimitiveDrawing::Drawer': 'NewShapePainter',
+  'TextObject::Text': 'NewText',
+  'BBText::BBText': 'NewBBText',
+  'BitmapText::BitmapTextObject': 'NewBitmapText',
+  'TextEntryObject::TextEntry': 'NewTextEntry',
+  'TileMap::TileMap': 'NewTileMap',
+  'MyDummyExtension::DummyObject': 'NewDummyObject',
+  'Lighting::LightObject': 'NewLight',
+  'TextInput::TextInputObject': 'NewTextInput',
+  'Video::VideoObject': 'NewVideo',
+};
+
 export const objectWithContextReactDndType = 'GD_OBJECT_WITH_CONTEXT';
 
 const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
@@ -167,7 +184,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     } = this.props;
 
     const name = newNameGenerator(
-      'NewObject',
+      objectTypeToDefaultName[objectType] || 'NewObject',
       name =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );
@@ -587,12 +604,16 @@ export default class ObjectsList extends React.Component<Props, State> {
                     height={height}
                     getItemName={getObjectWithContextName}
                     getItemThumbnail={this._getObjectThumbnail}
+                    getItemId={(objectWithContext, index) => {
+                      return 'object-item-' + index;
+                    }}
                     isItemBold={isObjectWithContextGlobal}
                     onEditItem={objectWithContext =>
                       this.props.onEditObject(objectWithContext.object)
                     }
                     onAddNewItem={this.onAddNewObject}
                     addNewItemLabel={<Trans>Add a new object</Trans>}
+                    addNewItemId="add-new-object-button"
                     selectedItems={selectedObjects}
                     onItemSelected={this._selectObject}
                     renamedItem={renamedObjectWithContext}

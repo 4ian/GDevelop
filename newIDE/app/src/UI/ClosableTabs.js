@@ -105,6 +105,7 @@ export class ClosableTabs extends Component<ClosableTabsProps> {
 }
 
 type ClosableTabProps = {|
+  id?: string,
   active: boolean,
   label: Node,
   closable: boolean,
@@ -116,6 +117,7 @@ type ClosableTabProps = {|
 |};
 
 export function ClosableTab({
+  id,
   active,
   onClose,
   onCloseOthers,
@@ -141,6 +143,15 @@ export function ClosableTab({
       contextMenu.current.open(event.clientX, event.clientY);
     }
   };
+
+  const closeOnMiddleClick = React.useCallback(
+    event => {
+      if (event.nativeEvent && event.nativeEvent.button === 1) {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
@@ -176,7 +187,9 @@ export function ClosableTab({
             >
               <ButtonBase
                 onClick={onClick}
+                onAuxClick={closable ? closeOnMiddleClick : undefined}
                 onContextMenu={openContextMenu}
+                id={id ? `${id}-button` : undefined}
                 {...longTouchForContextMenuProps}
                 focusRipple
               >
@@ -193,6 +206,7 @@ export function ClosableTab({
               {closable && (
                 <ButtonBase
                   onClick={onClose}
+                  onAuxClick={closeOnMiddleClick}
                   onContextMenu={openContextMenu}
                   {...longTouchForContextMenuProps}
                   focusRipple

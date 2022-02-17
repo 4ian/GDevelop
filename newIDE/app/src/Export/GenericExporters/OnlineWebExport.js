@@ -39,6 +39,7 @@ import {
   type Game,
 } from '../../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../../Profile/AuthenticatedUserContext';
+import AlertMessage from '../../UI/AlertMessage';
 
 const styles = {
   icon: {
@@ -51,8 +52,8 @@ export const ExplanationHeader = () => (
     <Line>
       <Text align="center">
         <Trans>
-          Generate a unique link to share your game, playable from any computer
-          or mobile phone's browser.
+          Generate a unique link, playable from any computer or mobile phone's
+          browser.
         </Trans>
       </Text>
     </Line>
@@ -85,11 +86,12 @@ export const WebProjectLink = ({
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
+  const gameUrl = getGameUrl(game);
   const buildUrl =
     exportPending || !isBuildComplete
       ? null
       : isBuildPublished
-      ? getGameUrl(game)
+      ? gameUrl
       : getBuildArtifactUrl(build, 's3Key');
 
   const loadGame = React.useCallback(
@@ -244,53 +246,76 @@ export const WebProjectLink = ({
               </Line>
             )}
             {isBuildPublished && !navigator.share && (
-              <Line justifyContent="flex-end">
-                <FacebookShareButton
-                  url={buildUrl}
-                  style={styles.icon}
-                  quote={`Try the game I just created with GDevelop.io`}
-                  hashtag="#gdevelop"
-                >
-                  <FacebookIcon size={32} round />
-                </FacebookShareButton>
-                <RedditShareButton
-                  url={buildUrl}
-                  title={`Try the game I just created with r/gdevelop`}
-                  style={styles.icon}
-                >
-                  <RedditIcon size={32} round />
-                </RedditShareButton>
-                <TwitterShareButton
-                  title={`Try the game I just created with GDevelop.io`}
-                  hashtags={['gdevelop']}
-                  url={buildUrl}
-                  style={styles.icon}
-                >
-                  <TwitterIcon size={32} round />
-                </TwitterShareButton>
-                <WhatsappShareButton
-                  title={`Try the game I just created with GDevelop.io`}
-                  url={buildUrl}
-                  style={styles.icon}
-                >
-                  <WhatsappIcon size={32} round />
-                </WhatsappShareButton>
-                <EmailShareButton
-                  subject="My GDevelop game"
-                  body="Try the game I just created with GDevelop.io"
-                  url={buildUrl}
-                  style={styles.icon}
-                >
-                  <EmailIcon size={32} round />
-                </EmailShareButton>
+              <Line justifyContent="space-between">
+                <Column justifyContent="center">
+                  <AlertMessage kind="info">
+                    <Trans>
+                      This link is unique to your game. Show what you made to
+                      the community!
+                    </Trans>
+                  </AlertMessage>
+                </Column>
+                <Column justifyContent="flex-end">
+                  <Line>
+                    <FacebookShareButton
+                      url={buildUrl}
+                      style={styles.icon}
+                      quote={`Try the game I just created with GDevelop.io`}
+                      hashtag="#gdevelop"
+                    >
+                      <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+                    <RedditShareButton
+                      url={buildUrl}
+                      title={`Try the game I just created with r/gdevelop`}
+                      style={styles.icon}
+                    >
+                      <RedditIcon size={32} round />
+                    </RedditShareButton>
+                    <TwitterShareButton
+                      title={`Try the game I just created with GDevelop.io`}
+                      hashtags={['gdevelop']}
+                      url={buildUrl}
+                      style={styles.icon}
+                    >
+                      <TwitterIcon size={32} round />
+                    </TwitterShareButton>
+                    <WhatsappShareButton
+                      title={`Try the game I just created with GDevelop.io`}
+                      url={buildUrl}
+                      style={styles.icon}
+                    >
+                      <WhatsappIcon size={32} round />
+                    </WhatsappShareButton>
+                    <EmailShareButton
+                      subject="My GDevelop game"
+                      body="Try the game I just created with GDevelop.io"
+                      url={buildUrl}
+                      style={styles.icon}
+                    >
+                      <EmailIcon size={32} round />
+                    </EmailShareButton>
+                  </Line>
+                </Column>
               </Line>
             )}
             {!isBuildPublished && (
-              <Line justifyContent="center">
-                <RaisedButton
-                  label={<Trans>Publish this build to the game's page</Trans>}
-                  onClick={onUpdatePublicBuild}
-                />
+              <Line>
+                <AlertMessage
+                  kind="info"
+                  renderRightButton={() => (
+                    <RaisedButton
+                      label={<Trans>Update your game</Trans>}
+                      onClick={onUpdatePublicBuild}
+                    />
+                  )}
+                >
+                  <Trans>
+                    This link is private so you can share it with friends and
+                    testers. When you're ready you can update your Liluo.io game
+                    page.
+                  </Trans>
+                </AlertMessage>
               </Line>
             )}
           </Column>

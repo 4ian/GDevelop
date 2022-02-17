@@ -1,11 +1,16 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import classNames from 'classnames';
-import { icon, nameAndIconContainer } from '../EventsTree/ClassNames';
+import {
+  icon,
+  nameAndIconContainer,
+  instructionWarningParameter,
+} from '../EventsTree/ClassNames';
 import SemiControlledAutoComplete, {
   type SemiControlledAutoCompleteInterface,
   type DataSource,
@@ -25,6 +30,41 @@ type Props = {
 type State = {|
   autocompletionVariableNames: DataSource,
 |};
+
+type VariableNameQuickAnalyzeResult = 0 | 1 | 2 | 3;
+
+export const VariableNameQuickAnalyzeResults = {
+  OK: 0,
+  WRONG_QUOTE: 1,
+  WRONG_SPACE: 2,
+  WRONG_EXPRESSION: 3,
+};
+
+export const quicklyAnalyzeVariableName = (
+  name: string
+): VariableNameQuickAnalyzeResult => {
+  for (let i = 0; i < name.length; ++i) {
+    const character = name[i];
+    if (character === '[') {
+      // This probably starts an expression, so stop the analysis.
+      return VariableNameQuickAnalyzeResults.OK;
+    } else if (character === ' ') {
+      return VariableNameQuickAnalyzeResults.WRONG_SPACE;
+    } else if (character === '"') {
+      return VariableNameQuickAnalyzeResults.WRONG_QUOTE;
+    } else if (
+      character === '(' ||
+      character === '+' ||
+      character === '-' ||
+      character === '/' ||
+      character === '*'
+    ) {
+      return VariableNameQuickAnalyzeResults.WRONG_EXPRESSION;
+    }
+  }
+
+  return VariableNameQuickAnalyzeResults.OK;
+};
 
 export default class VariableField extends Component<Props, State> {
   _field: ?SemiControlledAutoCompleteInterface;
@@ -73,8 +113,8 @@ export default class VariableField extends Component<Props, State> {
     });
   }
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {
@@ -92,6 +132,29 @@ export default class VariableField extends Component<Props, State> {
       ? parameterMetadata.getDescription()
       : undefined;
 
+    const quicklyAnalysisResult = quicklyAnalyzeVariableName(value);
+
+    const errorText =
+      quicklyAnalysisResult === VariableNameQuickAnalyzeResults.WRONG_QUOTE ? (
+        <Trans>
+          It seems you entered a name with a quote. Variable names should not be
+          quoted.
+        </Trans>
+      ) : quicklyAnalysisResult ===
+        VariableNameQuickAnalyzeResults.WRONG_SPACE ? (
+        <Trans>
+          The variable name contains a space - this is not recommended. Prefer
+          to use underscores or uppercase letters to separate words.
+        </Trans>
+      ) : quicklyAnalysisResult ===
+        VariableNameQuickAnalyzeResults.WRONG_EXPRESSION ? (
+        <Trans>
+          The variable name looks like you're building an expression or a
+          formula. You can only use this for structure or arrays. For example:
+          Score[3].
+        </Trans>
+      ) : null;
+
     return (
       <TextFieldWithButtonLayout
         renderTextField={() => (
@@ -103,6 +166,7 @@ export default class VariableField extends Component<Props, State> {
                 ? parameterMetadata.getLongDescription()
                 : undefined
             }
+            errorText={errorText}
             fullWidth
             value={value}
             onChange={onChange}
@@ -147,6 +211,9 @@ export const renderVariableWithIcon = (
       title={tooltip}
       className={classNames({
         [nameAndIconContainer]: true,
+        [instructionWarningParameter]:
+          quicklyAnalyzeVariableName(value) !==
+          VariableNameQuickAnalyzeResults.OK,
       })}
     >
       <img

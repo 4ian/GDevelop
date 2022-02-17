@@ -243,7 +243,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/light',
+        helpPagePath: '/all-features/lighting/reference',
       })
     );
   },

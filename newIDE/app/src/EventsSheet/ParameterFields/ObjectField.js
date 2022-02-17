@@ -34,8 +34,8 @@ export default class ObjectField extends React.Component<
       : undefined;
   }
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

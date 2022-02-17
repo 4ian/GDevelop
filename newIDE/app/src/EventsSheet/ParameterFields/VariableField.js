@@ -73,8 +73,8 @@ export default class VariableField extends Component<Props, State> {
     });
   }
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

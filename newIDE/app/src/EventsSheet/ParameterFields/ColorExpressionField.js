@@ -8,8 +8,8 @@ import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
 export default class ParameterColorField extends Component<ParameterFieldProps> {
   _field: ?GenericExpressionField;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

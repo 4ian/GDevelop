@@ -35,6 +35,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
+import { mapReverseFor } from '../Utils/MapFor';
 import UseSceneEditorCommands from './UseSceneEditorCommands';
 import { type InstancesEditorSettings } from '../InstancesEditor/InstancesEditorSettings';
 
@@ -43,6 +44,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type HistoryState,
   undo,
@@ -59,6 +61,7 @@ import {
   enumerateObjects,
 } from '../ObjectsList/EnumerateObjects';
 import TagsButton from '../UI/EditorMosaic/TagsButton';
+import LayerButton from '../UI/EditorMosaic/LayerButton';
 import CloseButton from '../UI/EditorMosaic/CloseButton';
 import {
   type SelectedTags,
@@ -155,6 +158,8 @@ type State = {|
 
   // State for tags of objects:
   selectedObjectTags: SelectedTags,
+  // State for default layer to add objects:
+  selectedObjectDefaultLayer: string,
 |};
 
 type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
@@ -212,6 +217,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       },
 
       selectedObjectTags: [],
+      selectedObjectDefaultLayer: '',
     };
   }
 
@@ -610,6 +616,8 @@ export default class SceneEditor extends React.Component<Props, State> {
                   newLayer
                 );
               }
+
+              this._setObjectDefaultLayer(newLayer || '');
             }
 
             done(doRemove);
@@ -634,6 +642,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     done: boolean => void
   ) => {
     this.props.initialInstances.moveInstancesToLayer(oldName, newName);
+    if (this.state.selectedObjectDefaultLayer === oldName)
+      this._setObjectDefaultLayer(newName);
     done(true);
   };
 
@@ -970,6 +980,55 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  _setObjectDefaultLayer = (layerName: string) => {
+    this.setState(
+      {
+        selectedObjectDefaultLayer: layerName,
+      },
+      () => {
+        if (this.editor) this.editor.setDefaultLayer(layerName);
+      }
+    );
+  };
+
+  _buildObjectLayerMenuItem = (
+    i18n: I18nType,
+    layerName: string
+  ): MenuItemTemplate => ({
+    type: 'checkbox',
+    label: layerName || i18n._(t`Base layer`),
+    checked: this.state.selectedObjectDefaultLayer === layerName,
+    click: () => this._setObjectDefaultLayer(layerName),
+  });
+
+  _buildObjectLayerMenuTemplate = (
+    i18n: I18nType,
+    layout: gdLayout
+  ): Array<MenuItemTemplate> => {
+    const nonBaseLayerNames = mapReverseFor(0, layout.getLayersCount(), i =>
+      layout.getLayerAt(i).getName()
+    ).filter(name => name !== '');
+
+    const layerMenu: Array<MenuItemTemplate> = [
+      this._buildObjectLayerMenuItem(i18n, ''),
+    ];
+
+    if (nonBaseLayerNames.length > 0) {
+      layerMenu.push(
+        ...[
+          {
+            type: 'separator',
+          },
+          ...nonBaseLayerNames.map(layerName =>
+            this._buildObjectLayerMenuItem(i18n, layerName)
+          ),
+        ]
+      );
+    }
+
+    return layerMenu;
+  };
+
   render() {
     const {
       project,
@@ -1078,6 +1137,15 @@ export default class SceneEditor extends React.Component<Props, State> {
         type: 'secondary',
         title: t`Objects`,
         toolbarControls: [
+          <I18n key="layer">
+            {i18n => (
+              <LayerButton
+                buildMenuTemplate={(i18n: I18nType) =>
+                  this._buildObjectLayerMenuTemplate(i18n, layout)
+                }
+              />
+            )}
+          </I18n>,
           <I18n key="tags">
             {({ i18n }) => (
               <TagsButton

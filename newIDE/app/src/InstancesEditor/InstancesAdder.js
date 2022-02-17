@@ -40,15 +40,21 @@ export default class InstancesAdder {
   _temporaryInstances: Array<gdInitialInstance>;
   _instancesEditorSettings: InstancesEditorSettings;
   _zOrderFinder = new gd.HighestZOrderFinder();
+  _defaultLayer: string;
 
   constructor({ instances, instancesEditorSettings }: Props) {
     this._instances = instances;
     this._instancesEditorSettings = instancesEditorSettings;
     this._temporaryInstances = [];
+    this._defaultLayer = '';
   }
 
   setInstancesEditorSettings(instancesEditorSettings: InstancesEditorSettings) {
     this._instancesEditorSettings = instancesEditorSettings;
+  }
+
+  setDefaultLayer(layerName: string) {
+    this._defaultLayer = layerName;
   }
 
   /**
@@ -69,6 +75,7 @@ export default class InstancesAdder {
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
       instance.setZOrder(zOrder);
+      if (this._defaultLayer) instance.setLayer(this._defaultLayer);
 
       return instance;
     });
@@ -109,6 +116,7 @@ export default class InstancesAdder {
       instance.setX(newPos[0]);
       instance.setY(newPos[1]);
       instance.setZOrder(zOrder);
+      if (this._defaultLayer) instance.setLayer(this._defaultLayer);
 
       return instance;
     });

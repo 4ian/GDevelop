@@ -524,6 +524,10 @@ export default class InstancesEditor extends Component<Props> {
     return this._instancesAdder.addInstances(pos, objectNames);
   };
 
+  setDefaultLayer = (layer: string) => {
+    this._instancesAdder.setDefaultLayer(layer);
+  };
+
   _onMouseMove = (x: number, y: number) => {
     this.lastCursorX = x;
     this.lastCursorY = y;

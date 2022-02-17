@@ -15,8 +15,8 @@ export default class ObjectAnimationNameField extends Component<
 > {
   _field: ?GenericExpressionField;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   getAnimationNames(): Array<ExpressionAutocompletion> {

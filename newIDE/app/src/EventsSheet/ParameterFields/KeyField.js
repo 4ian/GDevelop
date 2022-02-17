@@ -121,8 +121,8 @@ const isKeyValid = (key: string) => keyNames.indexOf(key) !== -1;
 export default class KeyField extends Component<ParameterFieldProps, {||}> {
   _field: ?any;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

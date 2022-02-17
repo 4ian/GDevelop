@@ -58,7 +58,7 @@ type Props = {|
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
-  focus: () => void,
+  focus: (selectAll?: boolean) => void,
   forceInputValueTo: (newValue: string) => void,
 |};
 
@@ -236,8 +236,12 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     const classes = useStyles();
 
     React.useImperativeHandle(ref, () => ({
-      focus: () => {
-        if (input.current) input.current.focus();
+      focus: (selectAll: boolean = false) => {
+        const { current } = input;
+        if (current) {
+          current.focus();
+          current.setSelectionRange(0, props.value.toString().length);
+        }
       },
       forceInputValueTo: (newValue: string) => {
         if (inputValue !== null) setInputValue(newValue);

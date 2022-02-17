@@ -33,6 +33,7 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _isLoaded: boolean = false;
+    private asyncTasksManager = new gdjs.AsyncTasksManager();
 
     // True if loadFromScene was called and the scene is being played.
     _isJustResumed: boolean = false;
@@ -472,6 +473,13 @@ namespace gdjs {
         elapsedTime,
         this._runtimeGame.getMinimalFramerate()
       );
+      if (this._profiler) {
+        this._profiler.begin('asynchronous callbacks');
+      }
+      this.asyncTasksManager.processTasks(this);
+      if (this._profiler) {
+        this._profiler.end('asynchronous callbacks');
+      }
       if (this._profiler) {
         this._profiler.begin('objects (pre-events)');
       }
@@ -1043,6 +1051,13 @@ namespace gdjs {
      */
     getSoundManager(): gdjs.SoundManager {
       return this._runtimeGame.getSoundManager();
+    }
+
+    /**
+     * @returns The scene's async tasks manager.
+     */
+    getAsyncTasksManager() {
+      return this.asyncTasksManager;
     }
 
     /**

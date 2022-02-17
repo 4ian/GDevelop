@@ -9,6 +9,7 @@
 #include <set>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -30,6 +31,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDJS/Events/Builtin/JsCodeEvent.h"
+#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 
 using namespace std;
 using namespace gd;
@@ -185,6 +187,80 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
 
         return outputCode;
+      });
+
+  GetAllEvents()["BuiltinCommonInstructions::Async"].SetCodeGenerator(
+      [](gd::BaseEvent& event_,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& parentContext) {
+        gd::AsyncEvent& event = dynamic_cast<gd::AsyncEvent&>(event_);
+
+        const gd::String callbackFunctionName =
+            "asyncCallback" +
+            gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
+                &event.GetInstruction()));
+
+        // Generate callback code
+        gd::EventsCodeGenerationContext callbackContext;
+        callbackContext.InheritsAsAsyncCallbackFrom(parentContext);
+
+        // Generate actions
+        gd::String actionsCode = codeGenerator.GenerateActionsListCode(
+            event.GetActions(), callbackContext);
+
+        // Generate subevents
+        if (event.HasSubEvents())  // Sub events
+        {
+          actionsCode += "\n{ //Subevents\n";
+          actionsCode += codeGenerator.GenerateEventsListCode(
+              event.GetSubEvents(), callbackContext);
+          actionsCode += "} //End of subevents\n";
+        }
+
+        // Compose the callback function and add outside main
+        const gd::String actionsDeclarationsCode =
+            codeGenerator.GenerateObjectsDeclarationCode(callbackContext);
+        // TODO: see if we can avoid putting these functions in the global
+        // namespace.
+        const gd::String callbackCode =
+            "function " + callbackFunctionName + "(" +
+            dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
+                .GenerateEventsParameters(callbackContext) +
+            ") {\n" + actionsDeclarationsCode + actionsCode + "}\n";
+        codeGenerator.AddCustomCodeOutsideMain(callbackCode);
+
+        // Generate code to backup the objects lists
+        gd::String objectsListsCode =
+            parentContext.IsAsync()
+                ? "asyncObjectsList = "
+                  "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
+                : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
+        // The objects to be declared of the callback context tell all objects
+        // used in the callbacks so that they can be backed up now.
+        for (const gd::String& objectToBackup :
+             callbackContext.GetAllDeclaredObjectsAcrossChildren()) {
+          if (parentContext.ObjectAlreadyDeclared(objectToBackup))
+            objectsListsCode +=
+                "for (const obj of " +
+                codeGenerator.GetObjectListName(objectToBackup, parentContext) +
+                ") asyncObjectsList.addObject(obj);\n";
+        }
+
+        const gd::String callbackCallCode =
+            "(runtimeScene) => (" + callbackFunctionName + "(" +
+            dynamic_cast<gdjs::EventsCodeGenerator&>(codeGenerator)
+                .GenerateEventsParameters(callbackContext) +
+            "))";
+
+        // Generate the action and store the generated task.
+        // TODO: rework this into a `codeGenerator.GenerateStoreTaskCode(codeGenerator.GenerateActionCode(...))`
+        const gd::String taskSchedulingCode = codeGenerator.GenerateActionCode(
+            event.GetInstruction(),
+            parentContext,
+            "runtimeScene.getAsyncTasksManager().addTask(",
+            ", " + callbackCallCode + ");\n");
+
+        return "{" + objectsListsCode + taskSchedulingCode + "}";
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Comment"].SetCodeGenerator(
@@ -437,11 +513,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (
-          event.GetWhileConditions().empty() &&
-          event.GetConditions().empty() &&
-          event.GetActions().empty()
-        )
+        if (event.GetWhileConditions().empty() &&
+            event.GetConditions().empty() && event.GetActions().empty())
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
 

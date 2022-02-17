@@ -11,8 +11,8 @@ export default class FunctionParameterNameField extends Component<
 > {
   _field: ?GenericExpressionField;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

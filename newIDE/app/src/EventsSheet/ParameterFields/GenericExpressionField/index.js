@@ -183,7 +183,6 @@ export default class ExpressionField extends React.Component<Props, State> {
     if (this._field) {
       this._field.focus();
       if (selectAll) {
-        this._inputElement = this._field ? this._field.getInputNode() : null;
         if (this._inputElement) {
           this._inputElement.setSelectionRange(
             0,

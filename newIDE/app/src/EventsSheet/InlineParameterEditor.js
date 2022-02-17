@@ -100,7 +100,8 @@ export default class InlineParameterEditor extends React.Component<
       () => {
         // Give a bit of time for the popover to mount itself
         setTimeout(() => {
-          if (this._field && this._field.focus) this._field.focus(true);
+          if (this._field && this._field.focus)
+            this._field.focus(/*selectAll=*/ true);
         }, 10);
       }
     );

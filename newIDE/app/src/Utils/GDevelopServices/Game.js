@@ -10,7 +10,7 @@ export type PublicGame = {
   authorName: string, // this corresponds to the publisher name
   publicWebBuildId?: ?string,
   description?: string,
-  authors: Array<UserPublicProfile>,
+  authors: Array<?UserPublicProfile>,
   metrics?: {
     lastWeekSessionsCount: number,
     lastYearSessionsCount: number,

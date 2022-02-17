@@ -48,7 +48,9 @@ const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
 }: Props) => {
-  const publicGameAuthorIds = game.authors.map(author => author.id);
+  const publicGameAuthorIds = game.authors
+    .map(author => (author ? author.id : null))
+    .filter(Boolean);
   const [name, setName] = React.useState(game.gameName);
   const [description, setDescription] = React.useState(game.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(

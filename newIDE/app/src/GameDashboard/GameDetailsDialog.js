@@ -200,7 +200,9 @@ export const GameDetailsDialog = ({
 
   const authorUsernames =
     publicGame && publicGame.authors
-      ? publicGame.authors.map(author => author.username).filter(Boolean)
+      ? publicGame.authors
+          .map(author => (author ? author.username : null))
+          .filter(Boolean)
       : [];
 
   const isGameOpenedAsProject =

@@ -487,6 +487,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             onClick={() => {
                               this._selectTag(tag);
                             }}
+                            disableAutoTranslate
                           />
                         ))}
                       {isSearching && displayedInstructionsList.length > 0 && (

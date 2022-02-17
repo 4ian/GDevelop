@@ -32,6 +32,7 @@ export const renderObjectListItem = ({
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
+      id={id}
       key={getObjectListItemKey(objectWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
@@ -52,7 +53,7 @@ export const renderObjectListItem = ({
         />
       }
       onClick={onClick}
-      id={id}
+      disableAutoTranslate
     />
   );
 };

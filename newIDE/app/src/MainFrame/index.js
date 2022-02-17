@@ -2333,7 +2333,10 @@ const MainFrame = (props: Props) => {
       {preferencesDialogOpen && (
         <PreferencesDialog
           i18n={props.i18n}
-          onClose={() => openPreferencesDialog(false)}
+          onClose={languageChanged => {
+            openPreferencesDialog(false);
+            if (languageChanged) _languageDidChange();
+          }}
         />
       )}
       {languageDialogOpen && (
@@ -2341,9 +2344,7 @@ const MainFrame = (props: Props) => {
           open
           onClose={languageChanged => {
             openLanguageDialog(false);
-            if (languageChanged) {
-              _languageDidChange();
-            }
+            if (languageChanged) _languageDidChange();
           }}
         />
       )}

@@ -261,8 +261,9 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.interactive = true;
       gesture.panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
-      renderedInstance._pixiObject.on('click', () => {
-        this.onInstanceClicked(instance);
+      renderedInstance._pixiObject.on('click', event => {
+        if (event.data.originalEvent.button === 0)
+          this.onInstanceClicked(instance);
       });
       renderedInstance._pixiObject.on('doubleclick', () => {
         this.onInstanceDoubleClicked(instance);
@@ -273,12 +274,14 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on(
         'mousedown',
         (event: PIXI.InteractionEvent) => {
-          const viewPoint = event.data.global;
-          const scenePoint = this.viewPosition.toSceneCoordinates(
-            viewPoint.x,
-            viewPoint.y
-          );
-          this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+          if (event.data.originalEvent.button === 0) {
+            const viewPoint = event.data.global;
+            const scenePoint = this.viewPosition.toSceneCoordinates(
+              viewPoint.x,
+              viewPoint.y
+            );
+            this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+          }
         }
       );
       renderedInstance._pixiObject.on('rightclick', interactionEvent => {

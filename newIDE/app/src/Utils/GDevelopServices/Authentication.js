@@ -101,7 +101,8 @@ export default class Authentication {
 
   createUser = (
     getAuthorizationHeader: () => Promise<string>,
-    form: RegisterForm
+    form: RegisterForm,
+    appLanguage: string
   ): Promise<void> => {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
@@ -120,6 +121,7 @@ export default class Authentication {
             id: currentUser.uid,
             email: form.email,
             username: form.username,
+            appLanguage: appLanguage,
           },
           {
             params: {
@@ -256,7 +258,8 @@ export default class Authentication {
 
   editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
-    form: EditForm
+    form: EditForm,
+    appLanguage: string
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -271,6 +274,7 @@ export default class Authentication {
             username,
             description,
             getGameStatsEmail,
+            appLanguage,
           },
           {
             params: {

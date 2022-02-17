@@ -152,17 +152,6 @@ export default class InstancesEditor extends Component<Props> {
         this.props.onContextMenu(event.clientX, event.clientY),
     });
 
-    this.pixiRenderer.view.addEventListener('contextmenu', e => {
-      e.preventDefault();
-
-      this.lastContextMenuX = e.offsetX;
-      this.lastContextMenuY = e.offsetY;
-      if (this.props.onContextMenu)
-        this.props.onContextMenu(e.clientX, e.clientY);
-
-      return false;
-    });
-
     this.pixiRenderer.view.onwheel = (event: any) => {
       const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom()) {
@@ -207,6 +196,22 @@ export default class InstancesEditor extends Component<Props> {
     gesture.panable(this.backgroundArea);
     this.backgroundArea.on('mousedown', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
+    );
+    this.backgroundArea.on(
+      'rightclick',
+      (interactionEvent: PIXI.InteractionEvent) => {
+        const {
+          data: { originalEvent: event },
+        } = interactionEvent;
+        this._onInstanceRightClicked({
+          offsetX: event.offsetX,
+          offsetY: event.offsetY,
+          x: event.clientX,
+          y: event.clientY,
+        })
+
+        return false;
+      }
     );
     this.backgroundArea.on('touchstart', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
@@ -332,6 +337,7 @@ export default class InstancesEditor extends Component<Props> {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
+      onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -596,6 +602,22 @@ export default class InstancesEditor extends Component<Props> {
 
   _onInstanceClicked = (instance: gdInitialInstance) => {
     this.pixiRenderer.view.focus();
+  };
+
+  _onInstanceRightClicked = ({
+    offsetX,
+    offsetY,
+    x,
+    y,
+  }: {|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+  |}) => {
+    this.lastContextMenuX = offsetX;
+    this.lastContextMenuY = offsetY;
+    if (this.props.onContextMenu) this.props.onContextMenu(x, y);
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {

@@ -22,6 +22,12 @@ export default class LayerRenderer {
   layer: gdLayer;
   viewPosition: ViewPosition;
   onInstanceClicked: gdInitialInstance => void;
+  onInstanceRightClicked: ({|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+  |}) => void;
   onInstanceDoubleClicked: gdInitialInstance => void;
   onOverInstance: gdInitialInstance => void;
   onOutInstance: gdInitialInstance => void;
@@ -51,6 +57,7 @@ export default class LayerRenderer {
     viewPosition,
     instances,
     onInstanceClicked,
+    onInstanceRightClicked,
     onInstanceDoubleClicked,
     onOverInstance,
     onOutInstance,
@@ -64,6 +71,12 @@ export default class LayerRenderer {
     layer: gdLayer,
     viewPosition: ViewPosition,
     onInstanceClicked: gdInitialInstance => void,
+    onInstanceRightClicked: ({|
+      offsetX: number,
+      offsetY: number,
+      x: number,
+      y: number,
+    |}) => void,
     onInstanceDoubleClicked: gdInitialInstance => void,
     onOverInstance: gdInitialInstance => void,
     onOutInstance: gdInitialInstance => void,
@@ -78,6 +91,7 @@ export default class LayerRenderer {
     // `layer` can be changed at any moment (see InstancesRenderer).
     this.viewPosition = viewPosition;
     this.onInstanceClicked = onInstanceClicked;
+    this.onInstanceRightClicked = onInstanceRightClicked;
     this.onInstanceDoubleClicked = onInstanceDoubleClicked;
     this.onOverInstance = onOverInstance;
     this.onOutInstance = onOutInstance;
@@ -256,13 +270,40 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mouseover', () => {
         this.onOverInstance(instance);
       });
-      renderedInstance._pixiObject.on('mousedown', event => {
-        const viewPoint = event.data.global;
+      renderedInstance._pixiObject.on(
+        'mousedown',
+        (event: PIXI.InteractionEvent) => {
+          const viewPoint = event.data.global;
+          const scenePoint = this.viewPosition.toSceneCoordinates(
+            viewPoint.x,
+            viewPoint.y
+          );
+          this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+        }
+      );
+      renderedInstance._pixiObject.on('rightclick', interactionEvent => {
+        const {
+          data: { global: viewPoint, originalEvent: event },
+        } = interactionEvent;
+
+        // First select the instance
         const scenePoint = this.viewPosition.toSceneCoordinates(
           viewPoint.x,
           viewPoint.y
         );
         this.onDownInstance(instance, scenePoint[0], scenePoint[1]);
+
+        // Then call right click callback
+        if (this.onInstanceRightClicked) {
+          this.onInstanceRightClicked({
+            offsetX: event.offsetX,
+            offsetY: event.offsetY,
+            x: event.clientX,
+            y: event.clientY,
+          });
+        }
+
+        return false;
       });
       renderedInstance._pixiObject.on('touchstart', event => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {

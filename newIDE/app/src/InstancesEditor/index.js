@@ -208,7 +208,7 @@ export default class InstancesEditor extends Component<Props> {
           offsetY: event.offsetY,
           x: event.clientX,
           y: event.clientY,
-        })
+        });
 
         return false;
       }

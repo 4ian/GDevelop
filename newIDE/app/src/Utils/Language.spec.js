@@ -27,13 +27,15 @@ jest.mock('../locales/LocalesMetadata', () => [
   },
 ]);
 
+const mockGetBrowserLanguageOrLocale = jest.fn();
+
 jest.mock('./Language', () => {
   const originalModule = jest.requireActual('./Language');
 
   return {
     __esModule: true,
     ...originalModule,
-    getBrowserLanguageOrLocale: jest.fn(),
+    getBrowserLanguageOrLocale: () => mockGetBrowserLanguageOrLocale(),
   };
 });
 
@@ -44,22 +46,19 @@ describe('PreferencesProvider', () => {
   describe('getInitialPreferences', () => {
     describe('Browser with language', () => {
       test('return the best translated locale among the possible locales for this language, if good enough', () => {
-        // $FlowFixMe
-        getBrowserLanguageOrLocale.mockReturnValue('pt');
+        mockGetBrowserLanguageOrLocale.mockReturnValue('pt');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('pt_BR');
       });
 
       test('return default if the best translated locale is not good enough', () => {
-        // $FlowFixMe
-        getBrowserLanguageOrLocale.mockReturnValue('fr');
+        mockGetBrowserLanguageOrLocale.mockReturnValue('fr');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('en');
       });
 
       test('return default if there is no matching language or locale', () => {
-        // $FlowFixMe
-        getBrowserLanguageOrLocale.mockReturnValue('zh');
+        mockGetBrowserLanguageOrLocale.mockReturnValue('zh');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('en');
       });
@@ -67,22 +66,19 @@ describe('PreferencesProvider', () => {
 
     describe('Browser with locale', () => {
       test('return locale if exact match exists and if translation ratio is good enough', () => {
-        // $FlowFixMe
-        getBrowserLanguageOrLocale.mockReturnValue('es_ES');
+        mockGetBrowserLanguageOrLocale.mockReturnValue('es_ES');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('es_ES');
       });
 
       test('return default if exact match exists but translation ratio is not good enough', () => {
-        // $FlowFixMe
-        getBrowserLanguageOrLocale.mockReturnValue('pt_PT');
+        mockGetBrowserLanguageOrLocale.mockReturnValue('pt_PT');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('en');
       });
 
       test('return default if there is no matching locale', () => {
-        // $FlowFixMe
-        getBrowserLanguageOrLocale.mockReturnValue('zh_CN');
+        mockGetBrowserLanguageOrLocale.mockReturnValue('zh_CN');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('en');
       });

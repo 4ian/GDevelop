@@ -8,14 +8,14 @@ This project is released under the MIT License.
 #include "PlatformerObjectBehavior.h"
 
 #include <iostream>
-#include <memory>
 #include <map>
+#include <memory>
 
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Project/PropertyDescriptor.h"
+#include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Localization.h"
 #include "PlatformBehavior.h"
 
 void PlatformerObjectBehavior::InitializeContent(
@@ -48,7 +48,8 @@ PlatformerObjectBehavior::GetProperties(
       gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
   properties[_("Jump speed")].SetGroup(_("Jump")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
-  properties["jumpSustainTime"].SetGroup(_("Jump"))
+  properties["jumpSustainTime"]
+      .SetGroup(_("Jump"))
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
       .SetLabel(_("Jump sustain time"))
@@ -58,8 +59,10 @@ PlatformerObjectBehavior::GetProperties(
             "jumps."));
   properties[_("Max. falling speed")].SetGroup(_("Jump")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
-  properties[_("Ladder climbing speed")].SetGroup(_("Ladder")).SetValue(gd::String::From(
-      behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
+  properties[_("Ladder climbing speed")]
+      .SetGroup(_("Ladder"))
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
   properties[_("Acceleration")].SetGroup(_("Walk")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
   properties[_("Deceleration")].SetGroup(_("Walk")).SetValue(
@@ -79,18 +82,25 @@ PlatformerObjectBehavior::GetProperties(
                     ? "true"
                     : "false")
       .SetType("Boolean");
-  properties[_("Automatically grab platform ledges without having to move horizontally")]
+  properties[_("Automatically grab platform ledges without having to move "
+               "horizontally")]
       .SetGroup(_("Ledge"))
       .SetValue(behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
                     ? "true"
                     : "false")
       .SetType("Boolean");
-  properties[_("Grab offset on Y axis")].SetGroup(_("Ledge")).SetValue(
-      gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
-  properties[_("Grab tolerance on X axis")].SetGroup(_("Ledge")).SetValue(gd::String::From(
-      behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
-  properties[_("Use frame per second dependent trajectories (deprecated)")]
-      .SetGroup(_("Jump"))
+  properties[_("Grab offset on Y axis")]
+      .SetGroup(_("Ledge"))
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
+  properties[_("Grab tolerance on X axis")]
+      .SetGroup(_("Ledge"))
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
+  properties["useLegacyTrajectory"]
+      .SetLabel(_("Use frame per second dependent trajectories (deprecated, it's "
+               "recommended to let this unchecked)"))
+      .SetGroup(_("Deprecated options (advanced)"))
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
                     ? "true"
                     : "false")
@@ -112,9 +122,10 @@ bool PlatformerObjectBehavior::UpdateProperty(
     behaviorContent.SetAttribute("ignoreDefaultControls", (value == "0"));
   else if (name == _("Can grab platform ledges"))
     behaviorContent.SetAttribute("canGrabPlatforms", (value == "1"));
-  else if (name == _("Automatically grab platform ledges without having to move horizontally"))
+  else if (name == _("Automatically grab platform ledges without having to "
+                     "move horizontally"))
     behaviorContent.SetAttribute("canGrabWithoutMoving", (value == "1"));
-  else if (name == _("Use frame per second dependent trajectories (deprecated)"))
+  else if (name == "useLegacyTrajectory")
     behaviorContent.SetAttribute("useLegacyTrajectory", (value == "1"));
   else if (name == _("Can go down from jumpthru platforms"))
     behaviorContent.SetAttribute("canGoDownFromJumpthru", (value == "1"));

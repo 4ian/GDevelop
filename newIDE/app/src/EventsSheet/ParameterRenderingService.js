@@ -54,6 +54,7 @@ import ObjectEffectParameterNameField from './ParameterFields/ObjectEffectParame
 import ObjectPointNameField from './ParameterFields/ObjectPointNameField';
 import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField';
 import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
+import ExternalLayoutNameField from './ParameterFields/ExternalLayoutNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 const gd: libGDevelop = global.gd;
 
@@ -93,6 +94,7 @@ const components = {
   objectPointName: ObjectPointNameField,
   objectAnimationName: ObjectAnimationNameField,
   functionParameterName: FunctionParameterNameField,
+  externalLayoutName: ExternalLayoutNameField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -140,6 +142,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   objectPointName: t`Object point name`,
   objectAnimationName: t`Object animation name`,
   functionParameterName: t`Parameter name`,
+  externalLayoutName: t`Name of the external layout`,
 };
 
 export default {

@@ -902,6 +902,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         instance.delete();
         return newInstance;
       });
+    this._onInstancesAdded(newInstances)
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances(newInstances, true);
   };

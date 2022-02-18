@@ -644,11 +644,14 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    const answer = Window.showConfirmDialog(
+    const answer = Window.showYesNoCancelDialog(
       i18n._(
         t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
       )
     );
+
+    if (answer === 1) return;
+    const shouldRemoveReferences = answer === 0;
 
     // Unselect instances of the deleted object because these instances
     // will be deleted by gd.WholeProjectRefactorer (and after that, they will
@@ -660,7 +663,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         project,
         object.getName(),
         /* isObjectGroup=*/ false,
-        !!answer
+        shouldRemoveReferences
       );
     } else {
       gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
@@ -668,7 +671,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         layout,
         object.getName(),
         /* isObjectGroup=*/ false,
-        !!answer
+        shouldRemoveReferences
       );
     }
 

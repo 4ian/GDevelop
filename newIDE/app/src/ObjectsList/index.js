@@ -222,12 +222,14 @@ export default class ObjectsList extends React.Component<Props, State> {
     this.setState({ newObjectDialogOpen: true });
   };
 
-  _deleteObject = (objectWithContext: ObjectWithContext) => {
+  _deleteObject = (i18n: I18nType, objectWithContext: ObjectWithContext) => {
     const { object, global } = objectWithContext;
     const { project, objectsContainer } = this.props;
 
     const answer = Window.showConfirmDialog(
-      "Are you sure you want to remove this object? This can't be undone."
+      i18n._(
+        t`Are you sure you want to remove this object? This can't be undone.`
+      )
     );
     if (!answer) return;
 
@@ -258,9 +260,9 @@ export default class ObjectsList extends React.Component<Props, State> {
     });
   };
 
-  _cutObject = (objectWithContext: ObjectWithContext) => {
+  _cutObject = (i18n: I18nType, objectWithContext: ObjectWithContext) => {
     this._copyObject(objectWithContext);
-    this._deleteObject(objectWithContext);
+    this._deleteObject(i18n, objectWithContext);
   };
 
   _duplicateObject = (objectWithContext: ObjectWithContext) => {
@@ -513,7 +515,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: i18n._(t`Delete`),
-        click: () => this._deleteObject(objectWithContext),
+        click: () => this._deleteObject(i18n, objectWithContext),
       },
       { type: 'separator' },
       {
@@ -527,7 +529,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       {
         label: i18n._(t`Cut`),
-        click: () => this._cutObject(objectWithContext),
+        click: () => this._cutObject(i18n, objectWithContext),
       },
       {
         label: getPasteLabel(objectWithContext.global),

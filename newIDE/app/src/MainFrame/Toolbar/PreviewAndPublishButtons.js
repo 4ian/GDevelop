@@ -119,6 +119,12 @@ export default function PreviewAndPublishButtons({
       previewState,
     ]
   );
+
+  const onClickPreview = event => {
+    if (event.target) event.target.blur();
+    onHotReloadPreview();
+  };
+
   return (
     <React.Fragment>
       <ElementWithMenu
@@ -134,7 +140,7 @@ export default function PreviewAndPublishButtons({
       <ElementWithMenu
         element={
           <FlatButton
-            onClick={onHotReloadPreview}
+            onClick={onClickPreview}
             disabled={!isPreviewEnabled}
             icon={
               <img

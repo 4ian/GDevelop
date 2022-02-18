@@ -203,7 +203,7 @@ export default class InstancesEditor extends Component<Props> {
         const {
           data: { originalEvent: event },
         } = interactionEvent;
-        this._onInstanceRightClicked({
+        this._onRightClicked({
           offsetX: event.offsetX,
           offsetY: event.offsetY,
           x: event.clientX,
@@ -337,7 +337,7 @@ export default class InstancesEditor extends Component<Props> {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
-      onInstanceRightClicked: this._onInstanceRightClicked,
+      onInstanceRightClicked: this._onRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -604,7 +604,7 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.focus();
   };
 
-  _onInstanceRightClicked = ({
+  _onRightClicked = ({
     offsetX,
     offsetY,
     x,

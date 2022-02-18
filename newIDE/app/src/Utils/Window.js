@@ -167,6 +167,33 @@ export default class Window {
       buttons: ['OK'],
     });
   }
+  /**
+   * @param message
+   * @param type
+   * @returns Index of the button on which the user clicked: 0 for Yes, 1 for Cancel, 2 for No
+   */
+  static showYesNoCancelDialog(
+    message: string,
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning'
+  ): number {
+    if (!dialog || !electron) {
+      // TODO: Find a way to display an alert with 3 buttons (not possible with the 3 native js method confirm, alert and prompt)
+      // eslint-disable-next-line
+      const answer = confirm(message);
+      if (answer) return 0;
+      return 2;
+    }
+
+    const browserWindow = electron.remote.getCurrentWindow();
+    const answer = dialog.showMessageBoxSync(browserWindow, {
+      message,
+      type,
+      cancelId: 1,
+      buttons: ['Yes', 'Cancel', 'No'], // TODO: Check on Windows and Linux how these buttons are displayed.
+      // On Mac, they are displayed vertically in the order Yes, No and Cancel from top to bottom.
+    });
+    return answer;
+  }
 
   static showConfirmDialog(
     message: string,
@@ -181,6 +208,7 @@ export default class Window {
     const answer = dialog.showMessageBoxSync(browserWindow, {
       message,
       type,
+      cancelId: 1,
       buttons: ['OK', 'Cancel'],
     });
     return answer === 0;

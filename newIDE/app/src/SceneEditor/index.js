@@ -887,20 +887,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
     if (x === null || y === null || instancesContent === null) return;
 
-    instancesContent
+    const newInstances = instancesContent
       .map(serializedInstance => {
         const instance = new gd.InitialInstance();
         unserializeFromJSObject(instance, serializedInstance);
         return instance;
       })
-      .forEach(instance => {
+      .map(instance => {
         instance.setX(instance.getX() - x + position[0]);
         instance.setY(instance.getY() - y + position[1]);
-        this.props.initialInstances
+        const newInstance = this.props.initialInstances
           .insertInitialInstance(instance)
           .resetPersistentUuid();
         instance.delete();
+        return newInstance;
       });
+    this._onInstancesAdded(newInstances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances(newInstances, true);
   };
 
   updateBehaviorsSharedData = () => {

@@ -637,7 +637,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
   };
 
-  _onDeleteObject = (
+  _onDeleteObject = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,
     done: boolean => void
   ) => {
@@ -645,7 +645,9 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { project, layout } = this.props;
 
     const answer = Window.showConfirmDialog(
-      'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
+      i18n._(
+        t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
+      )
     );
 
     // Unselect instances of the deleted object because these instances
@@ -1090,36 +1092,42 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton key="close" />,
         ],
         renderEditor: () => (
-          <ObjectsList
-            getThumbnail={ObjectsRenderingService.getThumbnail.bind(
-              ObjectsRenderingService
+          <I18n>
+            {({ i18n }) => (
+              <ObjectsList
+                getThumbnail={ObjectsRenderingService.getThumbnail.bind(
+                  ObjectsRenderingService
+                )}
+                project={project}
+                objectsContainer={layout}
+                layout={layout}
+                events={layout.getEvents()}
+                resourceSources={resourceSources}
+                resourceExternalEditors={resourceExternalEditors}
+                onChooseResource={onChooseResource}
+                selectedObjectNames={this.state.selectedObjectNames}
+                onEditObject={this.props.onEditObject || this.editObject}
+                onDeleteObject={this._onDeleteObject(i18n)}
+                canRenameObject={this._canObjectOrGroupUseNewName}
+                onObjectCreated={this._onObjectCreated}
+                onObjectSelected={this._onObjectSelected}
+                onRenameObject={this._onRenameObject}
+                onObjectPasted={() => this.updateBehaviorsSharedData()}
+                selectedObjectTags={this.state.selectedObjectTags}
+                onChangeSelectedObjectTags={selectedObjectTags =>
+                  this.setState({
+                    selectedObjectTags,
+                  })
+                }
+                getAllObjectTags={this._getAllObjectTags}
+                ref={objectsList => (this._objectsList = objectsList)}
+                unsavedChanges={this.props.unsavedChanges}
+                hotReloadPreviewButtonProps={
+                  this.props.hotReloadPreviewButtonProps
+                }
+              />
             )}
-            project={project}
-            objectsContainer={layout}
-            layout={layout}
-            events={layout.getEvents()}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
-            selectedObjectNames={this.state.selectedObjectNames}
-            onEditObject={this.props.onEditObject || this.editObject}
-            onDeleteObject={this._onDeleteObject}
-            canRenameObject={this._canObjectOrGroupUseNewName}
-            onObjectCreated={this._onObjectCreated}
-            onObjectSelected={this._onObjectSelected}
-            onRenameObject={this._onRenameObject}
-            onObjectPasted={() => this.updateBehaviorsSharedData()}
-            selectedObjectTags={this.state.selectedObjectTags}
-            onChangeSelectedObjectTags={selectedObjectTags =>
-              this.setState({
-                selectedObjectTags,
-              })
-            }
-            getAllObjectTags={this._getAllObjectTags}
-            ref={objectsList => (this._objectsList = objectsList)}
-            unsavedChanges={this.props.unsavedChanges}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-          />
+          </I18n>
         ),
       },
       'object-groups-list': {

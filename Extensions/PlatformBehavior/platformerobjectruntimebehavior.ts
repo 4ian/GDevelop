@@ -128,7 +128,10 @@ namespace gdjs {
       this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
-      this._useLegacyTrajectory = behaviorData.useLegacyTrajectory;
+      this._useLegacyTrajectory =
+        behaviorData.useLegacyTrajectory === undefined
+          ? true
+          : behaviorData.useLegacyTrajectory;
       this._canGoDownFromJumpthru = behaviorData.canGoDownFromJumpthru;
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);

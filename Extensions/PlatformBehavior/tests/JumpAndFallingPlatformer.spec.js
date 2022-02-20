@@ -1388,8 +1388,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
     });
 
-    // TODO a jumpthru should never be considered as an obstacle of landing on another platform.
-    it.skip('can fall through a jumpthru from the left side and land on another jumpthru at the exact same frame', function () {
+    it('can fall through a jumpthru from the left side and land on another jumpthru at the exact same frame', function () {
       object.setPosition(0, -100);
       jumpthru.setPosition(10, -90);
       jumpthru.setCustomWidthAndHeight(60, 20);

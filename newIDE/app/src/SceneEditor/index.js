@@ -650,8 +650,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       )
     );
 
-    if (answer === 1) return;
-    const shouldRemoveReferences = answer === 0;
+    if (answer === 'cancel') return;
+    const shouldRemoveReferences = answer === 'yes';
 
     // Unselect instances of the deleted object because these instances
     // will be deleted by gd.WholeProjectRefactorer (and after that, they will

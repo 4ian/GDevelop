@@ -8,6 +8,7 @@ const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
 
 export type AppArguments = { [string]: any };
+type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
 
 /**
  * The name of the key, in AppArguments, containing the array of
@@ -167,21 +168,17 @@ export default class Window {
       buttons: ['OK'],
     });
   }
-  /**
-   * @param message
-   * @param type
-   * @returns Index of the button on which the user clicked: 0 for Yes, 1 for Cancel, 2 for No
-   */
+
   static showYesNoCancelDialog(
     message: string,
     type?: 'none' | 'info' | 'error' | 'question' | 'warning'
-  ): number {
+  ): YesNoCancelDialogChoice {
     if (!dialog || !electron) {
       // TODO: Find a way to display an alert with 3 buttons (not possible with the 3 native js method confirm, alert and prompt)
       // eslint-disable-next-line
       const answer = confirm(message);
-      if (answer) return 0;
-      return 2;
+      if (answer) return 'yes';
+      return 'no';
     }
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -192,7 +189,16 @@ export default class Window {
       buttons: ['Yes', 'Cancel', 'No'], // TODO: Check on Windows and Linux how these buttons are displayed.
       // On Mac, they are displayed vertically in the order Yes, No and Cancel from top to bottom.
     });
-    return answer;
+    switch (answer) {
+      case 0:
+        return 'yes';
+      case 1:
+        return 'cancel';
+      case 2:
+        return 'no';
+      default:
+        return 'cancel';
+    }
   }
 
   static showConfirmDialog(

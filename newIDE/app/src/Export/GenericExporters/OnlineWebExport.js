@@ -299,7 +299,7 @@ export const WebProjectLink = ({
                 </Column>
               </Line>
             )}
-            {!isBuildPublished && (
+            {!isBuildPublished && game && (
               <Line>
                 <AlertMessage
                   kind="info"

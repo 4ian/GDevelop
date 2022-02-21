@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
 import { ColumnStackLayout } from '../UI/Layout';
+import Checkbox from '../UI/Checkbox';
 
 type Props = {|
   project: gdProject,
@@ -13,6 +14,12 @@ type Props = {|
   description: ?string,
   setAuthorIds: (string[]) => void,
   authorIds: string[],
+  setPlayableWithKeyboard: boolean => void,
+  playWithKeyboard: boolean,
+  setPlayableWithGamepad: boolean => void,
+  playWithGamepad: boolean,
+  setPlayableWithMobile: boolean => void,
+  playWithMobile: boolean,
 |};
 
 function PublicGameProperties({
@@ -23,6 +30,12 @@ function PublicGameProperties({
   description,
   setAuthorIds,
   authorIds,
+  setPlayableWithKeyboard,
+  playWithKeyboard,
+  setPlayableWithGamepad,
+  playWithGamepad,
+  setPlayableWithMobile,
+  playWithMobile,
 }: Props) {
   return (
     <ColumnStackLayout noMargin>
@@ -55,6 +68,21 @@ function PublicGameProperties({
             example or in the community.
           </Trans>
         }
+      />
+      <Checkbox
+        label={<Trans>Playable with keyboards</Trans>}
+        checked={playWithKeyboard}
+        onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
+      />
+      <Checkbox
+        label={<Trans>Playable with gamepads</Trans>}
+        checked={playWithGamepad}
+        onCheck={(e, checked) => setPlayableWithGamepad(checked)}
+      />
+      <Checkbox
+        label={<Trans>Playable on mobile</Trans>}
+        checked={playWithMobile}
+        onCheck={(e, checked) => setPlayableWithMobile(checked)}
       />
     </ColumnStackLayout>
   );

@@ -33,6 +33,21 @@ function applyPublicPropertiesToProject(
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
+type PublicGameOnlyProperties = {|
+  playWithKeyboard: boolean,
+  playWithGamepad: boolean,
+  playWithMobile: boolean,
+|};
+
+function applyPublicPropertiesToGame(
+  publicGame: PublicGame,
+  newProperties: PublicGameOnlyProperties
+) {
+  publicGame.playWithKeyboard = newProperties.playWithKeyboard;
+  publicGame.playWithGamepad = newProperties.playWithGamepad;
+  publicGame.playWithMobile = newProperties.playWithMobile;
+}
+
 type Props = {|
   project: gdProject,
   game: PublicGame,
@@ -56,9 +71,24 @@ const PublicGamePropertiesDialog = ({
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
+  const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
+    game.playWithKeyboard
+  );
+  const [playWithGamepad, setPlayableWithGamepad] = React.useState(
+    game.playWithGamepad
+  );
+  const [playWithMobile, setPlayableWithMobile] = React.useState(
+    game.playWithMobile
+  );
+
   if (!open) return null;
 
   const onSave = () => {
+    applyPublicPropertiesToGame(game, {
+      playWithKeyboard,
+      playWithGamepad,
+      playWithMobile,
+    });
     if (
       applyPublicPropertiesToProject(project, {
         name,
@@ -100,6 +130,12 @@ const PublicGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        setPlayableWithKeyboard={setPlayableWithKeyboard}
+        playWithKeyboard={playWithKeyboard}
+        setPlayableWithGamepad={setPlayableWithGamepad}
+        playWithGamepad={playWithGamepad}
+        setPlayableWithMobile={setPlayableWithMobile}
+        playWithMobile={playWithMobile}
       />
     </Dialog>
   );

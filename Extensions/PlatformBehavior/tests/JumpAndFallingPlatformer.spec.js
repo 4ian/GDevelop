@@ -1331,12 +1331,11 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
     });
 
     it('can fall through the jumpthru from the left side', function () {
-      jumpthru.setPosition(0, -33);
       object.setPosition(0, -100);
       jumpthru.setPosition(12, -90);
       jumpthru.setCustomWidthAndHeight(60, 100);
 
-      // Check the jumpthru let the platformer object go through.
+      // The jumpthru lets the character go through.
       for (let i = 0; i < 10; ++i) {
         object.getBehavior('auto1').simulateRightKey();
         runtimeScene.renderAndStep(1000 / 60);
@@ -1346,9 +1345,98 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         );
         expect(object.getBehavior('auto1').isMoving()).to.be(true);
       }
-      // Overlapping the jumpthru
-      expect(object.getX()).to.above(5);
-      expect(object.getY()).to.be.within(-100, -80);
+      // The character is overlapping the jumpthru.
+      expect(object.getX()).to.above(jumpthru.getX() - object.getWidth() + 3);
+      expect(object.getY()).to.be.within(
+        jumpthru.getY() - object.getHeight() + 10,
+        jumpthru.getY() + jumpthru.getHeight() - 10
+      );
+    });
+
+    it('can fall through a jumpthru from the left side and land on another jumpthru', function () {
+      object.setPosition(0, -100);
+      jumpthru.setPosition(12, -90);
+      jumpthru.setCustomWidthAndHeight(60, 20);
+
+      // Add another jumpthu under with a 10 pixels interleave (less than object height).
+      bottomJumpthru = addJumpThroughPlatformObject(runtimeScene);
+      bottomJumpthru.setPosition(0, -70);
+      bottomJumpthru.setCustomWidthAndHeight(60, 20);
+
+      // The jumpthru lets the character go through.
+      for (let i = 0; i < 7; ++i) {
+        object.getBehavior('auto1').simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      }
+      // The character is overlapping the jumpthru.
+      expect(object.getX()).to.above(jumpthru.getX() - object.getWidth() + 1);
+      expect(object.getY()).to.be.within(
+        jumpthru.getY() - object.getHeight() + 1,
+        jumpthru.getY() + jumpthru.getHeight() - 1
+      );
+
+      // The character lands on the other jumpthru
+      // while still overlapping the other one.
+      for (let i = 0; i < 5; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
+    });
+
+    it('can fall through a jumpthru from the left side and land on another jumpthru at the exact same frame', function () {
+      object.setPosition(0, -100);
+      jumpthru.setPosition(10, -90);
+      jumpthru.setCustomWidthAndHeight(60, 20);
+
+      // Add another jumpthu under with a 10 pixels interleave (less than object height).
+      bottomJumpthru = addJumpThroughPlatformObject(runtimeScene);
+      bottomJumpthru.setPosition(0, -70);
+      bottomJumpthru.setCustomWidthAndHeight(60, 20);
+
+      // The character falls next to the jumthru.
+      for (let i = 0; i < 8; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(object.getBehavior('auto1').isFalling()).to.be(true);
+        expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
+          true
+        );
+        expect(object.getBehavior('auto1').isMoving()).to.be(true);
+      }
+      // The character is right at the left of "jumpthru".
+      expect(object.getX()).to.be(0);
+      // The character is right above "bottomJumpthru".
+      expect(object.getY()).to.be.below(
+        bottomJumpthru.getY() - object.getHeight()
+      );
+
+      object.getBehavior('auto1').simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // The character is overlapping "jumpthru"...
+      expect(object.getX()).to.be.above(0);
+      // ...and "bottomJumpthru" at the same frame.
+      // The character lands on "bottomJumpthru".
+      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
+
+      // The character stays on the jumpthru
+      for (let i = 0; i < 5; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
+      expect(object.getBehavior('auto1').isFalling()).to.be(false);
+      expect(object.getBehavior('auto1').isMoving()).to.be(false);
+      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
     });
   });
 

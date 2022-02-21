@@ -1410,8 +1410,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       // The character is right at the left of "jumpthru".
       expect(object.getX()).to.be(0);
       // The character is right above "bottomJumpthru".
-      expect(object.getY()).to.be.below(
-        bottomJumpthru.getY() - object.getHeight()
+      expect(object.getY()).to.be.within(
+        bottomJumpthru.getY() - object.getHeight() - 2,
+        bottomJumpthru.getY() - object.getHeight() - 1
       );
 
       object.getBehavior('auto1').simulateRightKey();
@@ -1424,16 +1425,15 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
-      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
 
       // The character stays on the jumpthru
       for (let i = 0; i < 5; ++i) {
         runtimeScene.renderAndStep(1000 / 60);
       }
+      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       expect(object.getBehavior('auto1').isFalling()).to.be(false);
       expect(object.getBehavior('auto1').isMoving()).to.be(false);
-      expect(object.getY()).to.be(bottomJumpthru.getY() - object.getHeight());
     });
   });
 

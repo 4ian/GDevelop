@@ -44,6 +44,7 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 
 -   [GDevelop Roadmap on Trello.com](https://trello.com/b/qf0lM7k8/gdevelop-roadmap), for a global view of the features that could be added. Please vote and comment here for new features/requests.
 -   [GitHub issue page](https://github.com/4ian/GDevelop/issues), for technical issues and bugs.
+-   [Github discussions](https://github.com/4ian/GDevelop/discussions) to talk about new features and ideas.
 
 ### Games made with GDevelop
 

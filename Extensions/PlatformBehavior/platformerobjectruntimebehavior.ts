@@ -781,12 +781,16 @@ namespace gdjs {
         this._findPlatformHighestRelativeYUnderObject(platform, context);
         let highestRelativeY = context.getFloorDeltaY();
         if (
-          // When following the floor, ignore jumpthrus that are higher than the character bottom.
-          this._state === this._onFloor &&
-          platform !== this._onFloor.getFloorPlatform() &&
           platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
-          highestRelativeY < 0
+          // When following the floor, ignore jumpthrus that are higher than the character bottom.
+          ((this._state === this._onFloor &&
+            platform !== this._onFloor.getFloorPlatform() &&
+            highestRelativeY < 0) ||
+            // A jumpthrus should never constrain a character to go below.
+            // Jumpthrus are considered as obstacles at the 1st frame they are overlapping the character
+            // because it allows it to land on them, but they shouldn't push on its head.
+            context.allowedMinDeltaY !== previousAllowedMinDeltaY)
         ) {
           // Don't follow jumpthrus that are higher than the character bottom.
           // Revert side effect on the search context.

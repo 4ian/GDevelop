@@ -10,6 +10,12 @@ declare class gdProject extends gdObjectsContainer {
   setAuthor(authorName: string): void;
   getAuthor(): string;
   getAuthorIds(): gdVectorString;
+  isPlayableWithKeyboard(): boolean;
+  setPlayableWithKeyboard(playable: boolean): void;
+  isPlayableWithGamepad(): boolean;
+  setPlayableWithGamepad(playable: boolean): void;
+  isPlayableWithMobile(): boolean;
+  setPlayableWithMobile(playable: boolean): void;
   setPackageName(packageName: string): void;
   getPackageName(): string;
   setOrientation(orientation: string): void;

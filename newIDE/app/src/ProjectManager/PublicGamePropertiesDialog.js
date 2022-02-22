@@ -19,6 +19,9 @@ type PublicProjectProperties = {|
   name: string,
   description: string,
   authorIds: string[],
+  playWithKeyboard: boolean,
+  playWithGamepad: boolean,
+  playWithMobile: boolean,
 |};
 
 function applyPublicPropertiesToProject(
@@ -32,26 +35,11 @@ function applyPublicPropertiesToProject(
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
+  project.setPlayableWithGamepad(newProperties.playWithGamepad);
+  project.setPlayableWithMobile(newProperties.playWithMobile);
 
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
-}
-
-/**
- * Public game properties that are not stored in a project file.
- */
-type PublicGameOnlyProperties = {|
-  playWithKeyboard: boolean,
-  playWithGamepad: boolean,
-  playWithMobile: boolean,
-|};
-
-function applyPublicPropertiesToGame(
-  publicGame: PublicGame,
-  newProperties: PublicGameOnlyProperties
-) {
-  publicGame.playWithKeyboard = newProperties.playWithKeyboard;
-  publicGame.playWithGamepad = newProperties.playWithGamepad;
-  publicGame.playWithMobile = newProperties.playWithMobile;
 }
 
 type Props = {|
@@ -90,16 +78,14 @@ const PublicGamePropertiesDialog = ({
   if (!open) return null;
 
   const onSave = () => {
-    applyPublicPropertiesToGame(game, {
-      playWithKeyboard,
-      playWithGamepad,
-      playWithMobile,
-    });
     if (
       applyPublicPropertiesToProject(project, {
         name,
         description: description || '',
         authorIds,
+        playWithKeyboard: playWithKeyboard || false,
+        playWithGamepad: playWithGamepad || false,
+        playWithMobile: playWithMobile || false,
       })
     )
       onApply();

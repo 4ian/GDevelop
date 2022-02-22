@@ -12,6 +12,9 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 
+/**
+ * Public game properties that are shared with the project file ones.
+ */
 type PublicProjectProperties = {|
   name: string,
   description: string,
@@ -33,6 +36,9 @@ function applyPublicPropertiesToProject(
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
+/**
+ * Public game properties that are not stored in a project file.
+ */
 type PublicGameOnlyProperties = {|
   playWithKeyboard: boolean,
   playWithGamepad: boolean,

@@ -69,7 +69,9 @@ function PublicGameProperties({
           </Trans>
         }
       />
-      {setPlayableWithKeyboard &&
+      {// This view is used for public game properties as well as project properties.
+      // The following properties are not shown in project properties.
+      setPlayableWithKeyboard &&
         setPlayableWithGamepad &&
         setPlayableWithMobile && (
           <React.Fragment>

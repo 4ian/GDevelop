@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
 import Dialog from '../UI/Dialog';
@@ -24,6 +24,7 @@ import HotReloadPreviewButton, {
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
 import VariablesList from '../VariablesList/index';
+import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -89,6 +90,15 @@ const InnerDialog = (props: InnerDialogProps) => {
     // override the name.
     props.onRename(newObjectName);
   };
+
+  useEffect(
+    () => {
+      if (currentTab === 'behaviors') {
+        sendBehaviorsEditorShown({ parentEditor: 'object-editor-dialog' });
+      }
+    },
+    [currentTab]
+  );
 
   return (
     <Dialog

@@ -82,6 +82,10 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       localStats: {
         programOpeningCount: getProgramOpeningCount(),
       },
+      tutorials: {
+        // Useful to differentiate if an event is part of a tutorial or not.
+        isInAppTutorialRunning: isUserflowRunning,
+      },
       versionMetadata: {
         version,
         versionWithHash,

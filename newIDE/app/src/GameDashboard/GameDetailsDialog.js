@@ -37,6 +37,9 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
+import KeyboardIcon from '@material-ui/icons/Keyboard';
+import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
+import SmartphoneIcon from '@material-ui/icons/Smartphone';
 
 const styles = {
   tableRowStatColumn: {
@@ -146,6 +149,7 @@ export const GameDetailsDialog = ({
     const { id } = profile;
 
     try {
+      const { playWithKeyboard, playWithGamepad, playWithMobile } = publicGame;
       // Set public game to null as it will be refetched automatically by the callback above.
       setPublicGame(null);
       const gameId = project.getProjectUuid();
@@ -153,6 +157,9 @@ export const GameDetailsDialog = ({
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
         description: project.getDescription() || '',
+        playWithKeyboard: playWithKeyboard || false,
+        playWithGamepad: playWithGamepad || false,
+        playWithMobile: playWithMobile || false,
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
@@ -286,6 +293,11 @@ export const GameDetailsDialog = ({
                     </Trans>
                   </Text>
                 </Line>
+              </Line>
+              <Line expand justifyContent="flex-start" alignItems="center">
+                {publicGame.playWithKeyboard && <KeyboardIcon />}
+                {publicGame.playWithGamepad && <SportsEsportsIcon />}
+                {publicGame.playWithMobile && <SmartphoneIcon />}
               </Line>
               <TextField
                 value={publicGame.gameName}

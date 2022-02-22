@@ -20,15 +20,15 @@ axios
     {
       files: [
         // Update index.html:
-        'https://editor.gdevelop-app.com/',
-        'https://editor.gdevelop-app.com/index.html',
+        'https://editor.gdevelop.io/',
+        'https://editor.gdevelop.io/index.html',
         // Purge service worker (otherwise old service worker will serve the old index.html):
-        'https://editor.gdevelop-app.com/service-worker.js',
+        'https://editor.gdevelop.io/service-worker.js',
         // Purge libGD.js to avoid incompatibilities:
-        'https://editor.gdevelop-app.com/libGD.js',
-        'https://editor.gdevelop-app.com/libGD.mem',
+        'https://editor.gdevelop.io/libGD.js',
+        'https://editor.gdevelop.io/libGD.mem',
         // Purge other files:
-        'https://editor.gdevelop-app.com/manifest.json',
+        'https://editor.gdevelop.io/manifest.json',
       ],
     },
     {

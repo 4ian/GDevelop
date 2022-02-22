@@ -12,6 +12,9 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 
+/**
+ * Public game properties that are shared with the project file ones.
+ */
 type PublicProjectProperties = {|
   name: string,
   description: string,
@@ -31,6 +34,24 @@ function applyPublicPropertiesToProject(
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
 
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
+}
+
+/**
+ * Public game properties that are not stored in a project file.
+ */
+type PublicGameOnlyProperties = {|
+  playWithKeyboard: boolean,
+  playWithGamepad: boolean,
+  playWithMobile: boolean,
+|};
+
+function applyPublicPropertiesToGame(
+  publicGame: PublicGame,
+  newProperties: PublicGameOnlyProperties
+) {
+  publicGame.playWithKeyboard = newProperties.playWithKeyboard;
+  publicGame.playWithGamepad = newProperties.playWithGamepad;
+  publicGame.playWithMobile = newProperties.playWithMobile;
 }
 
 type Props = {|
@@ -56,9 +77,24 @@ const PublicGamePropertiesDialog = ({
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
+  const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
+    game.playWithKeyboard
+  );
+  const [playWithGamepad, setPlayableWithGamepad] = React.useState(
+    game.playWithGamepad
+  );
+  const [playWithMobile, setPlayableWithMobile] = React.useState(
+    game.playWithMobile
+  );
+
   if (!open) return null;
 
   const onSave = () => {
+    applyPublicPropertiesToGame(game, {
+      playWithKeyboard,
+      playWithGamepad,
+      playWithMobile,
+    });
     if (
       applyPublicPropertiesToProject(project, {
         name,
@@ -100,6 +136,12 @@ const PublicGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        setPlayableWithKeyboard={setPlayableWithKeyboard}
+        playWithKeyboard={playWithKeyboard}
+        setPlayableWithGamepad={setPlayableWithGamepad}
+        playWithGamepad={playWithGamepad}
+        setPlayableWithMobile={setPlayableWithMobile}
+        playWithMobile={playWithMobile}
       />
     </Dialog>
   );

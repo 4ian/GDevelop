@@ -108,6 +108,39 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::vector<gd::String>& GetAuthorIds() { return authorIds; };
 
   /**
+   * Define the project as playable with a keyboard.
+   * \param enable True to define the project as playable with a keyboard.
+   */
+  void SetPlayableWithKeyboard(bool playable = true) { isPlayableWithKeyboard = playable; }
+
+  /**
+   * Check if the project is defined as playable with a keyboard.
+   */
+  bool IsPlayableWithKeyboard() const { return isPlayableWithKeyboard; }
+
+  /**
+   * Define the project as playable with a gamepad.
+   * \param enable True to define the project as playable with a gamepad.
+   */
+  void SetPlayableWithGamepad(bool playable = true) { isPlayableWithGamepad = playable; }
+
+  /**
+   * Check if the project is defined as playable with a gamepad.
+   */
+  bool IsPlayableWithGamepad() const { return isPlayableWithGamepad; }
+
+  /**
+   * Define the project as playable on a mobile.
+   * \param enable True to define the project as playable on a mobile.
+   */
+  void SetPlayableWithMobile(bool playable = true) { isPlayableWithMobile = playable; }
+
+  /**
+   * Check if the project is defined as playable on a mobile.
+   */
+  bool IsPlayableWithMobile() const { return isPlayableWithMobile; }
+
+  /**
    * \brief Change the project package name.
    */
   void SetPackageName(const gd::String& packageName_) {
@@ -934,6 +967,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;           ///< Game author ids, from GDevelop users DB.
+  bool isPlayableWithKeyboard = true; ///< The project is playable with a keyboard.
+  bool isPlayableWithGamepad = true;  ///< The project is playable with a gamepad.
+  bool isPlayableWithMobile = true;     ///< The project is playable on a mobile.
   gd::String packageName;  ///< Game package name
   gd::String orientation;  ///< Lock game orientation (on mobile devices).
                            ///< "default", "landscape" or "portrait".

@@ -536,6 +536,21 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
   }
 
+  auto& playableDevicesElement = propElement.GetChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < playableDevicesElement.GetChildrenCount(); ++i) {
+    const auto& playableDevice = playableDevicesElement.GetChild(i).GetStringValue();
+    if (playableDevice == "keyboard") {
+      isPlayableWithKeyboard = true;
+    }
+    else if (playableDevice == "gamepad") {
+      isPlayableWithGamepad = true;
+    }
+    else if (playableDevice == "mobile") {
+      isPlayableWithMobile = true;
+    }
+  }
+
   // Compatibility with GD <= 5.0.0-beta101
   if (VersionWrapper::IsOlderOrEqual(
           gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 4, 0, 98, 0) &&
@@ -734,6 +749,18 @@ void Project::SerializeTo(SerializerElement& element) const {
   authorIdsElement.ConsiderAsArray();
   for (const auto& authorId : authorIds) {
     authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
+
+  auto& playableDevicesElement = propElement.AddChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  if (isPlayableWithKeyboard) {
+    playableDevicesElement.AddChild("").SetStringValue("keyboard");
+  }
+  if (isPlayableWithGamepad) {
+    playableDevicesElement.AddChild("").SetStringValue("gamepad");
+  }
+  if (isPlayableWithMobile) {
+    playableDevicesElement.AddChild("").SetStringValue("mobile");
   }
 
   // Compatibility with GD <= 5.0.0-beta101

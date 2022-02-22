@@ -371,6 +371,12 @@ interface Project {
     void SetAuthor([Const] DOMString authorName);
     [Const, Ref] DOMString GetAuthor();
     [Ref] VectorString GetAuthorIds();
+    boolean IsPlayableWithKeyboard();
+    void SetPlayableWithKeyboard(boolean playable);
+    boolean IsPlayableWithGamepad();
+    void SetPlayableWithGamepad(boolean playable);
+    boolean IsPlayableWithMobile();
+    void SetPlayableWithMobile(boolean playable);
     void SetPackageName([Const] DOMString packageName);
     [Const, Ref] DOMString GetPackageName();
     void SetOrientation([Const] DOMString orientation);

@@ -157,9 +157,9 @@ export const GameDetailsDialog = ({
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
         description: project.getDescription() || '',
-        playWithKeyboard,
-        playWithGamepad,
-        playWithMobile,
+        playWithKeyboard: playWithKeyboard || false,
+        playWithGamepad: playWithGamepad || false,
+        playWithMobile: playWithMobile || false,
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);

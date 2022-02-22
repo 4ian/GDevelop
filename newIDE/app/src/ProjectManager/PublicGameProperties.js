@@ -14,12 +14,12 @@ type Props = {|
   description: ?string,
   setAuthorIds: (string[]) => void,
   authorIds: string[],
-  setPlayableWithKeyboard: boolean => void,
-  playWithKeyboard: boolean,
-  setPlayableWithGamepad: boolean => void,
-  playWithGamepad: boolean,
-  setPlayableWithMobile: boolean => void,
-  playWithMobile: boolean,
+  setPlayableWithKeyboard?: boolean => void,
+  playWithKeyboard?: boolean,
+  setPlayableWithGamepad?: boolean => void,
+  playWithGamepad?: boolean,
+  setPlayableWithMobile?: boolean => void,
+  playWithMobile?: boolean,
 |};
 
 function PublicGameProperties({
@@ -69,21 +69,27 @@ function PublicGameProperties({
           </Trans>
         }
       />
-      <Checkbox
-        label={<Trans>Playable with keyboards</Trans>}
-        checked={playWithKeyboard}
-        onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
-      />
-      <Checkbox
-        label={<Trans>Playable with gamepads</Trans>}
-        checked={playWithGamepad}
-        onCheck={(e, checked) => setPlayableWithGamepad(checked)}
-      />
-      <Checkbox
-        label={<Trans>Playable on mobile</Trans>}
-        checked={playWithMobile}
-        onCheck={(e, checked) => setPlayableWithMobile(checked)}
-      />
+      {setPlayableWithKeyboard &&
+        setPlayableWithGamepad &&
+        setPlayableWithMobile && (
+          <React.Fragment>
+            <Checkbox
+              label={<Trans>Playable with keyboards</Trans>}
+              checked={playWithKeyboard}
+              onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
+            />
+            <Checkbox
+              label={<Trans>Playable with gamepads</Trans>}
+              checked={playWithGamepad}
+              onCheck={(e, checked) => setPlayableWithGamepad(checked)}
+            />
+            <Checkbox
+              label={<Trans>Playable on mobile</Trans>}
+              checked={playWithMobile}
+              onCheck={(e, checked) => setPlayableWithMobile(checked)}
+            />
+          </React.Fragment>
+        )}
     </ColumnStackLayout>
   );
 }

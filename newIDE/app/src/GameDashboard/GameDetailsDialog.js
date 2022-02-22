@@ -149,7 +149,12 @@ export const GameDetailsDialog = ({
     const { id } = profile;
 
     try {
-      const { playWithKeyboard, playWithGamepad, playWithMobile } = publicGame;
+      // These fields are not in the project.
+      // They must be saved before resetting the game fields.
+      const playWithKeyboard = publicGame ? publicGame.playWithKeyboard : false;
+      const playWithGamepad = publicGame ? publicGame.playWithGamepad : false;
+      const playWithMobile = publicGame ? publicGame.playWithMobile : false;
+
       // Set public game to null as it will be refetched automatically by the callback above.
       setPublicGame(null);
       const gameId = project.getProjectUuid();
@@ -157,9 +162,9 @@ export const GameDetailsDialog = ({
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
         description: project.getDescription() || '',
-        playWithKeyboard: playWithKeyboard || false,
-        playWithGamepad: playWithGamepad || false,
-        playWithMobile: playWithMobile || false,
+        playWithKeyboard: playWithKeyboard,
+        playWithGamepad: playWithGamepad,
+        playWithMobile: playWithMobile,
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);

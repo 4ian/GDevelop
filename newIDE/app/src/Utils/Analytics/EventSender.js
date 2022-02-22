@@ -292,6 +292,28 @@ export const sendExternalEditorOpened = (editorName: string) => {
   client.recordEvent('open_external_editor', { editorName });
 };
 
+export const sendBehaviorsEditorShown = ({
+  parentEditor,
+}: {|
+  parentEditor: 'object-editor-dialog',
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('behaviors-editor-shown', { parentEditor });
+};
+
+export const sendBehaviorAdded = ({
+  behaviorType,
+  parentEditor,
+}: {|
+  behaviorType: string,
+  parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('behavior-added', { behaviorType, parentEditor });
+};
+
 const trackInAppTutorialProgress = (
   stepIndex: number,
   isCompleted: boolean = false

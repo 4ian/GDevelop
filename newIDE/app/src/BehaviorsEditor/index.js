@@ -32,6 +32,7 @@ import {
   addBehaviorToObject,
   listObjectBehaviorsTypes,
 } from '../Utils/Behavior';
+import { sendBehaviorAdded } from '../Utils/Analytics/EventSender';
 
 const gd: libGDevelop = global.gd;
 
@@ -64,7 +65,13 @@ const BehaviorsEditor = (props: Props) => {
       defaultName
     );
 
-    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
+    if (wasBehaviorAdded) {
+      setNewBehaviorDialogOpen(false);
+      sendBehaviorAdded({
+        behaviorType: type,
+        parentEditor: 'behaviors-editor',
+      });
+    }
 
     forceUpdate();
     if (props.onSizeUpdated) props.onSizeUpdated();

@@ -33,6 +33,7 @@ import {
   listObjectBehaviorsTypes,
 } from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
+import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 
 const styles = {
   fullHeightSelector: {
@@ -177,7 +178,13 @@ export default function NewInstructionEditorDialog({
       defaultName
     );
 
-    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
+    if (wasBehaviorAdded) {
+      setNewBehaviorDialogOpen(false);
+      sendBehaviorAdded({
+        behaviorType: type,
+        parentEditor: 'instruction-editor-dialog',
+      });
+    }
 
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
     // This is not done automatically because a change in the object behaviors

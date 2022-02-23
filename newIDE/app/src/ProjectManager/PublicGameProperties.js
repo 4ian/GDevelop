@@ -77,17 +77,17 @@ function PublicGameProperties({
           <React.Fragment>
             <Checkbox
               label={<Trans>Playable with keyboards</Trans>}
-              checked={playWithKeyboard || false}
+              checked={!!playWithKeyboard}
               onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
             />
             <Checkbox
               label={<Trans>Playable with gamepads</Trans>}
-              checked={playWithGamepad || false}
+              checked={!!playWithGamepad}
               onCheck={(e, checked) => setPlayableWithGamepad(checked)}
             />
             <Checkbox
               label={<Trans>Playable on mobile</Trans>}
-              checked={playWithMobile || false}
+              checked={!!playWithMobile}
               onCheck={(e, checked) => setPlayableWithMobile(checked)}
             />
           </React.Fragment>

@@ -83,9 +83,9 @@ const PublicGamePropertiesDialog = ({
         name,
         description: description || '',
         authorIds,
-        playWithKeyboard: playWithKeyboard || false,
-        playWithGamepad: playWithGamepad || false,
-        playWithMobile: playWithMobile || false,
+        playWithKeyboard: !!playWithKeyboard,
+        playWithGamepad: !!playWithGamepad,
+        playWithMobile: !!playWithMobile,
       })
     )
       onApply();

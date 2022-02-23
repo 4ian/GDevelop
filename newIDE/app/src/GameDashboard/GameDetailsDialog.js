@@ -37,6 +37,9 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
+import KeyboardIcon from '@material-ui/icons/Keyboard';
+import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
+import SmartphoneIcon from '@material-ui/icons/Smartphone';
 
 const styles = {
   tableRowStatColumn: {
@@ -153,6 +156,9 @@ export const GameDetailsDialog = ({
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
         description: project.getDescription() || '',
+        playWithKeyboard: project.isPlayableWithKeyboard(),
+        playWithGamepad: project.isPlayableWithGamepad(),
+        playWithMobile: project.isPlayableWithMobile(),
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
@@ -287,6 +293,15 @@ export const GameDetailsDialog = ({
                   </Text>
                 </Line>
               </Line>
+              {(publicGame.playWithKeyboard ||
+                publicGame.playWithGamepad ||
+                publicGame.playWithMobile) && (
+                <Line expand justifyContent="flex-start" alignItems="center">
+                  {publicGame.playWithKeyboard && <KeyboardIcon />}
+                  {publicGame.playWithGamepad && <SportsEsportsIcon />}
+                  {publicGame.playWithMobile && <SmartphoneIcon />}
+                </Line>
+              )}
               <TextField
                 value={publicGame.gameName}
                 readOnly

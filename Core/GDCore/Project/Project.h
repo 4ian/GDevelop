@@ -967,9 +967,9 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;           ///< Game author ids, from GDevelop users DB.
-  bool isPlayableWithKeyboard = true; ///< The project is playable with a keyboard.
-  bool isPlayableWithGamepad = true;  ///< The project is playable with a gamepad.
-  bool isPlayableWithMobile = true;     ///< The project is playable on a mobile.
+  bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.
+  bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
+  bool isPlayableWithMobile;   ///< The project is playable on a mobile.
   gd::String packageName;  ///< Game package name
   gd::String orientation;  ///< Lock game orientation (on mobile devices).
                            ///< "default", "landscape" or "portrait".

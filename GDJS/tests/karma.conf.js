@@ -82,6 +82,8 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TextInput/textinputruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TextInput/textinputruntimeobject-pixi-renderer.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownmovementruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TopDownMovementBehavior/topdownobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/A_firebasejs/*.js',

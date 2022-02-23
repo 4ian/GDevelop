@@ -293,11 +293,15 @@ export const GameDetailsDialog = ({
                   </Text>
                 </Line>
               </Line>
-              <Line expand justifyContent="flex-start" alignItems="center">
-                {publicGame.playWithKeyboard && <KeyboardIcon />}
-                {publicGame.playWithGamepad && <SportsEsportsIcon />}
-                {publicGame.playWithMobile && <SmartphoneIcon />}
-              </Line>
+              {(publicGame.playWithKeyboard ||
+                publicGame.playWithGamepad ||
+                publicGame.playWithMobile) && (
+                <Line expand justifyContent="flex-start" alignItems="center">
+                  {publicGame.playWithKeyboard && <KeyboardIcon />}
+                  {publicGame.playWithGamepad && <SportsEsportsIcon />}
+                  {publicGame.playWithMobile && <SmartphoneIcon />}
+                </Line>
+              )}
               <TextField
                 value={publicGame.gameName}
                 readOnly

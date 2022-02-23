@@ -4,7 +4,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
   /**
    * @param {gdjs.RuntimeScene} runtimeScene
    */
-  const makeSpriteRuntimeObjectWithCustomHitBox = (runtimeScene) =>
+  const makeShapePainterRuntimeObject = (runtimeScene) =>
     new gdjs.ShapePainterRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: 'PrimitiveDrawing::Drawer',
@@ -55,7 +55,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 
-    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+    const object = makeShapePainterRuntimeObject(runtimeScene);
 
     expect(object.getWidth()).to.be(0);
     expect(object.getHeight()).to.be(0);
@@ -106,7 +106,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 
-    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+    const object = makeShapePainterRuntimeObject(runtimeScene);
 
     expect(object.getWidth()).to.be(0);
     expect(object.getHeight()).to.be(0);
@@ -174,7 +174,7 @@ describe('gdjs.ShapePainterRuntimeObject (using a PIXI RuntimeGame with assets)'
     const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
     loadScene(runtimeScene);
 
-    const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+    const object = makeShapePainterRuntimeObject(runtimeScene);
 
     object.drawLineV2(0, 0, 10, 10, 2);
     expect(object.getWidth()).to.be(12);

@@ -300,6 +300,8 @@ function ProjectPropertiesDialog(props: Props) {
                   project={project}
                   authorIds={authorIds}
                   setAuthorIds={setAuthorIds}
+                  orientation={orientation}
+                  setOrientation={setOrientation}
                 />
                 <Text size="title">
                   <Trans>Packaging</Trans>
@@ -499,21 +501,6 @@ function ProjectPropertiesDialog(props: Props) {
                     </Trans>
                   </DismissableAlertMessage>
                 )}
-                <SelectField
-                  fullWidth
-                  floatingLabelText={
-                    <Trans>Device orientation (for iOS and Android)</Trans>
-                  }
-                  value={orientation}
-                  onChange={(e, i, value: string) => setOrientation(value)}
-                >
-                  <SelectOption
-                    value="default"
-                    primaryText={t`Platform default`}
-                  />
-                  <SelectOption value="landscape" primaryText={t`Landscape`} />
-                  <SelectOption value="portrait" primaryText={t`Portrait`} />
-                </SelectField>
                 <SelectField
                   fullWidth
                   floatingLabelText={

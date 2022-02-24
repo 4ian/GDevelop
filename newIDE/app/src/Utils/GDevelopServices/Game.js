@@ -14,6 +14,7 @@ export type PublicGame = {
   playWithKeyboard: boolean,
   playWithGamepad: boolean,
   playWithMobile: boolean,
+  orientation: boolean,
   metrics?: {
     lastWeekSessionsCount: number,
     lastYearSessionsCount: number,
@@ -140,6 +141,7 @@ export const updateGame = (
     playWithKeyboard,
     playWithGamepad,
     playWithMobile,
+    orientation,
   }: {|
     gameName?: string,
     authorName?: string,
@@ -148,6 +150,7 @@ export const updateGame = (
     playWithKeyboard?: boolean,
     playWithGamepad?: boolean,
     playWithMobile?: boolean,
+    orientation?: string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -162,6 +165,7 @@ export const updateGame = (
           playWithKeyboard,
           playWithGamepad,
           playWithMobile,
+          orientation,
         },
         {
           params: {

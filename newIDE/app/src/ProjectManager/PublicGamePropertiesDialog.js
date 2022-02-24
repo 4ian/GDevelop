@@ -22,6 +22,7 @@ type PublicProjectProperties = {|
   playWithKeyboard: boolean,
   playWithGamepad: boolean,
   playWithMobile: boolean,
+  orientation: string,
 |};
 
 function applyPublicPropertiesToProject(
@@ -38,6 +39,7 @@ function applyPublicPropertiesToProject(
   project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
   project.setPlayableWithGamepad(newProperties.playWithGamepad);
   project.setPlayableWithMobile(newProperties.playWithMobile);
+  project.setOrientation(newProperties.orientation);
 
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
@@ -74,6 +76,7 @@ const PublicGamePropertiesDialog = ({
   const [playWithMobile, setPlayableWithMobile] = React.useState(
     game.playWithMobile
   );
+  const [orientation, setOrientation] = React.useState(game.orientation);
 
   if (!open) return null;
 
@@ -86,6 +89,7 @@ const PublicGamePropertiesDialog = ({
         playWithKeyboard: !!playWithKeyboard,
         playWithGamepad: !!playWithGamepad,
         playWithMobile: !!playWithMobile,
+        orientation: orientation || 'default',
       })
     )
       onApply();
@@ -128,6 +132,8 @@ const PublicGamePropertiesDialog = ({
         playWithGamepad={playWithGamepad}
         setPlayableWithMobile={setPlayableWithMobile}
         playWithMobile={playWithMobile}
+        setOrientation={setOrientation}
+        orientation={orientation}
       />
     </Dialog>
   );

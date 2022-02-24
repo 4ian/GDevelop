@@ -23,8 +23,8 @@ type Props = {|
   playWithGamepad?: boolean,
   setPlayableWithMobile?: boolean => void,
   playWithMobile?: boolean,
-  setOrientation?: string => void,
-  orientation?: string,
+  setOrientation: string => void,
+  orientation: string,
 |};
 
 function PublicGameProperties({

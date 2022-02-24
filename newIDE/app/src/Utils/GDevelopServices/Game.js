@@ -14,7 +14,7 @@ export type PublicGame = {
   playWithKeyboard: boolean,
   playWithGamepad: boolean,
   playWithMobile: boolean,
-  orientation: boolean,
+  orientation: string,
   metrics?: {
     lastWeekSessionsCount: number,
     lastYearSessionsCount: number,

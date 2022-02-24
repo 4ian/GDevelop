@@ -5,6 +5,9 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
 import { ColumnStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import { t } from '@lingui/macro';
 
 type Props = {|
   project: gdProject,
@@ -20,6 +23,8 @@ type Props = {|
   playWithGamepad?: boolean,
   setPlayableWithMobile?: boolean => void,
   playWithMobile?: boolean,
+  setOrientation: string => void,
+  orientation: string,
 |};
 
 function PublicGameProperties({
@@ -36,6 +41,8 @@ function PublicGameProperties({
   playWithGamepad,
   setPlayableWithMobile,
   playWithMobile,
+  setOrientation,
+  orientation,
 }: Props) {
   return (
     <ColumnStackLayout noMargin>
@@ -69,6 +76,18 @@ function PublicGameProperties({
           </Trans>
         }
       />
+      <SelectField
+        fullWidth
+        floatingLabelText={
+          <Trans>Device orientation (for iOS and Android)</Trans>
+        }
+        value={orientation}
+        onChange={(e, i, value: string) => setOrientation(value)}
+      >
+        <SelectOption value="default" primaryText={t`Platform default`} />
+        <SelectOption value="landscape" primaryText={t`Landscape`} />
+        <SelectOption value="portrait" primaryText={t`Portrait`} />
+      </SelectField>
       {// This view is used for public game properties as well as project properties.
       // The following properties are not shown in project properties.
       setPlayableWithKeyboard &&

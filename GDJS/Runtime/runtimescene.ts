@@ -281,6 +281,14 @@ namespace gdjs {
      * for some time, until it's resumed or unloaded.
      */
     onPause() {
+      // Notify the objects that the scene is being paused. Objects should not
+      // do anything special, but some object renderers might want to know about this.
+      this._constructListOfAllInstances();
+      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
+        const object = this._allInstancesList[i];
+        object.onScenePaused(this);
+      }
+
       for (let i = 0; i < gdjs.callbacksRuntimeScenePaused.length; ++i) {
         gdjs.callbacksRuntimeScenePaused[i](this);
       }
@@ -292,6 +300,15 @@ namespace gdjs {
      */
     onResume() {
       this._isJustResumed = true;
+
+      // Notify the objects that the scene is being resumed. Objects should not
+      // do anything special, but some object renderers might want to know about this.
+      this._constructListOfAllInstances();
+      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
+        const object = this._allInstancesList[i];
+        object.onSceneResumed(this);
+      }
+
       for (let i = 0; i < gdjs.callbacksRuntimeSceneResumed.length; ++i) {
         gdjs.callbacksRuntimeSceneResumed[i](this);
       }

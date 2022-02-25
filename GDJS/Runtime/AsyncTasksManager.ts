@@ -25,7 +25,10 @@ namespace gdjs {
         if (taskWithCallback.asyncTask.update(runtimeScene)) {
           // The task has finished, run the callback and remove it.
           taskWithCallback.callback(runtimeScene);
-          this.tasksWithCallback.splice(this.tasksWithCallback.indexOf(taskWithCallback), 1);
+          this.tasksWithCallback.splice(
+            this.tasksWithCallback.indexOf(taskWithCallback),
+            1
+          );
         }
       }
     }

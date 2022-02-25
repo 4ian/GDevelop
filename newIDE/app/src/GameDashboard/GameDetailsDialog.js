@@ -324,7 +324,7 @@ export const GameDetailsDialog = ({
                 disabled
                 fullWidth
                 floatingLabelText={
-                  <Trans>Device orientation (for iOS and Android)</Trans>
+                  <Trans>Device orientation (for mobile)</Trans>
                 }
                 value={publicGame.orientation}
               >

@@ -870,14 +870,6 @@ gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
   }
 }
 
-gd::String EventsCodeGenerator::GenerateEventsParameters(
-    const gd::EventsCodeGenerationContext& context) {
-  gd::String parameters = "runtimeScene";
-  if (!HasProjectAndLayout()) parameters += ", eventsFunctionContext";
-  if (context.IsAsync()) parameters += ", asyncObjectsList";
-  return parameters;
-};
-
 gd::String EventsCodeGenerator::GenerateEventsListCode(
     gd::EventsList& events, const gd::EventsCodeGenerationContext& context) {
   // *Optimization*: generating all JS code of events in a single, enormous

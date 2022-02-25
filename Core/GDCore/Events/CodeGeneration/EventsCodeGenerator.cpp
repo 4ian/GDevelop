@@ -577,6 +577,65 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   return actionCode;
 }
 
+const EventsCodeGenerator::CallbackDescriptor
+EventsCodeGenerator::GenerateCallback(
+    const gd::String& callbackID,
+    const gd::EventsCodeGenerationContext& parentContext,
+    gd::InstructionsList& actions,
+    gd::EventsList* subEvents) {
+  gd::EventsCodeGenerationContext callbackContext;
+  callbackContext.InheritsAsAsyncCallbackFrom(parentContext);
+  const gd::String callbackFunctionName =
+      GetCodeNamespaceAccessor() + "asyncCallback" + callbackID;
+  const gd::String callbackFunctionArguments =
+      GenerateEventsParameters(callbackContext);
+
+  // Generate actions
+  gd::String actionsCode = GenerateActionsListCode(actions, callbackContext);
+
+  // Generate subevents
+  if (subEvents != nullptr)  // Sub events
+  {
+    actionsCode += "\n{ //Subevents\n";
+    actionsCode += GenerateEventsListCode(*subEvents, callbackContext);
+    actionsCode += "} //End of subevents\n";
+  }
+
+  // Compose the callback function and add outside main
+  const gd::String actionsDeclarationsCode =
+      GenerateObjectsDeclarationCode(callbackContext);
+
+  const gd::String callbackCode = callbackFunctionName + " = function (" +
+                                  GenerateEventsParameters(callbackContext) +
+                                  ") {\n" + actionsDeclarationsCode +
+                                  actionsCode + "}\n";
+
+  AddCustomCodeOutsideMain(callbackCode);
+
+  std::set<const gd::String> requiredObjects;
+  // Build the list of all objects required by the callback. Any object that has
+  // already been declared could have gone through previous object picking, so
+  // if such an object is used by the actions or subevents of this callback, we
+  // must ask the caller to pass the already exiting objects lists through a
+  // `LongLivedObjectsList` to the callback function.
+  for (const auto& objectUsedInSubTree :
+       callbackContext.GetAllDeclaredObjectsAcrossChildren()) {
+    if (parentContext.ObjectAlreadyDeclared(objectUsedInSubTree))
+      requiredObjects.insert(objectUsedInSubTree);
+  };
+
+  return CallbackDescriptor(
+      callbackFunctionName, callbackFunctionArguments, requiredObjects);
+};
+
+const gd::String EventsCodeGenerator::GenerateEventsParameters(
+    const gd::EventsCodeGenerationContext& context) {
+  gd::String parameters = "runtimeScene";
+  if (!HasProjectAndLayout()) parameters += ", eventsFunctionContext";
+  if (context.IsAsync()) parameters += ", asyncObjectsList";
+  return parameters;
+};
+
 /**
  * Generate actions code.
  */

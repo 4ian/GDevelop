@@ -156,9 +156,51 @@ class GD_CORE_API EventsCodeGenerator {
    */
   gd::String GenerateActionCode(gd::Instruction& action,
                                 EventsCodeGenerationContext& context,
-                                // TODO: remove this in favor of a `GenerateStatementCode(GenerateActionCode(...))` which simply outputs a ;
                                 const gd::String& functionPrefix = "",
                                 const gd::String& functionSuffix = "");
+
+  struct CallbackDescriptor {
+    CallbackDescriptor(const gd::String functionName_,
+                       const gd::String argumentsList_,
+                       const std::set<const gd::String> requiredObjects_)
+        : functionName(functionName_),
+          argumentsList(argumentsList_),
+          requiredObjects(requiredObjects_){};
+    /**
+     * The name by which the function can be invoked.
+     */
+    const gd::String functionName;
+    /**
+     * The comma separated list of arguments that the function takes.
+     */
+    const gd::String argumentsList;
+    /**
+     * A set of all objects that need to be backed up into
+     */
+    const std::set<const gd::String> requiredObjects;
+  };
+
+  /**
+   * \brief Generates actions and events as a callback.
+   *
+   * This is used by asynchronous functions to run the code out of the normal
+   * events flow.
+   *
+   * \returns A set with all objects required by the callback code.
+   * The caller must take care of backing them up in a LongLivedObjectsList,
+   * and to pass it to the callback function as the last argument.
+   */
+  virtual const CallbackDescriptor GenerateCallback(
+      const gd::String& callbackFunctionName,
+      const gd::EventsCodeGenerationContext& parentContext,
+      gd::InstructionsList& actions,
+      gd::EventsList* subEvents = nullptr);
+
+  /**
+   * \brief Generates the parameters list of an event's generated function.
+   */
+  const gd::String GenerateEventsParameters(
+      const gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for declaring objects lists.

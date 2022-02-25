@@ -69,13 +69,13 @@ gd::String BaseEvent::GenerateEventCode(
 }
 
 void BaseEvent::PreprocessAsyncActions(const gd::Platform& platform) {
-  if (!CanHaveSubEvents()) return;                        // TODO
-  for (const auto& actionsList : GetAllActionsVectors())  // TODO
+  if (!CanHaveSubEvents()) return;
+  for (const auto& actionsList : GetAllActionsVectors())
     for (std::size_t aId = 0; aId < actionsList->size(); ++aId) {
       const auto& action = actionsList->at(aId);
-      const gd::InstructionMetadata& instrInfos =
+      const gd::InstructionMetadata& actionMetadata =
           gd::MetadataProvider::GetActionMetadata(platform, action.GetType());
-      if (instrInfos.IsAsync()) {
+      if (actionMetadata.IsAsync()) {
         gd::InstructionsList remainingActions;
         remainingActions.InsertInstructions(
             *actionsList, aId + 1, actionsList->size() - 1);

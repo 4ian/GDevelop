@@ -100,14 +100,14 @@ class GD_CORE_API InstructionMetadata {
 
   /**
    * Check if the instruction is asynchronous - it will be running in the
-   * background, executing the instuctions following it between two frames after
+   * background, executing the instructions following it before the frame after
    * it resolved.
    */
   bool IsAsync() const { return isAsync; }
 
   /**
    * Set that the instruction is asynchronous - it will be running in the
-   * background, executing the instuctions following it between two frames after
+   * background, executing the instructions following it before the frame after
    * it resolved.
    */
   InstructionMetadata &SetAsync() {

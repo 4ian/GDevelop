@@ -77,10 +77,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
-   * \param onceTriggersVariable The code to access the variable holding OnceTriggers.
-   * \param preludeCode The code to run just before the events generated code.
-   * \param compilationForRuntime Set this to true if the code is generated for
-   * runtime.
+   * \param onceTriggersVariable The code to access the variable holding
+   * OnceTriggers. \param preludeCode The code to run just before the events
+   * generated code. \param compilationForRuntime Set this to true if the code
+   * is generated for runtime.
    *
    * \return JavaScript code
    */
@@ -94,12 +94,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& preludeCode,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
-
-  /**
-   * Generates the list of parameters the generated function of an event should
-   * accept.
-   */
-  gd::String GenerateEventsParameters(const gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for executing an event list
@@ -237,7 +231,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
       const gd::String& functionPrefix = "",
-                                const gd::String& functionSuffix = "");
+      const gd::String& functionSuffix = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -247,7 +241,12 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
       const gd::String& functionPrefix = "",
-                                const gd::String& functionSuffix = "");
+      const gd::String& functionSuffix = "");
+
+  /**
+   * Generates actions and events as a callback. Used by asynchronous functions.
+   */
+  virtual gd::String GenerateCallback();
 
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);

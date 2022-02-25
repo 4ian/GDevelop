@@ -12,7 +12,7 @@ namespace gdjs {
     /**
      * Maps a task to the callback to be executed once it is finished.
      */
-    private tasks = new Array<{
+    private tasksWithCallback = new Array<{
       asyncTask: AsyncTask;
       callback: (runtimeScene: gdjs.RuntimeScene) => void;
     }>();
@@ -21,11 +21,11 @@ namespace gdjs {
      * Run all pending asynchronous tasks.
      */
     processTasks(runtimeScene: RuntimeScene): void {
-      for (const task of this.tasks) {
-        if (task.asyncTask.update(runtimeScene)) {
+      for (const taskWithCallback of this.tasksWithCallback) {
+        if (taskWithCallback.asyncTask.update(runtimeScene)) {
           // The task has finished, run the callback and remove it.
-          task.callback(runtimeScene);
-          this.tasks.splice(this.tasks.indexOf(task), 1);
+          taskWithCallback.callback(runtimeScene);
+          this.tasksWithCallback.splice(this.tasksWithCallback.indexOf(taskWithCallback), 1);
         }
       }
     }
@@ -39,7 +39,7 @@ namespace gdjs {
       asyncTask: AsyncTask,
       callback: (runtimeScene: RuntimeScene) => void
     ): void {
-      this.tasks.push({ asyncTask, callback });
+      this.tasksWithCallback.push({ asyncTask, callback });
     }
 
     /**
@@ -47,7 +47,7 @@ namespace gdjs {
      * @internal
      */
     clearTasks() {
-      this.tasks.length = 0;
+      this.tasksWithCallback.length = 0;
     }
   }
 

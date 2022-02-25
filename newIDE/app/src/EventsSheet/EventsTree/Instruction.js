@@ -35,6 +35,8 @@ import {
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import AsyncIcon from './AsyncIcon';
 import Tooltip from '@material-ui/core/Tooltip';
+import { Link } from '@material-ui/core';
+import Window from '../../Utils/Window';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -296,14 +298,15 @@ const Instruction = (props: Props) => {
                 title={
                   <Trans>
                     This is an asynchronous event.{' '}
-                    <a
-                      href="https://wiki.gdevelop.io/gdevelop5/events/async"
-                      rel="noopener noreferrer nofollow"
-                      target="_blank"
-                      style={{ cursor: 'pointer' }}
+                    <Link
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://wiki.gdevelop.io/gdevelop5/events/async'
+                        )
+                      }
                     >
                       Learn more
-                    </a>
+                    </Link>
                   </Trans>
                 }
                 placement="top"

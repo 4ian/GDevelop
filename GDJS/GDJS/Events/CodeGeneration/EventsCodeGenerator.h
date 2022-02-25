@@ -243,11 +243,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& functionPrefix = "",
       const gd::String& functionSuffix = "");
 
-  /**
-   * Generates actions and events as a callback. Used by asynchronous functions.
-   */
-  virtual gd::String GenerateCallback();
-
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
 

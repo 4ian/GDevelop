@@ -3027,7 +3027,6 @@
     "@lingui/babel-plugin-transform-react" "2.9.2"
 
 "@lingui/react@git://github.com/4ian/lingui-react.git#master":
-  "integrity" "sha512-eoYJ8TI+8IolPh4fue9aIwX2OVp0YrPnV86QBZLfGhxknodVeNmx+4Ic4ym7rI5/davbk9AUZHcssiH+YZWVxw=="
   "resolved" "git+ssh://git@github.com/4ian/lingui-react.git#dc6b1e013470d952cf85f96cc4affdd28e29634a"
   "version" "2.7.3"
   dependencies:
@@ -14303,7 +14302,6 @@
     "node-modules-regexp" "^1.0.0"
 
 "pixi-simple-gesture@git://github.com/4ian/pixi-simple-gesture#v0.3.3":
-  "integrity" "sha512-DG1BxP8SK2iPMYWMOPGz5gKDXFmA8JPUpcyyNyIH55fpQraenuLYlosYFFMTRXEy0RZViTUu11H3VrYlfG2CgA=="
   "resolved" "git+ssh://git@github.com/4ian/pixi-simple-gesture.git#c84e0cc3c62edeca019e708d9897ef6b97a0d18a"
   "version" "0.3.3"
 
@@ -15863,7 +15861,6 @@
     "prop-types" "^15.6.2"
 
 "react-mosaic-component@git://github.com/4ian/react-mosaic#v3.1.0":
-  "integrity" "sha512-Izfw/EkG1g39nrZbOqzY52rqFkVFA1SUSv1TLwk7soS1Wy7iHm6zrUgzJdfwKRC2GaDn9WAfSe5ZQ2vIJ/mu5A=="
   "resolved" "git+ssh://git@github.com/4ian/react-mosaic.git#d5ef155119d786c08c7c72e34997dcef2f01f98b"
   "version" "3.1.0"
   dependencies:
@@ -18747,6 +18744,11 @@
   "integrity" "sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ=="
   "resolved" "https://registry.npmjs.org/use/-/use-3.1.1.tgz"
   "version" "3.1.1"
+
+"userflow.js@^2.2.0":
+  "integrity" "sha512-voimujGKB3xX+ORYt/ZEiqPE2qT9FUtO2zLduNZu3y5tCZLWrMNkJQY9oBt+qcp7a9ivJF66q62l/dTt7s7kew=="
+  "resolved" "https://registry.npmjs.org/userflow.js/-/userflow.js-2.2.0.tgz"
+  "version" "2.2.0"
 
 "util-deprecate@^1.0.1", "util-deprecate@^1.0.2", "util-deprecate@~1.0.1":
   "integrity" "sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="

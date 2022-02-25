@@ -78,9 +78,7 @@ function PublicGameProperties({
       />
       <SelectField
         fullWidth
-        floatingLabelText={
-          <Trans>Device orientation (for mobile)</Trans>
-        }
+        floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}
         value={orientation}
         onChange={(e, i, value: string) => setOrientation(value)}
       >

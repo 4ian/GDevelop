@@ -159,6 +159,7 @@ export const GameDetailsDialog = ({
         playWithKeyboard: project.isPlayableWithKeyboard(),
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
+        orientation: project.getOrientation(),
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
@@ -319,6 +320,21 @@ export const GameDetailsDialog = ({
                 multiline
                 rows={5}
               />
+              <SelectField
+                disabled
+                fullWidth
+                floatingLabelText={
+                  <Trans>Device orientation (for mobile)</Trans>
+                }
+                value={publicGame.orientation}
+              >
+                <SelectOption
+                  value="default"
+                  primaryText={t`Platform default`}
+                />
+                <SelectOption value="landscape" primaryText={t`Landscape`} />
+                <SelectOption value="portrait" primaryText={t`Portrait`} />
+              </SelectField>
               <Line noMargin justifyContent="flex-end">
                 <FlatButton
                   onClick={() => {

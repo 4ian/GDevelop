@@ -13,6 +13,7 @@ import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import optionalRequire from '../OptionalRequire';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { isMobile } from '../Platform';
+import { getBrowserLanguageOrLocale } from '../Language';
 
 const electron = optionalRequire('electron');
 
@@ -43,8 +44,8 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       isRunning => (isUserflowRunning = isRunning)
     );
     const userPreferences = loadPreferencesFromLocalStorage();
-    const userLanguage = userPreferences ? userPreferences.language : undefined;
-    userflow.identify(getUserUUID(), { language: userLanguage });
+    const appLanguage = userPreferences ? userPreferences.language : undefined;
+    userflow.identify(getUserUUID(), { language: appLanguage });
   }
   if (isDev) {
     console.info('Development build - Analytics disabled');
@@ -71,6 +72,10 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
     // Compute the startup times (only once to avoid doing this for every event).
     startupTimesSummary = startupTimesSummary || getStartupTimesSummary();
 
+    const userPreferences = loadPreferencesFromLocalStorage();
+    const appLanguage = userPreferences ? userPreferences.language : undefined;
+    const browserLanguage = getBrowserLanguageOrLocale();
+
     return {
       user: {
         uuid: getUserUUID(),
@@ -85,6 +90,10 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       tutorials: {
         // Useful to differentiate if an event is part of a tutorial or not.
         isInAppTutorialRunning: isUserflowRunning,
+      },
+      language: {
+        appLanguage,
+        browserLanguage,
       },
       versionMetadata: {
         version,

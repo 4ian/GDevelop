@@ -237,7 +237,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * It is to be used by the Async event code generator to know what objects
    * lists to backup for the async callback and async callbacks after it.
    */
-  const std::set<const gd::String>& GetAllDeclaredObjectsAcrossChildren() {
+  const std::set<gd::String>& GetAllDeclaredObjectsAcrossChildren() {
     return allObjectsListToBeDeclaredAcrossChildren;
   };
 
@@ -294,7 +294,7 @@ class GD_CORE_API EventsCodeGenerationContext {
                                       ///< but not filled with scene's
                                       ///< objects and not filled with any
                                       ///< previously existing objects list.
-  std::set<const gd::String>
+  std::set<gd::String>
       allObjectsListToBeDeclaredAcrossChildren;  ///< This is only to be used by
                                                  ///< the async callback
                                                  ///< contexts to know all

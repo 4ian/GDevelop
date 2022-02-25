@@ -612,7 +612,7 @@ EventsCodeGenerator::GenerateCallback(
 
   AddCustomCodeOutsideMain(callbackCode);
 
-  std::set<const gd::String> requiredObjects;
+  std::set<gd::String> requiredObjects;
   // Build the list of all objects required by the callback. Any object that has
   // already been declared could have gone through previous object picking, so
   // if such an object is used by the actions or subevents of this callback, we

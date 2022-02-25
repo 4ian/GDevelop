@@ -162,7 +162,7 @@ class GD_CORE_API EventsCodeGenerator {
   struct CallbackDescriptor {
     CallbackDescriptor(const gd::String functionName_,
                        const gd::String argumentsList_,
-                       const std::set<const gd::String> requiredObjects_)
+                       const std::set<gd::String> requiredObjects_)
         : functionName(functionName_),
           argumentsList(argumentsList_),
           requiredObjects(requiredObjects_){};
@@ -177,7 +177,7 @@ class GD_CORE_API EventsCodeGenerator {
     /**
      * A set of all objects that need to be backed up into
      */
-    const std::set<const gd::String> requiredObjects;
+    const std::set<gd::String> requiredObjects;
   };
 
   /**

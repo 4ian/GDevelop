@@ -12,10 +12,16 @@ import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 
+/**
+ * Public game properties that are shared with the project file ones.
+ */
 type PublicProjectProperties = {|
   name: string,
   description: string,
   authorIds: string[],
+  playWithKeyboard: boolean,
+  playWithGamepad: boolean,
+  playWithMobile: boolean,
 |};
 
 function applyPublicPropertiesToProject(
@@ -29,6 +35,9 @@ function applyPublicPropertiesToProject(
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
   authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
+  project.setPlayableWithGamepad(newProperties.playWithGamepad);
+  project.setPlayableWithMobile(newProperties.playWithMobile);
 
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
@@ -48,12 +57,24 @@ const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
 }: Props) => {
-  const publicGameAuthorIds = game.authors.map(author => author.id);
+  const publicGameAuthorIds = game.authors
+    .map(author => (author ? author.id : null))
+    .filter(Boolean);
   const [name, setName] = React.useState(game.gameName);
   const [description, setDescription] = React.useState(game.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
+  const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
+    game.playWithKeyboard
+  );
+  const [playWithGamepad, setPlayableWithGamepad] = React.useState(
+    game.playWithGamepad
+  );
+  const [playWithMobile, setPlayableWithMobile] = React.useState(
+    game.playWithMobile
+  );
+
   if (!open) return null;
 
   const onSave = () => {
@@ -62,6 +83,9 @@ const PublicGamePropertiesDialog = ({
         name,
         description: description || '',
         authorIds,
+        playWithKeyboard: !!playWithKeyboard,
+        playWithGamepad: !!playWithGamepad,
+        playWithMobile: !!playWithMobile,
       })
     )
       onApply();
@@ -98,6 +122,12 @@ const PublicGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        setPlayableWithKeyboard={setPlayableWithKeyboard}
+        playWithKeyboard={playWithKeyboard}
+        setPlayableWithGamepad={setPlayableWithGamepad}
+        playWithGamepad={playWithGamepad}
+        setPlayableWithMobile={setPlayableWithMobile}
+        playWithMobile={playWithMobile}
       />
     </Dialog>
   );

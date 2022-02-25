@@ -188,6 +188,19 @@ namespace gdjs {
       }
     }
 
+    onScenePaused(runtimeScene: gdjs.RuntimeScene): void {
+      this._renderer.onScenePaused();
+    }
+
+    onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {
+      this._renderer.onSceneResumed();
+    }
+
+    onDestroyFromScene(runtimeScene: gdjs.RuntimeScene): void {
+      super.onDestroyFromScene(runtimeScene);
+      this._renderer.onDestroy();
+    }
+
     /**
      * Set object opacity.
      */

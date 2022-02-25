@@ -82,6 +82,10 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       localStats: {
         programOpeningCount: getProgramOpeningCount(),
       },
+      tutorials: {
+        // Useful to differentiate if an event is part of a tutorial or not.
+        isInAppTutorialRunning: isUserflowRunning,
+      },
       versionMetadata: {
         version,
         versionWithHash,
@@ -290,6 +294,28 @@ export const sendExternalEditorOpened = (editorName: string) => {
   if (isDev || !client) return;
 
   client.recordEvent('open_external_editor', { editorName });
+};
+
+export const sendBehaviorsEditorShown = ({
+  parentEditor,
+}: {|
+  parentEditor: 'object-editor-dialog',
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('behaviors-editor-shown', { parentEditor });
+};
+
+export const sendBehaviorAdded = ({
+  behaviorType,
+  parentEditor,
+}: {|
+  behaviorType: string,
+  parentEditor: 'behaviors-editor' | 'instruction-editor-dialog',
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('behavior-added', { behaviorType, parentEditor });
 };
 
 const trackInAppTutorialProgress = (

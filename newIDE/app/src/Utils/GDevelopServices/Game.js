@@ -10,7 +10,10 @@ export type PublicGame = {
   authorName: string, // this corresponds to the publisher name
   publicWebBuildId?: ?string,
   description?: string,
-  authors: Array<UserPublicProfile>,
+  authors: Array<?UserPublicProfile>,
+  playWithKeyboard: boolean,
+  playWithGamepad: boolean,
+  playWithMobile: boolean,
   metrics?: {
     lastWeekSessionsCount: number,
     lastYearSessionsCount: number,
@@ -134,11 +137,17 @@ export const updateGame = (
     authorName,
     publicWebBuildId,
     description,
+    playWithKeyboard,
+    playWithGamepad,
+    playWithMobile,
   }: {|
     gameName?: string,
     authorName?: string,
     publicWebBuildId?: ?string,
     description?: string,
+    playWithKeyboard?: boolean,
+    playWithGamepad?: boolean,
+    playWithMobile?: boolean,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -150,6 +159,9 @@ export const updateGame = (
           authorName,
           publicWebBuildId,
           description,
+          playWithKeyboard,
+          playWithGamepad,
+          playWithMobile,
         },
         {
           params: {

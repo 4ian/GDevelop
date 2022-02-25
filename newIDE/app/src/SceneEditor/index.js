@@ -637,16 +637,21 @@ export default class SceneEditor extends React.Component<Props, State> {
     done(true);
   };
 
-  _onDeleteObject = (
+  _onDeleteObject = (i18n: I18nType) => (
     objectWithContext: ObjectWithContext,
     done: boolean => void
   ) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    const answer = Window.showConfirmDialog(
-      'Do you want to remove all references to this object in groups and events (actions and conditions using the object)?'
+    const answer = Window.showYesNoCancelDialog(
+      i18n._(
+        t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
+      )
     );
+
+    if (answer === 'cancel') return;
+    const shouldRemoveReferences = answer === 'yes';
 
     // Unselect instances of the deleted object because these instances
     // will be deleted by gd.WholeProjectRefactorer (and after that, they will
@@ -658,7 +663,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         project,
         object.getName(),
         /* isObjectGroup=*/ false,
-        !!answer
+        shouldRemoveReferences
       );
     } else {
       gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
@@ -666,7 +671,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         layout,
         object.getName(),
         /* isObjectGroup=*/ false,
-        !!answer
+        shouldRemoveReferences
       );
     }
 
@@ -887,20 +892,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
     if (x === null || y === null || instancesContent === null) return;
 
-    instancesContent
+    const newInstances = instancesContent
       .map(serializedInstance => {
         const instance = new gd.InitialInstance();
         unserializeFromJSObject(instance, serializedInstance);
         return instance;
       })
-      .forEach(instance => {
+      .map(instance => {
         instance.setX(instance.getX() - x + position[0]);
         instance.setY(instance.getY() - y + position[1]);
-        this.props.initialInstances
+        const newInstance = this.props.initialInstances
           .insertInitialInstance(instance)
           .resetPersistentUuid();
         instance.delete();
+        return newInstance;
       });
+    this._onInstancesAdded(newInstances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances(newInstances, true);
   };
 
   updateBehaviorsSharedData = () => {
@@ -1090,36 +1099,42 @@ export default class SceneEditor extends React.Component<Props, State> {
           <CloseButton key="close" />,
         ],
         renderEditor: () => (
-          <ObjectsList
-            getThumbnail={ObjectsRenderingService.getThumbnail.bind(
-              ObjectsRenderingService
+          <I18n>
+            {({ i18n }) => (
+              <ObjectsList
+                getThumbnail={ObjectsRenderingService.getThumbnail.bind(
+                  ObjectsRenderingService
+                )}
+                project={project}
+                objectsContainer={layout}
+                layout={layout}
+                events={layout.getEvents()}
+                resourceSources={resourceSources}
+                resourceExternalEditors={resourceExternalEditors}
+                onChooseResource={onChooseResource}
+                selectedObjectNames={this.state.selectedObjectNames}
+                onEditObject={this.props.onEditObject || this.editObject}
+                onDeleteObject={this._onDeleteObject(i18n)}
+                canRenameObject={this._canObjectOrGroupUseNewName}
+                onObjectCreated={this._onObjectCreated}
+                onObjectSelected={this._onObjectSelected}
+                onRenameObject={this._onRenameObject}
+                onObjectPasted={() => this.updateBehaviorsSharedData()}
+                selectedObjectTags={this.state.selectedObjectTags}
+                onChangeSelectedObjectTags={selectedObjectTags =>
+                  this.setState({
+                    selectedObjectTags,
+                  })
+                }
+                getAllObjectTags={this._getAllObjectTags}
+                ref={objectsList => (this._objectsList = objectsList)}
+                unsavedChanges={this.props.unsavedChanges}
+                hotReloadPreviewButtonProps={
+                  this.props.hotReloadPreviewButtonProps
+                }
+              />
             )}
-            project={project}
-            objectsContainer={layout}
-            layout={layout}
-            events={layout.getEvents()}
-            resourceSources={resourceSources}
-            resourceExternalEditors={resourceExternalEditors}
-            onChooseResource={onChooseResource}
-            selectedObjectNames={this.state.selectedObjectNames}
-            onEditObject={this.props.onEditObject || this.editObject}
-            onDeleteObject={this._onDeleteObject}
-            canRenameObject={this._canObjectOrGroupUseNewName}
-            onObjectCreated={this._onObjectCreated}
-            onObjectSelected={this._onObjectSelected}
-            onRenameObject={this._onRenameObject}
-            onObjectPasted={() => this.updateBehaviorsSharedData()}
-            selectedObjectTags={this.state.selectedObjectTags}
-            onChangeSelectedObjectTags={selectedObjectTags =>
-              this.setState({
-                selectedObjectTags,
-              })
-            }
-            getAllObjectTags={this._getAllObjectTags}
-            ref={objectsList => (this._objectsList = objectsList)}
-            unsavedChanges={this.props.unsavedChanges}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-          />
+          </I18n>
         ),
       },
       'object-groups-list': {

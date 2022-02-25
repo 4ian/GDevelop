@@ -146,10 +146,11 @@ export default class DeprecatedKeyboardShortcuts {
       this.onPaste();
     }
     if (this._isControlPressed() && evt.which === Z_KEY) {
-      this.onUndo();
-    }
-    if (this._isControlPressed() && this.shiftPressed && evt.which === Z_KEY) {
-      this.onRedo();
+      if (this.shiftPressed) {
+        this.onRedo();
+      } else {
+        this.onUndo();
+      }
     }
     if (this._isControlPressed() && evt.which === Y_KEY) {
       this.onRedo();

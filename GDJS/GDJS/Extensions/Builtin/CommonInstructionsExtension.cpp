@@ -9,6 +9,7 @@
 #include <set>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -30,6 +31,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDJS/Events/Builtin/JsCodeEvent.h"
+#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 
 using namespace std;
 using namespace gd;
@@ -89,8 +91,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         return gd::String("");
       });
-  GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"].codeExtraInformation =
-    GetAllConditions()["Egal"].codeExtraInformation;
+  GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
+      .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
 
   GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
@@ -123,8 +125,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         return gd::String("");
       });
-  GetAllConditions()["BuiltinCommonInstructions::CompareStrings"].codeExtraInformation =
-    GetAllConditions()["StrEqual"].codeExtraInformation;
+  GetAllConditions()["BuiltinCommonInstructions::CompareStrings"]
+      .codeExtraInformation =
+      GetAllConditions()["StrEqual"].codeExtraInformation;
 
   GetAllEvents()["BuiltinCommonInstructions::Link"]
       .SetCodeGenerator([](gd::BaseEvent& event_,
@@ -185,6 +188,48 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
 
         return outputCode;
+      });
+
+  GetAllEvents()["BuiltinCommonInstructions::Async"].SetCodeGenerator(
+      [](gd::BaseEvent& event_,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& parentContext) {
+        gd::AsyncEvent& event = dynamic_cast<gd::AsyncEvent&>(event_);
+
+        // Generate callback code
+        const auto callbackDescriptor = codeGenerator.GenerateCallback(
+            gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
+                &event.GetInstruction())),
+            parentContext,
+            event.GetActions(),
+            event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
+
+        // Generate code to backup the objects lists
+        gd::String objectsListsCode =
+            parentContext.IsAsync()
+                ? "asyncObjectsList = "
+                  "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
+                : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
+        for (const gd::String& objectToBackup :
+             callbackDescriptor.requiredObjects) {
+            objectsListsCode +=
+                "for (const obj of " +
+                codeGenerator.GetObjectListName(objectToBackup, parentContext) +
+                ") asyncObjectsList.addObject(obj);\n";
+        }
+
+        const gd::String callbackCallCode =
+            "(runtimeScene) => (" + callbackDescriptor.functionName + "(" +
+            callbackDescriptor.argumentsList + "))";
+
+        // Generate the action and store the generated task.
+        const gd::String taskSchedulingCode = codeGenerator.GenerateActionCode(
+            event.GetInstruction(),
+            parentContext,
+            "runtimeScene.getAsyncTasksManager().addTask(",
+            ", " + callbackCallCode + ");\n");
+
+        return "{" + objectsListsCode + taskSchedulingCode + "}";
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Comment"].SetCodeGenerator(
@@ -437,11 +482,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (
-          event.GetWhileConditions().empty() &&
-          event.GetConditions().empty() &&
-          event.GetActions().empty()
-        )
+        if (event.GetWhileConditions().empty() &&
+            event.GetConditions().empty() && event.GetActions().empty())
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
 
@@ -553,6 +595,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             !event.GetValueIteratorVariableName().empty();
         bool keyIteratorExists = !event.GetKeyIteratorVariableName().empty();
 
+        // clang-format off
         // Define references to variables (if they exist)
         if (keyIteratorExists)
           outputCode +=
@@ -599,6 +642,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        // Arrays are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
             "    } else console.warn(\"Cannot identify type: \", type);\n";
+        // clang-format on
 
         // Now do the rest of standard event code generation
         outputCode += objectDeclaration;

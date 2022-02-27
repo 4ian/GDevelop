@@ -266,6 +266,32 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
+      .MarkAsAdvanced()
+      .SetHidden();  // Deprecated
+
+  extension
+      .AddAction(
+          "ClampCamera",
+          _("Move back the camera within bounds"),
+          _("Move back the camera inside the specified bounds."),
+          _("Move back the camera within bounds (left: _PARAM1_, top: _PARAM2_ "
+            "right: _PARAM3_, bottom: _PARAM4_, layer: _PARAM5_, camera: _PARAM6_)"),
+          "",
+          "res/actions/camera24.png",
+          "res/actions/camera.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression",
+                    _("Left bound X Position"))
+      .AddParameter("expression",
+                    _("Top bound Y Position"))
+      .AddParameter("expression",
+                    _("Right bound X Position"))
+      .AddParameter("expression",
+                    _("Bottom bound Y Position"))
+      .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
+      .SetDefaultValue("\"\"")
+      .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   extension

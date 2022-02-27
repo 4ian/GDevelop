@@ -217,22 +217,33 @@ namespace gdjs {
         const layer = runtimeScene.getLayer(layerName);
         const cameraHalfWidth = layer.getCameraWidth(cameraId) / 2;
         const cameraHalfHeight = layer.getCameraHeight(cameraId) / 2;
-        layer.setCameraX(
-          gdjs.evtTools.common.clamp(
-            layer.getCameraX(cameraId),
-            left + cameraHalfWidth,
-            right - cameraHalfWidth
-          ),
-          cameraId
-        );
-        layer.setCameraY(
-          gdjs.evtTools.common.clamp(
-            layer.getCameraY(cameraId),
-            top + cameraHalfHeight,
-            bottom - cameraHalfHeight
-          ),
-          cameraId
-        );
+
+        const centerLeftBound = left + cameraHalfWidth;
+        const centerRightBound = right - cameraHalfWidth;
+        const centerTopBound = top + cameraHalfHeight;
+        const centerBottomBound = bottom - cameraHalfHeight;
+
+        const cameraX =
+          centerLeftBound < centerRightBound
+            ? gdjs.evtTools.common.clamp(
+                layer.getCameraX(cameraId),
+                centerLeftBound,
+                centerRightBound
+              )
+            : // Center on the bounds when they are too small to fit the viewport.
+              (centerLeftBound + centerRightBound) / 2;
+        const cameraY =
+          centerTopBound < centerBottomBound
+            ? gdjs.evtTools.common.clamp(
+                layer.getCameraY(cameraId),
+                centerTopBound,
+                centerBottomBound
+              )
+            : // Center on the bounds when they are too small to fit the viewport.
+              (centerTopBound + centerBottomBound) / 2;
+
+        layer.setCameraX(cameraX, cameraId);
+        layer.setCameraY(cameraY, cameraId);
       };
 
       /**

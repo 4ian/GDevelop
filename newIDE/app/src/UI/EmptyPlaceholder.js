@@ -6,6 +6,7 @@ import { Line, Column } from './Grid';
 type Props = {|
   children: React.Node,
   renderButtons: () => React.Node,
+  buttonJustification?: string,
 |};
 
 /**
@@ -23,7 +24,7 @@ export const EmptyPlaceholder = (props: Props) => (
     >
       <Column>
         {props.children}
-        <Line expand justifyContent="flex-end">
+        <Line expand justifyContent={props.buttonJustification || 'flex-end'}>
           {props.renderButtons()}
         </Line>
       </Column>

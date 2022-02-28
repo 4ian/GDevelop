@@ -16,33 +16,22 @@ type Props = {|
  */
 export const EmptyPlaceholder = (props: Props) => (
   <Column alignItems="center">
-    {props.outlined || props.outlined === undefined ? (
-      <Paper
-        variant="outlined"
-        style={{
-          maxWidth: '450px',
-          whiteSpace: 'normal',
-        }}
-      >
-        <Column>
-          {props.children}
-          <Line expand justifyContent={props.buttonJustification || 'flex-end'}>
-            {props.renderButtons()}
-          </Line>
-        </Column>
-      </Paper>
-    ) : (
-      <Column
-        style={{
-          maxWidth: '450px',
-          whiteSpace: 'normal',
-        }}
-      >
+    <Paper
+      variant={
+        props.outlined || props.outlined === undefined ? 'outlined' : undefined
+      }
+      elevation={0}
+      style={{
+        maxWidth: '450px',
+        whiteSpace: 'normal',
+      }}
+    >
+      <Column>
         {props.children}
         <Line expand justifyContent={props.buttonJustification || 'flex-end'}>
           {props.renderButtons()}
         </Line>
       </Column>
-    )}
+    </Paper>
   </Column>
 );

@@ -23,16 +23,12 @@ const EmptyBehaviorsPlaceholder = (props: Props) => (
     buttonJustification="center"
     outlined={false}
   >
-    <Line justifyContent="center" expand>
-      <Text size="title">
-        <Trans>Add your first behavior</Trans>
-      </Text>
-    </Line>
-    <Line justifyContent="center" expand>
-      <Text>
-        <Trans>Behaviors add features to objects in a matter of clicks.</Trans>
-      </Text>
-    </Line>
+    <Text size="title" align="center">
+      <Trans>Add your first behavior</Trans>
+    </Text>
+    <Text align="center">
+      <Trans>Behaviors add features to objects in a matter of clicks.</Trans>
+    </Text>
     <Line justifyContent="center" expand>
       <RaisedButton
         key="add-behavior-line"

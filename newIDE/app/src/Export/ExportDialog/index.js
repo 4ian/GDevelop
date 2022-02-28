@@ -13,6 +13,7 @@ import AlertMessage from '../../UI/AlertMessage';
 import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
+import { showWarningBox } from '../../UI/Messages/MessageBox';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -84,6 +85,16 @@ const ExportDialog = ({
   );
   const onlineStatus = useOnlineStatus();
   const cantExportBecauseOffline = !!allExportersRequireOnline && !onlineStatus;
+
+  const openBuildDialog = () => {
+    if (!game) {
+      showWarningBox(
+        "You are not the owner of this game, so you can't see the builds or publish a build to the game page on Liluo.io."
+      );
+      return;
+    }
+    setBuildsDialogOpen(true);
+  };
 
   const loadGame = React.useCallback(
     async () => {
@@ -164,8 +175,8 @@ const ExportDialog = ({
         <FlatButton
           key="builds"
           label={<Trans>See this game builds</Trans>}
-          onClick={() => setBuildsDialogOpen(true)}
-          disabled={isNavigationDisabled || !game}
+          onClick={openBuildDialog}
+          disabled={isNavigationDisabled}
         />,
       ]}
       open

@@ -6,7 +6,6 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
 import Subheader from '../UI/Subheader';
-import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
@@ -30,8 +29,9 @@ import RaisedButton from '../UI/RaisedButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
-import { Line } from '../UI/Grid';
+import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
+import useForceUpdate from '../Utils/UseForceUpdate';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -45,7 +45,6 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   disabled?: boolean,
   onEditButtonClick?: Instance => void,
-  onClick?: Instance => void,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -91,6 +90,21 @@ type ResourceField = {|
   ...ValueFieldCommonProperties,
 |};
 
+type SectionTitle = {|
+  name: string,
+  getValue?: Instance => string,
+  nonFieldType: 'sectionTitle',
+  defaultValue?: string,
+|};
+
+type ActionButton = {|
+  label: string,
+  disabled: 'onValuesDifferent',
+  getValue: Instance => string,
+  nonFieldType: 'button',
+  onClick: (instance: Instance) => void,
+|};
+
 // A value field is a primitive or a resource.
 export type ValueField = PrimitiveValueField | ResourceField;
 
@@ -98,6 +112,8 @@ export type ValueField = PrimitiveValueField | ResourceField;
 export type Field =
   | PrimitiveValueField
   | ResourceField
+  | SectionTitle
+  | ActionButton
   | {|
       name: string,
       type: 'row' | 'column',
@@ -149,9 +165,15 @@ const styles = {
   },
 };
 
+/**
+ * Get the value for the given field across all instances.
+ * If one of the instances doesn't share the same value, returns the default value.
+ * If there is no instances, returns the default value.
+ * If the field does not have a `getValue` method, returns `null`.
+ */
 const getFieldValue = (
   instances: Instances,
-  field: ValueField,
+  field: ValueField | ActionButton | SectionTitle,
   defaultValue?: any
 ): any => {
   if (!instances[0]) {
@@ -161,9 +183,12 @@ const getFieldValue = (
     return defaultValue;
   }
 
-  let value = field.getValue(instances[0]);
+  const { getValue } = field;
+  if (!getValue) return null;
+
+  let value = getValue(instances[0]);
   for (var i = 1; i < instances.length; ++i) {
-    if (value !== field.getValue(instances[i])) {
+    if (value !== getValue(instances[i])) {
       if (typeof defaultValue !== 'undefined') value = defaultValue;
       break;
     }
@@ -185,20 +210,33 @@ const getFieldLabel = (instances: Instances, field: ValueField): any => {
   return field.name;
 };
 
-export default class PropertiesEditor extends React.Component<Props, {||}> {
-  _onInstancesModified = (instances: Instances) => {
+const PropertiesEditor = ({
+  onInstancesModified,
+  instances,
+  schema,
+  mode,
+  renderExtraDescriptionText,
+  unsavedChanges,
+  project,
+  resourceSources,
+  onChooseResource,
+  resourceExternalEditors,
+}: Props) => {
+  const forceUpdate = useForceUpdate();
+
+  const _onInstancesModified = (instances: Instances) => {
     // This properties editor is dealing with fields that are
     // responsible to update their state (see field.setValue).
 
-    if (this.props.unsavedChanges)
-      this.props.unsavedChanges.triggerUnsavedChanges();
-    if (this.props.onInstancesModified)
-      this.props.onInstancesModified(instances);
-    this.forceUpdate();
+    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+    if (onInstancesModified) onInstancesModified(instances);
+    forceUpdate();
   };
 
-  _getFieldDescription = (instances: Instances, field: ValueField): ?string => {
-    const { renderExtraDescriptionText } = this.props;
+  const getFieldDescription = (
+    instances: Instances,
+    field: ValueField
+  ): ?string => {
     if (!instances[0]) {
       console.log(
         'PropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
@@ -217,26 +255,21 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     return descriptions.join('\n') || undefined;
   };
 
-  _renderInputField = (field: ValueField) => {
+  const renderInputField = (field: ValueField) => {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
       const { setValue } = field;
-      const description = this._getFieldDescription(
-        this.props.instances,
-        field
-      );
+      const description = getFieldDescription(instances, field);
 
       return (
         <InlineCheckbox
           label={
             !description ? (
-              getFieldLabel(this.props.instances, field)
+              getFieldLabel(instances, field)
             ) : (
               <React.Fragment>
-                <Line noMargin>
-                  {getFieldLabel(this.props.instances, field)}
-                </Line>
+                <Line noMargin>{getFieldLabel(instances, field)}</Line>
                 <FormHelperText style={{ display: 'inline' }}>
                   <MarkdownText source={description} />
                 </FormHelperText>
@@ -244,10 +277,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             )
           }
           key={field.name}
-          checked={getFieldValue(this.props.instances, field)}
+          checked={getFieldValue(instances, field)}
           onCheck={(event, newValue) => {
-            this.props.instances.forEach(i => setValue(i, !!newValue));
-            this._onInstancesModified(this.props.instances);
+            instances.forEach(i => setValue(i, !!newValue));
+            _onInstancesModified(instances);
           }}
           disabled={field.disabled}
         />
@@ -256,20 +289,15 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       const { setValue } = field;
       return (
         <SemiControlledTextField
-          value={getFieldValue(this.props.instances, field)}
+          value={getFieldValue(instances, field)}
           key={field.name}
           id={field.name}
-          floatingLabelText={getFieldLabel(this.props.instances, field)}
+          floatingLabelText={getFieldLabel(instances, field)}
           floatingLabelFixed
-          helperMarkdownText={this._getFieldDescription(
-            this.props.instances,
-            field
-          )}
+          helperMarkdownText={getFieldDescription(instances, field)}
           onChange={newValue => {
-            this.props.instances.forEach(i =>
-              setValue(i, parseFloat(newValue) || 0)
-            );
-            this._onInstancesModified(this.props.instances);
+            instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+            _onInstancesModified(instances);
           }}
           type="number"
           style={styles.field}
@@ -282,19 +310,16 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         <ColorField
           key={field.name}
           id={field.name}
-          floatingLabelText={getFieldLabel(this.props.instances, field)}
-          helperMarkdownText={this._getFieldDescription(
-            this.props.instances,
-            field
-          )}
+          floatingLabelText={getFieldLabel(instances, field)}
+          helperMarkdownText={getFieldDescription(instances, field)}
           disableAlpha
           fullWidth
-          color={getFieldValue(this.props.instances, field)}
+          color={getFieldValue(instances, field)}
           onChange={color => {
             const rgbString =
               color.length === 0 ? '' : rgbOrHexToRGBString(color);
-            this.props.instances.forEach(i => setValue(i, rgbString));
-            this._onInstancesModified(this.props.instances);
+            instances.forEach(i => setValue(i, rgbString));
+            _onInstancesModified(instances);
           }}
         />
       );
@@ -305,16 +330,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           key={field.name}
           id={field.name}
           onChange={text => {
-            this.props.instances.forEach(i => setValue(i, text || ''));
-            this._onInstancesModified(this.props.instances);
+            instances.forEach(i => setValue(i, text || ''));
+            _onInstancesModified(instances);
           }}
-          value={getFieldValue(this.props.instances, field)}
-          floatingLabelText={getFieldLabel(this.props.instances, field)}
+          value={getFieldValue(instances, field)}
+          floatingLabelText={getFieldLabel(instances, field)}
           floatingLabelFixed
-          helperMarkdownText={this._getFieldDescription(
-            this.props.instances,
-            field
-          )}
+          helperMarkdownText={getFieldDescription(instances, field)}
           multiline
           style={styles.field}
         />
@@ -326,21 +348,14 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           key={field.name}
           renderTextField={() => (
             <SemiControlledTextField
-              value={getFieldValue(
-                this.props.instances,
-                field,
-                '(Multiple values)'
-              )}
+              value={getFieldValue(instances, field, '(Multiple values)')}
               id={field.name}
-              floatingLabelText={getFieldLabel(this.props.instances, field)}
+              floatingLabelText={getFieldLabel(instances, field)}
               floatingLabelFixed
-              helperMarkdownText={this._getFieldDescription(
-                this.props.instances,
-                field
-              )}
+              helperMarkdownText={getFieldDescription(instances, field)}
               onChange={newValue => {
-                this.props.instances.forEach(i => setValue(i, newValue || ''));
-                this._onInstancesModified(this.props.instances);
+                instances.forEach(i => setValue(i, newValue || ''));
+                _onInstancesModified(instances);
               }}
               style={styles.field}
               disabled={field.disabled}
@@ -351,10 +366,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               <RaisedButton
                 style={style}
                 primary
-                disabled={this.props.instances.length !== 1}
+                disabled={instances.length !== 1}
                 icon={<Edit />}
                 label={<Trans>Edit</Trans>}
-                onClick={() => onEditButtonClick(this.props.instances[0])}
+                onClick={() => onEditButtonClick(instances[0])}
               />
             ) : null
           }
@@ -363,7 +378,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     }
   };
 
-  _renderSelectField = (field: ValueField) => {
+  const renderSelectField = (field: ValueField) => {
     if (!field.getChoices || !field.getValue) return;
 
     const children = field
@@ -376,18 +391,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       const { setValue } = field;
       return (
         <SelectField
-          value={getFieldValue(this.props.instances, field)}
+          value={getFieldValue(instances, field)}
           key={field.name}
-          floatingLabelText={getFieldLabel(this.props.instances, field)}
-          helperMarkdownText={this._getFieldDescription(
-            this.props.instances,
-            field
-          )}
+          floatingLabelText={getFieldLabel(instances, field)}
+          helperMarkdownText={getFieldDescription(instances, field)}
           onChange={(event, index, newValue: string) => {
-            this.props.instances.forEach(i =>
-              setValue(i, parseFloat(newValue) || 0)
-            );
-            this._onInstancesModified(this.props.instances);
+            instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+            _onInstancesModified(instances);
           }}
           style={styles.field}
           disabled={field.disabled}
@@ -399,20 +409,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       const { setValue } = field;
       return (
         <SelectField
-          value={getFieldValue(
-            this.props.instances,
-            field,
-            '(Multiple values)'
-          )}
+          value={getFieldValue(instances, field, '(Multiple values)')}
           key={field.name}
-          floatingLabelText={getFieldLabel(this.props.instances, field)}
-          helperMarkdownText={this._getFieldDescription(
-            this.props.instances,
-            field
-          )}
+          floatingLabelText={getFieldLabel(instances, field)}
+          helperMarkdownText={getFieldDescription(instances, field)}
           onChange={(event, index, newValue: string) => {
-            this.props.instances.forEach(i => setValue(i, newValue || ''));
-            this._onInstancesModified(this.props.instances);
+            instances.forEach(i => setValue(i, newValue || ''));
+            _onInstancesModified(instances);
           }}
           style={styles.field}
           disabled={field.disabled}
@@ -423,27 +426,34 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     }
   };
 
-  _renderButton = (field: ValueField) => {
-    //TODO: multi selection handling
+  const renderButton = (field: ActionButton) => {
+    let disabled = false;
+    if (field.disabled === 'onValuesDifferent') {
+      const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
+      disabled =
+        getFieldValue(instances, field, DIFFERENT_VALUES) === DIFFERENT_VALUES;
+    }
     return (
-      <FlatButton
-        key={field.name}
+      <RaisedButton
+        key={`button-${field.label}`}
         fullWidth
         primary
-        label={getFieldLabel(this.props.instances, field)}
+        icon={<Edit />}
+        disabled={disabled}
+        label={field.label}
         onClick={() => {
-          if (field.onClick) field.onClick(this.props.instances[0]);
+          field.onClick(instances[0]);
         }}
       />
     );
   };
 
-  _renderResourceField = (field: ResourceField) => {
+  const renderResourceField = (field: ResourceField) => {
     if (
-      !this.props.project ||
-      !this.props.resourceSources ||
-      !this.props.onChooseResource ||
-      !this.props.resourceExternalEditors
+      !project ||
+      !resourceSources ||
+      !onChooseResource ||
+      !resourceExternalEditors
     ) {
       console.error(
         'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, onChooseResource, resourceExternalEditors).'
@@ -455,112 +465,140 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     return (
       <ResourceSelector
         key={field.name}
-        project={this.props.project}
-        resourceSources={this.props.resourceSources}
-        onChooseResource={this.props.onChooseResource}
-        resourceExternalEditors={this.props.resourceExternalEditors}
+        project={project}
+        resourceSources={resourceSources}
+        onChooseResource={onChooseResource}
+        resourceExternalEditors={resourceExternalEditors}
         resourcesLoader={ResourcesLoader}
         resourceKind={field.resourceKind}
         fullWidth
         initialResourceName={getFieldValue(
-          this.props.instances,
+          instances,
           field,
           '(Multiple values)' //TODO
         )}
         onChange={newValue => {
-          this.props.instances.forEach(i => setValue(i, newValue));
-          this._onInstancesModified(this.props.instances);
+          instances.forEach(i => setValue(i, newValue));
+          _onInstancesModified(instances);
         }}
-        floatingLabelText={getFieldLabel(this.props.instances, field)}
-        helperMarkdownText={this._getFieldDescription(
-          this.props.instances,
-          field
-        )}
+        floatingLabelText={getFieldLabel(instances, field)}
+        helperMarkdownText={getFieldDescription(instances, field)}
       />
     );
   };
 
-  render() {
-    const { mode } = this.props;
+  const renderContainer =
+    mode === 'row'
+      ? (fields: React.Node) => (
+          <ResponsiveLineStackLayout noMargin>
+            {fields}
+          </ResponsiveLineStackLayout>
+        )
+      : (fields: React.Node) => (
+          <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
+        );
 
-    const renderContainer =
-      mode === 'row'
-        ? (fields: React.Node) => (
-            <ResponsiveLineStackLayout noMargin>
-              {fields}
-            </ResponsiveLineStackLayout>
-          )
-        : (fields: React.Node) => (
-            <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
+  const renderSectionTitle = (field: SectionTitle) => {
+    const { getValue } = field;
+
+    let additionalText = null;
+
+    if (getValue) {
+      let selectedInstancesValue = getFieldValue(
+        instances,
+        field,
+        field.defaultValue || 'Multiple Values'
+      );
+      if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
+    }
+
+    if (!!additionalText) {
+      return (
+        <Line alignItems="baseline">
+          <Text displayInlineAsSpan>{field.name}</Text>
+          <Spacer />
+          <Text displayInlineAsSpan size="body2">{`- ${additionalText}`}</Text>
+        </Line>
+      );
+    }
+
+    return (
+      <Line>
+        <Text displayInlineAsSpan>{field.name}</Text>
+      </Line>
+    );
+  };
+
+  return renderContainer(
+    schema.map(field => {
+      if (!!field.nonFieldType) {
+        if (field.nonFieldType === 'sectionTitle') {
+          return renderSectionTitle(field);
+        } else if (field.nonFieldType === 'button') {
+          return renderButton(field);
+        }
+        return null;
+      } else if (field.children) {
+        if (field.type === 'row') {
+          const contentView = (
+            <UnsavedChangesContext.Consumer key={field.name}>
+              {unsavedChanges => (
+                <PropertiesEditor
+                  project={project}
+                  resourceSources={resourceSources}
+                  onChooseResource={onChooseResource}
+                  resourceExternalEditors={resourceExternalEditors}
+                  schema={field.children}
+                  instances={instances}
+                  mode="row"
+                  unsavedChanges={unsavedChanges}
+                  onInstancesModified={onInstancesModified}
+                />
+              )}
+            </UnsavedChangesContext.Consumer>
           );
+          if (field.title) {
+            return [
+              <Text key={field.name + '-title'} size="title">
+                {field.title}
+              </Text>,
+              contentView,
+            ];
+          }
+          return contentView;
+        }
 
-    return renderContainer(
-      this.props.schema.map(field => {
-        if (field.children) {
-          if (field.type === 'row') {
-            const contentView = (
+        return (
+          <div key={field.name}>
+            <Subheader>{field.name}</Subheader>
+            <div style={styles.subPropertiesEditorContainer}>
               <UnsavedChangesContext.Consumer key={field.name}>
                 {unsavedChanges => (
                   <PropertiesEditor
-                    project={this.props.project}
-                    resourceSources={this.props.resourceSources}
-                    onChooseResource={this.props.onChooseResource}
-                    resourceExternalEditors={this.props.resourceExternalEditors}
+                    project={project}
+                    resourceSources={resourceSources}
+                    onChooseResource={onChooseResource}
+                    resourceExternalEditors={resourceExternalEditors}
                     schema={field.children}
-                    instances={this.props.instances}
-                    mode="row"
+                    instances={instances}
+                    mode="column"
                     unsavedChanges={unsavedChanges}
-                    onInstancesModified={this.props.onInstancesModified}
+                    onInstancesModified={onInstancesModified}
                   />
                 )}
               </UnsavedChangesContext.Consumer>
-            );
-            if (field.title) {
-              return [
-                <Text key={field.name + '-title'} size="title">
-                  {field.title}
-                </Text>,
-                contentView,
-              ];
-            }
-            return contentView;
-          }
-
-          return (
-            <div key={field.name}>
-              <Subheader>{field.name}</Subheader>
-              <div style={styles.subPropertiesEditorContainer}>
-                <UnsavedChangesContext.Consumer key={field.name}>
-                  {unsavedChanges => (
-                    <PropertiesEditor
-                      project={this.props.project}
-                      resourceSources={this.props.resourceSources}
-                      onChooseResource={this.props.onChooseResource}
-                      resourceExternalEditors={
-                        this.props.resourceExternalEditors
-                      }
-                      schema={field.children}
-                      instances={this.props.instances}
-                      mode="column"
-                      unsavedChanges={unsavedChanges}
-                      onInstancesModified={this.props.onInstancesModified}
-                    />
-                  )}
-                </UnsavedChangesContext.Consumer>
-              </div>
             </div>
-          );
-        } else if (field.valueType === 'resource') {
-          return this._renderResourceField(field);
-        } else {
-          if (field.getChoices && field.getValue)
-            return this._renderSelectField(field);
-          if (field.getValue) return this._renderInputField(field);
-          if (field.onClick) return this._renderButton(field);
-        }
+          </div>
+        );
+      } else if (field.valueType === 'resource') {
+        return renderResourceField(field);
+      } else {
+        if (field.getChoices && field.getValue) return renderSelectField(field);
+        if (field.getValue) return renderInputField(field);
+      }
+      return null;
+    })
+  );
+};
 
-        return null;
-      })
-    );
-  }
-}
+export default PropertiesEditor;

@@ -6,7 +6,6 @@ import InlineCheckbox from '../UI/InlineCheckbox';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../ResourcesLoader';
 import Subheader from '../UI/Subheader';
-import FlatButton from '../UI/FlatButton';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Edit from '@material-ui/icons/Edit';
@@ -30,7 +29,7 @@ import RaisedButton from '../UI/RaisedButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
-import { Line } from '../UI/Grid';
+import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
@@ -46,7 +45,6 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   disabled?: boolean,
   onEditButtonClick?: Instance => void,
-  onClick?: Instance => void,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -92,6 +90,21 @@ type ResourceField = {|
   ...ValueFieldCommonProperties,
 |};
 
+type SectionTitle = {|
+  name: string,
+  getValue?: Instance => string,
+  nonFieldType: 'sectionTitle',
+  defaultValue?: string,
+|};
+
+type ActionButton = {|
+  label: string,
+  disabled: 'onValuesDifferent',
+  getValue: Instance => string,
+  nonFieldType: 'button',
+  onClick: (instance: Instance) => void,
+|};
+
 // A value field is a primitive or a resource.
 export type ValueField = PrimitiveValueField | ResourceField;
 
@@ -99,6 +112,8 @@ export type ValueField = PrimitiveValueField | ResourceField;
 export type Field =
   | PrimitiveValueField
   | ResourceField
+  | SectionTitle
+  | ActionButton
   | {|
       name: string,
       type: 'row' | 'column',
@@ -150,9 +165,15 @@ const styles = {
   },
 };
 
+/**
+ * Get the value for the given field across all instances.
+ * If one of the instances doesn't share the same value, returns the default value.
+ * If there is no instances, returns the default value.
+ * If the field does not have a `getValue` method, returns `null`.
+ */
 const getFieldValue = (
   instances: Instances,
-  field: ValueField,
+  field: ValueField | ActionButton | SectionTitle,
   defaultValue?: any
 ): any => {
   if (!instances[0]) {
@@ -162,9 +183,12 @@ const getFieldValue = (
     return defaultValue;
   }
 
-  let value = field.getValue(instances[0]);
+  const { getValue } = field;
+  if (!getValue) return null;
+
+  let value = getValue(instances[0]);
   for (var i = 1; i < instances.length; ++i) {
-    if (value !== field.getValue(instances[i])) {
+    if (value !== getValue(instances[i])) {
       if (typeof defaultValue !== 'undefined') value = defaultValue;
       break;
     }
@@ -402,16 +426,23 @@ const PropertiesEditor = ({
     }
   };
 
-  const renderButton = (field: ValueField) => {
-    //TODO: multi selection handling
+  const renderButton = (field: ActionButton) => {
+    let disabled = false;
+    if (field.disabled === 'onValuesDifferent') {
+      const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
+      disabled =
+        getFieldValue(instances, field, DIFFERENT_VALUES) === DIFFERENT_VALUES;
+    }
     return (
-      <FlatButton
-        key={field.name}
+      <RaisedButton
+        key={`button-${field.label}`}
         fullWidth
         primary
-        label={getFieldLabel(instances, field)}
+        icon={<Edit />}
+        disabled={disabled}
+        label={field.label}
         onClick={() => {
-          if (field.onClick) field.onClick(instances[0]);
+          field.onClick(instances[0]);
         }}
       />
     );
@@ -467,9 +498,47 @@ const PropertiesEditor = ({
           <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
         );
 
+  const renderSectionTitle = (field: SectionTitle) => {
+    const { getValue } = field;
+
+    let additionalText = null;
+
+    if (getValue) {
+      let selectedInstancesValue = getFieldValue(
+        instances,
+        field,
+        field.defaultValue || 'Multiple Values'
+      );
+      if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
+    }
+
+    if (!!additionalText) {
+      return (
+        <Line alignItems="baseline">
+          <Text displayInlineAsSpan>{field.name}</Text>
+          <Spacer />
+          <Text displayInlineAsSpan size="body2">{`- ${additionalText}`}</Text>
+        </Line>
+      );
+    }
+
+    return (
+      <Line>
+        <Text displayInlineAsSpan>{field.name}</Text>
+      </Line>
+    );
+  };
+
   return renderContainer(
     schema.map(field => {
-      if (field.children) {
+      if (!!field.nonFieldType) {
+        if (field.nonFieldType === 'sectionTitle') {
+          return renderSectionTitle(field);
+        } else if (field.nonFieldType === 'button') {
+          return renderButton(field);
+        }
+        return null;
+      } else if (field.children) {
         if (field.type === 'row') {
           const contentView = (
             <UnsavedChangesContext.Consumer key={field.name}>
@@ -526,9 +595,7 @@ const PropertiesEditor = ({
       } else {
         if (field.getChoices && field.getValue) return renderSelectField(field);
         if (field.getValue) return renderInputField(field);
-        if (field.onClick) return renderButton(field);
       }
-
       return null;
     })
   );

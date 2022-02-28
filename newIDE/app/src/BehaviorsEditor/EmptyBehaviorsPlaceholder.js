@@ -34,7 +34,7 @@ const EmptyBehaviorsPlaceholder = (props: Props) => (
         key="add-behavior-line"
         label={<Trans>Add a behavior</Trans>}
         primary
-        onClick={() => props.openNewBehaviorDialog()}
+        onClick={props.openNewBehaviorDialog}
         icon={<Add />}
         id="add-behavior-button"
       />

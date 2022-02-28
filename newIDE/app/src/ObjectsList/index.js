@@ -23,6 +23,7 @@ import {
   filterObjectsList,
   isSameObjectWithContext,
 } from './EnumerateObjects';
+import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import type {
   ObjectWithContextList,
   ObjectWithContext,
@@ -121,7 +122,7 @@ type Props = {|
   getAllObjectTags: () => Tags,
   onChangeSelectedObjectTags: SelectedTags => void,
 
-  onEditObject: (object: gdObject, initialTab: ?string) => void,
+  onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
   onObjectCreated: gdObject => void,
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,

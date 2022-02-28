@@ -21,6 +21,7 @@ import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialo
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
+import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import Toolbar from './Toolbar';
 import {
   serializeToJSObject,
@@ -135,7 +136,7 @@ type State = {|
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
   editedObjectWithContext: ?ObjectWithContext,
-  editedObjectInitialTab: ?string,
+  editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
@@ -362,7 +363,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
-  editObject = (editedObject: ?gdObject, initialTab: ?string) => {
+  editObject = (editedObject: ?gdObject, initialTab: ?ObjectEditorTab) => {
     const { project } = this.props;
     if (editedObject) {
       this.setState({

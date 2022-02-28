@@ -474,6 +474,24 @@ export default class ObjectsList extends React.Component<Props, State> {
     );
     return [
       {
+        label: i18n._(t`Copy`),
+        click: () => this._copyObject(objectWithContext),
+      },
+      {
+        label: i18n._(t`Cut`),
+        click: () => this._cutObject(i18n, objectWithContext),
+      },
+      {
+        label: getPasteLabel(objectWithContext.global),
+        enabled: Clipboard.has(CLIPBOARD_KIND),
+        click: () => this._paste(objectWithContext),
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this._duplicateObject(objectWithContext),
+      },
+      { type: 'separator' },
+      {
         label: i18n._(t`Edit object`),
         click: () => this.props.onEditObject(object),
       },
@@ -492,6 +510,15 @@ export default class ObjectsList extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
+        label: i18n._(t`Rename`),
+        click: () => this._editName(objectWithContext),
+      },
+      {
+        label: i18n._(t`Set as a global object`),
+        enabled: !isObjectWithContextGlobal(objectWithContext),
+        click: () => this._setAsGlobalObject(objectWithContext),
+      },
+      {
         label: i18n._(t`Tags`),
         submenu: buildTagsMenuTemplate({
           noTagLabel: 'No tags',
@@ -505,15 +532,6 @@ export default class ObjectsList extends React.Component<Props, State> {
         }),
       },
       {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(objectWithContext),
-      },
-      {
-        label: i18n._(t`Set as a global object`),
-        enabled: !isObjectWithContextGlobal(objectWithContext),
-        click: () => this._setAsGlobalObject(objectWithContext),
-      },
-      {
         label: i18n._(t`Delete`),
         click: () => this._deleteObject(i18n, objectWithContext),
       },
@@ -521,24 +539,6 @@ export default class ObjectsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Add a new object...`),
         click: () => this.onAddNewObject(),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Copy`),
-        click: () => this._copyObject(objectWithContext),
-      },
-      {
-        label: i18n._(t`Cut`),
-        click: () => this._cutObject(i18n, objectWithContext),
-      },
-      {
-        label: getPasteLabel(objectWithContext.global),
-        enabled: Clipboard.has(CLIPBOARD_KIND),
-        click: () => this._paste(objectWithContext),
-      },
-      {
-        label: i18n._(t`Duplicate`),
-        click: () => this._duplicateObject(objectWithContext),
       },
     ];
   };

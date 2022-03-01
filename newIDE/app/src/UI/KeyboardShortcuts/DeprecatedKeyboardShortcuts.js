@@ -125,13 +125,21 @@ export default class DeprecatedKeyboardShortcuts {
 
     if (this.onMove) {
       if (evt.which === UP_KEY) {
-        this.shiftPressed ? this.onMove(0, -MOVEMENT_BIG_DELTA) : this.onMove(0, -1);
+        this.shiftPressed
+          ? this.onMove(0, -MOVEMENT_BIG_DELTA)
+          : this.onMove(0, -1);
       } else if (evt.which === DOWN_KEY) {
-        this.shiftPressed ? this.onMove(0, MOVEMENT_BIG_DELTA) : this.onMove(0, 1);
+        this.shiftPressed
+          ? this.onMove(0, MOVEMENT_BIG_DELTA)
+          : this.onMove(0, 1);
       } else if (evt.which === LEFT_KEY) {
-        this.shiftPressed ? this.onMove(-MOVEMENT_BIG_DELTA, 0) : this.onMove(-1, 0);
+        this.shiftPressed
+          ? this.onMove(-MOVEMENT_BIG_DELTA, 0)
+          : this.onMove(-1, 0);
       } else if (evt.which === RIGHT_KEY) {
-        this.shiftPressed ? this.onMove(MOVEMENT_BIG_DELTA, 0) : this.onMove(1, 0);
+        this.shiftPressed
+          ? this.onMove(MOVEMENT_BIG_DELTA, 0)
+          : this.onMove(1, 0);
       }
     }
     if (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY) {

@@ -14,30 +14,14 @@ type Props = {
 
 const EmptyBehaviorsPlaceholder = (props: Props) => (
   <EmptyPlaceholder
-    renderButtons={() => (
-      <HelpButton
-        label={<Trans>Read the doc</Trans>}
-        helpPagePath="/behaviors"
-      />
-    )}
-  >
-    <Text size="title" align="center">
-      <Trans>Add your first behavior</Trans>
-    </Text>
-    <Text align="center">
+    title={<Trans>Add your first behavior</Trans>}
+    description={
       <Trans>Behaviors add features to objects in a matter of clicks.</Trans>
-    </Text>
-    <Line justifyContent="center" expand>
-      <RaisedButton
-        key="add-behavior-line"
-        label={<Trans>Add a behavior</Trans>}
-        primary
-        onClick={props.openNewBehaviorDialog}
-        icon={<Add />}
-        id="add-behavior-button"
-      />
-    </Line>
-  </EmptyPlaceholder>
+    }
+    actionLabel={<Trans>Add a behavior</Trans>}
+    helpPagePath="/behaviors"
+    onAdd={props.openNewBehaviorDialog}
+  />
 );
 
 export default EmptyBehaviorsPlaceholder;

@@ -64,15 +64,9 @@ export default class SceneVariableField extends React.Component<
               this.setState({ editorOpen: false });
               if (this._field) this._field.updateAutocompletions();
             }}
-            emptyExplanationMessage={
-              <Trans>
-                Add your first variable
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                Variables hold additional information on a scene.
-              </Trans>
+            emptyPlaceholderTitle={<Trans>Add your first variable</Trans>}
+            emptyPlaceholderDescription={
+              <Trans>Variables hold additional information on a scene.</Trans>
             }
             helpPagePath={'/all-features/variables/scene-variables'}
             onComputeAllVariableNames={onComputeAllVariableNames}

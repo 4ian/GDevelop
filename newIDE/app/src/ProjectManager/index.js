@@ -1082,15 +1082,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                     this.props.unsavedChanges.triggerUnsavedChanges();
                   this.setState({ projectVariablesEditorOpen: false });
                 }}
-                emptyExplanationMessage={
-              <Trans>
-                Add your first variable
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                Variables hold additional information on a project.
-              </Trans>
+                emptyPlaceholderTitle={<Trans>Add your first variable</Trans>}
+                emptyPlaceholderDescription={
+                  <Trans>
+                    Variables hold additional information on a project.
+                  </Trans>
                 }
                 helpPagePath={'/all-features/variables/global-variables'}
                 hotReloadPreviewButtonProps={

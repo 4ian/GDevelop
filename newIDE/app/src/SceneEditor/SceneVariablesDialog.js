@@ -22,15 +22,9 @@ export default (props: Props) => {
       onCancel={props.onClose}
       onApply={props.onApply}
       title={<Trans>Scene Variables</Trans>}
-      emptyExplanationMessage={
-              <Trans>
-                Add your first variable
-              </Trans>
-            }
-            emptyExplanationSecondMessage={
-              <Trans>
-                Variables hold additional information on a scene.
-              </Trans>
+      emptyPlaceholderTitle={<Trans>Add your first variable</Trans>}
+      emptyPlaceholderDescription={
+        <Trans>Variables hold additional information on a scene.</Trans>
       }
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}

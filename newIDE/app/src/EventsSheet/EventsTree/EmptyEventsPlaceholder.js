@@ -14,22 +14,13 @@ type Props = {
 };
 
 const EmptyEventsPlaceholder = (props: Props) => (
-  <EmptyPlaceholder renderButtons={() => <HelpButton helpPagePath="/events" />}>
-    <Text size="title" align="center">
-      <Trans>Add your first event</Trans>
-    </Text>
-    <Text align="center">
-      <Trans>Events define the rules of a game.</Trans>
-    </Text>
-    <Line justifyContent="center" expand>
-      <RaisedButton
-        primary
-        label={<Trans>Add an event</Trans>}
-        onClick={props.addEvent}
-        icon={<Add />}
-      />
-    </Line>
-  </EmptyPlaceholder>
+  <EmptyPlaceholder
+    title={<Trans>Add your first event</Trans>}
+    description={<Trans>Events define the rules of a game</Trans>}
+    actionLabel={<Trans>Add an event</Trans>}
+    helpPagePath="/events"
+    onAdd={props.addEvent}
+  />
 );
 
 export default EmptyEventsPlaceholder;

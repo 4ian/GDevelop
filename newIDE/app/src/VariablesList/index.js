@@ -49,8 +49,8 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   onComputeAllVariableNames: () => Array<string>,
   inheritedVariablesContainer?: ?gdVariablesContainer,
-  emptyExplanationMessage?: React.Node,
-  emptyExplanationSecondMessage?: React.Node,
+  emptyPlaceholderTitle?: React.Node,
+  emptyPlaceholderDescription?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
   helpPagePath?: ?string,
@@ -436,54 +436,38 @@ export default class VariablesList extends React.Component<Props, State> {
       <Column noMargin expand useFullHeight>
         {allVariables.length ? (
           <React.Fragment>
-          <ScrollView autoHideScrollbar>
-            <SortableVariablesListBody
-              variablesContainer={this.props.variablesContainer}
-              onSortEnd={({ oldIndex, newIndex }) => {
-                this.props.variablesContainer.move(oldIndex, newIndex);
-                this.forceUpdate();
-              }}
-              helperClass="sortable-helper"
-              useDragHandle
-              lockToContainerEdges
-            >
-              {allVariables}
-            </SortableVariablesListBody>
-          </ScrollView><EditVariableRow
-          onAdd={this.addVariable}
-          onCopy={this.copySelection}
-          onPaste={this.paste}
-          onDeleteSelection={this.deleteSelection}
-          hasSelection={hasSelection(this.state.selectedVariables)}
-          hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
-        />
-        </React.Fragment>
-        ) : !!this.props.emptyExplanationMessage ? (
+            <ScrollView autoHideScrollbar>
+              <SortableVariablesListBody
+                variablesContainer={this.props.variablesContainer}
+                onSortEnd={({ oldIndex, newIndex }) => {
+                  this.props.variablesContainer.move(oldIndex, newIndex);
+                  this.forceUpdate();
+                }}
+                helperClass="sortable-helper"
+                useDragHandle
+                lockToContainerEdges
+              >
+                {allVariables}
+              </SortableVariablesListBody>
+            </ScrollView>
+            <EditVariableRow
+              onAdd={this.addVariable}
+              onCopy={this.copySelection}
+              onPaste={this.paste}
+              onDeleteSelection={this.deleteSelection}
+              hasSelection={hasSelection(this.state.selectedVariables)}
+              hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
+            />
+          </React.Fragment>
+        ) : !!this.props.emptyPlaceholderTitle ? (
           <Column noMargin expand justifyContent="center">
             <EmptyPlaceholder
-              renderButtons={() => (
-                <HelpButton
-                  label={<Trans>Read the doc</Trans>}
-                  helpPagePath={this.props.helpPagePath}
-                />
-              )}
-            >
-              <Text size="title" align="center">
-                <Trans>{this.props.emptyExplanationMessage}</Trans>
-              </Text>
-              <Text align="center">
-                <Trans>{this.props.emptyExplanationSecondMessage}</Trans>
-              </Text>
-
-              <Line justifyContent="center" expand>
-                <RaisedButton
-                  primary
-                  label={<Trans>Add a variable</Trans>}
-                  onClick={this.addVariable}
-                  icon={<Add />}
-                />
-              </Line>
-            </EmptyPlaceholder>
+              title={this.props.emptyPlaceholderTitle}
+              description={this.props.emptyPlaceholderDescription}
+              actionLabel="Add a variable"
+              helpPagePath={this.props.helpPagePath}
+              onAdd={this.addVariable}
+            />
           </Column>
         ) : null}
       </Column>

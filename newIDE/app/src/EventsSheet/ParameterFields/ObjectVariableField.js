@@ -89,8 +89,8 @@ export default class ObjectVariableField extends React.Component<
             title={<Trans>Object Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
-            emptyExplanationMessage={<Trans>Add your first variable</Trans>}
-            emptyExplanationSecondMessage={
+            emptyPlaceholderTitle={<Trans>Add your first variable</Trans>}
+            emptyPlaceholderDescription={
               <Trans>Variables hold additional information on an object.</Trans>
             }
             helpPagePath={'/all-features/variables/object-variables'}

@@ -454,7 +454,9 @@ export default class VariablesList extends React.Component<Props, State> {
               hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
             />
           </React.Fragment>
-        ) : !!this.props.emptyPlaceholderTitle ? (
+        ) : this.props.emptyPlaceholderTitle &&
+          this.props.emptyPlaceholderDescription &&
+          this.props.helpPagePath ? (
           <Column noMargin expand justifyContent="center">
             <EmptyPlaceholder
               title={this.props.emptyPlaceholderTitle}

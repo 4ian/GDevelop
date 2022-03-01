@@ -9,8 +9,6 @@ import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
-  children: React.Node,
-  renderButtons: () => React.Node,
   title: React.Node,
   description: React.Node,
   actionLabel: React.Node,

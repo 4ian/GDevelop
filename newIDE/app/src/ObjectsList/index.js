@@ -127,6 +127,7 @@ type Props = {|
   onObjectSelected: string => void,
   onObjectPasted?: gdObject => void,
   canRenameObject: (newName: string) => boolean,
+  onAddObjectInstance: (objectName: string) => void,
 
   getThumbnail: (project: gdProject, object: Object) => string,
   unsavedChanges?: ?UnsavedChanges,
@@ -535,6 +536,11 @@ export default class ObjectsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Delete`),
         click: () => this._deleteObject(i18n, objectWithContext),
+      },
+      { type: 'separator' },
+      {
+        label: i18n._(t`Add instance to the scene`),
+        click: () => this.props.onAddObjectInstance(object.getName()),
       },
       { type: 'separator' },
       {

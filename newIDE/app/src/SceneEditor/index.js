@@ -472,6 +472,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     });
   };
 
+  addInstanceAtTheCenter = (objectName: string) => {
+    const { editor } = this;
+    if (editor)
+      this._addInstance(
+        [editor.grid.viewPosition.viewX, editor.grid.viewPosition.viewY],
+        objectName
+      );
+  };
+
   _addInstance = (pos: [number, number], objectName: string) => {
     if (!objectName || !this.editor) return;
 
@@ -1235,6 +1244,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
                 onRenameObject={this._onRenameObject}
+                onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
                 onChangeSelectedObjectTags={selectedObjectTags =>

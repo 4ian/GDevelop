@@ -1,6 +1,5 @@
 // @flow
 import Keen from 'keen-tracking';
-import userflow from 'userflow.js';
 import Window from '../Window';
 import { getUserUUID } from './UserUUID';
 import Authentication from '../GDevelopServices/Authentication';
@@ -10,43 +9,15 @@ import {
 } from './LocalStats';
 import { getStartupTimesSummary } from '../StartupTimes';
 import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
-import optionalRequire from '../OptionalRequire';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
-import { isMobile } from '../Platform';
 import { getBrowserLanguageOrLocale } from '../Language';
-
-const electron = optionalRequire('electron');
+import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
 
 const isDev = Window.isDev();
 let client = null;
 let startupTimesSummary = null;
-export let isUserflowRunning = false;
 
 export const installAnalyticsEvents = (authentication: Authentication) => {
-  // Activate userflow onboarding only on a portion of new users on web app on desktop.
-  if (
-    !electron &&
-    getProgramOpeningCount() <= 1 &&
-    !isMobile() &&
-    Math.random() < 0.1
-  ) {
-    if (isDev) {
-      userflow.init('ct_y5qogyfo6zbahjejcbo3dybnta');
-    } else {
-      userflow.init('ct_paaz6o2t2bhlrlyi7a3toojn7e');
-    }
-    userflow.on(
-      // Undocumented legacy userflow event that is fired
-      // "when a flow either becomes active or removed"
-      // (tip given by a tech member of Userflow - it shouldn't be removed
-      // in the near future given the fact that some of their users still use it).
-      'flowvisibilitychange',
-      isRunning => (isUserflowRunning = isRunning)
-    );
-    const userPreferences = loadPreferencesFromLocalStorage();
-    const appLanguage = userPreferences ? userPreferences.language : undefined;
-    userflow.identify(getUserUUID(), { language: appLanguage });
-  }
   if (isDev) {
     console.info('Development build - Analytics disabled');
     return;

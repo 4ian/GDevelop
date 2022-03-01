@@ -35,14 +35,22 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
   _instanceVariablesList: { current: null | VariablesList } = React.createRef();
   schema: Schema = [
     {
-      name: this.props.i18n._(t`Object name`),
-      valueType: 'string',
-      disabled: true,
+      name: this.props.i18n._(t`Object`),
       getValue: (instance: gdInitialInstance) => instance.getObjectName(),
-      setValue: (instance: gdInitialInstance, newValue: string) =>
-        instance.setObjectName(newValue),
-      onEditButtonClick: (instance: gdInitialInstance) =>
+      nonFieldType: 'sectionTitle',
+      defaultValue: this.props.i18n._(t`Different objects`),
+    },
+    {
+      label: this.props.i18n._(t`Edit object`),
+      disabled: 'onValuesDifferent',
+      nonFieldType: 'button',
+      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+      onClick: (instance: gdInitialInstance) =>
         this.props.onEditObjectByName(instance.getObjectName()),
+    },
+    {
+      name: this.props.i18n._(t`Instance`),
+      nonFieldType: 'sectionTitle',
     },
     {
       name: this.props.i18n._(t`Position`),

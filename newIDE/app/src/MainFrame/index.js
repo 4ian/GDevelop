@@ -133,6 +133,7 @@ import {
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import OnboardingDialog from './Onboarding/OnboardingDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -2388,6 +2389,7 @@ const MainFrame = (props: Props) => {
         hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
+      <OnboardingDialog />
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
         renderGDJSDevelopmentWatcher()}

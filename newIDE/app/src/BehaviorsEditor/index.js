@@ -23,7 +23,7 @@ import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 import { ColumnStackLayout } from '../UI/Layout';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
-import EmptyBehaviorsPlaceholder from './EmptyBehaviorsPlaceholder';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import { IconContainer } from '../UI/IconContainer';
@@ -119,8 +119,16 @@ const BehaviorsEditor = (props: Props) => {
     <Column noMargin expand useFullHeight noOverflowParent>
       {allBehaviorNames.length === 0 ? (
         <Column noMargin expand justifyContent="center">
-          <EmptyBehaviorsPlaceholder
-            openNewBehaviorDialog={() => setNewBehaviorDialogOpen(true)}
+          <EmptyPlaceholder
+            title={<Trans>Add your first behavior</Trans>}
+            description={
+              <Trans>
+                Behaviors add features to objects in a matter of clicks.
+              </Trans>
+            }
+            actionLabel={<Trans>Add a behavior</Trans>}
+            helpPagePath="/behaviors"
+            onAdd={() => setNewBehaviorDialogOpen(true)}
           />
         </Column>
       ) : (

@@ -33,7 +33,7 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import ScrollView from '../UI/ScrollView';
-import { EmptyEffectsPlaceholder } from './EmptyEffectsPlaceholder';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EFFECT,
@@ -270,9 +270,18 @@ export default function EffectsList(props: Props) {
             </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">
-              <EmptyEffectsPlaceholder
-                target={props.target}
-                addEffect={addEffect}
+              <EmptyPlaceholder
+                title={<Trans>Add your first effect</Trans>}
+                description={
+                  <Trans>Effects create visual changes to the object.</Trans>
+                }
+                actionLabel={<Trans>Add an effect</Trans>}
+                helpPagePath={
+                  props.target === 'object'
+                    ? '/objects/effects'
+                    : '/interface/scene-editor/layer-effects'
+                }
+                onAdd={addEffect}
               />
             </Column>
           )}

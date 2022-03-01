@@ -19,14 +19,9 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
-import HelpButton from '../UI/HelpButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
-import { Trans } from '@lingui/macro';
-import Text from '../UI/Text';
-import { Column, Line } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
-import Add from '@material-ui/icons/Add';
-import RaisedButton from '../UI/RaisedButton';
 
 const gd: libGDevelop = global.gd;
 

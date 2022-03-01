@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import React, { Component, type Node } from 'react';
 import findIndex from 'lodash/findIndex';
 import {
@@ -29,7 +30,7 @@ import 'react-sortable-tree/style.css';
 import './style.css';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
-import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
+import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
 const gd: libGDevelop = global.gd;
 
@@ -384,8 +385,12 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
       depth === 0 && eventsList.getEventsCount() === 0
         ? {
             title: () => (
-              <EmptyEventsPlaceholder
-                addEvent={() =>
+              <EmptyPlaceholder
+                title={<Trans>Add your first event</Trans>}
+                description={<Trans>Events define the rules of a game</Trans>}
+                actionLabel={<Trans>Add an event</Trans>}
+                helpPagePath="/events"
+                onAdd={() =>
                   this.props.onAddNewEvent(
                     'BuiltinCommonInstructions::Standard',
                     this.props.events

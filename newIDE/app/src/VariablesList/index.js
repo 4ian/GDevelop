@@ -23,8 +23,10 @@ import HelpButton from '../UI/HelpButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import { Trans } from '@lingui/macro';
 import Text from '../UI/Text';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
+import Add from '@material-ui/icons/Add';
+import RaisedButton from '../UI/RaisedButton';
 
 const gd: libGDevelop = global.gd;
 
@@ -367,6 +369,20 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
+  addVariable = () => {
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
+    const variable = new gd.Variable();
+    variable.setString('');
+    const name = newNameGenerator('Variable', name =>
+      inheritedVariablesContainer
+        ? inheritedVariablesContainer.has(name) || variablesContainer.has(name)
+        : variablesContainer.has(name)
+    );
+    variablesContainer.insert(name, variable, variablesContainer.count());
+    this.forceUpdate();
+    if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+  };
+
   render() {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
@@ -419,6 +435,7 @@ export default class VariablesList extends React.Component<Props, State> {
     return (
       <Column noMargin expand useFullHeight>
         {allVariables.length ? (
+          <React.Fragment>
           <ScrollView autoHideScrollbar>
             <SortableVariablesListBody
               variablesContainer={this.props.variablesContainer}
@@ -432,47 +449,43 @@ export default class VariablesList extends React.Component<Props, State> {
             >
               {allVariables}
             </SortableVariablesListBody>
-          </ScrollView>
-        ) : !!this.props.emptyExplanationMessage ? (
-          <Column noMargin expand justifyContent="center">
-            <EmptyPlaceholder
-              renderButtons={() => (
-                <HelpButton helpPagePath={this.props.helpPagePath} />
-              )}
-            >
-              <Text>
-                <Trans>{this.props.emptyExplanationMessage}</Trans>
-              </Text>
-              <Text>
-                <Trans>{this.props.emptyExplanationSecondMessage}</Trans>
-              </Text>
-            </EmptyPlaceholder>
-          </Column>
-        ) : null}
-        <EditVariableRow
-          onAdd={() => {
-            const variable = new gd.Variable();
-            variable.setString('');
-            const name = newNameGenerator('Variable', name =>
-              inheritedVariablesContainer
-                ? inheritedVariablesContainer.has(name) ||
-                  variablesContainer.has(name)
-                : variablesContainer.has(name)
-            );
-            variablesContainer.insert(
-              name,
-              variable,
-              variablesContainer.count()
-            );
-            this.forceUpdate();
-            if (this.props.onSizeUpdated) this.props.onSizeUpdated();
-          }}
+          </ScrollView><EditVariableRow
+          onAdd={this.addVariable}
           onCopy={this.copySelection}
           onPaste={this.paste}
           onDeleteSelection={this.deleteSelection}
           hasSelection={hasSelection(this.state.selectedVariables)}
           hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
         />
+        </React.Fragment>
+        ) : !!this.props.emptyExplanationMessage ? (
+          <Column noMargin expand justifyContent="center">
+            <EmptyPlaceholder
+              renderButtons={() => (
+                <HelpButton
+                  label={<Trans>Read the doc</Trans>}
+                  helpPagePath={this.props.helpPagePath}
+                />
+              )}
+            >
+              <Text size="title" align="center">
+                <Trans>{this.props.emptyExplanationMessage}</Trans>
+              </Text>
+              <Text align="center">
+                <Trans>{this.props.emptyExplanationSecondMessage}</Trans>
+              </Text>
+
+              <Line justifyContent="center" expand>
+                <RaisedButton
+                  primary
+                  label={<Trans>Add a variable</Trans>}
+                  onClick={this.addVariable}
+                  icon={<Add />}
+                />
+              </Line>
+            </EmptyPlaceholder>
+          </Column>
+        ) : null}
       </Column>
     );
   }

@@ -383,7 +383,16 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         : null,
       depth === 0 && eventsList.getEventsCount() === 0
         ? {
-            title: () => <EmptyEventsPlaceholder />,
+            title: () => (
+              <EmptyEventsPlaceholder
+                addEvent={() =>
+                  this.props.onAddNewEvent(
+                    'BuiltinCommonInstructions::Standard',
+                    this.props.events
+                  )
+                }
+              />
+            ),
             event: null,
             indexInList: eventsList.getEventsCount() + 1,
             disabled: false,

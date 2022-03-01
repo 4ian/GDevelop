@@ -66,14 +66,12 @@ export default class SceneVariableField extends React.Component<
             }}
             emptyExplanationMessage={
               <Trans>
-                Scene variables can be used to store any value or text during
-                the game.
+                Add your first variable
               </Trans>
             }
             emptyExplanationSecondMessage={
               <Trans>
-                For example, you can have a variable called Score representing
-                the current score of the player.
+                Variables hold additional information on a scene.
               </Trans>
             }
             helpPagePath={'/all-features/variables/scene-variables'}

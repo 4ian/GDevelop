@@ -6,8 +6,6 @@ import { Line, Column } from './Grid';
 type Props = {|
   children: React.Node,
   renderButtons: () => React.Node,
-  buttonJustification?: string,
-  outlined?: boolean,
 |};
 
 /**
@@ -17,9 +15,6 @@ type Props = {|
 export const EmptyPlaceholder = (props: Props) => (
   <Column alignItems="center">
     <Paper
-      variant={
-        props.outlined || props.outlined === undefined ? 'outlined' : undefined
-      }
       elevation={0}
       style={{
         maxWidth: '450px',
@@ -28,7 +23,7 @@ export const EmptyPlaceholder = (props: Props) => (
     >
       <Column>
         {props.children}
-        <Line expand justifyContent={props.buttonJustification || 'flex-end'}>
+        <Line expand justifyContent="center">
           {props.renderButtons()}
         </Line>
       </Column>

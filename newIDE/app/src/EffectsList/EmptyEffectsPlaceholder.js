@@ -4,15 +4,20 @@ import * as React from 'react';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
+import Add from '@material-ui/icons/Add';
+import { Column, Line } from '../UI/Grid';
+import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
   target: 'object' | 'layer',
+  openNewBehaviorDialog: () => void,
 |};
 
 export const EmptyEffectsPlaceholder = (props: Props) => (
   <EmptyPlaceholder
     renderButtons={() => (
       <HelpButton
+        label={<Trans>Read the doc</Trans>}
         helpPagePath={
           props.target === 'object'
             ? '/objects/effects'
@@ -21,17 +26,19 @@ export const EmptyEffectsPlaceholder = (props: Props) => (
       />
     )}
   >
-    <Text>
-      <Trans>
-        Effects can change how layers or objects are rendered on screen.
-      </Trans>
+    <Text size="title" align="center">
+      <Trans>Add your first effect</Trans>
     </Text>
-    <Text>
-      <Trans>
-        After adding an effect, set up its parameters. Launch a preview to see
-        the result. Using the events and the name of the effect, you can change
-        the parameters during the game.
-      </Trans>
+    <Text align="center">
+      <Trans>Effects create visual changes to the object.</Trans>
     </Text>
+    <Line justifyContent="center" expand>
+      <RaisedButton
+        primary
+        label={<Trans>Add an effect</Trans>}
+        onClick={props.addEffect}
+        icon={<Add />}
+      />
+    </Line>
   </EmptyPlaceholder>
 );

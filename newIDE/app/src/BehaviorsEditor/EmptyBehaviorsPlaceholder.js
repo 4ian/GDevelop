@@ -20,8 +20,6 @@ const EmptyBehaviorsPlaceholder = (props: Props) => (
         helpPagePath="/behaviors"
       />
     )}
-    buttonJustification="center"
-    outlined={false}
   >
     <Text size="title" align="center">
       <Trans>Add your first behavior</Trans>

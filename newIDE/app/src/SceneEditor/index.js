@@ -74,6 +74,7 @@ import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
 
 const gd: libGDevelop = global.gd;
 
@@ -918,6 +919,12 @@ export default class SceneEditor extends React.Component<Props, State> {
           enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
           accelerator: 'CmdOrCtrl+V',
         },
+        {
+          label: i18n._(t`Duplicate`),
+          click: () => {
+            this.duplicateSelection();
+          },
+        },
         { type: 'separator' },
         {
           label: i18n._(t`Delete`),
@@ -999,6 +1006,33 @@ export default class SceneEditor extends React.Component<Props, State> {
   cutSelection = (options: CopyCutPasteOptions = {}) => {
     this.copySelection(options);
     this.deleteSelection();
+  };
+
+  duplicateSelection = () => {
+    const serializedSelection = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => serializeToJSObject(instance));
+
+    if (!this.editor) return;
+
+    const newInstances = serializedSelection
+      .map(serializedInstance => {
+        const instance = new gd.InitialInstance();
+        unserializeFromJSObject(instance, serializedInstance);
+        return instance;
+      })
+      .map(instance => {
+        instance.setX(instance.getX() + 2 * MOVEMENT_BIG_DELTA);
+        instance.setY(instance.getY() + 2 * MOVEMENT_BIG_DELTA);
+        const newInstance = this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
+        instance.delete();
+        return newInstance;
+      });
+    this._onInstancesAdded(newInstances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances(newInstances, true);
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {

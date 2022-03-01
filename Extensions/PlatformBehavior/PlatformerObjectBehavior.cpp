@@ -43,89 +43,84 @@ void PlatformerObjectBehavior::InitializeContent(
   behaviorContent.SetAttribute("slopeMaxAngle", 60);
 }
 
-#
-if
-  defined(GD_IDE_ONLY)
-      std::map<gd::String, gd::PropertyDescriptor> PlatformerObjectBehavior::
-          GetProperties(const gd::SerializerElement &behaviorContent) const {
-    std::map<gd::String, gd::PropertyDescriptor> properties;
+std::map<gd::String, gd::PropertyDescriptor>
+PlatformerObjectBehavior::GetProperties(
+    const gd::SerializerElement &behaviorContent) const {
+  std::map<gd::String, gd::PropertyDescriptor> properties;
 
-    properties[_("Default controls")]
-        .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
-                      ? "false"
-                      : "true")
-        .SetType("Boolean");
+  properties[_("Default controls")]
+      .SetValue(behaviorContent.GetBoolAttribute("ignoreDefaultControls")
+                    ? "false"
+                    : "true")
+      .SetType("Boolean");
 
-    properties[_("Gravity")].SetGroup(_("Jump")).SetValue(
-        gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
-    properties[_("Jump speed")].SetGroup(_("Jump")).SetValue(
-        gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
-    properties["jumpSustainTime"]
-        .SetGroup(_("Jump"))
-        .SetValue(gd::String::From(
-            behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
-        .SetLabel(_("Jump sustain time"))
-        .SetDescription(_("Maximum time (in seconds) during which the jump "
-                          "strength is sustained if the jump key is held - "
-                          "allowing variable height jumps."));
-    properties[_("Max. falling speed")].SetGroup(_("Jump")).SetValue(
-        gd::String::From(
-            behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
-    properties["useLegacyTrajectory"]
-        .SetGroup(_("Deprecated options (advanced)"))
-        .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
-                      ? "true"
-                      : "false")
-        .SetLabel(_("Use frame rate dependent trajectories (deprecated)"))
-        .SetDescription(_("It's recommended to let this unchecked"))
-        .SetType("Boolean");
+  properties[_("Gravity")].SetGroup(_("Jump")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("gravity")));
+  properties[_("Jump speed")].SetGroup(_("Jump")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("jumpSpeed")));
+  properties["jumpSustainTime"]
+      .SetGroup(_("Jump"))
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("jumpSustainTime", 0)))
+      .SetLabel(_("Jump sustain time"))
+      .SetDescription(_("Maximum time (in seconds) during which the jump "
+                        "strength is sustained if the jump key is held - "
+                        "allowing variable height jumps."));
+  properties[_("Max. falling speed")].SetGroup(_("Jump")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("maxFallingSpeed")));
+  properties["useLegacyTrajectory"]
+      .SetGroup(_("Deprecated options (advanced)"))
+      .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
+                    ? "true"
+                    : "false")
+      .SetLabel(_("Use frame rate dependent trajectories (deprecated)"))
+      .SetDescription(_("It's recommended to let this unchecked"))
+      .SetType("Boolean");
 
-    properties[_("Ladder climbing speed")]
-        .SetGroup(_("Ladder"))
-        .SetValue(gd::String::From(
-            behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
+  properties[_("Ladder climbing speed")]
+      .SetGroup(_("Ladder"))
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("ladderClimbingSpeed", 150)));
 
-    properties[_("Can grab platform ledges")]
-        .SetGroup(_("Ledge"))
-        .SetValue(behaviorContent.GetBoolAttribute("canGrabPlatforms", false)
-                      ? "true"
-                      : "false")
-        .SetType("Boolean");
-    properties[_("Automatically grab platform ledges without having to move "
-                 "horizontally")]
-        .SetGroup(_("Ledge"))
-        .SetValue(
-            behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
-                ? "true"
-                : "false")
-        .SetType("Boolean");
-    properties[_("Grab tolerance on X axis")]
-        .SetGroup(_("Ledge"))
-        .SetValue(gd::String::From(
-            behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
-    properties[_("Grab offset on Y axis")]
-        .SetGroup(_("Ledge"))
-        .SetValue(gd::String::From(
-            behaviorContent.GetDoubleAttribute("yGrabOffset")));
+  properties[_("Can grab platform ledges")]
+      .SetGroup(_("Ledge"))
+      .SetValue(behaviorContent.GetBoolAttribute("canGrabPlatforms", false)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
+  properties[_("Automatically grab platform ledges without having to move "
+               "horizontally")]
+      .SetGroup(_("Ledge"))
+      .SetValue(behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
+  properties[_("Grab tolerance on X axis")]
+      .SetGroup(_("Ledge"))
+      .SetValue(gd::String::From(
+          behaviorContent.GetDoubleAttribute("xGrabTolerance", 10)));
+  properties[_("Grab offset on Y axis")]
+      .SetGroup(_("Ledge"))
+      .SetValue(
+          gd::String::From(behaviorContent.GetDoubleAttribute("yGrabOffset")));
 
-    properties[_("Can go down from jumpthru platforms")]
-        .SetGroup(_("Walk"))
-        .SetValue(
-            behaviorContent.GetBoolAttribute("canGoDownFromJumpthru", false)
-                ? "true"
-                : "false")
-        .SetType("Boolean");
-    properties[_("Acceleration")].SetGroup(_("Walk")).SetValue(
-        gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
-    properties[_("Deceleration")].SetGroup(_("Walk")).SetValue(
-        gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
-    properties[_("Max. speed")].SetGroup(_("Walk")).SetValue(
-        gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
-    properties[_("Slope max. angle")].SetGroup(_("Walk")).SetValue(
-        gd::String::From(behaviorContent.GetDoubleAttribute("slopeMaxAngle")));
+  properties[_("Can go down from jumpthru platforms")]
+      .SetGroup(_("Walk"))
+      .SetValue(behaviorContent.GetBoolAttribute("canGoDownFromJumpthru", false)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
+  properties[_("Acceleration")].SetGroup(_("Walk")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("acceleration")));
+  properties[_("Deceleration")].SetGroup(_("Walk")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("deceleration")));
+  properties[_("Max. speed")].SetGroup(_("Walk")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("maxSpeed")));
+  properties[_("Slope max. angle")].SetGroup(_("Walk")).SetValue(
+      gd::String::From(behaviorContent.GetDoubleAttribute("slopeMaxAngle")));
 
-    return properties;
-  }
+  return properties;
+}
 
 bool PlatformerObjectBehavior::UpdateProperty(
     gd::SerializerElement &behaviorContent, const gd::String &name,
@@ -177,5 +172,3 @@ bool PlatformerObjectBehavior::UpdateProperty(
 
   return true;
 }
-
-#endif

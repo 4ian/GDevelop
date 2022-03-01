@@ -138,6 +138,7 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
+  ignoreSelectedObjectNamesForContextMenu: boolean,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
@@ -190,6 +191,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
+      ignoreSelectedObjectNamesForContextMenu: false,
       selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
@@ -851,13 +853,27 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editor) this.editor.zoomBy(-0.1);
   };
 
-  _onContextMenu = (x: number, y: number) => {
-    if (this.contextMenu) this.contextMenu.open(x, y);
+  _onContextMenu = (
+    x: number,
+    y: number,
+    ignoreSelectedObjectNamesForContextMenu?: boolean = false
+  ) => {
+    if (!ignoreSelectedObjectNamesForContextMenu) {
+      if (this.contextMenu) this.contextMenu.open(x, y);
+    } else {
+      this.setState({ ignoreSelectedObjectNamesForContextMenu: true }, () => {
+        if (this.contextMenu) this.contextMenu.open(x, y);
+        this.setState({ ignoreSelectedObjectNamesForContextMenu: false });
+      });
+    }
   };
 
   buildContextMenu = (i18n: I18nType, layout: gdLayout) => {
     let contextMenuItems = [];
-    if (this.state.selectedObjectNames.length === 0) {
+    if (
+      this.state.ignoreSelectedObjectNamesForContextMenu ||
+      this.state.selectedObjectNames.length === 0
+    ) {
       contextMenuItems = [
         ...contextMenuItems,
         {

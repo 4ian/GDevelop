@@ -33,8 +33,10 @@ export const getBrowserLanguageOrLocale = (): string => {
   return navigator.language.replace('-', '_');
 };
 
-const isLanguage = (languageOrLocale: string): boolean => {
-  return languageOrLocale.split('_').length === 1;
+const getLanguageOnlyFromLanguageOrLocale = (
+  languageOrLocale: string
+): ?string => {
+  return languageOrLocale.split('_')[0] || null;
 };
 
 /**
@@ -56,21 +58,32 @@ export const selectLanguageOrLocale = (
     if (languageMetadata[0].translationRatio > translationRatioThreshold) {
       return languageOrLocale;
     } else {
+      // If the translation is not good enough, don't even try to find another translation
+      // by language (because if the exact locale exists, it means the locale is important).
+      // So return the default language.
       return defaultLanguage;
     }
   }
-  if (isLanguage(languageOrLocale)) {
-    // If it is a language, we look for corresponding locales
+
+  // If we can't find a translation for the exact language or locale,
+  // try to find a (good enough) translation for the language only.
+  const language = getLanguageOnlyFromLanguageOrLocale(languageOrLocale);
+  if (language) {
+    // Find the langauge corresponding locales ordered by translation ratio.
     const localeCandidates = LocalesMetadata.filter(localeMetadata =>
-      localeMetadata.languageCode.startsWith(languageOrLocale)
+      localeMetadata.languageCode.startsWith(language)
     ).sort((a, b) => (a.translationRatio > b.translationRatio ? -1 : 1));
 
-    if (localeCandidates.length === 0) return defaultLanguage;
-    // If translation ratio is not enough, return default
-    if (localeCandidates[0].translationRatio < translationRatioThreshold)
-      return defaultLanguage;
-    return localeCandidates[0].languageCode;
+    if (
+      localeCandidates.length >= 1 &&
+      localeCandidates[0].translationRatio >= translationRatioThreshold
+    )
+      return localeCandidates[0].languageCode;
   }
 
+  // We found:
+  // - no exact language or locale translation (considered good enough or not),
+  // - no language-only translation (considered good enough),
+  // so return the default language.
   return defaultLanguage;
 };

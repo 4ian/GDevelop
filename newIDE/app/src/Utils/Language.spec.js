@@ -45,6 +45,12 @@ import { getInitialPreferences } from '../MainFrame/Preferences/PreferencesProvi
 describe('PreferencesProvider', () => {
   describe('getInitialPreferences', () => {
     describe('Browser with language', () => {
+      test('return the only translated locale for this language, if good enough', () => {
+        mockGetBrowserLanguageOrLocale.mockReturnValue('es');
+        const preferences = getInitialPreferences();
+        expect(preferences.language).toBe('es_ES');
+      });
+
       test('return the best translated locale among the possible locales for this language, if good enough', () => {
         mockGetBrowserLanguageOrLocale.mockReturnValue('pt');
         const preferences = getInitialPreferences();
@@ -69,6 +75,18 @@ describe('PreferencesProvider', () => {
         mockGetBrowserLanguageOrLocale.mockReturnValue('es_ES');
         const preferences = getInitialPreferences();
         expect(preferences.language).toBe('es_ES');
+      });
+
+      test('return locale if language match exists and if translation ratio is good enough', () => {
+        mockGetBrowserLanguageOrLocale.mockReturnValue('es_US');
+        const preferences = getInitialPreferences();
+        expect(preferences.language).toBe('es_ES');
+      });
+
+      test('return default if language match exists but translation ratio is not good enough', () => {
+        mockGetBrowserLanguageOrLocale.mockReturnValue('fr_BE');
+        const preferences = getInitialPreferences();
+        expect(preferences.language).toBe('en');
       });
 
       test('return default if exact match exists but translation ratio is not good enough', () => {

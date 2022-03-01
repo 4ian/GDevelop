@@ -9,7 +9,6 @@
 #include <set>
 
 #include "GDCore/CommonTools.h"
-#include "GDCore/Events/Builtin/AsyncEvent.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachChildVariableEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
@@ -188,45 +187,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "}\n";
 
         return outputCode;
-      });
-
-  GetAllEvents()["BuiltinCommonInstructions::Async"].SetCodeGenerator(
-      [](gd::BaseEvent& event_,
-         gd::EventsCodeGenerator& codeGenerator,
-         gd::EventsCodeGenerationContext& parentContext) {
-        gd::AsyncEvent& event = dynamic_cast<gd::AsyncEvent&>(event_);
-
-        // Generate callback code
-        const auto callbackDescriptor = codeGenerator.GenerateCallback(
-            gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
-                &event.GetInstruction())),
-            parentContext,
-            event.GetActions(),
-            event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
-
-        // Generate code to backup the objects lists
-        gd::String objectsListsBackupCode =
-            parentContext.IsAsync()
-                ? "asyncObjectsList = "
-                  "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
-                : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
-        for (const gd::String& objectToBackup :
-             callbackDescriptor.requiredObjects) {
-          objectsListsBackupCode +=
-              "for (const obj of " +
-              codeGenerator.GetObjectListName(objectToBackup, parentContext) +
-              ") asyncObjectsList.addObject(obj);\n";
-        }
-
-        const gd::String callbackCallCode =
-            "(runtimeScene) => (" + callbackDescriptor.functionName + "(" +
-            callbackDescriptor.argumentsList + "))";
-
-        // Generate the action and store the generated task.
-        const gd::String asyncActionCode = codeGenerator.GenerateActionCode(
-            event.GetInstruction(), parentContext, callbackCallCode);
-
-        return "{" + objectsListsBackupCode + asyncActionCode + "}";
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Comment"].SetCodeGenerator(

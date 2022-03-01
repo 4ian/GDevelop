@@ -33,7 +33,7 @@ import {
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import ScrollView from '../UI/ScrollView';
-import { EmptyEffectsPlaceholder } from './EmptyEffectsPlaceholder';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EFFECT,
@@ -124,153 +124,167 @@ export default function EffectsList(props: Props) {
       {({ i18n }) => (
         <Column noMargin expand useFullHeight>
           {effectsContainer.getEffectsCount() !== 0 ? (
-            <ScrollView>
-              {effectsContainer.getEffectsCount() > 3 && (
-                <Line>
-                  <Column>
-                    <DismissableAlertMessage
-                      identifier="too-much-effects"
-                      kind="warning"
-                    >
-                      <Trans>
-                        Using a lot of effects can have a severe negative impact
-                        on the rendering performance, especially on low-end or
-                        mobile devices. Consider using less effects if possible.
-                        You can also disable and re-enable effects as needed
-                        using events.
-                      </Trans>
-                    </DismissableAlertMessage>
-                  </Column>
-                </Line>
-              )}
-              {mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
-                const effect: gdEffect = effectsContainer.getEffectAt(i);
-                const effectType = effect.getEffectType();
-                const effectMetadata = getEnumeratedEffectMetadata(
-                  allEffectMetadata,
-                  effectType
-                );
-
-                return (
-                  <React.Fragment key={i}>
-                    <MiniToolbar>
-                      <MiniToolbarText firstChild>
-                        <Trans>Effect name:</Trans>
-                      </MiniToolbarText>
-                      <SemiControlledTextField
-                        margin="none"
-                        commitOnBlur
-                        hintText={t`Enter the effect name`}
-                        value={effect.getName()}
-                        onChange={newName => {
-                          if (newName === effect.getName()) return;
-
-                          effect.setName(newName);
-                          forceUpdate();
-                          onEffectsUpdated();
-                        }}
-                        fullWidth
-                      />
-                      <MiniToolbarText>
-                        <Trans>Type:</Trans>
-                      </MiniToolbarText>
-                      <SelectField
-                        margin="none"
-                        value={effectType}
-                        onChange={(e, i, newEffectType: string) =>
-                          chooseEffectType(effect, newEffectType)
-                        }
-                        fullWidth
-                        hintText={t`Choose the effect to apply`}
+            <React.Fragment>
+              <ScrollView>
+                {effectsContainer.getEffectsCount() > 3 && (
+                  <Line>
+                    <Column>
+                      <DismissableAlertMessage
+                        identifier="too-much-effects"
+                        kind="warning"
                       >
-                        {allEffectMetadata.map(effectMetadata => (
-                          <SelectOption
-                            key={effectMetadata.type}
-                            value={effectMetadata.type}
-                            primaryText={effectMetadata.fullName}
-                            disabled={
-                              props.target === 'object' &&
-                              effectMetadata.isMarkedAsNotWorkingForObjects
-                            }
-                          />
-                        ))}
-                      </SelectField>
-                      <ElementWithMenu
-                        element={
-                          <IconButton>
-                            <MoreVert />
-                          </IconButton>
-                        }
-                        buildMenuTemplate={(i18n: I18nType) => [
-                          {
-                            label: i18n._(t`Delete`),
-                            click: () => removeEffect(effect.getName()),
-                          },
-                          { type: 'separator' },
-                          {
-                            type: 'checkbox',
-                            label: i18n._(t`Show Parameter Names`),
-                            checked: showEffectParameterNames,
-                            click: () =>
-                              setShowEffectParameterNames(
-                                !showEffectParameterNames
-                              ),
-                          },
-                        ]}
-                      />
-                    </MiniToolbar>
-                    <Line expand noMargin>
-                      <Column expand>
-                        {!!effectType && effectMetadata ? (
-                          <React.Fragment>
-                            <Line>
-                              <BackgroundText>
-                                <MarkdownText
-                                  source={effectMetadata.description}
-                                />
-                              </BackgroundText>
-                            </Line>
-                            <PropertiesEditor
-                              instances={[effect]}
-                              schema={effectMetadata.parametersSchema}
-                              project={props.project}
-                              resourceSources={props.resourceSources}
-                              onChooseResource={props.onChooseResource}
-                              resourceExternalEditors={
-                                props.resourceExternalEditors
-                              }
-                              renderExtraDescriptionText={
-                                showEffectParameterNames
-                                  ? parameterName =>
-                                      i18n._(
-                                        t`Parameter name in events: \`${parameterName}\` `
-                                      )
-                                  : undefined
+                        <Trans>
+                          Using a lot of effects can have a severe negative
+                          impact on the rendering performance, especially on
+                          low-end or mobile devices. Consider using less effects
+                          if possible. You can also disable and re-enable
+                          effects as needed using events.
+                        </Trans>
+                      </DismissableAlertMessage>
+                    </Column>
+                  </Line>
+                )}
+                {mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
+                  const effect: gdEffect = effectsContainer.getEffectAt(i);
+                  const effectType = effect.getEffectType();
+                  const effectMetadata = getEnumeratedEffectMetadata(
+                    allEffectMetadata,
+                    effectType
+                  );
+
+                  return (
+                    <React.Fragment key={i}>
+                      <MiniToolbar>
+                        <MiniToolbarText firstChild>
+                          <Trans>Effect name:</Trans>
+                        </MiniToolbarText>
+                        <SemiControlledTextField
+                          margin="none"
+                          commitOnBlur
+                          hintText={t`Enter the effect name`}
+                          value={effect.getName()}
+                          onChange={newName => {
+                            if (newName === effect.getName()) return;
+
+                            effect.setName(newName);
+                            forceUpdate();
+                            onEffectsUpdated();
+                          }}
+                          fullWidth
+                        />
+                        <MiniToolbarText>
+                          <Trans>Type:</Trans>
+                        </MiniToolbarText>
+                        <SelectField
+                          margin="none"
+                          value={effectType}
+                          onChange={(e, i, newEffectType: string) =>
+                            chooseEffectType(effect, newEffectType)
+                          }
+                          fullWidth
+                          hintText={t`Choose the effect to apply`}
+                        >
+                          {allEffectMetadata.map(effectMetadata => (
+                            <SelectOption
+                              key={effectMetadata.type}
+                              value={effectMetadata.type}
+                              primaryText={effectMetadata.fullName}
+                              disabled={
+                                props.target === 'object' &&
+                                effectMetadata.isMarkedAsNotWorkingForObjects
                               }
                             />
-                          </React.Fragment>
-                        ) : null}
-                      </Column>
-                    </Line>
-                  </React.Fragment>
-                );
-              })}
-            </ScrollView>
+                          ))}
+                        </SelectField>
+                        <ElementWithMenu
+                          element={
+                            <IconButton>
+                              <MoreVert />
+                            </IconButton>
+                          }
+                          buildMenuTemplate={(i18n: I18nType) => [
+                            {
+                              label: i18n._(t`Delete`),
+                              click: () => removeEffect(effect.getName()),
+                            },
+                            { type: 'separator' },
+                            {
+                              type: 'checkbox',
+                              label: i18n._(t`Show Parameter Names`),
+                              checked: showEffectParameterNames,
+                              click: () =>
+                                setShowEffectParameterNames(
+                                  !showEffectParameterNames
+                                ),
+                            },
+                          ]}
+                        />
+                      </MiniToolbar>
+                      <Line expand noMargin>
+                        <Column expand>
+                          {!!effectType && effectMetadata ? (
+                            <React.Fragment>
+                              <Line>
+                                <BackgroundText>
+                                  <MarkdownText
+                                    source={effectMetadata.description}
+                                  />
+                                </BackgroundText>
+                              </Line>
+                              <PropertiesEditor
+                                instances={[effect]}
+                                schema={effectMetadata.parametersSchema}
+                                project={props.project}
+                                resourceSources={props.resourceSources}
+                                onChooseResource={props.onChooseResource}
+                                resourceExternalEditors={
+                                  props.resourceExternalEditors
+                                }
+                                renderExtraDescriptionText={
+                                  showEffectParameterNames
+                                    ? parameterName =>
+                                        i18n._(
+                                          t`Parameter name in events: \`${parameterName}\` `
+                                        )
+                                    : undefined
+                                }
+                              />
+                            </React.Fragment>
+                          ) : null}
+                        </Column>
+                      </Line>
+                    </React.Fragment>
+                  );
+                })}
+              </ScrollView>
+              <Column>
+                <Line justifyContent="flex-end" expand>
+                  <RaisedButton
+                    primary
+                    label={<Trans>Add an effect</Trans>}
+                    onClick={addEffect}
+                    icon={<Add />}
+                  />
+                </Line>
+              </Column>
+            </React.Fragment>
           ) : (
             <Column noMargin expand justifyContent="center">
-              <EmptyEffectsPlaceholder target={props.target} />
+              <EmptyPlaceholder
+                title={<Trans>Add your first effect</Trans>}
+                description={
+                  <Trans>Effects create visual changes to the object.</Trans>
+                }
+                actionLabel={<Trans>Add an effect</Trans>}
+                helpPagePath={
+                  props.target === 'object'
+                    ? '/objects/effects'
+                    : '/interface/scene-editor/layer-effects'
+                }
+                onAdd={addEffect}
+              />
             </Column>
           )}
-          <Column>
-            <Line justifyContent="flex-end" expand>
-              <RaisedButton
-                primary
-                label={<Trans>Add an effect</Trans>}
-                onClick={addEffect}
-                icon={<Add />}
-              />
-            </Line>
-          </Column>
         </Column>
       )}
     </I18n>

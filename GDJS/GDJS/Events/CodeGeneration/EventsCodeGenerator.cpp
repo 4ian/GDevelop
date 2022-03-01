@@ -396,10 +396,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // Add the new instance to object lists
          "      if (object) {\n" +
          "        objectsList.get(objectsList.firstKey()).push(object);\n" +
-         "        eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
-         "      }\n" +
-         "      return object;" +
-         "    }\n" +
+         "        "
+         "eventsFunctionContext._objectArraysMap[objectName].push(object);\n" +
+         "      }\n" + "      return object;" + "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"
@@ -663,8 +662,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& functionPrefix,
-    const gd::String& functionSuffix) {
+    const gd::String& asyncCallback) {
   gd::String actionCode;
 
   // Prepare call
@@ -697,9 +695,13 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           1);
   } else {
-    call = functionPrefix + objectPart +
-           instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments, 1) + ")" + functionSuffix;
+    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
+           GenerateArgumentsList(arguments, 1) + ")";
+  }
+
+  if (!asyncCallback.empty()) {
+    actionCode += "{\nconst asyncTaskGroup = new gdjs.TaskGroup();\n";
+    call = "asyncTaskGroup.addTask(" + call + ")";
   }
 
   actionCode +=
@@ -707,6 +709,12 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
       ".length ;i < len;++i) {\n";
   actionCode += "    " + call + ";\n";
   actionCode += "}\n";
+
+  if (!asyncCallback.empty()) {
+    actionCode +=
+        "runtimeScene.getAsyncTasksManager().addTask(asyncTaskGroup, " +
+        asyncCallback + ")\n}";
+  }
 
   return actionCode;
 }
@@ -718,8 +726,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& functionPrefix,
-    const gd::String& functionSuffix) {
+    const gd::String& asyncCallback) {
   gd::String actionCode;
 
   // Prepare call
@@ -754,9 +761,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           2);
   } else {
-    call = functionPrefix + objectPart +
-           instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments, 2) + ")" + functionSuffix;
+    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
+           GenerateArgumentsList(arguments, 2) + ")";
   }
 
   // Verify that object has behavior.
@@ -768,11 +774,22 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
          << "\" requested for object \'" << objectName
          << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
   } else {
+    if (!asyncCallback.empty()) {
+      actionCode += "{\n  const asyncTaskGroup = new gdjs.TaskGroup();\n";
+      call = "asyncTaskGroup.addTask(" + call + ")";
+    }
+
     actionCode +=
         "for(var i = 0, len = " + GetObjectListName(objectName, context) +
         ".length ;i < len;++i) {\n";
     actionCode += "    " + call + ";\n";
     actionCode += "}\n";
+
+    if (!asyncCallback.empty()) {
+      actionCode +=
+          "runtimeScene.getAsyncTasksManager().addTask(asyncTaskGroup, " +
+          asyncCallback + ");\n  };";
+    }
   }
 
   return actionCode;

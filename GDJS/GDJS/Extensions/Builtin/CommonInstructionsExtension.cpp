@@ -205,17 +205,17 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
 
         // Generate code to backup the objects lists
-        gd::String objectsListsCode =
+        gd::String objectsListsBackupCode =
             parentContext.IsAsync()
                 ? "asyncObjectsList = "
                   "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
         for (const gd::String& objectToBackup :
              callbackDescriptor.requiredObjects) {
-            objectsListsCode +=
-                "for (const obj of " +
-                codeGenerator.GetObjectListName(objectToBackup, parentContext) +
-                ") asyncObjectsList.addObject(obj);\n";
+          objectsListsBackupCode +=
+              "for (const obj of " +
+              codeGenerator.GetObjectListName(objectToBackup, parentContext) +
+              ") asyncObjectsList.addObject(obj);\n";
         }
 
         const gd::String callbackCallCode =
@@ -223,13 +223,10 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             callbackDescriptor.argumentsList + "))";
 
         // Generate the action and store the generated task.
-        const gd::String taskSchedulingCode = codeGenerator.GenerateActionCode(
-            event.GetInstruction(),
-            parentContext,
-            "runtimeScene.getAsyncTasksManager().addTask(",
-            ", " + callbackCallCode + ");\n");
+        const gd::String asyncActionCode = codeGenerator.GenerateActionCode(
+            event.GetInstruction(), parentContext, callbackCallCode);
 
-        return "{" + objectsListsCode + taskSchedulingCode + "}";
+        return "{" + objectsListsBackupCode + asyncActionCode + "}";
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Comment"].SetCodeGenerator(

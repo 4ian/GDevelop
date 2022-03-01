@@ -21,14 +21,12 @@ namespace gdjs {
      * Run all pending asynchronous tasks.
      */
     processTasks(runtimeScene: RuntimeScene): void {
-      for (const taskWithCallback of this.tasksWithCallback) {
+      for (let i = 0; i < this.tasksWithCallback.length; i++) {
+        const taskWithCallback = this.tasksWithCallback[i];
         if (taskWithCallback.asyncTask.update(runtimeScene)) {
           // The task has finished, run the callback and remove it.
           taskWithCallback.callback(runtimeScene);
-          this.tasksWithCallback.splice(
-            this.tasksWithCallback.indexOf(taskWithCallback),
-            1
-          );
+          this.tasksWithCallback.splice(i--, 1);
         }
       }
     }
@@ -64,6 +62,23 @@ namespace gdjs {
      * @return True if the task is finished, false if it needs to continue running.
      */
     abstract update(runtimeScene: RuntimeScene): boolean;
+  }
+
+  export class TaskGroup extends AsyncTask {
+    private tasks = new Array<AsyncTask>();
+
+    addTask(task: AsyncTask) {
+      this.tasks.push(task);
+    }
+
+    update(runtimeScene: gdjs.RuntimeScene) {
+      for (let i = 0; i < this.tasks.length; i++) {
+        const task = this.tasks[i];
+        if (task.update(runtimeScene)) this.tasks.splice(i--, 1);
+      }
+
+      return this.tasks.length === 0;
+    }
   }
 
   const logger = new gdjs.Logger('Internal PromiseTask');

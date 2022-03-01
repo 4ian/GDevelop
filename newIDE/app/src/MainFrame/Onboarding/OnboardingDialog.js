@@ -12,13 +12,21 @@ import Window from '../../Utils/Window';
 import { loadPreferencesFromLocalStorage } from '../Preferences/PreferencesProvider';
 import { getUserUUID } from '../../Utils/Analytics/UserUUID';
 import RaisedButton from '../../UI/RaisedButton';
-import { Column, Line } from '../../UI/Grid';
+import { Line } from '../../UI/Grid';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 const electron = optionalRequire('electron');
 const isDev = Window.isDev();
+let isUserflowInitialized = false;
 export let isUserflowRunning = false;
+
+const styles = {
+  imgContainer: {
+    marginBottom: 16,
+  },
+};
 
 const onboardingText = `
 In 5 minutes, you will have:
@@ -33,7 +41,13 @@ const OnboardingDialog = () => {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
-  React.useEffect(() => {
+  const initializeUserflow = React.useCallback(() => {
+    if (isUserflowInitialized) return;
+    if (isDev) {
+      userflow.init('ct_y5qogyfo6zbahjejcbo3dybnta');
+    } else {
+      userflow.init('ct_paaz6o2t2bhlrlyi7a3toojn7e');
+    }
     userflow.on(
       // Undocumented legacy userflow event that is fired
       // "when a flow either becomes active or removed"
@@ -42,39 +56,34 @@ const OnboardingDialog = () => {
       'flowvisibilitychange',
       isRunning => {
         isUserflowRunning = isRunning;
-        if (isRunning) {
-          setLoading(false);
-          setOpen(false);
-        }
       }
     );
+    isUserflowInitialized = true;
   }, []);
 
   const startUserflow = React.useCallback(async () => {
     try {
       setLoading(true);
-      if (isDev) {
-        userflow.init('ct_y5qogyfo6zbahjejcbo3dybnta');
-      } else {
-        userflow.init('ct_paaz6o2t2bhlrlyi7a3toojn7e');
-      }
+      initializeUserflow();
       const userPreferences = loadPreferencesFromLocalStorage();
       const appLanguage = userPreferences
         ? userPreferences.language
         : undefined;
       await userflow.identify(getUserUUID(), { language: appLanguage });
       await userflow.start('b1611206-2fae-41ac-b08c-0f8ad72d8c39');
+      setOpen(false);
     } catch (e) {
+      // Something wrong happened, allow the user to retry.
       console.error('An error happened while starting the onboarding flow', e);
       showErrorBox({
         message: `There was an error while starting the onboarding flow. Verify your internet connection or try again later.`,
         rawError: e,
         errorId: 'onboarding-start-error',
       });
-      // Something wrong happened, allow the user to retry.
+    } finally {
       setLoading(false);
     }
-  }, []);
+  }, [initializeUserflow]);
 
   // Open modal if this is the first time the user opens the web app.
   React.useEffect(() => {
@@ -109,12 +118,16 @@ const OnboardingDialog = () => {
       cannotBeDismissed={false}
       maxWidth="xs"
     >
-      <Line alignItems="center" justifyContent="center">
-        <img alt="hero" src="res/hero.png" width={48} height={48} />
-      </Line>
-      <Column>
-        <MarkdownText source={onboardingText} />
-      </Column>
+      <ColumnStackLayout noMargin>
+        <Line alignItems="center" justifyContent="center" noMargin>
+          <div style={styles.imgContainer}>
+            <img alt="hero" src="res/hero.png" width={48} height={48} />
+          </div>
+        </Line>
+        <Line noMargin>
+          <MarkdownText source={onboardingText} />
+        </Line>
+      </ColumnStackLayout>
     </Dialog>
   );
 };

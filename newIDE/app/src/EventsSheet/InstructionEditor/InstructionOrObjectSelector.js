@@ -179,7 +179,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       {
         ...sharedFuseConfiguration,
         keys: [
-          { name: 'displayedName', weight: 2 },
+          { name: 'displayedName', weight: 5 },
           { name: 'fullGroupName', weight: 1 },
         ],
       }

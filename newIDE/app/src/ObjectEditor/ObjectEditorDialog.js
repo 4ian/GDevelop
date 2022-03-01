@@ -27,6 +27,12 @@ import VariablesList from '../VariablesList/index';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 const gd: libGDevelop = global.gd;
 
+export type ObjectEditorTab =
+  | 'properties'
+  | 'behaviors'
+  | 'variables'
+  | 'effects';
+
 type Props = {|
   open: boolean,
   object: ?gdObject,
@@ -46,7 +52,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
-  initialTab: ?string,
+  initialTab: ?ObjectEditorTab,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -61,7 +67,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
-  const [currentTab, setCurrentTab] = React.useState(
+  const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);

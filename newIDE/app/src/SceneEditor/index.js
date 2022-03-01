@@ -21,6 +21,7 @@ import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialo
 import InstancesSelection from '../InstancesEditor/InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
+import { type ObjectEditorTab } from '../ObjectEditor/ObjectEditorDialog';
 import Toolbar from './Toolbar';
 import {
   serializeToJSObject,
@@ -73,6 +74,7 @@ import { onObjectAdded, onInstanceAdded } from '../Hints/ObjectsAdditionalWork';
 import { type InfoBarDetails } from '../Hints/ObjectsAdditionalWork';
 import { type HotReloadPreviewButtonProps } from '../HotReload/HotReloadPreviewButton';
 import EventsRootVariablesFinder from '../Utils/EventsRootVariablesFinder';
+import { MOVEMENT_BIG_DELTA } from '../UI/KeyboardShortcuts/DeprecatedKeyboardShortcuts';
 
 const gd: libGDevelop = global.gd;
 
@@ -135,8 +137,9 @@ type State = {|
   editedLayer: ?gdLayer,
   editedLayerInitialTab: 'properties' | 'effects',
   editedObjectWithContext: ?ObjectWithContext,
-  editedObjectInitialTab: ?string,
+  editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
+  ignoreSelectedObjectNamesForContextMenu: boolean,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
@@ -189,6 +192,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
+      ignoreSelectedObjectNamesForContextMenu: false,
       selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
@@ -362,7 +366,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
-  editObject = (editedObject: ?gdObject, initialTab: ?string) => {
+  editObject = (editedObject: ?gdObject, initialTab: ?ObjectEditorTab) => {
     const { project } = this.props;
     if (editedObject) {
       this.setState({
@@ -380,12 +384,12 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  editObjectByName = (objectName: string) => {
+  editObjectByName = (objectName: string, initialTab?: ObjectEditorTab) => {
     const { project, layout } = this.props;
     if (layout.hasObjectNamed(objectName))
-      this.editObject(layout.getObject(objectName));
+      this.editObject(layout.getObject(objectName), initialTab);
     else if (project.hasObjectNamed(objectName))
-      this.editObject(project.getObject(objectName));
+      this.editObject(project.getObject(objectName), initialTab);
   };
 
   editGroup = (group: ?gdObjectGroup) => {
@@ -467,6 +471,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({
       selectedObjectNames: [objectSelected],
     });
+  };
+
+  addInstanceAtTheCenter = (objectName: string) => {
+    const { editor } = this;
+    if (editor)
+      this._addInstance(
+        [editor.grid.viewPosition.viewX, editor.grid.viewPosition.viewY],
+        objectName
+      );
   };
 
   _addInstance = (pos: [number, number], objectName: string) => {
@@ -850,8 +863,127 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (this.editor) this.editor.zoomBy(-0.1);
   };
 
-  _onContextMenu = (x: number, y: number) => {
-    if (this.contextMenu) this.contextMenu.open(x, y);
+  _onContextMenu = (
+    x: number,
+    y: number,
+    ignoreSelectedObjectNamesForContextMenu?: boolean = false
+  ) => {
+    if (!ignoreSelectedObjectNamesForContextMenu) {
+      if (this.contextMenu) this.contextMenu.open(x, y);
+    } else {
+      this.setState({ ignoreSelectedObjectNamesForContextMenu: true }, () => {
+        if (this.contextMenu) this.contextMenu.open(x, y);
+        this.setState({ ignoreSelectedObjectNamesForContextMenu: false });
+      });
+    }
+  };
+
+  buildContextMenu = (i18n: I18nType, layout: gdLayout) => {
+    let contextMenuItems = [];
+    if (
+      this.state.ignoreSelectedObjectNamesForContextMenu ||
+      this.state.selectedObjectNames.length === 0
+    ) {
+      contextMenuItems = [
+        ...contextMenuItems,
+        {
+          label: i18n._(t`Paste`),
+          click: () => this.paste(),
+          enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+          accelerator: 'CmdOrCtrl+V',
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Insert new...`),
+          click: () => this._createNewObjectAndInstanceUnderCursor(),
+        },
+      ];
+    } else {
+      contextMenuItems = [
+        ...contextMenuItems,
+        {
+          label: i18n._(t`Copy`),
+          click: () => this.copySelection(),
+          enabled: this.instancesSelection.hasSelectedInstances(),
+          accelerator: 'CmdOrCtrl+C',
+        },
+        {
+          label: i18n._(t`Cut`),
+          click: () => this.cutSelection(),
+          enabled: this.instancesSelection.hasSelectedInstances(),
+          accelerator: 'CmdOrCtrl+X',
+        },
+        {
+          label: i18n._(t`Paste`),
+          click: () => this.paste(),
+          enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
+          accelerator: 'CmdOrCtrl+V',
+        },
+        {
+          label: i18n._(t`Duplicate`),
+          click: () => {
+            this.duplicateSelection();
+          },
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Delete`),
+          click: () => this.deleteSelection(),
+          enabled: this.instancesSelection.hasSelectedInstances(),
+          accelerator: 'Delete',
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(
+            t`Edit object ${shortenString(
+              this.state.selectedObjectNames[0],
+              14
+            )}`
+          ),
+          click: () =>
+            this.editObjectByName(
+              this.state.selectedObjectNames[0],
+              'properties'
+            ),
+        },
+        {
+          label: i18n._(t`Edit object variables`),
+          click: () =>
+            this.editObjectByName(
+              this.state.selectedObjectNames[0],
+              'variables'
+            ),
+        },
+        {
+          label: i18n._(t`Edit behaviors`),
+          click: () =>
+            this.editObjectByName(
+              this.state.selectedObjectNames[0],
+              'behaviors'
+            ),
+        },
+        {
+          label: i18n._(t`Edit effects`),
+          click: () =>
+            this.editObjectByName(this.state.selectedObjectNames[0], 'effects'),
+        },
+      ];
+    }
+
+    contextMenuItems = [
+      ...contextMenuItems,
+      { type: 'separator' },
+      {
+        label: i18n._(t`Open scene events`),
+        click: () => this.props.onOpenEvents(layout.getName()),
+      },
+      {
+        label: i18n._(t`Open scene properties`),
+        click: () => this.openSceneProperties(true),
+      },
+    ];
+
+    return contextMenuItems;
   };
 
   copySelection = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
@@ -874,6 +1006,33 @@ export default class SceneEditor extends React.Component<Props, State> {
   cutSelection = (options: CopyCutPasteOptions = {}) => {
     this.copySelection(options);
     this.deleteSelection();
+  };
+
+  duplicateSelection = () => {
+    const serializedSelection = this.instancesSelection
+      .getSelectedInstances()
+      .map(instance => serializeToJSObject(instance));
+
+    if (!this.editor) return;
+
+    const newInstances = serializedSelection
+      .map(serializedInstance => {
+        const instance = new gd.InitialInstance();
+        unserializeFromJSObject(instance, serializedInstance);
+        return instance;
+      })
+      .map(instance => {
+        instance.setX(instance.getX() + 2 * MOVEMENT_BIG_DELTA);
+        instance.setY(instance.getY() + 2 * MOVEMENT_BIG_DELTA);
+        const newInstance = this.props.initialInstances
+          .insertInitialInstance(instance)
+          .resetPersistentUuid();
+        instance.delete();
+        return newInstance;
+      });
+    this._onInstancesAdded(newInstances);
+    this.instancesSelection.clearSelection();
+    this.instancesSelection.selectInstances(newInstances, true);
   };
 
   paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
@@ -1119,6 +1278,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onObjectCreated={this._onObjectCreated}
                 onObjectSelected={this._onObjectSelected}
                 onRenameObject={this._onRenameObject}
+                onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
                 onChangeSelectedObjectTags={selectedObjectTags =>
@@ -1434,84 +1594,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
               <ContextMenu
                 ref={contextMenu => (this.contextMenu = contextMenu)}
-                buildMenuTemplate={(i18n: I18nType) => [
-                  {
-                    label: this.state.selectedObjectNames.length
-                      ? i18n._(
-                          t`Add an Instance of ${shortenString(
-                            this.state.selectedObjectNames[0],
-                            7
-                          )}`
-                        )
-                      : '',
-                    click: () => this._onAddInstanceUnderCursor(),
-                    visible: this.state.selectedObjectNames.length > 0,
-                  },
-                  {
-                    label: i18n._(t`Insert a New Object`),
-                    click: () => this._createNewObjectAndInstanceUnderCursor(),
-                    visible: this.state.selectedObjectNames.length === 0,
-                  },
-                  {
-                    label: this.state.selectedObjectNames.length
-                      ? i18n._(
-                          t`Edit Object ${shortenString(
-                            this.state.selectedObjectNames[0],
-                            14
-                          )}`
-                        )
-                      : '',
-                    click: () =>
-                      this.editObjectByName(this.state.selectedObjectNames[0]),
-                    visible: this.state.selectedObjectNames.length > 0,
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Scene properties`),
-                    click: () => this.openSceneProperties(true),
-                  },
-                  {
-                    label: i18n._(t`Open the scene events`),
-                    click: () => this.props.onOpenEvents(layout.getName()),
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Copy`),
-                    click: () => this.copySelection(),
-                    enabled: this.instancesSelection.hasSelectedInstances(),
-                    accelerator: 'CmdOrCtrl+C',
-                  },
-                  {
-                    label: i18n._(t`Cut`),
-                    click: () => this.cutSelection(),
-                    enabled: this.instancesSelection.hasSelectedInstances(),
-                    accelerator: 'CmdOrCtrl+X',
-                  },
-                  {
-                    label: i18n._(t`Paste`),
-                    click: () => this.paste(),
-                    enabled: Clipboard.has(INSTANCES_CLIPBOARD_KIND),
-                    accelerator: 'CmdOrCtrl+V',
-                  },
-                  { type: 'separator' },
-                  {
-                    label: i18n._(t`Undo`),
-                    click: this.undo,
-                    enabled: canUndo(this.state.history),
-                    accelerator: 'CmdOrCtrl+Z',
-                  },
-                  {
-                    label: i18n._(t`Redo`),
-                    click: this.redo,
-                    enabled: canRedo(this.state.history),
-                    accelerator: 'CmdOrCtrl+Shift+Z',
-                  },
-                  {
-                    label: i18n._(t`Delete`),
-                    click: () => this.deleteSelection(),
-                    enabled: this.instancesSelection.hasSelectedInstances(),
-                  },
-                ]}
+                buildMenuTemplate={() => this.buildContextMenu(i18n, layout)}
               />
             </React.Fragment>
           )}

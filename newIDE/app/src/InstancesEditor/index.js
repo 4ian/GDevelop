@@ -56,7 +56,11 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
   selectedObjectNames: Array<string>,
-  onContextMenu: (x: number, y: number) => void,
+  onContextMenu: (
+    x: number,
+    y: number,
+    ignoreSelectedObjectNamesForContextMenu?: boolean
+  ) => void,
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
@@ -208,6 +212,7 @@ export default class InstancesEditor extends Component<Props> {
           offsetY: event.offsetY,
           x: event.clientX,
           y: event.clientY,
+          ignoreSelectedObjectNamesForContextMenu: true,
         });
 
         return false;
@@ -337,7 +342,7 @@ export default class InstancesEditor extends Component<Props> {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
-      onInstanceRightClicked: this._onRightClicked,
+      onInstanceRightClicked: this._onRightClickedOnInstance,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -604,20 +609,40 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.focus();
   };
 
-  _onRightClicked = ({
-    offsetX,
-    offsetY,
-    x,
-    y,
-  }: {|
+  _onRightClickedOnInstance = (coordinates: {|
     offsetX: number,
     offsetY: number,
     x: number,
     y: number,
   |}) => {
+    this._onRightClicked({
+      ...coordinates,
+      ignoreSelectedObjectNamesForContextMenu: false,
+    });
+  };
+
+  _onRightClicked = ({
+    offsetX,
+    offsetY,
+    x,
+    y,
+    ignoreSelectedObjectNamesForContextMenu,
+  }: {|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+    ignoreSelectedObjectNamesForContextMenu?: boolean,
+  |}) => {
     this.lastContextMenuX = offsetX;
     this.lastContextMenuY = offsetY;
-    if (this.props.onContextMenu) this.props.onContextMenu(x, y);
+    if (this.props.onContextMenu) {
+      const _ignoreSelectedObjectNamesForContextMenu =
+        typeof ignoreSelectedObjectNamesForContextMenu === 'boolean'
+          ? ignoreSelectedObjectNamesForContextMenu
+          : false;
+      this.props.onContextMenu(x, y, _ignoreSelectedObjectNamesForContextMenu);
+    }
   };
 
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {

@@ -224,229 +224,242 @@ const PropertiesEditor = ({
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
-  const _onInstancesModified = (instances: Instances) => {
-    // This properties editor is dealing with fields that are
-    // responsible to update their state (see field.setValue).
+  const _onInstancesModified = React.useCallback(
+    (instances: Instances) => {
+      // This properties editor is dealing with fields that are
+      // responsible to update their state (see field.setValue).
 
-    if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
-    if (onInstancesModified) onInstancesModified(instances);
-    forceUpdate();
-  };
+      if (unsavedChanges) unsavedChanges.triggerUnsavedChanges();
+      if (onInstancesModified) onInstancesModified(instances);
+      forceUpdate();
+    },
+    [unsavedChanges, onInstancesModified, forceUpdate]
+  );
 
-  const getFieldDescription = (
-    instances: Instances,
-    field: ValueField
-  ): ?string => {
-    if (!instances[0]) {
-      console.log(
-        'PropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
-      );
-      return undefined;
-    }
+  const getFieldDescription = React.useCallback(
+    (field: ValueField): ?string => {
+      if (!instances[0]) {
+        console.log(
+          'PropertiesEditor._getFieldDescription was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+        );
+        return undefined;
+      }
 
-    const descriptions: Array<string> = [];
-    if (field.getDescription)
-      descriptions.push(field.getDescription(instances[0]));
-    if (renderExtraDescriptionText && field.getExtraDescription)
-      descriptions.push(
-        renderExtraDescriptionText(field.getExtraDescription(instances[0]))
-      );
+      const descriptions: Array<string> = [];
+      if (field.getDescription)
+        descriptions.push(field.getDescription(instances[0]));
+      if (renderExtraDescriptionText && field.getExtraDescription)
+        descriptions.push(
+          renderExtraDescriptionText(field.getExtraDescription(instances[0]))
+        );
 
-    return descriptions.join('\n') || undefined;
-  };
+      return descriptions.join('\n') || undefined;
+    },
+    [instances, renderExtraDescriptionText]
+  );
 
-  const renderInputField = (field: ValueField) => {
-    if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
+  const renderInputField = React.useCallback(
+    (field: ValueField) => {
+      if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
-    if (field.valueType === 'boolean') {
-      const { setValue } = field;
-      const description = getFieldDescription(instances, field);
+      if (field.valueType === 'boolean') {
+        const { setValue } = field;
+        const description = getFieldDescription(field);
 
-      return (
-        <InlineCheckbox
-          label={
-            !description ? (
-              getFieldLabel(instances, field)
-            ) : (
-              <React.Fragment>
-                <Line noMargin>{getFieldLabel(instances, field)}</Line>
-                <FormHelperText style={{ display: 'inline' }}>
-                  <MarkdownText source={description} />
-                </FormHelperText>
-              </React.Fragment>
-            )
-          }
-          key={field.name}
-          checked={getFieldValue(instances, field)}
-          onCheck={(event, newValue) => {
-            instances.forEach(i => setValue(i, !!newValue));
-            _onInstancesModified(instances);
-          }}
-          disabled={field.disabled}
-        />
-      );
-    } else if (field.valueType === 'number') {
-      const { setValue } = field;
-      return (
-        <SemiControlledTextField
-          value={getFieldValue(instances, field)}
-          key={field.name}
-          id={field.name}
-          floatingLabelText={getFieldLabel(instances, field)}
-          floatingLabelFixed
-          helperMarkdownText={getFieldDescription(instances, field)}
-          onChange={newValue => {
-            instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
-            _onInstancesModified(instances);
-          }}
-          type="number"
-          style={styles.field}
-          disabled={field.disabled}
-        />
-      );
-    } else if (field.valueType === 'color') {
-      const { setValue } = field;
-      return (
-        <ColorField
-          key={field.name}
-          id={field.name}
-          floatingLabelText={getFieldLabel(instances, field)}
-          helperMarkdownText={getFieldDescription(instances, field)}
-          disableAlpha
-          fullWidth
-          color={getFieldValue(instances, field)}
-          onChange={color => {
-            const rgbString =
-              color.length === 0 ? '' : rgbOrHexToRGBString(color);
-            instances.forEach(i => setValue(i, rgbString));
-            _onInstancesModified(instances);
-          }}
-        />
-      );
-    } else if (field.valueType === 'textarea') {
-      const { setValue } = field;
-      return (
-        <SemiControlledTextField
-          key={field.name}
-          id={field.name}
-          onChange={text => {
-            instances.forEach(i => setValue(i, text || ''));
-            _onInstancesModified(instances);
-          }}
-          value={getFieldValue(instances, field)}
-          floatingLabelText={getFieldLabel(instances, field)}
-          floatingLabelFixed
-          helperMarkdownText={getFieldDescription(instances, field)}
-          multiline
-          style={styles.field}
-        />
-      );
-    } else {
-      const { onEditButtonClick, setValue } = field;
-      return (
-        <TextFieldWithButtonLayout
-          key={field.name}
-          renderTextField={() => (
-            <SemiControlledTextField
-              value={getFieldValue(instances, field, '(Multiple values)')}
-              id={field.name}
-              floatingLabelText={getFieldLabel(instances, field)}
-              floatingLabelFixed
-              helperMarkdownText={getFieldDescription(instances, field)}
-              onChange={newValue => {
-                instances.forEach(i => setValue(i, newValue || ''));
-                _onInstancesModified(instances);
-              }}
-              style={styles.field}
-              disabled={field.disabled}
-            />
-          )}
-          renderButton={style =>
-            onEditButtonClick ? (
-              <RaisedButton
-                style={style}
-                primary
-                disabled={instances.length !== 1}
-                icon={<Edit />}
-                label={<Trans>Edit</Trans>}
-                onClick={() => onEditButtonClick(instances[0])}
+        return (
+          <InlineCheckbox
+            label={
+              !description ? (
+                getFieldLabel(instances, field)
+              ) : (
+                <React.Fragment>
+                  <Line noMargin>{getFieldLabel(instances, field)}</Line>
+                  <FormHelperText style={{ display: 'inline' }}>
+                    <MarkdownText source={description} />
+                  </FormHelperText>
+                </React.Fragment>
+              )
+            }
+            key={field.name}
+            checked={getFieldValue(instances, field)}
+            onCheck={(event, newValue) => {
+              instances.forEach(i => setValue(i, !!newValue));
+              _onInstancesModified(instances);
+            }}
+            disabled={field.disabled}
+          />
+        );
+      } else if (field.valueType === 'number') {
+        const { setValue } = field;
+        return (
+          <SemiControlledTextField
+            value={getFieldValue(instances, field)}
+            key={field.name}
+            id={field.name}
+            floatingLabelText={getFieldLabel(instances, field)}
+            floatingLabelFixed
+            helperMarkdownText={getFieldDescription(field)}
+            onChange={newValue => {
+              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+              _onInstancesModified(instances);
+            }}
+            type="number"
+            style={styles.field}
+            disabled={field.disabled}
+          />
+        );
+      } else if (field.valueType === 'color') {
+        const { setValue } = field;
+        return (
+          <ColorField
+            key={field.name}
+            id={field.name}
+            floatingLabelText={getFieldLabel(instances, field)}
+            helperMarkdownText={getFieldDescription(field)}
+            disableAlpha
+            fullWidth
+            color={getFieldValue(instances, field)}
+            onChange={color => {
+              const rgbString =
+                color.length === 0 ? '' : rgbOrHexToRGBString(color);
+              instances.forEach(i => setValue(i, rgbString));
+              _onInstancesModified(instances);
+            }}
+          />
+        );
+      } else if (field.valueType === 'textarea') {
+        const { setValue } = field;
+        return (
+          <SemiControlledTextField
+            key={field.name}
+            id={field.name}
+            onChange={text => {
+              instances.forEach(i => setValue(i, text || ''));
+              _onInstancesModified(instances);
+            }}
+            value={getFieldValue(instances, field)}
+            floatingLabelText={getFieldLabel(instances, field)}
+            floatingLabelFixed
+            helperMarkdownText={getFieldDescription(field)}
+            multiline
+            style={styles.field}
+          />
+        );
+      } else {
+        const { onEditButtonClick, setValue } = field;
+        return (
+          <TextFieldWithButtonLayout
+            key={field.name}
+            renderTextField={() => (
+              <SemiControlledTextField
+                value={getFieldValue(instances, field, '(Multiple values)')}
+                id={field.name}
+                floatingLabelText={getFieldLabel(instances, field)}
+                floatingLabelFixed
+                helperMarkdownText={getFieldDescription(field)}
+                onChange={newValue => {
+                  instances.forEach(i => setValue(i, newValue || ''));
+                  _onInstancesModified(instances);
+                }}
+                style={styles.field}
+                disabled={field.disabled}
               />
-            ) : null
-          }
+            )}
+            renderButton={style =>
+              onEditButtonClick ? (
+                <RaisedButton
+                  style={style}
+                  primary
+                  disabled={instances.length !== 1}
+                  icon={<Edit />}
+                  label={<Trans>Edit</Trans>}
+                  onClick={() => onEditButtonClick(instances[0])}
+                />
+              ) : null
+            }
+          />
+        );
+      }
+    },
+    [instances, getFieldDescription, _onInstancesModified]
+  );
+
+  const renderSelectField = React.useCallback(
+    (field: ValueField) => {
+      if (!field.getChoices || !field.getValue) return;
+
+      const children = field
+        .getChoices()
+        .map(({ value, label }) => (
+          <SelectOption key={value} value={value} primaryText={label} />
+        ));
+
+      if (field.valueType === 'number') {
+        const { setValue } = field;
+        return (
+          <SelectField
+            value={getFieldValue(instances, field)}
+            key={field.name}
+            floatingLabelText={getFieldLabel(instances, field)}
+            helperMarkdownText={getFieldDescription(field)}
+            onChange={(event, index, newValue: string) => {
+              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+              _onInstancesModified(instances);
+            }}
+            style={styles.field}
+            disabled={field.disabled}
+          >
+            {children}
+          </SelectField>
+        );
+      } else if (field.valueType === 'string') {
+        const { setValue } = field;
+        return (
+          <SelectField
+            value={getFieldValue(instances, field, '(Multiple values)')}
+            key={field.name}
+            floatingLabelText={getFieldLabel(instances, field)}
+            helperMarkdownText={getFieldDescription(field)}
+            onChange={(event, index, newValue: string) => {
+              instances.forEach(i => setValue(i, newValue || ''));
+              _onInstancesModified(instances);
+            }}
+            style={styles.field}
+            disabled={field.disabled}
+          >
+            {children}
+          </SelectField>
+        );
+      }
+    },
+    [instances, _onInstancesModified, getFieldDescription]
+  );
+
+  const renderButton = React.useCallback(
+    (field: ActionButton) => {
+      let disabled = false;
+      if (field.disabled === 'onValuesDifferent') {
+        const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
+        disabled =
+          getFieldValue(instances, field, DIFFERENT_VALUES) ===
+          DIFFERENT_VALUES;
+      }
+      return (
+        <RaisedButton
+          key={`button-${field.label}`}
+          fullWidth
+          primary
+          icon={<Edit />}
+          disabled={disabled}
+          label={field.label}
+          onClick={() => {
+            field.onClick(instances[0]);
+          }}
         />
       );
-    }
-  };
-
-  const renderSelectField = (field: ValueField) => {
-    if (!field.getChoices || !field.getValue) return;
-
-    const children = field
-      .getChoices()
-      .map(({ value, label }) => (
-        <SelectOption key={value} value={value} primaryText={label} />
-      ));
-
-    if (field.valueType === 'number') {
-      const { setValue } = field;
-      return (
-        <SelectField
-          value={getFieldValue(instances, field)}
-          key={field.name}
-          floatingLabelText={getFieldLabel(instances, field)}
-          helperMarkdownText={getFieldDescription(instances, field)}
-          onChange={(event, index, newValue: string) => {
-            instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
-            _onInstancesModified(instances);
-          }}
-          style={styles.field}
-          disabled={field.disabled}
-        >
-          {children}
-        </SelectField>
-      );
-    } else if (field.valueType === 'string') {
-      const { setValue } = field;
-      return (
-        <SelectField
-          value={getFieldValue(instances, field, '(Multiple values)')}
-          key={field.name}
-          floatingLabelText={getFieldLabel(instances, field)}
-          helperMarkdownText={getFieldDescription(instances, field)}
-          onChange={(event, index, newValue: string) => {
-            instances.forEach(i => setValue(i, newValue || ''));
-            _onInstancesModified(instances);
-          }}
-          style={styles.field}
-          disabled={field.disabled}
-        >
-          {children}
-        </SelectField>
-      );
-    }
-  };
-
-  const renderButton = (field: ActionButton) => {
-    let disabled = false;
-    if (field.disabled === 'onValuesDifferent') {
-      const DIFFERENT_VALUES = 'DIFFERENT_VALUES';
-      disabled =
-        getFieldValue(instances, field, DIFFERENT_VALUES) === DIFFERENT_VALUES;
-    }
-    return (
-      <RaisedButton
-        key={`button-${field.label}`}
-        fullWidth
-        primary
-        icon={<Edit />}
-        disabled={disabled}
-        label={field.label}
-        onClick={() => {
-          field.onClick(instances[0]);
-        }}
-      />
-    );
-  };
+    },
+    [instances]
+  );
 
   const renderResourceField = (field: ResourceField) => {
     if (
@@ -482,7 +495,7 @@ const PropertiesEditor = ({
           _onInstancesModified(instances);
         }}
         floatingLabelText={getFieldLabel(instances, field)}
-        helperMarkdownText={getFieldDescription(instances, field)}
+        helperMarkdownText={getFieldDescription(field)}
       />
     );
   };
@@ -498,36 +511,42 @@ const PropertiesEditor = ({
           <ColumnStackLayout noMargin>{fields}</ColumnStackLayout>
         );
 
-  const renderSectionTitle = (field: SectionTitle) => {
-    const { getValue } = field;
+  const renderSectionTitle = React.useCallback(
+    (field: SectionTitle) => {
+      const { getValue } = field;
 
-    let additionalText = null;
+      let additionalText = null;
 
-    if (getValue) {
-      let selectedInstancesValue = getFieldValue(
-        instances,
-        field,
-        field.defaultValue || 'Multiple Values'
-      );
-      if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
-    }
+      if (getValue) {
+        let selectedInstancesValue = getFieldValue(
+          instances,
+          field,
+          field.defaultValue || 'Multiple Values'
+        );
+        if (!!selectedInstancesValue) additionalText = selectedInstancesValue;
+      }
 
-    if (!!additionalText) {
+      if (!!additionalText) {
+        return (
+          <Line alignItems="baseline">
+            <Text displayInlineAsSpan>{field.name}</Text>
+            <Spacer />
+            <Text
+              displayInlineAsSpan
+              size="body2"
+            >{`- ${additionalText}`}</Text>
+          </Line>
+        );
+      }
+
       return (
-        <Line alignItems="baseline">
+        <Line>
           <Text displayInlineAsSpan>{field.name}</Text>
-          <Spacer />
-          <Text displayInlineAsSpan size="body2">{`- ${additionalText}`}</Text>
         </Line>
       );
-    }
-
-    return (
-      <Line>
-        <Text displayInlineAsSpan>{field.name}</Text>
-      </Line>
-    );
-  };
+    },
+    [instances]
+  );
 
   return renderContainer(
     schema.map(field => {

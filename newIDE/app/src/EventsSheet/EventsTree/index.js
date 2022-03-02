@@ -387,7 +387,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
             title: () => (
               <EmptyPlaceholder
                 title={<Trans>Add your first event</Trans>}
-                description={<Trans>Events define the rules of a game</Trans>}
+                description={<Trans>Events define the rules of a game.</Trans>}
                 actionLabel={<Trans>Add an event</Trans>}
                 helpPagePath="/events"
                 onAdd={() =>

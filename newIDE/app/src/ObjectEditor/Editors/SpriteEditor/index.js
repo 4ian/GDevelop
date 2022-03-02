@@ -312,7 +312,7 @@ class AnimationsListContainer extends React.Component<
           <Column noMargin expand justifyContent="center">
             <EmptyPlaceholder
               title={<Trans>Add your first animation</Trans>}
-              description={<Trans>Animations contain images.</Trans>}
+              description={<Trans>Animations are a sequence of images.</Trans>}
               actionLabel={<Trans>Add an animation</Trans>}
               helpPagePath="/objects/sprite"
               onAdd={this.addAnimation}

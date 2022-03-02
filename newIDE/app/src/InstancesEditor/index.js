@@ -342,7 +342,7 @@ export default class InstancesEditor extends Component<Props> {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
-      onInstanceRightClicked: this._onRightClickedOnInstance,
+      onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -609,7 +609,7 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.focus();
   };
 
-  _onRightClickedOnInstance = (coordinates: {|
+  _onInstanceRightClicked = (coordinates: {|
     offsetX: number,
     offsetY: number,
     x: number,
@@ -637,11 +637,7 @@ export default class InstancesEditor extends Component<Props> {
     this.lastContextMenuX = offsetX;
     this.lastContextMenuY = offsetY;
     if (this.props.onContextMenu) {
-      const _ignoreSelectedObjectNamesForContextMenu =
-        typeof ignoreSelectedObjectNamesForContextMenu === 'boolean'
-          ? ignoreSelectedObjectNamesForContextMenu
-          : false;
-      this.props.onContextMenu(x, y, _ignoreSelectedObjectNamesForContextMenu);
+      this.props.onContextMenu(x, y, !!ignoreSelectedObjectNamesForContextMenu);
     }
   };
 

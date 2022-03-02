@@ -1009,21 +1009,17 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     if (!this.editor) return;
 
-    const newInstances = serializedSelection
-      .map(serializedInstance => {
-        const instance = new gd.InitialInstance();
-        unserializeFromJSObject(instance, serializedInstance);
-        return instance;
-      })
-      .map(instance => {
-        instance.setX(instance.getX() + 2 * MOVEMENT_BIG_DELTA);
-        instance.setY(instance.getY() + 2 * MOVEMENT_BIG_DELTA);
-        const newInstance = this.props.initialInstances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
-        instance.delete();
-        return newInstance;
-      });
+    const newInstances = serializedSelection.map(serializedInstance => {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      instance.setX(instance.getX() + 2 * MOVEMENT_BIG_DELTA);
+      instance.setY(instance.getY() + 2 * MOVEMENT_BIG_DELTA);
+      const newInstance = this.props.initialInstances
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+      return newInstance;
+    });
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances(newInstances, true);
@@ -1045,21 +1041,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
     if (x === null || y === null || instancesContent === null) return;
 
-    const newInstances = instancesContent
-      .map(serializedInstance => {
-        const instance = new gd.InitialInstance();
-        unserializeFromJSObject(instance, serializedInstance);
-        return instance;
-      })
-      .map(instance => {
-        instance.setX(instance.getX() - x + position[0]);
-        instance.setY(instance.getY() - y + position[1]);
-        const newInstance = this.props.initialInstances
-          .insertInitialInstance(instance)
-          .resetPersistentUuid();
-        instance.delete();
-        return newInstance;
-      });
+    const newInstances = instancesContent.map(serializedInstance => {
+      const instance = new gd.InitialInstance();
+      unserializeFromJSObject(instance, serializedInstance);
+      instance.setX(instance.getX() - x + position[0]);
+      instance.setY(instance.getY() - y + position[1]);
+      const newInstance = this.props.initialInstances
+        .insertInitialInstance(instance)
+        .resetPersistentUuid();
+      instance.delete();
+      return newInstance;
+    });
     this._onInstancesAdded(newInstances);
     this.instancesSelection.clearSelection();
     this.instancesSelection.selectInstances(newInstances, true);

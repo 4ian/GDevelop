@@ -139,7 +139,6 @@ type State = {|
   editedObjectWithContext: ?ObjectWithContext,
   editedObjectInitialTab: ?ObjectEditorTab,
   variablesEditedInstance: ?gdInitialInstance,
-  ignoreSelectedObjectNamesForContextMenu: boolean,
   selectedObjectNames: Array<string>,
   newObjectInstanceSceneCoordinates: ?[number, number],
 
@@ -192,7 +191,6 @@ export default class SceneEditor extends React.Component<Props, State> {
       editedObjectWithContext: null,
       editedObjectInitialTab: 'properties',
       variablesEditedInstance: null,
-      ignoreSelectedObjectNamesForContextMenu: false,
       selectedObjectNames: [],
       newObjectInstanceSceneCoordinates: null,
       editedGroup: null,
@@ -868,20 +866,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     y: number,
     ignoreSelectedObjectNamesForContextMenu?: boolean = false
   ) => {
-    if (!ignoreSelectedObjectNamesForContextMenu) {
-      if (this.contextMenu) this.contextMenu.open(x, y);
-    } else {
-      this.setState({ ignoreSelectedObjectNamesForContextMenu: true }, () => {
-        if (this.contextMenu) this.contextMenu.open(x, y);
-        this.setState({ ignoreSelectedObjectNamesForContextMenu: false });
+    if (this.contextMenu)
+      this.contextMenu.open(x, y, {
+        ignoreSelectedObjectNamesForContextMenu: !!ignoreSelectedObjectNamesForContextMenu,
       });
-    }
   };
 
-  buildContextMenu = (i18n: I18nType, layout: gdLayout) => {
+  buildContextMenu = (i18n: I18nType, layout: gdLayout, options: any) => {
     let contextMenuItems = [];
     if (
-      this.state.ignoreSelectedObjectNamesForContextMenu ||
+      options.ignoreSelectedObjectNamesForContextMenu ||
       this.state.selectedObjectNames.length === 0
     ) {
       contextMenuItems = [
@@ -1594,7 +1588,9 @@ export default class SceneEditor extends React.Component<Props, State> {
               />
               <ContextMenu
                 ref={contextMenu => (this.contextMenu = contextMenu)}
-                buildMenuTemplate={() => this.buildContextMenu(i18n, layout)}
+                buildMenuTemplate={(i18n, buildOptions) =>
+                  this.buildContextMenu(i18n, layout, buildOptions)
+                }
               />
             </React.Fragment>
           )}

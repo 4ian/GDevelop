@@ -14,7 +14,6 @@ import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
-import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
 import ContextMenu from '../../../UI/Menu/ContextMenu';
@@ -38,6 +37,7 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
 
 const gd: libGDevelop = global.gd;
 
@@ -309,13 +309,21 @@ class AnimationsListContainer extends React.Component<
     return (
       <Column noMargin expand useFullHeight>
         {this.props.spriteObject.getAnimationsCount() === 0 ? (
-          <EmptyMessage>
-            <Trans>
-              This object has no animations containing images. Start by adding
-              an animation.
-            </Trans>
-          </EmptyMessage>
+        <Column noMargin expand justifyContent="center">
+          <EmptyPlaceholder
+            title={<Trans>Add your first animation</Trans>}
+            description={
+              <Trans>
+                Animations contain images.
+              </Trans>
+            }
+            actionLabel={<Trans>Add an animation</Trans>}
+            helpPagePath="/objects/sprite"
+            onAdd={this.addAnimation}
+          />
+          </Column>
         ) : (
+          <React.Fragment>
           <SortableAnimationsList
             spriteObject={this.props.spriteObject}
             objectName={this.props.objectName}
@@ -336,21 +344,20 @@ class AnimationsListContainer extends React.Component<
             lockAxis="y"
             axis="y"
           />
-        )}
-        <Column>
-          <ResponsiveLineStackLayout
-            justifyContent="space-between"
-            noColumnMargin
-          >
-            {this.props.extraBottomTools}
-            <RaisedButton
-              label={<Trans>Add an animation</Trans>}
-              primary
-              onClick={this.addAnimation}
-              icon={<Add />}
-            />
-          </ResponsiveLineStackLayout>
-        </Column>
+          <Column>
+            <ResponsiveLineStackLayout
+              justifyContent="space-between"
+              noColumnMargin
+            >
+              {this.props.extraBottomTools}
+              <RaisedButton
+                label={<Trans>Add an animation</Trans>}
+                primary
+                onClick={this.addAnimation}
+                icon={<Add />}
+              />
+            </ResponsiveLineStackLayout>
+          </Column>
         <ContextMenu
           ref={spriteContextMenu =>
             (this.spriteContextMenu = spriteContextMenu)
@@ -366,6 +373,8 @@ class AnimationsListContainer extends React.Component<
             },
           ]}
         />
+          </React.Fragment>
+        )}
       </Column>
     );
   }

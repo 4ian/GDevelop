@@ -7,7 +7,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
-import { isUserflowRunning } from '../../Utils/Analytics/EventSender';
+import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
 
 type Props = {|
   identifier: AlertMessageIdentifier,

@@ -225,9 +225,11 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'variables' && (
         <VariablesList
           variablesContainer={props.object.getVariables()}
-          emptyPlaceholderTitle={<Trans>Add your first variable</Trans>}
+          emptyPlaceholderTitle={<Trans>Add your first object variable</Trans>}
           emptyPlaceholderDescription={
-            <Trans>Variables hold additional information on an object.</Trans>
+            <Trans>
+              These variables hold additional information on an object.
+            </Trans>
           }
           helpPagePath={'/all-features/variables/object-variables'}
           onSizeUpdated={

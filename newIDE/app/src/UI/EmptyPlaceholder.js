@@ -1,12 +1,12 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Paper from '@material-ui/core/Paper';
 import { Line, Column } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
+import Container from '@material-ui/core/Container';
 
 type Props = {|
   title: React.Node,
@@ -22,10 +22,9 @@ type Props = {|
  */
 export const EmptyPlaceholder = (props: Props) => (
   <Column alignItems="center">
-    <Paper
-      elevation={0}
+    <Container
       style={{
-        maxWidth: '450px',
+        maxWidth: '480px',
         whiteSpace: 'normal',
       }}
     >
@@ -51,6 +50,6 @@ export const EmptyPlaceholder = (props: Props) => (
           />
         </Line>
       </Column>
-    </Paper>
+    </Container>
   </Column>
 );

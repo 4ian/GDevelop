@@ -16,8 +16,8 @@ type Props = {|
   open: boolean,
   onEditObjectVariables?: () => void,
   title: React.Node,
-  emptyExplanationMessage?: React.Node,
-  emptyExplanationSecondMessage?: React.Node,
+  emptyPlaceholderTitle?: React.Node,
+  emptyPlaceholderDescription?: React.Node,
   variablesContainer: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   onComputeAllVariableNames: () => Array<string>,
@@ -30,8 +30,8 @@ const VariablesEditorDialog = ({
   open,
   onEditObjectVariables,
   title,
-  emptyExplanationMessage,
-  emptyExplanationSecondMessage,
+  emptyPlaceholderTitle,
+  emptyPlaceholderDescription,
   variablesContainer,
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
@@ -93,8 +93,8 @@ const VariablesEditorDialog = ({
           true
         }
         variablesContainer={variablesContainer}
-        emptyExplanationMessage={emptyExplanationMessage}
-        emptyExplanationSecondMessage={emptyExplanationSecondMessage}
+        emptyPlaceholderTitle={emptyPlaceholderTitle}
+        emptyPlaceholderDescription={emptyPlaceholderDescription}
         onSizeUpdated={
           forceUpdate /*Force update to ensure dialog is properly positioned*/
         }

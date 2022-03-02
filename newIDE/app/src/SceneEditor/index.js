@@ -1327,10 +1327,13 @@ export default class SceneEditor extends React.Component<Props, State> {
             }
             onCancel={() => this.editInstanceVariables(null)}
             onApply={() => this.editInstanceVariables(null)}
-            emptyExplanationMessage={
+            emptyPlaceholderTitle={
+              <Trans>Add your first instance variable</Trans>
+            }
+            emptyPlaceholderDescription={
               <Trans>
-                Instance variables will overwrite the default values of the
-                variables of the object.
+                Instance variables overwrite the default values of the variables
+                of the object.
               </Trans>
             }
             helpPagePath={'/all-features/variables/instance-variables'}

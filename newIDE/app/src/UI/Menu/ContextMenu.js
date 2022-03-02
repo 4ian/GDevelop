@@ -15,17 +15,19 @@ class MaterialUIContextMenu extends React.Component {
       open: false,
       anchorX: 0,
       anchorY: 0,
+      buildOptions: {},
     };
     this.menuImplementation = new MaterialUIMenuImplementation({
       onClose: this._onClose,
     });
   }
 
-  open = (x, y) => {
+  open = (x, y, options) => {
     this.setState(
       {
         anchorX: x,
         anchorY: y,
+        buildOptions: options
       },
       () => {
         this.setState({
@@ -57,7 +59,7 @@ class MaterialUIContextMenu extends React.Component {
             {...this.menuImplementation.getMenuProps()}
           >
             {this.menuImplementation.buildFromTemplate(
-              this.props.buildMenuTemplate(i18n)
+              this.props.buildMenuTemplate(i18n, this.state.buildOptions)
             )}
           </Menu>
         )}
@@ -75,9 +77,9 @@ class ElectronContextMenu extends React.Component {
     this.menuImplementation = new ElectronMenuImplementation();
   }
 
-  open = (x, y) => {
+  open = (x, y, options) => {
     this.menuImplementation.buildFromTemplate(
-      this.props.buildMenuTemplate(this.props.i18n)
+      this.props.buildMenuTemplate(this.props.i18n, options)
     );
     this.menuImplementation.showMenu({
       left: x || 0,
@@ -95,8 +97,8 @@ class ElectronContextMenu extends React.Component {
 const ElectronContextMenuWrapper = React.forwardRef((props, ref) => {
   const electronContextMenu = React.useRef(null);
   React.useImperativeHandle(ref, () => ({
-    open: (x, y) => {
-      if (electronContextMenu.current) electronContextMenu.current.open(x, y);
+    open: (x, y, options) => {
+      if (electronContextMenu.current) electronContextMenu.current.open(x, y, options);
     },
   }));
 

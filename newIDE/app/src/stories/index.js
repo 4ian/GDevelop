@@ -1865,6 +1865,7 @@ storiesOf('UI Building Blocks/ClosableTabs', module)
                     onChooseResource={() => Promise.reject('unimplemented')}
                     resourceExternalEditors={fakeResourceExternalEditors}
                     onEditObject={action('On edit object')}
+                    onAddObjectInstance={action('On add instance to the scene')}
                     selectedObjectNames={[]}
                     selectedObjectTags={[]}
                     onChangeSelectedObjectTags={() => {}}
@@ -3557,6 +3558,7 @@ storiesOf('ObjectsList', module)
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
+            onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
             selectedObjectTags={[]}
@@ -3586,6 +3588,7 @@ storiesOf('ObjectsList', module)
             onChooseResource={() => Promise.reject('unimplemented')}
             resourceExternalEditors={fakeResourceExternalEditors}
             onEditObject={action('On edit object')}
+            onAddObjectInstance={action('On add instance to the scene')}
             onObjectCreated={action('On object created')}
             selectedObjectNames={[]}
             selectedObjectTags={['Tag1', 'Tag2']}

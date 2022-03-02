@@ -309,70 +309,66 @@ class AnimationsListContainer extends React.Component<
     return (
       <Column noMargin expand useFullHeight>
         {this.props.spriteObject.getAnimationsCount() === 0 ? (
-        <Column noMargin expand justifyContent="center">
-          <EmptyPlaceholder
-            title={<Trans>Add your first animation</Trans>}
-            description={
-              <Trans>
-                Animations contain images.
-              </Trans>
-            }
-            actionLabel={<Trans>Add an animation</Trans>}
-            helpPagePath="/objects/sprite"
-            onAdd={this.addAnimation}
-          />
+          <Column noMargin expand justifyContent="center">
+            <EmptyPlaceholder
+              title={<Trans>Add your first animation</Trans>}
+              description={<Trans>Animations contain images.</Trans>}
+              actionLabel={<Trans>Add an animation</Trans>}
+              helpPagePath="/objects/sprite"
+              onAdd={this.addAnimation}
+            />
           </Column>
         ) : (
           <React.Fragment>
-          <SortableAnimationsList
-            spriteObject={this.props.spriteObject}
-            objectName={this.props.objectName}
-            helperClass="sortable-helper"
-            project={this.props.project}
-            onSortEnd={this.onSortEnd}
-            onChangeAnimationName={this.changeAnimationName}
-            onRemoveAnimation={this.removeAnimation}
-            onReplaceDirection={this.replaceDirection}
-            onSpriteContextMenu={this.openSpriteContextMenu}
-            selectedSprites={this.state.selectedSprites}
-            onSelectSprite={this.selectSprite}
-            resourcesLoader={this.props.resourcesLoader}
-            resourceSources={this.props.resourceSources}
-            resourceExternalEditors={this.props.resourceExternalEditors}
-            onChooseResource={this.props.onChooseResource}
-            useDragHandle
-            lockAxis="y"
-            axis="y"
-          />
-          <Column>
-            <ResponsiveLineStackLayout
-              justifyContent="space-between"
-              noColumnMargin
-            >
-              {this.props.extraBottomTools}
-              <RaisedButton
-                label={<Trans>Add an animation</Trans>}
-                primary
-                onClick={this.addAnimation}
-                icon={<Add />}
-              />
-            </ResponsiveLineStackLayout>
-          </Column>
-        <ContextMenu
-          ref={spriteContextMenu =>
-            (this.spriteContextMenu = spriteContextMenu)
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
-            {
-              label: i18n._(t`Delete selection`),
-              click: () => this.deleteSelection(),
-            },
-            {
-              label: i18n._(t`Duplicate selection`),
-              click: () => this.duplicateSelection(),
-            },
-          ]}
-        />
+            <SortableAnimationsList
+              spriteObject={this.props.spriteObject}
+              objectName={this.props.objectName}
+              helperClass="sortable-helper"
+              project={this.props.project}
+              onSortEnd={this.onSortEnd}
+              onChangeAnimationName={this.changeAnimationName}
+              onRemoveAnimation={this.removeAnimation}
+              onReplaceDirection={this.replaceDirection}
+              onSpriteContextMenu={this.openSpriteContextMenu}
+              selectedSprites={this.state.selectedSprites}
+              onSelectSprite={this.selectSprite}
+              resourcesLoader={this.props.resourcesLoader}
+              resourceSources={this.props.resourceSources}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              onChooseResource={this.props.onChooseResource}
+              useDragHandle
+              lockAxis="y"
+              axis="y"
+            />
+            <Column>
+              <ResponsiveLineStackLayout
+                justifyContent="space-between"
+                noColumnMargin
+              >
+                {this.props.extraBottomTools}
+                <RaisedButton
+                  label={<Trans>Add an animation</Trans>}
+                  primary
+                  onClick={this.addAnimation}
+                  icon={<Add />}
+                />
+              </ResponsiveLineStackLayout>
+            </Column>
+            <ContextMenu
+              ref={spriteContextMenu =>
+                (this.spriteContextMenu = spriteContextMenu)
+              }
+              buildMenuTemplate={(i18n: I18nType) => [
+                {
+                  label: i18n._(t`Delete selection`),
+                  click: () => this.deleteSelection(),
+                },
+                {
+                  label: i18n._(t`Duplicate selection`),
+                  click: () => this.duplicateSelection(),
+                },
+              ]}
+            />
           </React.Fragment>
         )}
       </Column>

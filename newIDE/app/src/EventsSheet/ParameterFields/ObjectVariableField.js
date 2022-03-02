@@ -89,17 +89,12 @@ export default class ObjectVariableField extends React.Component<
             title={<Trans>Object Variables</Trans>}
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
-            emptyExplanationMessage={
-              <Trans>
-                When you add variables to an object, any instance of the object
-                put on the scene or created during the game will have these
-                variables attached to it.
-              </Trans>
+            emptyPlaceholderTitle={
+              <Trans>Add your first object variable</Trans>
             }
-            emptyExplanationSecondMessage={
+            emptyPlaceholderDescription={
               <Trans>
-                For example, you can have a variable called Life representing
-                the health of the object.
+                These variables hold additional information on an object.
               </Trans>
             }
             helpPagePath={'/all-features/variables/object-variables'}

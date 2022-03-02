@@ -7,32 +7,11 @@ type ContainerProps = {|
   defaultOpen: boolean,
 |};
 
-type ContainerState = {|
-  open: boolean,
-|};
+const ChangelogDialogContainer = ({ defaultOpen }: ContainerProps) => {
+  const [open, setOpen] = React.useState(defaultOpen);
 
-class ChangelogDialogContainer extends React.Component<
-  ContainerProps,
-  ContainerState
-> {
-  state = {
-    open: this.props.defaultOpen,
-  };
-
-  render() {
-    const { open } = this.state;
-    return (
-      <ChangelogDialog
-        open={open}
-        onClose={() =>
-          this.setState({
-            open: false,
-          })
-        }
-      />
-    );
-  }
-}
+  return <ChangelogDialog open={open} onClose={() => setOpen(false)} />;
+};
 
 /**
  * The container showing the ChangelogDialog only if a a new version

@@ -231,17 +231,10 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'variables' && (
         <VariablesList
           variablesContainer={props.object.getVariables()}
-          emptyExplanationMessage={
+          emptyPlaceholderTitle={<Trans>Add your first object variable</Trans>}
+          emptyPlaceholderDescription={
             <Trans>
-              When you add variables to an object, any instance of the object
-              put on the scene or created during the game will have these
-              variables attached to it.
-            </Trans>
-          }
-          emptyExplanationSecondMessage={
-            <Trans>
-              For example, you can have a variable called Life representing the
-              health of the object.
+              These variables hold additional information on an object.
             </Trans>
           }
           helpPagePath={'/all-features/variables/object-variables'}

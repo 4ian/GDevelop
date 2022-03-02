@@ -32,7 +32,7 @@ import Window from '../Utils/Window';
 import FullSizeInstancesEditorWithScrollbars from '../InstancesEditor/FullSizeInstancesEditorWithScrollbars';
 import EditorMosaic from '../UI/EditorMosaic';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
-import ContextMenu from '../UI/Menu/ContextMenu';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import getObjectByName from '../Utils/GetObjectByName';
@@ -168,7 +168,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   instancesSelection: InstancesSelection;
   editor: ?InstancesEditor;
-  contextMenu: ?ContextMenu;
+  contextMenu: ?ContextMenuInterface;
   editorMosaic: ?EditorMosaic;
   _objectsList: ?ObjectsList;
   _layersList: ?LayersList;

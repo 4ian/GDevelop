@@ -17,7 +17,9 @@ import HelpButton from '../../../UI/HelpButton';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
-import ContextMenu from '../../../UI/Menu/ContextMenu';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
@@ -210,7 +212,7 @@ class AnimationsListContainer extends React.Component<
   state = {
     selectedSprites: {},
   };
-  spriteContextMenu: ?ContextMenu;
+  spriteContextMenu: ?ContextMenuInterface;
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.spriteObject.moveAnimation(oldIndex, newIndex);

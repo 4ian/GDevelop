@@ -5,7 +5,7 @@ import React, { Component, useEffect, type Node, useRef } from 'react';
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
-import ContextMenu from './Menu/ContextMenu';
+import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 
 const styles = {
@@ -135,7 +135,7 @@ export function ClosableTab({
     },
     [active, onActivated]
   );
-  const contextMenu = useRef<ContextMenu>(null);
+  const contextMenu = useRef<?ContextMenuInterface>(null);
 
   const openContextMenu = event => {
     event.stopPropagation();

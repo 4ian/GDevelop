@@ -14,7 +14,7 @@ import EventTextDialog, {
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
-import ContextMenu from '../UI/Menu/ContextMenu';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
@@ -209,8 +209,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
   });
 
-  eventContextMenu: ContextMenu;
-  instructionContextMenu: ContextMenu;
+  eventContextMenu: ?ContextMenuInterface;
+  instructionContextMenu: ?ContextMenuInterface;
   addNewEvent: (
     type: string,
     context: ?EventInsertionContext
@@ -642,7 +642,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     { type: 'separator' },
     {
       label: i18n._(t`Add New Event Below`),
-      click: () => this.addNewEvent('BuiltinCommonInstructions::Standard'),
+      click: () => {
+        this.addNewEvent('BuiltinCommonInstructions::Standard');
+      },
     },
     {
       label: i18n._(t`Add Sub Event`),
@@ -654,7 +656,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       submenu: this.state.allEventsMetadata.map(metadata => {
         return {
           label: metadata.fullName,
-          click: () => this.addNewEvent(metadata.type),
+          click: () => {
+            this.addNewEvent(metadata.type);
+          },
         };
       }),
     },
@@ -730,7 +734,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       },
       () => {
         this.updateToolbar();
-        this.eventContextMenu.open(x, y);
+        if (this.eventContextMenu) this.eventContextMenu.open(x, y);
       }
     );
   };
@@ -751,7 +755,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       },
       () => {
         this.updateToolbar();
-        this.instructionContextMenu.open(x, y);
+        if (this.instructionContextMenu) this.instructionContextMenu.open(x, y);
       }
     );
   };

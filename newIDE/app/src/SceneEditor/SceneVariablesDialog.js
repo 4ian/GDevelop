@@ -22,17 +22,9 @@ export default (props: Props) => {
       onCancel={props.onClose}
       onApply={props.onApply}
       title={<Trans>Scene Variables</Trans>}
-      emptyExplanationMessage={
-        <Trans>
-          Scene variables can be used to store any value or text during the
-          game.
-        </Trans>
-      }
-      emptyExplanationSecondMessage={
-        <Trans>
-          For example, you can have a variable called Score representing the
-          current score of the player.
-        </Trans>
+      emptyPlaceholderTitle={<Trans>Add your first scene variable</Trans>}
+      emptyPlaceholderDescription={
+        <Trans>These variables hold additional information on a scene.</Trans>
       }
       helpPagePath={'/all-features/variables/scene-variables'}
       hotReloadPreviewButtonProps={props.hotReloadPreviewButtonProps}

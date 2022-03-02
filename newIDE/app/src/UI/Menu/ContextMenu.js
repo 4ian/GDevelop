@@ -27,7 +27,7 @@ class MaterialUIContextMenu extends React.Component {
       {
         anchorX: x,
         anchorY: y,
-        buildOptions: options
+        buildOptions: options,
       },
       () => {
         this.setState({
@@ -98,7 +98,8 @@ const ElectronContextMenuWrapper = React.forwardRef((props, ref) => {
   const electronContextMenu = React.useRef(null);
   React.useImperativeHandle(ref, () => ({
     open: (x, y, options) => {
-      if (electronContextMenu.current) electronContextMenu.current.open(x, y, options);
+      if (electronContextMenu.current)
+        electronContextMenu.current.open(x, y, options);
     },
   }));
 

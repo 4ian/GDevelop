@@ -7,11 +7,6 @@ import {
 import ChangelogRenderer from './ChangelogRenderer';
 import { getIDEVersion } from '../../Version';
 
-type State = {|
-  releases: ?Array<Release>,
-  error: ?Error,
-|};
-
 type Props = {|
   onUpdated?: () => void,
 |};
@@ -19,45 +14,37 @@ type Props = {|
 /**
  * Load information about latest releases and display them.
  */
-export default class Changelog extends React.Component<Props, State> {
-  state = {
-    releases: null,
-    error: null,
-  };
+const Changelog = ({ onUpdated }: Props) => {
+  const [releases, setReleases] = React.useState<?Array<Release>>(null);
+  const [error, setError] = React.useState<?Error>(null);
 
-  _onUpdated = () => {
-    if (this.props.onUpdated) this.props.onUpdated();
-  };
+  React.useEffect(
+    () => {
+      getReleases()
+        .then(releases => {
+          setError(null);
+          setReleases(releases);
+          if (onUpdated) {
+            onUpdated();
+          }
+        })
+        .catch((error: ?Error) => {
+          setError(error);
+          if (onUpdated) {
+            onUpdated();
+          }
+        });
+    },
+    [onUpdated]
+  );
 
-  componentDidMount() {
-    getReleases()
-      .then(releases =>
-        this.setState(
-          {
-            releases,
-            error: null,
-          },
-          this._onUpdated
-        )
-      )
-      .catch((error: ?Error) =>
-        this.setState(
-          {
-            error,
-          },
-          this._onUpdated
-        )
-      );
-  }
+  return (
+    <ChangelogRenderer
+      releases={releases}
+      error={error}
+      currentReleaseName={getIDEVersion()}
+    />
+  );
+};
 
-  render() {
-    const { releases, error } = this.state;
-    return (
-      <ChangelogRenderer
-        releases={releases}
-        error={error}
-        currentReleaseName={getIDEVersion()}
-      />
-    );
-  }
-}
+export default Changelog;

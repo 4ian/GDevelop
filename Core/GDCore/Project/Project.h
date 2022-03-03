@@ -66,6 +66,16 @@ class GD_CORE_API Project : public ObjectsContainer {
   const gd::String& GetName() const { return name; }
 
   /**
+   * \brief Get the categories/genres of the project.
+   */
+  const std::vector<gd::String>& GetCategories() const { return categories; };
+
+  /**
+   * \brief Get the categories of the project, to modify them (non-const).
+   */
+  std::vector<gd::String>& GetCategories() { return categories; };
+
+  /**
    * \brief Change the project description
    */
   void SetDescription(const gd::String& description_) { description = description_; };
@@ -967,6 +977,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;           ///< Game author ids, from GDevelop users DB.
+  std::vector<gd::String>
+      categories;           ///< Game categories
   bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.
   bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
   bool isPlayableWithMobile;   ///< The project is playable on a mobile.

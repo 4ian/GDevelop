@@ -3,6 +3,7 @@ declare class gdProject extends gdObjectsContainer {
   constructor(): void;
   setName(name: string): void;
   getName(): string;
+  getCategories(): gdVectorString;
   setDescription(description: string): void;
   getDescription(): string;
   setVersion(authorName: string): void;

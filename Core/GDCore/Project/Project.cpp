@@ -536,17 +536,23 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
   }
 
+  categories.clear();
+  auto& categoriesElement = propElement.GetChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < categoriesElement.GetChildrenCount(); ++i) {
+    categories.push_back(categoriesElement.GetChild(i).GetStringValue());
+  }
+
   auto& playableDevicesElement = propElement.GetChild("playableDevices");
   playableDevicesElement.ConsiderAsArray();
   for (std::size_t i = 0; i < playableDevicesElement.GetChildrenCount(); ++i) {
-    const auto& playableDevice = playableDevicesElement.GetChild(i).GetStringValue();
+    const auto& playableDevice =
+        playableDevicesElement.GetChild(i).GetStringValue();
     if (playableDevice == "keyboard") {
       isPlayableWithKeyboard = true;
-    }
-    else if (playableDevice == "gamepad") {
+    } else if (playableDevice == "gamepad") {
       isPlayableWithGamepad = true;
-    }
-    else if (playableDevice == "mobile") {
+    } else if (playableDevice == "mobile") {
       isPlayableWithMobile = true;
     }
   }
@@ -751,6 +757,12 @@ void Project::SerializeTo(SerializerElement& element) const {
     authorIdsElement.AddChild("").SetStringValue(authorId);
   }
 
+  auto& categoriesElement = propElement.AddChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (const auto& category : categories) {
+    categoriesElement.AddChild("").SetStringValue(category);
+  }
+
   auto& playableDevicesElement = propElement.AddChild("playableDevices");
   playableDevicesElement.ConsiderAsArray();
   if (isPlayableWithKeyboard) {
@@ -938,6 +950,8 @@ Project& Project::operator=(const Project& other) {
 
 void Project::Init(const gd::Project& game) {
   name = game.name;
+  categories = game.categories;
+  description = game.description;
   firstLayout = game.firstLayout;
   version = game.version;
   windowWidth = game.windowWidth;

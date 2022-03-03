@@ -1083,6 +1083,7 @@ const MainFrame = (props: Props) => {
         newName
       );
       eventsFunctionsExtension.setName(newName);
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(currentProject, oldName);
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );

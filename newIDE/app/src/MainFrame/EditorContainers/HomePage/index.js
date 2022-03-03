@@ -403,6 +403,14 @@ export const HomePage = React.memo<Props>(
                           : null
                       }
                       displayItemTitles
+                      additionalAction={
+                        <RaisedButton
+                          label={<Trans>Play on Liluo.io</Trans>}
+                          onClick={() =>
+                            Window.openExternalURL('https://liluo.io')
+                          }
+                        />
+                      }
                       onBrowseAllClick={onOpenGamesShowcase}
                       browseAllLabel={<Trans>Browse all</Trans>}
                       error={

@@ -20,7 +20,12 @@ const findEmptyPath = (basePath: string) => {
 };
 
 export const findEmptyPathInDefaultFolder = (electronApp: any): string => {
-  return findEmptyPath(
-    path.join(electronApp.getPath('documents'), 'GDevelop projects')
-  );
+  let documentsPath = '';
+  try {
+    documentsPath = electronApp.getPath('documents');
+  } catch (ex) {
+    // a user may not have the Documents folder defined on Windows.
+    documentsPath = electronApp.getPath('home');
+  }
+  return findEmptyPath(path.join(documentsPath, 'GDevelop projects'));
 };

@@ -19,6 +19,7 @@ export type PublicGame = {
     lastWeekSessionsCount: number,
     lastYearSessionsCount: number,
   },
+  categories?: string[],
 };
 
 export type Game = {
@@ -61,6 +62,64 @@ export type ShowcasedGame = {
 export type AllShowcasedGames = {
   showcasedGames: Array<ShowcasedGame>,
   filters: Filters,
+};
+
+export const allGameCategories = [
+  'action',
+  'adventure',
+  'shooter',
+  'platformer',
+  'rpg',
+  'horror',
+  'strategy',
+  'puzzle',
+  'story-rich',
+  'survival',
+  'racing',
+  'building',
+  'simulation',
+  'sport',
+  'multiplayer',
+  'leaderboard',
+];
+
+export const getCategoryName = (category: string) => {
+  switch (category) {
+    case 'action':
+      return 'Action';
+    case 'adventure':
+      return 'Adventure';
+    case 'shooter':
+      return 'Shooter';
+    case 'platformer':
+      return 'Platformer';
+    case 'rpg':
+      return 'RPG';
+    case 'horror':
+      return 'Horror';
+    case 'strategy':
+      return 'Strategy';
+    case 'puzzle':
+      return 'Puzzle';
+    case 'racing':
+      return 'Racing';
+    case 'simulation':
+      return 'Simulation';
+    case 'sport':
+      return 'Sport';
+    case 'story-rich':
+      return 'Story-Rich';
+    case 'survival':
+      return 'Survival';
+    case 'building':
+      return 'Building';
+    case 'multiplayer':
+      return 'Multiplayer';
+    case 'leaderboard':
+      return 'Leaderboard';
+    default:
+      return category;
+  }
 };
 
 export const getGameUrl = (game: ?Game) => {
@@ -135,6 +194,7 @@ export const updateGame = (
   gameId: string,
   {
     gameName,
+    categories,
     authorName,
     publicWebBuildId,
     description,
@@ -144,6 +204,7 @@ export const updateGame = (
     orientation,
   }: {|
     gameName?: string,
+    categories?: string[],
     authorName?: string,
     publicWebBuildId?: ?string,
     description?: string,
@@ -159,6 +220,7 @@ export const updateGame = (
         `${GDevelopGameApi.baseUrl}/game/${gameId}`,
         {
           gameName,
+          categories,
           authorName,
           publicWebBuildId,
           description,

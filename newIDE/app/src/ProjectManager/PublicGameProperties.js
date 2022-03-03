@@ -8,11 +8,18 @@ import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { t } from '@lingui/macro';
+import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
+import {
+  allGameCategories,
+  getCategoryName,
+} from '../Utils/GDevelopServices/Game';
 
 type Props = {|
   project: gdProject,
   setName: string => void,
   name: string,
+  setCategories?: (string[]) => void,
+  categories?: string[],
   setDescription: string => void,
   description: ?string,
   setAuthorIds: (string[]) => void,
@@ -31,6 +38,8 @@ function PublicGameProperties({
   project,
   setName,
   name,
+  categories,
+  setCategories,
   setDescription,
   description,
   setAuthorIds,
@@ -44,6 +53,8 @@ function PublicGameProperties({
   setOrientation,
   orientation,
 }: Props) {
+  const [categoryInput, setCategoryInput] = React.useState('');
+
   return (
     <ColumnStackLayout noMargin>
       <SemiControlledTextField
@@ -54,6 +65,39 @@ function PublicGameProperties({
         onChange={setName}
         autoFocus
       />
+      {setCategories && (
+        <SemiControlledMultiAutoComplete
+          hintText={t`Select a genre`}
+          floatingLabelText={<Trans>Genres</Trans>}
+          helperText={
+            <Trans>
+              Select up to 4 genres, the first one will define the game's main
+              genre
+            </Trans>
+          }
+          value={
+            categories
+              ? categories.map(category => ({
+                  value: category,
+                  text: getCategoryName(category),
+                }))
+              : []
+          }
+          onChange={(event, values) => {
+            setCategories(values ? values.map(category => category.value) : []);
+          }}
+          inputValue={categoryInput}
+          onInputChange={(event, value) => {
+            setCategoryInput(value);
+          }}
+          dataSource={allGameCategories.map(category => ({
+            value: category,
+            text: getCategoryName(category),
+          }))}
+          fullWidth
+          optionsLimit={4}
+        />
+      )}
       <SemiControlledTextField
         floatingLabelText={<Trans>Game description</Trans>}
         fullWidth

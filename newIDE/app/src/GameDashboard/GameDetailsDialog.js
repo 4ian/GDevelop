@@ -12,6 +12,7 @@ import {
   getPublicGame,
   setGameUserAcls,
   getAclsFromAuthorIds,
+  getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
 import { Tab, Tabs } from '../UI/Tabs';
@@ -155,6 +156,7 @@ export const GameDetailsDialog = ({
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
+        categories: project.getCategories().toJSArray() || [],
         description: project.getDescription() || '',
         playWithKeyboard: project.isPlayableWithKeyboard(),
         playWithGamepad: project.isPlayableWithGamepad(),
@@ -263,14 +265,19 @@ export const GameDetailsDialog = ({
                   </Trans>
                 </AlertMessage>
               )}
-              <Line alignItems="center">
-                <Line expand justifyContent="flex-start" alignItems="center">
+              <Line alignItems="center" noMargin>
+                <Line
+                  expand
+                  justifyContent="flex-start"
+                  alignItems="center"
+                  noMargin
+                >
                   {authorUsernames && (
                     <>
                       <Text>
                         <Trans>Authors:</Trans>
                       </Text>
-                      <Line>
+                      <Line noMargin>
                         {authorUsernames.map((username, index) => (
                           <React.Fragment key={username}>
                             <Spacer />
@@ -285,7 +292,7 @@ export const GameDetailsDialog = ({
                     </>
                   )}
                 </Line>
-                <Line expand justifyContent="flex-end">
+                <Line expand justifyContent="flex-end" noMargin>
                   <Text>
                     <Trans>
                       Created on{' '}
@@ -296,11 +303,40 @@ export const GameDetailsDialog = ({
               </Line>
               {(publicGame.playWithKeyboard ||
                 publicGame.playWithGamepad ||
-                publicGame.playWithMobile) && (
-                <Line expand justifyContent="flex-start" alignItems="center">
-                  {publicGame.playWithKeyboard && <KeyboardIcon />}
-                  {publicGame.playWithGamepad && <SportsEsportsIcon />}
-                  {publicGame.playWithMobile && <SmartphoneIcon />}
+                publicGame.playWithMobile ||
+                publicGame.categories) && (
+                <Line alignItems="center" noMargin>
+                  <Line
+                    expand
+                    justifyContent="flex-start"
+                    alignItems="center"
+                    noMargin
+                  >
+                    {publicGame.categories && !!publicGame.categories.length && (
+                      <>
+                        <Text>
+                          <Trans>Genres:</Trans>
+                        </Text>
+                        <Line noMargin>
+                          {publicGame.categories.map((category, index) => (
+                            <React.Fragment key={category}>
+                              <Spacer />
+                              <Chip
+                                size="small"
+                                label={getCategoryName(category)}
+                                color={index === 0 ? 'primary' : 'default'}
+                              />
+                            </React.Fragment>
+                          ))}
+                        </Line>
+                      </>
+                    )}
+                  </Line>
+                  <Line expand justifyContent="flex-end" noMargin>
+                    {publicGame.playWithKeyboard && <KeyboardIcon />}
+                    {publicGame.playWithGamepad && <SportsEsportsIcon />}
+                    {publicGame.playWithMobile && <SmartphoneIcon />}
+                  </Line>
                 </Line>
               )}
               <TextField
@@ -554,7 +590,7 @@ export const GameDetailsDialog = ({
         <PublicGamePropertiesDialog
           open={isPublicGamePropertiesDialogOpen}
           project={project}
-          game={publicGame}
+          publicGame={publicGame}
           onApply={() => {
             setIsPublicGamePropertiesDialogOpen(false);
             updateGameFromProject();

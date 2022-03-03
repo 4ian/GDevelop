@@ -17,6 +17,7 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
  */
 type PublicProjectProperties = {|
   name: string,
+  categories: string[],
   description: string,
   authorIds: string[],
   playWithKeyboard: boolean,
@@ -30,8 +31,11 @@ function applyPublicPropertiesToProject(
   newProperties: PublicProjectProperties
 ) {
   const t = str => str; //TODO
-  const { name, authorIds, description } = newProperties;
+  const { name, authorIds, description, categories } = newProperties;
   project.setName(name);
+  const projectCategories = project.getCategories();
+  projectCategories.clear();
+  categories.forEach(category => projectCategories.push_back(category));
   project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
@@ -46,7 +50,7 @@ function applyPublicPropertiesToProject(
 
 type Props = {|
   project: gdProject,
-  game: PublicGame,
+  publicGame: PublicGame,
   open: boolean,
   onClose: () => void,
   onApply: () => void,
@@ -54,29 +58,30 @@ type Props = {|
 
 const PublicGamePropertiesDialog = ({
   project,
-  game,
+  publicGame,
   open,
   onClose,
   onApply,
 }: Props) => {
-  const publicGameAuthorIds = game.authors
+  const publicGameAuthorIds = publicGame.authors
     .map(author => (author ? author.id : null))
     .filter(Boolean);
-  const [name, setName] = React.useState(game.gameName);
-  const [description, setDescription] = React.useState(game.description);
+  const [name, setName] = React.useState(publicGame.gameName);
+  const [categories, setCategories] = React.useState(publicGame.categories);
+  const [description, setDescription] = React.useState(publicGame.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
-    game.playWithKeyboard
+    publicGame.playWithKeyboard
   );
   const [playWithGamepad, setPlayableWithGamepad] = React.useState(
-    game.playWithGamepad
+    publicGame.playWithGamepad
   );
   const [playWithMobile, setPlayableWithMobile] = React.useState(
-    game.playWithMobile
+    publicGame.playWithMobile
   );
-  const [orientation, setOrientation] = React.useState(game.orientation);
+  const [orientation, setOrientation] = React.useState(publicGame.orientation);
 
   if (!open) return null;
 
@@ -84,6 +89,7 @@ const PublicGamePropertiesDialog = ({
     if (
       applyPublicPropertiesToProject(project, {
         name,
+        categories: categories || [],
         description: description || '',
         authorIds,
         playWithKeyboard: !!playWithKeyboard,
@@ -121,6 +127,8 @@ const PublicGamePropertiesDialog = ({
       <PublicGameProperties
         name={name}
         setName={setName}
+        categories={categories}
+        setCategories={setCategories}
         description={description}
         setDescription={setDescription}
         project={project}

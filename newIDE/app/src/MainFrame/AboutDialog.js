@@ -272,7 +272,7 @@ export default class AboutDialog extends PureComponent<Props, State> {
             key="website"
             label={<Trans>GDevelop Website</Trans>}
             primary={false}
-            onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
+            onClick={() => Window.openExternalURL('https://gdevelop.io')}
           />,
           <FlatButton
             key="close"

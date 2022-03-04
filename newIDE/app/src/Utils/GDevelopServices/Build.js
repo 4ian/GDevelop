@@ -61,6 +61,29 @@ export const getBuildArtifactUrl = (
   return `https://builds.gdevelop-app.com/${build[keyName]}`;
 };
 
+export const getWebBuildGameFolderUrl = (buildId: string): string => {
+  return `https:/games.gdevelop-app.com/game-${buildId}`;
+};
+
+export const getWebBuildThumbnailUrl = (
+  project: gdProject,
+  buildId: string
+): string => {
+  // TODO use some helper methods to do this?
+  const path = project
+    .getPlatformSpecificAssets()
+    .get('liluo', `thumbnail`)
+    .split('\\');
+  if (path.length < 1) {
+    return '';
+  }
+  const fileName = path[path.length - 1];
+  if (!fileName) {
+    return '';
+  }
+  return `https:/games.gdevelop-app.com/game-${buildId}/${fileName}`;
+};
+
 type UploadOptions = {|
   signedUrl: string,
   contentType: string,

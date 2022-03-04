@@ -14,6 +14,7 @@ import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import { getWebBuildThumbnailUrl } from '../../Utils/GDevelopServices/Build';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -248,6 +249,12 @@ const ExportDialog = ({
           authenticatedUser={authenticatedUser}
           game={game}
           onGameUpdated={setGame}
+          getThumbnailURL={(buildId: string) => {
+            if (!project) {
+              return undefined;
+            }
+            return getWebBuildThumbnailUrl(project, buildId);
+          }}
         />
       )}
     </Dialog>

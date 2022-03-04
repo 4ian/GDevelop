@@ -20,6 +20,7 @@ type Props = {|
   loadBuilds: () => void,
   game: Game,
   onGameUpdated?: Game => void,
+  getThumbnailURL: (buildId: string) => ?string,
 |};
 
 export default ({
@@ -29,6 +30,7 @@ export default ({
   loadBuilds,
   game,
   onGameUpdated,
+  getThumbnailURL,
 }: Props) => {
   const [gameUpdating, setGameUpdating] = React.useState(false);
   return (
@@ -73,6 +75,7 @@ export default ({
                 onGameUpdated={onGameUpdated}
                 gameUpdating={gameUpdating}
                 setGameUpdating={setGameUpdating}
+                getThumbnailURL={getThumbnailURL}
               />
             ))}
           </ColumnStackLayout>

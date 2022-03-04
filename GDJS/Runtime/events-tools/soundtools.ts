@@ -428,6 +428,23 @@ namespace gdjs {
         runtimeScene
           .getSoundManager()
           .unloadAudio(soundFile, /* isMusic= */ true);
+    
+      export const interpolateAudioTo = (
+        runtimeScene: gdjs.RuntimeScene,
+        channel :integer, 
+        toVolume: float, 
+        timeOfFade: float
+        ) => {
+          
+          const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
+          if (sound) runtimeScene.getSoundManager().interpolateAudioTo(channel, toVolume, timeOfFade)
+          else {
+            logger.error(
+              `Cannot fade the volume of a non-existing sound on channel ${channel}.`
+            );
+          }
+          
+      }
     }
   }
 }

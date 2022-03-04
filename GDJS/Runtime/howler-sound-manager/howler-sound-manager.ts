@@ -731,6 +731,17 @@ namespace gdjs {
       this._pausedSounds.length = 0;
     }
 
+    interpolateAudioTo(channel: integer, toVolume: float, timeOfFade: integer):this {
+      const sound = this.getSoundOnChannel(channel);
+      if(sound) {
+        sound.fade(sound.getVolume(), toVolume, timeOfFade);
+      }
+      else {
+        logger.error("cannot interpolate audio on non-existing channel");
+      }
+      return this;
+    }
+
     preloadAudio(
       onProgress: (loadedCount: integer, totalCount: integer) => void,
       onComplete: (totalCount: integer) => void,
@@ -814,6 +825,9 @@ namespace gdjs {
         }
       }
     }
+
+
+
   }
 
   // Register the class to let the engine use it.

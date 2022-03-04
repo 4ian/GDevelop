@@ -45,6 +45,7 @@ type State = {|
   renamedResource: ?gdResource,
   searchText: string,
   resourcesWithErrors: { [string]: '' | 'error' | 'warning' },
+  resourceNamesList: string[],
 |};
 
 type Props = {|
@@ -67,7 +68,16 @@ export default class ResourcesList extends React.Component<Props, State> {
     renamedResource: null,
     searchText: '',
     resourcesWithErrors: {},
+    resourceNamesList: [],
   };
+
+  _shouldListUpdate(project: gdProject) {
+    const projectResourceNames = project
+      .getResourcesManager()
+      .getAllResourceNames()
+      .toJSArray();
+    return this.state.resourceNamesList.length !== projectResourceNames.length;
+  }
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
     // The component is costly to render, so avoid any re-rendering as much
@@ -82,6 +92,10 @@ export default class ResourcesList extends React.Component<Props, State> {
       this.state.searchText !== nextState.searchText
     )
       return true;
+
+    if (this._shouldListUpdate(nextProps.project)) {
+      return true;
+    }
 
     if (
       this.props.project !== nextProps.project ||
@@ -327,15 +341,26 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.checkMissingPaths();
   }
 
+  componentDidUpdate() {
+    const resourcesManager = this.props.project.getResourcesManager();
+
+    const resourceNamesList = resourcesManager
+      .getAllResourceNames()
+      .toJSArray();
+    this.setState({ resourceNamesList });
+  }
+
   render() {
     const { project, selectedResource, onSelectResource } = this.props;
     const { searchText } = this.state;
 
     const resourcesManager = project.getResourcesManager();
-    const allResourcesList = resourcesManager
+    const resourceNamesList = resourcesManager
       .getAllResourceNames()
-      .toJSArray()
-      .map(resourceName => resourcesManager.getResource(resourceName));
+      .toJSArray();
+    const allResourcesList = resourceNamesList.map(resourceName =>
+      resourcesManager.getResource(resourceName)
+    );
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
     // Force List component to be mounted again if project

@@ -2403,6 +2403,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={0}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (not started) (without build step)', () => (
@@ -2413,6 +2414,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={0}
       errored={false}
       hasBuildStep={false}
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (export)', () => (
@@ -2423,6 +2425,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={0}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (resources-download)', () => (
@@ -2433,6 +2436,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={16}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (export) (errored)', () => (
@@ -2443,6 +2447,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={0}
       errored={true}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (compress)', () => (
@@ -2453,6 +2458,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={0}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (upload)', () => (
@@ -2463,6 +2469,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (upload) (errored)', () => (
@@ -2473,6 +2480,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (waiting-for-build)', () => (
@@ -2483,6 +2491,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (build)', () => (
@@ -2502,6 +2511,7 @@ storiesOf('BuildStepsProgress', module)
       errored={false}
       showSeeAllMyBuildsExplanation
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (build) (errored)', () => (
@@ -2521,6 +2531,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (build) (complete)', () => (
@@ -2541,6 +2552,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored={false}
       hasBuildStep
+      getThumbnailURL={buildId => undefined}
     />
   ))
   .add('BuildStepsProgress (done) (without build step)', () => (
@@ -2551,6 +2563,7 @@ storiesOf('BuildStepsProgress', module)
       stepCurrentProgress={20}
       errored={false}
       hasBuildStep={false}
+      getThumbnailURL={buildId => undefined}
     />
   ));
 

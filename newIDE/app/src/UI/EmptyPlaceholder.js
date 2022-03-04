@@ -1,12 +1,13 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { Line, Column } from './Grid';
+import { Line, Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import Add from '@material-ui/icons/Add';
 import RaisedButton from '../UI/RaisedButton';
 import Container from '@material-ui/core/Container';
+import { ColumnStackLayout } from './Layout';
 
 type Props = {|
   title: React.Node,
@@ -32,8 +33,11 @@ export const EmptyPlaceholder = (props: Props) => (
         <Text size="title" align="center">
           {props.title}
         </Text>
-        <Text align="center">{props.description}</Text>
-        <Line justifyContent="center" expand>
+        <Text align="center" noMargin>
+          {props.description}
+        </Text>
+        <LargeSpacer />
+        <ColumnStackLayout alignItems="center" noMargin>
           <RaisedButton
             key="add-behavior-line"
             label={props.actionLabel}
@@ -42,13 +46,11 @@ export const EmptyPlaceholder = (props: Props) => (
             icon={<Add />}
             id="add-behavior-button"
           />
-        </Line>
-        <Line expand justifyContent="center">
           <HelpButton
             label={<Trans>Read the doc</Trans>}
             helpPagePath={props.helpPagePath}
           />
-        </Line>
+        </ColumnStackLayout>
       </Column>
     </Container>
   </Column>

@@ -31,6 +31,15 @@ export class ResourcesEditorContainer extends React.Component<RenderEditorContai
     // No updates to be done.
   }
 
+  componentDidUpdate(prevProps: RenderEditorContainerProps) {
+    if (
+      this.editor &&
+      this.props.isActive &&
+      prevProps.isActive !== this.props.isActive
+    )
+      this.editor.refreshResourcesList();
+  }
+
   render() {
     const { project } = this.props;
     if (!project) return null;

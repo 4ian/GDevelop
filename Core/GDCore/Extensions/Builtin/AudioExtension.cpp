@@ -343,6 +343,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsComplex();
+  extension
+      .AddAction(
+          "interpolateAudioTo",
+          _("Interpolate audio sound on to volume"),
+          _("Interpolate an audio sound on a channel to a volume within a given time."),
+          _("Interpolate an audio sound on _PARAM2_ to a specific volume of_PARAM1_ within a given time of _PARAM3_ ms"),
+          _("Sounds on channels"),
+          "res/actions/music24.png",
+          "res/actions/music.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("ID of the channel"), "", true)
+      .AddParameter("expression", _("Volume to interpolate to (0 to 100)"), "", true)
+      .AddParameter("expression", _("Interpolation time in ms"), "", true)
+      .MarkAsAdvanced();
 
   extension
       .AddCondition("MusicPlaying",

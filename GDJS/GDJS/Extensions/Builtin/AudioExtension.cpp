@@ -44,6 +44,8 @@ AudioExtension::AudioExtension() {
       "gdjs.evtTools.sound.unloadSound");
   GetAllActions()["UnloadAllAudio"].SetFunctionName(
       "gdjs.evtTools.sound.unloadAllAudio");
+  GetAllActions()["interpolateAudioTo"].SetFunctionName(
+      "gdjs.evtTools.sound.interpolateAudioTo");
 
   GetAllConditions()["MusicPlaying"].SetFunctionName(
       "gdjs.evtTools.sound.isMusicOnChannelPlaying");

@@ -82,3 +82,14 @@ export const Spacer = () => (
     }}
   />
 );
+
+/** A large spacer that is 24px width. */
+export const LargeSpacer = () => (
+  <span
+    style={{
+      width: 24,
+      height: 24,
+      flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
+    }}
+  />
+);

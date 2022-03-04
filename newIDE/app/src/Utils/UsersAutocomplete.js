@@ -10,6 +10,7 @@ import {
   type UserPublicProfileSearch,
   getUserPublicProfilesByIds,
 } from './GDevelopServices/User';
+import { type AutocompleteOption } from '../UI/SemiControlledMultiAutoComplete';
 
 import useForceUpdate from './UseForceUpdate';
 
@@ -18,11 +19,6 @@ type Props = {|
   onChange: (Array<string>) => void,
   floatingLabelText?: React.Node,
   helperText: React.Node,
-|};
-
-export type AutocompleteOption = {|
-  text: string,
-  value: string,
 |};
 
 const getErrorMessage = (error: ?Error) => {

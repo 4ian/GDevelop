@@ -43,6 +43,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<PlatformerObjectBehavior>(),
         std::make_shared<gd::BehaviorsSharedData>());
 
+    // Deprecated, use IsMovingEvenALittle instead
     aut.AddCondition("IsMoving",
                      _("Is moving"),
                      _("Check if the object is moving (whether it is on the "
@@ -53,8 +54,21 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
                      "CppPlatform/Extensions/platformerobjecticon.png")
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .SetHidden()
         .MarkAsSimple()
         .SetFunctionName("IsMoving");
+
+    aut.AddScopedCondition("IsMovingEvenALittle",
+                     _("Is moving"),
+                     _("Check if the object is moving (whether it is on the "
+                       "floor or in the air)."),
+                     _("_PARAM0_ is moving"),
+                     "",
+                     "CppPlatform/Extensions/platformerobjecticon.png",
+                     "CppPlatform/Extensions/platformerobjecticon.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "PlatformerObjectBehavior")
+        .MarkAsSimple();
 
     aut.AddCondition("IsOnFloor",
                      _("Is on floor"),

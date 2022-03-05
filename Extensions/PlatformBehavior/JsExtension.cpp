@@ -53,6 +53,8 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
               "PlatformBehavior::PlatformerObjectBehavior");
 
       autConditions["PlatformBehavior::IsMoving"].SetFunctionName("isMoving");
+      autConditions["PlatformBehavior::PlatformerObjectBehavior::IsMovingEvenALittle"]
+          .SetFunctionName("isMovingEvenALittle");
       autConditions["PlatformBehavior::IsOnFloor"].SetFunctionName("isOnFloor");
       autConditions["PlatformBehavior::IsOnLadder"].SetFunctionName(
           "isOnLadder");

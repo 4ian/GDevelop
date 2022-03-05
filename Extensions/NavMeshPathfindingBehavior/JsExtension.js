@@ -81,7 +81,8 @@ const declarePathfindingBehavior = function (
       .setValue(
         behaviorContent.getDoubleAttribute('angularMaxSpeed').toString()
       )
-      .setLabel(_('Rotate speed'));
+      .setLabel(_('Rotate speed'))
+      .setGroup(_("Rotation"));
 
     behaviorProperties
       .getOrCreate('rotateObject')
@@ -89,12 +90,14 @@ const declarePathfindingBehavior = function (
         behaviorContent.getBoolAttribute('rotateObject') ? 'true' : 'false'
       )
       .setLabel(_('Rotate object'))
-      .setType('Boolean');
+      .setType('Boolean')
+      .setGroup(_("Rotation"));
 
     behaviorProperties
       .getOrCreate('angleOffset')
       .setValue(behaviorContent.getDoubleAttribute('angleOffset').toString())
-      .setLabel(_('Angle offset'));
+      .setLabel(_('Angle offset'))
+      .setGroup(_("Rotation"));
 
     behaviorProperties
       .getOrCreate('collisionShape')
@@ -102,12 +105,14 @@ const declarePathfindingBehavior = function (
       .setType('Choice')
       .setLabel(_('Collision shape'))
       .addExtraInfo('Bounding disk')
-      .addExtraInfo('Dot at center');
+      .addExtraInfo('Dot at center')
+      .setGroup(_("Collision"));
 
     behaviorProperties
       .getOrCreate('extraBorder')
       .setValue(behaviorContent.getDoubleAttribute('extraBorder').toString())
-      .setLabel(_('Extra border size'));
+      .setLabel(_('Extra border size'))
+      .setGroup(_("Collision"));
 
     return behaviorProperties;
   };
@@ -720,7 +725,8 @@ const declareObstacleBehavior = function (
       .setLabel(_('Viewpoint'))
       .addExtraInfo('Top-Down')
       .addExtraInfo('Isometry 2:1 (26.565°)')
-      .addExtraInfo('True Isometry (30°)');
+      .addExtraInfo('True Isometry (30°)')
+      .setGroup(_("Path finding (polygonal mesh based)"));
 
     sharedProperties
       .getOrCreate('cellSize')
@@ -729,7 +735,8 @@ const declareObstacleBehavior = function (
       .setLabel(_('Cell size'))
       .setDescription(
         _('Cell size for obstacle collision mask rasterization.')
-      );
+      )
+      .setGroup(_("Path finding (polygonal mesh based)"));
 
     sharedProperties
       .getOrCreate('areaLeftBound')
@@ -740,7 +747,8 @@ const declareObstacleBehavior = function (
         _(
           'The left bound of the area where objects can go (default to the game resolution).'
         )
-      );
+      )
+      .setGroup(_("Path finding (polygonal mesh based)"));
 
     sharedProperties
       .getOrCreate('areaTopBound')
@@ -751,7 +759,8 @@ const declareObstacleBehavior = function (
         _(
           'The top bound of the area where objects can go (default to the game resolution).'
         )
-      );
+      )
+      .setGroup(_("Path finding (polygonal mesh based)"));
 
     sharedProperties
       .getOrCreate('areaRightBound')
@@ -762,7 +771,8 @@ const declareObstacleBehavior = function (
         _(
           'The right bound of the area where objects can go (default to the game resolution).'
         )
-      );
+      )
+      .setGroup(_("Path finding (polygonal mesh based)"));
 
     sharedProperties
       .getOrCreate('areaBottomBound')
@@ -775,7 +785,8 @@ const declareObstacleBehavior = function (
         _(
           'The bottom bound of the area where objects can go (default to the game resolution).'
         )
-      );
+      )
+      .setGroup(_("Path finding (polygonal mesh based)"));
 
     return sharedProperties;
   };

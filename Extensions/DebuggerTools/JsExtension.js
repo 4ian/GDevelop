@@ -61,10 +61,13 @@ module.exports = {
         'EnableDebugDraw',
         _('Draw collisions hitboxes and points'),
         _(
-          'This activates the display of rectangles and information on screen showing the objects bounding boxes (blue), the hitboxes (red) and some points of objects.'
+          'This activates the display of rectangles and information on screen showing the objects bounding boxes (blue),' +
+          ' the hitboxes (red) and some points of objects.'
         ),
         _(
-          'Enable debugging view of bounding boxes/collision masks: _PARAM1_ (include invisible objects: _PARAM2_, point names: _PARAM3_, custom points: _PARAM4_)'
+          'Enable debugging view: _PARAM1_' +
+          ' (include invisible objects: _PARAM2_, point names: _PARAM3_, custom points: _PARAM4_,' +
+          ' collision masks: _PARAM5_, positions: _PARAM6_)'
         ),
         '',
         'res/actions/planicon24.png',
@@ -83,6 +86,10 @@ module.exports = {
       .addParameter('yesorno', _('Show points names'), '', true)
       .setDefaultValue('yes')
       .addParameter('yesorno', _('Show custom points'), '', true)
+      .setDefaultValue('yes')
+      .addParameter('yesorno', _('Show collision masks'), '', true)
+      .setDefaultValue('yes')
+      .addParameter('yesorno', _('Show positions'), '', true)
       .setDefaultValue('yes')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/DebuggerTools/debuggertools.js')

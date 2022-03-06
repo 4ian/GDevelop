@@ -23,7 +23,7 @@ AsyncExtension::AsyncExtension() {
         // Generate callback code
         const auto callbackDescriptor = codeGenerator.GenerateCallback(
             gd::String::From(codeGenerator.GenerateSingleUsageUniqueIdFor(
-                &event.GetInstruction())),
+                event.GetInstruction().GetOriginalInstruction().lock().get())),
             parentContext, event.GetActions(),
             event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
 

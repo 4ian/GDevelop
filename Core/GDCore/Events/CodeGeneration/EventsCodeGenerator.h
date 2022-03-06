@@ -174,7 +174,7 @@ class GD_CORE_API EventsCodeGenerator {
      */
     const gd::String argumentsList;
     /**
-     * A set of all objects that need to be backed up into
+     * A set of all objects that need to be backed up to be passed to the callback code.
      */
     const std::set<gd::String> requiredObjects;
   };

@@ -249,12 +249,9 @@ const ExportDialog = ({
           authenticatedUser={authenticatedUser}
           game={game}
           onGameUpdated={setGame}
-          getThumbnailURL={(buildId: string) => {
-            if (!project) {
-              return undefined;
-            }
-            return getWebBuildThumbnailUrl(project, buildId);
-          }}
+          getThumbnailURL={(buildId: string) =>
+            project && getWebBuildThumbnailUrl(project, buildId)
+          }
         />
       )}
     </Dialog>

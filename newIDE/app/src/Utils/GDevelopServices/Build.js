@@ -3,6 +3,7 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import { basename } from 'path';
 
 export type TargetName =
   | 'winExe'
@@ -69,19 +70,13 @@ export const getWebBuildThumbnailUrl = (
   project: gdProject,
   buildId: string
 ): string => {
-  // TODO use some helper methods to do this?
-  const path = project
-    .getPlatformSpecificAssets()
-    .get('liluo', `thumbnail`)
-    .split('\\');
-  if (path.length < 1) {
+  const path = project.getPlatformSpecificAssets().get('liluo', `thumbnail`);
+  if (!path) {
     return '';
   }
-  const fileName = path[path.length - 1];
-  if (!fileName) {
-    return '';
-  }
-  return `https:/games.gdevelop-app.com/game-${buildId}/${fileName}`;
+  // The exporter put asset files directly in the build folder.
+  // It's not factorized with the exporter because it's a temporary solution.
+  return `https:/games.gdevelop-app.com/game-${buildId}/${basename(path)}`;
 };
 
 type UploadOptions = {|

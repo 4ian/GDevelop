@@ -345,10 +345,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .MarkAsComplex();
   extension
       .AddAction(
-          "interpolateAudioTo",
-          _("Interpolate audio sound on to volume"),
-          _("Interpolate an audio sound on a channel to a volume within a given time."),
-          _("Interpolate an audio sound on _PARAM2_ to a specific volume of_PARAM1_ within a given time of _PARAM3_ ms"),
+          "FadeVolume",
+          _("fade volume of a sound."),
+          _("fade the volume an audio sound on a channel to a volume within a given time."),
+          _("Fade the volume of a sound on channel n°_PARAM2_ to a volume of _PARAM1__ within a time of _PARAM3 ms"),
           _("Sounds on channels"),
           "res/actions/music24.png",
           "res/actions/music.png")

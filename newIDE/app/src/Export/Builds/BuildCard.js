@@ -56,6 +56,7 @@ type Props = {|
   onGameUpdated?: Game => void,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,
+  getThumbnailURL: (buildId: string) => ?string,
 |};
 
 export const BuildCard = ({
@@ -64,6 +65,7 @@ export const BuildCard = ({
   onGameUpdated,
   gameUpdating,
   setGameUpdating,
+  getThumbnailURL,
 }: Props) => {
   const isOld =
     build &&
@@ -92,6 +94,7 @@ export const BuildCard = ({
               onGameUpdated={onGameUpdated}
               gameUpdating={gameUpdating}
               setGameUpdating={setGameUpdating}
+              getThumbnailURL={getThumbnailURL}
             />
           )}
           {isOld && (

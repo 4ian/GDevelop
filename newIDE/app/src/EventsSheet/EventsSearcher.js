@@ -139,9 +139,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
       replaceText,
       matchCase,
       searchInConditions,
-      searchInActions
-      // TODO: add capability to replace in event strings
-      // searchInEventStrings
+      searchInActions,
+      searchInEventStrings
     );
   };
 

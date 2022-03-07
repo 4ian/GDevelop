@@ -542,7 +542,8 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                              gd::String newString,
                                              bool matchCase,
                                              bool inConditions,
-                                             bool inActions) {
+                                             bool inActions,
+                                             bool inEventStrings) {
   for (std::size_t i = 0; i < events.size(); ++i) {
     if (inConditions) {
       vector<gd::InstructionsList*> conditionsVectors =
@@ -571,6 +572,11 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
       }
     }
 
+    if (inEventStrings) {
+      bool eventStringModified = ReplaceStringInStringEvent(
+          project, layout, events[i], toReplace, newString, matchCase);
+    }
+
     if (events[i].CanHaveSubEvents())
       ReplaceStringInEvents(project,
                             layout,
@@ -579,7 +585,8 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                             newString,
                             matchCase,
                             inConditions,
-                            inActions);
+                            inActions,
+                            inEventStrings);
   }
 }
 
@@ -673,6 +680,28 @@ bool EventsRefactorer::ReplaceStringInConditions(
                                 newString,
                                 matchCase);
   }
+
+  return somethingModified;
+}
+
+bool EventsRefactorer::ReplaceStringInStringEvent(gd::ObjectsContainer& project,
+                                                  gd::ObjectsContainer& layout,
+                                                  gd::BaseEvent& event,
+                                                  gd::String toReplace,
+                                                  gd::String newString,
+                                                  bool matchCase) {
+  vector<gd::String> newStringEvents;
+  vector<gd::String> stringEvent = event.GetAllSearchableStrings();
+
+  for (std::size_t sNb = 0; sNb < stringEvent.size(); ++sNb) {
+    gd::String newStringEvent =
+        matchCase ? stringEvent[sNb].FindAndReplace(toReplace, newString, true)
+                  : ReplaceAllOccurencesCaseUnsensitive(
+                        stringEvent[sNb], toReplace, newString);
+    newStringEvents.push_back(newStringEvent);
+  }
+
+  bool somethingModified = event.ReplaceAllInSearchableString(newStringEvents);
 
   return somethingModified;
 }

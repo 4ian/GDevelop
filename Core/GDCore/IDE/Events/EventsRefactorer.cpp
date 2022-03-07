@@ -9,8 +9,6 @@
 #include <memory>
 
 #include "GDCore/CommonTools.h"
-#include "GDCore/Events/Builtin/CommentEvent.h"
-#include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
@@ -692,7 +690,7 @@ bool EventsRefactorer::ReplaceStringInStringEvent(gd::ObjectsContainer& project,
                                                   gd::String toReplace,
                                                   gd::String newString,
                                                   bool matchCase) {
-  bool somethingModified = false;
+  vector<gd::String> newStringEvents;
   vector<gd::String> stringEvent = event.GetAllSearchableStrings();
 
   for (std::size_t sNb = 0; sNb < stringEvent.size(); ++sNb) {
@@ -700,18 +698,10 @@ bool EventsRefactorer::ReplaceStringInStringEvent(gd::ObjectsContainer& project,
         matchCase ? stringEvent[sNb].FindAndReplace(toReplace, newString, true)
                   : ReplaceAllOccurencesCaseUnsensitive(
                         stringEvent[sNb], toReplace, newString);
-
-    if (newStringEvent != stringEvent[sNb]) {
-      if (event.GetType() == "BuiltinCommonInstructions::Group") {
-        gd::GroupEvent& groupEvent = dynamic_cast<gd::GroupEvent&>(event);
-        groupEvent.SetName(newStringEvent);
-      } else if (event.GetType() == "BuiltinCommonInstructions::Comment") {
-        gd::CommentEvent& commentEvent = dynamic_cast<gd::CommentEvent&>(event);
-        commentEvent.SetComment(newStringEvent);
-      }
-    }
-    somethingModified = true;
+    newStringEvents.push_back(newStringEvent);
   }
+
+  bool somethingModified = event.ReplaceAllInSearchableString(newStringEvents);
 
   return somethingModified;
 }

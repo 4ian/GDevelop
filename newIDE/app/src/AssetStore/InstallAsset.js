@@ -244,10 +244,10 @@ export const addAssetToProject = async ({
             groupEvent.getSubEvents(),
             parameter.name,
             parameter.defaultValue,
-            true,
-            true,
-            true,
-            false
+            /*matchCase=*/ true,
+            /*inConditions=*/ true,
+            /*inActions=*/ true,
+            /*inEventStrings=*/ false
           );
         });
 

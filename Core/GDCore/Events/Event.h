@@ -127,6 +127,16 @@ class GD_CORE_API BaseEvent {
   };
 
   /**
+   * \brief Replace searchable strings with new string vector, return true if
+   * string in event is modified.
+   * \note Used to preprocess or search in the event strings.
+   */
+  virtual bool ReplaceAllInSearchableString(
+      std::vector<gd::String> newSearchableString) {
+    return false;
+  };
+
+  /**
    * \brief Return a list of all expressions of the event, each with their associated metadata.
    * \note Used to preprocess or search in the expressions of the event.
    */

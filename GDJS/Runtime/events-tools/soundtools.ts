@@ -436,10 +436,10 @@ namespace gdjs {
         timeOfFade: float
       ) => {
         //Clamping volume
-        if(toVolume > 100) {
+        if (toVolume > 100) {
           toVolume = 100;
         }
-        if(toVolume < 0) {
+        if (toVolume < 0) {
           toVolume = 0;
         }
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);

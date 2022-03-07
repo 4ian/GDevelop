@@ -70,13 +70,21 @@ export const getWebBuildThumbnailUrl = (
   project: gdProject,
   buildId: string
 ): string => {
-  const path = project.getPlatformSpecificAssets().get('liluo', `thumbnail`);
-  if (!path) {
+  const resourceManager = project.getResourcesManager();
+  const resourceName = project
+    .getPlatformSpecificAssets()
+    .get('liluo', `thumbnail`);
+  if (!resourceManager.hasResource(resourceName)) {
+    return '';
+  }
+  const path = resourceManager.getResource(resourceName).getFile();
+  const fileName = basename(path);
+  if (!fileName) {
     return '';
   }
   // The exporter put asset files directly in the build folder.
   // It's not factorized with the exporter because it's a temporary solution.
-  return `https:/games.gdevelop-app.com/game-${buildId}/${basename(path)}`;
+  return `https:/games.gdevelop-app.com/game-${buildId}/${fileName}`;
 };
 
 type UploadOptions = {|

@@ -176,7 +176,7 @@ export const WebProjectLink = ({
           game.id,
           {
             publicWebBuildId: build.id,
-            thumbnailURL: build.id ? getThumbnailURL(build.id) : undefined,
+            thumbnailUrl: build.id ? getThumbnailURL(build.id) : undefined,
           }
         );
         setGame(updatedGame);

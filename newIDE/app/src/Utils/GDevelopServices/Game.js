@@ -17,7 +17,7 @@ export type PublicGame = {
   playWithGamepad: boolean,
   playWithMobile: boolean,
   orientation: string,
-  thumbnailURL?: string,
+  thumbnailUrl?: string,
   metrics?: {
     lastWeekSessionsCount: number,
     lastYearSessionsCount: number,
@@ -32,7 +32,7 @@ export type Game = {
   createdAt: number,
   publicWebBuildId?: ?string,
   description?: string,
-  thumbnailURL?: string,
+  thumbnailUrl?: string,
 };
 
 export type ShowcasedGameLink = {
@@ -206,7 +206,7 @@ export const updateGame = (
     playWithGamepad,
     playWithMobile,
     orientation,
-    thumbnailURL,
+    thumbnailUrl,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -217,7 +217,7 @@ export const updateGame = (
     playWithGamepad?: boolean,
     playWithMobile?: boolean,
     orientation?: string,
-    thumbnailURL?: ?string,
+    thumbnailUrl?: ?string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -234,8 +234,8 @@ export const updateGame = (
           playWithGamepad,
           playWithMobile,
           orientation,
-          // The thumbnailURL is updated only when a build is made public.
-          thumbnailURL,
+          // The thumbnailUrl is updated only when a build is made public.
+          thumbnailUrl,
         },
         {
           params: {

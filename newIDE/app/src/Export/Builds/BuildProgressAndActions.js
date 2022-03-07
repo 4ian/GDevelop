@@ -122,7 +122,7 @@ export default ({
           game.id,
           {
             publicWebBuildId: buildId,
-            thumbnailURL: buildId ? getThumbnailURL(buildId) : undefined,
+            thumbnailUrl: buildId ? getThumbnailURL(buildId) : undefined,
           }
         );
         onGameUpdated(updatedGame);

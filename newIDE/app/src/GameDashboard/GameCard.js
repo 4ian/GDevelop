@@ -55,9 +55,9 @@ export const GameCard = ({
       {({ i18n }) => (
         <Card key={game.id}>
           <Line>
-            {game.thumbnailURL ? (
+            {game.thumbnailUrl ? (
               <img
-                src={game.thumbnailURL}
+                src={game.thumbnailUrl}
                 style={{
                   ...styles.image,
                   width: 240,

@@ -14,6 +14,7 @@ type Props = {|
   description: React.Node,
   actionLabel: React.Node,
   helpPagePath: string,
+  actionButtonId?: string,
   onAdd: () => void,
 |};
 
@@ -39,12 +40,11 @@ export const EmptyPlaceholder = (props: Props) => (
         <LargeSpacer />
         <ColumnStackLayout alignItems="center" noMargin>
           <RaisedButton
-            key="add-behavior-line"
             label={props.actionLabel}
             primary
             onClick={props.onAdd}
             icon={<Add />}
-            id="add-behavior-button"
+            id={props.actionButtonId}
           />
           <HelpButton
             label={<Trans>Read the doc</Trans>}

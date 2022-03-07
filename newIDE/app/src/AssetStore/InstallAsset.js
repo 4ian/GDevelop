@@ -246,7 +246,8 @@ export const addAssetToProject = async ({
             parameter.defaultValue,
             true,
             true,
-            true
+            true,
+            false
           );
         });
 

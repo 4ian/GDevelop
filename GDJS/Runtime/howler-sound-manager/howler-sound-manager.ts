@@ -731,7 +731,6 @@ namespace gdjs {
       this._pausedSounds.length = 0;
     }
 
-
     preloadAudio(
       onProgress: (loadedCount: integer, totalCount: integer) => void,
       onComplete: (totalCount: integer) => void,

@@ -9,6 +9,8 @@
 #include <memory>
 
 #include "GDCore/CommonTools.h"
+#include "GDCore/Events/Builtin/CommentEvent.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
@@ -542,7 +544,8 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                              gd::String newString,
                                              bool matchCase,
                                              bool inConditions,
-                                             bool inActions) {
+                                             bool inActions,
+                                             bool inEventStrings) {
   for (std::size_t i = 0; i < events.size(); ++i) {
     if (inConditions) {
       vector<gd::InstructionsList*> conditionsVectors =
@@ -571,6 +574,11 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
       }
     }
 
+    if (inEventStrings) {
+      bool eventStringModified = ReplaceStringInStringEvent(
+          project, layout, events[i], toReplace, newString, matchCase);
+    }
+
     if (events[i].CanHaveSubEvents())
       ReplaceStringInEvents(project,
                             layout,
@@ -579,7 +587,8 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                             newString,
                             matchCase,
                             inConditions,
-                            inActions);
+                            inActions,
+                            inEventStrings);
   }
 }
 
@@ -672,6 +681,36 @@ bool EventsRefactorer::ReplaceStringInConditions(
                                 toReplace,
                                 newString,
                                 matchCase);
+  }
+
+  return somethingModified;
+}
+
+bool EventsRefactorer::ReplaceStringInStringEvent(gd::ObjectsContainer& project,
+                                                  gd::ObjectsContainer& layout,
+                                                  gd::BaseEvent& event,
+                                                  gd::String toReplace,
+                                                  gd::String newString,
+                                                  bool matchCase) {
+  bool somethingModified = false;
+  vector<gd::String> stringEvent = event.GetAllSearchableStrings();
+
+  for (std::size_t sNb = 0; sNb < stringEvent.size(); ++sNb) {
+    gd::String newStringEvent =
+        matchCase ? stringEvent[sNb].FindAndReplace(toReplace, newString, true)
+                  : ReplaceAllOccurencesCaseUnsensitive(
+                        stringEvent[sNb], toReplace, newString);
+
+    if (newStringEvent != stringEvent[sNb]) {
+      if (event.GetType() == "BuiltinCommonInstructions::Group") {
+        gd::GroupEvent& groupEvent = dynamic_cast<gd::GroupEvent&>(event);
+        groupEvent.SetName(newStringEvent);
+      } else if (event.GetType() == "BuiltinCommonInstructions::Comment") {
+        gd::CommentEvent& commentEvent = dynamic_cast<gd::CommentEvent&>(event);
+        commentEvent.SetComment(newStringEvent);
+      }
+    }
+    somethingModified = true;
   }
 
   return somethingModified;

@@ -11,6 +11,7 @@ type Props = {|
   authenticatedUser: AuthenticatedUser,
   game: Game,
   onGameUpdated?: Game => void,
+  getThumbnailURL: (buildId: string) => ?string,
 |};
 type State = {|
   builds: ?Array<Build>,
@@ -93,6 +94,7 @@ export default class Builds extends Component<Props, State> {
         loadBuilds={this._refreshBuilds}
         game={this.props.game}
         onGameUpdated={this.props.onGameUpdated}
+        getThumbnailURL={this.props.getThumbnailURL}
       />
     );
   }

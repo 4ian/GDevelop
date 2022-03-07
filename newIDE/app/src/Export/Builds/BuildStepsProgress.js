@@ -39,6 +39,7 @@ type Props = {|
   errored: boolean,
   showSeeAllMyBuildsExplanation?: boolean,
   hasBuildStep: boolean,
+  getThumbnailURL: (buildId: string) => ?string,
 |};
 
 /**
@@ -53,6 +54,7 @@ export default ({
   errored,
   hasBuildStep,
   showSeeAllMyBuildsExplanation,
+  getThumbnailURL,
 }: Props) => {
   const getActiveStep = React.useCallback(
     () =>
@@ -175,7 +177,12 @@ export default ({
                 <Trans>Build is starting...</Trans>
               </Text>
             )}
-            {build && <BuildProgressAndActions build={build} />}
+            {build && (
+              <BuildProgressAndActions
+                build={build}
+                getThumbnailURL={getThumbnailURL}
+              />
+            )}
             {showSeeAllMyBuildsExplanation && (
               <EmptyMessage>
                 <Trans>

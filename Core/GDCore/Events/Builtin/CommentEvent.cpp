@@ -21,7 +21,7 @@ vector<gd::String> CommentEvent::GetAllSearchableStrings() const {
   return allSearchableStrings;
 }
 
-bool CommentEvent::ReplaceAllInSearchableString(
+bool CommentEvent::ReplaceAllSearchableStrings(
     std::vector<gd::String> newSearchableString) {
   SetComment(newSearchableString[0]);
   return newSearchableString[0] == com1;

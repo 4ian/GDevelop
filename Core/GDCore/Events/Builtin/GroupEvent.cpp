@@ -27,7 +27,7 @@ vector<gd::String> GroupEvent::GetAllSearchableStrings() const {
   return allSearchableStrings;
 }
 
-bool GroupEvent::ReplaceAllInSearchableString(
+bool GroupEvent::ReplaceAllSearchableStrings(
     std::vector<gd::String> newSearchableString) {
   SetName(newSearchableString[0]);
   return newSearchableString[0] == name;

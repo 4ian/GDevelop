@@ -573,7 +573,7 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
     }
 
     if (inEventStrings) {
-      bool eventStringModified = ReplaceStringInStringEvent(
+      bool eventStringModified = ReplaceStringInEventSearchableStrings(
           project, layout, events[i], toReplace, newString, matchCase);
     }
 
@@ -684,13 +684,14 @@ bool EventsRefactorer::ReplaceStringInConditions(
   return somethingModified;
 }
 
-bool EventsRefactorer::ReplaceStringInStringEvent(gd::ObjectsContainer& project,
-                                                  gd::ObjectsContainer& layout,
-                                                  gd::BaseEvent& event,
-                                                  gd::String toReplace,
-                                                  gd::String newString,
-                                                  bool matchCase) {
-  vector<gd::String> newStringEvents;
+bool EventsRefactorer::ReplaceStringInEventSearchableStrings(
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::BaseEvent& event,
+    gd::String toReplace,
+    gd::String newString,
+    bool matchCase) {
+  vector<gd::String> newEventStrings;
   vector<gd::String> stringEvent = event.GetAllSearchableStrings();
 
   for (std::size_t sNb = 0; sNb < stringEvent.size(); ++sNb) {
@@ -698,10 +699,10 @@ bool EventsRefactorer::ReplaceStringInStringEvent(gd::ObjectsContainer& project,
         matchCase ? stringEvent[sNb].FindAndReplace(toReplace, newString, true)
                   : ReplaceAllOccurencesCaseUnsensitive(
                         stringEvent[sNb], toReplace, newString);
-    newStringEvents.push_back(newStringEvent);
+    newEventStrings.push_back(newStringEvent);
   }
 
-  bool somethingModified = event.ReplaceAllInSearchableString(newStringEvents);
+  bool somethingModified = event.ReplaceAllSearchableStrings(newEventStrings);
 
   return somethingModified;
 }

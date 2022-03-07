@@ -128,6 +128,7 @@ const BehaviorsEditor = (props: Props) => {
             }
             actionLabel={<Trans>Add a behavior</Trans>}
             helpPagePath="/behaviors"
+            actionButtonId="add-behavior-button"
             onAdd={() => setNewBehaviorDialogOpen(true)}
           />
         </Column>

@@ -77,13 +77,13 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
     build: ?Build,
     errored: boolean,
     exportStep: BuildStep,
-    getThumbnailURL: (buildId: string) => ?string
+    getThumbnailUrl: (buildId: string) => ?string
   ) => (
     <WebProjectLink
       build={build}
       errored={errored}
       exportStep={exportStep}
-      getThumbnailURL={getThumbnailURL}
+      getThumbnailUrl={getThumbnailUrl}
     />
   ),
 

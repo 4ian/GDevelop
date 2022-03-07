@@ -23,18 +23,13 @@ export default {
 };
 
 export const Errored = () => (
-  <BuildProgressAndActions
-    build={erroredCordovaBuild}
-    game={game1}
-    getThumbnailURL={buildId => undefined}
-  />
+  <BuildProgressAndActions build={erroredCordovaBuild} game={game1} />
 );
 
 export const PendingElectronBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingElectronBuild, updatedAt: Date.now() }}
     game={game1}
-    getThumbnailURL={buildId => undefined}
   />
 );
 
@@ -42,7 +37,6 @@ export const PendingCordovaBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() }}
     game={game1}
-    getThumbnailURL={buildId => undefined}
   />
 );
 
@@ -50,7 +44,6 @@ export const SlowPendingCordovaBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 400 }}
     game={game1}
-    getThumbnailURL={buildId => undefined}
   />
 );
 
@@ -58,31 +51,21 @@ export const TimedOutPendingCordovaBuild = () => (
   <BuildProgressAndActions
     build={{ ...pendingCordovaBuild, updatedAt: Date.now() - 1000 * 3600 * 24 }}
     game={game1}
-    getThumbnailURL={buildId => undefined}
   />
 );
 
 export const CompleteCordovaBuild = () => (
-  <BuildProgressAndActions
-    build={completeCordovaBuild}
-    game={game1}
-    getThumbnailURL={buildId => undefined}
-  />
+  <BuildProgressAndActions build={completeCordovaBuild} game={game1} />
 );
 
 export const CompleteElectronBuild = () => (
-  <BuildProgressAndActions
-    build={completeElectronBuild}
-    game={game1}
-    getThumbnailURL={buildId => undefined}
-  />
+  <BuildProgressAndActions build={completeElectronBuild} game={game1} />
 );
 
 export const CompleteUnpublishedWebBuild = () => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: 'other-build-id' }}
-    getThumbnailURL={buildId => undefined}
   />
 );
 
@@ -90,6 +73,5 @@ export const CompletePublishedWebBuild = () => (
   <BuildProgressAndActions
     build={completeWebBuild}
     game={{ ...game1, publicWebBuildId: completeWebBuild.id }}
-    getThumbnailURL={buildId => undefined}
   />
 );

@@ -431,9 +431,6 @@ export const GameDetailsDialog = ({
                 game={game}
                 authenticatedUser={authenticatedUser}
                 onGameUpdated={onGameUpdated}
-                getThumbnailURL={(buildId: string) =>
-                  project && getWebBuildThumbnailUrl(project, buildId)
-                }
               />
             ) : null}
             {currentTab === 'analytics' ? (

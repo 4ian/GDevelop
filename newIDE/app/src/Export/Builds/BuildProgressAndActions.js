@@ -74,7 +74,6 @@ type Props = {|
   onGameUpdated?: Game => void,
   gameUpdating?: boolean,
   setGameUpdating?: boolean => void,
-  getThumbnailURL: (buildId: string) => ?string,
 |};
 
 /**
@@ -87,7 +86,6 @@ export default ({
   onGameUpdated,
   gameUpdating,
   setGameUpdating,
-  getThumbnailURL,
 }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -122,7 +120,6 @@ export default ({
           game.id,
           {
             publicWebBuildId: buildId,
-            thumbnailUrl: buildId ? getThumbnailURL(buildId) : undefined,
           }
         );
         onGameUpdated(updatedGame);

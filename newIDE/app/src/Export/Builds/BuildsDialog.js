@@ -16,7 +16,6 @@ type Props = {|
   open: boolean,
   onClose: () => void,
   onGameUpdated: () => void,
-  getThumbnailURL: (buildId: string) => ?string,
 |};
 
 const BuildsDialog = ({
@@ -25,7 +24,6 @@ const BuildsDialog = ({
   open,
   onClose,
   onGameUpdated,
-  getThumbnailURL,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   if (!open) return null;
@@ -55,7 +53,6 @@ const BuildsDialog = ({
         authenticatedUser={authenticatedUser}
         game={game}
         onGameUpdated={onGameUpdated}
-        getThumbnailURL={getThumbnailURL}
       />
     </Dialog>
   );

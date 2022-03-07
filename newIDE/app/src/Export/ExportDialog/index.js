@@ -249,9 +249,6 @@ const ExportDialog = ({
           authenticatedUser={authenticatedUser}
           game={game}
           onGameUpdated={setGame}
-          getThumbnailURL={(buildId: string) =>
-            project && getWebBuildThumbnailUrl(project, buildId)
-          }
         />
       )}
     </Dialog>

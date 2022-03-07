@@ -333,10 +333,7 @@ export default class ExportLauncher extends Component<Props, State> {
 
   _getWebBuildThumbnailUrl = (buildId: string) => {
     const project = this.props.project;
-    if (!project) {
-      return undefined;
-    }
-    return getWebBuildThumbnailUrl(project, buildId);
+    return project && getWebBuildThumbnailUrl(project, buildId);
   };
 
   render() {
@@ -423,7 +420,9 @@ export default class ExportLauncher extends Component<Props, State> {
               build,
               errored,
               exportStep,
-              this._getWebBuildThumbnailUrl
+              buildId =>
+                this.props.project &&
+                getWebBuildThumbnailUrl(this.props.project, buildId)
             )
           ) : (
             <Line expand>
@@ -434,7 +433,6 @@ export default class ExportLauncher extends Component<Props, State> {
                 stepMaxProgress={stepMaxProgress}
                 stepCurrentProgress={stepCurrentProgress}
                 errored={errored}
-                getThumbnailURL={this._getWebBuildThumbnailUrl}
               />
             </Line>
           ))}

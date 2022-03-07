@@ -45,7 +45,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Move to a position"),
                   _("Move the object to a position"),
                   _("Move _PARAM0_ to _PARAM3_;_PARAM4_"),
-                  "Movement on the path",
+                  _("Movement on the path"),
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
@@ -61,7 +61,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Path found"),
                      _("Check if a path has been found."),
                      _("A path has been found for _PARAM0_"),
-                     "Movement on the path",
+                     _("Movement on the path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -74,7 +74,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Destination reached"),
                      _("Check if the destination was reached."),
                      _("_PARAM0_ reached its destination"),
-                     "Movement on the path",
+                     _("Movement on the path"),
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 

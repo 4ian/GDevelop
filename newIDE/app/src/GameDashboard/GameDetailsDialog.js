@@ -42,6 +42,7 @@ import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import { I18n } from '@lingui/react';
+import { getWebBuildThumbnailUrl } from '../Utils/GDevelopServices/Build';
 
 const styles = {
   tableRowStatColumn: {
@@ -163,6 +164,7 @@ export const GameDetailsDialog = ({
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
+        // The thumbnailUrl is updated only when a build is made public.
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);

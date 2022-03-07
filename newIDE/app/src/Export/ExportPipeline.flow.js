@@ -49,7 +49,8 @@ export type ExportPipeline<
   renderCustomStepsProgress?: (
     build: ?Build,
     errored: boolean,
-    exportStep: BuildStep
+    exportStep: BuildStep,
+    getThumbnailUrl: (buildId: string) => ?string
   ) => React.Node,
 
   prepareExporter: (

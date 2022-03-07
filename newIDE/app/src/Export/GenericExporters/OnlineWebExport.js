@@ -64,12 +64,14 @@ type WebProjectLinkProps = {|
   build: ?Build,
   errored: boolean,
   exportStep: BuildStep,
+  getThumbnailUrl: (buildId: string) => ?string,
 |};
 
 export const WebProjectLink = ({
   build,
   errored,
   exportStep,
+  getThumbnailUrl,
 }: WebProjectLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
@@ -174,6 +176,7 @@ export const WebProjectLink = ({
           game.id,
           {
             publicWebBuildId: build.id,
+            thumbnailUrl: build.id ? getThumbnailUrl(build.id) : undefined,
           }
         );
         setGame(updatedGame);

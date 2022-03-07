@@ -3,6 +3,7 @@ import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import { basename } from 'path';
 
 export type TargetName =
   | 'winExe'
@@ -59,6 +60,31 @@ export const getBuildArtifactUrl = (
   }
 
   return `https://builds.gdevelop-app.com/${build[keyName]}`;
+};
+
+export const getWebBuildGameFolderUrl = (buildId: string): string => {
+  return `https:/games.gdevelop-app.com/game-${buildId}`;
+};
+
+export const getWebBuildThumbnailUrl = (
+  project: gdProject,
+  buildId: string
+): string => {
+  const resourceManager = project.getResourcesManager();
+  const resourceName = project
+    .getPlatformSpecificAssets()
+    .get('liluo', `thumbnail`);
+  if (!resourceManager.hasResource(resourceName)) {
+    return '';
+  }
+  const path = resourceManager.getResource(resourceName).getFile();
+  const fileName = basename(path);
+  if (!fileName) {
+    return '';
+  }
+  // The exporter put asset files directly in the build folder.
+  // It's not factorized with the exporter because it's a temporary solution.
+  return `https:/games.gdevelop-app.com/game-${buildId}/${fileName}`;
 };
 
 type UploadOptions = {|

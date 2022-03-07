@@ -76,9 +76,15 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   renderCustomStepsProgress: (
     build: ?Build,
     errored: boolean,
-    exportStep: BuildStep
+    exportStep: BuildStep,
+    getThumbnailUrl: (buildId: string) => ?string
   ) => (
-    <WebProjectLink build={build} errored={errored} exportStep={exportStep} />
+    <WebProjectLink
+      build={build}
+      errored={errored}
+      exportStep={exportStep}
+      getThumbnailUrl={getThumbnailUrl}
+    />
   ),
 
   prepareExporter: (

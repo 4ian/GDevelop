@@ -193,7 +193,14 @@ namespace gdjs {
       }
       const position = this.getPosition(runtimeScene, draggableRuntimeBehavior);
       if (
-        !draggableRuntimeBehavior.owner.insideObject(position[0], position[1])
+        !draggableRuntimeBehavior.owner.insideObject(
+          position[0],
+          position[1]
+        ) ||
+        !draggableRuntimeBehavior.owner.isCollidingWithPoint(
+          position[0],
+          position[1]
+        )
       ) {
         return false;
       }

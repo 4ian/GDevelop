@@ -34,20 +34,22 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
     instances: [],
   });
 
-  var object = new gdjs.RuntimeObject(runtimeScene, {
+  var object = new gdjs.TestRuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [{ name: 'Behavior1', type: 'DraggableBehavior::Draggable' }],
     variables: [],
     effects: [],
   });
-  var object2 = new gdjs.RuntimeObject(runtimeScene, {
+  object.setCustomWidthAndHeight(10, 10);
+  var object2 = new gdjs.TestRuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [{ name: 'Behavior1', type: 'DraggableBehavior::Draggable' }],
     variables: [],
     effects: [],
   });
+  object2.setCustomWidthAndHeight(10, 10);
   runtimeScene.addObject(object);
   runtimeScene.addObject(object2);
 

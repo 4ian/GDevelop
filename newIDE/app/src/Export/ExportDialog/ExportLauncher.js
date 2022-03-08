@@ -331,11 +331,6 @@ export default class ExportLauncher extends Component<Props, State> {
     }));
   };
 
-  _getWebBuildThumbnailUrl = (buildId: string) => {
-    const project = this.props.project;
-    return project && getWebBuildThumbnailUrl(project, buildId);
-  };
-
   render() {
     const {
       exportStep,

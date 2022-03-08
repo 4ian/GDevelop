@@ -346,15 +346,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
   extension
       .AddAction(
           "FadeVolume",
-          _("fade volume of a sound."),
-          _("fade the volume an audio sound on a channel to a volume within a given time."),
-          _("Fade the volume of a sound on channel n°_PARAM1_ to a volume of _PARAM2__ within a time of _PARAM3_ ms"),
+          _("fade the volume of a sound played on a channel."),
+          _("Fade the volume of a sound played on a channel within a given time is milliseconds."),
+          _("Fade the volume of a sound on channel n°_PARAM1_ to a volume of _PARAM2_ within a time of _PARAM3_ ms"),
           _("Sounds on channels"),
           "res/actions/music24.png",
           "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("ID of the channel"), "", true)
-      .AddParameter("expression", _("Volume to interpolate to (0 to 100)"), "", true)
+      .AddParameter("expression", _("Volume to interpolate in %"), "", true)
       .AddParameter("expression", _("Interpolation time in ms"), "", true)
       .MarkAsAdvanced();
 

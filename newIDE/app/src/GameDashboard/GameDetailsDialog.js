@@ -163,6 +163,7 @@ export const GameDetailsDialog = ({
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
+        // The thumbnailUrl is updated only when a build is made public.
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
       await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);

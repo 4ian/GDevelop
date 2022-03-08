@@ -234,7 +234,6 @@ export const updateGame = (
           playWithGamepad,
           playWithMobile,
           orientation,
-          // The thumbnailUrl is updated only when a build is made public.
           thumbnailUrl,
         },
         {

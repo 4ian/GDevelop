@@ -62,10 +62,6 @@ export const getBuildArtifactUrl = (
   return `https://builds.gdevelop-app.com/${build[keyName]}`;
 };
 
-export const getWebBuildGameFolderUrl = (buildId: string): string => {
-  return `https:/games.gdevelop-app.com/game-${buildId}`;
-};
-
 export const getWebBuildThumbnailUrl = (
   project: gdProject,
   buildId: string

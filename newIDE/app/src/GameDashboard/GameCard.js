@@ -1,15 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import {
-  Card,
-  CardActions,
-  CardHeader,
-  Chip,
-  CardMedia,
-  Box,
-  Paper,
-} from '@material-ui/core';
+import { Card, CardActions, CardHeader, Chip, Paper } from '@material-ui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -20,7 +12,10 @@ import TuneIcon from '@material-ui/icons/Tune';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
 import FlatButton from '../UI/FlatButton';
-import Text from '../UI/Text';
+import EmptyMessage from '../UI/EmptyMessage';
+
+const thumbnailWidth = 240;
+const thumbnailHeight = 135;
 
 const styles = {
   image: {
@@ -49,7 +44,6 @@ export const GameCard = ({
     if (!url) return;
     Window.openExternalURL(url);
   };
-  // TODO center the placeholder text
   return (
     <I18n>
       {({ i18n }) => (
@@ -60,9 +54,9 @@ export const GameCard = ({
                 src={game.thumbnailUrl}
                 style={{
                   ...styles.image,
-                  width: 240,
-                  height: 135,
-                  minHeight: 135,
+                  width: thumbnailWidth,
+                  height: thumbnailHeight,
+                  minHeight: thumbnailHeight,
                 }}
                 alt={game.gameName}
                 title={game.gameName}
@@ -71,21 +65,15 @@ export const GameCard = ({
               <Paper
                 variant="outlined"
                 style={{
-                  width: '240px',
-                  height: '135px',
+                  width: thumbnailWidth,
+                  height: thumbnailHeight,
                   whiteSpace: 'normal',
+                  display: 'flex',
                 }}
               >
-                <Column
-                  expand
-                  useFullHeight
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Text align="center">
-                    <Trans>No thumbnail set</Trans>
-                  </Text>
-                </Column>
+                <EmptyMessage>
+                  <Trans>No thumbnail set</Trans>
+                </EmptyMessage>
               </Paper>
             )}
             <Column expand>

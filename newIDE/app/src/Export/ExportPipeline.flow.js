@@ -50,7 +50,7 @@ export type ExportPipeline<
     build: ?Build,
     errored: boolean,
     exportStep: BuildStep,
-    getThumbnailUrl: (buildId: string) => ?string
+    getGameThumbnailUrl: (buildId: string) => ?string
   ) => React.Node,
 
   prepareExporter: (

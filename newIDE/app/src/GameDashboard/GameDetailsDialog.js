@@ -42,7 +42,6 @@ import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import { I18n } from '@lingui/react';
-import { getWebBuildThumbnailUrl } from '../Utils/GDevelopServices/Build';
 
 const styles = {
   tableRowStatColumn: {

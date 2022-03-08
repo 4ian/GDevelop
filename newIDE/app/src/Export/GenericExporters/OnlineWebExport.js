@@ -64,14 +64,14 @@ type WebProjectLinkProps = {|
   build: ?Build,
   errored: boolean,
   exportStep: BuildStep,
-  getThumbnailUrl: (buildId: string) => ?string,
+  getGameThumbnailUrl: (buildId: string) => ?string,
 |};
 
 export const WebProjectLink = ({
   build,
   errored,
   exportStep,
-  getThumbnailUrl,
+  getGameThumbnailUrl,
 }: WebProjectLinkProps) => {
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
     false
@@ -176,7 +176,7 @@ export const WebProjectLink = ({
           game.id,
           {
             publicWebBuildId: build.id,
-            thumbnailUrl: build.id ? getThumbnailUrl(build.id) : undefined,
+            thumbnailUrl: build.id ? getGameThumbnailUrl(build.id) : undefined,
           }
         );
         setGame(updatedGame);
@@ -186,7 +186,7 @@ export const WebProjectLink = ({
         setIsGameLoading(false);
       }
     },
-    [game, getAuthorizationHeader, profile, build]
+    [game, getAuthorizationHeader, profile, build, getGameThumbnailUrl]
   );
 
   if (!build && !exportStep) return null;

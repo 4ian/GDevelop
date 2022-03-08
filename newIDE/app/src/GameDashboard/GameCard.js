@@ -14,13 +14,14 @@ import Window from '../Utils/Window';
 import FlatButton from '../UI/FlatButton';
 import EmptyMessage from '../UI/EmptyMessage';
 
-const thumbnailWidth = 240;
-const thumbnailHeight = 135;
-
 const styles = {
   image: {
     display: 'block',
     objectFit: 'cover',
+  },
+  thumbnail: {
+    width: 240,
+    height: 135,
   },
 };
 
@@ -54,9 +55,7 @@ export const GameCard = ({
                 src={game.thumbnailUrl}
                 style={{
                   ...styles.image,
-                  width: thumbnailWidth,
-                  height: thumbnailHeight,
-                  minHeight: thumbnailHeight,
+                  ...styles.thumbnail,
                 }}
                 alt={game.gameName}
                 title={game.gameName}
@@ -65,8 +64,7 @@ export const GameCard = ({
               <Paper
                 variant="outlined"
                 style={{
-                  width: thumbnailWidth,
-                  height: thumbnailHeight,
+                  ...styles.thumbnail,
                   whiteSpace: 'normal',
                   display: 'flex',
                 }}

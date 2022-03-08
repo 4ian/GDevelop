@@ -35,6 +35,7 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
+import { getWebBuildThumbnailUrl } from '../../Utils/GDevelopServices/Build';
 
 type State = {|
   exportStep: BuildStep,
@@ -330,6 +331,11 @@ export default class ExportLauncher extends Component<Props, State> {
     }));
   };
 
+  _getWebBuildThumbnailUrl = (buildId: string) => {
+    const project = this.props.project;
+    return project && getWebBuildThumbnailUrl(project, buildId);
+  };
+
   render() {
     const {
       exportStep,
@@ -410,7 +416,14 @@ export default class ExportLauncher extends Component<Props, State> {
           )}
         {authenticatedUser.authenticated &&
           (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress(build, errored, exportStep)
+            exportPipeline.renderCustomStepsProgress(
+              build,
+              errored,
+              exportStep,
+              buildId =>
+                this.props.project &&
+                getWebBuildThumbnailUrl(this.props.project, buildId)
+            )
           ) : (
             <Line expand>
               <BuildStepsProgress

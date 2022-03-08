@@ -40,15 +40,8 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
     this.hitBoxesDirty = true;
   }
 
-  setCustomZOrder(zorder) {
-    if (zorder === this.zOrder) {
-      return;
-    }
-    this.zOrder = zorder;
-  }
-
   getRendererObject() {
-    return { visible: true };
+    return null;
   }
 
   getWidth() {

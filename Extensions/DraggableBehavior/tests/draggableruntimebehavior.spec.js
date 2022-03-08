@@ -105,11 +105,11 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
         object.setPosition(450, 500);
         object2.setPosition(450, 500);
         if (firstInFront) {
-          object.setCustomZOrder(2);
-          object2.setCustomZOrder(1);
+          object.setZOrder(2);
+          object2.setZOrder(1);
         } else {
-          object.setCustomZOrder(1);
-          object2.setCustomZOrder(2);
+          object.setZOrder(1);
+          object2.setZOrder(2);
         }
 
         // Drag'n'drop
@@ -221,11 +221,11 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
         object.setPosition(450, 500);
         object2.setPosition(450, 500);
         if (firstInFront) {
-          object.setCustomZOrder(2);
-          object2.setCustomZOrder(1);
+          object.setZOrder(2);
+          object2.setZOrder(1);
         } else {
-          object.setCustomZOrder(1);
-          object2.setCustomZOrder(2);
+          object.setZOrder(1);
+          object2.setZOrder(2);
         }
 
         // Drag'n'drop

@@ -117,7 +117,8 @@ class GD_CORE_API EventsRefactorer {
                                     gd::String newString,
                                     bool matchCase,
                                     bool inConditions,
-                                    bool inActions);
+                                    bool inActions,
+                                    bool inEventString);
 
   virtual ~EventsRefactorer(){};
 
@@ -207,6 +208,20 @@ class GD_CORE_API EventsRefactorer {
                                      gd::String toReplace,
                                      gd::String newString,
                                      bool matchCase);
+
+  /**
+   * Replace all occurrences of a gd::String in strings of events (for example:
+   * comments and name of groups).
+   *
+   * \return true if something was modified.
+   */
+  static bool ReplaceStringInEventSearchableStrings(
+      gd::ObjectsContainer& project,
+      gd::ObjectsContainer& layout,
+      gd::BaseEvent& event,
+      gd::String toReplace,
+      gd::String newString,
+      bool matchCase);
 
   static bool SearchStringInFormattedText(const gd::Platform& platform,
                                           gd::Instruction& instruction,

@@ -126,6 +126,11 @@ class GD_CORE_API BaseEvent {
     return noSearchableStrings;
   };
 
+  virtual bool ReplaceAllSearchableStrings(
+      std::vector<gd::String> newSearchableString) {
+    return false;
+  };
+
   /**
    * \brief Return a list of all expressions of the event, each with their associated metadata.
    * \note Used to preprocess or search in the expressions of the event.

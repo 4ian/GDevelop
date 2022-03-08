@@ -34,20 +34,22 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
     instances: [],
   });
 
-  var object = new gdjs.RuntimeObject(runtimeScene, {
+  var object = new gdjs.TestRuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [{ name: 'Behavior1', type: 'DraggableBehavior::Draggable' }],
     variables: [],
     effects: [],
   });
-  var object2 = new gdjs.RuntimeObject(runtimeScene, {
+  object.setCustomWidthAndHeight(10, 10);
+  var object2 = new gdjs.TestRuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
     behaviors: [{ name: 'Behavior1', type: 'DraggableBehavior::Draggable' }],
     variables: [],
     effects: [],
   });
+  object2.setCustomWidthAndHeight(10, 10);
   runtimeScene.addObject(object);
   runtimeScene.addObject(object2);
 
@@ -103,11 +105,11 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
         object.setPosition(450, 500);
         object2.setPosition(450, 500);
         if (firstInFront) {
-          object.setZOrder(2);
-          object2.setZOrder(1);
+          object.setCustomZOrder(2);
+          object2.setCustomZOrder(1);
         } else {
-          object.setZOrder(1);
-          object2.setZOrder(2);
+          object.setCustomZOrder(1);
+          object2.setCustomZOrder(2);
         }
 
         // Drag'n'drop
@@ -219,11 +221,11 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
         object.setPosition(450, 500);
         object2.setPosition(450, 500);
         if (firstInFront) {
-          object.setZOrder(2);
-          object2.setZOrder(1);
+          object.setCustomZOrder(2);
+          object2.setCustomZOrder(1);
         } else {
-          object.setZOrder(1);
-          object2.setZOrder(2);
+          object.setCustomZOrder(1);
+          object2.setCustomZOrder(2);
         }
 
         // Drag'n'drop

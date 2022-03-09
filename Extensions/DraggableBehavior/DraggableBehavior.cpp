@@ -18,7 +18,6 @@ void DraggableBehavior::InitializeContent(gd::SerializerElement& content) {
   content.SetAttribute("checkCollisionMask", true);
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> DraggableBehavior::GetProperties(
     const gd::SerializerElement& behaviorContent) const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
@@ -29,8 +28,8 @@ std::map<gd::String, gd::PropertyDescriptor> DraggableBehavior::GetProperties(
       .SetType("Boolean")
       .SetLabel(_("Do a precision check against the object's collision mask"))
       .SetDescription(
-          _("Use (custom) collision mask instead of the bounding "
-            "box of the object making the behavior more precise at the cost of "
+          _("Use the object (custom) collision mask instead of the bounding "
+            "box, making the behavior more precise at the cost of "
             "reduced performance"));
   ;
 
@@ -46,4 +45,3 @@ bool DraggableBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
   }
   return false;
 }
-#endif

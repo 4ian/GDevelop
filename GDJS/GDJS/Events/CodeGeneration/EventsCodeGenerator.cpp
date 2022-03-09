@@ -69,12 +69,21 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
       codeGenerator.GenerateAllConditionsBooleanDeclarations();
 
   gd::String output =
-      codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
-      globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
+      // clang-format off
+      codeGenerator.GetCodeNamespace() + " = {};\n" +
+      globalDeclarations +
+      globalObjectLists + "\n" +
+      globalConditionsBooleans + "\n\n" +
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-      fullyQualifiedFunctionName + " = function(" + functionArgumentsCode +
-      ") {\n" + functionPreEventsCode + "\n" + globalObjectListsReset + "\n" +
-      wholeEventsCode + "\n" + functionReturnCode + "\n" + "}\n";
+      fullyQualifiedFunctionName + " = function(" +
+        functionArgumentsCode +
+      ") {\n" +
+        functionPreEventsCode + "\n" +
+        globalObjectListsReset + "\n" +
+        wholeEventsCode + "\n" +
+        functionReturnCode + "\n" +
+      "}\n";
+      // clang-format on
 
   return output;
 }
@@ -256,7 +265,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
     // optimized getter for it.
     behaviorNamesMap += ConvertToStringExplicit(thisBehaviorName) + ": " +
                         thisBehaviorName + "\n";
-    
+
     // Add required behaviors from properties
     for (size_t i = 0; i < eventsBasedBehavior.GetPropertyDescriptors().GetCount(); i++)
     {
@@ -271,7 +280,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionContext(
       }
     }
   }
-  
+
   return GenerateEventsFunctionContext(
       parameters,
       onceTriggersVariable,

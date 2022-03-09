@@ -6,7 +6,7 @@
  * an example to start a new object, take a look at gdjs.DummyRuntimeObject
  * in the Extensions folder.
  */
- gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
+gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
   /** @type {float}  */
   _customWidth = 0;
   /** @type {float}  */
@@ -41,7 +41,7 @@
   }
 
   getRendererObject() {
-    return { visible: true };
+    return null;
   }
 
   getWidth() {

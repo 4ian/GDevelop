@@ -602,6 +602,79 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     eventsFunctionCopy.delete();
     project.delete();
   });
+
+  it('generates a lifecycle function that registers itself, and unregister itself if hot-reloaded', function () {
+    // Event to create an object, then add
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        disabled: false,
+        folded: false,
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { inverted: false, value: 'ModVarScene' },
+            parameters: ['SuccessVariable', '+', '1'],
+            subInstructions: [],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunction = new gd.EventsFunction();
+    eventsFunction.setName('onScenePreEvents');
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+
+    const runCompiledEvents = generateCompiledEventsForEventsFunction(
+      gd,
+      project,
+      eventsFunction,
+      {
+        dontCallGeneratedFunction: true,
+      }
+    );
+
+    const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
+    runCompiledEvents(
+      gdjs,
+      runtimeScene /*, Don't pass arguments to not run the function. */
+    );
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    // Simulate a hot reloading by recompiling the function and running it again.
+    const runHotReloadedCompiledEvents =
+      generateCompiledEventsForEventsFunction(gd, project, eventsFunction, {
+        dontCallGeneratedFunction: true,
+      });
+    runHotReloadedCompiledEvents(
+      gdjs,
+      runtimeScene /*, Don't pass arguments to not run the function. */
+    );
+
+    // Ensure that when we call the callbacks, it's called only once (not registered twice).
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(3);
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(4);
+
+    eventsFunction.delete();
+    project.delete();
+  });
 });
 
 /**
@@ -641,9 +714,11 @@ function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
     `Hashtable = gdjs.Hashtable;` +
       '\n' +
       code +
-      // Return the function for it to be called.
+      // Return the function for it to be called (if arguments are passed).
       `;
-return functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]);`
+return functionArguments ?
+  functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
+  null;`
   );
 
   return runCompiledEventsFunction;

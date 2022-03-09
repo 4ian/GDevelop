@@ -236,11 +236,14 @@ class RuntimeScene {
 
 /**
  * Create a minimal mock of GDJS with a RuntimeScene (`gdjs.RuntimeScene`),
- * supporting setting a variable and using "Trigger Once" conditions
- * (just enough to validate events logic).
+ * supporting setting a variable, using "Trigger Once" conditions
+ * (just enough to validate events logic), registering a behavior and some
+ * lifecycle callbacks.
  */
 function makeMinimalGDJSMock() {
   const behaviorCtors = {};
+  let runtimeScenePreEventsCallbacks = [];
+  const runtimeScene = new RuntimeScene();
 
   return {
     gdjs: {
@@ -251,13 +254,26 @@ function makeMinimalGDJSMock() {
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;
       },
+      registerRuntimeScenePreEventsCallback: (cb) => {
+        runtimeScenePreEventsCallbacks.push(cb);
+      },
+      _unregisterCallback: (unregisteredCb) => {
+        runtimeScenePreEventsCallbacks = runtimeScenePreEventsCallbacks.filter(
+          (cb) => cb !== unregisteredCb
+        );
+      },
       copyArray,
       objectsListsToArray,
       RuntimeBehavior,
       OnceTriggers,
       Hashtable,
     },
-    runtimeScene: new RuntimeScene(),
+    mocks: {
+      runRuntimeScenePreEventsCallbacks: () => {
+        runtimeScenePreEventsCallbacks.forEach(cb => cb(runtimeScene))
+      }
+    },
+    runtimeScene,
   };
 }
 

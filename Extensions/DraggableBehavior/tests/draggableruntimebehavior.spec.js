@@ -45,7 +45,13 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
   var object2 = new gdjs.TestRuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
-    behaviors: [{ name: 'Behavior1', type: 'DraggableBehavior::Draggable' }],
+    behaviors: [
+      {
+        name: 'Behavior1',
+        type: 'DraggableBehavior::Draggable',
+        checkCollisionMask: true,
+      },
+    ],
     variables: [],
     effects: [],
   });
@@ -96,6 +102,70 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
 
       expect(object.getX()).to.be(850);
       expect(object.getY()).to.be(700);
+    });
+
+    it('can drag an object without collision mask check', function () {
+      object.setPosition(450, 500);
+      object.rotateTowardAngle(45, 0);
+
+      // Should drag in bounding box but not in hitbox
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onMouseMove(450, 500);
+      runtimeGame
+        .getInputManager()
+        .onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onMouseMove(750, 600);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame
+        .getInputManager()
+        .onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(object.getX()).to.be(750);
+      expect(object.getY()).to.be(600);
+
+      object.rotateTowardAngle(0, 0);
+    });
+
+    it('can drag an object with collision mask check', function () {
+      object2.setPosition(450, 500);
+      object2.rotateTowardAngle(45, 0);
+
+      // Should not drag in bounding box but not in hitbox
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onMouseMove(450, 500);
+      runtimeGame
+        .getInputManager()
+        .onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onMouseMove(750, 600);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame
+        .getInputManager()
+        .onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(object2.getX()).to.be(450);
+      expect(object2.getY()).to.be(500);
+
+      // Should drag in bounding box and in hitbox
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onMouseMove(455, 505);
+      runtimeGame
+        .getInputManager()
+        .onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onMouseMove(855, 705);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame
+        .getInputManager()
+        .onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(object2.getX()).to.be(850);
+      expect(object2.getY()).to.be(700);
+      object2.rotateTowardAngle(0, 0);
     });
 
     [false, true].forEach((firstInFront) => {
@@ -186,6 +256,65 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       expect(object.getX()).to.be(850);
       expect(object.getY()).to.be(700);
     });
+
+    it('can drag an object without collision mask check', function () {
+      object.setPosition(450, 500);
+      object.rotateTowardAngle(45, 0);
+
+      // Should drag in bounding box but not in hitbox
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onTouchStart(0, 450, 500);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+      runtimeGame.getInputManager().onTouchMove(0, 750, 600);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+      runtimeGame.getInputManager().onTouchEnd(0);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+
+      expect(object.getX()).to.be(750);
+      expect(object.getY()).to.be(600);
+
+      object.rotateTowardAngle(0, 0);
+    });
+
+    it('can drag an object with collision mask check', function () {
+      object2.setPosition(450, 500);
+      object2.rotateTowardAngle(45, 0);
+
+      // Should not drag in bounding box but not in hitbox
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onTouchStart(0, 450, 500);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+      runtimeGame.getInputManager().onTouchMove(0, 750, 600);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+      runtimeGame.getInputManager().onTouchEnd(0);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+
+      expect(object2.getX()).to.be(450);
+      expect(object2.getY()).to.be(500);
+
+      // Should drag in bounding box and in hitbox
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onTouchStart(0, 455, 505);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+      runtimeGame.getInputManager().onTouchMove(0, 855, 705);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+      runtimeGame.getInputManager().onTouchEnd(0);
+      runtimeScene.renderAndStep(1000 / 60);
+      runtimeGame.getInputManager().onFrameEnded();
+
+      expect(object2.getX()).to.be(850);
+      expect(object2.getY()).to.be(700);
+      object2.rotateTowardAngle(0, 0);
+    });
+
     it('can drag 2 objects with multitouch', function () {
       runtimeGame.getInputManager().touchSimulateMouse(false);
       object.setPosition(450, 500);

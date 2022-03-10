@@ -148,7 +148,7 @@ export default class ExportLauncher extends Component<Props, State> {
           this.props.authenticatedUser.getAuthorizationHeader,
           profile.id,
           this.props.project.getProjectUuid(),
-          authorAcls
+          { author: authorAcls }
         );
       } catch (e) {
         // Best effort call, do not prevent exporting the game.

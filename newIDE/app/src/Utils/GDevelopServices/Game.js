@@ -12,7 +12,8 @@ export type PublicGame = {
   authorName: string, // this corresponds to the publisher name
   publicWebBuildId?: ?string,
   description?: string,
-  authors: Array<?UserPublicProfile>,
+  owners: Array<UserPublicProfile>,
+  authors: Array<UserPublicProfile>,
   playWithKeyboard: boolean,
   playWithGamepad: boolean,
   playWithMobile: boolean,
@@ -131,12 +132,19 @@ export const getGameUrl = (game: ?Game) => {
   return GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
+export const getAclsFromOwnerIds = (
+  ownersIds: Array<string>
+): Array<{| userId: string, level: string |}> =>
+  ownersIds.map(ownerId => ({
+    userId: ownerId,
+    level: 'owner',
+  }));
+
 export const getAclsFromAuthorIds = (
   authorIds: gdVectorString
-): Array<{| userId: string, feature: string, level: string |}> =>
+): Array<{| userId: string, level: string |}> =>
   authorIds.toJSArray().map(authorId => ({
     userId: authorId,
-    feature: 'author',
     level: 'owner',
   }));
 
@@ -253,7 +261,10 @@ export const setGameUserAcls = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   gameId: string,
-  acls: Array<{| userId: string, feature: string, level: string |}>
+  acls: {|
+    ownership?: Array<{| userId: string, level: string |}>,
+    author?: Array<{| userId: string, level: string |}>,
+  |}
 ): Promise<void> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
@@ -261,7 +272,7 @@ export const setGameUserAcls = (
         `${GDevelopGameApi.baseUrl}/game/action/set-acls`,
         {
           gameId,
-          acls,
+          newAcls: acls,
         },
         {
           params: {

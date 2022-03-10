@@ -188,8 +188,8 @@ export function ClosableTab({
                 id={id ? `${id}-button` : undefined}
                 {...longTouchForContextMenuProps}
                 focusRipple
-                // If touch ripple is not disabled, dragged preview will use the size of the ripple
-                // and it will be too big
+                // If the touch ripple is not disabled, the dragged preview will
+                // use the size of the ripple and it will be too big.
                 disableTouchRipple
               >
                 <span

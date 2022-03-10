@@ -1851,11 +1851,11 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: changeCurrentTab(state.editorTabs, value),
     })).then(state =>
-      _onEditorTabActive(getCurrentTab(state.editorTabs), state)
+      _onEditorTabActived(getCurrentTab(state.editorTabs), state)
     );
   };
 
-  const _onEditorTabActive = (
+  const _onEditorTabActived = (
     editorTab: EditorTab,
     newState: State = state
   ) => {
@@ -1891,7 +1891,7 @@ const MainFrame = (props: Props) => {
     }));
   };
 
-  const _onDropEditorTab = (fromIndex: number, toIndex: number) => {
+  const onDropEditorTab = (fromIndex: number, toIndex: number) => {
     setState(state => {
       return {
         ...state,
@@ -2155,8 +2155,8 @@ const MainFrame = (props: Props) => {
           _onCloseOtherEditorTabs(editorTab)
         }
         onCloseAll={_onCloseAllEditorTabs}
-        onTabActive={(editorTab: EditorTab) => _onEditorTabActive(editorTab)}
-        onDropTab={_onDropEditorTab}
+        onTabActived={(editorTab: EditorTab) => _onEditorTabActived(editorTab)}
+        onDropTab={onDropEditorTab}
       />
       {getEditors(state.editorTabs).map((editorTab, id) => {
         const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;

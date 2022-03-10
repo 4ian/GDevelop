@@ -23,7 +23,7 @@ type DraggableClosableTabsProps = {|
   onCloseTab: (editor: EditorTab) => void,
   onCloseOtherTabs: (editor: EditorTab) => void,
   onCloseAll: () => void,
-  onTabActive: (editor: EditorTab) => void,
+  onTabActived: (editor: EditorTab) => void,
   onDropTab: (fromIndex: number, toIndex: number) => void,
 |};
 
@@ -34,10 +34,10 @@ export function DraggableClosableTabs({
   onCloseTab,
   onCloseOtherTabs,
   onCloseAll,
-  onTabActive,
+  onTabActived,
   onDropTab,
 }: DraggableClosableTabsProps) {
-  let draggedTabIndex: number | typeof undefined = undefined;
+  let draggedTabIndex: ?number = null;
 
   return (
     <ClosableTabs hideLabels={hideLabels}>
@@ -54,16 +54,16 @@ export function DraggableClosableTabs({
             onClose={() => onCloseTab(editorTab)}
             onCloseOthers={() => onCloseOtherTabs(editorTab)}
             onCloseAll={onCloseAll}
-            onActivated={() => onTabActive(editorTab)}
+            onActivated={() => onTabActived(editorTab)}
             closable={editorTab.closable}
             onBeginDrag={() => {
               draggedTabIndex = id;
               return editorTab;
             }}
             onDrop={toIndex => {
-              if (draggedTabIndex !== undefined) {
+              if (typeof draggedTabIndex === 'number') {
                 onDropTab(draggedTabIndex, id);
-                draggedTabIndex = undefined;
+                draggedTabIndex = null;
               }
             }}
           />
@@ -113,12 +113,6 @@ export function DraggableClosableTab({
           drop={() => onDrop(index)}
         >
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
-            // If on a touch screen, setting the whole item to be
-            // draggable would prevent scroll. Set the icon only to be
-            // draggable if the item is not selected. When selected,
-            // set the whole item to be draggable.
-            const canDragOnlyIcon = screenType === 'touch' && !active;
-
             // Add an extra div because connectDropTarget/connectDragSource can
             // only be used on native elements
             const dropTarget = connectDropTarget(
@@ -146,7 +140,7 @@ export function DraggableClosableTab({
 
             if (!dropTarget) return null;
 
-            return canDragOnlyIcon ? dropTarget : connectDragSource(dropTarget);
+            return connectDragSource(dropTarget);
           }}
         </DragSourceAndDropTarget>
       )}

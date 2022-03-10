@@ -295,18 +295,26 @@ export const moveTabToPosition = (
   fromIndex: number,
   toIndex: number
 ): EditorTabsState => {
-  if (toIndex < fromIndex) toIndex += 1;
+  // If the tab is dragged backward, we want it to be placed on the right
+  // of the hovered tab so as to match the position of the drop indicator.
+  const destinationIndex = toIndex < fromIndex ? toIndex + 1 : toIndex;
+
   const currentEditorTabs = [...getEditors(editorTabsState)];
   const movingTab = currentEditorTabs[fromIndex];
   currentEditorTabs.splice(fromIndex, 1);
-  currentEditorTabs.splice(toIndex, 0, movingTab);
+  currentEditorTabs.splice(destinationIndex, 0, movingTab);
 
-  let currentTabIndex: number = getCurrentTabIndex(editorTabsState);
-  if (fromIndex === currentTabIndex) currentTabIndex = toIndex;
-  else if (fromIndex < currentTabIndex && toIndex >= currentTabIndex)
-    currentTabIndex -= 1;
-  else if (fromIndex > currentTabIndex && toIndex <= currentTabIndex)
-    currentTabIndex += 1;
+  let currentTabIndex = getCurrentTabIndex(editorTabsState);
+
+  const movingTabIsCurrentTab = fromIndex === currentTabIndex;
+  const tabIsMovedFromLeftToRightOfCurrentTab =
+    fromIndex < currentTabIndex && destinationIndex >= currentTabIndex;
+  const tabIsMovedFromRightToLeftOfCurrentTab =
+    fromIndex > currentTabIndex && destinationIndex <= currentTabIndex;
+
+  if (movingTabIsCurrentTab) currentTabIndex = destinationIndex;
+  else if (tabIsMovedFromLeftToRightOfCurrentTab) currentTabIndex -= 1;
+  else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabIndex += 1;
 
   return { editors: currentEditorTabs, currentTab: currentTabIndex };
 };

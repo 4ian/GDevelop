@@ -7,11 +7,13 @@ import FlatButton from '../UI/FlatButton';
 import { Line, Spacer } from '../UI/Grid';
 import {
   type Game,
+  type ApiOnlyPublicGameInfo,
   updateGame,
   deleteGame,
   getPublicGame,
   setGameUserAcls,
   getAclsFromAuthorIds,
+  getAclsFromOwnerIds,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
@@ -41,6 +43,7 @@ import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
+import Crown from '../UI/CustomSvgIcons/Crown';
 import { I18n } from '@lingui/react';
 
 const styles = {
@@ -146,7 +149,9 @@ export const GameDetailsDialog = ({
     [loadPublicGame]
   );
 
-  const updateGameFromProject = async () => {
+  const updateGameFromProject = async (
+    apiOnlyPublicGameInfo: ApiOnlyPublicGameInfo
+  ) => {
     if (!project || !profile) return;
     const { id } = profile;
 
@@ -166,7 +171,11 @@ export const GameDetailsDialog = ({
         // The thumbnailUrl is updated only when a build is made public.
       });
       const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
-      await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
+      const ownerAcls = getAclsFromOwnerIds(apiOnlyPublicGameInfo.ownerIds);
+      await setGameUserAcls(getAuthorizationHeader, id, gameId, {
+        ownership: ownerAcls,
+        author: authorAcls,
+      });
       onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);
@@ -210,11 +219,10 @@ export const GameDetailsDialog = ({
   );
 
   const authorUsernames =
-    publicGame && publicGame.authors
-      ? publicGame.authors
-          .map(author => (author ? author.username : null))
-          .filter(Boolean)
-      : [];
+    publicGame && publicGame.authors.map(author => author.username);
+
+  const ownerUsernames =
+    publicGame && publicGame.owners.map(owner => owner.username);
 
   const isGameOpenedAsProject =
     !!project && project.getProjectUuid() === game.id;
@@ -278,7 +286,7 @@ export const GameDetailsDialog = ({
                       alignItems="center"
                       noMargin
                     >
-                      {authorUsernames && (
+                      {authorUsernames && ownerUsernames && (
                         <>
                           <Text>
                             <Trans>Authors:</Trans>
@@ -289,6 +297,13 @@ export const GameDetailsDialog = ({
                                 <Spacer />
                                 <Chip
                                   size="small"
+                                  icon={
+                                    ownerUsernames.includes(username) ? (
+                                      <Crown />
+                                    ) : (
+                                      undefined
+                                    )
+                                  }
                                   label={username}
                                   color={index === 0 ? 'primary' : 'default'}
                                 />
@@ -609,9 +624,9 @@ export const GameDetailsDialog = ({
               open={isPublicGamePropertiesDialogOpen}
               project={project}
               publicGame={publicGame}
-              onApply={() => {
+              onApply={apiOnlyPublicGameInfo => {
                 setIsPublicGamePropertiesDialogOpen(false);
-                updateGameFromProject();
+                updateGameFromProject(apiOnlyPublicGameInfo);
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
             />

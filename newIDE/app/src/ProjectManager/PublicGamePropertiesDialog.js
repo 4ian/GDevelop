@@ -10,7 +10,10 @@ import {
 } from '../Utils/ProjectErrorsChecker';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import {
+  type PublicGame,
+  type ApiOnlyPublicGameInfo,
+} from '../Utils/GDevelopServices/Game';
 
 /**
  * Public game properties that are shared with the project file ones.
@@ -53,7 +56,7 @@ type Props = {|
   publicGame: PublicGame,
   open: boolean,
   onClose: () => void,
-  onApply: () => void,
+  onApply: (apiOnlyPublicGameInfo: ApiOnlyPublicGameInfo) => void,
 |};
 
 const PublicGamePropertiesDialog = ({
@@ -63,15 +66,15 @@ const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
 }: Props) => {
-  const publicGameAuthorIds = publicGame.authors
-    .map(author => (author ? author.id : null))
-    .filter(Boolean);
+  const publicGameAuthorIds = publicGame.authors.map(author => author.id);
+  const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
   const [categories, setCategories] = React.useState(publicGame.categories);
   const [description, setDescription] = React.useState(publicGame.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
+  const [ownerIds, setOwnerIds] = React.useState<string[]>(publicGameOwnerIds);
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
     publicGame.playWithKeyboard
   );
@@ -97,8 +100,9 @@ const PublicGamePropertiesDialog = ({
         playWithMobile: !!playWithMobile,
         orientation: orientation || 'default',
       })
-    )
-      onApply();
+    ) {
+      onApply({ ownerIds });
+    }
   };
 
   const actions = [
@@ -134,6 +138,8 @@ const PublicGamePropertiesDialog = ({
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        ownerIds={ownerIds}
+        setOwnerIds={setOwnerIds}
         setPlayableWithKeyboard={setPlayableWithKeyboard}
         playWithKeyboard={playWithKeyboard}
         setPlayableWithGamepad={setPlayableWithGamepad}

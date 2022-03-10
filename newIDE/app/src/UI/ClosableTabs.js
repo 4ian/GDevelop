@@ -100,7 +100,7 @@ export function ClosableTabs({ hideLabels, children }: ClosableTabsProps) {
   );
 }
 
-type ClosableTabProps = {|
+export type ClosableTabProps = {|
   id?: string,
   active: boolean,
   label: Node,
@@ -188,6 +188,9 @@ export function ClosableTab({
                 id={id ? `${id}-button` : undefined}
                 {...longTouchForContextMenuProps}
                 focusRipple
+                // If touch ripple is not disabled, dragged preview will use the size of the ripple
+                // and it will be too big
+                disableTouchRipple
               >
                 <span
                   style={{

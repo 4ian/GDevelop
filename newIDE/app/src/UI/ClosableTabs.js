@@ -81,30 +81,26 @@ type ClosableTabsProps = {|
   children: Node,
 |};
 
-export class ClosableTabs extends Component<ClosableTabsProps> {
-  render() {
-    const { hideLabels, children } = this.props;
+export function ClosableTabs({ hideLabels, children }: ClosableTabsProps) {
+  return (
+    <ThemeConsumer>
+      {muiTheme => {
+        const tabItemContainerStyle = {
+          maxWidth: '100%', // Tabs should take all width
+          flexShrink: 0, // Tabs height should never be reduced
+          display: hideLabels ? 'none' : 'flex',
+          flexWrap: 'nowrap', // Single line of tab...
+          overflowX: 'auto', // ...scroll horizontally if needed
+          backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
+        };
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          const tabItemContainerStyle = {
-            maxWidth: '100%', // Tabs should take all width
-            flexShrink: 0, // Tabs height should never be reduced
-            display: hideLabels ? 'none' : 'flex',
-            flexWrap: 'nowrap', // Single line of tab...
-            overflowX: 'auto', // ...scroll horizontally if needed
-            backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
-          };
-
-          return <div style={tabItemContainerStyle}>{children}</div>;
-        }}
-      </ThemeConsumer>
-    );
-  }
+        return <div style={tabItemContainerStyle}>{children}</div>;
+      }}
+    </ThemeConsumer>
+  );
 }
 
-type ClosableTabProps = {|
+export type ClosableTabProps = {|
   id?: string,
   active: boolean,
   label: Node,
@@ -192,6 +188,9 @@ export function ClosableTab({
                 id={id ? `${id}-button` : undefined}
                 {...longTouchForContextMenuProps}
                 focusRipple
+                // If touch ripple is not disabled, dragged preview will use the size of the ripple
+                // and it will be too big
+                disableTouchRipple
               >
                 <span
                   style={{

@@ -1891,6 +1891,15 @@ const MainFrame = (props: Props) => {
     }));
   };
 
+  const _onDropEditorTab = (fromIndex: number, toIndex: number) => {
+    setState(state => {
+      return {
+        ...state,
+        editorTabs: moveTabToPosition(state.editorTabs, fromIndex, toIndex),
+      };
+    });
+  };
+
   const onChooseResource: ChooseResourceFunction = (
     options: ChooseResourceOptions
   ) => {
@@ -2147,18 +2156,7 @@ const MainFrame = (props: Props) => {
         }
         onCloseAll={_onCloseAllEditorTabs}
         onTabActive={(editorTab: EditorTab) => _onEditorTabActive(editorTab)}
-        onDropTab={(fromIndex: number, toIndex: number) => {
-          setState(state => {
-            return {
-              ...state,
-              editorTabs: moveTabToPosition(
-                state.editorTabs,
-                fromIndex,
-                toIndex
-              ),
-            };
-          });
-        }}
+        onDropTab={_onDropEditorTab}
       />
       {getEditors(state.editorTabs).map((editorTab, id) => {
         const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;

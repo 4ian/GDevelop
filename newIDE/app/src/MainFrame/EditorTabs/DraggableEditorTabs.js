@@ -110,9 +110,7 @@ export function DraggableClosableTab({
             return index !== 0;
           }}
           canDrop={() => true}
-          drop={() => {
-            onDrop(index);
-          }}
+          drop={() => onDrop(index)}
         >
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
             // If on a touch screen, setting the whole item to be
@@ -128,7 +126,6 @@ export function DraggableClosableTab({
                 style={{
                   display: 'flex',
                   flexShrink: 0,
-                  // transform: 'translate3d(0,0,0)',
                 }}
               >
                 <ClosableTab

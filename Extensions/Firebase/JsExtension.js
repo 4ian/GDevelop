@@ -249,7 +249,7 @@ module.exports = {
     extension
       .addAction(
         'CreateBasicAccount',
-        _('Create account with with email'),
+        _('Create account with email'),
         _('Create an account with email and password as credentials.'),
         _('Create account with email _PARAM0_ and password _PARAM1_'),
         _('Authentication'),

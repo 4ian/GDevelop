@@ -43,7 +43,7 @@ import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
-import StarIcon from '@material-ui/icons/Star';
+import Crown from '../UI/CustomSvgIcons/Crown';
 import { I18n } from '@lingui/react';
 
 const styles = {
@@ -299,7 +299,7 @@ export const GameDetailsDialog = ({
                                   size="small"
                                   icon={
                                     ownerUsernames.includes(username) ? (
-                                      <StarIcon />
+                                      <Crown />
                                     ) : (
                                       undefined
                                     )

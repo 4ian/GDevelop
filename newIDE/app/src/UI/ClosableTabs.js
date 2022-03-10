@@ -81,27 +81,23 @@ type ClosableTabsProps = {|
   children: Node,
 |};
 
-export class ClosableTabs extends Component<ClosableTabsProps> {
-  render() {
-    const { hideLabels, children } = this.props;
+export function ClosableTabs({ hideLabels, children }: ClosableTabsProps) {
+  return (
+    <ThemeConsumer>
+      {muiTheme => {
+        const tabItemContainerStyle = {
+          maxWidth: '100%', // Tabs should take all width
+          flexShrink: 0, // Tabs height should never be reduced
+          display: hideLabels ? 'none' : 'flex',
+          flexWrap: 'nowrap', // Single line of tab...
+          overflowX: 'auto', // ...scroll horizontally if needed
+          backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
+        };
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          const tabItemContainerStyle = {
-            maxWidth: '100%', // Tabs should take all width
-            flexShrink: 0, // Tabs height should never be reduced
-            display: hideLabels ? 'none' : 'flex',
-            flexWrap: 'nowrap', // Single line of tab...
-            overflowX: 'auto', // ...scroll horizontally if needed
-            backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
-          };
-
-          return <div style={tabItemContainerStyle}>{children}</div>;
-        }}
-      </ThemeConsumer>
-    );
-  }
+        return <div style={tabItemContainerStyle}>{children}</div>;
+      }}
+    </ThemeConsumer>
+  );
 }
 
 type ClosableTabProps = {|

@@ -7,7 +7,6 @@ import FlatButton from '../UI/FlatButton';
 import { Line, Spacer } from '../UI/Grid';
 import {
   type Game,
-  type ApiOnlyPublicGameInfo,
   updateGame,
   deleteGame,
   getPublicGame,
@@ -39,6 +38,7 @@ import HelpButton from '../UI/HelpButton';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
+import { type PartialGameChanges } from '../ProjectManager/PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
@@ -150,7 +150,7 @@ export const GameDetailsDialog = ({
   );
 
   const updateGameFromProject = async (
-    apiOnlyPublicGameInfo: ApiOnlyPublicGameInfo
+    apiOnlyPublicGameInfo: PartialGameChanges
   ) => {
     if (!project || !profile) return;
     const { id } = profile;

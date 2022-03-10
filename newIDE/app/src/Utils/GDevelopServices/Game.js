@@ -26,10 +26,6 @@ export type PublicGame = {
   categories?: string[],
 };
 
-export type ApiOnlyPublicGameInfo = {
-  ownerIds: Array<string>,
-};
-
 export type Game = {
   id: string,
   gameName: string,

@@ -10,10 +10,14 @@ import {
 } from '../Utils/ProjectErrorsChecker';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
-import {
-  type PublicGame,
-  type ApiOnlyPublicGameInfo,
-} from '../Utils/GDevelopServices/Game';
+import { type PublicGame } from '../Utils/GDevelopServices/Game';
+
+/**
+ * Changes that are not stored in the Project.
+ */
+export type PartialGameChanges = {|
+  ownerIds: Array<string>,
+|};
 
 /**
  * Public game properties that are shared with the project file ones.
@@ -56,7 +60,7 @@ type Props = {|
   publicGame: PublicGame,
   open: boolean,
   onClose: () => void,
-  onApply: (apiOnlyPublicGameInfo: ApiOnlyPublicGameInfo) => void,
+  onApply: (apiOnlyPublicGameInfo: PartialGameChanges) => void,
 |};
 
 const PublicGamePropertiesDialog = ({

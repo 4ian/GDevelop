@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react';
 import findIndex from 'lodash/findIndex';
-import { EventsEditorContainer } from './EditorContainers/EventsEditorContainer';
-import { DebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
-import { EventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
-import { ExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
-import { ExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
-import { ResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import { SceneEditorContainer } from './EditorContainers/SceneEditorContainer';
+import { EventsEditorContainer } from '../EditorContainers/EventsEditorContainer';
+import { DebuggerEditorContainer } from '../EditorContainers/DebuggerEditorContainer';
+import { EventsFunctionsExtensionEditorContainer } from '../EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
+import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
+import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
+import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
-} from './EditorContainers/BaseEditor';
+} from '../EditorContainers/BaseEditor';
 
 // Supported editors
 type EditorRef =
@@ -288,4 +288,33 @@ export const getEventsFunctionsExtensionEditor = (
   }
 
   return null;
+};
+
+export const moveTabToPosition = (
+  editorTabsState: EditorTabsState,
+  fromIndex: number,
+  toIndex: number
+): EditorTabsState => {
+  // If the tab is dragged backward, we want it to be placed on the right
+  // of the hovered tab so as to match the position of the drop indicator.
+  const destinationIndex = toIndex < fromIndex ? toIndex + 1 : toIndex;
+
+  const currentEditorTabs = [...getEditors(editorTabsState)];
+  const movingTab = currentEditorTabs[fromIndex];
+  currentEditorTabs.splice(fromIndex, 1);
+  currentEditorTabs.splice(destinationIndex, 0, movingTab);
+
+  let currentTabIndex = getCurrentTabIndex(editorTabsState);
+
+  const movingTabIsCurrentTab = fromIndex === currentTabIndex;
+  const tabIsMovedFromLeftToRightOfCurrentTab =
+    fromIndex < currentTabIndex && destinationIndex >= currentTabIndex;
+  const tabIsMovedFromRightToLeftOfCurrentTab =
+    fromIndex > currentTabIndex && destinationIndex <= currentTabIndex;
+
+  if (movingTabIsCurrentTab) currentTabIndex = destinationIndex;
+  else if (tabIsMovedFromLeftToRightOfCurrentTab) currentTabIndex -= 1;
+  else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabIndex += 1;
+
+  return { editors: currentEditorTabs, currentTab: currentTabIndex };
 };

@@ -42,7 +42,7 @@ import {
   type EditorTab,
   getEventsFunctionsExtensionEditor,
   notifyPreviewWillStart,
-} from './EditorTabsHandler';
+} from './EditorTabs/EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';

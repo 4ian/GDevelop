@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react';
 import findIndex from 'lodash/findIndex';
-import { EventsEditorContainer } from './EditorContainers/EventsEditorContainer';
-import { DebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
-import { EventsFunctionsExtensionEditorContainer } from './EditorContainers/EventsFunctionsExtensionEditorContainer';
-import { ExternalEventsEditorContainer } from './EditorContainers/ExternalEventsEditorContainer';
-import { ExternalLayoutEditorContainer } from './EditorContainers/ExternalLayoutEditorContainer';
-import { ResourcesEditorContainer } from './EditorContainers/ResourcesEditorContainer';
-import { SceneEditorContainer } from './EditorContainers/SceneEditorContainer';
+import { EventsEditorContainer } from '../EditorContainers/EventsEditorContainer';
+import { DebuggerEditorContainer } from '../EditorContainers/DebuggerEditorContainer';
+import { EventsFunctionsExtensionEditorContainer } from '../EditorContainers/EventsFunctionsExtensionEditorContainer';
+import { ExternalEventsEditorContainer } from '../EditorContainers/ExternalEventsEditorContainer';
+import { ExternalLayoutEditorContainer } from '../EditorContainers/ExternalLayoutEditorContainer';
+import { ResourcesEditorContainer } from '../EditorContainers/ResourcesEditorContainer';
+import { SceneEditorContainer } from '../EditorContainers/SceneEditorContainer';
 import {
   type RenderEditorContainerPropsWithRef,
   type EditorContainerExtraProps,
-} from './EditorContainers/BaseEditor';
+} from '../EditorContainers/BaseEditor';
 
 // Supported editors
 type EditorRef =

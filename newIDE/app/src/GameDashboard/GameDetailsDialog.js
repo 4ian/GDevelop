@@ -11,7 +11,6 @@ import {
   deleteGame,
   getPublicGame,
   setGameUserAcls,
-  getAclsFromAuthorIds,
   getAclsFromUserIds,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';

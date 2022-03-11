@@ -183,7 +183,10 @@ export const GameDetailsDialog = ({
     } catch (error) {
       console.error('Unable to update the game:', error);
     }
-    onGameUpdated(updatedGame || oldPublicGame);
+    // This should always be true in theory.
+    if (updatedGame || oldPublicGame) {
+      onGameUpdated(updatedGame || oldPublicGame);
+    }
   };
 
   const unregisterGame = async () => {

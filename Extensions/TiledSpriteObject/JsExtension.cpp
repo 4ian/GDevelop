@@ -77,6 +77,11 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("getHeight")
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
+    GetAllActionsForObject(
+        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::Size"]
+        .SetFunctionName("setSize")
+        .SetIncludeFile(
+            "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
 
     // Deprecated: now available for all objects.
     GetAllActionsForObject(

@@ -192,8 +192,7 @@ export const GameDetailsDialog = ({
           errorId: 'game-acls-update-error',
         });
       }
-      // Set public game to null to have it been refetched by the callback above.
-      // TODO this probably needs a refactor.
+      // Set public game to null as it will be refetched automatically by the callback above.
       setPublicGame(null);
       onGameUpdated(updatedGame);
     } catch (error) {

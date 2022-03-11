@@ -697,7 +697,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                   />,
                   <ListItem
                     key="icons"
-                    primaryText={<Trans>Icons</Trans>}
+                    primaryText={<Trans>Icons and thumbnail</Trans>}
                     leftIcon={<PhotoLibrary />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
                   />,

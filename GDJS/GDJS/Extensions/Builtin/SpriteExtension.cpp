@@ -74,7 +74,7 @@ SpriteExtension::SpriteExtension() {
       .SetFunctionName("setHeight")
       .SetGetter("getHeight");
   spriteConditions["Height"].SetFunctionName("getHeight");
-  spriteActions["ChangeSize"].SetFunctionName("setSize");
+  spriteActions["SetSize"].SetFunctionName("setSize");
   spriteActions["TourneVersPos"].SetFunctionName("rotateTowardPosition");
   spriteActions["TourneVers"].SetFunctionName("turnTowardObject");
   spriteActions["ChangeColor"].SetFunctionName("setColor");

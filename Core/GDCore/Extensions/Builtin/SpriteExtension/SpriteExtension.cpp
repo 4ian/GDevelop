@@ -235,7 +235,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced();
 
-  obj.AddAction("ChangeSize",
+  obj.AddAction("SetSize",
                 _("Size"),
                 _("Change the size of an object."),
                 _("Change the size of _PARAM0_: set to _PARAM1_x_PARAM2_"),

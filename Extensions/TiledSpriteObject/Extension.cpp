@@ -135,7 +135,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetHeight")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
-  obj.AddAction("Size",
+  obj.AddAction("SetSize",
                 _("Size"),
                 _("Modify the size of a Tiled Sprite."),
                 _("Change the size of _PARAM0_: set to _PARAM1_x_PARAM2_"),

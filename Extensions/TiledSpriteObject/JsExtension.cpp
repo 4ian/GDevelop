@@ -78,7 +78,7 @@ class TiledSpriteObjectJsExtension : public gd::PlatformExtension {
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");
     GetAllActionsForObject(
-        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::Size"]
+        "TiledSpriteObject::TiledSprite")["TiledSpriteObject::SetSize"]
         .SetFunctionName("setSize")
         .SetIncludeFile(
             "Extensions/TiledSpriteObject/tiledspriteruntimeobject.js");

@@ -433,17 +433,10 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         toVolume: float,
-        timeOfFade: float
+        timeOfFade: float /*In seconds and converted to ms*/
       ) => {
-        //Clamping volume
-        if (toVolume > 100) {
-          toVolume = 100;
-        }
-        if (toVolume < 0) {
-          toVolume = 0;
-        }
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade);
+        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade*1000);
         else {
           logger.error(
             `Cannot fade the volume of a non-existing sound on channel ${channel}.`

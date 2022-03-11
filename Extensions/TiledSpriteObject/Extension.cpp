@@ -138,8 +138,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
   obj.AddAction("Size",
                 _("Size"),
                 _("Modify the size of a Tiled Sprite."),
-                _("Change the size of _PARAM0_: _PARAM1_ (width) "
-                  ", _PARAM2_ (height)"),
+                _("Change the size of _PARAM0_: set to _PARAM1_x_PARAM2_"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")

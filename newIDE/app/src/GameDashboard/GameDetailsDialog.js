@@ -12,7 +12,7 @@ import {
   getPublicGame,
   setGameUserAcls,
   getAclsFromAuthorIds,
-  getAclsFromOwnerIds,
+  getAclsFromUserIds,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
@@ -37,8 +37,10 @@ import Window from '../Utils/Window';
 import HelpButton from '../UI/HelpButton';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
-import { type PartialGameChanges } from '../ProjectManager/PublicGamePropertiesDialog';
+import {
+  PublicGamePropertiesDialog,
+  type PartialGameChange,
+} from '../ProjectManager/PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
@@ -150,16 +152,18 @@ export const GameDetailsDialog = ({
   );
 
   const updateGameFromProject = async (
-    apiOnlyPublicGameInfo: PartialGameChanges
+    partialGameChange: PartialGameChange
   ) => {
     if (!project || !profile) return;
     const { id } = profile;
 
+    const oldPublicGame = publicGame;
+    let updatedGame = null;
     try {
       // Set public game to null as it will be refetched automatically by the callback above.
       setPublicGame(null);
       const gameId = project.getProjectUuid();
-      const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
+      updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
         categories: project.getCategories().toJSArray() || [],
@@ -170,16 +174,16 @@ export const GameDetailsDialog = ({
         orientation: project.getOrientation(),
         // The thumbnailUrl is updated only when a build is made public.
       });
-      const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
-      const ownerAcls = getAclsFromOwnerIds(apiOnlyPublicGameInfo.ownerIds);
+      const authorAcls = getAclsFromUserIds(project.getAuthorIds().toJSArray());
+      const ownerAcls = getAclsFromUserIds(partialGameChange.ownerIds);
       await setGameUserAcls(getAuthorizationHeader, id, gameId, {
         ownership: ownerAcls,
         author: authorAcls,
       });
-      onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);
     }
+    onGameUpdated(updatedGame || oldPublicGame);
   };
 
   const unregisterGame = async () => {
@@ -219,10 +223,12 @@ export const GameDetailsDialog = ({
   );
 
   const authorUsernames =
-    publicGame && publicGame.authors.map(author => author.username);
+    publicGame &&
+    publicGame.authors.map(author => author.username).filter(Boolean);
 
   const ownerUsernames =
-    publicGame && publicGame.owners.map(owner => owner.username);
+    publicGame &&
+    publicGame.owners.map(owner => owner.username).filter(Boolean);
 
   const isGameOpenedAsProject =
     !!project && project.getProjectUuid() === game.id;
@@ -286,7 +292,7 @@ export const GameDetailsDialog = ({
                       alignItems="center"
                       noMargin
                     >
-                      {authorUsernames && ownerUsernames && (
+                      {authorUsernames && (
                         <>
                           <Text>
                             <Trans>Authors:</Trans>
@@ -298,6 +304,7 @@ export const GameDetailsDialog = ({
                                 <Chip
                                   size="small"
                                   icon={
+                                    ownerUsernames &&
                                     ownerUsernames.includes(username) ? (
                                       <Crown />
                                     ) : (
@@ -624,9 +631,9 @@ export const GameDetailsDialog = ({
               open={isPublicGamePropertiesDialogOpen}
               project={project}
               publicGame={publicGame}
-              onApply={apiOnlyPublicGameInfo => {
+              onApply={partialGameChange => {
                 setIsPublicGamePropertiesDialogOpen(false);
-                updateGameFromProject(apiOnlyPublicGameInfo);
+                updateGameFromProject(partialGameChange);
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
             />

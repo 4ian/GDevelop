@@ -15,7 +15,7 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
 /**
  * Changes that are not stored in the Project.
  */
-export type PartialGameChanges = {|
+export type PartialGameChange = {|
   ownerIds: Array<string>,
 |};
 
@@ -60,10 +60,10 @@ type Props = {|
   publicGame: PublicGame,
   open: boolean,
   onClose: () => void,
-  onApply: (apiOnlyPublicGameInfo: PartialGameChanges) => void,
+  onApply: (partialGameChange: PartialGameChange) => void,
 |};
 
-const PublicGamePropertiesDialog = ({
+export const PublicGamePropertiesDialog = ({
   project,
   publicGame,
   open,

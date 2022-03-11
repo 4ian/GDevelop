@@ -132,19 +132,11 @@ export const getGameUrl = (game: ?Game) => {
   return GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
-export const getAclsFromOwnerIds = (
+export const getAclsFromUserIds = (
   ownersIds: Array<string>
 ): Array<{| userId: string, level: string |}> =>
   ownersIds.map(ownerId => ({
     userId: ownerId,
-    level: 'owner',
-  }));
-
-export const getAclsFromAuthorIds = (
-  authorIds: gdVectorString
-): Array<{| userId: string, level: string |}> =>
-  authorIds.toJSArray().map(authorId => ({
-    userId: authorId,
     level: 'owner',
   }));
 

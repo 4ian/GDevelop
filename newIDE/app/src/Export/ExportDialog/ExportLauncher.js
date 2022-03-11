@@ -26,7 +26,7 @@ import {
   updateGame,
   type Game,
   setGameUserAcls,
-  getAclsFromAuthorIds,
+  getAclsFromUserIds,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -139,8 +139,8 @@ export default class ExportLauncher extends Component<Props, State> {
   tryUpdateAuthors = async () => {
     const profile = this.props.authenticatedUser.profile;
     if (profile) {
-      const authorAcls = getAclsFromAuthorIds(
-        this.props.project.getAuthorIds()
+      const authorAcls = getAclsFromUserIds(
+        this.props.project.getAuthorIds().toJSArray()
       );
 
       try {

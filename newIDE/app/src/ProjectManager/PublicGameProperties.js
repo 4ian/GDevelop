@@ -25,6 +25,8 @@ type Props = {|
   description: ?string,
   setAuthorIds: (string[]) => void,
   authorIds: string[],
+  setOwnerIds?: (string[]) => void,
+  ownerIds?: string[],
   setPlayableWithKeyboard?: boolean => void,
   playWithKeyboard?: boolean,
   setPlayableWithGamepad?: boolean => void,
@@ -45,6 +47,8 @@ function PublicGameProperties({
   description,
   setAuthorIds,
   authorIds,
+  setOwnerIds,
+  ownerIds,
   setPlayableWithKeyboard,
   playWithKeyboard,
   setPlayableWithGamepad,
@@ -125,6 +129,22 @@ function PublicGameProperties({
               </Trans>
             }
           />
+          {// This view is used for public game properties as well as project properties.
+          // This property is not shown in project properties.
+          setOwnerIds && (
+            <UsersAutocomplete
+              userIds={ownerIds || []}
+              onChange={setOwnerIds}
+              floatingLabelText={<Trans>Owners</Trans>}
+              helperText={
+                <Trans>
+                  Select the usernames of the owners of this project to let them
+                  manage this game builds. Be aware that owners can revoke your
+                  ownership.
+                </Trans>
+              }
+            />
+          )}
           <SelectField
             fullWidth
             floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}

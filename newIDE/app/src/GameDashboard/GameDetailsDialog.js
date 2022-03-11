@@ -174,18 +174,21 @@ export const GameDetailsDialog = ({
         orientation: project.getOrientation(),
         // The thumbnailUrl is updated only when a build is made public.
       });
-      const authorAcls = getAclsFromUserIds(project.getAuthorIds().toJSArray());
-      const ownerAcls = getAclsFromUserIds(partialGameChange.ownerIds);
-      await setGameUserAcls(getAuthorizationHeader, id, gameId, {
-        ownership: ownerAcls,
-        author: authorAcls,
-      });
+      try {
+        const authorAcls = getAclsFromUserIds(
+          project.getAuthorIds().toJSArray()
+        );
+        const ownerAcls = getAclsFromUserIds(partialGameChange.ownerIds);
+        await setGameUserAcls(getAuthorizationHeader, id, gameId, {
+          ownership: ownerAcls,
+          author: authorAcls,
+        });
+      } catch (error) {
+        console.error('Unable to update the game owners or authors:', error);
+      }
+      onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);
-    }
-    // This should always be true in theory.
-    if (updatedGame || oldPublicGame) {
-      onGameUpdated(updatedGame || oldPublicGame);
     }
   };
 

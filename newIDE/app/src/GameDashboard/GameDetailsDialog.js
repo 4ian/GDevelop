@@ -1,6 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { formatISO } from 'date-fns';
 import FlatButton from '../UI/FlatButton';
@@ -11,7 +13,7 @@ import {
   deleteGame,
   getPublicGame,
   setGameUserAcls,
-  getAclsFromAuthorIds,
+  getAclsFromUserIds,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import Dialog from '../UI/Dialog';
@@ -36,12 +38,16 @@ import Window from '../Utils/Window';
 import HelpButton from '../UI/HelpButton';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import PublicGamePropertiesDialog from '../ProjectManager/PublicGamePropertiesDialog';
+import {
+  PublicGamePropertiesDialog,
+  type PartialGameChange,
+} from '../ProjectManager/PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
-import { I18n } from '@lingui/react';
+import Crown from '../UI/CustomSvgIcons/Crown';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 const styles = {
   tableRowStatColumn: {
@@ -146,13 +152,14 @@ export const GameDetailsDialog = ({
     [loadPublicGame]
   );
 
-  const updateGameFromProject = async () => {
+  const updateGameFromProject = async (
+    partialGameChange: PartialGameChange,
+    i18n: I18nType
+  ) => {
     if (!project || !profile) return;
     const { id } = profile;
 
     try {
-      // Set public game to null as it will be refetched automatically by the callback above.
-      setPublicGame(null);
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
@@ -165,11 +172,40 @@ export const GameDetailsDialog = ({
         orientation: project.getOrientation(),
         // The thumbnailUrl is updated only when a build is made public.
       });
-      const authorAcls = getAclsFromAuthorIds(project.getAuthorIds());
-      await setGameUserAcls(getAuthorizationHeader, id, gameId, authorAcls);
+      try {
+        const authorAcls = getAclsFromUserIds(
+          project.getAuthorIds().toJSArray()
+        );
+        const ownerAcls = getAclsFromUserIds(partialGameChange.ownerIds);
+        await setGameUserAcls(getAuthorizationHeader, id, gameId, {
+          ownership: ownerAcls,
+          author: authorAcls,
+        });
+      } catch (error) {
+        console.error('Unable to update the game owners or authors:', error);
+        showErrorBox({
+          message:
+            i18n._(t`Unable to update the game owners or authors.`) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'game-acls-update-error',
+        });
+      }
+      // Set public game to null to have it been refetched by the callback above.
+      // TODO this probably needs a refactor.
+      setPublicGame(null);
       onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);
+      showErrorBox({
+        message:
+          i18n._(t`Unable to update the game.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
+        rawError: error,
+        errorId: 'game-update-error',
+      });
     }
   };
 
@@ -210,11 +246,12 @@ export const GameDetailsDialog = ({
   );
 
   const authorUsernames =
-    publicGame && publicGame.authors
-      ? publicGame.authors
-          .map(author => (author ? author.username : null))
-          .filter(Boolean)
-      : [];
+    publicGame &&
+    publicGame.authors.map(author => author.username).filter(Boolean);
+
+  const ownerUsernames =
+    publicGame &&
+    publicGame.owners.map(owner => owner.username).filter(Boolean);
 
   const isGameOpenedAsProject =
     !!project && project.getProjectUuid() === game.id;
@@ -289,6 +326,14 @@ export const GameDetailsDialog = ({
                                 <Spacer />
                                 <Chip
                                   size="small"
+                                  icon={
+                                    ownerUsernames &&
+                                    ownerUsernames.includes(username) ? (
+                                      <Crown />
+                                    ) : (
+                                      undefined
+                                    )
+                                  }
                                   label={username}
                                   color={index === 0 ? 'primary' : 'default'}
                                 />
@@ -609,9 +654,9 @@ export const GameDetailsDialog = ({
               open={isPublicGamePropertiesDialogOpen}
               project={project}
               publicGame={publicGame}
-              onApply={() => {
+              onApply={partialGameChange => {
                 setIsPublicGamePropertiesDialogOpen(false);
-                updateGameFromProject();
+                updateGameFromProject(partialGameChange, i18n);
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
             />

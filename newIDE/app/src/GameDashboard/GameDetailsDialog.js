@@ -200,11 +200,11 @@ export const GameDetailsDialog = ({
       console.error('Unable to update the game:', error);
       showErrorBox({
         message:
-          i18n._(t`Unable to update the game.`) +
+          i18n._(t`Unable to update the game details.`) +
           ' ' +
           i18n._(t`Verify your internet connection or try again later.`),
         rawError: error,
-        errorId: 'game-update-error',
+        errorId: 'game-details-update-error',
       });
     }
   };

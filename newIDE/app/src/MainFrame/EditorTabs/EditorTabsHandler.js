@@ -290,31 +290,41 @@ export const getEventsFunctionsExtensionEditor = (
   return null;
 };
 
+export const moveTabToTheRightOfHoveredTab = (
+  editorTabsState: EditorTabsState,
+  movingTabIndex: number,
+  hoveredTabIndex: number
+): EditorTabsState => {
+  // If the tab is dragged backward, we want it to be placed on the right
+  // of the hovered tab so as to match the position of the drop indicator.
+  const destinationIndex =
+    movingTabIndex > hoveredTabIndex ? hoveredTabIndex + 1 : hoveredTabIndex;
+
+  return moveTabToPosition(editorTabsState, movingTabIndex, destinationIndex);
+};
+
 export const moveTabToPosition = (
   editorTabsState: EditorTabsState,
   fromIndex: number,
   toIndex: number
 ): EditorTabsState => {
-  // If the tab is dragged backward, we want it to be placed on the right
-  // of the hovered tab so as to match the position of the drop indicator.
-  const destinationIndex = toIndex < fromIndex ? toIndex + 1 : toIndex;
-
   const currentEditorTabs = [...getEditors(editorTabsState)];
   const movingTab = currentEditorTabs[fromIndex];
   currentEditorTabs.splice(fromIndex, 1);
-  currentEditorTabs.splice(destinationIndex, 0, movingTab);
+  currentEditorTabs.splice(toIndex, 0, movingTab);
 
   let currentTabIndex = getCurrentTabIndex(editorTabsState);
+  let currentTabNewIndex = currentTabIndex;
 
   const movingTabIsCurrentTab = fromIndex === currentTabIndex;
   const tabIsMovedFromLeftToRightOfCurrentTab =
-    fromIndex < currentTabIndex && destinationIndex >= currentTabIndex;
+    fromIndex < currentTabIndex && toIndex >= currentTabIndex;
   const tabIsMovedFromRightToLeftOfCurrentTab =
-    fromIndex > currentTabIndex && destinationIndex <= currentTabIndex;
+    fromIndex > currentTabIndex && toIndex <= currentTabIndex;
 
-  if (movingTabIsCurrentTab) currentTabIndex = destinationIndex;
-  else if (tabIsMovedFromLeftToRightOfCurrentTab) currentTabIndex -= 1;
-  else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabIndex += 1;
+  if (movingTabIsCurrentTab) currentTabNewIndex = toIndex;
+  else if (tabIsMovedFromLeftToRightOfCurrentTab) currentTabNewIndex -= 1;
+  else if (tabIsMovedFromRightToLeftOfCurrentTab) currentTabNewIndex += 1;
 
-  return { editors: currentEditorTabs, currentTab: currentTabIndex };
+  return { editors: currentEditorTabs, currentTab: currentTabNewIndex };
 };

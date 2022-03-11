@@ -24,7 +24,7 @@ type DraggableClosableTabsProps = {|
   onCloseOtherTabs: (editor: EditorTab) => void,
   onCloseAll: () => void,
   onTabActived: (editor: EditorTab) => void,
-  onDropTab: (fromIndex: number, toIndex: number) => void,
+  onDropTab: (fromIndex: number, toHoveredIndex: number) => void,
 |};
 
 export function DraggableClosableTabs({
@@ -60,7 +60,7 @@ export function DraggableClosableTabs({
               draggedTabIndex = id;
               return editorTab;
             }}
-            onDrop={toIndex => {
+            onDrop={toHoveredIndex => {
               if (typeof draggedTabIndex === 'number') {
                 onDropTab(draggedTabIndex, id);
                 draggedTabIndex = null;

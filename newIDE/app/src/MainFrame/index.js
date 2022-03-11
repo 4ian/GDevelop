@@ -39,7 +39,7 @@ import {
   type EditorTab,
   getEventsFunctionsExtensionEditor,
   notifyPreviewWillStart,
-  moveTabToPosition,
+  moveTabToTheRightOfHoveredTab,
 } from './EditorTabs/EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
 import HelpFinder from '../HelpFinder';
@@ -1891,11 +1891,15 @@ const MainFrame = (props: Props) => {
     }));
   };
 
-  const onDropEditorTab = (fromIndex: number, toIndex: number) => {
+  const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
     setState(state => {
       return {
         ...state,
-        editorTabs: moveTabToPosition(state.editorTabs, fromIndex, toIndex),
+        editorTabs: moveTabToTheRightOfHoveredTab(
+          state.editorTabs,
+          fromIndex,
+          toHoveredIndex
+        ),
       };
     });
   };

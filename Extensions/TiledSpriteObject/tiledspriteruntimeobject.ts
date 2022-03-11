@@ -163,6 +163,16 @@ namespace gdjs {
     }
 
     /**
+     * Set the size of the Tiled Sprite object.
+     * @param width The new width.
+     * @param height The new height.
+     */
+    setSize(width: float, height: float): void {
+      this.setWidth(width);
+      this.setHeight(height);
+    }
+
+    /**
      * Set the offset on the X-axis when displaying the image of the Tiled Sprite object.
      * @param xOffset The new offset on the X-axis.
      */

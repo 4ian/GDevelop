@@ -1,6 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { formatISO } from 'date-fns';
 import FlatButton from '../UI/FlatButton';
@@ -45,7 +47,7 @@ import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
-import { I18n } from '@lingui/react';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 const styles = {
   tableRowStatColumn: {
@@ -151,18 +153,15 @@ export const GameDetailsDialog = ({
   );
 
   const updateGameFromProject = async (
-    partialGameChange: PartialGameChange
+    partialGameChange: PartialGameChange,
+    i18n: I18nType
   ) => {
     if (!project || !profile) return;
     const { id } = profile;
 
-    const oldPublicGame = publicGame;
-    let updatedGame = null;
     try {
-      // Set public game to null as it will be refetched automatically by the callback above.
-      setPublicGame(null);
       const gameId = project.getProjectUuid();
-      updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
+      const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitle game',
         categories: project.getCategories().toJSArray() || [],
@@ -184,10 +183,29 @@ export const GameDetailsDialog = ({
         });
       } catch (error) {
         console.error('Unable to update the game owners or authors:', error);
+        showErrorBox({
+          message:
+            i18n._(t`Unable to update the game owners or authors.`) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'game-acls-update-error',
+        });
       }
+      // Set public game to null to have it been refetched by the callback above.
+      // TODO this probably needs a refactor.
+      setPublicGame(null);
       onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);
+      showErrorBox({
+        message:
+          i18n._(t`Unable to update the game.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
+        rawError: error,
+        errorId: 'game-update-error',
+      });
     }
   };
 
@@ -638,7 +656,7 @@ export const GameDetailsDialog = ({
               publicGame={publicGame}
               onApply={partialGameChange => {
                 setIsPublicGamePropertiesDialogOpen(false);
-                updateGameFromProject(partialGameChange);
+                updateGameFromProject(partialGameChange, i18n);
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
             />

@@ -436,7 +436,7 @@ namespace gdjs {
         timeOfFade: float /*In seconds and converted to ms*/
       ) => {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade*1000);
+        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade * 1000);
         else {
           logger.error(
             `Cannot fade the volume of a non-existing sound on channel ${channel}.`

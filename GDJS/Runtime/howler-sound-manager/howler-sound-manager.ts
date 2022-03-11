@@ -295,6 +295,8 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     fade(from: float, to: float, duration: float): this {
+      from = clampVolume(from);
+      to = clampVolume(to);
       if (this._id !== null) this._howl.fade(from, to, duration, this._id);
       return this;
     }

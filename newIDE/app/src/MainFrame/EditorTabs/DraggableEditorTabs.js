@@ -104,9 +104,9 @@ export function DraggableClosableTab({
         <DragSourceAndDropTarget
           beginDrag={onBeginDrag}
           canDrag={() => {
-            // On touchscreens, we allow DnD on active tab so that user can scroll
-            if (screenType === 'touch' && !active) return false;
-            // We want "Home" tab to stay on the left
+            // On touchscreens, we disable drag and drop.
+            if (screenType === 'touch') return false;
+            // We want "Home" tab to stay on the left.
             return index !== 0;
           }}
           canDrop={() => true}
@@ -114,7 +114,7 @@ export function DraggableClosableTab({
         >
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) => {
             // Add an extra div because connectDropTarget/connectDragSource can
-            // only be used on native elements
+            // only be used on native elements.
             const dropTarget = connectDropTarget(
               <div
                 style={{

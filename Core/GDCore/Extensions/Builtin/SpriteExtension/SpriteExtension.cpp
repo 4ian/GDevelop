@@ -238,8 +238,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("ChangeSize",
                 _("Size"),
                 _("Change the size of an object."),
-                _("Change the size of _PARAM0_: _PARAM1_ (width) "
-                  ", _PARAM2_ (height)"),
+                _("Change the size of _PARAM0_ to _PARAM1_ x _PARAM2_"),
                 _("Size"),
                 "res/actions/scale24.png",
                 "res/actions/scale.png")

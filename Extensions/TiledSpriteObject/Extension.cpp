@@ -135,6 +135,21 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetHeight")
       .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
+  obj.AddAction("Size",
+                _("Size"),
+                _("Modify the size of a Tiled Sprite."),
+                _("Change the size of _PARAM0_: _PARAM1_ (width) "
+                  ", _PARAM2_ (height)"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "TiledSprite")
+      .AddParameter("expression", _("Width"))
+      .AddParameter("expression", _("Height"))
+      .SetFunctionName("SetSize")
+      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
   // Deprecated: now available for all objects.
   obj.AddAction("Angle",
                 _("Angle"),

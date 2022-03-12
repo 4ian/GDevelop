@@ -236,6 +236,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0");
 
+  // TODO Deprecated: hide this action in a future release.
   extension
       .AddAction(
           "FixCamera",
@@ -266,16 +267,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
       .SetDefaultValue("0")
-      .MarkAsAdvanced()
-      .SetHidden();  // Deprecated
+      .MarkAsAdvanced();
 
   extension
       .AddAction(
           "ClampCamera",
-          _("Move back the camera within bounds"),
-          _("Move back the camera inside the specified bounds."),
-          _("Move back the camera within bounds (left: _PARAM1_, top: _PARAM2_ "
-            "right: _PARAM3_, bottom: _PARAM4_, layer: _PARAM5_, camera: _PARAM6_)"),
+          _("Enforce camera boundaries"),
+          _("Enforce camera boundaries by moving the camera back inside specified boundaries."),
+          _("Enforce camera boundaries (left: _PARAM1_, top: _PARAM2_ "
+            "right: _PARAM3_, bottom: _PARAM4_, layer: _PARAM5_)"),
           "",
           "res/actions/camera24.png",
           "res/actions/camera.png")
@@ -299,7 +299,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "CentreCamera",
           _("Center the camera on an object"),
           _("Center the camera on the specified object."),
-          _("Center camera on _PARAM1_ (layer: _PARAM3_, camera: _PARAM4_)"),
+          _("Center camera on _PARAM1_ (layer: _PARAM3_)"),
           "",
           "res/actions/camera24.png",
           "res/actions/camera.png")

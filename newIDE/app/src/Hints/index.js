@@ -90,6 +90,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`To start a timer, don't forget to use the action "Start (or reset) an object timer" in another event.`,
     };
   }
+  if (type === 'FixCamera') {
+    return {
+      kind: 'info',
+      message: t`Please prefer using the new action "Enforce camera boundaries" which is more flexible.`,
+    };
+  }
   if (type === 'BitmapText::Scale') {
     return {
       kind: 'info',

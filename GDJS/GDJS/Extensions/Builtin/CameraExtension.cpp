@@ -73,7 +73,9 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.getCameraHeight");
 
   GetAllActions()["FixCamera"].SetFunctionName(
-      "gdjs.evtTools.camera.centerCameraWithinLimits");
+      "gdjs.evtTools.camera.centerCameraWithinLimits");  // Deprecated
+  GetAllActions()["ClampCamera"].SetFunctionName(
+      "gdjs.evtTools.camera.clampCamera");
   GetAllActions()["CentreCamera"].SetFunctionName(
       "gdjs.evtTools.camera.centerCamera");
 

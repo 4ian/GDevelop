@@ -162,7 +162,6 @@ namespace gdjs {
         if (!runtimeScene.hasLayer(layerName) || object == null) {
           return;
         }
-        const layer = runtimeScene.getLayer(layerName);
         let xOffset = 0;
         let yOffset = 0;
         if (anticipateMove && !object.hasNoForces()) {
@@ -172,10 +171,14 @@ namespace gdjs {
           xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
           yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
         }
-        layer.setCameraX(object.getDrawableX() + object.getCenterX(), cameraId);
-        layer.setCameraY(object.getDrawableY() + object.getCenterY(), cameraId);
+        const layer = runtimeScene.getLayer(layerName);
+        layer.setCameraX(object.getCenterXInScene() + xOffset, cameraId);
+        layer.setCameraY(object.getCenterYInScene() + yOffset, cameraId);
       };
 
+      /**
+       * @deprecated prefer using centerCamera and clampCamera.
+       */
       export const centerCameraWithinLimits = function (
         runtimeScene: gdjs.RuntimeScene,
         object: gdjs.RuntimeObject | null,
@@ -187,35 +190,60 @@ namespace gdjs {
         layerName: string,
         cameraId: integer
       ) {
-        if (!runtimeScene.hasLayer(layerName) || object == null) {
+        centerCamera(runtimeScene, object, anticipateMove, layerName, cameraId);
+        clampCamera(
+          runtimeScene,
+          left,
+          top,
+          right,
+          bottom,
+          layerName,
+          cameraId
+        );
+      };
+
+      export const clampCamera = function (
+        runtimeScene: gdjs.RuntimeScene,
+        left: float,
+        top: float,
+        right: float,
+        bottom: float,
+        layerName: string,
+        cameraId: integer
+      ) {
+        if (!runtimeScene.hasLayer(layerName)) {
           return;
         }
         const layer = runtimeScene.getLayer(layerName);
-        let xOffset = 0;
-        let yOffset = 0;
-        if (anticipateMove && !object.hasNoForces()) {
-          const objectAverageForce = object.getAverageForce();
-          const elapsedTimeInSeconds =
-            object.getElapsedTime(runtimeScene) / 1000;
-          xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
-          yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
-        }
-        let newX = object.getDrawableX() + object.getCenterX() + xOffset;
-        if (newX < left + layer.getCameraWidth(cameraId) / 2) {
-          newX = left + layer.getCameraWidth(cameraId) / 2;
-        }
-        if (newX > right - layer.getCameraWidth(cameraId) / 2) {
-          newX = right - layer.getCameraWidth(cameraId) / 2;
-        }
-        let newY = object.getDrawableY() + object.getCenterY() + yOffset;
-        if (newY < top + layer.getCameraHeight(cameraId) / 2) {
-          newY = top + layer.getCameraHeight(cameraId) / 2;
-        }
-        if (newY > bottom - layer.getCameraHeight(cameraId) / 2) {
-          newY = bottom - layer.getCameraHeight(cameraId) / 2;
-        }
-        layer.setCameraX(newX, cameraId);
-        layer.setCameraY(newY, cameraId);
+        const cameraHalfWidth = layer.getCameraWidth(cameraId) / 2;
+        const cameraHalfHeight = layer.getCameraHeight(cameraId) / 2;
+
+        const centerLeftBound = left + cameraHalfWidth;
+        const centerRightBound = right - cameraHalfWidth;
+        const centerTopBound = top + cameraHalfHeight;
+        const centerBottomBound = bottom - cameraHalfHeight;
+
+        const cameraX =
+          centerLeftBound < centerRightBound
+            ? gdjs.evtTools.common.clamp(
+                layer.getCameraX(cameraId),
+                centerLeftBound,
+                centerRightBound
+              )
+            : // Center on the bounds when they are too small to fit the viewport.
+              (centerLeftBound + centerRightBound) / 2;
+        const cameraY =
+          centerTopBound < centerBottomBound
+            ? gdjs.evtTools.common.clamp(
+                layer.getCameraY(cameraId),
+                centerTopBound,
+                centerBottomBound
+              )
+            : // Center on the bounds when they are too small to fit the viewport.
+              (centerTopBound + centerBottomBound) / 2;
+
+        layer.setCameraX(cameraX, cameraId);
+        layer.setCameraY(cameraY, cameraId);
       };
 
       /**

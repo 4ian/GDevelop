@@ -291,6 +291,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         canAddSubEvent={hasEventSelected(this.state.selection)}
         onAddCommentEvent={this._addCommentEvent}
         onAddEvent={this.addNewEvent}
+        onToggleDisabledEvent={this.toggleDisabled}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         canUndo={canUndo(this.state.history)}
@@ -638,6 +639,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Toggle disabled`),
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
+      accelerator: 'D',
     },
     { type: 'separator' },
     {

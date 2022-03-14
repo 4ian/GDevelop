@@ -159,6 +159,8 @@ export const GameDetailsDialog = ({
     if (!project || !profile) return;
     const { id } = profile;
 
+    // Set public game to null as it will be refetched automatically by the callback above.
+    setPublicGame(null);
     try {
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
@@ -192,8 +194,6 @@ export const GameDetailsDialog = ({
           errorId: 'game-acls-update-error',
         });
       }
-      // Set public game to null as it will be refetched automatically by the callback above.
-      setPublicGame(null);
       onGameUpdated(updatedGame);
     } catch (error) {
       console.error('Unable to update the game:', error);

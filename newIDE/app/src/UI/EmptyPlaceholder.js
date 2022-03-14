@@ -13,7 +13,7 @@ type Props = {|
   title: React.Node,
   description: React.Node,
   actionLabel: React.Node,
-  helpPagePath: string,
+  helpPagePath?: string,
   actionButtonId?: string,
   onAdd: () => void,
 |};

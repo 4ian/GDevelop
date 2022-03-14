@@ -48,6 +48,7 @@ import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import LeaderboardAdmin from './LeaderboardAdmin';
 
 const styles = {
   tableRowStatColumn: {
@@ -55,7 +56,11 @@ const styles = {
   },
 };
 
-export type GamesDetailsTab = 'details' | 'builds' | 'analytics';
+export type GamesDetailsTab =
+  | 'details'
+  | 'builds'
+  | 'analytics'
+  | 'leaderboards';
 
 type Props = {|
   game: Game,
@@ -285,8 +290,12 @@ export const GameDetailsDialog = ({
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
             <Tab label={<Trans>Analytics</Trans>} value="analytics" />
+            <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
           <Line>
+            {currentTab === 'leaderboards' ? (
+              <LeaderboardAdmin gameId={game.id} />
+            ) : null}
             {currentTab === 'details' ? (
               publicGameError ? (
                 <PlaceholderError onRetry={loadPublicGame}>

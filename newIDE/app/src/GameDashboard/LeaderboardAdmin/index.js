@@ -1,58 +1,66 @@
 // @flow
+import React from 'react';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
+
+import MUITextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import Add from '@material-ui/icons/Add';
 import Fingerprint from '@material-ui/icons/Fingerprint';
 import Update from '@material-ui/icons/Update';
 import Today from '@material-ui/icons/Today';
 import Sort from '@material-ui/icons/Sort';
 import SwapVertical from '@material-ui/icons/SwapVert';
-import React from 'react';
+import Refresh from '@material-ui/icons/Refresh';
+import {
+  Avatar,
+  Divider,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
+  ListItemText,
+  Switch,
+  Tooltip,
+  Typography,
+} from '@material-ui/core';
+
 import Copy from '../../UI/CustomSvgIcons/Copy';
-import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
-import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
 import PlaceholderError from '../../UI/PlaceholderError';
 import RaisedButton from '../../UI/RaisedButton';
-import MUITextField from '@material-ui/core/TextField';
 import TextField from '../../UI/TextField';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {
-  Divider,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Tooltip,
-  Typography,
-} from '@material-ui/core';
-import { textEllipsisStyle } from '../../UI/TextEllipsis';
-import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
+import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
+import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
 import Window from '../../Utils/Window';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
-import Refresh from '@material-ui/icons/Refresh';
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
-const breakUuid = (uuid: string): string => {
-  const parts = uuid.split('-');
-  return `${parts[0]}-...-${parts[parts.length - 1]}`;
-};
+const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};
 
 const styles = {
   leftColumn: { display: 'flex', flexDirection: 'column', flex: 1 },
-  rightColumn: { display: 'flex', flexDirection: 'column', flex: 2 },
+  rightColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 2,
+  },
 };
 
 const LeaderboardAdmin = ({ onLoading }: Props) => {
   const isOnline = useOnlineStatus();
+  const windowWidth = useResponsiveWindowWidth();
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
   const [isRequestPending, setIsRequestPending] = React.useState<boolean>(
     false
@@ -180,10 +188,90 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         />
       </Line>
     );
+
+  const leaderboardDescription = (
+    i18n: I18nType,
+    currentLeaderboard: Leaderboard
+  ) => [
+    {
+      key: 'id',
+      avatar: <Fingerprint />,
+      text: (
+        <Tooltip title={currentLeaderboard.id}>
+          <Typography variant="body2">
+            {breakUuid(currentLeaderboard.id)}
+          </Typography>
+        </Tooltip>
+      ),
+      secondaryAction: (
+        <IconButton onClick={onCopy} tooltip={t`Copy`} edge="end">
+          <Copy />
+        </IconButton>
+      ),
+    },
+    {
+      key: 'startDatetime',
+      avatar: <Today />,
+      text: (
+        <Tooltip
+          title={i18n._(
+            t`Date from which entries are taken into account: ${i18n.date(
+              currentLeaderboard.startDatetime,
+              {
+                dateStyle: 'short',
+                timeStyle: 'short',
+              }
+            )}`
+          )}
+        >
+          <Typography variant="body2">
+            {i18n.date(currentLeaderboard.startDatetime)}
+          </Typography>
+        </Tooltip>
+      ),
+      secondaryAction: (
+        <IconButton
+          onClick={() => _resetLeaderboard(i18n)}
+          tooltip={t`Reset leaderboard`}
+          edge="end"
+          disabled={isRequestPending || isEditingName}
+        >
+          <Update />
+        </IconButton>
+      ),
+    },
+    {
+      key: 'sort',
+      avatar: <Sort />,
+      text: (
+        <Typography variant="body2">
+          {currentLeaderboard.sort === 'ASC' ? (
+            <Trans>Lower is better</Trans>
+          ) : (
+            <Trans>Higher is better</Trans>
+          )}
+        </Typography>
+      ),
+      secondaryAction: (
+        <IconButton
+          onClick={async () => {
+            await _updateLeaderboard({
+              sort: currentLeaderboard.sort === 'ASC' ? 'DESC' : 'ASC',
+            });
+          }}
+          tooltip={t`Change sort direction`}
+          edge="end"
+          disabled={isRequestPending || isEditingName}
+        >
+          <SwapVertical />
+        </IconButton>
+      ),
+    },
+  ];
   return (
     <I18n>
       {({ i18n }) => (
-        <Line noMargin expand>
+        <ResponsiveLineStackLayout noMargin expand>
           <div style={styles.leftColumn}>
             <Column>
               <Line>
@@ -277,101 +365,39 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                       }}
                     />
                   </Line>
-                  <Divider />
-                  <Table size="small">
-                    <TableBody>
-                      <TableRow>
-                        <TableCell align="center">
-                          <Fingerprint />
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip title={currentLeaderboard.id}>
-                            <span style={textEllipsisStyle}>
-                              {breakUuid(currentLeaderboard.id)}
-                            </span>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="center">
-                          <IconButton
-                            onClick={onCopy}
-                            tooltip={t`Copy`}
-                            edge="end"
-                          >
-                            <Copy />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell align="center">
-                          <Today />
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip
-                            title={i18n._(
-                              t`Date from which entries are taken into account: ${i18n.date(
-                                currentLeaderboard.startDatetime,
-                                {
-                                  dateStyle: 'short',
-                                  timeStyle: 'short',
-                                }
-                              )}`
-                            )}
-                          >
-                            <span>
-                              {i18n.date(currentLeaderboard.startDatetime)}
-                            </span>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell align="center">
-                          <IconButton
-                            onClick={() => _resetLeaderboard(i18n)}
-                            tooltip={t`Reset leaderboard`}
-                            edge="end"
-                            disabled={isRequestPending || isEditingName}
-                          >
-                            <Update />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell align="center">
-                          <Sort />
-                        </TableCell>
-                        <TableCell>
-                          <span>
-                            {currentLeaderboard.sort === 'ASC' ? (
-                              <Trans>Lower is better</Trans>
-                            ) : (
-                              <Trans>Higher is better</Trans>
-                            )}
-                          </span>
-                        </TableCell>
-                        <TableCell align="center">
-                          <IconButton
-                            onClick={async () => {
-                              await _updateLeaderboard({
-                                sort:
-                                  currentLeaderboard.sort === 'ASC'
-                                    ? 'DESC'
-                                    : 'ASC',
-                              });
-                            }}
-                            tooltip={t`Change sort direction`}
-                            edge="end"
-                            disabled={isRequestPending || isEditingName}
-                          >
-                            <SwapVertical />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
+                  <Spacer />
+                  <List>
+                    {leaderboardDescription(i18n, currentLeaderboard).map(
+                      (item, index) => (
+                        <>
+                          {index > 0 ? (
+                            <Divider key={`divider-${item.key}`}variant="inset" component="li" />
+                          ) : null}
+                          <ListItem key={item.key} disableGutters>
+                            <ListItemAvatar>
+                              <Avatar>{item.avatar}</Avatar>
+                            </ListItemAvatar>
+                            <ListItemText disableTypography>
+                              {item.text}
+                            </ListItemText>
+                            <ListItemSecondaryAction>
+                              {item.secondaryAction}
+                            </ListItemSecondaryAction>
+                          </ListItem>
+                        </>
+                      )
+                    )}
+                  </List>
                 </>
               ) : null}
             </Column>
           </div>
-          <Divider orientation="vertical" />
-          <div style={styles.rightColumn}>
+          <div
+            style={{
+              ...styles.rightColumn,
+              paddingLeft: windowWidth === 'small' ? 0 : 20,
+            }}
+          >
             <Line alignItems="center" justifyContent="flex-end">
               <Tooltip
                 title={i18n._(
@@ -403,7 +429,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
               onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
             />
           </div>
-        </Line>
+        </ResponsiveLineStackLayout>
       )}
     </I18n>
   );

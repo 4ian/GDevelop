@@ -189,7 +189,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                     });
                     if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
                   }}
-                  disabled={isEditingName}
+                  disabled={isEditingName || isRequestPending}
                 >
                   <Add />
                 </IconButton>
@@ -296,7 +296,16 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                         </TableCell>
                         <TableCell align="center">
                           <IconButton
-                            onClick={() => console.log('swap')}
+                            onClick={async () => {
+                              disableActions(true);
+                              await _updateLeaderboard({
+                                sort:
+                                  currentLeaderboard.sort === 'ASC'
+                                    ? 'DESC'
+                                    : 'ASC',
+                              });
+                              disableActions(false);
+                            }}
                             tooltip={t`Change sort direction`}
                             edge="end"
                             disabled={isRequestPending || isEditingName}

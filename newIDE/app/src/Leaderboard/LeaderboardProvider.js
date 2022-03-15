@@ -78,6 +78,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   const fetchEntries = React.useCallback(
     async () => {
       if (!currentLeaderboardId) return;
+      setEntries(null);
       const fetchedEntries:
         | LeaderboardEntry[]
         | LeaderboardExtremePlayerScore[] = await listLeaderboardEntries(

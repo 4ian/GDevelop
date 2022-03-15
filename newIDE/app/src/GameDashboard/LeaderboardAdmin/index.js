@@ -8,12 +8,17 @@ import { type I18n as I18nType } from '@lingui/core';
 import MUITextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import Add from '@material-ui/icons/Add';
+import Save from '@material-ui/icons/Save';
+import Cancel from '@material-ui/icons/Cancel';
+import Edit from '@material-ui/icons/Edit';
+import Label from '@material-ui/icons/Label';
 import Fingerprint from '@material-ui/icons/Fingerprint';
 import Update from '@material-ui/icons/Update';
 import Today from '@material-ui/icons/Today';
 import Sort from '@material-ui/icons/Sort';
 import SwapVertical from '@material-ui/icons/SwapVert';
 import Refresh from '@material-ui/icons/Refresh';
+import Delete from '@material-ui/icons/Delete';
 import {
   Avatar,
   Divider,
@@ -22,6 +27,7 @@ import {
   ListItemAvatar,
   ListItemSecondaryAction,
   ListItemText,
+  Paper,
   Switch,
   Tooltip,
   Typography,
@@ -50,7 +56,7 @@ type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};
 
 const styles = {
-  leftColumn: { display: 'flex', flexDirection: 'column', flex: 1 },
+  leftColumn: { display: 'flex', flexDirection: 'column', flex: 1, padding: 5 },
   rightColumn: {
     display: 'flex',
     flexDirection: 'column',
@@ -208,6 +214,57 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     currentLeaderboard: Leaderboard
   ) => [
     {
+      key: 'name',
+      avatar: <Label />,
+      text: isEditingName ? (
+        <Line alignItems="center">
+          <TextField
+            margin="none"
+            fullWidth
+            value={newName}
+            onChange={(e, text) => setNewName(text)}
+            onKeyPress={event => {
+              if (event.key === 'Enter' && !isRequestPending) {
+                _updateLeaderboard({ name: newName }).then(() =>
+                  setIsEditingName(false)
+                );
+              }
+            }}
+            disabled={isRequestPending}
+          />
+          <IconButton
+            style={{ padding: 0, marginLeft: 5 }}
+            onClick={() => {
+              setIsEditingName(false);
+            }}
+          >
+            <Cancel />
+          </IconButton>
+        </Line>
+      ) : (
+        <Typography variant="body2">{currentLeaderboard.name}</Typography>
+      ),
+      secondaryAction: (
+        <IconButton
+          onClick={() => {
+            if (isEditingName) {
+              _updateLeaderboard({ name: newName }).then(() =>
+                setIsEditingName(false)
+              );
+            } else {
+              setNewName(currentLeaderboard.name);
+              setIsEditingName(true);
+            }
+          }}
+          tooltip={t`Rename`}
+          disabled={isRequestPending}
+          edge="end"
+        >
+          {isEditingName ? <Save /> : <Edit />}
+        </IconButton>
+      ),
+    },
+    {
       key: 'id',
       avatar: <Fingerprint />,
       text: (
@@ -287,24 +344,9 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       {({ i18n }) => (
         <ResponsiveLineStackLayout noMargin expand>
           <div style={styles.leftColumn}>
-            <Column>
-              <Line>
-                {isEditingName ? (
-                  <TextField
-                    fullWidth
-                    value={newName}
-                    onChange={(e, text) => setNewName(text)}
-                    onKeyPress={event => {
-                      if (event.key === 'Enter' && !isRequestPending) {
-                        _updateLeaderboard({ name: newName }).then(() =>
-                          setIsEditingName(false)
-                        );
-                      }
-                    }}
-                    disabled={isRequestPending}
-                    floatingLabelText={<Trans>Leaderboard name</Trans>}
-                  />
-                ) : (
+            <Paper elevation={5} style={{ padding: 5, margin: 5 }}>
+              <Column>
+                <Line>
                   <Autocomplete
                     autoComplete
                     autoSelect
@@ -329,91 +371,58 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                       />
                     )}
                   />
-                )}
-                <IconButton
-                  onClick={async () => {
-                    const newLeaderboard = await createLeaderboard({
-                      name: 'New leaderboard',
-                      sort: 'ASC',
-                    });
-                    if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
-                  }}
-                  disabled={isEditingName || isRequestPending}
-                >
-                  <Add />
-                </IconButton>
-              </Line>
-              {currentLeaderboard ? (
-                <>
-                  {isEditingName ? (
+                  <IconButton
+                    onClick={async () => {
+                      const newLeaderboard = await createLeaderboard({
+                        name: 'New leaderboard',
+                        sort: 'ASC',
+                      });
+                      if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
+                    }}
+                    disabled={isEditingName || isRequestPending}
+                  >
+                    <Add />
+                  </IconButton>
+                </Line>
+                {currentLeaderboard ? (
+                  <>
+                    <List>
+                      {leaderboardDescription(i18n, currentLeaderboard).map(
+                        (item, index) => (
+                          <>
+                            {index > 0 ? (
+                              <Divider
+                                key={`divider-${item.key}`}
+                                component="li"
+                              />
+                            ) : null}
+                            <ListItem key={item.key} disableGutters>
+                              <ListItemAvatar>
+                                <Avatar>{item.avatar}</Avatar>
+                              </ListItemAvatar>
+                              <ListItemText disableTypography>
+                                {item.text}
+                              </ListItemText>
+                              <ListItemSecondaryAction>
+                                {item.secondaryAction}
+                              </ListItemSecondaryAction>
+                            </ListItem>
+                          </>
+                        )
+                      )}
+                    </List>
                     <Line>
-                      <>
-                        <RaisedButton
-                          label={<Trans>Cancel</Trans>}
-                          onClick={async () => {
-                            setIsEditingName(false);
-                          }}
-                          disabled={isRequestPending}
-                        />
-                        <Spacer />
-                        <RaisedButton
-                          primary
-                          label={<Trans>Save</Trans>}
-                          onClick={async () => {
-                            await _updateLeaderboard({ name: newName });
-                            setIsEditingName(false);
-                          }}
-                          disabled={isRequestPending}
-                        />
-                      </>
-                    </Line>
-                  ) : (
-                    <Line justifyContent="space-between">
                       <RaisedButton
-                        label={<Trans>Rename</Trans>}
-                        disabled={isRequestPending}
-                        onClick={async () => {
-                          setNewName(currentLeaderboard.name);
-                          setIsEditingName(true);
-                        }}
-                      />
-                      <RaisedButton
+                        icon={<Delete />}
                         label={<Trans>Delete</Trans>}
                         disabled={isRequestPending}
                         onClick={() => _deleteLeaderboard(i18n)}
                       />
                     </Line>
-                  )}
-                  <Spacer />
-                  <List>
-                    {leaderboardDescription(i18n, currentLeaderboard).map(
-                      (item, index) => (
-                        <>
-                          {index > 0 ? (
-                            <Divider
-                              key={`divider-${item.key}`}
-                              variant="inset"
-                              component="li"
-                            />
-                          ) : null}
-                          <ListItem key={item.key} disableGutters>
-                            <ListItemAvatar>
-                              <Avatar>{item.avatar}</Avatar>
-                            </ListItemAvatar>
-                            <ListItemText disableTypography>
-                              {item.text}
-                            </ListItemText>
-                            <ListItemSecondaryAction>
-                              {item.secondaryAction}
-                            </ListItemSecondaryAction>
-                          </ListItem>
-                        </>
-                      )
-                    )}
-                  </List>
-                </>
-              ) : null}
-            </Column>
+                  </>
+                ) : null}
+              </Column>
+            </Paper>
           </div>
           <div
             style={{
@@ -446,6 +455,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                   <Refresh />
                 </IconButton>
               </Tooltip>
+              <Spacer />
             </Line>
             <LeaderboardEntriesTable
               entries={entries}

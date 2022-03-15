@@ -274,6 +274,7 @@ export const GameDetailsDialog = ({
           }
           open
           noMargin
+          fullHeight={currentTab === 'leaderboards'}
           onRequestClose={() => {
             if (!isLoading) onClose()
           }}

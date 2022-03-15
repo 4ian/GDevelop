@@ -160,3 +160,26 @@ export const resetLeaderboard = async (
   );
   return response.data;
 };
+
+export const deleteLeaderboardEntry = async (
+  authenticatedUser: AuthenticatedUser,
+  gameId: string,
+  leaderboardId: string,
+  entryId: string
+): Promise<?Leaderboard> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.delete(
+    `${
+      GDevelopPlayApi.baseUrl
+    }/game/${gameId}/leaderboard/${leaderboardId}/entry/${entryId}`,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};

@@ -101,6 +101,16 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     disableActions(false);
   };
 
+  const _createLeaderboard = async () => {
+    disableActions(true);
+    const newLeaderboard = await createLeaderboard({
+      name: 'New leaderboard',
+      sort: 'ASC',
+    });
+    if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
+    disableActions(false);
+  };
+
   const _resetLeaderboard = async (i18n: I18nType) => {
     const answer = Window.showConfirmDialog(
       i18n._(
@@ -203,7 +213,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           description={<Trans>Leaderboards help retain your players</Trans>}
           actionLabel={<Trans>Create a leaderboard</Trans>}
           onAdd={() => {
-            createLeaderboard({ name: 'New leaderboard', sort: 'ASC' });
+            _createLeaderboard();
           }}
         />
       </Line>
@@ -372,13 +382,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                     )}
                   />
                   <IconButton
-                    onClick={async () => {
-                      const newLeaderboard = await createLeaderboard({
-                        name: 'New leaderboard',
-                        sort: 'ASC',
-                      });
-                      if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
-                    }}
+                    onClick={_createLeaderboard}
                     disabled={isEditingName || isRequestPending}
                   >
                     <Add />

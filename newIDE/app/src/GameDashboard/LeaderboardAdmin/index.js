@@ -30,17 +30,19 @@ import {
   Tooltip,
 } from '@material-ui/core';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
 
 const breakUuid = (uuid: string): string => {
   const parts = uuid.split('-');
   return `${parts[0]}-...-${parts[parts.length - 1]}`;
 };
 
-type Props = {| gameId: string |};
+type Props = {| onLoading: boolean => void |};
+type ContainerProps = {| ...Props, gameId: string |};
 
 const styles = { leftColumn: { display: 'flex', flexDirection: 'column' } };
 
-const LeaderboardAdmin = () => {
+const LeaderboardAdmin = ({ onLoading }: Props) => {
   const isOnline = useOnlineStatus();
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
   const [isRequestPending, setIsRequestPending] = React.useState<boolean>(
@@ -58,14 +60,24 @@ const LeaderboardAdmin = () => {
   } = React.useContext(LeaderboardContext);
 
   const _updateLeaderboard = async payload => {
-    setIsRequestPending(true);
+    disableActions(true);
     await updateLeaderboard(payload);
-    setIsRequestPending(false);
+    disableActions(false);
+  };
+
+  const disableActions = (yesOrNo: boolean) => {
+    setIsRequestPending(yesOrNo);
+    onLoading(yesOrNo);
   };
 
   React.useEffect(
     () => {
-      if (leaderboards === null) listLeaderboards();
+      if (leaderboards === null) {
+        setIsRequestPending(true);
+        listLeaderboards().then(() => {
+          setIsRequestPending(false);
+        });
+      }
     },
     [listLeaderboards, leaderboards]
   );
@@ -96,14 +108,18 @@ const LeaderboardAdmin = () => {
         </Trans>
       </PlaceholderError>
     );
-  if (leaderboards === null)
-    return (
-      <PlaceholderError onRetry={listLeaderboards}>
-        <Trans>
-          An error ocurred when retrieving leaderboards, please try again later.
-        </Trans>
-      </PlaceholderError>
-    );
+  if (leaderboards === null) {
+    if (isRequestPending) return <PlaceholderLoader />;
+    else
+      return (
+        <PlaceholderError onRetry={listLeaderboards}>
+          <Trans>
+            An error ocurred when retrieving leaderboards, please try again
+            later.
+          </Trans>
+        </PlaceholderError>
+      );
+  }
   if (!!leaderboards && leaderboards.length === 0)
     return (
       <Line noMargin expand justifyContent="center">
@@ -257,7 +273,7 @@ const LeaderboardAdmin = () => {
                             onClick={() => console.log('reset')}
                             tooltip={t`Reset leaderboard`}
                             edge="end"
-                            disabled={isRequestPending}
+                            disabled={isRequestPending || isEditingName}
                           >
                             <Update />
                           </IconButton>
@@ -281,7 +297,7 @@ const LeaderboardAdmin = () => {
                             onClick={() => console.log('swap')}
                             tooltip={t`Change sort direction`}
                             edge="end"
-                            disabled={isRequestPending}
+                            disabled={isRequestPending || isEditingName}
                           >
                             <SwapVertical />
                           </IconButton>
@@ -299,9 +315,12 @@ const LeaderboardAdmin = () => {
   );
 };
 
-const LeaderboardAdminContainer = ({ gameId }: Props) => (
+const LeaderboardAdminContainer = ({
+  gameId,
+  ...otherProps
+}: ContainerProps) => (
   <LeaderboardProvider gameId={gameId}>
-    <LeaderboardAdmin />
+    <LeaderboardAdmin {...otherProps} />
   </LeaderboardProvider>
 );
 

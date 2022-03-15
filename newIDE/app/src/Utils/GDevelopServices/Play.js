@@ -25,10 +25,10 @@ export type LeaderboardEntry = {|
 |};
 
 export type LeaderboardDisplayData = {|
-  id: string,
-  playerName: string,
-  createdAt: string,
-  score: number,
+  +id: string,
+  +playerName: string,
+  +createdAt: string,
+  +score: number,
 |};
 
 export type LeaderboardSortOption = 'ASC' | 'DESC';
@@ -38,15 +38,58 @@ export const leaderboardSortOptions: LeaderboardSortOption[] = ['ASC', 'DESC'];
 export type LeaderboardExtremePlayerScore = {|
   leaderboardId: string,
   playerId?: string,
-  playerName?: string,
+  playerName: string,
   relatedEntryCreatedAt: string,
   score: number,
   relatedEntryId: string,
 |};
 
+export const extractEntryDisplayData = ({
+  playerName,
+  id,
+  score,
+  createdAt,
+}: LeaderboardEntry): LeaderboardDisplayData => ({
+  id,
+  createdAt,
+  playerName,
+  score,
+});
+
+export const extractExtremeScoreDisplayData = ({
+  playerName,
+  relatedEntryId,
+  score,
+  relatedEntryCreatedAt,
+}: LeaderboardExtremePlayerScore): LeaderboardDisplayData => ({
+  id: relatedEntryId,
+  createdAt: relatedEntryCreatedAt,
+  playerName,
+  score,
+});
+
 export const listGameLeaderboards = (gameId: string): Promise<Leaderboard[]> =>
   axios
     .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboards`)
+    .then(response => response.data);
+
+export const listLeaderboardEntries = (
+  gameId: string,
+  leaderboardId: string,
+  options: {| pageSize: number, onlyBestEntry: boolean |}
+): Promise<LeaderboardEntry[] | LeaderboardExtremePlayerScore[]> =>
+  axios
+    .get(
+      `${
+        GDevelopPlayApi.baseUrl
+      }/game/${gameId}/leaderboard/${leaderboardId}/entries`,
+      {
+        params: {
+          onlyBestEntry: options.onlyBestEntry,
+          perPage: options.pageSize,
+        },
+      }
+    )
     .then(response => response.data);
 
 export const createLeaderboard = async (
@@ -98,7 +141,7 @@ export const updateLeaderboard = async (
 export const resetLeaderboard = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string,
-  leaderboardId: string,
+  leaderboardId: string
 ): Promise<?Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
@@ -106,7 +149,9 @@ export const resetLeaderboard = async (
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.put(
-    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/${leaderboardId}/reset`,
+    `${
+      GDevelopPlayApi.baseUrl
+    }/game/${gameId}/leaderboard/${leaderboardId}/reset`,
     {},
     {
       headers: { Authorization: authorizationHeader },

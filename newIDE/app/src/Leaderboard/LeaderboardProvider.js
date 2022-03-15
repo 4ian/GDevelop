@@ -5,16 +5,22 @@ import LeaderboardContext from './LeaderboardContext';
 import {
   type Leaderboard,
   type LeaderboardEntry,
+  type LeaderboardExtremePlayerScore,
   type LeaderboardSortOption,
   type LeaderboardDisplayData,
   createLeaderboard as doCreateLeaderboard,
   updateLeaderboard as doUpdateLeaderboard,
   resetLeaderboard as doResetLeaderboard,
+  extractExtremeScoreDisplayData,
+  extractEntryDisplayData,
+  listLeaderboardEntries,
   listGameLeaderboards,
 } from '../Utils/GDevelopServices/Play';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {| gameId: string, children: React.Node |};
+
+const pageSize = 10;
 
 const LeaderboardProvider = ({ gameId, children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -24,14 +30,27 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     null
   );
   const [
+    displayOnlyBestEntry,
+    setDisplayOnlyBestEntry,
+  ] = React.useState<boolean>(false);
+  const [
     currentLeaderboardId,
     setCurrentLeaderboardId,
   ] = React.useState<?string>(null);
   const [currentUrl, setCurrentUrl] = React.useState<string>('');
   const [nextUrl, setNextUrl] = React.useState<?string>(null);
-  const [entries, setEntries] = React.useState<Array<LeaderboardDisplayData>>(
-    []
+  const [entries, setEntries] = React.useState<?Array<LeaderboardDisplayData>>(
+    null
   );
+
+  React.useEffect(
+    () => {
+      if (!currentLeaderboardId) return;
+      fetchEntries();
+    },
+    [currentLeaderboardId, displayOnlyBestEntry]
+  );
+
   const listLeaderboards = React.useCallback(
     async () => {
       const fetchedLeaderboards = await listGameLeaderboards(gameId);
@@ -41,6 +60,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     },
     [gameId, currentLeaderboardId]
   );
+
   const createLeaderboard = React.useCallback(
     async (creationPayload: {|
       name: string,
@@ -56,12 +76,45 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     },
     [gameId, authenticatedUser, listLeaderboards]
   );
+
+  const fetchEntries = React.useCallback(
+    async () => {
+      if (!currentLeaderboardId) return;
+      const fetchedEntries:
+        | LeaderboardEntry[]
+        | LeaderboardExtremePlayerScore[] = await listLeaderboardEntries(
+        gameId,
+        currentLeaderboardId,
+        {
+          pageSize,
+          onlyBestEntry: displayOnlyBestEntry,
+        }
+      );
+      let entriesToDisplay: LeaderboardDisplayData[] = [];
+      if (displayOnlyBestEntry) {
+        entriesToDisplay = fetchedEntries.map(entry =>
+          // $FlowIgnore
+          extractExtremeScoreDisplayData(entry)
+        );
+      } else {
+        entriesToDisplay = fetchedEntries.map(entry =>
+          // $FlowIgnore
+          extractEntryDisplayData(entry)
+        );
+      }
+      setEntries(entriesToDisplay);
+    },
+    [displayOnlyBestEntry, currentLeaderboardId]
+  );
+
   const selectLeaderboard = React.useCallback(
     (leaderboardId: string) => {
+      setEntries(null);
       setCurrentLeaderboardId(leaderboardId);
     },
     [setCurrentLeaderboardId]
   );
+
   const updateLeaderboard = async (payload: {|
     name?: string,
     sort?: LeaderboardSortOption,
@@ -74,17 +127,14 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       payload
     );
     listLeaderboards();
+    if (payload.sort) fetchEntries();
   };
+
   const resetLeaderboard = async () => {
     if (!currentLeaderboardId) return;
-    await doResetLeaderboard(
-      authenticatedUser,
-      gameId,
-      currentLeaderboardId,
-    );
+    await doResetLeaderboard(authenticatedUser, gameId, currentLeaderboardId);
     listLeaderboards();
   };
-  // --
 
   return (
     <LeaderboardContext.Provider

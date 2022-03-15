@@ -33,6 +33,7 @@ import {
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Window from '../../Utils/Window';
+import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 
 const breakUuid = (uuid: string): string => {
   const parts = uuid.split('-');
@@ -42,7 +43,10 @@ const breakUuid = (uuid: string): string => {
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};
 
-const styles = { leftColumn: { display: 'flex', flexDirection: 'column' } };
+const styles = {
+  leftColumn: { display: 'flex', flexDirection: 'column', flex: 1 },
+  rightColumn: { display: 'flex', flex: 2 },
+};
 
 const LeaderboardAdmin = ({ onLoading }: Props) => {
   const isOnline = useOnlineStatus();
@@ -60,6 +64,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     selectLeaderboard,
     updateLeaderboard,
     resetLeaderboard,
+    browsing: { entries },
   } = React.useContext(LeaderboardContext);
 
   const _updateLeaderboard = async payload => {
@@ -338,6 +343,10 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 </>
               ) : null}
             </Column>
+          </div>
+          <Divider orientation="vertical" />
+          <div style={styles.rightColumn}>
+            <LeaderboardEntriesTable entries={entries} />
           </div>
         </Line>
       )}

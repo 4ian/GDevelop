@@ -9,9 +9,9 @@ import {
 export type LeaderboardState = {|
   leaderboards: ?Array<Leaderboard>,
   currentLeaderboardId: ?string,
-  browsing: ?{|
-    entries: Array<LeaderboardDisplayData>,
-    currentUrl: string,
+  browsing: {|
+    entries: ?Array<LeaderboardDisplayData>,
+    currentUrl: ?string,
     nextUrl: ?string,
   |},
   createLeaderboard: ({|
@@ -30,7 +30,11 @@ export type LeaderboardState = {|
 export const initialLeaderboardState = {
   leaderboards: null,
   currentLeaderboardId: null,
-  browsing: null,
+  browsing: {
+    entries: null,
+    currentUrl: null,
+    nextUrl: null,
+  },
   createLeaderboard: async () => null,
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},

@@ -9,6 +9,7 @@ import {
 export type LeaderboardState = {|
   leaderboards: ?Array<Leaderboard>,
   currentLeaderboardId: ?string,
+  displayOnlyBestEntry: boolean,
   browsing: {|
     entries: ?Array<LeaderboardDisplayData>,
     currentUrl: ?string,
@@ -20,6 +21,7 @@ export type LeaderboardState = {|
   |}) => Promise<?Leaderboard>,
   listLeaderboards: () => Promise<void>,
   selectLeaderboard: (id: string) => void,
+  setDisplayOnlyBestEntry: boolean => void,
   updateLeaderboard: ({|
     name?: string,
     sort?: LeaderboardSortOption,
@@ -31,6 +33,7 @@ export type LeaderboardState = {|
 export const initialLeaderboardState = {
   leaderboards: null,
   currentLeaderboardId: null,
+  displayOnlyBestEntry: false,
   browsing: {
     entries: null,
     currentUrl: null,
@@ -39,6 +42,7 @@ export const initialLeaderboardState = {
   createLeaderboard: async () => null,
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},
+  setDisplayOnlyBestEntry: () => {},
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboardEntry: async entryId => {},

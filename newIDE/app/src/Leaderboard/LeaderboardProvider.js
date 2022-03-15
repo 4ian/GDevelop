@@ -162,6 +162,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         updateLeaderboard,
         resetLeaderboard,
         deleteLeaderboardEntry,
+        fetchLeaderboardEntries: fetchEntries,
       }}
     >
       {children}

@@ -28,6 +28,7 @@ export type LeaderboardState = {|
   |}) => Promise<void>,
   resetLeaderboard: () => Promise<void>,
   deleteLeaderboardEntry: (entryId: string) => Promise<void>,
+  fetchLeaderboardEntries: () => Promise<void>,
 |};
 
 export const initialLeaderboardState = {
@@ -46,6 +47,7 @@ export const initialLeaderboardState = {
   updateLeaderboard: async () => {},
   resetLeaderboard: async () => {},
   deleteLeaderboardEntry: async entryId => {},
+  fetchLeaderboardEntries: async () => {},
 };
 
 const LeaderboardContext = React.createContext<LeaderboardState>(

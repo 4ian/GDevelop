@@ -36,6 +36,7 @@ import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Window from '../../Utils/Window';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
+import Refresh from '@material-ui/icons/Refresh';
 
 const breakUuid = (uuid: string): string => {
   const parts = uuid.split('-');
@@ -69,12 +70,19 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     deleteLeaderboardEntry,
     displayOnlyBestEntry,
     setDisplayOnlyBestEntry,
+    fetchLeaderboardEntries,
     browsing: { entries },
   } = React.useContext(LeaderboardContext);
 
   const _updateLeaderboard = async payload => {
     disableActions(true);
     await updateLeaderboard(payload);
+    disableActions(false);
+  };
+
+  const _fetchLeaderboardEntries = async payload => {
+    disableActions(true);
+    await fetchLeaderboardEntries();
     disableActions(false);
   };
 
@@ -379,6 +387,16 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 checked={displayOnlyBestEntry}
                 onClick={() => setDisplayOnlyBestEntry(!displayOnlyBestEntry)}
               />
+              <Divider orientation="vertical" />
+              <Tooltip title={i18n._(t`Refresh`)}>
+                <IconButton
+                  onClick={_fetchLeaderboardEntries}
+                  disabled={isRequestPending || isEditingName}
+                  size="small"
+                >
+                  <Refresh />
+                </IconButton>
+              </Tooltip>
             </Line>
             <LeaderboardEntriesTable
               entries={entries}

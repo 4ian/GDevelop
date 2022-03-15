@@ -12,6 +12,7 @@ import {
   updateLeaderboard as doUpdateLeaderboard,
   resetLeaderboard as doResetLeaderboard,
   deleteLeaderboardEntry as doDeleteLeaderboardEntry,
+  deleteLeaderboard as doDeleteLeaderboard,
   extractExtremeScoreDisplayData,
   extractEntryDisplayData,
   listLeaderboardEntries,
@@ -44,20 +45,16 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     null
   );
 
-  React.useEffect(
-    () => {
-      if (!currentLeaderboardId) return;
-      fetchEntries();
-    },
-    [currentLeaderboardId, displayOnlyBestEntry]
-  );
-
   const listLeaderboards = React.useCallback(
-    async () => {
+    async (ignoreCurrentLeaderboardId: boolean = false) => {
       const fetchedLeaderboards = await listGameLeaderboards(gameId);
       setLeaderboards(fetchedLeaderboards);
-      if (!currentLeaderboardId && fetchedLeaderboards.length > 0)
+      if (
+        fetchedLeaderboards.length > 0 &&
+        (ignoreCurrentLeaderboardId || !currentLeaderboardId)
+      ) {
         setCurrentLeaderboardId(fetchedLeaderboards[0].id);
+      }
     },
     [gameId, currentLeaderboardId]
   );
@@ -105,7 +102,15 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       }
       setEntries(entriesToDisplay);
     },
-    [displayOnlyBestEntry, currentLeaderboardId]
+    [displayOnlyBestEntry, currentLeaderboardId, gameId]
+  );
+
+  React.useEffect(
+    () => {
+      if (!currentLeaderboardId) return;
+      fetchEntries();
+    },
+    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
   );
 
   const selectLeaderboard = React.useCallback(
@@ -140,6 +145,15 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     fetchEntries();
   };
 
+  const deleteLeaderboard = async () => {
+    if (!currentLeaderboardId) return;
+    setEntries(null);
+    await doDeleteLeaderboard(authenticatedUser, gameId, currentLeaderboardId);
+    setCurrentLeaderboardId(null);
+    await listLeaderboards(true);
+    fetchEntries();
+  };
+
   const deleteLeaderboardEntry = async (entryId: string) => {
     if (!currentLeaderboardId) return;
     await doDeleteLeaderboardEntry(
@@ -164,6 +178,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         selectLeaderboard,
         updateLeaderboard,
         resetLeaderboard,
+        deleteLeaderboard,
         deleteLeaderboardEntry,
         fetchLeaderboardEntries: fetchEntries,
       }}

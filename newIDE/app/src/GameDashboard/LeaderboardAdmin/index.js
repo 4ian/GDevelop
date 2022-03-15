@@ -2,6 +2,7 @@
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import Add from '@material-ui/icons/Add';
 import Fingerprint from '@material-ui/icons/Fingerprint';
 import Update from '@material-ui/icons/Update';
@@ -31,6 +32,7 @@ import {
 } from '@material-ui/core';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import Window from '../../Utils/Window';
 
 const breakUuid = (uuid: string): string => {
   const parts = uuid.split('-');
@@ -57,11 +59,25 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     createLeaderboard,
     selectLeaderboard,
     updateLeaderboard,
+    resetLeaderboard,
   } = React.useContext(LeaderboardContext);
 
   const _updateLeaderboard = async payload => {
     disableActions(true);
     await updateLeaderboard(payload);
+    disableActions(false);
+  };
+
+  const _resetLeaderboard = async (i18n: I18nType) => {
+    const answer = Window.showConfirmDialog(
+      i18n._(
+        t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`
+      )
+    );
+    if (!answer) return;
+
+    disableActions(true);
+    await resetLeaderboard();
     disableActions(false);
   };
 
@@ -260,10 +276,15 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                         </TableCell>
                         <TableCell>
                           <Tooltip
-                            title={i18n.date(currentLeaderboard.startDatetime, {
-                              dateStyle: 'short',
-                              timeStyle: 'short',
-                            })}
+                            title={i18n._(
+                              t`Date from which entries are taken into account: ${i18n.date(
+                                currentLeaderboard.startDatetime,
+                                {
+                                  dateStyle: 'short',
+                                  timeStyle: 'short',
+                                }
+                              )}`
+                            )}
                           >
                             <span>
                               {i18n.date(currentLeaderboard.startDatetime)}
@@ -272,7 +293,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                         </TableCell>
                         <TableCell align="center">
                           <IconButton
-                            onClick={() => console.log('reset')}
+                            onClick={() => _resetLeaderboard(i18n)}
                             tooltip={t`Reset leaderboard`}
                             edge="end"
                             disabled={isRequestPending || isEditingName}
@@ -297,14 +318,12 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                         <TableCell align="center">
                           <IconButton
                             onClick={async () => {
-                              disableActions(true);
                               await _updateLeaderboard({
                                 sort:
                                   currentLeaderboard.sort === 'ASC'
                                     ? 'DESC'
                                     : 'ASC',
                               });
-                              disableActions(false);
                             }}
                             tooltip={t`Change sort direction`}
                             edge="end"

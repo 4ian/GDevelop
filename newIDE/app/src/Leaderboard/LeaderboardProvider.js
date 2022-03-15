@@ -11,6 +11,7 @@ import {
   createLeaderboard as doCreateLeaderboard,
   updateLeaderboard as doUpdateLeaderboard,
   resetLeaderboard as doResetLeaderboard,
+  deleteLeaderboardEntry as doDeleteLeaderboardEntry,
   extractExtremeScoreDisplayData,
   extractEntryDisplayData,
   listLeaderboardEntries,
@@ -136,6 +137,17 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     listLeaderboards();
   };
 
+  const deleteLeaderboardEntry = async (entryId: string) => {
+    if (!currentLeaderboardId) return;
+    await doDeleteLeaderboardEntry(
+      authenticatedUser,
+      gameId,
+      currentLeaderboardId,
+      entryId
+    );
+    fetchEntries();
+  };
+
   return (
     <LeaderboardContext.Provider
       value={{
@@ -147,6 +159,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         selectLeaderboard,
         updateLeaderboard,
         resetLeaderboard,
+        deleteLeaderboardEntry,
       }}
     >
       {children}

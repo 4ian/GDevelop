@@ -17,9 +17,12 @@ import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import { type LeaderboardDisplayData } from '../../Utils/GDevelopServices/Play';
 
-type Props = {| entries: ?Array<LeaderboardDisplayData> |};
+type Props = {|
+  entries: ?Array<LeaderboardDisplayData>,
+  onDeleteEntry: (entryId: string) => Promise<void>,
+|};
 
-const LeaderboardEntriesTable = ({ entries }: Props) => {
+const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
   if (!entries) return <PlaceholderLoader />;
 
   if (entries.length === 0) {
@@ -70,7 +73,7 @@ const LeaderboardEntriesTable = ({ entries }: Props) => {
                   </TableCell>
                   <TableCell>
                     <Tooltip title={'Remove entry'}>
-                      <IconButton onClick={() => console.log(entry.id)}>
+                      <IconButton onClick={() => onDeleteEntry(entry.id)}>
                         <DeleteOutline size={20} />
                       </IconButton>
                     </Tooltip>

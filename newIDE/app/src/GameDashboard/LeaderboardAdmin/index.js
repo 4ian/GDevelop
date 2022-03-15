@@ -64,6 +64,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     selectLeaderboard,
     updateLeaderboard,
     resetLeaderboard,
+    deleteLeaderboardEntry,
     browsing: { entries },
   } = React.useContext(LeaderboardContext);
 
@@ -83,6 +84,19 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
 
     disableActions(true);
     await resetLeaderboard();
+    disableActions(false);
+  };
+
+  const _deleteEntry = async (i18n: I18nType, entryId: string) => {
+    const answer = Window.showConfirmDialog(
+      i18n._(
+        t`Are you sure you want to delete this entry? This can't be undone.`
+      )
+    );
+    if (!answer) return;
+
+    disableActions(true);
+    await deleteLeaderboardEntry(entryId);
     disableActions(false);
   };
 
@@ -346,7 +360,10 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           </div>
           <Divider orientation="vertical" />
           <div style={styles.rightColumn}>
-            <LeaderboardEntriesTable entries={entries} />
+            <LeaderboardEntriesTable
+              entries={entries}
+              onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
+            />
           </div>
         </Line>
       )}

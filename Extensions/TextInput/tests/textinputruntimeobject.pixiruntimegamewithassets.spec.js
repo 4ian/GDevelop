@@ -169,4 +169,108 @@ describe('gdjs.TextInputRuntimeObject (using a PixiJS RuntimeGame with DOM eleme
     // Clean up - not mandatory but to avoid overloading the testing browser.
     runtimeScene.unloadScene();
   });
+
+  it('hides the DOM element when the object or layer is hidden', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    loadScene(runtimeScene);
+
+    // Make sure the renderer is created (to test the real DOM element creation/update)
+    const gameContainer = document.createElement('div');
+    runtimeGame.getRenderer().createStandardCanvas(gameContainer);
+
+    const object = makeTextInputRuntimeObject(runtimeScene);
+    runtimeScene.addObject(object);
+
+    // Check that the DOM element was created
+    const gameDomElementContainer = runtimeGame
+      .getRenderer()
+      .getDomElementContainer();
+    if (!gameDomElementContainer)
+      throw new Error(
+        'Expected getDomElementContainer to return a valid container.'
+      );
+
+    const inputElement = gameDomElementContainer.querySelector('input');
+    if (!inputElement) throw new Error('Expected input element to be found');
+
+    // Check visibility of the DOM element is visible by default, if it should be visible
+    // on the screen.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('initial');
+
+    // Check visibility of the DOM element is updated at each frame,
+    // according to the object visibility.
+    object.hide(true);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('none');
+
+    object.hide(false);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('initial');
+
+    // Check visibility of the DOM element is updated at each frame,
+    // according to the layer visibility.
+    runtimeScene.getLayer('').show(false);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('none');
+
+    runtimeScene.getLayer('').show(true);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('initial');
+
+    // Clean up - not mandatory but to avoid overloading the testing browser.
+    runtimeScene.unloadScene();
+  });
+
+  it('hides the DOM element when the object is far from the camera', async () => {
+    const runtimeGame = await gdjs.getPixiRuntimeGameWithAssets();
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    loadScene(runtimeScene);
+
+    // Make sure the renderer is created (to test the real DOM element creation/update)
+    const gameContainer = document.createElement('div');
+    runtimeGame.getRenderer().createStandardCanvas(gameContainer);
+
+    const object = makeTextInputRuntimeObject(runtimeScene);
+    runtimeScene.addObject(object);
+
+    // Check that the DOM element was created
+    const gameDomElementContainer = runtimeGame
+      .getRenderer()
+      .getDomElementContainer();
+    if (!gameDomElementContainer)
+      throw new Error(
+        'Expected getDomElementContainer to return a valid container.'
+      );
+
+    const inputElement = gameDomElementContainer.querySelector('input');
+    if (!inputElement) throw new Error('Expected input element to be found');
+
+    // Check visibility of the DOM element is visible by default, if it should be visible
+    // on the screen.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('initial');
+
+    // Check visibility of the DOM element is updated at each frame,
+    // according to the object position of screen.
+    object.setX(-500); // -500 + 300 (object default width) = -200, still outside the camera.
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('none');
+
+    object.setWidth(600); // -500 + 600 = 100, inside the camera
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('initial');
+
+    runtimeScene.getLayer('').setCameraX(900);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('none');
+
+    runtimeScene.getLayer('').setCameraX(400);
+    runtimeScene.renderAndStep(1000 / 60);
+    expect(inputElement.style.display).to.be('initial');
+
+    // Clean up - not mandatory but to avoid overloading the testing browser.
+    runtimeScene.unloadScene();
+  });
 });

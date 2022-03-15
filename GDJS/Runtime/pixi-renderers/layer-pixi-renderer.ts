@@ -13,7 +13,7 @@ namespace gdjs {
   export class LayerPixiRenderer {
     _pixiContainer: PIXI.Container;
 
-    _layer: any;
+    _layer: gdjs.Layer;
     _renderTexture: PIXI.RenderTexture | null = null;
     _lightingSprite: PIXI.Sprite | null = null;
     _runtimeSceneRenderer: any;
@@ -72,10 +72,26 @@ namespace gdjs {
       const centerY =
         this._layer.getCameraX() * zoomFactor * sinValue +
         this._layer.getCameraY() * zoomFactor * cosValue;
-      this._pixiContainer.position.x = -centerX;
-      this._pixiContainer.position.y = -centerY;
-      this._pixiContainer.position.x += this._layer.getWidth() / 2;
-      this._pixiContainer.position.y += this._layer.getHeight() / 2;
+      this._pixiContainer.position.x = this._layer.getWidth() / 2 - centerX;
+      this._pixiContainer.position.y = this._layer.getHeight() / 2 - centerY;
+
+      if (
+        this._layer.getRuntimeScene().getGame().getPixelsRounding() &&
+        (cosValue === 0 || sinValue === 0) &&
+        Number.isInteger(zoomFactor)
+      ) {
+        // Camera rounding is important for pixel perfect games.
+        // Otherwise the camera position fractional part is added to
+        // the sprite one and it changes in which direction sprites are rounded.
+        // It makes sprites rounding inconsistent with each other
+        // and they seems to move on pixel left and right.
+        this._pixiContainer.position.x = Math.round(
+          this._pixiContainer.position.x
+        );
+        this._pixiContainer.position.y = Math.round(
+          this._pixiContainer.position.y
+        );
+      }
     }
 
     updateVisibility(visible: boolean): void {

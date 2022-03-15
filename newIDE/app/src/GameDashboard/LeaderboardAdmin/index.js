@@ -75,6 +75,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     selectLeaderboard,
     updateLeaderboard,
     resetLeaderboard,
+    deleteLeaderboard,
     deleteLeaderboardEntry,
     displayOnlyBestEntry,
     setDisplayOnlyBestEntry,
@@ -104,6 +105,19 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
 
     disableActions(true);
     await resetLeaderboard();
+    disableActions(false);
+  };
+
+  const _deleteLeaderboard = async (i18n: I18nType) => {
+    const answer = Window.showConfirmDialog(
+      i18n._(
+        t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`
+      )
+    );
+    if (!answer) return;
+
+    disableActions(true);
+    await deleteLeaderboard();
     disableActions(false);
   };
 
@@ -331,8 +345,8 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
               </Line>
               {currentLeaderboard ? (
                 <>
-                  <Line>
-                    {isEditingName && (
+                  {isEditingName ? (
+                    <Line>
                       <>
                         <RaisedButton
                           label={<Trans>Cancel</Trans>}
@@ -342,36 +356,45 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                           disabled={isRequestPending}
                         />
                         <Spacer />
+                        <RaisedButton
+                          primary
+                          label={<Trans>Save</Trans>}
+                          onClick={async () => {
+                            await _updateLeaderboard({ name: newName });
+                            setIsEditingName(false);
+                          }}
+                          disabled={isRequestPending}
+                        />
                       </>
-                    )}
-                    <RaisedButton
-                      primary={isEditingName}
-                      label={
-                        isEditingName ? (
-                          <Trans>Save</Trans>
-                        ) : (
-                          <Trans>Rename</Trans>
-                        )
-                      }
-                      disabled={isRequestPending}
-                      onClick={async () => {
-                        if (isEditingName) {
-                          await _updateLeaderboard({ name: newName });
-                          setIsEditingName(false);
-                        } else {
+                    </Line>
+                  ) : (
+                    <Line justifyContent="space-between">
+                      <RaisedButton
+                        label={<Trans>Rename</Trans>}
+                        disabled={isRequestPending}
+                        onClick={async () => {
                           setNewName(currentLeaderboard.name);
                           setIsEditingName(true);
-                        }
-                      }}
-                    />
-                  </Line>
+                        }}
+                      />
+                      <RaisedButton
+                        label={<Trans>Delete</Trans>}
+                        disabled={isRequestPending}
+                        onClick={() => _deleteLeaderboard(i18n)}
+                      />
+                    </Line>
+                  )}
                   <Spacer />
                   <List>
                     {leaderboardDescription(i18n, currentLeaderboard).map(
                       (item, index) => (
                         <>
                           {index > 0 ? (
-                            <Divider key={`divider-${item.key}`}variant="inset" component="li" />
+                            <Divider
+                              key={`divider-${item.key}`}
+                              variant="inset"
+                              component="li"
+                            />
                           ) : null}
                           <ListItem key={item.key} disableGutters>
                             <ListItemAvatar>

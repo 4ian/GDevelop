@@ -681,11 +681,16 @@ namespace gdjs {
               this._runtimeGame
                 .getEffectsManager()
                 .updatePreRender(object.getRendererEffects(), object);
-            }
-          }
 
-          // Perform pre-render update.
-          object.updatePreRender(this);
+              // Perform pre-render update only if the object is visible
+              // (including if there is no visibility AABB returned previously).
+              object.updatePreRender(this);
+            }
+          } else {
+            // Perform pre-render update, always for objects not having an
+            // associated renderer object (so it must handle visibility on its own).
+            object.updatePreRender(this);
+          }
         }
       }
     }

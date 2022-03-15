@@ -121,6 +121,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     sort?: LeaderboardSortOption,
   |}) => {
     if (!currentLeaderboardId) return;
+    if (payload.sort) setEntries(null);
     await doUpdateLeaderboard(
       authenticatedUser,
       gameId,
@@ -133,8 +134,10 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   const resetLeaderboard = async () => {
     if (!currentLeaderboardId) return;
+    setEntries(null);
     await doResetLeaderboard(authenticatedUser, gameId, currentLeaderboardId);
     listLeaderboards();
+    fetchEntries();
   };
 
   const deleteLeaderboardEntry = async (entryId: string) => {

@@ -9,6 +9,7 @@ import {
   type LeaderboardDisplayData,
   createLeaderboard as doCreateLeaderboard,
   updateLeaderboard as doUpdateLeaderboard,
+  resetLeaderboard as doResetLeaderboard,
   listGameLeaderboards,
 } from '../Utils/GDevelopServices/Play';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -74,6 +75,15 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     );
     listLeaderboards();
   };
+  const resetLeaderboard = async () => {
+    if (!currentLeaderboardId) return;
+    await doResetLeaderboard(
+      authenticatedUser,
+      gameId,
+      currentLeaderboardId,
+    );
+    listLeaderboards();
+  };
   // --
 
   return (
@@ -86,6 +96,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         listLeaderboards,
         selectLeaderboard,
         updateLeaderboard,
+        resetLeaderboard,
       }}
     >
       {children}

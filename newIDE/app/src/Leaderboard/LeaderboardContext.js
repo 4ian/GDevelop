@@ -24,6 +24,7 @@ export type LeaderboardState = {|
     name?: string,
     sort?: LeaderboardSortOption,
   |}) => Promise<void>,
+  resetLeaderboard: () => Promise<void>,
 |};
 
 export const initialLeaderboardState = {
@@ -34,6 +35,7 @@ export const initialLeaderboardState = {
   listLeaderboards: async () => {},
   selectLeaderboard: () => {},
   updateLeaderboard: async () => {},
+  resetLeaderboard: async () => {},
 };
 
 const LeaderboardContext = React.createContext<LeaderboardState>(

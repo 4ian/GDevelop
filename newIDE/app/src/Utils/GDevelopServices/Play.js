@@ -94,3 +94,24 @@ export const updateLeaderboard = async (
   );
   return response.data;
 };
+
+export const resetLeaderboard = async (
+  authenticatedUser: AuthenticatedUser,
+  gameId: string,
+  leaderboardId: string,
+): Promise<?Leaderboard> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.put(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/${leaderboardId}/reset`,
+    {},
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    }
+  );
+  return response.data;
+};

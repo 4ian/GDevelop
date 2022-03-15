@@ -429,7 +429,7 @@ namespace gdjs {
           .getSoundManager()
           .unloadAudio(soundFile, /* isMusic= */ true);
 
-      export const FadeVolume = (
+      export const fadeVolume = (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         toVolume: float,

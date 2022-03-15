@@ -153,7 +153,9 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       value={{
         leaderboards,
         currentLeaderboardId,
+        displayOnlyBestEntry,
         browsing: { entries, currentUrl, nextUrl },
+        setDisplayOnlyBestEntry,
         createLeaderboard,
         listLeaderboards,
         selectLeaderboard,

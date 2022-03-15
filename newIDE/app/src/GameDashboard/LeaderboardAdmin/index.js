@@ -24,11 +24,13 @@ import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {
   Divider,
+  Switch,
   Table,
   TableBody,
   TableCell,
   TableRow,
   Tooltip,
+  Typography,
 } from '@material-ui/core';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -45,7 +47,7 @@ type ContainerProps = {| ...Props, gameId: string |};
 
 const styles = {
   leftColumn: { display: 'flex', flexDirection: 'column', flex: 1 },
-  rightColumn: { display: 'flex', flex: 2 },
+  rightColumn: { display: 'flex', flexDirection: 'column', flex: 2 },
 };
 
 const LeaderboardAdmin = ({ onLoading }: Props) => {
@@ -65,6 +67,8 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     updateLeaderboard,
     resetLeaderboard,
     deleteLeaderboardEntry,
+    displayOnlyBestEntry,
+    setDisplayOnlyBestEntry,
     browsing: { entries },
   } = React.useContext(LeaderboardContext);
 
@@ -360,6 +364,22 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           </div>
           <Divider orientation="vertical" />
           <div style={styles.rightColumn}>
+            <Line alignItems="center" justifyContent="flex-end">
+              <Tooltip
+                title={i18n._(
+                  t`When checked, will only display the best score of each player`
+                )}
+              >
+                <Typography variant="body2">
+                  <Trans>Player best entry</Trans>
+                </Typography>
+              </Tooltip>
+              <Switch
+                size="small"
+                checked={displayOnlyBestEntry}
+                onClick={() => setDisplayOnlyBestEntry(!displayOnlyBestEntry)}
+              />
+            </Line>
             <LeaderboardEntriesTable
               entries={entries}
               onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}

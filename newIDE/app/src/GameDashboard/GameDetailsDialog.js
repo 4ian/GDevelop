@@ -86,6 +86,7 @@ export const GameDetailsDialog = ({
   const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
     null
   );
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
@@ -273,11 +274,14 @@ export const GameDetailsDialog = ({
           }
           open
           noMargin
-          onRequestClose={onClose}
+          onRequestClose={() => {
+            if (!isLoading) onClose()
+          }}
           maxWidth="md"
           actions={[
             <FlatButton
-              label={<Trans>Close</Trans>}
+              label={isLoading ? null : <Trans>Close</Trans>}
+              icon={isLoading ? <CircularProgress size={20} /> : null}
               onClick={onClose}
               key="close"
             />,
@@ -294,7 +298,7 @@ export const GameDetailsDialog = ({
           </Tabs>
           <Line>
             {currentTab === 'leaderboards' ? (
-              <LeaderboardAdmin gameId={game.id} />
+              <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
             ) : null}
             {currentTab === 'details' ? (
               publicGameError ? (

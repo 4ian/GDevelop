@@ -42,13 +42,17 @@ import PlaceholderError from '../../UI/PlaceholderError';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
-import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
+import {
+  type Leaderboard,
+  type LeaderboardSortOption,
+} from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
 import Window from '../../Utils/Window';
 import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { textEllipsisStyle } from '../../UI/TextEllipsis';
 
 const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
@@ -72,6 +76,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     false
   );
   const [newName, setNewName] = React.useState<string>('');
+  const [newNameError, setNewNameError] = React.useState<?string>(null);
 
   const {
     leaderboards,
@@ -89,13 +94,26 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     browsing: { entries },
   } = React.useContext(LeaderboardContext);
 
-  const _updateLeaderboard = async payload => {
+  const _updateLeaderboard = async (
+    i18n: I18nType,
+    payload: {| name?: string, sort?: LeaderboardSortOption |}
+  ) => {
+    setNewNameError(null);
+    if (payload.name !== undefined && payload.name.length === 0) {
+      setNewNameError(
+        i18n._(
+          t`Please enter a name that is at least one character long and 50 at most.`
+        )
+      );
+      return;
+    }
     disableActions(true);
     await updateLeaderboard(payload);
     disableActions(false);
+    if (payload.name) setIsEditingName(false);
   };
 
-  const _fetchLeaderboardEntries = async payload => {
+  const _fetchLeaderboardEntries = async () => {
     disableActions(true);
     await fetchLeaderboardEntries();
     disableActions(false);
@@ -232,36 +250,43 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           <TextField
             margin="none"
             fullWidth
+            maxLength={50}
             value={newName}
+            errorText={newNameError}
             onChange={(e, text) => setNewName(text)}
             onKeyPress={event => {
               if (event.key === 'Enter' && !isRequestPending) {
-                _updateLeaderboard({ name: newName }).then(() =>
-                  setIsEditingName(false)
-                );
+                _updateLeaderboard(i18n, { name: newName });
               }
             }}
             disabled={isRequestPending}
           />
-          <IconButton
-            style={{ padding: 0, marginLeft: 5 }}
-            onClick={() => {
-              setIsEditingName(false);
-            }}
-          >
-            <Cancel />
-          </IconButton>
+          {!isRequestPending && (
+            <IconButton
+              style={{ padding: 0, marginLeft: 5 }}
+              onClick={() => {
+                setIsEditingName(false);
+              }}
+            >
+              <Cancel />
+            </IconButton>
+          )}
         </Line>
       ) : (
-        <Typography variant="body2">{currentLeaderboard.name}</Typography>
+        <Tooltip title={currentLeaderboard.name}>
+          <Typography
+            variant="body2"
+            style={{ ...textEllipsisStyle, width: 150 }}
+          >
+            {currentLeaderboard.name}
+          </Typography>
+        </Tooltip>
       ),
       secondaryAction: (
         <IconButton
           onClick={() => {
             if (isEditingName) {
-              _updateLeaderboard({ name: newName }).then(() =>
-                setIsEditingName(false)
-              );
+              _updateLeaderboard(i18n, { name: newName });
             } else {
               setNewName(currentLeaderboard.name);
               setIsEditingName(true);
@@ -337,7 +362,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       secondaryAction: (
         <IconButton
           onClick={async () => {
-            await _updateLeaderboard({
+            await _updateLeaderboard(i18n, {
               sort: currentLeaderboard.sort === 'ASC' ? 'DESC' : 'ASC',
             });
           }}

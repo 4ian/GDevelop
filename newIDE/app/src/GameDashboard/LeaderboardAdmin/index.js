@@ -207,7 +207,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   }
   if (!!leaderboards && leaderboards.length === 0)
     return (
-      <Line noMargin expand justifyContent="center">
+      <Line noMargin expand justifyContent="center" alignItems="center">
         <EmptyPlaceholder
           title={<Trans>Create your game's first leaderboard</Trans>}
           description={<Trans>Leaderboards help retain your players</Trans>}
@@ -215,6 +215,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           onAdd={() => {
             _createLeaderboard();
           }}
+          isLoading={isRequestPending}
         />
       </Line>
     );

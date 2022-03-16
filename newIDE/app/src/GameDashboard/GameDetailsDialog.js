@@ -274,9 +274,10 @@ export const GameDetailsDialog = ({
           }
           open
           noMargin
+          flexColumnBody
           fullHeight={currentTab === 'leaderboards'}
           onRequestClose={() => {
-            if (!isLoading) onClose()
+            if (!isLoading) onClose();
           }}
           maxWidth="md"
           actions={[
@@ -297,7 +298,7 @@ export const GameDetailsDialog = ({
             <Tab label={<Trans>Analytics</Trans>} value="analytics" />
             <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
-          <Line>
+          <Line expand>
             {currentTab === 'leaderboards' ? (
               <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
             ) : null}

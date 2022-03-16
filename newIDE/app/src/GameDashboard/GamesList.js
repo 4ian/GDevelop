@@ -107,6 +107,10 @@ export const GamesList = (props: Props) => {
             setOpenedGameInitialTab('analytics');
             setOpenedGame(game);
           }}
+          onOpenLeaderboards={() => {
+            setOpenedGameInitialTab('leaderboards');
+            setOpenedGame(game);
+          }}
         />
       ))}
       {openedGame && (

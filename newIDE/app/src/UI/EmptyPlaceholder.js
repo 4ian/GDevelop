@@ -1,13 +1,14 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import Container from '@material-ui/core/Container';
+import { CircularProgress } from '@material-ui/core';
+import Add from '@material-ui/icons/Add';
+import { ColumnStackLayout } from './Layout';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
-import Add from '@material-ui/icons/Add';
-import RaisedButton from '../UI/RaisedButton';
-import Container from '@material-ui/core/Container';
-import { ColumnStackLayout } from './Layout';
 
 type Props = {|
   title: React.Node,
@@ -16,6 +17,7 @@ type Props = {|
   helpPagePath?: string,
   actionButtonId?: string,
   onAdd: () => void,
+  isLoading?: boolean,
 |};
 
 /**
@@ -43,7 +45,8 @@ export const EmptyPlaceholder = (props: Props) => (
             label={props.actionLabel}
             primary
             onClick={props.onAdd}
-            icon={<Add />}
+            disabled={!!props.isLoading}
+            icon={props.isLoading ? <CircularProgress size={24} /> : <Add />}
             id={props.actionButtonId}
           />
           <HelpButton

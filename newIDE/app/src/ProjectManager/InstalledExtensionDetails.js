@@ -50,6 +50,7 @@ function InstalledExtensionDetails({
     <I18n>
       {({ i18n }) => (
         <ExtensionInstallDialog
+          project={project}
           alreadyInstalled
           isInstalling={isInstalling}
           onClose={onClose}

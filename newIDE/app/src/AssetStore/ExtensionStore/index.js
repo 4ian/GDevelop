@@ -121,6 +121,7 @@ export const ExtensionStore = ({
       </ResponsiveWindowMeasurer>
       {!!selectedExtensionShortHeader && (
         <ExtensionInstallDialog
+          project={project}
           isInstalling={isInstalling}
           extensionShortHeader={selectedExtensionShortHeader}
           alreadyInstalled={project.hasEventsFunctionsExtensionNamed(

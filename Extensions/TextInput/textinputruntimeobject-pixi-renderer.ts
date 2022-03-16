@@ -111,7 +111,23 @@ namespace gdjs {
     updatePreRender() {
       if (!this._input) return;
 
+      // Hide the input entirely if the object is hidden.
+      // Because this object is rendered as a DOM element (and not part of the PixiJS
+      // scene graph), we have to do this manually.
+      if (this._object.isHidden()) {
+        this._input.style.display = 'none';
+        return;
+      }
+
+      // Hide the input entirely if the layer is not visible.
+      // Because this object is rendered as a DOM element (and not part of the PixiJS
+      // scene graph), we have to do this manually.
       const layer = this._runtimeScene.getLayer(this._object.getLayer());
+      if (!layer.isVisible()) {
+        this._input.style.display = 'none';
+        return;
+      }
+
       const runtimeGame = this._runtimeScene.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
@@ -125,7 +141,7 @@ namespace gdjs {
         0
       );
 
-      // Hide the input entirely if not visible at all
+      // Hide the input entirely if not visible at all.
       const isOutsideCanvas =
         bottomRightCanvasCoordinates[0] < 0 ||
         bottomRightCanvasCoordinates[1] < 0 ||
@@ -136,7 +152,7 @@ namespace gdjs {
         return;
       }
 
-      // Position the input on the container on top of the canvas
+      // Position the input on the container on top of the canvas.
       const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
         topLeftCanvasCoordinates
       );

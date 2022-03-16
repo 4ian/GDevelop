@@ -25,16 +25,6 @@ type Props = {|
 const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
   if (!entries) return <PlaceholderLoader />;
 
-  if (entries.length === 0) {
-    return (
-      <Column expand justifyContent="center" alignItems="center">
-        <Text size="body2">
-          <Trans>No entries</Trans>
-        </Text>
-      </Column>
-    );
-  }
-
   return (
     <I18n>
       {({ i18n }) => (
@@ -82,6 +72,13 @@ const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
               ))}
             </TableBody>
           </Table>
+          {entries.length === 0 ? (
+            <Column expand justifyContent="center" alignItems="center">
+              <Text size="body2">
+                <Trans>No entries</Trans>
+              </Text>
+            </Column>
+          ) : null}
         </Column>
       )}
     </I18n>

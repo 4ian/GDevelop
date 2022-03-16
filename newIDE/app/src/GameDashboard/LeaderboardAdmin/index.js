@@ -77,6 +77,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   );
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
+  const newNameTextFieldRef = React.useRef<?TextField>(null);
 
   const {
     leaderboards,
@@ -175,6 +176,15 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
 
   React.useEffect(
     () => {
+      if (isEditingName && newNameTextFieldRef.current) {
+        newNameTextFieldRef.current.focus();
+      }
+    },
+    [isEditingName]
+  );
+
+  React.useEffect(
+    () => {
       if (leaderboards === null) {
         setIsRequestPending(true);
         listLeaderboards().then(() => {
@@ -248,6 +258,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       text: isEditingName ? (
         <Line alignItems="center">
           <TextField
+            ref={newNameTextFieldRef}
             margin="none"
             fullWidth
             maxLength={50}

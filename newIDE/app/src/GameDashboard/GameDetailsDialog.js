@@ -1,6 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
@@ -87,6 +86,10 @@ export const GameDetailsDialog = ({
     null
   );
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [
+    gameUnregisterErrorText,
+    setGameUnregisterErrorText,
+  ] = React.useState<?string>(null);
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
@@ -214,15 +217,29 @@ export const GameDetailsDialog = ({
     }
   };
 
-  const unregisterGame = async () => {
+  const unregisterGame = async (i18n: I18nType) => {
     if (!profile) return;
     const { id } = profile;
-
+    setGameUnregisterErrorText(null);
+    setIsLoading(true);
     try {
       await deleteGame(getAuthorizationHeader, id, game.id);
       onGameDeleted();
     } catch (error) {
       console.error('Unable to delete the game:', error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.code === 'game-deletion/leaderboards-exist'
+      ) {
+        setGameUnregisterErrorText(
+          i18n._(
+            t`You cannot unregister a game that has active leaderboards. To delete them, go in tab Leaderboards, and delete them one by one.`
+          )
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -452,7 +469,7 @@ export const GameDetailsDialog = ({
 
                         if (!answer) return;
 
-                        unregisterGame();
+                        unregisterGame(i18n);
                       }}
                       label={<Trans>Unregister this game</Trans>}
                     />
@@ -481,6 +498,13 @@ export const GameDetailsDialog = ({
                       disabled={!isGameOpenedAsProject}
                     />
                   </Line>
+                  {gameUnregisterErrorText ? (
+                    <PlaceholderError>
+                      <AlertMessage kind="error">
+                        {gameUnregisterErrorText}
+                      </AlertMessage>
+                    </PlaceholderError>
+                  ) : null}
                 </ColumnStackLayout>
               )
             ) : null}

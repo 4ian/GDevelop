@@ -24,6 +24,11 @@ namespace gdjs {
       isCollidingAnyPlatform: false,
     };
 
+    /**
+     * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
+     */
+    private static readonly epsilon = 2 ** -20;
+
     // Behavior configuration
 
     /** To achieve pixel-perfect precision when positioning object on platform or
@@ -107,6 +112,8 @@ namespace gdjs {
     _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
 
     private _hasReallyMoved: boolean = false;
+    /** @deprecated use _hasReallyMoved instead */
+    private _hasMovedAtLeastOnePixel: boolean = false;
     private _manager: gdjs.PlatformObjectsManager;
 
     constructor(
@@ -312,6 +319,11 @@ namespace gdjs {
 
       //5) Track the movement
       this._hasReallyMoved =
+        Math.abs(object.getX() - oldX) >
+          PlatformerObjectRuntimeBehavior.epsilon ||
+        Math.abs(object.getY() - oldY) >
+          PlatformerObjectRuntimeBehavior.epsilon;
+      this._hasMovedAtLeastOnePixel =
         Math.abs(object.getX() - oldX) >= 1 ||
         Math.abs(object.getY() - oldY) >= 1;
       this._lastDeltaY = object.getY() - oldY;
@@ -1543,9 +1555,27 @@ namespace gdjs {
 
     /**
      * Check if the Platformer Object is moving.
+     *
+     * When walking or climbing on a ladder,
+     * a speed of less than one pixel per frame won't be detected.
+     *
      * @returns Returns true if it is moving and false if not.
+     * @deprecated use isMovingEvenALittle instead
      */
     isMoving(): boolean {
+      return (
+        (this._hasMovedAtLeastOnePixel &&
+          (this._currentSpeed !== 0 || this._state === this._onLadder)) ||
+        this._jumping.getCurrentJumpSpeed() !== 0 ||
+        this._currentFallSpeed !== 0
+      );
+    }
+
+    /**
+     * Check if the Platformer Object is moving.
+     * @returns Returns true if it is moving and false if not.
+     */
+    isMovingEvenALittle(): boolean {
       return (
         (this._hasReallyMoved &&
           (this._currentSpeed !== 0 || this._state === this._onLadder)) ||

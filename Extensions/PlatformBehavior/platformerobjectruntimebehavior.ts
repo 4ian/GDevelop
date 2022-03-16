@@ -24,6 +24,11 @@ namespace gdjs {
       isCollidingAnyPlatform: false,
     };
 
+    /**
+     * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
+     */
+    private static readonly epsilon = 2 ** -20;
+
     // Behavior configuration
 
     /** To achieve pixel-perfect precision when positioning object on platform or
@@ -314,8 +319,10 @@ namespace gdjs {
 
       //5) Track the movement
       this._hasReallyMoved =
-        Math.abs(object.getX() - oldX) > 0 ||
-        Math.abs(object.getY() - oldY) > 0;
+        Math.abs(object.getX() - oldX) >
+          PlatformerObjectRuntimeBehavior.epsilon ||
+        Math.abs(object.getY() - oldY) >
+          PlatformerObjectRuntimeBehavior.epsilon;
       this._hasMovedAtLeastOnePixel =
         Math.abs(object.getX() - oldX) >= 1 ||
         Math.abs(object.getY() - oldY) >= 1;

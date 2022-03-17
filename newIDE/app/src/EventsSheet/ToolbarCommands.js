@@ -14,6 +14,7 @@ type Props = {|
   allEventsMetadata: Array<EventMetadata>,
   onAddEvent: (eventType: string) => Array<gdBaseEvent>,
   onToggleDisabledEvent: () => void,
+  canToggleEventDisabled: boolean,
   onRemove: () => void,
   canRemove: boolean,
   undo: () => void,
@@ -39,7 +40,7 @@ const ToolbarCommands = (props: Props) => {
     handler: props.onAddCommentEvent,
   });
 
-  useCommand('TOGGLE_EVENT_DISABLED', true, {
+  useCommand('TOGGLE_EVENT_DISABLED', props.canToggleEventDisabled, {
     handler: props.onToggleDisabledEvent,
   });
 

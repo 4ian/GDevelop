@@ -39,7 +39,7 @@ const ToolbarCommands = (props: Props) => {
     handler: props.onAddCommentEvent,
   });
 
-  useCommand('TOGGLE_EVENT', true, {
+  useCommand('TOGGLE_EVENT_DISABLED', true, {
     handler: props.onToggleDisabledEvent,
   });
 

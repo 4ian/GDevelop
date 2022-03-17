@@ -52,7 +52,7 @@ export type CommandName =
   | 'ADD_STANDARD_EVENT'
   | 'ADD_SUBEVENT'
   | 'ADD_COMMENT_EVENT'
-  | 'TOGGLE_EVENT'
+  | 'TOGGLE_EVENT_DISABLED'
   | 'CHOOSE_AND_ADD_EVENT'
   | 'EVENTS_EDITOR_UNDO'
   | 'EVENTS_EDITOR_REDO'
@@ -280,7 +280,7 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Add a sub-event to the selected event`,
   },
   ADD_COMMENT_EVENT: { area: 'EVENTS', displayText: t`Add a comment` },
-  TOGGLE_EVENT: { area: 'EVENTS', displayText: t`Toggle disabled event` },
+  TOGGLE_EVENT_DISABLED: { area: 'EVENTS', displayText: t`Toggle disabled event` },
   CHOOSE_AND_ADD_EVENT: {
     area: 'EVENTS',
     displayText: t`Choose and add an event...`,

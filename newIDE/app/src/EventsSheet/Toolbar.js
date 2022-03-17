@@ -48,11 +48,6 @@ export class Toolbar extends PureComponent<Props> {
             src="res/ribbon_default/commentaireadd32.png"
             tooltip={t`Add a comment`}
           />
-          <ToolbarIcon
-            onClick={this.props.onToggleDisabledEvent}
-            src="res/ribbon_default/subeventadd32.png"
-            tooltip={t`Toggle disabled selected event`}
-          />
           <ElementWithMenu
             element={
               <ToolbarIcon

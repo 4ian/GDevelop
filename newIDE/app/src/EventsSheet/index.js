@@ -13,6 +13,7 @@ import EventTextDialog, {
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
 import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { serializeToJSObject } from '../Utils/Serializer';
@@ -639,7 +640,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Toggle disabled`),
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
-      accelerator: 'D',
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_EVENT_DISABLED'
+        ] || 'KeyD'
+      ),
     },
     { type: 'separator' },
     {
@@ -833,12 +838,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   toggleDisabled = () => {
-    getSelectedEvents(this.state.selection).forEach(event =>
-      event.setDisabled(!event.isDisabled())
-    );
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    let shouldBeSaved = false;
+    getSelectedEvents(this.state.selection).forEach(event => {
+      if (event.isExecutable()) {
+        event.setDisabled(!event.isDisabled());
+        shouldBeSaved = true;
+      }
     });
+    if (shouldBeSaved) {
+      this._saveChangesToHistory(() => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      });
+    }
   };
 
   deleteSelection = ({

@@ -11,8 +11,9 @@ import {
   Tooltip,
 } from '@material-ui/core';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Error from '@material-ui/icons/Error';
 import React from 'react';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
@@ -22,12 +23,14 @@ type Props = {|
   entries: ?Array<LeaderboardDisplayData>,
   onDeleteEntry: (entryId: string) => Promise<void>,
   disableActions: boolean,
+  erroredEntry?: {| entryId: string, message: React$Node |},
 |};
 
 const LeaderboardEntriesTable = ({
   entries,
   onDeleteEntry,
   disableActions,
+  erroredEntry,
 }: Props) => {
   if (!entries) return <PlaceholderLoader />;
 
@@ -77,14 +80,25 @@ const LeaderboardEntriesTable = ({
                     </Tooltip>
                   </TableCell>
                   <TableCell>
-                    <Tooltip title={'Remove entry'}>
-                      <IconButton
-                        onClick={() => onDeleteEntry(entry.id)}
-                        disabled={disableActions}
-                      >
-                        <DeleteOutline size={20} />
-                      </IconButton>
-                    </Tooltip>
+                    <Line>
+                      <Tooltip title={'Remove entry'}>
+                        <IconButton
+                          onClick={() => onDeleteEntry(entry.id)}
+                          disabled={disableActions}
+                        >
+                          <DeleteOutline size={20} />
+                        </IconButton>
+                      </Tooltip>
+                      {erroredEntry && erroredEntry.entryId === entry.id ? (
+                        <Tooltip title={erroredEntry.message}>
+                          <IconButton
+                            onClick={() => {}} // wrap in icon button to match above icon padding
+                          >
+                            <Error size={20} color="error" />
+                          </IconButton>
+                        </Tooltip>
+                      ) : null}
+                    </Line>
                   </TableCell>
                 </TableRow>
               ))}

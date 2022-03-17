@@ -7,6 +7,7 @@ import {
   type LeaderboardEntry,
   type LeaderboardExtremePlayerScore,
   type LeaderboardSortOption,
+  type LeaderboardPlayerUnicityDisplayOption,
   type LeaderboardDisplayData,
   createLeaderboard as doCreateLeaderboard,
   updateLeaderboard as doUpdateLeaderboard,
@@ -126,6 +127,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   const updateLeaderboard = async (payload: {|
     name?: string,
     sort?: LeaderboardSortOption,
+    playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   |}) => {
     if (!currentLeaderboardId) return;
     if (payload.sort) setEntries(null);

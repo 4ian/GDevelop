@@ -11,6 +11,7 @@ export type Leaderboard = {|
   sort: 'DESC' | 'ASC',
   startDatetime: string,
   deletedAt?: string,
+  playerUnicityDisplayChoice: 'PREFER_UNIQUE' | 'PREFER_NON_UNIQUE' | 'FREE',
 |};
 
 export type LeaderboardEntry = {|
@@ -32,8 +33,10 @@ export type LeaderboardDisplayData = {|
 |};
 
 export type LeaderboardSortOption = 'ASC' | 'DESC';
-
-export const leaderboardSortOptions: LeaderboardSortOption[] = ['ASC', 'DESC'];
+export type LeaderboardPlayerUnicityDisplayOption =
+  | 'FREE'
+  | 'PREFER_UNIQUE'
+  | 'PREFER_NON_UNIQUE';
 
 export type LeaderboardExtremePlayerScore = {|
   leaderboardId: string,
@@ -120,7 +123,11 @@ export const updateLeaderboard = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
-  payload: {| name?: string, sort?: LeaderboardSortOption |}
+  payload: {|
+    name?: string,
+    sort?: LeaderboardSortOption,
+    playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+  |}
 ): Promise<?Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;

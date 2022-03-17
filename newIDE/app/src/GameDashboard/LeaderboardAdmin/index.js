@@ -16,6 +16,7 @@ import Fingerprint from '@material-ui/icons/Fingerprint';
 import Update from '@material-ui/icons/Update';
 import Today from '@material-ui/icons/Today';
 import Sort from '@material-ui/icons/Sort';
+import PeopleAlt from '@material-ui/icons/PeopleAlt';
 import SwapVertical from '@material-ui/icons/SwapVert';
 import Refresh from '@material-ui/icons/Refresh';
 import Delete from '@material-ui/icons/Delete';
@@ -47,6 +48,7 @@ import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import {
   type Leaderboard,
   type LeaderboardSortOption,
+  type LeaderboardPlayerUnicityDisplayOption,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
@@ -55,6 +57,8 @@ import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 
 const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
@@ -68,6 +72,7 @@ type ApiError = {|
     | 'leaderboardsFetching'
     | 'leaderboardNameUpdate'
     | 'leaderboardSortUpdate'
+    | 'leaderboardPlayerUnicityDisplayChoiceUpdate'
     | 'leaderboardCreation'
     | 'leaderboardReset'
     | 'leaderboardDeletion',
@@ -128,7 +133,11 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
 
   const _updateLeaderboard = async (
     i18n: I18nType,
-    payload: {| name?: string, sort?: LeaderboardSortOption |}
+    payload: {|
+      name?: string,
+      sort?: LeaderboardSortOption,
+      playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+    |}
   ) => {
     setNewNameError(null);
     if (payload.name !== undefined && payload.name.length === 0) {
@@ -149,15 +158,22 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       setApiError({
         action: payload.name
           ? 'leaderboardNameUpdate'
-          : 'leaderboardSortUpdate',
+          : payload.sort
+          ? 'leaderboardSortUpdate'
+          : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
         message: payload.name ? (
           <Trans>
             An error ocurred when updating the name of the leaderboard, please
             close the dialog, come back and try again.
           </Trans>
-        ) : (
+        ) : payload.sort ? (
           <Trans>
             An error ocurred when updating the sort direction of the
+            leaderboard, please close the dialog, come back and try again.
+          </Trans>
+        ) : (
+          <Trans>
+            An error ocurred when updating the display choice of the
             leaderboard, please close the dialog, come back and try again.
           </Trans>
         ),
@@ -584,6 +600,67 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         </IconButton>
       ),
     },
+    {
+      key: 'playerUnicityDisplayChoice',
+      avatar: <PeopleAlt />,
+      text: (
+        <Tooltip
+          title={i18n._(
+            t`This parameter allows you to decide how you want the leaderboard to be displayed.`
+          )}
+        >
+          <SelectField
+            fullWidth
+            margin="none"
+            value={currentLeaderboard.playerUnicityDisplayChoice}
+            onChange={(e, i, value) => {
+              _updateLeaderboard(i18n, {
+                // $FlowFixMe
+                playerUnicityDisplayChoice: value,
+              });
+            }}
+            disabled={isRequestPending || isEditingName}
+            inputStyle={{ fontSize: '0.875em' }}
+            helperMarkdownText={
+              currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
+                ? i18n._(
+                    t`Users can chose to see only players' best entries or not.`
+                  )
+                : currentLeaderboard.playerUnicityDisplayChoice ===
+                  'PREFER_UNIQUE'
+                ? i18n._(t`Only player's best entries are displayed.`)
+                : i18n._(t`All entries are displayed.`)
+            }
+          >
+            {[
+              <SelectOption
+                key={'free'}
+                value={'FREE'}
+                primaryText={t`Let the user select`}
+              />,
+              <SelectOption
+                key={'prefer-unique'}
+                value={'PREFER_UNIQUE'}
+                primaryText={t`Only best`}
+              />,
+              <SelectOption
+                key={'prefer-non-unique'}
+                value={'PREFER_NON_UNIQUE'}
+                primaryText={t`All entries`}
+              />,
+            ]}
+          </SelectField>
+        </Tooltip>
+      ),
+      secondaryText:
+        apiError &&
+        apiError.action === 'leaderboardPlayerUnicityDisplayChoiceUpdate' ? (
+          <Typography color="error" variant="body2">
+            {apiError.message}
+          </Typography>
+        ) : null,
+      secondaryAction: null,
+    },
   ];
   return (
     <I18n>
@@ -645,9 +722,11 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                               >
                                 {item.text}
                               </ListItemText>
-                              <ListItemSecondaryAction>
-                                {item.secondaryAction}
-                              </ListItemSecondaryAction>
+                              {item.secondaryAction ? (
+                                <ListItemSecondaryAction>
+                                  {item.secondaryAction}
+                                </ListItemSecondaryAction>
+                              ) : null}
                             </ListItem>
                           </>
                         )
@@ -682,7 +761,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
             <Line alignItems="center" justifyContent="flex-end">
               <Tooltip
                 title={i18n._(
-                  t`When checked, will only display the best score of each player`
+                  t`When checked, will only display the best score of each player (only for the display below).`
                 )}
               >
                 <Typography variant="body2">

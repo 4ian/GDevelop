@@ -13,6 +13,8 @@ type Props = {|
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
   onAddEvent: (eventType: string) => Array<gdBaseEvent>,
+  onToggleDisabledEvent: () => void,
+  canToggleEventDisabled: boolean,
   onRemove: () => void,
   canRemove: boolean,
   undo: () => void,
@@ -36,6 +38,10 @@ const ToolbarCommands = (props: Props) => {
 
   useCommand('ADD_COMMENT_EVENT', true, {
     handler: props.onAddCommentEvent,
+  });
+
+  useCommand('TOGGLE_EVENT_DISABLED', props.canToggleEventDisabled, {
+    handler: props.onToggleDisabledEvent,
   });
 
   useCommandWithOptions('CHOOSE_AND_ADD_EVENT', true, {

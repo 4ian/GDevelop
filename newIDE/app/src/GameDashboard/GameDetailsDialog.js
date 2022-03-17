@@ -499,10 +499,8 @@ export const GameDetailsDialog = ({
                     />
                   </Line>
                   {gameUnregisterErrorText ? (
-                    <PlaceholderError>
-                      <AlertMessage kind="error">
-                        {gameUnregisterErrorText}
-                      </AlertMessage>
+                    <PlaceholderError kind="error">
+                      {gameUnregisterErrorText}
                     </PlaceholderError>
                   ) : null}
                 </ColumnStackLayout>

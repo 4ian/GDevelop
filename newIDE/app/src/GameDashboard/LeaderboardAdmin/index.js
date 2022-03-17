@@ -409,8 +409,8 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   if (apiError && apiError.action === 'leaderboardsFetching') {
     return (
       <WrappedError>
-        <PlaceholderError onRetry={_listLeaderboards}>
-          <AlertMessage kind="error">{apiError.message}</AlertMessage>
+        <PlaceholderError onRetry={_listLeaderboards} kind="error">
+          {apiError.message}
         </PlaceholderError>
       </WrappedError>
     );
@@ -420,13 +420,11 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     else {
       return (
         <WrappedError>
-          <PlaceholderError onRetry={_listLeaderboards}>
-            <AlertMessage kind="error">
-              <Trans>
-                An error ocurred when retrieving leaderboards, please try again
-                later.
-              </Trans>
-            </AlertMessage>
+          <PlaceholderError onRetry={_listLeaderboards} kind="error">
+            <Trans>
+              An error ocurred when retrieving leaderboards, please try again
+              later.
+            </Trans>
           </PlaceholderError>
         </WrappedError>
       );
@@ -677,7 +675,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
-        <ResponsiveLineStackLayout noMargin expand>
+        <ResponsiveLineStackLayout noMargin expand noColumnMargin>
           <div style={styles.leftColumn}>
             <Paper elevation={5} style={{ padding: 5, margin: 5 }}>
               <Column>
@@ -753,10 +751,8 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                       />
                     </Line>
                     {apiError && apiError.action === 'leaderboardDeletion' ? (
-                      <PlaceholderError>
-                        <AlertMessage kind="error">
-                          {apiError.message}
-                        </AlertMessage>
+                      <PlaceholderError kind="error">
+                        {apiError.message}
                       </PlaceholderError>
                     ) : null}
                   </>
@@ -799,8 +795,11 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
             </Line>
             {apiError && apiError.action === 'entriesFetching' ? (
               <WrappedError>
-                <PlaceholderError onRetry={_fetchLeaderboardEntries}>
-                  <AlertMessage kind="error">{apiError.message}</AlertMessage>
+                <PlaceholderError
+                  onRetry={_fetchLeaderboardEntries}
+                  kind="error"
+                >
+                  {apiError.message}
                 </PlaceholderError>
               </WrappedError>
             ) : (

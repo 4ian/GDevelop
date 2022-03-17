@@ -349,14 +349,6 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     [isEditingName]
   );
 
-  React.useEffect(
-    () => {
-      if (leaderboards === null) {
-        _listLeaderboards();
-      }
-    },
-    [leaderboards, _listLeaderboards]
-  );
   const currentLeaderboard = React.useMemo(
     () => {
       if (!leaderboards || !currentLeaderboardId) return null;
@@ -365,6 +357,26 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       )[0];
     },
     [leaderboards, currentLeaderboardId]
+  );
+
+  React.useEffect(
+    () => {
+      if (leaderboards === null) {
+        _listLeaderboards();
+      }
+    },
+    [leaderboards, _listLeaderboards]
+  );
+
+  React.useEffect(
+    () => {
+      if (!!currentLeaderboard) {
+        setDisplayOnlyBestEntry(
+          currentLeaderboard.playerUnicityDisplayChoice === 'PREFER_UNIQUE'
+        );
+      }
+    },
+    [currentLeaderboard, setDisplayOnlyBestEntry]
   );
 
   const onCopy = React.useCallback(
@@ -641,7 +653,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
               <SelectOption
                 key={'prefer-unique'}
                 value={'PREFER_UNIQUE'}
-                primaryText={t`Only best`}
+                primaryText={t`Only best entry`}
               />,
               <SelectOption
                 key={'prefer-non-unique'}

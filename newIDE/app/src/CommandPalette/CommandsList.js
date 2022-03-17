@@ -280,7 +280,10 @@ const commandsList: { [CommandName]: CommandMetadata } = {
     displayText: t`Add a sub-event to the selected event`,
   },
   ADD_COMMENT_EVENT: { area: 'EVENTS', displayText: t`Add a comment` },
-  TOGGLE_EVENT_DISABLED: { area: 'EVENTS', displayText: t`Toggle disabled event` },
+  TOGGLE_EVENT_DISABLED: {
+    area: 'EVENTS',
+    displayText: t`Toggle disabled event`,
+  },
   CHOOSE_AND_ADD_EVENT: {
     area: 'EVENTS',
     displayText: t`Choose and add an event...`,

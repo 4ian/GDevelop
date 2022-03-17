@@ -396,7 +396,6 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 <Line>
                   <Autocomplete
                     autoComplete
-                    autoSelect
                     disableClearable
                     noOptionsText={<Trans>No matching leaderboard</Trans>}
                     style={{ flex: 1 }}

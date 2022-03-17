@@ -15,6 +15,7 @@ import React from 'react';
 import { Column } from '../../UI/Grid';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
+import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { type LeaderboardDisplayData } from '../../Utils/GDevelopServices/Play';
 
 type Props = {|
@@ -35,10 +36,10 @@ const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
                 <TableCell style={{ width: '20%' }} align="center">
                   <Trans>Score</Trans>
                 </TableCell>
-                <TableCell style={{ width: '35%' }}>
+                <TableCell style={{ width: '50%' }}>
                   <Trans>Player</Trans>
                 </TableCell>
-                <TableCell style={{ width: '30%' }}>
+                <TableCell style={{ width: '15%' }}>
                   <Trans>Date</Trans>
                 </TableCell>
                 <TableCell style={{ width: '15%' }}>
@@ -50,7 +51,16 @@ const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
               {entries.map(entry => (
                 <TableRow key={entry.id}>
                   <TableCell align="center">{entry.score}</TableCell>
-                  <TableCell>{entry.playerName}</TableCell>
+                  <TableCell
+                    style={{
+                      ...textEllipsisStyle,
+                      maxWidth: 0, // to trigger the text ellipsis when overflowing
+                    }}
+                  >
+                    <Tooltip title={entry.playerName}>
+                      <span>{entry.playerName}</span>
+                    </Tooltip>
+                  </TableCell>
                   <TableCell>
                     <Tooltip
                       title={i18n.date(entry.createdAt, {

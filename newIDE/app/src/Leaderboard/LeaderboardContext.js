@@ -4,6 +4,7 @@ import {
   type Leaderboard,
   type LeaderboardSortOption,
   type LeaderboardDisplayData,
+  type LeaderboardPlayerUnicityDisplayOption,
 } from '../Utils/GDevelopServices/Play';
 
 export type LeaderboardState = {|
@@ -25,6 +26,7 @@ export type LeaderboardState = {|
   updateLeaderboard: ({|
     name?: string,
     sort?: LeaderboardSortOption,
+    playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   |}) => Promise<void>,
   resetLeaderboard: () => Promise<void>,
   deleteLeaderboard: () => Promise<void>,

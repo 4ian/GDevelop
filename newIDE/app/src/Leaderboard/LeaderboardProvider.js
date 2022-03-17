@@ -48,7 +48,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   const listLeaderboards = React.useCallback(
     async (ignoreCurrentLeaderboardId: boolean = false) => {
       const fetchedLeaderboards = await listGameLeaderboards(gameId);
-      fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name))
+      fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
       setLeaderboards(fetchedLeaderboards);
       if (
         fetchedLeaderboards.length > 0 &&

@@ -21,6 +21,7 @@ import Refresh from '@material-ui/icons/Refresh';
 import Delete from '@material-ui/icons/Delete';
 import {
   Avatar,
+  CircularProgress,
   Divider,
   List,
   ListItem,
@@ -39,6 +40,7 @@ import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
 import PlaceholderError from '../../UI/PlaceholderError';
+import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
@@ -59,6 +61,26 @@ const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};
 
+type ApiError = {|
+  action:
+    | 'entriesFetching'
+    | 'entryDeletion'
+    | 'leaderboardsFetching'
+    | 'leaderboardNameUpdate'
+    | 'leaderboardSortUpdate'
+    | 'leaderboardCreation'
+    | 'leaderboardReset'
+    | 'leaderboardDeletion',
+  message: React$Node,
+  itemId?: string,
+|};
+
+const WrappedError = ({ children }: { children: React$Node }) => (
+  <Column expand justifyContent="center" alignItems="center">
+    <Line>{children}</Line>
+  </Column>
+);
+
 const styles = {
   leftColumn: { display: 'flex', flexDirection: 'column', flex: 1, padding: 5 },
   rightColumn: {
@@ -78,6 +100,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
   const newNameTextFieldRef = React.useRef<?TextField>(null);
+  const [apiError, setApiError] = React.useState<?ApiError>(null);
 
   const {
     leaderboards,
@@ -95,6 +118,14 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     browsing: { entries },
   } = React.useContext(LeaderboardContext);
 
+  const disableActions = React.useCallback(
+    (yesOrNo: boolean) => {
+      setIsRequestPending(yesOrNo);
+      onLoading(yesOrNo);
+    },
+    [onLoading]
+  );
+
   const _updateLeaderboard = async (
     i18n: I18nType,
     payload: {| name?: string, sort?: LeaderboardSortOption |}
@@ -109,25 +140,104 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       return;
     }
     disableActions(true);
-    await updateLeaderboard(payload);
-    disableActions(false);
-    if (payload.name) setIsEditingName(false);
+    setApiError(null);
+    try {
+      await updateLeaderboard(payload);
+      if (payload.name) setIsEditingName(false);
+    } catch (err) {
+      console.error(err);
+      setApiError({
+        action: payload.name
+          ? 'leaderboardNameUpdate'
+          : 'leaderboardSortUpdate',
+        message: payload.name ? (
+          <Trans>
+            An error ocurred when updating the name of the leaderboard, please
+            close the dialog, come back and try again.
+          </Trans>
+        ) : (
+          <Trans>
+            An error ocurred when updating the sort direction of the
+            leaderboard, please close the dialog, come back and try again.
+          </Trans>
+        ),
+      });
+    } finally {
+      disableActions(false);
+    }
   };
+
+  const _listLeaderboards = React.useCallback(
+    () => {
+      const fetchAndHandleError = async () => {
+        disableActions(true);
+        setApiError(null);
+        try {
+          await listLeaderboards();
+        } catch (err) {
+          console.error(err);
+          setApiError({
+            action: 'leaderboardsFetching',
+            message: (
+              <Trans>
+                An error ocurred when fetching the leaderboards, please close
+                the dialog and reopen it.
+              </Trans>
+            ),
+          });
+        } finally {
+          disableActions(false);
+        }
+      };
+      fetchAndHandleError();
+    },
+    [disableActions, listLeaderboards]
+  );
 
   const _fetchLeaderboardEntries = async () => {
     disableActions(true);
-    await fetchLeaderboardEntries();
-    disableActions(false);
+    setApiError(null);
+    try {
+      await fetchLeaderboardEntries();
+    } catch (err) {
+      console.error(err);
+      setApiError({
+        action: 'entriesFetching',
+        message: (
+          <Trans>
+            An error ocurred when fetching the entries of the leaderboard, you
+            can hit refresh to try again.
+          </Trans>
+        ),
+      });
+    } finally {
+      disableActions(false);
+    }
   };
 
   const _createLeaderboard = async () => {
     disableActions(true);
-    const newLeaderboard = await createLeaderboard({
-      name: 'New leaderboard',
-      sort: 'ASC',
-    });
-    if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
-    disableActions(false);
+    setApiError(null);
+    try {
+      const newLeaderboard = await createLeaderboard({
+        name: 'New leaderboard',
+        sort: 'ASC',
+      });
+      if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
+    } catch (err) {
+      console.error(err);
+      setApiError({
+        action: 'leaderboardCreation',
+        message: (
+          <Trans>
+            An error ocurred when creating a new leaderboard, please close the
+            dialog, come back and try again.
+          </Trans>
+        ),
+      });
+    } finally {
+      disableActions(false);
+    }
   };
 
   const _resetLeaderboard = async (i18n: I18nType) => {
@@ -139,8 +249,23 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     if (!answer) return;
 
     disableActions(true);
-    await resetLeaderboard();
-    disableActions(false);
+    setApiError(null);
+    try {
+      await resetLeaderboard();
+    } catch (err) {
+      console.error(err);
+      setApiError({
+        action: 'leaderboardReset',
+        message: (
+          <Trans>
+            An error ocurred when resetting the leaderboard, please close the
+            dialog, come back and try again.
+          </Trans>
+        ),
+      });
+    } finally {
+      disableActions(false);
+    }
   };
 
   const _deleteLeaderboard = async (i18n: I18nType) => {
@@ -152,8 +277,23 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     if (!answer) return;
 
     disableActions(true);
-    await deleteLeaderboard();
-    disableActions(false);
+    setApiError(null);
+    try {
+      await deleteLeaderboard();
+    } catch (err) {
+      console.error(err);
+      setApiError({
+        action: 'leaderboardDeletion',
+        message: (
+          <Trans>
+            An error ocurred when deleting the leaderboard, please close the
+            dialog, come back and try again.
+          </Trans>
+        ),
+      });
+    } finally {
+      disableActions(false);
+    }
   };
 
   const _deleteEntry = async (i18n: I18nType, entryId: string) => {
@@ -165,13 +305,23 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     if (!answer) return;
 
     disableActions(true);
-    await deleteLeaderboardEntry(entryId);
-    disableActions(false);
-  };
-
-  const disableActions = (yesOrNo: boolean) => {
-    setIsRequestPending(yesOrNo);
-    onLoading(yesOrNo);
+    setApiError(null);
+    try {
+      await deleteLeaderboardEntry(entryId);
+    } catch (err) {
+      console.error(err);
+      setApiError({
+        action: 'entryDeletion',
+        message: (
+          <Trans>
+            An error ocurred when deleting the entry, please try again.
+          </Trans>
+        ),
+        itemId: entryId,
+      });
+    } finally {
+      disableActions(false);
+    }
   };
 
   React.useEffect(
@@ -186,13 +336,10 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   React.useEffect(
     () => {
       if (leaderboards === null) {
-        setIsRequestPending(true);
-        listLeaderboards().then(() => {
-          setIsRequestPending(false);
-        });
+        _listLeaderboards();
       }
     },
-    [listLeaderboards, leaderboards]
+    [leaderboards, _listLeaderboards]
   );
   const currentLeaderboard = React.useMemo(
     () => {
@@ -212,27 +359,52 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     },
     [currentLeaderboard]
   );
-  if (!isOnline)
+  if (!isOnline) {
     return (
-      <PlaceholderError>
-        <Trans>
-          An internet connection is required to administrate your game's
-          leaderboards.
-        </Trans>
-      </PlaceholderError>
-    );
-  if (leaderboards === null) {
-    if (isRequestPending) return <PlaceholderLoader />;
-    else
-      return (
-        <PlaceholderError onRetry={listLeaderboards}>
+      <WrappedError>
+        <PlaceholderError>
           <Trans>
-            An error ocurred when retrieving leaderboards, please try again
-            later.
+            An internet connection is required to administrate your game's
+            leaderboards.
           </Trans>
         </PlaceholderError>
-      );
+      </WrappedError>
+    );
   }
+  if (apiError && apiError.action === 'leaderboardCreation') {
+    return (
+      <WrappedError>
+        <AlertMessage kind="error">{apiError.message}</AlertMessage>
+      </WrappedError>
+    );
+  }
+  if (apiError && apiError.action === 'leaderboardsFetching') {
+    return (
+      <WrappedError>
+        <PlaceholderError onRetry={_listLeaderboards}>
+          <AlertMessage kind="error">{apiError.message}</AlertMessage>
+        </PlaceholderError>
+      </WrappedError>
+    );
+  }
+  if (leaderboards === null) {
+    if (isRequestPending) return <PlaceholderLoader />;
+    else {
+      return (
+        <WrappedError>
+          <PlaceholderError onRetry={_listLeaderboards}>
+            <AlertMessage kind="error">
+              <Trans>
+                An error ocurred when retrieving leaderboards, please try again
+                later.
+              </Trans>
+            </AlertMessage>
+          </PlaceholderError>
+        </WrappedError>
+      );
+    }
+  }
+
   if (!!leaderboards && leaderboards.length === 0)
     return (
       <Line noMargin expand justifyContent="center" alignItems="center">
@@ -293,6 +465,12 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           </Typography>
         </Tooltip>
       ),
+      secondaryText:
+        apiError && apiError.action === 'leaderboardNameUpdate' ? (
+          <Typography color="error" variant="body2">
+            {apiError.message}
+          </Typography>
+        ) : null,
       secondaryAction: (
         <IconButton
           onClick={() => {
@@ -307,7 +485,15 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           disabled={isRequestPending}
           edge="end"
         >
-          {isEditingName ? <Save /> : <Edit />}
+          {isEditingName ? (
+            isRequestPending ? (
+              <CircularProgress size={20} />
+            ) : (
+              <Save />
+            )
+          ) : (
+            <Edit />
+          )}
         </IconButton>
       ),
     },
@@ -321,6 +507,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           </Typography>
         </Tooltip>
       ),
+      secondaryText: null,
       secondaryAction: (
         <IconButton onClick={onCopy} tooltip={t`Copy`} edge="end">
           <Copy />
@@ -347,6 +534,12 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           </Typography>
         </Tooltip>
       ),
+      secondaryText:
+        apiError && apiError.action === 'leaderboardReset' ? (
+          <Typography color="error" variant="body2">
+            {apiError.message}
+          </Typography>
+        ) : null,
       secondaryAction: (
         <IconButton
           onClick={() => _resetLeaderboard(i18n)}
@@ -370,6 +563,12 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           )}
         </Typography>
       ),
+      secondaryText:
+        apiError && apiError.action === 'leaderboardSortUpdate' ? (
+          <Typography color="error" variant="body2">
+            {apiError.message}
+          </Typography>
+        ) : null,
       secondaryAction: (
         <IconButton
           onClick={async () => {
@@ -440,7 +639,10 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                               <ListItemAvatar>
                                 <Avatar>{item.avatar}</Avatar>
                               </ListItemAvatar>
-                              <ListItemText disableTypography>
+                              <ListItemText
+                                disableTypography
+                                secondary={item.secondaryText}
+                              >
                                 {item.text}
                               </ListItemText>
                               <ListItemSecondaryAction>
@@ -455,10 +657,17 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                       <RaisedButton
                         icon={<Delete />}
                         label={<Trans>Delete</Trans>}
-                        disabled={isRequestPending}
+                        disabled={isRequestPending || isEditingName}
                         onClick={() => _deleteLeaderboard(i18n)}
                       />
                     </Line>
+                    {apiError && apiError.action === 'leaderboardDeletion' ? (
+                      <PlaceholderError>
+                        <AlertMessage kind="error">
+                          {apiError.message}
+                        </AlertMessage>
+                      </PlaceholderError>
+                    ) : null}
                   </>
                 ) : null}
               </Column>
@@ -497,11 +706,26 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
               </Tooltip>
               <Spacer />
             </Line>
-            <LeaderboardEntriesTable
-              entries={entries}
-              onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
-              disableActions={isRequestPending || isEditingName}
-            />
+            {apiError && apiError.action === 'entriesFetching' ? (
+              <WrappedError>
+                <PlaceholderError onRetry={_fetchLeaderboardEntries}>
+                  <AlertMessage kind="error">{apiError.message}</AlertMessage>
+                </PlaceholderError>
+              </WrappedError>
+            ) : (
+              <LeaderboardEntriesTable
+                entries={entries}
+                onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
+                disableActions={isRequestPending || isEditingName}
+                erroredEntry={
+                  apiError &&
+                  apiError.action === 'entryDeletion' &&
+                  apiError.itemId
+                    ? { entryId: apiError.itemId, message: apiError.message }
+                    : undefined
+                }
+              />
+            )}
           </div>
         </ResponsiveLineStackLayout>
       )}

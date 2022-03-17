@@ -135,8 +135,8 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       currentLeaderboardId,
       payload
     );
-    listLeaderboards();
-    if (payload.sort) fetchEntries();
+    await listLeaderboards();
+    if (payload.sort) await fetchEntries();
   };
 
   const resetLeaderboard = async () => {

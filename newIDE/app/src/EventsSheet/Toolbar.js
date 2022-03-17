@@ -15,6 +15,8 @@ type Props = {|
   onAddCommentEvent: () => void,
   allEventsMetadata: Array<EventMetadata>,
   onAddEvent: (eventType: string) => Array<gdBaseEvent>,
+  onToggleDisabledEvent: () => void,
+  canToggleEventDisabled: boolean,
   onRemove: () => void,
   canRemove: boolean,
   undo: () => void,

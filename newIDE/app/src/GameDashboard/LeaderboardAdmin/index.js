@@ -500,6 +500,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
             <LeaderboardEntriesTable
               entries={entries}
               onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
+              disableActions={isRequestPending || isEditingName}
             />
           </div>
         </ResponsiveLineStackLayout>

@@ -21,9 +21,14 @@ import { type LeaderboardDisplayData } from '../../Utils/GDevelopServices/Play';
 type Props = {|
   entries: ?Array<LeaderboardDisplayData>,
   onDeleteEntry: (entryId: string) => Promise<void>,
+  disableActions: boolean,
 |};
 
-const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
+const LeaderboardEntriesTable = ({
+  entries,
+  onDeleteEntry,
+  disableActions,
+}: Props) => {
   if (!entries) return <PlaceholderLoader />;
 
   return (
@@ -73,7 +78,10 @@ const LeaderboardEntriesTable = ({ entries, onDeleteEntry }: Props) => {
                   </TableCell>
                   <TableCell>
                     <Tooltip title={'Remove entry'}>
-                      <IconButton onClick={() => onDeleteEntry(entry.id)}>
+                      <IconButton
+                        onClick={() => onDeleteEntry(entry.id)}
+                        disabled={disableActions}
+                      >
                         <DeleteOutline size={20} />
                       </IconButton>
                     </Tooltip>

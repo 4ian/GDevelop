@@ -172,7 +172,8 @@ export const GameDetailsDialog = ({
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
-        // The thumbnailUrl is updated only when a build is made public.
+        userSlug: partialGameChange.userSlug === profile.username ? partialGameChange.userSlug : undefined,
+        gameSlug: partialGameChange.userSlug === profile.username ? partialGameChange.gameSlug : undefined,
       });
       try {
         const authorAcls = getAclsFromUserIds(

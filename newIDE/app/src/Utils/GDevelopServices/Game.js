@@ -24,6 +24,8 @@ export type PublicGame = {
     lastYearSessionsCount: number,
   },
   categories?: string[],
+  userSlug?: string,
+  gameSlug?: string,
 };
 
 export type Game = {

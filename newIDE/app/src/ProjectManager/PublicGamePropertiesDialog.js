@@ -17,6 +17,8 @@ import { type PublicGame } from '../Utils/GDevelopServices/Game';
  */
 export type PartialGameChange = {|
   ownerIds: Array<string>,
+  userSlug: string,
+  gameSlug: string,
 |};
 
 /**
@@ -89,6 +91,8 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
+  const [userSlug, setUserSlug] = React.useState(publicGame.userSlug);
+  const [gameSlug, setGameSlug] = React.useState(publicGame.gameSlug);
 
   if (!open) return null;
 
@@ -105,7 +109,7 @@ export const PublicGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      onApply({ ownerIds });
+      onApply({ ownerIds, userSlug, gameSlug });
     }
   };
 
@@ -152,6 +156,10 @@ export const PublicGamePropertiesDialog = ({
         playWithMobile={playWithMobile}
         setOrientation={setOrientation}
         orientation={orientation}
+        setUserSlug={setUserSlug}
+        userSlug={userSlug}
+        setGameSlug={setGameSlug}
+        gameSlug={gameSlug}
       />
     </Dialog>
   );

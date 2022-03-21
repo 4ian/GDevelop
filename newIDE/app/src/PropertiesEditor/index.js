@@ -528,7 +528,7 @@ const PropertiesEditor = ({
 
       if (!!additionalText) {
         return (
-          <Line alignItems="baseline">
+          <Line alignItems="baseline" key={`section-title-${field.name}`}>
             <Text displayInlineAsSpan>{field.name}</Text>
             <Spacer />
             <Text
@@ -540,7 +540,7 @@ const PropertiesEditor = ({
       }
 
       return (
-        <Line>
+        <Line key={`section-title-${field.name}`}>
           <Text displayInlineAsSpan>{field.name}</Text>
         </Line>
       );

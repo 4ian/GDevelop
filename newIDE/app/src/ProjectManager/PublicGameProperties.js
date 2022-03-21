@@ -18,10 +18,6 @@ import { Line, Spacer } from '../UI/Grid';
 import { I18n } from '@lingui/react';
 import { string } from 'prop-types';
 
-const getSlugFromName = (name: string) => {
-  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-}
-
 type Props = {|
   project: gdProject,
   userName: string,
@@ -143,7 +139,7 @@ function PublicGameProperties({
             <SelectField
               fullWidth
               floatingLabelText={<Trans>User name in the game URL</Trans>}
-              value={userSlug || profile.username}
+              value={userSlug || ''}
               onChange={(e, i, value: string) => setUserSlug(value)}
             >
               <SelectOption value={profile.username} primaryText={profile.username} />
@@ -154,7 +150,7 @@ function PublicGameProperties({
               floatingLabelText={<Trans>Game name in the game URL</Trans>}
               fullWidth
               type="text"
-              value={gameSlug || getSlugFromName(name)}
+              value={gameSlug || ''}
               onChange={setGameSlug}
               autoFocus
             />

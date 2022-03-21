@@ -209,6 +209,8 @@ export const updateGame = (
     playWithMobile,
     orientation,
     thumbnailUrl,
+    userSlug,
+    gameSlug,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -220,6 +222,8 @@ export const updateGame = (
     playWithMobile?: boolean,
     orientation?: string,
     thumbnailUrl?: ?string,
+    userSlug?: string,
+    gameSlug?: string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -237,6 +241,8 @@ export const updateGame = (
           playWithMobile,
           orientation,
           thumbnailUrl,
+          userSlug,
+          gameSlug,
         },
         {
           params: {

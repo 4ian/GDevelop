@@ -165,7 +165,7 @@ export const GameDetailsDialog = ({
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitle game',
+        gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
         description: project.getDescription() || '',
         playWithKeyboard: project.isPlayableWithKeyboard(),

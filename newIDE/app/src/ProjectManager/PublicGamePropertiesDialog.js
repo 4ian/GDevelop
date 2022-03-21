@@ -11,6 +11,7 @@ import {
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 /**
  * Changes that are not stored in the Project.
@@ -57,6 +58,10 @@ function applyPublicPropertiesToProject(
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
+const getSlugFromName = (name: string) => {
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
+}
+
 type Props = {|
   project: gdProject,
   publicGame: PublicGame,
@@ -72,6 +77,10 @@ export const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
 }: Props) => {
+  const { profile } = React.useContext(
+    AuthenticatedUserContext
+  );
+
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
   const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
@@ -91,8 +100,8 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
-  const [userSlug, setUserSlug] = React.useState(publicGame.userSlug);
-  const [gameSlug, setGameSlug] = React.useState(publicGame.gameSlug);
+  const [userSlug, setUserSlug] = React.useState(publicGame.userSlug || profile.username);
+  const [gameSlug, setGameSlug] = React.useState(publicGame.gameSlug || getSlugFromName(publicGame.gameName));
 
   if (!open) return null;
 

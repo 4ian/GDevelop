@@ -105,7 +105,9 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("string", _("Key"))
+      .AddParameter("stringWithSelector",
+                    _("Key"),
+                    "[\"Left\", \"Right\", \"Up\", \"Down\"]")
       .MarkAsAdvanced()
       .SetFunctionName("SimulateControl")
       .SetIncludeFile(

@@ -216,7 +216,9 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     try {
       await fetchLeaderboardEntries();
     } catch (err) {
-      console.error(`An error occurred when fetching leaderboard entries: ${err}`);
+      console.error(
+        `An error occurred when fetching leaderboard entries: ${err}`
+      );
       setApiError({
         action: 'entriesFetching',
         message: (
@@ -432,11 +434,11 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'name',
       avatar: <Label />,
       text: isEditingName ? (
-        <Line alignItems="center">
+        <Line alignItems="center" expand noMargin>
           <TextField
             ref={newNameTextFieldRef}
             margin="none"
-            fullWidth
+            style={{ width: 125 }}
             maxLength={50}
             value={newName}
             errorText={newNameError}
@@ -449,14 +451,18 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
             disabled={isRequestPending}
           />
           {!isRequestPending && (
-            <IconButton
-              style={{ padding: 0, marginLeft: 5 }}
-              onClick={() => {
-                setIsEditingName(false);
-              }}
-            >
-              <Cancel />
-            </IconButton>
+            <>
+              <Spacer />
+              <IconButton
+                tooltip={t`Cancel`}
+                style={{ padding: 0 }}
+                onClick={() => {
+                  setIsEditingName(false);
+                }}
+              >
+                <Cancel />
+              </IconButton>
+            </>
           )}
         </Line>
       ) : (
@@ -485,7 +491,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
               setIsEditingName(true);
             }
           }}
-          tooltip={t`Rename`}
+          tooltip={isEditingName ? t`Save` : t`Rename`}
           disabled={isRequestPending}
           edge="end"
         >

@@ -68,5 +68,7 @@ export const GDevelopUserApi = {
 };
 
 export const GDevelopPlayApi = {
-  baseUrl: 'https://n9dsp0xfw6.execute-api.us-east-1.amazonaws.com/dev',
+  baseUrl: isDev
+    ? 'https://n9dsp0xfw6.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/play',
 };

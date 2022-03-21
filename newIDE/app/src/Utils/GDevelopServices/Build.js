@@ -80,7 +80,7 @@ export const getWebBuildThumbnailUrl = (
   }
   // The exporter put asset files directly in the build folder.
   // It's not factorized with the exporter because it's a temporary solution.
-  return `https:/games.gdevelop-app.com/game-${buildId}/${fileName}`;
+  return `https://games.gdevelop-app.com/game-${buildId}/${fileName}`;
 };
 
 type UploadOptions = {|

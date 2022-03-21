@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
@@ -76,11 +76,11 @@ type ApiError = {|
     | 'leaderboardCreation'
     | 'leaderboardReset'
     | 'leaderboardDeletion',
-  message: React$Node,
+  message: React.Node,
   itemId?: string,
 |};
 
-const WrappedError = ({ children }: { children: React$Node }) => (
+const CenteredError = ({ children }: {| children: React.Node |}) => (
   <Column expand justifyContent="center" alignItems="center">
     <Line>{children}</Line>
   </Column>
@@ -369,44 +369,44 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   );
   if (!isOnline) {
     return (
-      <WrappedError>
+      <CenteredError>
         <PlaceholderError>
           <Trans>
             An internet connection is required to administrate your game's
             leaderboards.
           </Trans>
         </PlaceholderError>
-      </WrappedError>
+      </CenteredError>
     );
   }
   if (apiError && apiError.action === 'leaderboardCreation') {
     return (
-      <WrappedError>
+      <CenteredError>
         <AlertMessage kind="error">{apiError.message}</AlertMessage>
-      </WrappedError>
+      </CenteredError>
     );
   }
   if (apiError && apiError.action === 'leaderboardsFetching') {
     return (
-      <WrappedError>
+      <CenteredError>
         <PlaceholderError onRetry={_listLeaderboards} kind="error">
           {apiError.message}
         </PlaceholderError>
-      </WrappedError>
+      </CenteredError>
     );
   }
   if (leaderboards === null) {
     if (isRequestPending) return <PlaceholderLoader />;
     else {
       return (
-        <WrappedError>
+        <CenteredError>
           <PlaceholderError onRetry={_listLeaderboards} kind="error">
             <Trans>
               An error occurred when retrieving leaderboards, please try again
               later.
             </Trans>
           </PlaceholderError>
-        </WrappedError>
+        </CenteredError>
       );
     }
   }
@@ -792,14 +792,14 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
               <Spacer />
             </Line>
             {apiError && apiError.action === 'entriesFetching' ? (
-              <WrappedError>
+              <CenteredError>
                 <PlaceholderError
                   onRetry={_fetchLeaderboardEntries}
                   kind="error"
                 >
                   {apiError.message}
                 </PlaceholderError>
-              </WrappedError>
+              </CenteredError>
             ) : (
               <LeaderboardEntriesTable
                 entries={entries}

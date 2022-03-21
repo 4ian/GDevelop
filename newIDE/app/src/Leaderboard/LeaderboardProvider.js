@@ -25,40 +25,143 @@ type Props = {| gameId: string, children: React.Node |};
 
 const pageSize = 10;
 
+const shouldDisplayOnlyBestEntries = (leaderboard: Leaderboard) =>
+  leaderboard.playerUnicityDisplayChoice === 'PREFER_UNIQUE';
+
+type ReducerState = {|
+  currentLeaderboardId: ?string,
+  currentLeaderboard: ?Leaderboard,
+  leaderboardsByIds: ?{| [string]: Leaderboard |},
+  displayOnlyBestEntry: boolean,
+  entries: ?Array<LeaderboardDisplayData>,
+|};
+
+type ReducerAction =
+  | {| type: 'SET_LEADERBOARDS', payload: ?Array<Leaderboard> |}
+  | {| type: 'SET_ENTRIES', payload: ?Array<LeaderboardDisplayData> |}
+  | {| type: 'SELECT_LEADERBOARD', payload: string |}
+  | {| type: 'CHANGE_DISPLAY_ONLY_BEST_ENTRY', payload: boolean |}
+  | {| type: 'UPDATE_OR_CREATE_LEADERBOARD', payload: Leaderboard |}
+  | {| type: 'REMOVE_LEADERBOARD', payload: string |};
+
+const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
+  switch (action.type) {
+    case 'SET_LEADERBOARDS':
+      const leaderboards = action.payload;
+      if (!leaderboards)
+        return {
+          ...state,
+          leaderboardsByIds: null,
+          currentLeaderboardId: null,
+          currentLeaderboard: null,
+        };
+
+      const leaderboardsByIds = leaderboards.reduce((acc, leaderboard) => {
+        acc[leaderboard.id] = leaderboard;
+        return acc;
+      }, {});
+      const shouldDefineCurrentLeaderboardIfNoneSelected =
+        !state.currentLeaderboard && leaderboards && leaderboards.length > 0;
+      const newCurrentLeaderboard = shouldDefineCurrentLeaderboardIfNoneSelected
+        ? leaderboards[0]
+        : state.currentLeaderboard;
+      return {
+        ...state,
+        leaderboardsByIds,
+        displayOnlyBestEntry: newCurrentLeaderboard
+          ? shouldDisplayOnlyBestEntries(newCurrentLeaderboard)
+          : false,
+        currentLeaderboardId: newCurrentLeaderboard
+          ? newCurrentLeaderboard.id
+          : null,
+        currentLeaderboard: newCurrentLeaderboard,
+      };
+    case 'SET_ENTRIES':
+      return {
+        ...state,
+        entries: action.payload,
+      };
+    case 'SELECT_LEADERBOARD':
+      if (!state.leaderboardsByIds) return state;
+      const leaderboard = state.leaderboardsByIds[action.payload];
+      return {
+        ...state,
+        displayOnlyBestEntry: shouldDisplayOnlyBestEntries(leaderboard),
+        currentLeaderboardId: leaderboard.id,
+        currentLeaderboard: leaderboard,
+      };
+    case 'CHANGE_DISPLAY_ONLY_BEST_ENTRY':
+      return {
+        ...state,
+        displayOnlyBestEntry: action.payload,
+      };
+    case 'UPDATE_OR_CREATE_LEADERBOARD':
+      return {
+        ...state,
+        displayOnlyBestEntry: shouldDisplayOnlyBestEntries(action.payload),
+        leaderboardsByIds: {
+          ...state.leaderboardsByIds,
+          [action.payload.id]: action.payload,
+        },
+        currentLeaderboardId: action.payload.id,
+        currentLeaderboard: action.payload,
+      };
+    case 'REMOVE_LEADERBOARD':
+      const newLeaderboardsByIds = { ...state.leaderboardsByIds };
+      delete newLeaderboardsByIds[action.payload];
+      const leaderboardsIds = Object.keys(newLeaderboardsByIds);
+      if (leaderboardsIds.length === 0) {
+        return {
+          ...state,
+          displayOnlyBestEntry: false,
+          leaderboardsByIds: newLeaderboardsByIds,
+          currentLeaderboard: null,
+          currentLeaderboardId: null,
+        };
+      }
+      return {
+        ...state,
+        displayOnlyBestEntry: shouldDisplayOnlyBestEntries(
+          newLeaderboardsByIds[leaderboardsIds[0]]
+        ),
+        leaderboardsByIds: newLeaderboardsByIds,
+        currentLeaderboard: newLeaderboardsByIds[leaderboardsIds[0]],
+        currentLeaderboardId: leaderboardsIds[0],
+      };
+    default: {
+      throw new Error(`Unhandled type: ${action.type}`);
+    }
+  }
+};
+
 const LeaderboardProvider = ({ gameId, children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  // -- Context state --
-  const [leaderboards, setLeaderboards] = React.useState<?Array<Leaderboard>>(
-    null
-  );
   const [
-    displayOnlyBestEntry,
-    setDisplayOnlyBestEntry,
-  ] = React.useState<boolean>(false);
-  const [
-    currentLeaderboardId,
-    setCurrentLeaderboardId,
-  ] = React.useState<?string>(null);
-  const [currentUrl, setCurrentUrl] = React.useState<string>('');
-  const [nextUrl, setNextUrl] = React.useState<?string>(null);
-  const [entries, setEntries] = React.useState<?Array<LeaderboardDisplayData>>(
-    null
-  );
+    {
+      currentLeaderboardId,
+      currentLeaderboard,
+      leaderboardsByIds,
+      displayOnlyBestEntry,
+      entries,
+    },
+    dispatch,
+  ] = React.useReducer<ReducerState, ReducerAction>(reducer, {
+    currentLeaderboardId: null,
+    currentLeaderboard: null,
+    leaderboardsByIds: null,
+    displayOnlyBestEntry: false,
+    entries: null,
+  });
 
   const listLeaderboards = React.useCallback(
-    async (ignoreCurrentLeaderboardId: boolean = false) => {
+    async () => {
+      dispatch({ type: 'SET_LEADERBOARDS', payload: null });
       const fetchedLeaderboards = await listGameLeaderboards(gameId);
       fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
-      setLeaderboards(fetchedLeaderboards);
-      if (
-        fetchedLeaderboards.length > 0 &&
-        (ignoreCurrentLeaderboardId || !currentLeaderboardId)
-      ) {
-        setCurrentLeaderboardId(fetchedLeaderboards[0].id);
-      }
+      dispatch({ type: 'SET_LEADERBOARDS', payload: fetchedLeaderboards });
     },
-    [gameId, currentLeaderboardId]
+    [gameId]
   );
 
   const createLeaderboard = React.useCallback(
@@ -71,16 +174,20 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         gameId,
         creationPayload
       );
-      listLeaderboards();
-      return newLeaderboard;
+      if (!newLeaderboard) return;
+
+      dispatch({
+        type: 'UPDATE_OR_CREATE_LEADERBOARD',
+        payload: newLeaderboard,
+      });
     },
-    [gameId, authenticatedUser, listLeaderboards]
+    [gameId, authenticatedUser]
   );
 
   const fetchEntries = React.useCallback(
     async () => {
       if (!currentLeaderboardId) return;
-      setEntries(null);
+      dispatch({ type: 'SET_ENTRIES', payload: null });
       const fetchedEntries:
         | LeaderboardEntry[]
         | LeaderboardExtremePlayerScore[] = await listLeaderboardEntries(
@@ -91,6 +198,8 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
           onlyBestEntry: displayOnlyBestEntry,
         }
       );
+      if (!fetchedEntries) return;
+
       let entriesToDisplay: LeaderboardDisplayData[] = [];
       if (displayOnlyBestEntry) {
         entriesToDisplay = fetchedEntries.map(entry =>
@@ -103,9 +212,9 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
           extractEntryDisplayData(entry)
         );
       }
-      setEntries(entriesToDisplay);
+      dispatch({ type: 'SET_ENTRIES', payload: entriesToDisplay });
     },
-    [displayOnlyBestEntry, currentLeaderboardId, gameId]
+    [currentLeaderboardId, displayOnlyBestEntry, gameId]
   );
 
   React.useEffect(
@@ -116,46 +225,60 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
   );
 
-  const selectLeaderboard = React.useCallback(
-    (leaderboardId: string) => {
-      setEntries(null);
-      setCurrentLeaderboardId(leaderboardId);
-    },
-    [setCurrentLeaderboardId]
-  );
+  const selectLeaderboard = React.useCallback((leaderboardId: string) => {
+    dispatch({ type: 'SET_ENTRIES', payload: null });
+    dispatch({ type: 'SELECT_LEADERBOARD', payload: leaderboardId });
+  }, []);
 
-  const updateLeaderboard = async (payload: {|
+  const setDisplayOnlyBestEntry = React.useCallback((newValue: boolean) => {
+    dispatch({ type: 'CHANGE_DISPLAY_ONLY_BEST_ENTRY', payload: newValue });
+  }, []);
+
+  const updateLeaderboard = async (attributes: {|
     name?: string,
     sort?: LeaderboardSortOption,
     playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   |}) => {
     if (!currentLeaderboardId) return;
-    if (payload.sort) setEntries(null);
-    await doUpdateLeaderboard(
+    if (attributes.sort) dispatch({ type: 'SET_ENTRIES', payload: null });
+    const updatedLeaderboard = await doUpdateLeaderboard(
       authenticatedUser,
       gameId,
       currentLeaderboardId,
-      payload
+      attributes
     );
-    await listLeaderboards();
-    if (payload.sort) await fetchEntries();
+    if (!updatedLeaderboard) return;
+
+    dispatch({
+      type: 'UPDATE_OR_CREATE_LEADERBOARD',
+      payload: updatedLeaderboard,
+    });
+
+    if (attributes.sort) await fetchEntries();
   };
 
   const resetLeaderboard = async () => {
     if (!currentLeaderboardId) return;
-    setEntries(null);
-    await doResetLeaderboard(authenticatedUser, gameId, currentLeaderboardId);
-    listLeaderboards();
+    dispatch({ type: 'SET_ENTRIES', payload: null });
+    const updatedLeaderboard = await doResetLeaderboard(
+      authenticatedUser,
+      gameId,
+      currentLeaderboardId
+    );
+    if (!updatedLeaderboard) return;
+
+    dispatch({
+      type: 'UPDATE_OR_CREATE_LEADERBOARD',
+      payload: updatedLeaderboard,
+    });
     fetchEntries();
   };
 
   const deleteLeaderboard = async () => {
-    if (!currentLeaderboardId) return;
-    setEntries(null);
+    if (!currentLeaderboardId || !leaderboardsByIds) return;
+    dispatch({ type: 'SET_ENTRIES', payload: null });
     await doDeleteLeaderboard(authenticatedUser, gameId, currentLeaderboardId);
-    setCurrentLeaderboardId(null);
-    await listLeaderboards(true);
-    fetchEntries();
+    dispatch({ type: 'REMOVE_LEADERBOARD', payload: currentLeaderboardId });
   };
 
   const deleteLeaderboardEntry = async (entryId: string) => {
@@ -172,10 +295,13 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   return (
     <LeaderboardContext.Provider
       value={{
-        leaderboards,
-        currentLeaderboardId,
+        leaderboards: !!leaderboardsByIds
+          ? // $FlowFixMe
+            Object.values(leaderboardsByIds)
+          : null,
+        currentLeaderboard,
         displayOnlyBestEntry,
-        browsing: { entries, currentUrl, nextUrl },
+        browsing: { entries },
         setDisplayOnlyBestEntry,
         createLeaderboard,
         listLeaderboards,

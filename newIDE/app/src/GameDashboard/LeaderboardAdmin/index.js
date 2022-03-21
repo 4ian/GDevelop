@@ -110,7 +110,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
   const {
     leaderboards,
     listLeaderboards,
-    currentLeaderboardId,
+    currentLeaderboard,
     createLeaderboard,
     selectLeaderboard,
     updateLeaderboard,
@@ -235,11 +235,10 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     disableActions(true);
     setApiError(null);
     try {
-      const newLeaderboard = await createLeaderboard({
+       await createLeaderboard({
         name: 'New leaderboard',
         sort: 'ASC',
       });
-      if (newLeaderboard) selectLeaderboard(newLeaderboard.id);
     } catch (err) {
       console.error(err);
       setApiError({
@@ -349,16 +348,6 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     [isEditingName]
   );
 
-  const currentLeaderboard = React.useMemo(
-    () => {
-      if (!leaderboards || !currentLeaderboardId) return null;
-      return leaderboards.filter(
-        leaderboard => leaderboard.id === currentLeaderboardId
-      )[0];
-    },
-    [leaderboards, currentLeaderboardId]
-  );
-
   React.useEffect(
     () => {
       if (leaderboards === null) {
@@ -366,17 +355,6 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       }
     },
     [leaderboards, _listLeaderboards]
-  );
-
-  React.useEffect(
-    () => {
-      if (!!currentLeaderboard) {
-        setDisplayOnlyBestEntry(
-          currentLeaderboard.playerUnicityDisplayChoice === 'PREFER_UNIQUE'
-        );
-      }
-    },
-    [currentLeaderboard, setDisplayOnlyBestEntry]
   );
 
   const onCopy = React.useCallback(
@@ -777,6 +755,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 </Typography>
               </Tooltip>
               <Switch
+                color="primary"
                 size="small"
                 checked={displayOnlyBestEntry}
                 onClick={() => setDisplayOnlyBestEntry(!displayOnlyBestEntry)}

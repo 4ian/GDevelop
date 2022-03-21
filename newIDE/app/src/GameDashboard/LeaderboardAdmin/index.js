@@ -163,17 +163,17 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
         message: payload.name ? (
           <Trans>
-            An error ocurred when updating the name of the leaderboard, please
+            An error occurred when updating the name of the leaderboard, please
             close the dialog, come back and try again.
           </Trans>
         ) : payload.sort ? (
           <Trans>
-            An error ocurred when updating the sort direction of the
+            An error occurred when updating the sort direction of the
             leaderboard, please close the dialog, come back and try again.
           </Trans>
         ) : (
           <Trans>
-            An error ocurred when updating the display choice of the
+            An error occurred when updating the display choice of the
             leaderboard, please close the dialog, come back and try again.
           </Trans>
         ),
@@ -196,7 +196,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
             action: 'leaderboardsFetching',
             message: (
               <Trans>
-                An error ocurred when fetching the leaderboards, please close
+                An error occurred when fetching the leaderboards, please close
                 the dialog and reopen it.
               </Trans>
             ),
@@ -221,7 +221,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         action: 'entriesFetching',
         message: (
           <Trans>
-            An error ocurred when fetching the entries of the leaderboard, you
+            An error occurred when fetching the entries of the leaderboard, you
             can hit refresh to try again.
           </Trans>
         ),
@@ -245,7 +245,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         action: 'leaderboardCreation',
         message: (
           <Trans>
-            An error ocurred when creating a new leaderboard, please close the
+            An error occurred when creating a new leaderboard, please close the
             dialog, come back and try again.
           </Trans>
         ),
@@ -273,7 +273,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         action: 'leaderboardReset',
         message: (
           <Trans>
-            An error ocurred when resetting the leaderboard, please close the
+            An error occurred when resetting the leaderboard, please close the
             dialog, come back and try again.
           </Trans>
         ),
@@ -301,7 +301,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         action: 'leaderboardDeletion',
         message: (
           <Trans>
-            An error ocurred when deleting the leaderboard, please close the
+            An error occurred when deleting the leaderboard, please close the
             dialog, come back and try again.
           </Trans>
         ),
@@ -329,7 +329,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         action: 'entryDeletion',
         message: (
           <Trans>
-            An error ocurred when deleting the entry, please try again.
+            An error occurred when deleting the entry, please try again.
           </Trans>
         ),
         itemId: entryId,
@@ -400,7 +400,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
         <WrappedError>
           <PlaceholderError onRetry={_listLeaderboards} kind="error">
             <Trans>
-              An error ocurred when retrieving leaderboards, please try again
+              An error occurred when retrieving leaderboards, please try again
               later.
             </Trans>
           </PlaceholderError>

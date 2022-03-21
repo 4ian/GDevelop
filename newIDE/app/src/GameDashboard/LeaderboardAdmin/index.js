@@ -235,7 +235,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     disableActions(true);
     setApiError(null);
     try {
-       await createLeaderboard({
+      await createLeaderboard({
         name: 'New leaderboard',
         sort: 'ASC',
       });
@@ -660,6 +660,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 <Line>
                   <Autocomplete
                     autoComplete
+                    blurOnSelect
                     disableClearable
                     noOptionsText={<Trans>No matching leaderboard</Trans>}
                     style={{ flex: 1 }}
@@ -672,6 +673,18 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                       return leaderboard.id === selectedId;
                     }}
                     value={currentLeaderboard}
+                    renderOption={(option, state) => (
+                      <Typography
+                        color={
+                          currentLeaderboard &&
+                          option.id === currentLeaderboard.id
+                            ? 'primary'
+                            : 'initial'
+                        }
+                      >
+                        {option.name}
+                      </Typography>
+                    )}
                     renderInput={params => (
                       <MUITextField
                         {...params}

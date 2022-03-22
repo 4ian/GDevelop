@@ -1,9 +1,8 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import {
-  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -16,6 +15,7 @@ import Error from '@material-ui/icons/Error';
 import FirstPage from '@material-ui/icons/FirstPage';
 import NavigateBefore from '@material-ui/icons/NavigateBefore';
 import NavigateNext from '@material-ui/icons/NavigateNext';
+import IconButton from '../../UI/IconButton';
 import { Column, Line } from '../../UI/Grid';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
@@ -124,18 +124,21 @@ const LeaderboardEntriesTable = ({
           ) : (
             <Line noMargin justifyContent="flex-end">
               <IconButton
+                tooltip={t`Go to first page`}
                 disabled={!navigation.goToFirstPage}
                 onClick={navigation.goToFirstPage}
               >
                 <FirstPage />
               </IconButton>
               <IconButton
+                tooltip={t`Previous page`}
                 disabled={!navigation.goToPreviousPage}
                 onClick={navigation.goToPreviousPage}
               >
                 <NavigateBefore />
               </IconButton>
               <IconButton
+                tooltip={t`Next page`}
                 disabled={!navigation.goToNextPage}
                 onClick={navigation.goToNextPage}
               >

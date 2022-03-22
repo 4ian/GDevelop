@@ -1,6 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import * as React from 'react';
 import {
   IconButton,
   Table,
@@ -12,7 +13,6 @@ import {
 } from '@material-ui/core';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import Error from '@material-ui/icons/Error';
-import React from 'react';
 import { Column, Line } from '../../UI/Grid';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
@@ -83,6 +83,7 @@ const LeaderboardEntriesTable = ({
                     <Line>
                       <Tooltip title={'Remove entry'}>
                         <IconButton
+                          size="small"
                           onClick={() => onDeleteEntry(entry.id)}
                           disabled={disableActions}
                         >
@@ -92,6 +93,7 @@ const LeaderboardEntriesTable = ({
                       {erroredEntry && erroredEntry.entryId === entry.id ? (
                         <Tooltip title={erroredEntry.message}>
                           <IconButton
+                            size="small"
                             onClick={() => {}} // wrap in icon button to match above icon padding
                           >
                             <Error size={20} color="error" />

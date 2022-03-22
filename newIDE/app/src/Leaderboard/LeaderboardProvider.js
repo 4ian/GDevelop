@@ -34,12 +34,16 @@ type ReducerState = {|
   leaderboardsByIds: ?{| [string]: Leaderboard |},
   displayOnlyBestEntry: boolean,
   entries: ?Array<LeaderboardDisplayData>,
+  mapPageIndexToUri: {| [number]: string |},
+  pageIndex: number,
 |};
 
 type ReducerAction =
   | {| type: 'SET_LEADERBOARDS', payload: ?Array<Leaderboard> |}
   | {| type: 'SET_ENTRIES', payload: ?Array<LeaderboardDisplayData> |}
+  | {| type: 'SET_NEXT_PAGE_URI', payload: string |}
   | {| type: 'SELECT_LEADERBOARD', payload: string |}
+  | {| type: 'SET_PAGE_INDEX', payload: number |}
   | {| type: 'CHANGE_DISPLAY_ONLY_BEST_ENTRY', payload: boolean |}
   | {| type: 'UPDATE_OR_CREATE_LEADERBOARD', payload: Leaderboard |}
   | {| type: 'REMOVE_LEADERBOARD', payload: string |};
@@ -80,6 +84,20 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       return {
         ...state,
         entries: action.payload,
+      };
+    case 'SET_NEXT_PAGE_URI':
+      const nextPageIndex = state.pageIndex + 1;
+      return {
+        ...state,
+        mapPageIndexToUri: {
+          ...state.mapPageIndexToUri,
+          [nextPageIndex]: action.payload,
+        },
+      };
+    case 'SET_PAGE_INDEX':
+      return {
+        ...state,
+        pageIndex: action.payload,
       };
     case 'SELECT_LEADERBOARD':
       if (!state.leaderboardsByIds) return state;
@@ -144,6 +162,8 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       leaderboardsByIds,
       displayOnlyBestEntry,
       entries,
+      mapPageIndexToUri,
+      pageIndex,
     },
     dispatch,
   ] = React.useReducer<ReducerState, ReducerAction>(reducer, {
@@ -152,6 +172,8 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     leaderboardsByIds: null,
     displayOnlyBestEntry: false,
     entries: null,
+    mapPageIndexToUri: {},
+    pageIndex: 0,
   });
 
   const listLeaderboards = React.useCallback(
@@ -185,20 +207,22 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   );
 
   const fetchEntries = React.useCallback(
-    async () => {
+    async (uri?: string) => {
       if (!currentLeaderboardId) return;
       dispatch({ type: 'SET_ENTRIES', payload: null });
+      const data = await listLeaderboardEntries(gameId, currentLeaderboardId, {
+        pageSize,
+        onlyBestEntry: displayOnlyBestEntry,
+        forceUri: uri,
+      });
+      if (!data) return;
       const fetchedEntries:
         | LeaderboardEntry[]
-        | LeaderboardExtremePlayerScore[] = await listLeaderboardEntries(
-        gameId,
-        currentLeaderboardId,
-        {
-          pageSize,
-          onlyBestEntry: displayOnlyBestEntry,
-        }
-      );
-      if (!fetchedEntries) return;
+        | LeaderboardExtremePlayerScore[] = data.entries;
+
+      if (data.nextPageUri) {
+        dispatch({ type: 'SET_NEXT_PAGE_URI', payload: data.nextPageUri });
+      }
 
       let entriesToDisplay: LeaderboardDisplayData[] = [];
       if (displayOnlyBestEntry) {
@@ -292,6 +316,39 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     fetchEntries();
   };
 
+  const navigateToNextPage = React.useCallback(
+    async () => {
+      const nextPageUri = mapPageIndexToUri[pageIndex + 1];
+      if (!nextPageUri) return;
+      dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex + 1 });
+      await fetchEntries(nextPageUri);
+    },
+    [fetchEntries, mapPageIndexToUri, pageIndex]
+  );
+
+  const navigateToPreviousPage = React.useCallback(
+    async () => {
+      if (pageIndex === 1) {
+        dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
+        await fetchEntries();
+      } else {
+        const previousPageUri = mapPageIndexToUri[pageIndex - 1];
+        if (!previousPageUri) return;
+        dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex - 1 });
+        await fetchEntries(previousPageUri);
+      }
+    },
+    [fetchEntries, mapPageIndexToUri, pageIndex]
+  );
+
+  const navigateToFirstPage = React.useCallback(
+    async () => {
+      dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
+      await fetchEntries();
+    },
+    [fetchEntries]
+  );
+
   return (
     <LeaderboardContext.Provider
       value={{
@@ -301,7 +358,17 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
           : null,
         currentLeaderboard,
         displayOnlyBestEntry,
-        browsing: { entries },
+        browsing: {
+          entries,
+          goToNextPage: !!mapPageIndexToUri[pageIndex + 1]
+            ? navigateToNextPage
+            : null,
+          goToPreviousPage:
+            pageIndex === 1 || !!mapPageIndexToUri[pageIndex - 1]
+              ? navigateToPreviousPage
+              : null,
+          goToFirstPage: pageIndex === 0 ? null : navigateToFirstPage,
+        },
         setDisplayOnlyBestEntry,
         createLeaderboard,
         listLeaderboards,

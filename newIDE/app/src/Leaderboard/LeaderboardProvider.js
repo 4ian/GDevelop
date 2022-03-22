@@ -44,6 +44,7 @@ type ReducerAction =
   | {| type: 'SET_NEXT_PAGE_URI', payload: string |}
   | {| type: 'SELECT_LEADERBOARD', payload: string |}
   | {| type: 'SET_PAGE_INDEX', payload: number |}
+  | {| type: 'PURGE_NAVIGATION' |}
   | {| type: 'CHANGE_DISPLAY_ONLY_BEST_ENTRY', payload: boolean |}
   | {| type: 'UPDATE_OR_CREATE_LEADERBOARD', payload: Leaderboard |}
   | {| type: 'REMOVE_LEADERBOARD', payload: string |};
@@ -84,6 +85,13 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       return {
         ...state,
         entries: action.payload,
+      };
+    case 'PURGE_NAVIGATION':
+      return {
+        ...state,
+        entries: null,
+        pageIndex: 0,
+        mapPageIndexToUri: {},
       };
     case 'SET_NEXT_PAGE_URI':
       const nextPageIndex = state.pageIndex + 1;
@@ -244,13 +252,13 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   React.useEffect(
     () => {
       if (!currentLeaderboardId) return;
+      dispatch({ type: 'PURGE_NAVIGATION' });
       fetchEntries();
     },
     [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
   );
 
   const selectLeaderboard = React.useCallback((leaderboardId: string) => {
-    dispatch({ type: 'SET_ENTRIES', payload: null });
     dispatch({ type: 'SELECT_LEADERBOARD', payload: leaderboardId });
   }, []);
 
@@ -264,7 +272,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   |}) => {
     if (!currentLeaderboardId) return;
-    if (attributes.sort) dispatch({ type: 'SET_ENTRIES', payload: null });
+    if (attributes.sort) dispatch({ type: 'PURGE_NAVIGATION' });
     const updatedLeaderboard = await doUpdateLeaderboard(
       authenticatedUser,
       gameId,
@@ -283,7 +291,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   const resetLeaderboard = async () => {
     if (!currentLeaderboardId) return;
-    dispatch({ type: 'SET_ENTRIES', payload: null });
+    dispatch({ type: 'PURGE_NAVIGATION' });
     const updatedLeaderboard = await doResetLeaderboard(
       authenticatedUser,
       gameId,
@@ -300,7 +308,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   const deleteLeaderboard = async () => {
     if (!currentLeaderboardId || !leaderboardsByIds) return;
-    dispatch({ type: 'SET_ENTRIES', payload: null });
+    dispatch({ type: 'PURGE_NAVIGATION' });
     await doDeleteLeaderboard(authenticatedUser, gameId, currentLeaderboardId);
     dispatch({ type: 'REMOVE_LEADERBOARD', payload: currentLeaderboardId });
   };

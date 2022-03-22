@@ -155,7 +155,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         currentLeaderboardId: leaderboardsIds[0],
       };
     default: {
-      throw new Error(`Unhandled type: ${action.type}`);
+      return { ...state };
     }
   }
 };

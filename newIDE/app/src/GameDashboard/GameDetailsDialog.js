@@ -165,14 +165,15 @@ export const GameDetailsDialog = ({
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitle game',
+        gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
         description: project.getDescription() || '',
         playWithKeyboard: project.isPlayableWithKeyboard(),
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
-        // The thumbnailUrl is updated only when a build is made public.
+        userSlug: partialGameChange.userSlug === profile.username ? partialGameChange.userSlug : undefined,
+        gameSlug: partialGameChange.userSlug === profile.username ? partialGameChange.gameSlug : undefined,
       });
       try {
         const authorAcls = getAclsFromUserIds(

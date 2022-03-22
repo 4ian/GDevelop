@@ -25,7 +25,7 @@ type Props = {|
   entries: ?Array<LeaderboardDisplayData>,
   onDeleteEntry: (entryId: string) => Promise<void>,
   disableActions: boolean,
-  erroredEntry?: {| entryId: string, message: React$Node |},
+  erroredEntry?: {| entryId: string, message: React.Node |},
   navigation: {|
     goToFirstPage: ?() => Promise<void>,
     goToPreviousPage: ?() => Promise<void>,

@@ -215,13 +215,19 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   );
 
   const fetchEntries = React.useCallback(
-    async (uri?: string) => {
+    async (options?: {| uri?: ?string |}) => {
       if (!currentLeaderboardId) return;
+
+      let uriToUse = null;
+      if (options && options.uri) {
+        uriToUse = options.uri;
+      }
+
       dispatch({ type: 'SET_ENTRIES', payload: null });
       const data = await listLeaderboardEntries(gameId, currentLeaderboardId, {
         pageSize,
         onlyBestEntry: displayOnlyBestEntry,
-        forceUri: uri,
+        forceUri: uriToUse,
       });
       if (!data) return;
       const fetchedEntries:
@@ -312,7 +318,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       currentLeaderboardId,
       entryId
     );
-    fetchEntries();
+    fetchEntries({ uri: pageIndex > 0 ? mapPageIndexToUri[pageIndex] : null });
   };
 
   // --- Navigation ---
@@ -322,7 +328,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       const nextPageUri = mapPageIndexToUri[pageIndex + 1];
       if (!nextPageUri) return;
       dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex + 1 });
-      await fetchEntries(nextPageUri);
+      await fetchEntries({ uri: nextPageUri });
     },
     [fetchEntries, mapPageIndexToUri, pageIndex]
   );
@@ -336,7 +342,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         const previousPageUri = mapPageIndexToUri[pageIndex - 1];
         if (!previousPageUri) return;
         dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex - 1 });
-        await fetchEntries(previousPageUri);
+        await fetchEntries({ uri: previousPageUri });
       }
     },
     [fetchEntries, mapPageIndexToUri, pageIndex]

@@ -152,7 +152,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       await updateLeaderboard(payload);
       if (payload.name) setIsEditingName(false);
     } catch (err) {
-      console.error(`An error occurred when updating leaderboard: ${err}`);
+      console.error('An error occurred when updating leaderboard', err);
       setApiError({
         action: payload.name
           ? 'leaderboardNameUpdate'
@@ -189,7 +189,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         try {
           await listLeaderboards();
         } catch (err) {
-          console.error(`An error occurred when fetching leaderboards: ${err}`);
+          console.error('An error occurred when fetching leaderboards', err);
           setApiError({
             action: 'leaderboardsFetching',
             message: (
@@ -214,9 +214,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     try {
       await fetchLeaderboardEntries();
     } catch (err) {
-      console.error(
-        `An error occurred when fetching leaderboard entries: ${err}`
-      );
+      console.error('An error occurred when fetching leaderboard entries', err);
       setApiError({
         action: 'entriesFetching',
         message: (
@@ -240,7 +238,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         sort: 'ASC',
       });
     } catch (err) {
-      console.error(`An error occurred when creating leaderboard: ${err}`);
+      console.error('An error occurred when creating leaderboard', err);
       setApiError({
         action: 'leaderboardCreation',
         message: (
@@ -268,7 +266,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     try {
       await resetLeaderboard();
     } catch (err) {
-      console.error(`An error occurred when resetting leaderboard: ${err}`);
+      console.error('An error occurred when resetting leaderboard', err);
       setApiError({
         action: 'leaderboardReset',
         message: (
@@ -296,7 +294,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     try {
       await deleteLeaderboard();
     } catch (err) {
-      console.error(`An error occurred when deleting leaderboard: ${err}`);
+      console.error('An error occurred when deleting leaderboard', err);
       setApiError({
         action: 'leaderboardDeletion',
         message: (
@@ -324,7 +322,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     try {
       await deleteLeaderboardEntry(entryId);
     } catch (err) {
-      console.error(`An error occurred when deleting entry: ${err}`);
+      console.error('An error occurred when deleting entry', err);
       setApiError({
         action: 'entryDeletion',
         message: (

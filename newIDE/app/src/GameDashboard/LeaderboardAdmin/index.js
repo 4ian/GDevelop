@@ -598,53 +598,47 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'playerUnicityDisplayChoice',
       avatar: <PeopleAlt />,
       text: (
-        <Tooltip
-          title={i18n._(
-            t`This parameter allows you to decide how you want the leaderboard to be displayed.`
-          )}
+        <SelectField
+          fullWidth
+          margin="none"
+          value={currentLeaderboard.playerUnicityDisplayChoice}
+          onChange={(e, i, value) => {
+            _updateLeaderboard(i18n, {
+              // $FlowFixMe
+              playerUnicityDisplayChoice: value,
+            });
+          }}
+          disabled={isRequestPending || isEditingName}
+          inputStyle={{ fontSize: '0.875em' }}
+          helperMarkdownText={
+            currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
+              ? i18n._(
+                  t`Users can chose to see only players' best entries or not.`
+                )
+              : currentLeaderboard.playerUnicityDisplayChoice ===
+                'PREFER_UNIQUE'
+              ? i18n._(t`Only player's best entries are displayed.`)
+              : i18n._(t`All entries are displayed.`)
+          }
         >
-          <SelectField
-            fullWidth
-            margin="none"
-            value={currentLeaderboard.playerUnicityDisplayChoice}
-            onChange={(e, i, value) => {
-              _updateLeaderboard(i18n, {
-                // $FlowFixMe
-                playerUnicityDisplayChoice: value,
-              });
-            }}
-            disabled={isRequestPending || isEditingName}
-            inputStyle={{ fontSize: '0.875em' }}
-            helperMarkdownText={
-              currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
-                ? i18n._(
-                    t`Users can chose to see only players' best entries or not.`
-                  )
-                : currentLeaderboard.playerUnicityDisplayChoice ===
-                  'PREFER_UNIQUE'
-                ? i18n._(t`Only player's best entries are displayed.`)
-                : i18n._(t`All entries are displayed.`)
-            }
-          >
-            {[
-              <SelectOption
-                key={'free'}
-                value={'FREE'}
-                primaryText={t`Let the user select`}
-              />,
-              <SelectOption
-                key={'prefer-unique'}
-                value={'PREFER_UNIQUE'}
-                primaryText={t`Only best entry`}
-              />,
-              <SelectOption
-                key={'prefer-non-unique'}
-                value={'PREFER_NON_UNIQUE'}
-                primaryText={t`All entries`}
-              />,
-            ]}
-          </SelectField>
-        </Tooltip>
+          {[
+            <SelectOption
+              key={'free'}
+              value={'FREE'}
+              primaryText={t`Let the user select`}
+            />,
+            <SelectOption
+              key={'prefer-unique'}
+              value={'PREFER_UNIQUE'}
+              primaryText={t`Only best entry`}
+            />,
+            <SelectOption
+              key={'prefer-non-unique'}
+              value={'PREFER_NON_UNIQUE'}
+              primaryText={t`All entries`}
+            />,
+          ]}
+        </SelectField>
       ),
       secondaryText:
         apiError &&
@@ -769,15 +763,14 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 onClick={() => setDisplayOnlyBestEntry(!displayOnlyBestEntry)}
               />
               <Divider orientation="vertical" />
-              <Tooltip title={i18n._(t`Refresh`)}>
-                <IconButton
-                  onClick={_fetchLeaderboardEntries}
-                  disabled={isRequestPending || isEditingName}
-                  size="small"
-                >
-                  <Refresh />
-                </IconButton>
-              </Tooltip>
+              <IconButton
+                onClick={_fetchLeaderboardEntries}
+                disabled={isRequestPending || isEditingName}
+                tooltip={t`Refresh`}
+                size="small"
+              >
+                <Refresh />
+              </IconButton>
               <Spacer />
             </Line>
             {apiError && apiError.action === 'entriesFetching' ? (

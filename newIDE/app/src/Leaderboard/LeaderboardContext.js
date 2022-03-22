@@ -41,9 +41,9 @@ export const initialLeaderboardState = {
   displayOnlyBestEntry: false,
   browsing: {
     entries: null,
-    goToNextPage: async () => {},
-    goToPreviousPage: async () => {},
-    goToFirstPage: async () => {},
+    goToNextPage: null,
+    goToPreviousPage: null,
+    goToFirstPage: null,
   },
   createLeaderboard: async () => null,
   listLeaderboards: async () => {},

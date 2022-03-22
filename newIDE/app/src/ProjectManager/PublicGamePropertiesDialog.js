@@ -11,12 +11,15 @@ import {
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 /**
  * Changes that are not stored in the Project.
  */
 export type PartialGameChange = {|
   ownerIds: Array<string>,
+  userSlug: string,
+  gameSlug: string,
 |};
 
 /**
@@ -55,6 +58,14 @@ function applyPublicPropertiesToProject(
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
+const getSlugFromName = (name: string) => {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '-')
+    .toLowerCase();
+};
+
 type Props = {|
   project: gdProject,
   publicGame: PublicGame,
@@ -70,6 +81,8 @@ export const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
 }: Props) => {
+  const { profile } = React.useContext(AuthenticatedUserContext);
+
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
   const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
@@ -89,6 +102,12 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
+  const [userSlug, setUserSlug] = React.useState(
+    publicGame.userSlug || (profile && profile.username) || ''
+  );
+  const [gameSlug, setGameSlug] = React.useState(
+    publicGame.gameSlug || getSlugFromName(publicGame.gameName)
+  );
 
   if (!open) return null;
 
@@ -105,7 +124,7 @@ export const PublicGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      onApply({ ownerIds });
+      onApply({ ownerIds, userSlug, gameSlug });
     }
   };
 
@@ -152,6 +171,10 @@ export const PublicGamePropertiesDialog = ({
         playWithMobile={playWithMobile}
         setOrientation={setOrientation}
         orientation={orientation}
+        setUserSlug={setUserSlug}
+        userSlug={userSlug}
+        setGameSlug={setGameSlug}
+        gameSlug={gameSlug}
       />
     </Dialog>
   );

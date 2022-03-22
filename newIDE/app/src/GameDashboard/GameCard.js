@@ -9,6 +9,7 @@ import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
 import TuneIcon from '@material-ui/icons/Tune';
+import Cup from '@material-ui/icons/EmojiEvents';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
 import FlatButton from '../UI/FlatButton';
@@ -31,6 +32,7 @@ type Props = {|
   onOpenDetails: () => void,
   onOpenBuilds: () => void,
   onOpenAnalytics: () => void,
+  onOpenLeaderboards: () => void,
 |};
 
 export const GameCard = ({
@@ -39,6 +41,7 @@ export const GameCard = ({
   onOpenDetails,
   onOpenBuilds,
   onOpenAnalytics,
+  onOpenLeaderboards,
 }: Props) => {
   const openGameUrl = () => {
     const url = getGameUrl(game);
@@ -129,6 +132,11 @@ export const GameCard = ({
                     icon={<TimelineIcon />}
                     label={<Trans>Analytics</Trans>}
                     onClick={onOpenAnalytics}
+                  />
+                  <FlatButton
+                    icon={<Cup />}
+                    label={<Trans>Leaderboards</Trans>}
+                    onClick={onOpenLeaderboards}
                   />
                 </ResponsiveLineStackLayout>
               </CardActions>

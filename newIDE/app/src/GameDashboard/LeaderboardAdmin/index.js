@@ -130,7 +130,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     [onLoading]
   );
 
-  const _updateLeaderboard = async (
+  const onUpdateLeaderboard = async (
     i18n: I18nType,
     payload: {|
       name?: string,
@@ -182,7 +182,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     }
   };
 
-  const _listLeaderboards = React.useCallback(
+  const onListLeaderboards = React.useCallback(
     () => {
       const fetchAndHandleError = async () => {
         disableActions(true);
@@ -209,7 +209,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     [disableActions, listLeaderboards]
   );
 
-  const _fetchLeaderboardEntries = async () => {
+  const onFetchLeaderboardEntries = async () => {
     disableActions(true);
     setApiError(null);
     try {
@@ -230,7 +230,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     }
   };
 
-  const _createLeaderboard = async () => {
+  const onCreateLeaderboard = async () => {
     disableActions(true);
     setApiError(null);
     try {
@@ -254,7 +254,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     }
   };
 
-  const _resetLeaderboard = async (i18n: I18nType) => {
+  const onResetLeaderboard = async (i18n: I18nType) => {
     const answer = Window.showConfirmDialog(
       i18n._(
         t`All current entries will be deleted, are you sure you want to reset this leaderboard? This can't be undone.`
@@ -282,7 +282,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     }
   };
 
-  const _deleteLeaderboard = async (i18n: I18nType) => {
+  const onDeleteLeaderboard = async (i18n: I18nType) => {
     const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to delete this leaderboard and all of its entries? This can't be undone.`
@@ -310,7 +310,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     }
   };
 
-  const _deleteEntry = async (i18n: I18nType, entryId: string) => {
+  const onDeleteEntry = async (i18n: I18nType, entryId: string) => {
     const answer = Window.showConfirmDialog(
       i18n._(
         t`Are you sure you want to delete this entry? This can't be undone.`
@@ -350,10 +350,10 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
   React.useEffect(
     () => {
       if (leaderboards === null) {
-        _listLeaderboards();
+        onListLeaderboards();
       }
     },
-    [leaderboards, _listLeaderboards]
+    [leaderboards, onListLeaderboards]
   );
 
   const onCopy = React.useCallback(
@@ -386,7 +386,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
   if (apiError && apiError.action === 'leaderboardsFetching') {
     return (
       <CenteredError>
-        <PlaceholderError onRetry={_listLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards} kind="error">
           {apiError.message}
         </PlaceholderError>
       </CenteredError>
@@ -397,7 +397,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     else {
       return (
         <CenteredError>
-          <PlaceholderError onRetry={_listLeaderboards} kind="error">
+          <PlaceholderError onRetry={onListLeaderboards} kind="error">
             <Trans>
               An error occurred when retrieving leaderboards, please try again
               later.
@@ -416,7 +416,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
           description={<Trans>Leaderboards help retain your players</Trans>}
           actionLabel={<Trans>Create a leaderboard</Trans>}
           onAdd={() => {
-            _createLeaderboard();
+            onCreateLeaderboard();
           }}
           isLoading={isRequestPending}
         />
@@ -442,7 +442,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             onChange={(e, text) => setNewName(text)}
             onKeyPress={event => {
               if (shouldValidate(event) && !isRequestPending) {
-                _updateLeaderboard(i18n, { name: newName });
+                onUpdateLeaderboard(i18n, { name: newName });
               }
             }}
             disabled={isRequestPending}
@@ -482,7 +482,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         <IconButton
           onClick={() => {
             if (isEditingName) {
-              _updateLeaderboard(i18n, { name: newName });
+              onUpdateLeaderboard(i18n, { name: newName });
             } else {
               setNewName(currentLeaderboard.name);
               setIsEditingName(true);
@@ -549,7 +549,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         ) : null,
       secondaryAction: (
         <IconButton
-          onClick={() => _resetLeaderboard(i18n)}
+          onClick={() => onResetLeaderboard(i18n)}
           tooltip={t`Reset leaderboard`}
           edge="end"
           disabled={isRequestPending || isEditingName}
@@ -579,7 +579,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       secondaryAction: (
         <IconButton
           onClick={async () => {
-            await _updateLeaderboard(i18n, {
+            await onUpdateLeaderboard(i18n, {
               sort: currentLeaderboard.sort === 'ASC' ? 'DESC' : 'ASC',
             });
           }}
@@ -600,7 +600,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
           margin="none"
           value={currentLeaderboard.playerUnicityDisplayChoice}
           onChange={(e, i, value) => {
-            _updateLeaderboard(i18n, {
+            onUpdateLeaderboard(i18n, {
               // $FlowFixMe
               playerUnicityDisplayChoice: value,
             });
@@ -681,7 +681,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                     )}
                   />
                   <IconButton
-                    onClick={_createLeaderboard}
+                    onClick={onCreateLeaderboard}
                     disabled={isEditingName || isRequestPending}
                   >
                     <Add />
@@ -724,7 +724,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                         icon={<Delete />}
                         label={<Trans>Delete</Trans>}
                         disabled={isRequestPending || isEditingName}
-                        onClick={() => _deleteLeaderboard(i18n)}
+                        onClick={() => onDeleteLeaderboard(i18n)}
                       />
                     </Line>
                     {apiError && apiError.action === 'leaderboardDeletion' ? (
@@ -761,7 +761,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
               />
               <Divider orientation="vertical" />
               <IconButton
-                onClick={_fetchLeaderboardEntries}
+                onClick={onFetchLeaderboardEntries}
                 disabled={isRequestPending || isEditingName}
                 tooltip={t`Refresh`}
                 size="small"
@@ -773,7 +773,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             {apiError && apiError.action === 'entriesFetching' ? (
               <CenteredError>
                 <PlaceholderError
-                  onRetry={_fetchLeaderboardEntries}
+                  onRetry={onFetchLeaderboardEntries}
                   kind="error"
                 >
                   {apiError.message}
@@ -782,7 +782,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             ) : (
               <LeaderboardEntriesTable
                 entries={entries}
-                onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
+                onDeleteEntry={entryId => onDeleteEntry(i18n, entryId)}
                 disableActions={isRequestPending || isEditingName}
                 navigation={{
                   goToNextPage,

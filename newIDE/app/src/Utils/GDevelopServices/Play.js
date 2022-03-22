@@ -104,6 +104,7 @@ export const listLeaderboardEntries = async (
 |}> => {
   const uri =
     options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entries`;
+  // $FlowFixMe
   const response = await axios.get(`${GDevelopPlayApi.baseUrl}${uri}`, {
     params: options.forceUri
       ? null

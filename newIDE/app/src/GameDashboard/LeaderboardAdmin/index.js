@@ -438,7 +438,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
           <TextField
             ref={newNameTextFieldRef}
             margin="none"
-            style={{ width: 125 }}
+            style={{ width: 125, fontSize: 14 }}
             maxLength={50}
             value={newName}
             errorText={newNameError}

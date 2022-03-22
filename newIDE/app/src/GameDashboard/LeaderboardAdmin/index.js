@@ -95,7 +95,7 @@ const styles = {
   },
 };
 
-const LeaderboardAdmin = ({ onLoading }: Props) => {
+export const LeaderboardAdmin = ({ onLoading }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);

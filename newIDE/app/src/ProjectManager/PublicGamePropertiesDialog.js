@@ -59,8 +59,12 @@ function applyPublicPropertiesToProject(
 }
 
 const getSlugFromName = (name: string) => {
-  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]/g, "-").toLowerCase();
-}
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '-')
+    .toLowerCase();
+};
 
 type Props = {|
   project: gdProject,
@@ -77,9 +81,7 @@ export const PublicGamePropertiesDialog = ({
   onClose,
   onApply,
 }: Props) => {
-  const { profile } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { profile } = React.useContext(AuthenticatedUserContext);
 
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
   const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
@@ -100,8 +102,12 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
-  const [userSlug, setUserSlug] = React.useState(publicGame.userSlug || (profile && profile.username) || '');
-  const [gameSlug, setGameSlug] = React.useState(publicGame.gameSlug || getSlugFromName(publicGame.gameName));
+  const [userSlug, setUserSlug] = React.useState(
+    publicGame.userSlug || (profile && profile.username) || ''
+  );
+  const [gameSlug, setGameSlug] = React.useState(
+    publicGame.gameSlug || getSlugFromName(publicGame.gameName)
+  );
 
   if (!open) return null;
 

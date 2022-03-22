@@ -70,9 +70,7 @@ function PublicGameProperties({
   setGameSlug,
 }: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
-  const { profile } = React.useContext(
-    AuthenticatedUserContext
-  );
+  const { profile } = React.useContext(AuthenticatedUserContext);
 
   return (
     <I18n>
@@ -135,27 +133,33 @@ function PublicGameProperties({
           // This property is not shown in project properties.
           setUserSlug && setGameSlug && (
             <Line>
-            <SelectField
-              fullWidth
-              floatingLabelText={<Trans>User name in the game URL</Trans>}
-              value={userSlug || ''}
-              onChange={(e, i, value: string) => setUserSlug(value)}
-            >
-              {profile && profile.username && <SelectOption value={profile.username} primaryText={profile.username} />}
-              {userSlug && (!profile || (userSlug !== profile.username)) && <SelectOption value={userSlug} primaryText={userSlug} />}
-            </SelectField>
-            <Spacer/>
-            <SemiControlledTextField
-              floatingLabelText={<Trans>Game name in the game URL</Trans>}
-              fullWidth
-              type="text"
-              value={gameSlug || ''}
-              onChange={setGameSlug}
-              autoFocus
-            />
+              <SelectField
+                fullWidth
+                floatingLabelText={<Trans>User name in the game URL</Trans>}
+                value={userSlug || ''}
+                onChange={(e, i, value: string) => setUserSlug(value)}
+              >
+                {profile && profile.username && (
+                  <SelectOption
+                    value={profile.username}
+                    primaryText={profile.username}
+                  />
+                )}
+                {userSlug && (!profile || userSlug !== profile.username) && (
+                  <SelectOption value={userSlug} primaryText={userSlug} />
+                )}
+              </SelectField>
+              <Spacer />
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Game name in the game URL</Trans>}
+                fullWidth
+                type="text"
+                value={gameSlug || ''}
+                onChange={setGameSlug}
+                autoFocus
+              />
             </Line>
-          )
-          }
+          )}
           <UsersAutocomplete
             userIds={authorIds}
             onChange={setAuthorIds}

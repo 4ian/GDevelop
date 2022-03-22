@@ -172,8 +172,14 @@ export const GameDetailsDialog = ({
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
-        userSlug: partialGameChange.userSlug === profile.username ? partialGameChange.userSlug : undefined,
-        gameSlug: partialGameChange.userSlug === profile.username ? partialGameChange.gameSlug : undefined,
+        userSlug:
+          partialGameChange.userSlug === profile.username
+            ? partialGameChange.userSlug
+            : undefined,
+        gameSlug:
+          partialGameChange.userSlug === profile.username
+            ? partialGameChange.gameSlug
+            : undefined,
       });
       try {
         const authorAcls = getAclsFromUserIds(

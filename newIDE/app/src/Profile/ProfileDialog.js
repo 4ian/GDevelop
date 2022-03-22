@@ -80,6 +80,7 @@ const ProfileDialog = ({
       cannotBeDismissed={false}
       open={open}
       noMargin
+      fullHeight
       noTitleMargin
       title={
         <Tabs value={currentTab} onChange={_onChangeTab}>

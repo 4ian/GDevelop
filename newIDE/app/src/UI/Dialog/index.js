@@ -24,6 +24,10 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
   },
+  flexColumnBody: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   flexBody: {
     display: 'flex',
   },
@@ -71,6 +75,7 @@ type Props = {|
 
   // Display:
   flexRowBody?: boolean, //Check if necessary
+  flexColumnBody?: boolean,
   flexBody?: boolean,
 
   // Size
@@ -89,7 +94,7 @@ type DialogContentStyle = {
   padding?: 0,
   overflowX?: 'hidden',
   display?: 'flex',
-  flexDirection?: 'row',
+  flexDirection?: 'row' | 'column',
 };
 
 /**
@@ -108,6 +113,7 @@ export default (props: Props) => {
     title,
     children,
     flexRowBody,
+    flexColumnBody,
     flexBody,
     fullHeight,
     noTitleMargin,
@@ -132,7 +138,11 @@ export default (props: Props) => {
 
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-    ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
+    ...((flexRowBody
+      ? styles.flexRowBody
+      : flexColumnBody
+      ? styles.flexColumnBody
+      : {}): DialogContentStyle),
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
 

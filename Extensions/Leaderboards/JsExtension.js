@@ -36,7 +36,7 @@ module.exports = {
       .setCategory('Leaderboards');
     extension
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
-      .setIcon('JsPlatform/Extensions/leaderboard32.png');
+      .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
     extension
       .addAction(
@@ -47,8 +47,8 @@ module.exports = {
           'Send to leaderboard _PARAM0_ the score _PARAM1_ with player name: _PARAM2_.'
         ),
         '',
-        'JsPlatform/Extensions/leaderboard32.png',
-        'JsPlatform/Extensions/leaderboard32.png'
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
       )
       .addParameter(
         'string',
@@ -56,12 +56,8 @@ module.exports = {
         '',
         false
       )
-      .addParameter(
-        'scenevar',
-        'Score to register for the player (number)',
-        '',
-        false
-      )
+      .addParameter('expression', 'Score to register for the player', '', false)
+      .addParameter('string', 'Name to register for the player', '', false)
       .addParameter(
         'scenevar',
         _('Variable where to store the saved score'),
@@ -76,7 +72,6 @@ module.exports = {
         '',
         true
       )
-      .addParameter('scenevar', 'Error', '', true)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.setPlayerScore');
@@ -88,8 +83,8 @@ module.exports = {
         _('Check if the last sent entry failed to save'),
         _('Last entry failed to be saved in leaderboard'),
         _(''),
-        'JsPlatform/Extensions/leaderboard32.png',
-        'JsPlatform/Extensions/leaderboard32.png'
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
@@ -101,7 +96,7 @@ module.exports = {
         _('Status code of last sent entry'),
         _('Get the status code of the last sent leaderboard entry.'),
         _(''),
-        'JsPlatform/Extensions/leaderboard16.png'
+        'JsPlatform/Extensions/leaderboard.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')

@@ -9,8 +9,8 @@ namespace gdjs {
 
       export const setPlayerScore = function (
         leaderboardId: string,
-        score: gdjs.Variable,
-        playerName: gdjs.Variable,
+        score: float,
+        playerName: string,
         responseVar: gdjs.Variable,
         errorVar: gdjs.Variable
       ) {
@@ -18,8 +18,7 @@ namespace gdjs {
         responseVar.setString('');
 
         if (
-          (_lastPlayerName === playerName.getAsString() &&
-            _lastScore === score.getAsNumber()) ||
+          (_lastPlayerName === playerName && _lastScore === score) ||
           (!!_scoreLastSentAt && Date.now() - _scoreLastSentAt < 500)
         ) {
           errorVar.setString('Wait before sending a new score.');
@@ -29,8 +28,8 @@ namespace gdjs {
             `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
             {
               body: JSON.stringify({
-                playerName: playerName.getAsString(),
-                score: score.getAsNumber(),
+                playerName: playerName,
+                score: score,
               }),
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -44,8 +43,8 @@ namespace gdjs {
                 _lastErrorCode = response.status;
                 return response.statusText;
               } else {
-                _lastScore = score.getAsNumber();
-                _lastPlayerName = playerName.getAsString();
+                _lastScore = score;
+                _lastPlayerName = playerName;
                 _lastErrorCode = response.status;
                 return response.text();
               }

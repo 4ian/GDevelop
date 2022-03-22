@@ -97,7 +97,7 @@ export const extractNextPageUriFromLinkHeader = (
 export const listLeaderboardEntries = async (
   gameId: string,
   leaderboardId: string,
-  options: {| pageSize: number, onlyBestEntry: boolean, forceUri?: string |}
+  options: {| pageSize: number, onlyBestEntry: boolean, forceUri: ?string |}
 ): Promise<{|
   entries: LeaderboardEntry[] | LeaderboardExtremePlayerScore[],
   nextPageUri: ?string,

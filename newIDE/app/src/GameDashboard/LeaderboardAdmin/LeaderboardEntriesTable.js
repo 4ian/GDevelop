@@ -13,6 +13,9 @@ import {
 } from '@material-ui/core';
 import DeleteOutline from '@material-ui/icons/DeleteOutline';
 import Error from '@material-ui/icons/Error';
+import FirstPage from '@material-ui/icons/FirstPage';
+import NavigateBefore from '@material-ui/icons/NavigateBefore';
+import NavigateNext from '@material-ui/icons/NavigateNext';
 import { Column, Line } from '../../UI/Grid';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
@@ -24,6 +27,11 @@ type Props = {|
   onDeleteEntry: (entryId: string) => Promise<void>,
   disableActions: boolean,
   erroredEntry?: {| entryId: string, message: React$Node |},
+  navigation: {|
+    goToFirstPage: ?() => Promise<void>,
+    goToPreviousPage: ?() => Promise<void>,
+    goToNextPage: ?() => Promise<void>,
+  |},
 |};
 
 const LeaderboardEntriesTable = ({
@@ -31,13 +39,14 @@ const LeaderboardEntriesTable = ({
   onDeleteEntry,
   disableActions,
   erroredEntry,
+  navigation,
 }: Props) => {
   if (!entries) return <PlaceholderLoader />;
 
   return (
     <I18n>
       {({ i18n }) => (
-        <Column expand>
+        <Column expand justifyContent="space-between">
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -112,7 +121,28 @@ const LeaderboardEntriesTable = ({
                 <Trans>No entries</Trans>
               </Text>
             </Column>
-          ) : null}
+          ) : (
+            <Line noMargin justifyContent="flex-end">
+              <IconButton
+                disabled={!navigation.goToFirstPage}
+                onClick={navigation.goToFirstPage}
+              >
+                <FirstPage />
+              </IconButton>
+              <IconButton
+                disabled={!navigation.goToPreviousPage}
+                onClick={navigation.goToPreviousPage}
+              >
+                <NavigateBefore />
+              </IconButton>
+              <IconButton
+                disabled={!navigation.goToNextPage}
+                onClick={navigation.goToNextPage}
+              >
+                <NavigateNext />
+              </IconButton>
+            </Line>
+          )}
         </Column>
       )}
     </I18n>

@@ -13,6 +13,9 @@ export type LeaderboardState = {|
   displayOnlyBestEntry: boolean,
   browsing: {|
     entries: ?Array<LeaderboardDisplayData>,
+    goToNextPage: ?() => Promise<void>,
+    goToPreviousPage: ?() => Promise<void>,
+    goToFirstPage: ?() => Promise<void>,
   |},
   createLeaderboard: ({|
     name: string,
@@ -38,6 +41,9 @@ export const initialLeaderboardState = {
   displayOnlyBestEntry: false,
   browsing: {
     entries: null,
+    goToNextPage: async () => {},
+    goToPreviousPage: async () => {},
+    goToFirstPage: async () => {},
   },
   createLeaderboard: async () => null,
   listLeaderboards: async () => {},

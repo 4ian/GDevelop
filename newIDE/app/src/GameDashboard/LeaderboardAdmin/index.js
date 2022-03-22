@@ -120,7 +120,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
     displayOnlyBestEntry,
     setDisplayOnlyBestEntry,
     fetchLeaderboardEntries,
-    browsing: { entries },
+    browsing: { entries, goToNextPage, goToPreviousPage, goToFirstPage },
   } = React.useContext(LeaderboardContext);
 
   const disableActions = React.useCallback(
@@ -656,6 +656,7 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
       secondaryAction: null,
     },
   ];
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -805,6 +806,11 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                 entries={entries}
                 onDeleteEntry={entryId => _deleteEntry(i18n, entryId)}
                 disableActions={isRequestPending || isEditingName}
+                navigation={{
+                  goToNextPage,
+                  goToPreviousPage,
+                  goToFirstPage,
+                }}
                 erroredEntry={
                   apiError &&
                   apiError.action === 'entryDeletion' &&

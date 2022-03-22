@@ -218,10 +218,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     async (options?: {| uri?: ?string |}) => {
       if (!currentLeaderboardId) return;
 
-      let uriToUse = null;
-      if (options && options.uri) {
-        uriToUse = options.uri;
-      }
+      const uriToUse = options && options.uri ? options.uri : null;
 
       dispatch({ type: 'SET_ENTRIES', payload: null });
       const data = await listLeaderboardEntries(gameId, currentLeaderboardId, {

@@ -191,24 +191,32 @@ export const GameDetailsDialog = ({
           author: authorAcls,
         });
       } catch (error) {
-        console.error('Unable to update the game owners or authors:', error);
+        console.error(
+          'Unable to update the game owners or authors:',
+          error.response || error.message
+        );
         showErrorBox({
           message:
             i18n._(t`Unable to update the game owners or authors.`) +
             ' ' +
-            i18n._(t`Verify your internet connection or try again later.`),
+            ((error.response && error.response.data) ||
+              i18n._(t`Verify your internet connection or try again later.`)),
           rawError: error,
           errorId: 'game-acls-update-error',
         });
       }
       onGameUpdated(updatedGame);
     } catch (error) {
-      console.error('Unable to update the game:', error);
+      console.error(
+        'Unable to update the game:',
+        error.response || error.message
+      );
       showErrorBox({
         message:
           i18n._(t`Unable to update the game details.`) +
           ' ' +
-          i18n._(t`Verify your internet connection or try again later.`),
+          ((error.response && error.response.data) ||
+            i18n._(t`Verify your internet connection or try again later.`)),
         rawError: error,
         errorId: 'game-details-update-error',
       });

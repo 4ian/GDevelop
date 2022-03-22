@@ -299,8 +299,8 @@ export const GameDetailsDialog = ({
           maxWidth="md"
           actions={[
             <FlatButton
-              label={isLoading ? null : <Trans>Close</Trans>}
-              icon={isLoading ? <CircularProgress size={20} /> : null}
+              label={<Trans>Close</Trans>}
+              disabled={isLoading}
               onClick={onClose}
               key="close"
             />,

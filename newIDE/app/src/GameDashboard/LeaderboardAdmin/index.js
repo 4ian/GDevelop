@@ -57,6 +57,7 @@ import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMea
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 
 const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
@@ -440,7 +441,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             errorText={newNameError}
             onChange={(e, text) => setNewName(text)}
             onKeyPress={event => {
-              if (event.key === 'Enter' && !isRequestPending) {
+              if (shouldValidate(event) && !isRequestPending) {
                 _updateLeaderboard(i18n, { name: newName });
               }
             }}

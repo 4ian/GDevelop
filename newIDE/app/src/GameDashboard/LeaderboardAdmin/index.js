@@ -422,7 +422,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       </Line>
     );
 
-  const leaderboardDescription = (
+  const getLeaderboardDescription = (
     i18n: I18nType,
     currentLeaderboard: Leaderboard
   ) => [
@@ -689,7 +689,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                 {currentLeaderboard ? (
                   <>
                     <List>
-                      {leaderboardDescription(i18n, currentLeaderboard).map(
+                      {getLeaderboardDescription(i18n, currentLeaderboard).map(
                         (item, index) => (
                           <>
                             {index > 0 ? (

@@ -165,14 +165,21 @@ export const GameDetailsDialog = ({
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitle game',
+        gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
         description: project.getDescription() || '',
         playWithKeyboard: project.isPlayableWithKeyboard(),
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
-        // The thumbnailUrl is updated only when a build is made public.
+        userSlug:
+          partialGameChange.userSlug === profile.username
+            ? partialGameChange.userSlug
+            : undefined,
+        gameSlug:
+          partialGameChange.userSlug === profile.username
+            ? partialGameChange.gameSlug
+            : undefined,
       });
       try {
         const authorAcls = getAclsFromUserIds(
@@ -184,24 +191,32 @@ export const GameDetailsDialog = ({
           author: authorAcls,
         });
       } catch (error) {
-        console.error('Unable to update the game owners or authors:', error);
+        console.error(
+          'Unable to update the game owners or authors:',
+          error.response || error.message
+        );
         showErrorBox({
           message:
             i18n._(t`Unable to update the game owners or authors.`) +
             ' ' +
-            i18n._(t`Verify your internet connection or try again later.`),
+            ((error.response && error.response.data) ||
+              i18n._(t`Verify your internet connection or try again later.`)),
           rawError: error,
           errorId: 'game-acls-update-error',
         });
       }
       onGameUpdated(updatedGame);
     } catch (error) {
-      console.error('Unable to update the game:', error);
+      console.error(
+        'Unable to update the game:',
+        error.response || error.message
+      );
       showErrorBox({
         message:
           i18n._(t`Unable to update the game details.`) +
           ' ' +
-          i18n._(t`Verify your internet connection or try again later.`),
+          ((error.response && error.response.data) ||
+            i18n._(t`Verify your internet connection or try again later.`)),
         rawError: error,
         errorId: 'game-details-update-error',
       });

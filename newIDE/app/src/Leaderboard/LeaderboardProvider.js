@@ -249,15 +249,6 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     [currentLeaderboardId, displayOnlyBestEntry, gameId]
   );
 
-  React.useEffect(
-    () => {
-      if (!currentLeaderboardId) return;
-      dispatch({ type: 'PURGE_NAVIGATION' });
-      fetchEntries();
-    },
-    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
-  );
-
   const selectLeaderboard = React.useCallback((leaderboardId: string) => {
     dispatch({ type: 'SELECT_LEADERBOARD', payload: leaderboardId });
   }, []);
@@ -272,7 +263,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   |}) => {
     if (!currentLeaderboardId) return;
-    if (attributes.sort) dispatch({ type: 'PURGE_NAVIGATION' });
+    if (attributes.sort) dispatch({ type: 'PURGE_NAVIGATION' }); // When changing playerUnicityDisplayChoice, it will change the displayOnlyBestEntry state variable, which will purge navigation.
     const updatedLeaderboard = await doUpdateLeaderboard(
       authenticatedUser,
       gameId,
@@ -324,6 +315,8 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     fetchEntries();
   };
 
+  // --- Navigation ---
+
   const navigateToNextPage = React.useCallback(
     async () => {
       const nextPageUri = mapPageIndexToUri[pageIndex + 1];
@@ -355,6 +348,17 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       await fetchEntries();
     },
     [fetchEntries]
+  );
+
+  // --- Effects ---
+
+  React.useEffect(
+    () => {
+      if (!currentLeaderboardId) return;
+      dispatch({ type: 'PURGE_NAVIGATION' });
+      fetchEntries();
+    },
+    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
   );
 
   return (

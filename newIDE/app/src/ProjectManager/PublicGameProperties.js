@@ -20,7 +20,6 @@ import { string } from 'prop-types';
 
 type Props = {|
   project: gdProject,
-  userName: string,
   setName: string => void,
   name: string,
   setCategories?: (string[]) => void,
@@ -40,9 +39,9 @@ type Props = {|
   setOrientation: string => void,
   orientation: string,
   userSlug?: string,
-  setUserSlug: string => void,
+  setUserSlug?: string => void,
   gameSlug?: string,
-  setGameSlug: string => void,
+  setGameSlug?: string => void,
 |};
 
 function PublicGameProperties({
@@ -142,8 +141,8 @@ function PublicGameProperties({
               value={userSlug || ''}
               onChange={(e, i, value: string) => setUserSlug(value)}
             >
-              <SelectOption value={profile.username} primaryText={profile.username} />
-              {userSlug && userSlug !== profile.username && <SelectOption value={userSlug} primaryText={userSlug} />}
+              {profile && profile.username && <SelectOption value={profile.username} primaryText={profile.username} />}
+              {userSlug && (!profile || (userSlug !== profile.username)) && <SelectOption value={userSlug} primaryText={userSlug} />}
             </SelectField>
             <Spacer/>
             <SemiControlledTextField

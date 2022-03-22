@@ -100,7 +100,7 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
-  const [userSlug, setUserSlug] = React.useState(publicGame.userSlug || profile.username);
+  const [userSlug, setUserSlug] = React.useState(publicGame.userSlug || (profile && profile.username) || '');
   const [gameSlug, setGameSlug] = React.useState(publicGame.gameSlug || getSlugFromName(publicGame.gameName));
 
   if (!open) return null;

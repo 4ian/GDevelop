@@ -241,12 +241,12 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       let entriesToDisplay: LeaderboardDisplayData[] = [];
       if (displayOnlyBestEntry) {
         entriesToDisplay = fetchedEntries.map(entry =>
-          // $FlowIgnore
+          // $FlowFixMe
           extractExtremeScoreDisplayData(entry)
         );
       } else {
         entriesToDisplay = fetchedEntries.map(entry =>
-          // $FlowIgnore
+          // $FlowFixMe
           extractEntryDisplayData(entry)
         );
       }

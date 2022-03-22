@@ -125,21 +125,28 @@ const LeaderboardEntriesTable = ({
               <IconButton
                 tooltip={t`Go to first page`}
                 disabled={!navigation.goToFirstPage}
-                onClick={navigation.goToFirstPage || (() => {})}
+                onClick={() => {
+                  if (navigation.goToFirstPage) navigation.goToFirstPage();
+                }}
               >
                 <FirstPage />
               </IconButton>
               <IconButton
                 tooltip={t`Previous page`}
                 disabled={!navigation.goToPreviousPage}
-                onClick={navigation.goToPreviousPage || (() => {})}
+                onClick={() => {
+                  if (navigation.goToPreviousPage)
+                    navigation.goToPreviousPage();
+                }}
               >
                 <NavigateBefore />
               </IconButton>
               <IconButton
                 tooltip={t`Next page`}
                 disabled={!navigation.goToNextPage}
-                onClick={navigation.goToNextPage || (() => {})}
+                onClick={() => {
+                  if (navigation.goToNextPage) navigation.goToNextPage();
+                }}
               >
                 <NavigateNext />
               </IconButton>

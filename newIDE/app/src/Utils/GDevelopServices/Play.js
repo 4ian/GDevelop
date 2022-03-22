@@ -76,24 +76,50 @@ export const listGameLeaderboards = (gameId: string): Promise<Leaderboard[]> =>
     .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboards`)
     .then(response => response.data);
 
-export const listLeaderboardEntries = (
+export const extractNextPageUriFromLinkHeader = (
+  linkHeader: string
+): ?string => {
+  const links = linkHeader.split(',').map(link => link.trim());
+  const mapRelationToUri = links.reduce((acc, link) => {
+    const relationRegexMatch = link.match(/;\srel="(\w*)"/);
+    const uriMatch = link.match(/^<(.*)>/);
+    if (acc && relationRegexMatch && uriMatch) {
+      acc[relationRegexMatch[1]] = uriMatch[1];
+    }
+    return acc;
+  }, {});
+  if (Object.keys(mapRelationToUri).includes('next')) {
+    return mapRelationToUri.next;
+  }
+  return null;
+};
+
+export const listLeaderboardEntries = async (
   gameId: string,
   leaderboardId: string,
-  options: {| pageSize: number, onlyBestEntry: boolean |}
-): Promise<LeaderboardEntry[] | LeaderboardExtremePlayerScore[]> =>
-  axios
-    .get(
-      `${
-        GDevelopPlayApi.baseUrl
-      }/game/${gameId}/leaderboard/${leaderboardId}/entries`,
-      {
-        params: {
+  options: {| pageSize: number, onlyBestEntry: boolean, forceUri?: string |}
+): Promise<{|
+  entries: LeaderboardEntry[] | LeaderboardExtremePlayerScore[],
+  nextPageUri: ?string,
+|}> => {
+  const uri =
+    options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entries`;
+  const response = await axios.get(`${GDevelopPlayApi.baseUrl}${uri}`, {
+    params: options.forceUri
+      ? null
+      : {
           onlyBestEntry: options.onlyBestEntry,
           perPage: options.pageSize,
         },
-      }
-    )
-    .then(response => response.data);
+  });
+  const nextPageUri = response.headers.link
+    ? extractNextPageUriFromLinkHeader(response.headers.link)
+    : null;
+  return {
+    entries: response.data,
+    nextPageUri,
+  };
+};
 
 export const createLeaderboard = async (
   authenticatedUser: AuthenticatedUser,

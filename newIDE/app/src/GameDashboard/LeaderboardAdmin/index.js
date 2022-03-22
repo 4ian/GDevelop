@@ -676,22 +676,10 @@ const LeaderboardAdmin = ({ onLoading }: Props) => {
                     onChange={(e, leaderboard) => {
                       if (leaderboard) selectLeaderboard(leaderboard.id);
                     }}
-                    getOptionSelected={(leaderboard, selectedId) => {
-                      return leaderboard.id === selectedId;
-                    }}
+                    getOptionSelected={(leaderboard, selectedLeaderboard) =>
+                      leaderboard.id === selectedLeaderboard.id
+                    }
                     value={currentLeaderboard}
-                    renderOption={(option, state) => (
-                      <Typography
-                        color={
-                          currentLeaderboard &&
-                          option.id === currentLeaderboard.id
-                            ? 'primary'
-                            : 'initial'
-                        }
-                      >
-                        {option.name}
-                      </Typography>
-                    )}
                     renderInput={params => (
                       <MUITextField
                         {...params}

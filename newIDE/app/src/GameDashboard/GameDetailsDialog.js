@@ -304,7 +304,7 @@ export const GameDetailsDialog = ({
       ) {
         setGameUnregisterErrorText(
           i18n._(
-            t`You cannot unregister a game that has active leaderboards. To delete them, go in tab Leaderboards, and delete them one by one.`
+            t`You cannot unregister a game that has active leaderboards. To delete them, the Leaderboards tab, and delete them one by one.`
           )
         );
       }

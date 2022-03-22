@@ -160,10 +160,11 @@ export const GameDetailsDialog = ({
     const { id } = profile;
 
     // Set public game to null as it will be refetched automatically by the callback above.
+    let updatedGame = publicGame;
     setPublicGame(null);
     try {
       const gameId = project.getProjectUuid();
-      const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
+      updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
         gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
@@ -220,6 +221,7 @@ export const GameDetailsDialog = ({
         rawError: error,
         errorId: 'game-details-update-error',
       });
+      setPublicGame(updatedGame);
     }
   };
 

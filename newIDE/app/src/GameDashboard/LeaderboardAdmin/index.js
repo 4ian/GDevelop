@@ -652,7 +652,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                 <Line>
                   {currentLeaderboard && leaderboards ? (
                     <SelectField
-                      style={{ flex: 1 }}
+                      fullWidth
                       floatingLabelText={<Trans>Leaderboard name</Trans>}
                       value={currentLeaderboard.id}
                       onChange={(e, i, leaderboardId) => {

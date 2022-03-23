@@ -4,7 +4,6 @@ import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import Avatar from '@material-ui/core/Avatar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
@@ -13,7 +12,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import MUITextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -92,7 +90,9 @@ const styles = {
     flexDirection: 'column',
     flex: 2,
   },
-  menuItem: { fontSize: 14 },
+  leaderboardConfigurationPaper: { padding: 5, margin: 5 },
+  leaderboardNameText: { ...textEllipsisStyle, width: 150 },
+  leaderboardNameTextField: { width: 125, fontSize: 14 },
 };
 
 export const LeaderboardAdmin = ({ onLoading }: Props) => {
@@ -436,7 +436,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
           <TextField
             ref={newNameTextFieldRef}
             margin="none"
-            style={{ width: 125, fontSize: 14 }}
+            style={styles.leaderboardNameTextField}
             maxLength={50}
             value={newName}
             errorText={newNameError}
@@ -465,7 +465,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         </Line>
       ) : (
         <Tooltip title={currentLeaderboard.name}>
-          <Text size="body2" style={{ ...textEllipsisStyle, width: 150 }}>
+          <Text size="body2" style={styles.leaderboardNameText}>
             {currentLeaderboard.name}
           </Text>
         </Tooltip>
@@ -647,33 +647,27 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       {({ i18n }) => (
         <ResponsiveLineStackLayout noMargin expand noColumnMargin>
           <div style={styles.leftColumn}>
-            <Paper elevation={5} style={{ padding: 5, margin: 5 }}>
+            <Paper elevation={5} style={styles.leaderboardConfigurationPaper}>
               <Column>
                 <Line>
-                  <Autocomplete
-                    autoComplete
-                    blurOnSelect
-                    disableClearable
-                    noOptionsText={<Trans>No matching leaderboard</Trans>}
-                    style={{ flex: 1 }}
-                    options={leaderboards}
-                    getOptionLabel={option => option.name}
-                    onChange={(e, leaderboard) => {
-                      if (leaderboard) selectLeaderboard(leaderboard.id);
-                    }}
-                    getOptionSelected={(leaderboard, selectedLeaderboard) =>
-                      leaderboard.id === selectedLeaderboard.id
-                    }
-                    value={currentLeaderboard}
-                    renderInput={params => (
-                      <MUITextField
-                        {...params}
-                        margin="dense"
-                        label={<Trans>Leaderboard name</Trans>}
-                        variant="filled"
-                      />
-                    )}
-                  />
+                  {currentLeaderboard && leaderboards ? (
+                    <SelectField
+                      style={{ flex: 1 }}
+                      floatingLabelText={<Trans>Leaderboard name</Trans>}
+                      value={currentLeaderboard.id}
+                      onChange={(e, i, leaderboardId) => {
+                        selectLeaderboard(leaderboardId);
+                      }}
+                    >
+                      {leaderboards.map(leaderboard => (
+                        <SelectOption
+                          key={leaderboard.id}
+                          value={leaderboard.id}
+                          primaryText={leaderboard.name}
+                        />
+                      ))}
+                    </SelectField>
+                  ) : null}
                   <IconButton
                     onClick={onCreateLeaderboard}
                     disabled={isEditingName || isRequestPending}

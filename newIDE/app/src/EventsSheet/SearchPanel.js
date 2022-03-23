@@ -18,6 +18,7 @@ import {
 import RaisedButton from '../UI/RaisedButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import {
+  shouldBrowsePrevious,
   shouldCloseOrCancel,
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
@@ -171,7 +172,9 @@ const SearchPanel = (
                 setSearchText(searchText);
               }}
               onKeyPress={event => {
-                if (shouldValidate(event)) {
+                if (shouldBrowsePrevious(event)) {
+                  onGoToPreviousSearchResult();
+                } else if (shouldValidate(event)) {
                   if (!searchResultsDirty) {
                     onGoToNextSearchResult();
                   } else {

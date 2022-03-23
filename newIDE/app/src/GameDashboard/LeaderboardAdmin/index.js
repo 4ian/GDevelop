@@ -220,8 +220,8 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         action: 'entriesFetching',
         message: (
           <Trans>
-            An error occurred when fetching the entries of the leaderboard, you
-            can hit refresh to try again.
+            An error occurred when fetching the entries of the leaderboard,
+            please try again.
           </Trans>
         ),
       });

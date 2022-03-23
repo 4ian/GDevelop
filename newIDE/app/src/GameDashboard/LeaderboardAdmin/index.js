@@ -8,16 +8,13 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Avatar from '@material-ui/core/Avatar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
-import MenuItem from '@material-ui/core/MenuItem';
 import MUITextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
-import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
 
@@ -44,6 +41,8 @@ import PlaceholderError from '../../UI/PlaceholderError';
 import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import {
   type Leaderboard,
@@ -466,10 +465,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         </Line>
       ) : (
         <Tooltip title={currentLeaderboard.name}>
-          <Text
-            size="body2"
-            style={{ ...textEllipsisStyle, width: 150 }}
-          >
+          <Text size="body2" style={{ ...textEllipsisStyle, width: 150 }}>
             {currentLeaderboard.name}
           </Text>
         </Tooltip>
@@ -511,9 +507,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       avatar: <Fingerprint />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
-          <Text size="body2">
-            {breakUuid(currentLeaderboard.id)}
-          </Text>
+          <Text size="body2">{breakUuid(currentLeaderboard.id)}</Text>
         </Tooltip>
       ),
       secondaryText: null,
@@ -597,52 +591,45 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'playerUnicityDisplayChoice',
       avatar: <PeopleAlt />,
       text: (
-        <>
-          <Select
-            fullWidth
-            margin="none"
-            value={currentLeaderboard.playerUnicityDisplayChoice}
-            onChange={(event, option) => {
-              onUpdateLeaderboard(i18n, {
-                playerUnicityDisplayChoice: event.target.value,
-              });
-            }}
-            disabled={isRequestPending || isEditingName}
-            MenuProps={{
-              anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-              getContentAnchorEl: null,
-            }}
-            style={{ fontSize: 14 }}
-          >
-            <MenuItem style={styles.menuItem} key={'free'} value={'FREE'}>
-              <Trans>Let the user select</Trans>
-            </MenuItem>
-            <MenuItem
-              style={styles.menuItem}
-              key={'prefer-unique'}
-              value={'PREFER_UNIQUE'}
-            >
-              <Trans>Only best entry</Trans>
-            </MenuItem>
-            <MenuItem
-              style={styles.menuItem}
-              key={'prefer-non-unique'}
-              value={'PREFER_NON_UNIQUE'}
-            >
-              <Trans>All entries</Trans>
-            </MenuItem>
-          </Select>
-          <FormHelperText>
-            {currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
+        <SelectField
+          fullWidth
+          margin="none"
+          value={currentLeaderboard.playerUnicityDisplayChoice}
+          onChange={(e, i, value) => {
+            onUpdateLeaderboard(i18n, {
+              // $FlowFixMe
+              playerUnicityDisplayChoice: value,
+            });
+          }}
+          disabled={isRequestPending || isEditingName}
+          inputStyle={{ fontSize: 14 }}
+          helperMarkdownText={
+            currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
               ? i18n._(
                   t`Users can chose to see only players' best entries or not.`
                 )
               : currentLeaderboard.playerUnicityDisplayChoice ===
                 'PREFER_UNIQUE'
               ? i18n._(t`Only player's best entries are displayed.`)
-              : i18n._(t`All entries are displayed.`)}
-          </FormHelperText>
-        </>
+              : i18n._(t`All entries are displayed.`)
+          }
+        >
+          <SelectOption
+            key={'free'}
+            value={'FREE'}
+            primaryText={i18n._(t`Let the user select`)}
+          />
+          <SelectOption
+            key={'prefer-unique'}
+            value={'PREFER_UNIQUE'}
+            primaryText={i18n._(t`Only best entry`)}
+          />
+          <SelectOption
+            key={'prefer-non-unique'}
+            value={'PREFER_NON_UNIQUE'}
+            primaryText={i18n._(t`All entries`)}
+          />
+        </SelectField>
       ),
       secondaryText:
         apiError &&

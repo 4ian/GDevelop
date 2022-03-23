@@ -5,8 +5,24 @@ import { I18n } from '@lingui/react';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import MUITextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Avatar from '@material-ui/core/Avatar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Divider from '@material-ui/core/Divider';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import MenuItem from '@material-ui/core/MenuItem';
+import MUITextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
+import Select from '@material-ui/core/Select';
+import Switch from '@material-ui/core/Switch';
+import Tooltip from '@material-ui/core/Tooltip';
+import Typography from '@material-ui/core/Typography';
+
 import Add from '@material-ui/icons/Add';
 import Save from '@material-ui/icons/Save';
 import Cancel from '@material-ui/icons/Cancel';
@@ -20,20 +36,6 @@ import PeopleAlt from '@material-ui/icons/PeopleAlt';
 import SwapVertical from '@material-ui/icons/SwapVert';
 import Refresh from '@material-ui/icons/Refresh';
 import Delete from '@material-ui/icons/Delete';
-import Avatar from '@material-ui/core/Avatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import Paper from '@material-ui/core/Paper';
-import Select from '@material-ui/core/Select';
-import Switch from '@material-ui/core/Switch';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
-import MenuItem from '@material-ui/core/MenuItem';
 
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -92,6 +94,7 @@ const styles = {
     flexDirection: 'column',
     flex: 2,
   },
+  menuItem: { fontSize: 14 },
 };
 
 export const LeaderboardAdmin = ({ onLoading }: Props) => {
@@ -595,45 +598,53 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'playerUnicityDisplayChoice',
       avatar: <PeopleAlt />,
       text: (
-        <Select
-          fullWidth
-          margin="none"
-          value={currentLeaderboard.playerUnicityDisplayChoice}
-          onChange={(e, i, value) => {
-            onUpdateLeaderboard(i18n, {
-              // $FlowFixMe
-              playerUnicityDisplayChoice: value,
-            });
-          }}
-          disabled={isRequestPending || isEditingName}
-          MenuProps={{
-            anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
-            getContentAnchorEl: null,
-          }}
-          style={{ fontSize: 14 }}
-          helperText={
-            currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
+        <>
+          <Select
+            fullWidth
+            margin="none"
+            value={currentLeaderboard.playerUnicityDisplayChoice}
+            onChange={(e, i, value) => {
+              onUpdateLeaderboard(i18n, {
+                // $FlowFixMe
+                playerUnicityDisplayChoice: value,
+              });
+            }}
+            disabled={isRequestPending || isEditingName}
+            MenuProps={{
+              anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+              getContentAnchorEl: null,
+            }}
+            style={{ fontSize: 14 }}
+          >
+            <MenuItem style={styles.menuItem} key={'free'} value={'FREE'}>
+              <Trans>Let the user select</Trans>
+            </MenuItem>
+            <MenuItem
+              style={styles.menuItem}
+              key={'prefer-unique'}
+              value={'PREFER_UNIQUE'}
+            >
+              <Trans>Only best entry</Trans>
+            </MenuItem>
+            <MenuItem
+              style={styles.menuItem}
+              key={'prefer-non-unique'}
+              value={'PREFER_NON_UNIQUE'}
+            >
+              <Trans>All entries</Trans>
+            </MenuItem>
+          </Select>
+          <FormHelperText>
+            {currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
               ? i18n._(
                   t`Users can chose to see only players' best entries or not.`
                 )
               : currentLeaderboard.playerUnicityDisplayChoice ===
                 'PREFER_UNIQUE'
               ? i18n._(t`Only player's best entries are displayed.`)
-              : i18n._(t`All entries are displayed.`)
-          }
-        >
-          {[
-            <MenuItem key={'free'} value={'FREE'}>
-              <Trans>Let the user select</Trans>
-            </MenuItem>,
-            <MenuItem key={'prefer-unique'} value={'PREFER_UNIQUE'}>
-              <Trans>Only best entry</Trans>
-            </MenuItem>,
-            <MenuItem key={'prefer-non-unique'} value={'PREFER_NON_UNIQUE'}>
-              <Trans>All entries</Trans>
-            </MenuItem>,
-          ]}
-        </Select>
+              : i18n._(t`All entries are displayed.`)}
+          </FormHelperText>
+        </>
       ),
       secondaryText:
         apiError &&

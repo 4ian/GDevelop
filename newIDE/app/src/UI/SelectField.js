@@ -29,6 +29,7 @@ type Props = {|
     flex?: 1,
     width?: 'auto',
   },
+  inputStyle?: {| fontSize: 14 |},
   margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
@@ -96,6 +97,7 @@ export default class SelectField extends React.Component<Props, {||}> {
                   }
                 : undefined
             }
+            InputProps={{ style: props.inputStyle }}
             InputLabelProps={{
               shrink: true,
             }}

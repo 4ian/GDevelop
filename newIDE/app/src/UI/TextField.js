@@ -71,6 +71,9 @@ type Props = {|
   // Keyboard focus:
   autoFocus?: boolean,
 
+  // String text field:
+  maxLength?: number,
+
   // Number text field:
   precision?: number,
   max?: number,
@@ -248,6 +251,8 @@ export default class TextField extends React.Component<Props, {||}> {
                 onKeyUp: props.onKeyUp,
                 onKeyDown: props.onKeyDown,
                 onClick: props.onClick,
+                // String field props:
+                maxLength: props.maxLength,
                 // Number field props:
                 max: props.max,
                 min: props.min,

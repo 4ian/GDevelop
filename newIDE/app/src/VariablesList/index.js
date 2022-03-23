@@ -429,8 +429,8 @@ export default class VariablesList extends React.Component<Props, State> {
 
     return (
       <Column noMargin expand useFullHeight>
-        {allVariables.length ? (
-          <React.Fragment>
+        <React.Fragment>
+          {allVariables.length ? (
             <ScrollView autoHideScrollbar>
               <SortableVariablesListBody
                 variablesContainer={this.props.variablesContainer}
@@ -445,28 +445,28 @@ export default class VariablesList extends React.Component<Props, State> {
                 {allVariables}
               </SortableVariablesListBody>
             </ScrollView>
-            <EditVariableRow
-              onAdd={this.addVariable}
-              onCopy={this.copySelection}
-              onPaste={this.paste}
-              onDeleteSelection={this.deleteSelection}
-              hasSelection={hasSelection(this.state.selectedVariables)}
-              hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
-            />
-          </React.Fragment>
-        ) : this.props.emptyPlaceholderTitle &&
-          this.props.emptyPlaceholderDescription &&
-          this.props.helpPagePath ? (
-          <Column noMargin expand justifyContent="center">
-            <EmptyPlaceholder
-              title={this.props.emptyPlaceholderTitle}
-              description={this.props.emptyPlaceholderDescription}
-              actionLabel="Add a variable"
-              helpPagePath={this.props.helpPagePath}
-              onAdd={this.addVariable}
-            />
-          </Column>
-        ) : null}
+          ) : this.props.emptyPlaceholderTitle &&
+            this.props.emptyPlaceholderDescription &&
+            this.props.helpPagePath ? (
+            <Column noMargin expand justifyContent="center">
+              <EmptyPlaceholder
+                title={this.props.emptyPlaceholderTitle}
+                description={this.props.emptyPlaceholderDescription}
+                actionLabel="Add a variable"
+                helpPagePath={this.props.helpPagePath}
+                onAdd={this.addVariable}
+              />
+            </Column>
+          ) : null}
+          <EditVariableRow
+            onAdd={this.addVariable}
+            onCopy={this.copySelection}
+            onPaste={this.paste}
+            onDeleteSelection={this.deleteSelection}
+            hasSelection={hasSelection(this.state.selectedVariables)}
+            hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
+          />
+        </React.Fragment>
       </Column>
     );
   }

@@ -7,6 +7,8 @@ type Props = {|
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
   size?: 'body' | 'body2' | 'title' | 'bold-title',
+  /** Color of the text */
+  color?: 'error' | 'primary' | 'secondary',
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
@@ -42,6 +44,7 @@ export default ({
   children,
   style,
   size,
+  color,
   align,
   noShrink,
   noMargin,
@@ -57,6 +60,7 @@ export default ({
         ? 'body2'
         : 'body1'
     }
+    color={color}
     component={displayInlineAsSpan ? 'span' : undefined}
     style={{
       ...style,

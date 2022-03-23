@@ -430,30 +430,20 @@ export default class VariablesList extends React.Component<Props, State> {
     return (
       <Column noMargin expand useFullHeight>
         {allVariables.length ? (
-          <React.Fragment>
-            <ScrollView autoHideScrollbar>
-              <SortableVariablesListBody
-                variablesContainer={this.props.variablesContainer}
-                onSortEnd={({ oldIndex, newIndex }) => {
-                  this.props.variablesContainer.move(oldIndex, newIndex);
-                  this.forceUpdate();
-                }}
-                helperClass="sortable-helper"
-                useDragHandle
-                lockToContainerEdges
-              >
-                {allVariables}
-              </SortableVariablesListBody>
-            </ScrollView>
-            <EditVariableRow
-              onAdd={this.addVariable}
-              onCopy={this.copySelection}
-              onPaste={this.paste}
-              onDeleteSelection={this.deleteSelection}
-              hasSelection={hasSelection(this.state.selectedVariables)}
-              hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
-            />
-          </React.Fragment>
+          <ScrollView autoHideScrollbar>
+            <SortableVariablesListBody
+              variablesContainer={this.props.variablesContainer}
+              onSortEnd={({ oldIndex, newIndex }) => {
+                this.props.variablesContainer.move(oldIndex, newIndex);
+                this.forceUpdate();
+              }}
+              helperClass="sortable-helper"
+              useDragHandle
+              lockToContainerEdges
+            >
+              {allVariables}
+            </SortableVariablesListBody>
+          </ScrollView>
         ) : this.props.emptyPlaceholderTitle &&
           this.props.emptyPlaceholderDescription &&
           this.props.helpPagePath ? (
@@ -467,6 +457,14 @@ export default class VariablesList extends React.Component<Props, State> {
             />
           </Column>
         ) : null}
+        <EditVariableRow
+          onAdd={allVariables.length ? this.addVariable : null}
+          onCopy={this.copySelection}
+          onPaste={this.paste}
+          onDeleteSelection={this.deleteSelection}
+          hasSelection={hasSelection(this.state.selectedVariables)}
+          hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
+        />
       </Column>
     );
   }

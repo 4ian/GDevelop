@@ -333,6 +333,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _toggleSearchPanel = () => {
     this.setState(
       state => {
+        if (
+          state.showSearchPanel &&
+          this._searchPanel &&
+          this._searchPanel.isSearchOngoing()
+        ) {
+          this._searchPanel.focus();
+          return;
+        }
         const show = !state.showSearchPanel;
         if (!show) {
           if (this._eventSearcher) this._eventSearcher.reset();

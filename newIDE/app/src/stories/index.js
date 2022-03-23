@@ -5165,6 +5165,7 @@ storiesOf('GameDashboard/GameCard', module)
       onOpenDetails={action('onOpenDetails')}
       onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenLeaderboards={action('onOpenLeaderboards')}
     />
   ))
   .add('current game', () => (
@@ -5174,6 +5175,7 @@ storiesOf('GameDashboard/GameCard', module)
       onOpenDetails={action('onOpenDetails')}
       onOpenBuilds={action('onOpenBuilds')}
       onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenLeaderboards={action('onOpenLeaderboards')}
     />
   ));
 

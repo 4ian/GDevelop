@@ -24,7 +24,7 @@ import { type LeaderboardDisplayData } from '../../Utils/GDevelopServices/Play';
 type Props = {|
   entries: ?Array<LeaderboardDisplayData>,
   onDeleteEntry: (entryId: string) => Promise<void>,
-  disableActions: boolean,
+  isLoading: boolean,
   erroredEntry?: {| entryId: string, message: React.Node |},
   navigation: {|
     goToFirstPage: ?() => Promise<void>,
@@ -36,7 +36,7 @@ type Props = {|
 const LeaderboardEntriesTable = ({
   entries,
   onDeleteEntry,
-  disableActions,
+  isLoading,
   erroredEntry,
   navigation,
 }: Props) => {
@@ -93,7 +93,7 @@ const LeaderboardEntriesTable = ({
                         <IconButton
                           size="small"
                           onClick={() => onDeleteEntry(entry.id)}
-                          disabled={disableActions}
+                          disabled={isLoading}
                         >
                           <DeleteOutline size={20} />
                         </IconButton>

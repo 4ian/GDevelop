@@ -122,7 +122,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     browsing: { entries, goToNextPage, goToPreviousPage, goToFirstPage },
   } = React.useContext(LeaderboardContext);
 
-  const disableActions = React.useCallback(
+  const setIsLoading = React.useCallback(
     (yesOrNo: boolean) => {
       setIsRequestPending(yesOrNo);
       onLoading(yesOrNo);
@@ -147,7 +147,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       );
       return;
     }
-    disableActions(true);
+    setIsLoading(true);
     setApiError(null);
     try {
       await updateLeaderboard(payload);
@@ -178,14 +178,14 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         ),
       });
     } finally {
-      disableActions(false);
+      setIsLoading(false);
     }
   };
 
   const onListLeaderboards = React.useCallback(
     () => {
       const fetchAndHandleError = async () => {
-        disableActions(true);
+        setIsLoading(true);
         setApiError(null);
         try {
           await listLeaderboards();
@@ -201,16 +201,16 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             ),
           });
         } finally {
-          disableActions(false);
+          setIsLoading(false);
         }
       };
       fetchAndHandleError();
     },
-    [disableActions, listLeaderboards]
+    [setIsLoading, listLeaderboards]
   );
 
   const onFetchLeaderboardEntries = async () => {
-    disableActions(true);
+    setIsLoading(true);
     setApiError(null);
     try {
       await fetchLeaderboardEntries();
@@ -226,12 +226,12 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         ),
       });
     } finally {
-      disableActions(false);
+      setIsLoading(false);
     }
   };
 
   const onCreateLeaderboard = async () => {
-    disableActions(true);
+    setIsLoading(true);
     setApiError(null);
     try {
       await createLeaderboard({
@@ -250,7 +250,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         ),
       });
     } finally {
-      disableActions(false);
+      setIsLoading(false);
     }
   };
 
@@ -262,7 +262,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     );
     if (!answer) return;
 
-    disableActions(true);
+    setIsLoading(true);
     setApiError(null);
     try {
       await resetLeaderboard();
@@ -278,7 +278,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         ),
       });
     } finally {
-      disableActions(false);
+      setIsLoading(false);
     }
   };
 
@@ -290,7 +290,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     );
     if (!answer) return;
 
-    disableActions(true);
+    setIsLoading(true);
     setApiError(null);
     try {
       await deleteLeaderboard();
@@ -306,7 +306,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         ),
       });
     } finally {
-      disableActions(false);
+      setIsLoading(false);
     }
   };
 
@@ -318,7 +318,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     );
     if (!answer) return;
 
-    disableActions(true);
+    setIsLoading(true);
     setApiError(null);
     try {
       await deleteLeaderboardEntry(entryId);
@@ -334,7 +334,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         itemId: entryId,
       });
     } finally {
-      disableActions(false);
+      setIsLoading(false);
     }
   };
 
@@ -783,7 +783,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
               <LeaderboardEntriesTable
                 entries={entries}
                 onDeleteEntry={entryId => onDeleteEntry(i18n, entryId)}
-                disableActions={isRequestPending || isEditingName}
+                isLoading={isRequestPending || isEditingName}
                 navigation={{
                   goToNextPage,
                   goToPreviousPage,

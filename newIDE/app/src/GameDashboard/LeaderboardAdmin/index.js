@@ -29,9 +29,11 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
+import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -56,8 +58,6 @@ import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
-import SelectField from '../../UI/SelectField';
-import SelectOption from '../../UI/SelectOption';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 
 type Props = {| onLoading: boolean => void |};
@@ -594,7 +594,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'playerUnicityDisplayChoice',
       avatar: <PeopleAlt />,
       text: (
-        <SelectField
+        <Select
           fullWidth
           margin="none"
           value={currentLeaderboard.playerUnicityDisplayChoice}
@@ -605,8 +605,12 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             });
           }}
           disabled={isRequestPending || isEditingName}
-          inputStyle={{ fontSize: 14 }}
-          helperMarkdownText={
+          MenuProps={{
+            anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+            getContentAnchorEl: null,
+          }}
+          style={{ fontSize: 14 }}
+          helperText={
             currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
               ? i18n._(
                   t`Users can chose to see only players' best entries or not.`
@@ -618,23 +622,17 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
           }
         >
           {[
-            <SelectOption
-              key={'free'}
-              value={'FREE'}
-              primaryText={t`Let the user select`}
-            />,
-            <SelectOption
-              key={'prefer-unique'}
-              value={'PREFER_UNIQUE'}
-              primaryText={t`Only best entry`}
-            />,
-            <SelectOption
-              key={'prefer-non-unique'}
-              value={'PREFER_NON_UNIQUE'}
-              primaryText={t`All entries`}
-            />,
+            <MenuItem key={'free'} value={'FREE'}>
+              <Trans>Let the user select</Trans>
+            </MenuItem>,
+            <MenuItem key={'prefer-unique'} value={'PREFER_UNIQUE'}>
+              <Trans>Only best entry</Trans>
+            </MenuItem>,
+            <MenuItem key={'prefer-non-unique'} value={'PREFER_NON_UNIQUE'}>
+              <Trans>All entries</Trans>
+            </MenuItem>,
           ]}
-        </SelectField>
+        </Select>
       ),
       secondaryText:
         apiError &&

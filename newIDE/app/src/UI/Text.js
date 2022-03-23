@@ -37,40 +37,52 @@ type Props = {|
   |},
 |};
 
+type Interface = {||};
+
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help to maintain
 // consistency of text in the whole app.
-export default ({
-  children,
-  style,
-  size,
-  color,
-  align,
-  noShrink,
-  noMargin,
-  displayInlineAsSpan,
-}: Props) => (
-  <Typography
-    variant={
-      size === 'bold-title'
-        ? 'h5'
-        : size === 'title'
-        ? 'h6'
-        : size === 'body2'
-        ? 'body2'
-        : 'body1'
-    }
-    color={color}
-    component={displayInlineAsSpan ? 'span' : undefined}
-    style={{
-      ...style,
-      display: displayInlineAsSpan ? 'inline-block' : undefined,
-      flexShrink: noShrink ? 0 : undefined,
-      marginTop: noMargin ? 0 : 6,
-      marginBottom: noMargin ? 0 : 6,
-    }}
-    align={align || 'inherit'}
-  >
-    {children}
-  </Typography>
+const Text = React.forwardRef<Props, Interface>(
+  (
+    {
+      children,
+      style,
+      size,
+      color,
+      align,
+      noShrink,
+      noMargin,
+      displayInlineAsSpan,
+      ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
+    },
+    ref
+  ) => (
+    <Typography
+      variant={
+        size === 'bold-title'
+          ? 'h5'
+          : size === 'title'
+          ? 'h6'
+          : size === 'body2'
+          ? 'body2'
+          : 'body1'
+      }
+      ref={ref}
+      color={color}
+      component={displayInlineAsSpan ? 'span' : undefined}
+      style={{
+        ...style,
+        display: displayInlineAsSpan ? 'inline-block' : undefined,
+        flexShrink: noShrink ? 0 : undefined,
+        marginTop: noMargin ? 0 : 6,
+        marginBottom: noMargin ? 0 : 6,
+      }}
+      align={align || 'inherit'}
+      {...otherProps}
+    >
+      {children}
+    </Typography>
+  )
 );
+
+export default Text;

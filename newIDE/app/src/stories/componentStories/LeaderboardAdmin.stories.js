@@ -23,7 +23,7 @@ export default {
 const mockedLeaderboards = Array(5)
   .fill(0)
   .map((_, index) => ({
-    id: `489165zad49a8ad64a984da${index}`,
+    id: `489165zad49-a8ad6-4a984-dcz8da-hjqn983qh${index}`,
     name: `Level ${index + 1}`,
     sort: 'DESC',
     gameId: 'fakeGameId',

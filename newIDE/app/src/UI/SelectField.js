@@ -29,7 +29,7 @@ type Props = {|
     flex?: 1,
     width?: 'auto',
   },
-  inputStyle?: {| fontSize: '0.875em' |},
+  inputStyle?: {| fontSize: 14 |},
   margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,

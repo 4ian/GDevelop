@@ -606,7 +606,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             });
           }}
           disabled={isRequestPending || isEditingName}
-          inputStyle={{ fontSize: '0.875em' }}
+          inputStyle={{ fontSize: 14 }}
           helperMarkdownText={
             currentLeaderboard.playerUnicityDisplayChoice === 'FREE'
               ? i18n._(

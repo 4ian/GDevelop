@@ -20,10 +20,6 @@ const styles = {
     padding: 0,
     overflowX: 'hidden',
   },
-  flexRowBody: {
-    display: 'flex',
-    flexDirection: 'row',
-  },
   flexColumnBody: {
     display: 'flex',
     flexDirection: 'column',
@@ -74,7 +70,6 @@ type Props = {|
   children: React.Node, // The content of the dialog
 
   // Display:
-  flexRowBody?: boolean, //Check if necessary
   flexColumnBody?: boolean,
   flexBody?: boolean,
 
@@ -112,7 +107,6 @@ export default (props: Props) => {
     noMargin,
     title,
     children,
-    flexRowBody,
     flexColumnBody,
     flexBody,
     fullHeight,
@@ -138,11 +132,7 @@ export default (props: Props) => {
 
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-    ...((flexRowBody
-      ? styles.flexRowBody
-      : flexColumnBody
-      ? styles.flexColumnBody
-      : {}): DialogContentStyle),
+    ...((flexColumnBody ? styles.flexColumnBody : {}): DialogContentStyle),
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
 

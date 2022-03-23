@@ -6,6 +6,7 @@ import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
+import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
 export default {
   title: 'UI Building Blocks/EmptyPlaceholder',
@@ -13,11 +14,17 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 export const Default = () => (
-  <EmptyPlaceholder
-    title="Add your first event"
-    description="You can use events to create cause and effect."
-    actionLabel="Add something"
-    helpPagePath="/objects/tiled_sprite"
-    onAdd={action('onAdd')}
-  />
+  <FixedHeightFlexContainer
+    height={500}
+    justifyContent="center"
+    alignItems="center"
+  >
+    <EmptyPlaceholder
+      title="Add your first event"
+      description="You can use events to create cause and effect."
+      actionLabel="Add something"
+      helpPagePath="/objects/tiled_sprite"
+      onAdd={action('onAdd')}
+    />
+  </FixedHeightFlexContainer>
 );

@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -21,7 +20,6 @@ import Paper from '@material-ui/core/Paper';
 import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
 
 import Add from '@material-ui/icons/Add';
 import Save from '@material-ui/icons/Save';
@@ -61,6 +59,7 @@ import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import Text from '../../UI/Text';
 
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};
@@ -466,19 +465,19 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         </Line>
       ) : (
         <Tooltip title={currentLeaderboard.name}>
-          <Typography
-            variant="body2"
+          <Text
+            size="body2"
             style={{ ...textEllipsisStyle, width: 150 }}
           >
             {currentLeaderboard.name}
-          </Typography>
+          </Text>
         </Tooltip>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardNameUpdate' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: (
         <IconButton
@@ -511,9 +510,9 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       avatar: <Fingerprint />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
-          <Typography variant="body2">
+          <Text size="body2">
             {breakUuid(currentLeaderboard.id)}
-          </Typography>
+          </Text>
         </Tooltip>
       ),
       secondaryText: null,
@@ -538,16 +537,16 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             )}`
           )}
         >
-          <Typography variant="body2">
+          <Text size="body2">
             {i18n.date(currentLeaderboard.startDatetime)}
-          </Typography>
+          </Text>
         </Tooltip>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardReset' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: (
         <IconButton
@@ -564,19 +563,19 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'sort',
       avatar: <Sort />,
       text: (
-        <Typography variant="body2">
+        <Text size="body2">
           {currentLeaderboard.sort === 'ASC' ? (
             <Trans>Lower is better</Trans>
           ) : (
             <Trans>Higher is better</Trans>
           )}
-        </Typography>
+        </Text>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardSortUpdate' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: (
         <IconButton
@@ -647,9 +646,9 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       secondaryText:
         apiError &&
         apiError.action === 'leaderboardPlayerUnicityDisplayChoiceUpdate' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: null,
     },
@@ -756,9 +755,9 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                   t`When checked, will only display the best score of each player (only for the display below).`
                 )}
               >
-                <Typography variant="body2">
+                <Text size="body2">
                   <Trans>Player best entry</Trans>
-                </Typography>
+                </Text>
               </Tooltip>
               <Switch
                 color="primary"

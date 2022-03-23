@@ -602,10 +602,9 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             fullWidth
             margin="none"
             value={currentLeaderboard.playerUnicityDisplayChoice}
-            onChange={(e, i, value) => {
+            onChange={(event, option) => {
               onUpdateLeaderboard(i18n, {
-                // $FlowFixMe
-                playerUnicityDisplayChoice: value,
+                playerUnicityDisplayChoice: event.target.value,
               });
             }}
             disabled={isRequestPending || isEditingName}

@@ -51,7 +51,7 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addParameter(
-        'string',
+        'leaderboardId',
         'Leaderboard name (e.g: "PlayersBestTimes")',
         '',
         false

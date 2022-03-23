@@ -459,7 +459,7 @@ export default class VariablesList extends React.Component<Props, State> {
             </Column>
           ) : null}
           <EditVariableRow
-            onAdd={this.addVariable}
+            onAdd={allVariables.length ? this.addVariable : null}
             onCopy={this.copySelection}
             onPaste={this.paste}
             onDeleteSelection={this.deleteSelection}

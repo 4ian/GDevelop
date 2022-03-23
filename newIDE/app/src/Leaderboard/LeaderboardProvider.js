@@ -199,6 +199,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       name: string,
       sort: LeaderboardSortOption,
     |}) => {
+      dispatch({ type: 'SET_ENTRIES', payload: null });
       const newLeaderboard = await doCreateLeaderboard(
         authenticatedUser,
         gameId,

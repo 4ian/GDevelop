@@ -65,6 +65,22 @@ namespace gdjs {
       export const getLastSentEntryStatusCode = function () {
         return '' + _lastErrorCode;
       };
+
+      export const formatPlayerName = function (rawName) {
+        if (
+          !rawName ||
+          typeof rawName !== 'string' ||
+          (typeof rawName === 'string' && rawName.length === 0)
+        ) {
+          return `Player${Math.round(
+            (Math.random() * 9 + 1) * 10000 // Number between 10,000 and 99,999
+          )}`;
+        }
+        return rawName
+          .replace(/\s/, '_')
+          .replace(/[^\w|-]/g, '')
+          .slice(0, 30);
+      };
     }
   }
 }

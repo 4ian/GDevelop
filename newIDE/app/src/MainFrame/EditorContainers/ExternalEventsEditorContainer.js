@@ -13,6 +13,7 @@ import ExternalPropertiesDialog, {
 } from './ExternalPropertiesDialog';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
+import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
 
 const styles = {
   container: {
@@ -180,4 +181,11 @@ export class ExternalEventsEditorContainer extends React.Component<
 
 export const renderExternalEventsEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) => <ExternalEventsEditorContainer {...props} />;
+) =>
+  props.project ? (
+    <LeaderboardProvider gameId={props.project.getProjectUuid()}>
+      <ExternalEventsEditorContainer {...props} />
+    </LeaderboardProvider>
+  ) : (
+    <ExternalEventsEditorContainer {...props} />
+  );

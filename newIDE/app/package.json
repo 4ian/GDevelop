@@ -122,6 +122,10 @@
                 "Trans"
               ],
               "message": "Please import Trans from @lingui/macro"
+            },
+            {
+              "name": "prop-types",
+              "message": "Don't import anything from prop-types - use Flow/TypeScript types instead."
             }
           ]
         }

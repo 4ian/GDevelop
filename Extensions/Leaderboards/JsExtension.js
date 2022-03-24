@@ -50,12 +50,7 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
-      .addParameter(
-        'string',
-        'Leaderboard name (e.g: "PlayersBestTimes")',
-        '',
-        false
-      )
+      .addParameter('leaderboardId', 'Leaderboard', '', false)
       .addParameter('expression', 'Score to register for the player', '', false)
       .addParameter('string', 'Name to register for the player', '', false)
       .addParameter(

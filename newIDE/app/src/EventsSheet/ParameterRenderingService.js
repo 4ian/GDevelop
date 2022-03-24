@@ -56,6 +56,9 @@ import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField
 import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
 import ExternalLayoutNameField from './ParameterFields/ExternalLayoutNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import LeaderboardIdField, {
+  InlineLeaderboardIdField,
+} from './ParameterFields/LeaderboardIdField';
 const gd: libGDevelop = global.gd;
 
 const components = {
@@ -95,6 +98,7 @@ const components = {
   objectAnimationName: ObjectAnimationNameField,
   functionParameterName: FunctionParameterNameField,
   externalLayoutName: ExternalLayoutNameField,
+  leaderboardId: LeaderboardIdField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -109,6 +113,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
+  leaderboardId: InlineLeaderboardIdField,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,

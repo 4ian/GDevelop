@@ -121,7 +121,7 @@ export const Default = () => (
 export const InitialValidLeaderboard = () => (
   <MockLeaderboardProvider>
     <ValueStateHolder
-      initialValue={'489165zad49-a8ad6-4a984-dcz8da-hjqn983qh2'}
+      initialValue={'"489165zad49-a8ad6-4a984-dcz8da-hjqn983qh2"'}
       render={(value, onChange) => (
         <LeaderboardIdField
           project={testProject.project}

@@ -680,7 +680,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                     <List>
                       {getLeaderboardDescription(i18n, currentLeaderboard).map(
                         (item, index) => (
-                          <>
+                          <React.Fragment key={`fragment-${item.key}`}>
                             {index > 0 ? (
                               <Divider
                                 key={`divider-${item.key}`}
@@ -703,7 +703,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                                 </ListItemSecondaryAction>
                               ) : null}
                             </ListItem>
-                          </>
+                          </React.Fragment>
                         )
                       )}
                     </List>

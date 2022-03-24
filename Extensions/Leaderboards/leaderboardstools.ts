@@ -37,7 +37,6 @@ namespace gdjs {
           )
             .then((response) => {
               _scoreLastSentAt = Date.now();
-              console.log(response.status);
               if (!response.ok) {
                 errorVar.setString(response.status.toString());
                 _lastErrorCode = response.status;
@@ -50,11 +49,9 @@ namespace gdjs {
               }
             })
             .then((data) => {
-              console.log('two', data);
               responseVar.setString(data);
             })
             .catch((error) => {
-              console.log('here', JSON.stringify(error));
               errorVar.setString('REQUEST_NOT_SENT');
               _lastErrorCode = 400;
             });
@@ -66,7 +63,6 @@ namespace gdjs {
       };
 
       export const getLastSentEntryStatusCode = function () {
-        console.log({ _lastErrorCode });
         return '' + _lastErrorCode;
       };
     }

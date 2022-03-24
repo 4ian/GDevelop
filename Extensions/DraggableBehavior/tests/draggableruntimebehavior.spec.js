@@ -49,7 +49,6 @@ describe('gdjs.DraggableRuntimeBehavior', function () {
       {
         name: 'Behavior1',
         type: 'DraggableBehavior::Draggable',
-        // @ts-ignore - properties are not typed
         checkCollisionMask: true,
       },
     ],

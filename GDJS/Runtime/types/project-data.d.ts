@@ -60,6 +60,8 @@ declare type BehaviorData = {
   name: string;
   /** The behavior type. Used by GDJS to find the proper behavior to construct. */
   type: string;
+
+  [key: string]: any;
 };
 
 declare interface GdVersionData {
@@ -87,6 +89,7 @@ declare interface LayoutData {
 declare interface BehaviorSharedData {
   name: string;
   type: string;
+  [key: string]: any;
 }
 
 declare interface ExternalLayoutData {

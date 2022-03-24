@@ -80,6 +80,8 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PathfindingBehavior/pathfindingruntimebehavior.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/box2d.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2runtimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TextInput/textinputruntimeobject.js',

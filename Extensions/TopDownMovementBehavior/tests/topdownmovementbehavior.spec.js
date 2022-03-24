@@ -49,11 +49,11 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
       name: 'player',
       type: '',
       effects: [],
+      variables: [],
       behaviors: [
         {
           type: 'TopDownMovementBehavior::TopDownMovementBehavior',
           name: 'auto1',
-          // @ts-ignore - properties are not typed
           allowDiagonals: allowDiagonals,
           acceleration: 400,
           deceleration: 800,

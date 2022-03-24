@@ -20,7 +20,7 @@ namespace gdjs {
     // Start with 1 so the user is safe from default variables value (0)
     joints: any = {};
 
-    constructor(runtimeScene, sharedData) {
+    constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
       this.scaleX = sharedData.scaleX === 0 ? 100 : sharedData.scaleX;
@@ -242,7 +242,7 @@ namespace gdjs {
     masks: any;
     shapeScale: number = 1;
     currentContacts: any;
-    _body: any = null;
+    _body: Box2DBody | null = null;
     _sharedData: any;
     _tempb2Vec2: any;
 
@@ -662,6 +662,7 @@ namespace gdjs {
     }
 
     getBody() {
+      // TODO: if the object was delete, don't recreate the body
       // If there is no body, set a new one
       if (this._body === null) {
         this.createBody();
@@ -670,6 +671,8 @@ namespace gdjs {
     }
 
     createBody() {
+      // TODO: if the object was delete, don't recreate the body
+
       // Generate the body definition
       const bodyDef = new Box2D.b2BodyDef();
 
@@ -927,7 +930,6 @@ namespace gdjs {
       // If there is no body, set a new one
       if (this._body === null) {
         this.createBody();
-        return;
       }
 
       // Update body bullet flag

@@ -57,7 +57,6 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
           {
             type: 'PathfindingBehavior::PathfindingBehavior',
             name: 'auto1',
-            // @ts-ignore - properties are not typed
             allowDiagonals: allowDiagonals,
             acceleration: 400,
             maxSpeed: 200,
@@ -70,6 +69,7 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
             collisionMethod: collisionMethod,
           },
         ],
+        variables: [],
         effects: [],
       });
       player.getWidth = function () {
@@ -89,11 +89,12 @@ describe('gdjs.PathfindingRuntimeBehavior', function () {
         behaviors: [
           {
             type: 'PathfindingBehavior::PathfindingObstacleBehavior',
-            // @ts-ignore - properties are not typed
+            name: 'PathfindingObstacleBehavior',
             impassable: true,
             cost: 2,
           },
         ],
+        variables: [],
         effects: [],
       });
       obstacle.getWidth = function () {

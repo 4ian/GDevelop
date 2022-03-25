@@ -11,8 +11,6 @@ import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import { t } from '@lingui/macro';
-import Toggle from '../../UI/Toggle';
-import { LargeSpacer } from '../../UI/Grid';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { breakUuid } from '../../Utils/GDevelopServices/Play';

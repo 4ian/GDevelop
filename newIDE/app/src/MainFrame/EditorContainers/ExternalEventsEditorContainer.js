@@ -13,7 +13,6 @@ import ExternalPropertiesDialog, {
 } from './ExternalPropertiesDialog';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
-import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
 
 const styles = {
   container: {

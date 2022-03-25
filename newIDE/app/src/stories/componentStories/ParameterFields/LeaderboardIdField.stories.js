@@ -71,28 +71,16 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
           goToFirstPage: null,
         },
         setDisplayOnlyBestEntry: action('setDisplayOnlyBestEntry'),
-        createLeaderboard: () => {
-          throw new Error('createLeaderboard');
-        },
+        createLeaderboard: () => action('createLeaderboard'),
         listLeaderboards: action('listLeaderboards'),
         selectLeaderboard: leaderboardId => {
           setCurrentLeaderboard(leaderboardsByIds[leaderboardId]);
         },
-        updateLeaderboard: () => {
-          throw new Error('updateLeaderboard');
-        },
-        resetLeaderboard: () => {
-          throw new Error('resetLeaderboard');
-        },
-        deleteLeaderboard: () => {
-          throw new Error('deleteLeaderboard');
-        },
-        deleteLeaderboardEntry: () => {
-          throw new Error('deleteLeaderboardEntry');
-        },
-        fetchLeaderboardEntries: () => {
-          throw new Error('fetchLeaderboardEntries');
-        },
+        updateLeaderboard: () => action('updateLeaderboard'),
+        resetLeaderboard: () => action('resetLeaderboard'),
+        deleteLeaderboard: () => action('deleteLeaderboard'),
+        deleteLeaderboardEntry: () => action('deleteLeaderboardEntry'),
+        fetchLeaderboardEntries: () => action('fetchLeaderboardEntries'),
       }}
     >
       {children}

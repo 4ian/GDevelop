@@ -6,7 +6,7 @@ import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
-import RaisedButton from '../../UI/RaisedButton';
+import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import OpenInNew from '@material-ui/icons/OpenInNew';
@@ -116,19 +116,20 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
         }
         renderButton={style => (
           <>
-            <RaisedButton
+            <RaisedButtonWithSplitMenu
               icon={<OpenInNew />}
-              primary
               style={style}
+              primary
               onClick={() => setIsAdminOpen(true)}
-            />
-            <LargeSpacer />
-            <Toggle
-              labelPosition="right"
-              toggled={isTextInput}
-              onToggle={() => setIsTextInput(!isTextInput)}
-              style={{ marginTop: 8 }}
-              disabled={!leaderboards}
+              buildMenuTemplate={i18n => [
+                {
+                  label: isTextInput
+                    ? i18n._(t`Switch to expression`)
+                    : i18n._(t`Switch to select`),
+                  disabled: !leaderboards,
+                  click: () => setIsTextInput(!isTextInput),
+                },
+              ]}
             />
           </>
         )}
@@ -137,7 +138,6 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
         <LeaderboardDialog
           onClose={() => setIsAdminOpen(false)}
           open={isAdminOpen}
-          project={props.project}
         />
       )}
     </>

@@ -127,7 +127,7 @@ type ComponentProps = {|
   ...Props,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
-  leaderboards: LeaderboardState,
+  leaderboardsManager: ?LeaderboardState,
 |};
 
 type State = {|
@@ -271,16 +271,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
-    this.props.leaderboards
-      .listLeaderboards()
-      .then(() => {
-        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-      })
-      .catch(error =>
-        console.warn(
-          `Error while fetching leaderboards in EventsSheet: ${error}`
-        )
-      );
+    if (this.props.leaderboardsManager) {
+      this.props.leaderboardsManager
+        .listLeaderboards()
+        .then(() => {
+          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+        })
+        .catch(error =>
+          console.warn(
+            `Error while fetching leaderboards in EventsSheet: ${error}`
+          )
+        );
+    }
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -1569,13 +1571,13 @@ const EventsSheet = (props, ref) => {
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preferences = React.useContext(PreferencesContext);
-  const leaderboards = React.useContext(LeaderboardContext);
+  const leaderboardsManager = React.useContext(LeaderboardContext);
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
       authenticatedUser={authenticatedUser}
       preferences={preferences}
-      leaderboards={leaderboards}
+      leaderboardsManager={leaderboardsManager}
       {...props}
     />
   );

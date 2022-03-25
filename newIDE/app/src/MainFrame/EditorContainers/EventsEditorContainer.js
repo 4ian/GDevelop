@@ -63,27 +63,25 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     }
 
     return (
-      <LeaderboardProvider gameId={project.getProjectUuid()}>
-        <EventsSheet
-          ref={editor => (this.editor = editor)}
-          setToolbar={this.props.setToolbar}
-          onOpenLayout={this.props.onOpenLayout}
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this.props.onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          openInstructionOrExpression={this.props.openInstructionOrExpression}
-          onCreateEventsFunction={this.props.onCreateEventsFunction}
-          unsavedChanges={this.props.unsavedChanges}
-          project={project}
-          scope={{
-            layout,
-          }}
-          globalObjectsContainer={project}
-          objectsContainer={layout}
-          events={layout.getEvents()}
-          onOpenExternalEvents={this.props.onOpenExternalEvents}
-        />
-      </LeaderboardProvider>
+      <EventsSheet
+        ref={editor => (this.editor = editor)}
+        setToolbar={this.props.setToolbar}
+        onOpenLayout={this.props.onOpenLayout}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
+        openInstructionOrExpression={this.props.openInstructionOrExpression}
+        onCreateEventsFunction={this.props.onCreateEventsFunction}
+        unsavedChanges={this.props.unsavedChanges}
+        project={project}
+        scope={{
+          layout,
+        }}
+        globalObjectsContainer={project}
+        objectsContainer={layout}
+        events={layout.getEvents()}
+        onOpenExternalEvents={this.props.onOpenExternalEvents}
+      />
     );
   }
 }

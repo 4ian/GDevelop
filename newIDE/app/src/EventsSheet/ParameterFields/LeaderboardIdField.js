@@ -28,8 +28,28 @@ const getInlineParameterDisplayValue = (
   return leaderboard ? leaderboard.name : value;
 };
 
+const useFetchLeaderboards = () => {
+  const { leaderboards, listLeaderboards } = React.useContext(
+    LeaderboardContext
+  );
+  const fetchLeaderboards = React.useCallback(
+    async () => {
+      await listLeaderboards();
+    },
+    [listLeaderboards]
+  );
+  React.useEffect(
+    () => {
+      fetchLeaderboards();
+    },
+    [fetchLeaderboards]
+  );
+
+  return leaderboards;
+};
+
 export function LeaderboardIdField(props: ParameterFieldProps) {
-  const { leaderboards } = React.useContext(LeaderboardContext);
+  const leaderboards = useFetchLeaderboards();
   const [isAdminOpen, setIsAdminOpen] = React.useState(false);
 
   const isCurrentValueInLeaderboardList =

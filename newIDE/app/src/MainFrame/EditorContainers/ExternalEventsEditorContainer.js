@@ -181,11 +181,4 @@ export class ExternalEventsEditorContainer extends React.Component<
 
 export const renderExternalEventsEditorContainer = (
   props: RenderEditorContainerPropsWithRef
-) =>
-  props.project ? (
-    <LeaderboardProvider gameId={props.project.getProjectUuid()}>
-      <ExternalEventsEditorContainer {...props} />
-    </LeaderboardProvider>
-  ) : (
-    <ExternalEventsEditorContainer {...props} />
-  );
+) => <ExternalEventsEditorContainer {...props} />;

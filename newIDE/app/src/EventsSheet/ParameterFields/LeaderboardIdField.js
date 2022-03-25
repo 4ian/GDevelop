@@ -13,10 +13,10 @@ import OpenInNew from '@material-ui/icons/OpenInNew';
 import { t } from '@lingui/macro';
 import Toggle from '../../UI/Toggle';
 import { LargeSpacer } from '../../UI/Grid';
-import LeaderboardDialog from '../../SceneEditor/LeaderboardDialog';
+import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 
-const getLeaderboardNameByValue = (
+const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
   value: string
 ): string => {
@@ -129,7 +129,7 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
 
 export default React.forwardRef<ParameterFieldProps, {||}>(LeaderboardIdField);
 
-export const InlineLeaderboardIdField = ({
+const InlineLeaderboardIdField = ({
   value,
   InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
@@ -143,5 +143,9 @@ export const InlineLeaderboardIdField = ({
     );
   }
 
-  return <span>{getLeaderboardNameByValue(leaderboards, value)}</span>;
+  return <span>{getInlineParameterDisplayValue(leaderboards, value)}</span>;
 };
+
+export const renderInlineLeaderboardIdField = (
+  props: ParameterInlineRendererProps
+) => <InlineLeaderboardIdField {...props} />;

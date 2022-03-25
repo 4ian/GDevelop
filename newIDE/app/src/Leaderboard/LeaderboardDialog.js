@@ -9,27 +9,30 @@ import { Trans } from '@lingui/macro';
 type Props = {|
   onClose: () => void,
   open: boolean,
-  project: gdProject,
 |};
 
-const LeaderboardDialog = ({ onClose, open, project }: Props) => {
+const LeaderboardDialog = ({ onClose, open }: Props) => {
+  const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
+          disabled={isLoading}
           onClick={onClose}
-          key={'Cancel'}
+          key={'Close'}
         />,
       ]}
       open={open}
       cannotBeDismissed={true}
-      onRequestClose={onClose}
-      title="Leaderboards"
+      onRequestClose={() => {
+        if (!isLoading) onClose();
+      }}
+      title={<Trans>Leaderboards</Trans>}
       flexBody
       fullHeight
     >
-      <LeaderboardAdmin onLoading={() => {}} />
+      <LeaderboardAdmin onLoading={setIsLoading} />
     </Dialog>
   );
 };

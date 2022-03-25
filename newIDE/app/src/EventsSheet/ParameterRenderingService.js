@@ -57,7 +57,7 @@ import FunctionParameterNameField from './ParameterFields/FunctionParameterNameF
 import ExternalLayoutNameField from './ParameterFields/ExternalLayoutNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import LeaderboardIdField, {
-  InlineLeaderboardIdField,
+  renderInlineLeaderboardIdField,
 } from './ParameterFields/LeaderboardIdField';
 const gd: libGDevelop = global.gd;
 
@@ -113,7 +113,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
-  leaderboardId: InlineLeaderboardIdField,
+  leaderboardId: renderInlineLeaderboardIdField,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,

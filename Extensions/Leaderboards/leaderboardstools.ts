@@ -58,7 +58,7 @@ namespace gdjs {
         }
       };
 
-      export const lastEntrySaveFailed = function () {
+      export const hasLastEntrySaveFailed = function () {
         return _lastErrorCode && _lastErrorCode >= 400;
       };
 

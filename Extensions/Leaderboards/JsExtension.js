@@ -42,7 +42,7 @@ module.exports = {
       .addAction(
         'SavePlayerScore',
         _('Save player score'),
-        _("Save the player's score to a giver leaderboard."),
+        _("Save the player's score to the given leaderboard."),
         _(
           'Send to leaderboard _PARAM0_ the score _PARAM1_ with player name: _PARAM2_.'
         ),
@@ -55,7 +55,7 @@ module.exports = {
       .addParameter('string', 'Name to register for the player', '', false)
       .addParameter(
         'scenevar',
-        _('Variable where to store the saved score'),
+        _('Variable where to store the saved score (optional)'),
         '',
         true
       )
@@ -75,15 +75,15 @@ module.exports = {
       .addCondition(
         'LastSentEntrySaveFailed',
         _('Last entry failed to save'),
-        _('Check if the last sent entry failed to save'),
-        _('Last entry failed to be saved in leaderboard'),
+        _('Check if the last sent entry failed to save in the leaderboard.'),
+        _('Last entry failed to be saved in the leaderboard'),
         _(''),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.lastEntrySaveFailed');
+      .setFunctionName('gdjs.evtTools.leaderboards.hasLastEntrySaveFailed');
 
     extension
       .addStrExpression(

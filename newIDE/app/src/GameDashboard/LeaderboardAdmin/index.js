@@ -47,6 +47,7 @@ import {
   type Leaderboard,
   type LeaderboardSortOption,
   type LeaderboardPlayerUnicityDisplayOption,
+  breakUuid,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
@@ -58,8 +59,6 @@ import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
-
-const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};

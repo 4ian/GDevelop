@@ -15,18 +15,15 @@ import Toggle from '../../UI/Toggle';
 import { LargeSpacer } from '../../UI/Grid';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
+import { breakUuid } from '../../Utils/GDevelopServices/Play';
 
 const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
   value: string
 ): string => {
   if (!leaderboards) return value;
-  const quotedIdLeaderboards = leaderboards.map(leaderboard => ({
-    id: `"${leaderboard.id}"`,
-    name: leaderboard.name,
-  }));
-  const leaderboard = quotedIdLeaderboards.find(
-    leaderboard => leaderboard.id === value
+  const leaderboard = leaderboards.find(
+    leaderboard => `"${leaderboard.id}"` === value
   );
   return leaderboard ? leaderboard.name : value;
 };
@@ -75,7 +72,7 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
                       value={`"${leaderboard.id}"`}
                       primaryText={`${leaderboard.name} ${
                         leaderboard.id
-                          ? `(${leaderboard.id.substring(0, 8)})`
+                          ? `(${breakUuid(leaderboard.id.substring(0, 8))})`
                           : ''
                       }`}
                     />

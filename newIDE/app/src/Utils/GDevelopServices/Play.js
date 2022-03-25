@@ -71,6 +71,8 @@ export const extractExtremeScoreDisplayData = ({
   score,
 });
 
+export const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
+
 export const listGameLeaderboards = (gameId: string): Promise<Leaderboard[]> =>
   axios
     .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboards`)

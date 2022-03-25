@@ -541,10 +541,8 @@ export const GameDetailsDialog = ({
                           <Trans>Last week sessions count</Trans>
                         </TableRowColumn>
                         <TableRowColumn style={styles.tableRowStatColumn}>
-                          {publicGame &&
-                          publicGame.metrics &&
-                          publicGame.metrics.lastWeekSessionsCount
-                            ? publicGame.metrics.lastWeekSessionsCount
+                          {publicGame && publicGame.cachedLastWeekSessionsCount
+                            ? publicGame.cachedLastWeekSessionsCount
                             : '-'}
                         </TableRowColumn>
                       </TableRow>
@@ -553,10 +551,8 @@ export const GameDetailsDialog = ({
                           <Trans>Last year sessions count</Trans>
                         </TableRowColumn>
                         <TableRowColumn style={styles.tableRowStatColumn}>
-                          {publicGame &&
-                          publicGame.metrics &&
-                          publicGame.metrics.lastYearSessionsCount
-                            ? publicGame.metrics.lastYearSessionsCount
+                          {publicGame && publicGame.cachedLastYearSessionsCount
+                            ? publicGame.cachedLastYearSessionsCount
                             : '-'}
                         </TableRowColumn>
                       </TableRow>

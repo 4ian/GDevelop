@@ -19,10 +19,8 @@ export type PublicGame = {
   playWithMobile: boolean,
   orientation: string,
   thumbnailUrl?: string,
-  metrics?: {
-    lastWeekSessionsCount: number,
-    lastYearSessionsCount: number,
-  },
+  cachedLastWeekSessionsCount?: number,
+  cachedLastYearSessionsCount?: number,
   categories?: string[],
 };
 

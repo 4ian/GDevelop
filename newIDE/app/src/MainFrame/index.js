@@ -17,11 +17,8 @@ import CloseConfirmDialog from '../UI/CloseConfirmDialog';
 import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-import {
-  ClosableTabs,
-  ClosableTab,
-  TabContentContainer,
-} from '../UI/ClosableTabs';
+import { TabContentContainer } from '../UI/ClosableTabs';
+import { DraggableClosableTabs } from './EditorTabs/DraggableEditorTabs';
 import {
   getEditorTabsInitialState,
   openEditorTab,
@@ -42,7 +39,8 @@ import {
   type EditorTab,
   getEventsFunctionsExtensionEditor,
   notifyPreviewWillStart,
-} from './EditorTabsHandler';
+  moveTabToTheRightOfHoveredTab,
+} from './EditorTabs/EditorTabsHandler';
 import { timePromise } from '../Utils/TimeFunction';
 import HelpFinder from '../HelpFinder';
 import { renderDebuggerEditorContainer } from './EditorContainers/DebuggerEditorContainer';
@@ -133,6 +131,7 @@ import {
   TRIVIAL_FIRST_PREVIEW,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import OnboardingDialog from './Onboarding/OnboardingDialog';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1082,6 +1081,10 @@ const MainFrame = (props: Props) => {
         newName
       );
       eventsFunctionsExtension.setName(newName);
+      eventsFunctionsExtensionsState.unloadProjectEventsFunctionsExtension(
+        currentProject,
+        oldName
+      );
       eventsFunctionsExtensionsState.reloadProjectEventsFunctionsExtensions(
         currentProject
       );
@@ -1848,11 +1851,11 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: changeCurrentTab(state.editorTabs, value),
     })).then(state =>
-      _onEditorTabActive(getCurrentTab(state.editorTabs), state)
+      _onEditorTabActived(getCurrentTab(state.editorTabs), state)
     );
   };
 
-  const _onEditorTabActive = (
+  const _onEditorTabActived = (
     editorTab: EditorTab,
     newState: State = state
   ) => {
@@ -1886,6 +1889,19 @@ const MainFrame = (props: Props) => {
       ...state,
       editorTabs: closeAllEditorTabs(state.editorTabs),
     }));
+  };
+
+  const onDropEditorTab = (fromIndex: number, toHoveredIndex: number) => {
+    setState(state => {
+      return {
+        ...state,
+        editorTabs: moveTabToTheRightOfHoveredTab(
+          state.editorTabs,
+          fromIndex,
+          toHoveredIndex
+        ),
+      };
+    });
   };
 
   const onChooseResource: ChooseResourceFunction = (
@@ -2134,25 +2150,18 @@ const MainFrame = (props: Props) => {
         }
         previewState={previewState}
       />
-      <ClosableTabs hideLabels={!!props.integratedEditor}>
-        {getEditors(state.editorTabs).map((editorTab, id) => {
-          const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
-          return (
-            <ClosableTab
-              label={editorTab.label}
-              key={editorTab.key}
-              id={`tab-${editorTab.key.replace(/\s/g, '-')}`}
-              active={isCurrentTab}
-              onClick={() => _onChangeEditorTab(id)}
-              onClose={() => _onCloseEditorTab(editorTab)}
-              onCloseOthers={() => _onCloseOtherEditorTabs(editorTab)}
-              onCloseAll={_onCloseAllEditorTabs}
-              onActivated={() => _onEditorTabActive(editorTab)}
-              closable={editorTab.closable}
-            />
-          );
-        })}
-      </ClosableTabs>
+      <DraggableClosableTabs
+        hideLabels={!!props.integratedEditor}
+        editorTabs={state.editorTabs}
+        onClickTab={(id: number) => _onChangeEditorTab(id)}
+        onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
+        onCloseOtherTabs={(editorTab: EditorTab) =>
+          _onCloseOtherEditorTabs(editorTab)
+        }
+        onCloseAll={_onCloseAllEditorTabs}
+        onTabActived={(editorTab: EditorTab) => _onEditorTabActived(editorTab)}
+        onDropTab={onDropEditorTab}
+      />
       {getEditors(state.editorTabs).map((editorTab, id) => {
         const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
         return (
@@ -2388,6 +2397,7 @@ const MainFrame = (props: Props) => {
         hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
+      <OnboardingDialog />
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
         renderGDJSDevelopmentWatcher()}

@@ -24,9 +24,20 @@ class GD_EXTENSION_API DraggableBehavior : public gd::Behavior {
  public:
   DraggableBehavior();
   virtual ~DraggableBehavior(){};
-  virtual Behavior* Clone() const { return new DraggableBehavior(*this); }
+  virtual Behavior* Clone() const override {
+    return new DraggableBehavior(*this);
+  }
 
- private:
+#if defined(GD_IDE_ONLY)
+  virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      const gd::SerializerElement& behaviorContent) const override;
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
+                              const gd::String& name,
+                              const gd::String& value) override;
+#endif
+
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorContent) override;
 };
 
 #endif  // DRAGGABLEBEHAVIOR_H

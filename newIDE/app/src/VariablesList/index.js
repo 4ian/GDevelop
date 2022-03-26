@@ -19,10 +19,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { type VariableOrigin } from './VariablesList.flow';
-import HelpButton from '../UI/HelpButton';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
-import { Trans } from '@lingui/macro';
-import Text from '../UI/Text';
 import { Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 
@@ -47,8 +44,8 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   onComputeAllVariableNames: () => Array<string>,
   inheritedVariablesContainer?: ?gdVariablesContainer,
-  emptyExplanationMessage?: React.Node,
-  emptyExplanationSecondMessage?: React.Node,
+  emptyPlaceholderTitle?: React.Node,
+  emptyPlaceholderDescription?: React.Node,
   onSizeUpdated?: () => void,
   commitVariableValueOnBlur?: boolean,
   helpPagePath?: ?string,
@@ -367,6 +364,20 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
+  addVariable = () => {
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
+    const variable = new gd.Variable();
+    variable.setString('');
+    const name = newNameGenerator('Variable', name =>
+      inheritedVariablesContainer
+        ? inheritedVariablesContainer.has(name) || variablesContainer.has(name)
+        : variablesContainer.has(name)
+    );
+    variablesContainer.insert(name, variable, variablesContainer.count());
+    this.forceUpdate();
+    if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+  };
+
   render() {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
@@ -433,40 +444,21 @@ export default class VariablesList extends React.Component<Props, State> {
               {allVariables}
             </SortableVariablesListBody>
           </ScrollView>
-        ) : !!this.props.emptyExplanationMessage ? (
+        ) : this.props.emptyPlaceholderTitle &&
+          this.props.emptyPlaceholderDescription &&
+          this.props.helpPagePath ? (
           <Column noMargin expand justifyContent="center">
             <EmptyPlaceholder
-              renderButtons={() => (
-                <HelpButton helpPagePath={this.props.helpPagePath} />
-              )}
-            >
-              <Text>
-                <Trans>{this.props.emptyExplanationMessage}</Trans>
-              </Text>
-              <Text>
-                <Trans>{this.props.emptyExplanationSecondMessage}</Trans>
-              </Text>
-            </EmptyPlaceholder>
+              title={this.props.emptyPlaceholderTitle}
+              description={this.props.emptyPlaceholderDescription}
+              actionLabel="Add a variable"
+              helpPagePath={this.props.helpPagePath}
+              onAdd={this.addVariable}
+            />
           </Column>
         ) : null}
         <EditVariableRow
-          onAdd={() => {
-            const variable = new gd.Variable();
-            variable.setString('');
-            const name = newNameGenerator('Variable', name =>
-              inheritedVariablesContainer
-                ? inheritedVariablesContainer.has(name) ||
-                  variablesContainer.has(name)
-                : variablesContainer.has(name)
-            );
-            variablesContainer.insert(
-              name,
-              variable,
-              variablesContainer.count()
-            );
-            this.forceUpdate();
-            if (this.props.onSizeUpdated) this.props.onSizeUpdated();
-          }}
+          onAdd={allVariables.length ? this.addVariable : null}
           onCopy={this.copySelection}
           onPaste={this.paste}
           onDeleteSelection={this.deleteSelection}

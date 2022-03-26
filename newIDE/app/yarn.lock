@@ -18748,6 +18748,11 @@
   "resolved" "https://registry.npmjs.org/use/-/use-3.1.1.tgz"
   "version" "3.1.1"
 
+"userflow.js@^2.2.0":
+  "integrity" "sha512-voimujGKB3xX+ORYt/ZEiqPE2qT9FUtO2zLduNZu3y5tCZLWrMNkJQY9oBt+qcp7a9ivJF66q62l/dTt7s7kew=="
+  "resolved" "https://registry.npmjs.org/userflow.js/-/userflow.js-2.2.0.tgz"
+  "version" "2.2.0"
+
 "util-deprecate@^1.0.1", "util-deprecate@^1.0.2", "util-deprecate@~1.0.1":
   "integrity" "sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8="
   "resolved" "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"

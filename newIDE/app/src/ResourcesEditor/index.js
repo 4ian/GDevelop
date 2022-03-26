@@ -72,6 +72,10 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     selectedResource: null,
   };
 
+  refreshResourcesList() {
+    if (this._resourcesList) this._resourcesList.forceUpdate();
+  }
+
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar

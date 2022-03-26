@@ -697,7 +697,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                   />,
                   <ListItem
                     key="icons"
-                    primaryText={<Trans>Icons</Trans>}
+                    primaryText={<Trans>Icons and thumbnail</Trans>}
                     leftIcon={<PhotoLibrary />}
                     onClick={this.props.onOpenPlatformSpecificAssets}
                   />,
@@ -1082,17 +1082,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                     this.props.unsavedChanges.triggerUnsavedChanges();
                   this.setState({ projectVariablesEditorOpen: false });
                 }}
-                emptyExplanationMessage={
-                  <Trans>
-                    Global variables are variables that are shared amongst all
-                    the scenes of the game.
-                  </Trans>
+                emptyPlaceholderTitle={
+                  <Trans>Add your first global variable</Trans>
                 }
-                emptyExplanationSecondMessage={
+                emptyPlaceholderDescription={
                   <Trans>
-                    For example, you can have a variable called
-                    UnlockedLevelsCount representing the number of levels
-                    unlocked by the player.
+                    These variables hold additional information on a project.
                   </Trans>
                 }
                 helpPagePath={'/all-features/variables/global-variables'}

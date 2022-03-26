@@ -5,7 +5,7 @@ import React, { Component, useEffect, type Node, useRef } from 'react';
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
-import ContextMenu from './Menu/ContextMenu';
+import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
 
 const styles = {
@@ -81,30 +81,24 @@ type ClosableTabsProps = {|
   children: Node,
 |};
 
-export class ClosableTabs extends Component<ClosableTabsProps> {
-  render() {
-    const { hideLabels, children } = this.props;
+export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => (
+  <ThemeConsumer>
+    {muiTheme => {
+      const tabItemContainerStyle = {
+        maxWidth: '100%', // Tabs should take all width
+        flexShrink: 0, // Tabs height should never be reduced
+        display: hideLabels ? 'none' : 'flex',
+        flexWrap: 'nowrap', // Single line of tab...
+        overflowX: 'auto', // ...scroll horizontally if needed
+        backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
+      };
 
-    return (
-      <ThemeConsumer>
-        {muiTheme => {
-          const tabItemContainerStyle = {
-            maxWidth: '100%', // Tabs should take all width
-            flexShrink: 0, // Tabs height should never be reduced
-            display: hideLabels ? 'none' : 'flex',
-            flexWrap: 'nowrap', // Single line of tab...
-            overflowX: 'auto', // ...scroll horizontally if needed
-            backgroundColor: muiTheme.closableTabs.containerBackgroundColor,
-          };
+      return <div style={tabItemContainerStyle}>{children}</div>;
+    }}
+  </ThemeConsumer>
+);
 
-          return <div style={tabItemContainerStyle}>{children}</div>;
-        }}
-      </ThemeConsumer>
-    );
-  }
-}
-
-type ClosableTabProps = {|
+export type ClosableTabProps = {|
   id?: string,
   active: boolean,
   label: Node,
@@ -135,7 +129,7 @@ export function ClosableTab({
     },
     [active, onActivated]
   );
-  const contextMenu = useRef<ContextMenu>(null);
+  const contextMenu = useRef<?ContextMenuInterface>(null);
 
   const openContextMenu = event => {
     event.stopPropagation();
@@ -192,6 +186,9 @@ export function ClosableTab({
                 id={id ? `${id}-button` : undefined}
                 {...longTouchForContextMenuProps}
                 focusRipple
+                // If the touch ripple is not disabled, the dragged preview will
+                // use the size of the ripple and it will be too big.
+                disableTouchRipple
               >
                 <span
                   style={{

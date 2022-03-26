@@ -26,7 +26,7 @@ import {
   updateGame,
   type Game,
   setGameUserAcls,
-  getAclsFromAuthorIds,
+  getAclsFromUserIds,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -35,6 +35,7 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
+import { getWebBuildThumbnailUrl } from '../../Utils/GDevelopServices/Build';
 
 type State = {|
   exportStep: BuildStep,
@@ -138,8 +139,8 @@ export default class ExportLauncher extends Component<Props, State> {
   tryUpdateAuthors = async () => {
     const profile = this.props.authenticatedUser.profile;
     if (profile) {
-      const authorAcls = getAclsFromAuthorIds(
-        this.props.project.getAuthorIds()
+      const authorAcls = getAclsFromUserIds(
+        this.props.project.getAuthorIds().toJSArray()
       );
 
       try {
@@ -147,7 +148,7 @@ export default class ExportLauncher extends Component<Props, State> {
           this.props.authenticatedUser.getAuthorizationHeader,
           profile.id,
           this.props.project.getProjectUuid(),
-          authorAcls
+          { author: authorAcls }
         );
       } catch (e) {
         // Best effort call, do not prevent exporting the game.
@@ -410,7 +411,14 @@ export default class ExportLauncher extends Component<Props, State> {
           )}
         {authenticatedUser.authenticated &&
           (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress(build, errored, exportStep)
+            exportPipeline.renderCustomStepsProgress(
+              build,
+              errored,
+              exportStep,
+              buildId =>
+                this.props.project &&
+                getWebBuildThumbnailUrl(this.props.project, buildId)
+            )
           ) : (
             <Line expand>
               <BuildStepsProgress

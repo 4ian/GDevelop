@@ -89,7 +89,7 @@ const ExportHome = ({
         <div style={styles.titleContainer}>
           <Line>
             <Text size="title">
-              <Trans>Publish your game on other stores</Trans>
+              <Trans>Export and publish on other platforms</Trans>
             </Text>
           </Line>
         </div>
@@ -110,7 +110,7 @@ const ExportHome = ({
               </Text>
             </Line>
             <RaisedButton
-              label={<Trans>Publish on stores</Trans>}
+              label={<Trans>Export to other platforms</Trans>}
               onClick={() => {
                 setChosenExporterSection('automated');
                 setChosenExporterKey('webexport');

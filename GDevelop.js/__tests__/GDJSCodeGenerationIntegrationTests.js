@@ -648,7 +648,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Process the tasks (after faking it's finished).
     runtimeScene.getAsyncTasksManager().markAllFakeSyncTasksAsFinished();
     runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-    expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(1);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
   });
 
   it('generates a working function with two asynchronous actions', function () {
@@ -709,12 +711,16 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Process the tasks (after faking it's finished).
     runtimeScene.getAsyncTasksManager().markAllFakeSyncTasksAsFinished();
     runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-    expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(1);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
 
     // Process the tasks (after faking it's finished).
     runtimeScene.getAsyncTasksManager().markAllFakeSyncTasksAsFinished();
     runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-    expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(3);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(3);
   });
 
   it('generates a working function with asynchronous actions referring to the function arguments', function () {
@@ -737,7 +743,11 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             },
             {
               type: { inverted: false, value: 'ModVarScene' },
-              parameters: ['SuccessVariable', '+', 'GetArgumentAsNumber("IncreaseValue")'],
+              parameters: [
+                'SuccessVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
               subInstructions: [],
             },
           ],
@@ -749,14 +759,15 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const eventsFunction = new gd.EventsFunction();
 
-    eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
 
     const parameter = new gd.ParameterMetadata();
     parameter.setType('number');
     parameter.setName('IncreaseValue');
     eventsFunction.getParameters().push_back(parameter);
     parameter.delete();
-
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
@@ -767,7 +778,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     project.delete();
 
     const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-    runCompiledEvents(gdjs, runtimeScene, [ 5 ]);
+    runCompiledEvents(gdjs, runtimeScene, [5]);
     expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
 
     // Process the tasks (but the task is not finished yet).
@@ -777,7 +788,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Process the tasks (after faking it's finished).
     runtimeScene.getAsyncTasksManager().markAllFakeSyncTasksAsFinished();
     runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-    expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(5);
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(5);
   });
 
   it('generates a working function with asynchronous actions referring to objects', function () {
@@ -792,7 +805,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           actions: [
             {
               type: { inverted: false, value: 'ModVarObjet' },
-              parameters: ['MyObjectA', 'TestVariable', '+', 'GetArgumentAsNumber("IncreaseValue")'],
+              parameters: [
+                'MyObjectA',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
               subInstructions: [],
             },
             {
@@ -805,7 +823,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
             },
             {
               type: { inverted: false, value: 'ModVarObjet' },
-              parameters: ['MyObjectA', 'TestVariable', '+', 'GetArgumentAsNumber("IncreaseValue")'],
+              parameters: [
+                'MyObjectA',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
               subInstructions: [],
             },
           ],
@@ -817,7 +840,9 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const project = new gd.ProjectHelper.createNewGDJSProject();
     const eventsFunction = new gd.EventsFunction();
 
-    eventsFunction.getEvents().unserializeFrom(project, eventsSerializerElement);
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
 
     const parameter = new gd.ParameterMetadata();
     parameter.setType('number');
@@ -856,6 +881,79 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
   // TODO: Add a test simulating the deletion of an object before a task is finished,
   // and the task then updating the other object instances variable.
+
+  it('generates a lifecycle function that registers itself, and unregister itself if hot-reloaded', function () {
+    // Event to create an object, then add
+    const eventsSerializerElement = gd.Serializer.fromJSObject([
+      {
+        disabled: false,
+        folded: false,
+        type: 'BuiltinCommonInstructions::Standard',
+        conditions: [],
+        actions: [
+          {
+            type: { inverted: false, value: 'ModVarScene' },
+            parameters: ['SuccessVariable', '+', '1'],
+            subInstructions: [],
+          },
+        ],
+        events: [],
+      },
+    ]);
+
+    const project = new gd.ProjectHelper.createNewGDJSProject();
+    const eventsFunction = new gd.EventsFunction();
+    eventsFunction.setName('onScenePreEvents');
+    eventsFunction
+      .getEvents()
+      .unserializeFrom(project, eventsSerializerElement);
+
+    const runCompiledEvents = generateCompiledEventsForEventsFunction(
+      gd,
+      project,
+      eventsFunction,
+      {
+        dontCallGeneratedFunction: true,
+      }
+    );
+
+    const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
+    runCompiledEvents(
+      gdjs,
+      runtimeScene /*, Don't pass arguments to not run the function. */
+    );
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(1);
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(2);
+
+    // Simulate a hot reloading by recompiling the function and running it again.
+    const runHotReloadedCompiledEvents =
+      generateCompiledEventsForEventsFunction(gd, project, eventsFunction, {
+        dontCallGeneratedFunction: true,
+      });
+    runHotReloadedCompiledEvents(
+      gdjs,
+      runtimeScene /*, Don't pass arguments to not run the function. */
+    );
+
+    // Ensure that when we call the callbacks, it's called only once (not registered twice).
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(3);
+    mocks.runRuntimeScenePreEventsCallbacks();
+    expect(
+      runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+    ).toBe(4);
+
+    eventsFunction.delete();
+    project.delete();
+  });
 });
 
 // TODO: Split this file in GDJSBasicCodeGenerationIntegrationTests.js
@@ -900,9 +998,11 @@ function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
     `Hashtable = gdjs.Hashtable;` +
       '\n' +
       code +
-      // Return the function for it to be called.
+      // Return the function for it to be called (if arguments are passed).
       `;
-return functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]);`
+return functionArguments ?
+  functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
+  null;`
   );
 
   return runCompiledEventsFunction;

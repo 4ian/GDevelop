@@ -294,8 +294,8 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
   obj.AddCondition("NoMoreParticles",
                    _("No more particles"),
                    _("Check if the object does not emit particles "
-                     "anylonger, so as to destroy it for example."),
-                   _("_PARAM0_ does not emit anylonger."),
+                     "any longer, so as to destroy it for example."),
+                   _("_PARAM0_ does not emit any longer"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")

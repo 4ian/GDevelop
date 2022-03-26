@@ -27,6 +27,12 @@ import VariablesList from '../VariablesList/index';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 const gd: libGDevelop = global.gd;
 
+export type ObjectEditorTab =
+  | 'properties'
+  | 'behaviors'
+  | 'variables'
+  | 'effects';
+
 type Props = {|
   open: boolean,
   object: ?gdObject,
@@ -46,7 +52,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   unsavedChanges?: UnsavedChanges,
   onUpdateBehaviorsSharedData: () => void,
-  initialTab: ?string,
+  initialTab: ?ObjectEditorTab,
 
   // Preview:
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
@@ -61,7 +67,7 @@ type InnerDialogProps = {|
 |};
 
 const InnerDialog = (props: InnerDialogProps) => {
-  const [currentTab, setCurrentTab] = React.useState(
+  const [currentTab, setCurrentTab] = React.useState<ObjectEditorTab>(
     props.initialTab || 'properties'
   );
   const [newObjectName, setNewObjectName] = React.useState(props.objectName);
@@ -225,17 +231,10 @@ const InnerDialog = (props: InnerDialogProps) => {
       {currentTab === 'variables' && (
         <VariablesList
           variablesContainer={props.object.getVariables()}
-          emptyExplanationMessage={
+          emptyPlaceholderTitle={<Trans>Add your first object variable</Trans>}
+          emptyPlaceholderDescription={
             <Trans>
-              When you add variables to an object, any instance of the object
-              put on the scene or created during the game will have these
-              variables attached to it.
-            </Trans>
-          }
-          emptyExplanationSecondMessage={
-            <Trans>
-              For example, you can have a variable called Life representing the
-              health of the object.
+              These variables hold additional information on an object.
             </Trans>
           }
           helpPagePath={'/all-features/variables/object-variables'}

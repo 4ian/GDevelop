@@ -13,15 +13,24 @@ import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 
 /**
+ * Changes that are not stored in the Project.
+ */
+export type PartialGameChange = {|
+  ownerIds: Array<string>,
+|};
+
+/**
  * Public game properties that are shared with the project file ones.
  */
 type PublicProjectProperties = {|
   name: string,
+  categories: string[],
   description: string,
   authorIds: string[],
   playWithKeyboard: boolean,
   playWithGamepad: boolean,
   playWithMobile: boolean,
+  orientation: string,
 |};
 
 function applyPublicPropertiesToProject(
@@ -29,8 +38,11 @@ function applyPublicPropertiesToProject(
   newProperties: PublicProjectProperties
 ) {
   const t = str => str; //TODO
-  const { name, authorIds, description } = newProperties;
+  const { name, authorIds, description, categories } = newProperties;
   project.setName(name);
+  const projectCategories = project.getCategories();
+  projectCategories.clear();
+  categories.forEach(category => projectCategories.push_back(category));
   project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
@@ -38,42 +50,45 @@ function applyPublicPropertiesToProject(
   project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
   project.setPlayableWithGamepad(newProperties.playWithGamepad);
   project.setPlayableWithMobile(newProperties.playWithMobile);
+  project.setOrientation(newProperties.orientation);
 
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 }
 
 type Props = {|
   project: gdProject,
-  game: PublicGame,
+  publicGame: PublicGame,
   open: boolean,
   onClose: () => void,
-  onApply: () => void,
+  onApply: (partialGameChange: PartialGameChange) => void,
 |};
 
-const PublicGamePropertiesDialog = ({
+export const PublicGamePropertiesDialog = ({
   project,
-  game,
+  publicGame,
   open,
   onClose,
   onApply,
 }: Props) => {
-  const publicGameAuthorIds = game.authors
-    .map(author => (author ? author.id : null))
-    .filter(Boolean);
-  const [name, setName] = React.useState(game.gameName);
-  const [description, setDescription] = React.useState(game.description);
+  const publicGameAuthorIds = publicGame.authors.map(author => author.id);
+  const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
+  const [name, setName] = React.useState(publicGame.gameName);
+  const [categories, setCategories] = React.useState(publicGame.categories);
+  const [description, setDescription] = React.useState(publicGame.description);
   const [authorIds, setAuthorIds] = React.useState<string[]>(
     publicGameAuthorIds
   );
+  const [ownerIds, setOwnerIds] = React.useState<string[]>(publicGameOwnerIds);
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
-    game.playWithKeyboard
+    publicGame.playWithKeyboard
   );
   const [playWithGamepad, setPlayableWithGamepad] = React.useState(
-    game.playWithGamepad
+    publicGame.playWithGamepad
   );
   const [playWithMobile, setPlayableWithMobile] = React.useState(
-    game.playWithMobile
+    publicGame.playWithMobile
   );
+  const [orientation, setOrientation] = React.useState(publicGame.orientation);
 
   if (!open) return null;
 
@@ -81,14 +96,17 @@ const PublicGamePropertiesDialog = ({
     if (
       applyPublicPropertiesToProject(project, {
         name,
+        categories: categories || [],
         description: description || '',
         authorIds,
         playWithKeyboard: !!playWithKeyboard,
         playWithGamepad: !!playWithGamepad,
         playWithMobile: !!playWithMobile,
+        orientation: orientation || 'default',
       })
-    )
-      onApply();
+    ) {
+      onApply({ ownerIds });
+    }
   };
 
   const actions = [
@@ -117,17 +135,23 @@ const PublicGamePropertiesDialog = ({
       <PublicGameProperties
         name={name}
         setName={setName}
+        categories={categories}
+        setCategories={setCategories}
         description={description}
         setDescription={setDescription}
         project={project}
         authorIds={authorIds}
         setAuthorIds={setAuthorIds}
+        ownerIds={ownerIds}
+        setOwnerIds={setOwnerIds}
         setPlayableWithKeyboard={setPlayableWithKeyboard}
         playWithKeyboard={playWithKeyboard}
         setPlayableWithGamepad={setPlayableWithGamepad}
         playWithGamepad={playWithGamepad}
         setPlayableWithMobile={setPlayableWithMobile}
         playWithMobile={playWithMobile}
+        setOrientation={setOrientation}
+        orientation={orientation}
       />
     </Dialog>
   );

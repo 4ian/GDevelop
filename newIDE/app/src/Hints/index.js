@@ -37,7 +37,7 @@ export const getExtraObjectsInformation = (): {
   'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
-      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button bellow.`,
+      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button below.`,
     },
     {
       kind: 'info',
@@ -88,6 +88,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`To start a timer, don't forget to use the action "Start (or reset) an object timer" in another event.`,
+    };
+  }
+  if (type === 'FixCamera') {
+    return {
+      kind: 'info',
+      message: t`Please prefer using the new action "Enforce camera boundaries" which is more flexible.`,
     };
   }
   if (type === 'BitmapText::Scale') {

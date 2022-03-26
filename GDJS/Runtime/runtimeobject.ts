@@ -2351,6 +2351,7 @@ namespace gdjs {
      *
      * The position should be in "world" coordinates, i.e use gdjs.Layer.convertCoords
      * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
+     * To check if a point is inside the object collision mask, you can use `isCollidingWithPoint` instead.
      *
      */
     insideObject(x: float, y: float): boolean {

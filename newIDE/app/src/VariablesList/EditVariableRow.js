@@ -10,7 +10,7 @@ import { Line, Column } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 
 type Props = {|
-  onAdd: () => void,
+  onAdd: ?() => void,
   onCopy: () => void,
   hasSelection: boolean,
   onPaste: () => void,
@@ -46,12 +46,14 @@ const EditVariableRow = ({
     </Column>
 
     <Column>
-      <RaisedButton
-        primary
-        label={<Trans>Add</Trans>}
-        onClick={onAdd}
-        icon={<Add />}
-      />
+      {onAdd ? (
+        <RaisedButton
+          primary
+          label={<Trans>Add</Trans>}
+          onClick={onAdd}
+          icon={<Add />}
+        />
+      ) : null}
     </Column>
   </Line>
 );

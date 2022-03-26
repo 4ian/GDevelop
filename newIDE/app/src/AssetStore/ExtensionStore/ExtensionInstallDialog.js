@@ -23,6 +23,8 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
+import { useExtensionUpdates } from './UseExtensionUpdates';
+import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (
@@ -46,6 +48,7 @@ type Props = {|
   onInstall: () => Promise<void>,
   onEdit?: () => void,
   alreadyInstalled: boolean,
+  project: gdProject,
 |};
 
 const ExtensionInstallDialog = ({
@@ -55,7 +58,13 @@ const ExtensionInstallDialog = ({
   onInstall,
   onEdit,
   alreadyInstalled,
+  project,
 }: Props) => {
+  const installedExtensions = new Set(
+    enumerateEventsFunctionsExtensions(project).map(ext => ext.getName())
+  );
+  const extensionUpdates = useExtensionUpdates(project);
+
   const [error, setError] = React.useState<?Error>(null);
   const [
     extensionHeader,
@@ -117,8 +126,12 @@ const ExtensionInstallDialog = ({
             label={
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
-              ) : alreadyInstalled ? (
-                <Trans>Re-install/update</Trans>
+              ) : installedExtensions.has(extensionShortHeader.name) ? (
+                extensionUpdates.has(extensionShortHeader.name) ? (
+                  <Trans>Update</Trans>
+                ) : (
+                  <Trans>Re-install</Trans>
+                )
               ) : (
                 <Trans>Install in project</Trans>
               )

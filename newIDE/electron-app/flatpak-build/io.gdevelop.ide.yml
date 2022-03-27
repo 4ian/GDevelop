@@ -1,0 +1,64 @@
+# This is the Flatpak manifest.
+# To build it from a clean Ubuntu based distro:
+# `sudo apt install flatpak`
+# `sudo apt-get install -y flatpak-builder`
+# `sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo`
+# `sudo flatpak install flathub org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08`
+# `sudo flatpak install flathub org.electronjs.Electron2.BaseApp//21.08`
+# `flatpak-builder build-dir io.gdevelop.ide.yml`
+
+# `flatpak-builder --user --install --force-clean build-dir io.gdevelop.ide.yml`
+
+app-id: io.gdevelop.ide
+base: org.electronjs.Electron2.BaseApp
+base-version: '21.08'
+runtime: org.freedesktop.Platform
+runtime-version: '21.08'
+sdk: org.freedesktop.Sdk
+command: run.sh
+separate-locales: false
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=x11
+  - --socket=pulseaudio
+  - --share=network
+  - --device=all
+  - --filesystem=home
+  - --filesystem=xdg-run/dconf
+  - --filesystem=~/.config/dconf:ro
+  - --filesystem=xdg-run/pipewire-0
+  - --env=DCONF_USER_CONFIG_DIR=.config/dconf
+  - --talk-name=ca.desrt.dconf
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.gtk.Notifications
+  - --env=XDG_CURRENT_DESKTOP=Unity
+modules:
+  - name: gdevelop-ide
+    buildsystem: simple
+
+    sources:
+      - type: file
+        url: https://gdevelop-releases.s3.amazonaws.com/master/latest/gdevelop_5.0.130_amd64.deb
+        sha256: 2111869f9442fd7a20bf3bd85bfbf8513ccb013194c19ae06b221c613def82ef
+      - type: file
+        path: io.gdevelop.ide.appdata.xml      
+      - type: script
+        dest-filename: run.sh
+        commands:
+          - zypak-wrapper.sh /app/gdevelop/gdevelop "$@"
+
+    build-commands:
+      - ar x gdevelop_5.0.130_amd64.deb
+      - tar -xf data.tar.xz
+      - cp -r ./opt/* /app/
+      - cp -r ./usr/share/* /app/share/
+      - ln -s /app/gdevelop/gdevelop /app/bin
+      - install -Dm644 io.gdevelop.ide.appdata.xml -t /app/share/metainfo
+      - mv ${FLATPAK_DEST}/share/applications/gdevelop.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - desktop-file-edit --set-key Exec --set-value "run.sh gdevelop %U" ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - desktop-file-edit --set-key Icon --set-value "io.gdevelop.ide" ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - rm -rf ${FLATPAK_DEST}/share/icons/hicolor/1024x1024/
+      - find ${FLATPAK_DEST}/share/icons -type f -name *.png -exec rename gdevelop.png ${FLATPAK_ID}.png '{}' \;
+      - install -Dm755 -t /app/bin/ run.sh

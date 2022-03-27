@@ -24,7 +24,6 @@ import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
-import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
 
 const getTransformedDescription = (extensionHeader: ExtensionHeader) => {
   if (

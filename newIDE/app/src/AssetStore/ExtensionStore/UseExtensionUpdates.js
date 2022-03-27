@@ -89,6 +89,6 @@ export const useAllExtensionUpdates = (
 
       return extensionUpdates;
     },
-    [project]
+    [project, extensionShortHeadersByName]
   );
 };

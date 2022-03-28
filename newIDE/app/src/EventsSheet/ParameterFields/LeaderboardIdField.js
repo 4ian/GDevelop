@@ -148,7 +148,7 @@ const InlineLeaderboardIdField = ({
   value,
   InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
-  const { leaderboards } = React.useContext(LeaderboardContext);
+  const leaderboards = useFetchLeaderboards();
 
   if (!value) {
     return (

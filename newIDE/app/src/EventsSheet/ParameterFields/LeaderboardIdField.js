@@ -122,8 +122,8 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
               buildMenuTemplate={i18n => [
                 {
                   label: isTextInput
-                    ? i18n._(t`Switch to expression`)
-                    : i18n._(t`Switch to select`),
+                    ? i18n._(t`Select the leaderboard from a list`)
+                    : i18n._(t`Enter the leaderboard id as an expression`),
                   disabled: !leaderboards,
                   click: () => setIsTextInput(!isTextInput),
                 },

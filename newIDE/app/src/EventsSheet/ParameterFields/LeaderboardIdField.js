@@ -1,7 +1,8 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React from 'react';
+import { Trans, t } from '@lingui/macro';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -9,8 +10,6 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import { t } from '@lingui/macro';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { breakUuid } from '../../Utils/GDevelopServices/Play';
@@ -82,6 +81,13 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
               fullWidth
               floatingLabelText={fieldLabel}
               hintText={t`Choose a leaderboard`}
+              helperText={
+                leaderboards && leaderboards.length === 0 ? (
+                  <Trans>
+                    There are currently no leaderboards created for this game. Open the leaderboards manager to create one.
+                  </Trans>
+                ) : null
+              }
             >
               {leaderboards && !!leaderboards.length
                 ? leaderboards.map(leaderboard => (
@@ -95,7 +101,14 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
                       }`}
                     />
                   ))
-                : null}
+                : [
+                    <SelectOption
+                      disabled
+                      key="empty"
+                      value="empty"
+                      primaryText={''}
+                    />,
+                  ]}
             </SelectField>
           ) : (
             <GenericExpressionField
@@ -122,8 +135,8 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
               buildMenuTemplate={i18n => [
                 {
                   label: isTextInput
-                    ? i18n._(t`Switch to expression`)
-                    : i18n._(t`Switch to select`),
+                    ? i18n._(t`Select the leaderboard from a list`)
+                    : i18n._(t`Enter the leaderboard id as an expression`),
                   disabled: !leaderboards,
                   click: () => setIsTextInput(!isTextInput),
                 },
@@ -136,6 +149,7 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
         <LeaderboardDialog
           onClose={() => setIsAdminOpen(false)}
           open={isAdminOpen}
+          project={props.project}
         />
       )}
     </>

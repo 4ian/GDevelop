@@ -38,9 +38,11 @@ const useFetchLeaderboards = () => {
   );
   React.useEffect(
     () => {
-      fetchLeaderboards();
+      if (!leaderboards) {
+        fetchLeaderboards();
+      }
     },
-    [fetchLeaderboards]
+    [fetchLeaderboards, leaderboards]
   );
 
   return leaderboards;

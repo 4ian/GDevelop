@@ -67,6 +67,7 @@ module.exports = {
         '',
         true
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.setPlayerScore');

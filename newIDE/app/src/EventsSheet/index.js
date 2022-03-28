@@ -271,18 +271,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
-    if (this.props.leaderboardsManager) {
-      this.props.leaderboardsManager
-        .listLeaderboards()
-        .then(() => {
-          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-        })
-        .catch(error =>
-          console.warn(
-            `Error while fetching leaderboards in EventsSheet: ${error}`
-          )
-        );
-    }
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {

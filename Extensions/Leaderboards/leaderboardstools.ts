@@ -24,9 +24,7 @@ namespace gdjs {
         ) {
           errorVar.setString('Wait before sending a new score.');
         } else {
-          const baseUrl =
-            'https://n9dsp0xfw6.execute-api.us-east-1.amazonaws.com/dev';
-          // const baseUrl = 'https://api.gdevelop-app.com/play';
+          const baseUrl = 'https://api.gdevelop-app.com/play';
           const game = runtimeScene.getGame();
           const getLocation = () => {
             if (typeof window !== 'undefined')

@@ -29,21 +29,26 @@ describe('Leaderboards', () => {
     });
 
     it('it generates a predefined player name with a random number if input is void/wrong type/empty', () => {
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(null))
-        .to.be.a('string')
-        .and.match(/^Player\d{5}/);
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(5))
-        .to.be.a('string')
-        .and.match(/^Player\d{5}/);
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(undefined))
-        .to.be.a('string')
-        .and.match(/^Player\d{5}/);
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(() => {}))
-        .to.be.a('string')
-        .and.match(/^Player\d{5}/);
-      expect(gdjs.evtTools.leaderboards.formatPlayerName(''))
-        .to.be.a('string')
-        .and.match(/^Player\d{5}/);
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(null)).to.match(
+        /^Player\d{5}/
+      );
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(5)).to.match(
+        /^Player\d{5}/
+      );
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(undefined)).to.match(
+        /^Player\d{5}/
+      );
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName(() => {})).to.match(
+        /^Player\d{5}/
+      );
+      // @ts-ignore
+      expect(gdjs.evtTools.leaderboards.formatPlayerName('')).to.match(
+        /^Player\d{5}/
+      );
     });
 
     it('it removes non-accepted characters in a long name', () => {

@@ -1,3 +1,5 @@
+// @ts-check
+
 describe('Leaderboards', () => {
   describe('formatPlayerName', () => {
     it('it returns name if correct', () => {

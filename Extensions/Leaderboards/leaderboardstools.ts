@@ -66,7 +66,7 @@ namespace gdjs {
         return '' + _lastErrorCode;
       };
 
-      export const formatPlayerName = function (rawName) {
+      export const formatPlayerName = function (rawName: string): string {
         if (
           !rawName ||
           typeof rawName !== 'string' ||

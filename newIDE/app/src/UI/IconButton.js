@@ -25,7 +25,7 @@ type IconProps =
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   ...IconProps,
-  onClick?: (ev: any) => void,
+  onClick?: (ev: any) => void | Promise<void>,
   onContextMenu?: () => void,
   disabled?: boolean,
   edge?: 'start' | 'end' | false,

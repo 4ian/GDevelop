@@ -343,7 +343,7 @@ export default function NewInstructionEditorDialog({
         cannotBeDismissed={true}
         maxWidth={false}
         noMargin
-        flexRowBody
+        flexBody
         fullHeight={
           true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
         }

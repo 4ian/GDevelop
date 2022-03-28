@@ -97,6 +97,19 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.getLastSentEntryStatusCode');
 
+    extension
+      .addStrExpression(
+        'FormatPlayerName',
+        _('Format player name'),
+        _('Formats a name so that it can be submitted to a leaderboard.'),
+        _(''),
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addParameter('string', _('Raw player name'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.formatPlayerName');
+
     return extension;
   },
   runExtensionSanityTests: function (

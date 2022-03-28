@@ -46,6 +46,7 @@ import {
   type Leaderboard,
   type LeaderboardSortOption,
   type LeaderboardPlayerUnicityDisplayOption,
+  breakUuid,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
@@ -56,8 +57,6 @@ import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMea
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';
-
-const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};

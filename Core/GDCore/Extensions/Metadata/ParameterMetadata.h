@@ -9,6 +9,7 @@
 #if defined(GD_IDE_ONLY)
 #include <map>
 #include <memory>
+
 #include "GDCore/String.h"
 namespace gd {
 class Project;
@@ -196,7 +197,8 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "objectPointName" ||
              parameterType == "objectAnimationName" ||
              parameterType == "functionParameterName" ||
-             parameterType == "externalLayoutName";
+             parameterType == "externalLayoutName" ||
+             parameterType == "leaderboardId";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

@@ -92,6 +92,9 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EVENT,
 } from '../Utils/GDevelopServices/Badge';
+import LeaderboardContext, {
+  type LeaderboardState,
+} from '../Leaderboard/LeaderboardContext';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -124,6 +127,7 @@ type ComponentProps = {|
   ...Props,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
+  leaderboardsManager: ?LeaderboardState,
 |};
 
 type State = {|
@@ -267,6 +271,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
+    if (this.props.leaderboardsManager) {
+      this.props.leaderboardsManager
+        .listLeaderboards()
+        .then(() => {
+          if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+        })
+        .catch(error =>
+          console.warn(
+            `Error while fetching leaderboards in EventsSheet: ${error}`
+          )
+        );
+    }
   }
 
   componentDidUpdate(prevProps: ComponentProps, prevState: State) {
@@ -1563,11 +1579,13 @@ const EventsSheet = (props, ref) => {
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preferences = React.useContext(PreferencesContext);
+  const leaderboardsManager = React.useContext(LeaderboardContext);
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
       authenticatedUser={authenticatedUser}
       preferences={preferences}
+      leaderboardsManager={leaderboardsManager}
       {...props}
     />
   );

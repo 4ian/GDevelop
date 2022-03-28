@@ -1,6 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
@@ -48,6 +47,7 @@ import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import LeaderboardAdmin from './LeaderboardAdmin';
 
 const styles = {
   tableRowStatColumn: {
@@ -55,7 +55,11 @@ const styles = {
   },
 };
 
-export type GamesDetailsTab = 'details' | 'builds' | 'analytics';
+export type GamesDetailsTab =
+  | 'details'
+  | 'builds'
+  | 'analytics'
+  | 'leaderboards';
 
 type Props = {|
   game: Game,
@@ -81,6 +85,11 @@ export const GameDetailsDialog = ({
   const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
     null
   );
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [
+    gameUnregisterErrorText,
+    setGameUnregisterErrorText,
+  ] = React.useState<?string>(null);
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
@@ -208,15 +217,29 @@ export const GameDetailsDialog = ({
     }
   };
 
-  const unregisterGame = async () => {
+  const unregisterGame = async (i18n: I18nType) => {
     if (!profile) return;
     const { id } = profile;
-
+    setGameUnregisterErrorText(null);
+    setIsLoading(true);
     try {
       await deleteGame(getAuthorizationHeader, id, game.id);
       onGameDeleted();
     } catch (error) {
       console.error('Unable to delete the game:', error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.code === 'game-deletion/leaderboards-exist'
+      ) {
+        setGameUnregisterErrorText(
+          i18n._(
+            t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
+          )
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -268,11 +291,16 @@ export const GameDetailsDialog = ({
           }
           open
           noMargin
-          onRequestClose={onClose}
+          flexColumnBody
+          fullHeight={currentTab === 'leaderboards'}
+          onRequestClose={() => {
+            if (!isLoading) onClose();
+          }}
           maxWidth="md"
           actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
+              disabled={isLoading}
               onClick={onClose}
               key="close"
             />,
@@ -285,8 +313,12 @@ export const GameDetailsDialog = ({
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
             <Tab label={<Trans>Analytics</Trans>} value="analytics" />
+            <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
-          <Line>
+          <Line expand>
+            {currentTab === 'leaderboards' ? (
+              <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
+            ) : null}
             {currentTab === 'details' ? (
               publicGameError ? (
                 <PlaceholderError onRetry={loadPublicGame}>
@@ -437,7 +469,7 @@ export const GameDetailsDialog = ({
 
                         if (!answer) return;
 
-                        unregisterGame();
+                        unregisterGame(i18n);
                       }}
                       label={<Trans>Unregister this game</Trans>}
                     />
@@ -466,6 +498,11 @@ export const GameDetailsDialog = ({
                       disabled={!isGameOpenedAsProject}
                     />
                   </Line>
+                  {gameUnregisterErrorText ? (
+                    <PlaceholderError kind="error">
+                      {gameUnregisterErrorText}
+                    </PlaceholderError>
+                  ) : null}
                 </ColumnStackLayout>
               )
             ) : null}

@@ -84,7 +84,8 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
               helperText={
                 leaderboards && leaderboards.length === 0 ? (
                   <Trans>
-                    There are currently no leaderboards created for this game. Open the leaderboards manager to create one.
+                    There are currently no leaderboards created for this game.
+                    Open the leaderboards manager to create one.
                   </Trans>
                 ) : null
               }

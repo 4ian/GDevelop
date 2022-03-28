@@ -15,7 +15,14 @@ type Props = {|
   icon?: React.Node,
   onClick: ?() => void,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
-  style?: Object,
+  style?: {|
+    marginTop?: number,
+    marginBottom?: number,
+    marginLeft?: number,
+    marginRight?: number,
+    margin?: number,
+    flexShrink?: 0,
+  |},
 |};
 
 const shouldNeverBeCalled = () => {

@@ -1,12 +1,21 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 
-import MUITextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Avatar from '@material-ui/core/Avatar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Divider from '@material-ui/core/Divider';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import ListItemText from '@material-ui/core/ListItemText';
+import Paper from '@material-ui/core/Paper';
+import Switch from '@material-ui/core/Switch';
+import Tooltip from '@material-ui/core/Tooltip';
+
 import Add from '@material-ui/icons/Add';
 import Save from '@material-ui/icons/Save';
 import Cancel from '@material-ui/icons/Cancel';
@@ -20,18 +29,6 @@ import PeopleAlt from '@material-ui/icons/PeopleAlt';
 import SwapVertical from '@material-ui/icons/SwapVert';
 import Refresh from '@material-ui/icons/Refresh';
 import Delete from '@material-ui/icons/Delete';
-import Avatar from '@material-ui/core/Avatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Divider from '@material-ui/core/Divider';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import ListItemText from '@material-ui/core/ListItemText';
-import Paper from '@material-ui/core/Paper';
-import Switch from '@material-ui/core/Switch';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
 
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -42,6 +39,8 @@ import PlaceholderError from '../../UI/PlaceholderError';
 import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
+import SelectField from '../../UI/SelectField';
+import SelectOption from '../../UI/SelectOption';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import {
   type Leaderboard,
@@ -56,9 +55,8 @@ import LeaderboardEntriesTable from './LeaderboardEntriesTable';
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
-import SelectField from '../../UI/SelectField';
-import SelectOption from '../../UI/SelectOption';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import Text from '../../UI/Text';
 
 type Props = {| onLoading: boolean => void |};
 type ContainerProps = {| ...Props, gameId: string |};
@@ -91,6 +89,9 @@ const styles = {
     flexDirection: 'column',
     flex: 2,
   },
+  leaderboardConfigurationPaper: { padding: 5, margin: 5 },
+  leaderboardNameText: { ...textEllipsisStyle, width: 150 },
+  leaderboardNameTextField: { width: 125, fontSize: 14 },
 };
 
 export const LeaderboardAdmin = ({ onLoading }: Props) => {
@@ -434,7 +435,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
           <TextField
             ref={newNameTextFieldRef}
             margin="none"
-            style={{ width: 125, fontSize: 14 }}
+            style={styles.leaderboardNameTextField}
             maxLength={50}
             value={newName}
             errorText={newNameError}
@@ -463,19 +464,16 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         </Line>
       ) : (
         <Tooltip title={currentLeaderboard.name}>
-          <Typography
-            variant="body2"
-            style={{ ...textEllipsisStyle, width: 150 }}
-          >
+          <Text size="body2" style={styles.leaderboardNameText}>
             {currentLeaderboard.name}
-          </Typography>
+          </Text>
         </Tooltip>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardNameUpdate' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: (
         <IconButton
@@ -508,9 +506,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       avatar: <Fingerprint />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
-          <Typography variant="body2">
-            {breakUuid(currentLeaderboard.id)}
-          </Typography>
+          <Text size="body2">{breakUuid(currentLeaderboard.id)}</Text>
         </Tooltip>
       ),
       secondaryText: null,
@@ -535,16 +531,16 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
             )}`
           )}
         >
-          <Typography variant="body2">
+          <Text size="body2">
             {i18n.date(currentLeaderboard.startDatetime)}
-          </Typography>
+          </Text>
         </Tooltip>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardReset' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: (
         <IconButton
@@ -561,19 +557,19 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       key: 'sort',
       avatar: <Sort />,
       text: (
-        <Typography variant="body2">
+        <Text size="body2">
           {currentLeaderboard.sort === 'ASC' ? (
             <Trans>Lower is better</Trans>
           ) : (
             <Trans>Higher is better</Trans>
           )}
-        </Typography>
+        </Text>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardSortUpdate' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: (
         <IconButton
@@ -617,31 +613,29 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
               : i18n._(t`All entries are displayed.`)
           }
         >
-          {[
-            <SelectOption
-              key={'free'}
-              value={'FREE'}
-              primaryText={t`Let the user select`}
-            />,
-            <SelectOption
-              key={'prefer-unique'}
-              value={'PREFER_UNIQUE'}
-              primaryText={t`Only best entry`}
-            />,
-            <SelectOption
-              key={'prefer-non-unique'}
-              value={'PREFER_NON_UNIQUE'}
-              primaryText={t`All entries`}
-            />,
-          ]}
+          <SelectOption
+            key={'free'}
+            value={'FREE'}
+            primaryText={i18n._(t`Let the user select`)}
+          />
+          <SelectOption
+            key={'prefer-unique'}
+            value={'PREFER_UNIQUE'}
+            primaryText={i18n._(t`Only best entry`)}
+          />
+          <SelectOption
+            key={'prefer-non-unique'}
+            value={'PREFER_NON_UNIQUE'}
+            primaryText={i18n._(t`All entries`)}
+          />
         </SelectField>
       ),
       secondaryText:
         apiError &&
         apiError.action === 'leaderboardPlayerUnicityDisplayChoiceUpdate' ? (
-          <Typography color="error" variant="body2">
+          <Text color="error" size="body2">
             {apiError.message}
-          </Typography>
+          </Text>
         ) : null,
       secondaryAction: null,
     },
@@ -652,33 +646,27 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       {({ i18n }) => (
         <ResponsiveLineStackLayout noMargin expand noColumnMargin>
           <div style={styles.leftColumn}>
-            <Paper elevation={5} style={{ padding: 5, margin: 5 }}>
+            <Paper elevation={5} style={styles.leaderboardConfigurationPaper}>
               <Column>
                 <Line>
-                  <Autocomplete
-                    autoComplete
-                    blurOnSelect
-                    disableClearable
-                    noOptionsText={<Trans>No matching leaderboard</Trans>}
-                    style={{ flex: 1 }}
-                    options={leaderboards}
-                    getOptionLabel={option => option.name}
-                    onChange={(e, leaderboard) => {
-                      if (leaderboard) selectLeaderboard(leaderboard.id);
-                    }}
-                    getOptionSelected={(leaderboard, selectedLeaderboard) =>
-                      leaderboard.id === selectedLeaderboard.id
-                    }
-                    value={currentLeaderboard}
-                    renderInput={params => (
-                      <MUITextField
-                        {...params}
-                        margin="dense"
-                        label={<Trans>Leaderboard name</Trans>}
-                        variant="filled"
-                      />
-                    )}
-                  />
+                  {currentLeaderboard && leaderboards ? (
+                    <SelectField
+                      fullWidth
+                      floatingLabelText={<Trans>Leaderboard name</Trans>}
+                      value={currentLeaderboard.id}
+                      onChange={(e, i, leaderboardId) => {
+                        selectLeaderboard(leaderboardId);
+                      }}
+                    >
+                      {leaderboards.map(leaderboard => (
+                        <SelectOption
+                          key={leaderboard.id}
+                          value={leaderboard.id}
+                          primaryText={leaderboard.name}
+                        />
+                      ))}
+                    </SelectField>
+                  ) : null}
                   <IconButton
                     onClick={onCreateLeaderboard}
                     disabled={isEditingName || isRequestPending}
@@ -691,7 +679,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                     <List>
                       {getLeaderboardDescription(i18n, currentLeaderboard).map(
                         (item, index) => (
-                          <>
+                          <React.Fragment key={`fragment-${item.key}`}>
                             {index > 0 ? (
                               <Divider
                                 key={`divider-${item.key}`}
@@ -714,7 +702,7 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                                 </ListItemSecondaryAction>
                               ) : null}
                             </ListItem>
-                          </>
+                          </React.Fragment>
                         )
                       )}
                     </List>
@@ -748,9 +736,9 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
                   t`When checked, will only display the best score of each player (only for the display below).`
                 )}
               >
-                <Typography variant="body2">
+                <Text size="body2">
                   <Trans>Player best entry</Trans>
-                </Typography>
+                </Text>
               </Tooltip>
               <Switch
                 color="primary"

@@ -162,6 +162,8 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
 
 const LeaderboardProvider = ({ gameId, children }: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  // Ensure that only one request for leaderboards list is sent at the same time.
+  const isListingLeaderboards = React.useRef(false);
 
   const [
     {
@@ -186,10 +188,20 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   const listLeaderboards = React.useCallback(
     async () => {
-      dispatch({ type: 'SET_LEADERBOARDS', payload: null });
-      const fetchedLeaderboards = await listGameLeaderboards(gameId);
-      fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
-      dispatch({ type: 'SET_LEADERBOARDS', payload: fetchedLeaderboards });
+      if (!isListingLeaderboards.current) {
+        isListingLeaderboards.current = true;
+        try {
+          dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+          const fetchedLeaderboards = await listGameLeaderboards(gameId);
+          fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
+          dispatch({
+            type: 'SET_LEADERBOARDS',
+            payload: fetchedLeaderboards,
+          });
+        } finally {
+          isListingLeaderboards.current = false;
+        }
+      }
     },
     [gameId]
   );
@@ -199,6 +211,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
       name: string,
       sort: LeaderboardSortOption,
     |}) => {
+      dispatch({ type: 'SET_ENTRIES', payload: null });
       const newLeaderboard = await doCreateLeaderboard(
         authenticatedUser,
         gameId,

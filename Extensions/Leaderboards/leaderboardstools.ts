@@ -12,7 +12,8 @@ namespace gdjs {
         score: float,
         playerName: string,
         responseVar: gdjs.Variable,
-        errorVar: gdjs.Variable
+        errorVar: gdjs.Variable,
+        runtimeScene: gdjs.RuntimeScene
       ) {
         errorVar.setString('');
         responseVar.setString('');
@@ -24,12 +25,16 @@ namespace gdjs {
           errorVar.setString('Wait before sending a new score.');
         } else {
           const baseUrl = 'https://api.gdevelop-app.com/play';
+          const game = runtimeScene.getGame();
           fetch(
             `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
             {
               body: JSON.stringify({
                 playerName: playerName,
                 score: score,
+                sessionId: game.getSessionId(),
+                clientPlayerId: game.getPlayerId(),
+                location: (window as any).location.href,
               }),
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -52,6 +57,7 @@ namespace gdjs {
               responseVar.setString(data);
             })
             .catch((error) => {
+              console.warn(error);
               errorVar.setString('REQUEST_NOT_SENT');
               _lastErrorCode = 400;
             });

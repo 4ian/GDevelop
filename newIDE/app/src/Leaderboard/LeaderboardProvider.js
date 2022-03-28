@@ -190,7 +190,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     async () => {
       if (!isListingLeaderboards.current) {
         isListingLeaderboards.current = true;
-        const fetchLeaderboardAndDispatch = async () => {
+        try {
           dispatch({ type: 'SET_LEADERBOARDS', payload: null });
           const fetchedLeaderboards = await listGameLeaderboards(gameId);
           fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
@@ -198,10 +198,9 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
             type: 'SET_LEADERBOARDS',
             payload: fetchedLeaderboards,
           });
-        };
-        fetchLeaderboardAndDispatch().then(
-          () => (isListingLeaderboards.current = false)
-        );
+        } finally {
+          isListingLeaderboards.current = false;
+        }
       }
     },
     [gameId]

@@ -38,9 +38,11 @@ const useFetchLeaderboards = () => {
   );
   React.useEffect(
     () => {
-      fetchLeaderboards();
+      if (!leaderboards) {
+        fetchLeaderboards();
+      }
     },
-    [fetchLeaderboards]
+    [fetchLeaderboards, leaderboards]
   );
 
   return leaderboards;
@@ -148,7 +150,7 @@ const InlineLeaderboardIdField = ({
   value,
   InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
-  const { leaderboards } = React.useContext(LeaderboardContext);
+  const leaderboards = useFetchLeaderboards();
 
   if (!value) {
     return (

@@ -8,6 +8,7 @@ namespace gdjs {
       let _lastErrorCode: number;
 
       export const setPlayerScore = function (
+        runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
         score: float,
         playerName: string,
@@ -24,12 +25,23 @@ namespace gdjs {
           errorVar.setString('Wait before sending a new score.');
         } else {
           const baseUrl = 'https://api.gdevelop-app.com/play';
+          const game = runtimeScene.getGame();
+          const getLocation = () => {
+            if (typeof window !== 'undefined')
+              return (window as any).location.href;
+            else if (typeof cc !== 'undefined' && cc.sys) {
+              return cc.sys.platform;
+            } else return '';
+          };
           fetch(
             `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
             {
               body: JSON.stringify({
                 playerName: playerName,
                 score: score,
+                sessionId: game.getSessionId(),
+                clientPlayerId: game.getPlayerId(),
+                location: getLocation(),
               }),
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -52,6 +64,9 @@ namespace gdjs {
               responseVar.setString(data);
             })
             .catch((error) => {
+              console.warn(
+                `Error while submitting a leaderboard score: ${error}`
+              );
               errorVar.setString('REQUEST_NOT_SENT');
               _lastErrorCode = 400;
             });

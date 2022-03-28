@@ -44,12 +44,13 @@ module.exports = {
         _('Save player score'),
         _("Save the player's score to the given leaderboard."),
         _(
-          'Send to leaderboard _PARAM0_ the score _PARAM1_ with player name: _PARAM2_.'
+          'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_.'
         ),
         '',
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .addParameter('leaderboardId', 'Leaderboard', '', false)
       .addParameter('expression', 'Score to register for the player', '', false)
       .addParameter('string', 'Name to register for the player', '', false)

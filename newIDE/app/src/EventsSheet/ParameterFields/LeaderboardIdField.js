@@ -136,6 +136,7 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
         <LeaderboardDialog
           onClose={() => setIsAdminOpen(false)}
           open={isAdminOpen}
+          project={props.project}
         />
       )}
     </>

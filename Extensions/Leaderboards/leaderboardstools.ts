@@ -147,7 +147,7 @@ namespace gdjs {
             .getDomElementContainer();
           if (!domElementContainer) {
             logger.error(
-              "Div covering game couldn't be found, leaderboard cannot be displayed."
+              "The div element covering the game couldn't be found, the leaderboard cannot be displayed."
             );
             return;
           }
@@ -182,7 +182,7 @@ namespace gdjs {
       ) {
         if (!_leaderboardViewIframe) {
           logger.info(
-            "Couldn't find the current leaderboard view. Doing nothing."
+            "The iframe displaying the current leaderboard couldn't be found, the leaderboard must be already closed."
           );
           return;
         }
@@ -192,7 +192,7 @@ namespace gdjs {
           .getDomElementContainer();
         if (!domElementContainer) {
           logger.info(
-            "Element containing leaderboard view couldn't be found. Doing nothing."
+            "The div element covering the game couldn't be found, the leaderboard must be already closed."
           );
           return;
         }

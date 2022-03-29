@@ -115,8 +115,8 @@ module.exports = {
       .addAction(
         'DisplayLeaderboard',
         _('Display leaderboard'),
-        _('Display leaderboard on top of the game.'),
-        _('Display leaderboard _PARAM1_.'),
+        _('Display the specified leaderboard on top of the game. If a leaderboard was already displayed on top of the game, the new leaderboard will replace it.'),
+        _('Display leaderboard _PARAM1_'),
         '',
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
@@ -130,9 +130,9 @@ module.exports = {
     extension
       .addAction(
         'CloseLeaderboardView',
-        _('Close leaderboard view'),
-        _('Close the view of the leaderboard.'),
-        _('Close leaderboard view.'),
+        _('Close current leaderboard'),
+        _('Close the leaderboard currently displayed on top of the game.'),
+        _('Close current leaderboard displayed on top of the game'),
         '',
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'

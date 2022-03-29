@@ -57,8 +57,9 @@ import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMea
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';
+import { GameRegistration } from '../GameRegistration';
 
-type Props = {| onLoading: boolean => void |};
+type Props = {| onLoading: boolean => void, project?: gdProject |};
 type ContainerProps = {| ...Props, gameId: string |};
 
 type ApiError = {|
@@ -94,7 +95,7 @@ const styles = {
   leaderboardNameTextField: { width: 125, fontSize: 14 },
 };
 
-export const LeaderboardAdmin = ({ onLoading }: Props) => {
+export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
@@ -384,6 +385,17 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
     );
   }
   if (apiError && apiError.action === 'leaderboardsFetching') {
+    if (!!project) {
+      return (
+        <CenteredError>
+          <GameRegistration
+            project={project}
+            hideIfRegistered
+            onGameRegistered={onListLeaderboards}
+          />
+        </CenteredError>
+      );
+    }
     return (
       <CenteredError>
         <PlaceholderError onRetry={onListLeaderboards} kind="error">
@@ -394,18 +406,17 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
   }
   if (leaderboards === null) {
     if (isRequestPending) return <PlaceholderLoader />;
-    else {
-      return (
-        <CenteredError>
-          <PlaceholderError onRetry={onListLeaderboards} kind="error">
-            <Trans>
-              An error occurred when retrieving leaderboards, please try again
-              later.
-            </Trans>
-          </PlaceholderError>
-        </CenteredError>
-      );
-    }
+
+    return (
+      <CenteredError>
+        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+          <Trans>
+            An error occurred when retrieving leaderboards, please try again
+            later.
+          </Trans>
+        </PlaceholderError>
+      </CenteredError>
+    );
   }
 
   if (!!leaderboards && leaderboards.length === 0)

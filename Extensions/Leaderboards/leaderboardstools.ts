@@ -35,7 +35,7 @@ namespace gdjs {
                 sessionId: game.getSessionId(),
                 clientPlayerId: game.getPlayerId(),
                 location:
-                  typeof window !== 'undefined'
+                  typeof window !== 'undefined' && (window as any).location
                     ? (window as any).location.href
                     : '',
               }),

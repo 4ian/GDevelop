@@ -114,9 +114,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                             value={`"${leaderboard.id}"`}
                             primaryText={`${leaderboard.name} ${
                               leaderboard.id
-                                ? `(${breakUuid(
-                                    leaderboard.id.substring(0, 8)
-                                  )})`
+                                ? `(${breakUuid(leaderboard.id)})`
                                 : ''
                             }`}
                           />

@@ -34,7 +34,6 @@ type Props = {|
 
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
-  helperText?: React.Node,
 
   // If a hint text is specified, will be shown as an option for the empty
   // value (""), disabled.
@@ -78,9 +77,7 @@ export default class SelectField extends React.Component<Props, {||}> {
 
     const helperText = props.helperMarkdownText ? (
       <MarkdownText source={props.helperMarkdownText} />
-    ) : (
-      props.helperText || null
-    );
+    ) : null;
 
     return (
       <I18n>

@@ -6,6 +6,7 @@ namespace gdjs {
       let _lastScore: number;
       let _lastPlayerName: string;
       let _lastErrorCode: number;
+      let _leaderboardViewIframe: HTMLIFrameElement | null = null;
 
       export const setPlayerScore = function (
         runtimeScene: gdjs.RuntimeScene,
@@ -91,6 +92,65 @@ namespace gdjs {
           .replace(/\s/, '_')
           .replace(/[^\w|-]/g, '')
           .slice(0, 30);
+      };
+
+      export const displayLeaderboard = function (
+        runtimeScene: gdjs.RuntimeScene,
+        leaderboardId: string
+      ) {
+        const gameId = gdjs.projectData.properties.projectUuid;
+        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?dev=true`;
+        if (_leaderboardViewIframe) {
+          _leaderboardViewIframe.src = targetUrl;
+        } else {
+          const domElementContainer = runtimeScene
+            .getGame()
+            .getRenderer()
+            .getDomElementContainer();
+          if (!domElementContainer) {
+            logger.error(
+              "Div covering game couldn't be found, leaderboard cannot be displayed."
+            );
+            return;
+          }
+          const iframe = document.createElement('iframe');
+
+          iframe.src = targetUrl;
+          iframe.id = 'leaderboard-view';
+          iframe.style.position = 'absolute';
+          iframe.style.pointerEvents = 'all';
+          iframe.style.top = '0px';
+          iframe.style.height = '100%';
+          iframe.style.left = '0px';
+          iframe.style.width = '100%';
+          iframe.style.border = 'none';
+          _leaderboardViewIframe = iframe;
+          domElementContainer.appendChild(iframe);
+        }
+      };
+
+      export const closeLeaderboardView = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        if (!_leaderboardViewIframe) {
+          logger.info(
+            "Couldn't find the current leaderboard view. Doing nothing."
+          );
+          return;
+        }
+        const domElementContainer = runtimeScene
+          .getGame()
+          .getRenderer()
+          .getDomElementContainer();
+        if (!domElementContainer) {
+          logger.info(
+            "Element containing leaderboard view couldn't be found. Doing nothing."
+          );
+          return;
+        }
+
+        domElementContainer.removeChild(_leaderboardViewIframe);
+        _leaderboardViewIframe = null;
       };
     }
   }

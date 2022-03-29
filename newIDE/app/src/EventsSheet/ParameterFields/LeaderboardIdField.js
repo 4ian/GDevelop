@@ -141,8 +141,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                       currentExpressionNode: gdExpressionNode
                     ) => {
                       if (!leaderboards) {
-                        if (!isOnline) return 'Unable to fetch leaderboards as you are offline.';
-                        return 'Your game may not be registered, create one in the leaderboard manager.'
+                        if (!isOnline)
+                          return 'Unable to fetch leaderboards as you are offline.';
+                        return 'Your game may not be registered, create one in the leaderboard manager.';
                       }
                     }}
                   />

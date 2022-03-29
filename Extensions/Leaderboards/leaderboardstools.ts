@@ -7,6 +7,9 @@ namespace gdjs {
       let _lastPlayerName: string;
       let _lastErrorCode: number;
       let _leaderboardViewIframe: HTMLIFrameElement | null = null;
+      let _leaderboardViewClosingCallback:
+        | ((event: MessageEvent) => void)
+        | null = null;
 
       export const setPlayerScore = function (
         runtimeScene: gdjs.RuntimeScene,
@@ -115,6 +118,15 @@ namespace gdjs {
         }
       };
 
+      const receiveMessage = function (
+        runtimeScene: gdjs.RuntimeScene,
+        event: MessageEvent
+      ) {
+        if (event.data === 'closeLeaderboardView') {
+          closeLeaderboardView(runtimeScene);
+        }
+      };
+
       export const displayLeaderboard = async function (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string
@@ -151,6 +163,16 @@ namespace gdjs {
           iframe.style.width = '100%';
           iframe.style.border = 'none';
           _leaderboardViewIframe = iframe;
+          if (typeof window !== 'undefined') {
+            _leaderboardViewClosingCallback = (event: MessageEvent) => {
+              receiveMessage(runtimeScene, event);
+            };
+            (window as any).addEventListener(
+              'message',
+              _leaderboardViewClosingCallback,
+              true
+            );
+          }
           domElementContainer.appendChild(iframe);
         }
       };
@@ -173,6 +195,15 @@ namespace gdjs {
             "Element containing leaderboard view couldn't be found. Doing nothing."
           );
           return;
+        }
+
+        if (typeof window !== 'undefined') {
+          (window as any).removeEventListener(
+            'message',
+            _leaderboardViewClosingCallback,
+            true
+          );
+          _leaderboardViewClosingCallback = null;
         }
 
         domElementContainer.removeChild(_leaderboardViewIframe);

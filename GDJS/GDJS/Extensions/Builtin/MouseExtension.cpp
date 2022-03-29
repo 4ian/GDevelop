@@ -17,6 +17,8 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.getMouseX");
   GetAllConditions()["MouseY"].SetFunctionName(
       "gdjs.evtTools.input.getMouseY");
+  GetAllConditions()["IsMouseInsideCanvas"].SetFunctionName(
+      "gdjs.evtTools.input.isMouseInsideCanvas");
   GetAllConditions()["SourisX"].SetFunctionName(
       "gdjs.evtTools.input.getMouseX"); // Deprecated
   GetAllConditions()["SourisY"].SetFunctionName(

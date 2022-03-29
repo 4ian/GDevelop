@@ -191,6 +191,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
   extension.AddDuplicatedExpression("SourisY", "MouseY").SetHidden();
 
   extension
+      .AddCondition("IsMouseInsideCanvas",
+                    _("Mouse is inside the window"),
+                    _("Check if the mouse is inside the window."),
+                    _("The mouse is inside the window"),
+                    "",
+                    "res/conditions/mouse24.png",
+                    "res/conditions/mouse.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .MarkAsAdvanced();
+
+  extension
       .AddCondition("MouseButtonPressed",
                     _("Mouse button pressed or touch held"),
                     _("Check if the specified mouse button is pressed or "

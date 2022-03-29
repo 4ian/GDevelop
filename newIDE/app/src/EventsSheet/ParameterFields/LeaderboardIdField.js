@@ -138,7 +138,7 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
                   {
                     label: isTextInput
                       ? i18n._(t`Select the leaderboard from a list`)
-                      : i18n._(t`Enter the leaderboard id as an expression`),
+                      : i18n._(t`Enter the leaderboard id as a text or an expression`),
                     disabled: !leaderboards,
                     click: () => setIsTextInput(!isTextInput),
                   },

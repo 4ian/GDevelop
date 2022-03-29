@@ -129,23 +129,21 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
               )
             }
             renderButton={style => (
-              <>
-                <RaisedButtonWithSplitMenu
-                  icon={<OpenInNew />}
-                  style={style}
-                  primary
-                  onClick={() => setIsAdminOpen(true)}
-                  buildMenuTemplate={i18n => [
-                    {
-                      label: isTextInput
-                        ? i18n._(t`Select the leaderboard from a list`)
-                        : i18n._(t`Enter the leaderboard id as an expression`),
-                      disabled: !leaderboards,
-                      click: () => setIsTextInput(!isTextInput),
-                    },
-                  ]}
-                />
-              </>
+              <RaisedButtonWithSplitMenu
+                icon={<OpenInNew />}
+                style={style}
+                primary
+                onClick={() => setIsAdminOpen(true)}
+                buildMenuTemplate={i18n => [
+                  {
+                    label: isTextInput
+                      ? i18n._(t`Select the leaderboard from a list`)
+                      : i18n._(t`Enter the leaderboard id as an expression`),
+                    disabled: !leaderboards,
+                    click: () => setIsTextInput(!isTextInput),
+                  },
+                ]}
+              />
             )}
           />
           {isAdminOpen && !!props.project && (

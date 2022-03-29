@@ -94,12 +94,37 @@ namespace gdjs {
           .slice(0, 30);
       };
 
-      export const displayLeaderboard = function (
+      const checkLeaderboardAvailability = async function (
+        url: string
+      ): Promise<boolean> {
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          if (!response.ok) {
+            logger.error(
+              `Error while fetching leaderboard view, server returned: ${response.status} ${response.statusText}`
+            );
+            return false;
+          }
+          return true;
+        } catch (err) {
+          logger.error(`Error while fetching leaderboard view: ${err}`);
+          return false;
+        }
+      };
+
+      export const displayLeaderboard = async function (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string
       ) {
         const gameId = gdjs.projectData.properties.projectUuid;
         const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}`;
+        if (!(await checkLeaderboardAvailability(targetUrl))) {
+          logger.error('Leaderboard data could not be fetched, doing nothing');
+          return;
+        }
 
         if (_leaderboardViewIframe) {
           _leaderboardViewIframe.src = targetUrl;

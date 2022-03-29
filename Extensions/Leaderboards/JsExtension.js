@@ -111,6 +111,37 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.formatPlayerName');
 
+    extension
+      .addAction(
+        'DisplayLeaderboard',
+        _('Display leaderboard'),
+        _('Display the specified leaderboard on top of the game. If a leaderboard was already displayed on top of the game, the new leaderboard will replace it.'),
+        _('Display leaderboard _PARAM1_'),
+        '',
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('leaderboardId', 'Leaderboard', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.displayLeaderboard');
+
+    extension
+      .addAction(
+        'CloseLeaderboardView',
+        _('Close current leaderboard'),
+        _('Close the leaderboard currently displayed on top of the game.'),
+        _('Close current leaderboard displayed on top of the game'),
+        '',
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.closeLeaderboardView');
+
     return extension;
   },
   runExtensionSanityTests: function (

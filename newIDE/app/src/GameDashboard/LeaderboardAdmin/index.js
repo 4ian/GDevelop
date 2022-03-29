@@ -57,8 +57,9 @@ import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMea
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';
+import { GameRegistration } from '../GameRegistration';
 
-type Props = {| onLoading: boolean => void |};
+type Props = {| onLoading: boolean => void, project?: gdProject |};
 type ContainerProps = {| ...Props, gameId: string |};
 
 type ApiError = {|
@@ -94,7 +95,7 @@ const styles = {
   leaderboardNameTextField: { width: 125, fontSize: 14 },
 };
 
-export const LeaderboardAdmin = ({ onLoading }: Props) => {
+export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
@@ -105,6 +106,10 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
   const [newNameError, setNewNameError] = React.useState<?string>(null);
   const newNameTextFieldRef = React.useRef<?TextField>(null);
   const [apiError, setApiError] = React.useState<?ApiError>(null);
+  const [
+    displayGameRegistration,
+    setDisplayGameRegistration,
+  ] = React.useState<boolean>(false);
 
   const {
     leaderboards,
@@ -190,6 +195,10 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
         try {
           await listLeaderboards();
         } catch (err) {
+          if (err.response && err.response.status === 404) {
+            setDisplayGameRegistration(true);
+            return;
+          }
           console.error('An error occurred when fetching leaderboards', err);
           setApiError({
             action: 'leaderboardsFetching',
@@ -376,6 +385,20 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
       </CenteredError>
     );
   }
+  if (!!displayGameRegistration) {
+    return (
+      <CenteredError>
+        <GameRegistration
+          project={project}
+          hideIfRegistered
+          onGameRegistered={() => {
+            setDisplayGameRegistration(false);
+            onListLeaderboards();
+          }}
+        />
+      </CenteredError>
+    );
+  }
   if (apiError && apiError.action === 'leaderboardCreation') {
     return (
       <CenteredError>
@@ -394,18 +417,17 @@ export const LeaderboardAdmin = ({ onLoading }: Props) => {
   }
   if (leaderboards === null) {
     if (isRequestPending) return <PlaceholderLoader />;
-    else {
-      return (
-        <CenteredError>
-          <PlaceholderError onRetry={onListLeaderboards} kind="error">
-            <Trans>
-              An error occurred when retrieving leaderboards, please try again
-              later.
-            </Trans>
-          </PlaceholderError>
-        </CenteredError>
-      );
-    }
+
+    return (
+      <CenteredError>
+        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+          <Trans>
+            An error occurred when retrieving leaderboards, please try again
+            later.
+          </Trans>
+        </PlaceholderError>
+      </CenteredError>
+    );
   }
 
   if (!!leaderboards && leaderboards.length === 0)

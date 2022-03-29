@@ -6,6 +6,10 @@ namespace gdjs {
       let _lastScore: number;
       let _lastPlayerName: string;
       let _lastErrorCode: number;
+      let _leaderboardViewIframe: HTMLIFrameElement | null = null;
+      let _leaderboardViewClosingCallback:
+        | ((event: MessageEvent) => void)
+        | null = null;
 
       export const setPlayerScore = function (
         runtimeScene: gdjs.RuntimeScene,
@@ -91,6 +95,119 @@ namespace gdjs {
           .replace(/\s/, '_')
           .replace(/[^\w|-]/g, '')
           .slice(0, 30);
+      };
+
+      const checkLeaderboardAvailability = async function (
+        url: string
+      ): Promise<boolean> {
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          if (!response.ok) {
+            logger.error(
+              `Error while fetching leaderboard view, server returned: ${response.status} ${response.statusText}`
+            );
+            return false;
+          }
+          return true;
+        } catch (err) {
+          logger.error(`Error while fetching leaderboard view: ${err}`);
+          return false;
+        }
+      };
+
+      const receiveMessage = function (
+        runtimeScene: gdjs.RuntimeScene,
+        event: MessageEvent
+      ) {
+        if (event.data === 'closeLeaderboardView') {
+          closeLeaderboardView(runtimeScene);
+        }
+      };
+
+      export const displayLeaderboard = async function (
+        runtimeScene: gdjs.RuntimeScene,
+        leaderboardId: string
+      ) {
+        const gameId = gdjs.projectData.properties.projectUuid;
+        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?dev=true`;
+        if (!(await checkLeaderboardAvailability(targetUrl))) {
+          logger.error('Leaderboard data could not be fetched, doing nothing');
+          return;
+        }
+
+        if (_leaderboardViewIframe) {
+          _leaderboardViewIframe.src = targetUrl;
+        } else {
+          const domElementContainer = runtimeScene
+            .getGame()
+            .getRenderer()
+            .getDomElementContainer();
+          if (!domElementContainer) {
+            logger.error(
+              "Div covering game couldn't be found, leaderboard cannot be displayed."
+            );
+            return;
+          }
+          const iframe = document.createElement('iframe');
+
+          iframe.src = targetUrl;
+          iframe.id = 'leaderboard-view';
+          iframe.style.position = 'absolute';
+          iframe.style.pointerEvents = 'all';
+          iframe.style.top = '0px';
+          iframe.style.height = '100%';
+          iframe.style.left = '0px';
+          iframe.style.width = '100%';
+          iframe.style.border = 'none';
+          _leaderboardViewIframe = iframe;
+          if (typeof window !== 'undefined') {
+            _leaderboardViewClosingCallback = (event: MessageEvent) => {
+              receiveMessage(runtimeScene, event);
+            };
+            (window as any).addEventListener(
+              'message',
+              _leaderboardViewClosingCallback,
+              true
+            );
+          }
+          domElementContainer.appendChild(iframe);
+        }
+      };
+
+      export const closeLeaderboardView = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        if (!_leaderboardViewIframe) {
+          logger.info(
+            "Couldn't find the current leaderboard view. Doing nothing."
+          );
+          return;
+        }
+        const domElementContainer = runtimeScene
+          .getGame()
+          .getRenderer()
+          .getDomElementContainer();
+        if (!domElementContainer) {
+          logger.info(
+            "Element containing leaderboard view couldn't be found. Doing nothing."
+          );
+          return;
+        }
+
+        if (typeof window !== 'undefined') {
+          (window as any).removeEventListener(
+            'message',
+            _leaderboardViewClosingCallback,
+            true
+          );
+          _leaderboardViewClosingCallback = null;
+        }
+
+        domElementContainer.removeChild(_leaderboardViewIframe);
+        _leaderboardViewIframe = null;
       };
     }
   }

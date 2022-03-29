@@ -28,7 +28,7 @@ namespace gdjs {
             `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
             {
               body: JSON.stringify({
-                playerName: playerName,
+                playerName: formatPlayerName(playerName),
                 score: score,
               }),
               method: 'POST',

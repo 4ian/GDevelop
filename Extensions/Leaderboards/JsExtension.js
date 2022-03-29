@@ -111,6 +111,37 @@ module.exports = {
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.formatPlayerName');
 
+    extension
+      .addAction(
+        'DisplayLeaderboard',
+        _('Display leaderboard'),
+        _('Display leaderboard on top of the game.'),
+        _('Display leaderboard _PARAM1_.'),
+        '',
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('leaderboardId', 'Leaderboard', '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.displayLeaderboard');
+
+    extension
+      .addAction(
+        'CloseLeaderboardView',
+        _('Close leaderboard view'),
+        _('Close the view of the leaderboard.'),
+        _('Close leaderboard view.'),
+        '',
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.closeLeaderboardView');
+
     return extension;
   },
   runExtensionSanityTests: function (

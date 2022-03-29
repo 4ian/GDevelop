@@ -64,7 +64,7 @@ namespace gdjs {
               responseVar.setString(data);
             })
             .catch((error) => {
-              console.warn(
+              logger.warn(
                 `Error while submitting a leaderboard score: ${error}`
               );
               errorVar.setString('REQUEST_NOT_SENT');

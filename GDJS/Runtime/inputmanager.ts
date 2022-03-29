@@ -28,6 +28,7 @@ namespace gdjs {
     _releasedMouseButtons: Array<boolean>;
     _mouseX: float = 0;
     _mouseY: float = 0;
+    _isMouseInsideCanvas: boolean = true;
     _mouseWheelDelta: float = 0;
     _touches: Hashtable<Touch>;
     //Identifiers of the touches that started during/before the frame.
@@ -191,6 +192,27 @@ namespace gdjs {
      */
     getMouseY(): float {
       return this._mouseY;
+    }
+
+    /**
+     * Should be called when the mouse leave the canvas.
+     */
+    onMouseLeave(): void {
+      this._isMouseInsideCanvas = false;
+    }
+
+    /**
+     * Should be called when the mouse enter the canvas.
+     */
+    onMouseEnter(): void {
+      this._isMouseInsideCanvas = true;
+    }
+
+    /**
+     * @return true when the mouse is inside the canvas.
+     */
+    isMouseInsideCanvas(): boolean {
+      return this._isMouseInsideCanvas;
     }
 
     /**

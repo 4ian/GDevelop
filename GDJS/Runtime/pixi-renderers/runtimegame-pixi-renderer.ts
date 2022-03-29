@@ -571,6 +571,12 @@ namespace gdjs {
         );
         return false;
       };
+      canvas.onmouseleave = function (e) {
+        manager.onMouseLeave();
+      };
+      canvas.onmouseenter = function (e) {
+        manager.onMouseEnter();
+      };
       window.addEventListener(
         'click',
         function (e) {

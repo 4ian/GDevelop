@@ -90,6 +90,12 @@ describe('gdjs.InputManager', function() {
     expect(
       inputManager.isMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON)
     ).to.be(false);
+    
+    expect(inputManager.isMouseInsideCanvas()).to.be(true);
+    inputManager.onMouseLeave();
+    expect(inputManager.isMouseInsideCanvas()).to.be(false);
+    inputManager.onMouseEnter();
+    expect(inputManager.isMouseInsideCanvas()).to.be(true);
   });
 
   it('should handle touch events', function() {

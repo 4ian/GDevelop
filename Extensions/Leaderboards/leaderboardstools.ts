@@ -26,13 +26,6 @@ namespace gdjs {
         } else {
           const baseUrl = 'https://api.gdevelop-app.com/play';
           const game = runtimeScene.getGame();
-          const getLocation = () => {
-            if (typeof window !== 'undefined')
-              return (window as any).location.href;
-            else if (typeof cc !== 'undefined' && cc.sys) {
-              return cc.sys.platform;
-            } else return '';
-          };
           fetch(
             `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
             {
@@ -41,7 +34,10 @@ namespace gdjs {
                 score: score,
                 sessionId: game.getSessionId(),
                 clientPlayerId: game.getPlayerId(),
-                location: getLocation(),
+                location:
+                  typeof window !== 'undefined'
+                    ? (window as any).location.href
+                    : '',
               }),
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

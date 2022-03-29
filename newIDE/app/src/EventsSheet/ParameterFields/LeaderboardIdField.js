@@ -53,13 +53,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LeaderboardIdField(props, ref) {
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
-    const genericExpressionFieldRef = React.useRef<?GenericExpressionField>(
+    const inputFieldRef = React.useRef<?(GenericExpressionField | SelectField)>(
       null
     );
     React.useImperativeHandle(ref, () => ({
       focus: () => {
-        if (genericExpressionFieldRef.current) {
-          genericExpressionFieldRef.current.focus();
+        if (inputFieldRef.current) {
+          inputFieldRef.current.focus();
         }
       },
     }));
@@ -92,6 +92,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
               renderTextField={() =>
                 !isTextInput ? (
                   <SelectField
+                    ref={inputFieldRef}
                     value={props.value}
                     onChange={onChangeSelectValue}
                     margin={props.isInline ? 'none' : 'dense'}
@@ -131,7 +132,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   </SelectField>
                 ) : (
                   <GenericExpressionField
-                    ref={genericExpressionFieldRef}
+                    ref={inputFieldRef}
                     expressionType="string"
                     {...props}
                     onChange={onChangeTextValue}

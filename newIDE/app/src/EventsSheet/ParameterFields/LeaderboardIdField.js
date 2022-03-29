@@ -17,6 +17,7 @@ import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { breakUuid } from '../../Utils/GDevelopServices/Play';
+import { useOnlineStatus } from '../../Utils/OnlineStatus';
 
 const getInlineParameterDisplayValue = (
   leaderboards: ?Array<Leaderboard>,
@@ -51,6 +52,7 @@ const useFetchLeaderboards = () => {
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function LeaderboardIdField(props, ref) {
+    const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
     const inputFieldRef = React.useRef<?(GenericExpressionField | SelectField)>(
@@ -138,8 +140,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                       currentExpression: string,
                       currentExpressionNode: gdExpressionNode
                     ) => {
-                      if (!leaderboards)
-                        return `Unable to fetch leaderboards as you are offline.`;
+                      if (!leaderboards) {
+                        if (!isOnline) return 'Unable to fetch leaderboards as you are offline.';
+                        return 'Your game may not be registered, create one in the leaderboard manager.'
+                      }
                     }}
                   />
                 )

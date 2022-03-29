@@ -1,7 +1,9 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React from 'react';
+import { Trans, t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
@@ -9,8 +11,6 @@ import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
-import OpenInNew from '@material-ui/icons/OpenInNew';
-import { t } from '@lingui/macro';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
 import { breakUuid } from '../../Utils/GDevelopServices/Play';
@@ -73,74 +73,91 @@ export function LeaderboardIdField(props: ParameterFieldProps) {
     : undefined;
 
   return (
-    <>
-      <TextFieldWithButtonLayout
-        renderTextField={() =>
-          !isTextInput ? (
-            <SelectField
-              value={props.value}
-              onChange={onChangeSelectValue}
-              margin={props.isInline ? 'none' : 'dense'}
-              fullWidth
-              floatingLabelText={fieldLabel}
-              hintText={t`Choose a leaderboard`}
-            >
-              {leaderboards && !!leaderboards.length
-                ? leaderboards.map(leaderboard => (
-                    <SelectOption
-                      key={leaderboard.id}
-                      value={`"${leaderboard.id}"`}
-                      primaryText={`${leaderboard.name} ${
-                        leaderboard.id
-                          ? `(${breakUuid(leaderboard.id.substring(0, 8))})`
-                          : ''
-                      }`}
-                    />
-                  ))
-                : null}
-            </SelectField>
-          ) : (
-            <GenericExpressionField
-              expressionType="string"
-              {...props}
-              onChange={onChangeTextValue}
-              onExtractAdditionalErrors={(
-                currentExpression: string,
-                currentExpressionNode: gdExpressionNode
-              ) => {
-                if (!leaderboards)
-                  return `Unable to fetch leaderboards as you are offline.`;
-              }}
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <TextFieldWithButtonLayout
+            renderTextField={() =>
+              !isTextInput ? (
+                <SelectField
+                  value={props.value}
+                  onChange={onChangeSelectValue}
+                  margin={props.isInline ? 'none' : 'dense'}
+                  fullWidth
+                  floatingLabelText={fieldLabel}
+                  hintText={t`Choose a leaderboard`}
+                  helperMarkdownText={
+                    leaderboards && leaderboards.length === 0
+                      ? i18n._(
+                          t`There are currently no leaderboards created for this game. Open the leaderboards manager to create one.`
+                        )
+                      : null
+                  }
+                >
+                  {leaderboards && !!leaderboards.length
+                    ? leaderboards.map(leaderboard => (
+                        <SelectOption
+                          key={leaderboard.id}
+                          value={`"${leaderboard.id}"`}
+                          primaryText={`${leaderboard.name} ${
+                            leaderboard.id
+                              ? `(${breakUuid(leaderboard.id.substring(0, 8))})`
+                              : ''
+                          }`}
+                        />
+                      ))
+                    : [
+                        <SelectOption
+                          disabled
+                          key="empty"
+                          value="empty"
+                          primaryText={''}
+                        />,
+                      ]}
+                </SelectField>
+              ) : (
+                <GenericExpressionField
+                  expressionType="string"
+                  {...props}
+                  onChange={onChangeTextValue}
+                  onExtractAdditionalErrors={(
+                    currentExpression: string,
+                    currentExpressionNode: gdExpressionNode
+                  ) => {
+                    if (!leaderboards)
+                      return `Unable to fetch leaderboards as you are offline.`;
+                  }}
+                />
+              )
+            }
+            renderButton={style => (
+              <RaisedButtonWithSplitMenu
+                icon={<OpenInNew />}
+                style={style}
+                primary
+                onClick={() => setIsAdminOpen(true)}
+                buildMenuTemplate={i18n => [
+                  {
+                    label: isTextInput
+                      ? i18n._(t`Select the leaderboard from a list`)
+                      : i18n._(t`Enter the leaderboard id as an expression`),
+                    disabled: !leaderboards,
+                    click: () => setIsTextInput(!isTextInput),
+                  },
+                ]}
+              />
+            )}
+          />
+          {isAdminOpen && !!props.project && (
+            <LeaderboardDialog
+              onClose={() => setIsAdminOpen(false)}
+              open={isAdminOpen}
+              project={props.project}
             />
-          )
-        }
-        renderButton={style => (
-          <>
-            <RaisedButtonWithSplitMenu
-              icon={<OpenInNew />}
-              style={style}
-              primary
-              onClick={() => setIsAdminOpen(true)}
-              buildMenuTemplate={i18n => [
-                {
-                  label: isTextInput
-                    ? i18n._(t`Switch to expression`)
-                    : i18n._(t`Switch to select`),
-                  disabled: !leaderboards,
-                  click: () => setIsTextInput(!isTextInput),
-                },
-              ]}
-            />
-          </>
-        )}
-      />
-      {isAdminOpen && !!props.project && (
-        <LeaderboardDialog
-          onClose={() => setIsAdminOpen(false)}
-          open={isAdminOpen}
-        />
+          )}
+        </>
       )}
-    </>
+    </I18n>
   );
 }
 

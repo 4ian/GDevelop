@@ -106,6 +106,10 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const [newNameError, setNewNameError] = React.useState<?string>(null);
   const newNameTextFieldRef = React.useRef<?TextField>(null);
   const [apiError, setApiError] = React.useState<?ApiError>(null);
+  const [
+    displayGameRegistration,
+    setDisplayGameRegistration,
+  ] = React.useState<boolean>(false);
 
   const {
     leaderboards,
@@ -191,6 +195,10 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
         try {
           await listLeaderboards();
         } catch (err) {
+          if (err.response && err.response.status === 404) {
+            setDisplayGameRegistration(true);
+            return;
+          }
           console.error('An error occurred when fetching leaderboards', err);
           setApiError({
             action: 'leaderboardsFetching',
@@ -377,6 +385,20 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       </CenteredError>
     );
   }
+  if (!!displayGameRegistration) {
+    return (
+      <CenteredError>
+        <GameRegistration
+          project={project}
+          hideIfRegistered
+          onGameRegistered={() => {
+            setDisplayGameRegistration(false);
+            onListLeaderboards();
+          }}
+        />
+      </CenteredError>
+    );
+  }
   if (apiError && apiError.action === 'leaderboardCreation') {
     return (
       <CenteredError>
@@ -385,17 +407,6 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     );
   }
   if (apiError && apiError.action === 'leaderboardsFetching') {
-    if (!!project) {
-      return (
-        <CenteredError>
-          <GameRegistration
-            project={project}
-            hideIfRegistered
-            onGameRegistered={onListLeaderboards}
-          />
-        </CenteredError>
-      );
-    }
     return (
       <CenteredError>
         <PlaceholderError onRetry={onListLeaderboards} kind="error">

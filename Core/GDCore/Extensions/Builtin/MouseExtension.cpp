@@ -192,9 +192,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
 
   extension
       .AddCondition("IsMouseInsideCanvas",
-                    _("Mouse is inside the window"),
-                    _("Check if the mouse is inside the window."),
-                    _("The mouse is inside the window"),
+                    _("Mouse cursor is inside the window"),
+                    _("Check if the mouse cursor is inside the window."),
+                    _("The mouse cursor is inside the window"),
                     "",
                     "res/conditions/mouse24.png",
                     "res/conditions/mouse.png")

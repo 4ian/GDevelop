@@ -366,6 +366,10 @@ namespace gdjs {
       this._touchSimulateMouse = enable;
     }
 
+    isSimulatingMouseWithTouch(): boolean {
+      return this._touchSimulateMouse;
+    }
+
     /**
      * Notify the input manager that the frame ended, so anything that last
      * only for one frame (started/ended touches) should be reset.

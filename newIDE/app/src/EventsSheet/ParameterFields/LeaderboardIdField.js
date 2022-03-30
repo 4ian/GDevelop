@@ -70,7 +70,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       leaderboards &&
       !!leaderboards.find(leaderboard => `"${leaderboard.id}"` === props.value);
 
-    const [isTextInput, setIsTextInput] = React.useState(
+    const [isExpressionField, setIsExpressionField] = React.useState(
       !leaderboards || (!!props.value && !isCurrentValueInLeaderboardList)
     );
 
@@ -86,13 +86,38 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       ? props.parameterMetadata.getDescription()
       : undefined;
 
+    const gameHasLeaderboards = leaderboards && leaderboards.length > 0;
+
+    const selectOptions = React.useMemo(
+      () =>
+        leaderboards && gameHasLeaderboards
+          ? leaderboards.map(leaderboard => (
+              <SelectOption
+                key={leaderboard.id}
+                value={`"${leaderboard.id}"`}
+                primaryText={`${leaderboard.name} ${
+                  leaderboard.id ? `(${breakUuid(leaderboard.id)})` : ''
+                }`}
+              />
+            ))
+          : [
+              <SelectOption
+                disabled
+                key="empty"
+                value="empty"
+                primaryText={''}
+              />,
+            ],
+      [leaderboards, gameHasLeaderboards]
+    );
+
     return (
       <I18n>
         {({ i18n }) => (
           <>
             <TextFieldWithButtonLayout
               renderTextField={() =>
-                !isTextInput ? (
+                !isExpressionField ? (
                   <SelectField
                     ref={inputFieldRef}
                     value={props.value}
@@ -100,35 +125,20 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                     margin={props.isInline ? 'none' : 'dense'}
                     fullWidth
                     floatingLabelText={fieldLabel}
-                    hintText={t`Choose a leaderboard`}
+                    hintText={
+                      gameHasLeaderboards
+                        ? t`Choose a leaderboard`
+                        : t`No leaderboards`
+                    }
                     helperMarkdownText={
-                      leaderboards && leaderboards.length === 0
-                        ? i18n._(
+                      gameHasLeaderboards
+                        ? null
+                        : i18n._(
                             t`There are currently no leaderboards created for this game. Open the leaderboards manager to create one.`
                           )
-                        : null
                     }
                   >
-                    {leaderboards && !!leaderboards.length
-                      ? leaderboards.map(leaderboard => (
-                          <SelectOption
-                            key={leaderboard.id}
-                            value={`"${leaderboard.id}"`}
-                            primaryText={`${leaderboard.name} ${
-                              leaderboard.id
-                                ? `(${breakUuid(leaderboard.id)})`
-                                : ''
-                            }`}
-                          />
-                        ))
-                      : [
-                          <SelectOption
-                            disabled
-                            key="empty"
-                            value="empty"
-                            primaryText={''}
-                          />,
-                        ]}
+                    {selectOptions}
                   </SelectField>
                 ) : (
                   <GenericExpressionField
@@ -157,13 +167,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   onClick={() => setIsAdminOpen(true)}
                   buildMenuTemplate={i18n => [
                     {
-                      label: isTextInput
+                      label: isExpressionField
                         ? i18n._(t`Select the leaderboard from a list`)
                         : i18n._(
                             t`Enter the leaderboard id as a text or an expression`
                           ),
                       disabled: !leaderboards,
-                      click: () => setIsTextInput(!isTextInput),
+                      click: () => setIsExpressionField(!isExpressionField),
                     },
                   ]}
                 />

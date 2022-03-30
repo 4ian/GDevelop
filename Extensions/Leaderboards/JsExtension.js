@@ -51,9 +51,14 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('leaderboardId', 'Leaderboard', '', false)
-      .addParameter('expression', 'Score to register for the player', '', false)
-      .addParameter('string', 'Name to register for the player', '', false)
+      .addParameter('leaderboardId', _('Leaderboard'), '', false)
+      .addParameter(
+        'expression',
+        _('Score to register for the player'),
+        '',
+        false
+      )
+      .addParameter('string', _('Name to register for the player'), '', false)
       .addParameter(
         'scenevar',
         _('Variable where to store the saved score (optional)'),
@@ -87,6 +92,48 @@ module.exports = {
       .setFunctionName('gdjs.evtTools.leaderboards.hasLastEntrySaveFailed');
 
     extension
+      .addCondition(
+        'isLeaderboardViewErrored',
+        _('Leaderboard display is errored'),
+        _('Check if the display of the leaderboard errored.'),
+        _('Leaderboard display is errored'),
+        _(''),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewErrored');
+
+    extension
+      .addCondition(
+        'isLeaderboardViewLoaded',
+        _('Leaderboard display is loaded'),
+        _('Check if the display of the leaderboard has finished loading.'),
+        _('Leaderboard display is loaded'),
+        _(''),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewLoaded');
+
+    extension
+      .addCondition(
+        'isLeaderboardViewLoading',
+        _('Leaderboard display is loading'),
+        _('Check if the display of the leaderboard is loading.'),
+        _('Leaderboard display is loading'),
+        _(''),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewLoading');
+
+    extension
       .addStrExpression(
         'LastSentEntryStatusCode',
         _('Status code of last sent entry'),
@@ -115,14 +162,22 @@ module.exports = {
       .addAction(
         'DisplayLeaderboard',
         _('Display leaderboard'),
-        _('Display the specified leaderboard on top of the game. If a leaderboard was already displayed on top of the game, the new leaderboard will replace it.'),
-        _('Display leaderboard _PARAM1_'),
+        _(
+          'Display the specified leaderboard on top of the game. If a leaderboard was already displayed on top of the game, the new leaderboard will replace it.'
+        ),
+        _('Display leaderboard _PARAM1_ (display loader _PARAM2_)'),
         '',
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter('leaderboardId', 'Leaderboard', '', false)
+      .addParameter('leaderboardId', _('Leaderboard'), '', false)
+      .addParameter(
+        'yesorno',
+        _('Display loader while leaderboard is loading'),
+        '',
+        false
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.displayLeaderboard');

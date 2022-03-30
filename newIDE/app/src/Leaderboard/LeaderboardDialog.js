@@ -9,9 +9,10 @@ import { Trans } from '@lingui/macro';
 type Props = {|
   onClose: () => void,
   open: boolean,
+  project: gdProject,
 |};
 
-const LeaderboardDialog = ({ onClose, open }: Props) => {
+const LeaderboardDialog = ({ onClose, open, project }: Props) => {
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog
@@ -32,7 +33,7 @@ const LeaderboardDialog = ({ onClose, open }: Props) => {
       flexBody
       fullHeight
     >
-      <LeaderboardAdmin onLoading={setIsLoading} />
+      <LeaderboardAdmin onLoading={setIsLoading} project={project} />
     </Dialog>
   );
 };

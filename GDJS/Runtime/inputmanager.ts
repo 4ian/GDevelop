@@ -366,6 +366,9 @@ namespace gdjs {
       this._touchSimulateMouse = enable;
     }
 
+    /**
+     * @returns true if the touch events are used to simulate mouse events.
+     */
     isSimulatingMouseWithTouch(): boolean {
       return this._touchSimulateMouse;
     }

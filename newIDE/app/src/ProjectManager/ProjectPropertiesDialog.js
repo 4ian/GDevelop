@@ -547,8 +547,8 @@ function ProjectPropertiesDialog(props: Props) {
                     kind="info"
                   >
                     <Trans>
-                      To avoid flickering on objects followed by
-                      the camera, use sprites with even dimensions.
+                      To avoid flickering on objects followed by the camera, use
+                      sprites with even dimensions.
                     </Trans>
                   </DismissableAlertMessage>
                 )}

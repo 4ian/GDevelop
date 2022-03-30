@@ -85,10 +85,10 @@ namespace gdjs {
         // the sprite one and it changes in which direction sprites are rounded.
         // It makes sprites rounding inconsistent with each other
         // and they seems to move on pixel left and right.
-        this._pixiContainer.position.x = Math.round(
+        this._pixiContainer.position.x = Math.floor(
           this._pixiContainer.position.x
         );
-        this._pixiContainer.position.y = Math.round(
+        this._pixiContainer.position.y = Math.floor(
           this._pixiContainer.position.y
         );
       }

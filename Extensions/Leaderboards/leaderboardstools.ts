@@ -132,7 +132,7 @@ namespace gdjs {
         leaderboardId: string
       ) {
         const gameId = gdjs.projectData.properties.projectUuid;
-        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}`;
+        const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
         if (!(await checkLeaderboardAvailability(targetUrl))) {
           logger.error('Leaderboard data could not be fetched, doing nothing');
           return;

@@ -14,17 +14,24 @@ import {
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
 import { I18n } from '@lingui/react';
+import { Column, Line, Spacer } from '../UI/Grid';
+import BackgroundText from '../UI/BackgroundText';
+import { GameThumbnail } from './GameThumbnail';
 
 type Props = {|
   project: gdProject,
+  // Properties visible in the project properties and game dialogs.
   setName: string => void,
   name: string,
-  setCategories?: (string[]) => void,
-  categories?: string[],
   setDescription: string => void,
   description: ?string,
   setAuthorIds: (string[]) => void,
   authorIds: string[],
+  setOrientation: string => void,
+  orientation: string,
+  // Properties only visible in the game dialog.
+  setCategories?: (string[]) => void,
+  categories?: string[],
   setOwnerIds?: (string[]) => void,
   ownerIds?: string[],
   setPlayableWithKeyboard?: boolean => void,
@@ -33,8 +40,10 @@ type Props = {|
   playWithGamepad?: boolean,
   setPlayableWithMobile?: boolean => void,
   playWithMobile?: boolean,
-  setOrientation: string => void,
-  orientation: string,
+  setDiscoverable?: boolean => void,
+  discoverable?: boolean,
+  displayThumbnail?: boolean,
+  thumbnailUrl?: string,
 |};
 
 function PublicGameProperties({
@@ -57,6 +66,10 @@ function PublicGameProperties({
   playWithMobile,
   setOrientation,
   orientation,
+  setDiscoverable,
+  discoverable,
+  displayThumbnail,
+  thumbnailUrl,
 }: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
 
@@ -64,48 +77,80 @@ function PublicGameProperties({
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
-          <SemiControlledTextField
-            floatingLabelText={<Trans>Game name</Trans>}
-            fullWidth
-            type="text"
-            value={name}
-            onChange={setName}
-            autoFocus
-          />
-          {setCategories && (
-            <SemiControlledMultiAutoComplete
-              hintText={t`Select a genre`}
-              floatingLabelText={<Trans>Genres</Trans>}
-              helperText={
+          <Line noMargin>
+            {displayThumbnail && (
+              <>
+                <Column noMargin>
+                  <GameThumbnail
+                    gameName={project.getName()}
+                    thumbnailUrl={thumbnailUrl}
+                  />
+                </Column>
+                <Spacer />
+              </>
+            )}
+            <ColumnStackLayout noMargin expand>
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Game name</Trans>}
+                fullWidth
+                type="text"
+                value={name}
+                onChange={setName}
+                autoFocus
+              />
+              {setCategories && (
+                <SemiControlledMultiAutoComplete
+                  hintText={t`Select a genre`}
+                  floatingLabelText={<Trans>Genres</Trans>}
+                  helperText={
+                    <Trans>
+                      Select up to 4 genres for the game to be visible on
+                      Liluo.io's categories pages!
+                    </Trans>
+                  }
+                  value={
+                    categories
+                      ? categories.map(category => ({
+                          value: category,
+                          text: getCategoryName(category, i18n),
+                        }))
+                      : []
+                  }
+                  onChange={(event, values) => {
+                    setCategories(
+                      values ? values.map(category => category.value) : []
+                    );
+                  }}
+                  inputValue={categoryInput}
+                  onInputChange={(event, value) => {
+                    setCategoryInput(value);
+                  }}
+                  dataSource={allGameCategories.map(category => ({
+                    value: category,
+                    text: getCategoryName(category, i18n),
+                  }))}
+                  fullWidth
+                  optionsLimit={4}
+                />
+              )}
+              {setDiscoverable && (
+                <Checkbox
+                  label={<Trans>Make your game discoverable on Liluo.io</Trans>}
+                  checked={!!discoverable}
+                  onCheck={(e, checked) => setDiscoverable(checked)}
+                />
+              )}
+            </ColumnStackLayout>
+          </Line>
+          {displayThumbnail && (
+            <Line noMargin>
+              <BackgroundText>
                 <Trans>
-                  Select up to 4 genres, the first one will define the game's
-                  main genre
+                  To update your thumbnail, go into your Game Settings > Icons
+                  and thumbnail, then create and publish a new build.
                 </Trans>
-              }
-              value={
-                categories
-                  ? categories.map(category => ({
-                      value: category,
-                      text: getCategoryName(category, i18n),
-                    }))
-                  : []
-              }
-              onChange={(event, values) => {
-                setCategories(
-                  values ? values.map(category => category.value) : []
-                );
-              }}
-              inputValue={categoryInput}
-              onInputChange={(event, value) => {
-                setCategoryInput(value);
-              }}
-              dataSource={allGameCategories.map(category => ({
-                value: category,
-                text: getCategoryName(category, i18n),
-              }))}
-              fullWidth
-              optionsLimit={4}
-            />
+              </BackgroundText>
+            </Line>
           )}
           <SemiControlledTextField
             floatingLabelText={<Trans>Game description</Trans>}
@@ -129,9 +174,7 @@ function PublicGameProperties({
               </Trans>
             }
           />
-          {// This view is used for public game properties as well as project properties.
-          // This property is not shown in project properties.
-          setOwnerIds && (
+          {setOwnerIds && (
             <UsersAutocomplete
               userIds={ownerIds || []}
               onChange={setOwnerIds}
@@ -155,9 +198,7 @@ function PublicGameProperties({
             <SelectOption value="landscape" primaryText={t`Landscape`} />
             <SelectOption value="portrait" primaryText={t`Portrait`} />
           </SelectField>
-          {// This view is used for public game properties as well as project properties.
-          // The following properties are not shown in project properties.
-          setPlayableWithKeyboard &&
+          {setPlayableWithKeyboard &&
             setPlayableWithGamepad &&
             setPlayableWithMobile && (
               <React.Fragment>

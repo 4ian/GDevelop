@@ -169,16 +169,15 @@ namespace gdjs {
               displayLoaderInLeaderboardView(false, runtimeScene, {
                 callOnErrorIfDomElementContainerMissing: false,
               });
-              if (!_leaderboardViewIframe) {
-                handleErrorDisplayingLeaderboard(
-                  runtimeScene,
-                  "The leaderboard view couldn't be found. Doing nothing."
-                );
-                return;
-              }
-
-              _leaderboardViewIframe.style.opacity = '1';
             }
+            if (!_leaderboardViewIframe) {
+              handleErrorDisplayingLeaderboard(
+                runtimeScene,
+                "The leaderboard view couldn't be found. Doing nothing."
+              );
+              return;
+            }
+            _leaderboardViewIframe.style.opacity = '1';
             _leaderboardViewIframeLoaded = true;
             _leaderboardViewIframeLoading = false;
 
@@ -255,18 +254,15 @@ namespace gdjs {
       };
 
       const computeLeaderboardDisplayingIframe = function (
-        url: string,
-        options: { hide: boolean }
+        url: string
       ): HTMLIFrameElement {
         const iframe = document.createElement('iframe');
 
         iframe.src = url;
         iframe.id = 'leaderboard-view';
         iframe.style.position = 'absolute';
-        if (options.hide) {
-          // To trigger iframe loading and be able to listen to its events, use `opacity: 0` instead of `visibility: hidden` or `display: none`
-          iframe.style.opacity = '0';
-        }
+        // To trigger iframe loading and be able to listen to its events, use `opacity: 0` instead of `visibility: hidden` or `display: none`
+        iframe.style.opacity = '0';
         iframe.style.pointerEvents = 'all';
         iframe.style.backgroundColor = '#FFFFFF';
         iframe.style.top = '0px';
@@ -328,12 +324,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl,
-                {
-                  hide: displayLoader,
-                }
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(

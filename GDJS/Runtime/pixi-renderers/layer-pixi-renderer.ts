@@ -86,7 +86,7 @@ namespace gdjs {
         // It makes sprites rounding inconsistent with each other
         // and they seems to move on pixel left and right.
         //
-        // PIXI uses a floor function on onScreenPosition,
+        // PIXI uses a floor function on sprites position on the screen,
         // so a floor must be applied on the camera position too.
         // According to the above calculus,
         // _pixiContainer.position is the opposite of the camera,

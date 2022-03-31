@@ -283,6 +283,11 @@ namespace gdjs {
         _leaderboardViewIframeErrored = false;
         _leaderboardViewIframeLoaded = false;
         _leaderboardViewIframeLoading = true;
+        if (displayLoader) {
+          displayLoaderInLeaderboardView(true, runtimeScene, {
+            callOnErrorIfDomElementContainerMissing: true,
+          });
+        }
         const gameId = gdjs.projectData.properties.projectUuid;
         const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
         checkLeaderboardAvailability(targetUrl).then(
@@ -324,9 +329,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(
@@ -340,11 +344,6 @@ namespace gdjs {
                   _leaderboardViewClosingCallback,
                   true
                 );
-              }
-              if (displayLoader) {
-                displayLoaderInLeaderboardView(true, runtimeScene, {
-                  callOnErrorIfDomElementContainerMissing: true,
-                });
               }
               domElementContainer.appendChild(_leaderboardViewIframe);
             }
@@ -375,6 +374,10 @@ namespace gdjs {
       export const closeLeaderboardView = function (
         runtimeScene: gdjs.RuntimeScene
       ) {
+        displayLoaderInLeaderboardView(false, runtimeScene, {
+          callOnErrorIfDomElementContainerMissing: false,
+        });
+
         if (!_leaderboardViewIframe) {
           logger.info(
             "The iframe displaying the current leaderboard couldn't be found, the leaderboard must be already closed."
@@ -400,7 +403,6 @@ namespace gdjs {
           );
           _leaderboardViewClosingCallback = null;
         }
-
         domElementContainer.removeChild(_leaderboardViewIframe);
         _leaderboardViewIframe = null;
       };

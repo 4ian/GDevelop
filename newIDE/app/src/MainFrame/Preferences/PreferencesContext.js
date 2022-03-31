@@ -14,6 +14,7 @@ export type AlertMessageIdentifier =
   | 'automatic-lighting-layer'
   | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'
+  | 'use-pixel-rounding'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
   | 'minimum-fps-too-low'
@@ -52,6 +53,10 @@ export const allAlertMessages: Array<{
   {
     key: 'use-non-smoothed-textures',
     label: <Trans>Using non smoothed textures</Trans>,
+  },
+  {
+    key: 'use-pixel-rounding',
+    label: <Trans>Using pixel rounding</Trans>,
   },
   {
     key: 'use-nearest-scale-mode',

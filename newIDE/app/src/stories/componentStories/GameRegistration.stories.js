@@ -5,8 +5,6 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
 
-import { type TestProject } from '../../fixtures/TestProject';
-
 import {
   GameRegistrationWidget,
   type GameRegistrationWidgetProps,

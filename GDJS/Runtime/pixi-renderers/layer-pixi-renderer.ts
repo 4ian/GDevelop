@@ -81,14 +81,36 @@ namespace gdjs {
         Number.isInteger(zoomFactor)
       ) {
         // Camera rounding is important for pixel perfect games.
-        // Otherwise the camera position fractional part is added to
+        // Otherwise, the camera position fractional part is added to
         // the sprite one and it changes in which direction sprites are rounded.
         // It makes sprites rounding inconsistent with each other
-        // and they seems to move on pixel left and right.
-        this._pixiContainer.position.x = Math.round(
+        // and they seem to move on pixel left and right.
+        //
+        // PIXI uses a floor function on sprites position on the screen,
+        // so a floor must be applied on the camera position too.
+        // According to the above calculus,
+        // _pixiContainer.position is the opposite of the camera,
+        // this is why the ceil function is used floor(x) = -ceil(-x).
+        //
+        // When the camera directly follows an object,
+        // given this object dimension is even,
+        // the decimal part of onScenePosition and cameraPosition are the same.
+        //
+        // Doing the calculus without rounding:
+        // onScreenPosition = onScenePosition - cameraPosition
+        // onScreenPosition = 980.75 - 200.75
+        // onScreenPosition = 780
+        //
+        // Doing the calculus with rounding:
+        // onScreenPosition = floor(onScenePosition + ceil(-cameraPosition))
+        // onScreenPosition = floor(980.75 + ceil(-200.75))
+        // onScreenPosition = floor(980.75 - 200)
+        // onScreenPosition = floor(780.75)
+        // onScreenPosition = 780
+        this._pixiContainer.position.x = Math.ceil(
           this._pixiContainer.position.x
         );
-        this._pixiContainer.position.y = Math.round(
+        this._pixiContainer.position.y = Math.ceil(
           this._pixiContainer.position.y
         );
       }

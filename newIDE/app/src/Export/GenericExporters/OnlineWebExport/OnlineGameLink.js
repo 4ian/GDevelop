@@ -217,7 +217,8 @@ const OnlineGameLink = ({
       primary={false}
       onClick={() => setIsShareDialogOpen(false)}
     />,
-    buildUrl && !isGameLoading && !isBuildPublished && (
+    // Ensure there is a game loaded, meaning the user owns the game.
+    game && buildUrl && !isBuildPublished && (
       <RaisedButton
         key="publish"
         label={<Trans>Verify and Publish to Liluo.io</Trans>}
@@ -238,126 +239,128 @@ const OnlineGameLink = ({
               <LinearProgress />
             </>
           )}
-          <Dialog
-            title={<Trans>Share your game</Trans>}
-            actions={dialogActions}
-            open={isShareDialogOpen}
-            onRequestClose={() => setIsShareDialogOpen(false)}
-          >
-            {buildUrl && !isGameLoading ? (
-              <Column noMargin>
-                <TextFieldWithButtonLayout
-                  noFloatingLabelText
-                  renderTextField={() => (
-                    <TextField
-                      value={buildUrl}
-                      readOnly
-                      fullWidth
-                      endAdornment={
-                        <IconButton
-                          onClick={onCopy}
-                          tooltip={t`Copy`}
-                          edge="end"
-                        >
-                          <Copy />
-                        </IconButton>
-                      }
-                    />
+          {isShareDialogOpen && (
+            <Dialog
+              title={<Trans>Share your game</Trans>}
+              actions={dialogActions}
+              open
+              onRequestClose={() => setIsShareDialogOpen(false)}
+            >
+              {buildUrl && !isGameLoading ? (
+                <Column noMargin>
+                  <TextFieldWithButtonLayout
+                    noFloatingLabelText
+                    renderTextField={() => (
+                      <TextField
+                        value={buildUrl}
+                        readOnly
+                        fullWidth
+                        endAdornment={
+                          <IconButton
+                            onClick={onCopy}
+                            tooltip={t`Copy`}
+                            edge="end"
+                          >
+                            <Copy />
+                          </IconButton>
+                        }
+                      />
+                    )}
+                    renderButton={style => (
+                      <RaisedButton
+                        primary
+                        label={<Trans>Open</Trans>}
+                        onClick={onOpen}
+                        style={style}
+                      />
+                    )}
+                  />
+                  {isBuildPublished && navigator.share && (
+                    <Line justifyContent="flex-end">
+                      <FlatButton
+                        label={<Trans>Share</Trans>}
+                        onClick={onShare}
+                        icon={<Share />}
+                      />
+                    </Line>
                   )}
-                  renderButton={style => (
-                    <RaisedButton
-                      primary
-                      label={<Trans>Open</Trans>}
-                      onClick={onOpen}
-                      style={style}
-                    />
+                  {isBuildPublished && !navigator.share && (
+                    <Line justifyContent="space-between">
+                      <Column justifyContent="center">
+                        <AlertMessage kind="info">
+                          <Trans>
+                            Your game is published! Share it with the community!
+                          </Trans>
+                        </AlertMessage>
+                      </Column>
+                      <Column justifyContent="flex-end">
+                        <Line>
+                          <FacebookShareButton
+                            url={buildUrl}
+                            style={styles.icon}
+                            quote={`Try the game I just created with GDevelop.io`}
+                            hashtag="#gdevelop"
+                          >
+                            <FacebookIcon size={32} round />
+                          </FacebookShareButton>
+                          <RedditShareButton
+                            url={buildUrl}
+                            title={`Try the game I just created with r/gdevelop`}
+                            style={styles.icon}
+                          >
+                            <RedditIcon size={32} round />
+                          </RedditShareButton>
+                          <TwitterShareButton
+                            title={`Try the game I just created with GDevelop.io`}
+                            hashtags={['gdevelop']}
+                            url={buildUrl}
+                            style={styles.icon}
+                          >
+                            <TwitterIcon size={32} round />
+                          </TwitterShareButton>
+                          <WhatsappShareButton
+                            title={`Try the game I just created with GDevelop.io`}
+                            url={buildUrl}
+                            style={styles.icon}
+                          >
+                            <WhatsappIcon size={32} round />
+                          </WhatsappShareButton>
+                          <EmailShareButton
+                            subject="My GDevelop game"
+                            body="Try the game I just created with GDevelop.io"
+                            url={buildUrl}
+                            style={styles.icon}
+                          >
+                            <EmailIcon size={32} round />
+                          </EmailShareButton>
+                        </Line>
+                      </Column>
+                    </Line>
                   )}
-                />
-                {isBuildPublished && navigator.share && (
-                  <Line justifyContent="flex-end">
-                    <FlatButton
-                      label={<Trans>Share</Trans>}
-                      onClick={onShare}
-                      icon={<Share />}
-                    />
-                  </Line>
-                )}
-                {isBuildPublished && !navigator.share && (
-                  <Line justifyContent="space-between">
-                    <Column justifyContent="center">
+                  {!isBuildPublished && game && (
+                    <Line>
                       <AlertMessage kind="info">
                         <Trans>
-                          Your game is published! Share it with the community!
+                          This link is private so you can share it with friends
+                          and testers. When you're ready you can update your
+                          Liluo.io game page.
                         </Trans>
                       </AlertMessage>
-                    </Column>
-                    <Column justifyContent="flex-end">
-                      <Line>
-                        <FacebookShareButton
-                          url={buildUrl}
-                          style={styles.icon}
-                          quote={`Try the game I just created with GDevelop.io`}
-                          hashtag="#gdevelop"
-                        >
-                          <FacebookIcon size={32} round />
-                        </FacebookShareButton>
-                        <RedditShareButton
-                          url={buildUrl}
-                          title={`Try the game I just created with r/gdevelop`}
-                          style={styles.icon}
-                        >
-                          <RedditIcon size={32} round />
-                        </RedditShareButton>
-                        <TwitterShareButton
-                          title={`Try the game I just created with GDevelop.io`}
-                          hashtags={['gdevelop']}
-                          url={buildUrl}
-                          style={styles.icon}
-                        >
-                          <TwitterIcon size={32} round />
-                        </TwitterShareButton>
-                        <WhatsappShareButton
-                          title={`Try the game I just created with GDevelop.io`}
-                          url={buildUrl}
-                          style={styles.icon}
-                        >
-                          <WhatsappIcon size={32} round />
-                        </WhatsappShareButton>
-                        <EmailShareButton
-                          subject="My GDevelop game"
-                          body="Try the game I just created with GDevelop.io"
-                          url={buildUrl}
-                          style={styles.icon}
-                        >
-                          <EmailIcon size={32} round />
-                        </EmailShareButton>
-                      </Line>
-                    </Column>
-                  </Line>
-                )}
-                {!isBuildPublished && game && (
-                  <Line>
-                    <AlertMessage kind="info">
-                      <Trans>
-                        This link is private so you can share it with friends
-                        and testers. When you're ready you can update your
-                        Liluo.io game page.
-                      </Trans>
-                    </AlertMessage>
-                  </Line>
-                )}
-              </Column>
-            ) : (
-              <Column alignItems="center">
-                <CircularProgress />
-              </Column>
-            )}
-            <InfoBar
-              message={<Trans>Copied to clipboard!</Trans>}
-              visible={showCopiedInfoBar}
-              hide={() => setShowCopiedInfoBar(false)}
-            />
-          </Dialog>
+                    </Line>
+                  )}
+                </Column>
+              ) : (
+                <Column alignItems="center">
+                  <CircularProgress />
+                </Column>
+              )}
+              <InfoBar
+                message={<Trans>Copied to clipboard!</Trans>}
+                visible={showCopiedInfoBar}
+                hide={() => setShowCopiedInfoBar(false)}
+              />
+            </Dialog>
+          )}
           {game && build && isOnlineGamePropertiesDialogOpen && (
             <OnlineGamePropertiesDialog
               project={project}

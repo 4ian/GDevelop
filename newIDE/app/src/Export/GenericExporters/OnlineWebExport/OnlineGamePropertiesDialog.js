@@ -96,6 +96,7 @@ export const OnlineGamePropertiesDialog = ({
         />,
         <RaisedButtonWithSplitMenu
           label={<Trans>Save project and publish</Trans>}
+          key="publish"
           primary
           onClick={() => {
             saveProjectAndPublish();

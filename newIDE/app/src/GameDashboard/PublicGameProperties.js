@@ -3,7 +3,7 @@ import React from 'react';
 import { Trans } from '@lingui/macro';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
-import { ColumnStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
@@ -77,7 +77,7 @@ function PublicGameProperties({
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout noMargin>
-          <Line noMargin>
+          <ResponsiveLineStackLayout noMargin>
             {displayThumbnail && (
               <>
                 <Column noMargin>
@@ -141,7 +141,7 @@ function PublicGameProperties({
                 />
               )}
             </ColumnStackLayout>
-          </Line>
+          </ResponsiveLineStackLayout>
           {displayThumbnail && (
             <Line noMargin>
               <BackgroundText>

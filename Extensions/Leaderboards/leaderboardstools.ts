@@ -28,13 +28,17 @@ namespace gdjs {
         'src',
         'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCAyNCAyNCI+CjxjaXJjbGUgb3BhY2l0eT0nMC4yNScgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIiBzdHJva2U9IiNGRkZGRkYiIHN0cm9rZS13aWR0aD0iNCI+PC9jaXJjbGU+CjxwYXRoIG9wYWNpdHk9JzAuNzUnIGZpbGw9IiNGRkZGRkYiIGQ9Ik00IDEyYTggOCAwIDAxOC04VjBDNS4zNzMgMCAwIDUuMzczIDAgMTJoNHptMiA1LjI5MUE3Ljk2MiA3Ljk2MiAwIDAxNCAxMkgwYzAgMy4wNDIgMS4xMzUgNS44MjQgMyA3LjkzOGwzLTIuNjQ3eiI+PC9wYXRoPgo8L3N2Zz4='
       );
-      _loader.animate(
-        [{ transform: 'rotate(0deg)' }, { transform: 'rotate(359deg)' }],
-        {
-          duration: 3000,
-          iterations: Infinity,
-        }
-      );
+      try {
+        _loader.animate(
+          [{ transform: 'rotate(0deg)' }, { transform: 'rotate(359deg)' }],
+          {
+            duration: 3000,
+            iterations: Infinity,
+          }
+        );
+      } catch {
+        logger.warn("Animation not supported, loader will be fixed.")
+      }
       _loaderContainer.appendChild(_loader);
 
       export const setPlayerScore = function (

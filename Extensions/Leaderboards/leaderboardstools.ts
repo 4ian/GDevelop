@@ -196,7 +196,9 @@ namespace gdjs {
         closeLeaderboardView(runtimeScene);
       };
 
-      const resetLeaderboardDisplayErrorTimeout = (runtimeScene: gdjs.RuntimeScene) => {
+      const resetLeaderboardDisplayErrorTimeout = (
+        runtimeScene: gdjs.RuntimeScene
+      ) => {
         if (_errorTimeoutId) clearTimeout(_errorTimeoutId);
         _errorTimeoutId = setTimeout(() => {
           if (!_leaderboardViewIframeLoaded) {
@@ -326,12 +328,19 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(targetUrl, {
-                hide: displayLoader,
-              });
+              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
+                targetUrl,
+                {
+                  hide: displayLoader,
+                }
+              );
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
-                  receiveMessageFromLeaderboardView(runtimeScene, displayLoader, event);
+                  receiveMessageFromLeaderboardView(
+                    runtimeScene,
+                    displayLoader,
+                    event
+                  );
                 };
                 (window as any).addEventListener(
                   'message',

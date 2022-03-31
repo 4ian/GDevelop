@@ -93,10 +93,10 @@ module.exports = {
 
     extension
       .addCondition(
-        'isLeaderboardViewErrored',
-        _('Leaderboard display is errored'),
+        'IsLeaderboardViewErrored',
+        _('Leaderboard display has errored'),
         _('Check if the display of the leaderboard errored.'),
-        _('Leaderboard display is errored'),
+        _('Leaderboard display has errored'),
         _(''),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
@@ -107,10 +107,10 @@ module.exports = {
 
     extension
       .addCondition(
-        'isLeaderboardViewLoaded',
-        _('Leaderboard display is loaded'),
-        _('Check if the display of the leaderboard has finished loading.'),
-        _('Leaderboard display is loaded'),
+        'IsLeaderboardViewLoaded',
+        _('Leaderboard display has loaded'),
+        _('Check if the display of the leaderboard has finished loading and been displayed on screen.'),
+        _('Leaderboard display has loaded and is displayed on screen'),
         _(''),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
@@ -121,7 +121,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'isLeaderboardViewLoading',
+        'IsLeaderboardViewLoading',
         _('Leaderboard display is loading'),
         _('Check if the display of the leaderboard is loading.'),
         _('Leaderboard display is loading'),

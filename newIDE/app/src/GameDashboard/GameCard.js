@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { Card, CardActions, CardHeader, Chip, Paper } from '@material-ui/core';
+import { Card, CardActions, CardHeader, Chip } from '@material-ui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
@@ -12,18 +12,7 @@ import TuneIcon from '@material-ui/icons/Tune';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
 import FlatButton from '../UI/FlatButton';
-import EmptyMessage from '../UI/EmptyMessage';
-
-const styles = {
-  image: {
-    display: 'block',
-    objectFit: 'cover',
-  },
-  thumbnail: {
-    width: 240,
-    height: 135,
-  },
-};
+import { GameThumbnail } from './GameThumbnail';
 
 type Props = {|
   game: Game,
@@ -50,30 +39,10 @@ export const GameCard = ({
       {({ i18n }) => (
         <Card key={game.id}>
           <Line>
-            {game.thumbnailUrl ? (
-              <img
-                src={game.thumbnailUrl}
-                style={{
-                  ...styles.image,
-                  ...styles.thumbnail,
-                }}
-                alt={game.gameName}
-                title={game.gameName}
-              />
-            ) : (
-              <Paper
-                variant="outlined"
-                style={{
-                  ...styles.thumbnail,
-                  whiteSpace: 'normal',
-                  display: 'flex',
-                }}
-              >
-                <EmptyMessage>
-                  <Trans>No thumbnail set</Trans>
-                </EmptyMessage>
-              </Paper>
-            )}
+            <GameThumbnail
+              gameName={game.gameName}
+              thumbnailUrl={game.thumbnailUrl}
+            />
             <Column expand>
               <CardHeader
                 title={game.gameName}
@@ -95,7 +64,7 @@ export const GameCard = ({
                         <Spacer />
                         <Chip
                           size="small"
-                          label={<Trans>Published on Liluo</Trans>}
+                          label={<Trans>Published on Liluo.io</Trans>}
                         />
                       </>
                     )}

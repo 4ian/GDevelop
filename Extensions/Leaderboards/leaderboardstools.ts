@@ -6,6 +6,7 @@ namespace gdjs {
       let _lastScore: number;
       let _lastPlayerName: string;
       let _lastErrorCode: number;
+      let _requestedLeaderboardId: string | null;
       let _leaderboardViewIframe: HTMLIFrameElement | null = null;
       let _leaderboardViewIframeErrored: boolean = false;
       let _leaderboardViewIframeLoading: boolean = false;
@@ -37,7 +38,7 @@ namespace gdjs {
           }
         );
       } catch {
-        logger.warn("Animation not supported, loader will be fixed.")
+        logger.warn('Animation not supported, loader will be fixed.');
       }
       _loaderContainer.appendChild(_loader);
 
@@ -127,25 +128,27 @@ namespace gdjs {
           .slice(0, 30);
       };
 
-      const checkLeaderboardAvailability = async function (
+      const checkLeaderboardAvailability = function (
         url: string
       ): Promise<boolean> {
-        try {
-          const response = await fetch(url, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
-          if (!response.ok) {
-            logger.error(
-              `Error while fetching leaderboard view, server returned: ${response.status} ${response.statusText}`
-            );
+        return fetch(url, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }).then(
+          (response) => {
+            if (!response.ok) {
+              logger.error(
+                `Error while fetching leaderboard view, server returned: ${response.status} ${response.statusText}`
+              );
+              return false;
+            }
+            return true;
+          },
+          (err) => {
+            logger.error(`Error while fetching leaderboard view: ${err}`);
             return false;
           }
-          return true;
-        } catch (err) {
-          logger.error(`Error while fetching leaderboard view: ${err}`);
-          return false;
-        }
+        );
       };
 
       const receiveMessage = function (
@@ -221,6 +224,7 @@ namespace gdjs {
         leaderboardId: string,
         displayLoader: boolean
       ) {
+        _requestedLeaderboardId = leaderboardId;
         _leaderboardViewIframeErrored = false;
         _leaderboardViewIframeLoaded = false;
         _leaderboardViewIframeLoading = true;
@@ -228,6 +232,12 @@ namespace gdjs {
         const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
         checkLeaderboardAvailability(targetUrl).then(
           (isAvailable) => {
+            if (leaderboardId !== _requestedLeaderboardId) {
+              logger.warn(
+                `Received a response for leaderboard ${leaderboardId} though the last leaderboard requested is ${_requestedLeaderboardId}, ignoring this response.`
+              );
+              return;
+            }
             if (!isAvailable) {
               onError(
                 runtimeScene,

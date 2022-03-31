@@ -1,20 +1,17 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
-import React, { Component, useEffect, type Node, useRef } from 'react';
+import * as React from 'react';
 import Close from '@material-ui/icons/Close';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import ContextMenu, { type ContextMenuInterface } from './Menu/ContextMenu';
 import { useLongTouch } from '../Utils/UseLongTouch';
+import { Spacer } from './Grid';
+
+const TAB_HEIGHT = 30;
 
 const styles = {
-  tabsContainerStyle: {
-    maxWidth: '100%',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
   tabContentContainer: {
     width: '100%',
     position: 'relative',
@@ -24,19 +21,20 @@ const styles = {
     flex: 1,
   },
   tabLabel: {
-    maxWidth: 400,
+    maxWidth: 360,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-    marginTop: 6,
-    marginBottom: 6,
-    marginLeft: 10,
-    marginRight: 10,
     fontSize: '15px', // Same as in Mosaic.css (for mosaic-window-title)
   },
+  tabLabelAndIcon: {
+    height: TAB_HEIGHT,
+    display: 'flex',
+    alignItems: 'center',
+    marginLeft: 10,
+    marginRight: 10,
+  },
   closeButton: {
-    marginTop: 7,
-    marginBottom: 7,
     marginRight: 5,
     marginLeft: 5,
   },
@@ -44,7 +42,7 @@ const styles = {
 
 type TabContentContainerProps = {|
   active: boolean,
-  children: Node,
+  children: React.Node,
 |};
 
 /**
@@ -56,7 +54,7 @@ type TabContentContainerProps = {|
  *
  * 2) shouldComponentUpdate is used to avoid updating the content of a tab that is not selected.
  */
-export class TabContentContainer extends Component<TabContentContainerProps> {
+export class TabContentContainer extends React.Component<TabContentContainerProps> {
   shouldComponentUpdate(nextProps: TabContentContainerProps) {
     return this.props.active || nextProps.active;
   }
@@ -78,7 +76,7 @@ export class TabContentContainer extends Component<TabContentContainerProps> {
 
 type ClosableTabsProps = {|
   hideLabels?: boolean,
-  children: Node,
+  children: React.Node,
 |};
 
 export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => (
@@ -101,7 +99,8 @@ export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => (
 export type ClosableTabProps = {|
   id?: string,
   active: boolean,
-  label: Node,
+  label: ?React.Node,
+  icon: ?React.Node,
   closable: boolean,
   onClose: () => void,
   onCloseOthers: () => void,
@@ -117,11 +116,12 @@ export function ClosableTab({
   onCloseOthers,
   onCloseAll,
   label,
+  icon,
   closable,
   onClick,
   onActivated,
 }: ClosableTabProps) {
-  useEffect(
+  React.useEffect(
     () => {
       if (active) {
         onActivated();
@@ -129,7 +129,7 @@ export function ClosableTab({
     },
     [active, onActivated]
   );
-  const contextMenu = useRef<?ContextMenuInterface>(null);
+  const contextMenu = React.useRef<?ContextMenuInterface>(null);
 
   const openContextMenu = event => {
     event.stopPropagation();
@@ -192,12 +192,14 @@ export function ClosableTab({
               >
                 <span
                   style={{
-                    ...styles.tabLabel,
+                    ...styles.tabLabelAndIcon,
                     color: textColor,
                     fontFamily: muiTheme.closableTabs.fontFamily,
                   }}
                 >
-                  {label}
+                  {icon}
+                  {icon && label ? <Spacer /> : null}
+                  <span style={styles.tabLabel}>{label}</span>
                 </span>
               </ButtonBase>
               {closable && (

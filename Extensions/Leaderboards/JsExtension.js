@@ -109,7 +109,9 @@ module.exports = {
       .addCondition(
         'IsLeaderboardViewLoaded',
         _('Leaderboard display has loaded'),
-        _('Check if the display of the leaderboard has finished loading and been displayed on screen.'),
+        _(
+          'Check if the display of the leaderboard has finished loading and been displayed on screen.'
+        ),
         _('Leaderboard display has loaded and is displayed on screen'),
         _(''),
         'JsPlatform/Extensions/leaderboard.svg',

@@ -2,10 +2,13 @@ namespace gdjs {
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {
     export namespace leaderboards {
+      // Score submission
       let _scoreLastSentAt: number | null = null;
       let _lastScore: number;
       let _lastPlayerName: string;
       let _lastErrorCode: number;
+
+      // Leaderboard display
       let _requestedLeaderboardId: string | null;
       let _leaderboardViewIframe: HTMLIFrameElement | null = null;
       let _leaderboardViewIframeErrored: boolean = false;
@@ -151,7 +154,7 @@ namespace gdjs {
         );
       };
 
-      const receiveMessage = function (
+      const receiveMessageFromLeaderboardView = function (
         runtimeScene: gdjs.RuntimeScene,
         displayLoader: boolean,
         event: MessageEvent
@@ -163,11 +166,11 @@ namespace gdjs {
           case 'leaderboardViewLoaded':
             if (displayLoader) {
               if (_errorTimeoutId) clearTimeout(_errorTimeoutId);
-              setDisplayLoader(false, runtimeScene, {
+              displayLoaderInLeaderboardView(false, runtimeScene, {
                 callOnErrorIfDomElementContainerMissing: false,
               });
               if (!_leaderboardViewIframe) {
-                onError(
+                handleErrorDisplayingLeaderboard(
                   runtimeScene,
                   "The leaderboard view couldn't be found. Doing nothing."
                 );
@@ -183,7 +186,7 @@ namespace gdjs {
         }
       };
 
-      const onError = function (
+      const handleErrorDisplayingLeaderboard = function (
         runtimeScene: gdjs.RuntimeScene,
         message: string
       ) {
@@ -193,11 +196,11 @@ namespace gdjs {
         closeLeaderboardView(runtimeScene);
       };
 
-      const resetErrorTimeout = (runtimeScene: gdjs.RuntimeScene) => {
+      const resetLeaderboardDisplayErrorTimeout = (runtimeScene: gdjs.RuntimeScene) => {
         if (_errorTimeoutId) clearTimeout(_errorTimeoutId);
         _errorTimeoutId = setTimeout(() => {
           if (!_leaderboardViewIframeLoaded) {
-            onError(
+            handleErrorDisplayingLeaderboard(
               runtimeScene,
               'Leaderboard page did not send message in time. Closing leaderboard view.'
             );
@@ -205,7 +208,7 @@ namespace gdjs {
         }, 5000);
       };
 
-      const setDisplayLoader = function (
+      const displayLoaderInLeaderboardView = function (
         yesOrNo: boolean,
         runtimeScene: gdjs.RuntimeScene,
         options: { callOnErrorIfDomElementContainerMissing: boolean }
@@ -216,7 +219,7 @@ namespace gdjs {
           .getDomElementContainer();
         if (!domElementContainer) {
           if (options.callOnErrorIfDomElementContainerMissing) {
-            onError(
+            handleErrorDisplayingLeaderboard(
               runtimeScene,
               "The div element covering the game couldn't be found, the leaderboard cannot be displayed."
             );
@@ -249,7 +252,7 @@ namespace gdjs {
         return true;
       };
 
-      const computeIframe = function (
+      const computeLeaderboardDisplayingIframe = function (
         url: string,
         options: { hide: boolean }
       ): HTMLIFrameElement {
@@ -293,7 +296,7 @@ namespace gdjs {
               return;
             }
             if (!isAvailable) {
-              onError(
+              handleErrorDisplayingLeaderboard(
                 runtimeScene,
                 'Leaderboard data could not be fetched. Closing leaderboard view if there is one.'
               );
@@ -301,9 +304,9 @@ namespace gdjs {
             }
 
             if (_leaderboardViewIframe) {
-              resetErrorTimeout(runtimeScene);
+              resetLeaderboardDisplayErrorTimeout(runtimeScene);
               if (displayLoader) {
-                setDisplayLoader(true, runtimeScene, {
+                displayLoaderInLeaderboardView(true, runtimeScene, {
                   callOnErrorIfDomElementContainerMissing: false,
                 });
               }
@@ -314,21 +317,21 @@ namespace gdjs {
                 .getRenderer()
                 .getDomElementContainer();
               if (!domElementContainer) {
-                onError(
+                handleErrorDisplayingLeaderboard(
                   runtimeScene,
                   "The div element covering the game couldn't be found, the leaderboard cannot be displayed."
                 );
                 return;
               }
 
-              resetErrorTimeout(runtimeScene);
+              resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeIframe(targetUrl, {
+              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(targetUrl, {
                 hide: displayLoader,
               });
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
-                  receiveMessage(runtimeScene, displayLoader, event);
+                  receiveMessageFromLeaderboardView(runtimeScene, displayLoader, event);
                 };
                 (window as any).addEventListener(
                   'message',
@@ -337,7 +340,7 @@ namespace gdjs {
                 );
               }
               if (displayLoader) {
-                setDisplayLoader(true, runtimeScene, {
+                displayLoaderInLeaderboardView(true, runtimeScene, {
                   callOnErrorIfDomElementContainerMissing: true,
                 });
               }
@@ -346,7 +349,7 @@ namespace gdjs {
           },
           (err) => {
             logger.log(err);
-            onError(
+            handleErrorDisplayingLeaderboard(
               runtimeScene,
               'An error occurred when fetching leaderboard data. Closing leaderboard view if there is one.'
             );

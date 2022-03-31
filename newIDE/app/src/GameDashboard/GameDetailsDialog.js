@@ -153,11 +153,15 @@ export const GameDetailsDialog = ({
     [loadPublicGame]
   );
 
-  const handleGameUpdated = React.useCallback((updatedGame: Game) => {
-    // Set Public Game to null as it will be refetched automatically by the callback above.
-    setPublicGame(null);
-    onGameUpdated(updatedGame);
-  });
+  const handleGameUpdated = React.useCallback(
+    (updatedGame: Game) => {
+      // Set Public Game to null to show the loader.
+      // It will be refetched thanks to loadPublicGame, because Game is updated.
+      setPublicGame(null);
+      onGameUpdated(updatedGame);
+    },
+    [onGameUpdated]
+  );
 
   const updateGameFromProject = async (
     partialGameChange: PartialGameChange,
@@ -272,7 +276,7 @@ export const GameDetailsDialog = ({
         setIsGameUpdating(false);
       }
     },
-    [game, getAuthorizationHeader, profile, onGameUpdated]
+    [game, getAuthorizationHeader, profile, handleGameUpdated]
   );
 
   const authorUsernames =
@@ -479,7 +483,7 @@ export const GameDetailsDialog = ({
                         <RaisedButton
                           onClick={() => {
                             const answer = Window.showConfirmDialog(
-                              'Are you sure you want to unpublish this game? \n\nThis will make your Liluo.io unique game URL not accessible anymore. \n\nYou can decide anytime to publish it again.'
+                              'Are you sure you want to unpublish this game? \n\nThis will make your Liluo.io unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
                             );
 
                             if (!answer) return;
@@ -496,8 +500,7 @@ export const GameDetailsDialog = ({
                       primary
                       onClick={() => setIsPublicGamePropertiesDialogOpen(true)}
                       label={<Trans>Edit game details</Trans>}
-                      disabled={!isGameOpenedAsProject}
-                      disabled={isGameUpdating}
+                      disabled={!isGameOpenedAsProject || isGameUpdating}
                     />
                   </Line>
                 </ColumnStackLayout>
@@ -678,9 +681,8 @@ export const GameDetailsDialog = ({
               )
             ) : null}
           </Line>
-          {publicGame && project && (
+          {publicGame && project && isPublicGamePropertiesDialogOpen && (
             <PublicGamePropertiesDialog
-              open={isPublicGamePropertiesDialogOpen}
               project={project}
               publicGame={publicGame}
               onApply={async partialGameChange => {

@@ -66,10 +66,17 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
-  renderCustomStepsProgress: ({ build, project, errored, exportStep }) => (
+  renderCustomStepsProgress: ({
+    build,
+    project,
+    saveProject,
+    errored,
+    exportStep,
+  }) => (
     <OnlineGameLink
       build={build}
       project={project}
+      saveProject={saveProject}
       errored={errored}
       exportStep={exportStep}
     />

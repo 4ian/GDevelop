@@ -59,7 +59,6 @@ export const applyPublicPropertiesToProject = (
 type Props = {|
   project: gdProject,
   publicGame: PublicGame,
-  open: boolean,
   onClose: () => void,
   onApply: (partialGameChange: PartialGameChange) => Promise<void>,
   isLoading: boolean,
@@ -68,7 +67,6 @@ type Props = {|
 export const PublicGamePropertiesDialog = ({
   project,
   publicGame,
-  open,
   onClose,
   onApply,
   isLoading,
@@ -95,8 +93,6 @@ export const PublicGamePropertiesDialog = ({
   const [discoverable, setDiscoverable] = React.useState(
     publicGame.discoverable
   );
-
-  if (!open) return null;
 
   const onSave = async () => {
     if (
@@ -138,7 +134,7 @@ export const PublicGamePropertiesDialog = ({
       onRequestClose={onClose}
       actions={actions}
       cannotBeDismissed={false}
-      open={open}
+      open
     >
       <PublicGameProperties
         name={name}

@@ -1,10 +1,9 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
-import React from 'react';
+import * as React from 'react';
 import { type Game } from '../../../Utils/GDevelopServices/Game';
 import FlatButton from '../../../UI/FlatButton';
-import RaisedButton from '../../../UI/RaisedButton';
 import Dialog from '../../../UI/Dialog';
 import PublicGameProperties from '../../../GameDashboard/PublicGameProperties';
 import {
@@ -12,12 +11,13 @@ import {
   type PartialGameChange,
 } from '../../../GameDashboard/PublicGamePropertiesDialog';
 import { getWebBuildThumbnailUrl } from '../../../Utils/GDevelopServices/Build';
+import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 
 type Props = {|
   project: gdProject,
+  saveProject: () => Promise<void>,
   buildId: string,
   game: Game,
-  open: boolean,
   onClose: () => void,
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
@@ -25,9 +25,9 @@ type Props = {|
 
 export const OnlineGamePropertiesDialog = ({
   project,
+  saveProject,
   buildId,
   game,
-  open,
   onClose,
   onApply,
   isLoading,
@@ -59,7 +59,10 @@ export const OnlineGamePropertiesDialog = ({
   );
   const thumbnailUrl = getWebBuildThumbnailUrl(project, buildId);
 
-  if (!open) return null;
+  const saveProjectAndPublish = async () => {
+    await saveProject();
+    await onPublish();
+  };
 
   const onPublish = async () => {
     // Update the project with the new properties before updating the game.
@@ -79,30 +82,35 @@ export const OnlineGamePropertiesDialog = ({
     }
   };
 
-  const actions = [
-    <FlatButton
-      label={<Trans>Back</Trans>}
-      key="back"
-      primary={false}
-      onClick={onClose}
-      disabled={isLoading}
-    />,
-    <RaisedButton
-      label={<Trans>Publish</Trans>}
-      key="publish"
-      primary
-      onClick={onPublish}
-      disabled={isLoading}
-    />,
-  ];
-
   return (
     <Dialog
       title={<Trans>Verify your game info before publishing</Trans>}
       onRequestClose={onClose}
-      actions={actions}
+      actions={[
+        <FlatButton
+          label={<Trans>Back</Trans>}
+          key="back"
+          primary={false}
+          onClick={onClose}
+          disabled={isLoading}
+        />,
+        <RaisedButtonWithSplitMenu
+          label={<Trans>Save project and publish</Trans>}
+          primary
+          onClick={() => {
+            saveProjectAndPublish();
+          }}
+          disabled={isLoading}
+          buildMenuTemplate={i18n => [
+            {
+              label: i18n._(t`Publish without saving project`),
+              click: onPublish,
+            },
+          ]}
+        />,
+      ]}
       cannotBeDismissed={isLoading}
-      open={open}
+      open
     >
       <PublicGameProperties
         name={name}

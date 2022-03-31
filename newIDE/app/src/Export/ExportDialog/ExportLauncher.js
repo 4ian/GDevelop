@@ -48,6 +48,7 @@ type State = {|
 
 type Props = {|
   project: gdProject,
+  saveProject: () => Promise<void>,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
@@ -332,7 +333,12 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen,
       exportState,
     } = this.state;
-    const { project, authenticatedUser, exportPipeline } = this.props;
+    const {
+      project,
+      authenticatedUser,
+      exportPipeline,
+      saveProject,
+    } = this.props;
     if (!project) return null;
     const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
@@ -404,6 +410,7 @@ export default class ExportLauncher extends Component<Props, State> {
             exportPipeline.renderCustomStepsProgress({
               build,
               project,
+              saveProject,
               errored,
               exportStep,
             })

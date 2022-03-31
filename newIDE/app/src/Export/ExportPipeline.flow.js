@@ -49,6 +49,7 @@ export type ExportPipeline<
   renderCustomStepsProgress?: ({
     build: ?Build,
     project: gdProject,
+    saveProject: () => Promise<void>,
     errored: boolean,
     exportStep: BuildStep,
   }) => React.Node,

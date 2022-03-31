@@ -374,37 +374,42 @@ namespace gdjs {
       export const closeLeaderboardView = function (
         runtimeScene: gdjs.RuntimeScene
       ) {
-        displayLoaderInLeaderboardView(false, runtimeScene, {
-          callOnErrorIfDomElementContainerMissing: false,
-        });
+        try {
+          displayLoaderInLeaderboardView(false, runtimeScene, {
+            callOnErrorIfDomElementContainerMissing: false,
+          });
 
-        if (!_leaderboardViewIframe) {
-          logger.info(
-            "The iframe displaying the current leaderboard couldn't be found, the leaderboard must be already closed."
-          );
-          return;
-        }
-        const domElementContainer = runtimeScene
-          .getGame()
-          .getRenderer()
-          .getDomElementContainer();
-        if (!domElementContainer) {
-          logger.info(
-            "The div element covering the game couldn't be found, the leaderboard must be already closed."
-          );
-          return;
-        }
+          if (!_leaderboardViewIframe) {
+            logger.info(
+              "The iframe displaying the current leaderboard couldn't be found, the leaderboard must be already closed."
+            );
+            return;
+          }
+          const domElementContainer = runtimeScene
+            .getGame()
+            .getRenderer()
+            .getDomElementContainer();
+          if (!domElementContainer) {
+            logger.info(
+              "The div element covering the game couldn't be found, the leaderboard must be already closed."
+            );
+            return;
+          }
 
-        if (typeof window !== 'undefined') {
-          (window as any).removeEventListener(
-            'message',
-            _leaderboardViewClosingCallback,
-            true
-          );
-          _leaderboardViewClosingCallback = null;
+          if (typeof window !== 'undefined') {
+            (window as any).removeEventListener(
+              'message',
+              _leaderboardViewClosingCallback,
+              true
+            );
+            _leaderboardViewClosingCallback = null;
+          }
+          domElementContainer.removeChild(_leaderboardViewIframe);
+          _leaderboardViewIframe = null;
+        } finally {
+          const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
+          if (gameCanvas) gameCanvas.focus();
         }
-        domElementContainer.removeChild(_leaderboardViewIframe);
-        _leaderboardViewIframe = null;
       };
     }
   }

@@ -29,7 +29,8 @@ export type EditorTab = {|
   // A reference to the editor.
   editorRef: ?EditorRef,
   // The label shown on the tab.
-  label: string,
+  label?: string,
+  icon?: React.Node,
   // The name of the layout/external layout/external events/extension.
   projectItemName: ?string,
   // A unique key for the tab.
@@ -56,6 +57,7 @@ export const openEditorTab = (
   state: EditorTabsState,
   {
     label,
+    icon,
     projectItemName,
     renderEditorContainer,
     key,
@@ -63,7 +65,8 @@ export const openEditorTab = (
     dontFocusTab,
     closable,
   }: {|
-    label: string,
+    label?: string,
+    icon?: React.Node,
     projectItemName: ?string,
     renderEditorContainer: (
       props: RenderEditorContainerPropsWithRef
@@ -87,6 +90,7 @@ export const openEditorTab = (
 
   const editorTab: EditorTab = {
     label,
+    icon,
     projectItemName,
     renderEditorContainer,
     key,

@@ -5,6 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
+import HomeIcon from '@material-ui/icons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -1377,7 +1378,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Home`),
+          icon: <HomeIcon />,
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,
           key: 'start page',

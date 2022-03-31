@@ -36,7 +36,7 @@ import {
   type HotReloadPreviewButtonProps,
   NewPreviewIcon,
 } from '../HotReload/HotReloadPreviewButton';
-import PublicGameProperties from './PublicGameProperties';
+import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 
 type Props = {|
   project: gdProject,

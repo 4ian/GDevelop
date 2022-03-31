@@ -53,6 +53,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
             ) ||
             (props.optionsLimit && props.value.length >= props.optionsLimit)
           }
+          getOptionSelected={(option, value) => option.value === value.value}
           loading={props.loading}
           renderInput={params => (
             <TextField

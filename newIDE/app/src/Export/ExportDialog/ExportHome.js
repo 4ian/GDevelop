@@ -41,6 +41,7 @@ type ExportHomeProps = {|
   setChosenExporterSection: (section: ExporterSection) => void,
   cantExportBecauseOffline: boolean,
   project: gdProject,
+  saveProject: () => Promise<void>,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   isNavigationDisabled: boolean,
@@ -54,6 +55,7 @@ const ExportHome = ({
   setChosenExporterSection,
   cantExportBecauseOffline,
   project,
+  saveProject,
   onChangeSubscription,
   authenticatedUser,
   isNavigationDisabled,
@@ -77,6 +79,7 @@ const ExportHome = ({
           <ExportLauncher
             exportPipeline={onlineWebExporter.exportPipeline}
             project={project}
+            saveProject={saveProject}
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             setIsNavigationDisabled={setIsNavigationDisabled}

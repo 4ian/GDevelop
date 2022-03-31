@@ -295,7 +295,7 @@ namespace gdjs {
             if (!isAvailable) {
               onError(
                 runtimeScene,
-                'Leaderboard data could not be fetched. Doing nothing.'
+                'Leaderboard data could not be fetched. Closing leaderboard view if there is one.'
               );
               return;
             }
@@ -348,7 +348,7 @@ namespace gdjs {
             logger.log(err);
             onError(
               runtimeScene,
-              'An error occurred when fetching leaderboard data. Doing nothing.'
+              'An error occurred when fetching leaderboard data. Closing leaderboard view if there is one.'
             );
             return;
           }

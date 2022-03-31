@@ -274,6 +274,7 @@ namespace gdjs {
                 iframe.style.opacity = '0';
               }
               iframe.style.pointerEvents = 'all';
+              iframe.style.backgroundColor = '#FFFFFF';
               iframe.style.top = '0px';
               iframe.style.height = '100%';
               iframe.style.left = '0px';

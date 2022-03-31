@@ -226,8 +226,8 @@ namespace gdjs {
         _leaderboardViewIframeLoading = true;
         const gameId = gdjs.projectData.properties.projectUuid;
         const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
-        checkLeaderboardAvailability(targetUrl)
-          .then((isAvailable) => {
+        checkLeaderboardAvailability(targetUrl).then(
+          (isAvailable) => {
             if (!isAvailable) {
               onError(
                 runtimeScene,
@@ -285,14 +285,16 @@ namespace gdjs {
               }
               domElementContainer.appendChild(_leaderboardViewIframe);
             }
-          })
-          .catch(() => {
+          },
+          (err) => {
+            logger.log(err);
             onError(
               runtimeScene,
               'An error occurred when fetching leaderboard data. Doing nothing.'
             );
             return;
-          });
+          }
+        );
       };
 
       export const isLeaderboardViewErrored = function (): boolean {

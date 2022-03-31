@@ -163,23 +163,9 @@ namespace gdjs {
           case 'leaderboardViewLoaded':
             if (displayLoader) {
               if (_errorTimeoutId) clearTimeout(_errorTimeoutId);
-              // First remove loader and then display iframe
-              const domElementContainer = runtimeScene
-                .getGame()
-                .getRenderer()
-                .getDomElementContainer();
-              if (!domElementContainer) {
-                onError(
-                  runtimeScene,
-                  "The div element covering the game couldn't be found, the leaderboard cannot be displayed."
-                );
-                return;
-              }
-              try {
-                // Loader may not be present if iframe target has just been changed
-                domElementContainer.removeChild(_loaderContainer);
-              } catch {}
-
+              setDisplayLoader(false, runtimeScene, {
+                callOnErrorIfDomElementContainerMissing: false,
+              });
               if (!_leaderboardViewIframe) {
                 onError(
                   runtimeScene,
@@ -219,6 +205,74 @@ namespace gdjs {
         }, 5000);
       };
 
+      const setDisplayLoader = function (
+        yesOrNo: boolean,
+        runtimeScene: gdjs.RuntimeScene,
+        options: { callOnErrorIfDomElementContainerMissing: boolean }
+      ): boolean {
+        const domElementContainer = runtimeScene
+          .getGame()
+          .getRenderer()
+          .getDomElementContainer();
+        if (!domElementContainer) {
+          if (options.callOnErrorIfDomElementContainerMissing) {
+            onError(
+              runtimeScene,
+              "The div element covering the game couldn't be found, the leaderboard cannot be displayed."
+            );
+          }
+          return false;
+        }
+        if (yesOrNo) {
+          if (
+            domElementContainer.children &&
+            domElementContainer.children.length > 0
+          ) {
+            domElementContainer.insertBefore(
+              _loaderContainer,
+              domElementContainer.children[0]
+            );
+          } else {
+            domElementContainer.appendChild(_loaderContainer);
+          }
+          if (_leaderboardViewIframe) {
+            _leaderboardViewIframe.style.opacity = '0';
+          }
+        } else {
+          try {
+            domElementContainer.removeChild(_loaderContainer);
+            if (_leaderboardViewIframe) {
+              _leaderboardViewIframe.style.opacity = '1';
+            }
+          } catch {}
+        }
+        return true;
+      };
+
+      const computeIframe = function (
+        url: string,
+        options: { hide: boolean }
+      ): HTMLIFrameElement {
+        const iframe = document.createElement('iframe');
+
+        iframe.src = url;
+        iframe.id = 'leaderboard-view';
+        iframe.style.position = 'absolute';
+        if (options.hide) {
+          // To trigger iframe loading and be able to listen to its events, use `opacity: 0` instead of `visibility: hidden` or `display: none`
+          iframe.style.opacity = '0';
+        }
+        iframe.style.pointerEvents = 'all';
+        iframe.style.backgroundColor = '#FFFFFF';
+        iframe.style.top = '0px';
+        iframe.style.height = '100%';
+        iframe.style.left = '0px';
+        iframe.style.width = '100%';
+        iframe.style.border = 'none';
+
+        return iframe;
+      };
+
       export const displayLeaderboard = function (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
@@ -247,8 +301,12 @@ namespace gdjs {
             }
 
             if (_leaderboardViewIframe) {
-              // Do not display loader when changing leaderboard
               resetErrorTimeout(runtimeScene);
+              if (displayLoader) {
+                setDisplayLoader(true, runtimeScene, {
+                  callOnErrorIfDomElementContainerMissing: false,
+                });
+              }
               _leaderboardViewIframe.src = targetUrl;
             } else {
               const domElementContainer = runtimeScene
@@ -263,24 +321,11 @@ namespace gdjs {
                 return;
               }
 
-              const iframe = document.createElement('iframe');
-
               resetErrorTimeout(runtimeScene);
-              iframe.src = targetUrl;
-              iframe.id = 'leaderboard-view';
-              iframe.style.position = 'absolute';
-              if (displayLoader) {
-                // To trigger iframe loading and be able to listen to its events, use `opacity: 0` instead of `visibility: hidden` or `display: none`
-                iframe.style.opacity = '0';
-              }
-              iframe.style.pointerEvents = 'all';
-              iframe.style.backgroundColor = '#FFFFFF';
-              iframe.style.top = '0px';
-              iframe.style.height = '100%';
-              iframe.style.left = '0px';
-              iframe.style.width = '100%';
-              iframe.style.border = 'none';
-              _leaderboardViewIframe = iframe;
+
+              _leaderboardViewIframe = computeIframe(targetUrl, {
+                hide: displayLoader,
+              });
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessage(runtimeScene, displayLoader, event);
@@ -292,7 +337,9 @@ namespace gdjs {
                 );
               }
               if (displayLoader) {
-                domElementContainer.appendChild(_loaderContainer);
+                setDisplayLoader(true, runtimeScene, {
+                  callOnErrorIfDomElementContainerMissing: true,
+                });
               }
               domElementContainer.appendChild(_leaderboardViewIframe);
             }

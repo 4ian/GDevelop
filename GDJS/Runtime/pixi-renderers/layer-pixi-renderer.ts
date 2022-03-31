@@ -81,10 +81,10 @@ namespace gdjs {
         Number.isInteger(zoomFactor)
       ) {
         // Camera rounding is important for pixel perfect games.
-        // Otherwise the camera position fractional part is added to
+        // Otherwise, the camera position fractional part is added to
         // the sprite one and it changes in which direction sprites are rounded.
         // It makes sprites rounding inconsistent with each other
-        // and they seems to move on pixel left and right.
+        // and they seem to move on pixel left and right.
         //
         // PIXI uses a floor function on sprites position on the screen,
         // so a floor must be applied on the camera position too.

@@ -197,7 +197,11 @@ export const GameDetailsDialog = ({
         discoverable: partialGameChange.discoverable,
       });
       try {
-        if (partialGameChange.userSlug === profile.username) {
+        if (
+          partialGameChange.userSlug &&
+          partialGameChange.gameSlug &&
+          partialGameChange.userSlug === profile.username
+        ) {
           await setGameSlug(
             getAuthorizationHeader,
             id,

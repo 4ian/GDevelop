@@ -17,9 +17,9 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
  * Changes that are not stored in the Project.
  */
 export type PartialGameChange = {|
-  ownerIds: Array<string>,
-  userSlug: string,
-  gameSlug: string,
+  ownerIds: Array<string> | null,
+  userSlug: string | null,
+  gameSlug: string | null,
   discoverable?: boolean,
 |};
 

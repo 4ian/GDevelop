@@ -2266,6 +2266,7 @@ const MainFrame = (props: Props) => {
             openSubscriptionDialog(true);
           },
           project: state.currentProject,
+          onSaveProject: saveProject,
         })}
       {!!renderCreateDialog &&
         state.createDialogOpen &&

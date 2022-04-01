@@ -126,6 +126,8 @@ namespace gdjs {
           )}`;
         }
         return rawName
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
           .replace(/\s/, '_')
           .replace(/[^\w|-]/g, '')
           .slice(0, 30);

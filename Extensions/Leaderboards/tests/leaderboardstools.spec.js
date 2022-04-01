@@ -51,12 +51,20 @@ describe('Leaderboards', () => {
       );
     });
 
+    it('it removes accents from latin letters', () => {
+      expect(
+        gdjs.evtTools.leaderboards.formatPlayerName(
+          'plâyèrÏonisé'
+        )
+      ).to.be('playerIonise');
+    });
+
     it('it removes non-accepted characters in a long name', () => {
       expect(
         gdjs.evtTools.leaderboards.formatPlayerName(
-          'aＰιâΥÉᚱｎÀⅯeThatᎥsTooⅬonᏀToBeՏaѵÊĐThisPartAppears'
+          'aＰιΥÉᚱｎÀⅯeThatᎥsTooⅬonᏀToBeՏaѵÊĐThisPartAppears'
         )
-      ).to.be('aeThatsTooonToBeaThisPartAppea');
+      ).to.be('aEAeThatsTooonToBeaEThisPartAp');
     });
   });
 });

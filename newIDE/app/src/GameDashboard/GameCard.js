@@ -64,7 +64,13 @@ export const GameCard = ({
                         <Spacer />
                         <Chip
                           size="small"
-                          label={<Trans>Published on Liluo.io</Trans>}
+                          label={
+                            game.discoverable ? (
+                              <Trans>Discoverable on Liluo.io</Trans>
+                            ) : (
+                              <Trans>Published on Liluo.io</Trans>
+                            )
+                          }
                         />
                       </>
                     )}

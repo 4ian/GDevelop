@@ -2,11 +2,14 @@ namespace gdjs {
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {
     export namespace leaderboards {
-      // Score submission
-      let _scoreLastSentAt: number | null = null;
-      let _lastScore: number;
-      let _lastPlayerName: string;
-      let _lastErrorCode: number;
+      // Score saving
+      let _scoreLastSavedAt: number | null = null;
+      let _lastSavedScore: number;
+      let _lastSavedPlayerName: string;
+      let _lastSaveError: string;
+      let _isScoreSaving: boolean = false;
+      let _hasScoreBeenSaved: boolean = false;
+      let _hasScoreSavingErrored: boolean = false;
 
       // Leaderboard display
       let _requestedLeaderboardId: string | null;
@@ -45,7 +48,7 @@ namespace gdjs {
       }
       _loaderContainer.appendChild(_loader);
 
-      export const setPlayerScore = function (
+      export const savePlayerScore = function (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
         score: float,
@@ -53,66 +56,113 @@ namespace gdjs {
         responseVar: gdjs.Variable,
         errorVar: gdjs.Variable
       ) {
+        _isScoreSaving = true;
+        _hasScoreBeenSaved = false;
+        _hasScoreSavingErrored = false;
         errorVar.setString('');
         responseVar.setString('');
 
-        if (
-          (_lastPlayerName === playerName && _lastScore === score) ||
-          (!!_scoreLastSentAt && Date.now() - _scoreLastSentAt < 500)
-        ) {
-          errorVar.setString('Wait before sending a new score.');
-        } else {
-          const baseUrl = 'https://api.gdevelop-app.com/play';
-          const game = runtimeScene.getGame();
-          fetch(
-            `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
-            {
-              body: JSON.stringify({
-                playerName: formatPlayerName(playerName),
-                score: score,
-                sessionId: game.getSessionId(),
-                clientPlayerId: game.getPlayerId(),
-                location:
-                  typeof window !== 'undefined' && (window as any).location
-                    ? (window as any).location.href
-                    : '',
-              }),
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-            }
-          )
-            .then((response) => {
-              _scoreLastSentAt = Date.now();
-              if (!response.ok) {
-                errorVar.setString(response.status.toString());
-                _lastErrorCode = response.status;
-                return response.statusText;
-              } else {
-                _lastScore = score;
-                _lastPlayerName = playerName;
-                _lastErrorCode = response.status;
-                return response.text();
-              }
-            })
-            .then((data) => {
-              responseVar.setString(data);
-            })
-            .catch((error) => {
-              logger.warn(
-                `Error while submitting a leaderboard score: ${error}`
-              );
-              errorVar.setString('REQUEST_NOT_SENT');
-              _lastErrorCode = 400;
-            });
+        if (_lastSavedPlayerName === playerName && _lastSavedScore === score) {
+          logger.warn(
+            'The player and score to be sent are the same as previous one. Ignoring this one.'
+          );
+          _lastSaveError = 'SAME_AS_PREVIOUS';
+          _isScoreSaving = false;
+          _hasScoreSavingErrored = true;
+          errorVar.setString(_lastSaveError);
+          return;
         }
+
+        if (!!_scoreLastSavedAt && Date.now() - _scoreLastSavedAt < 500) {
+          _scoreLastSavedAt = Date.now();
+          logger.warn(
+            'Last entry was sent too little time ago. Ignoring this one.'
+          );
+          _lastSaveError = 'TOO_FAST';
+          _isScoreSaving = false;
+          _hasScoreSavingErrored = true;
+          errorVar.setString(_lastSaveError);
+          return;
+        }
+
+        const baseUrl = 'https://api.gdevelop-app.com/play';
+        const game = runtimeScene.getGame();
+        const formattedPlayerName = formatPlayerName(playerName);
+        const sessionId = game.getSessionId();
+        const playerId = game.getPlayerId();
+        const location =
+          typeof window !== 'undefined' && (window as any).location
+            ? (window as any).location.href
+            : '';
+        fetch(
+          `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
+          {
+            body: JSON.stringify({
+              playerName: formattedPlayerName,
+              score: score,
+              sessionId: sessionId,
+              clientPlayerId: playerId,
+              location: location,
+            }),
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        ).then(
+          (response) => {
+            _scoreLastSavedAt = Date.now();
+
+            if (!response.ok) {
+              _lastSaveError = response.status.toString();
+              logger.error(
+                'Server responded with an error:',
+                _lastSaveError,
+                response.statusText
+              );
+              _isScoreSaving = false;
+              _hasScoreSavingErrored = true;
+              errorVar.setString(_lastSaveError);
+              return;
+            }
+
+            _lastSavedScore = score;
+            _lastSavedPlayerName = playerName;
+            _isScoreSaving = false;
+            _hasScoreBeenSaved = true;
+
+            response.text().then(
+              (text) => {
+                responseVar.setString(text);
+              },
+              (error) => {
+                logger.warn(
+                  'An error occurred when reading response but score has been saved:',
+                  error
+                );
+                responseVar.setString('CANNOT_READ_RESPONSE');
+              }
+            );
+          },
+          (error) => {
+            logger.error('Error while submitting a leaderboard score:', error);
+            _isScoreSaving = false;
+            _hasScoreSavingErrored = true;
+            errorVar.setString('REQUEST_NOT_SENT');
+          }
+        );
       };
 
-      export const hasLastEntrySaveFailed = function () {
-        return _lastErrorCode && _lastErrorCode >= 400;
+      export const isSaving = function (): boolean {
+        return _isScoreSaving;
+      };
+      export const hasBeenSaved = function (): boolean {
+        return _hasScoreBeenSaved;
+      };
+      export const hasSavingErrored = function (): boolean {
+        return _hasScoreSavingErrored;
       };
 
-      export const getLastSentEntryStatusCode = function () {
-        return '' + _lastErrorCode;
+      export const getLastSaveError = function (): string {
+        return _lastSaveError;
       };
 
       export const formatPlayerName = function (rawName: string): string {
@@ -126,7 +176,9 @@ namespace gdjs {
           )}`;
         }
         return rawName
-          .replace(/\s/, '_')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s/g, '_')
           .replace(/[^\w|-]/g, '')
           .slice(0, 30);
       };
@@ -148,7 +200,7 @@ namespace gdjs {
             return true;
           },
           (err) => {
-            logger.error(`Error while fetching leaderboard view: ${err}`);
+            logger.error('Error while fetching leaderboard view:', err);
             return false;
           }
         );
@@ -329,9 +381,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(
@@ -350,7 +401,7 @@ namespace gdjs {
             }
           },
           (err) => {
-            logger.log(err);
+            logger.error(err);
             handleErrorDisplayingLeaderboard(
               runtimeScene,
               'An error occurred when fetching leaderboard data. Closing leaderboard view if there is one.'

@@ -284,6 +284,35 @@ export const setGameUserAcls = (
     .then(response => response.data);
 };
 
+export const setGameSlug = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  userSlug: string,
+  gameSlug: string
+): Promise<void> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopGameApi.baseUrl}/game/action/set-slug`,
+        {
+          gameId,
+          userSlug,
+          gameSlug,
+        },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
 export const getGame = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,

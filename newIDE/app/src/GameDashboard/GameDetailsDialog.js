@@ -13,6 +13,7 @@ import {
   deleteGame,
   getPublicGame,
   setGameUserAcls,
+  setGameSlug,
   getAclsFromUserIds,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
@@ -181,8 +182,6 @@ export const GameDetailsDialog = ({
       return false;
     }
 
-    const notUpdatedGame = publicGame;
-    setPublicGame(null);
     try {
       setIsGameUpdating(true);
       const gameId = project.getProjectUuid();
@@ -195,16 +194,36 @@ export const GameDetailsDialog = ({
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
-        userSlug:
-          partialGameChange.userSlug === profile.username
-            ? partialGameChange.userSlug
-            : undefined,
-        gameSlug:
-          partialGameChange.userSlug === profile.username
-            ? partialGameChange.gameSlug
-            : undefined,
         discoverable: partialGameChange.discoverable,
       });
+      try {
+        if (partialGameChange.userSlug === profile.username) {
+          await setGameSlug(
+            getAuthorizationHeader,
+            id,
+            gameId,
+            partialGameChange.userSlug,
+            partialGameChange.gameSlug
+          );
+        }
+      } catch (error) {
+        console.error(
+          'Unable to update the game slug:',
+          error.response || error.message
+        );
+        showErrorBox({
+          message:
+            i18n._(
+              t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
+            ) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'game-slug-update-error',
+        });
+        setIsGameUpdating(false);
+        return false;
+      }
       try {
         const authorAcls = getAclsFromUserIds(
           project.getAuthorIds().toJSArray()
@@ -225,8 +244,7 @@ export const GameDetailsDialog = ({
               t`Unable to update the game owners or authors. Have you removed yourself from the owners?`
             ) +
             ' ' +
-            ((error.response && error.response.data) ||
-              i18n._(t`Verify your internet connection or try again later.`)),
+            i18n._(t`Verify your internet connection or try again later.`),
           rawError: error,
           errorId: 'game-acls-update-error',
         });
@@ -243,12 +261,10 @@ export const GameDetailsDialog = ({
         message:
           i18n._(t`Unable to update the game details.`) +
           ' ' +
-          ((error.response && error.response.data) ||
-            i18n._(t`Verify your internet connection or try again later.`)),
+          i18n._(t`Verify your internet connection or try again later.`),
         rawError: error,
         errorId: 'game-details-update-error',
       });
-      setPublicGame(notUpdatedGame);
       setIsGameUpdating(false);
       return false;
     }

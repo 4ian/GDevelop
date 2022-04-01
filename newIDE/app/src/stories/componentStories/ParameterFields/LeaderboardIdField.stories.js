@@ -34,6 +34,7 @@ const mockedLeaderboards = Array(5)
     gameId: 'fakeGameId',
     startDatetime: '2021-11-18T10:19:50.417Z',
     playerUnicityDisplayChoice: index % 2 === 0 ? 'PREFER_UNIQUE' : 'FREE',
+    visibility: index % 3 === 0 ? 'HIDDEN' : 'PUBLIC',
   }));
 const mockedEntries = Array(8)
   .fill(0)

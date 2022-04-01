@@ -46,7 +46,7 @@ module.exports = {
         _(
           'Send to leaderboard _PARAM1_ the score _PARAM2_ with player name: _PARAM3_.'
         ),
-        '',
+        _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
@@ -75,21 +75,49 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.setPlayerScore');
+      .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
 
     extension
       .addCondition(
-        'LastSentEntrySaveFailed',
-        _('Last entry failed to save'),
-        _('Check if the last sent entry failed to save in the leaderboard.'),
-        _('Last entry failed to be saved in the leaderboard'),
-        _(''),
+        'HasLastSaveErrored',
+        _('Last score save has errored'),
+        _('Check if the last attempt to save a score has errored.'),
+        _('Last score save has errored'),
+        _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.hasLastEntrySaveFailed');
+      .setFunctionName('gdjs.evtTools.leaderboards.hasSavingErrored');
+
+    extension
+      .addCondition(
+        'HasLastSaveSucceeded',
+        _('Last score save has succeeded'),
+        _('Check if the last attempt to save a score has succeeded.'),
+        _('Last score save has succeeded'),
+        _('Save score'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.hasBeenSaved');
+
+    extension
+      .addCondition(
+        'IsSaving',
+        _('Score is saving'),
+        _('Check if a score is currently being saved in leaderboard.'),
+        _('Score is saving'),
+        _('Save score'),
+        'JsPlatform/Extensions/leaderboard.svg',
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.isSaving');
 
     extension
       .addCondition(
@@ -97,7 +125,7 @@ module.exports = {
         _('Leaderboard display has errored'),
         _('Check if the display of the leaderboard errored.'),
         _('Leaderboard display has errored'),
-        _(''),
+        _('Display leaderboard'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
@@ -113,7 +141,7 @@ module.exports = {
           'Check if the display of the leaderboard has finished loading and been displayed on screen.'
         ),
         _('Leaderboard display has loaded and is displayed on screen'),
-        _(''),
+        _('Display leaderboard'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
@@ -127,7 +155,7 @@ module.exports = {
         _('Leaderboard display is loading'),
         _('Check if the display of the leaderboard is loading.'),
         _('Leaderboard display is loading'),
-        _(''),
+        _('Display leaderboard'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
@@ -137,22 +165,22 @@ module.exports = {
 
     extension
       .addStrExpression(
-        'LastSentEntryStatusCode',
-        _('Status code of last sent entry'),
-        _('Get the status code of the last sent leaderboard entry.'),
-        _(''),
+        'LastSaveError',
+        _('Error of last save attempt'),
+        _('Get the error of the last save attempt'),
+        _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.getLastSentEntryStatusCode');
+      .setFunctionName('gdjs.evtTools.leaderboards.getLastSaveError');
 
     extension
       .addStrExpression(
         'FormatPlayerName',
         _('Format player name'),
         _('Formats a name so that it can be submitted to a leaderboard.'),
-        _(''),
+        _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addParameter('string', _('Raw player name'), '', false)
@@ -168,7 +196,7 @@ module.exports = {
           'Display the specified leaderboard on top of the game. If a leaderboard was already displayed on top of the game, the new leaderboard will replace it.'
         ),
         _('Display leaderboard _PARAM1_ (display loader _PARAM2_)'),
-        '',
+        _('Display leaderboard'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
@@ -190,7 +218,7 @@ module.exports = {
         _('Close current leaderboard'),
         _('Close the leaderboard currently displayed on top of the game.'),
         _('Close current leaderboard displayed on top of the game'),
-        '',
+        _('Display leaderboard'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )

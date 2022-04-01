@@ -9,8 +9,8 @@ describe('Leaderboards', () => {
     });
 
     it('it returns name with underscores instead of whitespaces', () => {
-      expect(gdjs.evtTools.leaderboards.formatPlayerName('Player Name')).to.be(
-        'Player_Name'
+      expect(gdjs.evtTools.leaderboards.formatPlayerName('My Player Name')).to.be(
+        'My_Player_Name'
       );
     });
 

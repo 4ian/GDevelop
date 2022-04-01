@@ -3,7 +3,11 @@ namespace gdjs {
   export namespace evtTools {
     export namespace leaderboards {
       // Score saving
+      // TODO: add a notion of "per leaderboard id" to allow posting to multiple
+      // leaderboards at once.
       let _scoreLastSavedAt: number | null = null;
+      let _currentlySavingScore: number;
+      let _currentlySavingPlayerName: string;
       let _lastSavedScore: number;
       let _lastSavedPlayerName: string;
       let _lastSaveError: string;
@@ -56,11 +60,24 @@ namespace gdjs {
         responseVar: gdjs.Variable,
         errorVar: gdjs.Variable
       ) {
+        if (
+          _isScoreSaving &&
+          _currentlySavingPlayerName === playerName &&
+          _currentlySavingScore === score
+        ) {
+          logger.warn(
+            'There is already a request to save with this player name and this score. Ignoring this one.'
+          );
+          return;
+        }
+
         _isScoreSaving = true;
         _hasScoreBeenSaved = false;
         _hasScoreSavingErrored = false;
         errorVar.setString('');
         responseVar.setString('');
+        _currentlySavingScore = score;
+        _currentlySavingPlayerName = playerName;
 
         if (_lastSavedPlayerName === playerName && _lastSavedScore === score) {
           logger.warn(

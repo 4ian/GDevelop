@@ -22,6 +22,7 @@ export type PublicGame = {
   cachedLastWeekSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   categories?: string[],
+  discoverable?: boolean,
 };
 
 export type Game = {
@@ -32,6 +33,7 @@ export type Game = {
   publicWebBuildId?: ?string,
   description?: string,
   thumbnailUrl?: string,
+  discoverable?: boolean,
 };
 
 export type ShowcasedGameLink = {
@@ -205,6 +207,7 @@ export const updateGame = (
     playWithMobile,
     orientation,
     thumbnailUrl,
+    discoverable,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -216,6 +219,7 @@ export const updateGame = (
     playWithMobile?: boolean,
     orientation?: string,
     thumbnailUrl?: ?string,
+    discoverable?: boolean,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -233,6 +237,7 @@ export const updateGame = (
           playWithMobile,
           orientation,
           thumbnailUrl,
+          discoverable,
         },
         {
           params: {

@@ -22,6 +22,8 @@ export type PublicGame = {
   cachedLastWeekSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   categories?: string[],
+  userSlug?: string,
+  gameSlug?: string,
   discoverable?: boolean,
 };
 
@@ -268,6 +270,35 @@ export const setGameUserAcls = (
         {
           gameId,
           newAcls: acls,
+        },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
+export const setGameSlug = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  userSlug: string,
+  gameSlug: string
+): Promise<void> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopGameApi.baseUrl}/game/action/set-slug`,
+        {
+          gameId,
+          userSlug,
+          gameSlug,
         },
         {
           params: {

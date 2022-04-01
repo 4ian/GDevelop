@@ -4,6 +4,13 @@ import { GDevelopPlayApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
+export type LeaderboardSortOption = 'ASC' | 'DESC';
+export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
+export type LeaderboardPlayerUnicityDisplayOption =
+  | 'FREE'
+  | 'PREFER_UNIQUE'
+  | 'PREFER_NON_UNIQUE';
+
 export type Leaderboard = {|
   id: string,
   gameId: string,
@@ -32,13 +39,6 @@ export type LeaderboardDisplayData = {|
   +createdAt: string,
   +score: number,
 |};
-
-export type LeaderboardSortOption = 'ASC' | 'DESC';
-export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
-export type LeaderboardPlayerUnicityDisplayOption =
-  | 'FREE'
-  | 'PREFER_UNIQUE'
-  | 'PREFER_NON_UNIQUE';
 
 export type LeaderboardExtremePlayerScore = {|
   leaderboardId: string,
@@ -172,6 +172,7 @@ export const updateLeaderboard = async (
     name?: string,
     sort?: LeaderboardSortOption,
     playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+    visibility?: LeaderboardVisibilityOption,
   |}
 ): Promise<?Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;

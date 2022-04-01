@@ -7,6 +7,7 @@ import {
   type LeaderboardEntry,
   type LeaderboardExtremePlayerScore,
   type LeaderboardSortOption,
+  type LeaderboardVisibilityOption,
   type LeaderboardPlayerUnicityDisplayOption,
   type LeaderboardDisplayData,
   createLeaderboard as doCreateLeaderboard,
@@ -192,7 +193,11 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         isListingLeaderboards.current = true;
         try {
           dispatch({ type: 'SET_LEADERBOARDS', payload: null });
-          const fetchedLeaderboards = await listGameLeaderboards(gameId);
+          const fetchedLeaderboards = await listGameLeaderboards(
+            authenticatedUser,
+            gameId
+          );
+          if (!fetchedLeaderboards) return;
           fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
           dispatch({
             type: 'SET_LEADERBOARDS',
@@ -203,7 +208,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         }
       }
     },
-    [gameId]
+    [gameId, authenticatedUser]
   );
 
   const createLeaderboard = React.useCallback(
@@ -277,6 +282,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     name?: string,
     sort?: LeaderboardSortOption,
     playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+    visibility?: LeaderboardVisibilityOption,
   |}) => {
     if (!currentLeaderboardId) return;
     if (attributes.sort) dispatch({ type: 'PURGE_NAVIGATION' }); // When changing playerUnicityDisplayChoice, it will change the displayOnlyBestEntry state variable, which will purge navigation.

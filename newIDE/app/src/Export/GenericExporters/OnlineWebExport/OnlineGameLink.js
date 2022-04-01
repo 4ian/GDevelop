@@ -55,7 +55,7 @@ const styles = {
 type OnlineGameLinkProps = {|
   build: ?Build,
   project: gdProject,
-  saveProject: () => Promise<void>,
+  onSaveProject: () => Promise<void>,
   errored: boolean,
   exportStep: BuildStep,
 |};
@@ -63,7 +63,7 @@ type OnlineGameLinkProps = {|
 const OnlineGameLink = ({
   build,
   project,
-  saveProject,
+  onSaveProject,
   errored,
   exportStep,
 }: OnlineGameLinkProps) => {
@@ -364,7 +364,7 @@ const OnlineGameLink = ({
           {game && build && isOnlineGamePropertiesDialogOpen && (
             <OnlineGamePropertiesDialog
               project={project}
-              saveProject={saveProject}
+              onSaveProject={onSaveProject}
               buildId={build.id}
               onClose={() => setIsOnlineGamePropertiesDialogOpen(false)}
               onApply={async partialGameChange => {

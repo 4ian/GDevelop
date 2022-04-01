@@ -43,7 +43,7 @@ export type Exporter = {|
 
 export type ExportDialogWithoutExportsProps = {|
   project: ?gdProject,
-  saveProject: () => Promise<void>,
+  onSaveProject: () => Promise<void>,
   onClose: () => void,
   onChangeSubscription: () => void,
 |};
@@ -58,7 +58,7 @@ type Props = {|
 
 const ExportDialog = ({
   project,
-  saveProject,
+  onSaveProject,
   onClose,
   allExportersRequireOnline,
   onChangeSubscription,
@@ -199,7 +199,7 @@ const ExportDialog = ({
           setChosenExporterKey={setChosenExporterKey}
           setChosenExporterSection={setChosenExporterSection}
           project={project}
-          saveProject={saveProject}
+          onSaveProject={onSaveProject}
           onChangeSubscription={onChangeSubscription}
           authenticatedUser={authenticatedUser}
           isNavigationDisabled={isNavigationDisabled}
@@ -236,7 +236,7 @@ const ExportDialog = ({
           <ExportLauncher
             exportPipeline={exporter.exportPipeline}
             project={project}
-            saveProject={saveProject}
+            onSaveProject={onSaveProject}
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             key={chosenExporterKey}

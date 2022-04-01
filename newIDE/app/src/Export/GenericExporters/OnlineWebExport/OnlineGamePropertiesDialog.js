@@ -15,7 +15,7 @@ import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 
 type Props = {|
   project: gdProject,
-  saveProject: () => Promise<void>,
+  onSaveProject: () => Promise<void>,
   buildId: string,
   game: Game,
   onClose: () => void,
@@ -25,7 +25,7 @@ type Props = {|
 
 export const OnlineGamePropertiesDialog = ({
   project,
-  saveProject,
+  onSaveProject,
   buildId,
   game,
   onClose,
@@ -60,7 +60,7 @@ export const OnlineGamePropertiesDialog = ({
   const thumbnailUrl = getWebBuildThumbnailUrl(project, buildId);
 
   const saveProjectAndPublish = async () => {
-    await saveProject();
+    await onSaveProject();
     await onPublish();
   };
 

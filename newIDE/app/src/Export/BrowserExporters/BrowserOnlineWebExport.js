@@ -75,14 +75,14 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   renderCustomStepsProgress: ({
     build,
     project,
-    saveProject,
+    onSaveProject,
     errored,
     exportStep,
   }) => (
     <OnlineGameLink
       build={build}
       project={project}
-      saveProject={saveProject}
+      onSaveProject={onSaveProject}
       errored={errored}
       exportStep={exportStep}
     />

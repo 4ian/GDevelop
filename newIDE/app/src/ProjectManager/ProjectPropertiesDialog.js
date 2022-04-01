@@ -541,6 +541,17 @@ function ProjectPropertiesDialog(props: Props) {
                     </Trans>
                   </DismissableAlertMessage>
                 )}
+                {pixelsRounding && (
+                  <DismissableAlertMessage
+                    identifier="use-pixel-rounding"
+                    kind="info"
+                  >
+                    <Trans>
+                      To avoid flickering on objects followed by the camera, use
+                      sprites with even dimensions.
+                    </Trans>
+                  </DismissableAlertMessage>
+                )}
 
                 <Text size="title">
                   <Trans>Project files</Trans>

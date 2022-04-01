@@ -19,6 +19,14 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import BackgroundText from '../UI/BackgroundText';
 import { GameThumbnail } from './GameThumbnail';
 
+export const cleanUpGameSlug = (gameSlug: string) => {
+  return gameSlug
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '-')
+    .toLowerCase();
+};
+
 type Props = {|
   project: gdProject,
   // Properties visible in the project properties and game dialogs.
@@ -51,7 +59,7 @@ type Props = {|
   thumbnailUrl?: string,
 |};
 
-function PublicGameProperties({
+export function PublicGameProperties({
   project,
   setName,
   name,
@@ -196,7 +204,7 @@ function PublicGameProperties({
                 fullWidth
                 type="text"
                 value={gameSlug || ''}
-                onChange={setGameSlug}
+                onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
                 autoFocus
               />
             </Line>

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import PublicGameProperties from './PublicGameProperties';
+import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
 import RaisedButton from '../UI/RaisedButton';
 import {
   displayProjectErrorsBox,
@@ -59,14 +59,6 @@ export const applyPublicPropertiesToProject = (
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
 };
 
-const getSlugFromName = (name: string) => {
-  return name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]/g, '-')
-    .toLowerCase();
-};
-
 type Props = {|
   project: gdProject,
   publicGame: PublicGame,
@@ -107,7 +99,7 @@ export const PublicGamePropertiesDialog = ({
     publicGame.userSlug || (profile && profile.username) || ''
   );
   const [gameSlug, setGameSlug] = React.useState(
-    publicGame.gameSlug || getSlugFromName(publicGame.gameName)
+    publicGame.gameSlug || cleanUpGameSlug(publicGame.gameName)
   );
   const [discoverable, setDiscoverable] = React.useState(
     publicGame.discoverable

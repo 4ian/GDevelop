@@ -13,6 +13,7 @@ import {
   allGameCategories,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import BackgroundText from '../UI/BackgroundText';
@@ -40,6 +41,10 @@ type Props = {|
   playWithGamepad?: boolean,
   setPlayableWithMobile?: boolean => void,
   playWithMobile?: boolean,
+  userSlug?: string,
+  setUserSlug?: string => void,
+  gameSlug?: string,
+  setGameSlug?: string => void,
   setDiscoverable?: boolean => void,
   discoverable?: boolean,
   displayThumbnail?: boolean,
@@ -66,12 +71,13 @@ function PublicGameProperties({
   playWithMobile,
   setOrientation,
   orientation,
-  setDiscoverable,
-  discoverable,
-  displayThumbnail,
-  thumbnailUrl,
+  userSlug,
+  setUserSlug,
+  gameSlug,
+  setGameSlug,
 }: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
+  const { profile } = React.useContext(AuthenticatedUserContext);
 
   return (
     <I18n>
@@ -162,6 +168,35 @@ function PublicGameProperties({
             multiline
             rows={5}
           />
+          {setUserSlug && setGameSlug && (
+            <Line>
+              <SelectField
+                fullWidth
+                floatingLabelText={<Trans>User name in the game URL</Trans>}
+                value={userSlug || ''}
+                onChange={(e, i, value: string) => setUserSlug(value)}
+              >
+                {profile && profile.username && (
+                  <SelectOption
+                    value={profile.username}
+                    primaryText={profile.username}
+                  />
+                )}
+                {userSlug && (!profile || userSlug !== profile.username) && (
+                  <SelectOption value={userSlug} primaryText={userSlug} />
+                )}
+              </SelectField>
+              <Spacer />
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Game name in the game URL</Trans>}
+                fullWidth
+                type="text"
+                value={gameSlug || ''}
+                onChange={setGameSlug}
+                autoFocus
+              />
+            </Line>
+          )}
           <UsersAutocomplete
             userIds={authorIds}
             onChange={setAuthorIds}

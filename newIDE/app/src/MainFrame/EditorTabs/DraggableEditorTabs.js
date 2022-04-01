@@ -47,6 +47,7 @@ export function DraggableClosableTabs({
           <DraggableClosableTab
             index={id}
             label={editorTab.label}
+            icon={editorTab.icon}
             key={editorTab.key}
             id={`tab-${editorTab.key.replace(/\s/g, '-')}`}
             active={isCurrentTab}
@@ -88,6 +89,7 @@ export function DraggableClosableTab({
   onCloseOthers,
   onCloseAll,
   label,
+  icon,
   closable,
   onClick,
   onActivated,
@@ -129,6 +131,7 @@ export function DraggableClosableTab({
                   onCloseOthers={onCloseOthers}
                   onCloseAll={onCloseAll}
                   label={label}
+                  icon={icon}
                   closable={closable}
                   onClick={onClick}
                   onActivated={onActivated}

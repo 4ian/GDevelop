@@ -22,6 +22,8 @@ export type PublicGame = {
   cachedLastWeekSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   categories?: string[],
+  userSlug?: string,
+  gameSlug?: string,
   discoverable?: boolean,
 };
 

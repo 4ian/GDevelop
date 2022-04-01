@@ -442,7 +442,11 @@ namespace gdjs {
     /**
      * Add the standard events handler.
      */
-    bindStandardEvents(manager, window, document) {
+    bindStandardEvents(
+      manager: gdjs.InputManager,
+      window: Window,
+      document: Document
+    ) {
       const renderer = this._pixiRenderer;
       if (!renderer) return;
       const canvas = renderer.view;
@@ -451,7 +455,7 @@ namespace gdjs {
       //to game coordinates.
       const that = this;
 
-      function getEventPosition(e) {
+      function getEventPosition(e: MouseEvent | Touch) {
         const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
 
         // Handle the fact that the game is stretched to fill the canvas.
@@ -460,6 +464,18 @@ namespace gdjs {
         pos[1] *=
           that._game.getGameResolutionHeight() / (that._canvasHeight || 1);
         return pos;
+      }
+
+      function isInsideCanvas(e: MouseEvent | Touch) {
+        const x = e.pageX - canvas.offsetLeft;
+        const y = e.pageY - canvas.offsetTop;
+
+        return (
+          0 <= x &&
+          x < (that._canvasWidth || 1) &&
+          0 <= y &&
+          y < (that._canvasHeight || 1)
+        );
       }
 
       //Some browsers lacks definition of some variables used to do calculations
@@ -480,6 +496,7 @@ namespace gdjs {
           document.documentElement === undefined ||
           document.documentElement === null
         ) {
+          // @ts-ignore
           document.documentElement = {};
         }
         if (isNaN(document.documentElement.scrollLeft)) {
@@ -571,6 +588,12 @@ namespace gdjs {
         );
         return false;
       };
+      canvas.onmouseleave = function (e) {
+        manager.onMouseLeave();
+      };
+      canvas.onmouseenter = function (e) {
+        manager.onMouseEnter();
+      };
       window.addEventListener(
         'click',
         function (e) {
@@ -606,6 +629,15 @@ namespace gdjs {
           for (let i = 0; i < e.changedTouches.length; ++i) {
             const pos = getEventPosition(e.changedTouches[i]);
             manager.onTouchMove(e.changedTouches[i].identifier, pos[0], pos[1]);
+            // This works because touch events are sent
+            // when they continue outside of the canvas.
+            if (manager.isSimulatingMouseWithTouch()) {
+              if (isInsideCanvas(e.changedTouches[i])) {
+                manager.onMouseEnter();
+              } else {
+                manager.onMouseLeave();
+              }
+            }
           }
         }
       });

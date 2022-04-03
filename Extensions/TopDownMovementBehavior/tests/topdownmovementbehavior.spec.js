@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.TopDownMovementRuntimeBehavior', function () {
+describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
   const epsilon = 1 / (2 << 8);
   const topDownName = 'auto1';
 
@@ -99,14 +99,14 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateDownKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(
+                player.getBehavior(topDownName).getXVelocity()
+              ).to.be.above(0);
+              expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
             }
 
             expect(player.getX()).to.be.above(200 + 20);
             expect(player.getY()).to.be(300);
-            expect(player.getBehavior(topDownName).getXVelocity()).to.be.above(
-              0
-            );
-            expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
           });
 
           it('can move left', function () {
@@ -124,14 +124,14 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateUpKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(
+                player.getBehavior(topDownName).getXVelocity()
+              ).to.be.below(0);
+              expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
             }
 
             expect(player.getX()).to.be.below(200 - 20);
             expect(player.getY()).to.be(300);
-            expect(player.getBehavior(topDownName).getXVelocity()).to.be.below(
-              0
-            );
-            expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
           });
 
           it('can move down', function () {
@@ -149,14 +149,14 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateLeftKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
+              expect(
+                player.getBehavior(topDownName).getYVelocity()
+              ).to.be.above(0);
             }
 
             expect(player.getX()).to.be(200);
             expect(player.getY()).to.be.above(300 + 20);
-            expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
-            expect(player.getBehavior(topDownName).getYVelocity()).to.be.above(
-              0
-            );
           });
 
           it('can move up', function () {
@@ -174,14 +174,14 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateLeftKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
+              expect(
+                player.getBehavior(topDownName).getYVelocity()
+              ).to.be.below(0);
             }
 
             expect(player.getX()).to.be(200);
             expect(player.getY()).to.be.below(300 - 20);
-            expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
-            expect(player.getBehavior(topDownName).getYVelocity()).to.be.below(
-              0
-            );
           });
         });
       });

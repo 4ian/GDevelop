@@ -103,6 +103,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
 
             expect(player.getX()).to.be.above(200 + 20);
             expect(player.getY()).to.be(300);
+            expect(player.getBehavior(topDownName).getXVelocity()).to.be.above(
+              0
+            );
+            expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
           });
 
           it('can move left', function () {
@@ -124,6 +128,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
 
             expect(player.getX()).to.be.below(200 - 20);
             expect(player.getY()).to.be(300);
+            expect(player.getBehavior(topDownName).getXVelocity()).to.be.below(
+              0
+            );
+            expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
           });
 
           it('can move down', function () {
@@ -145,6 +153,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
 
             expect(player.getX()).to.be(200);
             expect(player.getY()).to.be.above(300 + 20);
+            expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
+            expect(player.getBehavior(topDownName).getYVelocity()).to.be.above(
+              0
+            );
           });
 
           it('can move up', function () {
@@ -166,6 +178,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
 
             expect(player.getX()).to.be(200);
             expect(player.getY()).to.be.below(300 - 20);
+            expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
+            expect(player.getBehavior(topDownName).getYVelocity()).to.be.below(
+              0
+            );
           });
         });
       });

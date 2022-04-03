@@ -35,10 +35,11 @@ namespace gdjs {
     private _rightKey: boolean = false;
     private _upKey: boolean = false;
     private _downKey: boolean = false;
-    private _leftKeyPressedDuration: integer = -1;
-    private _rightKeyPressedDuration: integer = -1;
-    private _upKeyPressedDuration: integer = -1;
-    private _downKeyPressedDuration: integer = -1;
+    private _leftKeyPressedDuration: integer = 0;
+    private _rightKeyPressedDuration: integer = 0;
+    private _upKeyPressedDuration: integer = 0;
+    private _downKeyPressedDuration: integer = 0;
+    private _wasStickUsed: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
 
@@ -192,18 +193,26 @@ namespace gdjs {
       return this._xVelocity !== 0 || this._yVelocity !== 0;
     }
 
-    getSpeed() {
+    getSpeed(): float {
       return Math.sqrt(
         this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity
       );
     }
 
-    getXVelocity() {
+    getXVelocity(): float {
       return this._xVelocity;
     }
 
-    getYVelocity() {
+    setXVelocity(velocityX: float): void {
+      this._xVelocity = velocityX;
+    }
+
+    getYVelocity(): float {
       return this._yVelocity;
+    }
+
+    setYVelocity(velocityY: float): void {
+      this._yVelocity = velocityY;
     }
 
     getAngle(): float {
@@ -242,31 +251,31 @@ namespace gdjs {
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
 
+      const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+
+      if (!this._leftKey) {
+        this._leftKeyPressedDuration = 0;
+      } else {
+        this._leftKeyPressedDuration += elapsedTime;
+      }
+      if (!this._rightKey) {
+        this._rightKeyPressedDuration = 0;
+      } else {
+        this._rightKeyPressedDuration += elapsedTime;
+      }
+      if (!this._downKey) {
+        this._downKeyPressedDuration = 0;
+      } else {
+        this._downKeyPressedDuration += elapsedTime;
+      }
+      if (!this._upKey) {
+        this._upKeyPressedDuration = 0;
+      } else {
+        this._upKeyPressedDuration += elapsedTime;
+      }
+
       let direction = -1;
       if (!this._allowDiagonals) {
-        const elapsedTime = this.owner.getElapsedTime(runtimeScene);
-
-        if (!this._leftKey) {
-          this._leftKeyPressedDuration = 0;
-        } else {
-          this._leftKeyPressedDuration += elapsedTime;
-        }
-        if (!this._rightKey) {
-          this._rightKeyPressedDuration = 0;
-        } else {
-          this._rightKeyPressedDuration += elapsedTime;
-        }
-        if (!this._downKey) {
-          this._downKeyPressedDuration = 0;
-        } else {
-          this._downKeyPressedDuration += elapsedTime;
-        }
-        if (!this._upKey) {
-          this._upKeyPressedDuration = 0;
-        } else {
-          this._upKeyPressedDuration += elapsedTime;
-        }
-
         if (this._upKey && !this._downKey) {
           direction = 6;
         } else if (!this._upKey && this._downKey) {
@@ -326,6 +335,7 @@ namespace gdjs {
       let directionInDeg = 0;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
+      this._wasStickUsed = false;
 
       // Update the speed of the object:
       if (direction !== -1) {
@@ -346,6 +356,7 @@ namespace gdjs {
         this._xVelocity += norm * Math.cos(directionInRad);
         this._yVelocity += norm * Math.sin(directionInRad);
 
+        this._wasStickUsed = true;
         this._stickForce = 0;
       } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
@@ -450,6 +461,33 @@ namespace gdjs {
     simulateStick(stickAngle: float, stickForce: float) {
       this._stickAngle = stickAngle % 360;
       this._stickForce = Math.max(0, Math.min(1, stickForce));
+    }
+
+    /**.
+     * @param input The control to be tested [Left,Right,Up,Down,Stick].
+     * @returns true if the key was used since the last `doStepPreEvents` call.
+     */
+    isUsingControl(input: string): boolean {
+      if (input === 'Left') {
+        return this._leftKeyPressedDuration > 0;
+      }
+      if (input === 'Right') {
+        return this._rightKeyPressedDuration > 0;
+      }
+      if (input === 'Up') {
+        return this._upKeyPressedDuration > 0;
+      }
+      if (input === 'Down') {
+        return this._downKeyPressedDuration > 0;
+      }
+      if (input === 'Stick') {
+        return this._wasStickUsed;
+      }
+      return false;
+    }
+
+    getLastStickInputAngle() {
+      return this._stickAngle;
     }
   }
   export namespace TopDownMovementRuntimeBehavior {

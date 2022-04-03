@@ -35,10 +35,10 @@ namespace gdjs {
     private _rightKey: boolean = false;
     private _upKey: boolean = false;
     private _downKey: boolean = false;
-    private _leftKeyPressedDuration: integer = -1;
-    private _rightKeyPressedDuration: integer = -1;
-    private _upKeyPressedDuration: integer = -1;
-    private _downKeyPressedDuration: integer = -1;
+    private _leftKeyPressedDuration: integer = 0;
+    private _rightKeyPressedDuration: integer = 0;
+    private _upKeyPressedDuration: integer = 0;
+    private _downKeyPressedDuration: integer = 0;
     private _wasStickUsed: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;

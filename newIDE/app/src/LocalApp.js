@@ -71,6 +71,7 @@ export const create = (authentication: Authentication) => {
               renderExportDialog={props => (
                 <ExportDialog
                   project={props.project}
+                  onSaveProject={props.onSaveProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={localAutomatedExporters}

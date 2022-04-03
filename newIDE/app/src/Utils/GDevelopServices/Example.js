@@ -6,6 +6,7 @@ import { type UserPublicProfileSearch } from './User';
 
 export type ExampleShortHeader = {|
   id: string,
+  slug: string,
   name: string,
   shortDescription: string,
   license: string,

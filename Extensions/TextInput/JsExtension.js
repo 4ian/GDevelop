@@ -578,12 +578,6 @@ module.exports = {
     const TEXT_MASK_PADDING = 2;
 
     class RenderedTextInputObjectInstance extends RenderedInstance {
-      _pixiText;
-      _pixiTextMask;
-      _pixiGraphics;
-      _fontResourceName = '';
-      _finalTextColor = 0x0;
-
       constructor(
         project,
         layout,
@@ -601,6 +595,8 @@ module.exports = {
           pixiResourcesLoader
         );
 
+        this._fontResourceName = '';
+        this._finalTextColor = 0x0;
         this._pixiGraphics = new PIXI.Graphics();
         this._pixiTextMask = new PIXI.Graphics();
         this._pixiText = new PIXI.Text(' ', {

@@ -108,7 +108,7 @@ export const GameCard = ({
                 </ResponsiveLineStackLayout>
               </CardActions>
             </Column>
-          </ResponsiveLineStackLayout >
+          </ResponsiveLineStackLayout>
         </Card>
       )}
     </I18n>

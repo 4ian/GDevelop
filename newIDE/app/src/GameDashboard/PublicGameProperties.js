@@ -201,6 +201,15 @@ export function PublicGameProperties({
                 floatingLabelText={<Trans>User name in the game URL</Trans>}
                 value={userSlug || ''}
                 onChange={(e, i, value: string) => setUserSlug(value)}
+                // It's disabled if one of the condition of SelectOption is false.
+                disabled={
+                  !(
+                    profile &&
+                    profile.username &&
+                    userSlug &&
+                    (!profile || userSlug !== profile.username)
+                  )
+                }
               >
                 {profile && profile.username && (
                   <SelectOption

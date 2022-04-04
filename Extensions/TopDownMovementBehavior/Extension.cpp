@@ -145,6 +145,28 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
+    aut.AddScopedCondition("IsUsingControl",
+                  _("Control pressed or simulated"),
+                  _("A control was applied from a default control or a simulated by an action."),
+                  _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
+                  _("Controls"),
+                  "res/conditions/keyboard24.png",
+                  "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+        .AddParameter("stringWithSelector",
+                    _("Key"),
+                    "[\"Left\", \"Right\", \"Up\", \"Down\", \"Stick\"]")
+        .MarkAsAdvanced();
+
+  aut.AddExpression("StickAngle",
+                    _("Stick angle"),
+                    _("Return the angle of the simulated stick input (in degrees)"),
+                    _("Controls"),
+                    "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior");
+
   aut.AddCondition("IsMoving",
                    _("Is moving"),
                    _("Check if the object is moving."),
@@ -531,6 +553,30 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetYVelocity")
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
+
+  aut.AddScopedAction("SetVelocityX",
+                _("Speed on the X axis"),
+                _("Change the speed on the X axis of the movement"),
+                _("the speed on the X axis of the movement"),
+                _("Movement"),
+                "CppPlatform/Extensions/topdownmovementicon24.png",
+                "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  aut.AddScopedAction("SetVelocityY",
+                _("Speed on the Y axis"),
+                _("Change the speed on the Y axis of the movement"),
+                _("the speed on the Y axis of the movement"),
+                _("Movement"),
+                "CppPlatform/Extensions/topdownmovementicon24.png",
+                "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   aut.AddExpressionAndConditionAndAction("number",
                     "MovementAngleOffset",

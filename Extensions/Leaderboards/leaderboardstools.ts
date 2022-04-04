@@ -348,15 +348,35 @@ namespace gdjs {
         leaderboardId: string,
         displayLoader: boolean
       ) {
+        // First ensure we're not trying to display multiple times the same leaderboard (in which case
+        // we "de-duplicate" the request to display it).
+        if (leaderboardId === _requestedLeaderboardId) {
+          if (_leaderboardViewIframeLoading) {
+            logger.warn(
+              `Already loading the view for the requested loader (${leaderboardId}), ignoring.`
+            );
+            return;
+          }
+          if (_leaderboardViewIframeLoaded) {
+            logger.warn(
+              `Already loaded the view for the requested loader (${leaderboardId}), ignoring.`
+            );
+            return;
+          }
+        }
+
+        // We are now assured we want to display a new (or different) leaderboard: start loading it.
         _requestedLeaderboardId = leaderboardId;
         _leaderboardViewIframeErrored = false;
         _leaderboardViewIframeLoaded = false;
         _leaderboardViewIframeLoading = true;
+
         if (displayLoader) {
           displayLoaderInLeaderboardView(true, runtimeScene, {
             callOnErrorIfDomElementContainerMissing: true,
           });
         }
+
         const gameId = gdjs.projectData.properties.projectUuid;
         const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
         checkLeaderboardAvailability(targetUrl).then(
@@ -451,7 +471,7 @@ namespace gdjs {
 
           if (!_leaderboardViewIframe) {
             logger.info(
-              "The iframe displaying the current leaderboard couldn't be found, the leaderboard must be already closed."
+              "The iframe displaying the current leaderboard couldn't be found, the leaderboard view must be already closed."
             );
             return;
           }
@@ -461,7 +481,7 @@ namespace gdjs {
             .getDomElementContainer();
           if (!domElementContainer) {
             logger.info(
-              "The div element covering the game couldn't be found, the leaderboard must be already closed."
+              "The div element covering the game couldn't be found, the leaderboard view must be already closed."
             );
             return;
           }
@@ -477,6 +497,11 @@ namespace gdjs {
           domElementContainer.removeChild(_leaderboardViewIframe);
           _leaderboardViewIframe = null;
         } finally {
+          // Don't reset the loading flag (the view of another leaderboard might be loading)
+          // or the error flag (we want to persist the error flag even after the view is closed),
+          // but reset the flag indicating the view is loaded (if it was).
+          _leaderboardViewIframeLoaded = false;
+
           const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
           if (gameCanvas) gameCanvas.focus();
         }

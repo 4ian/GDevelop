@@ -19,8 +19,22 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import BackgroundText from '../UI/BackgroundText';
 import { GameThumbnail } from './GameThumbnail';
 
+const isCyrillic = (text: string) =>
+  /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
+const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
+
 export const cleanUpGameSlug = (gameSlug: string) => {
-  return gameSlug
+  let latinGameSlug = gameSlug;
+  if (isCyrillic(gameSlug)) {
+    latinGameSlug = gameSlug
+      .split('')
+      .map(function(char) {
+        const latin = cyrillicToLatinMapping[char];
+        return latin === undefined ? char : latin;
+      })
+      .join('');
+  }
+  return latinGameSlug
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '-')

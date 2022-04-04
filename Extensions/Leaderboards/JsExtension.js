@@ -195,7 +195,7 @@ module.exports = {
         _(
           'Display the specified leaderboard on top of the game. If a leaderboard was already displayed on top of the game, the new leaderboard will replace it.'
         ),
-        _('Display leaderboard _PARAM1_ (display loader _PARAM2_)'),
+        _('Display leaderboard _PARAM1_ (display a loader: _PARAM2_)'),
         _('Display leaderboard'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'

@@ -375,6 +375,10 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     [leaderboards, onListLeaderboards]
   );
 
+  React.useEffect(() => {
+    if (currentLeaderboard) onFetchLeaderboardEntries();
+  }, []);
+
   const onCopy = React.useCallback(
     () => {
       if (!currentLeaderboard) return;

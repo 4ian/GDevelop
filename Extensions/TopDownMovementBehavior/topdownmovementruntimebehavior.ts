@@ -322,11 +322,14 @@ namespace gdjs {
 
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
-      let directionInRad = 0;
-      let directionInDeg = 0;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
-      let cos = 0;
+      // These 4 values are not actually used.
+      // JavaScript doesn't allow to declare
+      // variables without assigning them a value.
+      let directionInRad = 0;
+      let directionInDeg = 0;
+      let cos = 1;
       let sin = 0;
 
       // Update the speed of the object:
@@ -334,7 +337,7 @@ namespace gdjs {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
-        // This make the trigo resilient to rounding errors on directionInRad.
+        // This makes the trigo resilient to rounding errors on directionInRad.
         cos = Math.cos(directionInRad);
         sin = Math.sin(directionInRad);
         if (cos === -1 || cos === 1) {
@@ -352,7 +355,7 @@ namespace gdjs {
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
         const norm = this._acceleration * timeDelta * this._stickForce;
-        // This make the trigo resilient to rounding errors on directionInRad.
+        // This makes the trigo resilient to rounding errors on directionInRad.
         cos = Math.cos(directionInRad);
         sin = Math.sin(directionInRad);
         if (cos === -1 || cos === 1) {
@@ -370,7 +373,7 @@ namespace gdjs {
         directionInDeg = (directionInRad * 180.0) / Math.PI;
         const xVelocityWasPositive = this._xVelocity >= 0;
         const yVelocityWasPositive = this._yVelocity >= 0;
-        // This make the trigo resilient to rounding errors on directionInRad.
+        // This makes the trigo resilient to rounding errors on directionInRad.
         cos = Math.cos(directionInRad);
         sin = Math.sin(directionInRad);
         if (cos === -1 || cos === 1) {

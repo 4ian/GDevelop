@@ -1,5 +1,5 @@
 // @ts-check
-describe.only('gdjs.TopDownMovementRuntimeBehavior', function () {
+describe('gdjs.TopDownMovementRuntimeBehavior', function () {
   const epsilon = 1 / (2 << 8);
   const topDownName = 'auto1';
 

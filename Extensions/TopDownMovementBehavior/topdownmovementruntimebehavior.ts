@@ -322,20 +322,32 @@ namespace gdjs {
 
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
-      let directionInRad = 0;
-      let directionInDeg = 0;
       const previousVelocityX = this._xVelocity;
       const previousVelocityY = this._yVelocity;
+      // These 4 values are not actually used.
+      // JavaScript doesn't allow to declare
+      // variables without assigning them a value.
+      let directionInRad = 0;
+      let directionInDeg = 0;
+      let cos = 1;
+      let sin = 0;
 
       // Update the speed of the object:
       if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
-        this._xVelocity +=
-          this._acceleration * timeDelta * Math.cos(directionInRad);
-        this._yVelocity +=
-          this._acceleration * timeDelta * Math.sin(directionInRad);
+        // This makes the trigo resilient to rounding errors on directionInRad.
+        cos = Math.cos(directionInRad);
+        sin = Math.sin(directionInRad);
+        if (cos === -1 || cos === 1) {
+          sin = 0;
+        }
+        if (sin === -1 || sin === 1) {
+          cos = 0;
+        }
+        this._xVelocity += this._acceleration * timeDelta * cos;
+        this._yVelocity += this._acceleration * timeDelta * sin;
       } else if (this._stickForce !== 0) {
         if (!this._allowDiagonals) {
           this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
@@ -343,8 +355,17 @@ namespace gdjs {
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
         const norm = this._acceleration * timeDelta * this._stickForce;
-        this._xVelocity += norm * Math.cos(directionInRad);
-        this._yVelocity += norm * Math.sin(directionInRad);
+        // This makes the trigo resilient to rounding errors on directionInRad.
+        cos = Math.cos(directionInRad);
+        sin = Math.sin(directionInRad);
+        if (cos === -1 || cos === 1) {
+          sin = 0;
+        }
+        if (sin === -1 || sin === 1) {
+          cos = 0;
+        }
+        this._xVelocity += norm * cos;
+        this._yVelocity += norm * sin;
 
         this._stickForce = 0;
       } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
@@ -352,10 +373,17 @@ namespace gdjs {
         directionInDeg = (directionInRad * 180.0) / Math.PI;
         const xVelocityWasPositive = this._xVelocity >= 0;
         const yVelocityWasPositive = this._yVelocity >= 0;
-        this._xVelocity -=
-          this._deceleration * timeDelta * Math.cos(directionInRad);
-        this._yVelocity -=
-          this._deceleration * timeDelta * Math.sin(directionInRad);
+        // This makes the trigo resilient to rounding errors on directionInRad.
+        cos = Math.cos(directionInRad);
+        sin = Math.sin(directionInRad);
+        if (cos === -1 || cos === 1) {
+          sin = 0;
+        }
+        if (sin === -1 || sin === 1) {
+          cos = 0;
+        }
+        this._xVelocity -= this._deceleration * timeDelta * cos;
+        this._yVelocity -= this._deceleration * timeDelta * sin;
         if (this._xVelocity > 0 !== xVelocityWasPositive) {
           this._xVelocity = 0;
         }
@@ -366,8 +394,8 @@ namespace gdjs {
       const squaredSpeed =
         this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
       if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
-        this._xVelocity = this._maxSpeed * Math.cos(directionInRad);
-        this._yVelocity = this._maxSpeed * Math.sin(directionInRad);
+        this._xVelocity = this._maxSpeed * cos;
+        this._yVelocity = this._maxSpeed * sin;
       }
 
       // No acceleration for angular speed for now.

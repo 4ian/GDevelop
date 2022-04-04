@@ -196,12 +196,12 @@ export const GameDetailsDialog = ({
         orientation: project.getOrientation(),
         discoverable: partialGameChange.discoverable,
       });
-      try {
-        if (
-          partialGameChange.userSlug &&
-          partialGameChange.gameSlug &&
-          partialGameChange.userSlug === profile.username
-        ) {
+      if (
+        partialGameChange.userSlug &&
+        partialGameChange.gameSlug &&
+        partialGameChange.userSlug === profile.username
+      ) {
+        try {
           await setGameSlug(
             getAuthorizationHeader,
             id,
@@ -209,24 +209,24 @@ export const GameDetailsDialog = ({
             partialGameChange.userSlug,
             partialGameChange.gameSlug
           );
+        } catch (error) {
+          console.error(
+            'Unable to update the game slug:',
+            error.response || error.message
+          );
+          showErrorBox({
+            message:
+              i18n._(
+                t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
+              ) +
+              ' ' +
+              i18n._(t`Verify your internet connection or try again later.`),
+            rawError: error,
+            errorId: 'game-slug-update-error',
+          });
+          setIsGameUpdating(false);
+          return false;
         }
-      } catch (error) {
-        console.error(
-          'Unable to update the game slug:',
-          error.response || error.message
-        );
-        showErrorBox({
-          message:
-            i18n._(
-              t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
-            ) +
-            ' ' +
-            i18n._(t`Verify your internet connection or try again later.`),
-          rawError: error,
-          errorId: 'game-slug-update-error',
-        });
-        setIsGameUpdating(false);
-        return false;
       }
       try {
         const authorAcls = getAclsFromUserIds(

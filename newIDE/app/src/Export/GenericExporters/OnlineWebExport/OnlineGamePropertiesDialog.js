@@ -78,12 +78,7 @@ export const OnlineGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      await onApply({
-        ownerIds: null,
-        discoverable,
-        userSlug: null,
-        gameSlug: null,
-      });
+      await onApply({ discoverable });
     }
   };
 

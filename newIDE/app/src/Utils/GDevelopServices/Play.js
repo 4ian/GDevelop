@@ -4,14 +4,22 @@ import { GDevelopPlayApi } from './ApiConfigs';
 
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
+export type LeaderboardSortOption = 'ASC' | 'DESC';
+export type LeaderboardVisibilityOption = 'HIDDEN' | 'PUBLIC';
+export type LeaderboardPlayerUnicityDisplayOption =
+  | 'FREE'
+  | 'PREFER_UNIQUE'
+  | 'PREFER_NON_UNIQUE';
+
 export type Leaderboard = {|
   id: string,
   gameId: string,
   name: string,
-  sort: 'DESC' | 'ASC',
+  sort: LeaderboardSortOption,
   startDatetime: string,
   deletedAt?: string,
-  playerUnicityDisplayChoice: 'PREFER_UNIQUE' | 'PREFER_NON_UNIQUE' | 'FREE',
+  playerUnicityDisplayChoice: LeaderboardPlayerUnicityDisplayOption,
+  visibility: LeaderboardVisibilityOption,
 |};
 
 export type LeaderboardEntry = {|
@@ -31,12 +39,6 @@ export type LeaderboardDisplayData = {|
   +createdAt: string,
   +score: number,
 |};
-
-export type LeaderboardSortOption = 'ASC' | 'DESC';
-export type LeaderboardPlayerUnicityDisplayOption =
-  | 'FREE'
-  | 'PREFER_UNIQUE'
-  | 'PREFER_NON_UNIQUE';
 
 export type LeaderboardExtremePlayerScore = {|
   leaderboardId: string,
@@ -73,10 +75,24 @@ export const extractExtremeScoreDisplayData = ({
 
 export const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
-export const listGameLeaderboards = (gameId: string): Promise<Leaderboard[]> =>
-  axios
-    .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboards`)
-    .then(response => response.data);
+export const listGameLeaderboards = async (
+  authenticatedUser: AuthenticatedUser,
+  gameId: string
+): Promise<?Array<Leaderboard>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  return axios
+    .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard`, {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+    })
+    .then(response =>
+      response.data.filter(leaderboard => !leaderboard.deletedAt)
+    );
+};
 
 export const extractNextPageUriFromLinkHeader = (
   linkHeader: string
@@ -105,7 +121,7 @@ export const listLeaderboardEntries = async (
   nextPageUri: ?string,
 |}> => {
   const uri =
-    options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entries`;
+    options.forceUri || `/game/${gameId}/leaderboard/${leaderboardId}/entry`;
   // $FlowFixMe
   const response = await axios.get(`${GDevelopPlayApi.baseUrl}${uri}`, {
     params: options.forceUri
@@ -156,6 +172,7 @@ export const updateLeaderboard = async (
     name?: string,
     sort?: LeaderboardSortOption,
     playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+    visibility?: LeaderboardVisibilityOption,
   |}
 ): Promise<?Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;

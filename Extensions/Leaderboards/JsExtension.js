@@ -113,7 +113,7 @@ module.exports = {
         'leaderboardId',
         _('Leaderboard'),
         _(
-          'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
+          'If no leaderboard is specified, will return the value related to the last leaderboard save action that successfully ended.'
         ),
         true
       )

@@ -21,6 +21,9 @@ const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
 const { downloadLocalFile } = require('./LocalFileDownloader');
 
+// TODO
+// v9.stable breaks file access. Fix available from v11 maybe (issue #23757, PR #28489)
+
 log.info('GDevelop Electron app starting...');
 
 // Logs made with electron-logs can be found
@@ -46,17 +49,18 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
+// TODO: Linked issue is resolved in v10.1.4+. Set to true (or remove) and check if stuff works
 // Should be set to true, which will be the default value in future Electron
 // versions, but then causes an issue on Windows where the `fs` module stops
 // working in the renderer process.
 // See https://github.com/electron/electron/issues/22119
 // For now, disable this as we rely heavily on `fs` in the renderer process.
-app.allowRendererProcessReuse = false;
+app.allowRendererProcessReuse = true;
 
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
 if (process.platform === 'win32') {
-    app.setAppUserModelId('gdevelop.ide');
+  app.setAppUserModelId('gdevelop.ide');
 }
 
 // Quit when all windows are closed.
@@ -102,13 +106,13 @@ app.on('ready', function() {
     options.show = false;
   }
 
-  if (isDev)
-    BrowserWindow.addDevToolsExtension(
-      path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/')
-    );
-
   mainWindow = new BrowserWindow(options);
   if (!isIntegrated) mainWindow.maximize();
+
+  if (isDev)
+    mainWindow.webContents.session.loadExtension(
+      path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/')
+    );
 
   // Expose program arguments (to be accessed by mainWindow)
   global['args'] = args;
@@ -255,7 +259,7 @@ app.on('ready', function() {
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {
     const result = await downloadLocalFile(url, outputPath);
     return result;
-  })
+  });
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {

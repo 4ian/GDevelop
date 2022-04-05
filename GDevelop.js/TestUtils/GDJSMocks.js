@@ -1,6 +1,5 @@
 /** A minimal RuntimeBehavior base class */
-class RuntimeBehavior {
-}
+class RuntimeBehavior {}
 
 /** A minimal implementation of OnceTriggers */
 function OnceTriggers() {
@@ -52,8 +51,8 @@ class FakeAsyncTasksManager {
     this.tasks.set(task, then);
   }
 
-  markAllFakeSyncTasksAsFinished() {
-    for(const task of this.tasks.keys()) {
+  markAllFakeAsyncTasksAsFinished() {
+    for (const task of this.tasks.keys()) {
       task.markAsFinished();
     }
   }
@@ -68,7 +67,9 @@ class FakeAsyncTask {
     return this._finished;
   }
 
-  markAsFinished() { this._finished = true; }
+  markAsFinished() {
+    this._finished = true;
+  }
 }
 
 class VariablesContainer {
@@ -99,6 +100,10 @@ class RuntimeObject {
   constructor(runtimeScene, objectData) {
     this.name = objectData.name || '';
     this._variables = new VariablesContainer();
+    this._livingOnScene = true;
+
+    /** @type {Set<() => void>} */
+    this.destroyCallbacks = new Set();
   }
 
   getName() {
@@ -113,8 +118,27 @@ class RuntimeObject {
     return variable;
   }
 
-  registerDestroyCallback() {
-    // TODO
+  /** @param {RuntimeScene} runtimeScene */
+  deleteFromScene(runtimeScene) {
+    if (this._livingOnScene) {
+      runtimeScene.markObjectForDeletion(this);
+      this._livingOnScene = false;
+    }
+  }
+
+  /** @param {RuntimeScene} runtimeScene */
+  onDestroyFromScene(runtimeScene) {
+    // Note: these mocks don't support behaviors nor layers or effects.
+
+    this.destroyCallbacks.forEach((c) => c());
+  }
+
+  registerDestroyCallback(callback) {
+    this.destroyCallbacks.add(callback);
+  }
+
+  unregisterDestroyCallback(callback) {
+    this.destroyCallbacks.delete(callback);
   }
 }
 
@@ -279,6 +303,24 @@ class RuntimeScene {
 
     return newObject;
   }
+
+  /** @param {RuntimeObject} obj */
+  markObjectForDeletion(obj) {
+    // Delete from the living instances.
+    const instances = this._instances[obj.getName()];
+    if (instances) {
+      for (let i = 0, len = instances.length; i < len; ++i) {
+        if (instances == obj) {
+          allInstances.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    //Notify the object it was removed from the scene
+    obj.onDestroyFromScene(this);
+  }
+
   getObjects(objectName) {
     return this._instances[objectName] || [];
   }
@@ -298,10 +340,6 @@ class RuntimeScene {
  * It automatically removes objects that were destroyed from the objects lists.
  */
 class LongLivedObjectsList {
-
-  // TODO: This class was NOT tested yet. It was adapted from the game engine implemented.
-  // Need also adaptations in the RuntimeObject mock.
-
   constructor() {
     /** @type {Map<string, Array<RuntimeObject>>} */
     this.objectsLists = new Map();
@@ -375,7 +413,7 @@ function makeMinimalGDJSMock() {
         object: { createObjectOnScene },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
-        }
+        },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;
@@ -397,8 +435,8 @@ function makeMinimalGDJSMock() {
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {
-        runtimeScenePreEventsCallbacks.forEach(cb => cb(runtimeScene))
-      }
+        runtimeScenePreEventsCallbacks.forEach((cb) => cb(runtimeScene));
+      },
     },
     runtimeScene,
   };

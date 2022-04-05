@@ -214,7 +214,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { inverted: false, value: 'ModVarObjet' },
               parameters: [
-                'MyObjectA',
+                'MyParamObject',
                 'TestVariable',
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
@@ -232,7 +232,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { inverted: false, value: 'ModVarObjet' },
               parameters: [
-                'MyObjectA',
+                'MyParamObject',
                 'TestVariable',
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
@@ -257,7 +257,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     parameter.setName('IncreaseValue');
     eventsFunction.getParameters().push_back(parameter);
     parameter.setType('object');
-    parameter.setName('MyObjectA');
+    parameter.setName('MyParamObject');
     eventsFunction.getParameters().push_back(parameter);
     parameter.delete();
 
@@ -299,7 +299,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { inverted: false, value: 'ModVarObjet' },
               parameters: [
-                'MyObjectA',
+                'MyParamObject',
                 'TestVariable',
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
@@ -317,7 +317,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { inverted: false, value: 'ModVarObjet' },
               parameters: [
-                'MyObjectA',
+                'MyParamObject',
                 'TestVariable',
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
@@ -335,7 +335,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { inverted: false, value: 'ModVarObjet' },
               parameters: [
-                'MyObjectA',
+                'MyParamObject',
                 'TestVariable',
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
@@ -360,7 +360,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     parameter.setName('IncreaseValue');
     eventsFunction.getParameters().push_back(parameter);
     parameter.setType('object');
-    parameter.setName('MyObjectA');
+    parameter.setName('MyParamObject');
     eventsFunction.getParameters().push_back(parameter);
     parameter.delete();
 
@@ -377,15 +377,20 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     const myObjectA1 = runtimeScene.createObject('MyObjectA');
     const myObjectA2 = runtimeScene.createObject('MyObjectA');
     const myObjectA3 = runtimeScene.createObject('MyObjectA');
-    const myObjectALists = gdjs.Hashtable.newFrom({
+    const myObjectB1 = runtimeScene.createObject('MyObjectB');
+    const myObjectB2 = runtimeScene.createObject('MyObjectB');
+    const myObjectsLists = gdjs.Hashtable.newFrom({
       MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+      MyObjectB: [myObjectB1, myObjectB2],
     });
-    runCompiledEvents(gdjs, runtimeScene, [5, myObjectALists]);
+    runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
     expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(5);
     expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(5);
     expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(5);
+    expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(5);
+    expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(5);
 
-    // Delete an object while the task is running
+    // Delete an object while the task is running.
     myObjectA1.deleteFromScene(runtimeScene);
 
     // Process the tasks (after faking it's finished).
@@ -398,9 +403,16 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
       10
     );
+    expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+      10
+    );
+    expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+      10
+    );
 
-    // Delete another object while the task is running
+    // Delete other objects while the task is running.
     myObjectA3.deleteFromScene(runtimeScene);
+    myObjectB1.deleteFromScene(runtimeScene);
 
     // Process the tasks again (after faking it's finished).
     runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
@@ -411,6 +423,12 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     );
     expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
       10
+    );
+    expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+      10
+    );
+    expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+      15
     );
   });
 });

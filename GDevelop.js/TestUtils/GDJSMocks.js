@@ -1,7 +1,5 @@
 /** A minimal RuntimeBehavior base class */
-function RuntimeBehavior() {
-  return this;
-}
+class RuntimeBehavior {}
 
 /** A minimal implementation of OnceTriggers */
 function OnceTriggers() {
@@ -25,6 +23,54 @@ OnceTriggers.prototype.triggerOnce = function (triggerId) {
 
   return !this._lastFrameTriggers.hasOwnProperty(triggerId);
 };
+
+class FakeAsyncTasksManager {
+  constructor() {
+    /** @type {Map<FakeAsyncTask, (runtimeScene: RuntimeScene) => void>()>} */
+    this.tasks = new Map();
+  }
+
+  /**
+   * @param {gdjs.RuntimeScene} runtimeScene
+   */
+  processTasks(runtimeScene) {
+    for (const task of this.tasks.keys()) {
+      if (task.update(runtimeScene)) {
+        // The task has finished, run the callback and remove it.
+        this.tasks.get(task)(runtimeScene);
+        this.tasks.delete(task);
+      }
+    }
+  }
+
+  /**
+   * @param {FakeAsyncTask} task The {@link AsyncTask} to run.
+   * @param {(runtimeScene: RuntimeScene) => void} then The callback to execute once the task is finished.
+   */
+  addTask(task, then) {
+    this.tasks.set(task, then);
+  }
+
+  markAllFakeAsyncTasksAsFinished() {
+    for (const task of this.tasks.keys()) {
+      task.markAsFinished();
+    }
+  }
+}
+
+class FakeAsyncTask {
+  constructor(waitingAsyncTasks) {
+    this._finished = false;
+  }
+
+  update(runtimeScene) {
+    return this._finished;
+  }
+
+  markAsFinished() {
+    this._finished = true;
+  }
+}
 
 class VariablesContainer {
   constructor() {
@@ -51,8 +97,17 @@ class VariablesContainer {
 }
 
 class RuntimeObject {
-  constructor() {
+  constructor(runtimeScene, objectData) {
+    this.name = objectData.name || '';
     this._variables = new VariablesContainer();
+    this._livingOnScene = true;
+
+    /** @type {Set<() => void>} */
+    this.destroyCallbacks = new Set();
+  }
+
+  getName() {
+    return this.name;
   }
 
   getVariables() {
@@ -61,6 +116,29 @@ class RuntimeObject {
 
   returnVariable(variable) {
     return variable;
+  }
+
+  /** @param {RuntimeScene} runtimeScene */
+  deleteFromScene(runtimeScene) {
+    if (this._livingOnScene) {
+      runtimeScene.markObjectForDeletion(this);
+      this._livingOnScene = false;
+    }
+  }
+
+  /** @param {RuntimeScene} runtimeScene */
+  onDestroyFromScene(runtimeScene) {
+    // Note: these mocks don't support behaviors nor layers or effects.
+
+    this.destroyCallbacks.forEach((c) => c());
+  }
+
+  registerDestroyCallback(callback) {
+    this.destroyCallbacks.add(callback);
+  }
+
+  unregisterDestroyCallback(callback) {
+    this.destroyCallbacks.delete(callback);
   }
 }
 
@@ -210,6 +288,7 @@ class RuntimeScene {
   constructor() {
     this._variablesContainer = new VariablesContainer();
     this._onceTriggers = new OnceTriggers();
+    this._asyncTasksManager = new FakeAsyncTasksManager();
 
     /** @type {Object.<string, RuntimeObject[]>} */
     this._instances = {};
@@ -218,11 +297,30 @@ class RuntimeScene {
   createObject(objectName) {
     if (!this._instances[objectName]) this._instances[objectName] = [];
 
-    const newObject = new RuntimeObject();
+    const fakeObjectData = { name: objectName };
+    const newObject = new RuntimeObject(this, fakeObjectData);
     this._instances[objectName].push(newObject);
 
     return newObject;
   }
+
+  /** @param {RuntimeObject} obj */
+  markObjectForDeletion(obj) {
+    // Delete from the living instances.
+    const instances = this._instances[obj.getName()];
+    if (instances) {
+      for (let i = 0, len = instances.length; i < len; ++i) {
+        if (instances == obj) {
+          allInstances.splice(i, 1);
+          break;
+        }
+      }
+    }
+
+    //Notify the object it was removed from the scene
+    obj.onDestroyFromScene(this);
+  }
+
   getObjects(objectName) {
     return this._instances[objectName] || [];
   }
@@ -231,6 +329,69 @@ class RuntimeScene {
   }
   getOnceTriggers() {
     return this._onceTriggers;
+  }
+  getAsyncTasksManager() {
+    return this._asyncTasksManager;
+  }
+}
+
+/**
+ * A container for objects lists that should last more than the current frame.
+ * It automatically removes objects that were destroyed from the objects lists.
+ */
+class LongLivedObjectsList {
+  constructor() {
+    /** @type {Map<string, Array<RuntimeObject>>} */
+    this.objectsLists = new Map();
+    /** @type {Map<RuntimeObject, () => void>} */
+    this.callbacks = new Map();
+    /** @type {LongLivedObjectsList | null} */
+    this.parent = null;
+  }
+
+  /** @param {LongLivedObjectsList} parent */
+  static from(parent) {
+    const newList = new LongLivedObjectsList();
+    newList.parent = parent;
+    return newList;
+  }
+
+  /** @param {string} objectName */
+  getOrCreateList(objectName) {
+    if (!this.objectsLists.has(objectName))
+      this.objectsLists.set(objectName, []);
+    return this.objectsLists.get(objectName);
+  }
+
+  /** @param {string} objectName */
+  getObjects(objectName) {
+    if (!this.objectsLists.has(objectName) && this.parent)
+      return this.parent.getObjects(objectName);
+    return this.objectsLists.get(objectName) || [];
+  }
+
+  /** @param {gdjs.RuntimeObject} runtimeObject */
+  addObject(runtimeObject) {
+    const list = this.getOrCreateList(runtimeObject.getName());
+    if (list.includes(runtimeObject)) return;
+    list.push(runtimeObject);
+
+    // Register callbacks for when the object is destroyed
+    const onDestroy = () => this.removeObject(runtimeObject);
+    this.callbacks.set(runtimeObject, onDestroy);
+    runtimeObject.registerDestroyCallback(onDestroy);
+  }
+
+  /** @param {gdjs.RuntimeObject} runtimeObject */
+  removeObject(runtimeObject) {
+    const list = this.getOrCreateList(runtimeObject.getName());
+    const index = list.indexOf(runtimeObject);
+    if (index === -1) return;
+    list.splice(index, 1);
+
+    // Properly remove callbacks to not leak the object
+    runtimeObject.unregisterDestroyCallback(this.callbacks.get(runtimeObject));
+    this.callbacks.delete(runtimeObject);
   }
 }
 
@@ -250,6 +411,9 @@ function makeMinimalGDJSMock() {
       evtTools: {
         variable: { getVariableNumber: (variable) => variable.getAsNumber() },
         object: { createObjectOnScene },
+        runtimeScene: {
+          wait: () => new FakeAsyncTask(),
+        },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;
@@ -267,11 +431,12 @@ function makeMinimalGDJSMock() {
       RuntimeBehavior,
       OnceTriggers,
       Hashtable,
+      LongLivedObjectsList,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {
-        runtimeScenePreEventsCallbacks.forEach(cb => cb(runtimeScene))
-      }
+        runtimeScenePreEventsCallbacks.forEach((cb) => cb(runtimeScene));
+      },
     },
     runtimeScene,
   };

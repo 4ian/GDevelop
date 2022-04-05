@@ -129,7 +129,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                     floatingLabelText={fieldLabel}
                     hintText={
                       gameHasLeaderboards
-                        ? props.parameterMetadata.isOptional()
+                        ? props.parameterMetadata &&
+                          props.parameterMetadata.isOptional()
                           ? t`Choose a leaderboard (optional)`
                           : t`Choose a leaderboard`
                         : t`No leaderboards`
@@ -139,7 +140,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                         ? i18n._(
                             t`There are currently no leaderboards created for this game. Open the leaderboards manager to create one.`
                           )
-                        : props.parameterMetadata.getLongDescription() || null
+                        : (props.parameterMetadata &&
+                            props.parameterMetadata.getLongDescription()) ||
+                          null
                     }
                   >
                     {selectOptions}

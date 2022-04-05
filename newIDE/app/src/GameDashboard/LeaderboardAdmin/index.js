@@ -29,6 +29,9 @@ import PeopleAlt from '@material-ui/icons/PeopleAlt';
 import SwapVertical from '@material-ui/icons/SwapVert';
 import Refresh from '@material-ui/icons/Refresh';
 import Delete from '@material-ui/icons/Delete';
+import Visibility from '@material-ui/icons/Visibility';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Loop from '@material-ui/icons/Loop';
 
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
@@ -46,6 +49,7 @@ import {
   type Leaderboard,
   type LeaderboardSortOption,
   type LeaderboardPlayerUnicityDisplayOption,
+  type LeaderboardVisibilityOption,
   breakUuid,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
@@ -141,6 +145,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       name?: string,
       sort?: LeaderboardSortOption,
       playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+      visibility?: LeaderboardVisibilityOption,
     |}
   ) => {
     setNewNameError(null);
@@ -174,6 +179,11 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
           <Trans>
             An error occurred when updating the sort direction of the
             leaderboard, please close the dialog, come back and try again.
+          </Trans>
+        ) : payload.visibility ? (
+          <Trans>
+            An error occurred when updating the visibility of the leaderboard,
+            please close the dialog, come back and try again.
           </Trans>
         ) : (
           <Trans>
@@ -364,6 +374,12 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     },
     [leaderboards, onListLeaderboards]
   );
+
+  React.useEffect(() => {
+    if (currentLeaderboard) onFetchLeaderboardEntries();
+    // This has to be executed on component mount to refresh entries on each admin opening
+    // eslint-disable-next-line
+  }, []);
 
   const onCopy = React.useCallback(
     () => {
@@ -605,6 +621,51 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
           disabled={isRequestPending || isEditingName}
         >
           <SwapVertical />
+        </IconButton>
+      ),
+    },
+    {
+      key: 'visibility',
+      avatar:
+        currentLeaderboard.visibility === 'HIDDEN' ? (
+          <VisibilityOff />
+        ) : (
+          <Visibility />
+        ),
+      text: (
+        <Text size="body2">
+          {currentLeaderboard.visibility === 'HIDDEN' ? (
+            <Trans>Only you can see it</Trans>
+          ) : (
+            <Trans>Public</Trans>
+          )}
+        </Text>
+      ),
+      secondaryText:
+        apiError && apiError.action === 'leaderboardVisibilityUpdate' ? (
+          <Text color="error" size="body2">
+            {apiError.message}
+          </Text>
+        ) : null,
+      secondaryAction: (
+        <IconButton
+          onClick={async () => {
+            await onUpdateLeaderboard(i18n, {
+              visibility:
+                currentLeaderboard.visibility === 'HIDDEN'
+                  ? 'PUBLIC'
+                  : 'HIDDEN',
+            });
+          }}
+          tooltip={
+            currentLeaderboard.visibility === 'HIDDEN'
+              ? t`Make the leaderboard public`
+              : t`Hide the leaderboard`
+          }
+          edge="end"
+          disabled={isRequestPending || isEditingName}
+        >
+          <Loop />
         </IconButton>
       ),
     },

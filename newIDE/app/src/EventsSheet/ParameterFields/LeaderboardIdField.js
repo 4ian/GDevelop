@@ -129,15 +129,17 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                     floatingLabelText={fieldLabel}
                     hintText={
                       gameHasLeaderboards
-                        ? t`Choose a leaderboard`
+                        ? props.parameterMetadata.isOptional()
+                          ? t`Choose a leaderboard (optional)`
+                          : t`Choose a leaderboard`
                         : t`No leaderboards`
                     }
                     helperMarkdownText={
-                      gameHasLeaderboards
-                        ? null
-                        : i18n._(
+                      !gameHasLeaderboards
+                        ? i18n._(
                             t`There are currently no leaderboards created for this game. Open the leaderboards manager to create one.`
                           )
+                        : props.parameterMetadata.getLongDescription() || null
                     }
                   >
                     {selectOptions}
@@ -197,16 +199,25 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
 const InlineLeaderboardIdField = ({
   value,
+  parameterMetadata,
   InvalidParameterValue,
 }: ParameterInlineRendererProps) => {
   const leaderboards = useFetchLeaderboards();
 
   if (!value) {
-    return (
-      <InvalidParameterValue isEmpty>
-        <Trans>Choose a leaderboard</Trans>
-      </InvalidParameterValue>
-    );
+    if (parameterMetadata.isOptional()) {
+      return (
+        <span>
+          <Trans>No leaderboard chosen</Trans>
+        </span>
+      );
+    } else {
+      return (
+        <InvalidParameterValue isEmpty>
+          <Trans>Choose a leaderboard</Trans>
+        </InvalidParameterValue>
+      );
+    }
   }
 
   return <span>{getInlineParameterDisplayValue(leaderboards, value)}</span>;

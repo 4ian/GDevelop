@@ -87,13 +87,11 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
-      .addParameter(
-        'leaderboardId',
-        _('Leaderboard'),
+      .addParameter('leaderboardId', _('Leaderboard'), '', true)
+      .setParameterLongDescription(
         _(
           'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
-        ),
-        true
+        )
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
@@ -109,13 +107,11 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
-      .addParameter(
-        'leaderboardId',
-        _('Leaderboard'),
+      .addParameter('leaderboardId', _('Leaderboard'), '', true)
+      .setParameterLongDescription(
         _(
           'If no leaderboard is specified, will return the value related to the last leaderboard save action that successfully ended.'
-        ),
-        true
+        )
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
@@ -131,13 +127,11 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
-      .addParameter(
-        'leaderboardId',
-        _('Leaderboard'),
+      .addParameter('leaderboardId', _('Leaderboard'), '', true)
+      .setParameterLongDescription(
         _(
           'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
-        ),
-        true
+        )
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
@@ -151,13 +145,11 @@ module.exports = {
         _('Error of last save attempt in leaderboard _PARAM0_'),
         'JsPlatform/Extensions/leaderboard.svg'
       )
-      .addParameter(
-        'leaderboardId',
-        _('Leaderboard'),
+      .addParameter('leaderboardId', _('Leaderboard'), '', true)
+      .setParameterLongDescription(
         _(
           'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
-        ),
-        true
+        )
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')

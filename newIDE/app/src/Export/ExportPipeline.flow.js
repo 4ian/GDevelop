@@ -46,12 +46,13 @@ export type ExportPipeline<
 
   isNavigationDisabled: (exportStep: BuildStep, errored: boolean) => boolean,
 
-  renderCustomStepsProgress?: (
+  renderCustomStepsProgress?: ({
     build: ?Build,
+    project: gdProject,
+    onSaveProject: () => Promise<void>,
     errored: boolean,
     exportStep: BuildStep,
-    getGameThumbnailUrl: (buildId: string) => ?string
-  ) => React.Node,
+  }) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

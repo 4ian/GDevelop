@@ -3026,8 +3026,7 @@
   dependencies:
     "@lingui/babel-plugin-transform-react" "2.9.2"
 
-"@lingui/react@git://github.com/4ian/lingui-react.git#master":
-  "integrity" "sha512-eoYJ8TI+8IolPh4fue9aIwX2OVp0YrPnV86QBZLfGhxknodVeNmx+4Ic4ym7rI5/davbk9AUZHcssiH+YZWVxw=="
+"@lingui/react@github:4ian/lingui-react#master":
   "resolved" "git+ssh://git@github.com/4ian/lingui-react.git#dc6b1e013470d952cf85f96cc4affdd28e29634a"
   "version" "2.7.3"
   dependencies:
@@ -5954,6 +5953,13 @@
     "buffers" "~0.1.1"
     "chainsaw" "~0.1.0"
 
+"bindings@^1.5.0":
+  "integrity" "sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ=="
+  "resolved" "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz"
+  "version" "1.5.0"
+  dependencies:
+    "file-uri-to-path" "1.0.0"
+
 "bluebird@^3.3.5", "bluebird@^3.5.5":
   "integrity" "sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg=="
   "resolved" "https://registry.npmjs.org/bluebird/-/bluebird-3.7.2.tgz"
@@ -6663,9 +6669,9 @@
   "version" "2.2.5"
 
 "classnames@^2.2.6":
-  "integrity" "sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q=="
-  "resolved" "https://registry.npmjs.org/classnames/-/classnames-2.2.6.tgz"
-  "version" "2.2.6"
+  "integrity" "sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA=="
+  "resolved" "https://registry.npmjs.org/classnames/-/classnames-2.3.1.tgz"
+  "version" "2.3.1"
 
 "clean-css@^4.2.3":
   "integrity" "sha512-VcMWDN54ZN/DS+g58HYL5/n4Zrqe8vHJpGA8KdgUXFU4fuP/aHNw8eld9SyEIyabIMJX/0RaY/fplOo5hYLSFA=="
@@ -9689,6 +9695,24 @@
   "integrity" "sha1-FQStJSMVjKpA20onh8sBQRmU6k8="
   "resolved" "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
   "version" "1.0.0"
+
+"fsevents@^1.2.7":
+  "integrity" "sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw=="
+  "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-1.2.13.tgz"
+  "version" "1.2.13"
+  dependencies:
+    "bindings" "^1.5.0"
+    "nan" "^2.12.1"
+
+"fsevents@^2.1.2", "fsevents@~2.1.2":
+  "integrity" "sha512-Auw9a4AxqWpa9GUfj370BMPzzyncfBABW8Mab7BGWBYDj4Isgq+cDKtx0i6u9jcX9pQDnswsaaOTgTmA5pEjuQ=="
+  "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-2.1.3.tgz"
+  "version" "2.1.3"
+
+"fsevents@2.1.2":
+  "integrity" "sha512-R4wDiBwZ0KzpgOWetKDug1FZcYhqYnUYKtfZYt4mD5SBz76q0KR4Q9o7GIPamsVPGmW3EYPPJ0dOOjvx32ldZA=="
+  "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-2.1.2.tgz"
+  "version" "2.1.2"
 
 "fstream@^1.0.12":
   "integrity" "sha512-WvJ193OHa0GHPEL+AycEJgxvBEwyfRkN1vhjca23OaPVMCaLCXTd5qAu82AjTcgP1UJmytkOKb63Ypde7raDIg=="
@@ -13356,6 +13380,11 @@
   "resolved" "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.8.tgz"
   "version" "0.0.8"
 
+"nan@^2.12.1":
+  "integrity" "sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw=="
+  "resolved" "https://registry.npmjs.org/nan/-/nan-2.14.1.tgz"
+  "version" "2.14.1"
+
 "nanomatch@^1.2.9":
   "integrity" "sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA=="
   "resolved" "https://registry.npmjs.org/nanomatch/-/nanomatch-1.2.13.tgz"
@@ -14302,8 +14331,7 @@
   dependencies:
     "node-modules-regexp" "^1.0.0"
 
-"pixi-simple-gesture@git://github.com/4ian/pixi-simple-gesture#v0.3.3":
-  "integrity" "sha512-DG1BxP8SK2iPMYWMOPGz5gKDXFmA8JPUpcyyNyIH55fpQraenuLYlosYFFMTRXEy0RZViTUu11H3VrYlfG2CgA=="
+"pixi-simple-gesture@github:4ian/pixi-simple-gesture#v0.3.3":
   "resolved" "git+ssh://git@github.com/4ian/pixi-simple-gesture.git#c84e0cc3c62edeca019e708d9897ef6b97a0d18a"
   "version" "0.3.3"
 
@@ -15862,8 +15890,7 @@
     "monaco-editor" "^0.14.2"
     "prop-types" "^15.6.2"
 
-"react-mosaic-component@git://github.com/4ian/react-mosaic#v3.1.0":
-  "integrity" "sha512-Izfw/EkG1g39nrZbOqzY52rqFkVFA1SUSv1TLwk7soS1Wy7iHm6zrUgzJdfwKRC2GaDn9WAfSe5ZQ2vIJ/mu5A=="
+"react-mosaic-component@github:4ian/react-mosaic#v3.1.0":
   "resolved" "git+ssh://git@github.com/4ian/react-mosaic.git#d5ef155119d786c08c7c72e34997dcef2f01f98b"
   "version" "3.1.0"
   dependencies:

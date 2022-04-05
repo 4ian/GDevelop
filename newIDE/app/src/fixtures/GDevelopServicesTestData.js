@@ -818,6 +818,7 @@ export const showcasedGame1: ShowcasedGame = {
 
 export const exampleFromFutureVersion: ExampleShortHeader = {
   id: 'fake-id',
+  slug: 'fake-slug',
   name: 'Fake example',
   shortDescription: 'This is a fake example made in a future GDevelop version',
   license: 'MIT',
@@ -829,6 +830,7 @@ export const exampleFromFutureVersion: ExampleShortHeader = {
 export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
   id: '2ff24efa0de9b1340d7e8c8aedb494af6b4db9a72c6a643303734755efb977df',
   name: 'Geometry monster',
+  slug: 'geometry-monster',
   shortDescription:
     'A hyper casual endless game where you have to collect shapes and avoid bombs, with a progressively increasing difficulty.\n',
   license: 'MIT',

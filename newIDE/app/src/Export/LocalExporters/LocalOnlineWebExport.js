@@ -17,10 +17,9 @@ import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { type BuildStep } from '../Builds/BuildStepsProgress';
 import {
   ExplanationHeader,
-  WebProjectLink,
+  OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
@@ -67,17 +66,19 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
-  renderCustomStepsProgress: (
-    build: ?Build,
-    errored: boolean,
-    exportStep: BuildStep,
-    getGameThumbnailUrl: (buildId: string) => ?string
-  ) => (
-    <WebProjectLink
+  renderCustomStepsProgress: ({
+    build,
+    project,
+    onSaveProject,
+    errored,
+    exportStep,
+  }) => (
+    <OnlineGameLink
       build={build}
+      project={project}
+      onSaveProject={onSaveProject}
       errored={errored}
       exportStep={exportStep}
-      getGameThumbnailUrl={getGameThumbnailUrl}
     />
   ),
 

@@ -266,6 +266,12 @@ namespace gdjs {
           )[1];
       };
 
+      export const isMouseInsideCanvas = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        return runtimeScene.getGame().getInputManager().isMouseInsideCanvas();
+      };
+
       export const _cursorIsOnObject = function (obj, runtimeScene) {
         return obj.cursorOnObject(runtimeScene);
       };

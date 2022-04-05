@@ -36,7 +36,7 @@ import {
   type HotReloadPreviewButtonProps,
   NewPreviewIcon,
 } from '../HotReload/HotReloadPreviewButton';
-import PublicGameProperties from './PublicGameProperties';
+import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 
 type Props = {|
   project: gdProject,
@@ -538,6 +538,17 @@ function ProjectPropertiesDialog(props: Props) {
                       the resources editor and disable the Smoothing for all
                       images of your game. It will be done automatically for new
                       images added from now.
+                    </Trans>
+                  </DismissableAlertMessage>
+                )}
+                {pixelsRounding && (
+                  <DismissableAlertMessage
+                    identifier="use-pixel-rounding"
+                    kind="info"
+                  >
+                    <Trans>
+                      To avoid flickering on objects followed by the camera, use
+                      sprites with even dimensions.
                     </Trans>
                   </DismissableAlertMessage>
                 )}

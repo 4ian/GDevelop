@@ -256,9 +256,6 @@ namespace gdjs {
       ): boolean {
         if (leaderboardId) {
           if (!_savingDataByLeaderboard[leaderboardId]) {
-            logger.error(
-              `No score saving data for leaderboard ${leaderboardId}`
-            );
             return false;
           }
           return _savingDataByLeaderboard[leaderboardId][state];
@@ -267,7 +264,6 @@ namespace gdjs {
           hasEnded: state === 'hasScoreBeenSaved',
         });
         if (!lastScoreSavingData) {
-          logger.warn(`No score saving data available`);
           return false;
         }
         return lastScoreSavingData[state];
@@ -299,7 +295,6 @@ namespace gdjs {
       ): string | null {
         if (leaderboardId) {
           if (!_savingDataByLeaderboard[leaderboardId]) {
-            logger.error(`No saving data for leaderboard ${leaderboardId}`);
             return 'NO_DATA_ERROR';
           }
           return _savingDataByLeaderboard[leaderboardId].lastSaveError;
@@ -307,7 +302,6 @@ namespace gdjs {
 
         const lastScoreSavingData = getLastScoreSavingData({ hasEnded: true });
         if (!lastScoreSavingData) {
-          logger.warn(`No score saving data available`);
           return 'NO_DATA_ERROR';
         }
 

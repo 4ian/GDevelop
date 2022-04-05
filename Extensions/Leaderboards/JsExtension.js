@@ -82,10 +82,18 @@ module.exports = {
         'HasLastSaveErrored',
         _('Last score save has errored'),
         _('Check if the last attempt to save a score has errored.'),
-        _('Last score save has errored'),
+        _('Last score save in leaderboard _PARAM0_ has errored'),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addParameter(
+        'leaderboardId',
+        _('Leaderboard'),
+        _(
+          'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
+        ),
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
@@ -96,10 +104,18 @@ module.exports = {
         'HasLastSaveSucceeded',
         _('Last score save has succeeded'),
         _('Check if the last attempt to save a score has succeeded.'),
-        _('Last score save has succeeded'),
+        _('Last score save in leaderboard _PARAM0_ has succeeded'),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addParameter(
+        'leaderboardId',
+        _('Leaderboard'),
+        _(
+          'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
+        ),
+        true
       )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
@@ -110,14 +126,42 @@ module.exports = {
         'IsSaving',
         _('Score is saving'),
         _('Check if a score is currently being saved in leaderboard.'),
-        _('Score is saving'),
+        _('Score is saving in leaderboard _PARAM0_'),
         _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
+      .addParameter(
+        'leaderboardId',
+        _('Leaderboard'),
+        _(
+          'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
+        ),
+        true
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isSaving');
+
+    extension
+      .addStrExpression(
+        'LastSaveError',
+        _('Error of last save attempt'),
+        _('Get the error of the last save attempt.'),
+        _('Error of last save attempt in leaderboard _PARAM0_'),
+        'JsPlatform/Extensions/leaderboard.svg'
+      )
+      .addParameter(
+        'leaderboardId',
+        _('Leaderboard'),
+        _(
+          'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
+        ),
+        true
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setFunctionName('gdjs.evtTools.leaderboards.getLastSaveError');
 
     extension
       .addCondition(
@@ -162,18 +206,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewLoading');
-
-    extension
-      .addStrExpression(
-        'LastSaveError',
-        _('Error of last save attempt'),
-        _('Get the error of the last save attempt'),
-        _('Save score'),
-        'JsPlatform/Extensions/leaderboard.svg'
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
-      .setFunctionName('gdjs.evtTools.leaderboards.getLastSaveError');
 
     extension
       .addStrExpression(

@@ -3,17 +3,79 @@ namespace gdjs {
   export namespace evtTools {
     export namespace leaderboards {
       // Score saving
-      // TODO: add a notion of "per leaderboard id" to allow posting to multiple
-      // leaderboards at once.
-      let _scoreLastSavedAt: number | null = null;
-      let _currentlySavingScore: number;
-      let _currentlySavingPlayerName: string;
-      let _lastSavedScore: number;
-      let _lastSavedPlayerName: string;
-      let _lastSaveError: string;
-      let _isScoreSaving: boolean = false;
-      let _hasScoreBeenSaved: boolean = false;
-      let _hasScoreSavingErrored: boolean = false;
+      class ScoreSavingData {
+        scoreLastSavedAt: number | null;
+        currentlySavingScore: number | null;
+        currentlySavingPlayerName: string | null;
+        lastSavedScore: number | null;
+        lastSavedPlayerName: string | null;
+        lastSaveError: string | null;
+        isScoreSaving: boolean;
+        hasScoreBeenSaved: boolean;
+        hasScoreSavingErrored: boolean;
+
+        constructor() {
+          this.scoreLastSavedAt = null;
+          this.currentlySavingScore = null;
+          this.currentlySavingPlayerName = null;
+          this.lastSavedScore = null;
+          this.lastSavedPlayerName = null;
+          this.lastSaveError = null;
+          this.isScoreSaving = false;
+          this.hasScoreBeenSaved = false;
+          this.hasScoreSavingErrored = false;
+        }
+
+        isSameAsLastScore(playerName: string, score: number): boolean {
+          return (
+            this.lastSavedPlayerName === playerName &&
+            this.lastSavedScore === score
+          );
+        }
+
+        isAlreadySavingThisScore(playerName: string, score: number): boolean {
+          return (
+            this.isScoreSaving &&
+            this.currentlySavingPlayerName === playerName &&
+            this.currentlySavingScore === score
+          );
+        }
+
+        isTooSoonToSaveAnotherScore(): boolean {
+          return (
+            !!this.scoreLastSavedAt && Date.now() - this.scoreLastSavedAt < 500
+          );
+        }
+
+        resetTimer(): void {
+          this.scoreLastSavedAt = Date.now();
+        }
+
+        startSaving(playerName: string, score: number): void {
+          this.isScoreSaving = true;
+          this.hasScoreBeenSaved = false;
+          this.hasScoreSavingErrored = false;
+          this.currentlySavingScore = score;
+          this.currentlySavingPlayerName = playerName;
+        }
+
+        closeSaving(): void {
+          this.lastSavedScore = this.currentlySavingScore;
+          this.lastSavedPlayerName = this.currentlySavingPlayerName;
+          this.isScoreSaving = false;
+          this.hasScoreBeenSaved = true;
+        }
+
+        setError(errorCode: string): void {
+          this.lastSaveError = errorCode;
+          this.isScoreSaving = false;
+          this.hasScoreSavingErrored = true;
+        }
+      }
+
+      let _savingDataByLeaderboard: {
+        [leaderboardId: string]: ScoreSavingData;
+      } = {};
 
       // Leaderboard display
       let _requestedLeaderboardId: string | null;
@@ -52,6 +114,26 @@ namespace gdjs {
       }
       _loaderContainer.appendChild(_loader);
 
+      const getLastScoreSavingData = function (): ScoreSavingData | null {
+        const scoreSavingDataArray = Object.values(
+          _savingDataByLeaderboard
+        ).filter((scoreSavingData) => !!scoreSavingData.scoreLastSavedAt);
+        if (scoreSavingDataArray.length === 0) return null;
+
+        let lastScoreSavingData = scoreSavingDataArray[0];
+        scoreSavingDataArray.forEach((scoreSavingData) => {
+          if (
+            scoreSavingData.scoreLastSavedAt &&
+            lastScoreSavingData.scoreLastSavedAt &&
+            scoreSavingData.scoreLastSavedAt >
+              lastScoreSavingData.scoreLastSavedAt
+          ) {
+            lastScoreSavingData = scoreSavingData;
+          }
+        });
+        return lastScoreSavingData;
+      };
+
       export const savePlayerScore = function (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
@@ -60,45 +142,42 @@ namespace gdjs {
         responseVar: gdjs.Variable,
         errorVar: gdjs.Variable
       ) {
-        if (
-          _isScoreSaving &&
-          _currentlySavingPlayerName === playerName &&
-          _currentlySavingScore === score
-        ) {
-          logger.warn(
-            'There is already a request to save with this player name and this score. Ignoring this one.'
-          );
-          return;
+        let scoreSavingData: ScoreSavingData;
+        if (_savingDataByLeaderboard[leaderboardId]) {
+          scoreSavingData = _savingDataByLeaderboard[leaderboardId];
+          if (scoreSavingData.isAlreadySavingThisScore(playerName, score)) {
+            logger.warn(
+              'There is already a request to save with this player name and this score. Ignoring this one.'
+            );
+            return;
+          }
+        } else {
+          scoreSavingData = new ScoreSavingData();
+          _savingDataByLeaderboard[leaderboardId] = scoreSavingData;
         }
 
-        _isScoreSaving = true;
-        _hasScoreBeenSaved = false;
-        _hasScoreSavingErrored = false;
         errorVar.setString('');
         responseVar.setString('');
-        _currentlySavingScore = score;
-        _currentlySavingPlayerName = playerName;
+        scoreSavingData.startSaving(playerName, score);
 
-        if (_lastSavedPlayerName === playerName && _lastSavedScore === score) {
+        if (scoreSavingData.isSameAsLastScore(playerName, score)) {
           logger.warn(
             'The player and score to be sent are the same as previous one. Ignoring this one.'
           );
-          _lastSaveError = 'SAME_AS_PREVIOUS';
-          _isScoreSaving = false;
-          _hasScoreSavingErrored = true;
-          errorVar.setString(_lastSaveError);
+          const errorCode = 'SAME_AS_PREVIOUS';
+          scoreSavingData.setError(errorCode);
+          errorVar.setString(errorCode);
           return;
         }
 
-        if (!!_scoreLastSavedAt && Date.now() - _scoreLastSavedAt < 500) {
-          _scoreLastSavedAt = Date.now();
+        if (scoreSavingData.isTooSoonToSaveAnotherScore()) {
+          scoreSavingData.resetTimer();
           logger.warn(
             'Last entry was sent too little time ago. Ignoring this one.'
           );
-          _lastSaveError = 'TOO_FAST';
-          _isScoreSaving = false;
-          _hasScoreSavingErrored = true;
-          errorVar.setString(_lastSaveError);
+          const errorCode = 'TOO_FAST';
+          scoreSavingData.setError(errorCode);
+          errorVar.setString(errorCode);
           return;
         }
 
@@ -126,25 +205,21 @@ namespace gdjs {
           }
         ).then(
           (response) => {
-            _scoreLastSavedAt = Date.now();
+            scoreSavingData.resetTimer();
 
             if (!response.ok) {
-              _lastSaveError = response.status.toString();
+              const errorCode = response.status.toString();
               logger.error(
                 'Server responded with an error:',
-                _lastSaveError,
+                errorCode,
                 response.statusText
               );
-              _isScoreSaving = false;
-              _hasScoreSavingErrored = true;
-              errorVar.setString(_lastSaveError);
+              scoreSavingData.setError(errorCode);
+              errorVar.setString(errorCode);
               return;
             }
 
-            _lastSavedScore = score;
-            _lastSavedPlayerName = playerName;
-            _isScoreSaving = false;
-            _hasScoreBeenSaved = true;
+            scoreSavingData.closeSaving();
 
             response.text().then(
               (text) => {
@@ -161,25 +236,74 @@ namespace gdjs {
           },
           (error) => {
             logger.error('Error while submitting a leaderboard score:', error);
-            _isScoreSaving = false;
-            _hasScoreSavingErrored = true;
-            errorVar.setString('REQUEST_NOT_SENT');
+            const errorCode = 'REQUEST_NOT_SENT';
+            scoreSavingData.setError(errorCode);
+            errorVar.setString(errorCode);
           }
         );
       };
 
-      export const isSaving = function (): boolean {
-        return _isScoreSaving;
-      };
-      export const hasBeenSaved = function (): boolean {
-        return _hasScoreBeenSaved;
-      };
-      export const hasSavingErrored = function (): boolean {
-        return _hasScoreSavingErrored;
+      const getLeaderboardOrLastLeaderboardState = function (
+        state: string,
+        leaderboardId?: string
+      ): boolean {
+        if (leaderboardId) {
+          if (!_savingDataByLeaderboard[leaderboardId]) {
+            logger.error(
+              `No score saving data for leaderboard ${leaderboardId}`
+            );
+            return false;
+          }
+          return _savingDataByLeaderboard[leaderboardId][state];
+        }
+        const lastScoreSavingData = getLastScoreSavingData();
+        if (!lastScoreSavingData) {
+          // logger.warn(`No score saving data available`);
+          return false;
+        }
+        logger.log("BONJOUR")
+        return lastScoreSavingData[state];
       };
 
-      export const getLastSaveError = function (): string {
-        return _lastSaveError;
+      export const isSaving = function (leaderboardId?: string): boolean {
+        return getLeaderboardOrLastLeaderboardState(
+          'isScoreSaving',
+          leaderboardId
+        );
+      };
+      export const hasBeenSaved = function (leaderboardId?: string): boolean {
+        return getLeaderboardOrLastLeaderboardState(
+          'hasScoreBeenSaved',
+          leaderboardId
+        );
+      };
+      export const hasSavingErrored = function (
+        leaderboardId?: string
+      ): boolean {
+        return getLeaderboardOrLastLeaderboardState(
+          'hasScoreSavingErrored',
+          leaderboardId
+        );
+      };
+
+      export const getLastSaveError = function (
+        leaderboardId?: string
+      ): string | null {
+        if (leaderboardId) {
+          if (!_savingDataByLeaderboard[leaderboardId]) {
+            logger.error(`No saving data for leaderboard ${leaderboardId}`);
+            return 'NO_DATA_ERROR';
+          }
+          return _savingDataByLeaderboard[leaderboardId].lastSaveError;
+        }
+
+        const lastScoreSavingData = getLastScoreSavingData();
+        if (!lastScoreSavingData) {
+          logger.warn(`No score saving data available`);
+          return 'NO_DATA_ERROR';
+        }
+
+        return lastScoreSavingData.lastSaveError;
       };
 
       export const formatPlayerName = function (rawName: string): string {
@@ -418,9 +542,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(

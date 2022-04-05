@@ -89,6 +89,7 @@ app.on('ready', function() {
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',

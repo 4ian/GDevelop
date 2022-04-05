@@ -2,11 +2,82 @@ namespace gdjs {
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {
     export namespace leaderboards {
-      // Score submission
-      let _scoreLastSentAt: number | null = null;
-      let _lastScore: number;
-      let _lastPlayerName: string;
-      let _lastErrorCode: number;
+      // Score saving
+      class ScoreSavingData {
+        lastScoreSavingStartedAt: number | null;
+        lastScoreSavingSucceededAt: number | null;
+        currentlySavingScore: number | null;
+        currentlySavingPlayerName: string | null;
+        lastSavedScore: number | null;
+        lastSavedPlayerName: string | null;
+        lastSaveError: string | null;
+        isScoreSaving: boolean;
+        hasScoreBeenSaved: boolean;
+        hasScoreSavingErrored: boolean;
+
+        constructor() {
+          this.lastScoreSavingStartedAt = null;
+          this.lastScoreSavingSucceededAt = null;
+          this.currentlySavingScore = null;
+          this.currentlySavingPlayerName = null;
+          this.lastSavedScore = null;
+          this.lastSavedPlayerName = null;
+          this.lastSaveError = null;
+          this.isScoreSaving = false;
+          this.hasScoreBeenSaved = false;
+          this.hasScoreSavingErrored = false;
+        }
+
+        isSameAsLastScore(playerName: string, score: number): boolean {
+          return (
+            this.lastSavedPlayerName === playerName &&
+            this.lastSavedScore === score
+          );
+        }
+
+        isAlreadySavingThisScore(playerName: string, score: number): boolean {
+          return (
+            this.isScoreSaving &&
+            this.currentlySavingPlayerName === playerName &&
+            this.currentlySavingScore === score
+          );
+        }
+
+        isTooSoonToSaveAnotherScore(): boolean {
+          return (
+            !!this.lastScoreSavingSucceededAt &&
+            Date.now() - this.lastScoreSavingSucceededAt < 500
+          );
+        }
+
+        startSaving(playerName: string, score: number): void {
+          this.lastScoreSavingStartedAt = Date.now();
+          this.isScoreSaving = true;
+          this.hasScoreBeenSaved = false;
+          this.hasScoreSavingErrored = false;
+          this.currentlySavingScore = score;
+          this.currentlySavingPlayerName = playerName;
+        }
+
+        closeSaving(): void {
+          this.lastScoreSavingSucceededAt = Date.now();
+          this.lastSavedScore = this.currentlySavingScore;
+          this.lastSavedPlayerName = this.currentlySavingPlayerName;
+          this.isScoreSaving = false;
+          this.hasScoreBeenSaved = true;
+        }
+
+        setError(errorCode: string): void {
+          this.lastSaveError = errorCode;
+          this.isScoreSaving = false;
+          this.hasScoreBeenSaved = false;
+          this.hasScoreSavingErrored = true;
+        }
+      }
+
+      let _savingDataByLeaderboard: {
+        [leaderboardId: string]: ScoreSavingData;
+      } = {};
 
       // Leaderboard display
       let _requestedLeaderboardId: string | null;
@@ -45,7 +116,35 @@ namespace gdjs {
       }
       _loaderContainer.appendChild(_loader);
 
-      export const setPlayerScore = function (
+      const getLastScoreSavingData = function ({
+        hasEnded,
+      }: {
+        hasEnded: boolean;
+      }): ScoreSavingData | null {
+        const dateFieldToUse = hasEnded
+          ? 'lastScoreSavingSucceededAt'
+          : 'lastScoreSavingStartedAt';
+        const scoreSavingDataArray = Object.values(
+          _savingDataByLeaderboard
+        ).filter((scoreSavingData) => !!scoreSavingData[dateFieldToUse]);
+        if (scoreSavingDataArray.length === 0) return null;
+
+        let lastScoreSavingData = scoreSavingDataArray[0];
+        scoreSavingDataArray.forEach((scoreSavingData) => {
+          const currentItemDate = scoreSavingData[dateFieldToUse];
+          const lastItemDate = lastScoreSavingData[dateFieldToUse];
+          if (
+            currentItemDate &&
+            lastItemDate &&
+            currentItemDate > lastItemDate
+          ) {
+            lastScoreSavingData = scoreSavingData;
+          }
+        });
+        return lastScoreSavingData;
+      };
+
+      export const savePlayerScore = function (
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
         score: float,
@@ -53,66 +152,160 @@ namespace gdjs {
         responseVar: gdjs.Variable,
         errorVar: gdjs.Variable
       ) {
+        let scoreSavingData: ScoreSavingData;
+        if (_savingDataByLeaderboard[leaderboardId]) {
+          scoreSavingData = _savingDataByLeaderboard[leaderboardId];
+          if (scoreSavingData.isAlreadySavingThisScore(playerName, score)) {
+            logger.warn(
+              'There is already a request to save with this player name and this score. Ignoring this one.'
+            );
+            return;
+          }
+
+          if (scoreSavingData.isSameAsLastScore(playerName, score)) {
+            logger.warn(
+              'The player and score to be sent are the same as previous one. Ignoring this one.'
+            );
+            const errorCode = 'SAME_AS_PREVIOUS';
+            scoreSavingData.setError(errorCode);
+            errorVar.setString(errorCode);
+            return;
+          }
+
+          if (scoreSavingData.isTooSoonToSaveAnotherScore()) {
+            logger.warn(
+              'Last entry was sent too little time ago. Ignoring this one.'
+            );
+            const errorCode = 'TOO_FAST';
+            scoreSavingData.setError(errorCode);
+            errorVar.setString(errorCode);
+            return;
+          }
+        } else {
+          scoreSavingData = new ScoreSavingData();
+          _savingDataByLeaderboard[leaderboardId] = scoreSavingData;
+        }
+
         errorVar.setString('');
         responseVar.setString('');
+        scoreSavingData.startSaving(playerName, score);
 
-        if (
-          (_lastPlayerName === playerName && _lastScore === score) ||
-          (!!_scoreLastSentAt && Date.now() - _scoreLastSentAt < 500)
-        ) {
-          errorVar.setString('Wait before sending a new score.');
-        } else {
-          const baseUrl = 'https://api.gdevelop-app.com/play';
-          const game = runtimeScene.getGame();
-          fetch(
-            `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
-            {
-              body: JSON.stringify({
-                playerName: formatPlayerName(playerName),
-                score: score,
-                sessionId: game.getSessionId(),
-                clientPlayerId: game.getPlayerId(),
-                location:
-                  typeof window !== 'undefined' && (window as any).location
-                    ? (window as any).location.href
-                    : '',
-              }),
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-            }
-          )
-            .then((response) => {
-              _scoreLastSentAt = Date.now();
-              if (!response.ok) {
-                errorVar.setString(response.status.toString());
-                _lastErrorCode = response.status;
-                return response.statusText;
-              } else {
-                _lastScore = score;
-                _lastPlayerName = playerName;
-                _lastErrorCode = response.status;
-                return response.text();
-              }
-            })
-            .then((data) => {
-              responseVar.setString(data);
-            })
-            .catch((error) => {
-              logger.warn(
-                `Error while submitting a leaderboard score: ${error}`
+        const baseUrl = 'https://api.gdevelop-app.com/play';
+        const game = runtimeScene.getGame();
+        const formattedPlayerName = formatPlayerName(playerName);
+        const sessionId = game.getSessionId();
+        const playerId = game.getPlayerId();
+        const location =
+          typeof window !== 'undefined' && (window as any).location
+            ? (window as any).location.href
+            : '';
+        fetch(
+          `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
+          {
+            body: JSON.stringify({
+              playerName: formattedPlayerName,
+              score: score,
+              sessionId: sessionId,
+              clientPlayerId: playerId,
+              location: location,
+            }),
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        ).then(
+          (response) => {
+            if (!response.ok) {
+              const errorCode = response.status.toString();
+              logger.error(
+                'Server responded with an error:',
+                errorCode,
+                response.statusText
               );
-              errorVar.setString('REQUEST_NOT_SENT');
-              _lastErrorCode = 400;
-            });
+              scoreSavingData.setError(errorCode);
+              errorVar.setString(errorCode);
+              return;
+            }
+
+            scoreSavingData.closeSaving();
+
+            response.text().then(
+              (text) => {
+                responseVar.setString(text);
+              },
+              (error) => {
+                logger.warn(
+                  'An error occurred when reading response but score has been saved:',
+                  error
+                );
+                responseVar.setString('CANNOT_READ_RESPONSE');
+              }
+            );
+          },
+          (error) => {
+            logger.error('Error while submitting a leaderboard score:', error);
+            const errorCode = 'REQUEST_NOT_SENT';
+            scoreSavingData.setError(errorCode);
+            errorVar.setString(errorCode);
+          }
+        );
+      };
+
+      const getLeaderboardOrLastLeaderboardState = function (
+        state: string,
+        leaderboardId?: string
+      ): boolean {
+        if (leaderboardId) {
+          if (!_savingDataByLeaderboard[leaderboardId]) {
+            return false;
+          }
+          return _savingDataByLeaderboard[leaderboardId][state];
         }
+        const lastScoreSavingData = getLastScoreSavingData({
+          hasEnded: state === 'hasScoreBeenSaved',
+        });
+        if (!lastScoreSavingData) {
+          return false;
+        }
+        return lastScoreSavingData[state];
       };
 
-      export const hasLastEntrySaveFailed = function () {
-        return _lastErrorCode && _lastErrorCode >= 400;
+      export const isSaving = function (leaderboardId?: string): boolean {
+        return getLeaderboardOrLastLeaderboardState(
+          'isScoreSaving',
+          leaderboardId
+        );
+      };
+      export const hasBeenSaved = function (leaderboardId?: string): boolean {
+        return getLeaderboardOrLastLeaderboardState(
+          'hasScoreBeenSaved',
+          leaderboardId
+        );
+      };
+      export const hasSavingErrored = function (
+        leaderboardId?: string
+      ): boolean {
+        return getLeaderboardOrLastLeaderboardState(
+          'hasScoreSavingErrored',
+          leaderboardId
+        );
       };
 
-      export const getLastSentEntryStatusCode = function () {
-        return '' + _lastErrorCode;
+      export const getLastSaveError = function (
+        leaderboardId?: string
+      ): string | null {
+        if (leaderboardId) {
+          if (!_savingDataByLeaderboard[leaderboardId]) {
+            return 'NO_DATA_ERROR';
+          }
+          return _savingDataByLeaderboard[leaderboardId].lastSaveError;
+        }
+
+        const lastScoreSavingData = getLastScoreSavingData({ hasEnded: true });
+        if (!lastScoreSavingData) {
+          return 'NO_DATA_ERROR';
+        }
+
+        return lastScoreSavingData.lastSaveError;
       };
 
       export const formatPlayerName = function (rawName: string): string {
@@ -126,7 +319,9 @@ namespace gdjs {
           )}`;
         }
         return rawName
-          .replace(/\s/, '_')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s/g, '_')
           .replace(/[^\w|-]/g, '')
           .slice(0, 30);
       };
@@ -148,7 +343,7 @@ namespace gdjs {
             return true;
           },
           (err) => {
-            logger.error(`Error while fetching leaderboard view: ${err}`);
+            logger.error('Error while fetching leaderboard view:', err);
             return false;
           }
         );
@@ -279,15 +474,35 @@ namespace gdjs {
         leaderboardId: string,
         displayLoader: boolean
       ) {
+        // First ensure we're not trying to display multiple times the same leaderboard (in which case
+        // we "de-duplicate" the request to display it).
+        if (leaderboardId === _requestedLeaderboardId) {
+          if (_leaderboardViewIframeLoading) {
+            logger.warn(
+              `Already loading the view for the requested loader (${leaderboardId}), ignoring.`
+            );
+            return;
+          }
+          if (_leaderboardViewIframeLoaded) {
+            logger.warn(
+              `Already loaded the view for the requested loader (${leaderboardId}), ignoring.`
+            );
+            return;
+          }
+        }
+
+        // We are now assured we want to display a new (or different) leaderboard: start loading it.
         _requestedLeaderboardId = leaderboardId;
         _leaderboardViewIframeErrored = false;
         _leaderboardViewIframeLoaded = false;
         _leaderboardViewIframeLoading = true;
+
         if (displayLoader) {
           displayLoaderInLeaderboardView(true, runtimeScene, {
             callOnErrorIfDomElementContainerMissing: true,
           });
         }
+
         const gameId = gdjs.projectData.properties.projectUuid;
         const targetUrl = `https://liluo.io/games/${gameId}/leaderboard/${leaderboardId}?inGameEmbedded=true`;
         checkLeaderboardAvailability(targetUrl).then(
@@ -329,9 +544,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(
@@ -350,7 +564,7 @@ namespace gdjs {
             }
           },
           (err) => {
-            logger.log(err);
+            logger.error(err);
             handleErrorDisplayingLeaderboard(
               runtimeScene,
               'An error occurred when fetching leaderboard data. Closing leaderboard view if there is one.'
@@ -382,7 +596,7 @@ namespace gdjs {
 
           if (!_leaderboardViewIframe) {
             logger.info(
-              "The iframe displaying the current leaderboard couldn't be found, the leaderboard must be already closed."
+              "The iframe displaying the current leaderboard couldn't be found, the leaderboard view must be already closed."
             );
             return;
           }
@@ -392,7 +606,7 @@ namespace gdjs {
             .getDomElementContainer();
           if (!domElementContainer) {
             logger.info(
-              "The div element covering the game couldn't be found, the leaderboard must be already closed."
+              "The div element covering the game couldn't be found, the leaderboard view must be already closed."
             );
             return;
           }
@@ -408,6 +622,11 @@ namespace gdjs {
           domElementContainer.removeChild(_leaderboardViewIframe);
           _leaderboardViewIframe = null;
         } finally {
+          // Don't reset the loading flag (the view of another leaderboard might be loading)
+          // or the error flag (we want to persist the error flag even after the view is closed),
+          // but reset the flag indicating the view is loaded (if it was).
+          _leaderboardViewIframeLoaded = false;
+
           const gameCanvas = runtimeScene.getGame().getRenderer().getCanvas();
           if (gameCanvas) gameCanvas.focus();
         }

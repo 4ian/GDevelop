@@ -147,7 +147,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddScopedCondition("IsUsingControl",
                   _("Control pressed or simulated"),
-                  _("A control was applied from a default control or a simulated by an action."),
+                  _("A control was applied from a default control or simulated by an action."),
                   _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
                   _("Controls"),
                   "res/conditions/keyboard24.png",

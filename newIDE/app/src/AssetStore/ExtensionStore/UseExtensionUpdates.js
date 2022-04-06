@@ -59,36 +59,3 @@ export const useExtensionUpdate = (
     [project, extension]
   );
 };
-
-// TODO: Use this hook to display a visual hint when an installed extension can be updated
-export const useAllExtensionUpdates = (
-  project: gdProject
-): ExtensionUpdates => {
-  const { extensionShortHeadersByName } = useContext(ExtensionStoreContext);
-  return useMemo(
-    () => {
-      const installedExtensions = enumerateEventsFunctionsExtensions(project);
-      const extensionUpdates = new Map<string, UpdateMetadata>();
-
-      for (const localExtension of installedExtensions) {
-        const localExtensionName = localExtension.getName();
-        const extensionHeader = extensionShortHeadersByName[localExtensionName];
-
-        // No header, this is not an extension that exists on the store. Skip it.
-        if (!extensionHeader) continue;
-
-        const currentVersion = localExtension.getVersion();
-        const newestVersion = extensionHeader.version;
-        const updateMetadata = getUpdateMetadataFromVersions(
-          currentVersion,
-          newestVersion
-        );
-        if (updateMetadata)
-          extensionUpdates.set(localExtensionName, updateMetadata);
-      }
-
-      return extensionUpdates;
-    },
-    [project, extensionShortHeadersByName]
-  );
-};

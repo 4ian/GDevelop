@@ -39,6 +39,7 @@ const loadModalWindow = ({
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true,
+      enableRemoteModule: true,
     },
   };
 

@@ -38,6 +38,12 @@ export type Game = {
   discoverable?: boolean,
 };
 
+export type GameSlug = {
+  username: string,
+  gameSlug: string,
+  createdAt: number,
+};
+
 export type ShowcasedGameLink = {
   url: string,
   type:
@@ -372,5 +378,25 @@ export const getGames = (
 export const getPublicGame = (gameId: string): Promise<PublicGame> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
+    .then(response => response.data);
+};
+
+export const getGameSlugs = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string
+): Promise<Array<GameSlug>> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopGameApi.baseUrl}/game-slug`, {
+        params: {
+          userId,
+          gameId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
     .then(response => response.data);
 };

@@ -449,11 +449,11 @@ namespace gdjs {
         toVolume: float,
         timeOfFade: float /* in seconds */
       ) => {
-        const sound = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade * 1000);
+        const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
+        if (music) music.fade(music.getVolume(), toVolume, timeOfFade * 1000);
         else {
           logger.error(
-            `Cannot fade the volume of a non-existing sound on channel ${channel}.`
+            `Cannot fade the volume of a non-existing music on channel ${channel}.`
           );
         }
       };

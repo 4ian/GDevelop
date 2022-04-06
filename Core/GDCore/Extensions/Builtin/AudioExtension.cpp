@@ -362,7 +362,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "FadeMusicVolume",
           _("Fade the volume of a music played on a channel."),
           _("Fade the volume of a music played on a channel to the specified volume within the specified duration."),
-          _("Fade a music on channel _PARAM1_ to volume _PARAM2_ within _PARAM3_ seconds"),
+          _("Fade the music on channel _PARAM1_ to volume _PARAM2_ within _PARAM3_ seconds"),
           _("Music on channels"),
           "res/actions/music24.png",
           "res/actions/music.png")

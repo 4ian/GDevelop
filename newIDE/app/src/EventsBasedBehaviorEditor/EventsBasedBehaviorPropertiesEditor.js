@@ -131,7 +131,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
       newExtraInfo.forEach(item => vectorString.push_back(item));
       property.setExtraInfo(vectorString);
       vectorString.delete();
-      property.setValue(newExtraInfo[defaultValueIndex]);
+      property.setValue(newExtraInfo[defaultValueIndex] || '');
       this.forceUpdate();
     };
   };

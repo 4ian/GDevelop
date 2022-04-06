@@ -9,9 +9,9 @@ describe('Leaderboards', () => {
     });
 
     it('it returns name with underscores instead of whitespaces', () => {
-      expect(gdjs.evtTools.leaderboards.formatPlayerName('Player Name')).to.be(
-        'Player_Name'
-      );
+      expect(
+        gdjs.evtTools.leaderboards.formatPlayerName('My Player Name')
+      ).to.be('My_Player_Name');
     });
 
     it("it doesn't change a name with vertical bars and hyphens", () => {
@@ -51,12 +51,18 @@ describe('Leaderboards', () => {
       );
     });
 
+    it('it removes accents from latin letters', () => {
+      expect(gdjs.evtTools.leaderboards.formatPlayerName('plâyèrÏonisé')).to.be(
+        'playerIonise'
+      );
+    });
+
     it('it removes non-accepted characters in a long name', () => {
       expect(
         gdjs.evtTools.leaderboards.formatPlayerName(
-          'aＰιâΥÉᚱｎÀⅯeThatᎥsTooⅬonᏀToBeՏaѵÊĐThisPartAppears'
+          'aＰιΥÉᚱｎÀⅯeThatᎥsTooⅬonᏀToBeՏaѵÊĐThisPartAppears'
         )
-      ).to.be('aeThatsTooonToBeaThisPartAppea');
+      ).to.be('aEAeThatsTooonToBeaEThisPartAp');
     });
   });
 });

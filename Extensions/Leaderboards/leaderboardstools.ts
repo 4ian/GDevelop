@@ -253,69 +253,67 @@ namespace gdjs {
 
       export const isSaving = function (leaderboardId?: string): boolean {
         if (leaderboardId) {
-          if (_scoreSavingStateByLeaderboard[leaderboardId]) {
-            return _scoreSavingStateByLeaderboard[leaderboardId].isScoreSaving;
-          }
-          return false;
+          return _scoreSavingStateByLeaderboard[leaderboardId]
+            ? _scoreSavingStateByLeaderboard[leaderboardId].isScoreSaving
+            : false;
         }
 
         const lastScoreSavingState = getLastScoreSavingState({
           hasSucceeded: false,
         });
-        if (lastScoreSavingState) return lastScoreSavingState.isScoreSaving;
-        return false;
+        return lastScoreSavingState
+          ? lastScoreSavingState.isScoreSaving
+          : false;
       };
 
       export const hasBeenSaved = function (leaderboardId?: string): boolean {
         if (leaderboardId) {
-          if (_scoreSavingStateByLeaderboard[leaderboardId]) {
-            return _scoreSavingStateByLeaderboard[leaderboardId]
-              .hasScoreBeenSaved;
-          }
-          return false;
+          return _scoreSavingStateByLeaderboard[leaderboardId]
+            ? _scoreSavingStateByLeaderboard[leaderboardId].hasScoreBeenSaved
+            : false;
         }
 
         const lastScoreSavingState = getLastScoreSavingState({
           hasSucceeded: true,
         });
-        if (lastScoreSavingState) return lastScoreSavingState.hasScoreBeenSaved;
-        return false;
+        return lastScoreSavingState
+          ? lastScoreSavingState.hasScoreBeenSaved
+          : false;
       };
 
       export const hasSavingErrored = function (
         leaderboardId?: string
       ): boolean {
         if (leaderboardId) {
-          if (_scoreSavingStateByLeaderboard[leaderboardId]) {
-            return _scoreSavingStateByLeaderboard[leaderboardId]
-              .hasScoreSavingErrored;
-          }
-          return false;
+          return _scoreSavingStateByLeaderboard[leaderboardId]
+            ? _scoreSavingStateByLeaderboard[leaderboardId]
+                .hasScoreSavingErrored
+            : false;
         }
 
         const lastScoreSavingState = getLastScoreSavingState({
           hasSucceeded: false,
         });
-        if (lastScoreSavingState)
-          return lastScoreSavingState.hasScoreSavingErrored;
-        return false;
+        return lastScoreSavingState
+          ? lastScoreSavingState.hasScoreSavingErrored
+          : false;
       };
 
       export const getLastSaveError = function (
         leaderboardId?: string
       ): string | null {
         if (leaderboardId) {
-          if (_scoreSavingStateByLeaderboard[leaderboardId]) {
-            return _scoreSavingStateByLeaderboard[leaderboardId].lastSaveError;
-          }
-          return 'NO_DATA_ERROR';
+          return _scoreSavingStateByLeaderboard[leaderboardId]
+            ? _scoreSavingStateByLeaderboard[leaderboardId].lastSaveError
+            : 'NO_DATA_ERROR';
         }
 
         const lastScoreSavingState = getLastScoreSavingState({
           hasSucceeded: false,
         });
-        if (lastScoreSavingState) return lastScoreSavingState.lastSaveError;
-        return 'NO_DATA_ERROR';
+        return lastScoreSavingState
+          ? lastScoreSavingState.lastSaveError
+          : 'NO_DATA_ERROR';
       };
 
       export const formatPlayerName = function (rawName: string): string {

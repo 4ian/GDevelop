@@ -633,13 +633,21 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
           <Visibility />
         ),
       text: (
-        <Text size="body2">
-          {currentLeaderboard.visibility === 'HIDDEN' ? (
-            <Trans>Only you can see it</Trans>
-          ) : (
-            <Trans>Public</Trans>
+        <Tooltip
+          title={i18n._(
+            currentLeaderboard.visibility === 'HIDDEN'
+              ? t`Anyone with the link can see it, but it is not listed in your game's leaderboards.`
+              : t`Anyone can access it.`
           )}
-        </Text>
+        >
+          <Text size="body2">
+            {currentLeaderboard.visibility === 'HIDDEN' ? (
+              <Trans>Not visible</Trans>
+            ) : (
+              <Trans>Public</Trans>
+            )}
+          </Text>
+        </Tooltip>
       ),
       secondaryText:
         apiError && apiError.action === 'leaderboardVisibilityUpdate' ? (

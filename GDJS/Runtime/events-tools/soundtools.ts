@@ -428,6 +428,35 @@ namespace gdjs {
         runtimeScene
           .getSoundManager()
           .unloadAudio(soundFile, /* isMusic= */ true);
+
+      export const fadeSoundVolume = (
+        runtimeScene: gdjs.RuntimeScene,
+        channel: integer,
+        toVolume: float,
+        timeOfFade: float /* in seconds */
+      ) => {
+        const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
+        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade * 1000);
+        else {
+          logger.error(
+            `Cannot fade the volume of a non-existing sound on channel ${channel}.`
+          );
+        }
+      };
+      export const fadeMusicVolume = (
+        runtimeScene: gdjs.RuntimeScene,
+        channel: integer,
+        toVolume: float,
+        timeOfFade: float /* in seconds */
+      ) => {
+        const sound = runtimeScene.getSoundManager().getMusicOnChannel(channel);
+        if (sound) sound.fade(sound.getVolume(), toVolume, timeOfFade * 1000);
+        else {
+          logger.error(
+            `Cannot fade the volume of a non-existing sound on channel ${channel}.`
+          );
+        }
+      };
     }
   }
 }

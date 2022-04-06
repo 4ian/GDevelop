@@ -223,7 +223,8 @@ namespace gdjs {
      * @returns A float from 0 to 1.
      */
     getVolume(): float {
-      return this._volume;
+      if (this._id === null) return this._volume;
+      return this._howl.volume(this._id);
     }
 
     /**
@@ -295,7 +296,8 @@ namespace gdjs {
      * @returns The current instance for chaining.
      */
     fade(from: float, to: float, duration: float): this {
-      if (this._id !== null) this._howl.fade(from, to, duration, this._id);
+      if (this._id !== null)
+        this._howl.fade(clampVolume(from), clampVolume(to), duration, this._id);
       return this;
     }
 

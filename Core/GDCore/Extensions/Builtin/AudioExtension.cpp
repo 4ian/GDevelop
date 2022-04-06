@@ -343,6 +343,34 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
           "res/actions/music.png")
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsComplex();
+  extension
+      .AddAction(
+          "FadeSoundVolume",
+          _("Fade the volume of a sound played on a channel."),
+          _("Fade the volume of a sound played on a channel to the specified volume within the specified duration."),
+          _("Fade the sound on channel _PARAM1_ to volume _PARAM2_ within _PARAM3_ seconds"),
+          _("Sounds on channels"),
+          "res/actions/son24.png",
+          "res/actions/son.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Channel identifier"))
+      .AddParameter("expression", _("Final volume (0-100)"))
+      .AddParameter("expression", _("Fading time in seconds"))
+      .MarkAsAdvanced();
+  extension
+      .AddAction(
+          "FadeMusicVolume",
+          _("Fade the volume of a music played on a channel."),
+          _("Fade the volume of a music played on a channel to the specified volume within the specified duration."),
+          _("Fade a music on channel _PARAM1_ to volume _PARAM2_ within _PARAM3_ seconds"),
+          _("Music on channels"),
+          "res/actions/music24.png",
+          "res/actions/music.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Channel identifier"))
+      .AddParameter("expression", _("Final volume (0-100)"))
+      .AddParameter("expression", _("Fading time in seconds"))
+      .MarkAsAdvanced();
 
   extension
       .AddCondition("MusicPlaying",

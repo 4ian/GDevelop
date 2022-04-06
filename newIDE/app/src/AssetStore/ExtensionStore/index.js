@@ -121,11 +121,9 @@ export const ExtensionStore = ({
       </ResponsiveWindowMeasurer>
       {!!selectedExtensionShortHeader && (
         <ExtensionInstallDialog
+          project={project}
           isInstalling={isInstalling}
           extensionShortHeader={selectedExtensionShortHeader}
-          alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
-            selectedExtensionShortHeader.name
-          )}
           onInstall={async () => {
             const wasInstalled = await onInstall(selectedExtensionShortHeader);
             if (wasInstalled) setSelectedExtensionShortHeader(null);

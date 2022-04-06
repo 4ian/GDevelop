@@ -229,7 +229,7 @@ namespace gdjs {
 
             scoreSavingState.closeSaving();
 
-            response.text().then(
+            return response.text().then(
               (text) => {
                 responseVar.setString(text);
               },

@@ -1,8 +1,6 @@
 //@flow
 import { diff } from 'semver/functions/diff';
-import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
-import { ExtensionStoreContext } from './ExtensionStoreContext';
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 
 type UpdateType = 'patch' | 'minor' | 'major';
@@ -11,7 +9,6 @@ type UpdateMetadata = {|
   currentVersion: string,
   newestVersion: string,
 |};
-type ExtensionUpdates = Map<string, UpdateMetadata>;
 
 const getUpdateMetadataFromVersions = (
   currentVersion: string,

@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import PublicGameProperties from './PublicGameProperties';
+import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
 import RaisedButton from '../UI/RaisedButton';
 import {
   displayProjectErrorsBox,
@@ -11,12 +11,15 @@ import {
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 /**
  * Changes that are not stored in the Project.
  */
 export type PartialGameChange = {|
   ownerIds?: Array<string>,
+  userSlug?: string,
+  gameSlug?: string,
   discoverable?: boolean,
 |};
 
@@ -71,6 +74,8 @@ export const PublicGamePropertiesDialog = ({
   onApply,
   isLoading,
 }: Props) => {
+  const { profile } = React.useContext(AuthenticatedUserContext);
+
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
   const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
@@ -90,6 +95,12 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
+  const [userSlug, setUserSlug] = React.useState(
+    publicGame.userSlug || (profile && profile.username) || ''
+  );
+  const [gameSlug, setGameSlug] = React.useState(
+    publicGame.gameSlug || cleanUpGameSlug(publicGame.gameName)
+  );
   const [discoverable, setDiscoverable] = React.useState(
     publicGame.discoverable
   );
@@ -107,7 +118,7 @@ export const PublicGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      await onApply({ ownerIds, discoverable });
+      await onApply({ ownerIds, userSlug, gameSlug, discoverable });
     }
   };
 
@@ -156,6 +167,10 @@ export const PublicGamePropertiesDialog = ({
         playWithMobile={playWithMobile}
         setOrientation={setOrientation}
         orientation={orientation}
+        setUserSlug={setUserSlug}
+        userSlug={userSlug}
+        setGameSlug={setGameSlug}
+        gameSlug={gameSlug}
         setDiscoverable={setDiscoverable}
         discoverable={discoverable}
         displayThumbnail

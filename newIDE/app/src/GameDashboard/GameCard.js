@@ -38,7 +38,7 @@ export const GameCard = ({
     <I18n>
       {({ i18n }) => (
         <Card key={game.id}>
-          <Line>
+          <ResponsiveLineStackLayout>
             <GameThumbnail
               gameName={game.gameName}
               thumbnailUrl={game.thumbnailUrl}
@@ -108,7 +108,7 @@ export const GameCard = ({
                 </ResponsiveLineStackLayout>
               </CardActions>
             </Column>
-          </Line>
+          </ResponsiveLineStackLayout>
         </Card>
       )}
     </I18n>

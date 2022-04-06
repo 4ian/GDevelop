@@ -29,6 +29,7 @@ const untransformedPaths = [
   'GDJS/Runtime/FacebookInstantGames',
   'GDJS/Runtime/libs/CocoonJS',
   'GDJS/Runtime/libs/rbush.js',
+  'GDJS/Runtime/libs/sha256.js',
 
   // Extensions pre-built files:
   'Extensions/Firebase/A_firebasejs',

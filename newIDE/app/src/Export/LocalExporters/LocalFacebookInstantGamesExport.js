@@ -156,7 +156,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   renderDoneFooter: ({ exportState, onClose }) => {
     const openExportFolder = () => {
       if (shell && path)
-        shell.openItem(path.dirname(exportState.archiveOutputFilename));
+        shell.openPath(path.dirname(exportState.archiveOutputFilename));
     };
 
     return (

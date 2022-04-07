@@ -104,7 +104,7 @@ export const createPathEditorHeader = ({
   headerObject.setFolderButton.addEventListener('click', selectFolderPath);
 
   const openFolderPath = () => {
-    electron.shell.openItem(headerObject.state.folderPath);
+    electron.shell.openPath(headerObject.state.folderPath);
   };
   headerObject.openFolderButton.addEventListener('click', openFolderPath);
 

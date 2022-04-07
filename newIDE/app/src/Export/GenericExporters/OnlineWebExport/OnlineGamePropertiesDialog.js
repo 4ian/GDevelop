@@ -2,22 +2,27 @@
 import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { type Game } from '../../../Utils/GDevelopServices/Game';
+import { type Game, type GameSlug } from '../../../Utils/GDevelopServices/Game';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog from '../../../UI/Dialog';
-import PublicGameProperties from '../../../GameDashboard/PublicGameProperties';
+import {
+  cleanUpGameSlug,
+  PublicGameProperties,
+} from '../../../GameDashboard/PublicGameProperties';
 import {
   applyPublicPropertiesToProject,
   type PartialGameChange,
 } from '../../../GameDashboard/PublicGamePropertiesDialog';
 import { getWebBuildThumbnailUrl } from '../../../Utils/GDevelopServices/Build';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   buildId: string,
   game: Game,
+  slug: ?GameSlug,
   onClose: () => void,
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
@@ -28,10 +33,13 @@ export const OnlineGamePropertiesDialog = ({
   onSaveProject,
   buildId,
   game,
+  slug,
   onClose,
   onApply,
   isLoading,
 }: Props) => {
+  const { profile } = React.useContext(AuthenticatedUserContext);
+
   const [name, setName] = React.useState<string>(project.getName());
   const [categories, setCategories] = React.useState<string[]>(
     project.getCategories().toJSArray()
@@ -50,6 +58,12 @@ export const OnlineGamePropertiesDialog = ({
   );
   const [playWithMobile, setPlayableWithMobile] = React.useState<boolean>(
     project.isPlayableWithMobile()
+  );
+  const [userSlug, setUserSlug] = React.useState<string>(
+    (slug && slug.username) || (profile && profile.username) || ''
+  );
+  const [gameSlug, setGameSlug] = React.useState<string>(
+    (slug && slug.gameSlug) || cleanUpGameSlug(project.getName())
   );
   const [orientation, setOrientation] = React.useState<string>(
     project.getOrientation()
@@ -78,7 +92,7 @@ export const OnlineGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      await onApply({ discoverable });
+      await onApply({ discoverable, userSlug, gameSlug });
     }
   };
 
@@ -131,6 +145,10 @@ export const OnlineGamePropertiesDialog = ({
         playWithMobile={playWithMobile}
         setOrientation={setOrientation}
         orientation={orientation}
+        userSlug={userSlug}
+        setUserSlug={setUserSlug}
+        gameSlug={gameSlug}
+        setGameSlug={setGameSlug}
         discoverable={discoverable}
         setDiscoverable={setDiscoverable}
         displayThumbnail

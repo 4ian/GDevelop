@@ -3,7 +3,8 @@
 
 const optionalRequire = require('../Utils/OptionalRequire.js');
 const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+const remote = optionalRequire('@electron/remote');
+const app = electron ? remote.app : null;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const process = optionalRequire('process');

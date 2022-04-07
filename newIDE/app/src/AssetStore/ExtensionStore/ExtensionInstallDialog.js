@@ -1,5 +1,6 @@
 // @flow
 import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';

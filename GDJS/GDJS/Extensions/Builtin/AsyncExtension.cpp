@@ -38,7 +38,9 @@ AsyncExtension::AsyncExtension() {
           objectsListsBackupCode +=
               "for (const obj of " +
               codeGenerator.GetObjectListName(objectToBackup, parentContext) +
-              ") asyncObjectsList.addObject(obj);\n";
+              ") asyncObjectsList.addObject(" +
+              codeGenerator.ConvertToStringExplicit(objectToBackup) +
+              ", obj);\n";
         }
 
         const gd::String callbackCallCode =

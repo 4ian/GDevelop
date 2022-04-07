@@ -588,19 +588,19 @@ namespace gdjs {
       return this.objectsLists.get(objectName) || [];
     }
 
-    addObject(runtimeObject: gdjs.RuntimeObject): void {
-      const list = this.getOrCreateList(runtimeObject.getName());
+    addObject(objectName: string, runtimeObject: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(objectName);
       if (list.includes(runtimeObject)) return;
       list.push(runtimeObject);
 
       // Register callbacks for when the object is destroyed
-      const onDestroy = () => this.removeObject(runtimeObject);
+      const onDestroy = () => this.removeObject(objectName, runtimeObject);
       this.callbacks.set(runtimeObject, onDestroy);
       runtimeObject.registerDestroyCallback(onDestroy);
     }
 
-    removeObject(runtimeObject: gdjs.RuntimeObject): void {
-      const list = this.getOrCreateList(runtimeObject.getName());
+    removeObject(objectName: string, runtimeObject: gdjs.RuntimeObject): void {
+      const list = this.getOrCreateList(objectName);
       const index = list.indexOf(runtimeObject);
       if (index === -1) return;
       list.splice(index, 1);

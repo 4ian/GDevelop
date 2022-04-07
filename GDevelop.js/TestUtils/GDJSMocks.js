@@ -370,21 +370,27 @@ class LongLivedObjectsList {
     return this.objectsLists.get(objectName) || [];
   }
 
-  /** @param {gdjs.RuntimeObject} runtimeObject */
-  addObject(runtimeObject) {
-    const list = this.getOrCreateList(runtimeObject.getName());
+  /**
+   * @param {string} objectName
+   * @param {gdjs.RuntimeObject} runtimeObject
+   */
+  addObject(objectName, runtimeObject) {
+    const list = this.getOrCreateList(objectName);
     if (list.includes(runtimeObject)) return;
     list.push(runtimeObject);
 
     // Register callbacks for when the object is destroyed
-    const onDestroy = () => this.removeObject(runtimeObject);
+    const onDestroy = () => this.removeObject(objectName, runtimeObject);
     this.callbacks.set(runtimeObject, onDestroy);
     runtimeObject.registerDestroyCallback(onDestroy);
   }
 
-  /** @param {gdjs.RuntimeObject} runtimeObject */
-  removeObject(runtimeObject) {
-    const list = this.getOrCreateList(runtimeObject.getName());
+  /**
+   * @param {string} objectName
+   * @param {gdjs.RuntimeObject} runtimeObject
+   */
+  removeObject(objectName, runtimeObject) {
+    const list = this.getOrCreateList(objectName);
     const index = list.indexOf(runtimeObject);
     if (index === -1) return;
     list.splice(index, 1);

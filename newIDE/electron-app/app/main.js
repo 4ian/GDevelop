@@ -21,9 +21,6 @@ const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
 const { downloadLocalFile } = require('./LocalFileDownloader');
 
-// TODO
-// v9.stable breaks file access. Fix available from v11 maybe (issue #23757, PR #28489)
-
 log.info('GDevelop Electron app starting...');
 
 // Logs made with electron-logs can be found

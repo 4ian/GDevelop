@@ -17,7 +17,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import BackgroundText from '../UI/BackgroundText';
-import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
 
 const isCyrillic = (text: string) =>
@@ -251,14 +251,11 @@ export function PublicGameProperties({
                 profile &&
                 profile.username
               ) && (
-                <DismissableAlertMessage
-                  identifier="no-username-for-slug"
-                  kind="info"
-                >
+                <AlertMessage kind="info">
                   <Trans>
                     Usernames are required to choose a custom game URL.
                   </Trans>
-                </DismissableAlertMessage>
+                </AlertMessage>
               )}
             </>
           )}

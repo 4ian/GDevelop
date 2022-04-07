@@ -33,13 +33,13 @@ AsyncExtension::AsyncExtension() {
                 ? "asyncObjectsList = "
                   "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
-        for (const gd::String &objectToBackup :
+        for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {
           objectsListsBackupCode +=
               "for (const obj of " +
-              codeGenerator.GetObjectListName(objectToBackup, parentContext) +
+              codeGenerator.GetObjectListName(objectNameToBackup, parentContext) +
               ") asyncObjectsList.addObject(" +
-              codeGenerator.ConvertToStringExplicit(objectToBackup) +
+              codeGenerator.ConvertToStringExplicit(objectNameToBackup) +
               ", obj);\n";
         }
 

@@ -118,6 +118,10 @@ class RuntimeObject {
     return variable;
   }
 
+  getVariableNumber(variable) {
+    return variable.getAsNumber();
+  }
+
   /** @param {RuntimeScene} runtimeScene */
   deleteFromScene(runtimeScene) {
     if (this._livingOnScene) {

@@ -145,7 +145,7 @@ app.on('ready', function() {
 
   // Prevent opening any website or url inside Electron
   mainWindow.webContents.setWindowOpenHandler(details => {
-    console.info('Opening in browser (because of new-window): ', details.url);
+    console.info('Opening in browser (because of new window): ', details.url);
     electron.shell.openExternal(details.url);
     return { action: 'deny' };
   });

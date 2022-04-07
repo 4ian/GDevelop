@@ -90,7 +90,7 @@ const OnlineGameLink = ({
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
-  const gameUrl = getGameUrl(game);
+  const gameUrl = getGameUrl(game, slug);
   const buildUrl =
     exportPending || !isBuildComplete
       ? null
@@ -202,19 +202,17 @@ const OnlineGameLink = ({
           }
         );
         setGame(updatedGame);
-        if (
-          partialGameChange.userSlug &&
-          partialGameChange.gameSlug &&
-          partialGameChange.userSlug === profile.username
-        ) {
+        const { userSlug, gameSlug } = partialGameChange;
+        if (userSlug && gameSlug && userSlug === profile.username) {
           try {
             await setGameSlug(
               getAuthorizationHeader,
               id,
               game.id,
-              partialGameChange.userSlug,
-              partialGameChange.gameSlug
+              userSlug,
+              gameSlug
             );
+            setSlug({ username: userSlug, gameSlug: gameSlug, createdAt: 0 });
           } catch (error) {
             console.error(
               'Unable to update the game slug:',

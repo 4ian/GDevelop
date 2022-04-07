@@ -135,9 +135,11 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-export const getGameUrl = (game: ?Game) => {
+export const getGameUrl = (game: ?Game, slug: ?GameSlug) => {
   if (!game) return null;
-  return GDevelopGamesPlatform.getGameUrl(game.id);
+  return slug
+    ? GDevelopGamesPlatform.getGameUrlWithSlug(slug.username, slug.gameSlug)
+    : GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
 export const getAclsFromUserIds = (

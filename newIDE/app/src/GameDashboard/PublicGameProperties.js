@@ -17,6 +17,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import BackgroundText from '../UI/BackgroundText';
+import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { GameThumbnail } from './GameThumbnail';
 
 const isCyrillic = (text: string) =>
@@ -195,42 +196,72 @@ export function PublicGameProperties({
             rows={5}
           />
           {setUserSlug && setGameSlug && (
-            <Line>
-              <SelectField
-                fullWidth
-                floatingLabelText={<Trans>User name in the game URL</Trans>}
-                value={userSlug || ''}
-                onChange={(e, i, value: string) => setUserSlug(value)}
-                // It's disabled if one of the condition of SelectOption is false.
-                disabled={
-                  !(
-                    profile &&
-                    profile.username &&
-                    userSlug &&
-                    (!profile || userSlug !== profile.username)
-                  )
-                }
-              >
-                {profile && profile.username && (
-                  <SelectOption
-                    value={profile.username}
-                    primaryText={profile.username}
-                  />
-                )}
-                {userSlug && (!profile || userSlug !== profile.username) && (
-                  <SelectOption value={userSlug} primaryText={userSlug} />
-                )}
-              </SelectField>
-              <Spacer />
-              <SemiControlledTextField
-                floatingLabelText={<Trans>Game name in the game URL</Trans>}
-                fullWidth
-                type="text"
-                value={gameSlug || ''}
-                onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
-                autoFocus
-              />
-            </Line>
+            <>
+              <Line>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>User name in the game URL</Trans>}
+                  value={userSlug || ''}
+                  onChange={(e, i, value: string) => setUserSlug(value)}
+                  // It's disabled if one of the condition of SelectOption is false.
+                  disabled={
+                    !(
+                      profile &&
+                      profile.username &&
+                      userSlug &&
+                      (!profile || userSlug !== profile.username)
+                    )
+                  }
+                >
+                  {profile && profile.username && (
+                    <SelectOption
+                      value={profile.username}
+                      primaryText={profile.username}
+                    />
+                  )}
+                  {userSlug && (!profile || userSlug !== profile.username) && (
+                    <SelectOption value={userSlug} primaryText={userSlug} />
+                  )}
+                </SelectField>
+                <Spacer />
+                <SemiControlledTextField
+                  disabled={
+                    !(
+                      userSlug &&
+                      userSlug.length &&
+                      profile &&
+                      profile.username
+                    )
+                  }
+                  floatingLabelText={<Trans>Game name in the game URL</Trans>}
+                  fullWidth
+                  type="text"
+                  value={
+                    userSlug && userSlug.length && profile && profile.username
+                      ? gameSlug || ''
+                      : ''
+                  }
+                  onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
+                  autoFocus
+                />
+              </Line>
+              {!(
+                userSlug &&
+                userSlug.length &&
+                profile &&
+                profile.username
+              ) && (
+                <DismissableAlertMessage
+                  identifier="no-username-for-slug"
+                  kind="info"
+                >
+                  <Trans>
+                    A username must be defined in your profile to be able to
+                    choose a custom game URL.
+                  </Trans>
+                </DismissableAlertMessage>
+              )}
+            </>
           )}
           <UsersAutocomplete
             userIds={authorIds}

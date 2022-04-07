@@ -77,8 +77,10 @@ app.on('ready', function() {
     y: args.y,
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
-      nodeIntegration: true,
       enableRemoteModule: true,
+      // Allow Node.js API access in renderer process
+      nodeIntegration: true,
+      contextIsolation: false,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',

@@ -106,17 +106,16 @@ const OnlineGameLink = ({
       const { id } = profile;
       try {
         setIsGameLoading(true);
-        const gamePromise = getGame(getAuthorizationHeader, id, gameId);
-        try {
-          const slugs = await getGameSlugs(getAuthorizationHeader, id, gameId);
-          if (slugs.length > 0) {
-            setSlug(slugs[0]);
-          }
-        } catch (err) {
-          console.error('Unable to get the game slug', err);
-        }
-        const game = await gamePromise;
+        const [game, slugs] = await Promise.all([
+          getGame(getAuthorizationHeader, id, gameId),
+          getGameSlugs(getAuthorizationHeader, id, gameId).catch(err => {
+            console.error('Unable to get the game slug', err);
+          }),
+        ]);
         setGame(game);
+        if (slugs && slugs.length > 0) {
+          setSlug(slugs[0]);
+        }
       } catch (err) {
         console.error('Unable to load the game', err);
       } finally {

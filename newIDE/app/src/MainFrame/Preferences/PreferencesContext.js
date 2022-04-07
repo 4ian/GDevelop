@@ -161,12 +161,7 @@ export const allAlertMessages: Array<{
   },
   {
     key: 'no-username-for-slug',
-    label: (
-      <Trans>
-        A username must be defined in your profile to be able to choose a custom
-        game URL.
-      </Trans>
-    ),
+    label: <Trans>Usernames are required to choose a custom game URL.</Trans>,
   },
 ];
 

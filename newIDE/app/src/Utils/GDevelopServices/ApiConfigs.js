@@ -14,6 +14,10 @@ export const GDevelopGamesPlatform = {
     isDev
       ? `https://liluo.io/games/${gameId}?dev=true`
       : `https://liluo.io/games/${gameId}`,
+  getGameUrlWithSlug: (userSlug: string, gameSlug: string) =>
+    isDev
+      ? `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
+      : `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
 };
 
 export const GDevelopBuildApi = {

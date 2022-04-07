@@ -37,7 +37,8 @@ export type AlertMessageIdentifier =
   | 'command-palette-shortcut'
   | 'asset-installed-explanation'
   | 'extension-installed-explanation'
-  | 'project-should-have-unique-package-name';
+  | 'project-should-have-unique-package-name'
+  | 'no-username-for-slug';
 
 export type EditorMosaicName =
   | 'scene-editor'
@@ -157,6 +158,10 @@ export const allAlertMessages: Array<{
     label: (
       <Trans>Project package names should not begin with com.example</Trans>
     ),
+  },
+  {
+    key: 'no-username-for-slug',
+    label: <Trans>Usernames are required to choose a custom game URL.</Trans>,
   },
 ];
 

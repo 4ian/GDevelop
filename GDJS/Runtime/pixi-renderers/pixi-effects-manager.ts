@@ -14,6 +14,7 @@ namespace gdjs {
     getHeight: () => number;
     getWidth: () => number;
     isLightingLayer?: () => boolean;
+    getName: () => string;
   }
 
   /**
@@ -38,9 +39,11 @@ namespace gdjs {
       );
       if (!filterCreator) {
         console.log(
-          'Effect "' +
+          'Effect: "' +
             effectData.name +
-            '" has an unknown effect type: "' +
+            '", on layer: "' +
+            target.getName()
+            +'", has an unknown effect type: "' +
             effectData.effectType +
             '". Was it registered properly? Is the effect type correct?'
         );

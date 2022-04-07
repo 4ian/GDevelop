@@ -63,6 +63,7 @@
     "unzipper": "^0.9.11"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.8",
     "electron-is": "^2.4.0"
   }
 }

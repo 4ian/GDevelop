@@ -20,7 +20,8 @@ import {
 } from '../GenericExporters/FacebookInstantGamesExport';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+const remote = optionalRequire('@electron/remote');
+const app = electron ? remote.app : null;
 const shell = electron ? electron.shell : null;
 
 const gd: libGDevelop = global.gd;

@@ -1,7 +1,7 @@
 const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
-const remote = electron.remote;
+const remote = require('@electron/remote');
 const { dialog } = remote;
 
 export const createPathEditorHeader = ({

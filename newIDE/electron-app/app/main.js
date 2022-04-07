@@ -46,14 +46,6 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
-// TODO: Linked issue is resolved in v10.1.4+. Set to true (or remove) and check if stuff works
-// Should be set to true, which will be the default value in future Electron
-// versions, but then causes an issue on Windows where the `fs` module stops
-// working in the renderer process.
-// See https://github.com/electron/electron/issues/22119
-// For now, disable this as we rely heavily on `fs` in the renderer process.
-app.allowRendererProcessReuse = true;
-
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
 if (process.platform === 'win32') {

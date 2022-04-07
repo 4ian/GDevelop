@@ -4,7 +4,8 @@ import optionalRequire from '../../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = electron ? remote.dialog : null;
 
 const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
@@ -33,7 +34,7 @@ export default class LocalEventsFunctionsExtensionWriter {
     extensionName?: string
   ): Promise<?string> => {
     if (!dialog) return Promise.reject('Not supported');
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
 
     return dialog
       .showSaveDialog(browserWindow, {

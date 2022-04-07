@@ -136,12 +136,13 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
 
   obj.AddAction("Texture",
                 _("Image"),
-                _("Change the image of particles, valid name is the resource name from the resource tab."),
+                _("Change the image of particles ( if displayed )."),
                 _("Change the image of particles of _PARAM0_ to _PARAM1_"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
+      .SetParameterLongDescription(_("Valid name is the resource name used for an asset."))
       .AddParameter("string", _("New image"));
 
   obj.AddCondition(

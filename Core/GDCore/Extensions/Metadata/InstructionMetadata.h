@@ -99,6 +99,23 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
+   * Check if the instruction is asynchronous - it will be running in the
+   * background, executing the instructions following it before the frame after
+   * it resolved.
+   */
+  bool IsAsync() const { return isAsync; }
+
+  /**
+   * Set that the instruction is asynchronous - it will be running in the
+   * background, executing the instructions following it before the frame after
+   * it resolved.
+   */
+  InstructionMetadata &SetAsync() {
+    isAsync = true;
+    return *this;
+  }
+
+  /**
    * Notify that the instruction can have sub instructions.
    */
   InstructionMetadata &SetCanHaveSubInstructions() {
@@ -461,6 +478,7 @@ class GD_CORE_API InstructionMetadata {
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
   bool isPrivate;
+  bool isAsync;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;

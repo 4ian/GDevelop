@@ -100,7 +100,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     const resourceFolderPath = path.dirname(
       getLocalResourceFullPath(this.props.project, resource.getName())
     );
-    electron.shell.openItem(resourceFolderPath);
+    electron.shell.openPath(resourceFolderPath);
   };
 
   _openResourceFile = (resource: gdResource) => {
@@ -108,7 +108,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       this.props.project,
       resource.getName()
     );
-    electron.shell.openItem(resourceFilePath);
+    electron.shell.openPath(resourceFilePath);
   };
 
   _copyResourceFilePath = (resource: gdResource) => {

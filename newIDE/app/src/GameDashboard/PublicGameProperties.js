@@ -256,8 +256,7 @@ export function PublicGameProperties({
                   kind="info"
                 >
                   <Trans>
-                    A username must be defined in your profile to be able to
-                    choose a custom game URL.
+                    Usernames are required to choose a custom game URL.
                   </Trans>
                 </DismissableAlertMessage>
               )}

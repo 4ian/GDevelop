@@ -143,11 +143,11 @@ app.on('ready', function() {
     }
   });
 
-  //Prevent opening any website or url inside Electron.
-  mainWindow.webContents.on('new-window', (e, url) => {
-    console.info('Opening in browser (because of new-window): ', url);
-    e.preventDefault();
-    electron.shell.openExternal(url);
+  // Prevent opening any website or url inside Electron
+  mainWindow.webContents.setWindowOpenHandler(details => {
+    console.info('Opening in browser (because of new-window): ', details.url);
+    electron.shell.openExternal(details.url);
+    return { action: 'deny' };
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {

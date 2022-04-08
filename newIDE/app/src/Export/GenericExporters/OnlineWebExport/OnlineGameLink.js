@@ -47,6 +47,7 @@ import AlertMessage from '../../../UI/AlertMessage';
 import OnlineGamePropertiesDialog from './OnlineGamePropertiesDialog';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropertiesDialog';
+import { type Profile } from '../../../Utils/GDevelopServices/Authentication';
 
 const styles = {
   icon: {
@@ -128,7 +129,8 @@ const OnlineGameLink = ({
 
         let updatedGame = null;
         try {
-          const isPublishedForTheFirstTime = game.publicWebBuildId === build.id;
+          const isPublishedForTheFirstTime =
+            build && game.publicWebBuildId === build.id;
           if (isPublishedForTheFirstTime) {
             updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
               authorName: project.getAuthor() || 'Unspecified publisher',

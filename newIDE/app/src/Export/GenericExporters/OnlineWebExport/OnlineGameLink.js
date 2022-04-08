@@ -39,17 +39,40 @@ import {
   getGameUrl,
   updateGame,
   type Game,
+  setGameUserAcls,
+  getAclsFromUserIds,
 } from '../../../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import AlertMessage from '../../../UI/AlertMessage';
 import OnlineGamePropertiesDialog from './OnlineGamePropertiesDialog';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropertiesDialog';
+import { type Profile } from '../../../Utils/GDevelopServices/Authentication';
 
 const styles = {
   icon: {
     padding: 5,
   },
+};
+
+const tryUpdateAuthors = async (
+  getAuthorizationHeader: () => Promise<string>,
+  project: gdProject,
+  profile: Profile
+) => {
+  const authorAcls = getAclsFromUserIds(project.getAuthorIds().toJSArray());
+
+  try {
+    await setGameUserAcls(
+      getAuthorizationHeader,
+      profile.id,
+      project.getProjectUuid(),
+      { author: authorAcls }
+    );
+  } catch (e) {
+    // Best effort call, do not prevent exporting the game.
+    console.error(e);
+  }
 };
 
 type OnlineGameLinkProps = {|
@@ -103,14 +126,42 @@ const OnlineGameLink = ({
       try {
         setIsGameLoading(true);
         const game = await getGame(getAuthorizationHeader, id, gameId);
-        setGame(game);
+
+        let updatedGame = null;
+        try {
+          const isPublishedForTheFirstTime =
+            build && game.publicWebBuildId === build.id;
+          if (isPublishedForTheFirstTime) {
+            updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
+              authorName: project.getAuthor() || 'Unspecified publisher',
+              gameName: project.getName() || 'Untitled game',
+              description: project.getDescription(),
+              playWithGamepad: project.isPlayableWithGamepad(),
+              playWithKeyboard: project.isPlayableWithKeyboard(),
+              playWithMobile: project.isPlayableWithMobile(),
+              orientation: project.getOrientation(),
+              categories: project.getCategories().toJSArray(),
+              thumbnailUrl: build
+                ? getWebBuildThumbnailUrl(project, build.id)
+                : undefined,
+              discoverable: false,
+            });
+            // We don't await for the authors update, as it is not required for publishing.
+            if (profile) {
+              tryUpdateAuthors(getAuthorizationHeader, project, profile);
+            }
+          }
+        } catch (err) {
+          console.error('Unable to update the game', err);
+        }
+        setGame(updatedGame || game);
       } catch (err) {
         console.error('Unable to load the game', err);
       } finally {
         setIsGameLoading(false);
       }
     },
-    [build, getAuthorizationHeader, profile]
+    [build, getAuthorizationHeader, profile, project]
   );
 
   React.useEffect(

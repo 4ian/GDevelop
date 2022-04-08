@@ -48,6 +48,9 @@ const loadModalWindow = ({
   modalWindow = new BrowserWindow(windowOptions);
   modalWindow.setMenu(null);
 
+  // Enable `@electron/remote` module for renderer process
+  require('@electron/remote/main').enable(modalWindow.webContents);
+
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {
     onReady(modalWindow);

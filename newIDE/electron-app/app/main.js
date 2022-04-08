@@ -21,7 +21,7 @@ const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
 const { downloadLocalFile } = require('./LocalFileDownloader');
 
-// Initialize `@electron/remote` module for use in renderer
+// Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
 
 log.info('GDevelop Electron app starting...');
@@ -103,6 +103,9 @@ app.on('ready', function() {
 
   mainWindow = new BrowserWindow(options);
   if (!isIntegrated) mainWindow.maximize();
+
+  // Enable `@electron/remote` module for renderer process
+  require('@electron/remote/main').enable(mainWindow.webContents);
 
   if (isDev)
     mainWindow.webContents.session.loadExtension(

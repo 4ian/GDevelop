@@ -38,12 +38,18 @@ const loadModalWindow = ({
     center: true,
     webPreferences: {
       webSecurity: false,
+      enableRemoteModule: true,
+      // Allow Node.js API access in renderer process
       nodeIntegration: true,
+      contextIsolation: false,
     },
   };
 
   modalWindow = new BrowserWindow(windowOptions);
   modalWindow.setMenu(null);
+
+  // Enable `@electron/remote` module for renderer process
+  require('@electron/remote/main').enable(modalWindow.webContents);
 
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {

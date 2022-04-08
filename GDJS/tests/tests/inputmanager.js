@@ -3,7 +3,7 @@
  */
 
 describe('gdjs.InputManager', function() {
-  var inputManager = new gdjs.InputManager();
+  const inputManager = new gdjs.InputManager();
 
   it('should handle keyboards events', function() {
     expect(inputManager.anyKeyPressed()).to.be(false);
@@ -98,15 +98,15 @@ describe('gdjs.InputManager', function() {
     expect(inputManager.isMouseInsideCanvas()).to.be(true);
   });
 
-  it('should handle touch events', function() {
+  it('should handle deprecated touch events', function() {
     inputManager.onTouchStart(46, 510, 610);
     inputManager.onTouchStart(10, 510, 610);
     expect(inputManager.getStartedTouchIdentifiers()).to.have.length(2);
-    expect(inputManager.getTouchX(46)).to.be(510);
-    expect(inputManager.getTouchY(46)).to.be(610);
+    expect(inputManager.getTouchX(47)).to.be(510);
+    expect(inputManager.getTouchY(47)).to.be(610);
 
-    expect(inputManager.popStartedTouch()).to.be(46);
-    expect(inputManager.popStartedTouch()).to.be(10);
+    expect(inputManager.popStartedTouch()).to.be(47);
+    expect(inputManager.popStartedTouch()).to.be(11);
     expect(inputManager.popEndedTouch()).to.be(undefined);
 
     inputManager.onFrameEnded();
@@ -114,13 +114,14 @@ describe('gdjs.InputManager', function() {
     expect(inputManager.getAllTouchIdentifiers()).to.have.length(2);
     expect(inputManager.getStartedTouchIdentifiers()).to.have.length(0);
     expect(inputManager.popStartedTouch()).to.be(undefined);
-    expect(inputManager.popEndedTouch()).to.be(10);
-    expect(inputManager.getTouchX(10)).to.be(510);
-    expect(inputManager.getTouchY(10)).to.be(610);
+    expect(inputManager.popEndedTouch()).to.be(11);
+    expect(inputManager.getTouchX(11)).to.be(510);
+    expect(inputManager.getTouchY(11)).to.be(610);
 
     inputManager.onFrameEnded();
     expect(inputManager.getAllTouchIdentifiers()).to.have.length(1);
   });
+
   it('should simulate (or not) mouse events', function() {
     inputManager.touchSimulateMouse();
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);

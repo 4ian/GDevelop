@@ -5,7 +5,7 @@ import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 const electron = optionalRequire('electron');
-const remote = optionalRequire('remote');
+const remote = optionalRequire('@electron/remote');
 
 type Props = {|
   shouldPrompt: boolean,

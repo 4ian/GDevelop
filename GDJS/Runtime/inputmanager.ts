@@ -38,6 +38,15 @@ namespace gdjs {
     _endedTouches: Array<integer> = [];
     _touchSimulateMouse: boolean = true;
 
+    /**
+     * @deprecated
+     */
+    _lastStartedTouchIndex = 0;
+    /**
+     * @deprecated
+     */
+    _lastEndedTouchIndex = 0;
+
     constructor() {
       this._pressedKeys = new Hashtable();
       this._releasedKeys = new Hashtable();
@@ -296,6 +305,14 @@ namespace gdjs {
     }
 
     /**
+     * @param identifier the touch identifier
+     * @returns true if the touch has just ended.
+     */
+    hasTouchEnded(identifier: integer): boolean {
+      return this._endedTouches.includes(identifier);
+    }
+
+    /**
      * Update and return the array containing the identifiers of all touches.
      */
     getAllTouchIdentifiers(): Array<integer> {
@@ -309,8 +326,10 @@ namespace gdjs {
     }
 
     onTouchStart(identifier: integer, x: float, y: float): void {
-      this._startedTouches.push(identifier);
-      this._touches.put(identifier, { x: x, y: y, justEnded: false });
+      // Add 1 to the identifier to avoid identifiers taking
+      // the GDevelop default variable value which is 0.
+      this._startedTouches.push(identifier + 1);
+      this._touches.put(identifier + 1, { x: x, y: y, justEnded: false });
       if (this._touchSimulateMouse) {
         this.onMouseMove(x, y);
         this.onMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON);
@@ -318,7 +337,7 @@ namespace gdjs {
     }
 
     onTouchMove(identifier: integer, x: float, y: float): void {
-      const touch = this._touches.get(identifier);
+      const touch = this._touches.get(identifier + 1);
       if (!touch) {
         return;
       }
@@ -330,10 +349,10 @@ namespace gdjs {
     }
 
     onTouchEnd(identifier: number): void {
-      this._endedTouches.push(identifier);
-      if (this._touches.containsKey(identifier)) {
+      this._endedTouches.push(identifier + 1);
+      if (this._touches.containsKey(identifier + 1)) {
         //Postpone deletion at the end of the frame
-        this._touches.get(identifier).justEnded = true;
+        this._touches.get(identifier + 1).justEnded = true;
       }
       if (this._touchSimulateMouse) {
         this.onMouseButtonReleased(InputManager.MOUSE_LEFT_BUTTON);
@@ -344,12 +363,22 @@ namespace gdjs {
       return this._startedTouches;
     }
 
+    /**
+     * @deprecated
+     */
     popStartedTouch(): integer | undefined {
-      return this._startedTouches.shift();
+      const touchId = this._startedTouches[this._lastStartedTouchIndex];
+      this._lastStartedTouchIndex++;
+      return touchId;
     }
 
+    /**
+     * @deprecated
+     */
     popEndedTouch(): integer | undefined {
-      return this._endedTouches.shift();
+      const touchId = this._endedTouches[this._lastEndedTouchIndex];
+      this._lastEndedTouchIndex++;
+      return touchId;
     }
 
     /**
@@ -395,6 +424,8 @@ namespace gdjs {
       this._releasedKeys.clear();
       this._releasedMouseButtons.length = 0;
       this._mouseWheelDelta = 0;
+      this._lastStartedTouchIndex = 0;
+      this._lastEndedTouchIndex = 0;
     }
 
     /**

@@ -3,7 +3,29 @@
  */
 
 describe('gdjs.InputManager', function() {
-  var inputManager = new gdjs.InputManager();
+
+  const runtimeGame = new gdjs.RuntimeGame({
+    variables: [],
+    resources: {
+      resources: [],
+    },
+    properties: { windowWidth: 800, windowHeight: 600 },
+  });
+  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  runtimeScene.loadFromScene({
+    layers: [{ name: '', visibility: true, effects: [] }],
+    variables: [],
+    behaviorsSharedData: [],
+    objects: [],
+    instances: [],
+  });
+  runtimeScene.getGame.getElapsedTime = function () {
+    return 1000 / 60;
+  };
+  const inputManager = runtimeScene
+  .getGame()
+  .getInputManager();
+  const inputTool = gdjs.evtTools.input;
 
   it('should handle keyboards events', function() {
     expect(inputManager.anyKeyPressed()).to.be(false);
@@ -100,13 +122,88 @@ describe('gdjs.InputManager', function() {
 
   it('should handle touch events', function() {
     inputManager.onTouchStart(46, 510, 610);
-    inputManager.onTouchStart(10, 510, 610);
-    expect(inputManager.getStartedTouchIdentifiers()).to.have.length(2);
-    expect(inputManager.getTouchX(46)).to.be(510);
-    expect(inputManager.getTouchY(46)).to.be(610);
+    inputManager.onTouchStart(10, 470, 320);
 
-    expect(inputManager.popStartedTouch()).to.be(46);
-    expect(inputManager.popStartedTouch()).to.be(10);
+    expect(inputTool.hasAnyTouchStarted(runtimeScene)).to.be(true);
+    expect(inputTool.getStartedTouchCount(runtimeScene)).to.be(2);
+    expect(inputTool.getStartedTouchIdentifier(runtimeScene, 0)).to.be(47);
+    expect(inputTool.getTouchX(runtimeScene, 47)).to.be(510);
+    expect(inputTool.getTouchY(runtimeScene, 47)).to.be(610);
+    expect(inputTool.getStartedTouchIdentifier(runtimeScene, 1)).to.be(11);
+    expect(inputTool.getTouchX(runtimeScene, 11)).to.be(470);
+    expect(inputTool.getTouchY(runtimeScene, 11)).to.be(320);
+    // Events can ask touches again
+    expect(inputTool.hasAnyTouchStarted(runtimeScene)).to.be(true);
+    expect(inputTool.getStartedTouchCount(runtimeScene)).to.be(2);
+
+    inputManager.onFrameEnded();
+    inputManager.onTouchEnd(10);
+    expect(inputTool.hasTouchEnded(runtimeScene, 11)).to.be(true);
+    expect(inputTool.hasTouchEnded(runtimeScene, 47)).to.be(false);
+    expect(inputTool.hasAnyTouchStarted(runtimeScene)).to.be(false);
+    expect(inputTool.getTouchX(runtimeScene, 11)).to.be(470);
+    expect(inputTool.getTouchY(runtimeScene, 11)).to.be(320);
+
+    inputManager.onFrameEnded();
+    expect(inputManager.getAllTouchIdentifiers()).to.have.length(1);
+  });
+
+  it('should handle legacy and new touch events without any conflict', function() {
+    inputManager.onTouchStart(46, 510, 610);
+    inputManager.onTouchStart(10, 470, 320);
+
+    // legacy ones
+    expect(inputTool.popStartedTouch(runtimeScene)).to.be(true);
+    expect(inputTool.getLastTouchId(runtimeScene)).to.be(47);
+    expect(inputTool.getTouchX(runtimeScene, 47)).to.be(510);
+    expect(inputTool.getTouchY(runtimeScene, 47)).to.be(610);
+    expect(inputTool.popStartedTouch(runtimeScene)).to.be(true);
+    expect(inputTool.getLastTouchId(runtimeScene)).to.be(11);
+    expect(inputTool.getTouchX(runtimeScene, 11)).to.be(470);
+    expect(inputTool.getTouchY(runtimeScene, 11)).to.be(320);
+    expect(inputTool.hasTouchEnded(runtimeScene)).to.be(false);
+
+    // new ones
+    expect(inputTool.hasAnyTouchStarted(runtimeScene)).to.be(true);
+    expect(inputTool.getStartedTouchCount(runtimeScene)).to.be(2);
+    expect(inputTool.getStartedTouchIdentifier(runtimeScene, 0)).to.be(47);
+    expect(inputTool.getTouchX(runtimeScene, 47)).to.be(510);
+    expect(inputTool.getTouchY(runtimeScene, 47)).to.be(610);
+    expect(inputTool.getStartedTouchIdentifier(runtimeScene, 1)).to.be(11);
+    expect(inputTool.getTouchX(runtimeScene, 11)).to.be(470);
+    expect(inputTool.getTouchY(runtimeScene, 11)).to.be(320);
+
+    inputManager.onFrameEnded();
+    inputManager.onTouchEnd(10);
+
+    // legacy ones
+    expect(inputTool.popEndedTouch(runtimeScene)).to.be(true);
+    expect(inputTool.getLastEndedTouchId()).to.be(11);
+    expect(inputTool.popEndedTouch(runtimeScene)).to.be(false);
+    expect(inputTool.hasAnyTouchStarted(runtimeScene)).to.be(false);
+    expect(inputTool.getTouchX(runtimeScene, 11)).to.be(470);
+    expect(inputTool.getTouchY(runtimeScene, 11)).to.be(320);
+
+    // new ones
+    expect(inputTool.hasTouchEnded(runtimeScene, 11)).to.be(true);
+    expect(inputTool.hasTouchEnded(runtimeScene, 47)).to.be(false);
+    expect(inputTool.hasAnyTouchStarted(runtimeScene)).to.be(false);
+    expect(inputTool.getTouchX(runtimeScene, 11)).to.be(470);
+    expect(inputTool.getTouchY(runtimeScene, 11)).to.be(320);
+
+    inputManager.onFrameEnded();
+    expect(inputManager.getAllTouchIdentifiers()).to.have.length(1);
+  });
+
+  it('should handle deprecated touch events', function() {
+    inputManager.onTouchStart(46, 510, 610);
+    inputManager.onTouchStart(10, 470, 320);
+    expect(inputManager.getStartedTouchIdentifiers()).to.have.length(2);
+    expect(inputManager.getTouchX(47)).to.be(510);
+    expect(inputManager.getTouchY(47)).to.be(610);
+
+    expect(inputManager.popStartedTouch()).to.be(47);
+    expect(inputManager.popStartedTouch()).to.be(11);
     expect(inputManager.popEndedTouch()).to.be(undefined);
 
     inputManager.onFrameEnded();
@@ -114,13 +211,14 @@ describe('gdjs.InputManager', function() {
     expect(inputManager.getAllTouchIdentifiers()).to.have.length(2);
     expect(inputManager.getStartedTouchIdentifiers()).to.have.length(0);
     expect(inputManager.popStartedTouch()).to.be(undefined);
-    expect(inputManager.popEndedTouch()).to.be(10);
-    expect(inputManager.getTouchX(10)).to.be(510);
-    expect(inputManager.getTouchY(10)).to.be(610);
+    expect(inputManager.popEndedTouch()).to.be(11);
+    expect(inputManager.getTouchX(11)).to.be(470);
+    expect(inputManager.getTouchY(11)).to.be(320);
 
     inputManager.onFrameEnded();
     expect(inputManager.getAllTouchIdentifiers()).to.have.length(1);
   });
+
   it('should simulate (or not) mouse events', function() {
     inputManager.touchSimulateMouse();
     expect(inputManager.isMouseButtonPressed(0)).to.be(false);

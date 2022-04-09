@@ -106,7 +106,10 @@ namespace gdjs {
       // expected not to "move". Not adapting the center position would make the camera
       // move from its initial position (which is centered in the screen) - and anchor
       // behavior would behave counterintuitively.
-      if (this._cameraX === oldGameResolutionWidth / 2 && this._cameraY === oldGameResolutionHeight / 2) {
+      if (
+        this._cameraX === oldGameResolutionWidth / 2 &&
+        this._cameraY === oldGameResolutionHeight / 2
+      ) {
         this._cameraX = this._cachedGameResolutionWidth / 2;
         this._cameraY = this._cachedGameResolutionHeight / 2;
       }

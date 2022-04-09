@@ -108,7 +108,8 @@ namespace gdjs {
       // behavior would behave counterintuitively.
       if (
         this._cameraX === oldGameResolutionWidth / 2 &&
-        this._cameraY === oldGameResolutionHeight / 2
+        this._cameraY === oldGameResolutionHeight / 2 &&
+        this._zoomFactor === 1
       ) {
         this._cameraX = this._cachedGameResolutionWidth / 2;
         this._cameraY = this._cachedGameResolutionHeight / 2;

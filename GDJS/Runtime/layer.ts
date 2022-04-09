@@ -100,17 +100,20 @@ namespace gdjs {
         .getGame()
         .getGameResolutionHeight();
 
-      // Adapt position of the camera center as:
-      // * Most cameras following a player/object on the scene will be updating this
-      // in events anyway.
+      // Adapt position of the camera center only if the camera never moved as:
+      // * When the camera follows a player/object, it will rarely be at the default position.
       // * Cameras not following a player/object are usually UIs which are intuitively
       // expected not to "move". Not adapting the center position would make the camera
       // move from its initial position (which is centered in the screen) - and anchor
       // behavior would behave counterintuitively.
-      this._cameraX +=
-        (this._cachedGameResolutionWidth - oldGameResolutionWidth) / 2;
-      this._cameraY +=
-        (this._cachedGameResolutionHeight - oldGameResolutionHeight) / 2;
+      if (
+        this._cameraX === oldGameResolutionWidth / 2 &&
+        this._cameraY === oldGameResolutionHeight / 2 &&
+        this._zoomFactor === 1
+      ) {
+        this._cameraX = this._cachedGameResolutionWidth / 2;
+        this._cameraY = this._cachedGameResolutionHeight / 2;
+      }
       this._renderer.updatePosition();
     }
 

@@ -156,6 +156,7 @@ namespace gdjs {
     protected _livingOnScene: boolean = true;
 
     readonly id: integer;
+    private destroyCallbacks = new Set<() => void>();
     _runtimeScene: gdjs.RuntimeScene;
 
     /**
@@ -320,6 +321,8 @@ namespace gdjs {
 
       // Make sure to delete existing timers.
       this._timers.clear();
+
+      this.destroyCallbacks.clear();
     }
 
     static supportsReinitialization = false;
@@ -395,6 +398,14 @@ namespace gdjs {
       }
     }
 
+    registerDestroyCallback(callback: () => void) {
+      this.destroyCallbacks.add(callback);
+    }
+
+    unregisterDestroyCallback(callback: () => void) {
+      this.destroyCallbacks.delete(callback);
+    }
+
     /**
      * Called when the object is destroyed (because it is removed from a scene or the scene
      * is being unloaded). If you redefine this function, **make sure to call the original method**
@@ -411,6 +422,7 @@ namespace gdjs {
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
+      this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
     }
 

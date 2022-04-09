@@ -150,6 +150,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
 
   extension
+      .AddAction("Wait",
+                 _("Wait X seconds"),
+                 _("Waits a certain amount of seconds before continuing "
+                   "to execute the actions."),
+                 _("Wait _PARAM0_ seconds"),
+                 _("Time"),
+                 "res/conditions/timer24.png",
+                 "res/conditions/timer.png")
+      .AddParameter("expression", "Time to wait in seconds")
+      .SetAsync();
+
+  extension
       .AddExpression("TimeDelta",
                      _("Time elapsed since the last frame"),
                      _("Time elapsed since the last frame rendered on screen"),

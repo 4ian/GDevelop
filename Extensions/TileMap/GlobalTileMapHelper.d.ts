@@ -1,4 +1,3 @@
-
 import * as TileMapHelperModule from './helper/TileMapHelper.js';
 
 declare global {

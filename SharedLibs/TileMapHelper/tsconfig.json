@@ -3,7 +3,7 @@
     "compilerOptions": {
         "module": "esnext",
         "noImplicitAny": true,
-        "outDir": "../../Extensions/TileMap/helper/", //"./dist",
+        "outDir": "./dist",//"../../Extensions/TileMap/helper/", //
         "target": "ES5",
         "sourceMap": true,
 		"declaration": true,

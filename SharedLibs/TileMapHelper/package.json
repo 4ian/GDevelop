@@ -24,6 +24,7 @@
     "check-format": "prettier --list-different \"src/**/*.ts\""
   },
   "dependencies": {
+    "@types/offscreencanvas": "^2019.6.4",
     "pako": "^2.0.4",
     "pixi.js": "^6.1.2"
   },
@@ -47,7 +48,8 @@
     "ts-loader": "^9.2.3",
     "typescript": "latest",
     "webpack": "^5.40.0",
-    "webpack-cli": "^4.9.0"
+    "webpack-cli": "^4.9.0",
+    "tslib": "^2.3.1"
   },
   "repository": {
     "type": "git",

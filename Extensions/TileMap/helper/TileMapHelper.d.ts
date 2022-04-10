@@ -1,7 +1,10 @@
 declare namespace TileMapHelper {
   import PIXI = GlobalPIXIModule.PIXI;
 
-  type PolygonVertices$1 = FloatPoint[];
+  type integer = number;
+  type float = number;
+  type FloatPoint = [float, float];
+  type PolygonVertices = FloatPoint[];
 
   /**
    * Tiled JSON format.
@@ -301,7 +304,6 @@ declare namespace TileMapHelper {
     y: float;
   };
 
-  type PolygonVertices = FloatPoint[];
   /**
    * A tile map model.
    *
@@ -782,12 +784,15 @@ declare namespace TileMapHelper {
   export {
     EditableTileMap,
     EditableTileMapLayer,
+    FloatPoint,
     PixiTileMapHelper,
-    PolygonVertices$1 as PolygonVertices,
+    PolygonVertices,
     TileDefinition,
     TileMapManager,
     TileTextureCache,
     TiledMap,
     TiledTileset,
+    float,
+    integer,
   };
 }

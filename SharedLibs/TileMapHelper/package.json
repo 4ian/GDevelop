@@ -15,13 +15,14 @@
     "test:firefox": "karma start --browsers Firefox --single-run",
     "test:firefox:watch": "karma start --browsers Firefox",
     "tsc": "tsc",
-    "build": "rollup -c",
+    "build": "npm run tsc && rollup -c && npm run rmdir -- dist ../../Extensions/TileMap/helper/dts",
     "dev": "rollup -c -w",
     "build:webpack": "webpack --mode production",
     "build:watch": "webpack --mode development --watch",
     "prepublishOnly": "npm run build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "check-format": "prettier --list-different \"src/**/*.ts\""
+    "check-format": "prettier --list-different \"src/**/*.ts\"",
+    "rmdir": "node -e \"var fs = require('fs'); process.argv.slice(1).map((fpath) => fs.rmdirSync(fpath, { recursive: true })); process.exit(0);\""
   },
   "dependencies": {
     "@types/offscreencanvas": "^2019.6.4",

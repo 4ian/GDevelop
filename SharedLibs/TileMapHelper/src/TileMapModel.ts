@@ -1,6 +1,5 @@
-import { FloatPoint, integer, float } from "./CommonTypes";
+import { PolygonVertices, integer, float } from "./CommonTypes";
 
-export type PolygonVertices = FloatPoint[];
 /**
  * A tile map model.
  *

@@ -1,7 +1,7 @@
+/// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
   export namespace TileMap {
     import PIXI = GlobalPIXIModule.PIXI;
-    import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
 
     const logger = new gdjs.Logger('Tilemap object');
 

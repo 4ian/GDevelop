@@ -1,6 +1,6 @@
+/// <reference path="../helper/TileMapHelper.d.ts" />
 namespace gdjs {
   export namespace TileMap {
-    import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
     /**
      * A tile map transformed with an affine transformation.
      *

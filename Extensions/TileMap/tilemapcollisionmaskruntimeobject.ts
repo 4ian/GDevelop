@@ -1,6 +1,5 @@
+/// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
-  import TileMapHelper = GlobalTileMapHelperModule.TileMapHelper;
-
   const logger = new gdjs.Logger('Tilemap object');
 
   /**

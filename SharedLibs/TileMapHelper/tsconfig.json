@@ -11,7 +11,8 @@
         "declarationDir": "../../Extensions/TileMap/helper/dts",
         "types" : [
             "mocha",
-            "expect.js"
+            "expect.js",
+            "offscreencanvas"
         ],
 		"lib": ["DOM", "ES5", "ES6"],
         "esModuleInterop": false, 

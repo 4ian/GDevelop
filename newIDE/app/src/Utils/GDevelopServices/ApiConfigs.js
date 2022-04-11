@@ -1,5 +1,7 @@
 // @flow
-const isDev = process.env.NODE_ENV === 'development';
+import Window from '../Window';
+
+const isDev = Window.isDev();
 
 export const GDevelopGamePreviews = {
   baseUrl: `https://game-previews.gdevelop-app.com/`,
@@ -14,6 +16,10 @@ export const GDevelopGamesPlatform = {
     isDev
       ? `https://liluo.io/games/${gameId}?dev=true`
       : `https://liluo.io/games/${gameId}`,
+  getUserPublicProfileUrl: (userId: string, username: ?string) =>
+    username
+      ? `https://liluo.io/${username}${isDev ? '?dev=true' : ''}`
+      : `https://liluo.io/user/${userId}${isDev ? '?dev=true' : ''}`,
 };
 
 export const GDevelopBuildApi = {

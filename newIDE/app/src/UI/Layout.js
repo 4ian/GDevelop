@@ -132,6 +132,7 @@ type ColumnStackLayoutProps = {|
   expand?: boolean,
   noMargin?: boolean,
   children: React.Node,
+  noOverflowParent?: boolean,
 |};
 
 export const ColumnStackLayout = ({
@@ -140,6 +141,7 @@ export const ColumnStackLayout = ({
   expand,
   noMargin,
   children,
+  noOverflowParent,
 }: ColumnStackLayoutProps) => {
   let isFirstChild = true;
   return (
@@ -148,6 +150,7 @@ export const ColumnStackLayout = ({
       justifyContent={justifyContent}
       expand={expand}
       noMargin={noMargin}
+      noOverflowParent={noOverflowParent}
     >
       {React.Children.map(children, (child, index) => {
         if (!child) return null;

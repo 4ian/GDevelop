@@ -3,6 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -14,8 +15,10 @@ import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import Window from '../Utils/Window';
 
 type DisplayedProfile = {
+  id: string,
   +email?: string,
   description: ?string,
   username: ?string,
@@ -40,6 +43,7 @@ const ProfileDetails = ({
   onEditProfile,
   badges,
 }: Props) => {
+  const isDev = process.env.NODE_ENV === 'development';
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -89,6 +93,23 @@ const ProfileDetails = ({
           </Line>
           {isAuthenticatedUserProfile && (
             <ResponsiveLineStackLayout justifyContent="flex-end" noColumnMargin>
+              {profile.id && (
+                <RaisedButton
+                  label={i18n._(t`Access public profile`)}
+                  onClick={() =>
+                    Window.openExternalURL(
+                      profile.username
+                        ? `https://liluo.io/${profile.username}${
+                            isDev ? '?dev=true' : ''
+                          }`
+                        : `https://liluo.io/user/${profile.id}${
+                            isDev ? '?dev=true' : ''
+                          }`
+                    )
+                  }
+                  icon={<OpenInNew />}
+                />
+              )}
               <RaisedButton
                 label={<Trans>Change my email</Trans>}
                 onClick={onChangeEmail}

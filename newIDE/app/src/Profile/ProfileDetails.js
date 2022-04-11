@@ -16,7 +16,7 @@ import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
 import Window from '../Utils/Window';
-import { getUserPublicProfileUrl } from '../Utils/GDevelopServices/User';
+import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 
 type DisplayedProfile = {
   id: string,
@@ -44,7 +44,6 @@ const ProfileDetails = ({
   onEditProfile,
   badges,
 }: Props) => {
-  const isDev = process.env.NODE_ENV === 'development';
   return profile ? (
     <I18n>
       {({ i18n }) => (
@@ -74,7 +73,10 @@ const ProfileDetails = ({
                 label={i18n._(t`Access public profile`)}
                 onClick={() =>
                   Window.openExternalURL(
-                    getUserPublicProfileUrl(profile.id, profile.username)
+                    GDevelopGamesPlatform.getUserPublicProfileUrl(
+                      profile.id,
+                      profile.username
+                    )
                   )
                 }
                 icon={<OpenInNew />}

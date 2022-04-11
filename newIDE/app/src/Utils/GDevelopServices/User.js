@@ -3,7 +3,6 @@ import axios from 'axios';
 import { GDevelopUserApi } from './ApiConfigs';
 
 import { type Badge } from './Badge';
-const isDev = process.env.NODE_ENV === 'development';
 
 export type UserPublicProfile = {|
   id: string,
@@ -57,8 +56,3 @@ export const getUserPublicProfile = (
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
     .then(response => response.data);
 };
-
-export const getUserPublicProfileUrl = (userId: string, username: ?string) =>
-  username
-    ? `https://liluo.io/${username}${isDev ? '?dev=true' : ''}`
-    : `https://liluo.io/user/${userId}${isDev ? '?dev=true' : ''}`;

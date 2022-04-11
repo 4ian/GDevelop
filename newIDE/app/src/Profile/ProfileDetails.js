@@ -16,6 +16,7 @@ import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
 import Window from '../Utils/Window';
+import { getUserPublicProfileUrl } from '../Utils/GDevelopServices/User';
 
 type DisplayedProfile = {
   id: string,
@@ -73,13 +74,7 @@ const ProfileDetails = ({
                 label={i18n._(t`Access public profile`)}
                 onClick={() =>
                   Window.openExternalURL(
-                    profile.username
-                      ? `https://liluo.io/${profile.username}${
-                          isDev ? '?dev=true' : ''
-                        }`
-                      : `https://liluo.io/user/${profile.id}${
-                          isDev ? '?dev=true' : ''
-                        }`
+                    getUserPublicProfileUrl(profile.id, profile.username)
                   )
                 }
                 icon={<OpenInNew />}

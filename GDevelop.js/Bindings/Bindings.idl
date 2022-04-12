@@ -1074,10 +1074,15 @@ interface Instruction {
     void SetInverted(boolean inverted);
     boolean IsInverted();
     void SetParameter(unsigned long id, [Const] DOMString value);
-    [Const, Ref] DOMString GetParameter(unsigned long id);
+    [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
     unsigned long GetParametersCount();
     [Ref] InstructionsList GetSubInstructions();
+};
+
+interface Expression {
+  [Const, Ref] DOMString GetPlainString();
+  [Value] UniquePtrExpressionNode GetRootNode([Const] DOMString type, [Ref] ExpressionParser2 parser);
 };
 
 interface VectorPairStringTextFormatting {

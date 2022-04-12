@@ -104,6 +104,7 @@ declare class libGDevelop {
   Serializer: Class<gdSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
+  Expression: Class<gdExpression>;
   VectorPairStringTextFormatting: Class<gdVectorPairStringTextFormatting>;
   TextFormatting: Class<gdTextFormatting>;
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;

@@ -66,7 +66,7 @@ export default class ExpressionParametersEditor extends React.Component<
     const expression = {
       getParametersCount: () => parametersCount,
       getParameter: index => {
-        return parameterValues[index] || '';
+        return parameterValues[index].getPlainString() || '';
       },
     };
 
@@ -85,7 +85,7 @@ export default class ExpressionParametersEditor extends React.Component<
               expression={expression}
               parameterMetadata={parameterMetadata}
               parameterIndex={i}
-              value={parameterValues[i]}
+              value={parameterValues[i].getPlainString()}
               onChange={value => this.props.onChangeParameter(i, value)}
               project={project}
               scope={scope}

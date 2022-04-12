@@ -376,6 +376,14 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   React.useEffect(
     () => {
+      dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+      dispatch({ type: 'PURGE_LEADERBOARDS' });
+    },
+    [gameId]
+  );
+
+  React.useEffect(
+    () => {
       if (!currentLeaderboardId) return;
       dispatch({ type: 'PURGE_NAVIGATION' });
       fetchEntries();

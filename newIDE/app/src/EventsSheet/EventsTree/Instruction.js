@@ -33,6 +33,9 @@ import {
   shouldActivate,
   shouldValidate,
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import BackgroundHighlighting, {
+  type Highlight,
+} from '../ParameterFields/GenericExpressionField/BackgroundHighlighting';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -41,6 +44,18 @@ const styles = {
     wordWrap: 'break-word',
     cursor: 'pointer',
     marginBottom: 1,
+  },
+  input: {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+    lineHeight: 1.4,
+  },
+  backgroundHighlightingInline: {
+    marginTop: 0, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  textFieldAndHightlightContainer: {
+    position: 'relative',
   },
 };
 
@@ -91,6 +106,9 @@ type Props = {|
 
   screenType: ScreenType,
   windowWidth: WidthType,
+
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
 |};
 
 const Instruction = (props: Props) => {
@@ -100,6 +118,8 @@ const Instruction = (props: Props) => {
     onClick,
     onMoveToInstruction,
     onContextMenu,
+    globalObjectsContainer,
+    objectsContainer,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -147,6 +167,22 @@ const Instruction = (props: Props) => {
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
           const parameterType = parameterMetadata.getType();
+
+          const parser = new gd.ExpressionParser2(
+            gd.JsPlatform.get(),
+            globalObjectsContainer,
+            objectsContainer
+          );
+          const expressionNode = instruction
+            .getParameter(parameterIndex)
+            .getRootNode(parameterType, parser)
+            .get();
+          const expressionValidator = new gd.ExpressionValidator();
+          expressionNode.visit(expressionValidator);
+          const expressionIsValid =
+            expressionValidator.getErrors().size() === 0;
+          parser.delete();
+
           return (
             <span
               key={i}
@@ -175,6 +211,7 @@ const Instruction = (props: Props) => {
             >
               {ParameterRenderingService.renderInlineParameter({
                 value: formattedTexts.getString(i),
+                expressionIsValid,
                 parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,

@@ -130,13 +130,13 @@ void EventsContextAnalyzer::AnalyzeParameter(
     context.AddObjectName(value);
   } else if (ParameterMetadata::IsExpression("number", type)) {
     gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = parser.ParseExpression("number", value);
+    auto node = parameter.GetRootNode("number", parser);
 
     ExpressionObjectsAnalyzer analyzer(context);
     node->Visit(analyzer);
   } else if (ParameterMetadata::IsExpression("string", type)) {
     gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = parser.ParseExpression("string", value);
+    auto node = parameter.GetRootNode("string", parser);
 
     ExpressionObjectsAnalyzer analyzer(context);
     node->Visit(analyzer);

@@ -41,8 +41,14 @@ class GD_CORE_API Expression {
    */
   Expression(const char* plainString_);
 
+  /**
+   * \brief Copy construct an expression.
+   */
   Expression(const Expression& copy);
 
+  /**
+   * \brief Expression affectation overriding.
+   */
   Expression& operator=(const Expression& expression);
 
   /**
@@ -50,6 +56,14 @@ class GD_CORE_API Expression {
    */
   inline const gd::String& GetPlainString() const { return plainString; };
 
+  /**
+   * @brief Get the expression node.
+   *
+   * @param type the expression type
+   * @param parser the parser to use if this expression never has been parsed
+   * before.
+   * @return std::unique_ptr<gd::ExpressionNode>
+   */
   std::unique_ptr<gd::ExpressionNode> GetRootNode(
       const gd::String& type, gd::ExpressionParser2& parser) const;
 

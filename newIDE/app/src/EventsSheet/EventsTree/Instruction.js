@@ -165,7 +165,15 @@ const Instruction = (props: Props) => {
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
-          const parameterType = parameterMetadata.getType();
+          const parameterSubType = parameterMetadata.getType();
+          const parameterType = gd.ParameterMetadata.isExpression(
+            'number',
+            parameterSubType
+          )
+            ? 'number'
+            : gd.ParameterMetadata.isExpression('string', parameterSubType)
+            ? 'string'
+            : parameterSubType;
 
           const parser = new gd.ExpressionParser2(
             gd.JsPlatform.get(),
@@ -188,7 +196,7 @@ const Instruction = (props: Props) => {
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
-                [parameterType]: true,
+                [parameterSubType]: true,
               })}
               onClick={domEvent => {
                 props.onParameterClick(domEvent, parameterIndex);

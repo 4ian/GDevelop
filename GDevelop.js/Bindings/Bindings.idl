@@ -1274,6 +1274,7 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+    boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

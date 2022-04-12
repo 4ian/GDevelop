@@ -155,6 +155,8 @@ export default class RepeatEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
             />
           )}
           renderActionsList={({ className }) => (
@@ -183,6 +185,8 @@ export default class RepeatEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
             />
           )}
         />

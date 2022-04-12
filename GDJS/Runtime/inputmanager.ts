@@ -326,10 +326,9 @@ namespace gdjs {
     }
 
     onTouchStart(identifier: integer, x: float, y: float): void {
-      // Add 1 to the identifier to avoid identifiers taking
-      // the GDevelop default variable value which is 0.
-      this._startedTouches.push(identifier + 1);
-      this._touches.put(identifier + 1, { x: x, y: y, justEnded: false });
+      const publicIdentifier = this.getPublicTouchIdentifier(identifier);
+      this._startedTouches.push(publicIdentifier);
+      this._touches.put(publicIdentifier, { x: x, y: y, justEnded: false });
       if (this._touchSimulateMouse) {
         this.onMouseMove(x, y);
         this.onMouseButtonPressed(InputManager.MOUSE_LEFT_BUTTON);
@@ -337,7 +336,8 @@ namespace gdjs {
     }
 
     onTouchMove(identifier: integer, x: float, y: float): void {
-      const touch = this._touches.get(identifier + 1);
+      const publicIdentifier = this.getPublicTouchIdentifier(identifier);
+      const touch = this._touches.get(publicIdentifier);
       if (!touch) {
         return;
       }
@@ -349,14 +349,25 @@ namespace gdjs {
     }
 
     onTouchEnd(identifier: number): void {
-      this._endedTouches.push(identifier + 1);
-      if (this._touches.containsKey(identifier + 1)) {
+      const publicIdentifier = this.getPublicTouchIdentifier(identifier);
+      this._endedTouches.push(publicIdentifier);
+      if (this._touches.containsKey(publicIdentifier)) {
         //Postpone deletion at the end of the frame
-        this._touches.get(identifier + 1).justEnded = true;
+        this._touches.get(publicIdentifier).justEnded = true;
       }
       if (this._touchSimulateMouse) {
         this.onMouseButtonReleased(InputManager.MOUSE_LEFT_BUTTON);
       }
+    }
+
+    /**
+     * Add 1 to the identifier to avoid identifiers taking
+     * the GDevelop default variable value which is 0.
+     * @param identifier The identifier given by the browser.
+     * @returns The identifier used in events.
+     */
+    getPublicTouchIdentifier(identifier: integer): integer {
+      return identifier + 1;
     }
 
     getStartedTouchIdentifiers(): integer[] {

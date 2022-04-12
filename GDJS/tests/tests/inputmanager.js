@@ -19,9 +19,6 @@ describe('gdjs.InputManager', function() {
     objects: [],
     instances: [],
   });
-  runtimeScene.getGame.getElapsedTime = function () {
-    return 1000 / 60;
-  };
   const inputManager = runtimeScene
   .getGame()
   .getInputManager();

@@ -368,7 +368,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           "HasTouchEnded",
           _("A touch has ended"),
           _("Check if a touch has ended."),
-          _("The touch has ended with identifier: _PARAM1_"),
+          _("The touch with identifier _PARAM1_ has ended"),
           _("Multitouch"),
           "res/conditions/touch24.png",
           "res/conditions/touch.png")

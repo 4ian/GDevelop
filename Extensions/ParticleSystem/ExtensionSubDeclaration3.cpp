@@ -28,7 +28,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
   obj.AddAction(
          "RendererParam1",
          _("Rendering first parameter"),
-         _("Modify first parameter of rendering ( Size/Length ).\nParticles "
+         _("Modify first parameter of rendering (Size/Length).\nParticles "
            "have to be recreated in order to take changes in account."),
          _("the rendering 1st parameter"),
          _("Setup"),
@@ -40,7 +40,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
   obj.AddCondition(
          "RendererParam1",
          _("Rendering first parameter"),
-         _("Test the first parameter of rendering ( Size/Length )."),
+         _("Test the first parameter of rendering (Size/Length)."),
          _("the 1st rendering parameter"),
          _("Setup"),
          "CppPlatform/Extensions/particleSystemicon24.png",
@@ -51,7 +51,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
 
   obj.AddAction("RendererParam2",
                 _("Rendering second parameter"),
-                _("Modify the second parameter of rendering ( Size/Length "
+                _("Modify the second parameter of rendering (Size/Length"
                   ").\nParticles have to be recreated in order to take changes "
                   "in account."),
                 _("the rendering 2nd parameter"),
@@ -64,7 +64,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
   obj.AddCondition(
          "RendererParam2",
          _("Rendering second parameter"),
-         _("Test the second parameter of rendering ( Size/Length )."),
+         _("Test the second parameter of rendering (Size/Length)."),
          _("the 2nd rendering parameter"),
          _("Setup"),
          "CppPlatform/Extensions/particleSystemicon24.png",
@@ -136,7 +136,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
 
   obj.AddAction("Texture",
                 _("Image"),
-                _("Change the image of particles ( if displayed )."),
+                _("Change the image of particles (if displayed)."),
                 _("Change the image of particles of _PARAM0_ to _PARAM1_"),
                 _("Common"),
                 "CppPlatform/Extensions/particleSystemicon24.png",

@@ -178,7 +178,6 @@ const Instruction = (props: Props) => {
           if (
             parameterType === 'number' ||
             parameterType === 'string' ||
-            gd.ParameterMetadata.isObject(parameterType) ||
             gd.ParameterMetadata.isExpression('variable', parameterType)
           ) {
             const parser = new gd.ExpressionParser2(
@@ -194,6 +193,13 @@ const Instruction = (props: Props) => {
             expressionNode.visit(expressionValidator);
             expressionIsValid = expressionValidator.getErrors().size() === 0;
             parser.delete();
+          } else if (gd.ParameterMetadata.isObject(parameterType)) {
+            const objectName = instruction
+              .getParameter(parameterIndex)
+              .getPlainString();
+            expressionIsValid =
+              globalObjectsContainer.hasObjectNamed(objectName) ||
+              objectsContainer.hasObjectNamed(objectName);
           }
 
           return (

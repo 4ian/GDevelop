@@ -48,6 +48,9 @@ type Props = {
 
   screenType: ScreenType,
   windowWidth: WidthType,
+
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
 };
 
 const DropTarget = makeDropTarget<{
@@ -74,6 +77,8 @@ export default function InstructionsList({
   renderObjectThumbnail,
   screenType,
   windowWidth,
+  globalObjectsContainer,
+  objectsContainer,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
 
@@ -143,6 +148,8 @@ export default function InstructionsList({
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
         windowWidth={windowWidth}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
       />
     );
   });

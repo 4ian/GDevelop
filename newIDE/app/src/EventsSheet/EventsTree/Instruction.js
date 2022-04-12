@@ -384,6 +384,8 @@ const Instruction = (props: Props) => {
                 renderObjectThumbnail={props.renderObjectThumbnail}
                 screenType={props.screenType}
                 windowWidth={props.windowWidth}
+                globalObjectsContainer={props.globalObjectsContainer}
+                objectsContainer={props.objectsContainer}
               />
             )}
           </React.Fragment>

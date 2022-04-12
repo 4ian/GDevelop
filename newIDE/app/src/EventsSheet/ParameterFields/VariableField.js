@@ -203,6 +203,8 @@ export const renderVariableWithIcon = (
   {
     value,
     parameterMetadata,
+    expressionIsValid,
+    InvalidParameterValue,
     MissingParameterValue,
   }: ParameterInlineRendererProps,
   iconPath: string,
@@ -229,7 +231,11 @@ export const renderVariableWithIcon = (
         src={iconPath}
         alt=""
       />
-      {value}
+      {expressionIsValid ? (
+        value
+      ) : (
+        <InvalidParameterValue>{value}</InvalidParameterValue>
+      )}
     </span>
   );
 };

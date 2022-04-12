@@ -4,6 +4,7 @@ import { LeaderboardAdmin } from '../GameDashboard/LeaderboardAdmin';
 
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import HelpButton from '../UI/HelpButton';
 import { Trans } from '@lingui/macro';
 
 type Props = {|
@@ -22,6 +23,12 @@ const LeaderboardDialog = ({ onClose, open, project }: Props) => {
           disabled={isLoading}
           onClick={onClose}
           key={'Close'}
+        />,
+      ]}
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath="/interface/games-dashboard/leaderboard-administration"
         />,
       ]}
       open={open}

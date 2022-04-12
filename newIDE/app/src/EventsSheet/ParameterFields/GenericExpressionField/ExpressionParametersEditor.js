@@ -85,7 +85,7 @@ export default class ExpressionParametersEditor extends React.Component<
               expression={expression}
               parameterMetadata={parameterMetadata}
               parameterIndex={i}
-              value={parameterValues[i].getPlainString()}
+              value={parameterValues[i]}
               onChange={value => this.props.onChangeParameter(i, value)}
               project={project}
               scope={scope}

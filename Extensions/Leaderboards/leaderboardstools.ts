@@ -1,7 +1,15 @@
 namespace gdjs {
+  declare var jsSHA: any;
+
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {
     export namespace leaderboards {
+      const computeDigest = (payload: string): string => {
+        const shaObj = new jsSHA('SHA-256', 'TEXT', { encoding: 'UTF8' });
+        shaObj.update(payload);
+        return shaObj.getHash('B64');
+      };
+
       // Score saving
       class ScoreSavingState {
         lastScoreSavingStartedAt: number | null;
@@ -193,25 +201,25 @@ namespace gdjs {
 
         const baseUrl = 'https://api.gdevelop-app.com/play';
         const game = runtimeScene.getGame();
-        const formattedPlayerName = formatPlayerName(playerName);
-        const sessionId = game.getSessionId();
-        const playerId = game.getPlayerId();
-        const location =
-          typeof window !== 'undefined' && (window as any).location
-            ? (window as any).location.href
-            : '';
+        const payload = JSON.stringify({
+          playerName: formatPlayerName(playerName),
+          score: score,
+          sessionId: game.getSessionId(),
+          clientPlayerId: game.getPlayerId(),
+          location:
+            typeof window !== 'undefined' && (window as any).location
+              ? (window as any).location.href
+              : '',
+        });
         fetch(
           `${baseUrl}/game/${gdjs.projectData.properties.projectUuid}/leaderboard/${leaderboardId}/entry`,
           {
-            body: JSON.stringify({
-              playerName: formattedPlayerName,
-              score: score,
-              sessionId: sessionId,
-              clientPlayerId: playerId,
-              location: location,
-            }),
+            body: payload,
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              Digest: computeDigest(payload),
+            },
           }
         ).then(
           (response) => {

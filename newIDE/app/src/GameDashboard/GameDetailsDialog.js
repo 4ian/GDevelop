@@ -378,7 +378,14 @@ export const GameDetailsDialog = ({
             />,
           ]}
           secondaryActions={[
-            <HelpButton key="help" helpPagePath="/interface/games-dashboard" />,
+            <HelpButton
+              key="help"
+              helpPagePath={
+                currentTab === 'leaderboards'
+                  ? '/interface/games-dashboard/leaderboard-administration'
+                  : '/interface/games-dashboard'
+              }
+            />,
           ]}
         >
           <Tabs value={currentTab} onChange={setCurrentTab}>

@@ -175,21 +175,27 @@ const Instruction = (props: Props) => {
             : gd.ParameterMetadata.isExpression('string', parameterSubType)
             ? 'string'
             : parameterSubType;
-
-          const parser = new gd.ExpressionParser2(
-            gd.JsPlatform.get(),
-            globalObjectsContainer,
-            objectsContainer
-          );
-          const expressionNode = instruction
-            .getParameter(parameterIndex)
-            .getRootNode(parameterType, parser)
-            .get();
-          const expressionValidator = new gd.ExpressionValidator();
-          expressionNode.visit(expressionValidator);
-          const expressionIsValid =
-            expressionValidator.getErrors().size() === 0;
-          parser.delete();
+          let expressionIsValid = true;
+          if (
+            parameterType === 'number' ||
+            parameterType === 'string' ||
+            gd.ParameterMetadata.isObject(parameterType) ||
+            gd.ParameterMetadata.isExpression('variable', parameterType)
+          ) {
+            const parser = new gd.ExpressionParser2(
+              gd.JsPlatform.get(),
+              globalObjectsContainer,
+              objectsContainer
+            );
+            const expressionNode = instruction
+              .getParameter(parameterIndex)
+              .getRootNode(parameterType, parser)
+              .get();
+            const expressionValidator = new gd.ExpressionValidator();
+            expressionNode.visit(expressionValidator);
+            expressionIsValid = expressionValidator.getErrors().size() === 0;
+            parser.delete();
+          }
 
           return (
             <span

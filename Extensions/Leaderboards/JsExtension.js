@@ -28,7 +28,7 @@ module.exports = {
     extension
       .setExtensionInformation(
         'Leaderboards',
-        _('Leaderboards'),
+        _('Leaderboards (experimental)'),
         _('Allow your game to send scores to your leaderboards.'),
         'Florian Rival',
         'Open source (MIT License)'

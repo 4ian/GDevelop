@@ -1,6 +1,6 @@
-namespace gdjs {
-  declare var jsSHA: any;
+/// <reference path="sha256.d.ts" />
 
+namespace gdjs {
   const logger = new gdjs.Logger('Leaderboards');
   export namespace evtTools {
     export namespace leaderboards {

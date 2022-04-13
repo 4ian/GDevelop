@@ -31,7 +31,6 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/logger.js',
       '../../newIDE/app/resources/GDJS/Runtime/gd.js',
       '../../newIDE/app/resources/GDJS/Runtime/libs/rbush.js',
-      '../../newIDE/app/resources/GDJS/Runtime/libs/sha256.js',
       '../../newIDE/app/resources/GDJS/Runtime/cocos-renderers/cocos-director-manager.js',
       '../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/pixi.js',
       '../../newIDE/app/resources/GDJS/Runtime/pixi-renderers/*.js',

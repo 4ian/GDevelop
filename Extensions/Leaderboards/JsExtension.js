@@ -75,7 +75,8 @@ module.exports = {
       )
       .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setIncludeFile('Extensions/Leaderboards/sha256.js')
+      .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
 
     extension

@@ -334,7 +334,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCondition(
           "HasAnyTouchStarted",
           _("A new touch has started"),
-          _("Check if a touch has started. The touch identifiers can be "
+          _("Check if a touch has just started on this frame. The touch identifiers can be "
             "accessed using StartedTouchId() and StartedTouchCount()."),
           _("A new touch has started"),
           _("Multitouch"),
@@ -346,7 +346,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddExpression(
           "StartedTouchCount",
           _("Started touch count"),
-          _("The number of touches that have started. The touch identifiers can be "
+          _("The number of touches that have just started on this frame. The touch identifiers can be "
             "accessed using StartedTouchId()."),
           _("Multitouch"),
           "res/conditions/touch.png")
@@ -356,7 +356,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddExpression(
           "StartedTouchId",
           _("Started touch identifier"),
-          _("The identifier of the touch that has started. The touch number of touches can be "
+          _("The identifier of the touch that has just started on this frame. The touch number of touches can be "
             "accessed using StartedTouchCount()."),
           _("Multitouch"),
           "res/conditions/touch.png")

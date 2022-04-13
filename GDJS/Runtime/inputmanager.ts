@@ -285,11 +285,11 @@ namespace gdjs {
      *
      * @return the touch X position, relative to the game view.
      */
-    getTouchX(identifier: integer): float {
-      if (!this._touches.containsKey(identifier)) {
+    getTouchX(publicIdentifier: integer): float {
+      if (!this._touches.containsKey(publicIdentifier)) {
         return 0;
       }
-      return this._touches.get(identifier).x;
+      return this._touches.get(publicIdentifier).x;
     }
 
     /**
@@ -297,19 +297,19 @@ namespace gdjs {
      *
      * @return the touch Y position, relative to the game view.
      */
-    getTouchY(identifier: integer): float {
-      if (!this._touches.containsKey(identifier)) {
+    getTouchY(publicIdentifier: integer): float {
+      if (!this._touches.containsKey(publicIdentifier)) {
         return 0;
       }
-      return this._touches.get(identifier).y;
+      return this._touches.get(publicIdentifier).y;
     }
 
     /**
-     * @param identifier the touch identifier
+     * @param publicIdentifier the touch identifier
      * @returns true if the touch has just ended.
      */
-    hasTouchEnded(identifier: integer): boolean {
-      return this._endedTouches.includes(identifier);
+    hasTouchEnded(publicIdentifier: integer): boolean {
+      return this._endedTouches.includes(publicIdentifier);
     }
 
     /**
@@ -325,8 +325,8 @@ namespace gdjs {
       return InputManager._allTouchIds;
     }
 
-    onTouchStart(identifier: integer, x: float, y: float): void {
-      const publicIdentifier = this.getPublicTouchIdentifier(identifier);
+    onTouchStart(rawIdentifier: integer, x: float, y: float): void {
+      const publicIdentifier = this.getPublicTouchIdentifier(rawIdentifier);
       this._startedTouches.push(publicIdentifier);
       this._touches.put(publicIdentifier, { x: x, y: y, justEnded: false });
       if (this._touchSimulateMouse) {
@@ -335,8 +335,8 @@ namespace gdjs {
       }
     }
 
-    onTouchMove(identifier: integer, x: float, y: float): void {
-      const publicIdentifier = this.getPublicTouchIdentifier(identifier);
+    onTouchMove(rawIdentifier: integer, x: float, y: float): void {
+      const publicIdentifier = this.getPublicTouchIdentifier(rawIdentifier);
       const touch = this._touches.get(publicIdentifier);
       if (!touch) {
         return;
@@ -348,8 +348,8 @@ namespace gdjs {
       }
     }
 
-    onTouchEnd(identifier: number): void {
-      const publicIdentifier = this.getPublicTouchIdentifier(identifier);
+    onTouchEnd(rawIdentifier: number): void {
+      const publicIdentifier = this.getPublicTouchIdentifier(rawIdentifier);
       this._endedTouches.push(publicIdentifier);
       if (this._touches.containsKey(publicIdentifier)) {
         //Postpone deletion at the end of the frame
@@ -363,11 +363,11 @@ namespace gdjs {
     /**
      * Add 1 to the identifier to avoid identifiers taking
      * the GDevelop default variable value which is 0.
-     * @param identifier The identifier given by the browser.
+     * @param rawIdentifier The identifier given by the browser.
      * @returns The identifier used in events.
      */
-    getPublicTouchIdentifier(identifier: integer): integer {
-      return identifier + 1;
+    private getPublicTouchIdentifier(rawIdentifier: integer): integer {
+      return rawIdentifier + 1;
     }
 
     getStartedTouchIdentifiers(): integer[] {
@@ -378,18 +378,20 @@ namespace gdjs {
      * @deprecated
      */
     popStartedTouch(): integer | undefined {
-      const touchId = this._startedTouches[this._lastStartedTouchIndex];
+      const publicIdentifier = this._startedTouches[
+        this._lastStartedTouchIndex
+      ];
       this._lastStartedTouchIndex++;
-      return touchId;
+      return publicIdentifier;
     }
 
     /**
      * @deprecated
      */
     popEndedTouch(): integer | undefined {
-      const touchId = this._endedTouches[this._lastEndedTouchIndex];
+      const publicIdentifier = this._endedTouches[this._lastEndedTouchIndex];
       this._lastEndedTouchIndex++;
-      return touchId;
+      return publicIdentifier;
     }
 
     /**

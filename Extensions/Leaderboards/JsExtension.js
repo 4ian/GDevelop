@@ -33,8 +33,8 @@ module.exports = {
         'Florian Rival',
         'Open source (MIT License)'
       )
-      .setCategory('Leaderboards');
-    extension
+      .setExtensionHelpPath('/all-features/leaderboards')
+      .setCategory('Leaderboards')
       .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
@@ -73,8 +73,10 @@ module.exports = {
         '',
         true
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
+      .setIncludeFile('Extensions/Leaderboards/sha256.js')
+      .addIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.savePlayerScore');
 
     extension
@@ -93,6 +95,7 @@ module.exports = {
           'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
         )
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.hasSavingErrored');
@@ -113,6 +116,7 @@ module.exports = {
           'If no leaderboard is specified, will return the value related to the last leaderboard save action that successfully ended.'
         )
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.hasBeenSaved');
@@ -133,6 +137,7 @@ module.exports = {
           'If no leaderboard is specified, will return the value related to the last leaderboard save action.'
         )
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isSaving');
@@ -165,6 +170,7 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewErrored');
@@ -181,6 +187,7 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewLoaded');
@@ -195,6 +202,7 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg',
         'JsPlatform/Extensions/leaderboard.svg'
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.isLeaderboardViewLoading');
@@ -232,6 +240,7 @@ module.exports = {
         '',
         false
       )
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.displayLeaderboard');
@@ -247,6 +256,7 @@ module.exports = {
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addCodeOnlyParameter('currentScene', '')
+      .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/leaderboardstools.js')
       .setFunctionName('gdjs.evtTools.leaderboards.closeLeaderboardView');

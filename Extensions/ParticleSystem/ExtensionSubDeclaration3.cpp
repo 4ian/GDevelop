@@ -142,8 +142,8 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter")
-      .SetParameterLongDescription(_("Valid name is the resource name used for an asset."))
-      .AddParameter("string", _("New image"));
+      .AddParameter("string", _("New image"))
+      .SetParameterLongDescription(_("Valid name is the resource name used for an asset."));
 
   obj.AddCondition(
          "Texture",

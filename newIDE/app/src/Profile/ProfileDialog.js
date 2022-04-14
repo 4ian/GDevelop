@@ -114,7 +114,7 @@ const ProfileDialog = ({
       {currentTab === 'games-dashboard' &&
         (authenticatedUser.authenticated ? (
           <Line>
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noOverflowParent>
               <GamesList project={currentProject} />
             </ColumnStackLayout>
           </Line>

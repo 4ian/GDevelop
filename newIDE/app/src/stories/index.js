@@ -4894,20 +4894,14 @@ storiesOf('GameDashboard/GameCard', module)
     <GameCard
       game={game1}
       isCurrentGame={false}
-      onOpenDetails={action('onOpenDetails')}
-      onOpenBuilds={action('onOpenBuilds')}
-      onOpenAnalytics={action('onOpenAnalytics')}
-      onOpenLeaderboards={action('onOpenLeaderboards')}
+      onOpenGameManager={action('onOpenGameManager')}
     />
   ))
   .add('current game', () => (
     <GameCard
       game={game1}
       isCurrentGame={true}
-      onOpenDetails={action('onOpenDetails')}
-      onOpenBuilds={action('onOpenBuilds')}
-      onOpenAnalytics={action('onOpenAnalytics')}
-      onOpenLeaderboards={action('onOpenLeaderboards')}
+      onOpenGameManager={action('onOpenGameManager')}
     />
   ));
 

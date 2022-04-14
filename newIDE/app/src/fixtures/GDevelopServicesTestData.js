@@ -731,6 +731,7 @@ export const game1: Game = {
   authorName: 'My company',
   gameName: 'My Great Game',
   createdAt: 1606065498,
+  publicWebBuildId: 'fake-publicwebbuild-id',
 };
 
 export const game2: Game = {

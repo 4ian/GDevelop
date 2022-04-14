@@ -77,6 +77,10 @@ export type AllShowcasedGames = {
   filters: Filters,
 };
 
+export type GameApiError = {|
+  code: 'game-deletion/leaderboards-exist',
+|};
+
 export const allGameCategories = [
   'action',
   'adventure',

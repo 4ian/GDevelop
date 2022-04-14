@@ -59,6 +59,8 @@ namespace gdjs {
         if (
           // Don't reload Box2d as it would confuse and crash the asm.js library.
           endsWith(srcFilename, 'box2d.js') ||
+          // Don't reload sha256.js library.
+          endsWith(srcFilename, 'sha256.js') ||
           // Don't reload shifty.js library.
           endsWith(srcFilename, 'shifty.js') ||
           // Don't reload shopify-buy library.

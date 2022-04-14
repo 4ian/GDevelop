@@ -371,9 +371,7 @@ module.exports = {
         'res/conditions/text24.png'
       )
       .addParameter('object', _('Text input'), 'TextInputObject', false)
-      .addParameter("stringWithSelector", _("Input type"),
-              "[\"text\", \"text area\", \"email\", \"password\", \"number\", "
-              "\"telephone number\", \"url\", \"search\"]")
+      .useStandardParameters('string') // TODO: stringWithSelector?
       .setFunctionName('setInputType')
       .setGetter('getInputType');
 

@@ -10,8 +10,8 @@ import {
 } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import Window from '../Utils/Window';
-const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
 
 const localResourceSources: Array<ResourceSource> = [
@@ -37,7 +37,7 @@ const localResourceSources: Array<ResourceSource> = [
         const projectPath = path.dirname(project.getProjectFile());
         const latestPath = getLastUsedPath(project, kind) || projectPath;
 
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         let { filePaths } = await dialog.showOpenDialog(browserWindow, {
           title: i18n._(t`Choose a file`),
           properties,

@@ -9,8 +9,6 @@ import { testProject } from '../../GDevelopJsInitializerDecorator';
 import LeaderboardIdField from '../../../EventsSheet/ParameterFields/LeaderboardIdField';
 import ValueStateHolder from '../../ValueStateHolder';
 
-import { Trans } from '@lingui/macro';
-
 import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
 import {
   type Leaderboard,

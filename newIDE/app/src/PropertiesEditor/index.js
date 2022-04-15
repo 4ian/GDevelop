@@ -26,12 +26,14 @@ import {
   ColumnStackLayout,
 } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
 import UnsavedChangesContext, {
   type UnsavedChanges,
 } from '../MainFrame/UnsavedChangesContext';
 import { Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import useForceUpdate from '../Utils/UseForceUpdate';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 
 // An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
@@ -45,6 +47,7 @@ export type ValueFieldCommonProperties = {|
   getExtraDescription?: Instance => string,
   disabled?: boolean,
   onEditButtonClick?: Instance => void,
+  usageComplexity?: number,
 |};
 
 // "Primitive" value fields are "simple" fields.
@@ -140,6 +143,7 @@ type Props = {|
   resourceSources?: ?Array<ResourceSource>,
   onChooseResource?: ?ChooseResourceFunction,
   resourceExternalEditors?: ?Array<ResourceExternalEditor>,
+  shouldShowAdvancedParameter?: boolean,
 |};
 
 const styles = {
@@ -210,6 +214,22 @@ const getFieldLabel = (instances: Instances, field: ValueField): any => {
   return field.name;
 };
 
+const containsAdvancedFields = (schema: Schema): boolean => {
+  return schema.some(
+    field =>
+      (field.usageComplexity && field.usageComplexity > 5) ||
+      (field.children && containsAdvancedFields(field.children))
+  );
+};
+
+const containsBasicFields = (schema: Schema): boolean => {
+  return schema.some(
+    field =>
+      !(field.usageComplexity && field.usageComplexity > 5) ||
+      (field.children && containsBasicFields(field.children))
+  );
+};
+
 const PropertiesEditor = ({
   onInstancesModified,
   instances,
@@ -221,8 +241,22 @@ const PropertiesEditor = ({
   resourceSources,
   onChooseResource,
   resourceExternalEditors,
+  shouldShowAdvancedParameter,
 }: Props) => {
   const forceUpdate = useForceUpdate();
+
+  const {
+    getShowAdvancedParametersAndProperties,
+    setShowAdvancedParametersAndProperties,
+  } = React.useContext(PreferencesContext);
+
+  let [
+    showAdvancedParameter,
+    setShowAdvancedParameter,
+  ] = React.useState<boolean>(getShowAdvancedParametersAndProperties());
+  if (shouldShowAdvancedParameter !== undefined) {
+    showAdvancedParameter = shouldShowAdvancedParameter;
+  }
 
   const _onInstancesModified = React.useCallback(
     (instances: Instances) => {
@@ -548,18 +582,58 @@ const PropertiesEditor = ({
     [instances]
   );
 
-  return renderContainer(
-    schema.map(field => {
-      if (!!field.nonFieldType) {
-        if (field.nonFieldType === 'sectionTitle') {
-          return renderSectionTitle(field);
-        } else if (field.nonFieldType === 'button') {
-          return renderButton(field);
-        }
+  const fieldComponents = schema.map(field => {
+    if (
+      !showAdvancedParameter &&
+      field.usageComplexity &&
+      field.usageComplexity > 5
+    ) {
+      return null;
+    }
+    if (!!field.nonFieldType) {
+      if (field.nonFieldType === 'sectionTitle') {
+        return renderSectionTitle(field);
+      } else if (field.nonFieldType === 'button') {
+        return renderButton(field);
+      }
+      return null;
+    } else if (field.children) {
+      if (!showAdvancedParameter && !containsBasicFields(field.children)) {
         return null;
-      } else if (field.children) {
-        if (field.type === 'row') {
-          const contentView = (
+      }
+      if (field.type === 'row') {
+        const contentView = (
+          <UnsavedChangesContext.Consumer key={field.name}>
+            {unsavedChanges => (
+              <PropertiesEditor
+                project={project}
+                resourceSources={resourceSources}
+                onChooseResource={onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
+                schema={field.children}
+                instances={instances}
+                mode="row"
+                unsavedChanges={unsavedChanges}
+                onInstancesModified={onInstancesModified}
+              />
+            )}
+          </UnsavedChangesContext.Consumer>
+        );
+        if (field.title) {
+          return [
+            <Text key={field.name + '-title'} size="title">
+              {field.title}
+            </Text>,
+            contentView,
+          ];
+        }
+        return contentView;
+      }
+
+      return (
+        <div key={field.name}>
+          <Subheader>{field.name}</Subheader>
+          <div style={styles.subPropertiesEditorContainer}>
             <UnsavedChangesContext.Consumer key={field.name}>
               {unsavedChanges => (
                 <PropertiesEditor
@@ -569,55 +643,45 @@ const PropertiesEditor = ({
                   resourceExternalEditors={resourceExternalEditors}
                   schema={field.children}
                   instances={instances}
-                  mode="row"
+                  mode="column"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
+                  shouldShowAdvancedParameter={showAdvancedParameter}
                 />
               )}
             </UnsavedChangesContext.Consumer>
-          );
-          if (field.title) {
-            return [
-              <Text key={field.name + '-title'} size="title">
-                {field.title}
-              </Text>,
-              contentView,
-            ];
-          }
-          return contentView;
-        }
-
-        return (
-          <div key={field.name}>
-            <Subheader>{field.name}</Subheader>
-            <div style={styles.subPropertiesEditorContainer}>
-              <UnsavedChangesContext.Consumer key={field.name}>
-                {unsavedChanges => (
-                  <PropertiesEditor
-                    project={project}
-                    resourceSources={resourceSources}
-                    onChooseResource={onChooseResource}
-                    resourceExternalEditors={resourceExternalEditors}
-                    schema={field.children}
-                    instances={instances}
-                    mode="column"
-                    unsavedChanges={unsavedChanges}
-                    onInstancesModified={onInstancesModified}
-                  />
-                )}
-              </UnsavedChangesContext.Consumer>
-            </div>
           </div>
-        );
-      } else if (field.valueType === 'resource') {
-        return renderResourceField(field);
-      } else {
-        if (field.getChoices && field.getValue) return renderSelectField(field);
-        if (field.getValue) return renderInputField(field);
-      }
-      return null;
-    })
-  );
+        </div>
+      );
+    } else if (field.valueType === 'resource') {
+      return renderResourceField(field);
+    } else {
+      if (field.getChoices && field.getValue) return renderSelectField(field);
+      if (field.getValue) return renderInputField(field);
+    }
+    return null;
+  });
+  if (shouldShowAdvancedParameter === undefined) {
+    if (!showAdvancedParameter && containsAdvancedFields(schema)) {
+      fieldComponents.push(
+        <FlatButton
+          key="show-advanced-parameters"
+          label={<Trans>Show advanced parameters</Trans>}
+          onClick={() => setShowAdvancedParameter(true)}
+        />
+      );
+    }
+    if (showAdvancedParameter && !getShowAdvancedParametersAndProperties()) {
+      fieldComponents.push(
+        <FlatButton
+          key="always-show-advanced-parameters"
+          label={<Trans>Always show advanced parameters</Trans>}
+          onClick={() => setShowAdvancedParametersAndProperties(true)}
+        />
+      );
+    }
+  }
+  return renderContainer(fieldComponents);
 };
 
 export default PropertiesEditor;

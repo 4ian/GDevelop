@@ -773,6 +773,11 @@ interface PropertyDescriptor {
     [Ref] VectorString GetExtraInfo();
     [Ref] PropertyDescriptor SetHidden(boolean enable);
     boolean IsHidden();
+    
+    long GetUsageComplexity();
+    [Ref] PropertyDescriptor MarkAsSimple();
+    [Ref] PropertyDescriptor MarkAsAdvanced();
+    [Ref] PropertyDescriptor MarkAsComplex();
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1138,6 +1143,7 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] InstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
     [Ref] InstructionMetadata SetParameterExtraInfo([Const] DOMString extraInfo);
+    [Ref] InstructionMetadata MarkParameterAsAdvanced();
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
@@ -1200,6 +1206,7 @@ interface MultipleInstructionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] MultipleInstructionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] MultipleInstructionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+    [Ref] MultipleInstructionMetadata MarkParameterAsAdvanced();
 
     [Ref] MultipleInstructionMetadata UseStandardParameters([Const] DOMString type);
 
@@ -1255,6 +1262,10 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetCodeOnly(boolean codeOnly_);
     [Const, Ref] DOMString GetDefaultValue();
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
+    [Ref] ParameterMetadata MarkAsSimple();
+    [Ref] ParameterMetadata MarkAsAdvanced();
+    [Ref] ParameterMetadata MarkAsComplex();
+    long GetUsageComplexity();
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
 

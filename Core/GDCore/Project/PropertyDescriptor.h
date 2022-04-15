@@ -28,12 +28,12 @@ class GD_CORE_API PropertyDescriptor {
    * \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), label(""), hidden(false) {}
+      : currentValue(propertyValue), type("string"), label(""), hidden(false), usageComplexity(5) {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
    */
-  PropertyDescriptor() : hidden(false){};
+  PropertyDescriptor() : hidden(false), usageComplexity(5) {};
 
   /**
    * \brief Destructor
@@ -104,6 +104,37 @@ class GD_CORE_API PropertyDescriptor {
     return *this;
   }
 
+  /**
+   * \brief Consider that the property is easy for a user to understand.
+   */
+  PropertyDescriptor &MarkAsSimple() {
+    usageComplexity = 2;
+    return *this;
+  }
+
+  /**
+   * \brief Consider that the property is harder for a user to understand
+   * than a normal property.
+   */
+  PropertyDescriptor &MarkAsAdvanced() {
+    usageComplexity = 7;
+    return *this;
+  }
+
+  /**
+   * \brief Consider that the property is complex for a user to understand.
+   */
+  PropertyDescriptor &MarkAsComplex() {
+    usageComplexity = 9;
+    return *this;
+  }
+
+  /**
+   * \brief Return the usage complexity of this property for the user,
+   * from 0 (simple&easy to use) to 10 (complex to understand).
+   */
+  int GetUsageComplexity() const { return usageComplexity; }
+
   const gd::String& GetValue() const { return currentValue; }
   const gd::String& GetType() const { return type; }
   const gd::String& GetLabel() const { return label; }
@@ -168,6 +199,8 @@ class GD_CORE_API PropertyDescriptor {
                          ///< choices, if a property is a displayed as a combo
                          ///< box.
   bool hidden;
+  int usageComplexity;  ///< Evaluate the parameter from 0 (simple&easy to
+                        ///< use) to 10 (complex to understand)
 };
 
 }  // namespace gd

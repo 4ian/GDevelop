@@ -145,7 +145,7 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
       .AddParameter("string", _("Image to use"))
       .SetParameterLongDescription("Indicate the name of the resource");
 
-  obj.AddAction("TextureAmongResources",
+  obj.AddAction("SetTextureFromResource",
                 _("Change image"),
                 _("Change the image of particles (if displayed)."),
                 _("Change the image of particles of _PARAM0_ to _PARAM1_"),

@@ -169,7 +169,7 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
     actions["ParticleSystem::Flow"].SetFunctionName("setFlow").SetGetter(
         "getFlow");
     conditions["ParticleSystem::Flow"].SetFunctionName("getFlow");
-    actions["ParticleSystem::TextureAmongResources"]
+    actions["ParticleSystem::SetTextureFromResource"]
         .AddCodeOnlyParameter("currentScene", "")
         .SetFunctionName("setTexture")
         .SetGetter("getTexture");

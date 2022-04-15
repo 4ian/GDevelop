@@ -6,7 +6,7 @@ import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 
-export default class BitmapFontResourceField extends Component<
+export default class FontResourceField extends Component<
   ParameterFieldProps,
   void
 > {

@@ -143,7 +143,7 @@ type Props = {|
   resourceSources?: ?Array<ResourceSource>,
   onChooseResource?: ?ChooseResourceFunction,
   resourceExternalEditors?: ?Array<ResourceExternalEditor>,
-  shouldShowAdvancedParameter?: boolean,
+  shouldShowAdvancedProperties?: boolean,
 |};
 
 const styles = {
@@ -241,7 +241,7 @@ const PropertiesEditor = ({
   resourceSources,
   onChooseResource,
   resourceExternalEditors,
-  shouldShowAdvancedParameter,
+  shouldShowAdvancedProperties,
 }: Props) => {
   const forceUpdate = useForceUpdate();
 
@@ -251,11 +251,11 @@ const PropertiesEditor = ({
   } = React.useContext(PreferencesContext);
 
   let [
-    showAdvancedParameter,
-    setShowAdvancedParameter,
+    showAdvancedProperties,
+    setShowAdvancedProperties,
   ] = React.useState<boolean>(getShowAdvancedParametersAndProperties());
-  if (shouldShowAdvancedParameter !== undefined) {
-    showAdvancedParameter = shouldShowAdvancedParameter;
+  if (shouldShowAdvancedProperties !== undefined) {
+    showAdvancedProperties = shouldShowAdvancedProperties;
   }
 
   const _onInstancesModified = React.useCallback(
@@ -584,7 +584,7 @@ const PropertiesEditor = ({
 
   const fieldComponents = schema.map(field => {
     if (
-      !showAdvancedParameter &&
+      !showAdvancedProperties &&
       field.usageComplexity &&
       field.usageComplexity > 5
     ) {
@@ -598,7 +598,7 @@ const PropertiesEditor = ({
       }
       return null;
     } else if (field.children) {
-      if (!showAdvancedParameter && !containsBasicFields(field.children)) {
+      if (!showAdvancedProperties && !containsBasicFields(field.children)) {
         return null;
       }
       if (field.type === 'row') {
@@ -646,7 +646,7 @@ const PropertiesEditor = ({
                   mode="column"
                   unsavedChanges={unsavedChanges}
                   onInstancesModified={onInstancesModified}
-                  shouldShowAdvancedParameter={showAdvancedParameter}
+                  shouldShowAdvancedProperties={showAdvancedProperties}
                 />
               )}
             </UnsavedChangesContext.Consumer>
@@ -661,21 +661,21 @@ const PropertiesEditor = ({
     }
     return null;
   });
-  if (shouldShowAdvancedParameter === undefined) {
-    if (!showAdvancedParameter && containsAdvancedFields(schema)) {
+  if (shouldShowAdvancedProperties === undefined) {
+    if (!showAdvancedProperties && containsAdvancedFields(schema)) {
       fieldComponents.push(
         <FlatButton
-          key="show-advanced-parameters"
-          label={<Trans>Show advanced parameters</Trans>}
-          onClick={() => setShowAdvancedParameter(true)}
+          key="show-advanced-properties"
+          label={<Trans>Show advanced properties</Trans>}
+          onClick={() => setShowAdvancedProperties(true)}
         />
       );
     }
-    if (showAdvancedParameter && !getShowAdvancedParametersAndProperties()) {
+    if (showAdvancedProperties && !getShowAdvancedParametersAndProperties()) {
       fieldComponents.push(
         <FlatButton
-          key="always-show-advanced-parameters"
-          label={<Trans>Always show advanced parameters</Trans>}
+          key="always-show-advanced-properties"
+          label={<Trans>Always show advanced properties</Trans>}
           onClick={() => setShowAdvancedParametersAndProperties(true)}
         />
       );

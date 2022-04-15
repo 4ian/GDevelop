@@ -37,9 +37,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleRed1",
-         _("Red start color"),
-         _("Modify the start red color."),
-         _("the start red color"),
+         _("Start color red component"),
+         _("Modify the start color red component."),
+         _("the start color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -48,9 +48,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleRed1",
-         _("Red start color"),
-         _("Compare the start red color."),
-         _("the start red color"),
+         _("Start color red component"),
+         _("Compare the start color red component."),
+         _("the start color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -59,9 +59,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleRed2",
-         _("Red end color"),
-         _("Modify the end red color."),
-         _("the end red color"),
+         _("End color red component"),
+         _("Modify the end color red component."),
+         _("the end color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -70,9 +70,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleRed2",
-         _("Red end color"),
-         _("Compare the end red color."),
-         _("the end red color"),
+         _("End color red component"),
+         _("Compare the end color red component."),
+         _("the end color red component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -81,9 +81,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleBlue1",
-         _("Blue start color"),
-         _("Modify the start blue color."),
-         _("the end blue color"),
+         _("Start color blue component"),
+         _("Modify the start color blue component."),
+         _("the start color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -92,9 +92,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleBlue1",
-         _("Blue start color"),
-         _("Compare the start blue color."),
-         _("the start blue color"),
+         _("Start color blue component"),
+         _("Compare the start color blue component."),
+         _("the start color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -103,9 +103,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleBlue2",
-         _("Blue end color"),
-         _("Modify the end blue color."),
-         _("the end blue color"),
+         _("End color blue component"),
+         _("Modify the end color blue component."),
+         _("the end color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -114,9 +114,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleBlue2",
-         _("Blue end color"),
-         _("Compare the end blue color."),
-         _("the end blue color"),
+         _("End color blue component"),
+         _("Compare the end color blue component."),
+         _("the end color blue component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -125,9 +125,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleGreen1",
-         _("Green start color"),
-         _("Modify the start green color."),
-         _("the start green color"),
+         _("Start color green component"),
+         _("Modify the start color green component."),
+         _("the start color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -136,9 +136,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleGreen1",
-         _("Green start color"),
-         _("Compare the start green color."),
-         _("the end green color"),
+         _("Start color green component"),
+         _("Compare the start color green component."),
+         _("the start color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -147,9 +147,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddAction(
          "ParticleGreen2",
-         _("Green end color"),
-         _("Modify the end green color."),
-         _("the end green color"),
+         _("End color green component"),
+         _("Modify the end color green component."),
+         _("the end color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -158,9 +158,9 @@ void ExtensionSubDeclaration2(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleGreen2",
-         _("Green end color"),
-         _("Compare the end green color."),
-         _("the end green color"),
+         _("End color green component"),
+         _("Compare the end color green component."),
+         _("the end color green component"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")

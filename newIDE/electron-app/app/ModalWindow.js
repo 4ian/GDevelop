@@ -72,11 +72,11 @@ const loadModalWindow = ({
     }
   });
 
-  //Prevent opening any website or url inside Electron.
-  modalWindow.webContents.on('new-window', (e, url) => {
-    console.info('Opening in browser (because of new-window): ', url);
-    e.preventDefault();
-    electron.shell.openExternal(url);
+  // Prevent opening any website or url inside Electron
+  modalWindow.webContents.setWindowOpenHandler(details => {
+    console.info('Opening in browser (because of new window): ', details.url);
+    electron.shell.openExternal(details.url);
+    return { action: 'deny' };
   });
 
   modalWindow.on('closed', event => {

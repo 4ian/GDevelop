@@ -78,12 +78,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   videoResource1.setFile('fake-video1.mp4');
   videoResource2.setName('fake-video2.mp4');
   videoResource2.setFile('fake-video2.mp4');
-  fontResource.setName('font.ttf')
-  fontResource.setFile('font.ttf')
-  bitmapFontResource1.setName('bmfont.xml')
-  bitmapFontResource1.setFile('bmfont.xml')
-  bitmapFontResource2.setName('super-font.fnt')
-  bitmapFontResource2.setFile('super-font.fnt')
+  fontResource.setName('font.ttf');
+  fontResource.setFile('font.ttf');
+  bitmapFontResource1.setName('bmfont.xml');
+  bitmapFontResource1.setFile('bmfont.xml');
+  bitmapFontResource2.setName('super-font.fnt');
+  bitmapFontResource2.setFile('super-font.fnt');
   jsonResource1.setName('levelData.json');
   jsonResource1.setFile('levelData.json');
   jsonResource2.setName('InventoryData.json');

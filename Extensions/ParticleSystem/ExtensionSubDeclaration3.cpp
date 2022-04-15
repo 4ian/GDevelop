@@ -280,38 +280,38 @@ void ExtensionSubDeclaration3(gd::ObjectMetadata& obj) {
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleRed1",
-                    _("Red start color"),
-                    _("The red start color of the particles."),
+                    _("Start color red component"),
+                    _("The start color red component of the particles."),
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleRed2",
-                    _("Red end color"),
-                    _("The red end color of the particles."),
+                    _("End color red component"),
+                    _("The end color red component of the particles."),
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleBlue1",
-                    _("Blue start color"),
-                    _("The blue start color of the particles."),
+                    _("Start color blue component"),
+                    _("The start color blue component of the particles."),
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleBlue2",
-                    _("Blue end color"),
-                    _("The blue end color of the particles."),
+                    _("End color blue component"),
+                    _("The end color blue component of the particles."),
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleGreen1",
-                    _("Green start color"),
-                    _("The green start color of the particles."),
+                    _("Start color green component"),
+                    _("The start color green component of the particles."),
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);
   obj.AddExpression("ParticleGreen2",
-                    _("Green end color"),
-                    _("The green end color of the particles."),
+                    _("End color green component"),
+                    _("The end color green component of the particles."),
                     _("Setup"),
                     "CppPlatform/Extensions/particleSystemicon16.png")
       .AddParameter("object", _("Object"), "ParticleEmitter", false);

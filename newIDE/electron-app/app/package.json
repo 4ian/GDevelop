@@ -18,6 +18,7 @@
     "electron-is": "^2.4.0",
     "electron-log": "^4.1.1",
     "electron-updater": "4.2.0",
+    "@electron/remote": "^2.0.8",
     "fs-extra": "^3.0.1",
     "jimp": "^0.2.28",
     "live-server": "^1.2.0",

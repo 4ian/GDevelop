@@ -7,7 +7,8 @@ import TextField from '../TextField';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 import RaisedButton from '../RaisedButton';
 const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = electron ? remote.dialog : null;
 
 const styles = {
   container: {
@@ -40,7 +41,7 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
   onChooseFolder = () => {
     if (!dialog || !electron) return;
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     return dialog
       .showSaveDialog(browserWindow, {
         title: this.props.title,

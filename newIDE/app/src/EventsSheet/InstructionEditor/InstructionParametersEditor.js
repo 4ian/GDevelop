@@ -10,6 +10,7 @@ import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
+import FlatButton from '../../UI/FlatButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -32,6 +33,7 @@ import { ColumnStackLayout } from '../../UI/Layout';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
 import ScrollView from '../../UI/ScrollView';
 import { getInstructionTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -80,6 +82,7 @@ type Props = {|
 |};
 type State = {|
   isDirty: boolean,
+  showAdvancedParameter: boolean,
 |};
 
 const isParameterVisible = (
@@ -100,9 +103,13 @@ export default class InstructionParametersEditor extends React.Component<
   Props,
   State
 > {
+  static contextType = PreferencesContext;
+
   _firstVisibleField: ?any = {};
   state = {
     isDirty: false,
+    showAdvancedParameter: this.context.values
+      .showAdvancedParametersAndProperties,
   };
 
   componentDidMount() {
@@ -233,6 +240,9 @@ export default class InstructionParametersEditor extends React.Component<
       objectName
     );
 
+    const preferences = this.context;
+    let anyAdvancedParameterIsHidden = false;
+
     let parameterFieldIndex = 0;
     return (
       <I18n>
@@ -306,6 +316,15 @@ export default class InstructionParametersEditor extends React.Component<
                     )
                       return null;
 
+                    if (
+                      !this.state.showAdvancedParameter &&
+                      parameterMetadata.isOptional() &&
+                      parameterMetadata.getUsageComplexity() > 5
+                    ) {
+                      anyAdvancedParameterIsHidden = true;
+                      return null;
+                    }
+
                     const parameterMetadataType = parameterMetadata.getType();
                     const ParameterComponent = ParameterRenderingService.getParameterComponent(
                       parameterMetadataType
@@ -351,6 +370,28 @@ export default class InstructionParametersEditor extends React.Component<
                       />
                     );
                   })}
+                  {!this.state.showAdvancedParameter &&
+                    anyAdvancedParameterIsHidden && (
+                      <FlatButton
+                        label={<Trans>Show advanced parameters</Trans>}
+                        onClick={() =>
+                          this.setState({
+                            showAdvancedParameter: true,
+                          })
+                        }
+                      />
+                    )}
+                  {this.state.showAdvancedParameter &&
+                    !preferences.values.showAdvancedParametersAndProperties && (
+                      <FlatButton
+                        label={<Trans>Always show advanced parameters</Trans>}
+                        onClick={() =>
+                          preferences.setShowAdvancedParametersAndProperties(
+                            true
+                          )
+                        }
+                      />
+                    )}
                 </ColumnStackLayout>
                 {this._getVisibleParametersCount(
                   instructionMetadata,

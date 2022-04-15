@@ -152,6 +152,37 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
+   * \brief Consider that the parameter is easy for a user to understand.
+   */
+  ParameterMetadata &MarkAsSimple() {
+    usageComplexity = 2;
+    return *this;
+  }
+
+  /**
+   * \brief Consider that the parameter is harder for a user to understand
+   * than a normal parameter.
+   */
+  ParameterMetadata &MarkAsAdvanced() {
+    usageComplexity = 7;
+    return *this;
+  }
+
+  /**
+   * \brief Consider that the parameter is complex for a user to understand.
+   */
+  ParameterMetadata &MarkAsComplex() {
+    usageComplexity = 9;
+    return *this;
+  }
+
+  /**
+   * \brief Return the usage complexity of this parameter for the user,
+   * from 0 (simple&easy to use) to 10 (complex to understand).
+   */
+  int GetUsageComplexity() const { return usageComplexity; }
+
+  /**
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
    * "objectList".
    *
@@ -235,6 +266,8 @@ class GD_CORE_API ParameterMetadata {
                                ///< optional parameter is empty.
   gd::String name;             ///< The name of the parameter to be used in code
                                ///< generation. Optional.
+  int usageComplexity;  ///< Evaluate the parameter from 0 (simple&easy to
+                        ///< use) to 10 (complex to understand)
 };
 
 }  // namespace gd

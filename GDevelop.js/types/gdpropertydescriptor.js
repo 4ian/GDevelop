@@ -16,6 +16,10 @@ declare class gdPropertyDescriptor {
   getExtraInfo(): gdVectorString;
   setHidden(enable: boolean): gdPropertyDescriptor;
   isHidden(): boolean;
+  getUsageComplexity(): number;
+  markAsSimple(): gdPropertyDescriptor;
+  markAsAdvanced(): gdPropertyDescriptor;
+  markAsComplex(): gdPropertyDescriptor;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   serializeValuesTo(element: gdSerializerElement): void;

@@ -40,6 +40,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
@@ -62,6 +63,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
@@ -116,6 +118,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
@@ -234,6 +237,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0");
 
   // TODO Deprecated: hide this action in a future release.
@@ -262,10 +266,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("Anticipate the movement of the object (yes by default)"),
                     "",
                     true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("yes")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
@@ -291,6 +297,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
@@ -309,10 +316,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
                     _("Anticipate the movement of the object (yes by default)"),
                     "",
                     true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("yes")
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("0")
       .MarkAsSimple();
 

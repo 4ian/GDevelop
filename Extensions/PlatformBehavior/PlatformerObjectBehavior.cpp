@@ -88,7 +88,8 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(behaviorContent.GetBoolAttribute("canGrabWithoutMoving", false)
                     ? "true"
                     : "false")
-      .SetType("Boolean");
+      .SetType("Boolean")
+      .MarkAsAdvanced();
   properties[_("Grab offset on Y axis")]
       .SetGroup(_("Ledge"))
       .SetValue(
@@ -104,13 +105,15 @@ PlatformerObjectBehavior::GetProperties(
       .SetValue(behaviorContent.GetBoolAttribute("useLegacyTrajectory", true)
                     ? "true"
                     : "false")
-      .SetType("Boolean");
+      .SetType("Boolean")
+      .MarkAsComplex();
   properties[_("Can go down from jumpthru platforms")]
       .SetGroup(_("Walk"))
       .SetValue(behaviorContent.GetBoolAttribute("canGoDownFromJumpthru", false)
                     ? "true"
                     : "false")
-      .SetType("Boolean");
+      .SetType("Boolean")
+      .MarkAsAdvanced();
   return properties;
 }
 

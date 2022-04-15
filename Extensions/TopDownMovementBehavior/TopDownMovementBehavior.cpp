@@ -87,20 +87,23 @@ TopDownMovementBehavior::GetProperties(
       .AddExtraInfo(_("Top-Down"))
       .AddExtraInfo(_("Isometry 2:1 (26.565°)"))
       .AddExtraInfo(_("True Isometry (30°)"))
-      .AddExtraInfo(_("Custom Isometry"));
+      .AddExtraInfo(_("Custom Isometry"))
+      .MarkAsAdvanced();
   properties[_("Custom isometry angle")]
       .SetGroup(_("Viewpoint"))
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("customIsometryAngle")))
       .SetDescription(_("If you choose \"Custom Isometry\", this allows to "
-                        "specify the angle of your isometry projection."));
+                        "specify the angle of your isometry projection."))
+      .MarkAsAdvanced();
   properties[_("Movement angle offset")]
       .SetGroup(_("Viewpoint"))
       .SetValue(gd::String::From(
           behaviorContent.GetDoubleAttribute("movementAngleOffset")))
       .SetDescription(_(
           "Usually 0, unless you choose an *Isometry* viewpoint in which case "
-          "-45 is recommended."));
+          "-45 is recommended."))
+      .MarkAsAdvanced();
 
   return properties;
 }

@@ -17,6 +17,10 @@ declare class gdParameterMetadata {
   setCodeOnly(codeOnly_: boolean): gdParameterMetadata;
   getDefaultValue(): string;
   setDefaultValue(defaultValue_: string): gdParameterMetadata;
+  markAsSimple(): gdParameterMetadata;
+  markAsAdvanced(): gdParameterMetadata;
+  markAsComplex(): gdParameterMetadata;
+  getUsageComplexity(): number;
   static isObject(param: string): boolean;
   static isBehavior(param: string): boolean;
   serializeTo(element: gdSerializerElement): void;

@@ -55,6 +55,8 @@ namespace gdjs {
     _scaleMode: 'linear' | 'nearest';
     _pixelsRounding: boolean;
     _renderer: RuntimeGameRenderer;
+    _sessionId: string | null;
+    _playerId: string | null;
 
     //Game loop management (see startGameLoop method)
     _sceneStack: SceneStack;
@@ -120,6 +122,8 @@ namespace gdjs {
         ? new gdjs.DebuggerClient(this)
         : null;
       this._isPreview = this._options.isPreview || false;
+      this._sessionId = null;
+      this._playerId = null;
     }
 
     /**
@@ -648,8 +652,7 @@ namespace gdjs {
         return;
       }
       const baseUrl = 'https://api.gdevelop-app.com/analytics';
-      const playerId = this._makePlayerUuid();
-      let sessionId: string | null = null;
+      this._playerId = this._makePlayerUuid();
       let lastSessionHitTime = Date.now();
       fetch(baseUrl + '/session', {
         method: 'POST',
@@ -659,7 +662,7 @@ namespace gdjs {
         // precisely identify someone.
         body: JSON.stringify({
           gameId: this._data.properties.projectUuid,
-          playerId: playerId,
+          playerId: this._playerId,
           game: {
             name: this._data.properties.name || '',
             packageName: this._data.properties.packageName || '',
@@ -691,13 +694,13 @@ namespace gdjs {
         })
         .then((response) => response.text())
         .then((returnedSessionId) => {
-          sessionId = returnedSessionId;
+          this._sessionId = returnedSessionId;
         })
         .catch(() => {});
 
       /* Ignore any error */
       const sendSessionHit = () => {
-        if (!sessionId) {
+        if (!this._sessionId) {
           return;
         }
 
@@ -711,8 +714,8 @@ namespace gdjs {
           baseUrl + '/session-hit',
           JSON.stringify({
             gameId: this._data.properties.projectUuid,
-            playerId: playerId,
-            sessionId: sessionId,
+            playerId: this._playerId,
+            sessionId: this._sessionId,
           })
         );
       };
@@ -741,6 +744,7 @@ namespace gdjs {
         }
       }
       this._sessionMetricsInitialized = true;
+      this._sessionId = this._sessionId;
     }
 
     /**
@@ -760,6 +764,14 @@ namespace gdjs {
       } catch (err) {
         return gdjs.makeUuid();
       }
+    }
+
+    getSessionId(): string | null {
+      return this._sessionId;
+    }
+
+    getPlayerId(): string | null {
+      return this._playerId;
     }
 
     /**

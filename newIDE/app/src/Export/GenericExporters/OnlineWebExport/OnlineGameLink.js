@@ -38,7 +38,10 @@ import {
   getGame,
   getGameUrl,
   updateGame,
+  setGameSlug,
+  getGameSlugs,
   type Game,
+  type GameSlug,
 } from '../../../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import AlertMessage from '../../../UI/AlertMessage';
@@ -78,6 +81,7 @@ const OnlineGameLink = ({
     setIsOnlineGamePropertiesDialogOpen,
   ] = React.useState<boolean>(false);
   const [game, setGame] = React.useState<?Game>(null);
+  const [slug, setSlug] = React.useState<?GameSlug>(null);
   const [isGameLoading, setIsGameLoading] = React.useState<boolean>(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -86,7 +90,7 @@ const OnlineGameLink = ({
   const exportPending = !errored && exportStep !== '' && exportStep !== 'done';
   const isBuildComplete = build && build.status === 'complete';
   const isBuildPublished = build && game && build.id === game.publicWebBuildId;
-  const gameUrl = getGameUrl(game);
+  const gameUrl = getGameUrl(game, slug);
   const buildUrl =
     exportPending || !isBuildComplete
       ? null
@@ -102,8 +106,16 @@ const OnlineGameLink = ({
       const { id } = profile;
       try {
         setIsGameLoading(true);
-        const game = await getGame(getAuthorizationHeader, id, gameId);
+        const [game, slugs] = await Promise.all([
+          getGame(getAuthorizationHeader, id, gameId),
+          getGameSlugs(getAuthorizationHeader, id, gameId).catch(err => {
+            console.error('Unable to get the game slug', err);
+          }),
+        ]);
         setGame(game);
+        if (slugs && slugs.length > 0) {
+          setSlug(slugs[0]);
+        }
       } catch (err) {
         console.error('Unable to load the game', err);
       } finally {
@@ -189,6 +201,35 @@ const OnlineGameLink = ({
           }
         );
         setGame(updatedGame);
+        const { userSlug, gameSlug } = partialGameChange;
+        if (userSlug && gameSlug && userSlug === profile.username) {
+          try {
+            await setGameSlug(
+              getAuthorizationHeader,
+              id,
+              game.id,
+              userSlug,
+              gameSlug
+            );
+            setSlug({ username: userSlug, gameSlug: gameSlug, createdAt: 0 });
+          } catch (error) {
+            console.error(
+              'Unable to update the game slug:',
+              error.response || error.message
+            );
+            showErrorBox({
+              message:
+                i18n._(
+                  t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
+                ) +
+                ' ' +
+                i18n._(t`Verify your internet connection or try again later.`),
+              rawError: error,
+              errorId: 'game-slug-update-error',
+            });
+            return false;
+          }
+        }
       } catch (err) {
         showErrorBox({
           message: i18n._(
@@ -377,6 +418,7 @@ const OnlineGameLink = ({
                 }
               }}
               game={game}
+              slug={slug}
               isLoading={isGameLoading}
             />
           )}

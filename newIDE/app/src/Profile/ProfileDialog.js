@@ -80,6 +80,7 @@ const ProfileDialog = ({
       cannotBeDismissed={false}
       open={open}
       noMargin
+      fullHeight
       noTitleMargin
       title={
         <Tabs value={currentTab} onChange={_onChangeTab}>
@@ -113,7 +114,7 @@ const ProfileDialog = ({
       {currentTab === 'games-dashboard' &&
         (authenticatedUser.authenticated ? (
           <Line>
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noOverflowParent>
               <GamesList project={currentProject} />
             </ColumnStackLayout>
           </Line>

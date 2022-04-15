@@ -38,7 +38,6 @@ const loadModalWindow = ({
     center: true,
     webPreferences: {
       webSecurity: false,
-      enableRemoteModule: true,
       // Allow Node.js API access in renderer process
       nodeIntegration: true,
       contextIsolation: false,

@@ -13,10 +13,34 @@ import {
   allGameCategories,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { I18n } from '@lingui/react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import BackgroundText from '../UI/BackgroundText';
+import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
+
+const isCyrillic = (text: string) =>
+  /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
+const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
+
+export const cleanUpGameSlug = (gameSlug: string) => {
+  let latinGameSlug = gameSlug;
+  if (isCyrillic(gameSlug)) {
+    latinGameSlug = gameSlug
+      .split('')
+      .map(function(char) {
+        const latin = cyrillicToLatinMapping[char];
+        return latin === undefined ? char : latin;
+      })
+      .join('');
+  }
+  return latinGameSlug
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]/g, '-')
+    .toLowerCase();
+};
 
 type Props = {|
   project: gdProject,
@@ -40,13 +64,17 @@ type Props = {|
   playWithGamepad?: boolean,
   setPlayableWithMobile?: boolean => void,
   playWithMobile?: boolean,
+  userSlug?: string,
+  setUserSlug?: string => void,
+  gameSlug?: string,
+  setGameSlug?: string => void,
   setDiscoverable?: boolean => void,
   discoverable?: boolean,
   displayThumbnail?: boolean,
   thumbnailUrl?: string,
 |};
 
-function PublicGameProperties({
+export function PublicGameProperties({
   project,
   setName,
   name,
@@ -66,12 +94,17 @@ function PublicGameProperties({
   playWithMobile,
   setOrientation,
   orientation,
+  userSlug,
+  setUserSlug,
+  gameSlug,
+  setGameSlug,
   setDiscoverable,
   discoverable,
   displayThumbnail,
   thumbnailUrl,
 }: Props) {
   const [categoryInput, setCategoryInput] = React.useState('');
+  const { profile } = React.useContext(AuthenticatedUserContext);
 
   return (
     <I18n>
@@ -162,6 +195,70 @@ function PublicGameProperties({
             multiline
             rows={5}
           />
+          {setUserSlug && setGameSlug && (
+            <>
+              <Line>
+                <SelectField
+                  fullWidth
+                  floatingLabelText={<Trans>User name in the game URL</Trans>}
+                  value={userSlug || ''}
+                  onChange={(e, i, value: string) => setUserSlug(value)}
+                  // It's disabled if one of the condition of SelectOption is false.
+                  disabled={
+                    !(
+                      profile &&
+                      profile.username &&
+                      userSlug &&
+                      (!profile || userSlug !== profile.username)
+                    )
+                  }
+                >
+                  {profile && profile.username && (
+                    <SelectOption
+                      value={profile.username}
+                      primaryText={profile.username}
+                    />
+                  )}
+                  {userSlug && (!profile || userSlug !== profile.username) && (
+                    <SelectOption value={userSlug} primaryText={userSlug} />
+                  )}
+                </SelectField>
+                <Spacer />
+                <SemiControlledTextField
+                  disabled={
+                    !(
+                      userSlug &&
+                      userSlug.length &&
+                      profile &&
+                      profile.username
+                    )
+                  }
+                  floatingLabelText={<Trans>Game name in the game URL</Trans>}
+                  fullWidth
+                  type="text"
+                  value={
+                    userSlug && userSlug.length && profile && profile.username
+                      ? gameSlug || ''
+                      : ''
+                  }
+                  onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
+                  autoFocus
+                />
+              </Line>
+              {!(
+                userSlug &&
+                userSlug.length &&
+                profile &&
+                profile.username
+              ) && (
+                <AlertMessage kind="info">
+                  <Trans>
+                    Usernames are required to choose a custom game URL.
+                  </Trans>
+                </AlertMessage>
+              )}
+            </>
+          )}
           <UsersAutocomplete
             userIds={authorIds}
             onChange={setAuthorIds}

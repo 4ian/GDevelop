@@ -95,16 +95,8 @@ export const GamesList = (props: Props) => {
           key={game.id}
           isCurrentGame={!!projectUuid && game.id === projectUuid}
           game={game}
-          onOpenDetails={() => {
+          onOpenGameManager={() => {
             setOpenedGameInitialTab('details');
-            setOpenedGame(game);
-          }}
-          onOpenBuilds={() => {
-            setOpenedGameInitialTab('builds');
-            setOpenedGame(game);
-          }}
-          onOpenAnalytics={() => {
-            setOpenedGameInitialTab('analytics');
             setOpenedGame(game);
           }}
         />

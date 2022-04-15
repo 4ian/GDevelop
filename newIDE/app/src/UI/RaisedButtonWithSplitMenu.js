@@ -15,6 +15,14 @@ type Props = {|
   icon?: React.Node,
   onClick: ?() => void,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+  style?: {|
+    marginTop?: number,
+    marginBottom?: number,
+    marginLeft?: number,
+    marginRight?: number,
+    margin?: number,
+    flexShrink?: 0,
+  |},
 |};
 
 const shouldNeverBeCalled = () => {
@@ -46,6 +54,7 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
       color={primary ? 'primary' : 'default'}
       disabled={disabled}
       size="small"
+      style={props.style}
     >
       <Button
         focusRipple={focusRipple}

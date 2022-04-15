@@ -22,6 +22,8 @@ export type PublicGame = {
   cachedLastWeekSessionsCount?: number,
   cachedLastYearSessionsCount?: number,
   categories?: string[],
+  userSlug?: string,
+  gameSlug?: string,
   discoverable?: boolean,
 };
 
@@ -34,6 +36,12 @@ export type Game = {
   description?: string,
   thumbnailUrl?: string,
   discoverable?: boolean,
+};
+
+export type GameSlug = {
+  username: string,
+  gameSlug: string,
+  createdAt: number,
 };
 
 export type ShowcasedGameLink = {
@@ -68,6 +76,10 @@ export type AllShowcasedGames = {
   showcasedGames: Array<ShowcasedGame>,
   filters: Filters,
 };
+
+export type GameApiError = {|
+  code: 'game-deletion/leaderboards-exist',
+|};
 
 export const allGameCategories = [
   'action',
@@ -127,9 +139,11 @@ export const getCategoryName = (category: string, i18n: I18nType) => {
   }
 };
 
-export const getGameUrl = (game: ?Game) => {
+export const getGameUrl = (game: ?Game, slug: ?GameSlug) => {
   if (!game) return null;
-  return GDevelopGamesPlatform.getGameUrl(game.id);
+  return slug
+    ? GDevelopGamesPlatform.getGameUrlWithSlug(slug.username, slug.gameSlug)
+    : GDevelopGamesPlatform.getGameUrl(game.id);
 };
 
 export const getAclsFromUserIds = (
@@ -282,6 +296,35 @@ export const setGameUserAcls = (
     .then(response => response.data);
 };
 
+export const setGameSlug = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  userSlug: string,
+  gameSlug: string
+): Promise<void> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopGameApi.baseUrl}/game/action/set-slug`,
+        {
+          gameId,
+          userSlug,
+          gameSlug,
+        },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
 export const getGame = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
@@ -341,5 +384,25 @@ export const getGames = (
 export const getPublicGame = (gameId: string): Promise<PublicGame> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
+    .then(response => response.data);
+};
+
+export const getGameSlugs = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string
+): Promise<Array<GameSlug>> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopGameApi.baseUrl}/game-slug`, {
+        params: {
+          userId,
+          gameId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
     .then(response => response.data);
 };

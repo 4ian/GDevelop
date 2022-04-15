@@ -311,7 +311,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           _("Multitouch"),
           "res/conditions/touch24.png",
           "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetHidden();
 
   extension
       .AddCondition(
@@ -326,7 +327,53 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           _("Multitouch"),
           "res/conditions/touch24.png",
           "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetHidden();
+
+  extension
+      .AddCondition(
+          "HasAnyTouchStarted",
+          _("A new touch has started"),
+          _("Check if a touch has just started on this frame. The touch identifiers can be "
+            "accessed using StartedTouchId() and StartedTouchCount()."),
+          _("A new touch has started"),
+          _("Multitouch"),
+          "res/conditions/touch24.png",
+          "res/conditions/touch.png")
       .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddExpression(
+          "StartedTouchCount",
+          _("Started touch count"),
+          _("The number of touches that have just started on this frame. The touch identifiers can be "
+            "accessed using StartedTouchId()."),
+          _("Multitouch"),
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "");
+
+  extension
+      .AddExpression(
+          "StartedTouchId",
+          _("Started touch identifier"),
+          _("The identifier of the touch that has just started on this frame. The touch number of touches can be "
+            "accessed using StartedTouchCount()."),
+          _("Multitouch"),
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Touch index"));
+
+  extension
+      .AddCondition(
+          "HasTouchEnded",
+          _("A touch has ended"),
+          _("Check if a touch has ended."),
+          _("The touch with identifier _PARAM1_ has ended"),
+          _("Multitouch"),
+          "res/conditions/touch24.png",
+          "res/conditions/touch.png")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("expression", _("Touch identifier"));
 
   extension
       .AddExpression("MouseWheelDelta",
@@ -342,7 +389,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                      _("Identifier of the last touch"),
                      _("Multitouch"),
                      "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetHidden();
 
   extension
       .AddExpression("LastEndedTouchId",
@@ -350,7 +398,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
                      _("Identifier of the last ended touch"),
                      _("Multitouch"),
                      "res/conditions/touch.png")
-      .AddCodeOnlyParameter("currentScene", "");
+      .AddCodeOnlyParameter("currentScene", "")
+      .SetHidden();
 }
 
 }  // namespace gd

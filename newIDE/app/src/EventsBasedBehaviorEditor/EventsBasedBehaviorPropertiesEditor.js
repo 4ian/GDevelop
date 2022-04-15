@@ -124,10 +124,14 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
 
   _setChoiceExtraInfo = (property: gdNamedPropertyDescriptor) => {
     return (newExtraInfo: Array<string>) => {
+      const defaultValueIndex = getExtraInfoArray(property).indexOf(
+        property.getValue()
+      );
       const vectorString = new gd.VectorString();
       newExtraInfo.forEach(item => vectorString.push_back(item));
       property.setExtraInfo(vectorString);
       vectorString.delete();
+      property.setValue(newExtraInfo[defaultValueIndex] || '');
       this.forceUpdate();
     };
   };
@@ -333,6 +337,28 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                 }}
                                 disabled={false}
                               />
+                            )}
+                            {property.getType() === 'Choice' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={property.getValue()}
+                                onChange={(e, i, value) => {
+                                  property.setValue(value);
+                                  this.forceUpdate();
+                                  this.props.onPropertiesUpdated();
+                                }}
+                                fullWidth
+                              >
+                                {getExtraInfoArray(property).map(
+                                  (choice, index) => (
+                                    <SelectOption
+                                      key={index}
+                                      value={choice}
+                                      primaryText={choice}
+                                    />
+                                  )
+                                )}
+                              </SelectField>
                             )}
                           </ResponsiveLineStackLayout>
                           {property.getType() === 'Choice' && (

@@ -839,6 +839,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                       "edges, but are not overlapping (default: no)"),
                     "",
                     true)
+      .MarkParameterAsAdvanced()
       .SetDefaultValue("no")
       .MarkAsSimple();
 

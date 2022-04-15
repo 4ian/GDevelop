@@ -103,6 +103,12 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
       this
     ),
+    getShowAdvancedParametersAndProperties: this._getShowAdvancedParametersAndProperties.bind(
+      this
+    ),
+    setShowAdvancedParametersAndProperties: this._setShowAdvancedParametersAndProperties.bind(
+      this
+    ),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
     setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
       this
@@ -199,6 +205,26 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           useUndefinedVariablesInAutocompletion,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _getShowAdvancedParametersAndProperties(
+    showAdvancedParametersAndProperties: boolean
+  ) {
+    return this.state.values.showAdvancedParametersAndProperties;
+  }
+
+  _setShowAdvancedParametersAndProperties(
+    showAdvancedParametersAndProperties: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showAdvancedParametersAndProperties,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

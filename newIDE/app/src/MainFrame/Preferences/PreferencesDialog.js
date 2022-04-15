@@ -44,6 +44,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setAutosaveOnPreview,
     setUseNewInstructionEditorDialog,
     setUseUndefinedVariablesInAutocompletion,
+    setShowAdvancedParametersAndProperties,
     setUseGDJSDevelopmentWatcher,
     setEventsSheetUseAssignmentOperators,
     getDefaultEditorMosaicNode,
@@ -271,6 +272,18 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   Suggest names of variables used in events but not declared in
                   the list of variables
                 </Trans>
+              }
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) =>
+                setShowAdvancedParametersAndProperties(check)
+              }
+              toggled={values.showAdvancedParametersAndProperties}
+              labelPosition="right"
+              label={
+                <Trans>Always show advanced parameters and properties</Trans>
               }
             />
           </Line>

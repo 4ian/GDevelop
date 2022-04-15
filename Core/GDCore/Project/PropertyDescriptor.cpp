@@ -27,6 +27,7 @@ void PropertyDescriptor::SerializeTo(SerializerElement& element) const {
     extraInformationElement.AddChild("").SetStringValue(information);
   }
   element.AddChild("hidden").SetBoolValue(hidden);
+  element.AddChild("usageComplexity").SetIntValue(usageComplexity);
 }
 
 void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
@@ -47,6 +48,7 @@ void PropertyDescriptor::UnserializeFrom(const SerializerElement& element) {
   hidden = element.HasChild("hidden")
                ? element.GetChild("hidden").GetBoolValue()
                : false;
+  usageComplexity = element.GetChild("usageComplexity").GetIntValue();
 }
 
 void PropertyDescriptor::SerializeValuesTo(SerializerElement& element) const {

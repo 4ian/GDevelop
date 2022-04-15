@@ -1,11 +1,10 @@
 // @flow
 import optionalRequire from './OptionalRequire.js';
-const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const process = optionalRequire('process');
 
 let _isWindows = false;
-if (electron) {
+if (remote) {
   _isWindows = remote.require('electron-is').windows();
 }
 const _isMacLike =

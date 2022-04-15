@@ -4,7 +4,7 @@ import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');
-const app = electron ? remote.app : null;
+const app = remote ? remote.app : null;
 const fs = optionalRequire('fs');
 const process = optionalRequire('process');
 

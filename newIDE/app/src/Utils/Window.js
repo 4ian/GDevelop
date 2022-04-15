@@ -6,7 +6,7 @@ import { isWindows } from './Platform';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = electron ? electron.shell : null;
-const dialog = electron ? remote.dialog : null;
+const dialog = remote ? remote.dialog : null;
 
 export type AppArguments = { [string]: any };
 type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
@@ -24,7 +24,7 @@ let currentTitleBarColor: ?string = null;
  */
 export default class Window {
   static setTitle(title: string) {
-    if (electron) {
+    if (remote) {
       try {
         const browserWindow = remote.getCurrentWindow();
         browserWindow.setTitle(title);
@@ -60,7 +60,7 @@ export default class Window {
   }
 
   static setBounds(x: number, y: number, width: number, height: number) {
-    if (!electron) return;
+    if (!remote) return;
 
     let scaleFactor = 1;
     if (isWindows()) {
@@ -86,14 +86,14 @@ export default class Window {
   }
 
   static quit() {
-    if (!electron) return;
+    if (!remote) return;
 
     const electronApp = remote.app;
     electronApp.quit();
   }
 
   static show() {
-    if (!electron) return;
+    if (!remote) return;
 
     const browserWindow = remote.getCurrentWindow();
     browserWindow.showInactive();
@@ -101,7 +101,7 @@ export default class Window {
   }
 
   static hide(forceHide: boolean = false) {
-    if (!electron) return;
+    if (!remote) return;
 
     const browserWindow = remote.getCurrentWindow();
     if (!browserWindow.isFocused() || forceHide) {
@@ -111,19 +111,19 @@ export default class Window {
   }
 
   static onFocus(cb: () => void) {
-    if (!electron) return;
+    if (!remote) return;
 
     return remote.getCurrentWindow().on('focus', cb);
   }
 
   static onBlur(cb: () => void) {
-    if (!electron) return;
+    if (!remote) return;
 
     return remote.getCurrentWindow().on('blur', cb);
   }
 
   static onClose(cb: () => void) {
-    if (!electron) return;
+    if (!remote) return;
 
     return remote.getCurrentWindow().on('close', cb);
   }
@@ -136,7 +136,7 @@ export default class Window {
    * (On the web-app, this is emulated using the "project" argument).
    */
   static getArguments(): AppArguments {
-    if (electron) {
+    if (remote) {
       return remote.getGlobal('args');
     }
 
@@ -272,7 +272,7 @@ export default class Window {
   }
 
   static isDev(): boolean {
-    if (!electron)
+    if (!electron || !remote)
       return !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
     try {

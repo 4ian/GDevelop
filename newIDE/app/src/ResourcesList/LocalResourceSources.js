@@ -10,9 +10,8 @@ import {
 } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import Window from '../Utils/Window';
-const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
-const dialog = electron ? remote.dialog : null;
+const dialog = remote ? remote.dialog : null;
 const path = optionalRequire('path');
 
 const localResourceSources: Array<ResourceSource> = [

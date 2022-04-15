@@ -21,7 +21,7 @@ import {
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
-const app = electron ? remote.app : null;
+const app = remote ? remote.app : null;
 const shell = electron ? electron.shell : null;
 
 const gd: libGDevelop = global.gd;

@@ -15,9 +15,8 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
 
-const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
-const app = electron ? remote.app : null;
+const app = remote ? remote.app : null;
 
 type Props = {|
   open: boolean,

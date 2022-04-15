@@ -10,7 +10,7 @@ import RaisedButton from '../RaisedButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
-const dialog = electron ? remote.dialog : null;
+const dialog = remote ? remote.dialog : null;
 
 const styles = {
   container: {

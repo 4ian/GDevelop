@@ -14,9 +14,8 @@ const gd: libGDevelop = global.gd;
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
-const dialog = electron ? remote.dialog : null;
+const dialog = remote ? remote.dialog : null;
 
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();

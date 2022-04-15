@@ -1,9 +1,8 @@
 // @flow
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
-const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
-const dialog = electron ? remote.dialog : null;
+const dialog = remote ? remote.dialog : null;
 
 const readJSONFile = (filepath: string): Promise<Object> => {
   if (!fs) return Promise.reject('Filesystem is not supported.');

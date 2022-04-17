@@ -37,45 +37,45 @@ module.exports = {
       )
       .setExtensionHelpPath('/behaviors/tween');
 
-    const easingChoices = JSON.stringify([
-      'linear',
-      'easeInQuad',
-      'easeOutQuad',
-      'easeInOutQuad',
-      'easeInCubic',
-      'easeOutCubic',
-      'easeInOutCubic',
-      'easeInQuart',
-      'easeOutQuart',
-      'easeInOutQuart',
-      'easeInQuint',
-      'easeOutQuint',
-      'easeInOutQuint',
-      'easeInSine',
-      'easeOutSine',
-      'easeInOutSine',
-      'easeInExpo',
-      'easeOutExpo',
-      'easeInOutExpo',
-      'easeInCirc',
-      'easeOutCirc',
-      'easeInOutCirc',
-      'easeOutBounce',
-      'easeInBack',
-      'easeOutBack',
-      'easeInOutBack',
-      'elastic',
-      'swingFromTo',
-      'swingFrom',
-      'swingTo',
-      'bounce',
-      'bouncePast',
-      'easeFromTo',
-      'easeFrom',
-      'easeTo',
-    ]);
-
-    extension
+      const easingChoices = JSON.stringify([
+        'linear',
+        'easeInQuad',
+        'easeOutQuad',
+        'easeInOutQuad',
+        'easeInCubic',
+        'easeOutCubic',
+        'easeInOutCubic',
+        'easeInQuart',
+        'easeOutQuart',
+        'easeInOutQuart',
+        'easeInQuint',
+        'easeOutQuint',
+        'easeInOutQuint',
+        'easeInSine',
+        'easeOutSine',
+        'easeInOutSine',
+        'easeInExpo',
+        'easeOutExpo',
+        'easeInOutExpo',
+        'easeInCirc',
+        'easeOutCirc',
+        'easeInOutCirc',
+        'easeOutBounce',
+        'easeInBack',
+        'easeOutBack',
+        'easeInOutBack',
+        'elastic',
+        'swingFromTo',
+        'swingFrom',
+        'swingTo',
+        'bounce',
+        'bouncePast',
+        'easeFromTo',
+        'easeFrom',
+        'easeTo',
+      ]);
+  
+      extension
       .addExpression(
         'Ease',
         _('Ease'),
@@ -88,7 +88,9 @@ module.exports = {
       .addParameter('expression', _('From value'))
       .addParameter('expression', _('To value'))
       .addParameter('expression', _('Weighting'))
-      .setParameterLongDescription(_('From 0 to 1.'))
+      .setParameterLongDescription(
+        _('From 0 to 1.')
+      )
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
@@ -690,23 +692,6 @@ module.exports = {
       .addParameter('string', _('Tween Identifier'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('removeTween');
-
-    behavior
-      .addAction(
-        'AwaitTween',
-        _('Await the end of a tween'),
-        _('Waits until a tween has finished before continuing the execution of events.'),
-        _('Wait for tween _PARAM2_ of _PARAM0_ to end'),
-        '',
-        'JsPlatform/Extensions/tween_behavior24.png',
-        'JsPlatform/Extensions/tween_behavior32.png'
-      )
-      .addParameter('object', _('Object'), '', false)
-      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
-      .addParameter('string', _('Tween Identifier'), '', false)
-      .setAsync()
-      .getCodeExtraInformation()
-      .setFunctionName('awaitTween');
 
     behavior
       .addExpression(

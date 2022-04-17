@@ -112,7 +112,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    *
    * The list will be filled with objects from the scene if it is the first time
    * it is requested, unless there is already an object list with this name
-   * (i.e. `ObjectAlreadyDeclared(objectName)` returns true).
+   * (i.e. `ObjectAlreadyDeclaredByParents(objectName)` returns true).
    */
   void ObjectsListNeeded(const gd::String& objectName);
 
@@ -137,29 +137,21 @@ class GD_CORE_API EventsCodeGenerationContext {
   void EmptyObjectsListNeeded(const gd::String& objectName);
 
   /**
-   * Return true if an object list has already been declared (or is going to be
-   * declared).
+   * Return true if an object list has already been declared by the parent contexts.
    */
-  bool ObjectAlreadyDeclared(const gd::String& objectName) const {
+  bool ObjectAlreadyDeclaredByParents(const gd::String& objectName) const {
     return (alreadyDeclaredObjectsLists.find(objectName) !=
             alreadyDeclaredObjectsLists.end());
   };
 
   /**
-   * \brief Consider that \a objectName is now declared in the context.
-   */
-  void SetObjectDeclared(const gd::String& objectName) {
-    alreadyDeclaredObjectsLists.insert(objectName);
-  }
-
-  /**
    * Return all the objects lists which will be declared by the current context
-   * ( the non empty as well as the empty objects lists )
+   * (normal, without picking or empty).
    */
   std::set<gd::String> GetAllObjectsToBeDeclared() const;
 
   /**
-   * Return the objects lists which will be declared by the current context
+   * Return the objects lists which will be declared by the current context.
    */
   const std::set<gd::String>& GetObjectsListsToBeDeclared() const {
     return objectsListsToBeDeclared;
@@ -187,7 +179,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * Return the objects lists which are already declared and can be used in the
    * current context without declaration.
    */
-  const std::set<gd::String>& GetObjectsListsAlreadyDeclared() const {
+  const std::set<gd::String>& GetObjectsListsAlreadyDeclaredByParents() const {
     return alreadyDeclaredObjectsLists;
   };
 

@@ -131,14 +131,21 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
 bool EventsCodeGenerationContext::ShouldUseAsyncObjectsLists(
     const gd::String& objectName) const {
   if (!IsAsync()) return false;
+  std::cout << "test"<< objectName <<", starting from" << this << std::endl;
   for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
        asyncContext != NULL;  // Should never happen, but there just in case.
        asyncContext = asyncContext->parent->nearestAsyncParent) {
-    if (asyncContext->ObjectAlreadyDeclared(objectName)) return true;
+  std::cout << "parent:" << asyncContext << std::endl;
+    if (asyncContext->ObjectAlreadyDeclaredByParents(objectName)) {
+  std::cout << "true, declared in this async context" << std::endl;
+      return true;
+    }
     // When reaching the last asynchronous context, check the parent synchronous
     // context before returning.
-    if (!asyncContext->parent->IsAsync())
-      return asyncContext->parent->ObjectAlreadyDeclared(objectName);
+    if (!asyncContext->parent->IsAsync()) {
+      std::cout << "parent is not async, object already declared:" << asyncContext->parent->ObjectAlreadyDeclaredByParents(objectName) << std::endl;
+      return asyncContext->parent->ObjectAlreadyDeclaredByParents(objectName);
+    }
   }
   return false;
 };

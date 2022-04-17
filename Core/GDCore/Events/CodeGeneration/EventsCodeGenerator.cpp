@@ -617,7 +617,7 @@ EventsCodeGenerator::GenerateCallback(
   // `LongLivedObjectsList` to the callback function.
   for (const auto& objectUsedInSubTree :
        callbackContext.GetAllDeclaredObjectsAcrossChildren()) {
-    if (parentContext.ObjectAlreadyDeclared(objectUsedInSubTree))
+    if (parentContext.ObjectAlreadyDeclaredByParents(objectUsedInSubTree))
       requiredObjects.insert(objectUsedInSubTree);
   };
 
@@ -810,12 +810,12 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   gd::String declarationsCode;
   for (auto object : context.GetObjectsListsToBeDeclared()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) +
                               " = runtimeContext->GetObjectsRawPointers(\"" +
                               ConvertToString(object) + "\");\n";
-      context.SetObjectDeclared(object);
+      // context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
 
@@ -823,10 +823,10 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   }
   for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";
-      context.SetObjectDeclared(object);
+      // context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
 
@@ -834,10 +834,10 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   }
   for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";
-      context.SetObjectDeclared(object);
+      // context.SetObjectDeclared(object);
     } else
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";

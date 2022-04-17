@@ -822,7 +822,7 @@ gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
 
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::EventsCodeGenerationContext& context) {
-  auto declareObjectList = [this](gd::String object,
+  auto declareObjectListFromParent = [this](gd::String object,
                                   gd::EventsCodeGenerationContext& context) {
     gd::String objectListName = GetObjectListName(object, context);
     if (!context.GetParentContext()) {
@@ -845,33 +845,33 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   gd::String declarationsCode;
   for (auto object : context.GetObjectsListsToBeDeclared()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration += "gdjs.copyArray(" +
                                GenerateAllInstancesGetterCode(object, context) +
                                ", " + GetObjectListName(object, context) + ");";
-      context.SetObjectDeclared(object);
+      // context.SetObjectDeclared(object); // TODO: comment this? Useless
     } else
-      objectListDeclaration = declareObjectList(object, context);
+      objectListDeclaration = declareObjectListFromParent(object, context);
 
     declarationsCode += objectListDeclaration + "\n";
   }
   for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
-      context.SetObjectDeclared(object);
+      // context.SetObjectDeclared(object); // TODO: comment this? Useless
     } else
-      objectListDeclaration = declareObjectList(object, context);
+      objectListDeclaration = declareObjectListFromParent(object, context);
 
     declarationsCode += objectListDeclaration + "\n";
   }
   for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
-      context.SetObjectDeclared(object);
+      // context.SetObjectDeclared(object); // TODO: comment this? Useless
     } else
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";

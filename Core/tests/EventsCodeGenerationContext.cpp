@@ -70,7 +70,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
   }
 
   SECTION("Object list needed") {
-    REQUIRE(c1.GetObjectsListsAlreadyDeclared() == std::set<gd::String>());
+    REQUIRE(c1.GetObjectsListsAlreadyDeclaredByParents() == std::set<gd::String>());
     REQUIRE(c1.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c1.object1", "c1.object2"}));
     REQUIRE(c1.GetObjectsListsToBeDeclaredWithoutPicking() ==
@@ -78,7 +78,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c1.GetAllObjectsToBeDeclared() ==
             std::set<gd::String>({"c1.object1", "c1.object2", "c1.noPicking1"}));
 
-    REQUIRE(c2.GetObjectsListsAlreadyDeclared() ==
+    REQUIRE(c2.GetObjectsListsAlreadyDeclaredByParents() ==
             std::set<gd::String>({"c1.object1", "c1.object2", "c1.noPicking1"}));
     REQUIRE(c2.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c2.object1"}));
@@ -86,7 +86,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c2.GetAllObjectsToBeDeclared() ==
             std::set<gd::String>({"c2.object1"}));
 
-    REQUIRE(c3.GetObjectsListsAlreadyDeclared() ==
+    REQUIRE(c3.GetObjectsListsAlreadyDeclaredByParents() ==
             std::set<gd::String>({"c1.object1", "c1.object2", "c1.noPicking1"}));
     REQUIRE(c3.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c3.object1", "c1.object2"}));
@@ -94,7 +94,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c3.GetAllObjectsToBeDeclared() ==
             std::set<gd::String>({"c3.object1", "c1.object2"}));
 
-    REQUIRE(c5.GetObjectsListsAlreadyDeclared() ==
+    REQUIRE(c5.GetObjectsListsAlreadyDeclaredByParents() ==
             std::set<gd::String>(
                 {"c1.object1", "c1.object2", "c1.noPicking1", "c2.object1"}));
     REQUIRE(c5.GetObjectsListsToBeDeclared() ==
@@ -108,21 +108,22 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
   }
 
   SECTION("ObjectAlreadyDeclared") {
-    REQUIRE(c1.ObjectAlreadyDeclared("c1.object1") == false);
-    REQUIRE(c2.ObjectAlreadyDeclared("c1.object1") == true);
-    REQUIRE(c3.ObjectAlreadyDeclared("c1.object1") == true);
-    REQUIRE(c4.ObjectAlreadyDeclared("c1.object1") == true);
-    REQUIRE(c5.ObjectAlreadyDeclared("c1.object1") == true);
+    REQUIRE(c1.ObjectAlreadyDeclaredByParents("c1.object1") == false);
+    REQUIRE(c2.ObjectAlreadyDeclaredByParents("c1.object1") == true);
+    REQUIRE(c3.ObjectAlreadyDeclaredByParents("c1.object1") == true);
+    REQUIRE(c4.ObjectAlreadyDeclaredByParents("c1.object1") == true);
+    REQUIRE(c5.ObjectAlreadyDeclaredByParents("c1.object1") == true);
 
-    REQUIRE(c2.ObjectAlreadyDeclared("c2.object1") == false);
-    REQUIRE(c1.ObjectAlreadyDeclared("c2.object1") == false);
-    REQUIRE(c3.ObjectAlreadyDeclared("c2.object1") == false);
-    REQUIRE(c4.ObjectAlreadyDeclared("c2.object1") == true);
-    REQUIRE(c5.ObjectAlreadyDeclared("c2.object1") == true);
+    REQUIRE(c1.ObjectAlreadyDeclaredByParents("c2.object1") == false);
+    REQUIRE(c2.ObjectAlreadyDeclaredByParents("c2.object1") == false);
+    REQUIRE(c3.ObjectAlreadyDeclaredByParents("c2.object1") == false);
+    REQUIRE(c4.ObjectAlreadyDeclaredByParents("c2.object1") == true);
+    REQUIRE(c5.ObjectAlreadyDeclaredByParents("c2.object1") == true);
 
-    REQUIRE(c3.ObjectAlreadyDeclared("some object") == false);
-    c3.SetObjectDeclared("some object");
-    REQUIRE(c3.ObjectAlreadyDeclared("some object") == true);
+// TODO: useless?
+//     REQUIRE(c3.ObjectAlreadyDeclaredByParents("some object") == false);
+//     c3.SetObjectDeclared("some object");
+//     REQUIRE(c3.ObjectAlreadyDeclaredByParents("some object") == true);
   }
 
   SECTION("Object list last depth") {
@@ -185,5 +186,61 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c7.IsSameObjectsList("c5.object1", c6) == false);
     REQUIRE(c7.IsSameObjectsList("c6.object3", c6) == false);
     REQUIRE(c7.IsSameObjectsList("c5.empty1", c5) == false);
+  }
+
+  SECTION("Async") {
+    /**
+     * Generate a tree of contexts with declared objects as below:
+     *                  c1 -> c1.object1, c1.noPicking1 (no picking request), c1.empty1 (empty list request)
+     *                   \
+     *                   c2 (async) -> c2.object1, c2.noPicking1, c2.empty1
+     *                   \
+     *                   c3 (async) -> c3.object1, c3.noPicking1, c3.empty1
+     *                   \
+     *                   c4 -> c4.object1, c4.noPicking1, c4.empty1
+     *                   \
+     *                   c5 -> c5.object1, c5.noPicking1, c5.empty1
+     */
+    gd::EventsCodeGenerationContext c1;
+    c1.ObjectsListNeeded("c1.object1");
+    c1.ObjectsListWithoutPickingNeeded("c1.noPicking1");
+    c1.EmptyObjectsListNeeded("c1.empty1");
+
+    gd::EventsCodeGenerationContext c2;
+    c2.InheritsAsAsyncCallbackFrom(c1);
+    c2.ObjectsListNeeded("c2.object1");
+    c2.ObjectsListWithoutPickingNeeded("c2.noPicking1");
+    c2.EmptyObjectsListNeeded("c2.empty1");
+    c2.ObjectsListNeeded("c1.object1");
+
+    gd::EventsCodeGenerationContext c3;
+    c3.InheritsAsAsyncCallbackFrom(c2);
+    c3.ObjectsListNeeded("c3.object1");
+    c3.ObjectsListWithoutPickingNeeded("c3.noPicking1");
+    c3.EmptyObjectsListNeeded("c3.empty1");
+    c3.ObjectsListNeeded("c1.object1");
+
+    gd::EventsCodeGenerationContext c4;
+    c4.InheritsFrom(c3);
+    c4.ObjectsListNeeded("c4.object1");
+    c4.ObjectsListWithoutPickingNeeded("c4.noPicking1");
+    c4.EmptyObjectsListNeeded("c4.empty1");
+    c4.ObjectsListNeeded("c1.object1");
+
+    gd::EventsCodeGenerationContext c5;
+    c5.InheritsAsAsyncCallbackFrom(c4);
+    c5.ObjectsListNeeded("c5.object1");
+    c5.ObjectsListWithoutPickingNeeded("c5.noPicking1");
+    c5.EmptyObjectsListNeeded("c5.empty1");
+    c5.ObjectsListNeeded("c1.object1");
+
+    REQUIRE(c1.ShouldUseAsyncObjectsLists("c1.object1") == false);
+    REQUIRE(c1.ShouldUseAsyncObjectsLists("c1.noPicking1") == false);
+    REQUIRE(c1.ShouldUseAsyncObjectsLists("c1.empty1") == false);
+
+    REQUIRE(c2.ShouldUseAsyncObjectsLists("c2.object1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsLists("c2.noPicking1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsLists("c2.empty1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsLists("c1.object1") == true);
   }
 }

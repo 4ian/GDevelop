@@ -636,10 +636,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction,
-      {
-        dontCallGeneratedFunction: true,
-      }
+      eventsFunction
     );
 
     const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
@@ -658,9 +655,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
     // Simulate a hot reloading by recompiling the function and running it again.
     const runHotReloadedCompiledEvents =
-      generateCompiledEventsForEventsFunction(gd, project, eventsFunction, {
-        dontCallGeneratedFunction: true,
-      });
+      generateCompiledEventsForEventsFunction(gd, project, eventsFunction);
     runHotReloadedCompiledEvents(
       gdjs,
       runtimeScene /*, Don't pass arguments to not run the function. */

@@ -137,12 +137,21 @@ class GD_CORE_API EventsCodeGenerationContext {
   void EmptyObjectsListNeeded(const gd::String& objectName);
 
   /**
-   * Return true if an object list has already been declared (or is going to be
-   * declared).
+   * Return true if an object list has already been declared (or was declared by
+   * the current context if the code generation for this context's declarations
+   * was done already).
    */
   bool ObjectAlreadyDeclared(const gd::String& objectName) const {
     return (alreadyDeclaredObjectsLists.find(objectName) !=
             alreadyDeclaredObjectsLists.end());
+  };
+
+  /**
+   * Return true if an object list has already been or is going to be
+   * declared.
+   */
+  bool ObjectWillBeDeclared(const gd::String& objectName) const {
+    return ObjectAlreadyDeclared(objectName) || IsToBeDeclared(objectName);
   };
 
   /**
@@ -268,7 +277,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * empty).
    *
    */
-  bool IsToBeDeclared(const gd::String& objectName) {
+  bool IsToBeDeclared(const gd::String& objectName) const {
     return objectsListsToBeDeclared.find(objectName) !=
                objectsListsToBeDeclared.end() ||
            objectsListsWithoutPickingToBeDeclared.find(objectName) !=

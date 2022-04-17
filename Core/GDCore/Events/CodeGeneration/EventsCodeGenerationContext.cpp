@@ -135,18 +135,19 @@ bool EventsCodeGenerationContext::ShouldUseAsyncObjectsLists(
   // If this is the only async context so far, we cannot start iterating since
   // we must start at the previous async context. We do not need to anyways in
   // that case, we can just check the parent directly.
-  if (asyncDepth == 1) return parent->ObjectAlreadyDeclared(objectName);
+  if (asyncDepth == 1) return parent->ObjectWillBeDeclared(objectName);
 
   for (gd::EventsCodeGenerationContext* asyncContext =
            nearestAsyncParent->parent->nearestAsyncParent;
        asyncContext != NULL;
        asyncContext = asyncContext->parent->nearestAsyncParent) {
-    if (asyncContext->ObjectAlreadyDeclared(objectName)) return true;
+    if (asyncContext - ObjectWillBeDeclared(objectName)) return true;
     // When reaching the last asynchronous context, check the parent
     // synchronous context before returning.
     if (asyncContext->asyncDepth == 1)
-      return asyncContext->parent->ObjectAlreadyDeclared(objectName);
+      return asyncContext->parent->ObjectWillBeDeclared(objectName);
   }
+
   return false;
 };
 

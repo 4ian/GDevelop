@@ -58,6 +58,10 @@ See examples in [examplejsextensiontools.ts](../Extensions/ExampleJsExtension/ex
 
 Read about [`gdjs.RuntimeScene`](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation//RuntimeScene.html), the class representing a scene being played, as lots of events can need it.
 
+##### How to create an asynchronous function
+
+You can make an asynchronous action by making your function return an instance of an AsyncTask (don't forget to also declare your function as async!). You can make an `AsyncTask` yourself by extending the `gdjs.AsyncTask` abstract base class, or, if you are using JavaScript async functions/promises, by instanciating a new `gdjs.PromiseTask` with your promise as argument.
+
 #### How to create a behavior by extending `gdjs.RuntimeBehavior`
 
 See examples in [dummyruntimebehavior.ts](../Extensions/ExampleJsExtension/dummyruntimebehavior.ts) (or [dummywithshareddataruntimebehavior.ts](../Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.ts) for an example with shared data between behaviors).
@@ -98,6 +102,7 @@ Use [`extension.setExtensionInformation`](https://docs.gdevelop-app.com/GDCore%2
 Use [`addAction`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
 
 -   Chain calls to [`addParameter`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
+-   If your function is asynchronous, call `setAsync` to tell GDevelop to wait for your task to resolve before executing subevents.
 -   Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
 
 > You can call these functions on the `extension` object, or on the objects returned by `extension.addObject` (for objects) or `extension.addBehavior` (for behaviors). See below.

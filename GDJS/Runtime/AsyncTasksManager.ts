@@ -81,6 +81,12 @@ namespace gdjs {
     }
   }
 
+  export class ResolveTask extends AsyncTask {
+    update() {
+      return true;
+    }
+  }
+
   const logger = new gdjs.Logger('Internal PromiseTask');
 
   /**

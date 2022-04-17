@@ -1,3 +1,4 @@
+//@ts-check
 (() => {
   function createMockCallback() {
     let callCount = 0;

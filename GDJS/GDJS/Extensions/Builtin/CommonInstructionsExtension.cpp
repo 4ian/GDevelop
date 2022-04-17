@@ -494,6 +494,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "if (" + ifPredicat + ") {\n";
         outputCode += actionsCode;
         outputCode += "\n{ //Subevents: \n";
+        // TODO: generate before so that objects declaration code is aware of sub events/
         outputCode +=
             codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
         outputCode += "} //Subevents end.\n";

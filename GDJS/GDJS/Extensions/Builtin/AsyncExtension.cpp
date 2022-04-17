@@ -29,7 +29,8 @@ AsyncExtension::AsyncExtension() {
 
         // Generate code to backup the objects lists
         gd::String objectsListsBackupCode =
-            parentContext.IsAsync()
+            // TODO: don't reuse same variable
+            parentContext.IsInsideAsync()
                 ? "asyncObjectsList = "
                   "gdjs.LongLivedObjectsList.from(asyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";

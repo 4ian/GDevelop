@@ -77,7 +77,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \return Code
    */
   virtual gd::String GenerateEventsListCode(
-      gd::EventsList& events, const EventsCodeGenerationContext& context);
+      gd::EventsList& events, EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for executing a condition list
@@ -191,7 +191,7 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual const CallbackDescriptor GenerateCallback(
       const gd::String& callbackFunctionName,
-      const gd::EventsCodeGenerationContext& parentContext,
+      gd::EventsCodeGenerationContext& parentContext,
       gd::InstructionsList& actions,
       gd::EventsList* subEvents = nullptr);
 

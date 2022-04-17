@@ -107,7 +107,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \return Code
    */
   virtual gd::String GenerateEventsListCode(
-      gd::EventsList& events, const gd::EventsCodeGenerationContext& context);
+      gd::EventsList& events, gd::EventsCodeGenerationContext& context);
 
   /**
    * Generate code for executing a condition list

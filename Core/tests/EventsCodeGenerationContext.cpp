@@ -119,11 +119,6 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c3.ObjectAlreadyDeclaredByParents("c2.object1") == false);
     REQUIRE(c4.ObjectAlreadyDeclaredByParents("c2.object1") == true);
     REQUIRE(c5.ObjectAlreadyDeclaredByParents("c2.object1") == true);
-
-// TODO: useless?
-//     REQUIRE(c3.ObjectAlreadyDeclaredByParents("some object") == false);
-//     c3.SetObjectDeclared("some object");
-//     REQUIRE(c3.ObjectAlreadyDeclaredByParents("some object") == true);
   }
 
   SECTION("Object list last depth") {
@@ -234,13 +229,15 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     c5.EmptyObjectsListNeeded("c5.empty1");
     c5.ObjectsListNeeded("c1.object1");
 
-    REQUIRE(c1.ShouldUseAsyncObjectsLists("c1.object1") == false);
-    REQUIRE(c1.ShouldUseAsyncObjectsLists("c1.noPicking1") == false);
-    REQUIRE(c1.ShouldUseAsyncObjectsLists("c1.empty1") == false);
+    REQUIRE(c1.ShouldUseAsyncObjectsList("c1.object1") == false);
+    REQUIRE(c1.ShouldUseAsyncObjectsList("c1.noPicking1") == false);
+    REQUIRE(c1.ShouldUseAsyncObjectsList("c1.empty1") == false);
 
-    REQUIRE(c2.ShouldUseAsyncObjectsLists("c2.object1") == false);
-    REQUIRE(c2.ShouldUseAsyncObjectsLists("c2.noPicking1") == false);
-    REQUIRE(c2.ShouldUseAsyncObjectsLists("c2.empty1") == false);
-    REQUIRE(c2.ShouldUseAsyncObjectsLists("c1.object1") == true);
+    REQUIRE(c2.ShouldUseAsyncObjectsList("c2.object1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsList("c2.noPicking1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsList("c2.empty1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsList("c1.object1") == true);
+
+    // TODO: finish test
   }
 }

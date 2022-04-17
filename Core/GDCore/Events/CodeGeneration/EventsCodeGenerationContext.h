@@ -42,13 +42,13 @@ class GD_CORE_API EventsCodeGenerationContext {
    * another one. The child will then for example not declare again objects
    * already declared by its parent.
    */
-  void InheritsFrom(const EventsCodeGenerationContext& parent);
+  void InheritsFrom(EventsCodeGenerationContext& parent);
 
   /**
    * Call this method to make an EventsCodeGenerationContext as a "child" of
    * another one, but in the context of an async function.
    */
-  void InheritsAsAsyncCallbackFrom(const EventsCodeGenerationContext& parent);
+  void InheritsAsAsyncCallbackFrom(EventsCodeGenerationContext& parent);
 
   /**
    * \brief As InheritsFrom, mark the context as being the child of another one,
@@ -56,7 +56,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    *
    * Used for example for optimizing the last event of a list.
    */
-  void Reuse(const EventsCodeGenerationContext& parent);
+  void Reuse(EventsCodeGenerationContext& parent);
 
   /**
    * \brief Forbid any optimization that would reuse and modify the object list
@@ -245,13 +245,18 @@ class GD_CORE_API EventsCodeGenerationContext {
    * This returns true if the nearest parent with depth 0 OR an asynchronous
    * context with a different depth than the current one has defined the object.
    */
-  bool ShouldUseAsyncObjectsLists(const gd::String& objectName) const;
+  bool ShouldUseAsyncObjectsList(const gd::String& objectName) const;
+
+  /**
+   * Returns true if the code currently being generated is asynchronous
+   */
+  bool IsInsideAsync() const { return asyncDepth != 0; };
 
   /**
    * Returns true if the code currently being generated is an asynchronous
    * callback.
    */
-  bool IsAsync() const { return asyncDepth != 0; };
+  bool IsAsyncCallback() const { return parent != nullptr && parent->asyncDepth != asyncDepth; }
 
  private:
   /**

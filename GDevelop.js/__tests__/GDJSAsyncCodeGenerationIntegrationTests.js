@@ -864,4 +864,5 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
   // TODO: add a test involving TaskGroup (i.e: an object async action).
   // TODO: add a test involving CreateObject
+  // TODO: add a test involving subevents
 });

@@ -577,7 +577,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 const EventsCodeGenerator::CallbackDescriptor
 EventsCodeGenerator::GenerateCallback(
     const gd::String& callbackID,
-    const gd::EventsCodeGenerationContext& parentContext,
+    gd::EventsCodeGenerationContext& parentContext,
     gd::InstructionsList& actions,
     gd::EventsList* subEvents) {
   gd::EventsCodeGenerationContext callbackContext;
@@ -613,11 +613,11 @@ EventsCodeGenerator::GenerateCallback(
   // Build the list of all objects required by the callback. Any object that has
   // already been declared could have gone through previous object picking, so
   // if such an object is used by the actions or subevents of this callback, we
-  // must ask the caller to pass the already exiting objects lists through a
+  // must ask the caller to pass the already existing objects lists through a
   // `LongLivedObjectsList` to the callback function.
   for (const auto& objectUsedInSubTree :
        callbackContext.GetAllDeclaredObjectsAcrossChildren()) {
-    if (parentContext.ObjectAlreadyDeclaredByParents(objectUsedInSubTree))
+    if (callbackContext.ObjectAlreadyDeclaredByParents(objectUsedInSubTree))
       requiredObjects.insert(objectUsedInSubTree);
   };
 
@@ -629,7 +629,7 @@ const gd::String EventsCodeGenerator::GenerateEventsParameters(
     const gd::EventsCodeGenerationContext& context) {
   gd::String parameters = "runtimeScene";
   if (!HasProjectAndLayout()) parameters += ", eventsFunctionContext";
-  if (context.IsAsync()) parameters += ", asyncObjectsList";
+  if (context.IsInsideAsync()) parameters += ", asyncObjectsList";
   return parameters;
 };
 
@@ -852,7 +852,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
  * Generate events list code.
  */
 gd::String EventsCodeGenerator::GenerateEventsListCode(
-    gd::EventsList& events, const EventsCodeGenerationContext& parentContext) {
+    gd::EventsList& events, EventsCodeGenerationContext& parentContext) {
   gd::String output;
   for (std::size_t eId = 0; eId < events.size(); ++eId) {
     // Each event has its own context : Objects picked in an event are totally

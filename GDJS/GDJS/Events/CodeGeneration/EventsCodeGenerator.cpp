@@ -832,6 +832,11 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
       return "/* Could not declare " + objectListName + " */";
     }
 
+    if (context.ShouldUseAsyncObjectsList(object)) {
+      gd::String copiedListName = "asyncObjectsList.getObjects(" + ConvertToStringExplicit(object) + ")";
+      return "gdjs.copyArray(" + copiedListName + ", " + objectListName + ");\n";
+    }
+
     //*Optimization*: Avoid expensive copy of the object list if we're using
     // the same list as the one from the parent context.
     if (context.IsSameObjectsList(object, *context.GetParentContext()))
@@ -849,7 +854,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
       objectListDeclaration += "gdjs.copyArray(" +
                                GenerateAllInstancesGetterCode(object, context) +
                                ", " + GetObjectListName(object, context) + ");";
-      // context.SetObjectDeclared(object); // TODO: comment this? Useless
     } else
       objectListDeclaration = declareObjectListFromParent(object, context);
 
@@ -860,7 +864,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
-      // context.SetObjectDeclared(object); // TODO: comment this? Useless
     } else
       objectListDeclaration = declareObjectListFromParent(object, context);
 
@@ -871,7 +874,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
-      // context.SetObjectDeclared(object); // TODO: comment this? Useless
     } else
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
@@ -884,10 +886,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
 gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
     const gd::String& objectName, gd::EventsCodeGenerationContext& context) {
-  if (context.ShouldUseAsyncObjectsLists(objectName)) {
-    return "asyncObjectsList.getObjects(" +
-           ConvertToStringExplicit(objectName) + ")";
-  } else if (HasProjectAndLayout()) {
+  if (HasProjectAndLayout()) {
     return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +
            ")";
   } else {
@@ -897,7 +896,7 @@ gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
 }
 
 gd::String EventsCodeGenerator::GenerateEventsListCode(
-    gd::EventsList& events, const gd::EventsCodeGenerationContext& context) {
+    gd::EventsList& events, gd::EventsCodeGenerationContext& context) {
   // *Optimization*: generating all JS code of events in a single, enormous
   // function is badly handled by JS engines and in particular the garbage
   // collectors, leading to intermittent lag/freeze while the garbage collector

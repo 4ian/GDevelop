@@ -16,7 +16,7 @@ using namespace std;
 namespace gd {
 
 void EventsCodeGenerationContext::InheritsFrom(
-    const EventsCodeGenerationContext& parent_) {
+    EventsCodeGenerationContext& parent_) {
   parent = &parent_;
 
   // Objects lists declared by parent became "already declared" in the child
@@ -35,7 +35,7 @@ void EventsCodeGenerationContext::InheritsFrom(
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
 
-  nearestAsyncParent = parent_.nearestAsyncParent;
+  nearestAsyncParent = parent_.IsAsyncCallback() ? &parent_ : parent_.nearestAsyncParent;
   asyncDepth = parent_.asyncDepth;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
@@ -47,9 +47,29 @@ void EventsCodeGenerationContext::InheritsFrom(
 }
 
 void EventsCodeGenerationContext::InheritsAsAsyncCallbackFrom(
-    const EventsCodeGenerationContext& parent_) {
+    EventsCodeGenerationContext& parent_) {
+      // TODO: set as can't be reused? Not sure, double check.
+      // TODO: call InheritsFrom and just do a asyncDepth++;
+
   parent = &parent_;
-  nearestAsyncParent = this;
+
+  // Objects lists declared by parent became "already declared" in the child
+  // context.
+  alreadyDeclaredObjectsLists = parent_.alreadyDeclaredObjectsLists;
+  std::copy(parent_.objectsListsToBeDeclared.begin(),
+            parent_.objectsListsToBeDeclared.end(),
+            std::inserter(alreadyDeclaredObjectsLists,
+                          alreadyDeclaredObjectsLists.begin()));
+  std::copy(parent_.objectsListsWithoutPickingToBeDeclared.begin(),
+            parent_.objectsListsWithoutPickingToBeDeclared.end(),
+            std::inserter(alreadyDeclaredObjectsLists,
+                          alreadyDeclaredObjectsLists.begin()));
+  std::copy(parent_.emptyObjectsListsToBeDeclared.begin(),
+            parent_.emptyObjectsListsToBeDeclared.end(),
+            std::inserter(alreadyDeclaredObjectsLists,
+                          alreadyDeclaredObjectsLists.begin()));
+
+  nearestAsyncParent = parent_.IsAsyncCallback() ? &parent_ : parent_.nearestAsyncParent;
   asyncDepth = parent_.asyncDepth + 1;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
@@ -61,7 +81,7 @@ void EventsCodeGenerationContext::InheritsAsAsyncCallbackFrom(
 }
 
 void EventsCodeGenerationContext::Reuse(
-    const EventsCodeGenerationContext& parent_) {
+    EventsCodeGenerationContext& parent_) {
   InheritsFrom(parent_);
   if (parent_.CanReuse())
     contextDepth = parent_.GetContextDepth();  // Keep same context depth
@@ -71,9 +91,10 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
   if (!IsToBeDeclared(objectName)) {
     objectsListsToBeDeclared.insert(objectName);
-    if (IsAsync()) {
-      for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
-           asyncContext != NULL;
+    if (IsInsideAsync()) {
+      gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
+      for (;
+           asyncContext != nullptr;
            asyncContext = asyncContext->parent->nearestAsyncParent)
         asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
     }
@@ -128,26 +149,13 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
          otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
 
-bool EventsCodeGenerationContext::ShouldUseAsyncObjectsLists(
+bool EventsCodeGenerationContext::ShouldUseAsyncObjectsList(
     const gd::String& objectName) const {
-  if (!IsAsync()) return false;
-  std::cout << "test"<< objectName <<", starting from" << this << std::endl;
-  for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
-       asyncContext != NULL;  // Should never happen, but there just in case.
-       asyncContext = asyncContext->parent->nearestAsyncParent) {
-  std::cout << "parent:" << asyncContext << std::endl;
-    if (asyncContext->ObjectAlreadyDeclaredByParents(objectName)) {
-  std::cout << "true, declared in this async context" << std::endl;
-      return true;
-    }
-    // When reaching the last asynchronous context, check the parent synchronous
-    // context before returning.
-    if (!asyncContext->parent->IsAsync()) {
-      std::cout << "parent is not async, object already declared:" << asyncContext->parent->ObjectAlreadyDeclaredByParents(objectName) << std::endl;
-      return asyncContext->parent->ObjectAlreadyDeclaredByParents(objectName);
-    }
-  }
-  return false;
+  if (!IsInsideAsync()) return false;
+
+  // If the object list
+  const gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
+  return asyncContext->ObjectAlreadyDeclaredByParents(objectName);
 };
 
 }  // namespace gd

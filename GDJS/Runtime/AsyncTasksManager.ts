@@ -94,9 +94,9 @@ namespace gdjs {
    */
   export class PromiseTask extends AsyncTask {
     private isResolved: boolean = false;
-    promise: Promise<any>;
+    promise: Promise<void>;
 
-    constructor(promise: Promise<any>) {
+    constructor(promise: Promise<void>) {
       super();
       this.promise = promise
         .catch((error) => {

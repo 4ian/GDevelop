@@ -17,12 +17,6 @@
   }
 
   describe('gdjs.AsyncTaskManager', function () {
-    class ResolvingTask extends gdjs.AsyncTask {
-      update() {
-        return true;
-      }
-    }
-
     class NeverResolvingTask extends gdjs.AsyncTask {
       update() {
         return false;
@@ -42,18 +36,18 @@
 
     it('should call a resolved callback', function () {
       const cb = createMockCallback();
-      asyncTasksManager.addTask(new ResolvingTask(), cb);
+      asyncTasksManager.addTask(new gdjs.ResolveTask(), cb);
       cb.expectToNotHaveBeenCalled();
-      asyncTasksManager.processTasks();
+      asyncTasksManager.processTasks(runtimeScene);
       cb.expectToHaveBeenCalled();
     });
 
     it('should not call callbacks twice', function () {
       const cb = createMockCallback();
-      asyncTasksManager.addTask(new ResolvingTask(), cb);
+      asyncTasksManager.addTask(new gdjs.ResolveTask(), cb);
       cb.expectToNotHaveBeenCalled();
-      asyncTasksManager.processTasks();
-      asyncTasksManager.processTasks();
+      asyncTasksManager.processTasks(runtimeScene);
+      asyncTasksManager.processTasks(runtimeScene);
       cb.expectToHaveBeenCalledOnce();
     });
 
@@ -61,7 +55,7 @@
       const cb = createMockCallback();
       asyncTasksManager.addTask(new NeverResolvingTask(), cb);
       cb.expectToNotHaveBeenCalled();
-      asyncTasksManager.processTasks();
+      asyncTasksManager.processTasks(runtimeScene);
       cb.expectToNotHaveBeenCalled();
     });
   });

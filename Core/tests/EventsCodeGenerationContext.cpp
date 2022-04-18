@@ -223,7 +223,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     c4.ObjectsListNeeded("c1.object1");
 
     gd::EventsCodeGenerationContext c5;
-    c5.InheritsAsAsyncCallbackFrom(c4);
+    c5.InheritsFrom(c4);
     c5.ObjectsListNeeded("c5.object1");
     c5.ObjectsListWithoutPickingNeeded("c5.noPicking1");
     c5.EmptyObjectsListNeeded("c5.empty1");
@@ -237,6 +237,9 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c2.ShouldUseAsyncObjectsList("c2.noPicking1") == false);
     REQUIRE(c2.ShouldUseAsyncObjectsList("c2.empty1") == false);
     REQUIRE(c2.ShouldUseAsyncObjectsList("c1.object1") == true);
+    REQUIRE(c3.ShouldUseAsyncObjectsList("c1.object1") == true);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c1.object1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c1.object1") == false);
 
     // TODO: finish test
   }

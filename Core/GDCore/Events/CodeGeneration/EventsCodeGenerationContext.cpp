@@ -153,8 +153,16 @@ bool EventsCodeGenerationContext::ShouldUseAsyncObjectsList(
     const gd::String& objectName) const {
   if (!IsInsideAsync()) return false;
 
-  // If the object list
+  // Check if the objects list was used after (or in) the nearest async callback context.
   const gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
+  if (parent->GetLastDepthObjectListWasNeeded(objectName) >= asyncContext->GetContextDepth()) {
+    // The object was used in a context after (or in) the nearest async parent context, so we're not getting it from the
+    // async object lists (it was already gotten from there in this previous context).
+    return false;
+  }
+
+  // If the objects list is declared in a parent of the nearest async context, it means
+  // the async context had to use an async objects list to access it.
   return asyncContext->ObjectAlreadyDeclaredByParents(objectName);
 };
 

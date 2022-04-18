@@ -141,7 +141,7 @@ bool EventsCodeGenerationContext::ShouldUseAsyncObjectsLists(
            nearestAsyncParent->parent->nearestAsyncParent;
        asyncContext != NULL;
        asyncContext = asyncContext->parent->nearestAsyncParent) {
-    if (asyncContext - ObjectWillBeDeclared(objectName)) return true;
+    if (asyncContext->ObjectWillBeDeclared(objectName)) return true;
     // When reaching the last asynchronous context, check the parent
     // synchronous context before returning.
     if (asyncContext->asyncDepth == 1)

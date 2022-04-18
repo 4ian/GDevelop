@@ -4,7 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
+
 #include <set>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
@@ -33,6 +35,22 @@ void EventsCodeGenerationContext::InheritsFrom(
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
 
+  nearestAsyncParent = parent_.nearestAsyncParent;
+  asyncDepth = parent_.asyncDepth;
+  depthOfLastUse = parent_.depthOfLastUse;
+  customConditionDepth = parent_.customConditionDepth;
+  contextDepth = parent_.GetContextDepth() + 1;
+  if (parent_.maxDepthLevel) {
+    maxDepthLevel = parent_.maxDepthLevel;
+    *maxDepthLevel = std::max(*maxDepthLevel, contextDepth);
+  }
+}
+
+void EventsCodeGenerationContext::InheritsAsAsyncCallbackFrom(
+    const EventsCodeGenerationContext& parent_) {
+  parent = &parent_;
+  nearestAsyncParent = this;
+  asyncDepth = parent_.asyncDepth + 1;
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
   contextDepth = parent_.GetContextDepth() + 1;
@@ -51,8 +69,15 @@ void EventsCodeGenerationContext::Reuse(
 
 void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
-  if (!IsToBeDeclared(objectName))
+  if (!IsToBeDeclared(objectName)) {
     objectsListsToBeDeclared.insert(objectName);
+    if (IsAsync()) {
+      for (gd::EventsCodeGenerationContext* asyncContext = nearestAsyncParent;
+           asyncContext != NULL;
+           asyncContext = asyncContext->parent->nearestAsyncParent)
+        asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
+    }
+  }
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
@@ -77,8 +102,9 @@ std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
     const {
   std::set<gd::String> allObjectListsToBeDeclared(
       objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
-  allObjectListsToBeDeclared.insert(objectsListsWithoutPickingToBeDeclared.begin(),
-                                    objectsListsWithoutPickingToBeDeclared.end());
+  allObjectListsToBeDeclared.insert(
+      objectsListsWithoutPickingToBeDeclared.begin(),
+      objectsListsWithoutPickingToBeDeclared.end());
   allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(),
                                     emptyObjectsListsToBeDeclared.end());
 
@@ -101,5 +127,28 @@ bool EventsCodeGenerationContext::IsSameObjectsList(
   return GetLastDepthObjectListWasNeeded(objectName) ==
          otherContext.GetLastDepthObjectListWasNeeded(objectName);
 }
+
+bool EventsCodeGenerationContext::ShouldUseAsyncObjectsLists(
+    const gd::String& objectName) const {
+  if (!IsAsync()) return false;
+
+  // If this is the only async context so far, we cannot start iterating since
+  // we must start at the previous async context. We do not need to anyways in
+  // that case, we can just check the parent directly.
+  if (asyncDepth == 1) return parent->ObjectWillBeDeclared(objectName);
+
+  for (gd::EventsCodeGenerationContext* asyncContext =
+           nearestAsyncParent->parent->nearestAsyncParent;
+       asyncContext != NULL;
+       asyncContext = asyncContext->parent->nearestAsyncParent) {
+    if (asyncContext->ObjectWillBeDeclared(objectName)) return true;
+    // When reaching the last asynchronous context, check the parent
+    // synchronous context before returning.
+    if (asyncContext->asyncDepth == 1)
+      return asyncContext->parent->ObjectWillBeDeclared(objectName);
+  }
+
+  return false;
+};
 
 }  // namespace gd

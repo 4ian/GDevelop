@@ -59,16 +59,39 @@ class FakeAsyncTasksManager {
 }
 
 class FakeAsyncTask {
-  constructor(waitingAsyncTasks) {
+  constructor() {
     this._finished = false;
   }
 
+  /** @param {RuntimeScene} runtimeScene */
   update(runtimeScene) {
     return this._finished;
   }
 
   markAsFinished() {
     this._finished = true;
+  }
+}
+
+class TaskGroup {
+  constructor() {
+    /** @type {FakeAsyncTask[]} */
+    this._tasks = [];
+  }
+
+  /** @param {FakeAsyncTask} task */
+  addTask(task) {
+    this._tasks.push(task);
+  }
+
+  /** @param {RuntimeScene} runtimeScene */
+  update(runtimeScene) {
+    for (let i = 0; i < this._tasks.length; i++) {
+      const task = this._tasks[i];
+      if (task.update(runtimeScene)) this._tasks.splice(i--, 1);
+    }
+
+    return this._tasks.length === 0;
   }
 }
 
@@ -143,6 +166,15 @@ class RuntimeObject {
 
   unregisterDestroyCallback(callback) {
     this.destroyCallbacks.delete(callback);
+  }
+
+  doFakeAsyncAction() {
+    this._task = new FakeAsyncTask();
+    return this._task;
+  }
+
+  markFakeAsyncActionAsFinished() {
+    if (this._task) this._task.markAsFinished();
   }
 }
 
@@ -442,6 +474,7 @@ function makeMinimalGDJSMock() {
       OnceTriggers,
       Hashtable,
       LongLivedObjectsList,
+      TaskGroup,
     },
     mocks: {
       runRuntimeScenePreEventsCallbacks: () => {

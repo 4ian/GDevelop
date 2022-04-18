@@ -4,12 +4,14 @@ const {
   generateCompiledEventsFromSerializedEvents,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 const { makeMinimalGDJSMock } = require('../TestUtils/GDJSMocks');
+const { makeTestExtensions } = require('../TestUtils/TestExtensions');
 
 describe('libGD.js - GDJS Async Code Generation integration tests', function () {
   let gd = null;
   beforeAll((done) =>
     initializeGDevelopJs().then((module) => {
       gd = module;
+      makeTestExtensions(gd);
       done();
     })
   );
@@ -311,7 +313,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [
                   {
                     type: {
-
                       value: 'Wait',
                     },
                     parameters: ['1.5'],
@@ -431,7 +432,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [
                   {
                     type: {
-
                       value: 'Wait',
                     },
                     parameters: ['1.5'],
@@ -578,7 +578,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     actions: [
                       {
                         type: {
-
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
@@ -749,7 +748,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     actions: [
                       {
                         type: {
-
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
@@ -932,7 +930,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     actions: [
                       {
                         type: {
-
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
@@ -2043,7 +2040,126 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         0
       );
     });
-  });
 
-  // TODO: add a test involving TaskGroup (i.e: an object async action).
+    it('works with async object actions, waiting for all objects to be finished', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            disabled: false,
+            folded: false,
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: {
+                  value:
+                    'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction',
+                },
+                parameters: ['MyParamObject'],
+                subInstructions: [],
+              },
+              {
+                type: { value: 'ModVarObjet' },
+                parameters: [
+                  'MyParamObject',
+                  'TestVariable',
+                  '+',
+                  'GetArgumentAsNumber("IncreaseValue")',
+                ],
+                subInstructions: [],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SuccessVariable', '+', '1'],
+                subInstructions: [],
+              },
+            ],
+            events: [],
+          },
+        ])
+      );
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const parameter = new gd.ParameterMetadata();
+      parameter.setType('number');
+      parameter.setName('IncreaseValue');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyParamObject');
+      parameter.setExtraInfo(
+        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+      );
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      eventsFunction.delete();
+      project.delete();
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      const myObjectA3 = runtimeScene.createObject('MyObjectA');
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      const myObjectB2 = runtimeScene.createObject('MyObjectB');
+      const myObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+        MyObjectB: [myObjectB1, myObjectB2],
+      });
+
+      runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Process the tasks again (but none is finished).
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Mark some tasks as done.
+      myObjectA1.markFakeAsyncActionAsFinished();
+      myObjectA2.markFakeAsyncActionAsFinished();
+      myObjectB1.markFakeAsyncActionAsFinished();
+
+      // Process the tasks again (but not everything is finished).
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Mark the rest of tasks as done.
+      myObjectA3.markFakeAsyncActionAsFinished();
+      myObjectB2.markFakeAsyncActionAsFinished();
+
+      // Process the tasks again (but not everything is finished).
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+      expect(
+        runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+      ).toBe(1);
+
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+    });
+  });
 });

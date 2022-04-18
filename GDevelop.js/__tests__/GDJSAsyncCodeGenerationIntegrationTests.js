@@ -313,7 +313,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [
                   {
                     type: {
-
                       value: 'Wait',
                     },
                     parameters: ['1.5'],
@@ -433,7 +432,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [
                   {
                     type: {
-
                       value: 'Wait',
                     },
                     parameters: ['1.5'],
@@ -580,7 +578,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     actions: [
                       {
                         type: {
-
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
@@ -751,7 +748,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     actions: [
                       {
                         type: {
-
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
@@ -934,7 +930,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     actions: [
                       {
                         type: {
-
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
@@ -2053,14 +2048,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             disabled: false,
             folded: false,
             type: 'BuiltinCommonInstructions::Standard',
-            conditions: [
-            ],
+            conditions: [],
             actions: [
               {
-                type: { value: 'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction' },
-                parameters: [
-                  'MyParamObject',
-                ],
+                type: {
+                  value:
+                    'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction',
+                },
+                parameters: ['MyParamObject'],
                 subInstructions: [],
               },
               {
@@ -2097,7 +2092,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       eventsFunction.getParameters().push_back(parameter);
       parameter.setType('object');
       parameter.setName('MyParamObject');
-      parameter.setExtraInfo('FakeObjectWithAsyncAction::FakeObjectWithAsyncAction');
+      parameter.setExtraInfo(
+        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+      );
       eventsFunction.getParameters().push_back(parameter);
       parameter.delete();
 
@@ -2144,13 +2141,25 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       // Process the tasks again (but not everything is finished).
       runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
       expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
-      expect(runtimeScene.getVariables().get('SuccessVariable').getAsNumber()).toBe(1);
+      expect(
+        runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+      ).toBe(1);
 
-      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(5)
-      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(5)
-      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(5)
-      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(5)
-      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(5)
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
     });
   });
 });

@@ -48,36 +48,10 @@ void EventsCodeGenerationContext::InheritsFrom(
 
 void EventsCodeGenerationContext::InheritsAsAsyncCallbackFrom(
     EventsCodeGenerationContext& parent_) {
-      // TODO: set as can't be reused? Not sure, double check.
-      // TODO: call InheritsFrom and just do a asyncDepth++;
-
-  parent = &parent_;
-
-  // Objects lists declared by parent became "already declared" in the child
-  // context.
-  alreadyDeclaredObjectsLists = parent_.alreadyDeclaredObjectsLists;
-  std::copy(parent_.objectsListsToBeDeclared.begin(),
-            parent_.objectsListsToBeDeclared.end(),
-            std::inserter(alreadyDeclaredObjectsLists,
-                          alreadyDeclaredObjectsLists.begin()));
-  std::copy(parent_.objectsListsWithoutPickingToBeDeclared.begin(),
-            parent_.objectsListsWithoutPickingToBeDeclared.end(),
-            std::inserter(alreadyDeclaredObjectsLists,
-                          alreadyDeclaredObjectsLists.begin()));
-  std::copy(parent_.emptyObjectsListsToBeDeclared.begin(),
-            parent_.emptyObjectsListsToBeDeclared.end(),
-            std::inserter(alreadyDeclaredObjectsLists,
-                          alreadyDeclaredObjectsLists.begin()));
-
-  nearestAsyncParent = parent_.IsAsyncCallback() ? &parent_ : parent_.nearestAsyncParent;
+  // TODO: set as can't be reused? Not sure, double check.
+  // Increasing the async depth is enough to mark the context as an async callback.
+  InheritsFrom(parent_);
   asyncDepth = parent_.asyncDepth + 1;
-  depthOfLastUse = parent_.depthOfLastUse;
-  customConditionDepth = parent_.customConditionDepth;
-  contextDepth = parent_.GetContextDepth() + 1;
-  if (parent_.maxDepthLevel) {
-    maxDepthLevel = parent_.maxDepthLevel;
-    *maxDepthLevel = std::max(*maxDepthLevel, contextDepth);
-  }
 }
 
 void EventsCodeGenerationContext::Reuse(

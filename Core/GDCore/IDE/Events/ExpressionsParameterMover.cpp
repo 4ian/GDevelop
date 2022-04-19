@@ -155,7 +155,7 @@ bool ExpressionsParameterMover::DoVisitInstruction(gd::Instruction& instruction,
                     ? expression.GetRootNode("number", parser)
                     : (gd::ParameterMetadata::IsExpression("string", type)
                            ? expression.GetRootNode("string", parser)
-                           : std::unique_ptr<gd::ExpressionNode>());
+                           : nullptr);
     if (node) {
       ExpressionParameterMover mover(GetGlobalObjectsContainer(),
                                      GetObjectsContainer(),

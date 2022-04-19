@@ -10,6 +10,7 @@
 #include "GDCore/String.h"
 namespace gd {
 class ExpressionParser2;
+class ObjectsContainer;
 struct ExpressionNode;
 }  // namespace gd
 
@@ -64,7 +65,7 @@ class GD_CORE_API Expression {
    * before.
    * @return std::unique_ptr<gd::ExpressionNode>
    */
-  std::unique_ptr<gd::ExpressionNode> GetRootNode(
+  gd::ExpressionNode* GetRootNode(
       const gd::String& type, gd::ExpressionParser2& parser) const;
 
   /**
@@ -77,6 +78,7 @@ class GD_CORE_API Expression {
  private:
   gd::String plainString;  ///< The expression string
   mutable std::unique_ptr<gd::ExpressionNode> node;
+  mutable const gd::ObjectsContainer *parserObjectsContainer;
 };
 
 }  // namespace gd

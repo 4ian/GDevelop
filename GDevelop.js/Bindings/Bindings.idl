@@ -1082,7 +1082,7 @@ interface Instruction {
 
 interface Expression {
   [Const, Ref] DOMString GetPlainString();
-  [Value] UniquePtrExpressionNode GetRootNode([Const] DOMString type, [Ref] ExpressionParser2 parser);
+  ExpressionNode GetRootNode([Const] DOMString type, [Ref] ExpressionParser2 parser);
 };
 
 interface VectorPairStringTextFormatting {

@@ -187,8 +187,7 @@ const Instruction = (props: Props) => {
             );
             const expressionNode = instruction
               .getParameter(parameterIndex)
-              .getRootNode(parameterType, parser)
-              .get();
+              .getRootNode(parameterType, parser);
             const expressionValidator = new gd.ExpressionValidator();
             expressionNode.visit(expressionValidator);
             expressionIsValid = expressionValidator.getErrors().size() === 0;

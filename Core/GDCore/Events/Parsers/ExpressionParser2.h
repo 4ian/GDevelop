@@ -66,6 +66,11 @@ class GD_CORE_API ExpressionParser2 {
     currentPosition = 0;
     return Start(type, objectName);
   }
+  
+  /**
+   * \brief Return the object container used by the parser.
+   */
+  const gd::ObjectsContainer& GetObjectsContainer() const { return objectsContainer; };
 
   /**
    * Given an object name (or empty if none) and a behavior name (or empty if

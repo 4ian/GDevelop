@@ -167,8 +167,7 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
         gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", instructions[aId].GetParameter(pNb).GetPlainString());
+        auto node = instructions[aId].GetParameter(pNb).GetRootNode("number", parser);
 
         ExpressionParameterSearcher searcher(
             results, parameterType, objectName);
@@ -178,8 +177,7 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
         gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", instructions[aId].GetParameter(pNb).GetPlainString());
+        auto node = instructions[aId].GetParameter(pNb).GetRootNode("string", parser);
 
         ExpressionParameterSearcher searcher(
             results, parameterType, objectName);

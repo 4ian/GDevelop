@@ -146,17 +146,16 @@ bool ExpressionsParameterMover::DoVisitInstruction(gd::Instruction& instruction,
                             pNb < instruction.GetParametersCount();
        ++pNb) {
     const gd::String& type = metadata.parameters[pNb].type;
-    const gd::String& expression =
-        instruction.GetParameter(pNb).GetPlainString();
+    const gd::Expression& expression = instruction.GetParameter(pNb);
 
     gd::ExpressionParser2 parser(
         platform, GetGlobalObjectsContainer(), GetObjectsContainer());
 
     auto node = gd::ParameterMetadata::IsExpression("number", type)
-                    ? parser.ParseExpression("number", expression)
+                    ? expression.GetRootNode("number", parser)
                     : (gd::ParameterMetadata::IsExpression("string", type)
-                           ? parser.ParseExpression("string", expression)
-                           : std::unique_ptr<gd::ExpressionNode>());
+                           ? expression.GetRootNode("string", parser)
+                           : nullptr);
     if (node) {
       ExpressionParameterMover mover(GetGlobalObjectsContainer(),
                                      GetObjectsContainer(),

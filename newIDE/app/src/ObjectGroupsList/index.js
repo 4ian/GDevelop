@@ -302,7 +302,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       click: () => this._onEditName(groupWithContext),
     },
     {
-      label: i18n._(t`Set as Global group`),
+      label: i18n._(t`Set as global group`),
       enabled: !isGroupWithContextGlobal(groupWithContext),
       click: () => this._setAsGlobalGroup(groupWithContext),
       visible: this.props.canSetAsGlobalGroup !== false,
@@ -313,7 +313,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     },
     { type: 'separator' },
     {
-      label: i18n._(t`Add a new group`),
+      label: i18n._(t`Add a new group...`),
       click: this.addGroup,
     },
   ];

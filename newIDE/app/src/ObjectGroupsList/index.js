@@ -291,9 +291,15 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       label: i18n._(t`Duplicate`),
       click: () => this._onDuplicate(groupWithContext),
     },
+    { type: 'separator' },
     {
       label: i18n._(t`Edit group`),
       click: () => this.props.onEditGroup(groupWithContext.group),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Rename`),
+      click: () => this._onEditName(groupWithContext),
     },
     {
       label: i18n._(t`Set as Global group`),
@@ -302,12 +308,13 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       visible: this.props.canSetAsGlobalGroup !== false,
     },
     {
-      label: i18n._(t`Rename`),
-      click: () => this._onEditName(groupWithContext),
-    },
-    {
       label: i18n._(t`Delete`),
       click: () => this._onDelete(groupWithContext),
+    },
+    { type: 'separator' },
+    {
+      label: i18n._(t`Add a new group`),
+      click: this.addGroup,
     },
   ];
 

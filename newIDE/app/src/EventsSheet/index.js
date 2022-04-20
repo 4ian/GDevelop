@@ -1319,7 +1319,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onChooseResource,
       resourceExternalEditors,
       onCreateEventsFunction,
-      onBeginCreateEventsFunction,
     } = this.props;
     if (!project) return null;
 

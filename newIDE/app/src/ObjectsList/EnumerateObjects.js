@@ -27,6 +27,17 @@ export type GroupWithContext = {|
 export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
 
+export const isSameGroupWithContext = (
+  groupWithContext: ?GroupWithContext
+) => (other: ?GroupWithContext) => {
+  return (
+    groupWithContext &&
+    other &&
+    groupWithContext.global === other.global &&
+    groupWithContext.group === other.group
+  );
+};
+
 export const isSameObjectWithContext = (
   objectWithContext: ?ObjectWithContext
 ) => (other: ?ObjectWithContext) => {

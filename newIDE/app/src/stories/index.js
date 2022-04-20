@@ -2734,6 +2734,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          onBeginCreateEventsFunction={action('begin create events function')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2758,6 +2759,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          onBeginCreateEventsFunction={action('begin create events function')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

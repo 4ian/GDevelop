@@ -120,6 +120,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -1094,6 +1095,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
+    this.props.onBeginCreateEventsFunction();
+
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
     });
@@ -1316,6 +1319,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onChooseResource,
       resourceExternalEditors,
       onCreateEventsFunction,
+      onBeginCreateEventsFunction,
     } = this.props;
     if (!project) return null;
 

@@ -134,6 +134,7 @@ import {
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import OnboardingDialog from './Onboarding/OnboardingDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
+import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1471,10 +1472,19 @@ const MainFrame = (props: Props) => {
 
   const onCreateEventsFunction = (
     extensionName: string,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    editorIdentifier:
+      | 'scene-events-editor'
+      | 'extension-events-editor'
+      | 'external-events-editor'
   ) => {
     const { currentProject } = state;
     if (!currentProject) return;
+
+    sendEventsExtractedAsFunction({
+      step: 'end',
+      parentEditor: editorIdentifier,
+    });
 
     // Names are assumed to be already validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(

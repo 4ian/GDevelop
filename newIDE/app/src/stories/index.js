@@ -2734,6 +2734,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          onBeginCreateEventsFunction={action('begin create events function')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2758,6 +2759,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          onBeginCreateEventsFunction={action('begin create events function')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2772,6 +2774,7 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEvents}
       onClose={action('close')}
+      onOpen={action('open')}
       onCreate={action('create')}
     />
   ))
@@ -2782,6 +2785,7 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEventsWithLotsOfObjects}
       onClose={action('close')}
+      onOpen={action('open')}
       onCreate={action('create')}
     />
   ));

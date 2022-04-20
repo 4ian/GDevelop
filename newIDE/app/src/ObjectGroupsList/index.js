@@ -21,6 +21,10 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import Window from '../Utils/Window';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 
 export const groupWithContextReactDndType = 'GD_GROUP_WITH_CONTEXT';
 
@@ -158,6 +162,37 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
   };
 
+  _onDuplicate = (groupWithContext: GroupWithContext): ?GroupWithContext => {
+    const { group, global } = groupWithContext;
+    const { globalObjectGroups, objectGroups } = this.props;
+
+    const container: gdObjectGroupsContainer = global
+      ? globalObjectGroups
+      : objectGroups;
+
+    const newName = newNameGenerator(
+      group.getName(),
+      name => container.has(name),
+      ''
+    );
+
+    const newGroup = container.insertNew(
+      newName,
+      container.getPosition(group.getName()) + 1
+    );
+
+    unserializeFromJSObject(
+      newGroup,
+      serializeToJSObject(group),
+      'unserializeFrom'
+    );
+    newGroup.setName(newName); // Unserialization has overwritten the name.
+
+    this._onObjectGroupModified();
+
+    return { group: newGroup, global };
+  };
+
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
     const { group } = groupWithContext;
     const { globalObjectGroups, objectGroups } = this.props;
@@ -252,6 +287,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     groupWithContext: GroupWithContext,
     index: number
   ) => [
+    {
+      label: i18n._(t`Duplicate`),
+      click: () => this._onDuplicate(groupWithContext),
+    },
     {
       label: i18n._(t`Edit group`),
       click: () => this.props.onEditGroup(groupWithContext.group),

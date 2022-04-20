@@ -303,13 +303,13 @@ export default class ObjectsList extends React.Component<Props, State> {
           project,
           type,
           newName,
-          project.getObjectPosition(pasteObject.getName())
+          project.getObjectPosition(pasteObject.getName()) + 1
         )
       : objectsContainer.insertNewObject(
           project,
           type,
           newName,
-          objectsContainer.getObjectPosition(pasteObject.getName())
+          objectsContainer.getObjectPosition(pasteObject.getName()) + 1
         );
 
     unserializeFromJSObject(

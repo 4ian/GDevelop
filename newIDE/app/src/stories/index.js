@@ -2774,7 +2774,6 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEvents}
       onClose={action('close')}
-      onOpen={action('open')}
       onCreate={action('create')}
     />
   ))
@@ -2785,7 +2784,6 @@ storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
       objectsContainer={testProject.testLayout}
       serializedEvents={testProject.testSerializedEventsWithLotsOfObjects}
       onClose={action('close')}
-      onOpen={action('open')}
       onCreate={action('create')}
     />
   ));

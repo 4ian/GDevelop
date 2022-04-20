@@ -1095,6 +1095,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
+    this.props.onBeginCreateEventsFunction();
+
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
     });
@@ -1504,7 +1506,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                         serializedEventsToExtract: null,
                       })
                     }
-                    onOpen={onBeginCreateEventsFunction}
                     serializedEvents={this.state.serializedEventsToExtract}
                     onCreate={(extensionName, eventsFunction) => {
                       onCreateEventsFunction(extensionName, eventsFunction);

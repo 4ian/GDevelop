@@ -34,7 +34,6 @@ type Props = {|
   serializedEvents: Object,
   onClose: () => void,
   onCreate: (extensionName: string, eventsFunction: gdEventsFunction) => void,
-  onOpen: () => void,
 |};
 
 type State = {|
@@ -65,7 +64,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
 
     // Set up the function
     const eventsFunction = new gd.EventsFunction();
-    this.props.onOpen();
     setupFunctionFromEvents({
       project,
       globalObjectsContainer,

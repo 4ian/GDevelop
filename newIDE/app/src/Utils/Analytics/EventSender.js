@@ -298,6 +298,24 @@ export const sendBehaviorAdded = ({
   client.recordEvent('behavior-added', { behaviorType, parentEditor });
 };
 
+export const sendEventsExtractedAsFunction = ({
+  step,
+  parentEditor,
+}: {|
+  step: 'begin' | 'end',
+  parentEditor:
+    | 'scene-events-editor'
+    | 'extension-events-editor'
+    | 'external-events-editor',
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('events-extracted-as-function', {
+    step,
+    parentEditor,
+  });
+};
+
 const trackInAppTutorialProgress = (
   stepIndex: number,
   isCompleted: boolean = false

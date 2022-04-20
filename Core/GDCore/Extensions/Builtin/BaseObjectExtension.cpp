@@ -1418,7 +1418,33 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
           "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"))
       .UseStandardRelationalOperatorParameters("number")
-      .MarkAsSimple();
+      .MarkAsSimple()
+      .SetHidden();
+
+  extension.AddExpressionAndCondition(
+      "number",
+      "SceneInstancesCount",
+      _("Number of object instances on the scene"),
+      _("Compare the number of instances of the specified objects living on the scene."),
+      _("the number of _PARAM0_ objects living on the scene"),
+      _("Objects"),
+      "res/conditions/nbObjet24.png")
+    .AddCodeOnlyParameter("objectsContext", "")
+    .AddParameter("objectListWithoutPicking", _("Object"))
+    .UseStandardParameters("number")
+    .MarkAsSimple();
+
+  extension.AddExpressionAndCondition(
+      "number",
+      "PickedInstancesCount",
+      _("Number of object instances currently picked"),
+      _("Compare the number of instances picked by the previous conditions (or actions)."),
+      _("the number of _PARAM0_ objects currently picked"),
+      _("Objects"),
+      "res/conditions/nbObjet24.png")
+    .AddParameter("objectListWithoutPicking", _("Object"))
+    .UseStandardParameters("number")
+    .MarkAsSimple();
 
   extension
       .AddCondition(
@@ -1526,7 +1552,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                        "currently picked in the event"),
                      "",
                      "res/conditions/nbObjet.png")
-      .AddParameter("objectList", _("Object"));
+      .AddParameter("objectList", _("Object"))
+      .SetHidden(); // Deprecated
 
   obj.AddStrExpression("ObjectName",
                        _("Object name"),

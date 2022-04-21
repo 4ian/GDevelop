@@ -203,6 +203,18 @@ class GD_CORE_API InstructionMetadata {
   };
 
   /**
+   * \brief Consider that the parameter is harder for a user to understand
+   * and not necessary for common usages.
+   *
+   * \see AddParameter
+   */
+  InstructionMetadata &MarkParameterAsAdvanced() {
+    if (!parameters.empty())
+      parameters.back().MarkAsAdvanced();
+    return *this;
+  };
+
+  /**
    * \brief Add the default parameters for an instruction manipulating the
    * specified type ("string", "number") with the default operators.
    */

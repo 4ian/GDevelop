@@ -10,7 +10,7 @@
 
 namespace gd {
 
-ParameterMetadata::ParameterMetadata() : optional(false), codeOnly(false) {}
+ParameterMetadata::ParameterMetadata() : optional(false), codeOnly(false), usageComplexity(5) {}
 
 void ParameterMetadata::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("type", type);
@@ -21,6 +21,7 @@ void ParameterMetadata::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("codeOnly", codeOnly);
   element.SetAttribute("defaultValue", defaultValue);
   element.SetAttribute("name", name);
+  element.SetAttribute("usageComplexity", usageComplexity);
 }
 
 void ParameterMetadata::UnserializeFrom(const SerializerElement& element) {
@@ -33,6 +34,7 @@ void ParameterMetadata::UnserializeFrom(const SerializerElement& element) {
   codeOnly = element.GetBoolAttribute("codeOnly");
   defaultValue = element.GetStringAttribute("defaultValue");
   name = element.GetStringAttribute("name");
+  usageComplexity = element.GetIntAttribute("usageComplexity");
 }
 
 }  // namespace gd

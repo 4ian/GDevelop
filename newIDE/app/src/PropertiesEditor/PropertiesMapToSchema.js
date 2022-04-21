@@ -37,6 +37,7 @@ export default (
 
     const propertyDescription = property.getDescription();
     const valueType = property.getType().toLowerCase();
+    const usageComplexity = property.getUsageComplexity();
     const getLabel = (instance: Instance) => {
       const propertyName = getProperties(instance)
         .get(name)
@@ -72,6 +73,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'string' || valueType === '') {
@@ -88,6 +90,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'boolean') {
@@ -106,6 +109,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'choice') {
@@ -128,6 +132,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'behavior') {
@@ -160,6 +165,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'resource') {
@@ -180,6 +186,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'color') {
@@ -196,6 +203,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else if (valueType === 'textarea') {
@@ -212,6 +220,7 @@ export default (
         },
         getLabel,
         getDescription,
+        usageComplexity,
       });
       return null;
     } else {

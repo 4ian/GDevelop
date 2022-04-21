@@ -92,6 +92,18 @@ class GD_CORE_API MultipleInstructionMetadata {
   };
 
   /**
+   * \brief Consider that the parameter is harder for a user to understand
+   * and not necessary for common usages.
+   *
+   * \see AddParameter
+   */
+  MultipleInstructionMetadata &MarkParameterAsAdvanced() {
+    if (condition) condition->MarkParameterAsAdvanced();
+    if (action) action->MarkParameterAsAdvanced();
+    return *this;
+  };
+
+  /**
    * \see gd::InstructionMetadata::SetHidden
    */
   MultipleInstructionMetadata &SetHidden() {

@@ -1,7 +1,9 @@
 import * as React from 'react';
 import muiDecorator from '../ThemeDecorator';
+import GDevelopJsInitializerDecorator, {
+  testProject,
+} from '../GDevelopJsInitializerDecorator';
 import NewVariablesList from '../../VariablesList/NewVariablesList';
-import { testProject } from '../GDevelopJsInitializerDecorator';
 import SerializedObjectDisplay from '../SerializedObjectDisplay';
 
 export const New = () => (
@@ -16,5 +18,5 @@ export const New = () => (
 export default {
   title: 'NewVariablesList',
   component: NewVariablesList,
-  decorators: [muiDecorator],
+  decorators: [muiDecorator, GDevelopJsInitializerDecorator],
 };

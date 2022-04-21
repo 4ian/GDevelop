@@ -257,25 +257,63 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   _canMoveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
     if (!this.state.selectedGroupWithContext) return false;
 
-    return (
+    if (
       this.state.selectedGroupWithContext.global ===
       targetGroupWithContext.global
-    );
+    ) {
+      return true;
+    }
+
+    const { globalObjectGroups, objectGroups } = this.props;
+    if (
+      !this.state.selectedGroupWithContext.global &&
+      targetGroupWithContext.global &&
+      globalObjectGroups.getPosition(targetGroupWithContext.group.getName()) ===
+        0
+    ) {
+      // Allow drop on first element of global items to put local item at the end of its list
+      return true;
+    }
+
+    return false;
   };
 
   _moveSelectionTo = (targetGroupWithContext: GroupWithContext) => {
-    if (!this.state.selectedGroupWithContext) return;
+    const { selectedGroupWithContext } = this.state;
+    if (!selectedGroupWithContext) return;
 
     const { globalObjectGroups, objectGroups } = this.props;
+    let container: gdObjectGroupsContainer;
+    let fromIndex: number;
+    let toIndex: number;
 
-    const container: gdObjectGroupsContainer = targetGroupWithContext.global
-      ? globalObjectGroups
-      : objectGroups;
+    const areSelectedAndTargetItemsFromSameContext =
+      selectedGroupWithContext.global === targetGroupWithContext.global;
 
-    const fromIndex = container.getPosition(
-      this.state.selectedGroupWithContext.group.getName()
-    );
-    let toIndex = container.getPosition(targetGroupWithContext.group.getName());
+    const shouldMoveLocalItemToEndOfList =
+      !selectedGroupWithContext.global &&
+      targetGroupWithContext.global &&
+      globalObjectGroups.getPosition(targetGroupWithContext.group.getName()) ===
+        0;
+
+    if (areSelectedAndTargetItemsFromSameContext) {
+      container = selectedGroupWithContext.global
+        ? globalObjectGroups
+        : objectGroups;
+
+      fromIndex = container.getPosition(
+        selectedGroupWithContext.group.getName()
+      );
+      toIndex = container.getPosition(targetGroupWithContext.group.getName());
+    } else if (shouldMoveLocalItemToEndOfList) {
+      container = objectGroups;
+      fromIndex = container.getPosition(
+        selectedGroupWithContext.group.getName()
+      );
+      toIndex = container.count();
+    } else {
+      return;
+    }
     if (toIndex > fromIndex) toIndex -= 1;
 
     container.move(fromIndex, toIndex);

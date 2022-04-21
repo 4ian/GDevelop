@@ -62,6 +62,10 @@ class RuntimeObject {
   returnVariable(variable) {
     return variable;
   }
+
+  getVariableNumber(variable) {
+    return variable.getAsNumber();
+  }
 }
 
 /**
@@ -205,6 +209,36 @@ const createObjectOnScene = (objectsContext, objectsLists, x, y, layer) => {
   }
 };
 
+/**
+ * @param {any} objectsContext
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const sceneInstancesCount = (objectsContext, objectsLists) => {
+  let count = 0;
+
+  const objectNames = [];
+  objectsLists.keys(objectNames);
+
+  const uniqueObjectNames = new Set(objectNames);
+  for (const objectName of uniqueObjectNames) {
+    count += objectsContext.getInstancesCountOnScene(objectName);
+  }
+  return count;
+}
+
+/**
+ * @param {Hashtable<RuntimeObject[]>} objectsLists
+ */
+const pickedInstancesCount = (objectsLists) => {
+  let count = 0;
+  const lists = [];
+  objectsLists.values(lists);
+  for (let i = 0, len = lists.length; i < len; ++i) {
+    count += lists[i].length;
+  }
+  return count;
+}
+
 /** A minimal implementation of gdjs.RuntimeScene for testing. */
 class RuntimeScene {
   constructor() {
@@ -232,6 +266,16 @@ class RuntimeScene {
   getOnceTriggers() {
     return this._onceTriggers;
   }
+
+  /** @param {string} objectName */
+  getInstancesCountOnScene(objectName) {
+    const instances = this._instances[objectName];
+    if (instances) {
+      return instances.length;
+    }
+
+    return 0;
+  }
 }
 
 /**
@@ -249,7 +293,7 @@ function makeMinimalGDJSMock() {
     gdjs: {
       evtTools: {
         variable: { getVariableNumber: (variable) => variable.getAsNumber() },
-        object: { createObjectOnScene },
+        object: { createObjectOnScene, sceneInstancesCount, pickedInstancesCount },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;

@@ -45,7 +45,7 @@ const NewVariablesList = (props: Props) => {
                 value={name}
                 onChange={name => {
                   onChangeName(nodeId, name);
-                  forceUpdate()
+                  forceUpdate();
                 }}
               />
             </Column>

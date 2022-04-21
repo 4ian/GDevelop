@@ -260,10 +260,10 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .setString('Hello\nMultiline\nWorld');
   testLayoutVariables.insert('Variable3', variable3, 2);
   const variable4 = new gd.Variable();
-  variable4.getAtIndex(0).setString("String value\nwith Multiline")
-  variable4.getAtIndex(1).setValue(4539.42)
-  variable4.getAtIndex(2).setBool(true)
-  testLayoutVariables.insert('Variable4', variable4, 3)
+  variable4.getAtIndex(0).setString('String value\nwith Multiline');
+  variable4.getAtIndex(1).setValue(4539.42);
+  variable4.getAtIndex(2).setBool(true);
+  testLayoutVariables.insert('Variable4', variable4, 3);
 
   //Create a few events
   //Add a new "standard" event to the scene:

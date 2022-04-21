@@ -122,7 +122,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                     onChoose={() => {
                       sendExampleDetailsOpened({
                         id: exampleShortHeader.id,
-                        name: exampleShortHeader.name
+                        name: exampleShortHeader.name,
                       });
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}
@@ -143,7 +143,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
           onOpen={() => {
             sendExampleChosenAsProject({
               id: selectedExampleShortHeader.id,
-              name: selectedExampleShortHeader.name
+              name: selectedExampleShortHeader.name,
             });
             onOpen(selectedExampleShortHeader);
           }}

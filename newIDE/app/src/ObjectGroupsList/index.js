@@ -75,8 +75,8 @@ export default class GroupsListContainer extends React.Component<Props, State> {
   };
 
   sortableList: ?SortableVirtualizedItemList<GroupWithContext>;
-  objectGroupsList: GroupWithContextList = [];
-  globalObjectGroupsList: GroupWithContextList = [];
+  displayedObjectGroupsList: GroupWithContextList = [];
+  displayedGlobalObjectGroupsList: GroupWithContextList = [];
   state: State = {
     renamedGroupWithContext: null,
     selectedGroupWithContext: null,
@@ -268,8 +268,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     if (
       !this.state.selectedGroupWithContext.global &&
       targetGroupWithContext.global &&
-      globalObjectGroups.getPosition(targetGroupWithContext.group.getName()) ===
-        0
+      this.displayedGlobalObjectGroupsList.indexOf(targetGroupWithContext) === 0
     ) {
       // Allow drop on first element of global items to put local item at the end of its list
       return true;
@@ -290,7 +289,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const areSelectedAndTargetItemsFromSameContext =
       selectedGroupWithContext.global === targetGroupWithContext.global;
 
-    const shouldMoveLocalItemToEndOfList =
+    const isDroppingLocalItemOnFirstGlobalItemOfDisplayedList =
       !selectedGroupWithContext.global &&
       targetGroupWithContext.global &&
       globalObjectGroups.getPosition(targetGroupWithContext.group.getName()) ===
@@ -305,12 +304,18 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         selectedGroupWithContext.group.getName()
       );
       toIndex = container.getPosition(targetGroupWithContext.group.getName());
-    } else if (shouldMoveLocalItemToEndOfList) {
+    } else if (isDroppingLocalItemOnFirstGlobalItemOfDisplayedList) {
       container = objectGroups;
       fromIndex = container.getPosition(
         selectedGroupWithContext.group.getName()
       );
-      toIndex = container.count();
+      toIndex = !this.state.searchText
+        ? container.count()
+        : container.getPosition(
+            this.displayedObjectGroupsList[
+              this.displayedObjectGroupsList.length - 1
+            ].group.getName()
+          ) + 1;
     } else {
       return;
     }
@@ -366,10 +371,15 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
       globalObjectGroups
     ).map(group => ({ group, global: true }));
-    this.objectGroupsList = filterGroupsList(objectGroupsList, { searchText });
-    this.globalObjectGroupsList = filterGroupsList(globalObjectGroupsList, {
+    this.displayedObjectGroupsList = filterGroupsList(objectGroupsList, {
       searchText,
     });
+    this.displayedGlobalObjectGroupsList = filterGroupsList(
+      globalObjectGroupsList,
+      {
+        searchText,
+      }
+    );
     const fullList = filterGroupsList(
       [...objectGroupsList, ...globalObjectGroupsList],
       { searchText }

@@ -15,18 +15,18 @@ type Props = {
   variablesContainer: gdVariablesContainer,
 };
 
-const variableTypeToLabel = {
-  [gd.Variable.String]: <Trans>String</Trans>,
-  [gd.Variable.Number]: <Trans>Number</Trans>,
-  [gd.Variable.Boolean]: <Trans>Boolean</Trans>,
-  [gd.Variable.Structure]: <Trans>Structure</Trans>,
-  [gd.Variable.Array]: <Trans>Array</Trans>,
-};
-
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const forceUpdate = useForceUpdate();
+
+  const variableTypeToLabel = {
+    [gd.Variable.String]: <Trans>String</Trans>,
+    [gd.Variable.Number]: <Trans>Number</Trans>,
+    [gd.Variable.Boolean]: <Trans>Boolean</Trans>,
+    [gd.Variable.Structure]: <Trans>Structure</Trans>,
+    [gd.Variable.Array]: <Trans>Array</Trans>,
+  };
 
   const renderVariableAndChildrenRows = (name, variable, depth) => {
     const type = variable.getType();
@@ -101,7 +101,6 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onChangeName = (nodeId, newName) => {
-    console.log(nodeId, newName)
     props.variablesContainer.rename(nodeId, newName);
   };
 
@@ -119,7 +118,6 @@ const NewVariablesList = (props: Props) => {
     return containerVariablesTree;
   };
 
-  console.log(selectedNodes);
   return (
     <TreeView
       multiSelect

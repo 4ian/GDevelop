@@ -390,9 +390,11 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     // crash the app.
     const listKey = objectGroups.ptr + ';' + globalObjectGroups.ptr;
 
-    const renamedGroupWithContext = fullList.find(
-      isSameGroupWithContext(this.state.renamedGroupWithContext)
-    );
+    const renamedGroupWithContext = this.state.renamedGroupWithContext
+      ? fullList.find(
+          isSameGroupWithContext(this.state.renamedGroupWithContext)
+        )
+      : null;
 
     return (
       <Background>

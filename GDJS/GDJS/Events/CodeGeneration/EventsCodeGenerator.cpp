@@ -405,18 +405,20 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"
+         // Function to count instances on the scene. We need it here because
+         // it needs the objects map to get the object names of the parent context.
          "  getInstancesCountOnScene: function(objectName) {\n"
          "    const objectsList = "
          "eventsFunctionContext._objectsMap[objectName];\n" +
+         "    let count = 0;\n" +
          "    if (objectsList) {\n" +
-         // TODO: Add all the keys, not just the first key.
-         "      return parentEventsFunctionContext ?\n" +
-         "parentEventsFunctionContext.getInstancesCountOnScene(objectsList.firstKey()) "
+         "      for(const objectName in objectsList.items)\n" +
+         "        count += parentEventsFunctionContext ?\n" +
+         "parentEventsFunctionContext.getInstancesCountOnScene(objectName) "
          ":\n" +
-         "        runtimeScene.getInstancesCountOnScene(objectsList.firstKey());\n" +
+         "        runtimeScene.getInstancesCountOnScene(objectName);\n" +
          "    }\n" +
-         // Unknown object, so there is none:
-         "    return 0;\n" +
+         "    return count;\n" +
          "  },\n"
          // Allow to get a layer directly from the context for convenience:
          "  getLayer: function(layerName) {\n"

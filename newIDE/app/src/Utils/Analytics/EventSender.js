@@ -252,6 +252,54 @@ export const sendAssetAddedToProject = ({
   client.recordEvent('asset-added-to-project', { id, name });
 };
 
+export const sendExtensionDetailsOpened = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('extension-details-opened', { name });
+};
+
+export const sendExtensionAddedToProject = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('extension-added-to-project', { name });
+};
+
+export const sendExampleDetailsOpened = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('example-details-opened', { id, name });
+};
+
+export const sendExampleChosenAsProject = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('example-chosen-as-project', { id, name });
+};
+
 export const sendNewObjectCreated = (name: string) => {
   if (isDev || !client) return;
 

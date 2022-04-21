@@ -264,7 +264,6 @@ export default class GroupsListContainer extends React.Component<Props, State> {
       return true;
     }
 
-    const { globalObjectGroups, objectGroups } = this.props;
     if (
       !this.state.selectedGroupWithContext.global &&
       targetGroupWithContext.global &&

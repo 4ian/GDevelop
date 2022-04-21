@@ -402,7 +402,9 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     const isDestinationItemFirstItemOfGlobalDisplayedList =
       destinationObjectWithContext.global &&
-      displayedGlobalObjectsWithContext.indexOf(destinationObjectWithContext) === 0;
+      displayedGlobalObjectsWithContext.indexOf(
+        destinationObjectWithContext
+      ) === 0;
 
     const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
       objectWithContext =>

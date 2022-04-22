@@ -1957,21 +1957,37 @@ const MainFrame = (props: Props) => {
     if (shouldCloseDialog)
       await setState(state => ({ ...state, createDialogOpen: false }));
 
-    await getStorageProviderOperations(storageProvider);
     let state;
     if (project) state = await loadFromProject(project, fileMetadata);
     else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
 
-    if (state) {
-      if (state.currentProject) {
-        const { currentProject } = state;
-        currentProject.resetProjectUuid();
-        if (projectName) currentProject.setName(projectName);
+    if (!state) return;
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    currentProject.resetProjectUuid();
+    if (projectName) currentProject.setName(projectName);
+    openSceneOrProjectManager({
+      currentProject: currentProject,
+      editorTabs: editorTabs,
+    });
+
+    const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
+      storageProvider
+    );
+    const { onSaveProject } = storageProviderOperations;
+
+    if (onSaveProject && fileMetadata) {
+      try {
+        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
+
+        if (wasSaved) {
+          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+        }
+      } catch (rawError) {
+        // Do not prevent creating the project.
+        console.error("Couldn't save the project after creation.", rawError);
       }
-      openSceneOrProjectManager({
-        currentProject: state.currentProject,
-        editorTabs: state.editorTabs,
-      });
     }
   };
 

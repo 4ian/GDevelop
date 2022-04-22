@@ -498,7 +498,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       expect(runtimeScene.getObjects('MyObjectA').length).toBe(2);
       expect(runtimeScene.getObjects('MyObjectB').length).toBe(2);
 
-      // Check only the created object was modified.
+      // Check only the created object and previously picked objects were modified.
       expect(runtimeScene.getObjects('MyObjectA')[0].getVariables().get('Picked').getAsNumber()).toBe(1);
       expect(runtimeScene.getObjects('MyObjectA')[1].getVariables().get('Picked').getAsNumber()).toBe(1);
       expect(myObjectB1.getVariables().get('Picked').getAsNumber()).toBe(0);

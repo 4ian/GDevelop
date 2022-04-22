@@ -11,16 +11,16 @@
 
 namespace gd {
 
-Expression::Expression() : node(nullptr), parserObjectsContainer(nullptr){};
+Expression::Expression() : node(nullptr) {};
 
 Expression::Expression(gd::String plainString_)
-    : node(nullptr), parserObjectsContainer(nullptr), plainString(plainString_){};
+    : node(nullptr), plainString(plainString_) {};
 
 Expression::Expression(const char* plainString_)
-    : node(nullptr), parserObjectsContainer(nullptr), plainString(plainString_){};
+    : node(nullptr), plainString(plainString_) {};
 
 Expression::Expression(const Expression& copy)
-    : node(nullptr), parserObjectsContainer(nullptr), plainString{copy.plainString} {};
+    : node(nullptr), plainString{copy.plainString} {};
 
 Expression& Expression::operator=(const Expression& expression) {
   plainString = expression.plainString;
@@ -34,11 +34,6 @@ ExpressionNode* Expression::GetRootNode(
     const gd::String& type, gd::ExpressionParser2& parser) const {
   if (!node) {
     node = std::move(parser.ParseExpression(type, plainString));
-    parserObjectsContainer = &parser.GetObjectsContainer();
-  }
-  if (&parser.GetObjectsContainer() != parserObjectsContainer) {
-      std::cout << "Unable to get events from a link ( Invalid start )"
-                << std::endl;
   }
   return node.get();
 }

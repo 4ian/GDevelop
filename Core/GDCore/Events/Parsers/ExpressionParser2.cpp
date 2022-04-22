@@ -26,15 +26,9 @@ namespace gd {
 
 gd::String ExpressionParser2::NAMESPACE_SEPARATOR = "::";
 
-ExpressionParser2::ExpressionParser2(
-    const gd::Platform& platform_,
-    const gd::ObjectsContainer& globalObjectsContainer_,
-    const gd::ObjectsContainer& objectsContainer_)
+ExpressionParser2::ExpressionParser2()
     : expression(""),
-      currentPosition(0),
-      platform(platform_),
-      globalObjectsContainer(globalObjectsContainer_),
-      objectsContainer(objectsContainer_) {}
+      currentPosition(0) {}
 
 namespace {
 /**
@@ -67,85 +61,6 @@ size_t GetMaximumParametersNumber(
   return nb;
 }
 }  // namespace
-
-std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
-    const gd::String& type,
-    const gd::FunctionCallNode& function,
-    size_t functionStartPosition) {
-  if (gd::MetadataProvider::IsBadExpressionMetadata(
-          function.expressionMetadata)) {
-    return gd::make_unique<ExpressionParserError>(
-        "invalid_function_name",
-        _("Cannot find an expression with this name: ") +
-            function.functionName + "\n" +
-            _("Double check that you've not made any typo in the name."),
-        functionStartPosition,
-        GetCurrentPosition());
-  }
-
-  // Validate the type of the function
-  const gd::String& returnType = function.expressionMetadata.GetReturnType();
-  if (returnType == "number") {
-    if (type == "string")
-      return RaiseTypeError(
-          _("You tried to use an expression that returns a number, but a "
-            "string is expected. Use `ToString` if you need to convert a "
-            "number to a string."),
-          functionStartPosition);
-    else if (type != "number" && type != "number|string")
-      return RaiseTypeError(_("You tried to use an expression that returns a "
-                              "number, but another type is expected:") +
-                              " " + type,
-                            functionStartPosition);
-  } else if (returnType == "string") {
-    if (type == "number")
-      return RaiseTypeError(
-          _("You tried to use an expression that returns a string, but a "
-            "number is expected. Use `ToNumber` if you need to convert a "
-            "string to a number."),
-          functionStartPosition);
-    else if (type != "string" && type != "number|string")
-      return RaiseTypeError(_("You tried to use an expression that returns a "
-                              "string, but another type is expected:") +
-                              " " + type,
-                            functionStartPosition);
-  } else {
-    if (type != returnType)
-      return RaiseTypeError(
-          _("You tried to use an expression with the wrong return type:") + " " +
-            returnType,
-          functionStartPosition);
-  }
-
-  // Validate parameters count
-  size_t minParametersCount = GetMinimumParametersNumber(
-      function.expressionMetadata.parameters,
-      WrittenParametersFirstIndex(function.objectName, function.behaviorName));
-  size_t maxParametersCount = GetMaximumParametersNumber(
-      function.expressionMetadata.parameters,
-      WrittenParametersFirstIndex(function.objectName, function.behaviorName));
-  if (function.parameters.size() < minParametersCount ||
-      function.parameters.size() > maxParametersCount) {
-    gd::String expectedCountMessage =
-        minParametersCount == maxParametersCount
-            ? _("The number of parameters must be exactly ") +
-                  gd::String::From(minParametersCount)
-            : _("The number of parameters must be: ") +
-                  gd::String::From(minParametersCount) + "-" +
-                  gd::String::From(maxParametersCount);
-
-    if (function.parameters.size() < minParametersCount) {
-      return gd::make_unique<ExpressionParserError>(
-          "too_few_parameters",
-          "You have not entered enough parameters for the expression. " +
-              expectedCountMessage,
-          functionStartPosition,
-          GetCurrentPosition());
-    }
-  }
-
-  return gd::make_unique<ExpressionParserDiagnostic>();
-}
 
 std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   size_t textStartPosition = GetCurrentPosition();

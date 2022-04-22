@@ -227,7 +227,6 @@ class GD_CORE_API EventsCodeGenerationContext {
    */
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
- private:
   /**
    * \brief Returns true if the given object is already going to be declared
    * (either as a traditional objects list, or one without picking, or one
@@ -243,6 +242,7 @@ class GD_CORE_API EventsCodeGenerationContext {
                emptyObjectsListsToBeDeclared.end();
   };
 
+ private:
   std::set<gd::String>
       alreadyDeclaredObjectsLists;  ///< Objects lists already needed in a
                                     ///< parent context.

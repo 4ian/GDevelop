@@ -5,25 +5,6 @@ const {
   generateCompiledEventsFromSerializedEvents,
 } = require('../TestUtils/CodeGenerationHelpers.js');
 
-/**
- * Helper generating an event, ready to be unserialized, adding 1 to
- * "TestVariable" of the specified object (or object group).
- */
-const makeAddOneToObjectTestVariableEvent = (objectName) => ({
-  disabled: false,
-  folded: false,
-  type: 'BuiltinCommonInstructions::Standard',
-  conditions: [],
-  actions: [
-    {
-      type: { inverted: false, value: 'ModVarObjet' },
-      parameters: [objectName, 'TestVariable', '+', '1'],
-      subInstructions: [],
-    },
-  ],
-  events: [],
-});
-
 describe('libGD.js - GDJS Object Code Generation integration tests', function () {
   let gd = null;
   beforeAll((done) =>
@@ -39,11 +20,28 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         disabled: false,
         folded: false,
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [],
+        // This condition should pass, but do not change the picking of the objects.
+        conditions: [
+          {
+            type: { value: 'SceneInstancesCount' },
+            parameters: ['', 'MyObjectGroup', '>', '0'],
+            subInstructions: [],
+          },
+        ],
         actions: [
           {
             type: { inverted: false, value: 'ModVarScene' },
-            parameters: ['Result', '=', 'SceneInstancesCount(MyObjectGroup)'],
+            parameters: ['ResultBeforePicking', '=', 'SceneInstancesCount(MyObjectGroup)'],
+            subInstructions: [],
+          },
+          {
+            type: { inverted: false, value: 'ModVarObjet' },
+            parameters: ['MyObjectGroup', 'Picked', '=', '1'],
+            subInstructions: [],
+          },
+          {
+            type: { inverted: false, value: 'ModVarScene' },
+            parameters: ['ResultAfterPicking', '=', 'SceneInstancesCount(MyObjectGroup)'],
             subInstructions: [],
           },
         ],
@@ -86,7 +84,15 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     runCompiledEvents(gdjs, runtimeScene, [objectsLists]);
 
     // Check that the instances from the scene were counted.
-    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(5);
+    expect(runtimeScene.getVariables().get('ResultBeforePicking').getAsNumber()).toBe(5);
+    expect(runtimeScene.getVariables().get('ResultAfterPicking').getAsNumber()).toBe(5);
+
+    // Check that the initial condition did not modify the objects picked by the action.
+    expect(myObjectA1.getVariables().get('Picked').getAsNumber()).toBe(1);
+    expect(myObjectA2.getVariables().get('Picked').getAsNumber()).toBe(1);
+    expect(myObjectB1.getVariables().get('Picked').getAsNumber()).toBe(1);
+    expect(myObjectB2.getVariables().get('Picked').getAsNumber()).toBe(1);
+    expect(myObjectB3.getVariables().get('Picked').getAsNumber()).toBe(1);
 
     eventsFunction.delete();
     project.delete();
@@ -98,20 +104,33 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         disabled: false,
         folded: false,
         type: 'BuiltinCommonInstructions::Standard',
-        conditions: [
-          {
-            type: { value: 'VarObjet' },
-            parameters: ['MyObjectGroup', 'PleaseCountMe', '=', '1'],
-            subInstructions: [],
-          },
-        ],
+        conditions: [],
         actions: [
           {
             type: { value: 'ModVarScene' },
-            parameters: ['Result', '=', 'PickedInstancesCount(MyObjectGroup)'],
+            parameters: ['Result1', '=', 'PickedInstancesCount(MyObjectGroup)'],
             subInstructions: [],
           },
         ],
+        events: [{
+          disabled: false,
+          folded: false,
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: { value: 'VarObjet' },
+              parameters: ['MyObjectGroup', 'PleaseCountMe', '=', '1'],
+              subInstructions: [],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'ModVarScene' },
+              parameters: ['Result2', '=', 'PickedInstancesCount(MyObjectGroup)'],
+              subInstructions: [],
+            },
+          ],
+        }]
       },
     ]);
 
@@ -156,7 +175,8 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     runCompiledEvents(gdjs, runtimeScene, [objectsLists]);
 
     // Check that the instances from the scene were counted.
-    expect(runtimeScene.getVariables().get('Result').getAsNumber()).toBe(3);
+    expect(runtimeScene.getVariables().get('Result1').getAsNumber()).toBe(0);
+    expect(runtimeScene.getVariables().get('Result2').getAsNumber()).toBe(3);
 
     eventsFunction.delete();
     project.delete();

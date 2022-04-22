@@ -1150,6 +1150,10 @@ namespace gdjs {
       return this._allInstancesList;
     }
 
+    /**
+     * Return the number of instances of the specified object living on the scene.
+     * @param objectName The object name for which instances must be counted.
+     */
     getInstancesCountOnScene(objectName: string): integer {
       const instances = this._instances.get(objectName);
       if (instances) {

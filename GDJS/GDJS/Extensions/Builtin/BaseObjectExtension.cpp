@@ -254,9 +254,9 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.createObjectFromGroupOnScene");
 
   GetAllExpressions()["Count"].SetFunctionName(
-      "gdjs.evtTools.object.getPickedObjectsCount"); // Deprecated
+      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
   GetAllConditions()["NbObjet"].SetFunctionName(
-      "gdjs.evtTools.object.getPickedObjectsCount"); // Deprecated
+      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
 
   GetAllExpressions()["SceneInstancesCount"].SetFunctionName(
       "gdjs.evtTools.object.getSceneInstancesCount");

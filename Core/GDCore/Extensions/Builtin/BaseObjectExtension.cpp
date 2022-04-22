@@ -1426,7 +1426,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       "SceneInstancesCount",
       _("Number of object instances on the scene"),
       _("Compare the number of instances of the specified objects living on the scene."),
-      _("the number of _PARAM0_ living on the scene"),
+      _("the number of _PARAM1_ living on the scene"),
       _("Objects"),
       "res/conditions/nbObjet24.png")
     .AddCodeOnlyParameter("objectsContext", "")

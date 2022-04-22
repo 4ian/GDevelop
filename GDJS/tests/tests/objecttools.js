@@ -48,6 +48,16 @@ describe('gdjs.evtTools.object', function () {
         })
       )
     ).to.be(0);
+
+    // Also test the deprecated name for this function:
+    expect(
+      gdjs.evtTools.object.pickedObjectsCount(
+        Hashtable.newFrom({
+          MyObjectA: [objectA1, objectA2],
+          MyObjectB: [objectB1],
+        })
+      )
+    ).to.be(3);
   });
 
   it('can count instances of objects living on the scene', function () {

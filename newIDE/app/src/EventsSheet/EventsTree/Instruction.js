@@ -193,12 +193,14 @@ const Instruction = (props: Props) => {
             expressionIsValid = expressionValidator.getErrors().size() === 0;
             parser.delete();
           } else if (gd.ParameterMetadata.isObject(parameterType)) {
-            const objectName = instruction
+            const objectOrGroupName = instruction
               .getParameter(parameterIndex)
               .getPlainString();
             expressionIsValid =
-              globalObjectsContainer.hasObjectNamed(objectName) ||
-              objectsContainer.hasObjectNamed(objectName);
+              globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
+              objectsContainer.hasObjectNamed(objectOrGroupName) ||
+              globalObjectsContainer.getObjectGroups().has(objectOrGroupName) ||
+              objectsContainer.getObjectGroups().has(objectOrGroupName);
           }
 
           return (

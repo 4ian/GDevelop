@@ -5,14 +5,17 @@ import GDevelopJsInitializerDecorator, {
 } from '../GDevelopJsInitializerDecorator';
 import NewVariablesList from '../../VariablesList/NewVariablesList';
 import SerializedObjectDisplay from '../SerializedObjectDisplay';
+import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 
 export const New = () => (
-  <SerializedObjectDisplay object={testProject.testLayout}>
-    <NewVariablesList
-      variablesContainer={testProject.testLayout.getVariables()}
-      onComputeAllVariableNames={() => []}
-    />
-  </SerializedObjectDisplay>
+  <DragAndDropContextProvider>
+    <SerializedObjectDisplay object={testProject.testLayout}>
+      <NewVariablesList
+        variablesContainer={testProject.testLayout.getVariables()}
+        onComputeAllVariableNames={() => []}
+      />
+    </SerializedObjectDisplay>
+  </DragAndDropContextProvider>
 );
 
 export default {

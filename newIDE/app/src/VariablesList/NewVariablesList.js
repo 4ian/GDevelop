@@ -9,16 +9,57 @@ import { Column, Line } from '../UI/Grid';
 import Checkbox from '../UI/Checkbox';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Trans } from '@lingui/macro';
+import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
+import DragHandle from '@material-ui/icons/DragHandle';
+import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 const gd: libGDevelop = global.gd;
 
 type Props = {
   variablesContainer: gdVariablesContainer,
 };
 
+const getVariableFromNodeId = (
+  nodeId: string,
+  variablesContainer: gdVariablesContainer
+) => {
+  const nodes = nodeId.split('.');
+  let currentVariable = null;
+  let depth = -1;
+
+  while (depth < nodes.length - 1) {
+    depth++;
+    const variableName = nodes[depth];
+    if (!currentVariable) {
+      currentVariable = variablesContainer.get(variableName);
+    } else if (currentVariable.getType() === gd.Variable.Array)
+      currentVariable = currentVariable.getAtIndex(parseInt(variableName, 10));
+    else {
+      currentVariable = currentVariable.getChild(variableName);
+    }
+  }
+  return { variable: currentVariable, depth };
+};
+
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
+  const draggedNode = React.useRef<any>(null);
   const forceUpdate = useForceUpdate();
+
+  React.useEffect(
+    () => {
+      setExpandedNodes(
+        mapFor(0, props.variablesContainer.count(), index =>
+          props.variablesContainer.getNameAt(index)
+        )
+      );
+    },
+    [props.variablesContainer.ptr]
+  );
+
+  const DragSourceAndDropTarget = React.useMemo(() => makeDragSourceAndDropTarget(
+    'variable-editor'
+  ), []);
 
   const variableTypeToLabel = {
     [gd.Variable.String]: <Trans>String</Trans>,
@@ -27,81 +68,161 @@ const NewVariablesList = (props: Props) => {
     [gd.Variable.Structure]: <Trans>Structure</Trans>,
     [gd.Variable.Array]: <Trans>Array</Trans>,
   };
+  console.log(expandedNodes);
 
-  const renderVariableAndChildrenRows = (name, variable, depth) => {
+  const dropNode = nodeId => {
+    const { variable, depth } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!variable) return;
+    console.log(variable.getString());
+    if (depth === 0 && props.variablesContainer.has(nodeId)) {
+      console.log(nodeId);
+      console.log(draggedNode);
+      props.variablesContainer.swap(
+        props.variablesContainer.getPosition(nodeId),
+        props.variablesContainer.getPosition(draggedNode.current)
+      );
+      draggedNode.current = null;
+      forceUpdate();
+    }
+  };
+
+  const renderVariableAndChildrenRows = (
+    name,
+    variable,
+    depth,
+    parentNodeId: string
+  ) => {
     const type = variable.getType();
     const isCollection = !gd.Variable.isPrimitive(variable.getType());
 
-    const nodeId = name;
+    const nodeId = !!parentNodeId ? `${parentNodeId}.${name}` : name;
+
     return (
-      <TreeItem
-        label={
-          <Line>
-            <Column>
-              <SemiControlledTextField
-                onClick={event => {
-                  event.stopPropagation();
-                }}
-                value={name}
-                onChange={name => {
-                  onChangeName(nodeId, name);
-                  forceUpdate();
-                }}
-              />
-            </Column>
-            <Column>{variableTypeToLabel[variable.getType()]}</Column>
-            <Column>
-              <SemiControlledTextField
-                onClick={event => {
-                  event.stopPropagation();
-                }}
-                value={
-                  isCollection
-                    ? ''
-                    : type === gd.Variable.String
-                    ? variable.getString()
-                    : type === gd.Variable.Number
-                    ? '' + variable.getValue()
-                    : variable.getBool().toString()
-                }
-                onChange={() => {}}
-              />
-            </Column>
-          </Line>
-        }
-        onLabelClick={event => {
-          event.preventDefault();
+      <DragSourceAndDropTarget
+        key={variable.ptr}
+        beginDrag={() => {
+          draggedNode.current = nodeId;
+          return {};
         }}
-        nodeId={nodeId}
+        canDrag={() => true}
+        canDrop={() => true}
+        drop={() => {
+          dropNode(nodeId);
+        }}
       >
-        {!isCollection
-          ? null
-          : type === gd.Variable.Structure
-          ? variable
-              .getAllChildrenNames()
-              .toJSArray()
-              .map((childName, index) => {
-                const childVariable = variable.getChild(childName);
-                return renderVariableAndChildrenRows(
-                  childName,
-                  childVariable,
-                  depth + 1
-                );
-              })
-          : mapFor(0, variable.getChildrenCount(), index => {
-              const childVariable = variable.getAtIndex(index);
-              return renderVariableAndChildrenRows(
-                '' + index,
-                childVariable,
-                depth + 1
-              );
-            })}
-      </TreeItem>
+        {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+          connectDropTarget(
+            <div>
+              {isOver && <DropIndicator canDrop={canDrop} />}
+              <div style={{ display: 'flex' }}>
+                {connectDragSource(<div>bonjour</div>)}
+                <TreeItem
+                  label={
+                    <Line>
+                      <Column>
+                        <SemiControlledTextField
+                          key="name"
+                          onClick={event => {
+                            event.stopPropagation();
+                          }}
+                          value={name}
+                          onChange={name => {
+                            onChangeName(nodeId, name);
+                            forceUpdate();
+                          }}
+                        />
+                      </Column>
+                      <Column>{variableTypeToLabel[variable.getType()]}</Column>
+                      <Column>
+                        <SemiControlledTextField
+                          key="value"
+                          onClick={event => {
+                            event.stopPropagation();
+                          }}
+                          value={
+                            isCollection
+                              ? ''
+                              : type === gd.Variable.String
+                              ? variable.getString()
+                              : type === gd.Variable.Number
+                              ? '' + variable.getValue()
+                              : variable.getBool().toString()
+                          }
+                          onChange={value => {
+                            onChangeValue(nodeId, value);
+                            forceUpdate();
+                          }}
+                        />
+                      </Column>
+                    </Line>
+                  }
+                  onLabelClick={event => {
+                    event.preventDefault();
+                  }}
+                  nodeId={nodeId}
+                >
+                  {!isCollection
+                    ? null
+                    : type === gd.Variable.Structure
+                    ? variable
+                        .getAllChildrenNames()
+                        .toJSArray()
+                        .map((childName, index) => {
+                          const childVariable = variable.getChild(childName);
+                          return renderVariableAndChildrenRows(
+                            childName,
+                            childVariable,
+                            depth + 1,
+                            nodeId
+                          );
+                        })
+                    : mapFor(0, variable.getChildrenCount(), index => {
+                        const childVariable = variable.getAtIndex(index);
+                        return renderVariableAndChildrenRows(
+                          '' + index,
+                          childVariable,
+                          depth + 1,
+                          nodeId
+                        );
+                      })}
+                </TreeItem>
+              </div>
+            </div>
+          )
+        }
+      </DragSourceAndDropTarget>
     );
   };
 
   const onChangeName = (nodeId, newName) => {
     props.variablesContainer.rename(nodeId, newName);
+  };
+  const onChangeValue = (nodeId, newValue) => {
+    console.log(nodeId);
+    const { variable } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!variable) return;
+    console.log(variable.getValue());
+    switch (variable.getType()) {
+      case gd.Variable.String:
+        variable.setString(newValue);
+        break;
+      case gd.Variable.Number:
+        variable.setValue(parseFloat(newValue));
+        break;
+      case gd.Variable.Boolean:
+        variable.setBool(newValue === 'true');
+        break;
+      default:
+        console.error(
+          `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
+        );
+    }
   };
 
   const renderTree = variablesContainer => {
@@ -112,7 +233,7 @@ const NewVariablesList = (props: Props) => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
-        return renderVariableAndChildrenRows(name, variable, 0);
+        return renderVariableAndChildrenRows(name, variable, 0, '');
       }
     );
     return containerVariablesTree;

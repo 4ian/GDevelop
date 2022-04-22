@@ -1150,6 +1150,15 @@ namespace gdjs {
       return this._allInstancesList;
     }
 
+    getInstancesCountOnScene(objectName: string): integer {
+      const instances = this._instances.get(objectName);
+      if (instances) {
+        return instances.length;
+      }
+
+      return 0;
+    }
+
     /**
      * Check if the scene was just resumed.
      * This is true during the first frame after the scene has been unpaused.

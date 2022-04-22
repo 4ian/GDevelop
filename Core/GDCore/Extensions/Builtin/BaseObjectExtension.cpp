@@ -1430,7 +1430,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       _("Objects"),
       "res/conditions/nbObjet24.png")
     .AddCodeOnlyParameter("objectsContext", "")
-    .AddParameter("objectListWithoutPicking", _("Object"))
+    .AddParameter("readOnlyObjectList", _("Object"))
     .UseStandardParameters("number")
     .MarkAsSimple();
 
@@ -1442,7 +1442,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       _("the number of _PARAM0_ currently picked"),
       _("Objects"),
       "res/conditions/nbObjet24.png")
-    .AddParameter("objectListWithoutPicking", _("Object"))
+    .AddParameter("readOnlyObjectList", _("Object"))
     .UseStandardParameters("number")
     .MarkAsSimple();
 

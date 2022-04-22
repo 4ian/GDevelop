@@ -160,8 +160,8 @@ class GD_CORE_API ParameterMetadata {
   static bool IsObject(const gd::String &parameterType) {
     return parameterType == "object" || parameterType == "objectPtr" ||
            parameterType == "objectList" ||
-           parameterType == "objectListWithoutPicking" ||
-           parameterType == "readOnlyObjectList";
+           parameterType == "objectListOrEmptyIfJustDeclared" ||
+           parameterType == "objectListOrEmptyWithoutPicking";
   }
 
   /**

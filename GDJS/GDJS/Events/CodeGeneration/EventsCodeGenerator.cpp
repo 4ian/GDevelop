@@ -830,7 +830,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   gd::String declarationsCode;
   for (auto object : context.GetObjectsListsToBeDeclared()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration += "gdjs.copyArray(" +
                                GenerateAllInstancesGetterCode(object) + ", " +
                                GetObjectListName(object, context) + ");";
@@ -840,9 +840,9 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
-  for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
+  for (auto object : context.GetObjectsListsToBeEmptyIfJustDeclared()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
       context.SetObjectDeclared(object);
@@ -853,7 +853,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   }
   for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration =
           GetObjectListName(object, context) + ".length = 0;\n";
       context.SetObjectDeclared(object);
@@ -1002,6 +1002,7 @@ gd::String EventsCodeGenerator::GenerateObject(
         gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
         gd::String mapDeclaration;
 
+        // Map each declared object to its list.
         for (auto& objectName : declaredObjectNames) {
           objectsMapName +=
               ManObjListName(GetObjectListName(objectName, context));
@@ -1010,6 +1011,10 @@ gd::String EventsCodeGenerator::GenerateObject(
           mapDeclaration += "\"" + ConvertToString(objectName) +
                             "\": " + GetObjectListName(objectName, context);
         }
+
+        // Map each object not declared to an empty list.
+        // Useful for parameters willing to get objects lists without
+        // picking the objects for future instructions.
         for (auto& objectName : notDeclaredObjectNames) {
           objectsMapName += "Empty" + ManObjListName(objectName);
 
@@ -1018,6 +1023,7 @@ gd::String EventsCodeGenerator::GenerateObject(
                             "\": []";
         }
 
+        // TODO: this should be de-duplicated.
         AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" +
                                  mapDeclaration + "});\n");
         return objectsMapName;
@@ -1031,23 +1037,23 @@ gd::String EventsCodeGenerator::GenerateObject(
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;
-  } else if (type == "objectListWithoutPicking") {
+  } else if (type == "objectListOrEmptyIfJustDeclared") {
     std::vector<gd::String> realObjects =
         ExpandObjectsName(objectName, context);
     for (auto& objectName : realObjects)
-      context.ObjectsListWithoutPickingNeeded(objectName);
+      context.ObjectsListNeededOrEmptyIfJustDeclared(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;
-  } else if (type == "readOnlyObjectList") {
+  } else if (type == "objectListOrEmptyWithoutPicking") {
     std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
 
-    // Find the objects not yet declared, and consider them separately so we can
-    // pass them as an empty array.
+    // Find the objects not yet declared, and handle them separately so they are
+    // passed as empty object lists.
     std::vector<gd::String> objectToBeDeclaredNames;
     std::vector<gd::String> objectNotYetDeclaredNames;
     for (auto& objectName : realObjects) {
-      if (context.ObjectAlreadyDeclared(objectName) ||
+      if (context.ObjectAlreadyDeclaredByParents(objectName) ||
           context.IsToBeDeclared(objectName)) {
         objectToBeDeclaredNames.push_back(objectName);
       } else {

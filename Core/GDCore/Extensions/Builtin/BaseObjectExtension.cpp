@@ -1252,7 +1252,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  "res/actions/create24.png",
                  "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
-      .AddParameter("objectListWithoutPicking", _("Object to create"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Object to create"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
@@ -1270,7 +1270,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  "res/actions/create24.png",
                  "res/actions/create24.png")
       .AddCodeOnlyParameter("objectsContext", "")
-      .AddParameter("objectListWithoutPicking", _("Group of potential objects"))
+      .AddParameter("objectListOrEmptyIfJustDeclared", _("Group of potential objects"))
       .SetParameterLongDescription(
           _("Group containing objects that can be created by the action."))
       .AddParameter("string", _("Name of the object to create"))
@@ -1430,7 +1430,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       _("Objects"),
       "res/conditions/nbObjet24.png")
     .AddCodeOnlyParameter("objectsContext", "")
-    .AddParameter("readOnlyObjectList", _("Object"))
+    .AddParameter("objectListOrEmptyWithoutPicking", _("Object"))
     .UseStandardParameters("number")
     .MarkAsSimple();
 
@@ -1442,7 +1442,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       _("the number of _PARAM0_ currently picked"),
       _("Objects"),
       "res/conditions/nbObjet24.png")
-    .AddParameter("readOnlyObjectList", _("Object"))
+    .AddParameter("objectListOrEmptyWithoutPicking", _("Object"))
     .UseStandardParameters("number")
     .MarkAsSimple();
 

@@ -463,7 +463,7 @@ class GD_CORE_API EventsCodeGenerator {
    * - currentScene: Reference to the current runtime scene.
    * - objectList : a map containing lists of objects which are specified by the
   object name in another parameter.
-   * - objectListWithoutPicking : Same as `objectList` but do not pick object if
+   * - objectListOrEmptyIfJustDeclared : Same as `objectList` but do not pick object if
   they are not already picked.
    * - objectPtr: Return a reference to the object specified by the object name in
   another parameter. Example:

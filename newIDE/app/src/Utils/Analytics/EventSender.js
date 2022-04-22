@@ -146,24 +146,25 @@ export const sendExportLaunched = (exportKind: string) => {
   });
 };
 
-export const sendExampleDetailsOpened = ({
-  id,
-  name,
-}: {|
-  id: string,
-  name: string,
-|}) => {
+export const sendExampleDetailsOpened = (slug: string) => {
   if (isDev || !client) return;
 
-  client.recordEvent('example-details-opened', { id, name });
+  client.recordEvent('example-details-opened', { slug });
 };
 
-export const sendNewGameCreated = (templateName: string) => {
+export const sendNewGameCreated = ({
+  exampleUrl,
+  exampleSlug,
+}: {|
+  exampleUrl: string,
+  exampleSlug: string,
+|}) => {
   if (isDev || !client) return;
 
   client.recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
-    templateName,
+    templateName: exampleUrl,
+    exampleSlug,
   });
 };
 

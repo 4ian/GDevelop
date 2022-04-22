@@ -12,10 +12,7 @@ import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-import {
-  sendExampleDetailsOpened,
-  sendExampleChosenAsProject,
-} from '../../Utils/Analytics/EventSender';
+import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 
 const styles = {
   searchBar: {
@@ -120,10 +117,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                     exampleShortHeader={exampleShortHeader}
                     matches={getExampleMatches(exampleShortHeader)}
                     onChoose={() => {
-                      sendExampleDetailsOpened({
-                        id: exampleShortHeader.id,
-                        name: exampleShortHeader.name,
-                      });
+                      sendExampleDetailsOpened(exampleShortHeader.slug);
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}
                     onOpen={() => {
@@ -140,7 +134,9 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
         <ExampleDialog
           isOpening={isOpening}
           exampleShortHeader={selectedExampleShortHeader}
-          onOpen={() => onOpen(selectedExampleShortHeader)}
+          onOpen={() => {
+            onOpen(selectedExampleShortHeader);
+          }}
           onClose={() => setSelectedExampleShortHeader(null)}
         />
       )}

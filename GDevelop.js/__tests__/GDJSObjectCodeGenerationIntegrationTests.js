@@ -26,32 +26,28 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
             {
               type: { value: 'SceneInstancesCount' },
               parameters: ['', 'MyParamObject', '>', '0'],
-              subInstructions: [],
             },
           ],
           actions: [
             {
-              type: { inverted: false, value: 'ModVarScene' },
+              type: { value: 'ModVarScene' },
               parameters: [
                 'ResultBeforePicking',
                 '=',
                 'SceneInstancesCount(MyParamObject)',
               ],
-              subInstructions: [],
             },
             {
-              type: { inverted: false, value: 'ModVarObjet' },
+              type: { value: 'ModVarObjet' },
               parameters: ['MyParamObject', 'Picked', '=', '1'],
-              subInstructions: [],
             },
             {
-              type: { inverted: false, value: 'ModVarScene' },
+              type: { value: 'ModVarScene' },
               parameters: [
                 'ResultAfterPicking',
                 '=',
                 'SceneInstancesCount(MyParamObject)',
               ],
-              subInstructions: [],
             },
           ],
         },
@@ -165,7 +161,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 '=',
                 'PickedInstancesCount(MyParamObject)',
               ],
-              subInstructions: [],
             },
           ],
           events: [
@@ -177,7 +172,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 {
                   type: { value: 'VarObjet' },
                   parameters: ['MyParamObject', 'PleaseCountMe', '=', '1'],
-                  subInstructions: [],
                 },
               ],
               actions: [
@@ -188,7 +182,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyParamObject)',
                   ],
-                  subInstructions: [],
                 },
               ],
             },
@@ -257,7 +250,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 '=',
                 'PickedInstancesCount(MyParamObject)',
               ],
-              subInstructions: [],
             },
           ],
           events: [
@@ -274,7 +266,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyParamObject)',
                   ],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'Create' },
@@ -285,7 +276,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '0',
                     '',
                   ],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -294,12 +284,10 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyParamObject)',
                   ],
-                  subInstructions: [],
                 },
                 {
-                  type: { inverted: false, value: 'ModVarObjet' },
+                  type: { value: 'ModVarObjet' },
                   parameters: ['MyParamObject', 'Picked', '=', '1'],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -308,7 +296,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyParamObject)',
                   ],
-                  subInstructions: [],
                 },
               ],
             },
@@ -379,7 +366,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 '=',
                 'PickedInstancesCount(MyObjectGroup)',
               ],
-              subInstructions: [],
             },
             {
               type: { value: 'ModVarScene' },
@@ -388,7 +374,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 '=',
                 'PickedInstancesCount(ObjectParam1)',
               ],
-              subInstructions: [],
             },
           ],
           events: [
@@ -400,7 +385,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 {
                   type: { value: 'VarObjet' },
                   parameters: ['ObjectParam1', 'PleaseCountMe', '=', '1'],
-                  subInstructions: [],
                 },
               ],
               actions: [
@@ -411,7 +395,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyObjectGroup)',
                   ],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -420,7 +403,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(ObjectParam1)',
                   ],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'Create' },
@@ -431,7 +413,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '0',
                     '',
                   ],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -440,12 +421,10 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyObjectGroup)',
                   ],
-                  subInstructions: [],
                 },
                 {
-                  type: { inverted: false, value: 'ModVarObjet' },
+                  type: { value: 'ModVarObjet' },
                   parameters: ['MyObjectGroup', 'Picked', '=', '1'],
-                  subInstructions: [],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -454,7 +433,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                     '=',
                     'PickedInstancesCount(MyObjectGroup)',
                   ],
-                  subInstructions: [],
                 },
               ],
             },

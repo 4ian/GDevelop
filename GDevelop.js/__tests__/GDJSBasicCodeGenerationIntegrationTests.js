@@ -16,9 +16,8 @@ const makeAddOneToObjectTestVariableEvent = (objectName) => ({
   conditions: [],
   actions: [
     {
-      type: { inverted: false, value: 'ModVarObjet' },
+      type: { value: 'ModVarObjet' },
       parameters: [objectName, 'TestVariable', '+', '1'],
-      subInstructions: [],
     },
   ],
   events: [],
@@ -43,9 +42,8 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['Counter', '=', '0'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -57,17 +55,15 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         type: 'BuiltinCommonInstructions::While',
         whileConditions: [
           {
-            type: { inverted: false, value: 'VarScene' },
+            type: { value: 'VarScene' },
             parameters: ['Counter', '<', '4'],
-            subInstructions: [],
           },
         ],
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['Counter', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -96,44 +92,38 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Or',
             },
             parameters: [],
             subInstructions: [
               {
-                type: { inverted: false, value: 'Egal' },
+                type: { value: 'Egal' },
                 parameters: ['1', '=', '2'],
-                subInstructions: [],
               },
               {
                 type: {
-                  inverted: false,
                   value: 'BuiltinCommonInstructions::Or',
                 },
                 parameters: [],
                 subInstructions: [
                   // This should be true and make the entire conditions true.
                   {
-                    type: { inverted: false, value: 'StrEqual' },
+                    type: { value: 'StrEqual' },
                     parameters: ['"1"', '=', '"1"'],
-                    subInstructions: [],
                   },
                 ],
               },
               {
-                type: { inverted: false, value: 'StrEqual' },
+                type: { value: 'StrEqual' },
                 parameters: ['"1"', '=', '"2"'],
-                subInstructions: [],
               },
             ],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '=', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -164,67 +154,57 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::And',
             },
             parameters: [],
             subInstructions: [
               {
-                type: { inverted: false, value: 'Egal' },
+                type: { value: 'Egal' },
                 parameters: ['1', '=', '1'],
-                subInstructions: [],
               },
               {
                 type: {
-                  inverted: false,
                   value: 'BuiltinCommonInstructions::And',
                 },
                 parameters: [],
                 subInstructions: [
                   {
-                    type: { inverted: false, value: 'Egal' },
+                    type: { value: 'Egal' },
                     parameters: ['1', '=', '1'],
-                    subInstructions: [],
                   },
                   {
                     type: {
-                      inverted: false,
                       value: 'BuiltinCommonInstructions::And',
                     },
                     parameters: [],
                     subInstructions: [
                       {
-                        type: { inverted: false, value: 'Egal' },
+                        type: { value: 'Egal' },
                         parameters: ['1', '=', '1'],
-                        subInstructions: [],
                       },
                       {
-                        type: { inverted: false, value: 'StrEqual' },
+                        type: { value: 'StrEqual' },
                         parameters: ['"1"', '=', '"1"'],
-                        subInstructions: [],
                       },
                     ],
                   },
                   {
-                    type: { inverted: false, value: 'StrEqual' },
+                    type: { value: 'StrEqual' },
                     parameters: ['"1"', '=', '"1"'],
-                    subInstructions: [],
                   },
                 ],
               },
               {
-                type: { inverted: false, value: 'StrEqual' },
+                type: { value: 'StrEqual' },
                 parameters: ['"1"', '=', '"1"'],
-                subInstructions: [],
               },
             ],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '=', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -254,9 +234,8 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'Create' },
+            type: { value: 'Create' },
             parameters: ['', 'MyObjectA', '0', '0', ''],
-            subInstructions: [],
           },
         ],
         events: [makeAddOneToObjectTestVariableEvent('MyObjectA')],
@@ -436,18 +415,15 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Once',
             },
             parameters: [],
-            subInstructions: [],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -459,18 +435,15 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Once',
             },
             parameters: [],
-            subInstructions: [],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -517,18 +490,15 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           conditions: [
             {
               type: {
-                inverted: false,
                 value: 'BuiltinCommonInstructions::Once',
               },
               parameters: [],
-              subInstructions: [],
             },
           ],
           actions: [
             {
-              type: { inverted: false, value: 'ModVarScene' },
+              type: { value: 'ModVarScene' },
               parameters: ['SuccessVariable', '+', '1'],
-              subInstructions: [],
             },
           ],
           events: [],
@@ -540,18 +510,15 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           conditions: [
             {
               type: {
-                inverted: false,
                 value: 'BuiltinCommonInstructions::Once',
               },
               parameters: [],
-              subInstructions: [],
             },
           ],
           actions: [
             {
-              type: { inverted: false, value: 'ModVarScene' },
+              type: { value: 'ModVarScene' },
               parameters: ['SuccessVariable', '+', '1'],
-              subInstructions: [],
             },
           ],
           events: [],
@@ -617,9 +584,8 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],

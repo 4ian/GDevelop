@@ -105,6 +105,8 @@ namespace gdjs {
       _loaderContainer.style.width = '100%';
       _loaderContainer.style.justifyContent = 'center';
       _loaderContainer.style.alignItems = 'center';
+      _loaderContainer.style.position = 'absolute';
+      _loaderContainer.style.zIndex = '2';
       const _loader = document.createElement('img');
       _loader.setAttribute('width', '50px');
       _loader.setAttribute(
@@ -560,9 +562,8 @@ namespace gdjs {
 
               resetLeaderboardDisplayErrorTimeout(runtimeScene);
 
-              _leaderboardViewIframe = computeLeaderboardDisplayingIframe(
-                targetUrl
-              );
+              _leaderboardViewIframe =
+                computeLeaderboardDisplayingIframe(targetUrl);
               if (typeof window !== 'undefined') {
                 _leaderboardViewClosingCallback = (event: MessageEvent) => {
                   receiveMessageFromLeaderboardView(

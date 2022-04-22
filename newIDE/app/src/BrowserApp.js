@@ -82,7 +82,10 @@ export const create = (authentication: Authentication) => {
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog
-                  {...props}
+                  open={props.open}
+                  onClose={props.onClose}
+                  onOpen={props.onOpen}
+                  initialTab={props.initialTab}
                   onCreateBlank={onCreateBlank}
                   onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
                 />

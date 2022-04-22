@@ -78,7 +78,6 @@ class GD_CORE_API Expression {
  private:
   gd::String plainString;  ///< The expression string
   mutable std::unique_ptr<gd::ExpressionNode> node;
-  mutable const gd::ObjectsContainer *parserObjectsContainer;
 };
 
 }  // namespace gd

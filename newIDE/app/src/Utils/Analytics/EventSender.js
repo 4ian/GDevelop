@@ -146,6 +146,18 @@ export const sendExportLaunched = (exportKind: string) => {
   });
 };
 
+export const sendExampleDetailsOpened = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('example-details-opened', { id, name });
+};
+
 export const sendNewGameCreated = (templateName: string) => {
   if (isDev || !client) return;
 
@@ -262,30 +274,6 @@ export const sendExtensionAddedToProject = (name: string) => {
   if (isDev || !client) return;
 
   client.recordEvent('extension-added-to-project', { name });
-};
-
-export const sendExampleDetailsOpened = ({
-  id,
-  name,
-}: {|
-  id: string,
-  name: string,
-|}) => {
-  if (isDev || !client) return;
-
-  client.recordEvent('example-details-opened', { id, name });
-};
-
-export const sendExampleChosenAsProject = ({
-  id,
-  name,
-}: {|
-  id: string,
-  name: string,
-|}) => {
-  if (isDev || !client) return;
-
-  client.recordEvent('example-chosen-as-project', { id, name });
 };
 
 export const sendNewObjectCreated = (name: string) => {

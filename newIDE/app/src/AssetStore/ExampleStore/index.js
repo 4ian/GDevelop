@@ -140,13 +140,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
         <ExampleDialog
           isOpening={isOpening}
           exampleShortHeader={selectedExampleShortHeader}
-          onOpen={() => {
-            sendExampleChosenAsProject({
-              id: selectedExampleShortHeader.id,
-              name: selectedExampleShortHeader.name,
-            });
-            onOpen(selectedExampleShortHeader);
-          }}
+          onOpen={() => onOpen(selectedExampleShortHeader)}
           onClose={() => setSelectedExampleShortHeader(null)}
         />
       )}

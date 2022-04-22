@@ -1966,6 +1966,7 @@ const MainFrame = (props: Props) => {
     if (!currentProject) return;
 
     currentProject.resetProjectUuid();
+    currentProject.setVersion("1.0.0");
     if (projectName) currentProject.setName(projectName);
     openSceneOrProjectManager({
       currentProject: currentProject,

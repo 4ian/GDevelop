@@ -549,23 +549,30 @@ namespace gdjs {
       /**
        * Return the number of instances in the specified lists of objects.
        */
-      export const pickedInstancesCount = (objectsLists: ObjectsLists) => {
+      export const getPickedInstancesCount = (objectsLists: ObjectsLists) => {
         let count = 0;
-        const lists = gdjs.staticArray(gdjs.evtTools.object.pickedInstancesCount);
+        const lists = gdjs.staticArray(
+          gdjs.evtTools.object.getPickedInstancesCount
+        );
         objectsLists.values(lists);
         for (let i = 0, len = lists.length; i < len; ++i) {
           count += lists[i].length;
         }
         return count;
-      }
+      };
 
       /**
        * Return the number of instances of the specified objects living on the scene.
        */
-      export const sceneInstancesCount = (objectsContext: EventsFunctionContext | gdjs.RuntimeScene, objectsLists: ObjectsLists) => {
+      export const getSceneInstancesCount = (
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists
+      ) => {
         let count = 0;
 
-        const objectNames = gdjs.staticArray(gdjs.evtTools.object.sceneInstancesCount);
+        const objectNames = gdjs.staticArray(
+          gdjs.evtTools.object.getSceneInstancesCount
+        );
         objectsLists.keys(objectNames);
 
         const uniqueObjectNames = new Set(objectNames);
@@ -573,10 +580,10 @@ namespace gdjs {
           count += objectsContext.getInstancesCountOnScene(objectName);
         }
         return count;
-      }
+      };
 
       /** @deprecated */
-      export const pickedObjectsCount = pickedInstancesCount;
+      export const pickedObjectsCount = getPickedInstancesCount;
     }
   }
 }

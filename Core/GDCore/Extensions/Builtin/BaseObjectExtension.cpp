@@ -1426,7 +1426,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       "SceneInstancesCount",
       _("Number of object instances on the scene"),
       _("Compare the number of instances of the specified objects living on the scene."),
-      _("the number of _PARAM0_ objects living on the scene"),
+      _("the number of _PARAM0_ living on the scene"),
       _("Objects"),
       "res/conditions/nbObjet24.png")
     .AddCodeOnlyParameter("objectsContext", "")
@@ -1439,7 +1439,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       "PickedInstancesCount",
       _("Number of object instances currently picked"),
       _("Compare the number of instances picked by the previous conditions (or actions)."),
-      _("the number of _PARAM0_ objects currently picked"),
+      _("the number of _PARAM0_ currently picked"),
       _("Objects"),
       "res/conditions/nbObjet24.png")
     .AddParameter("objectListWithoutPicking", _("Object"))

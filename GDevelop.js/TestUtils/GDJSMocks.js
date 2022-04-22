@@ -213,7 +213,7 @@ const createObjectOnScene = (objectsContext, objectsLists, x, y, layer) => {
  * @param {any} objectsContext
  * @param {Hashtable<RuntimeObject[]>} objectsLists
  */
-const sceneInstancesCount = (objectsContext, objectsLists) => {
+const getSceneInstancesCount = (objectsContext, objectsLists) => {
   let count = 0;
 
   const objectNames = [];
@@ -229,7 +229,7 @@ const sceneInstancesCount = (objectsContext, objectsLists) => {
 /**
  * @param {Hashtable<RuntimeObject[]>} objectsLists
  */
-const pickedInstancesCount = (objectsLists) => {
+const getPickedInstancesCount = (objectsLists) => {
   let count = 0;
   const lists = [];
   objectsLists.values(lists);
@@ -293,7 +293,7 @@ function makeMinimalGDJSMock() {
     gdjs: {
       evtTools: {
         variable: { getVariableNumber: (variable) => variable.getAsNumber() },
-        object: { createObjectOnScene, sceneInstancesCount, pickedInstancesCount },
+        object: { createObjectOnScene, getSceneInstancesCount, getPickedInstancesCount },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {
         behaviorCtors[behaviorTypeName] = Ctor;

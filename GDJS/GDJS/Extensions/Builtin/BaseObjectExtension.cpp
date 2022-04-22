@@ -252,10 +252,20 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.createObjectOnScene");
   GetAllActions()["CreateByName"].SetFunctionName(
       "gdjs.evtTools.object.createObjectFromGroupOnScene");
+
   GetAllExpressions()["Count"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount");
+      "gdjs.evtTools.object.getPickedObjectsCount"); // Deprecated
   GetAllConditions()["NbObjet"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount");
+      "gdjs.evtTools.object.getPickedObjectsCount"); // Deprecated
+  GetAllExpressions()["SceneInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getSceneInstancesCount");
+  GetAllConditions()["SceneInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getSceneInstancesCount");
+  GetAllExpressions()["PickedInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getPickedInstancesCount");
+  GetAllConditions()["PickedInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getPickedInstancesCount");
+
   GetAllConditions()["CollisionNP"].SetFunctionName(
       "gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(

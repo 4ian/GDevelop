@@ -152,15 +152,16 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is "object", "objectPtr" or
-   * "objectList".
+   * \brief Return true if the type of the parameter is representing one object
+   * (or more, i.e: an object group).
    *
    * \see gd::ParameterMetadata::GetType
    */
   static bool IsObject(const gd::String &parameterType) {
     return parameterType == "object" || parameterType == "objectPtr" ||
            parameterType == "objectList" ||
-           parameterType == "objectListWithoutPicking";
+           parameterType == "objectListWithoutPicking" ||
+           parameterType == "readOnlyObjectList";
   }
 
   /**

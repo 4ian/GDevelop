@@ -547,17 +547,43 @@ namespace gdjs {
       };
 
       /**
-       * Allows events to get the number of objects picked.
+       * Return the number of instances in the specified lists of objects.
        */
-      export const pickedObjectsCount = function (objectsLists) {
-        let size = 0;
-        const lists = gdjs.staticArray(gdjs.evtTools.object.pickedObjectsCount);
+      export const getPickedInstancesCount = (objectsLists: ObjectsLists) => {
+        let count = 0;
+        const lists = gdjs.staticArray(
+          gdjs.evtTools.object.getPickedInstancesCount
+        );
         objectsLists.values(lists);
         for (let i = 0, len = lists.length; i < len; ++i) {
-          size += lists[i].length;
+          count += lists[i].length;
         }
-        return size;
+        return count;
       };
+
+      /**
+       * Return the number of instances of the specified objects living on the scene.
+       */
+      export const getSceneInstancesCount = (
+        objectsContext: EventsFunctionContext | gdjs.RuntimeScene,
+        objectsLists: ObjectsLists
+      ) => {
+        let count = 0;
+
+        const objectNames = gdjs.staticArray(
+          gdjs.evtTools.object.getSceneInstancesCount
+        );
+        objectsLists.keys(objectNames);
+
+        const uniqueObjectNames = new Set(objectNames);
+        for (const objectName of uniqueObjectNames) {
+          count += objectsContext.getInstancesCountOnScene(objectName);
+        }
+        return count;
+      };
+
+      /** @deprecated */
+      export const pickedObjectsCount = getPickedInstancesCount;
     }
   }
 }

@@ -124,7 +124,8 @@
 .gd-events-sheet .instruction-parameter.object,
 .gd-events-sheet .instruction-parameter.objectPtr,
 .gd-events-sheet .instruction-parameter.objectList,
-.gd-events-sheet .instruction-parameter.objectListWithoutPicking {
+.gd-events-sheet .instruction-parameter.objectListWithoutPicking,
+.gd-events-sheet .instruction-parameter.readOnlyObjectList {
     color:var(--event-sheet-instruction-parameter-object-color);
     font-weight: bold;
 }

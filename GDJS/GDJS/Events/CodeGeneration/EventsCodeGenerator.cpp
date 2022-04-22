@@ -384,7 +384,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          // to create the new object as the object names used in the function
          // are not the same as the objects available in the scene.
          "  createObject: function(objectName) {\n"
-         "    var objectsList = "
+         "    const objectsList = "
          "eventsFunctionContext._objectsMap[objectName];\n" +
          // TODO: we could speed this up by storing a map of object names, but
          // the cost of creating/storing it for each events function might not
@@ -404,6 +404,21 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "    }\n" +
          // Unknown object, don't create anything:
          "    return null;\n" +
+         "  },\n"
+         // Function to count instances on the scene. We need it here because
+         // it needs the objects map to get the object names of the parent context.
+         "  getInstancesCountOnScene: function(objectName) {\n"
+         "    const objectsList = "
+         "eventsFunctionContext._objectsMap[objectName];\n" +
+         "    let count = 0;\n" +
+         "    if (objectsList) {\n" +
+         "      for(const objectName in objectsList.items)\n" +
+         "        count += parentEventsFunctionContext ?\n" +
+         "parentEventsFunctionContext.getInstancesCountOnScene(objectName) "
+         ":\n" +
+         "        runtimeScene.getInstancesCountOnScene(objectName);\n" +
+         "    }\n" +
+         "    return count;\n" +
          "  },\n"
          // Allow to get a layer directly from the context for convenience:
          "  getLayer: function(layerName) {\n"
@@ -979,12 +994,15 @@ gd::String EventsCodeGenerator::GenerateObject(
   // avoid re-creating them at runtime. Arrays are passed as reference in JS and
   // we always use the same static arrays, making this possible.
   auto declareMapOfObjects =
-      [this](const std::vector<gd::String>& objects,
-             const gd::EventsCodeGenerationContext& context) {
+      [this](const std::vector<gd::String>& declaredObjectNames,
+             const gd::EventsCodeGenerationContext& context,
+             const std::vector<gd::String>& notDeclaredObjectNames = {}) {
+        // The map name must be unique for each set of objects lists.
+        // We generate it from the objects lists names.
         gd::String objectsMapName = GetCodeNamespaceAccessor() + "mapOf";
         gd::String mapDeclaration;
-        for (auto& objectName : objects) {
-          // The map name must be unique for each set of objects lists.
+
+        for (auto& objectName : declaredObjectNames) {
           objectsMapName +=
               ManObjListName(GetObjectListName(objectName, context));
 
@@ -992,9 +1010,16 @@ gd::String EventsCodeGenerator::GenerateObject(
           mapDeclaration += "\"" + ConvertToString(objectName) +
                             "\": " + GetObjectListName(objectName, context);
         }
+        for (auto& objectName : notDeclaredObjectNames) {
+          objectsMapName += "Empty" + ManObjListName(objectName);
+
+          if (!mapDeclaration.empty()) mapDeclaration += ", ";
+          mapDeclaration += "\"" + ConvertToString(objectName) +
+                            "\": []";
+        }
 
         AddCustomCodeOutsideMain(objectsMapName + " = Hashtable.newFrom({" +
-                                 mapDeclaration + "});");
+                                 mapDeclaration + "});\n");
         return objectsMapName;
       };
 
@@ -1013,6 +1038,24 @@ gd::String EventsCodeGenerator::GenerateObject(
       context.ObjectsListWithoutPickingNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
+    output = objectsMapName;
+  } else if (type == "readOnlyObjectList") {
+    std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
+
+    // Find the objects not yet declared, and consider them separately so we can
+    // pass them as an empty array.
+    std::vector<gd::String> objectToBeDeclaredNames;
+    std::vector<gd::String> objectNotYetDeclaredNames;
+    for (auto& objectName : realObjects) {
+      if (context.ObjectAlreadyDeclared(objectName) ||
+          context.IsToBeDeclared(objectName)) {
+        objectToBeDeclaredNames.push_back(objectName);
+      } else {
+        objectNotYetDeclaredNames.push_back(objectName);
+      }
+    }
+
+    gd::String objectsMapName = declareMapOfObjects(objectToBeDeclaredNames, context, objectNotYetDeclaredNames);
     output = objectsMapName;
   } else if (type == "objectPtr") {
     std::vector<gd::String> realObjects =

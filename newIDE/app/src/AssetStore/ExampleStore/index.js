@@ -12,6 +12,7 @@ import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 
 const styles = {
   searchBar: {
@@ -116,6 +117,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                     exampleShortHeader={exampleShortHeader}
                     matches={getExampleMatches(exampleShortHeader)}
                     onChoose={() => {
+                      sendExampleDetailsOpened(exampleShortHeader.slug);
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}
                     onOpen={() => {

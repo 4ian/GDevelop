@@ -1425,7 +1425,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       "number",
       "SceneInstancesCount",
       _("Number of object instances on the scene"),
-      _("Compare the number of instances of the specified objects living on the scene."),
+      _("the number of instances of the specified objects living on the scene"),
       _("the number of _PARAM1_ living on the scene"),
       _("Objects"),
       "res/conditions/nbObjet24.png")
@@ -1438,7 +1438,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       "number",
       "PickedInstancesCount",
       _("Number of object instances currently picked"),
-      _("Compare the number of instances picked by the previous conditions (or actions)."),
+      _("the number of instances picked by the previous conditions (or actions)"),
       _("the number of _PARAM0_ currently picked"),
       _("Objects"),
       "res/conditions/nbObjet24.png")

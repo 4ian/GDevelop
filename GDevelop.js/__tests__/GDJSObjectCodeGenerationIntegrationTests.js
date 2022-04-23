@@ -149,6 +149,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
         {
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [],
+          // Verify the picked instances count is 0 at first.
           actions: [
             {
               type: { value: 'ModVarScene' },
@@ -159,6 +160,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
               ],
             },
           ],
+          // Then verify it changes when the instances are picked by an action.
           events: [
             {
               type: 'BuiltinCommonInstructions::Standard',
@@ -178,7 +180,37 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                   ],
                 },
               ],
-            },
+              events: [{
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [],
+                actions: [],
+                events: [{
+                  type: 'BuiltinCommonInstructions::Standard',
+                  conditions: [],
+                  // Verify the picked instances count works when deeply nested in sub events.
+                  actions: [{
+                    type: { value: 'ModVarScene' },
+                    parameters: [
+                      'Result3',
+                      '=',
+                      'PickedInstancesCount(MyParamObject)',
+                    ],
+                  }]
+                }]
+              }]
+            }, {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              // Verify the picked instances count is back to 0.
+              actions: [{
+                type: { value: 'ModVarScene' },
+                parameters: [
+                  'Result4',
+                  '=',
+                  'PickedInstancesCount(MyParamObject)',
+                ],
+              }]
+            }
           ],
         },
       ]);
@@ -224,6 +256,8 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       // Check that the picked instances were properly counted.
       expect(runtimeScene.getVariables().get('Result1').getAsNumber()).toBe(0);
       expect(runtimeScene.getVariables().get('Result2').getAsNumber()).toBe(3);
+      expect(runtimeScene.getVariables().get('Result3').getAsNumber()).toBe(3);
+      expect(runtimeScene.getVariables().get('Result4').getAsNumber()).toBe(0);
 
       eventsFunction.delete();
       project.delete();

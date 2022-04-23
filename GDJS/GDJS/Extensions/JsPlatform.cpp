@@ -13,6 +13,7 @@
 
 // Built-in extensions
 #include "GDJS/Extensions/Builtin/AdvancedExtension.h"
+#include "GDJS/Extensions/Builtin/AsyncExtension.h"
 #include "GDJS/Extensions/Builtin/AudioExtension.h"
 #include "GDJS/Extensions/Builtin/BaseObjectExtension.h"
 #include "GDJS/Extensions/Builtin/CameraExtension.h"
@@ -70,6 +71,8 @@ void JsPlatform::ReloadBuiltinExtensions() {
   AddExtension(
       std::shared_ptr<gd::PlatformExtension>(new CommonInstructionsExtension));
   std::cout.flush();
+  AddExtension(std::shared_ptr<gd::PlatformExtension>(new AsyncExtension));
+  std::cout.flush();
   AddExtension(
       std::shared_ptr<gd::PlatformExtension>(new CommonConversionsExtension));
   std::cout.flush();
@@ -106,8 +109,8 @@ void JsPlatform::ReloadBuiltinExtensions() {
   std::cout.flush();
   std::cout << "done." << std::endl;
 
-#if defined(EMSCRIPTEN)  // When compiling with emscripten, hardcode extensions
-                         // to load.
+#if defined(EMSCRIPTEN) // When compiling with emscripten, hardcode extensions
+                        // to load.
   std::cout << "* Loading other extensions... ";
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(
@@ -173,7 +176,8 @@ void JsPlatform::AddNewExtension(const gd::PlatformExtension &extension) {
 JsPlatform::JsPlatform() : gd::Platform() { ReloadBuiltinExtensions(); }
 
 JsPlatform &JsPlatform::Get() {
-  if (!singleton) singleton = new JsPlatform;
+  if (!singleton)
+    singleton = new JsPlatform;
 
   return *singleton;
 }
@@ -199,4 +203,4 @@ extern "C" gd::Platform *GD_API CreateGDPlatform() {
 extern "C" void GD_API DestroyGDPlatform() { JsPlatform::DestroySingleton(); }
 #endif
 
-}  // namespace gdjs
+} // namespace gdjs

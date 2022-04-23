@@ -303,13 +303,13 @@ export default class ObjectsList extends React.Component<Props, State> {
           project,
           type,
           newName,
-          project.getObjectPosition(pasteObject.getName())
+          project.getObjectPosition(pasteObject.getName()) + 1
         )
       : objectsContainer.insertNewObject(
           project,
           type,
           newName,
-          objectsContainer.getObjectPosition(pasteObject.getName())
+          objectsContainer.getObjectPosition(pasteObject.getName()) + 1
         );
 
     unserializeFromJSObject(
@@ -357,49 +357,96 @@ export default class ObjectsList extends React.Component<Props, State> {
 
   _canMoveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     // Check if at least one element in the selection can be moved.
-    const selectedObjects = this._displayedObjectWithContextsList.filter(
+    const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
       objectWithContext =>
         this.props.selectedObjectNames.indexOf(
           objectWithContext.object.getName()
         ) !== -1
     );
-    return (
-      selectedObjects.filter(movedObjectWithContext => {
-        return (
-          movedObjectWithContext.global === destinationObjectWithContext.global
-        );
-      }).length > 0
+    if (
+      selectedObjectsWithContext.every(
+        selectedObject =>
+          selectedObject.global === destinationObjectWithContext.global
+      )
+    ) {
+      return true;
+    }
+
+    const displayedGlobalObjectsWithContext = this._displayedObjectWithContextsList.filter(
+      objectWithContext => objectWithContext.global
     );
+
+    if (
+      selectedObjectsWithContext.every(
+        selectedObject => !selectedObject.global
+      ) &&
+      destinationObjectWithContext.global &&
+      displayedGlobalObjectsWithContext.indexOf(
+        destinationObjectWithContext
+      ) === 0
+    ) {
+      return true;
+    }
+    return false;
   };
 
   _moveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     const { project, objectsContainer } = this.props;
 
-    const container: gdObjectsContainer = destinationObjectWithContext.global
-      ? project
-      : objectsContainer;
+    const displayedGlobalObjectsWithContext = this._displayedObjectWithContextsList.filter(
+      objectWithContext => objectWithContext.global
+    );
+    const displayedLocalObjectsWithContext = this._displayedObjectWithContextsList.filter(
+      objectWithContext => !objectWithContext.global
+    );
 
-    const selectedObjects = this._displayedObjectWithContextsList.filter(
+    const isDestinationItemFirstItemOfGlobalDisplayedList =
+      destinationObjectWithContext.global &&
+      displayedGlobalObjectsWithContext.indexOf(
+        destinationObjectWithContext
+      ) === 0;
+
+    const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
       objectWithContext =>
         this.props.selectedObjectNames.indexOf(
           objectWithContext.object.getName()
         ) !== -1
     );
-    selectedObjects.forEach(movedObjectWithContext => {
+    selectedObjectsWithContext.forEach(movedObjectWithContext => {
+      let container: gdObjectsContainer;
+      let fromIndex: number;
+      let toIndex: number;
       if (
-        movedObjectWithContext.global !== destinationObjectWithContext.global
+        movedObjectWithContext.global === destinationObjectWithContext.global
       ) {
-        // Can't move an object from the objects container to the global objects
-        // or vice-versa.
+        container = destinationObjectWithContext.global
+          ? project
+          : objectsContainer;
+
+        fromIndex = container.getObjectPosition(
+          movedObjectWithContext.object.getName()
+        );
+        toIndex = container.getObjectPosition(
+          destinationObjectWithContext.object.getName()
+        );
+      } else if (
+        !movedObjectWithContext.global &&
+        isDestinationItemFirstItemOfGlobalDisplayedList
+      ) {
+        container = objectsContainer;
+        fromIndex = container.getObjectPosition(
+          movedObjectWithContext.object.getName()
+        );
+        toIndex = !this.state.searchText
+          ? container.getObjectsCount()
+          : container.getObjectPosition(
+              displayedLocalObjectsWithContext[
+                displayedLocalObjectsWithContext.length - 1
+              ].object.getName()
+            ) + 1;
+      } else {
         return;
       }
-
-      const fromIndex = container.getObjectPosition(
-        movedObjectWithContext.object.getName()
-      );
-      let toIndex = container.getObjectPosition(
-        destinationObjectWithContext.object.getName()
-      );
       if (toIndex > fromIndex) toIndex -= 1;
       container.moveObject(fromIndex, toIndex);
     });
@@ -516,7 +563,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         click: () => this._editName(objectWithContext),
       },
       {
-        label: i18n._(t`Set as a global object`),
+        label: i18n._(t`Set as global object`),
         enabled: !isObjectWithContextGlobal(objectWithContext),
         click: () => this._setAsGlobalObject(objectWithContext),
       },

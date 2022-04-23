@@ -10,15 +10,12 @@ const {
  * "TestVariable" of the specified object (or object group).
  */
 const makeAddOneToObjectTestVariableEvent = (objectName) => ({
-  disabled: false,
-  folded: false,
   type: 'BuiltinCommonInstructions::Standard',
   conditions: [],
   actions: [
     {
-      type: { inverted: false, value: 'ModVarObjet' },
+      type: { value: 'ModVarObjet' },
       parameters: [objectName, 'TestVariable', '+', '1'],
-      subInstructions: [],
     },
   ],
   events: [],
@@ -37,37 +34,30 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Create nested events using And and StrEqual conditions
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['Counter', '=', '0'],
-            subInstructions: [],
           },
         ],
         events: [],
       },
       {
-        disabled: false,
-        folded: false,
         infiniteLoopWarning: true,
         type: 'BuiltinCommonInstructions::While',
         whileConditions: [
           {
-            type: { inverted: false, value: 'VarScene' },
+            type: { value: 'VarScene' },
             parameters: ['Counter', '<', '4'],
-            subInstructions: [],
           },
         ],
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['Counter', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -90,50 +80,42 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Create nested events using Or and StrEqual conditions
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Or',
             },
             parameters: [],
             subInstructions: [
               {
-                type: { inverted: false, value: 'Egal' },
+                type: { value: 'Egal' },
                 parameters: ['1', '=', '2'],
-                subInstructions: [],
               },
               {
                 type: {
-                  inverted: false,
                   value: 'BuiltinCommonInstructions::Or',
                 },
                 parameters: [],
                 subInstructions: [
                   // This should be true and make the entire conditions true.
                   {
-                    type: { inverted: false, value: 'StrEqual' },
+                    type: { value: 'StrEqual' },
                     parameters: ['"1"', '=', '"1"'],
-                    subInstructions: [],
                   },
                 ],
               },
               {
-                type: { inverted: false, value: 'StrEqual' },
+                type: { value: 'StrEqual' },
                 parameters: ['"1"', '=', '"2"'],
-                subInstructions: [],
               },
             ],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '=', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -158,73 +140,61 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Create nested events using And and StrEqual conditions
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::And',
             },
             parameters: [],
             subInstructions: [
               {
-                type: { inverted: false, value: 'Egal' },
+                type: { value: 'Egal' },
                 parameters: ['1', '=', '1'],
-                subInstructions: [],
               },
               {
                 type: {
-                  inverted: false,
                   value: 'BuiltinCommonInstructions::And',
                 },
                 parameters: [],
                 subInstructions: [
                   {
-                    type: { inverted: false, value: 'Egal' },
+                    type: { value: 'Egal' },
                     parameters: ['1', '=', '1'],
-                    subInstructions: [],
                   },
                   {
                     type: {
-                      inverted: false,
                       value: 'BuiltinCommonInstructions::And',
                     },
                     parameters: [],
                     subInstructions: [
                       {
-                        type: { inverted: false, value: 'Egal' },
+                        type: { value: 'Egal' },
                         parameters: ['1', '=', '1'],
-                        subInstructions: [],
                       },
                       {
-                        type: { inverted: false, value: 'StrEqual' },
+                        type: { value: 'StrEqual' },
                         parameters: ['"1"', '=', '"1"'],
-                        subInstructions: [],
                       },
                     ],
                   },
                   {
-                    type: { inverted: false, value: 'StrEqual' },
+                    type: { value: 'StrEqual' },
                     parameters: ['"1"', '=', '"1"'],
-                    subInstructions: [],
                   },
                 ],
               },
               {
-                type: { inverted: false, value: 'StrEqual' },
+                type: { value: 'StrEqual' },
                 parameters: ['"1"', '=', '"1"'],
-                subInstructions: [],
               },
             ],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '=', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -248,15 +218,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   it('generates a working function creating objects', function () {
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'Create' },
+            type: { value: 'Create' },
             parameters: ['', 'MyObjectA', '0', '0', ''],
-            subInstructions: [],
           },
         ],
         events: [makeAddOneToObjectTestVariableEvent('MyObjectA')],
@@ -430,47 +397,37 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Event to create an object, then add
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Once',
             },
             parameters: [],
-            subInstructions: [],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
       },
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Once',
             },
             parameters: [],
-            subInstructions: [],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -511,47 +468,37 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const eventsSerializerElement = gd.Serializer.fromJSON(
       JSON.stringify([
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [
             {
               type: {
-                inverted: false,
                 value: 'BuiltinCommonInstructions::Once',
               },
               parameters: [],
-              subInstructions: [],
             },
           ],
           actions: [
             {
-              type: { inverted: false, value: 'ModVarScene' },
+              type: { value: 'ModVarScene' },
               parameters: ['SuccessVariable', '+', '1'],
-              subInstructions: [],
             },
           ],
           events: [],
         },
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [
             {
               type: {
-                inverted: false,
                 value: 'BuiltinCommonInstructions::Once',
               },
               parameters: [],
-              subInstructions: [],
             },
           ],
           actions: [
             {
-              type: { inverted: false, value: 'ModVarScene' },
+              type: { value: 'ModVarScene' },
               parameters: ['SuccessVariable', '+', '1'],
-              subInstructions: [],
             },
           ],
           events: [],
@@ -611,15 +558,12 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Event to create an object, then add
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
         events: [],
@@ -636,10 +580,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const runCompiledEvents = generateCompiledEventsForEventsFunction(
       gd,
       project,
-      eventsFunction,
-      {
-        dontCallGeneratedFunction: true,
-      }
+      eventsFunction
     );
 
     const { gdjs, runtimeScene, mocks } = makeMinimalGDJSMock();
@@ -658,9 +599,7 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
 
     // Simulate a hot reloading by recompiling the function and running it again.
     const runHotReloadedCompiledEvents =
-      generateCompiledEventsForEventsFunction(gd, project, eventsFunction, {
-        dontCallGeneratedFunction: true,
-      });
+      generateCompiledEventsForEventsFunction(gd, project, eventsFunction);
     runHotReloadedCompiledEvents(
       gdjs,
       runtimeScene /*, Don't pass arguments to not run the function. */

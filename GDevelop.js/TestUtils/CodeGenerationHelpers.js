@@ -6,7 +6,12 @@
  * In this context, GDJS game engine does not exist, so you must pass a mock
  * to it to validate that the events are working properly.
  */
-function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
+function generateCompiledEventsForEventsFunction(
+  gd,
+  project,
+  eventsFunction,
+  logCode = false
+) {
   const namespace = 'functionNamespace';
   const eventsFunctionsExtensionCodeGenerator =
     new gd.EventsFunctionsExtensionCodeGenerator(project);
@@ -23,8 +28,7 @@ function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
   eventsFunctionsExtensionCodeGenerator.delete();
   includeFiles.delete();
 
-  // Uncomment to see the generated code:
-  // console.log(code);
+  if (logCode) console.log(code);
 
   // Create a "real" JavaScript function with the generated code.
   const runCompiledEventsFunction = new Function(
@@ -37,9 +41,9 @@ function generateCompiledEventsForEventsFunction(gd, project, eventsFunction) {
       code +
       // Return the function for it to be called (if arguments are passed).
       `;
-  return functionArguments ?
-    functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
-    null;`
+    return functionArguments ?
+      functionNamespace.func.apply(functionNamespace.func, [runtimeScene, ...functionArguments, runtimeScene]) :
+      null;`
   );
 
   return runCompiledEventsFunction;

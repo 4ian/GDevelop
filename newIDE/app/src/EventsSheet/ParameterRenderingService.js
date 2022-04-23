@@ -37,6 +37,7 @@ import ObjectVariableField, {
   renderInlineObjectVariable,
 } from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
+import ImageResourceField from './ParameterFields/ImageResourceField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
 import JsonResourceField from './ParameterFields/JsonResourceField';
@@ -56,6 +57,9 @@ import ObjectAnimationNameField from './ParameterFields/ObjectAnimationNameField
 import FunctionParameterNameField from './ParameterFields/FunctionParameterNameField';
 import ExternalLayoutNameField from './ParameterFields/ExternalLayoutNameField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
+import LeaderboardIdField, {
+  renderInlineLeaderboardIdField,
+} from './ParameterFields/LeaderboardIdField';
 const gd: libGDevelop = global.gd;
 
 const components = {
@@ -78,6 +82,7 @@ const components = {
   file: DefaultField, //TODO
   musicfile: AudioResourceField,
   soundfile: AudioResourceField,
+  imageResource: ImageResourceField,
   videoResource: VideoResourceField,
   jsonResource: JsonResourceField,
   bitmapFontResource: BitmapFontResourceField,
@@ -95,6 +100,7 @@ const components = {
   objectAnimationName: ObjectAnimationNameField,
   functionParameterName: FunctionParameterNameField,
   externalLayoutName: ExternalLayoutNameField,
+  leaderboardId: LeaderboardIdField,
 };
 const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   default: renderInlineDefaultField,
@@ -109,6 +115,7 @@ const inlineRenderers: { [string]: ParameterInlineRenderer } = {
   trueorfalse: renderInlineTrueFalse,
   operator: renderInlineOperator,
   relationalOperator: renderInlineRelationalOperator,
+  leaderboardId: renderInlineLeaderboardIdField,
 };
 const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   mouse: t`Mouse button`,
@@ -128,6 +135,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   key: t`Keyboard key`,
   musicfile: t`Audio resource`,
   soundfile: t`Audio resource`,
+  imageResource: t`Image resource`,
   videoResource: t`Video resource`,
   bitmapFontResource: t`Bitmap font resource`,
   fontResource: t`Font resource`,

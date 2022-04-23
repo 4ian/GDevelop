@@ -39,7 +39,6 @@ import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/ParameterFields/KeyField';
-import AudioResourceField from '../EventsSheet/ParameterFields/AudioResourceField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -1765,25 +1764,6 @@ storiesOf('PropertiesEditor', module)
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('AudioResourceField', () => (
-    <ValueStateHolder
-      initialValue={''}
-      render={(value, onChange) => (
-        <AudioResourceField
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          value={value}
-          onChange={onChange}
-          parameterRenderingService={ParameterRenderingService}
-          resourceSources={[]}
-          onChooseResource={() => Promise.reject('unimplemented')}
-          resourceExternalEditors={fakeResourceExternalEditors}
-        />
-      )}
-    />
-  ))
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
@@ -2754,6 +2734,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          onBeginCreateEventsFunction={action('begin create events function')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2778,6 +2759,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
+          onBeginCreateEventsFunction={action('begin create events function')}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -4894,18 +4876,14 @@ storiesOf('GameDashboard/GameCard', module)
     <GameCard
       game={game1}
       isCurrentGame={false}
-      onOpenDetails={action('onOpenDetails')}
-      onOpenBuilds={action('onOpenBuilds')}
-      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenGameManager={action('onOpenGameManager')}
     />
   ))
   .add('current game', () => (
     <GameCard
       game={game1}
       isCurrentGame={true}
-      onOpenDetails={action('onOpenDetails')}
-      onOpenBuilds={action('onOpenBuilds')}
-      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenGameManager={action('onOpenGameManager')}
     />
   ));
 

@@ -31,7 +31,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
   gd::EventsCodeGenerationContext c1(&maxDepth);
   c1.ObjectsListNeeded("c1.object1");
   c1.ObjectsListNeeded("c1.object2");
-  c1.ObjectsListWithoutPickingNeeded("c1.noPicking1");
+  c1.ObjectsListNeededOrEmptyIfJustDeclared("c1.noPicking1");
 
   gd::EventsCodeGenerationContext c2;
   c2.InheritsFrom(c1);
@@ -47,7 +47,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
 
   gd::EventsCodeGenerationContext c5;
   c5.InheritsFrom(c2);
-  c5.ObjectsListWithoutPickingNeeded("c5.noPicking1");
+  c5.ObjectsListNeededOrEmptyIfJustDeclared("c5.noPicking1");
   c5.ObjectsListNeeded("c5.object1");
   c5.ObjectsListNeeded("c1.object2");
   c5.EmptyObjectsListNeeded("c5.empty1");
@@ -73,7 +73,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c1.GetObjectsListsAlreadyDeclaredByParents() == std::set<gd::String>());
     REQUIRE(c1.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c1.object1", "c1.object2"}));
-    REQUIRE(c1.GetObjectsListsToBeDeclaredWithoutPicking() ==
+    REQUIRE(c1.GetObjectsListsToBeEmptyIfJustDeclared() ==
             std::set<gd::String>({"c1.noPicking1"}));
     REQUIRE(c1.GetAllObjectsToBeDeclared() ==
             std::set<gd::String>({"c1.object1", "c1.object2", "c1.noPicking1"}));
@@ -82,7 +82,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
             std::set<gd::String>({"c1.object1", "c1.object2", "c1.noPicking1"}));
     REQUIRE(c2.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c2.object1"}));
-    REQUIRE(c2.GetObjectsListsToBeDeclaredWithoutPicking() == std::set<gd::String>());
+    REQUIRE(c2.GetObjectsListsToBeEmptyIfJustDeclared() == std::set<gd::String>());
     REQUIRE(c2.GetAllObjectsToBeDeclared() ==
             std::set<gd::String>({"c2.object1"}));
 
@@ -90,7 +90,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
             std::set<gd::String>({"c1.object1", "c1.object2", "c1.noPicking1"}));
     REQUIRE(c3.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c3.object1", "c1.object2"}));
-    REQUIRE(c3.GetObjectsListsToBeDeclaredWithoutPicking() == std::set<gd::String>());
+    REQUIRE(c3.GetObjectsListsToBeEmptyIfJustDeclared() == std::set<gd::String>());
     REQUIRE(c3.GetAllObjectsToBeDeclared() ==
             std::set<gd::String>({"c3.object1", "c1.object2"}));
 
@@ -99,7 +99,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
                 {"c1.object1", "c1.object2", "c1.noPicking1", "c2.object1"}));
     REQUIRE(c5.GetObjectsListsToBeDeclared() ==
             std::set<gd::String>({"c5.object1", "c1.object2"}));
-    REQUIRE(c5.GetObjectsListsToBeDeclaredWithoutPicking() ==
+    REQUIRE(c5.GetObjectsListsToBeEmptyIfJustDeclared() ==
             std::set<gd::String>({"c5.noPicking1"}));
     REQUIRE(c5.GetObjectsListsToBeDeclaredEmpty() ==
             std::set<gd::String>({"c5.empty1"}));
@@ -107,7 +107,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
             std::set<gd::String>({"c5.object1", "c5.noPicking1", "c1.object2", "c5.empty1"}));
   }
 
-  SECTION("ObjectAlreadyDeclared") {
+  SECTION("ObjectAlreadyDeclaredByParents") {
     REQUIRE(c1.ObjectAlreadyDeclaredByParents("c1.object1") == false);
     REQUIRE(c2.ObjectAlreadyDeclaredByParents("c1.object1") == true);
     REQUIRE(c3.ObjectAlreadyDeclaredByParents("c1.object1") == true);
@@ -198,34 +198,34 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
      */
     gd::EventsCodeGenerationContext c1;
     c1.ObjectsListNeeded("c1.object1");
-    c1.ObjectsListWithoutPickingNeeded("c1.noPicking1");
+    c1.ObjectsListNeededOrEmptyIfJustDeclared("c1.noPicking1");
     c1.EmptyObjectsListNeeded("c1.empty1");
 
     gd::EventsCodeGenerationContext c2;
     c2.InheritsAsAsyncCallbackFrom(c1);
     c2.ObjectsListNeeded("c2.object1");
-    c2.ObjectsListWithoutPickingNeeded("c2.noPicking1");
+    c2.ObjectsListNeededOrEmptyIfJustDeclared("c2.noPicking1");
     c2.EmptyObjectsListNeeded("c2.empty1");
     c2.ObjectsListNeeded("c1.object1");
 
     gd::EventsCodeGenerationContext c3;
     c3.InheritsAsAsyncCallbackFrom(c2);
     c3.ObjectsListNeeded("c3.object1");
-    c3.ObjectsListWithoutPickingNeeded("c3.noPicking1");
+    c3.ObjectsListNeededOrEmptyIfJustDeclared("c3.noPicking1");
     c3.EmptyObjectsListNeeded("c3.empty1");
     c3.ObjectsListNeeded("c1.object1");
 
     gd::EventsCodeGenerationContext c4;
     c4.InheritsFrom(c3);
     c4.ObjectsListNeeded("c4.object1");
-    c4.ObjectsListWithoutPickingNeeded("c4.noPicking1");
+    c4.ObjectsListNeededOrEmptyIfJustDeclared("c4.noPicking1");
     c4.EmptyObjectsListNeeded("c4.empty1");
     c4.ObjectsListNeeded("c1.object1");
 
     gd::EventsCodeGenerationContext c5;
     c5.InheritsFrom(c4);
     c5.ObjectsListNeeded("c5.object1");
-    c5.ObjectsListWithoutPickingNeeded("c5.noPicking1");
+    c5.ObjectsListNeededOrEmptyIfJustDeclared("c5.noPicking1");
     c5.EmptyObjectsListNeeded("c5.empty1");
     c5.ObjectsListNeeded("c1.object1");
 

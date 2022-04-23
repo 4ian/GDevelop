@@ -3,6 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
+import OpenInNew from '@material-ui/icons/OpenInNew';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -14,8 +15,11 @@ import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import Window from '../Utils/Window';
+import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 
 type DisplayedProfile = {
+  id: string,
   +email?: string,
   description: ?string,
   username: ?string,
@@ -44,21 +48,41 @@ const ProfileDetails = ({
     <I18n>
       {({ i18n }) => (
         <Column>
-          <Line alignItems="center">
-            <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
-            <Spacer />
-            <Text
-              size="title"
-              style={{
-                opacity: profile.username ? 1.0 : 0.5,
-              }}
-            >
-              {profile.username ||
-                (isAuthenticatedUserProfile
-                  ? i18n._(t`Edit your profile to pick a username!`)
-                  : i18n._(t`No username`))}
-            </Text>
-          </Line>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            justifyContent="space-between"
+            noColumnMargin
+          >
+            <Line>
+              <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
+              <Spacer />
+              <Text
+                size="title"
+                style={{
+                  opacity: profile.username ? 1.0 : 0.5,
+                }}
+              >
+                {profile.username ||
+                  (isAuthenticatedUserProfile
+                    ? i18n._(t`Edit your profile to pick a username!`)
+                    : i18n._(t`No username`))}
+              </Text>
+            </Line>
+            {profile.id && (
+              <RaisedButton
+                label={i18n._(t`Access public profile`)}
+                onClick={() =>
+                  Window.openExternalURL(
+                    GDevelopGamesPlatform.getUserPublicProfileUrl(
+                      profile.id,
+                      profile.username
+                    )
+                  )
+                }
+                icon={<OpenInNew />}
+              />
+            )}
+          </ResponsiveLineStackLayout>
           {isAuthenticatedUserProfile && profile.email && (
             <Line>
               <TextField

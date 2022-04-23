@@ -26,8 +26,8 @@ void EventsCodeGenerationContext::InheritsFrom(
             parent_.objectsListsToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
-  std::copy(parent_.objectsListsWithoutPickingToBeDeclared.begin(),
-            parent_.objectsListsWithoutPickingToBeDeclared.end(),
+  std::copy(parent_.objectsListsOrEmptyToBeDeclared.begin(),
+            parent_.objectsListsOrEmptyToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
   std::copy(parent_.emptyObjectsListsToBeDeclared.begin(),
@@ -77,10 +77,10 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
   depthOfLastUse[objectName] = GetContextDepth();
 }
 
-void EventsCodeGenerationContext::ObjectsListWithoutPickingNeeded(
+void EventsCodeGenerationContext::ObjectsListNeededOrEmptyIfJustDeclared(
     const gd::String& objectName) {
   if (!IsToBeDeclared(objectName))
-    objectsListsWithoutPickingToBeDeclared.insert(objectName);
+    objectsListsOrEmptyToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
@@ -97,9 +97,8 @@ std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
     const {
   std::set<gd::String> allObjectListsToBeDeclared(
       objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
-  allObjectListsToBeDeclared.insert(
-      objectsListsWithoutPickingToBeDeclared.begin(),
-      objectsListsWithoutPickingToBeDeclared.end());
+  allObjectListsToBeDeclared.insert(objectsListsOrEmptyToBeDeclared.begin(),
+                                    objectsListsOrEmptyToBeDeclared.end());
   allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(),
                                     emptyObjectsListsToBeDeclared.end());
 

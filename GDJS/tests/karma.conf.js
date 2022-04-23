@@ -74,6 +74,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/LinkedObjects/linkedobjects.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventory.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventorytools.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Leaderboards/leaderboardstools.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightobstacleruntimebehavior.js',

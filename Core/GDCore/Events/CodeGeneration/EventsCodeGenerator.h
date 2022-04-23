@@ -506,18 +506,11 @@ class GD_CORE_API EventsCodeGenerator {
    * Other standard parameters type that should be implemented by platforms:
    * - currentScene: Reference to the current runtime scene.
    * - objectList : a map containing lists of objects which are specified by the
-  object name in another parameter. Example:
-   * \code
-      AddExpression("Count", _("Object count"), _("Count the number of picked
-  objects"), _("Objects"), "res/conditions/nbObjet.png")
-      .AddParameter("objectList", _("Object"))
-      .SetFunctionName("getPickedObjectsCount");
-
-   * \endcode
-   * - objectListWithoutPicking : Same as objectList but do not pick object if
+  object name in another parameter.
+   * - objectListOrEmptyIfJustDeclared : Same as `objectList` but do not pick object if
   they are not already picked.
-   * - objectPtr : Return a reference to the object specified by the object name
-  in another parameter. Example:
+   * - objectPtr: Return a reference to the object specified by the object name in
+  another parameter. Example:
    * \code
   .AddParameter("object", _("Object"))
   .AddParameter("objectPtr", _("Target object"))

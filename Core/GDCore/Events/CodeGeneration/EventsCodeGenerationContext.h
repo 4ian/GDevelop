@@ -88,19 +88,19 @@ class GD_CORE_API EventsCodeGenerationContext {
   const EventsCodeGenerationContext* GetParentContext() const { return parent; }
 
   /**
-   * Mark the object has being the object being handled by the instruction
+   * Mark the object as being the object being handled by the instruction.
    */
   void SetCurrentObject(const gd::String& objectName) {
     currentObject = objectName;
   };
 
   /**
-   * Set that no particular object is being handled by an instruction
+   * Set that no particular object is being handled by an instruction.
    */
   void SetNoCurrentObject() { currentObject = ""; };
 
   /**
-   * Get the object being handled by the instruction
+   * Get the object being handled by the instruction.
    */
   const gd::String& GetCurrentObject() const { return currentObject; };
 
@@ -109,7 +109,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    *
    * The list will be filled with objects from the scene if it is the first time
    * it is requested, unless there is already an object list with this name
-   * (i.e. `ObjectAlreadyDeclared(objectName)` returns true).
+   * (i.e. `ObjectAlreadyDeclaredByParents(objectName)` returns true).
    */
   void ObjectsListNeeded(const gd::String& objectName);
 
@@ -121,7 +121,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * from the scene. If there is already an objects list with this name, no new
    * list will be declared again.
    */
-  void ObjectsListWithoutPickingNeeded(const gd::String& objectName);
+  void ObjectsListNeededOrEmptyIfJustDeclared(const gd::String& objectName);
 
   /**
    * Call this when an instruction in the event needs an empty object list,
@@ -134,10 +134,9 @@ class GD_CORE_API EventsCodeGenerationContext {
   void EmptyObjectsListNeeded(const gd::String& objectName);
 
   /**
-   * Return true if an object list has already been declared (or is going to be
-   * declared).
+   * Return true if an object list has already been declared by the parent contexts.
    */
-  bool ObjectAlreadyDeclared(const gd::String& objectName) const {
+  bool ObjectAlreadyDeclaredByParents(const gd::String& objectName) const {
     return (alreadyDeclaredObjectsLists.find(objectName) !=
             alreadyDeclaredObjectsLists.end());
   };
@@ -166,9 +165,9 @@ class GD_CORE_API EventsCodeGenerationContext {
    * Return the objects lists which will be will be declared, without filling
    * them with objects from the scene.
    */
-  const std::set<gd::String>& GetObjectsListsToBeDeclaredWithoutPicking()
+  const std::set<gd::String>& GetObjectsListsToBeEmptyIfJustDeclared()
       const {
-    return objectsListsWithoutPickingToBeDeclared;
+    return objectsListsOrEmptyToBeDeclared;
   };
 
   /**
@@ -184,7 +183,7 @@ class GD_CORE_API EventsCodeGenerationContext {
    * Return the objects lists which are already declared and can be used in the
    * current context without declaration.
    */
-  const std::set<gd::String>& GetObjectsListsAlreadyDeclared() const {
+  const std::set<gd::String>& GetObjectsListsAlreadyDeclaredByParents() const {
     return alreadyDeclaredObjectsLists;
   };
 
@@ -227,22 +226,20 @@ class GD_CORE_API EventsCodeGenerationContext {
    */
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
- private:
   /**
    * \brief Returns true if the given object is already going to be declared
-   * (either as a traditional objects list, or one without picking, or one
-   * empty).
-   *
+   * (either as a traditional objects list, or an empty one).
    */
   bool IsToBeDeclared(const gd::String& objectName) {
     return objectsListsToBeDeclared.find(objectName) !=
                objectsListsToBeDeclared.end() ||
-           objectsListsWithoutPickingToBeDeclared.find(objectName) !=
-               objectsListsWithoutPickingToBeDeclared.end() ||
+           objectsListsOrEmptyToBeDeclared.find(objectName) !=
+               objectsListsOrEmptyToBeDeclared.end() ||
            emptyObjectsListsToBeDeclared.find(objectName) !=
                emptyObjectsListsToBeDeclared.end();
   };
 
+ private:
   std::set<gd::String>
       alreadyDeclaredObjectsLists;  ///< Objects lists already needed in a
                                     ///< parent context.
@@ -250,7 +247,7 @@ class GD_CORE_API EventsCodeGenerationContext {
       objectsListsToBeDeclared;  ///< Objects lists that will be declared in
                                  ///< this context.
   std::set<gd::String>
-      objectsListsWithoutPickingToBeDeclared;  ///< Objects lists that will be
+      objectsListsOrEmptyToBeDeclared;  ///< Objects lists that will be
                                                ///< declared in this context,
                                                ///< but not filled with scene's
                                                ///< objects.

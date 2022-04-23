@@ -51,27 +51,21 @@ describe('libGD.js - GDJS Behavior Code Generation integration tests', function 
 
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
             type: {
-              inverted: false,
               value: 'BuiltinCommonInstructions::Once',
             },
             parameters: [],
-            subInstructions: [],
           },
         ],
         actions: [
           {
-            type: { inverted: false, value: 'ModVarScene' },
+            type: { value: 'ModVarScene' },
             parameters: ['SuccessVariable', '+', '1'],
-            subInstructions: [],
           },
         ],
-        events: [],
       },
     ]);
     eventsBasedBehavior

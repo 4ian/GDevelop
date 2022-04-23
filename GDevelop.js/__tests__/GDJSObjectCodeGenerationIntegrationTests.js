@@ -18,8 +18,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     const prepareCompiledEvents = () => {
       const eventsSerializerElement = gd.Serializer.fromJSObject([
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           // This condition should pass, but do not change the picking of the objects.
           conditions: [
@@ -149,8 +147,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     it('counts picked instances in a function', function () {
       const eventsSerializerElement = gd.Serializer.fromJSObject([
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [],
           actions: [
@@ -165,8 +161,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
           ],
           events: [
             {
-              disabled: false,
-              folded: false,
               type: 'BuiltinCommonInstructions::Standard',
               conditions: [
                 {
@@ -238,8 +232,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     it('counts picked instances in a function after creating an object', function () {
       const eventsSerializerElement = gd.Serializer.fromJSObject([
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [],
           actions: [
@@ -254,8 +246,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
           ],
           events: [
             {
-              disabled: false,
-              folded: false,
               type: 'BuiltinCommonInstructions::Standard',
               conditions: [],
               actions: [
@@ -269,13 +259,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 },
                 {
                   type: { value: 'Create' },
-                  parameters: [
-                    '',
-                    'MyParamObject',
-                    '0',
-                    '0',
-                    '',
-                  ],
+                  parameters: ['', 'MyParamObject', '0', '0', ''],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -344,8 +328,20 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       expect(runtimeScene.getObjects('MyObjectB').length).toBe(1);
 
       // Check only the created object was modified.
-      expect(runtimeScene.getObjects('MyObjectA')[0].getVariables().get('Picked').getAsNumber()).toBe(0);
-      expect(runtimeScene.getObjects('MyObjectA')[1].getVariables().get('Picked').getAsNumber()).toBe(1);
+      expect(
+        runtimeScene
+          .getObjects('MyObjectA')[0]
+          .getVariables()
+          .get('Picked')
+          .getAsNumber()
+      ).toBe(0);
+      expect(
+        runtimeScene
+          .getObjects('MyObjectA')[1]
+          .getVariables()
+          .get('Picked')
+          .getAsNumber()
+      ).toBe(1);
 
       eventsFunction.delete();
       project.delete();
@@ -354,8 +350,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
     it('counts picked instances in a function after creating an object, including a partially picked object group', function () {
       const eventsSerializerElement = gd.Serializer.fromJSObject([
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [],
           actions: [
@@ -378,8 +372,6 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
           ],
           events: [
             {
-              disabled: false,
-              folded: false,
               type: 'BuiltinCommonInstructions::Standard',
               conditions: [
                 {
@@ -406,13 +398,7 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                 },
                 {
                   type: { value: 'Create' },
-                  parameters: [
-                    '',
-                    'ObjectParam1',
-                    '0',
-                    '0',
-                    '',
-                  ],
+                  parameters: ['', 'ObjectParam1', '0', '0', ''],
                 },
                 {
                   type: { value: 'ModVarScene' },
@@ -485,22 +471,50 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       runCompiledEvents(gdjs, runtimeScene, [objectsLists1, objectsLists2]);
 
       // Check that the picked instances were properly counted.
-      expect(runtimeScene.getVariables().has('Result1_MyObjectGroup')).toBe(true);
-      expect(runtimeScene.getVariables().has('Result1_ObjectParam1')).toBe(true);
-      expect(runtimeScene.getVariables().get('Result1_MyObjectGroup').getAsNumber()).toBe(0);
-      expect(runtimeScene.getVariables().get('Result1_ObjectParam1').getAsNumber()).toBe(0);
-      expect(runtimeScene.getVariables().get('Result2_MyObjectGroup').getAsNumber()).toBe(1);
-      expect(runtimeScene.getVariables().get('Result2_ObjectParam1').getAsNumber()).toBe(1);
-      expect(runtimeScene.getVariables().get('Result3_MyObjectGroup').getAsNumber()).toBe(2);
-      expect(runtimeScene.getVariables().get('Result4_MyObjectGroup').getAsNumber()).toBe(3);
+      expect(runtimeScene.getVariables().has('Result1_MyObjectGroup')).toBe(
+        true
+      );
+      expect(runtimeScene.getVariables().has('Result1_ObjectParam1')).toBe(
+        true
+      );
+      expect(
+        runtimeScene.getVariables().get('Result1_MyObjectGroup').getAsNumber()
+      ).toBe(0);
+      expect(
+        runtimeScene.getVariables().get('Result1_ObjectParam1').getAsNumber()
+      ).toBe(0);
+      expect(
+        runtimeScene.getVariables().get('Result2_MyObjectGroup').getAsNumber()
+      ).toBe(1);
+      expect(
+        runtimeScene.getVariables().get('Result2_ObjectParam1').getAsNumber()
+      ).toBe(1);
+      expect(
+        runtimeScene.getVariables().get('Result3_MyObjectGroup').getAsNumber()
+      ).toBe(2);
+      expect(
+        runtimeScene.getVariables().get('Result4_MyObjectGroup').getAsNumber()
+      ).toBe(3);
 
       // Check that the MyObjectA was created.
       expect(runtimeScene.getObjects('MyObjectA').length).toBe(2);
       expect(runtimeScene.getObjects('MyObjectB').length).toBe(2);
 
       // Check only the created object and previously picked objects were modified.
-      expect(runtimeScene.getObjects('MyObjectA')[0].getVariables().get('Picked').getAsNumber()).toBe(1);
-      expect(runtimeScene.getObjects('MyObjectA')[1].getVariables().get('Picked').getAsNumber()).toBe(1);
+      expect(
+        runtimeScene
+          .getObjects('MyObjectA')[0]
+          .getVariables()
+          .get('Picked')
+          .getAsNumber()
+      ).toBe(1);
+      expect(
+        runtimeScene
+          .getObjects('MyObjectA')[1]
+          .getVariables()
+          .get('Picked')
+          .getAsNumber()
+      ).toBe(1);
       expect(myObjectB1.getVariables().get('Picked').getAsNumber()).toBe(0);
       expect(myObjectB2.getVariables().get('Picked').getAsNumber()).toBe(1);
 

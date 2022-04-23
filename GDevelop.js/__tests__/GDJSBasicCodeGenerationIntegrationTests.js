@@ -10,8 +10,6 @@ const {
  * "TestVariable" of the specified object (or object group).
  */
 const makeAddOneToObjectTestVariableEvent = (objectName) => ({
-  disabled: false,
-  folded: false,
   type: 'BuiltinCommonInstructions::Standard',
   conditions: [],
   actions: [
@@ -36,8 +34,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Create nested events using And and StrEqual conditions
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [],
         actions: [
@@ -49,8 +45,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         events: [],
       },
       {
-        disabled: false,
-        folded: false,
         infiniteLoopWarning: true,
         type: 'BuiltinCommonInstructions::While',
         whileConditions: [
@@ -86,8 +80,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Create nested events using Or and StrEqual conditions
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
@@ -148,8 +140,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Create nested events using And and StrEqual conditions
     const serializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
@@ -228,8 +218,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
   it('generates a working function creating objects', function () {
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [],
         actions: [
@@ -409,8 +397,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Event to create an object, then add
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
@@ -429,8 +415,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
         events: [],
       },
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [
           {
@@ -484,8 +468,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     const eventsSerializerElement = gd.Serializer.fromJSON(
       JSON.stringify([
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [
             {
@@ -504,8 +486,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
           events: [],
         },
         {
-          disabled: false,
-          folded: false,
           type: 'BuiltinCommonInstructions::Standard',
           conditions: [
             {
@@ -578,8 +558,6 @@ describe('libGD.js - GDJS Code Generation integration tests', function () {
     // Event to create an object, then add
     const eventsSerializerElement = gd.Serializer.fromJSObject([
       {
-        disabled: false,
-        folded: false,
         type: 'BuiltinCommonInstructions::Standard',
         conditions: [],
         actions: [

@@ -88,19 +88,19 @@ class GD_CORE_API EventsCodeGenerationContext {
   const EventsCodeGenerationContext* GetParentContext() const { return parent; }
 
   /**
-   * Mark the object has being the object being handled by the instruction
+   * Mark the object as being the object being handled by the instruction.
    */
   void SetCurrentObject(const gd::String& objectName) {
     currentObject = objectName;
   };
 
   /**
-   * Set that no particular object is being handled by an instruction
+   * Set that no particular object is being handled by an instruction.
    */
   void SetNoCurrentObject() { currentObject = ""; };
 
   /**
-   * Get the object being handled by the instruction
+   * Get the object being handled by the instruction.
    */
   const gd::String& GetCurrentObject() const { return currentObject; };
 
@@ -228,9 +228,7 @@ class GD_CORE_API EventsCodeGenerationContext {
 
   /**
    * \brief Returns true if the given object is already going to be declared
-   * (either as a traditional objects list, or one without picking, or one
-   * empty).
-   *
+   * (either as a traditional objects list, or an empty one).
    */
   bool IsToBeDeclared(const gd::String& objectName) {
     return objectsListsToBeDeclared.find(objectName) !=

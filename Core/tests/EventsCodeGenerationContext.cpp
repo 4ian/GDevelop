@@ -184,63 +184,85 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
   }
 
   SECTION("Async") {
-    /**
-     * Generate a tree of contexts with declared objects as below:
-     *                  c1 -> c1.object1, c1.noPicking1 (no picking request), c1.empty1 (empty list request)
-     *                   \
-     *                   c2 (async) -> c2.object1, c2.noPicking1, c2.empty1
-     *                   \
-     *                   c3 (async) -> c3.object1, c3.noPicking1, c3.empty1
-     *                   \
-     *                   c4 -> c4.object1, c4.noPicking1, c4.empty1
-     *                   \
-     *                   c5 -> c5.object1, c5.noPicking1, c5.empty1
-     */
     gd::EventsCodeGenerationContext c1;
     c1.ObjectsListNeeded("c1.object1");
-    c1.ObjectsListNeededOrEmptyIfJustDeclared("c1.noPicking1");
+    c1.ObjectsListNeeded("c1.object2");
+    c1.ObjectsListNeededOrEmptyIfJustDeclared("c1.possiblyEmpty1");
     c1.EmptyObjectsListNeeded("c1.empty1");
 
     gd::EventsCodeGenerationContext c2;
     c2.InheritsAsAsyncCallbackFrom(c1);
     c2.ObjectsListNeeded("c2.object1");
-    c2.ObjectsListNeededOrEmptyIfJustDeclared("c2.noPicking1");
+    c2.ObjectsListNeededOrEmptyIfJustDeclared("c2.possiblyEmpty1");
     c2.EmptyObjectsListNeeded("c2.empty1");
     c2.ObjectsListNeeded("c1.object1");
 
     gd::EventsCodeGenerationContext c3;
     c3.InheritsAsAsyncCallbackFrom(c2);
     c3.ObjectsListNeeded("c3.object1");
-    c3.ObjectsListNeededOrEmptyIfJustDeclared("c3.noPicking1");
+    c3.ObjectsListNeededOrEmptyIfJustDeclared("c3.possiblyEmpty1");
     c3.EmptyObjectsListNeeded("c3.empty1");
     c3.ObjectsListNeeded("c1.object1");
 
     gd::EventsCodeGenerationContext c4;
     c4.InheritsFrom(c3);
     c4.ObjectsListNeeded("c4.object1");
-    c4.ObjectsListNeededOrEmptyIfJustDeclared("c4.noPicking1");
+    c4.ObjectsListNeededOrEmptyIfJustDeclared("c4.possiblyEmpty1");
     c4.EmptyObjectsListNeeded("c4.empty1");
     c4.ObjectsListNeeded("c1.object1");
+    c4.ObjectsListNeeded("c1.object2");
 
     gd::EventsCodeGenerationContext c5;
     c5.InheritsFrom(c4);
     c5.ObjectsListNeeded("c5.object1");
-    c5.ObjectsListNeededOrEmptyIfJustDeclared("c5.noPicking1");
+    c5.ObjectsListNeededOrEmptyIfJustDeclared("c5.possiblyEmpty1");
     c5.EmptyObjectsListNeeded("c5.empty1");
     c5.ObjectsListNeeded("c1.object1");
+    c5.ObjectsListNeeded("c1.object2");
 
     REQUIRE(c1.ShouldUseAsyncObjectsList("c1.object1") == false);
-    REQUIRE(c1.ShouldUseAsyncObjectsList("c1.noPicking1") == false);
+    REQUIRE(c1.ShouldUseAsyncObjectsList("c1.possiblyEmpty1") == false);
     REQUIRE(c1.ShouldUseAsyncObjectsList("c1.empty1") == false);
 
+    // Objects declared in async callback are used traditionally:
     REQUIRE(c2.ShouldUseAsyncObjectsList("c2.object1") == false);
-    REQUIRE(c2.ShouldUseAsyncObjectsList("c2.noPicking1") == false);
+    REQUIRE(c2.ShouldUseAsyncObjectsList("c2.possiblyEmpty1") == false);
     REQUIRE(c2.ShouldUseAsyncObjectsList("c2.empty1") == false);
+
+    // Objects declared in c1 are gotten from the async list in c2 and c3
+    // because these contexts use them and are async.
     REQUIRE(c2.ShouldUseAsyncObjectsList("c1.object1") == true);
     REQUIRE(c3.ShouldUseAsyncObjectsList("c1.object1") == true);
     REQUIRE(c4.ShouldUseAsyncObjectsList("c1.object1") == false);
     REQUIRE(c5.ShouldUseAsyncObjectsList("c1.object1") == false);
 
-    // TODO: finish test
+    // Objects declared in c1 are gotten from the async list in c4
+    // because c3 is async (but is not using them)
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c1.object2") == true);
+
+    // Objects declared in c1 but gotten from the async list in c4
+    // is used traditionnally:
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c1.object2") == false);
+
+    // Objects declared in or after c3 are used traditionally:
+    REQUIRE(c3.ShouldUseAsyncObjectsList("c3.object1") == false);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c3.object1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c3.object1") == false);
+    REQUIRE(c3.ShouldUseAsyncObjectsList("c3.possiblyEmpty1") == false);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c3.possiblyEmpty1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c3.possiblyEmpty1") == false);
+    REQUIRE(c3.ShouldUseAsyncObjectsList("c3.empty1") == false);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c3.empty1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c3.empty1") == false);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c4.object1") == false);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c4.possiblyEmpty1") == false);
+    REQUIRE(c4.ShouldUseAsyncObjectsList("c4.empty1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c4.object1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c4.possiblyEmpty1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c4.empty1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c5.object1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c5.possiblyEmpty1") == false);
+    REQUIRE(c5.ShouldUseAsyncObjectsList("c5.empty1") == false);
+
   }
 }

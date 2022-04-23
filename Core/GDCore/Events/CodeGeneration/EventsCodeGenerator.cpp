@@ -815,7 +815,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
                               GetObjectListName(object, context) +
                               " = runtimeContext->GetObjectsRawPointers(\"" +
                               ConvertToString(object) + "\");\n";
-      // context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
 
@@ -826,7 +825,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";
-      // context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
 
@@ -837,7 +835,6 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";
-      // context.SetObjectDeclared(object);
     } else
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";

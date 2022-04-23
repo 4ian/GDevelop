@@ -743,7 +743,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   gd::String declarationsCode;
   for (auto object : context.GetObjectsListsToBeDeclared()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) +
                               " = runtimeContext->GetObjectsRawPointers(\"" +
@@ -754,9 +754,9 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
-  for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
+  for (auto object : context.GetObjectsListsToBeEmptyIfJustDeclared()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";
       context.SetObjectDeclared(object);
@@ -767,7 +767,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
   }
   for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
     gd::String objectListDeclaration = "";
-    if (!context.ObjectAlreadyDeclared(object)) {
+    if (!context.ObjectAlreadyDeclaredByParents(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +
                               GetObjectListName(object, context) + ";\n";
       context.SetObjectDeclared(object);

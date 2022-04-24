@@ -9,7 +9,8 @@ import TextField from '../TextField';
 import RaisedButton from '../RaisedButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 
 const styles = {
   container: {
@@ -42,7 +43,7 @@ export default class LocalFolderPicker extends PureComponent<Props, {||}> {
   _onChooseFolder = ({ title, message }: TitleAndMessage) => {
     if (!dialog || !electron) return;
 
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
     dialog
       .showOpenDialog(browserWindow, {
         title,

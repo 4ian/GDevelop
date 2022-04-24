@@ -182,7 +182,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProjectFolder = () => {
     const project = this.props.project;
-    if (shell) shell.openItem(path.dirname(project.getProjectFile()));
+    if (shell) shell.openPath(path.dirname(project.getProjectFile()));
   };
 
   openProperties = () => {

@@ -223,9 +223,10 @@ class GD_CORE_API EventsCodeGenerationContext {
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
   /**
-   * Only works on an async callback's context!
+   * \brief Returns the list of all objects declared in this context
+   * and subcontexts.
+   * \warning Only works on an async callback's context.
    *
-   * Returns the list of all objects declared in this context and subcontexts.
    * It is to be used by the Async event code generator to know what objects
    * lists to backup for the async callback and async callbacks after it.
    */
@@ -234,27 +235,23 @@ class GD_CORE_API EventsCodeGenerationContext {
   };
 
   /**
-   * Returns true if the base object list should be gotten from a backed up
-   * objects list instead of the scene. This happens when inside of an
-   * asynchronous callback, where the objects to be declared are cleared, since
-   * the lists from the higher context do not exist anymore, frames have passed
-   * and the lists objects have been cleared and reused to pick other objects.
-   * Therefore, a backup of the lists is passed down to asynchronous events
-   * where they can get previously picked objects from.
-   *
-   * This returns true if the nearest parent with depth 0 OR an asynchronous
-   * context with a different depth than the current one has defined the object.
+   * Returns true if an object list should be gotten from a backed up
+   * objects list instead of the parent context. This can happen inside an
+   * asynchronous callback or a child context of an asynchronous callback (i.e:
+   * the `asyncDepth` is not 0).
    */
   bool ShouldUseAsyncObjectsList(const gd::String& objectName) const;
 
   /**
-   * Returns true if the code currently being generated is asynchronous
+   * Returns true if the code currently being generated is inside an
+   * asynchronous context (either in an asynchronous callback, or in a children of
+   * an asynchronous callback).
    */
   bool IsInsideAsync() const { return asyncDepth != 0; };
 
   /**
    * Returns true if the code currently being generated is an asynchronous
-   * callback.
+   * callback (but not a child of an asynchronous callback).
    */
   bool IsAsyncCallback() const { return parent != nullptr && parent->asyncDepth != asyncDepth; }
 
@@ -302,29 +299,26 @@ class GD_CORE_API EventsCodeGenerationContext {
       depthOfLastUse;  ///< The context depth when an object was last used.
   gd::String
       currentObject;  ///< The object being used by an action or condition.
-  unsigned int contextDepth = 0;  ///< The depth of the context : 0 for a newly
+  unsigned int contextDepth = 0;  ///< The depth of the context: 0 for a newly
                                   ///< created context, n+1 for any context
                                   ///< inheriting from context with depth n.
   unsigned int customConditionDepth =
       0;  ///< The depth of the conditions being generated.
   unsigned int asyncDepth =
-      0;  ///< If higher than 0, the current context is executed from
-          ///< inside of an asynchronous callback. If the parents async
-          ///< depth != the current async depth, the current context is
-          ///< an asynchronous callback's context.
+      0;  ///< If higher than 0, the current context is an asynchronous callback,
+          ///< or a child context of an asynchronous callback:
+          ///< - If the parent's async depth != the current context async depth,
+          ///<   then the current context is an asynchronous callback context.
+          ///< - Otherwise, it's a child of an asynchronous callback.
   unsigned int* maxDepthLevel;  ///< A pointer to a unsigned int updated with
                                 ///< the maximum depth reached.
   const EventsCodeGenerationContext* parent =
       nullptr;  ///< The parent of the current context. Can be NULL.
   EventsCodeGenerationContext* nearestAsyncParent =
       nullptr;  ///< The nearest parent context that is an async callback
-                ///< context. This is used because async callbacks do not
-                ///< inherit declared objects lists, but sometimes their
-                ///< declared objets lists need to be accessed. This is used as
-                ///< an optimization to find all parents async callbacks
-                ///< contexts easily, without iterating through each parent.
+                ///< context.
   bool reuseExplicitlyForbidden =
-      false;  ///< If set to true, forbid children context
+      false;  ///< If set to true, forbid children contexts
               ///< to reuse this one without inheriting.
 };
 

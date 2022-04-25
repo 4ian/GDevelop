@@ -30,38 +30,6 @@ ExpressionParser2::ExpressionParser2()
     : expression(""),
       currentPosition(0) {}
 
-namespace {
-/**
- * Return the minimum number of parameters, starting from a given parameter
- * (by convention, 1 for object functions and 2 for behavior functions).
- */
-size_t GetMinimumParametersNumber(
-    const std::vector<gd::ParameterMetadata>& parameters,
-    size_t initialParameterIndex) {
-  size_t nb = 0;
-  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].optional && !parameters[i].codeOnly) nb++;
-  }
-
-  return nb;
-}
-
-/**
- * Return the maximum number of parameters, starting from a given parameter
- * (by convention, 1 for object functions and 2 for behavior functions).
- */
-size_t GetMaximumParametersNumber(
-    const std::vector<gd::ParameterMetadata>& parameters,
-    size_t initialParameterIndex) {
-  size_t nb = 0;
-  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].codeOnly) nb++;
-  }
-
-  return nb;
-}
-}  // namespace
-
 std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   size_t textStartPosition = GetCurrentPosition();
   SkipAllWhitespaces();

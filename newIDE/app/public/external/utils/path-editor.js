@@ -1,7 +1,7 @@
 const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
-const remote = electron.remote;
+const remote = require('@electron/remote');
 const { dialog } = remote;
 
 export const createPathEditorHeader = ({
@@ -104,7 +104,7 @@ export const createPathEditorHeader = ({
   headerObject.setFolderButton.addEventListener('click', selectFolderPath);
 
   const openFolderPath = () => {
-    electron.shell.openItem(headerObject.state.folderPath);
+    electron.shell.openPath(headerObject.state.folderPath);
   };
   headerObject.openFolderButton.addEventListener('click', openFolderPath);
 

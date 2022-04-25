@@ -159,14 +159,7 @@ bool ExpressionsRenamer::DoVisitInstruction(gd::Instruction& instruction,
     const gd::String& type = metadata.parameters[pNb].type;
     const gd::Expression& expression = instruction.GetParameter(pNb);
 
-    gd::ExpressionParser2 parser(
-        platform, GetGlobalObjectsContainer(), GetObjectsContainer());
-
-    auto node = gd::ParameterMetadata::IsExpression("number", type)
-                    ? expression.GetRootNode("number", parser)
-                    : (gd::ParameterMetadata::IsExpression("string", type)
-                           ? expression.GetRootNode("string", parser)
-                           : nullptr);
+    auto node = expression.GetRootNode();
     if (node) {
       ExpressionFunctionRenamer renamer(GetGlobalObjectsContainer(),
                                         GetObjectsContainer(),

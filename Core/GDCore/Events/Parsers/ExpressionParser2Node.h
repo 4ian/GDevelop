@@ -172,6 +172,36 @@ struct GD_CORE_API TextNode : public ExpressionNode {
   gd::String text;
 };
 
+struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
+    : public ExpressionNode {
+  IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode()
+      : ExpressionNode(){};
+};
+
+/**
+ * \brief An identifier node, usually representing an object or a variable.
+ */
+struct GD_CORE_API IdentifierNode
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
+  IdentifierNode(const gd::String &identifierName_)
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(),
+        identifierName(identifierName_){};
+  virtual ~IdentifierNode(){};
+  virtual void Visit(ExpressionParser2NodeWorker &worker) {
+    worker.OnVisitIdentifierNode(*this);
+  };
+
+  gd::String identifierName;
+};
+
+struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
+  FunctionCallOrObjectFunctionNameOrEmptyNode()
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(){};
+  virtual ~FunctionCallOrObjectFunctionNameOrEmptyNode(){};
+  void Visit(ExpressionParser2NodeWorker &worker) override{};
+};
+
 struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
   VariableAccessorOrVariableBracketAccessorNode() : ExpressionNode(){};
 
@@ -236,36 +266,6 @@ struct GD_CORE_API VariableBracketAccessorNode
   };
 
   std::unique_ptr<ExpressionNode> expression;
-};
-
-struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
-    : public ExpressionNode {
-  IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode()
-      : ExpressionNode(){};
-};
-
-/**
- * \brief An identifier node, usually representing an object or a variable.
- */
-struct GD_CORE_API IdentifierNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
-  IdentifierNode(const gd::String &identifierName_)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(),
-        identifierName(identifierName_){};
-  virtual ~IdentifierNode(){};
-  virtual void Visit(ExpressionParser2NodeWorker &worker) {
-    worker.OnVisitIdentifierNode(*this);
-  };
-
-  gd::String identifierName;
-};
-
-struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
-  FunctionCallOrObjectFunctionNameOrEmptyNode()
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(){};
-  virtual ~FunctionCallOrObjectFunctionNameOrEmptyNode(){};
-  void Visit(ExpressionParser2NodeWorker &worker) override{};
 };
 
 /**

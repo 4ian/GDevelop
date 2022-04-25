@@ -56,11 +56,7 @@ bool UsedExtensionsFinder::DoVisitInstruction(gd::Instruction& instruction,
 
     if (gd::ParameterMetadata::IsExpression("string", parameterType) ||
         gd::ParameterMetadata::IsExpression("number", parameterType)) {
-      gd::ExpressionParser2 parser(project.GetCurrentPlatform(),
-                                   GetGlobalObjectsContainer(),
-                                   GetObjectsContainer());
-      expression.GetRootNode(parameterType, parser)
-          ->Visit(*this);
+      expression.GetRootNode()->Visit(*this);
     } else if (gd::ParameterMetadata::IsExpression("variable", parameterType))
       usedExtensions.insert("BuiltinVariables");
   }

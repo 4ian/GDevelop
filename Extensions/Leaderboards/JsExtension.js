@@ -35,7 +35,7 @@ module.exports = {
       )
       .setExtensionHelpPath('/all-features/leaderboards')
       .setCategory('Leaderboards')
-      .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
+      .addInstructionOrExpressionGroupMetadata(_('Leaderboards (experimental)'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
     extension

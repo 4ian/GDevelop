@@ -162,7 +162,7 @@ export const ExtensionDependenciesEditor = ({
                     </TableRowColumn>
                     <TableRowColumn>
                       <IconButton
-                        tooltip={t`Remove`}
+                        tooltip={t`Delete`}
                         onClick={() => {
                           eventsFunctionsExtension.removeDependencyAt(index);
                           forceUpdate();

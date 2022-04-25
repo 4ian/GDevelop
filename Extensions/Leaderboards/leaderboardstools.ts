@@ -105,6 +105,8 @@ namespace gdjs {
       _loaderContainer.style.width = '100%';
       _loaderContainer.style.justifyContent = 'center';
       _loaderContainer.style.alignItems = 'center';
+      _loaderContainer.style.position = 'relative';
+      _loaderContainer.style.zIndex = '2';
       const _loader = document.createElement('img');
       _loader.setAttribute('width', '50px');
       _loader.setAttribute(

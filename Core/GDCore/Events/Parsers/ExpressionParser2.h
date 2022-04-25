@@ -129,6 +129,7 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(op);
     }
 
+    // TODO Use the messages for sting and number in a more general way?
     leftHandSide->diagnostic = RaiseSyntaxError(
         "More than one term was found. Verify that your expression is "
         "properly written.");
@@ -226,7 +227,7 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(subExpression);
   };
 
-  std::unique_ptr<VariableOrFunctionCallOrObjectFunctionNameOrEmptyNode>
+  std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
   Identifier(const gd::String &objectName) {
     auto identifierAndLocation = ReadIdentifierName();
     gd::String name = identifierAndLocation.name;
@@ -261,21 +262,11 @@ class GD_CORE_API ExpressionParser2 {
       return ObjectFunctionOrBehaviorFunction(
           name, nameLocation, dotLocation, "");
     } else {
-      return std::move(Variable(name, nameLocation, objectName));
+      auto identifier = gd::make_unique<IdentifierNode>(name);
+      identifier->location = ExpressionParserLocation(
+          nameLocation.GetStartPosition(), GetCurrentPosition());
+      return std::move(identifier);
     }
-  }
-
-  std::unique_ptr<VariableNode> Variable(
-      const gd::String &variableName,
-      const ExpressionParserLocation &variableNameLocation,
-      const gd::String &objectName) {
-    auto variable = gd::make_unique<VariableNode>(variableName, objectName);
-    variable->child = VariableAccessorOrVariableBracketAccessor();
-
-    variable->location = ExpressionParserLocation(
-        variableNameLocation.GetStartPosition(), GetCurrentPosition());
-    variable->nameLocation = variableNameLocation;
-    return std::move(variable);
   }
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
@@ -342,7 +333,7 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(function);
   }
 
-  std::unique_ptr<VariableOrFunctionCallOrObjectFunctionNameOrEmptyNode>
+  std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode>
   ObjectFunctionOrBehaviorFunction(
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
@@ -419,7 +410,7 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(node);
   }
 
-  std::unique_ptr<VariableOrFunctionCallOrObjectFunctionNameOrEmptyNode> BehaviorFunction(
+  std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode> BehaviorFunction(
       const gd::String &objectName,
       const gd::String &behaviorName,
       const ExpressionParserLocation &objectNameLocation,

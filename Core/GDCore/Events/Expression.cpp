@@ -30,10 +30,10 @@ Expression& Expression::operator=(const Expression& expression) {
 
 Expression::~Expression(){};
 
-ExpressionNode* Expression::GetRootNode(
-    const gd::String& type, gd::ExpressionParser2& parser) const {
+ExpressionNode* Expression::GetRootNode() const {
   if (!node) {
-    node = std::move(parser.ParseExpression(type, plainString));
+    gd::ExpressionParser2 parser = ExpressionParser2();
+    node = std::move(parser.ParseExpression(plainString));
   }
   return node.get();
 }

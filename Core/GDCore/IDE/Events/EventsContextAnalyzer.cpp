@@ -31,7 +31,13 @@ namespace gd {
 class GD_CORE_API ExpressionObjectsAnalyzer
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionObjectsAnalyzer(EventsContext& context_) : context(context_){};
+  ExpressionObjectsAnalyzer(
+        const gd::ObjectsContainer &globalObjectsContainer_,
+        const gd::ObjectsContainer &objectsContainer_,
+        EventsContext& context_) :
+        globalObjectsContainer(globalObjectsContainer_),
+        objectsContainer(objectsContainer_),
+        context(context_){};
   virtual ~ExpressionObjectsAnalyzer(){};
 
  protected:
@@ -87,6 +93,9 @@ class GD_CORE_API ExpressionObjectsAnalyzer
   void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
+  const gd::ObjectsContainer &globalObjectsContainer;
+  const gd::ObjectsContainer &objectsContainer;
+
   EventsContext& context;
 };
 
@@ -128,17 +137,11 @@ void EventsContextAnalyzer::AnalyzeParameter(
   const auto& type = metadata.GetType();
   if (ParameterMetadata::IsObject(type)) {
     context.AddObjectName(value);
-  } else if (ParameterMetadata::IsExpression("number", type)) {
-    gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = parameter.GetRootNode("number", parser);
+  } else if (ParameterMetadata::IsExpression("number", type) ||
+             ParameterMetadata::IsExpression("string", type)) {
+    auto node = parameter.GetRootNode();
 
-    ExpressionObjectsAnalyzer analyzer(context);
-    node->Visit(analyzer);
-  } else if (ParameterMetadata::IsExpression("string", type)) {
-    gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = parameter.GetRootNode("string", parser);
-
-    ExpressionObjectsAnalyzer analyzer(context);
+    ExpressionObjectsAnalyzer analyzer(project, layout, context);
     node->Visit(analyzer);
   } else if (ParameterMetadata::IsBehavior(type)) {
     context.AddBehaviorName(lastObjectName, value);

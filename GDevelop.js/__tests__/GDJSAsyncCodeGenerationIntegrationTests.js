@@ -2162,4 +2162,226 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
     });
   });
+
+  describe('With non standard events', () => {
+    it('works with a While event', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [],
+          actions: [
+            {
+              type: { value: 'ModVarScene' },
+              parameters: ['Counter', '=', '0'],
+            },
+          ],
+          events: [],
+        },
+        {
+          infiniteLoopWarning: true,
+          type: 'BuiltinCommonInstructions::While',
+          whileConditions: [
+            {
+              type: { value: 'VarScene' },
+              parameters: ['Counter', '<', '4'],
+            },
+          ],
+          conditions: [
+            {
+              type: { value: 'VarObjet' },
+              parameters: ['MyParamObject', 'PleasePickMe', '=', '1'],
+              subInstructions: [],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'ModVarScene' },
+              parameters: ['Counter', '+', '1'],
+            },
+            {
+              type: { value: 'Wait' },
+              parameters: ['1.5'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: [
+                'MyParamObject',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+      ]);
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const parameter = new gd.ParameterMetadata();
+      parameter.setType('number');
+      parameter.setName('IncreaseValue');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyParamObject');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      eventsFunction.delete();
+      project.delete();
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      const myObjectA3 = runtimeScene.createObject('MyObjectA');
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      const myObjectB2 = runtimeScene.createObject('MyObjectB');
+      const myObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+        MyObjectB: [myObjectB1, myObjectB2],
+      });
+      myObjectA1.getVariables().get('PleasePickMe').setNumber(1);
+      myObjectA2.getVariables().get('PleasePickMe').setNumber(1);
+      myObjectB1.getVariables().get('PleasePickMe').setNumber(1);
+
+      runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+
+      // Check that the loop is done.
+      expect(runtimeScene.getVariables().has('Counter')).toBe(true);
+      expect(runtimeScene.getVariables().get('Counter').getAsNumber()).toBe(4);
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that all the tasks are done
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 * 4
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 * 4
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 * 4
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+    });
+
+    it('works with a Repeat event', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          infiniteLoopWarning: true,
+          type: 'BuiltinCommonInstructions::Repeat',
+          repeatExpression: "3",
+          conditions: [
+            {
+              type: { value: 'VarObjet' },
+              parameters: ['MyParamObject', 'PleasePickMe', '=', '1'],
+              subInstructions: [],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'ModVarScene' },
+              parameters: ['Counter', '+', '1'],
+            },
+            {
+              type: { value: 'Wait' },
+              parameters: ['1.5'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: [
+                'MyParamObject',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+      ]);
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const parameter = new gd.ParameterMetadata();
+      parameter.setType('number');
+      parameter.setName('IncreaseValue');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyParamObject');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      eventsFunction.delete();
+      project.delete();
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      const myObjectA3 = runtimeScene.createObject('MyObjectA');
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      const myObjectB2 = runtimeScene.createObject('MyObjectB');
+      const myObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+        MyObjectB: [myObjectB1, myObjectB2],
+      });
+      myObjectA1.getVariables().get('PleasePickMe').setNumber(1);
+      myObjectA2.getVariables().get('PleasePickMe').setNumber(1);
+      myObjectB1.getVariables().get('PleasePickMe').setNumber(1);
+
+      runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that all the tasks are done
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 * 3
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 * 3
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 * 3
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+    });
+  });
 });

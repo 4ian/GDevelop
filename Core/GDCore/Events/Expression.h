@@ -59,14 +59,9 @@ class GD_CORE_API Expression {
 
   /**
    * @brief Get the expression node.
-   *
-   * @param type the expression type
-   * @param parser the parser to use if this expression never has been parsed
-   * before.
    * @return std::unique_ptr<gd::ExpressionNode>
    */
-  gd::ExpressionNode* GetRootNode(
-      const gd::String& type, gd::ExpressionParser2& parser) const;
+  gd::ExpressionNode* GetRootNode() const;
 
   /**
    * \brief Mimics std::string::c_str

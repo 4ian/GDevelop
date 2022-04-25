@@ -25,14 +25,14 @@ using namespace std;
 
 namespace gd {
 
-const gd::String& ExpressionValidator::ValidateFunction(const gd::FunctionCallNode& function) {
+ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::FunctionCallNode& function) {
 
   ReportAnyError(function);
   
-  gd::String objectType = function.objectName.empty() ? String() :
+  gd::String objectType = function.objectName.empty() ? gd::String() :
       GetTypeOfObject(globalObjectsContainer, objectsContainer, function.objectName);
       
-  gd::String behaviorType = function.behaviorName.empty() ? String() :
+  gd::String behaviorType = function.behaviorName.empty() ? gd::String() :
       GetTypeOfBehavior(globalObjectsContainer, objectsContainer, function.behaviorName);
 
   const gd::ExpressionMetadata &metadata = function.behaviorName.empty() ?
@@ -55,12 +55,12 @@ const gd::String& ExpressionValidator::ValidateFunction(const gd::FunctionCallNo
         errors.push_back(RaiseTypeError(
             _("This expression exists, but it can't be used on this object."),
             function.objectNameLocation.GetStartPosition()).get());
-        return metadata.GetReturnType();
+        return stringToType(metadata.GetReturnType());
       }
     }
   }
 
-  const gd::String returnType = metadata.GetReturnType();
+  Type returnType = stringToType(metadata.GetReturnType());
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     errors.push_back(gd::make_unique<ExpressionParserError>(
@@ -74,9 +74,8 @@ const gd::String& ExpressionValidator::ValidateFunction(const gd::FunctionCallNo
   }
 
   // Validate the type of the function
-  const gd::String& returnType = metadata.GetReturnType();
-  if (returnType == "number") {
-    if (*childType == "string") {
+  if (returnType == Type::Number) {
+    if (childType == Type::String) {
       errors.push_back(RaiseTypeError(
           _("You tried to use an expression that returns a number, but a "
             "string is expected. Use `ToString` if you need to convert a "
@@ -84,15 +83,15 @@ const gd::String& ExpressionValidator::ValidateFunction(const gd::FunctionCallNo
           function.location).get());
       return;
     }
-    else if (*childType != "number" && *childType != "number|string") {
+    else if (childType != Type::Number && childType != Type::NumberOrString) {
       errors.push_back(RaiseTypeError(_("You tried to use an expression that returns a "
                               "number, but another type is expected:") +
-                              " " + *childType,
+                              " " + typeToSting(childType),
                             function.location).get());
       return returnType;
     }
-  } else if (returnType == "string") {
-    if (*childType == "number") {
+  } else if (returnType == Type::String) {
+    if (childType == Type::Number) {
       errors.push_back(RaiseTypeError(
           _("You tried to use an expression that returns a string, but a "
             "number is expected. Use `ToNumber` if you need to convert a "
@@ -100,18 +99,18 @@ const gd::String& ExpressionValidator::ValidateFunction(const gd::FunctionCallNo
           function.location).get());
       return returnType;
     }
-    else if (*childType != "string" && *childType != "number|string") {
+    else if (childType != Type::String && childType != Type::NumberOrString) {
       errors.push_back(RaiseTypeError(_("You tried to use an expression that returns a "
                               "string, but another type is expected:") +
-                              " " + *childType,
+                              " " + typeToSting(childType),
                             function.location).get());
       return returnType;
     }
   } else {
-    if (*childType != returnType) {
+    if (childType != returnType) {
       errors.push_back(RaiseTypeError(
           _("You tried to use an expression with the wrong return type:") + " " +
-            returnType,
+            typeToSting(returnType),
           function.location).get());
       return returnType;
     }
@@ -159,21 +158,21 @@ const gd::String& ExpressionValidator::ValidateFunction(const gd::FunctionCallNo
       continue;
     }
     auto currentParentType = parentType;
-    parentType = &parameterMetadata.GetType();
+    parentType = stringToType(parameterMetadata.GetType());
     parameter->Visit(*this);
     parentType = currentParentType;
 
     const gd::String &expectedParameterType = parameterMetadata.GetType();
     if (gd::ParameterMetadata::IsExpression("number", expectedParameterType)) {
-      if (*childType != "number") {
+      if (childType != Type::Number) {
         // TODO error
       }
     } else if (gd::ParameterMetadata::IsExpression("string", expectedParameterType)) {
-      if (*childType != "string") {
+      if (childType != Type::String) {
         // TODO error
       }
     } else if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
-      if (*childType != "variable" && *childType != "identifier") {
+      if (childType != Type::Variable && childType != Type::Identifier) {
         // TODO error
       }
     } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {

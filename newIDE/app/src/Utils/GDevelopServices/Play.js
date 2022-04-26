@@ -11,12 +11,12 @@ export type LeaderboardPlayerUnicityDisplayOption =
   | 'PREFER_UNIQUE'
   | 'PREFER_NON_UNIQUE';
 
-export type LeaderboardScoreFormattingCustom = {
+export type LeaderboardScoreFormattingCustom = {|
   type: 'custom',
   prefix: string,
   suffix: string,
   precision: number,
-};
+|};
 
 export type LeaderboardScoreFormattingTimeUnit =
   | 'hour'
@@ -24,10 +24,10 @@ export type LeaderboardScoreFormattingTimeUnit =
   | 'second'
   | 'millisecond';
 
-export type LeaderboardScoreFormattingTime = {
+export type LeaderboardScoreFormattingTime = {|
   type: 'time',
   units: LeaderboardScoreFormattingTimeUnit[],
-};
+|};
 
 export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingCustom

@@ -146,12 +146,25 @@ export const sendExportLaunched = (exportKind: string) => {
   });
 };
 
-export const sendNewGameCreated = (templateName: string) => {
+export const sendExampleDetailsOpened = (slug: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('example-details-opened', { slug });
+};
+
+export const sendNewGameCreated = ({
+  exampleUrl,
+  exampleSlug,
+}: {|
+  exampleUrl: string,
+  exampleSlug: string,
+|}) => {
   if (isDev || !client) return;
 
   client.recordEvent('new_game_creation', {
     platform: 'GDevelop JS Platform', // Hardcoded here for now
-    templateName,
+    templateName: exampleUrl,
+    exampleSlug,
   });
 };
 
@@ -250,6 +263,18 @@ export const sendAssetAddedToProject = ({
   if (isDev || !client) return;
 
   client.recordEvent('asset-added-to-project', { id, name });
+};
+
+export const sendExtensionDetailsOpened = (name: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('extension-details-opened', { name });
+};
+
+export const sendExtensionAddedToProject = (name: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('extension-added-to-project', { name });
 };
 
 export const sendNewObjectCreated = (name: string) => {

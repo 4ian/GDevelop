@@ -40,7 +40,7 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
   const filePath = path.join(outputPath, 'game.json');
   project.setProjectFile(filePath);
-  sendNewGameCreated('');
+  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
   return {
     project,
     storageProvider: LocalFileStorageProvider,
@@ -73,7 +73,10 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
 
     await writeAndCheckFile(projectFileContent, localFilePath);
 
-    sendNewGameCreated(example.projectFileUrl);
+    sendNewGameCreated({
+      exampleUrl: example.projectFileUrl,
+      exampleSlug: exampleShortHeader.slug,
+    });
     return {
       storageProvider: LocalFileStorageProvider,
       fileMetadata: { fileIdentifier: localFilePath },

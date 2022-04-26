@@ -4,10 +4,6 @@ import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
-import {
-  type Leaderboard,
-  type LeaderboardSortOption,
-} from '../../Utils/GDevelopServices/Play';
 import LeaderboardAppearanceDialog from '../../GameDashboard/LeaderboardAdmin/LeaderboardAppearanceDialog';
 
 export default {

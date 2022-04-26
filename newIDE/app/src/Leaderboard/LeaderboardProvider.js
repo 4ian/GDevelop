@@ -7,9 +7,8 @@ import {
   type LeaderboardEntry,
   type LeaderboardExtremePlayerScore,
   type LeaderboardSortOption,
-  type LeaderboardVisibilityOption,
-  type LeaderboardPlayerUnicityDisplayOption,
   type LeaderboardDisplayData,
+  type LeaderboardUpdatePayload,
   createLeaderboard as doCreateLeaderboard,
   updateLeaderboard as doUpdateLeaderboard,
   resetLeaderboard as doResetLeaderboard,
@@ -278,12 +277,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     dispatch({ type: 'CHANGE_DISPLAY_ONLY_BEST_ENTRY', payload: newValue });
   }, []);
 
-  const updateLeaderboard = async (attributes: {|
-    name?: string,
-    sort?: LeaderboardSortOption,
-    playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
-    visibility?: LeaderboardVisibilityOption,
-  |}) => {
+  const updateLeaderboard = async (attributes: LeaderboardUpdatePayload) => {
     if (!currentLeaderboardId) return;
     if (attributes.sort) dispatch({ type: 'PURGE_NAVIGATION' }); // When changing playerUnicityDisplayChoice, it will change the displayOnlyBestEntry state variable, which will purge navigation.
     const updatedLeaderboard = await doUpdateLeaderboard(

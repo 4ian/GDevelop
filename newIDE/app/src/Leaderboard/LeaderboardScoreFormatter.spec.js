@@ -166,5 +166,31 @@ describe('LeaderboardScoreFormatter', () => {
         })
       ).toEqual('0.19coins');
     });
+    test('it correctly formats score with prefix or suffix, with decimal places', () => {
+      expect(
+        formatCustomScore(250, {
+          type: 'custom',
+          scorePrefix: '$ ',
+          scoreSuffix: '',
+          decimalPlacesNumber: -1
+        })
+      ).toEqual('$ 250');
+      expect(
+        formatCustomScore(6432, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: 'coins',
+          decimalPlacesNumber: -2
+        })
+      ).toEqual('6400coins');
+      expect(
+        formatCustomScore(315, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: 'coins',
+          decimalPlacesNumber: -3
+        })
+      ).toEqual('0coins');
+    });
   });
 });

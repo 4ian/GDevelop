@@ -61,6 +61,6 @@ export const formatCustomScore = (
     Math.round(score * 10 ** options.decimalPlacesNumber) /
     10 ** options.decimalPlacesNumber;
   return `${options.scorePrefix}${roundedScore.toFixed(
-    options.decimalPlacesNumber
+    Math.max(0, options.decimalPlacesNumber)
   )}${options.scoreSuffix}`;
 };

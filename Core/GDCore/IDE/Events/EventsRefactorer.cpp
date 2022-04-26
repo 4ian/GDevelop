@@ -20,6 +20,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
+#include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 
 using namespace std;
 
@@ -93,10 +94,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-  auto type = node.GetType(platform,
-                           globalObjectsContainer,
-                           objectsContainer,
-                           rootType);
+    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasDoneRenaming = true;
@@ -195,10 +193,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-  auto type = node.GetType(platform,
-                           globalObjectsContainer,
-                           objectsContainer,
-                           rootType);
+    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasObject = true;

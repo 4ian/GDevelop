@@ -87,11 +87,11 @@ class GD_CORE_API ExpressionParser2 {
   ///@{
   std::unique_ptr<ExpressionNode> Start(const gd::String &objectName = "") {
     size_t expressionStartPosition = GetCurrentPosition();
-    auto expression = Expression(objectName);
+    auto expression = Expression(ParentParameter(nullptr, 0), objectName);
 
     // Check for extra characters at the end of the expression
     if (!IsEndReached()) {
-      auto op = gd::make_unique<OperatorNode>(' ');
+      auto op = gd::make_unique<OperatorNode>(ParentParameter(nullptr, 0), ' ');
       op->leftHandSide = std::move(expression);
       op->rightHandSide = ReadUntilEnd();
 
@@ -107,22 +107,22 @@ class GD_CORE_API ExpressionParser2 {
     return expression;
   }
 
-  std::unique_ptr<ExpressionNode> Expression(const gd::String &objectName = "") {
+  std::unique_ptr<ExpressionNode> Expression(const ParentParameter parentParameter, const gd::String &objectName = "") {
     SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
-    std::unique_ptr<ExpressionNode> leftHandSide = Term(objectName);
+    std::unique_ptr<ExpressionNode> leftHandSide = Term(parentParameter, objectName);
 
     SkipAllWhitespaces();
 
     if (IsEndReached()) return leftHandSide;
     if (CheckIfChar(IsExpressionEndingChar)) return leftHandSide;
     if (CheckIfChar(IsExpressionOperator)) {
-      auto op = gd::make_unique<OperatorNode>(GetCurrentChar());
+      auto op = gd::make_unique<OperatorNode>(parentParameter, GetCurrentChar());
       op->leftHandSide = std::move(leftHandSide);
       op->diagnostic = ValidateOperator(GetCurrentChar());
       SkipChar();
-      op->rightHandSide = Expression(objectName);
+      op->rightHandSide = Expression(parentParameter, objectName);
 
       op->location = ExpressionParserLocation(expressionStartPosition,
                                               GetCurrentPosition());
@@ -134,19 +134,19 @@ class GD_CORE_API ExpressionParser2 {
         "More than one term was found. Verify that your expression is "
         "properly written.");
 
-    auto op = gd::make_unique<OperatorNode>(' ');
+    auto op = gd::make_unique<OperatorNode>(parentParameter, ' ');
     op->leftHandSide = std::move(leftHandSide);
-    op->rightHandSide = Expression(objectName);
+    op->rightHandSide = Expression(parentParameter, objectName);
     op->location =
         ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
     return std::move(op);
   }
 
-  std::unique_ptr<ExpressionNode> Term(const gd::String &objectName) {
+  std::unique_ptr<ExpressionNode> Term(const ParentParameter parentParameter, const gd::String &objectName) {
     SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
-    std::unique_ptr<ExpressionNode> factor = Factor(objectName);
+    std::unique_ptr<ExpressionNode> factor = Factor(parentParameter, objectName);
 
     SkipAllWhitespaces();
 
@@ -154,11 +154,11 @@ class GD_CORE_API ExpressionParser2 {
     // to guarantee the proper operator precedence. (Expression could also
     // be reworked to use a while loop).
     while (CheckIfChar(IsTermOperator)) {
-      auto op = gd::make_unique<OperatorNode>(GetCurrentChar());
+      auto op = gd::make_unique<OperatorNode>(parentParameter, GetCurrentChar());
       op->leftHandSide = std::move(factor);
       op->diagnostic = ValidateOperator(GetCurrentChar());
       SkipChar();
-      op->rightHandSide = Factor(objectName);
+      op->rightHandSide = Factor(parentParameter, objectName);
       op->location = ExpressionParserLocation(expressionStartPosition,
                                               GetCurrentPosition());
       SkipAllWhitespaces();
@@ -169,7 +169,7 @@ class GD_CORE_API ExpressionParser2 {
     return factor;
   };
 
-  std::unique_ptr<ExpressionNode> Factor(const gd::String &objectName) {
+  std::unique_ptr<ExpressionNode> Factor(const ParentParameter parentParameter, const gd::String &objectName) {
     SkipAllWhitespaces();
     size_t expressionStartPosition = GetCurrentPosition();
 
@@ -180,10 +180,10 @@ class GD_CORE_API ExpressionParser2 {
       auto unaryOperatorCharacter = GetCurrentChar();
       SkipChar();
 
-      auto operatorOperand = Factor(objectName);
+      auto operatorOperand = Factor(parentParameter, objectName);
 
       auto unaryOperator = gd::make_unique<UnaryOperatorNode>(
-          unaryOperatorCharacter);
+          parentParameter, unaryOperatorCharacter);
       unaryOperator->diagnostic = ValidateUnaryOperator(
           unaryOperatorCharacter, expressionStartPosition);
       unaryOperator->factor = std::move(operatorOperand);
@@ -196,7 +196,7 @@ class GD_CORE_API ExpressionParser2 {
       return factor;
     } else if (CheckIfChar(IsOpeningParenthesis)) {
       SkipChar();
-      std::unique_ptr<ExpressionNode> factor = SubExpression(objectName);
+      std::unique_ptr<ExpressionNode> factor = SubExpression(parentParameter, objectName);
 
       if (!CheckIfChar(IsClosingParenthesis)) {
         factor->diagnostic =
@@ -206,7 +206,7 @@ class GD_CORE_API ExpressionParser2 {
       SkipIfChar(IsClosingParenthesis);
       return factor;
     } else if (IsIdentifierAllowedChar()) {
-      return Identifier(objectName);
+      return Identifier(parentParameter, objectName);
     }
 
     std::unique_ptr<ExpressionNode> factor = ReadUntilWhitespace();
@@ -214,13 +214,13 @@ class GD_CORE_API ExpressionParser2 {
     return factor;
   }
 
-  std::unique_ptr<SubExpressionNode> SubExpression(const gd::String &objectName) {
+  std::unique_ptr<SubExpressionNode> SubExpression(const ParentParameter parentParameter, const gd::String &objectName) {
     size_t expressionStartPosition = GetCurrentPosition();
 
-    auto expression = Expression(objectName);
+    auto expression = Expression(parentParameter, objectName);
 
     auto subExpression =
-        gd::make_unique<SubExpressionNode>(std::move(expression));
+        gd::make_unique<SubExpressionNode>(parentParameter, std::move(expression));
     subExpression->location =
         ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
 
@@ -228,7 +228,7 @@ class GD_CORE_API ExpressionParser2 {
   };
 
   std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
-  Identifier(const gd::String &objectName) {
+  Identifier(const ParentParameter parentParameter, const gd::String &objectName) {
     auto identifierAndLocation = ReadIdentifierName();
     gd::String name = identifierAndLocation.name;
     auto nameLocation = identifierAndLocation.location;
@@ -255,14 +255,14 @@ class GD_CORE_API ExpressionParser2 {
 
     if (CheckIfChar(IsOpeningParenthesis)) {
       ExpressionParserLocation openingParenthesisLocation = SkipChar();
-      return FreeFunction(name, nameLocation, openingParenthesisLocation);
+      return FreeFunction(parentParameter, name, nameLocation, openingParenthesisLocation);
     } else if (CheckIfChar(IsDot)) {
       ExpressionParserLocation dotLocation = SkipChar();
       SkipAllWhitespaces();
       return ObjectFunctionOrBehaviorFunction(
-          name, nameLocation, dotLocation, "");
+          parentParameter, name, nameLocation, dotLocation, "");
     } else {
-      auto identifier = gd::make_unique<IdentifierNode>(name);
+      auto identifier = gd::make_unique<IdentifierNode>(parentParameter, name);
       identifier->location = ExpressionParserLocation(
           nameLocation.GetStartPosition(), GetCurrentPosition());
       return std::move(identifier);
@@ -270,14 +270,14 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
-  VariableAccessorOrVariableBracketAccessor() {
+  VariableAccessorOrVariableBracketAccessor(const ParentParameter parentParameter) {
     size_t childStartPosition = GetCurrentPosition();
 
     SkipAllWhitespaces();
     if (CheckIfChar(IsOpeningSquareBracket)) {
       SkipChar();
       auto child = gd::make_unique<VariableBracketAccessorNode>(
-          Expression("number|string"));
+          parentParameter, Expression(parentParameter));
 
       if (!CheckIfChar(IsClosingSquareBracket)) {
         child->diagnostic =
@@ -285,7 +285,7 @@ class GD_CORE_API ExpressionParser2 {
                                "bracket for each opening bracket."));
       }
       SkipIfChar(IsClosingSquareBracket);
-      child->child = VariableAccessorOrVariableBracketAccessor();
+      child->child = VariableAccessorOrVariableBracketAccessor(parentParameter);
       child->location =
           ExpressionParserLocation(childStartPosition, GetCurrentPosition());
 
@@ -296,8 +296,8 @@ class GD_CORE_API ExpressionParser2 {
 
       auto identifierAndLocation = ReadIdentifierName();
       auto child =
-          gd::make_unique<VariableAccessorNode>(identifierAndLocation.name);
-      child->child = VariableAccessorOrVariableBracketAccessor();
+          gd::make_unique<VariableAccessorNode>(parentParameter, identifierAndLocation.name);
+      child->child = VariableAccessorOrVariableBracketAccessor(parentParameter);
       child->nameLocation = identifierAndLocation.location;
       child->dotLocation = dotLocation;
       child->location =
@@ -311,16 +311,18 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<FunctionCallNode> FreeFunction(
+      const ParentParameter parentParameter, 
       const gd::String &functionFullName,
       const ExpressionParserLocation &identifierLocation,
       const ExpressionParserLocation &openingParenthesisLocation) {
     // TODO: error if trying to use function for type != "number" && != "string"
     // + Test for it
 
-    auto parametersNode = Parameters();
     auto function =
-        gd::make_unique<FunctionCallNode>(std::move(parametersNode.parameters),
+        gd::make_unique<FunctionCallNode>(parentParameter,
                                           functionFullName);
+    auto parametersNode = Parameters(function.get());
+    function->parameters = std::move(parametersNode.parameters);
     function->diagnostic = std::move(parametersNode.diagnostic);
 
     function->location = ExpressionParserLocation(
@@ -335,6 +337,7 @@ class GD_CORE_API ExpressionParser2 {
 
   std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode>
   ObjectFunctionOrBehaviorFunction(
+      const ParentParameter parentParameter,
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
       const ExpressionParserLocation &parentIdentifierDotLocation,
@@ -351,7 +354,8 @@ class GD_CORE_API ExpressionParser2 {
       ExpressionParserLocation namespaceSeparatorLocation =
           SkipNamespaceSeparator();
       SkipAllWhitespaces();
-      return BehaviorFunction(parentIdentifier,
+      return BehaviorFunction(parentParameter,
+                              parentIdentifier,
                               childIdentifierName,
                               parentIdentifierLocation,
                               parentIdentifierDotLocation,
@@ -360,11 +364,11 @@ class GD_CORE_API ExpressionParser2 {
     } else if (CheckIfChar(IsOpeningParenthesis)) {
       ExpressionParserLocation openingParenthesisLocation = SkipChar();
 
-      auto parametersNode = Parameters(parentIdentifier);
       auto function = gd::make_unique<FunctionCallNode>(
-          parentIdentifier,
-          std::move(parametersNode.parameters),
+          parentParameter, parentIdentifier,
           childIdentifierName);
+      auto parametersNode = Parameters(function.get(), parentIdentifier);
+      function->parameters = std::move(parametersNode.parameters),
       function->diagnostic = std::move(parametersNode.diagnostic);
 
       function->location = ExpressionParserLocation(
@@ -377,10 +381,10 @@ class GD_CORE_API ExpressionParser2 {
           parametersNode.closingParenthesisLocation;
       return std::move(function);
     } else {
-      auto variable = gd::make_unique<VariableNode>(parentIdentifier, objectName);
+      auto variable = gd::make_unique<VariableNode>(parentParameter, parentIdentifier, objectName);
       auto child =
-          gd::make_unique<VariableAccessorNode>(childIdentifierAndLocation.name);
-      child->child = VariableAccessorOrVariableBracketAccessor();
+          gd::make_unique<VariableAccessorNode>(parentParameter, childIdentifierAndLocation.name);
+      child->child = VariableAccessorOrVariableBracketAccessor(parentParameter);
       child->nameLocation = childIdentifierAndLocation.location;
       child->dotLocation = parentIdentifierDotLocation;
       child->location =
@@ -395,7 +399,7 @@ class GD_CORE_API ExpressionParser2 {
     }
 
     auto node = gd::make_unique<ObjectFunctionNameNode>(
-        parentIdentifier, childIdentifierName);
+        parentParameter, parentIdentifier, childIdentifierName);
     // TODO update this message
     node->diagnostic = RaiseSyntaxError(
         _("An opening parenthesis (for an object expression), or double colon "
@@ -411,6 +415,7 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode> BehaviorFunction(
+      const ParentParameter parentParameter,
       const gd::String &objectName,
       const gd::String &behaviorName,
       const ExpressionParserLocation &objectNameLocation,
@@ -426,13 +431,14 @@ class GD_CORE_API ExpressionParser2 {
     if (CheckIfChar(IsOpeningParenthesis)) {
       ExpressionParserLocation openingParenthesisLocation = SkipChar();
 
-      auto parametersNode =
-          Parameters(objectName, behaviorName);
       auto function = gd::make_unique<FunctionCallNode>(
+          parentParameter,
           objectName,
           behaviorName,
-          std::move(parametersNode.parameters),
           functionName);
+      auto parametersNode =
+          Parameters(function.get(), objectName, behaviorName);
+      function->parameters = std::move(parametersNode.parameters);
       function->diagnostic = std::move(parametersNode.diagnostic);
 
       function->location = ExpressionParserLocation(
@@ -449,7 +455,7 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(function);
     } else {
       auto node = gd::make_unique<ObjectFunctionNameNode>(
-          objectName, behaviorName, functionName);
+          parentParameter, objectName, behaviorName, functionName);
       node->diagnostic = RaiseSyntaxError(
           _("An opening parenthesis was expected here to call a function."));
 
@@ -473,6 +479,7 @@ class GD_CORE_API ExpressionParser2 {
   };
 
   ParametersNode Parameters(
+      const FunctionCallNode *functionCallNode,
       const gd::String &objectName = "",
       const gd::String &behaviorName = "") {
     std::vector<std::unique_ptr<ExpressionNode>> parameters;
@@ -491,7 +498,7 @@ class GD_CORE_API ExpressionParser2 {
         return ParametersNode{
             std::move(parameters), nullptr, closingParenthesisLocation};
       } else {
-        parameters.push_back(Expression());
+        parameters.push_back(Expression(ParentParameter(functionCallNode, parameterIndex)));
 
         SkipAllWhitespaces();
         SkipIfChar(IsParameterSeparator);

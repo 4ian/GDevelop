@@ -29,12 +29,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarScene' },
                 parameters: ['SuccessVariable', '+', '1'],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -76,22 +74,18 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarScene' },
                 parameters: ['SuccessVariable', '+', '1'],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarScene' },
                 parameters: ['SuccessVariable', '+', '2'],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -139,7 +133,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarScene' },
@@ -148,7 +141,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -212,12 +204,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -227,7 +217,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -294,14 +283,12 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'VarObjet' },
                 parameters: ['MyParamObject', 'TestVariable', '=', '1'],
-                subInstructions: [],
               },
             ],
             actions: [
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
             ],
             events: [
@@ -316,7 +303,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                       value: 'Wait',
                     },
                     parameters: ['1.5'],
-                    subInstructions: [],
                   },
                   {
                     type: { value: 'ModVarObjet' },
@@ -326,7 +312,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                       '+',
                       'GetArgumentAsNumber("IncreaseValue")',
                     ],
-                    subInstructions: [],
                   },
                 ],
                 events: [],
@@ -414,7 +399,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
             ],
             events: [
@@ -426,7 +410,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   {
                     type: { value: 'VarObjet' },
                     parameters: ['MyParamObject', 'TestVariable', '=', '1'],
-                    subInstructions: [],
                   },
                 ],
                 actions: [
@@ -435,7 +418,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                       value: 'Wait',
                     },
                     parameters: ['1.5'],
-                    subInstructions: [],
                   },
                   {
                     type: { value: 'ModVarObjet' },
@@ -445,7 +427,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                       '+',
                       'GetArgumentAsNumber("IncreaseValue")',
                     ],
-                    subInstructions: [],
                   },
                 ],
                 events: [],
@@ -533,14 +514,12 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'VarObjet' },
                 parameters: ['MyParamObject', 'TestVariable', '>=', '1'],
-                subInstructions: [],
               },
             ],
             actions: [
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
             ],
             events: [
@@ -553,7 +532,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   {
                     type: { value: 'VarObjet' },
                     parameters: ['MyParamObject', 'TestVariable', '>=', '3'],
-                    subInstructions: [],
                   },
                 ],
                 actions: [],
@@ -572,7 +550,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '>=',
                           '2',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     actions: [
@@ -581,7 +558,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
-                        subInstructions: [],
                       },
                       {
                         type: { value: 'ModVarObjet' },
@@ -591,7 +567,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '+',
                           'GetArgumentAsNumber("IncreaseValue")',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     events: [],
@@ -703,14 +678,12 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'VarObjet' },
                 parameters: ['MyParamObject', 'TestVariable', '>=', '1'],
-                subInstructions: [],
               },
             ],
             actions: [
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
             ],
             events: [
@@ -723,7 +696,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   {
                     type: { value: 'VarObjet' },
                     parameters: ['MyParamObject', 'TestVariable', '>=', '3'],
-                    subInstructions: [],
                   },
                 ],
                 actions: [],
@@ -742,7 +714,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '>=',
                           '2',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     actions: [
@@ -751,7 +722,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
-                        subInstructions: [],
                       },
                       {
                         type: { value: 'ModVarObjet' },
@@ -761,7 +731,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '+',
                           'GetArgumentAsNumber("IncreaseValue")',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     events: [],
@@ -781,7 +750,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '>=',
                           '0',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     actions: [],
@@ -894,7 +862,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
             ],
             events: [
@@ -906,7 +873,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   {
                     type: { value: 'VarObjet' },
                     parameters: ['MyParamObject', 'TestVariable', '>=', '2'],
-                    subInstructions: [],
                   },
                 ],
                 actions: [],
@@ -924,7 +890,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '>=',
                           '1',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     actions: [
@@ -933,7 +898,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           value: 'Wait',
                         },
                         parameters: ['1.5'],
-                        subInstructions: [],
                       },
                       {
                         type: { value: 'ModVarObjet' },
@@ -943,7 +907,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '+',
                           'GetArgumentAsNumber("IncreaseValue")',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     events: [],
@@ -963,7 +926,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                           '>=',
                           '0',
                         ],
-                        subInstructions: [],
                       },
                     ],
                     actions: [],
@@ -1072,12 +1034,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1087,12 +1047,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1102,7 +1060,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -1227,17 +1184,14 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1247,7 +1201,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -1368,7 +1321,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'VarObjet' },
                 parameters: ['MyGroup', 'TestVariable', '=', '1'],
-                subInstructions: [],
               },
             ],
             actions: [
@@ -1380,12 +1332,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1395,12 +1345,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1410,7 +1358,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -1556,12 +1503,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1571,12 +1516,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1586,7 +1529,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -1726,7 +1668,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'VarObjet' },
                 parameters: ['MyParamObject', 'TestVariable', '>=', '1'],
-                subInstructions: [],
               },
             ],
             actions: [
@@ -1738,22 +1679,18 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'Create' },
                 parameters: ['', 'MyParamObject', '0', '0', ''],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1763,7 +1700,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -1883,7 +1819,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               {
                 type: { value: 'VarObjet' },
                 parameters: ['MyParamObject', 'TestVariable', '>=', '1'],
-                subInstructions: [],
               },
             ],
             actions: [
@@ -1895,27 +1830,22 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'Create' },
                 parameters: ['', 'MyParamObject', '0', '0', ''],
-                subInstructions: [],
               },
               {
                 type: { value: 'Create' },
                 parameters: ['', 'MyParamObject', '0', '0', ''],
-                subInstructions: [],
               },
               {
                 type: { value: 'Wait' },
                 parameters: ['1.5'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -1925,7 +1855,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -2056,7 +1985,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction',
                 },
                 parameters: ['MyParamObject'],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarObjet' },
@@ -2066,12 +1994,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   '+',
                   'GetArgumentAsNumber("IncreaseValue")',
                 ],
-                subInstructions: [],
               },
               {
                 type: { value: 'ModVarScene' },
                 parameters: ['SuccessVariable', '+', '1'],
-                subInstructions: [],
               },
             ],
             events: [],
@@ -2190,7 +2116,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { value: 'VarObjet' },
               parameters: ['MyParamObject', 'PleasePickMe', '=', '1'],
-              subInstructions: [],
             },
           ],
           actions: [
@@ -2210,7 +2135,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
               ],
-              subInstructions: [],
             },
           ],
           events: [],
@@ -2294,7 +2218,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { value: 'VarObjet' },
               parameters: ['MyParamObject', 'PleasePickMe', '=', '1'],
-              subInstructions: [],
             },
           ],
           actions: [
@@ -2314,7 +2237,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
               ],
-              subInstructions: [],
             },
           ],
           events: [],
@@ -2394,7 +2316,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             {
               type: { value: 'VarObjet' },
               parameters: ['MyParamObject', 'PleasePickMe', '=', '1'],
-              subInstructions: [],
             },
           ],
           actions: [
@@ -2402,6 +2323,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               type: { value: 'ModVarScene' },
               parameters: ['Counter', '+', '1'],
             },
+            // Add a wait action to check that 3 different waits will be done
             {
               type: { value: 'Wait' },
               parameters: ['1.5'],
@@ -2414,8 +2336,8 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
               ],
-              subInstructions: [],
             },
+            // Add another wait action to check that 3 different waits will be done
             {
               type: { value: 'Wait' },
               parameters: ['1.5'],
@@ -2428,13 +2350,30 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 '+',
                 'GetArgumentAsNumber("IncreaseValue")',
               ],
-              subInstructions: [],
             },
             {
               type: { value: 'ModVarObjet' },
               parameters: ['MyOtherParamObject', 'TestVariable', '+', '4'],
-              subInstructions: [],
             },
+            // Add an async object action that can be resolved at different time by each object.
+            {
+              type: { value: 'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction'},
+              parameters: ['MyParamObject'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: [
+                'MyParamObject',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyOtherParamObject', 'TestVariable', '+', '4'],
+            },
+
           ],
           events: [],
         },
@@ -2453,6 +2392,9 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       eventsFunction.getParameters().push_back(parameter);
       parameter.setType('object');
       parameter.setName('MyParamObject');
+      parameter.setExtraInfo(
+        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+      );
       eventsFunction.getParameters().push_back(parameter);
       parameter.setType('object');
       parameter.setName('MyOtherParamObject');
@@ -2545,6 +2487,69 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       expect(myObjectC2.getVariables().get('TestVariable').getAsNumber()).toBe(
         3 * 4
       );
+
+      // Process some object (myObjectA1, myObjectB1) async tasks:
+      myObjectA1.markFakeAsyncActionAsFinished();
+      myObjectB1.markFakeAsyncActionAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that each object A and B got its variable updated.
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 + 5
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 // This was not updated
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 + 5
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+
+      // Check that the objects C are also updated: the two of them are updated
+      // 2 times (once for each object that finished its task)
+      // (4 is added each time to the variable).
+      expect(myObjectC1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        3 * 4 + 2 * 4
+      );
+      expect(myObjectC2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        3 * 4 + 2 * 4
+      );
+
+      // Process the last object (myObjectA2) async tasks:
+      myObjectA2.markFakeAsyncActionAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that each object A and B got its variable updated.
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 + 5
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 + 5 // This was just updated.
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 + 5
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+
+      // Check that the objects C are also updated: the two of them are updated
+      // 1 more time (once the last object) (4 is added each time to the variable).
+      expect(myObjectC1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        3 * 4 + 2 * 4 + 1 * 4
+      );
+      expect(myObjectC2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        3 * 4 + 2 * 4 + 1 * 4
+      );
+
     });
   });
 });

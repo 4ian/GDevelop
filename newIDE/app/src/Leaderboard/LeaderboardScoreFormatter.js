@@ -2,6 +2,7 @@
 import {
   type LeaderboardScoreFormattingCustom,
   type LeaderboardScoreFormattingTime,
+  type LeaderboardScoreFormatting,
   type LeaderboardScoreFormattingTimeUnit,
 } from '../Utils/GDevelopServices/Play';
 
@@ -68,3 +69,11 @@ export const formatCustomScore = (
     Math.max(0, options.precision)
   )}${options.suffix}`;
 };
+
+export const formatScore = (
+  score: number,
+  options: LeaderboardScoreFormatting
+): string =>
+  options.type === 'time'
+    ? formatDuration(score, options)
+    : formatCustomScore(score, options);

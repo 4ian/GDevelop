@@ -898,6 +898,11 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
               ) : (
                 <LeaderboardEntriesTable
                   entries={entries}
+                  customizationSettings={
+                    currentLeaderboard
+                      ? currentLeaderboard.customizationSettings
+                      : null
+                  }
                   onDeleteEntry={entryId => onDeleteEntry(i18n, entryId)}
                   isLoading={isRequestPending || isEditingName}
                   navigation={{

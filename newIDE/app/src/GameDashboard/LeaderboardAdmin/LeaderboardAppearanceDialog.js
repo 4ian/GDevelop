@@ -17,11 +17,8 @@ import {
   type LeaderboardCustomizationSettings,
   type LeaderboardScoreFormattingTimeUnit,
 } from '../../Utils/GDevelopServices/Play';
-import { Column, Line, Spacer } from '../../UI/Grid';
-import {
-  formatCustomScore,
-  formatDuration,
-} from '../../Leaderboard/LeaderboardScoreFormatter';
+import { Column, Line } from '../../UI/Grid';
+import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 import AlertMessage from '../../UI/AlertMessage';
 
 const getIdentifierFromUnits = (
@@ -305,19 +302,20 @@ function LeaderboardAppearanceDialog({
                   <TextField
                     disabled
                     floatingLabelText={<Trans>Displayed score</Trans>}
-                    value={
+                    value={formatScore(
+                      scorePreview || 0,
                       scoreType === 'time'
-                        ? formatDuration(scorePreview || 0, {
+                        ? {
                             type: scoreType,
                             units: unitSelectOptions[units],
-                          })
-                        : formatCustomScore(scorePreview || 0, {
+                          }
+                        : {
                             type: scoreType,
                             prefix,
                             suffix,
                             precision: precision || 0,
-                          })
-                    }
+                          }
+                    )}
                   />
                 </Line>
               </Column>

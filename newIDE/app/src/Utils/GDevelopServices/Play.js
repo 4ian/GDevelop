@@ -25,7 +25,7 @@ export type LeaderboardScoreFormattingTime = {
   units: LeaderboardScoreFormattingTimeUnit[],
 };
 
-type LeaderboardScoreFormatting =
+export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingCustom
   | LeaderboardScoreFormattingTime;
 

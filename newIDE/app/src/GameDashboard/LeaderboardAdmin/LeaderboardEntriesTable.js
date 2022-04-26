@@ -19,10 +19,15 @@ import { Column, Line } from '../../UI/Grid';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import Text from '../../UI/Text';
 import { textEllipsisStyle } from '../../UI/TextEllipsis';
-import { type LeaderboardDisplayData } from '../../Utils/GDevelopServices/Play';
+import {
+  type LeaderboardDisplayData,
+  type LeaderboardCustomizationSettings,
+} from '../../Utils/GDevelopServices/Play';
+import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 
 type Props = {|
   entries: ?Array<LeaderboardDisplayData>,
+  customizationSettings: ?LeaderboardCustomizationSettings,
   onDeleteEntry: (entryId: string) => Promise<void>,
   isLoading: boolean,
   erroredEntry?: {| entryId: string, message: React.Node |},
@@ -35,6 +40,7 @@ type Props = {|
 
 const LeaderboardEntriesTable = ({
   entries,
+  customizationSettings,
   onDeleteEntry,
   isLoading,
   erroredEntry,
@@ -50,7 +56,11 @@ const LeaderboardEntriesTable = ({
             <TableHead>
               <TableRow>
                 <TableCell style={{ width: '20%' }} align="center">
-                  <Trans>Score</Trans>
+                  {customizationSettings ? (
+                    customizationSettings.scoreTitle
+                  ) : (
+                    <Trans>Score</Trans>
+                  )}
                 </TableCell>
                 <TableCell style={{ width: '50%' }}>
                   <Trans>Player</Trans>
@@ -66,7 +76,14 @@ const LeaderboardEntriesTable = ({
             <TableBody>
               {entries.map(entry => (
                 <TableRow key={entry.id}>
-                  <TableCell align="center">{entry.score}</TableCell>
+                  <TableCell align="center">
+                    {customizationSettings
+                      ? formatScore(
+                          entry.score,
+                          customizationSettings.scoreFormatting
+                        )
+                      : entry.score}
+                  </TableCell>
                   <TableCell
                     style={{
                       ...textEllipsisStyle,

@@ -44,7 +44,7 @@ export const formatDuration = (
   for (const unit of ['hour', 'minute', 'second', 'millisecond']) {
     if (options.units.includes(unit)) {
       const divider = labelToDivider[unit];
-      const remainder = Math.round((durationInMs % divider) * 1000) / 1000;
+      const remainder = durationInMs % divider;
       const quotient = (durationInMs - remainder) / divider;
       formattedDuration += `${quotient
         .toString()

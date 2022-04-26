@@ -34,18 +34,30 @@ const gd::String EventsRefactorer::searchIgnoredCharacters = ";:,#()";
  */
 class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
  public:
-  ExpressionObjectRenamer(const gd::String& objectName_,
+  ExpressionObjectRenamer(const gd::Platform &platform_,
+                          const gd::ObjectsContainer &globalObjectsContainer_,
+                          const gd::ObjectsContainer &objectsContainer_,
+                          const gd::String &rootType_,
+                          const gd::String& objectName_,
                           const gd::String& objectNewName_)
-      : hasDoneRenaming(false),
+      : platform(platform_),
+        globalObjectsContainer(globalObjectsContainer_),
+        objectsContainer(objectsContainer_),
+        rootType(rootType_),
+        hasDoneRenaming(false),
         objectName(objectName_),
         objectNewName(objectNewName_){};
   virtual ~ExpressionObjectRenamer(){};
 
-  static bool Rename(gd::ExpressionNode& node,
+  static bool Rename(const gd::Platform &platform,
+                     const gd::ObjectsContainer &globalObjectsContainer,
+                     const gd::ObjectsContainer &objectsContainer,
+                     const gd::String &rootType,
+                     gd::ExpressionNode& node,
                      const gd::String& objectName,
                      const gd::String& objectNewName) {
-    if (ExpressionValidator::HasNoErrors(node)) {
-      ExpressionObjectRenamer renamer(objectName, objectNewName);
+    if (ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
+      ExpressionObjectRenamer renamer(platform, globalObjectsContainer, objectsContainer, rootType, objectName, objectNewName);
       node.Visit(renamer);
 
       return renamer.HasDoneRenaming();
@@ -81,7 +93,11 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    if (gd::ParameterMetadata::IsObject(node.type) &&
+  auto type = node.GetType(platform,
+                           globalObjectsContainer,
+                           objectsContainer,
+                           rootType);
+    if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasDoneRenaming = true;
       node.identifierName = objectNewName;
@@ -108,6 +124,11 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   bool hasDoneRenaming;
   const gd::String& objectName;
   const gd::String& objectNewName;
+  
+  const gd::Platform &platform;
+  const gd::ObjectsContainer &globalObjectsContainer;
+  const gd::ObjectsContainer &objectsContainer;
+  const gd::String &rootType;
 };
 
 /**
@@ -118,14 +139,27 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
  */
 class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  public:
-  ExpressionObjectFinder(const gd::String& objectName_)
-      : hasObject(false), objectName(objectName_){};
+  ExpressionObjectFinder(const gd::Platform &platform_,
+                         const gd::ObjectsContainer &globalObjectsContainer_,
+                         const gd::ObjectsContainer &objectsContainer_,
+                         const gd::String &rootType_,
+                         const gd::String& objectName_)
+      : platform(platform_),
+        globalObjectsContainer(globalObjectsContainer_),
+        objectsContainer(objectsContainer_),
+        rootType(rootType_),
+        hasObject(false),
+        objectName(objectName_){};
   virtual ~ExpressionObjectFinder(){};
 
-  static bool CheckIfHasObject(gd::ExpressionNode& node,
+  static bool CheckIfHasObject(const gd::Platform &platform,
+                               const gd::ObjectsContainer &globalObjectsContainer,
+                               const gd::ObjectsContainer &objectsContainer,
+                               const gd::String &rootType,
+                               gd::ExpressionNode& node,
                                const gd::String& objectName) {
-    if (ExpressionValidator::HasNoErrors(node)) {
-      ExpressionObjectFinder finder(objectName);
+    if (ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
+      ExpressionObjectFinder finder(platform, globalObjectsContainer, objectsContainer, rootType, objectName);
       node.Visit(finder);
 
       return finder.HasFoundObject();
@@ -161,7 +195,11 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    if (gd::ParameterMetadata::IsObject(node.type) &&
+  auto type = node.GetType(platform,
+                           globalObjectsContainer,
+                           objectsContainer,
+                           rootType);
+    if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasObject = true;
     }
@@ -184,6 +222,11 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  private:
   bool hasObject;
   const gd::String& objectName;
+  
+  const gd::Platform &platform;
+  const gd::ObjectsContainer &globalObjectsContainer;
+  const gd::ObjectsContainer &objectsContainer;
+  const gd::String &rootType;
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
@@ -205,10 +248,9 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
       // Replace object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = actions[aId].GetParameter(pNb).GetRootNode("number", parser);
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
           actions[aId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -216,10 +258,9 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
       // Replace object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = actions[aId].GetParameter(pNb).GetRootNode("string", parser);
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
           actions[aId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -261,10 +302,9 @@ bool EventsRefactorer::RenameObjectInConditions(
       // Replace object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode("number", parser);
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
           conditions[cId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -272,10 +312,9 @@ bool EventsRefactorer::RenameObjectInConditions(
       // Replace object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode("string", parser);
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+        if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
           conditions[cId].SetParameter(
               pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
@@ -312,20 +351,18 @@ bool EventsRefactorer::RenameObjectInEventParameters(
   // Replace object's name in expressions
   else if (ParameterMetadata::IsExpression("number",
                                            parameterMetadata.GetType())) {
-    gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = expression.GetRootNode("number", parser);
+    auto node = expression.GetRootNode();
 
-    if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+    if (ExpressionObjectRenamer::Rename(platform, project, layout, "number", *node, oldName, newName)) {
       expression = ExpressionParser2NodePrinter::PrintNode(*node);
     }
   }
   // Replace object's name in text expressions
   else if (ParameterMetadata::IsExpression("string",
                                            parameterMetadata.GetType())) {
-    gd::ExpressionParser2 parser(platform, project, layout);
-    auto node = expression.GetRootNode("string", parser);
+    auto node = expression.GetRootNode();
 
-    if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+    if (ExpressionObjectRenamer::Rename(platform, project, layout, "string", *node, oldName, newName)) {
       expression = ExpressionParser2NodePrinter::PrintNode(*node);
     }
   }
@@ -401,10 +438,9 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
       // Find object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = actions[aId].GetParameter(pNb).GetRootNode("number", parser);
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "number", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -412,10 +448,9 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
       // Find object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = actions[aId].GetParameter(pNb).GetRootNode("string", parser);
+        auto node = actions[aId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "string", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -463,10 +498,9 @@ bool EventsRefactorer::RemoveObjectInConditions(
       // Find object's name in expressions
       else if (ParameterMetadata::IsExpression(
                    "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode("number", parser);
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "number", *node, name)) {
           deleteMe = true;
           break;
         }
@@ -474,10 +508,9 @@ bool EventsRefactorer::RemoveObjectInConditions(
       // Find object's name in text expressions
       else if (ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = conditions[cId].GetParameter(pNb).GetRootNode("string", parser);
+        auto node = conditions[cId].GetParameter(pNb).GetRootNode();
 
-        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
+        if (ExpressionObjectFinder::CheckIfHasObject(platform, project, layout, "string", *node, name)) {
           deleteMe = true;
           break;
         }

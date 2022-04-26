@@ -18,7 +18,11 @@ export type LeaderboardScoreFormattingCustom = {
   precision: number,
 };
 
-export type LeaderboardScoreFormattingTimeUnit = 'hour' | 'minute' | 'second' | 'millisecond';
+export type LeaderboardScoreFormattingTimeUnit =
+  | 'hour'
+  | 'minute'
+  | 'second'
+  | 'millisecond';
 
 export type LeaderboardScoreFormattingTime = {
   type: 'time',

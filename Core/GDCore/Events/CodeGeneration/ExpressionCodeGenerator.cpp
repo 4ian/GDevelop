@@ -25,6 +25,7 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 
 namespace gd {
 
@@ -98,10 +99,11 @@ void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
 void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   // This "translation" from the type to an enum could be avoided
   // if all types were moved to an enum.
-  auto type = node.GetType(codeGenerator.GetPlatform(),
-                           codeGenerator.GetGlobalObjectsAndGroups(),
-                           codeGenerator.GetObjectsAndGroups(),
-                           rootType);
+    auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                              codeGenerator.GetGlobalObjectsAndGroups(),
+                                              codeGenerator.GetObjectsAndGroups(),
+                                              rootType,
+                                              node);
   EventsCodeGenerator::VariableScope scope =
       type == "globalvar"
           ? gd::EventsCodeGenerator::PROJECT_VARIABLE
@@ -146,10 +148,11 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
 }
 
 void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
-  auto type = node.GetType(codeGenerator.GetPlatform(),
-                           codeGenerator.GetGlobalObjectsAndGroups(),
-                           codeGenerator.GetObjectsAndGroups(),
-                           rootType);
+    auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                              codeGenerator.GetGlobalObjectsAndGroups(),
+                                              codeGenerator.GetObjectsAndGroups(),
+                                              rootType,
+                                              node);
 
     // TODO create an helper method to retrieve the metadata of a FunctionCallNode?
     gd::String objectType = node.objectName.empty() ? gd::String() :
@@ -400,19 +403,21 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
-  auto type = node.GetType(codeGenerator.GetPlatform(),
-                           codeGenerator.GetGlobalObjectsAndGroups(),
-                           codeGenerator.GetObjectsAndGroups(),
-                           rootType);
+  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                            codeGenerator.GetGlobalObjectsAndGroups(),
+                                            codeGenerator.GetObjectsAndGroups(),
+                                            rootType,
+                                            node);
   output += GenerateDefaultValue(type);
 }
 
 void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(
     ObjectFunctionNameNode& node) {
-  auto type = node.GetType(codeGenerator.GetPlatform(),
-                           codeGenerator.GetGlobalObjectsAndGroups(),
-                           codeGenerator.GetObjectsAndGroups(),
-                           rootType);
+  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                            codeGenerator.GetGlobalObjectsAndGroups(),
+                                            codeGenerator.GetObjectsAndGroups(),
+                                            rootType,
+                                            node);
   output += GenerateDefaultValue(type);
 }
 

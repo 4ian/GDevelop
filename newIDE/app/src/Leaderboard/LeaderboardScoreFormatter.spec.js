@@ -1,9 +1,11 @@
 // @flow
 
-const { it } = require('date-fns/locale');
-const { formatDuration } = require('./LeaderboardScoreFormatter');
+const {
+  formatDuration,
+  formatCustomScore,
+} = require('./LeaderboardScoreFormatter');
 
-describe('Duration', () => {
+describe('LeaderboardScoreFormatter', () => {
   describe('formatDuration', () => {
     test('it correctly formats whole seconds', () => {
       expect(formatDuration(81, ['second'])).toEqual('81');
@@ -98,6 +100,71 @@ describe('Duration', () => {
           'millisecond',
         ])
       ).toEqual('08:09:00.050');
+    });
+  });
+
+  describe('formatCustomScore', () => {
+    test('it correctly formats score without prefix nor suffix, with 0 decimal places', () => {
+      expect(
+        formatCustomScore(39, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: '',
+          decimalPlacesNumber: 0
+        })
+      ).toEqual('39');
+      expect(
+        formatCustomScore(0.1, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: '',
+          decimalPlacesNumber: 0
+        })
+      ).toEqual('0');
+    });
+    test('it correctly formats score with prefix or suffix, with 0 decimal places', () => {
+      expect(
+        formatCustomScore(39, {
+          type: 'custom',
+          scorePrefix: '$ ',
+          scoreSuffix: '',
+          decimalPlacesNumber: 0
+        })
+      ).toEqual('$ 39');
+      expect(
+        formatCustomScore(0.1, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: 'coins',
+          decimalPlacesNumber: 0
+        })
+      ).toEqual('0coins');
+    });
+    test('it correctly formats score with prefix or suffix, with decimal places', () => {
+      expect(
+        formatCustomScore(39, {
+          type: 'custom',
+          scorePrefix: '$ ',
+          scoreSuffix: '',
+          decimalPlacesNumber: 2
+        })
+      ).toEqual('$ 39.00');
+      expect(
+        formatCustomScore(0.1, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: 'coins',
+          decimalPlacesNumber: 2
+        })
+      ).toEqual('0.10coins');
+      expect(
+        formatCustomScore(0.185462, {
+          type: 'custom',
+          scorePrefix: '',
+          scoreSuffix: 'coins',
+          decimalPlacesNumber: 2
+        })
+      ).toEqual('0.19coins');
     });
   });
 });

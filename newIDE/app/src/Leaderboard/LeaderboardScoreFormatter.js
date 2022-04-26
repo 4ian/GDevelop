@@ -1,5 +1,5 @@
 // @flow
-
+import { type LeaderboardScoreFormattingCustom } from '../Utils/GDevelopServices/Play';
 type DurationFormattingOption = 'hour' | 'minute' | 'second' | 'millisecond';
 
 const labelToDivider = {
@@ -51,4 +51,16 @@ export const formatDuration = (
     }
   }
   return formattedDuration;
+};
+
+export const formatCustomScore = (
+  score: number,
+  options: LeaderboardScoreFormattingCustom
+): string => {
+  const roundedScore =
+    Math.round(score * 10 ** options.decimalPlacesNumber) /
+    10 ** options.decimalPlacesNumber;
+  return `${options.scorePrefix}${roundedScore.toFixed(
+    options.decimalPlacesNumber
+  )}${options.scoreSuffix}`;
 };

@@ -11,10 +11,11 @@ export type LeaderboardPlayerUnicityDisplayOption =
   | 'PREFER_UNIQUE'
   | 'PREFER_NON_UNIQUE';
 
-type LeaderboardScoreFormattingCustom = {
+export type LeaderboardScoreFormattingCustom = {
   type: 'custom',
   scorePrefix: string,
   scoreSuffix: string,
+  decimalPlacesNumber: number,
 };
 
 type LeaderboardScoreFormattingTime = {

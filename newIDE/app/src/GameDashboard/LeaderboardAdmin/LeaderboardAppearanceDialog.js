@@ -43,6 +43,7 @@ function LeaderboardAppearanceDialog({
             type: 'custom',
             scorePrefix: '',
             scoreSuffix: '',
+            precision: 0,
           },
         }
   );

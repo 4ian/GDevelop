@@ -8,97 +8,137 @@ const {
 describe('LeaderboardScoreFormatter', () => {
   describe('formatDuration', () => {
     test('it correctly formats whole seconds', () => {
-      expect(formatDuration(81, ['second'])).toEqual('81');
-      expect(formatDuration(15, ['second'])).toEqual('15');
-      expect(formatDuration(8, ['second'])).toEqual('08');
+      expect(formatDuration(81, { type: 'time', units: ['second'] })).toEqual(
+        '81'
+      );
+      expect(formatDuration(15, { type: 'time', units: ['second'] })).toEqual(
+        '15'
+      );
+      expect(formatDuration(8, { type: 'time', units: ['second'] })).toEqual(
+        '08'
+      );
     });
     test('it correctly formats seconds without milliseconds', () => {
-      expect(formatDuration(81.29, ['second'])).toEqual('81');
-      expect(formatDuration(15.677, ['second'])).toEqual('15');
-      expect(formatDuration(8.045, ['second'])).toEqual('08');
+      expect(
+        formatDuration(81.29, { type: 'time', units: ['second'] })
+      ).toEqual('81');
+      expect(
+        formatDuration(15.677, { type: 'time', units: ['second'] })
+      ).toEqual('15');
+      expect(
+        formatDuration(8.045, { type: 'time', units: ['second'] })
+      ).toEqual('08');
     });
     test('it correctly formats seconds with milliseconds', () => {
-      expect(formatDuration(81.29, ['second', 'millisecond'])).toEqual(
-        '81.290'
-      );
-      expect(formatDuration(15.677, ['second', 'millisecond'])).toEqual(
-        '15.677'
-      );
-      expect(formatDuration(8.045, ['second', 'millisecond'])).toEqual(
-        '08.045'
-      );
+      expect(
+        formatDuration(81.29, {
+          type: 'time',
+          units: ['second', 'millisecond'],
+        })
+      ).toEqual('81.290');
+      expect(
+        formatDuration(15.677, {
+          type: 'time',
+          units: ['second', 'millisecond'],
+        })
+      ).toEqual('15.677');
+      expect(
+        formatDuration(8.045, {
+          type: 'time',
+          units: ['second', 'millisecond'],
+        })
+      ).toEqual('08.045');
     });
 
     test('it correctly formats whole hours', () => {
-      expect(formatDuration(39 * 3600, ['hour'])).toEqual('39');
-      expect(formatDuration(15 * 3600, ['hour'])).toEqual('15');
-      expect(formatDuration(8 * 3600, ['hour'])).toEqual('08');
+      expect(
+        formatDuration(39 * 3600, { type: 'time', units: ['hour'] })
+      ).toEqual('39');
+      expect(
+        formatDuration(15 * 3600, { type: 'time', units: ['hour'] })
+      ).toEqual('15');
+      expect(
+        formatDuration(8 * 3600, { type: 'time', units: ['hour'] })
+      ).toEqual('08');
     });
     test('it correctly formats hours without lower units', () => {
       expect(
-        formatDuration(39 * 3600 + Math.random() * 15 * 60, ['hour'])
+        formatDuration(39 * 3600 + Math.random() * 15 * 60, {
+          type: 'time',
+          units: ['hour'],
+        })
       ).toEqual('39');
       expect(
-        formatDuration(15 * 3600 + Math.random() * 15 * 60, ['hour'])
+        formatDuration(15 * 3600 + Math.random() * 15 * 60, {
+          type: 'time',
+          units: ['hour'],
+        })
       ).toEqual('15');
       expect(
-        formatDuration(8 * 3600 + Math.random() * 15 * 60, ['hour'])
+        formatDuration(8 * 3600 + Math.random() * 15 * 60, {
+          type: 'time',
+          units: ['hour'],
+        })
       ).toEqual('08');
     });
     test('it correctly formats hours with minutes', () => {
       expect(
-        formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, ['hour', 'minute'])
+        formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, {
+          type: 'time',
+          units: ['hour', 'minute'],
+        })
       ).toEqual('39:13');
       expect(
-        formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98332, ['hour', 'minute'])
+        formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98332, {
+          type: 'time',
+          units: ['hour', 'minute'],
+        })
       ).toEqual('15:45');
       expect(
-        formatDuration(8 * 3600 + 9 * 60 + 0.05, ['hour', 'minute'])
+        formatDuration(8 * 3600 + 9 * 60 + 0.05, {
+          type: 'time',
+          units: ['hour', 'minute'],
+        })
       ).toEqual('08:09');
     });
     test('it correctly formats hours with minutes and seconds', () => {
       expect(
-        formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, [
-          'hour',
-          'minute',
-          'second',
-        ])
+        formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, {
+          type: 'time',
+          units: ['hour', 'minute', 'second'],
+        })
       ).toEqual('39:13:06');
       expect(
-        formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98332, [
-          'hour',
-          'minute',
-          'second',
-        ])
+        formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98332, {
+          type: 'time',
+          units: ['hour', 'minute', 'second'],
+        })
       ).toEqual('15:45:56');
       expect(
-        formatDuration(8 * 3600 + 9 * 60 + 0.05, ['hour', 'minute', 'second'])
+        formatDuration(8 * 3600 + 9 * 60 + 0.05, {
+          type: 'time',
+          units: ['hour', 'minute', 'second'],
+        })
       ).toEqual('08:09:00');
     });
     test('it correctly formats hours with minutes, seconds and milliseconds', () => {
       expect(
-        formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, [
-          'hour',
-          'minute',
-          'second',
-          'millisecond',
-        ])
+        formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, {
+          type: 'time',
+          units: ['hour', 'minute', 'second', 'millisecond'],
+        })
       ).toEqual('39:13:06.134');
       expect(
-        formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98352, [
-          'hour',
-          'minute',
-          'second',
-          'millisecond',
-        ])
+        formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98352, {
+          type: 'time',
+          units: ['hour', 'minute', 'second', 'millisecond'],
+        })
       ).toEqual('15:45:56.984');
       expect(
-        formatDuration(8 * 3600 + 9 * 60 + 0.05, [
-          'hour',
-          'minute',
-          'second',
-          'millisecond',
-        ])
+        formatDuration(8 * 3600 + 9 * 60 + 0.05, {
+          type: 'time',
+          units: ['hour', 'minute', 'second', 'millisecond'],
+        })
       ).toEqual('08:09:00.050');
     });
   });
@@ -110,7 +150,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: '',
-          precision: 0
+          precision: 0,
         })
       ).toEqual('39');
       expect(
@@ -118,7 +158,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: '',
-          precision: 0
+          precision: 0,
         })
       ).toEqual('0');
     });
@@ -128,7 +168,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '$ ',
           scoreSuffix: '',
-          precision: 0
+          precision: 0,
         })
       ).toEqual('$ 39');
       expect(
@@ -136,7 +176,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          precision: 0
+          precision: 0,
         })
       ).toEqual('0coins');
     });
@@ -146,7 +186,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '$ ',
           scoreSuffix: '',
-          precision: 2
+          precision: 2,
         })
       ).toEqual('$ 39.00');
       expect(
@@ -154,7 +194,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          precision: 2
+          precision: 2,
         })
       ).toEqual('0.10coins');
       expect(
@@ -162,7 +202,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          precision: 2
+          precision: 2,
         })
       ).toEqual('0.19coins');
     });
@@ -172,7 +212,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '$ ',
           scoreSuffix: '',
-          precision: -1
+          precision: -1,
         })
       ).toEqual('$ 250');
       expect(
@@ -180,7 +220,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          precision: -2
+          precision: -2,
         })
       ).toEqual('6400coins');
       expect(
@@ -188,7 +228,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          precision: -3
+          precision: -3,
         })
       ).toEqual('0coins');
     });

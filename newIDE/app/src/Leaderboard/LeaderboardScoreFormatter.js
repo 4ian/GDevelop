@@ -1,6 +1,9 @@
 // @flow
-import { type LeaderboardScoreFormattingCustom } from '../Utils/GDevelopServices/Play';
-type DurationFormattingOption = 'hour' | 'minute' | 'second' | 'millisecond';
+import {
+  type LeaderboardScoreFormattingCustom,
+  type LeaderboardScoreFormattingTime,
+  type LeaderboardScoreFormattingTimeUnit,
+} from '../Utils/GDevelopServices/Play';
 
 const labelToDivider = {
   hour: 3600000,
@@ -16,16 +19,16 @@ const labelToNextSeparator = {
 };
 
 const shouldDisplaySeparator = (
-  currentUnit: DurationFormattingOption,
-  options: DurationFormattingOption[]
+  currentUnit: LeaderboardScoreFormattingTimeUnit,
+  requestedUnits: LeaderboardScoreFormattingTimeUnit[]
 ): boolean => {
   switch (currentUnit) {
     case 'hour':
-      return options.includes('minute');
+      return requestedUnits.includes('minute');
     case 'minute':
-      return options.includes('second');
+      return requestedUnits.includes('second');
     case 'second':
-      return options.includes('millisecond');
+      return requestedUnits.includes('millisecond');
     default:
       return false;
   }
@@ -33,19 +36,21 @@ const shouldDisplaySeparator = (
 
 export const formatDuration = (
   durationInSecond: number,
-  options: DurationFormattingOption[]
+  options: LeaderboardScoreFormattingTime
 ): string => {
   let formattedDuration = '';
   let durationInMs = Math.round(durationInSecond * 1000);
   for (const unit of ['hour', 'minute', 'second', 'millisecond']) {
-    if (options.includes(unit)) {
+    if (options.units.includes(unit)) {
       const divider = labelToDivider[unit];
       const remainder = Math.round((durationInMs % divider) * 1000) / 1000;
       const quotient = (durationInMs - remainder) / divider;
       formattedDuration += `${quotient
         .toString()
         .padStart(unit === 'millisecond' ? 3 : 2, '0')}${
-        shouldDisplaySeparator(unit, options) ? labelToNextSeparator[unit] : ''
+        shouldDisplaySeparator(unit, options.units)
+          ? labelToNextSeparator[unit]
+          : ''
       }`;
       durationInMs = remainder;
     }
@@ -58,8 +63,7 @@ export const formatCustomScore = (
   options: LeaderboardScoreFormattingCustom
 ): string => {
   const roundedScore =
-    Math.round(score * 10 ** options.precision) /
-    10 ** options.precision;
+    Math.round(score * 10 ** options.precision) / 10 ** options.precision;
   return `${options.scorePrefix}${roundedScore.toFixed(
     Math.max(0, options.precision)
   )}${options.scoreSuffix}`;

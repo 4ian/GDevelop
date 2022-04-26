@@ -2289,7 +2289,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
         {
           infiniteLoopWarning: true,
           type: 'BuiltinCommonInstructions::Repeat',
-          repeatExpression: "3",
+          repeatExpression: '3',
           conditions: [
             {
               type: { value: 'VarObjet' },
@@ -2381,6 +2381,169 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
       expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
         0
+      );
+    });
+
+    it('works with a ForEach event', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          infiniteLoopWarning: true,
+          type: 'BuiltinCommonInstructions::ForEach',
+          object: 'MyParamObject',
+          conditions: [
+            {
+              type: { value: 'VarObjet' },
+              parameters: ['MyParamObject', 'PleasePickMe', '=', '1'],
+              subInstructions: [],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'ModVarScene' },
+              parameters: ['Counter', '+', '1'],
+            },
+            {
+              type: { value: 'Wait' },
+              parameters: ['1.5'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: [
+                'MyParamObject',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
+              subInstructions: [],
+            },
+            {
+              type: { value: 'Wait' },
+              parameters: ['1.5'],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: [
+                'MyParamObject',
+                'TestVariable',
+                '+',
+                'GetArgumentAsNumber("IncreaseValue")',
+              ],
+              subInstructions: [],
+            },
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyOtherParamObject', 'TestVariable', '+', '4'],
+              subInstructions: [],
+            },
+          ],
+          events: [],
+        },
+      ]);
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const parameter = new gd.ParameterMetadata();
+      parameter.setType('number');
+      parameter.setName('IncreaseValue');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyParamObject');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyOtherParamObject');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      eventsFunction.delete();
+      project.delete();
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      const myObjectA3 = runtimeScene.createObject('MyObjectA');
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      const myObjectB2 = runtimeScene.createObject('MyObjectB');
+      const myObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+        MyObjectB: [myObjectB1, myObjectB2],
+      });
+
+      myObjectA1.getVariables().get('PleasePickMe').setNumber(1);
+      myObjectA2.getVariables().get('PleasePickMe').setNumber(1);
+      myObjectB1.getVariables().get('PleasePickMe').setNumber(1);
+      const myObjectC1 = runtimeScene.createObject('MyObjectC');
+      const myObjectC2 = runtimeScene.createObject('MyObjectC');
+      const myOtherObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectC: [myObjectC1, myObjectC2],
+      });
+
+      runCompiledEvents(gdjs, runtimeScene, [
+        5,
+        myObjectsLists,
+        myOtherObjectsLists,
+      ]);
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that each object A and B got its variable updated.
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that each object A and B got its variable updated.
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+
+      // Check that the objects C are also updated: the two of them are updated
+      // 3 times (once for each object of the ForEach)
+      // (4 is added each time to the variable).
+      expect(myObjectC1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        3 * 4
+      );
+      expect(myObjectC2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        3 * 4
       );
     });
   });

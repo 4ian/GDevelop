@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
@@ -11,7 +10,6 @@ import {
   type Leaderboard,
   type LeaderboardSortOption,
 } from '../../Utils/GDevelopServices/Play';
-import { Column } from '../../UI/Grid';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
 export default {

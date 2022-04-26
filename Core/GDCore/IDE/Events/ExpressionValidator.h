@@ -45,12 +45,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
    * \brief Helper function to check if a given node does not contain
    * any error.
    */
-  static bool HasNoErrors(const gd::Platform &platform_,
-                      const gd::ObjectsContainer &globalObjectsContainer_,
-                      const gd::ObjectsContainer &objectsContainer_,
-                      gd::ExpressionNode& node,
-                      const gd::String &type) {
-    gd::ExpressionValidator validator(platform_, globalObjectsContainer_, objectsContainer_, type);
+  static bool HasNoErrors(const gd::Platform &platform,
+                      const gd::ObjectsContainer &globalObjectsContainer,
+                      const gd::ObjectsContainer &objectsContainer,
+                      const gd::String &type,
+                      gd::ExpressionNode& node) {
+    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, type);
     node.Visit(validator);
     return validator.GetErrors().empty();
   }

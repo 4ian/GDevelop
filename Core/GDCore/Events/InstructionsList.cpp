@@ -5,6 +5,7 @@
  */
 
 #include "InstructionsList.h"
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Project/Project.h"
 #include "Serialization.h"
@@ -29,6 +30,10 @@ void InstructionsList::InsertInstructions(const InstructionsList& list,
     else
       elements.push_back(copiedInstruction);
   }
+}
+
+void InstructionsList::RemoveAfter(const size_t position) {
+  elements.resize(position);
 }
 
 void InstructionsList::SerializeTo(SerializerElement& element) const {

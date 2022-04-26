@@ -77,7 +77,6 @@ class GD_CORE_API ObjectGroupsContainer {
    */
   bool IsEmpty() const { return objectGroups.empty(); };
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief return the position of the group called "name" in the group list
    */
@@ -107,7 +106,6 @@ class GD_CORE_API ObjectGroupsContainer {
    * \brief Move the specified group at a new position in the list.
    */
   void Move(std::size_t oldIndex, std::size_t newIndex);
-#endif
 
   /**
    * \brief Clear all groups of the container.

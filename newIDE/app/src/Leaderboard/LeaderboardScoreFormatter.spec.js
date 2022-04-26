@@ -1,7 +1,7 @@
 // @flow
 
 const { it } = require('date-fns/locale');
-const { formatDuration } = require('./DurationFormatter');
+const { formatDuration } = require('./LeaderboardScoreFormatter');
 
 describe('Duration', () => {
   describe('formatDuration', () => {

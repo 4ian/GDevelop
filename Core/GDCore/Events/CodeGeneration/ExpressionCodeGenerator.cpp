@@ -34,12 +34,10 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     const gd::String& type,
     const gd::String& expression,
     const gd::String& objectName) {
-  gd::ExpressionParser2 parser(codeGenerator.GetPlatform(),
-                               codeGenerator.GetGlobalObjectsAndGroups(),
-                               codeGenerator.GetObjectsAndGroups());
-  ExpressionCodeGenerator generator(codeGenerator, context);
+  gd::ExpressionParser2 parser;
+  ExpressionCodeGenerator generator(type, codeGenerator, context);
 
-  auto node = parser.ParseExpression(type, expression, objectName);
+  auto node = parser.ParseExpression(expression, objectName);
   if (!node) {
     std::cout << "Error: error while parsing: \"" << expression << "\" ("
               << type << ")" << std::endl;
@@ -47,7 +45,10 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     return generator.GenerateDefaultValue(type);
   }
 
-  gd::ExpressionValidator validator;
+  gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
+                                    codeGenerator.GetGlobalObjectsAndGroups(),
+                                    codeGenerator.GetObjectsAndGroups(),
+                                    type);
   node->Visit(validator);
   if (!validator.GetErrors().empty()) {
     std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
@@ -97,10 +98,14 @@ void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
 void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   // This "translation" from the type to an enum could be avoided
   // if all types were moved to an enum.
+  auto type = node.GetType(codeGenerator.GetPlatform(),
+                           codeGenerator.GetGlobalObjectsAndGroups(),
+                           codeGenerator.GetObjectsAndGroups(),
+                           rootType);
   EventsCodeGenerator::VariableScope scope =
-      node.type == "globalvar"
+      type == "globalvar"
           ? gd::EventsCodeGenerator::PROJECT_VARIABLE
-          : ((node.type == "scenevar")
+          : ((type == "scenevar")
                  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
@@ -117,7 +122,7 @@ void ExpressionCodeGenerator::OnVisitVariableAccessorNode(
 
 void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
     VariableBracketAccessorNode& node) {
-  ExpressionCodeGenerator generator(codeGenerator, context);
+  ExpressionCodeGenerator generator("string", codeGenerator, context);
   node.expression->Visit(generator);
   output +=
       codeGenerator.GenerateVariableBracketAccessor(generator.GetOutput());
@@ -125,39 +130,63 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
 }
 
 void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
-  if (gd::ParameterMetadata::IsObject(node.type)) {
+  auto type = node.GetType(codeGenerator.GetPlatform(),
+                           codeGenerator.GetGlobalObjectsAndGroups(),
+                           codeGenerator.GetObjectsAndGroups(),
+                           rootType);
+  if (gd::ParameterMetadata::IsObject(type)) {
     output +=
-        codeGenerator.GenerateObject(node.identifierName, node.type, context);
+        codeGenerator.GenerateObject(node.identifierName, type, context);
   } else {
     output += "/* Error during generation, unrecognized identifier type: " +
-              codeGenerator.ConvertToString(node.type) + " with value " +
+              codeGenerator.ConvertToString(type) + " with value " +
               codeGenerator.ConvertToString(node.identifierName) + " */ " +
               codeGenerator.ConvertToStringExplicit(node.identifierName);
   }
 }
 
 void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
-  if (gd::MetadataProvider::IsBadExpressionMetadata(node.expressionMetadata)) {
+  auto type = node.GetType(codeGenerator.GetPlatform(),
+                           codeGenerator.GetGlobalObjectsAndGroups(),
+                           codeGenerator.GetObjectsAndGroups(),
+                           rootType);
+
+    // TODO create an helper method to retrieve the metadata of a FunctionCallNode?
+    gd::String objectType = node.objectName.empty() ? gd::String() :
+        GetTypeOfObject(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.objectName);
+        
+    gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
+        GetTypeOfBehavior(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.behaviorName);
+
+    const gd::ExpressionMetadata &metadata = node.behaviorName.empty() ?
+        node.objectName.empty() ?
+            MetadataProvider::GetAnyExpressionMetadata(codeGenerator.GetPlatform(), node.functionName) :
+            MetadataProvider::GetObjectAnyExpressionMetadata(
+                codeGenerator.GetPlatform(), objectType, node.functionName) : 
+        MetadataProvider::GetBehaviorAnyExpressionMetadata(
+              codeGenerator.GetPlatform(), behaviorType, node.functionName);
+
+  if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     output += "/* Error during generation, function not found: " +
               codeGenerator.ConvertToString(node.functionName) + " */ " +
-              GenerateDefaultValue(node.type);
+              GenerateDefaultValue(type);
     return;
   }
 
   if (!node.objectName.empty()) {
     if (!node.behaviorName.empty()) {
-      output += GenerateBehaviorFunctionCode(node.type,
+      output += GenerateBehaviorFunctionCode(type,
                                              node.objectName,
                                              node.behaviorName,
                                              node.parameters,
-                                             node.expressionMetadata);
+                                             metadata);
     } else {
       output += GenerateObjectFunctionCode(
-          node.type, node.objectName, node.parameters, node.expressionMetadata);
+          type, node.objectName, node.parameters, metadata);
     }
   } else {
     output +=
-        GenerateFreeFunctionCode(node.parameters, node.expressionMetadata);
+        GenerateFreeFunctionCode(node.parameters, metadata);
   }
 }
 
@@ -305,18 +334,15 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
 
     auto& parameterMetadata = expressionMetadata.parameters[i];
     if (!parameterMetadata.IsCodeOnly()) {
-      ExpressionCodeGenerator generator(codeGenerator, context);
+      ExpressionCodeGenerator generator(parameterMetadata.GetType(), codeGenerator, context);
       if (nonCodeOnlyParameterIndex < parameters.size()) {
         parameters[nonCodeOnlyParameterIndex]->Visit(generator);
         parametersCode += generator.GetOutput();
       } else if (parameterMetadata.IsOptional()) {
         // Optional parameters default value were not parsed at the time of the
         // expression parsing. Parse them now.
-        ExpressionParser2 parser(codeGenerator.GetPlatform(),
-                                 codeGenerator.GetGlobalObjectsAndGroups(),
-                                 codeGenerator.GetObjectsAndGroups());
-        auto node = parser.ParseExpression(parameterMetadata.GetType(),
-                                           parameterMetadata.GetDefaultValue());
+        ExpressionParser2 parser;
+        auto node = parser.ParseExpression(parameterMetadata.GetDefaultValue());
 
         node->Visit(generator);
         parametersCode += generator.GetOutput();
@@ -374,12 +400,20 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
-  output += GenerateDefaultValue(node.type);
+  auto type = node.GetType(codeGenerator.GetPlatform(),
+                           codeGenerator.GetGlobalObjectsAndGroups(),
+                           codeGenerator.GetObjectsAndGroups(),
+                           rootType);
+  output += GenerateDefaultValue(type);
 }
 
 void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(
     ObjectFunctionNameNode& node) {
-  output += GenerateDefaultValue(node.type);
+  auto type = node.GetType(codeGenerator.GetPlatform(),
+                           codeGenerator.GetGlobalObjectsAndGroups(),
+                           codeGenerator.GetObjectsAndGroups(),
+                           rootType);
+  output += GenerateDefaultValue(type);
 }
 
 }  // namespace gd

@@ -437,8 +437,8 @@ struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrE
  * encountered and any other node could not make sense.
  */
 struct GD_CORE_API EmptyNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
-  EmptyNode(const ParentParameter parentParameter_, const gd::String &text_ = "")
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(parentParameter_), text(text_){};
+  EmptyNode(const gd::String &text_ = "")
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(ParentParameter(nullptr, 0)), text(text_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);

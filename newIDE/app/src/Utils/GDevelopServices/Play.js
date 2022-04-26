@@ -15,7 +15,7 @@ export type LeaderboardScoreFormattingCustom = {
   type: 'custom',
   scorePrefix: string,
   scoreSuffix: string,
-  decimalPlacesNumber: number,
+  precision: number,
 };
 
 type LeaderboardScoreFormattingTime = {

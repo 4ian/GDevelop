@@ -110,7 +110,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: '',
-          decimalPlacesNumber: 0
+          precision: 0
         })
       ).toEqual('39');
       expect(
@@ -118,7 +118,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: '',
-          decimalPlacesNumber: 0
+          precision: 0
         })
       ).toEqual('0');
     });
@@ -128,7 +128,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '$ ',
           scoreSuffix: '',
-          decimalPlacesNumber: 0
+          precision: 0
         })
       ).toEqual('$ 39');
       expect(
@@ -136,7 +136,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          decimalPlacesNumber: 0
+          precision: 0
         })
       ).toEqual('0coins');
     });
@@ -146,7 +146,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '$ ',
           scoreSuffix: '',
-          decimalPlacesNumber: 2
+          precision: 2
         })
       ).toEqual('$ 39.00');
       expect(
@@ -154,7 +154,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          decimalPlacesNumber: 2
+          precision: 2
         })
       ).toEqual('0.10coins');
       expect(
@@ -162,7 +162,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          decimalPlacesNumber: 2
+          precision: 2
         })
       ).toEqual('0.19coins');
     });
@@ -172,7 +172,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '$ ',
           scoreSuffix: '',
-          decimalPlacesNumber: -1
+          precision: -1
         })
       ).toEqual('$ 250');
       expect(
@@ -180,7 +180,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          decimalPlacesNumber: -2
+          precision: -2
         })
       ).toEqual('6400coins');
       expect(
@@ -188,7 +188,7 @@ describe('LeaderboardScoreFormatter', () => {
           type: 'custom',
           scorePrefix: '',
           scoreSuffix: 'coins',
-          decimalPlacesNumber: -3
+          precision: -3
         })
       ).toEqual('0coins');
     });

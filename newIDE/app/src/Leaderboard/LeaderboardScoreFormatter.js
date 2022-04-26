@@ -58,9 +58,9 @@ export const formatCustomScore = (
   options: LeaderboardScoreFormattingCustom
 ): string => {
   const roundedScore =
-    Math.round(score * 10 ** options.decimalPlacesNumber) /
-    10 ** options.decimalPlacesNumber;
+    Math.round(score * 10 ** options.precision) /
+    10 ** options.precision;
   return `${options.scorePrefix}${roundedScore.toFixed(
-    Math.max(0, options.decimalPlacesNumber)
+    Math.max(0, options.precision)
   )}${options.scoreSuffix}`;
 };

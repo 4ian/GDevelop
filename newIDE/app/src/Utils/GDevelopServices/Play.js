@@ -13,8 +13,8 @@ export type LeaderboardPlayerUnicityDisplayOption =
 
 export type LeaderboardScoreFormattingCustom = {
   type: 'custom',
-  scorePrefix: string,
-  scoreSuffix: string,
+  prefix: string,
+  suffix: string,
   precision: number,
 };
 

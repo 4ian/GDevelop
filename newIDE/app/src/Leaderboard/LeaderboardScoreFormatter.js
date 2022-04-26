@@ -64,7 +64,7 @@ export const formatCustomScore = (
 ): string => {
   const roundedScore =
     Math.round(score * 10 ** options.precision) / 10 ** options.precision;
-  return `${options.scorePrefix}${roundedScore.toFixed(
+  return `${options.prefix}${roundedScore.toFixed(
     Math.max(0, options.precision)
-  )}${options.scoreSuffix}`;
+  )}${options.suffix}`;
 };

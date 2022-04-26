@@ -148,16 +148,16 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatCustomScore(39, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: '',
+          prefix: '',
+          suffix: '',
           precision: 0,
         })
       ).toEqual('39');
       expect(
         formatCustomScore(0.1, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: '',
+          prefix: '',
+          suffix: '',
           precision: 0,
         })
       ).toEqual('0');
@@ -166,16 +166,16 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatCustomScore(39, {
           type: 'custom',
-          scorePrefix: '$ ',
-          scoreSuffix: '',
+          prefix: '$ ',
+          suffix: '',
           precision: 0,
         })
       ).toEqual('$ 39');
       expect(
         formatCustomScore(0.1, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: 'coins',
+          prefix: '',
+          suffix: 'coins',
           precision: 0,
         })
       ).toEqual('0coins');
@@ -184,24 +184,24 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatCustomScore(39, {
           type: 'custom',
-          scorePrefix: '$ ',
-          scoreSuffix: '',
+          prefix: '$ ',
+          suffix: '',
           precision: 2,
         })
       ).toEqual('$ 39.00');
       expect(
         formatCustomScore(0.1, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: 'coins',
+          prefix: '',
+          suffix: 'coins',
           precision: 2,
         })
       ).toEqual('0.10coins');
       expect(
         formatCustomScore(0.185462, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: 'coins',
+          prefix: '',
+          suffix: 'coins',
           precision: 2,
         })
       ).toEqual('0.19coins');
@@ -210,24 +210,24 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatCustomScore(250, {
           type: 'custom',
-          scorePrefix: '$ ',
-          scoreSuffix: '',
+          prefix: '$ ',
+          suffix: '',
           precision: -1,
         })
       ).toEqual('$ 250');
       expect(
         formatCustomScore(6432, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: 'coins',
+          prefix: '',
+          suffix: 'coins',
           precision: -2,
         })
       ).toEqual('6400coins');
       expect(
         formatCustomScore(315, {
           type: 'custom',
-          scorePrefix: '',
-          scoreSuffix: 'coins',
+          prefix: '',
+          suffix: 'coins',
           precision: -3,
         })
       ).toEqual('0coins');

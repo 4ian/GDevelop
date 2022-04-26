@@ -41,8 +41,8 @@ function LeaderboardAppearanceDialog({
           scoreTitle: 'Score',
           scoreFormatting: {
             type: 'custom',
-            scorePrefix: '',
-            scoreSuffix: '',
+            prefix: '',
+            suffix: '',
             precision: 0,
           },
         }

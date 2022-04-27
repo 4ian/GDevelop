@@ -502,7 +502,7 @@ class GD_CORE_API ExpressionParser2 {
             std::move(parameters), nullptr, closingParenthesisLocation};
       } else {
         auto parameter = Expression();
-        parameters.push_back(parameter);
+        parameters.push_back(std::move(parameter));
         parameter->parent = functionCallNode;
 
         SkipAllWhitespaces();

@@ -15,6 +15,8 @@ class ExpressionMetadata;
 class ExpressionMetadata;
 class Platform;
 class PlatformExtension;
+struct FunctionCallNode;
+struct ExpressionNode;
 }  // namespace gd
 
 namespace gd {

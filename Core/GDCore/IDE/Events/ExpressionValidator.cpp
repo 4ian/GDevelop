@@ -264,6 +264,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       case Type::Empty:
       return emptyTypeString;
     }
+    return unknownTypeString;
   }
 
   ExpressionValidator::Type ExpressionValidator::stringToType(const gd::String &type) {

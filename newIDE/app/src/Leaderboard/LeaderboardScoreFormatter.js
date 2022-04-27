@@ -3,7 +3,6 @@ import {
   type LeaderboardScoreFormattingCustom,
   type LeaderboardScoreFormattingTime,
   type LeaderboardScoreFormatting,
-  type LeaderboardScoreFormattingTimeUnit,
 } from '../Utils/GDevelopServices/Play';
 
 export const orderedTimeUnits = ['hour', 'minute', 'second', 'millisecond'];

@@ -113,7 +113,7 @@ function LeaderboardAppearanceDialog({
       ? leaderboardCustomizationSettings.scoreFormatting.precision
       : 0
   );
-  const [units, setUnits] = React.useState<string>(
+  const [timeUnits, setTimeUnits] = React.useState<string>(
     leaderboardCustomizationSettings &&
       leaderboardCustomizationSettings.scoreFormatting.type === 'time'
       ? getIdentifierFromUnits({
@@ -145,7 +145,7 @@ function LeaderboardAppearanceDialog({
               suffix,
               precision,
             }
-          : { type: scoreType, ...unitSelectOptions[units] },
+          : { type: scoreType, ...unitSelectOptions[timeUnits] },
     };
     await onSave(customizationSettings);
   };
@@ -271,11 +271,11 @@ function LeaderboardAppearanceDialog({
                     <Line>
                       <SelectField
                         fullWidth
-                        value={units}
+                        value={timeUnits}
                         floatingLabelText={<Trans>Time format</Trans>}
                         onChange={(e, i, newValue) =>
                           // $FlowIgnore
-                          setUnits(newValue)
+                          setTimeUnits(newValue)
                         }
                       >
                         {Object.keys(unitSelectOptions).map(option => (
@@ -337,7 +337,7 @@ function LeaderboardAppearanceDialog({
                       scoreType === 'time'
                         ? {
                             type: scoreType,
-                            ...unitSelectOptions[units],
+                            ...unitSelectOptions[timeUnits],
                           }
                         : {
                             type: scoreType,

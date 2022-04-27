@@ -17,6 +17,7 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
+#include "GDCore/IDE/Events/ExpressionTypeFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
@@ -32,11 +33,15 @@ class GD_CORE_API ExpressionObjectsAnalyzer
     : public ExpressionParser2NodeWorker {
  public:
   ExpressionObjectsAnalyzer(
+        const gd::Platform &platform_,
         const gd::ObjectsContainer &globalObjectsContainer_,
         const gd::ObjectsContainer &objectsContainer_,
+        const gd::String &rootType_,
         EventsContext& context_) :
+        platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
+        rootType(rootType_),
         context(context_){};
   virtual ~ExpressionObjectsAnalyzer(){};
 
@@ -65,7 +70,8 @@ class GD_CORE_API ExpressionObjectsAnalyzer
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    if (gd::ParameterMetadata::IsObject(node.type)) {
+    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    if (gd::ParameterMetadata::IsObject(type)) {
       context.AddObjectName(node.identifierName);
     }
   }
@@ -93,8 +99,10 @@ class GD_CORE_API ExpressionObjectsAnalyzer
   void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
+  const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
+  const gd::String rootType;
 
   EventsContext& context;
 };
@@ -137,11 +145,15 @@ void EventsContextAnalyzer::AnalyzeParameter(
   const auto& type = metadata.GetType();
   if (ParameterMetadata::IsObject(type)) {
     context.AddObjectName(value);
-  } else if (ParameterMetadata::IsExpression("number", type) ||
-             ParameterMetadata::IsExpression("string", type)) {
+  } else if (ParameterMetadata::IsExpression("number", type)) {
     auto node = parameter.GetRootNode();
 
-    ExpressionObjectsAnalyzer analyzer(project, layout, context);
+    ExpressionObjectsAnalyzer analyzer(platform, project, layout, "number", context);
+    node->Visit(analyzer);
+  } else if (ParameterMetadata::IsExpression("string", type)) {
+    auto node = parameter.GetRootNode();
+
+    ExpressionObjectsAnalyzer analyzer(platform, project, layout, "string", context);
     node->Visit(analyzer);
   } else if (ParameterMetadata::IsBehavior(type)) {
     context.AddBehaviorName(lastObjectName, value);

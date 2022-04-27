@@ -181,18 +181,17 @@ const Instruction = (props: Props) => {
             parameterType === 'string' ||
             gd.ParameterMetadata.isExpression('variable', parameterType)
           ) {
-            const parser = new gd.ExpressionParser2(
-              gd.JsPlatform.get(),
-              globalObjectsContainer,
-              objectsContainer
-            );
             const expressionNode = instruction
               .getParameter(parameterIndex)
-              .getRootNode(parameterType, parser);
-            const expressionValidator = new gd.ExpressionValidator();
+              .getRootNode();
+            const expressionValidator = new gd.ExpressionValidator(
+              gd.JsPlatform.get(),
+              globalObjectsContainer,
+              objectsContainer,
+              parameterType
+            );
             expressionNode.visit(expressionValidator);
             expressionIsValid = expressionValidator.getErrors().size() === 0;
-            parser.delete();
           } else if (gd.ParameterMetadata.isObject(parameterType)) {
             const objectOrGroupName = instruction
               .getParameter(parameterIndex)

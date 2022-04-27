@@ -13,7 +13,9 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
 #include "GDCore/String.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 
 using namespace std;
 
@@ -388,6 +390,69 @@ MetadataProvider::GetBehaviorAnyExpressionMetadata(const gd::Platform& platform,
              : &stringExpressionMetadata != &badExpressionMetadata
                    ? stringExpressionMetadata
                    : badExpressionMetadata;
+}
+
+const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& node) {
+  
+  gd::String objectType = node.objectName.empty() ? gd::String() :
+      GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
+      
+  gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
+      GetTypeOfBehavior(globalObjectsContainer, objectsContainer, node.behaviorName);
+
+  return node.behaviorName.empty() ?
+      node.objectName.empty() ?
+          MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName) :
+          MetadataProvider::GetObjectAnyExpressionMetadata(
+              platform, objectType, node.functionName) : 
+      MetadataProvider::GetBehaviorAnyExpressionMetadata(
+            platform, behaviorType, node.functionName);
+}
+
+  static const gd::ParameterMetadata* GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    ExpressionNode& parameter) {
+      int parameterIndex = -1;
+      for (int i = 0; i < functionCall.parameters.size(); i++) {
+        if (functionCall.parameters.at(i).get() == &parameter) {
+          parameterIndex = i;
+          break;
+        }
+      }
+      if (parameterIndex < 0) {
+        return nullptr;
+      }
+      // Search the parameter metadata index skipping invisible ones.
+      size_t visibleParameterIndex = 0;
+      size_t metadataParameterIndex =
+          ExpressionParser2::WrittenParametersFirstIndex(
+              functionCall.objectName, functionCall.behaviorName);
+      const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
+          platform, globalObjectsContainer, objectsContainer, functionCall);
+
+      const gd::ParameterMetadata* parameterMetadata = nullptr;
+      while (metadataParameterIndex <
+             metadata.parameters.size()) {
+        if (!metadata.parameters[metadataParameterIndex]
+                 .IsCodeOnly()) {
+          if (visibleParameterIndex == parameterIndex) {
+            parameterMetadata = &metadata.parameters[metadataParameterIndex];
+          }
+          visibleParameterIndex++;
+        }
+        metadataParameterIndex++;
+      }
+      const int visibleParameterCount = visibleParameterIndex;
+      // It can be null if there are too many parameters in the expression, this text node is
+      // not actually linked to a parameter expected by the function call.
+      return parameterMetadata;
 }
 
 MetadataProvider::~MetadataProvider() {}

@@ -306,6 +306,51 @@ namespace gdjs {
       ): number {
         return distance * Math.sin(gdjs.toRad(angle));
       };
+
+      /**
+       * Rounds a number to the Nth decimal place
+       * @param {float} value
+       * @param {number} decimalPlace
+       * @returns the rounded value
+       */
+      export const roundTo = function (
+        value: float,
+        decimalPlace: number
+      ): number {
+        if (!decimalPlace || !Number.isInteger(decimalPlace))
+          return Math.round(value);
+        return Math.round(value * 10 ** decimalPlace) / 10 ** decimalPlace;
+      };
+
+      /**
+       * Rounds down a number to the Nth decimal place
+       * @param {float} value
+       * @param {number} decimalPlace
+       * @returns the rounded value
+       */
+      export const floorTo = function (
+        value: float,
+        decimalPlace: number
+      ): number {
+        if (!decimalPlace || !Number.isInteger(decimalPlace))
+          return Math.floor(value);
+        return Math.floor(value * 10 ** decimalPlace) / 10 ** decimalPlace;
+      };
+
+      /**
+       * Rounds up a number to the Nth decimal place
+       * @param {float} value
+       * @param {number} decimalPlace
+       * @returns the rounded value
+       */
+      export const ceilTo = function (
+        value: float,
+        decimalPlace: number
+      ): number {
+        if (!decimalPlace || !Number.isInteger(decimalPlace))
+          return Math.ceil(value);
+        return Math.ceil(value * 10 ** decimalPlace) / 10 ** decimalPlace;
+      };
     }
   }
 }

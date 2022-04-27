@@ -3,8 +3,8 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONVALIDATOR_H
-#define GDCORE_EXPRESSIONVALIDATOR_H
+#ifndef GDCORE_EXPRESSIONTYPEFINDER_H
+#define GDCORE_EXPRESSIONTYPEFINDER_H
 
 #include <memory>
 #include <vector>
@@ -13,6 +13,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadata.h"
 #include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
 #include "GDCore/Tools/Localization.h"
 
@@ -42,9 +43,9 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   static const gd::String &GetType(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
-                      const gd::String &type,
+                      const gd::String &rootType,
                       gd::ExpressionNode& node) {
-    gd::ExpressionTypeFinder typeFinder(platform, globalObjectsContainer, objectsContainer, type);
+    gd::ExpressionTypeFinder typeFinder(platform, globalObjectsContainer, objectsContainer, rootType);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
@@ -149,4 +150,4 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
 
 }  // namespace gd
 
-#endif  // GDCORE_EXPRESSIONVALIDATOR_H
+#endif  // GDCORE_EXPRESSIONTYPEFINDER_H

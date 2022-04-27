@@ -60,6 +60,10 @@ struct GD_CORE_API ExpressionParserDiagnostic {
 struct GD_CORE_API ExpressionParserError : public ExpressionParserDiagnostic {
   ExpressionParserError(const gd::String &type_,
                         const gd::String &message_,
+                        ExpressionParserLocation location_)
+      : type(type_), message(message_), location(location_){};
+  ExpressionParserError(const gd::String &type_,
+                        const gd::String &message_,
                         size_t position_)
       : type(type_), message(message_), location(position_){};
   ExpressionParserError(const gd::String &type_,
@@ -219,8 +223,7 @@ struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public Expres
  * \see gd::VariableBracketAccessorNode
  */
 struct GD_CORE_API VariableNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
-  VariableNode(const gd::String &type_,
-               const gd::String &name_,
+  VariableNode(const gd::String &name_,
                const gd::String &objectName_)
       : FunctionCallOrObjectFunctionNameOrEmptyNode(), name(name_), objectName(objectName_){};
   virtual ~VariableNode(){};

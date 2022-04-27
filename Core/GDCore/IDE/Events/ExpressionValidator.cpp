@@ -25,6 +25,39 @@ using namespace std;
 
 namespace gd {
 
+namespace {
+/**
+ * Return the minimum number of parameters, starting from a given parameter
+ * (by convention, 1 for object functions and 2 for behavior functions).
+ */
+size_t GetMinimumParametersNumber(
+    const std::vector<gd::ParameterMetadata>& parameters,
+    size_t initialParameterIndex) {
+  size_t nb = 0;
+  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
+    if (!parameters[i].optional && !parameters[i].codeOnly) nb++;
+  }
+
+  return nb;
+}
+
+/**
+ * Return the maximum number of parameters, starting from a given parameter
+ * (by convention, 1 for object functions and 2 for behavior functions).
+ */
+size_t GetMaximumParametersNumber(
+    const std::vector<gd::ParameterMetadata>& parameters,
+    size_t initialParameterIndex) {
+  size_t nb = 0;
+  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
+    if (!parameters[i].codeOnly) nb++;
+  }
+
+  return nb;
+}
+
+}  // namespace
+
 ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::FunctionCallNode& function) {
 
   ReportAnyError(function);
@@ -54,7 +87,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
               metadata.GetRequiredBaseObjectCapability())) {
         errors.push_back(RaiseTypeError(
             _("This expression exists, but it can't be used on this object."),
-            function.objectNameLocation.GetStartPosition()).get());
+            function.objectNameLocation).get());
         return stringToType(metadata.GetReturnType());
       }
     }
@@ -68,8 +101,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
         _("Cannot find an expression with this name: ") +
             function.functionName + "\n" +
             _("Double check that you've not made any typo in the name."),
-        function.location.GetStartPosition(),
-        function.location.GetEndPosition()).get());
+        function.location).get());
       return returnType;
   }
 
@@ -81,7 +113,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
             "string is expected. Use `ToString` if you need to convert a "
             "number to a string."),
           function.location).get());
-      return;
+      return returnType;
     }
     else if (childType != Type::Number && childType != Type::NumberOrString) {
       errors.push_back(RaiseTypeError(_("You tried to use an expression that returns a "
@@ -141,15 +173,14 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
           "too_few_parameters",
           "You have not entered enough parameters for the expression. " +
               expectedCountMessage,
-          function.location.GetStartPosition(),
-          function.location.GetEndPosition()).get());
+          function.location).get());
       return returnType;
     }
   }
 
   // TODO: reverse the order of diagnostic?
 
-  for (int parameterIndex; parameterIndex < function.parameters.size(); parameterIndex++) {
+  for (int parameterIndex = 0; parameterIndex < function.parameters.size(); parameterIndex++) {
     auto& parameter = function.parameters[parameterIndex];
     auto& parameterMetadata = metadata.GetParameters()[parameterIndex];
 
@@ -205,37 +236,52 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   return returnType;
 }
 
-namespace {
-/**
- * Return the minimum number of parameters, starting from a given parameter
- * (by convention, 1 for object functions and 2 for behavior functions).
- */
-size_t GetMinimumParametersNumber(
-    const std::vector<gd::ParameterMetadata>& parameters,
-    size_t initialParameterIndex) {
-  size_t nb = 0;
-  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].optional && !parameters[i].codeOnly) nb++;
+  const gd::String ExpressionValidator::unknownTypeString = "unknown";
+  const gd::String ExpressionValidator::numberTypeString = "number";
+  const gd::String ExpressionValidator::stringTypeString = "string";
+  const gd::String ExpressionValidator::numberOrStringTypeString = "number|string";
+  const gd::String ExpressionValidator::variableTypeString = "variable";
+  const gd::String ExpressionValidator::objectTypeString = "object";
+  const gd::String ExpressionValidator::identifierTypeString = "identifier";
+  const gd::String ExpressionValidator::emptyTypeString = "empty";
+
+  const gd::String &ExpressionValidator::typeToSting(Type type) {
+    switch (type) {
+      case Type::Unknown:
+      return unknownTypeString;
+      case Type::Number:
+      return numberTypeString;
+      case Type::String:
+      return stringTypeString;
+      case Type::NumberOrString:
+      return numberOrStringTypeString;
+      case Type::Variable:
+      return variableTypeString;
+      case Type::Object:
+      return objectTypeString;
+      case Type::Identifier:
+      return identifierTypeString;
+      case Type::Empty:
+      return emptyTypeString;
+    }
   }
 
-  return nb;
-}
-
-/**
- * Return the maximum number of parameters, starting from a given parameter
- * (by convention, 1 for object functions and 2 for behavior functions).
- */
-size_t GetMaximumParametersNumber(
-    const std::vector<gd::ParameterMetadata>& parameters,
-    size_t initialParameterIndex) {
-  size_t nb = 0;
-  for (std::size_t i = initialParameterIndex; i < parameters.size(); ++i) {
-    if (!parameters[i].codeOnly) nb++;
+  ExpressionValidator::Type ExpressionValidator::stringToType(const gd::String &type) {
+    if (type == "number" || gd::ParameterMetadata::IsExpression("number", type)) {
+      return Type::Number;
+    }
+    if (type == "string" || gd::ParameterMetadata::IsExpression("string", type)) {
+      return Type::String;
+    }
+    if (type == "number|string") {
+      return Type::NumberOrString;
+    }
+    if (type == "variable" || gd::ParameterMetadata::IsExpression("variable", type)) {
+      return Type::Variable;
+    }
+    if (type == "object" || gd::ParameterMetadata::IsObject(type)) {
+      return Type::Object;
+    }
+    return Type::Unknown;
   }
-
-  return nb;
-}
-
-}  // namespace
-
 }  // namespace gd

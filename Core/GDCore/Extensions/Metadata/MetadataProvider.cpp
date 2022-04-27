@@ -427,7 +427,7 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
         }
       }
       if (parameterIndex < 0) {
-        return;
+        return nullptr;
       }
       // Search the parameter metadata index skipping invisible ones.
       size_t visibleParameterIndex = 0;

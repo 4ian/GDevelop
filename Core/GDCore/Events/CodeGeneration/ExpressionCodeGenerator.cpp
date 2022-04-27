@@ -99,11 +99,11 @@ void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
 void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   // This "translation" from the type to an enum could be avoided
   // if all types were moved to an enum.
-    auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                              codeGenerator.GetGlobalObjectsAndGroups(),
-                                              codeGenerator.GetObjectsAndGroups(),
-                                              rootType,
-                                              node);
+  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                            codeGenerator.GetGlobalObjectsAndGroups(),
+                                            codeGenerator.GetObjectsAndGroups(),
+                                            rootType,
+                                            node);
   EventsCodeGenerator::VariableScope scope =
       type == "globalvar"
           ? gd::EventsCodeGenerator::PROJECT_VARIABLE
@@ -132,10 +132,11 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
 }
 
 void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
-  auto type = node.GetType(codeGenerator.GetPlatform(),
-                           codeGenerator.GetGlobalObjectsAndGroups(),
-                           codeGenerator.GetObjectsAndGroups(),
-                           rootType);
+  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                            codeGenerator.GetGlobalObjectsAndGroups(),
+                                            codeGenerator.GetObjectsAndGroups(),
+                                            rootType,
+                                            node);
   if (gd::ParameterMetadata::IsObject(type)) {
     output +=
         codeGenerator.GenerateObject(node.identifierName, type, context);
@@ -148,26 +149,26 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
 }
 
 void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
-    auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
-                                              codeGenerator.GetGlobalObjectsAndGroups(),
-                                              codeGenerator.GetObjectsAndGroups(),
-                                              rootType,
-                                              node);
+  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+                                            codeGenerator.GetGlobalObjectsAndGroups(),
+                                            codeGenerator.GetObjectsAndGroups(),
+                                            rootType,
+                                            node);
 
-    // TODO create an helper method to retrieve the metadata of a FunctionCallNode?
-    gd::String objectType = node.objectName.empty() ? gd::String() :
-        GetTypeOfObject(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.objectName);
-        
-    gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
-        GetTypeOfBehavior(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.behaviorName);
+  // TODO create an helper method to retrieve the metadata of a FunctionCallNode?
+  gd::String objectType = node.objectName.empty() ? gd::String() :
+      GetTypeOfObject(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.objectName);
+      
+  gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
+      GetTypeOfBehavior(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.behaviorName);
 
-    const gd::ExpressionMetadata &metadata = node.behaviorName.empty() ?
-        node.objectName.empty() ?
-            MetadataProvider::GetAnyExpressionMetadata(codeGenerator.GetPlatform(), node.functionName) :
-            MetadataProvider::GetObjectAnyExpressionMetadata(
-                codeGenerator.GetPlatform(), objectType, node.functionName) : 
-        MetadataProvider::GetBehaviorAnyExpressionMetadata(
-              codeGenerator.GetPlatform(), behaviorType, node.functionName);
+  const gd::ExpressionMetadata &metadata = node.behaviorName.empty() ?
+      node.objectName.empty() ?
+          MetadataProvider::GetAnyExpressionMetadata(codeGenerator.GetPlatform(), node.functionName) :
+          MetadataProvider::GetObjectAnyExpressionMetadata(
+              codeGenerator.GetPlatform(), objectType, node.functionName) : 
+      MetadataProvider::GetBehaviorAnyExpressionMetadata(
+            codeGenerator.GetPlatform(), behaviorType, node.functionName);
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     output += "/* Error during generation, function not found: " +

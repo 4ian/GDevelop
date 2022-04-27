@@ -251,7 +251,7 @@ function LeaderboardAppearanceDialog({
                       <TextField
                         fullWidth
                         type="number"
-                        floatingLabelText={<Trans>Precision</Trans>}
+                        floatingLabelText={<Trans>Round to X decimal point</Trans>}
                         value={isNaN(precision) ? '' : precision}
                         min={precisionMinValue}
                         max={precisionMaxValue}

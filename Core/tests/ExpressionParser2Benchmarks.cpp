@@ -21,15 +21,16 @@ TEST_CASE("ExpressionParser2 - Benchmarks", "[common][events]") {
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
 
-  gd::ExpressionParser2 parser(platform, project, layout1);
+  gd::ExpressionParser2 parser;
 
   auto parseExpression = [&parser](const gd::String &expression) {
     auto parseExpressionWithType = [&parser,
                                     &expression](const gd::String &type) {
-      auto node = parser.ParseExpression(type, expression);
+      auto node = parser.ParseExpression(expression);
       REQUIRE(node != nullptr);
     };
 
+    // TODO The type is not used any more.
     parseExpressionWithType("number");
     parseExpressionWithType("string");
     parseExpressionWithType("scenevar");

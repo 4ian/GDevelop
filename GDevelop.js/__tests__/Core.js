@@ -3235,14 +3235,14 @@ describe('libGD.js', function () {
       expectedError,
       expectedErrorPosition
     ) {
-      const parser = new gd.ExpressionParser2(
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
+
+      const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
         project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
-
-      const expressionValidator = new gd.ExpressionValidator();
+        layout,
+        type);
       expressionNode.visit(expressionValidator);
       if (expectedError) {
         expect(expressionValidator.getErrors().size()).toBe(1);
@@ -3409,14 +3409,14 @@ describe('libGD.js', function () {
       }
       const expression = expressionWithCaret.replace('|', '');
 
-      const parser = new gd.ExpressionParser2(
-        gd.JsPlatform.get(),
-        project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
       const completionDescriptions =
         gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+          gd.JsPlatform.get(),
+          project,
+          layout,
+          type,
           expressionNode,
           // We're looking for completion for the character just before the caret.
           Math.max(0, caretPosition - 1)

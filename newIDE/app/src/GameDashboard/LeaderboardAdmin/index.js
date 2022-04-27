@@ -103,6 +103,44 @@ const styles = {
   leaderboardNameTextField: { width: 125, fontSize: 14 },
 };
 
+const getApiError = (payload: LeaderboardUpdatePayload) => ({
+  action: payload.name
+    ? 'leaderboardNameUpdate'
+    : payload.sort
+    ? 'leaderboardSortUpdate'
+    : payload.visibility
+    ? 'leaderboardVisibilityUpdate'
+    : payload.customizationSettings
+    ? 'leaderboardAppearanceUpdate'
+    : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
+  message: payload.name ? (
+    <Trans>
+      An error occurred when updating the name of the leaderboard, please close
+      the dialog, come back and try again.
+    </Trans>
+  ) : payload.sort ? (
+    <Trans>
+      An error occurred when updating the sort direction of the leaderboard,
+      please close the dialog, come back and try again.
+    </Trans>
+  ) : payload.visibility ? (
+    <Trans>
+      An error occurred when updating the visibility of the leaderboard, please
+      close the dialog, come back and try again.
+    </Trans>
+  ) : payload.customizationSettings ? (
+    <Trans>
+      An error occurred when updating the appearance of the leaderboard, please
+      close the dialog, come back and try again.
+    </Trans>
+  ) : (
+    <Trans>
+      An error occurred when updating the display choice of the leaderboard,
+      please close the dialog, come back and try again.
+    </Trans>
+  ),
+});
+
 export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
@@ -166,43 +204,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       if (payload.name) setIsEditingName(false);
     } catch (err) {
       console.error('An error occurred when updating leaderboard', err);
-      setApiError({
-        action: payload.name
-          ? 'leaderboardNameUpdate'
-          : payload.sort
-          ? 'leaderboardSortUpdate'
-          : payload.visibility
-          ? 'leaderboardVisibilityUpdate'
-          : payload.customizationSettings
-          ? 'leaderboardAppearanceUpdate'
-          : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
-        message: payload.name ? (
-          <Trans>
-            An error occurred when updating the name of the leaderboard, please
-            close the dialog, come back and try again.
-          </Trans>
-        ) : payload.sort ? (
-          <Trans>
-            An error occurred when updating the sort direction of the
-            leaderboard, please close the dialog, come back and try again.
-          </Trans>
-        ) : payload.visibility ? (
-          <Trans>
-            An error occurred when updating the visibility of the leaderboard,
-            please close the dialog, come back and try again.
-          </Trans>
-        ) : payload.customizationSettings ? (
-          <Trans>
-            An error occurred when updating the appearance of the leaderboard,
-            please close the dialog, come back and try again.
-          </Trans>
-        ) : (
-          <Trans>
-            An error occurred when updating the display choice of the
-            leaderboard, please close the dialog, come back and try again.
-          </Trans>
-        ),
-      });
+      setApiError(getApiError(payload));
     } finally {
       setIsLoading(false);
     }

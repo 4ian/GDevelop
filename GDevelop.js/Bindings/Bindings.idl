@@ -1076,7 +1076,7 @@ interface Instruction {
 
 interface Expression {
   [Const, Ref] DOMString GetPlainString();
-  ExpressionNode GetRootNode([Const] DOMString type, [Ref] ExpressionParser2 parser);
+  ExpressionNode GetRootNode();
 };
 
 interface VectorPairStringTextFormatting {
@@ -2081,7 +2081,7 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator();
+    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetErrors();
 
@@ -2115,7 +2115,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2131,9 +2131,9 @@ interface UniquePtrExpressionNode {
 };
 
 interface ExpressionParser2 {
-    void ExpressionParser2([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer);
+    void ExpressionParser2();
 
-    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString type, [Const] DOMString expression);
+    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString expression);
 };
 
 enum EventsFunction_FunctionType {

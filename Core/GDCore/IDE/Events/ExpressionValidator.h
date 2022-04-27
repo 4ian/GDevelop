@@ -34,11 +34,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   ExpressionValidator(const gd::Platform &platform_,
                       const gd::ObjectsContainer &globalObjectsContainer_,
                       const gd::ObjectsContainer &objectsContainer_,
-                      const gd::String &type_)
+                      const gd::String &rootType_)
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
-        parentType(stringToType(type_)) ,
+        parentType(stringToType(rootType_)) ,
         childType(Type::Unknown) {};
   virtual ~ExpressionValidator(){};
 
@@ -49,9 +49,9 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   static bool HasNoErrors(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
-                      const gd::String &type,
+                      const gd::String &rootType,
                       gd::ExpressionNode& node) {
-    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, type);
+    gd::ExpressionValidator validator(platform, globalObjectsContainer, objectsContainer, rootType);
     node.Visit(validator);
     return validator.GetErrors().empty();
   }

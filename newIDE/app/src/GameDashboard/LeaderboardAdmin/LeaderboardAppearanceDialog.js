@@ -73,6 +73,10 @@ type Props = {
   onClose: () => void,
 };
 
+const scorePreviewMaxValue = 999999999;
+const precisionMinValue = -3;
+const precisionMaxValue = 3;
+
 function LeaderboardAppearanceDialog({
   open,
   onClose,
@@ -123,7 +127,7 @@ function LeaderboardAppearanceDialog({
           smallestUnit: 'millisecond',
         })
   );
-  const [scorePreview, setScorePreview] = React.useState<number>(15.2);
+  const [scorePreview, setScorePreview] = React.useState<number>(15.2659);
 
   const onSaveSettings = async (i18n: I18nType) => {
     if (!scoreTitle) {
@@ -248,13 +252,15 @@ function LeaderboardAppearanceDialog({
                         fullWidth
                         type="number"
                         floatingLabelText={<Trans>Precision</Trans>}
-                        maxLength={10}
-                        value={precision}
-                        min={-3}
-                        max={3}
+                        value={isNaN(precision) ? '' : precision}
+                        min={precisionMinValue}
+                        max={precisionMaxValue}
                         onChange={(e, newValue) => {
                           setPrecision(
-                            Math.max(-3, Math.min(3, parseFloat(newValue)))
+                            Math.max(
+                              precisionMinValue,
+                              Math.min(precisionMaxValue, parseFloat(newValue))
+                            )
                           );
                         }}
                       />
@@ -308,9 +314,18 @@ function LeaderboardAppearanceDialog({
                         <Trans>Test value (in second)</Trans>
                       )
                     }
+                    max={scorePreviewMaxValue}
+                    min={0}
                     type="number"
-                    value={scorePreview}
-                    onChange={(e, value) => setScorePreview(parseFloat(value))}
+                    value={isNaN(scorePreview) ? '' : scorePreview}
+                    onChange={(e, value) =>
+                      setScorePreview(
+                        Math.max(
+                          0,
+                          Math.min(scorePreviewMaxValue, parseFloat(value))
+                        )
+                      )
+                    }
                   />
                 </Line>
                 <Line justifyContent="center" alignItems="center" expand>

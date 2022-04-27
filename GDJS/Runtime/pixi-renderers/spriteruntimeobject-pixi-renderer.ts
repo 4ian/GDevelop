@@ -8,7 +8,7 @@ namespace gdjs {
     _object: gdjs.SpriteRuntimeObject;
     _spriteDirty: boolean = true;
     _textureDirty: boolean = true;
-    _sprite: PIXI.Sprite;
+    _sprite: any;
     _cachedWidth: float = 0;
     _cachedHeight: float = 0;
 
@@ -21,9 +21,11 @@ namespace gdjs {
       runtimeScene: gdjs.RuntimeScene
     ) {
       this._object = runtimeObject;
-      this._sprite = new PIXI.Sprite(
-        runtimeScene.getGame().getImageManager().getInvalidPIXITexture()
-      );
+      if (this._sprite === undefined) {
+        this._sprite = new PIXI.Sprite(
+          runtimeScene.getGame().getImageManager().getInvalidPIXITexture()
+        );
+      }
       const layer = runtimeScene.getLayer('');
       if (layer) {
         layer

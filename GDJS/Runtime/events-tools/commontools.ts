@@ -319,7 +319,10 @@ namespace gdjs {
       ): number {
         if (!decimalPlace || !Number.isInteger(decimalPlace))
           return Math.round(value);
-        return Math.round(value * 10 ** decimalPlace) / 10 ** decimalPlace;
+        return (
+          Math.round(value * Math.pow(10, decimalPlace)) /
+          Math.pow(10, decimalPlace)
+        );
       };
 
       /**
@@ -334,7 +337,10 @@ namespace gdjs {
       ): number {
         if (!decimalPlace || !Number.isInteger(decimalPlace))
           return Math.floor(value);
-        return Math.floor(value * 10 ** decimalPlace) / 10 ** decimalPlace;
+        return (
+          Math.floor(value * Math.pow(10, decimalPlace)) /
+          Math.pow(10, decimalPlace)
+        );
       };
 
       /**
@@ -349,7 +355,10 @@ namespace gdjs {
       ): number {
         if (!decimalPlace || !Number.isInteger(decimalPlace))
           return Math.ceil(value);
-        return Math.ceil(value * 10 ** decimalPlace) / 10 ** decimalPlace;
+        return (
+          Math.ceil(value * Math.pow(10, decimalPlace)) /
+          Math.pow(10, decimalPlace)
+        );
       };
     }
   }

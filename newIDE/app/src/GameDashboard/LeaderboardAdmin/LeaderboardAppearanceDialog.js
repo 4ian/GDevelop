@@ -17,7 +17,7 @@ import {
   type LeaderboardCustomizationSettings,
   type LeaderboardScoreFormattingTimeUnit,
 } from '../../Utils/GDevelopServices/Play';
-import { Column, Line } from '../../UI/Grid';
+import { Column, Line, Spacer } from '../../UI/Grid';
 import {
   formatScore,
   orderedTimeUnits,
@@ -175,10 +175,13 @@ function LeaderboardAppearanceDialog({
             />,
           ]}
         >
+          <Text size="title">
+            <Trans>Score column settings</Trans>
+          </Text>
           <Line>
             <TextField
               fullWidth
-              floatingLabelText={<Trans>Score column title</Trans>}
+              floatingLabelText={<Trans>Column title</Trans>}
               maxLength={20}
               errorText={scoreTitleError}
               value={scoreTitle}
@@ -188,10 +191,7 @@ function LeaderboardAppearanceDialog({
               }}
             />
           </Line>
-          <Text size="title">
-            <Trans>Score formatting</Trans>
-          </Text>
-          <Column>
+          <Column noMargin>
             <Line>
               <SelectField
                 fullWidth
@@ -214,40 +214,45 @@ function LeaderboardAppearanceDialog({
                 />
               </SelectField>
             </Line>
-            <ResponsiveLineStackLayout noColumnMargin>
-              <Column noMargin expand>
-                <Line noMargin>
-                  <Text size="body2">
-                    <Trans>Settings</Trans>
-                  </Text>
-                </Line>
-                {scoreType === 'custom' ? (
-                  <>
-                    <Line expand>
+            <Column>
+              <Line noMargin>
+                <Text size="body2">
+                  <Trans>Settings</Trans>
+                </Text>
+              </Line>
+              {scoreType === 'custom' ? (
+                <>
+                  <ResponsiveLineStackLayout noColumnMargin>
+                    <Column expand noMargin>
                       <TextField
                         fullWidth
+                        floatingLabelFixed
                         floatingLabelText={<Trans>Prefix</Trans>}
                         maxLength={10}
                         value={prefix}
-                        hintText={t`Ex: €`}
+                        hintText={t`Ex: $`}
                         onChange={(e, newValue) => {
                           setPrefix(newValue);
                         }}
                       />
-                    </Line>
-                    <Line expand>
+                    </Column>
+                    <Column expand noMargin>
                       <TextField
                         fullWidth
+                        floatingLabelFixed
                         floatingLabelText={<Trans>Suffix</Trans>}
                         maxLength={10}
                         value={suffix}
-                        hintText={t`Ex: gold`}
+                        hintText={t`Ex: coins`}
                         onChange={(e, newValue) => {
                           setSuffix(newValue);
                         }}
                       />
-                    </Line>
-                    <Line expand>
+                    </Column>
+                  </ResponsiveLineStackLayout>
+                  <Spacer />
+                  <ResponsiveLineStackLayout noColumnMargin noMargin>
+                    <Column expand noMargin>
                       <TextField
                         fullWidth
                         type="number"
@@ -266,93 +271,92 @@ function LeaderboardAppearanceDialog({
                           );
                         }}
                       />
-                    </Line>
-                  </>
-                ) : (
-                  <>
-                    <Line>
-                      <SelectField
-                        fullWidth
-                        value={timeUnits}
-                        floatingLabelText={<Trans>Time format</Trans>}
-                        onChange={(e, i, newValue) =>
-                          // $FlowIgnore
-                          setTimeUnits(newValue)
+                    </Column>
+                    <Column expand noMargin />
+                  </ResponsiveLineStackLayout>
+                </>
+              ) : (
+                <>
+                  <Line noMargin>
+                    <SelectField
+                      fullWidth
+                      value={timeUnits}
+                      floatingLabelText={<Trans>Time format</Trans>}
+                      onChange={(e, i, newValue) =>
+                        // $FlowIgnore
+                        setTimeUnits(newValue)
+                      }
+                    >
+                      {Object.keys(unitSelectOptions).map(option => (
+                        <SelectOption
+                          key={option}
+                          value={option}
+                          primaryText={option}
+                        />
+                      ))}
+                    </SelectField>
+                  </Line>
+                  <Line>
+                    <AlertMessage kind="info">
+                      <Trans>
+                        To use this formatting, you must send a score expressed
+                        in seconds
+                      </Trans>
+                    </AlertMessage>
+                  </Line>
+                </>
+              )}
+              <Spacer />
+              <Line noMargin>
+                <Text size="body2">
+                  <Trans>Preview</Trans>
+                </Text>
+              </Line>
+              <ResponsiveLineStackLayout noColumnMargin>
+                <TextField
+                  fullWidth
+                  floatingLabelText={
+                    scoreType === 'custom' ? (
+                      <Trans>Test value</Trans>
+                    ) : (
+                      <Trans>Test value (in second)</Trans>
+                    )
+                  }
+                  max={scorePreviewMaxValue}
+                  min={0}
+                  type="number"
+                  value={isNaN(scorePreview) ? '' : scorePreview}
+                  onChange={(e, value) =>
+                    setScorePreview(
+                      Math.max(
+                        0,
+                        Math.min(scorePreviewMaxValue, parseFloat(value))
+                      )
+                    )
+                  }
+                />
+
+                <TextField
+                  disabled
+                  fullWidth
+                  floatingLabelText={<Trans>Displayed score</Trans>}
+                  value={formatScore(
+                    scorePreview || 0,
+                    scoreType === 'time'
+                      ? {
+                          type: scoreType,
+                          ...unitSelectOptions[timeUnits],
                         }
-                      >
-                        {Object.keys(unitSelectOptions).map(option => (
-                          <SelectOption
-                            key={option}
-                            value={option}
-                            primaryText={option}
-                          />
-                        ))}
-                      </SelectField>
-                    </Line>
-                    <Line>
-                      <AlertMessage kind="info">
-                        <Trans>
-                          To use this formatting, you must send a score
-                          expressed in seconds
-                        </Trans>
-                      </AlertMessage>
-                    </Line>
-                  </>
-                )}
-              </Column>
-              <Column expand noMargin>
-                <Line noMargin>
-                  <Text size="body2">
-                    <Trans>Preview</Trans>
-                  </Text>
-                </Line>
-                <Line>
-                  <TextField
-                    fullWidth
-                    floatingLabelText={
-                      scoreType === 'custom' ? (
-                        <Trans>Test value</Trans>
-                      ) : (
-                        <Trans>Test value (in second)</Trans>
-                      )
-                    }
-                    max={scorePreviewMaxValue}
-                    min={0}
-                    type="number"
-                    value={isNaN(scorePreview) ? '' : scorePreview}
-                    onChange={(e, value) =>
-                      setScorePreview(
-                        Math.max(
-                          0,
-                          Math.min(scorePreviewMaxValue, parseFloat(value))
-                        )
-                      )
-                    }
-                  />
-                </Line>
-                <Line>
-                  <TextField
-                    disabled
-                    fullWidth
-                    floatingLabelText={<Trans>Displayed score</Trans>}
-                    value={formatScore(
-                      scorePreview || 0,
-                      scoreType === 'time'
-                        ? {
-                            type: scoreType,
-                            ...unitSelectOptions[timeUnits],
-                          }
-                        : {
-                            type: scoreType,
-                            prefix,
-                            suffix,
-                            precision: precision || 0,
-                          }
-                    )}
-                  />
-                </Line>
-              </Column>
-            </ResponsiveLineStackLayout>
+                      : {
+                          type: scoreType,
+                          prefix,
+                          suffix,
+                          precision: precision || 0,
+                        }
+                  )}
+                />
+              </ResponsiveLineStackLayout>
+            </Column>
           </Column>
         </Dialog>
       )}

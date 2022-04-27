@@ -6,33 +6,18 @@ import {
   type LeaderboardScoreFormattingTimeUnit,
 } from '../Utils/GDevelopServices/Play';
 
-const labelToDivider = {
+export const orderedTimeUnits = ['hour', 'minute', 'second', 'millisecond'];
+const unitToDivider = {
   hour: 3600000,
   minute: 60000,
   second: 1000,
   millisecond: 1,
 };
-const labelToNextSeparator = {
+export const unitToNextSeparator = {
   hour: ':',
   minute: ':',
   second: '.',
   millisecond: '',
-};
-
-const shouldDisplaySeparator = (
-  currentUnit: LeaderboardScoreFormattingTimeUnit,
-  requestedUnits: LeaderboardScoreFormattingTimeUnit[]
-): boolean => {
-  switch (currentUnit) {
-    case 'hour':
-      return requestedUnits.includes('minute');
-    case 'minute':
-      return requestedUnits.includes('second');
-    case 'second':
-      return requestedUnits.includes('millisecond');
-    default:
-      return false;
-  }
 };
 
 export const formatDuration = (
@@ -41,20 +26,19 @@ export const formatDuration = (
 ): string => {
   let formattedDuration = '';
   let durationInMs = Math.round(durationInSecond * 1000);
-  for (const unit of ['hour', 'minute', 'second', 'millisecond']) {
-    if (options.units.includes(unit)) {
-      const divider = labelToDivider[unit];
-      const remainder = durationInMs % divider;
-      const quotient = (durationInMs - remainder) / divider;
-      formattedDuration += `${quotient
-        .toString()
-        .padStart(unit === 'millisecond' ? 3 : 2, '0')}${
-        shouldDisplaySeparator(unit, options.units)
-          ? labelToNextSeparator[unit]
-          : ''
-      }`;
-      durationInMs = remainder;
-    }
+  const biggestUnitIndex = orderedTimeUnits.indexOf(options.biggestUnit);
+  const smallestUnitIndex = orderedTimeUnits.indexOf(options.smallestUnit);
+  for (let index = biggestUnitIndex; index <= smallestUnitIndex; index++) {
+    const unit = orderedTimeUnits[index];
+    const divider = unitToDivider[unit];
+    const remainder = durationInMs % divider;
+    const quotient = (durationInMs - remainder) / divider;
+    formattedDuration += `${quotient
+      .toString()
+      .padStart(unit === 'millisecond' ? 3 : 2, '0')}${
+      index === smallestUnitIndex ? '' : unitToNextSeparator[unit]
+    }`;
+    durationInMs = remainder;
   }
   return formattedDuration;
 };

@@ -26,7 +26,8 @@ export type LeaderboardScoreFormattingTimeUnit =
 
 export type LeaderboardScoreFormattingTime = {|
   type: 'time',
-  units: LeaderboardScoreFormattingTimeUnit[],
+  smallestUnit: LeaderboardScoreFormattingTimeUnit,
+  biggestUnit: LeaderboardScoreFormattingTimeUnit,
 |};
 
 export type LeaderboardScoreFormatting =

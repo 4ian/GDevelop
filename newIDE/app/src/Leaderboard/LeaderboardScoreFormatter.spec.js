@@ -8,76 +8,118 @@ const {
 describe('LeaderboardScoreFormatter', () => {
   describe('formatDuration', () => {
     test('it correctly formats whole seconds', () => {
-      expect(formatDuration(81, { type: 'time', units: ['second'] })).toEqual(
-        '81'
-      );
-      expect(formatDuration(15, { type: 'time', units: ['second'] })).toEqual(
-        '15'
-      );
-      expect(formatDuration(8, { type: 'time', units: ['second'] })).toEqual(
-        '08'
-      );
+      expect(
+        formatDuration(81, {
+          type: 'time',
+          smallestUnit: 'second',
+          biggestUnit: 'second',
+        })
+      ).toEqual('81');
+      expect(
+        formatDuration(15, {
+          type: 'time',
+          smallestUnit: 'second',
+          biggestUnit: 'second',
+        })
+      ).toEqual('15');
+      expect(
+        formatDuration(8, {
+          type: 'time',
+          smallestUnit: 'second',
+          biggestUnit: 'second',
+        })
+      ).toEqual('08');
     });
     test('it correctly formats seconds without milliseconds', () => {
       expect(
-        formatDuration(81.29, { type: 'time', units: ['second'] })
+        formatDuration(81.29, {
+          type: 'time',
+          smallestUnit: 'second',
+          biggestUnit: 'second',
+        })
       ).toEqual('81');
       expect(
-        formatDuration(15.677, { type: 'time', units: ['second'] })
+        formatDuration(15.677, {
+          type: 'time',
+          smallestUnit: 'second',
+          biggestUnit: 'second',
+        })
       ).toEqual('15');
       expect(
-        formatDuration(8.045, { type: 'time', units: ['second'] })
+        formatDuration(8.045, {
+          type: 'time',
+          smallestUnit: 'second',
+          biggestUnit: 'second',
+        })
       ).toEqual('08');
     });
     test('it correctly formats seconds with milliseconds', () => {
       expect(
         formatDuration(81.29, {
           type: 'time',
-          units: ['second', 'millisecond'],
+          biggestUnit: 'second',
+          smallestUnit: 'millisecond',
         })
       ).toEqual('81.290');
       expect(
         formatDuration(15.677, {
           type: 'time',
-          units: ['second', 'millisecond'],
+          biggestUnit: 'second',
+          smallestUnit: 'millisecond',
         })
       ).toEqual('15.677');
       expect(
         formatDuration(8.045, {
           type: 'time',
-          units: ['second', 'millisecond'],
+          biggestUnit: 'second',
+          smallestUnit: 'millisecond',
         })
       ).toEqual('08.045');
     });
 
     test('it correctly formats whole hours', () => {
       expect(
-        formatDuration(39 * 3600, { type: 'time', units: ['hour'] })
+        formatDuration(39 * 3600, {
+          type: 'time',
+          biggestUnit: 'hour',
+          smallestUnit: 'hour',
+        })
       ).toEqual('39');
       expect(
-        formatDuration(15 * 3600, { type: 'time', units: ['hour'] })
+        formatDuration(15 * 3600, {
+          type: 'time',
+          biggestUnit: 'hour',
+          smallestUnit: 'hour',
+        })
       ).toEqual('15');
       expect(
-        formatDuration(8 * 3600, { type: 'time', units: ['hour'] })
+        formatDuration(8 * 3600, {
+          type: 'time',
+          biggestUnit: 'hour',
+          smallestUnit: 'hour',
+        })
       ).toEqual('08');
     });
     test('it correctly formats hours without lower units', () => {
       expect(
         formatDuration(39 * 3600 + Math.random() * 15 * 60, {
           type: 'time',
-          units: ['hour'],
+          biggestUnit: 'hour',
+          smallestUnit: 'hour',
         })
       ).toEqual('39');
       expect(
         formatDuration(15 * 3600 + Math.random() * 15 * 60, {
           type: 'time',
-          units: ['hour'],
+          biggestUnit: 'hour',
+          smallestUnit: 'hour',
         })
       ).toEqual('15');
       expect(
         formatDuration(8 * 3600 + Math.random() * 15 * 60, {
           type: 'time',
-          units: ['hour'],
+          biggestUnit: 'hour',
+          smallestUnit: 'hour',
         })
       ).toEqual('08');
     });
@@ -85,19 +127,22 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, {
           type: 'time',
-          units: ['hour', 'minute'],
+          biggestUnit: 'hour',
+          smallestUnit: 'minute',
         })
       ).toEqual('39:13');
       expect(
         formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98332, {
           type: 'time',
-          units: ['hour', 'minute'],
+          biggestUnit: 'hour',
+          smallestUnit: 'minute',
         })
       ).toEqual('15:45');
       expect(
         formatDuration(8 * 3600 + 9 * 60 + 0.05, {
           type: 'time',
-          units: ['hour', 'minute'],
+          biggestUnit: 'hour',
+          smallestUnit: 'minute',
         })
       ).toEqual('08:09');
     });
@@ -105,19 +150,22 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, {
           type: 'time',
-          units: ['hour', 'minute', 'second'],
+          biggestUnit: 'hour',
+          smallestUnit: 'second',
         })
       ).toEqual('39:13:06');
       expect(
         formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98332, {
           type: 'time',
-          units: ['hour', 'minute', 'second'],
+          biggestUnit: 'hour',
+          smallestUnit: 'second',
         })
       ).toEqual('15:45:56');
       expect(
         formatDuration(8 * 3600 + 9 * 60 + 0.05, {
           type: 'time',
-          units: ['hour', 'minute', 'second'],
+          biggestUnit: 'hour',
+          smallestUnit: 'second',
         })
       ).toEqual('08:09:00');
     });
@@ -125,19 +173,22 @@ describe('LeaderboardScoreFormatter', () => {
       expect(
         formatDuration(39 * 3600 + 13 * 60 + 6 + 0.134, {
           type: 'time',
-          units: ['hour', 'minute', 'second', 'millisecond'],
+          biggestUnit: 'hour',
+          smallestUnit: 'millisecond',
         })
       ).toEqual('39:13:06.134');
       expect(
         formatDuration(15 * 3600 + 45 * 60 + 56 + 0.98352, {
           type: 'time',
-          units: ['hour', 'minute', 'second', 'millisecond'],
+          biggestUnit: 'hour',
+          smallestUnit: 'millisecond',
         })
       ).toEqual('15:45:56.984');
       expect(
         formatDuration(8 * 3600 + 9 * 60 + 0.05, {
           type: 'time',
-          units: ['hour', 'minute', 'second', 'millisecond'],
+          biggestUnit: 'hour',
+          smallestUnit: 'millisecond',
         })
       ).toEqual('08:09:00.050');
     });

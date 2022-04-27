@@ -18,44 +18,53 @@ import {
   type LeaderboardScoreFormattingTimeUnit,
 } from '../../Utils/GDevelopServices/Play';
 import { Column, Line } from '../../UI/Grid';
-import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
+import {
+  formatScore,
+  orderedTimeUnits,
+  unitToNextSeparator,
+} from '../../Leaderboard/LeaderboardScoreFormatter';
 import AlertMessage from '../../UI/AlertMessage';
 
-const getIdentifierFromUnits = (
-  units: LeaderboardScoreFormattingTimeUnit[]
-): string =>
-  units
-    .map(
-      (unit, index) =>
-        `${index === 0 ? '' : unit === 'millisecond' ? '.' : ':'}${
-          unitToAbbreviation[unit]
-        }`
-    )
-    .join('');
-const units = ['hour', 'minute', 'second', 'millisecond'];
 const unitToAbbreviation = {
   hour: 'HH',
   minute: 'MM',
   second: 'SS',
-  millisecond: 'sss',
+  millisecond: 'ms',
 };
-const unitSelectOptions = units.reduce((acc, currentUnit, index) => {
-  for (
-    let otherUnitIndex = index;
-    otherUnitIndex < units.length;
-    otherUnitIndex++
-  ) {
-    const selectedUnits = units
-      .map((unit, selectionIndex) =>
-        selectionIndex <= otherUnitIndex && selectionIndex >= index
-          ? unit
-          : null
-      )
-      .filter(Boolean);
-    acc[getIdentifierFromUnits(selectedUnits)] = selectedUnits;
+
+const getIdentifierFromUnits = (units: {|
+  smallestUnit: LeaderboardScoreFormattingTimeUnit,
+  biggestUnit: LeaderboardScoreFormattingTimeUnit,
+|}): string => {
+  const biggestUnitIndex = orderedTimeUnits.indexOf(units.biggestUnit);
+  const smallestUnitIndex = orderedTimeUnits.indexOf(units.smallestUnit);
+  let identifier = '';
+  for (let index = biggestUnitIndex; index <= smallestUnitIndex; index++) {
+    const unit = orderedTimeUnits[index];
+    identifier += `${unitToAbbreviation[unit]}${
+      index === smallestUnitIndex ? '' : unitToNextSeparator[unit]
+    }`;
   }
-  return acc;
-}, {});
+  return identifier;
+};
+
+const unitSelectOptions = orderedTimeUnits.reduce(
+  (acc, currentUnit, currentUnitIndex) => {
+    for (
+      let otherUnitIndex = currentUnitIndex;
+      otherUnitIndex < orderedTimeUnits.length;
+      otherUnitIndex++
+    ) {
+      const selectedUnits = {
+        biggestUnit: orderedTimeUnits[currentUnitIndex],
+        smallestUnit: orderedTimeUnits[otherUnitIndex],
+      };
+      acc[getIdentifierFromUnits(selectedUnits)] = selectedUnits;
+    }
+    return acc;
+  },
+  {}
+);
 
 type Props = {
   open: boolean,
@@ -103,10 +112,16 @@ function LeaderboardAppearanceDialog({
   const [units, setUnits] = React.useState<string>(
     leaderboardCustomizationSettings &&
       leaderboardCustomizationSettings.scoreFormatting.type === 'time'
-      ? getIdentifierFromUnits(
-          leaderboardCustomizationSettings.scoreFormatting.units
-        )
-      : getIdentifierFromUnits(['second', 'millisecond'])
+      ? getIdentifierFromUnits({
+          smallestUnit:
+            leaderboardCustomizationSettings.scoreFormatting.smallestUnit,
+          biggestUnit:
+            leaderboardCustomizationSettings.scoreFormatting.biggestUnit,
+        })
+      : getIdentifierFromUnits({
+          biggestUnit: 'second',
+          smallestUnit: 'millisecond',
+        })
   );
   const [scorePreview, setScorePreview] = React.useState<number>(15.2);
 
@@ -126,7 +141,7 @@ function LeaderboardAppearanceDialog({
               suffix,
               precision,
             }
-          : { type: scoreType, units: unitSelectOptions[units] },
+          : { type: scoreType, ...unitSelectOptions[units] },
     };
     await onSave(customizationSettings);
   };
@@ -307,7 +322,7 @@ function LeaderboardAppearanceDialog({
                       scoreType === 'time'
                         ? {
                             type: scoreType,
-                            units: unitSelectOptions[units],
+                            ...unitSelectOptions[units],
                           }
                         : {
                             type: scoreType,

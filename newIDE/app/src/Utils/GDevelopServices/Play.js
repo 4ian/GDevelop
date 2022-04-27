@@ -11,6 +11,34 @@ export type LeaderboardPlayerUnicityDisplayOption =
   | 'PREFER_UNIQUE'
   | 'PREFER_NON_UNIQUE';
 
+export type LeaderboardScoreFormattingCustom = {|
+  type: 'custom',
+  prefix: string,
+  suffix: string,
+  precision: number,
+|};
+
+export type LeaderboardScoreFormattingTimeUnit =
+  | 'hour'
+  | 'minute'
+  | 'second'
+  | 'millisecond';
+
+export type LeaderboardScoreFormattingTime = {|
+  type: 'time',
+  smallestUnit: LeaderboardScoreFormattingTimeUnit,
+  biggestUnit: LeaderboardScoreFormattingTimeUnit,
+|};
+
+export type LeaderboardScoreFormatting =
+  | LeaderboardScoreFormattingCustom
+  | LeaderboardScoreFormattingTime;
+
+export type LeaderboardCustomizationSettings = {|
+  scoreTitle: string,
+  scoreFormatting: LeaderboardScoreFormatting,
+|};
+
 export type Leaderboard = {|
   id: string,
   gameId: string,
@@ -20,6 +48,15 @@ export type Leaderboard = {|
   deletedAt?: string,
   playerUnicityDisplayChoice: LeaderboardPlayerUnicityDisplayOption,
   visibility: LeaderboardVisibilityOption,
+  customizationSettings?: LeaderboardCustomizationSettings,
+|};
+
+export type LeaderboardUpdatePayload = {|
+  name?: string,
+  sort?: LeaderboardSortOption,
+  playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+  visibility?: LeaderboardVisibilityOption,
+  customizationSettings?: LeaderboardCustomizationSettings,
 |};
 
 export type LeaderboardEntry = {|
@@ -168,12 +205,7 @@ export const updateLeaderboard = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
-  payload: {|
-    name?: string,
-    sort?: LeaderboardSortOption,
-    playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
-    visibility?: LeaderboardVisibilityOption,
-  |}
+  payload: LeaderboardUpdatePayload
 ): Promise<?Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;

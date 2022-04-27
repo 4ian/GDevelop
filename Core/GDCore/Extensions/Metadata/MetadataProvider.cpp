@@ -413,7 +413,7 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
             platform, behaviorType, node.functionName);
 }
 
-  static const gd::ParameterMetadata* GetFunctionCallParameterMetadata(
+  const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
     const gd::Platform& platform, 
     const gd::ObjectsContainer &globalObjectsContainer,
     const gd::ObjectsContainer &objectsContainer,

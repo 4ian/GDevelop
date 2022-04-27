@@ -1898,9 +1898,9 @@ describe('libGD.js', function () {
       let instr = new gd.Instruction();
       instr.setParametersCount(3);
       expect(instr.getParametersCount()).toBe(3);
-      expect(instr.getParameter(1)).toBe('');
+      expect(instr.getParameter(1).getPlainString()).toBe('');
       instr.setParameter(2, 'MyValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
       instr.delete();
     });
     it('can be cloned', function () {
@@ -1910,14 +1910,14 @@ describe('libGD.js', function () {
 
       let newInstr = instr.clone();
       expect(newInstr.getParametersCount()).toBe(3);
-      expect(newInstr.getParameter(1)).toBe('');
-      expect(newInstr.getParameter(2)).toBe('MyValue');
+      expect(newInstr.getParameter(1).getPlainString()).toBe('');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyValue');
 
       newInstr.setParameter(2, 'MyChangedValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
-      expect(newInstr.getParameter(2)).toBe('MyChangedValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyChangedValue');
       newInstr.delete();
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
 
       instr.delete();
     });
@@ -2009,9 +2009,9 @@ describe('libGD.js', function () {
       expect(list2.get(1).getType()).toBe('Type2');
       expect(list2.get(0).getParametersCount()).toBe(2);
       expect(list2.get(1).getParametersCount()).toBe(1);
-      expect(list2.get(0).getParameter(0)).toBe('Param1');
-      expect(list2.get(0).getParameter(1)).toBe('Param2');
-      expect(list2.get(1).getParameter(0)).toBe('Param3');
+      expect(list2.get(0).getParameter(0).getPlainString()).toBe('Param1');
+      expect(list2.get(0).getParameter(1).getPlainString()).toBe('Param2');
+      expect(list2.get(1).getParameter(0).getPlainString()).toBe('Param3');
 
       list2.delete();
       project.delete();
@@ -3235,14 +3235,14 @@ describe('libGD.js', function () {
       expectedError,
       expectedErrorPosition
     ) {
-      const parser = new gd.ExpressionParser2(
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
+
+      const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
         project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
-
-      const expressionValidator = new gd.ExpressionValidator();
+        layout,
+        type);
       expressionNode.visit(expressionValidator);
       if (expectedError) {
         expect(expressionValidator.getErrors().size()).toBe(1);
@@ -3409,14 +3409,14 @@ describe('libGD.js', function () {
       }
       const expression = expressionWithCaret.replace('|', '');
 
-      const parser = new gd.ExpressionParser2(
-        gd.JsPlatform.get(),
-        project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
       const completionDescriptions =
         gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+          gd.JsPlatform.get(),
+          project,
+          layout,
+          type,
           expressionNode,
           // We're looking for completion for the character just before the caret.
           Math.max(0, caretPosition - 1)

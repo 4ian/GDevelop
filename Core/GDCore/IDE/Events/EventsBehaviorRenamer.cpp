@@ -131,14 +131,8 @@ bool EventsBehaviorRenamer::DoVisitInstruction(gd::Instruction& instruction,
             }
           }
         } else {
-          gd::ExpressionParser2 parser(
-              platform, GetGlobalObjectsContainer(), GetObjectsContainer());
-          auto node =
-              gd::ParameterMetadata::IsExpression("number", type)
-                  ? parser.ParseExpression("number", parameterValue)
-                  : (gd::ParameterMetadata::IsExpression("string", type)
-                         ? parser.ParseExpression("string", parameterValue)
-                         : std::unique_ptr<gd::ExpressionNode>());
+          gd::ExpressionParser2 parser;
+          auto node = parser.ParseExpression(parameterValue);
           if (node) {
             ExpressionBehaviorRenamer renamer(GetGlobalObjectsContainer(),
                                               GetObjectsContainer(),

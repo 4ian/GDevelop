@@ -10,6 +10,7 @@
 #include <vector>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
+#include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Localization.h"
 
 namespace gd {
@@ -235,50 +236,25 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   std::unique_ptr<ExpressionParserError> RaiseTypeError(
       const gd::String &message, const ExpressionParserLocation &location) {
     return std::move(gd::make_unique<ExpressionParserError>(
-        "type_error", message, location.GetStartPosition(), location.GetEndPosition()));
+        "type_error", message, location));
   }
 
   std::unique_ptr<ExpressionParserError> RaiseOperatorError(
       const gd::String &message, const ExpressionParserLocation &location) {
     return std::move(gd::make_unique<ExpressionParserError>(
-        "invalid_operator", message, location.GetStartPosition(), location.GetEndPosition()));
+        "invalid_operator", message, location));
   }
 
-  static Type stringToType(const gd::String &type) {
-    if (type == "number" || gd::ParameterMetadata::IsExpression("number", type)) {
-      return Type::Number;
-    }
-    if (type == "string" || gd::ParameterMetadata::IsExpression("string", type)) {
-      return Type::String;
-    }
-    if (type == "number|string") {
-      return Type::NumberOrString;
-    }
-    if (type == "variable" || gd::ParameterMetadata::IsExpression("variable", type)) {
-      return Type::Variable;
-    }
-    if (type == "object" || gd::ParameterMetadata::IsObject(type)) {
-      return Type::Object;
-    }
-    return Type::Unknown;
-  }
-
-  static const gd::String &typeToSting(Type type) {
-    switch (type) {
-      case Type::Unknown:
-      return gd::String("unknown");
-      case Type::Number:
-      return gd::String("number");
-      case Type::String:
-      return gd::String("string");
-      case Type::NumberOrString:
-      return gd::String("number|string");
-      case Type::Variable:
-      return gd::String("variable");
-      case Type::Object:
-      return gd::String("object");
-    }
-  }
+  static Type stringToType(const gd::String &type);
+  static const gd::String &typeToSting(Type type);
+  static const gd::String unknownTypeString;
+  static const gd::String numberTypeString;
+  static const gd::String stringTypeString;
+  static const gd::String numberOrStringTypeString;
+  static const gd::String variableTypeString;
+  static const gd::String objectTypeString;
+  static const gd::String identifierTypeString;
+  static const gd::String emptyTypeString;
 
   std::vector<ExpressionParserDiagnostic*> errors;
   Type childType;

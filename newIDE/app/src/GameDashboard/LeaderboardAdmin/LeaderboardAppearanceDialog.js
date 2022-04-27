@@ -328,9 +328,10 @@ function LeaderboardAppearanceDialog({
                     }
                   />
                 </Line>
-                <Line justifyContent="center" alignItems="center" expand>
+                <Line>
                   <TextField
                     disabled
+                    fullWidth
                     floatingLabelText={<Trans>Displayed score</Trans>}
                     value={formatScore(
                       scorePreview || 0,

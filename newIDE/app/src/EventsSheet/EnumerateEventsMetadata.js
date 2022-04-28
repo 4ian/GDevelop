@@ -23,7 +23,7 @@ export const enumerateEventsMetadata = (): Array<EventMetadata> => {
       return extensionEvents
         .keys()
         .toJSArray()
-        .filter(type => type !== 'Async::Async')
+        .filter(type => type !== 'BuiltinAsync::Async')
         .map(type => {
           const metadata = extensionEvents.get(type);
           return {

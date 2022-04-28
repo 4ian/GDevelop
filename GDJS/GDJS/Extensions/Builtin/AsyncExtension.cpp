@@ -15,7 +15,7 @@ namespace gdjs {
 AsyncExtension::AsyncExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAsyncExtension(*this);
 
-  GetAllEvents()["Async::Async"].SetCodeGenerator(
+  GetAllEvents()["BuiltinAsync::Async"].SetCodeGenerator(
       [](gd::BaseEvent &event_,
          gd::EventsCodeGenerator &codeGenerator,
          gd::EventsCodeGenerationContext &parentContext) {

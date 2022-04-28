@@ -27,7 +27,7 @@ public:
              const gd::InstructionsList &actions_,
              const gd::EventsList &subEvents_)
       : asyncAction(asyncAction_), actions(actions_), subEvents(subEvents_) {
-    SetType("Async::Async");
+    SetType("BuiltinAsync::Async");
   };
   virtual ~AsyncEvent();
   virtual gd::AsyncEvent *Clone() const { return new AsyncEvent(*this); }

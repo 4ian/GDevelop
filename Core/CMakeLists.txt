@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
+# Use new policy for `FindOpenGL` to prefer GLVND by default when available on linux (use `cmake --help-policy CMP0072` for details).
+cmake_policy(SET CMP0072 NEW)
 
 project(GDCore)
 
@@ -14,7 +16,6 @@ set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SY
 
 #Dependencies on external libraries:
 ###
-include_directories(${sfml_include_dir})
 
 #Defines
 ###
@@ -73,7 +74,7 @@ set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMA
 IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
-	target_link_libraries(GDCore ${sfml_LIBRARIES})
+  #Nothing.
 ENDIF()
 
 #Tests
@@ -88,5 +89,5 @@ if(BUILD_TESTS)
 	add_executable(GDCore_tests ${test_source_files})
 	set_target_properties(GDCore_tests PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
 	target_link_libraries(GDCore_tests GDCore)
-	target_link_libraries(GDCore_tests ${sfml_LIBRARIES})
+	target_link_libraries(GDCore_tests ${CMAKE_DL_LIBS})
 endif()

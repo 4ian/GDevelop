@@ -77,21 +77,21 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
     if (leftType == Type::String) {
       if (node.op != '+') {
-      errors.push_back(RaiseOperatorError(
+      RaiseOperatorError(
           _("You've used an operator that is not supported. Only + can be used "
             "to concatenate texts."),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
       }
     } else if (leftType == Type::Object) {
-      errors.push_back(RaiseOperatorError(
+      RaiseOperatorError(
           _("Operators (+, -, /, *) can't be used with an object name. Remove "
             "the operator."),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
     } else if (leftType == Type::Variable) {
-      errors.push_back(RaiseOperatorError(
+      RaiseOperatorError(
           _("Operators (+, -, /, *) can't be used in variable names. Remove "
             "the operator from the variable name."),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
     }
 
     node.rightHandSide->Visit(*this);
@@ -99,51 +99,51 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
     if (rightType == Type::String) {
       if (leftType == Type::Number) {
-        errors.push_back(RaiseTypeError(_("You entered a text, but a number was expected."),
-                           node.rightHandSide->location).get());
+        RaiseTypeError(_("You entered a text, but a number was expected."),
+                           node.rightHandSide->location);
         childType = Type::NumberOrString;
       }
       else if (leftType != Type::String && leftType != Type::NumberOrString) {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
             _("You entered a text, but this type was expected:") + typeToSting(leftType),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
         childType = Type::Unknown;
       }
     }
     else if (rightType == Type::Number) {
       if (leftType == Type::String) {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
             _("You entered a number, but a text was expected (in quotes)."),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
         childType = Type::NumberOrString;
       }
       else if (leftType != Type::Number && leftType != Type::NumberOrString) {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
             _("You entered a number, but this type was expected:") + typeToSting(leftType),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
         childType = Type::Unknown;
       }
     }
     else if (rightType == Type::Identifier) {
       if (leftType == Type::String) {
-        errors.push_back(RaiseTypeError(_("You must wrap your text inside double quotes "
+        RaiseTypeError(_("You must wrap your text inside double quotes "
                              "(example: \"Hello world\")."),
-                           node.rightHandSide->location.GetStartPosition()).get());
+                           node.rightHandSide->location);
       }
       else if (leftType == Type::Number) {
-        errors.push_back(RaiseTypeError(
-            _("You must enter a number."), node.rightHandSide->location.GetStartPosition()).get());
+        RaiseTypeError(
+            _("You must enter a number."), node.rightHandSide->location);
       }
       else if (leftType == Type::NumberOrString) {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
             _("You must enter a number or a text, wrapped inside double quotes "
               "(example: \"Hello world\")."),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
       }
       else if (leftType != Type::Object) {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
             _("You've entered a name, but this type was expected:") + typeToSting(leftType),
-            node.rightHandSide->location).get());
+            node.rightHandSide->location);
       }
       childType = Type::Unknown;
     }
@@ -155,31 +155,31 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
     if (rightType == Type::Number) {
       if (node.op != '+' && node.op != '-') {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
           _("You've used an \"unary\" operator that is not supported. Operator "
             "should be "
             "either + or -."),
-          node.factor->location).get());
+          node.factor->location);
         childType = Type::Unknown;
       }
     } else if (rightType == Type::String) {
-      errors.push_back(RaiseTypeError(
+      RaiseTypeError(
           _("You've used an operator that is not supported. Only + can be used "
             "to concatenate texts, and must be placed between two texts (or "
             "expressions)."),
-          node.factor->location).get());
+          node.factor->location);
       childType = Type::Unknown;
     } else if (rightType == Type::Object) {
-      errors.push_back(RaiseTypeError(
+      RaiseTypeError(
           _("Operators (+, -) can't be used with an object name. Remove the "
             "operator."),
-          node.factor->location).get());
+          node.factor->location);
       childType = Type::Unknown;
     } else if (rightType == Type::Variable) {
-      errors.push_back(RaiseTypeError(
+      RaiseTypeError(
           _("Operators (+, -) can't be used in variable names. Remove "
             "the operator from the variable name."),
-          node.factor->location).get());
+          node.factor->location);
       childType = Type::Unknown;
     }
   }
@@ -233,16 +233,22 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
   }
 
-  std::unique_ptr<ExpressionParserError> RaiseTypeError(
+  void RaiseError(const gd::String &type, 
       const gd::String &message, const ExpressionParserLocation &location) {
-    return std::move(gd::make_unique<ExpressionParserError>(
-        "type_error", message, location));
+    auto diagnostic = std::move(gd::make_unique<ExpressionParserError>(
+        type, message, location));
+    errors.push_back(diagnostic.get());
+    supplementalErrors.push_back(std::move(diagnostic));
   }
 
-  std::unique_ptr<ExpressionParserError> RaiseOperatorError(
+  void RaiseTypeError(
       const gd::String &message, const ExpressionParserLocation &location) {
-    return std::move(gd::make_unique<ExpressionParserError>(
-        "invalid_operator", message, location));
+    RaiseError("type_error", message, location);
+  }
+
+  void RaiseOperatorError(
+      const gd::String &message, const ExpressionParserLocation &location) {
+    RaiseError("invalid_operator", message, location);
   }
 
   static Type stringToType(const gd::String &type);
@@ -257,6 +263,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   static const gd::String emptyTypeString;
 
   std::vector<ExpressionParserDiagnostic*> errors;
+  std::vector<std::unique_ptr<ExpressionParserDiagnostic>> supplementalErrors;
   Type childType;
   Type parentType;
   gd::String lastObjectName;

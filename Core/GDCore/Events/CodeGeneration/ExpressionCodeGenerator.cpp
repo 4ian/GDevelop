@@ -38,7 +38,7 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   gd::ExpressionParser2 parser;
   ExpressionCodeGenerator generator(type, codeGenerator, context);
 
-  auto node = parser.ParseExpression(expression, objectName);
+  auto node = parser.ParseExpression(expression);
   if (!node) {
     std::cout << "Error: error while parsing: \"" << expression << "\" ("
               << type << ")" << std::endl;

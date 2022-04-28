@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
+# Use new policy for `FindOpenGL` to prefer GLVND by default when available on linux (use `cmake --help-policy CMP0072` for details).
+cmake_policy(SET CMP0072 NEW)
 
 project(GDJS)
 #Dependencies on external libraries:
 ###
-include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 
 #Defines
@@ -75,5 +76,4 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 	target_link_libraries(GDJS GDCore)
-	target_link_libraries(GDJS ${sfml_LIBRARIES})
 ENDIF()

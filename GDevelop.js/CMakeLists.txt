@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
+# Use new policy for `FindOpenGL` to prefer GLVND by default when available on linux (use `cmake --help-policy CMP0072` for details).
+cmake_policy(SET CMP0072 NEW)
 
 project(libGD.js)
 
@@ -23,7 +25,6 @@ set(GDJS_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYST
 
 #Dependencies on external libraries:
 ###
-include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 include_directories(${GDJS_include_dir})
 

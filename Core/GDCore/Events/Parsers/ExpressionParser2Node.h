@@ -60,7 +60,7 @@ struct GD_CORE_API ExpressionParserDiagnostic {
 struct GD_CORE_API ExpressionParserError : public ExpressionParserDiagnostic {
   ExpressionParserError(const gd::String &type_,
                         const gd::String &message_,
-                        ExpressionParserLocation location_)
+                        const ExpressionParserLocation &location_)
       : type(type_), message(message_), location(location_){};
   ExpressionParserError(const gd::String &type_,
                         const gd::String &message_,

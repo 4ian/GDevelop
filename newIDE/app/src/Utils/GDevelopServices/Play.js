@@ -35,6 +35,7 @@ export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingTime;
 
 export type LeaderboardCustomizationSettings = {|
+  defaultDisplayedEntriesNumber?: number,
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
 |};

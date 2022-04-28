@@ -209,6 +209,9 @@ function LeaderboardAppearanceDialog({
             />,
           ]}
         >
+          <Text size="title">
+            <Trans>Table settings</Trans>
+          </Text>
           <Line>
             <TextField
               fullWidth

@@ -56,12 +56,11 @@ class GD_CORE_API ExpressionParser2 {
    * \return The node representing the expression as a parsed tree.
    */
   std::unique_ptr<ExpressionNode> ParseExpression(
-      const gd::String &expression_,
-      const gd::String &objectName = "") {
+      const gd::String &expression_) {
     expression = expression_;
 
     currentPosition = 0;
-    return Start(objectName);
+    return Start();
   }
 
   /**
@@ -85,9 +84,9 @@ class GD_CORE_API ExpressionParser2 {
    * Each method is a part of the grammar.
    */
   ///@{
-  std::unique_ptr<ExpressionNode> Start(const gd::String &objectName = "") {
+  std::unique_ptr<ExpressionNode> Start() {
     size_t expressionStartPosition = GetCurrentPosition();
-    auto expression = Expression(objectName);
+    auto expression = Expression();
 
     // Check for extra characters at the end of the expression
     if (!IsEndReached()) {
@@ -107,11 +106,11 @@ class GD_CORE_API ExpressionParser2 {
     return expression;
   }
 
-  std::unique_ptr<ExpressionNode> Expression(const gd::String &objectName = "") {
+  std::unique_ptr<ExpressionNode> Expression() {
     SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
-    std::unique_ptr<ExpressionNode> leftHandSide = Term(objectName);
+    std::unique_ptr<ExpressionNode> leftHandSide = Term();
 
     SkipAllWhitespaces();
 
@@ -123,7 +122,7 @@ class GD_CORE_API ExpressionParser2 {
       op->leftHandSide->parent = op.get();
       op->diagnostic = ValidateOperator(GetCurrentChar());
       SkipChar();
-      op->rightHandSide = Expression(objectName);
+      op->rightHandSide = Expression();
       op->rightHandSide->parent = op.get();
 
       op->location = ExpressionParserLocation(expressionStartPosition,
@@ -139,18 +138,18 @@ class GD_CORE_API ExpressionParser2 {
     auto op = gd::make_unique<OperatorNode>(' ');
     op->leftHandSide = std::move(leftHandSide);
     op->leftHandSide->parent = op.get();
-    op->rightHandSide = Expression(objectName);
+    op->rightHandSide = Expression();
     op->rightHandSide->parent = op.get();
     op->location =
         ExpressionParserLocation(expressionStartPosition, GetCurrentPosition());
     return std::move(op);
   }
 
-  std::unique_ptr<ExpressionNode> Term(const gd::String &objectName) {
+  std::unique_ptr<ExpressionNode> Term() {
     SkipAllWhitespaces();
 
     size_t expressionStartPosition = GetCurrentPosition();
-    std::unique_ptr<ExpressionNode> factor = Factor(objectName);
+    std::unique_ptr<ExpressionNode> factor = Factor();
 
     SkipAllWhitespaces();
 
@@ -163,7 +162,7 @@ class GD_CORE_API ExpressionParser2 {
       op->leftHandSide->parent = op.get();
       op->diagnostic = ValidateOperator(GetCurrentChar());
       SkipChar();
-      op->rightHandSide = Factor(objectName);
+      op->rightHandSide = Factor();
       op->rightHandSide->parent = op.get();
       op->location = ExpressionParserLocation(expressionStartPosition,
                                               GetCurrentPosition());
@@ -175,7 +174,7 @@ class GD_CORE_API ExpressionParser2 {
     return factor;
   };
 
-  std::unique_ptr<ExpressionNode> Factor(const gd::String &objectName) {
+  std::unique_ptr<ExpressionNode> Factor() {
     SkipAllWhitespaces();
     size_t expressionStartPosition = GetCurrentPosition();
 
@@ -186,7 +185,7 @@ class GD_CORE_API ExpressionParser2 {
       auto unaryOperatorCharacter = GetCurrentChar();
       SkipChar();
 
-      auto operatorOperand = Factor(objectName);
+      auto operatorOperand = Factor();
 
       auto unaryOperator = gd::make_unique<UnaryOperatorNode>(
           unaryOperatorCharacter);
@@ -203,7 +202,7 @@ class GD_CORE_API ExpressionParser2 {
       return factor;
     } else if (CheckIfChar(IsOpeningParenthesis)) {
       SkipChar();
-      std::unique_ptr<ExpressionNode> factor = SubExpression(objectName);
+      std::unique_ptr<ExpressionNode> factor = SubExpression();
 
       if (!CheckIfChar(IsClosingParenthesis)) {
         factor->diagnostic =
@@ -213,7 +212,7 @@ class GD_CORE_API ExpressionParser2 {
       SkipIfChar(IsClosingParenthesis);
       return factor;
     } else if (IsIdentifierAllowedChar()) {
-      return Identifier(objectName);
+      return Identifier();
     }
 
     std::unique_ptr<ExpressionNode> factor = ReadUntilWhitespace();
@@ -221,10 +220,10 @@ class GD_CORE_API ExpressionParser2 {
     return factor;
   }
 
-  std::unique_ptr<SubExpressionNode> SubExpression(const gd::String &objectName) {
+  std::unique_ptr<SubExpressionNode> SubExpression() {
     size_t expressionStartPosition = GetCurrentPosition();
 
-    auto expression = Expression(objectName);
+    auto expression = Expression();
 
     auto subExpression =
         gd::make_unique<SubExpressionNode>(std::move(expression));
@@ -235,7 +234,7 @@ class GD_CORE_API ExpressionParser2 {
   };
 
   std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
-  Identifier(const gd::String &objectName) {
+  Identifier() {
     auto identifierAndLocation = ReadIdentifierName();
     gd::String name = identifierAndLocation.name;
     auto nameLocation = identifierAndLocation.location;

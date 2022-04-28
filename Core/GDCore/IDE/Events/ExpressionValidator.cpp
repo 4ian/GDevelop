@@ -85,9 +85,9 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
 
       if (objectMetadata.IsUnsupportedBaseObjectCapability(
               metadata.GetRequiredBaseObjectCapability())) {
-        errors.push_back(RaiseTypeError(
+        RaiseTypeError(
             _("This expression exists, but it can't be used on this object."),
-            function.objectNameLocation).get());
+            function.objectNameLocation);
         return stringToType(metadata.GetReturnType());
       }
     }
@@ -96,54 +96,54 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   Type returnType = stringToType(metadata.GetReturnType());
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
-    errors.push_back(gd::make_unique<ExpressionParserError>(
+    RaiseError(
         "invalid_function_name",
         _("Cannot find an expression with this name: ") +
             function.functionName + "\n" +
             _("Double check that you've not made any typo in the name."),
-        function.location).get());
+        function.location);
       return returnType;
   }
 
   // Validate the type of the function
   if (returnType == Type::Number) {
     if (childType == Type::String) {
-      errors.push_back(RaiseTypeError(
+      RaiseTypeError(
           _("You tried to use an expression that returns a number, but a "
             "string is expected. Use `ToString` if you need to convert a "
             "number to a string."),
-          function.location).get());
+          function.location);
       return returnType;
     }
     else if (childType != Type::Number && childType != Type::NumberOrString) {
-      errors.push_back(RaiseTypeError(_("You tried to use an expression that returns a "
+      RaiseTypeError(_("You tried to use an expression that returns a "
                               "number, but another type is expected:") +
                               " " + typeToSting(childType),
-                            function.location).get());
+                            function.location);
       return returnType;
     }
   } else if (returnType == Type::String) {
     if (childType == Type::Number) {
-      errors.push_back(RaiseTypeError(
+      RaiseTypeError(
           _("You tried to use an expression that returns a string, but a "
             "number is expected. Use `ToNumber` if you need to convert a "
             "string to a number."),
-          function.location).get());
+          function.location);
       return returnType;
     }
     else if (childType != Type::String && childType != Type::NumberOrString) {
-      errors.push_back(RaiseTypeError(_("You tried to use an expression that returns a "
+      RaiseTypeError(_("You tried to use an expression that returns a "
                               "string, but another type is expected:") +
                               " " + typeToSting(childType),
-                            function.location).get());
+                            function.location);
       return returnType;
     }
   } else {
     if (childType != returnType) {
-      errors.push_back(RaiseTypeError(
+      RaiseTypeError(
           _("You tried to use an expression with the wrong return type:") + " " +
             typeToSting(returnType),
-          function.location).get());
+          function.location);
       return returnType;
     }
   }
@@ -169,11 +169,11 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       // TODO what about this message?
       // _("This parameter was not expected by this expression. Remove it "
       // "or verify that you've entered the proper expression name."),
-      errors.push_back(gd::make_unique<ExpressionParserError>(
+      RaiseError(
           "too_few_parameters",
           "You have not entered enough parameters for the expression. " +
               expectedCountMessage,
-          function.location).get());
+          function.location);
       return returnType;
     }
   }
@@ -217,20 +217,20 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
         lastObjectName = identifierNode->identifierName;
       }
       else {
-        errors.push_back(gd::make_unique<ExpressionParserError>(
+        RaiseError(
                 "malformed_object_parameter",
                 _("An object name was expected but something else was "
                   "written. Enter just the name of the object for this "
                   "parameter."),
-              parameter->location).get());
+              parameter->location);
       }
     } else {
-      errors.push_back(gd::make_unique<ExpressionParserError>(
+      RaiseError(
               "unknown_parameter_type",
               _("This function is improperly set up. Reach out to the "
                 "extension developer or a GDevelop maintainer to fix "
                 "this issue"),
-              parameter->location).get());
+              parameter->location);
     }
   }
   return returnType;

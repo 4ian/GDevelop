@@ -105,6 +105,28 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
+      export class WaitTask extends gdjs.AsyncTask {
+        private duration: float;
+        private timeElapsedOnScene = 0;
+
+        constructor(durationInMilliseconds: float) {
+          super();
+          this.duration = durationInMilliseconds;
+        }
+
+        update(runtimeScene: RuntimeScene): boolean {
+          this.timeElapsedOnScene += runtimeScene
+            .getTimeManager()
+            .getElapsedTime();
+          return this.timeElapsedOnScene >= this.duration;
+        }
+      }
+
+      export const wait = (durationInSeconds: float): AsyncTask =>
+        new WaitTask(
+          durationInSeconds * 1000 /* Convert from seconds to milliseconds */
+        );
+
       /**
        * This is used by expressions to return 0 when a timer doesn't exist,
        * because numeric expressions must always return a number.

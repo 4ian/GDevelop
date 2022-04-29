@@ -35,6 +35,7 @@ export type LeaderboardScoreFormatting =
   | LeaderboardScoreFormattingTime;
 
 export type LeaderboardCustomizationSettings = {|
+  defaultDisplayedEntriesNumber?: number,
   scoreTitle: string,
   scoreFormatting: LeaderboardScoreFormatting,
 |};
@@ -49,6 +50,7 @@ export type Leaderboard = {|
   playerUnicityDisplayChoice: LeaderboardPlayerUnicityDisplayOption,
   visibility: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
+  primary?: boolean,
 |};
 
 export type LeaderboardUpdatePayload = {|
@@ -57,6 +59,7 @@ export type LeaderboardUpdatePayload = {|
   playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   visibility?: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
+  primary?: boolean,
 |};
 
 export type LeaderboardEntry = {|
@@ -121,14 +124,14 @@ export const listGameLeaderboards = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  return axios
-    .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard`, {
+  const response = await axios.get(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard?deleted=false`,
+    {
       headers: { Authorization: authorizationHeader },
       params: { userId },
-    })
-    .then(response =>
-      response.data.filter(leaderboard => !leaderboard.deletedAt)
-    );
+    }
+  );
+  return response.data;
 };
 
 export const extractNextPageUriFromLinkHeader = (

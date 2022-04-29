@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
-# Use new policy for `FindOpenGL` to prefer GLVND by default when available on linux (use `cmake --help-policy CMP0072` for details).
-cmake_policy(SET CMP0072 NEW)
 
 project(libGD.js)
 

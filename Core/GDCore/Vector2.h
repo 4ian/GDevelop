@@ -1,4 +1,4 @@
-// This code comes from the SFML.
+// This is adapted from SFML (https://github.com/SFML/SFML).
 
 #ifndef GDCORE_VECTOR2_H
 #define GDCORE_VECTOR2_H
@@ -321,7 +321,7 @@ typedef Vector2<float>        Vector2f;
 
 ////////////////////////////////////////////////////////////
 /// \class gd::Vector2
-/// \ingroup system
+/// \ingroup CommonProgrammingTools
 ///
 /// gd::Vector2 is a simple class that defines a mathematical
 /// vector with two coordinates (x and y). It can be used to

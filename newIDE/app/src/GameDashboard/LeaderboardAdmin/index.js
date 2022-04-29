@@ -850,25 +850,30 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                           </React.Fragment>
                         ))}
                       </List>
-                      <Line>
+                      <Line justifyContent="space-between">
                         <FlatButton
                           icon={<Delete />}
                           label={<Trans>Delete</Trans>}
                           disabled={isRequestPending || isEditingName}
                           onClick={() => onDeleteLeaderboard(i18n)}
                         />
-                        {!currentLeaderboard.primary ? (
-                          <>
-                            <Spacer />
-                            <RaisedButton
-                              label={<Trans>Set as default</Trans>}
-                              disabled={isRequestPending || isEditingName}
-                              onClick={() =>
-                                onUpdateLeaderboard(i18n, { primary: true })
-                              }
-                            />
-                          </>
-                        ) : null}
+                        <RaisedButton
+                          label={
+                            currentLeaderboard.primary ? (
+                              <Trans>Default</Trans>
+                            ) : (
+                              <Trans>Set as default</Trans>
+                            )
+                          }
+                          disabled={
+                            isRequestPending ||
+                            isEditingName ||
+                            currentLeaderboard.primary
+                          }
+                          onClick={() =>
+                            onUpdateLeaderboard(i18n, { primary: true })
+                          }
+                        />
                       </Line>
                       {apiError &&
                       (apiError.action === 'leaderboardDeletion' ||

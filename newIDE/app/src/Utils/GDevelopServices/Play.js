@@ -50,6 +50,7 @@ export type Leaderboard = {|
   playerUnicityDisplayChoice: LeaderboardPlayerUnicityDisplayOption,
   visibility: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
+  primary?: boolean,
 |};
 
 export type LeaderboardUpdatePayload = {|
@@ -58,6 +59,7 @@ export type LeaderboardUpdatePayload = {|
   playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
   visibility?: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
+  primary?: boolean,
 |};
 
 export type LeaderboardEntry = {|

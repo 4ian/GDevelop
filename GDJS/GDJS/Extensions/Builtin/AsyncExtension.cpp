@@ -30,21 +30,23 @@ AsyncExtension::AsyncExtension() {
             event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
 
         // Generate code to backup the objects lists
-        gd::String objectsListsBackupCode =
-            // TODO: reverse old vs new to avoid replacing the parameter.
+        gd::String parentAsyncObjectsListGetter =
             parentContext.IsInsideAsync()
-                ? "const parentAsyncObjectsList = asyncObjectsList; "
-                  "asyncObjectsList = "
+                ? "const parentAsyncObjectsList = asyncObjectsList;\n"
+                : "";
+        gd::String asyncObjectsListBuilder =
+            parentContext.IsInsideAsync()
+                ? "const asyncObjectsList = "
                   "gdjs.LongLivedObjectsList.from(parentAsyncObjectsList);\n"
                 : "const asyncObjectsList = new gdjs.LongLivedObjectsList();\n";
         for (const gd::String &objectNameToBackup :
              callbackDescriptor.requiredObjects) {
           if (parentContext.ShouldUseAsyncObjectsList(objectNameToBackup))
-            objectsListsBackupCode +=
+            asyncObjectsListBuilder +=
                 "/* Don't save " + objectNameToBackup +
                 " as it will be provided by the parent asyncObjectsList. */\n";
           else
-            objectsListsBackupCode +=
+            asyncObjectsListBuilder +=
                 "for (const obj of " +
                 codeGenerator.GetObjectListName(objectNameToBackup,
                                                 parentContext) +
@@ -61,7 +63,8 @@ AsyncExtension::AsyncExtension() {
         const gd::String asyncActionCode = codeGenerator.GenerateActionCode(
             event.GetInstruction(), parentContext, callbackCallCode);
 
-        return "{" + objectsListsBackupCode + asyncActionCode + "}";
+        return "{\n" + parentAsyncObjectsListGetter + "{\n" +
+               asyncObjectsListBuilder + asyncActionCode + "}\n" + "}\n";
       });
 }
 

@@ -350,6 +350,18 @@
                 ""
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "SetAngle"
+              },
+              "parameters": [
+                "BoltGreenPowerup",
+                "=",
+                "45"
+              ],
+              "subInstructions": []
             }
           ],
           "events": []

@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0015 NEW)
-# Use new policy for `FindOpenGL` to prefer GLVND by default when available on linux (use `cmake --help-policy CMP0072` for details).
-cmake_policy(SET CMP0072 NEW)
 
 project(GDCore)
 
@@ -68,14 +66,6 @@ ENDIF()
 set(LIBRARY_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(ARCHIVE_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
-
-#Linker files
-###
-IF(EMSCRIPTEN)
-	#Nothing.
-ELSE()
-  #Nothing.
-ENDIF()
 
 #Tests
 ###

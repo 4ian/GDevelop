@@ -67,8 +67,11 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       }, {});
       const shouldDefineCurrentLeaderboardIfNoneSelected =
         !state.currentLeaderboard && leaderboards && leaderboards.length > 0;
+      const primaryLeaderboard = leaderboards.find(
+        leaderboard => leaderboard.primary
+      );
       const newCurrentLeaderboard = shouldDefineCurrentLeaderboardIfNoneSelected
-        ? leaderboards[0]
+        ? primaryLeaderboard || leaderboards[0]
         : state.currentLeaderboard;
       return {
         ...state,

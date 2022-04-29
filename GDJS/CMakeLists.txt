@@ -4,7 +4,6 @@ cmake_policy(SET CMP0015 NEW)
 project(GDJS)
 #Dependencies on external libraries:
 ###
-include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 
 #Defines
@@ -75,5 +74,4 @@ IF(EMSCRIPTEN)
 	#Nothing.
 ELSE()
 	target_link_libraries(GDJS GDCore)
-	target_link_libraries(GDJS ${sfml_LIBRARIES})
 ENDIF()

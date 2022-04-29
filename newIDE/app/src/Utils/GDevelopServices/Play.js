@@ -122,14 +122,14 @@ export const listGameLeaderboards = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  return axios
-    .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard`, {
+  const response = await axios.get(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard?deleted=false`,
+    {
       headers: { Authorization: authorizationHeader },
       params: { userId },
-    })
-    .then(response =>
-      response.data.filter(leaderboard => !leaderboard.deletedAt)
-    );
+    }
+  );
+  return response.data;
 };
 
 export const extractNextPageUriFromLinkHeader = (

@@ -33,10 +33,8 @@ import {
   shouldActivate,
   shouldValidate,
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
-import AsyncIcon from './AsyncIcon';
+import AsyncIcon from '../../UI/CustomSvgIcons/Async';
 import Tooltip from '@material-ui/core/Tooltip';
-import { Link } from '@material-ui/core';
-import Window from '../../Utils/Window';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -297,20 +295,11 @@ const Instruction = (props: Props) => {
               <Tooltip
                 title={
                   <Trans>
-                    This is an asynchronous event.{' '}
-                    <Link
-                      onClick={() =>
-                        Window.openExternalURL(
-                          'https://wiki.gdevelop.io/gdevelop5/events/async'
-                        )
-                      }
-                    >
-                      Learn more
-                    </Link>
+                    Next actions (and sub-events) will wait for this action to
+                    be finished before running.
                   </Trans>
                 }
                 placement="top"
-                interactive
               >
                 <AsyncIcon
                   className={classNames({

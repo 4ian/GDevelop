@@ -14,17 +14,22 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
     gd::PlatformExtension &extension) {
   extension
       .SetExtensionInformation(
-          "BuiltinAsync", _("Async functions"),
+          "BuiltinAsync",
+          _("Async functions"),
           _("Functions that defer the execution of the events after it."),
-          "Arthur Pacaud (arthuro555)", "Open source (MIT License)")
+          "Arthur Pacaud (arthuro555)",
+          "Open source (MIT License)")
       .SetCategory("Advanced");
 
   extension.AddInstructionOrExpressionGroupMetadata(_("Event functions"))
       .SetIcon("res/function32.png");
 
-  extension.AddEvent(
-      "Async", _("Async event"), _("Internal event for asynchronous actions"),
-      "", "res/eventaddicon.png", std::make_shared<gd::AsyncEvent>());
+  extension.AddEvent("Async",
+                     _("Async event"),
+                     _("Internal event for asynchronous actions"),
+                     "",
+                     "res/eventaddicon.png",
+                     std::make_shared<gd::AsyncEvent>());
 }
 
-} // namespace gd
+}  // namespace gd

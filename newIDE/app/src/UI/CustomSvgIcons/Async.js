@@ -1,8 +1,8 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-export default React.forwardRef((props, ref) => {
-  return (
+export default React.memo(
+  React.forwardRef((props, ref) => (
     <SvgIcon viewBox="10 10 54 54" {...props} ref={ref}>
       <path
         d="M30.5461 30.5034L28.3521 34.288C30.0252 35.8147 31.6363 36.9026 34.934 37.9129L36.1222 33.5573C33.9641 32.8388 31.7827 31.6259 30.5461 30.5034Z"
@@ -29,5 +29,5 @@ export default React.forwardRef((props, ref) => {
         fill="white"
       />
     </SvgIcon>
-  );
-});
+  ))
+);

@@ -20,15 +20,15 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   SetupProjectWithDummyPlatform(project, platform);
   auto& layout1 = project.InsertNewLayout("Layout1", 0);
 
-  gd::ExpressionParser2 parser(platform, project, layout1);
+  gd::ExpressionParser2 parser;
 
   auto getCompletionsFor = [&](const gd::String& type,
                                const gd::String& expression,
                                size_t location) {
-    auto node = parser.ParseExpression(type, expression);
+    auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     return gd::ExpressionCompletionFinder::GetCompletionDescriptionsFor(
-        *node, location);
+        platform, project, layout1, type, *node, location);
   };
 
   const std::vector<gd::ExpressionCompletionDescription>

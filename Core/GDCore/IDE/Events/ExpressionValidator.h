@@ -71,9 +71,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.expression->Visit(*this);
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
+    const Type thisParentType = parentType;
     node.leftHandSide->Visit(*this);
     const Type leftType = childType;
     ReportAnyError(node);
+    CheckType(thisParentType, leftType, node.leftHandSide->location);
 
     if (leftType == Type::String) {
       if (node.op != '+') {
@@ -94,59 +96,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             node.rightHandSide->location);
     }
 
+    parentType = leftType;
     node.rightHandSide->Visit(*this);
     const Type rightType = childType;
+    CheckType(leftType, rightType, node.rightHandSide->location);
 
-    if (rightType == Type::String) {
-      if (leftType == Type::Number) {
-        RaiseTypeError(_("You entered a text, but a number was expected."),
-                           node.rightHandSide->location);
-        childType = Type::NumberOrString;
-      }
-      else if (leftType != Type::String && leftType != Type::NumberOrString) {
-        RaiseTypeError(
-            _("You entered a text, but this type was expected:") + typeToSting(leftType),
-            node.rightHandSide->location);
-        childType = Type::Unknown;
-      }
-    }
-    else if (rightType == Type::Number) {
-      if (leftType == Type::String) {
-        RaiseTypeError(
-            _("You entered a number, but a text was expected (in quotes)."),
-            node.rightHandSide->location);
-        childType = Type::NumberOrString;
-      }
-      else if (leftType != Type::Number && leftType != Type::NumberOrString) {
-        RaiseTypeError(
-            _("You entered a number, but this type was expected:") + typeToSting(leftType),
-            node.rightHandSide->location);
-        childType = Type::Unknown;
-      }
-    }
-    else if (rightType == Type::Identifier) {
-      if (leftType == Type::String) {
-        RaiseTypeError(_("You must wrap your text inside double quotes "
-                             "(example: \"Hello world\")."),
-                           node.rightHandSide->location);
-      }
-      else if (leftType == Type::Number) {
-        RaiseTypeError(
-            _("You must enter a number."), node.rightHandSide->location);
-      }
-      else if (leftType == Type::NumberOrString) {
-        RaiseTypeError(
-            _("You must enter a number or a text, wrapped inside double quotes "
-              "(example: \"Hello world\")."),
-            node.rightHandSide->location);
-      }
-      else if (leftType != Type::Object) {
-        RaiseTypeError(
-            _("You've entered a name, but this type was expected:") + typeToSting(leftType),
-            node.rightHandSide->location);
-      }
-      childType = Type::Unknown;
-    }
+    childType = leftType;
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     ReportAnyError(node);
@@ -160,7 +115,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             "should be "
             "either + or -."),
           node.factor->location);
-        childType = Type::Unknown;
       }
     } else if (rightType == Type::String) {
       RaiseTypeError(
@@ -168,19 +122,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             "to concatenate texts, and must be placed between two texts (or "
             "expressions)."),
           node.factor->location);
-      childType = Type::Unknown;
     } else if (rightType == Type::Object) {
       RaiseTypeError(
           _("Operators (+, -) can't be used with an object name. Remove the "
             "operator."),
           node.factor->location);
-      childType = Type::Unknown;
     } else if (rightType == Type::Variable) {
       RaiseTypeError(
           _("Operators (+, -) can't be used in variable names. Remove "
             "the operator from the variable name."),
           node.factor->location);
-      childType = Type::Unknown;
     }
   }
   void OnVisitNumberNode(NumberNode& node) override {
@@ -210,7 +161,27 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     ReportAnyError(node);
-    childType = Type::Identifier;
+    if (parentType == Type::String) {
+      RaiseTypeError(_("You must wrap your text inside double quotes "
+                            "(example: \"Hello world\")."),
+                          node.location);
+    }
+    else if (parentType == Type::Number) {
+      RaiseTypeError(
+          _("You must enter a number."), node.location);
+    }
+    else if (parentType == Type::NumberOrString) {
+      RaiseTypeError(
+          _("You must enter a number or a text, wrapped inside double quotes "
+            "(example: \"Hello world\")."),
+          node.location);
+    }
+    else if (parentType != Type::Object && parentType != Type::Variable) {
+      RaiseTypeError(
+          _("You've entered a name, but this type was expected:") + " " + typeToSting(parentType),
+          node.location);
+    }
+    childType = parentType;
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     ReportAnyError(node);
@@ -224,7 +195,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
 
  private:
-  enum Type {Unknown = 0, Number, String, NumberOrString, Identifier, Variable, Object, Empty};
+  enum Type {Unknown = 0, Number, String, NumberOrString, Variable, Object, Empty};
   Type ValidateFunction(const gd::FunctionCallNode& function);
 
   void ReportAnyError(const ExpressionNode& node) {
@@ -249,6 +220,36 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void RaiseOperatorError(
       const gd::String &message, const ExpressionParserLocation &location) {
     RaiseError("invalid_operator", message, location);
+  }
+
+  void CheckType(Type expect, Type actual, const ExpressionParserLocation &location) {
+    if (actual == Type::String) {
+      if (expect == Type::Number) {
+        RaiseTypeError(_("You entered a text, but a number was expected."),
+                           location);
+        childType = Type::NumberOrString;
+      }
+      else if (expect != Type::String && expect != Type::NumberOrString) {
+        RaiseTypeError(
+            _("You entered a text, but this type was expected:") + " " + typeToSting(expect),
+            location);
+        childType = Type::Unknown;
+      }
+    }
+    else if (actual == Type::Number) {
+      if (expect == Type::String) {
+        RaiseTypeError(
+            _("You entered a number, but a text was expected (in quotes)."),
+            location);
+        childType = Type::NumberOrString;
+      }
+      else if (expect != Type::Number && expect != Type::NumberOrString) {
+        RaiseTypeError(
+            _("You entered a number, but this type was expected:") + " " + typeToSting(expect),
+            location);
+        childType = Type::Unknown;
+      }
+    }
   }
 
   static Type stringToType(const gd::String &type);

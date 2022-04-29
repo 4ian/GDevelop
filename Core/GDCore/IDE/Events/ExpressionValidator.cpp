@@ -107,7 +107,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
 
   // Validate the type of the function
   if (returnType == Type::Number) {
-    if (childType == Type::String) {
+    if (parentType == Type::String) {
       RaiseTypeError(
           _("You tried to use an expression that returns a number, but a "
             "string is expected. Use `ToString` if you need to convert a "
@@ -115,15 +115,15 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
           function.location);
       return returnType;
     }
-    else if (childType != Type::Number && childType != Type::NumberOrString) {
+    else if (parentType != Type::Number && parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "number, but another type is expected:") +
-                              " " + typeToSting(childType),
+                              " " + typeToSting(parentType),
                             function.location);
       return returnType;
     }
   } else if (returnType == Type::String) {
-    if (childType == Type::Number) {
+    if (parentType == Type::Number) {
       RaiseTypeError(
           _("You tried to use an expression that returns a string, but a "
             "number is expected. Use `ToNumber` if you need to convert a "
@@ -131,15 +131,15 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
           function.location);
       return returnType;
     }
-    else if (childType != Type::String && childType != Type::NumberOrString) {
+    else if (parentType != Type::String && parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "string, but another type is expected:") +
-                              " " + typeToSting(childType),
+                              " " + typeToSting(parentType),
                             function.location);
       return returnType;
     }
   } else {
-    if (childType != returnType) {
+    if (parentType != returnType) {
       RaiseTypeError(
           _("You tried to use an expression with the wrong return type:") + " " +
             typeToSting(returnType),
@@ -203,7 +203,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
         // TODO error
       }
     } else if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
-      if (childType != Type::Variable && childType != Type::Identifier) {
+      if (childType != Type::Variable) {
         // TODO error
       }
     } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
@@ -242,7 +242,6 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   const gd::String ExpressionValidator::numberOrStringTypeString = "number|string";
   const gd::String ExpressionValidator::variableTypeString = "variable";
   const gd::String ExpressionValidator::objectTypeString = "object";
-  const gd::String ExpressionValidator::identifierTypeString = "identifier";
   const gd::String ExpressionValidator::emptyTypeString = "empty";
 
   const gd::String &ExpressionValidator::typeToSting(Type type) {
@@ -259,8 +258,6 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       return variableTypeString;
       case Type::Object:
       return objectTypeString;
-      case Type::Identifier:
-      return identifierTypeString;
       case Type::Empty:
       return emptyTypeString;
     }

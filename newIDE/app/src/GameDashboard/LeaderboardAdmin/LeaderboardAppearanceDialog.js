@@ -24,6 +24,7 @@ import {
   unitToNextSeparator,
 } from '../../Leaderboard/LeaderboardScoreFormatter';
 import AlertMessage from '../../UI/AlertMessage';
+import HelpButton from '../../UI/HelpButton';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -193,6 +194,12 @@ function LeaderboardAppearanceDialog({
           onRequestClose={() => {
             if (!isLoading) onClose();
           }}
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/interface/games-dashboard/leaderboard-administration"
+              anchor="change_the_appearance_of_a_leaderboard"
+            />,
+          ]}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}

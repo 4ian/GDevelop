@@ -1657,6 +1657,107 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
     });
 
+    it('works with asynchronous actions, and it handles multiple created objects (that were not used before)', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: { value: 'Wait' },
+                parameters: ['1.5'],
+              },
+              {
+                type: { value: 'Create' },
+                parameters: ['', 'MyParamObject', '0', '0', ''],
+              },
+              {
+                type: { value: 'Wait' },
+                parameters: ['1.5'],
+              },
+              {
+                type: { value: 'Create' },
+                parameters: ['', 'MyParamObject', '0', '0', ''],
+              },
+              {
+                type: { value: 'ModVarObjet' },
+                parameters: [
+                  'MyParamObject',
+                  'TestVariable',
+                  '+',
+                  'GetArgumentAsNumber("IncreaseValue")',
+                ],
+              },
+            ],
+            events: [],
+          },
+        ])
+      );
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const parameter = new gd.ParameterMetadata();
+      parameter.setType('number');
+      parameter.setName('IncreaseValue');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyParamObject');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      eventsFunction.delete();
+      project.delete();
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [],
+      });
+
+      runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check an object was created.
+      expect(runtimeScene.getObjects('MyObjectA').length).toBe(2);
+      const myObjectA2 = runtimeScene.getObjects('MyObjectA')[1];
+
+      // Process the tasks again (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check an object was created.
+      expect(runtimeScene.getObjects('MyObjectA').length).toBe(3);
+      const myObjectA3 = runtimeScene.getObjects('MyObjectA')[2];
+
+      // Check that both objects that have been created are updated by
+      // the last action (like if there was no wait action).
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5
+      );
+    });
+
     it('works with asynchronous actions, and it handles created and deleted objects, using object groups', function () {
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([

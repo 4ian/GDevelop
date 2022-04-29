@@ -8,6 +8,8 @@
 #define GDCORE_EXPRESSION_H
 
 #include "GDCore/String.h"
+#include <memory>
+
 namespace gd {
 class ExpressionParser2;
 class ObjectsContainer;

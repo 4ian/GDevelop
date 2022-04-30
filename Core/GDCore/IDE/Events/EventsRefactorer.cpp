@@ -126,7 +126,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
-  const gd::String &rootType;
+  const gd::String rootType;
 };
 
 /**
@@ -221,7 +221,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
-  const gd::String &rootType;
+  const gd::String rootType;
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,

@@ -104,7 +104,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
   gd::String output;
   EventsCodeGenerator& codeGenerator;
   EventsCodeGenerationContext& context;
-  const gd::String &rootType;
+  const gd::String rootType;
 };
 
 }  // namespace gd

@@ -156,7 +156,6 @@ bool ExpressionsRenamer::DoVisitInstruction(gd::Instruction& instruction,
   for (std::size_t pNb = 0; pNb < metadata.parameters.size() &&
                             pNb < instruction.GetParametersCount();
        ++pNb) {
-    const gd::String& type = metadata.parameters[pNb].type;
     const gd::Expression& expression = instruction.GetParameter(pNb);
 
     auto node = expression.GetRootNode();

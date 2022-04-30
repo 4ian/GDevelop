@@ -93,6 +93,7 @@ class GD_CORE_API ExpressionParser2 {
       auto op = gd::make_unique<OperatorNode>(' ');
       op->leftHandSide = std::move(expression);
       op->rightHandSide = ReadUntilEnd();
+      op->rightHandSide->parent = op.get();
 
       op->rightHandSide->diagnostic = RaiseSyntaxError(
           _("The expression has extra character at the end that should be "
@@ -130,7 +131,7 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(op);
     }
 
-    // TODO Use the messages for sting and number in a more general way?
+    // TODO Use the messages for string and number in a more general way?
     leftHandSide->diagnostic = RaiseSyntaxError(
         "More than one term was found. Verify that your expression is "
         "properly written.");
@@ -313,8 +314,7 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(child);
     }
 
-    return std::move(
-        std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>());
+    return std::move(gd::make_unique<VariableAccessorOrVariableBracketAccessorNode>());
   }
 
   std::unique_ptr<FunctionCallNode> FreeFunction(
@@ -394,6 +394,7 @@ class GD_CORE_API ExpressionParser2 {
       child->location =
           ExpressionParserLocation(childStartPosition, GetCurrentPosition());
       variable->child = std::move(child);
+      variable->child->parent = variable.get();
 
       variable->location = ExpressionParserLocation(
           parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
@@ -501,8 +502,8 @@ class GD_CORE_API ExpressionParser2 {
             std::move(parameters), nullptr, closingParenthesisLocation};
       } else {
         auto parameter = Expression();
-        parameters.push_back(std::move(parameter));
         parameter->parent = functionCallNode;
+        parameters.push_back(std::move(parameter));
 
         SkipAllWhitespaces();
         SkipIfChar(IsParameterSeparator);

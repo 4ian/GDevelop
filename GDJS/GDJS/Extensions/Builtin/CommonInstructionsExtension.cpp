@@ -218,7 +218,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               // "MyObject" will both have to declare a "MyObject" object list.
               gd::EventsCodeGenerationContext context;
               context.InheritsFrom(parentContext);
-              context.ForbidReuse();  // TODO: This may not be necessary
+              context.ForbidReuse();   // TODO: This may not be necessary (to be investigated/heavily tested).
 
               gd::String conditionCode = codeGenerator.GenerateConditionCode(
                   conditions[cId],
@@ -757,7 +757,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // picked again)
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
-        context.ForbidReuse();
+        context.ForbidReuse(); // TODO: This may not be necessary (to be investigated/heavily tested).
 
         for (unsigned int i = 0; i < realObjects.size(); ++i)
           context.EmptyObjectsListNeeded(realObjects[i]);

@@ -865,6 +865,8 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     // operation.
     bool reuseParentContext =
         parentContext.CanReuse() && eId == events.size() - 1;
+
+    // TODO: avoid creating if useless.
     gd::EventsCodeGenerationContext reusedContext;
     reusedContext.Reuse(parentContext);
 

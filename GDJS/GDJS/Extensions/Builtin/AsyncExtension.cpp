@@ -29,7 +29,17 @@ AsyncExtension::AsyncExtension() {
             event.GetActions(),
             event.HasSubEvents() ? &event.GetSubEvents() : nullptr);
 
-        // Generate code to backup the objects lists
+        const gd::String callbackCallCode =
+            "(runtimeScene) => (" + callbackDescriptor.functionName + "(" +
+            callbackDescriptor.argumentsList + "))";
+
+        // Generate the action and store the generated task.
+        const gd::String asyncActionCode = codeGenerator.GenerateActionCode(
+            event.GetInstruction(), parentContext, callbackCallCode);
+
+        // Generate code to backup the objects lists.
+        // Do it after generating the code of the action so that it uses the
+        // same object list as used in the action.
         gd::String parentAsyncObjectsListGetter =
             parentContext.IsInsideAsync()
                 ? "const parentAsyncObjectsList = asyncObjectsList;\n"
@@ -54,14 +64,6 @@ AsyncExtension::AsyncExtension() {
                 codeGenerator.ConvertToStringExplicit(objectNameToBackup) +
                 ", obj);\n";
         }
-
-        const gd::String callbackCallCode =
-            "(runtimeScene) => (" + callbackDescriptor.functionName + "(" +
-            callbackDescriptor.argumentsList + "))";
-
-        // Generate the action and store the generated task.
-        const gd::String asyncActionCode = codeGenerator.GenerateActionCode(
-            event.GetInstruction(), parentContext, callbackCallCode);
 
         return "{\n" + parentAsyncObjectsListGetter + "{\n" +
                asyncObjectsListBuilder + asyncActionCode + "}\n" + "}\n";

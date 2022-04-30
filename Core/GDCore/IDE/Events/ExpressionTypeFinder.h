@@ -120,7 +120,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
           objectsContainer,
           node,
           *child);
-      if (type == nullptr) {
+      if (parameterMetadata == nullptr) {
         type = "unknown";
       }
       else {

@@ -42,6 +42,7 @@ class GD_CORE_API BuiltinExtensionsImplementer {
   static void ImplementsTimeExtension(gd::PlatformExtension& extension);
   static void ImplementsVariablesExtension(gd::PlatformExtension& extension);
   static void ImplementsWindowExtension(gd::PlatformExtension& extension);
+  static void ImplementsAsyncExtension(gd::PlatformExtension& extension);
 };
 
 }  // namespace gd

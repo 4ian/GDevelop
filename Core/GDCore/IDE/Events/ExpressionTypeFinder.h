@@ -70,7 +70,8 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
         rootType(rootType_),
-        type("unknown") {};
+        type("unknown"),
+        child(nullptr) {};
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
     VisitParent(node);

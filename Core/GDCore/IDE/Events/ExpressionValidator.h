@@ -71,11 +71,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.expression->Visit(*this);
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
+    ReportAnyError(node);
+    
     const Type thisParentType = parentType;
     node.leftHandSide->Visit(*this);
     const Type leftType = childType;
-    ReportAnyError(node);
-    CheckType(thisParentType, leftType, node.leftHandSide->location);
 
     if (leftType == Type::String) {
       if (node.op != '+') {
@@ -99,7 +99,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     parentType = leftType;
     node.rightHandSide->Visit(*this);
     const Type rightType = childType;
-    CheckType(leftType, rightType, node.rightHandSide->location);
 
     childType = leftType;
   }
@@ -137,10 +136,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitNumberNode(NumberNode& node) override {
     ReportAnyError(node);
     childType = Type::Number;
+    CheckType(parentType, childType, node.location);
   }
   void OnVisitTextNode(TextNode& node) override {
     ReportAnyError(node);
     childType = Type::String;
+    CheckType(parentType, childType, node.location);
   }
   void OnVisitVariableNode(VariableNode& node) override {
     ReportAnyError(node);
@@ -148,6 +149,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       node.child->Visit(*this);
     }
     childType = Type::Variable;
+    CheckType(parentType, childType, node.location);
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     ReportAnyError(node);
@@ -227,13 +229,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       if (expect == Type::Number) {
         RaiseTypeError(_("You entered a text, but a number was expected."),
                            location);
-        childType = Type::NumberOrString;
       }
       else if (expect != Type::String && expect != Type::NumberOrString) {
         RaiseTypeError(
             _("You entered a text, but this type was expected:") + " " + typeToSting(expect),
             location);
-        childType = Type::Unknown;
       }
     }
     else if (actual == Type::Number) {
@@ -241,13 +241,11 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
         RaiseTypeError(
             _("You entered a number, but a text was expected (in quotes)."),
             location);
-        childType = Type::NumberOrString;
       }
       else if (expect != Type::Number && expect != Type::NumberOrString) {
         RaiseTypeError(
             _("You entered a number, but this type was expected:") + " " + typeToSting(expect),
             location);
-        childType = Type::Unknown;
       }
     }
   }

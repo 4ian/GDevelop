@@ -65,6 +65,8 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
   if (!IsToBeDeclared(objectName)) {
     objectsListsToBeDeclared.insert(objectName);
+
+    // TODO: factor
     if (IsInsideAsync()) {
       gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
       for (;
@@ -79,16 +81,27 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
 
 void EventsCodeGenerationContext::ObjectsListNeededOrEmptyIfJustDeclared(
     const gd::String& objectName) {
-  if (!IsToBeDeclared(objectName))
+  if (!IsToBeDeclared(objectName)) {
     objectsListsOrEmptyToBeDeclared.insert(objectName);
+
+    // TODO: factor and verify if we need to do that in all cases.
+    if (IsInsideAsync()) {
+      gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
+      for (;
+           asyncContext != nullptr;
+           asyncContext = asyncContext->parent->nearestAsyncParent)
+        asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
+    }
+  }
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
 
 void EventsCodeGenerationContext::EmptyObjectsListNeeded(
     const gd::String& objectName) {
-  if (!IsToBeDeclared(objectName))
+  if (!IsToBeDeclared(objectName)) {
     emptyObjectsListsToBeDeclared.insert(objectName);
+  }
 
   depthOfLastUse[objectName] = GetContextDepth();
 }

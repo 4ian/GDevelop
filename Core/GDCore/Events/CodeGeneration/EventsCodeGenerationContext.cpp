@@ -48,7 +48,6 @@ void EventsCodeGenerationContext::InheritsFrom(
 
 void EventsCodeGenerationContext::InheritsAsAsyncCallbackFrom(
     EventsCodeGenerationContext& parent_) {
-  // TODO: set as can't be reused? Not sure, double check.
   // Increasing the async depth is enough to mark the context as an async callback.
   InheritsFrom(parent_);
   asyncDepth = parent_.asyncDepth + 1;

@@ -288,7 +288,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
   };
 
   gd::String str =
-      fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
+      fs.ReadFile(gdjsRoot + "/Runtime/Targets/Cordova/config.xml")
           .FindAndReplace("GDJS_PROJECTNAME",
                           gd::Serializer::ToEscapedXMLString(project.GetName()))
           .FindAndReplace(
@@ -355,7 +355,7 @@ bool ExporterHelper::ExportCordovaFiles(const gd::Project &project,
 
   {
     gd::String str =
-        fs.ReadFile(gdjsRoot + "/Runtime/Cordova/package.json")
+        fs.ReadFile(gdjsRoot + "/Runtime/Targets/Cordova/package.json")
             .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
             .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
@@ -375,7 +375,7 @@ bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
   {
     gd::String str =
         fs.ReadFile(gdjsRoot +
-                    "/Runtime/FacebookInstantGames/fbapp-config.json")
+                    "/Runtime/Targets/FacebookInstantGames/fbapp-config.json")
             .FindAndReplace("\"GDJS_ORIENTATION\"",
                             project.GetOrientation() == "portrait"
                                 ? "\"PORTRAIT\""
@@ -410,7 +410,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
   {
     gd::String str =
-        fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
+        fs.ReadFile(gdjsRoot + "/Runtime/Targets/Electron/package.json")
             .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
             .FindAndReplace("\"GDJS_GAME_PACKAGE_NAME\"", jsonPackageName)
             .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
@@ -455,7 +455,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
 
   {
     gd::String str =
-        fs.ReadFile(gdjsRoot + "/Runtime/Electron/main.js")
+        fs.ReadFile(gdjsRoot + "/Runtime/Targets/Electron/main.js")
             .FindAndReplace(
                 "800 /*GDJS_WINDOW_WIDTH*/",
                 gd::String::From<int>(project.GetGameResolutionWidth()))
@@ -530,83 +530,108 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                                     std::vector<gd::String> &includesFiles) {
   // First, do not forget common includes (they must be included before events
   // generated code files).
-  InsertUnique(includesFiles, "libs/jshashtable.js");
-  InsertUnique(includesFiles, "logger.js");
-  InsertUnique(includesFiles, "gd.js");
-  InsertUnique(includesFiles, "libs/rbush.js");
-  InsertUnique(includesFiles, "inputmanager.js");
-  InsertUnique(includesFiles, "jsonmanager.js");
-  InsertUnique(includesFiles, "timemanager.js");
-  InsertUnique(includesFiles, "runtimeobject.js");
-  InsertUnique(includesFiles, "profiler.js");
-  InsertUnique(includesFiles, "runtimescene.js");
-  InsertUnique(includesFiles, "scenestack.js");
-  InsertUnique(includesFiles, "polygon.js");
-  InsertUnique(includesFiles, "force.js");
-  InsertUnique(includesFiles, "layer.js");
-  InsertUnique(includesFiles, "timer.js");
-  InsertUnique(includesFiles, "runtimegame.js");
-  InsertUnique(includesFiles, "variable.js");
-  InsertUnique(includesFiles, "variablescontainer.js");
-  InsertUnique(includesFiles, "oncetriggers.js");
-  InsertUnique(includesFiles, "runtimebehavior.js");
-  InsertUnique(includesFiles, "spriteruntimeobject.js");
+  InsertUnique(includesFiles, "Core/libs/jshashtable.js");
+  InsertUnique(includesFiles, "Core/logger.js");
+  InsertUnique(includesFiles, "Core/gd.js");
+  InsertUnique(includesFiles, "Core/libs/rbush.js");
+  InsertUnique(includesFiles, "Core/inputmanager.js");
+  InsertUnique(includesFiles, "Core/jsonmanager.js");
+  InsertUnique(includesFiles, "Core/timemanager.js");
+  InsertUnique(includesFiles, "Core/runtimeobject.js");
+  InsertUnique(includesFiles, "Core/profiler.js");
+  InsertUnique(includesFiles, "Core/runtimescene.js");
+  InsertUnique(includesFiles, "Core/scenestack.js");
+  InsertUnique(includesFiles, "Core/polygon.js");
+  InsertUnique(includesFiles, "Core/force.js");
+  InsertUnique(includesFiles, "Core/layer.js");
+  InsertUnique(includesFiles, "Core/timer.js");
+  InsertUnique(includesFiles, "Core/runtimegame.js");
+  InsertUnique(includesFiles, "Core/variable.js");
+  InsertUnique(includesFiles, "Core/variablescontainer.js");
+  InsertUnique(includesFiles, "Core/oncetriggers.js");
+  InsertUnique(includesFiles, "Core/runtimebehavior.js");
+  InsertUnique(includesFiles, "Core/spriteruntimeobject.js");
 
   // Common includes for events only.
-  InsertUnique(includesFiles, "events-tools/commontools.js");
-  InsertUnique(includesFiles, "events-tools/variabletools.js");
-  InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
-  InsertUnique(includesFiles, "events-tools/inputtools.js");
-  InsertUnique(includesFiles, "events-tools/objecttools.js");
-  InsertUnique(includesFiles, "events-tools/cameratools.js");
-  InsertUnique(includesFiles, "events-tools/soundtools.js");
-  InsertUnique(includesFiles, "events-tools/storagetools.js");
-  InsertUnique(includesFiles, "events-tools/stringtools.js");
-  InsertUnique(includesFiles, "events-tools/windowtools.js");
-  InsertUnique(includesFiles, "events-tools/networktools.js");
+  InsertUnique(includesFiles, "Core/events-tools/commontools.js");
+  InsertUnique(includesFiles, "Core/events-tools/variabletools.js");
+  InsertUnique(includesFiles, "Core/events-tools/runtimescenetools.js");
+  InsertUnique(includesFiles, "Core/events-tools/inputtools.js");
+  InsertUnique(includesFiles, "Core/events-tools/objecttools.js");
+  InsertUnique(includesFiles, "Core/events-tools/cameratools.js");
+  InsertUnique(includesFiles, "Core/events-tools/soundtools.js");
+  InsertUnique(includesFiles, "Core/events-tools/storagetools.js");
+  InsertUnique(includesFiles, "Core/events-tools/stringtools.js");
+  InsertUnique(includesFiles, "Core/events-tools/windowtools.js");
+  InsertUnique(includesFiles, "Core/events-tools/networktools.js");
 
   if (gdevelopLogoStyle == "dark") {
-    InsertUnique(includesFiles, "splash/gd-logo-dark.js");
+    InsertUnique(includesFiles, "Core/splash/gd-logo-dark.js");
   } else if (gdevelopLogoStyle == "dark-colored") {
-    InsertUnique(includesFiles, "splash/gd-logo-dark-colored.js");
+    InsertUnique(includesFiles, "Core/splash/gd-logo-dark-colored.js");
   } else if (gdevelopLogoStyle == "light-colored") {
-    InsertUnique(includesFiles, "splash/gd-logo-light-colored.js");
+    InsertUnique(includesFiles, "Core/splash/gd-logo-light-colored.js");
   } else {
-    InsertUnique(includesFiles, "splash/gd-logo-light.js");
+    InsertUnique(includesFiles, "Core/splash/gd-logo-light.js");
   }
 
   if (includeWebsocketDebuggerClient || includeWindowMessageDebuggerClient) {
-    InsertUnique(includesFiles, "debugger-client/hot-reloader.js");
-    InsertUnique(includesFiles, "debugger-client/abstract-debugger-client.js");
+    InsertUnique(includesFiles,
+                 "Managers/Interfaces/debugger-client/hot-reloader.js");
+    InsertUnique(
+        includesFiles,
+        "Managers/Interfaces/debugger-client/abstract-debugger-client.js");
   }
   if (includeWebsocketDebuggerClient) {
-    InsertUnique(includesFiles, "debugger-client/websocket-debugger-client.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/websocket-debugger-client/"
+                 "websocket-debugger-client.js");
   }
   if (includeWindowMessageDebuggerClient) {
     InsertUnique(includesFiles,
-                 "debugger-client/window-message-debugger-client.js");
+                 "Managers/Implementations/window-message-debugger-client/"
+                 "window-message-debugger-client.js");
   }
 
   if (pixiRenderers) {
-    InsertUnique(includesFiles, "pixi-renderers/pixi.js");
-    InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
-    InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
-    InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
-    InsertUnique(includesFiles, "pixi-renderers/layer-pixi-renderer.js");
-    InsertUnique(includesFiles, "pixi-renderers/pixi-image-manager.js");
-    InsertUnique(includesFiles, "pixi-renderers/pixi-bitmapfont-manager.js");
     InsertUnique(includesFiles,
-                 "pixi-renderers/spriteruntimeobject-pixi-renderer.js");
-    InsertUnique(includesFiles,
-                 "pixi-renderers/loadingscreen-pixi-renderer.js");
-    InsertUnique(includesFiles, "pixi-renderers/pixi-effects-manager.js");
-    InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");
-    InsertUnique(includesFiles, "howler-sound-manager/howler-sound-manager.js");
-    InsertUnique(includesFiles,
-                 "fontfaceobserver-font-manager/fontfaceobserver.js");
+                 "Managers/Implementations/pixi-renderers/pixi.js");
     InsertUnique(
         includesFiles,
-        "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
+        "Managers/Implementations/pixi-renderers/pixi-filters-tools.js");
+    InsertUnique(
+        includesFiles,
+        "Managers/Implementations/pixi-renderers/runtimegame-pixi-renderer.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/pixi-renderers/"
+                 "runtimescene-pixi-renderer.js");
+    InsertUnique(
+        includesFiles,
+        "Managers/Implementations/pixi-renderers/layer-pixi-renderer.js");
+    InsertUnique(
+        includesFiles,
+        "Managers/Implementations/pixi-renderers/pixi-image-manager.js");
+    InsertUnique(
+        includesFiles,
+        "Managers/Implementations/pixi-renderers/pixi-bitmapfont-manager.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/pixi-renderers/"
+                 "spriteruntimeobject-pixi-renderer.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/pixi-renderers/"
+                 "loadingscreen-pixi-renderer.js");
+    InsertUnique(includesFiles, "Managers/Implementations/pixi-renderers/pixi-effects-manager.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/howler-sound-manager/howler.min.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/howler-sound-manager/"
+                 "howler-sound-manager.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/fontfaceobserver-font-manager/"
+                 "fontfaceobserver.js");
+    InsertUnique(includesFiles,
+                 "Managers/Implementations/fontfaceobserver-font-manager/"
+                 "fontfaceobserver-font-manager.js");
   }
 }
 

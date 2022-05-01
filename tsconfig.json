@@ -35,15 +35,10 @@
   // As Cocos2D-JS renderers are not maintained, we exclude them from TypeScript checks.
   // Also exclude some libraries or deprecated extensions.
   "exclude": [
-    "GDJS/Runtime/cocos-renderers",
-    "GDJS/Runtime/cocos-sound-manager",
-    "Extensions/**/*-cocos-renderer.ts",
-    "GDJS/Runtime/pixi-renderers/pixi.js",
-    "GDJS/Runtime/Cocos2d",
-    "GDJS/Runtime/Cordova",
-    "GDJS/Runtime/Electron",
-    "GDJS/Runtime/FacebookInstantGames",
-    "GDJS/Runtime/libs/CocoonJS",
+    "GDJS/Runtime/Managers/Implementations/pixi-renderers/pixi.js",
+    "GDJS/Runtime/Platforms/Cordova",
+    "GDJS/Runtime/Platforms/Electron",
+    "GDJS/Runtime/Platforms/FacebookInstantGames",
     "Extensions/**/JsExtension.js",
     "Extensions/Effects/pixi-filters/filter-alpha.js"
   ]

@@ -79,7 +79,8 @@
                 "${workspaceRoot}/Extensions",
                 "${workspaceRoot}/Core",
                 "${workspaceRoot}/ExtLibs/SFML/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "${workspaceRoot}/../emsdk/upstream/emscripten/system/include"
             ],
             "defines": [
                 "_DEBUG",

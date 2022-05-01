@@ -1,11 +1,11 @@
 {
   "tsconfig": "../../tsconfig.json",
-  "entryPoints": ["../Runtime/gd.ts"],
+  "entryPoints": ["../Runtime/Core/gd.ts"],
   "entryPointStrategy": "expand",
   "externalPattern": [
-    "Runtime/Cordova/",
-    "Runtime/Electron/",
-    "Runtime/FacebookInstantGames/"
+    "Runtime/Targets/Cordova/",
+    "Runtime/Targets/Electron/",
+    "Runtime/Targets/FacebookInstantGames/"
   ],
   "excludeExternals": true,
   "excludeInternal": true,

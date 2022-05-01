@@ -46,9 +46,9 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
-        '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
-        '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
-        '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Targets/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Targets/Cordova/config.xml': fakeConfigXmlContent,
+        '/fake-gdjs-root/Runtime/Targets/Cordova/package.json': fakePackageJsonContent,
       });
 
       // Export and check the content of written files.
@@ -109,9 +109,9 @@ describe('libGD.js - GDJS related tests', function () {
 
       // Prepare a fake file system
       var fs = makeFakeAbstractFileSystem(gd, {
-        '/fake-gdjs-root/Runtime/Cordova/www/index.html': fakeIndexHtmlContent,
-        '/fake-gdjs-root/Runtime/Cordova/config.xml': fakeConfigXmlContent,
-        '/fake-gdjs-root/Runtime/Cordova/package.json': fakePackageJsonContent,
+        '/fake-gdjs-root/Runtime/Targets/Cordova/www/index.html': fakeIndexHtmlContent,
+        '/fake-gdjs-root/Runtime/Targets/Cordova/config.xml': fakeConfigXmlContent,
+        '/fake-gdjs-root/Runtime/Targets/Cordova/package.json': fakePackageJsonContent,
       });
 
       // Export and check the content of written files.

@@ -22,13 +22,12 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 // be built with esbuild, but simply copied.
 const untransformedPaths = [
   // GDJS prebuilt files:
-  'GDJS/Runtime/pixi-renderers/pixi.js',
-  'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
-  'GDJS/Runtime/Cordova',
-  'GDJS/Runtime/Electron',
-  'GDJS/Runtime/FacebookInstantGames',
-  'GDJS/Runtime/libs/CocoonJS',
-  'GDJS/Runtime/libs/rbush.js',
+  'GDJS/Runtime/Managers/Implementations/pixi-renderers/pixi.js',
+  'GDJS/Runtime/Managers/Implementations/fontfaceobserver-font-manager/fontfaceobserver.js',
+  'GDJS/Runtime/Targets/Cordova',
+  'GDJS/Runtime/Targets/Electron',
+  'GDJS/Runtime/Targets/FacebookInstantGames',
+  'GDJS/Runtime/Core/libs/rbush.js',
 
   // Extensions pre-built files:
   'Extensions/Leaderboards/sha256.js',

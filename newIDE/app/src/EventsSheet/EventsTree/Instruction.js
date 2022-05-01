@@ -33,6 +33,8 @@ import {
   shouldActivate,
   shouldValidate,
 } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import AsyncIcon from '../../UI/CustomSvgIcons/Async';
+import Tooltip from '@material-ui/core/Tooltip';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -288,6 +290,23 @@ const Instruction = (props: Props) => {
                 src="res/contraire.png"
                 alt="Condition is negated"
               />
+            )}
+            {metadata.isAsync() && (
+              <Tooltip
+                title={
+                  <Trans>
+                    Next actions (and sub-events) will wait for this action to
+                    be finished before running.
+                  </Trans>
+                }
+                placement="top"
+              >
+                <AsyncIcon
+                  className={classNames({
+                    [icon]: true,
+                  })}
+                />
+              </Tooltip>
             )}
             <img
               className={classNames({

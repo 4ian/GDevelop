@@ -125,9 +125,9 @@ bool Exporter::ExportWholePixiProject(
 
     gd::String source = gdjsRoot + "/Runtime/index.html";
     if (exportForCordova)
-      source = gdjsRoot + "/Runtime/Cordova/www/index.html";
+      source = gdjsRoot + "/Runtime/Targets/Cordova/www/index.html";
     else if (exportForFacebookInstantGames)
-      source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
+      source = gdjsRoot + "/Runtime/Targets/FacebookInstantGames/index.html";
 
     if (!helper.ExportPixiIndexFile(exportedProject,
                                     source,

@@ -33,6 +33,9 @@ const unitToAbbreviation = {
   millisecond: 'ms',
 };
 
+const isWholeNumber = (value: any): boolean =>
+  !isNaN(value) && Number.isInteger(value);
+
 const getIdentifierFromUnits = (units: {|
   smallestUnit: LeaderboardScoreFormattingTimeUnit,
   biggestUnit: LeaderboardScoreFormattingTimeUnit,
@@ -150,10 +153,7 @@ function LeaderboardAppearanceDialog({
       setScoreTitleError(i18n._(t`Title cannot be empty.`));
       return;
     }
-    if (
-      isNaN(defaultDisplayedEntriesNumber) ||
-      !Number.isInteger(defaultDisplayedEntriesNumber)
-    ) {
+    if (!isWholeNumber(defaultDisplayedEntriesNumber)) {
       setDefaultDisplayedEntriesNumberError(
         i18n._(
           t`The number of displayed entries must be a whole value between ${displayedEntriesMinNumber} and ${displayedEntriesMaxNumber}`
@@ -161,7 +161,7 @@ function LeaderboardAppearanceDialog({
       );
       return;
     }
-    if (isNaN(precision) || !Number.isInteger(precision)) {
+    if (!isWholeNumber(precision)) {
       setPrecisionError(
         i18n._(
           t`The number of decimal places must be a whole value between ${precisionMinValue} and ${precisionMaxValue}`

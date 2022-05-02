@@ -100,12 +100,12 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   void OnVisitEmptyNode(EmptyNode& node) override {
     VisitParent(node);
   }
+  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
+    VisitParent(node);
+  }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
     type = "number|string";
-  }
-  void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    type = "unknown";
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (child == nullptr) {

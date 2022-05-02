@@ -184,20 +184,44 @@ struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
 };
 
 /**
- * \brief An identifier node, usually representing an object or a variable.
+ * \brief An identifier node, usually representing an object or a variable
+ * with an optional function name or child variable name respectively.
+ *
+ * The name of a function to call on an object or the behavior,
+ * for example: "MyObject.Function" or "MyObject.Physics".
+ * 
+ * A variable, potentially with accessor to its child,
+ * for example: MyVariable or MyVariable.MyChild
  */
 struct GD_CORE_API IdentifierNode
     : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
   IdentifierNode(
   const gd::String &identifierName_)
       : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(),
-        identifierName(identifierName_){};
+        identifierName(identifierName_),
+        childIdentifierName(""){};
+  IdentifierNode(
+  const gd::String &identifierName_,
+  const gd::String &childIdentifierName_)
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(),
+        identifierName(identifierName_),
+        childIdentifierName(childIdentifierName_){};
   virtual ~IdentifierNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitIdentifierNode(*this);
   };
 
-  gd::String identifierName;
+  gd::String identifierName;  ///< The object or variable name.
+  gd::String childIdentifierName;  ///< The object function or variable child name.
+
+
+  ExpressionParserLocation
+      identifierNameLocation;  ///< Location of the object or variable name.
+  ExpressionParserLocation
+      identifierNameDotLocation;  ///< Location of the "." after the object or variable name.
+  ExpressionParserLocation childIdentifierNameLocation;  ///< Location of object
+                                                         /// function, behavior or
+                                                         /// child variable name.
 };
 
 struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode

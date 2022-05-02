@@ -372,6 +372,7 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
 
   SECTION("Valid variables") {
     SECTION("Test 1") {
+      // TODO check if there acn be side effect to be an IdentifierNode
       REQUIRE(CheckNodeAtLocationIs<gd::VariableNode>(
                   parser, "myVariable", 0) == true);
       REQUIRE(CheckNodeAtLocationIs<gd::VariableNode>(

@@ -131,7 +131,6 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(op);
     }
 
-    // TODO Use the messages for string and number in a more general way?
     leftHandSide->diagnostic = RaiseSyntaxError(
         "More than one term was found. Verify that your expression is "
         "properly written.");
@@ -217,7 +216,6 @@ class GD_CORE_API ExpressionParser2 {
     }
 
     std::unique_ptr<ExpressionNode> factor = ReadUntilWhitespace();
-    factor->diagnostic = RaiseEmptyError(expressionStartPosition);
     return factor;
   }
 
@@ -346,7 +344,6 @@ class GD_CORE_API ExpressionParser2 {
       const ExpressionParserLocation &parentIdentifierLocation,
       const ExpressionParserLocation &parentIdentifierDotLocation,
       const gd::String &objectName) {
-    size_t childStartPosition = GetCurrentPosition();
     auto childIdentifierAndLocation = ReadIdentifierName();
     const gd::String &childIdentifierName = childIdentifierAndLocation.name;
     const auto &childIdentifierNameLocation =
@@ -386,13 +383,13 @@ class GD_CORE_API ExpressionParser2 {
     } else {
       auto variable = gd::make_unique<VariableNode>(parentIdentifier, objectName);
       auto child =
-          gd::make_unique<VariableAccessorNode>(childIdentifierAndLocation.name);
+          gd::make_unique<VariableAccessorNode>(childIdentifierName);
       child->child = VariableAccessorOrVariableBracketAccessor();
       child->child->parent = child.get();
-      child->nameLocation = childIdentifierAndLocation.location;
+      child->nameLocation = childIdentifierNameLocation;
       child->dotLocation = parentIdentifierDotLocation;
-      child->location =
-          ExpressionParserLocation(childStartPosition, GetCurrentPosition());
+      child->location = ExpressionParserLocation(
+          parentIdentifierDotLocation.GetStartPosition(), GetCurrentPosition());
       variable->child = std::move(child);
       variable->child->parent = variable.get();
 
@@ -500,15 +497,14 @@ class GD_CORE_API ExpressionParser2 {
         auto closingParenthesisLocation = SkipChar();
         return ParametersNode{
             std::move(parameters), nullptr, closingParenthesisLocation};
-      } else {
-        auto parameter = Expression();
-        parameter->parent = functionCallNode;
-        parameters.push_back(std::move(parameter));
-
-        SkipAllWhitespaces();
-        SkipIfChar(IsParameterSeparator);
-        parameterIndex++;
       }
+      auto parameter = Expression();
+      parameter->parent = functionCallNode;
+      parameters.push_back(std::move(parameter));
+
+      SkipAllWhitespaces();
+      SkipIfChar(IsParameterSeparator);
+      parameterIndex++;
     }
 
     ExpressionParserLocation invalidClosingParenthesisLocation;
@@ -788,11 +784,6 @@ class GD_CORE_API ExpressionParser2 {
       const gd::String &message, size_t beginningPosition) {
     return std::move(gd::make_unique<ExpressionParserError>(
         "type_error", message, beginningPosition, GetCurrentPosition()));
-  }
-
-  std::unique_ptr<ExpressionParserError> RaiseEmptyError(
-      size_t beginningPosition) {
-    return std::move(RaiseTypeError(_("You must enter a valid expression."), beginningPosition));
   }
   ///@}
 

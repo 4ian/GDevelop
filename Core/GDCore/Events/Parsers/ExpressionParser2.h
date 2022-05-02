@@ -266,12 +266,27 @@ class GD_CORE_API ExpressionParser2 {
       SkipAllWhitespaces();
       return ObjectFunctionOrBehaviorFunction(
           name, nameLocation, dotLocation, "");
-    } else {
+    } else if (CheckIfChar(IsOpeningSquareBracket)) {
+      return Variable("", name, nameLocation);
+    }
+    else {
       auto identifier = gd::make_unique<IdentifierNode>(name);
       identifier->location = ExpressionParserLocation(
           nameLocation.GetStartPosition(), GetCurrentPosition());
+      identifier->identifierNameLocation = identifier->location;
       return std::move(identifier);
     }
+  }
+
+  std::unique_ptr<VariableNode> Variable(
+      const gd::String &objectName, const gd::String &name, gd::ExpressionParserLocation nameLocation) {
+    auto variable = gd::make_unique<VariableNode>(name, objectName);
+    variable->child = VariableAccessorOrVariableBracketAccessor();
+
+    variable->location = ExpressionParserLocation(
+        nameLocation.GetStartPosition(), GetCurrentPosition());
+    variable->nameLocation = nameLocation;
+    return std::move(variable);
   }
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
@@ -338,7 +353,7 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(function);
   }
 
-  std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode>
+  std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
   ObjectFunctionOrBehaviorFunction(
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
@@ -380,7 +395,7 @@ class GD_CORE_API ExpressionParser2 {
       function->closingParenthesisLocation =
           parametersNode.closingParenthesisLocation;
       return std::move(function);
-    } else {
+    } else if (CheckIfChar(IsDot) || CheckIfChar(IsOpeningSquareBracket)) {
       auto variable = gd::make_unique<VariableNode>(parentIdentifier, objectName);
       auto child =
           gd::make_unique<VariableAccessorNode>(childIdentifierName);
@@ -400,7 +415,7 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(variable);
     }
 
-    auto node = gd::make_unique<ObjectFunctionNameNode>(
+    auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
     // TODO update this message
     node->diagnostic = RaiseSyntaxError(
@@ -409,10 +424,9 @@ class GD_CORE_API ExpressionParser2 {
 
     node->location = ExpressionParserLocation(
         parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
-    node->objectNameLocation = parentIdentifierLocation;
-    node->objectNameDotLocation = parentIdentifierDotLocation;
-    node->objectFunctionOrBehaviorNameLocation =
-        childIdentifierNameLocation;
+    node->identifierNameLocation = parentIdentifierLocation;
+    node->identifierNameDotLocation = parentIdentifierDotLocation;
+    node->childIdentifierNameLocation = childIdentifierNameLocation;
     return std::move(node);
   }
 

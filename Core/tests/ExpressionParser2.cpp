@@ -1013,10 +1013,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Valid object function name") {
     auto node = parser.ParseExpression("MyObject.MyFunc");
     REQUIRE(node != nullptr);
-    auto &objectFunctionName =
-        dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-    REQUIRE(objectFunctionName.objectName == "MyObject");
-    REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyFunc");
+    auto &identifierNode =
+        dynamic_cast<gd::IdentifierNode &>(*node);
+    REQUIRE(identifierNode.identifierName == "MyObject");
+    REQUIRE(identifierNode.childIdentifierName == "MyFunc");
   }
 
   SECTION("Valid object behavior name") {
@@ -1032,10 +1032,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Unfinished object function name") {
     auto node = parser.ParseExpression("MyObject.");
     REQUIRE(node != nullptr);
-    auto &objectFunctionName =
-        dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-    REQUIRE(objectFunctionName.objectName == "MyObject");
-    REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "");
+    auto &identifierNode =
+        dynamic_cast<gd::IdentifierNode &>(*node);
+    REQUIRE(identifierNode.identifierName == "MyObject");
+    REQUIRE(identifierNode.childIdentifierName == "");
   }
 
   SECTION("Unfinished object function name of type string with parentheses") {
@@ -1288,7 +1288,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "Cannot find an expression with this name: \nDouble "
               "check that you've not made any typo in the name.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);;
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
     }
   }
 
@@ -1309,19 +1309,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node = parser.ParseExpression("myVariable");
       REQUIRE(node != nullptr);
-      auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
-      REQUIRE(variableNode.name == "myVariable");
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "myVariable");
+      REQUIRE(identifierNode.identifierNameLocation.GetStartPosition() == 0);
+      REQUIRE(identifierNode.identifierNameLocation.GetEndPosition() == 10);
+      REQUIRE(identifierNode.childIdentifierName == "");
+      REQUIRE(identifierNode.identifierNameDotLocation.IsValid() == false);
+      REQUIRE(identifierNode.childIdentifierNameLocation.IsValid() == false);
     }
 
     {
       auto node = parser.ParseExpression("myVariable.myChild");
       REQUIRE(node != nullptr);
-      auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
-      REQUIRE(variableNode.name == "myVariable");
-      REQUIRE(variableNode.child != nullptr);
-      auto &childNode =
-          dynamic_cast<gd::VariableAccessorNode &>(*variableNode.child);
-      REQUIRE(childNode.name == "myChild");
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "myVariable");
+      REQUIRE(identifierNode.childIdentifierName == "myChild");
     }
 
     {
@@ -1399,18 +1401,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierObject1Node =
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
       auto &variable1Node =
-          dynamic_cast<gd::VariableNode &>(*functionNode.parameters[1]);
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[1]);
       auto &identifierObject2Node =
           dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
       auto &variable2Node =
-          dynamic_cast<gd::VariableNode &>(*functionNode.parameters[3]);
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[3]);
 
       REQUIRE(identifierObject1Node.identifierName == "MyObject1");
       REQUIRE(identifierObject2Node.identifierName == "MyObject2");
-      REQUIRE(variable1Node.objectName == "MyObject1");
-      REQUIRE(variable1Node.name == "MyVar1");
-      REQUIRE(variable2Node.objectName == "MyObject2");
-      REQUIRE(variable2Node.name == "MyVar2");
+      REQUIRE(variable1Node.identifierName == "MyVar1");
+      REQUIRE(variable2Node.identifierName == "MyVar2");
+      // TODO Was the association between variable and object parameters useful somewhere?
     }
   }
 
@@ -1542,31 +1543,26 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     SECTION("Variable locations (simple variable name)") {
       auto node = parser.ParseExpression("MyVariable");
       REQUIRE(node != nullptr);
-      auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
-      REQUIRE(variableNode.name == "MyVariable");
-      REQUIRE(variableNode.location.GetStartPosition() == 0);
-      REQUIRE(variableNode.location.GetEndPosition() == 10);
-      REQUIRE(variableNode.nameLocation.GetStartPosition() == 0);
-      REQUIRE(variableNode.nameLocation.GetEndPosition() == 10);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "MyVariable");
+      REQUIRE(identifierNode.location.GetStartPosition() == 0);
+      REQUIRE(identifierNode.location.GetEndPosition() == 10);
+      REQUIRE(identifierNode.childIdentifierName == "");
     }
     SECTION("Variable locations (with child)") {
       auto node = parser.ParseExpression("MyVariable.MyChild");
       REQUIRE(node != nullptr);
-      auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
-      REQUIRE(variableNode.name == "MyVariable");
-      REQUIRE(variableNode.location.GetStartPosition() == 0);
-      REQUIRE(variableNode.location.GetEndPosition() == 18);
-      REQUIRE(variableNode.nameLocation.GetStartPosition() == 0);
-      REQUIRE(variableNode.nameLocation.GetEndPosition() == 10);
-      REQUIRE(variableNode.child != nullptr);
-      auto &childVariableAccessorNode =
-          dynamic_cast<gd::VariableAccessorNode &>(*variableNode.child);
-      REQUIRE(childVariableAccessorNode.location.GetStartPosition() == 10);
-      REQUIRE(childVariableAccessorNode.location.GetEndPosition() == 18);
-      REQUIRE(childVariableAccessorNode.dotLocation.GetStartPosition() == 10);
-      REQUIRE(childVariableAccessorNode.dotLocation.GetEndPosition() == 11);
-      REQUIRE(childVariableAccessorNode.nameLocation.GetStartPosition() == 11);
-      REQUIRE(childVariableAccessorNode.nameLocation.GetEndPosition() == 18);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "MyVariable");
+      REQUIRE(identifierNode.location.GetStartPosition() == 0);
+      REQUIRE(identifierNode.location.GetEndPosition() == 18);
+      REQUIRE(identifierNode.identifierNameLocation.GetStartPosition() == 0);
+      REQUIRE(identifierNode.identifierNameLocation.GetEndPosition() == 10);
+      REQUIRE(identifierNode.identifierNameDotLocation.GetStartPosition() == 10);
+      REQUIRE(identifierNode.identifierNameDotLocation.GetEndPosition() == 11);
+      REQUIRE(identifierNode.childIdentifierName == "MyChild");
+      REQUIRE(identifierNode.childIdentifierNameLocation.GetStartPosition() == 11);
+      REQUIRE(identifierNode.childIdentifierNameLocation.GetEndPosition() == 18);
     }
     SECTION("Free function locations") {
       auto node =
@@ -1672,56 +1668,48 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node =
           parser.ParseExpression("WhateverObject.WhateverFunction");
       REQUIRE(node != nullptr);
-      auto &objectFunctionNameNode =
-          dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionNameNode.objectName == "WhateverObject");
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorName ==
+      auto &identifierNode =
+          dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "WhateverObject");
+      REQUIRE(identifierNode.childIdentifierName ==
               "WhateverFunction");
 
-      REQUIRE(objectFunctionNameNode.location.GetStartPosition() == 0);
-      REQUIRE(objectFunctionNameNode.location.GetEndPosition() == 31);
-      REQUIRE(objectFunctionNameNode.objectNameLocation.GetStartPosition() ==
+      REQUIRE(identifierNode.location.GetStartPosition() == 0);
+      REQUIRE(identifierNode.location.GetEndPosition() == 31);
+      REQUIRE(identifierNode.identifierNameLocation.GetStartPosition() ==
               0);
-      REQUIRE(objectFunctionNameNode.objectNameLocation.GetEndPosition() == 14);
-      REQUIRE(objectFunctionNameNode.objectNameDotLocation.GetStartPosition() ==
+      REQUIRE(identifierNode.identifierNameLocation.GetEndPosition() == 14);
+      REQUIRE(identifierNode.identifierNameDotLocation.GetStartPosition() ==
               14);
-      REQUIRE(objectFunctionNameNode.objectNameDotLocation.GetEndPosition() ==
+      REQUIRE(identifierNode.identifierNameDotLocation.GetEndPosition() ==
               15);
-      REQUIRE(objectFunctionNameNode.behaviorFunctionNameLocation.IsValid() ==
-              false);
-      REQUIRE(objectFunctionNameNode.behaviorNameNamespaceSeparatorLocation
-                  .IsValid() == false);
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorNameLocation
+      REQUIRE(identifierNode.childIdentifierNameLocation
                   .GetStartPosition() == 15);
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorNameLocation
+      REQUIRE(identifierNode.childIdentifierNameLocation
                   .GetEndPosition() == 31);
     }
     SECTION("Object function name locations (with whitespace)") {
       auto node = parser.ParseExpression(
           "WhateverObject  .  WhateverFunction  ");
       REQUIRE(node != nullptr);
-      auto &objectFunctionNameNode =
-          dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionNameNode.objectName == "WhateverObject");
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorName ==
+      auto &identifierNode =
+          dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "WhateverObject");
+      REQUIRE(identifierNode.childIdentifierName ==
               "WhateverFunction");
 
-      REQUIRE(objectFunctionNameNode.location.GetStartPosition() == 0);
-      REQUIRE(objectFunctionNameNode.location.GetEndPosition() == 37);
-      REQUIRE(objectFunctionNameNode.objectNameLocation.GetStartPosition() ==
+      REQUIRE(identifierNode.location.GetStartPosition() == 0);
+      REQUIRE(identifierNode.location.GetEndPosition() == 37);
+      REQUIRE(identifierNode.identifierNameLocation.GetStartPosition() ==
               0);
-      REQUIRE(objectFunctionNameNode.objectNameLocation.GetEndPosition() == 14);
-      REQUIRE(objectFunctionNameNode.objectNameDotLocation.GetStartPosition() ==
+      REQUIRE(identifierNode.identifierNameLocation.GetEndPosition() == 14);
+      REQUIRE(identifierNode.identifierNameDotLocation.GetStartPosition() ==
               16);
-      REQUIRE(objectFunctionNameNode.objectNameDotLocation.GetEndPosition() ==
+      REQUIRE(identifierNode.identifierNameDotLocation.GetEndPosition() ==
               17);
-      REQUIRE(objectFunctionNameNode.behaviorFunctionNameLocation.IsValid() ==
-              false);
-      REQUIRE(objectFunctionNameNode.behaviorNameNamespaceSeparatorLocation
-                  .IsValid() == false);
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorNameLocation
+      REQUIRE(identifierNode.childIdentifierNameLocation
                   .GetStartPosition() == 19);
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorNameLocation
+      REQUIRE(identifierNode.childIdentifierNameLocation
                   .GetEndPosition() == 35);
     }
     SECTION("Object function locations (with whitespaces)") {
@@ -1794,28 +1782,24 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression(
           "WhateverObject  .  WhateverFunction  ");
       REQUIRE(node != nullptr);
-      auto &objectFunctionNameNode =
-          dynamic_cast<gd::ObjectFunctionNameNode &>(*node);
-      REQUIRE(objectFunctionNameNode.objectName == "WhateverObject");
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorName ==
+      auto &identifierNode =
+          dynamic_cast<gd::IdentifierNode &>(*node);
+      REQUIRE(identifierNode.identifierName == "WhateverObject");
+      REQUIRE(identifierNode.childIdentifierName ==
               "WhateverFunction");
 
-      REQUIRE(objectFunctionNameNode.location.GetStartPosition() == 0);
-      REQUIRE(objectFunctionNameNode.location.GetEndPosition() == 37);
-      REQUIRE(objectFunctionNameNode.objectNameLocation.GetStartPosition() ==
+      REQUIRE(identifierNode.location.GetStartPosition() == 0);
+      REQUIRE(identifierNode.location.GetEndPosition() == 37);
+      REQUIRE(identifierNode.identifierNameLocation.GetStartPosition() ==
               0);
-      REQUIRE(objectFunctionNameNode.objectNameLocation.GetEndPosition() == 14);
-      REQUIRE(objectFunctionNameNode.objectNameDotLocation.GetStartPosition() ==
+      REQUIRE(identifierNode.identifierNameLocation.GetEndPosition() == 14);
+      REQUIRE(identifierNode.identifierNameDotLocation.GetStartPosition() ==
               16);
-      REQUIRE(objectFunctionNameNode.objectNameDotLocation.GetEndPosition() ==
+      REQUIRE(identifierNode.identifierNameDotLocation.GetEndPosition() ==
               17);
-      REQUIRE(objectFunctionNameNode.behaviorFunctionNameLocation.IsValid() ==
-              false);
-      REQUIRE(objectFunctionNameNode.behaviorNameNamespaceSeparatorLocation
-                  .IsValid() == false);
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorNameLocation
+      REQUIRE(identifierNode.childIdentifierNameLocation
                   .GetStartPosition() == 19);
-      REQUIRE(objectFunctionNameNode.objectFunctionOrBehaviorNameLocation
+      REQUIRE(identifierNode.childIdentifierNameLocation
                   .GetEndPosition() == 35);
     }
     SECTION("Behavior function name locations") {

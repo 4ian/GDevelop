@@ -97,14 +97,14 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     VisitParent(node);
   }
+  void OnVisitEmptyNode(EmptyNode& node) override {
+    VisitParent(node);
+  }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
-    type = "string";
+    type = "number|string";
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    type = "unknown";
-  }
-  void OnVisitEmptyNode(EmptyNode& node) override {
     type = "unknown";
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {

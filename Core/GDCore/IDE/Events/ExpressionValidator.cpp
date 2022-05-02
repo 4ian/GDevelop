@@ -187,9 +187,12 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
 
   // TODO: reverse the order of diagnostic?
 
+  size_t writtenParametersFirstIndex =
+      ExpressionParser2::WrittenParametersFirstIndex(
+          function.objectName, function.behaviorName);
   for (int parameterIndex = 0; parameterIndex < function.parameters.size(); parameterIndex++) {
     auto& parameter = function.parameters[parameterIndex];
-    auto& parameterMetadata = metadata.GetParameters()[parameterIndex];
+    auto& parameterMetadata = metadata.GetParameters()[writtenParametersFirstIndex + parameterIndex];
 
     if (parameterMetadata.IsCodeOnly()) {
       // Do nothing, code only parameters are not written in expressions.

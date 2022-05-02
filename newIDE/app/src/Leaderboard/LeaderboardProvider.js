@@ -67,8 +67,11 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       }, {});
       const shouldDefineCurrentLeaderboardIfNoneSelected =
         !state.currentLeaderboard && leaderboards && leaderboards.length > 0;
+      const primaryLeaderboard = leaderboards.find(
+        leaderboard => leaderboard.primary
+      );
       const newCurrentLeaderboard = shouldDefineCurrentLeaderboardIfNoneSelected
-        ? leaderboards[0]
+        ? primaryLeaderboard || leaderboards[0]
         : state.currentLeaderboard;
       return {
         ...state,
@@ -122,13 +125,25 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         displayOnlyBestEntry: action.payload,
       };
     case 'UPDATE_OR_CREATE_LEADERBOARD':
+      const leaderboardsByIdsWithUpdatedPrimaryFlags = {};
+      if (state.leaderboardsByIds) {
+        Object.entries(state.leaderboardsByIds).forEach(
+          ([leaderboardId, leaderboard]) => {
+            leaderboardsByIdsWithUpdatedPrimaryFlags[leaderboardId] = {
+              ...leaderboard,
+              // $FlowFixMe: known error where Flow returns mixed for object value https://github.com/facebook/flow/issues/2221
+              primary: action.payload.primary ? undefined : leaderboard.primary,
+            };
+          }
+        );
+      }
+      leaderboardsByIdsWithUpdatedPrimaryFlags[action.payload.id] =
+        action.payload;
+
       return {
         ...state,
         displayOnlyBestEntry: shouldDisplayOnlyBestEntries(action.payload),
-        leaderboardsByIds: {
-          ...state.leaderboardsByIds,
-          [action.payload.id]: action.payload,
-        },
+        leaderboardsByIds: leaderboardsByIdsWithUpdatedPrimaryFlags,
         currentLeaderboardId: action.payload.id,
         currentLeaderboard: action.payload,
       };

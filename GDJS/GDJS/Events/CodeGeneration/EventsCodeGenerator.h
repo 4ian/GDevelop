@@ -77,10 +77,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param eventsFunction The events function to be compiled.
    * \param codeNamespace Where to store the context used by the function.
    * \param includeFiles Will be filled with the necessary include files.
-   * \param onceTriggersVariable The code to access the variable holding OnceTriggers.
-   * \param preludeCode The code to run just before the events generated code.
-   * \param compilationForRuntime Set this to true if the code is generated for
-   * runtime.
+   * \param onceTriggersVariable The code to access the variable holding
+   * OnceTriggers. \param preludeCode The code to run just before the events
+   * generated code. \param compilationForRuntime Set this to true if the code
+   * is generated for runtime.
    *
    * \return JavaScript code
    */
@@ -107,7 +107,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \return Code
    */
   virtual gd::String GenerateEventsListCode(
-      gd::EventsList& events, const gd::EventsCodeGenerationContext& context);
+      gd::EventsList& events, gd::EventsCodeGenerationContext& context);
 
   /**
    * Generate code for executing a condition list
@@ -229,7 +229,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::ObjectMetadata& objInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& asyncCallback = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -237,7 +238,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::BehaviorMetadata& autoInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& asyncCallback = "");
 
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);
@@ -279,7 +281,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateAllInstancesGetterCode(gd::String& objectName);
+  virtual gd::String GenerateAllInstancesGetterCode(
+      const gd::String& objectName, gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateProfilerSectionBegin(const gd::String& section);
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);
@@ -323,18 +326,18 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       bool isBehaviorEventsFunction);
 
   /**
-   * \brief Generate the "eventsFunctionContext" object that allow a free function
-   * to provides access objects, object creation and access to arguments from
-   * the rest of the events.
+   * \brief Generate the "eventsFunctionContext" object that allow a free
+   * function to provides access objects, object creation and access to
+   * arguments from the rest of the events.
    */
   gd::String GenerateFreeEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters,
       const gd::String& onceTriggersVariable);
 
   /**
-   * \brief Generate the "eventsFunctionContext" object that allow a behavior function
-   * to provides access objects, object creation and access to arguments from
-   * the rest of the events.
+   * \brief Generate the "eventsFunctionContext" object that allow a behavior
+   * function to provides access objects, object creation and access to
+   * arguments from the rest of the events.
    */
   gd::String GenerateBehaviorEventsFunctionContext(
       const gd::EventsBasedBehavior& eventsBasedBehavior,
@@ -360,7 +363,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   gd::String codeNamespace;  ///< Optional namespace for the generated code,
                              ///< used when generating events function.
-private:
+ private:
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a function
    * to provides access objects, object creation and access to arguments from

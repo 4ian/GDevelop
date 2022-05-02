@@ -166,16 +166,23 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
                   gd::String::From(maxParametersCount);
 
     if (function.parameters.size() < minParametersCount) {
-      // TODO what about this message?
-      // _("This parameter was not expected by this expression. Remove it "
-      // "or verify that you've entered the proper expression name."),
       RaiseError(
           "too_few_parameters",
-          "You have not entered enough parameters for the expression. " +
+          _("You have not entered enough parameters for the expression.") + " " +
               expectedCountMessage,
           function.location);
-      return returnType;
     }
+    else {
+      RaiseError(
+          "extra_parameter",
+          _("This parameter was not expected by this expression. Remove it "
+          "or verify that you've entered the proper expression name.") + " " +
+              expectedCountMessage,
+          ExpressionParserLocation(
+              function.parameters[maxParametersCount]->location.GetStartPosition(),
+              function.location.GetEndPosition() - 1));
+    }
+    return returnType;
   }
 
   // TODO: reverse the order of diagnostic?

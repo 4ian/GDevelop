@@ -686,7 +686,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& optionalAsyncCallbackName) {
   gd::String actionCode;
 
   // Prepare call
@@ -723,7 +723,7 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
            GenerateArgumentsList(arguments, 1) + ")";
   }
 
-  if (!asyncCallback.empty()) {
+  if (!optionalAsyncCallbackName.empty()) {
     actionCode += "{\nconst asyncTaskGroup = new gdjs.TaskGroup();\n";
     call = "asyncTaskGroup.addTask(" + call + ")";
   }
@@ -734,10 +734,10 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
   actionCode += "    " + call + ";\n";
   actionCode += "}\n";
 
-  if (!asyncCallback.empty()) {
+  if (!optionalAsyncCallbackName.empty()) {
     actionCode +=
         "runtimeScene.getAsyncTasksManager().addTask(asyncTaskGroup, " +
-        asyncCallback + ")\n}";
+        optionalAsyncCallbackName + ")\n}";
   }
 
   return actionCode;
@@ -750,7 +750,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& asyncCallback) {
+    const gd::String& optionalAsyncCallbackName) {
   gd::String actionCode;
 
   // Prepare call
@@ -798,7 +798,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
          << "\" requested for object \'" << objectName
          << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
   } else {
-    if (!asyncCallback.empty()) {
+    if (!optionalAsyncCallbackName.empty()) {
       actionCode += "{\n  const asyncTaskGroup = new gdjs.TaskGroup();\n";
       call = "asyncTaskGroup.addTask(" + call + ")";
     }
@@ -809,10 +809,10 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     actionCode += "    " + call + ";\n";
     actionCode += "}\n";
 
-    if (!asyncCallback.empty()) {
+    if (!optionalAsyncCallbackName.empty()) {
       actionCode +=
           "runtimeScene.getAsyncTasksManager().addTask(asyncTaskGroup, " +
-          asyncCallback + ");\n  };";
+          optionalAsyncCallbackName + ");\n  };";
     }
   }
 

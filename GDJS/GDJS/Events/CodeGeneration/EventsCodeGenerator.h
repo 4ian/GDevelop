@@ -230,7 +230,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -239,7 +239,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateGetBehaviorNameCode(
       const gd::String& behaviorName);

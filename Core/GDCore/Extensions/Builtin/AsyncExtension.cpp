@@ -21,9 +21,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAsyncExtension(
           "Open source (MIT License)")
       .SetCategory("Advanced");
 
-  extension.AddInstructionOrExpressionGroupMetadata(_("Event functions"))
-      .SetIcon("res/function32.png");
-
   extension.AddEvent("Async",
                      _("Async event"),
                      _("Internal event for asynchronous actions"),

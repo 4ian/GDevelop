@@ -77,8 +77,20 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     node.leftHandSide->Visit(*this);
     const Type leftType = childType;
 
-    if (leftType == Type::String) {
-      if (node.op != '+') {
+    if (leftType == Type::Number) {
+      if (node.op == ' ') {
+        RaiseError("syntax_error",
+            "No operator found. Did you forget to enter an operator (like +, -, "
+            "* or /) between numbers or expressions?", node.location);
+      }
+    }
+    else if (leftType == Type::String) {
+      if (node.op == ' ') {
+        RaiseError("syntax_error",
+            "You must add the operator + between texts or expressions. For "
+            "example: \"Your name: \" + VariableString(PlayerName).", node.location);
+      }
+      else if (node.op != '+') {
       RaiseOperatorError(
           _("You've used an operator that is not supported. Only + can be used "
             "to concatenate texts."),
@@ -193,6 +205,20 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
     ReportAnyError(node);
+    gd::String message;
+    if (parentType == Type::Number) {
+      message = _("You must enter a number or a valid expression call.");
+    } else if (parentType == Type::String) {
+      message = _(
+          "You must enter a text (between quotes) or a valid expression call.");
+    } else if (parentType == Type::Variable) {
+      message = _("You must enter a variable name.");
+    } else if (parentType == Type::Object) {
+      message = _("You must enter a valid object name.");
+    } else {
+      message = _("You must enter a valid expression.");
+    }
+    RaiseTypeError(message, node.location);
     childType = Type::Empty;
   }
 

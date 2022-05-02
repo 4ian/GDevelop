@@ -573,11 +573,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 2);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "More than one term was found. Verify that your expression is "
+          "properly written.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 4);
+      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 4);
     }
     {
       auto node = parser.ParseExpression("3..14");
@@ -585,11 +588,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 2);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "More than one term was found. Verify that your expression is "
+          "properly written.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
+      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 2);
     }
     {
       auto node = parser.ParseExpression(".");
@@ -612,10 +618,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 2);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 4);
+      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 4);
     }
     {
       auto node = parser.ParseExpression("1//2");
@@ -977,6 +983,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
+      //TODO fix: The list of parameters is not terminated.
       REQUIRE(validator.GetErrors().size() == 0);
     }
   }
@@ -1134,15 +1141,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "Cannot find an expression with this name: Idontexist\nDouble "
               "check that you've not made any typo in the name.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 14);
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
-              "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name.");
     }
     {
       auto node =
@@ -1154,7 +1158,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name.");
+              "or verify that you've entered the proper expression name. "
+              "The number of parameters must be exactly 0");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 23);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
     }
@@ -1194,7 +1199,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name.");
+              "or verify that you've entered the proper expression name. "
+              "The number of parameters must be exactly 0");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 31);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 33);
     }
@@ -1236,15 +1242,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "Cannot find an expression with this name: MyExtension::\nDouble "
               "check that you've not made any typo in the name.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 17);
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
-              "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name.");
     }
   }
 
@@ -1256,17 +1259,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors().size() == 1);
 
       // TODO: The error message could be improved
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "Cannot find an expression with this name: \nDouble "
               "check that you've not made any typo in the name.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
-              "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name.");
+      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);;
     }
   }
 

@@ -212,12 +212,15 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors().size() == 3);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "More than one term was found. Verify that your expression is "
+              "properly written.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 2);
+      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
               "A text must end with a double quote (\"). Add a double quote to "
               "terminate the text.");
     }
@@ -230,8 +233,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 3);
+
+      // TODO Find a way to remove these 2 extra errors.
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must add the operator + between texts or expressions. For "
+              "example: \"Your name: \" + VariableString(PlayerName).");
+      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+              "You must enter a text (between quotes) or a valid expression call.");
+
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
     }
@@ -241,8 +252,16 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 3);
+
+      // TODO Find a way to remove these 2 extra errors.
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must add the operator + between texts or expressions. For "
+              "example: \"Your name: \" + VariableString(PlayerName).");
+      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+              "You must enter a text (between quotes) or a valid expression call.");
+
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
     }
@@ -257,8 +276,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "The list of parameters is not terminated. Add a closing "
               "parenthesis to end the parameters.");
       REQUIRE(validator.GetErrors()[1]->GetMessage() ==
-              "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name.");
+              "Cannot find an expression with this name: Idontexist\n"
+              "Double check that you've not made any typo in the name.");
     }
     {
       auto node = parser.ParseExpression("=\"test\"");
@@ -523,12 +542,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You've used an operator that is not supported. Only + can be "
               "used to concatenate texts, and must be placed between two texts "
               "(or expressions).");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 1);
       REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "You've used an operator that is not supported. Only + can be "
               "used to concatenate texts, and must be placed between two texts "
               "(or expressions).");
-      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 1);
+      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 0);
     }
   }
 
@@ -617,11 +636,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors().size() == 3);
       REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
       REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 4);
+      // TODO Should error be removed?
+      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+              "You must enter a number.");
     }
     {
       auto node = parser.ParseExpression("1//2");
@@ -983,7 +1005,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      //TODO fix: The list of parameters is not terminated.
+      // TODO fix: The list of parameters is not terminated.
       REQUIRE(validator.GetErrors().size() == 0);
     }
   }
@@ -1404,8 +1426,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 2);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used with an object name. Remove "
+              "the operator.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "An object name was expected but something else was written. "
               "Enter just the name of the object for this parameter.");
     }

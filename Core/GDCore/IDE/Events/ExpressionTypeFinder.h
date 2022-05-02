@@ -83,10 +83,10 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     VisitParent(node);
   }
   void OnVisitNumberNode(NumberNode& node) override {
-    VisitParent(node);
+    type = "number";
   }
   void OnVisitTextNode(TextNode& node) override {
-    VisitParent(node);
+    type = "string";
   }
   void OnVisitVariableNode(VariableNode& node) override {
     VisitParent(node);
@@ -111,7 +111,12 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     if (child == nullptr) {
       const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
           platform, globalObjectsContainer, objectsContainer, node);
-      type = metadata.GetReturnType();
+      if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
+        VisitParent(node);
+      }
+      else {
+        type = metadata.GetReturnType();
+      }
     }
     else {
       const gd::ParameterMetadata* parameterMetadata = MetadataProvider::GetFunctionCallParameterMetadata(

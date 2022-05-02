@@ -125,13 +125,8 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
         displayOnlyBestEntry: action.payload,
       };
     case 'UPDATE_OR_CREATE_LEADERBOARD':
-      let leaderboardsByIdsWithUpdatedPrimaryFlags;
-      if (!state.leaderboardsByIds) {
-        leaderboardsByIdsWithUpdatedPrimaryFlags = {
-          [action.payload.id]: action.payload,
-        };
-      } else {
-        leaderboardsByIdsWithUpdatedPrimaryFlags = {};
+      const leaderboardsByIdsWithUpdatedPrimaryFlags = {};
+      if (state.leaderboardsByIds) {
         Object.entries(state.leaderboardsByIds).forEach(
           ([leaderboardId, leaderboard]) => {
             leaderboardsByIdsWithUpdatedPrimaryFlags[leaderboardId] = {
@@ -141,9 +136,9 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
             };
           }
         );
-        leaderboardsByIdsWithUpdatedPrimaryFlags[action.payload.id] =
-          action.payload;
       }
+      leaderboardsByIdsWithUpdatedPrimaryFlags[action.payload.id] =
+        action.payload;
 
       return {
         ...state,

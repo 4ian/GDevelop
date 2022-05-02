@@ -20,7 +20,7 @@ export const listAllTutorials = (): Promise<Array<Tutorial>> => {
 export const getObjectTutorialIds = (type: string): Array<string> => {
   switch (type) {
     case 'ParticleSystem::ParticleEmitter':
-      return ['in-depth-tutorial-particle-emitter', 'particle-effects'];
+      return ['in-depth-tutorial-particle-emitter'];
     case 'Lighting::LightObject':
       return ['flickering-dynamic-light-effect'];
     case 'BitmapText::BitmapTextObject':
@@ -41,7 +41,7 @@ export const getBehaviorTutorialIds = (type: string): Array<string> => {
       return ['in-depth-tutorial-physics-engine-two'];
     case 'PlatformBehavior::PlatformerObjectBehavior':
     case 'PlatformBehavior::PlatformBehavior':
-      return ['in-depth-tutorial-platformer', 'how-to-platformer-part-1'];
+      return ['in-depth-tutorial-platformer'];
     case 'TopDownMovementBehavior::TopDownMovementBehavior':
       return ['in-depth-tutorial-top-down-behavior'];
     default:
@@ -64,7 +64,7 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'EcrireFichierTxt':
     case 'LireFichierExp':
     case 'LireFichierTxt':
-      return ['intermediate-storage\n', 'advanced-saving-loading-storage'];
+      return ['intermediate-storage'];
     case 'PlatformBehavior::SimulateJumpKey':
       return ['simple-trampoline-platformer'];
     case 'AjoutObjConcern':

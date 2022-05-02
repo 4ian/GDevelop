@@ -141,13 +141,24 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  _("Change time scale"),
                  _("Change the time scale of the scene."),
                  _("Set the time scale of the scene to _PARAM1_"),
-
                  "",
                  "res/actions/time24.png",
                  "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression",
                     _("Scale (1: Default, 2: 2x faster, 0.5: 2x slower...)"));
+
+  extension
+      .AddAction("Wait",
+                 _("Wait X seconds (experimental)"),
+                 _("Waits a number of seconds before running "
+                   "the next actions (and sub-events)."),
+                 _("Wait _PARAM0_ seconds"),
+                 "",
+                 "res/timer.svg",
+                 "res/timer.svg")
+      .AddParameter("expression", "Time to wait in seconds")
+      .SetAsync();
 
   extension
       .AddExpression("TimeDelta",

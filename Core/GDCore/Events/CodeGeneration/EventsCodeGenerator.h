@@ -77,7 +77,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \return Code
    */
   virtual gd::String GenerateEventsListCode(
-      gd::EventsList& events, const EventsCodeGenerationContext& context);
+      gd::EventsList& events, EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for executing a condition list
@@ -155,7 +155,51 @@ class GD_CORE_API EventsCodeGenerator {
    * \return Code
    */
   gd::String GenerateActionCode(gd::Instruction& action,
-                                EventsCodeGenerationContext& context);
+                                EventsCodeGenerationContext& context,
+                                const gd::String& optionalAsyncCallbackName = "");
+
+  struct CallbackDescriptor {
+    CallbackDescriptor(const gd::String functionName_,
+                       const gd::String argumentsList_,
+                       const std::set<gd::String> requiredObjects_)
+        : functionName(functionName_),
+          argumentsList(argumentsList_),
+          requiredObjects(requiredObjects_){};
+    /**
+     * The name by which the function can be invoked.
+     */
+    const gd::String functionName;
+    /**
+     * The comma separated list of arguments that the function takes.
+     */
+    const gd::String argumentsList;
+    /**
+     * A set of all objects that need to be backed up to be passed to the callback code.
+     */
+    const std::set<gd::String> requiredObjects;
+  };
+
+  /**
+   * \brief Generates actions and events as a callback.
+   *
+   * This is used by asynchronous functions to run the code out of the normal
+   * events flow.
+   *
+   * \returns A set with all objects required by the callback code.
+   * The caller must take care of backing them up in a LongLivedObjectsList,
+   * and to pass it to the callback function as the last argument.
+   */
+  virtual const CallbackDescriptor GenerateCallback(
+      const gd::String& callbackFunctionName,
+      gd::EventsCodeGenerationContext& parentContext,
+      gd::InstructionsList& actions,
+      gd::EventsList* subEvents = nullptr);
+
+  /**
+   * \brief Generates the parameters list of an event's generated function.
+   */
+  const gd::String GenerateEventsParameters(
+      const gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for declaring objects lists.
@@ -658,14 +702,16 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateFreeAction(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -673,7 +719,8 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::BehaviorMetadata& autoInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& optionalAsyncCallbackName = "");
 
   gd::String GenerateRelationalOperatorCall(
       const gd::InstructionMetadata& instrInfos,

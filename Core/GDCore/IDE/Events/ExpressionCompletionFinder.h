@@ -432,6 +432,14 @@ class GD_CORE_API ExpressionCompletionFinder
           node.identifierName,
           node.location.GetStartPosition(),
           node.location.GetEndPosition()));
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      completions.push_back(ExpressionCompletionDescription::ForVariable(
+          type,
+          node.identifierName,
+          node.location.GetStartPosition(),
+          node.location.GetEndPosition(),
+          // TODO Find a way to get the objectName of the variable if any.
+          ""));
     } else {
       // Show completions for expressions and objects otherwise.
       completions.push_back(ExpressionCompletionDescription::ForObject(

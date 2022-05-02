@@ -5,7 +5,8 @@
  */
 namespace gdjs {
   /**
-   * A manager for all asynchronous tasks.
+   * This stores all asynchronous tasks waiting to be completed,
+   * for a given scene.
    * @see {@link RuntimeScene.getAsyncTasksManager}.
    */
   export class AsyncTasksManager {
@@ -101,9 +102,9 @@ namespace gdjs {
       this.promise = promise
         .catch((error) => {
           logger.error(
-            `A promise error has not been handled, this should never happen! 
-If you are using JavaScript promises in an asynchronous action, make sure to add a .catch(). 
-Otherwise, report this as a bug on the GDevelop forums! 
+            `A promise error has not been handled, this should never happen!
+If you are using JavaScript promises in an asynchronous action, make sure to add a .catch().
+Otherwise, report this as a bug on the GDevelop forums!
 ${error ? 'The following error was thrown: ' + error : ''}`
           );
         })

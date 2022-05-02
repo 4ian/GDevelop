@@ -60,18 +60,21 @@ void EventsCodeGenerationContext::Reuse(
     contextDepth = parent_.GetContextDepth();  // Keep same context depth
 }
 
+void EventsCodeGenerationContext::NotifyAsyncParentsAboutDeclaredObject(const gd::String& objectName) {
+  gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
+  for (;
+        asyncContext != nullptr;
+        asyncContext = asyncContext->parent->nearestAsyncParent)
+    asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
+}
+
 void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
   if (!IsToBeDeclared(objectName)) {
     objectsListsToBeDeclared.insert(objectName);
 
-    // TODO: factor
     if (IsInsideAsync()) {
-      gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
-      for (;
-           asyncContext != nullptr;
-           asyncContext = asyncContext->parent->nearestAsyncParent)
-        asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
+      NotifyAsyncParentsAboutDeclaredObject(objectName);
     }
   }
 
@@ -83,13 +86,8 @@ void EventsCodeGenerationContext::ObjectsListNeededOrEmptyIfJustDeclared(
   if (!IsToBeDeclared(objectName)) {
     objectsListsOrEmptyToBeDeclared.insert(objectName);
 
-    // TODO: factor and verify if we need to do that in all cases.
     if (IsInsideAsync()) {
-      gd::EventsCodeGenerationContext* asyncContext = IsAsyncCallback() ? this : nearestAsyncParent;
-      for (;
-           asyncContext != nullptr;
-           asyncContext = asyncContext->parent->nearestAsyncParent)
-        asyncContext->allObjectsListToBeDeclaredAcrossChildren.insert(objectName);
+      NotifyAsyncParentsAboutDeclaredObject(objectName);
     }
   }
 

@@ -596,6 +596,16 @@ namespace gdjs {
     private callbacks = new Map<RuntimeObject, () => void>();
     private parent: LongLivedObjectsList | null = null;
 
+    /**
+     * Create a new container for objects lists, inheriting from another one. This is
+     * useful should we get the objects that have not been saved in this context (using
+     * `addObject`) but saved in a parent context.
+     * This avoids to save all object lists every time we create a new `LongLivedObjectsList`,
+     * despite not all objects lists being used.
+     *
+     * @param parent
+     * @returns
+     */
     static from(parent: LongLivedObjectsList): LongLivedObjectsList {
       const newList = new LongLivedObjectsList();
       newList.parent = parent;

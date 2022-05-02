@@ -156,7 +156,7 @@ class GD_CORE_API EventsCodeGenerator {
    */
   gd::String GenerateActionCode(gd::Instruction& action,
                                 EventsCodeGenerationContext& context,
-                                const gd::String& asyncCallback = "");
+                                const gd::String& optionalAsyncCallbackName = "");
 
   struct CallbackDescriptor {
     CallbackDescriptor(const gd::String functionName_,
@@ -703,7 +703,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
@@ -711,7 +711,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -720,7 +720,7 @@ class GD_CORE_API EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& asyncCallback = "");
+      const gd::String& optionalAsyncCallbackName = "");
 
   gd::String GenerateRelationalOperatorCall(
       const gd::InstructionMetadata& instrInfos,

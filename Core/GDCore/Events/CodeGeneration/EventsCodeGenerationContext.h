@@ -146,7 +146,7 @@ class GD_CORE_API EventsCodeGenerationContext {
 
   /**
    * Return all the objects lists which will be declared by the current context
-   * (normal, without picking or empty).
+   * (normal, potentially empty or empty).
    */
   std::set<gd::String> GetAllObjectsToBeDeclared() const;
 
@@ -269,6 +269,8 @@ class GD_CORE_API EventsCodeGenerationContext {
   };
 
  private:
+  void NotifyAsyncParentsAboutDeclaredObject(const gd::String& objectName);
+
   std::set<gd::String>
       alreadyDeclaredObjectsLists;  ///< Objects lists already needed in a
                                     ///< parent context.

@@ -18,7 +18,9 @@ class Project;
 namespace gd {
 
 /**
- * \brief Internal event for asynchronous actions
+ * \brief Internal event for asynchronous actions.
+ * This event gets added internally to the events tree when an
+ * asynchronous action is used.
  */
 class GD_CORE_API AsyncEvent : public gd::BaseEvent {
 public:

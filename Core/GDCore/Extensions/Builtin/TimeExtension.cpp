@@ -150,7 +150,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("Wait",
-                 _("Wait X seconds"),
+                 _("Wait X seconds (experimental)"),
                  _("Waits a number of seconds before running "
                    "the next actions (and sub-events)."),
                  _("Wait _PARAM0_ seconds"),

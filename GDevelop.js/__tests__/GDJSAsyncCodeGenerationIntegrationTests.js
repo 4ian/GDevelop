@@ -2425,6 +2425,179 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
     });
   });
 
+  describe('With objects, and advanced conditions', () => {
+    test('with "Or" conditions', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [
+              {
+                type: {
+                  value: 'BuiltinCommonInstructions::Or',
+                },
+                parameters: [],
+                subInstructions: [
+                  {
+                    type: { value: 'VarObjet' },
+                    parameters: ['MyParamObject', 'PleaseCountMe', '=', '1'],
+                  },
+                  {
+                    type: { value: 'VarObjet' },
+                    parameters: ['MyParamObject', 'PleaseCountMeToo', '=', '1'],
+                  },
+                ],
+              },
+            ],
+            actions: [
+              {
+                type: {
+                  value:
+                    'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction',
+                },
+                parameters: ['MyParamObject'],
+              },
+              {
+                type: { value: 'ModVarObjet' },
+                parameters: [
+                  'MyParamObject',
+                  'TestVariable',
+                  '+',
+                  'GetArgumentAsNumber("IncreaseValue")',
+                ],
+              },
+            ],
+            events: [
+              {
+                type: 'BuiltinCommonInstructions::Standard',
+                conditions: [
+                  {
+                    type: {
+                      value: 'BuiltinCommonInstructions::Or',
+                    },
+                    parameters: [],
+                    subInstructions: [
+                      {
+                        type: { value: 'VarObjet' },
+                        parameters: [
+                          'MyParamObject',
+                          'PleaseCountMeASecondTime',
+                          '=',
+                          '1',
+                        ],
+                      },
+                      {
+                        type: { value: 'VarObjet' },
+                        parameters: [
+                          'MyParamObject',
+                          'PleaseCountMeASecondTimeToo',
+                          '=',
+                          '1',
+                        ],
+                      },
+                    ],
+                  },
+                ],
+                actions: [
+                  {
+                    type: { value: 'ModVarObjet' },
+                    parameters: [
+                      'MyParamObject',
+                      'TestVariable',
+                      '+',
+                      'GetArgumentAsNumber("IncreaseValue")',
+                    ],
+                  },
+                ],
+                events: [],
+              },
+            ],
+          },
+        ])
+      );
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const parameter = new gd.ParameterMetadata();
+      parameter.setType('number');
+      parameter.setName('IncreaseValue');
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.setType('object');
+      parameter.setName('MyParamObject');
+      parameter.setExtraInfo(
+        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+      );
+      eventsFunction.getParameters().push_back(parameter);
+      parameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      eventsFunction.delete();
+      project.delete();
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      const myObjectA3 = runtimeScene.createObject('MyObjectA');
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      const myObjectB2 = runtimeScene.createObject('MyObjectB');
+      const myObjectB3 = runtimeScene.createObject('MyObjectB');
+      const myObjectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+        MyObjectB: [myObjectB1, myObjectB2, myObjectB3],
+      });
+      myObjectA1.getVariables().get('PleaseCountMe').setNumber(1);
+      myObjectA1.getVariables().get('PleaseCountMeASecondTime').setNumber(1);
+      myObjectA2.getVariables().get('PleaseCountMeToo').setNumber(1);
+      myObjectB1.getVariables().get('PleaseCountMe').setNumber(1);
+      myObjectB1.getVariables().get('PleaseCountMeASecondTimeToo').setNumber(1);
+      myObjectB2.getVariables().get('PleaseCountMeToo').setNumber(1);
+
+      runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+
+      // Mark tasks as done.
+      myObjectA1.markFakeAsyncActionAsFinished();
+      myObjectA2.markFakeAsyncActionAsFinished();
+      myObjectA3.markFakeAsyncActionAsFinished();
+      myObjectB1.markFakeAsyncActionAsFinished();
+      myObjectB2.markFakeAsyncActionAsFinished();
+      myObjectB3.markFakeAsyncActionAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+
+      // Check that only objects passing the "Or" sub-conditions have been
+      // updated.
+      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 // Pass both "Or" conditions.
+      );
+      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 // Pass the first "Or" conditions.
+      );
+      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0 // Pass no conditions.
+      );
+      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 + 5 // Pass both "Or" conditions.
+      );
+      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
+        5 // Pass the first "Or" conditions.
+      );
+      expect(myObjectB3.getVariables().get('TestVariable').getAsNumber()).toBe(
+        0 // Pass no conditions.
+      );
+    });
+  });
+
   describe('With non standard events', () => {
     test('a While event', function () {
       const eventsSerializerElement = gd.Serializer.fromJSObject([

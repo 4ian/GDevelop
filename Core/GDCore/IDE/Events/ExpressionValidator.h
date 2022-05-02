@@ -81,20 +81,20 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       if (node.op == ' ') {
         RaiseError("syntax_error",
             "No operator found. Did you forget to enter an operator (like +, -, "
-            "* or /) between numbers or expressions?", node.location);
+            "* or /) between numbers or expressions?", node.rightHandSide->location);
       }
     }
     else if (leftType == Type::String) {
       if (node.op == ' ') {
         RaiseError("syntax_error",
             "You must add the operator + between texts or expressions. For "
-            "example: \"Your name: \" + VariableString(PlayerName).", node.location);
+            "example: \"Your name: \" + VariableString(PlayerName).", node.rightHandSide->location);
       }
       else if (node.op != '+') {
       RaiseOperatorError(
           _("You've used an operator that is not supported. Only + can be used "
             "to concatenate texts."),
-            node.rightHandSide->location);
+            ExpressionParserLocation(node.leftHandSide->location.GetEndPosition() + 1, node.location.GetEndPosition()));
       }
     } else if (leftType == Type::Object) {
       RaiseOperatorError(
@@ -125,24 +125,24 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           _("You've used an \"unary\" operator that is not supported. Operator "
             "should be "
             "either + or -."),
-          node.factor->location);
+          node.location);
       }
     } else if (rightType == Type::String) {
       RaiseTypeError(
           _("You've used an operator that is not supported. Only + can be used "
             "to concatenate texts, and must be placed between two texts (or "
             "expressions)."),
-          node.factor->location);
+          node.location);
     } else if (rightType == Type::Object) {
       RaiseTypeError(
           _("Operators (+, -) can't be used with an object name. Remove the "
             "operator."),
-          node.factor->location);
+          node.location);
     } else if (rightType == Type::Variable) {
       RaiseTypeError(
           _("Operators (+, -) can't be used in variable names. Remove "
             "the operator from the variable name."),
-          node.factor->location);
+          node.location);
     }
   }
   void OnVisitNumberNode(NumberNode& node) override {
@@ -171,7 +171,12 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
     node.expression->Visit(*this);
-    if (node.child) node.child->Visit(*this);
+    if (node.child) {
+      Type currentParentType = Type::NumberOrString;
+      parentType = Type::NumberOrString;
+      node.child->Visit(*this);
+      parentType = currentParentType;
+    }
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     ReportAnyError(node);

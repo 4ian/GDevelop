@@ -32,6 +32,8 @@ import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
+import { Column, Line } from '../../UI/Grid';
 const gd: libGDevelop = global.gd;
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
@@ -389,7 +391,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
                 title={<Trans>Add your first event</Trans>}
                 description={<Trans>Events define the rules of a game.</Trans>}
                 actionLabel={<Trans>Add an event</Trans>}
-                helpPagePath="/events"
+                tutorialId="intro-event-system"
                 onAdd={() =>
                   this.props.onAddNewEvent(
                     'BuiltinCommonInstructions::Standard',
@@ -403,6 +405,29 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
             disabled: false,
             depth: 0,
             fixedHeight: 300,
+            children: [],
+          }
+        : null,
+      depth === 0 && eventsList.getEventsCount() !== 0
+        ? {
+            title: () => (
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                <div style={{ maxWidth: 800 }}>
+                  <DismissableTutorialMessage tutorialId="intro-event-system" />
+                </div>
+              </div>
+            ),
+            event: null,
+            indexInList: eventsList.getEventsCount() + 1,
+            disabled: false,
+            depth: 0,
+            fixedHeight: 75,
             children: [],
           }
         : null,
@@ -591,6 +616,9 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
         }}
       >
+        {/* {treeData && treeData[0].event && (
+          <DismissableTutorialMessage tutorialId="intro-event-system" />
+        )} */}
         <SortableTree
           treeData={treeData}
           scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}

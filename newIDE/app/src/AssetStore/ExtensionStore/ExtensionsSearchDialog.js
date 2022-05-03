@@ -17,6 +17,7 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 type Props = {|
   project: gdProject,

@@ -13,6 +13,7 @@ import {
   sendExtensionDetailsOpened,
   sendExtensionAddedToProject,
 } from '../../Utils/Analytics/EventSender';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 const styles = {
   searchBar: {
@@ -90,6 +91,7 @@ export const ExtensionStore = ({
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <Column expand noMargin useFullHeight>
+            <DismissableTutorialMessage tutorialId="intro-behaviors-and-functions" />
             <SearchBar
               value={searchText}
               onChange={setSearchText}

@@ -9,12 +9,14 @@ import RaisedButton from '../UI/RaisedButton';
 import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
+import TutorialButton from './TutorialButton';
 
 type Props = {|
   title: React.Node,
   description: React.Node,
   actionLabel: React.Node,
   helpPagePath?: string,
+  tutorialId?: string,
   actionButtonId?: string,
   onAdd: () => void,
   isLoading?: boolean,
@@ -49,10 +51,17 @@ export const EmptyPlaceholder = (props: Props) => (
             icon={props.isLoading ? <CircularProgress size={24} /> : <Add />}
             id={props.actionButtonId}
           />
-          <HelpButton
-            label={<Trans>Read the doc</Trans>}
-            helpPagePath={props.helpPagePath}
-          />
+          {(
+            <TutorialButton
+              tutorialId={props.tutorialId}
+              label="Watch tutorial"
+            />
+          ) || (
+            <HelpButton
+              label={<Trans>Read the doc</Trans>}
+              helpPagePath={props.helpPagePath}
+            />
+          )}
         </ColumnStackLayout>
       </Column>
     </Container>

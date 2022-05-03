@@ -33,6 +33,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
+import DismissableTutorialMessage from '../Hints/DismissableTutorialMessage';
 
 const ObjectListItem = ({
   objectMetadata,
@@ -230,6 +231,7 @@ export default function NewObjectDialog({
         )}
         {currentTab === 'new-object' && (
           <ScrollView>
+            <DismissableTutorialMessage tutorialId="intro-object-types" />
             <List>
               {Object.keys(objectsByCategory).map(category => {
                 const categoryObjectMetadata = objectsByCategory[category];

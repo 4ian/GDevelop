@@ -61,6 +61,9 @@ import {
   EventFunctionExtensionItem,
 } from './ProjectManagerItems';
 import { Tooltip } from '@material-ui/core';
+import TutorialButton from '../UI/TutorialButton';
+import { Line } from '../UI/Grid';
+import HelpButton from '../UI/HelpButton';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -869,6 +872,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                         }
                       />
                     )
+                    .concat(
+                      <Line justifyContent="center" key="external-event-help">
+                        <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                        <TutorialButton tutorialId="Intermediate-externals" />
+                      </Line>
+                    )
                 }
               />
               <ProjectStructureItem
@@ -944,6 +953,15 @@ export default class ProjectManager extends React.Component<Props, State> {
                           )
                         }
                       />
+                    )
+                    .concat(
+                      <Line
+                        justifyContent="flex-start"
+                        key="external-layout-help"
+                      >
+                        <HelpButton helpPagePath="/interface/scene-editor/external-layouts#external_layouts" />
+                        <TutorialButton tutorialId="Intermediate-externals" />
+                      </Line>
                     )
                 }
               />

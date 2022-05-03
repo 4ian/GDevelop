@@ -40,6 +40,7 @@ import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
+import DismissableTutorialMessage from '../../../Hints/DismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -316,12 +317,13 @@ class AnimationsListContainer extends React.Component<
               title={<Trans>Add your first animation</Trans>}
               description={<Trans>Animations are a sequence of images.</Trans>}
               actionLabel={<Trans>Add an animation</Trans>}
-              helpPagePath="/objects/sprite"
+              tutorialId="intermediate-changing-animations"
               onAdd={this.addAnimation}
             />
           </Column>
         ) : (
           <React.Fragment>
+            <DismissableTutorialMessage tutorialId="intermediate-changing-animations" />
             <SortableAnimationsList
               spriteObject={this.props.spriteObject}
               objectName={this.props.objectName}

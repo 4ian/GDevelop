@@ -13,6 +13,7 @@ import Poki from '../../UI/CustomSvgIcons/Poki';
 import CrazyGames from '../../UI/CustomSvgIcons/CrazyGames';
 import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 const getIconStyle = windowWidth => ({
   height: windowWidth === 'small' ? 30 : 48,
@@ -25,6 +26,7 @@ export const ExplanationHeader = () => {
   const iconStyle = getIconStyle(windowWidth);
   return (
     <Column noMargin>
+      <DismissableTutorialMessage tutorialId="export-to-itch" />
       <Line>
         <Text>
           <Trans>

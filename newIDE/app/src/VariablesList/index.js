@@ -453,6 +453,7 @@ export default class VariablesList extends React.Component<Props, State> {
               description={this.props.emptyPlaceholderDescription}
               actionLabel="Add a variable"
               helpPagePath={this.props.helpPagePath}
+              tutorialId="intermediate-advanced-variables"
               onAdd={this.addVariable}
             />
           </Column>

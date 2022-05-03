@@ -298,6 +298,7 @@ struct GD_CORE_API VariableBracketAccessorNode
   std::unique_ptr<ExpressionNode> expression;
 };
 
+// TODO It is only "MyObject.Physics::LinearVelocity" now. Other cases are IdentifierNode.
 /**
  * \brief The name of a function to call on an object or the behavior
  * For example: "MyObject.Function" or "MyObject.Physics" or

@@ -140,7 +140,23 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   if (gd::ParameterMetadata::IsObject(type)) {
     output +=
         codeGenerator.GenerateObject(node.identifierName, type, context);
+  } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      EventsCodeGenerator::VariableScope scope =
+          type == "globalvar"
+              ? gd::EventsCodeGenerator::PROJECT_VARIABLE
+              : ((type == "scenevar")
+                    ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
+                    : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+
+      // TODO find a way to get the node.objectName
+      auto objectName = "";
+      output += codeGenerator.GenerateGetVariable(
+          node.identifierName, scope, context, objectName);
+      if (!node.childIdentifierName.empty()) {
+        // TODO handle child variable.
+      }
   } else {
+    // TODO Some case that were ObjectFunctionNameNode (without ::) will end up here.
     output += "/* Error during generation, unrecognized identifier type: " +
               codeGenerator.ConvertToString(type) + " with value " +
               codeGenerator.ConvertToString(node.identifierName) + " */ " +

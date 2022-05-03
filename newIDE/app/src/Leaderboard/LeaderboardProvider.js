@@ -17,7 +17,7 @@ import {
   extractExtremeScoreDisplayData,
   extractEntryDisplayData,
   listLeaderboardEntries,
-  listGameLeaderboards,
+  listGameActiveLeaderboards,
 } from '../Utils/GDevelopServices/Play';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
@@ -207,7 +207,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
         isListingLeaderboards.current = true;
         try {
           dispatch({ type: 'SET_LEADERBOARDS', payload: null });
-          const fetchedLeaderboards = await listGameLeaderboards(
+          const fetchedLeaderboards = await listGameActiveLeaderboards(
             authenticatedUser,
             gameId
           );

@@ -115,7 +115,7 @@ export const extractExtremeScoreDisplayData = ({
 
 export const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
-export const listGameLeaderboards = async (
+export const listGameActiveLeaderboards = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string
 ): Promise<?Array<Leaderboard>> => {

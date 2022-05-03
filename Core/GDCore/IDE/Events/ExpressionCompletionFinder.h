@@ -433,6 +433,7 @@ class GD_CORE_API ExpressionCompletionFinder
           node.location.GetStartPosition(),
           node.location.GetEndPosition()));
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // TODO handle variable child
       completions.push_back(ExpressionCompletionDescription::ForVariable(
           type,
           node.identifierName,
@@ -440,18 +441,35 @@ class GD_CORE_API ExpressionCompletionFinder
           node.location.GetEndPosition(),
           // TODO Find a way to get the objectName of the variable if any.
           ""));
-    } else {
-      // Show completions for expressions and objects otherwise.
-      completions.push_back(ExpressionCompletionDescription::ForObject(
-          type,
-          node.identifierName,
-          node.location.GetStartPosition(),
-          node.location.GetEndPosition()));
-      completions.push_back(ExpressionCompletionDescription::ForExpression(
-          type,
-          node.identifierName,
-          node.location.GetStartPosition(),
-          node.location.GetEndPosition()));
+    } else { // TODO check if the type is unknown because unknown could be a variable
+      // Object function or behavior name
+      if (IsCaretOn(node.identifierNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForObject(
+            type,
+            node.identifierName,
+            node.identifierNameLocation.GetStartPosition(),
+            node.identifierNameLocation.GetEndPosition()));
+        if (!node.identifierNameDotLocation.IsValid()) {
+          completions.push_back(ExpressionCompletionDescription::ForExpression(
+              type,
+              node.identifierName,
+              node.identifierNameLocation.GetStartPosition(),
+              node.identifierNameLocation.GetEndPosition()));
+        }
+      } else if (IsCaretOn(node.identifierNameDotLocation) ||
+                 IsCaretOn(node.childIdentifierNameLocation)) {
+        completions.push_back(ExpressionCompletionDescription::ForBehavior(
+            node.childIdentifierName,
+            node.childIdentifierNameLocation.GetStartPosition(),
+            node.childIdentifierNameLocation.GetEndPosition(),
+            node.identifierName));
+        completions.push_back(ExpressionCompletionDescription::ForExpression(
+            type,
+            node.childIdentifierName,
+            node.childIdentifierNameLocation.GetStartPosition(),
+            node.childIdentifierNameLocation.GetEndPosition(),
+            node.identifierName));
+      }
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {

@@ -180,37 +180,46 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
                   ],
                 },
               ],
-              events: [{
-                type: 'BuiltinCommonInstructions::Standard',
-                conditions: [],
-                actions: [],
-                events: [{
+              events: [
+                {
                   type: 'BuiltinCommonInstructions::Standard',
                   conditions: [],
-                  // Verify the picked instances count works when deeply nested in sub events.
-                  actions: [{
-                    type: { value: 'ModVarScene' },
-                    parameters: [
-                      'Result3',
-                      '=',
-                      'PickedInstancesCount(MyParamObject)',
-                    ],
-                  }]
-                }]
-              }]
-            }, {
+                  actions: [],
+                  events: [
+                    {
+                      type: 'BuiltinCommonInstructions::Standard',
+                      conditions: [],
+                      // Verify the picked instances count works when deeply nested in sub events.
+                      actions: [
+                        {
+                          type: { value: 'ModVarScene' },
+                          parameters: [
+                            'Result3',
+                            '=',
+                            'PickedInstancesCount(MyParamObject)',
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
               type: 'BuiltinCommonInstructions::Standard',
               conditions: [],
               // Verify the picked instances count is back to 0.
-              actions: [{
-                type: { value: 'ModVarScene' },
-                parameters: [
-                  'Result4',
-                  '=',
-                  'PickedInstancesCount(MyParamObject)',
-                ],
-              }]
-            }
+              actions: [
+                {
+                  type: { value: 'ModVarScene' },
+                  parameters: [
+                    'Result4',
+                    '=',
+                    'PickedInstancesCount(MyParamObject)',
+                  ],
+                },
+              ],
+            },
           ],
         },
       ]);
@@ -551,6 +560,112 @@ describe('libGD.js - GDJS Object Code Generation integration tests', function ()
       ).toBe(1);
       expect(myObjectB1.getVariables().get('Picked').getAsNumber()).toBe(0);
       expect(myObjectB2.getVariables().get('Picked').getAsNumber()).toBe(1);
+
+      eventsFunction.delete();
+      project.delete();
+    });
+  });
+
+  describe('"Or" condition with objects', () => {
+    test('Nested "Or"', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSObject([
+        {
+          type: 'BuiltinCommonInstructions::Standard',
+          conditions: [
+            {
+              type: {
+                value: 'BuiltinCommonInstructions::Or',
+              },
+              parameters: [],
+              subInstructions: [
+                {
+                  type: { value: 'VarObjet' },
+                  parameters: ['MyParamObject', 'PleaseCountMe', '=', '1'],
+                },
+                {
+                  type: {
+                    value: 'BuiltinCommonInstructions::Or',
+                  },
+                  parameters: [],
+                  subInstructions: [
+                    {
+                      type: { value: 'VarObjet' },
+                      parameters: [
+                        'MyParamObject',
+                        'PleaseCountMeToo',
+                        '=',
+                        '1',
+                      ],
+                    },
+                    ,
+                  ],
+                },
+                {
+                  type: { value: 'VarObjet' },
+                  parameters: [
+                    'MyParamObject',
+                    'VariableThatDoesNotExist',
+                    '=',
+                    '1',
+                  ],
+                },
+              ],
+            },
+          ],
+          actions: [
+            {
+              type: { value: 'ModVarObjet' },
+              parameters: ['MyParamObject', 'Picked', '=', '1'],
+            },
+          ],
+          events: [],
+        },
+      ]);
+
+      const project = new gd.ProjectHelper.createNewGDJSProject();
+      const eventsFunction = new gd.EventsFunction();
+      eventsFunction
+        .getEvents()
+        .unserializeFrom(project, eventsSerializerElement);
+
+      const objectParameter = new gd.ParameterMetadata();
+      objectParameter.setType('object');
+      objectParameter.setName('MyParamObject');
+      eventsFunction.getParameters().push_back(objectParameter);
+      objectParameter.delete();
+
+      const runCompiledEvents = generateCompiledEventsForEventsFunction(
+        gd,
+        project,
+        eventsFunction
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      runtimeScene.getOnceTriggers().startNewFrame();
+
+      const myObjectA1 = runtimeScene.createObject('MyObjectA');
+      const myObjectA2 = runtimeScene.createObject('MyObjectA');
+      const myObjectB1 = runtimeScene.createObject('MyObjectB');
+      const myObjectB2 = runtimeScene.createObject('MyObjectB');
+      const myObjectB3 = runtimeScene.createObject('MyObjectB');
+      const objectsLists = gdjs.Hashtable.newFrom({
+        MyObjectA: [myObjectA1],
+        MyObjectB: [myObjectB1, myObjectB3],
+        MyObjectC: [],
+      });
+
+      myObjectA1.getVariables().get('PleaseCountMe').setNumber(1);
+      myObjectB1.getVariables().get('PleaseCountMe').setNumber(1);
+      myObjectB3.getVariables().get('PleaseCountMeToo').setNumber(1);
+
+      runCompiledEvents(gdjs, runtimeScene, [objectsLists]);
+
+      // Check that the picked instances were properly counted.
+      expect(myObjectA1.getVariables().get('Picked').getAsNumber()).toBe(1);
+      expect(myObjectA2.getVariables().get('Picked').getAsNumber()).toBe(0);
+      expect(myObjectB1.getVariables().get('Picked').getAsNumber()).toBe(1);
+      expect(myObjectB2.getVariables().get('Picked').getAsNumber()).toBe(0);
+      expect(myObjectB3.getVariables().get('Picked').getAsNumber()).toBe(1);
 
       eventsFunction.delete();
       project.delete();

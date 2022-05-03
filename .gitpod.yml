@@ -1,0 +1,25 @@
+# This is a configuration file allowing to quickly set up a development environment
+# on GitPod (https://www.gitpod.io/).
+# Also check GitHub codespaces if you're interested in working 
+# on a remote development server.
+
+# This works well for:
+# - The editor web-app, including the C++ classes.
+# This is not yet adapted for:
+# - Working on the game engine or extensions, as they can't be easily tested on the web-app.
+# - Working on the desktop app (Electron).
+
+tasks:
+  - name: Install dependencies for Emscripten and build GDevelop.js
+    init: |
+          sudo apt-get update 
+          sudo apt install cmake python-is-python3 python3-distutils -y
+          git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+          cd GDevelop.js
+          npm install
+          source ../emsdk/emsdk_env.sh && npm run build -- --dev
+          cd ..
+  - name: Install GDevelop IDE dependencies
+    init: cd newIDE/app && npm install && cd ../electron-app && npm install
+
+

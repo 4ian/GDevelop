@@ -16,7 +16,7 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   i18n,
   settings,
 }) => {
-  sendNewGameCreated('');
+  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
 
   const { projectName } = settings;
 
@@ -38,7 +38,10 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
     const { projectName } = settings;
 
     const example = await getExample(exampleShortHeader);
-    sendNewGameCreated(example.projectFileUrl);
+    sendNewGameCreated({
+      exampleUrl: example.projectFileUrl,
+      exampleSlug: exampleShortHeader.slug,
+    });
     return {
       storageProvider: UrlStorageProvider,
       projectName,

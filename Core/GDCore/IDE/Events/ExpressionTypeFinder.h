@@ -40,7 +40,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
    * \brief Helper function to check if a given node does not contain
    * any error.
    */
-  static const gd::String &GetType(const gd::Platform &platform,
+  static const gd::String GetType(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
                       const gd::String &rootType,
@@ -125,7 +125,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
           objectsContainer,
           node,
           *child);
-      if (parameterMetadata == nullptr) {
+      if (parameterMetadata == nullptr || parameterMetadata->GetType().empty()) {
         type = "unknown";
       }
       else {

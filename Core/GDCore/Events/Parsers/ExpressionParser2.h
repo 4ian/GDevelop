@@ -513,7 +513,7 @@ class GD_CORE_API ExpressionParser2 {
             std::move(parameters), nullptr, closingParenthesisLocation};
       }
       bool isEmptyParameter = CheckIfChar(IsParameterSeparator)
-          || CheckIfChar(IsClosingParenthesis) && previousCharacterIsParameterSeparator;
+          || (CheckIfChar(IsClosingParenthesis) && previousCharacterIsParameterSeparator);
       auto parameter = isEmptyParameter ? gd::make_unique<EmptyNode>() : Expression();
       parameter->parent = functionCallNode;
       parameters.push_back(std::move(parameter));

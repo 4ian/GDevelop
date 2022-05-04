@@ -466,6 +466,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setPointsEditorOpen(false)}

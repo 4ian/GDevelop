@@ -171,6 +171,7 @@ function LeaderboardAppearanceDialog({
     }
     setIsLoading(true);
     const customizationSettings = {
+      defaultDisplayedEntriesNumber,
       scoreTitle,
       scoreFormatting:
         scoreType === 'custom'
@@ -215,6 +216,9 @@ function LeaderboardAppearanceDialog({
               key={'save'}
             />,
           ]}
+          onApply={() => {
+            onSaveSettings(i18n);
+          }}
         >
           <Text size="title">
             <Trans>Table settings</Trans>

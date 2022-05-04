@@ -28,6 +28,7 @@ class ExpressionMetadata;
 
 namespace gd {
 
+// TODO documentation
 /**
  * \brief Describe completions to be shown to the user.
  *

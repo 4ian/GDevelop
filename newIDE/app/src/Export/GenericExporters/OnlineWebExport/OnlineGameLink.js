@@ -42,6 +42,8 @@ import {
   getGameSlugs,
   type Game,
   type GameSlug,
+  getAclsFromUserIds,
+  setGameUserAcls,
 } from '../../../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import AlertMessage from '../../../UI/AlertMessage';
@@ -125,6 +127,80 @@ const OnlineGameLink = ({
     [build, getAuthorizationHeader, profile]
   );
 
+  const tryUpdateAuthors = React.useCallback(
+    async (i18n: I18nType) => {
+      if (!profile || !game || !build) return false;
+
+      const authorAcls = getAclsFromUserIds(project.getAuthorIds().toJSArray());
+
+      try {
+        await setGameUserAcls(
+          getAuthorizationHeader,
+          profile.id,
+          project.getProjectUuid(),
+          { author: authorAcls }
+        );
+      } catch (error) {
+        console.error(
+          'Unable to update the authors:',
+          error.response || error.message
+        );
+        showErrorBox({
+          message:
+            i18n._(t`Unable to update the authors of the project.`) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'author-update-error',
+        });
+        return false;
+      }
+
+      return true;
+    },
+    [build, game, getAuthorizationHeader, profile, project]
+  );
+
+  const tryUpdateSlug = React.useCallback(
+    async (partialGameChange: PartialGameChange, i18n: I18nType) => {
+      if (!profile || !game || !build) return false;
+
+      const { userSlug, gameSlug } = partialGameChange;
+
+      if (userSlug && gameSlug && userSlug === profile.username) {
+        try {
+          await setGameSlug(
+            getAuthorizationHeader,
+            profile.id,
+            game.id,
+            userSlug,
+            gameSlug
+          );
+          setSlug({ username: userSlug, gameSlug: gameSlug, createdAt: 0 });
+        } catch (error) {
+          console.error(
+            'Unable to update the game slug:',
+            error.response || error.message
+          );
+          showErrorBox({
+            message:
+              i18n._(
+                t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
+              ) +
+              ' ' +
+              i18n._(t`Verify your internet connection or try again later.`),
+            rawError: error,
+            errorId: 'game-slug-update-error',
+          });
+          return false;
+        }
+      }
+
+      return true;
+    },
+    [build, game, getAuthorizationHeader, profile]
+  );
+
   React.useEffect(
     () => {
       // Load game only once
@@ -183,6 +259,7 @@ const OnlineGameLink = ({
       const { id } = profile;
       try {
         setIsGameLoading(true);
+        // First update the game.
         const updatedGame = await updateGame(
           getAuthorizationHeader,
           id,
@@ -201,34 +278,15 @@ const OnlineGameLink = ({
           }
         );
         setGame(updatedGame);
-        const { userSlug, gameSlug } = partialGameChange;
-        if (userSlug && gameSlug && userSlug === profile.username) {
-          try {
-            await setGameSlug(
-              getAuthorizationHeader,
-              id,
-              game.id,
-              userSlug,
-              gameSlug
-            );
-            setSlug({ username: userSlug, gameSlug: gameSlug, createdAt: 0 });
-          } catch (error) {
-            console.error(
-              'Unable to update the game slug:',
-              error.response || error.message
-            );
-            showErrorBox({
-              message:
-                i18n._(
-                  t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
-                ) +
-                ' ' +
-                i18n._(t`Verify your internet connection or try again later.`),
-              rawError: error,
-              errorId: 'game-slug-update-error',
-            });
-            return false;
-          }
+        // Then set the authors.
+        const authorSuccess = await tryUpdateAuthors(i18n);
+        if (!authorSuccess) {
+          return false;
+        }
+        // Then set the slug if it has been filled.
+        const slugSuccess = await tryUpdateSlug(partialGameChange, i18n);
+        if (!slugSuccess) {
+          return false;
         }
       } catch (err) {
         showErrorBox({
@@ -246,7 +304,15 @@ const OnlineGameLink = ({
 
       return true;
     },
-    [game, getAuthorizationHeader, profile, build, project]
+    [
+      game,
+      getAuthorizationHeader,
+      profile,
+      build,
+      project,
+      tryUpdateAuthors,
+      tryUpdateSlug,
+    ]
   );
 
   if (!build && !exportStep) return null;

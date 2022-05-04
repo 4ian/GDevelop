@@ -11,6 +11,35 @@ export type LeaderboardPlayerUnicityDisplayOption =
   | 'PREFER_UNIQUE'
   | 'PREFER_NON_UNIQUE';
 
+export type LeaderboardScoreFormattingCustom = {|
+  type: 'custom',
+  prefix: string,
+  suffix: string,
+  precision: number,
+|};
+
+export type LeaderboardScoreFormattingTimeUnit =
+  | 'hour'
+  | 'minute'
+  | 'second'
+  | 'millisecond';
+
+export type LeaderboardScoreFormattingTime = {|
+  type: 'time',
+  smallestUnit: LeaderboardScoreFormattingTimeUnit,
+  biggestUnit: LeaderboardScoreFormattingTimeUnit,
+|};
+
+export type LeaderboardScoreFormatting =
+  | LeaderboardScoreFormattingCustom
+  | LeaderboardScoreFormattingTime;
+
+export type LeaderboardCustomizationSettings = {|
+  defaultDisplayedEntriesNumber?: number,
+  scoreTitle: string,
+  scoreFormatting: LeaderboardScoreFormatting,
+|};
+
 export type Leaderboard = {|
   id: string,
   gameId: string,
@@ -20,6 +49,17 @@ export type Leaderboard = {|
   deletedAt?: string,
   playerUnicityDisplayChoice: LeaderboardPlayerUnicityDisplayOption,
   visibility: LeaderboardVisibilityOption,
+  customizationSettings?: LeaderboardCustomizationSettings,
+  primary?: boolean,
+|};
+
+export type LeaderboardUpdatePayload = {|
+  name?: string,
+  sort?: LeaderboardSortOption,
+  playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
+  visibility?: LeaderboardVisibilityOption,
+  customizationSettings?: LeaderboardCustomizationSettings,
+  primary?: boolean,
 |};
 
 export type LeaderboardEntry = {|
@@ -75,7 +115,7 @@ export const extractExtremeScoreDisplayData = ({
 
 export const breakUuid = (uuid: string): string => `${uuid.split('-')[0]}-...`;
 
-export const listGameLeaderboards = async (
+export const listGameActiveLeaderboards = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string
 ): Promise<?Array<Leaderboard>> => {
@@ -84,14 +124,14 @@ export const listGameLeaderboards = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  return axios
-    .get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard`, {
+  const response = await axios.get(
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard?deleted=false`,
+    {
       headers: { Authorization: authorizationHeader },
       params: { userId },
-    })
-    .then(response =>
-      response.data.filter(leaderboard => !leaderboard.deletedAt)
-    );
+    }
+  );
+  return response.data;
 };
 
 export const extractNextPageUriFromLinkHeader = (
@@ -168,12 +208,7 @@ export const updateLeaderboard = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string,
   leaderboardId: string,
-  payload: {|
-    name?: string,
-    sort?: LeaderboardSortOption,
-    playerUnicityDisplayChoice?: LeaderboardPlayerUnicityDisplayOption,
-    visibility?: LeaderboardVisibilityOption,
-  |}
+  payload: LeaderboardUpdatePayload
 ): Promise<?Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;

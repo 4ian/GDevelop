@@ -159,9 +159,7 @@ namespace gdjs {
         runtimeScene: gdjs.RuntimeScene,
         leaderboardId: string,
         score: float,
-        playerName: string,
-        responseVar: gdjs.Variable,
-        errorVar: gdjs.Variable
+        playerName: string
       ) {
         let scoreSavingState: ScoreSavingState;
         if (_scoreSavingStateByLeaderboard[leaderboardId]) {
@@ -179,7 +177,6 @@ namespace gdjs {
             );
             const errorCode = 'SAME_AS_PREVIOUS';
             scoreSavingState.setError(errorCode);
-            errorVar.setString(errorCode);
             return;
           }
 
@@ -189,7 +186,6 @@ namespace gdjs {
             );
             const errorCode = 'TOO_FAST';
             scoreSavingState.setError(errorCode);
-            errorVar.setString(errorCode);
             return;
           }
         } else {
@@ -197,8 +193,6 @@ namespace gdjs {
           _scoreSavingStateByLeaderboard[leaderboardId] = scoreSavingState;
         }
 
-        errorVar.setString('');
-        responseVar.setString('');
         scoreSavingState.startSaving(playerName, score);
 
         const baseUrl = 'https://api.gdevelop-app.com/play';
@@ -233,22 +227,18 @@ namespace gdjs {
                 response.statusText
               );
               scoreSavingState.setError(errorCode);
-              errorVar.setString(errorCode);
               return;
             }
 
             scoreSavingState.closeSaving();
 
             return response.text().then(
-              (text) => {
-                responseVar.setString(text);
-              },
+              (text) => {},
               (error) => {
                 logger.warn(
                   'An error occurred when reading response but score has been saved:',
                   error
                 );
-                responseVar.setString('CANNOT_READ_RESPONSE');
               }
             );
           },
@@ -256,7 +246,6 @@ namespace gdjs {
             logger.error('Error while submitting a leaderboard score:', error);
             const errorCode = 'REQUEST_NOT_SENT';
             scoreSavingState.setError(errorCode);
-            errorVar.setString(errorCode);
           }
         );
       };
@@ -337,6 +326,7 @@ namespace gdjs {
           )}`;
         }
         return rawName
+          .trim()
           .normalize('NFD')
           .replace(/[\u0300-\u036f]/g, '')
           .replace(/\s/g, '_')

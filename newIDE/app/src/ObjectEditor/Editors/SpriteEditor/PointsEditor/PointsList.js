@@ -26,6 +26,9 @@ const SortablePointRow = SortableElement(PointRow);
 type PointsListBodyProps = {|
   pointsContainer: gdSprite,
   onPointsUpdated: () => void,
+  onHoverPoint: (pointName: ?string) => void,
+  onSelectPoint: (pointName: string) => void,
+  selectedPointName: ?string,
 |};
 
 const PointsListBody = (props: PointsListBodyProps) => {
@@ -82,6 +85,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
         onChangePointX={newValue => updatePointX(point, newValue)}
         onChangePointY={newValue => updatePointY(point, newValue)}
         pointName={pointName}
+        selected={pointName === props.selectedPointName}
         nameError={nameErrors[pointName]}
         onBlur={event => {
           const newName = event.target.value;
@@ -97,6 +101,9 @@ const PointsListBody = (props: PointsListBodyProps) => {
 
           setNameErrors(old => ({ ...old, [pointName]: !success }));
         }}
+        onMouseEnter={props.onHoverPoint}
+        onMouseLeave={props.onHoverPoint}
+        onClick={props.onSelectPoint}
         onRemove={() => {
           const answer = Window.showConfirmDialog(
             "Are you sure you want to remove this point? This can't be undone."
@@ -122,6 +129,10 @@ const PointsListBody = (props: PointsListBodyProps) => {
       pointY={originPoint.getY()}
       onChangePointX={updateOriginPointX}
       onChangePointY={updateOriginPointY}
+      onMouseEnter={props.onHoverPoint}
+      onMouseLeave={props.onHoverPoint}
+      onClick={props.onSelectPoint}
+      selected={'Origin' === props.selectedPointName}
       disabled
     />
   );
@@ -135,6 +146,10 @@ const PointsListBody = (props: PointsListBodyProps) => {
       pointY={centerPoint.getY()}
       onChangePointX={updateCenterPointX}
       onChangePointY={updateCenterPointY}
+      onMouseEnter={props.onHoverPoint}
+      onMouseLeave={props.onHoverPoint}
+      onClick={props.onSelectPoint}
+      selected={'Center' === props.selectedPointName}
       disabled
       onEdit={
         pointsContainer.isDefaultCenterPoint()
@@ -164,6 +179,9 @@ SortablePointsListBody.muiName = 'TableBody';
 type PointsListProps = {|
   pointsContainer: gdSprite,
   onPointsUpdated: () => void,
+  onHoverPoint: (pointName: string) => void,
+  onSelectPoint: (pointName: string) => void,
+  selectedPointName: ?string,
 |};
 
 const PointsList = (props: PointsListProps) => {
@@ -185,6 +203,9 @@ const PointsList = (props: PointsListProps) => {
         </TableHeader>
         <SortablePointsListBody
           pointsContainer={props.pointsContainer}
+          onHoverPoint={props.onHoverPoint}
+          onSelectPoint={props.onSelectPoint}
+          selectedPointName={props.selectedPointName}
           onPointsUpdated={props.onPointsUpdated}
           onSortEnd={({ oldIndex, newIndex }) => {
             // Reordering points is not supported for now

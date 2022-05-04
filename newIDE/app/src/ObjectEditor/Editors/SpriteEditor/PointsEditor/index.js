@@ -50,6 +50,13 @@ const PointsEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
+  const [selectedPointName, setSelectedPointName] = React.useState<?string>(
+    null
+  );
+  const [
+    highlightedPointName,
+    setHighlightedPointName,
+  ] = React.useState<?string>(null);
 
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSamePointsToggles). In
@@ -178,6 +185,9 @@ const PointsEditor = (props: Props) => {
                   {...overlayProps}
                   pointsContainer={sprite}
                   onPointsUpdated={updatePoints}
+                  selectedPointName={selectedPointName}
+                  highlightedPointName={highlightedPointName}
+                  onClickPoint={setSelectedPointName}
                 />
               )
             }
@@ -220,6 +230,9 @@ const PointsEditor = (props: Props) => {
               <PointsList
                 pointsContainer={sprite}
                 onPointsUpdated={updatePoints}
+                selectedPointName={selectedPointName}
+                onHoverPoint={setHighlightedPointName}
+                onSelectPoint={setSelectedPointName}
               />
             )}
             {!sprite && (

@@ -249,6 +249,13 @@ class GD_CORE_API MetadataProvider {
     FunctionCallNode& functionCall,
     ExpressionNode& parameter);
 
+  static const gd::ParameterMetadata* GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    int parameterIndex);
+
   /**
    * Get information about an expression from its type.
    * Works for behavior expressions.

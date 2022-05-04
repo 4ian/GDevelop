@@ -36,9 +36,10 @@ namespace gd {
 class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
  public:
   ExpressionCodeGenerator(const gd::String &rootType_,
+                          const gd::String &rootObjectName_,
                           EventsCodeGenerator& codeGenerator_,
                           EventsCodeGenerationContext& context_)
-      : rootType(rootType_), codeGenerator(codeGenerator_), context(context_){};
+      : rootType(rootType_), rootObjectName(rootObjectName_), codeGenerator(codeGenerator_), context(context_){};
   virtual ~ExpressionCodeGenerator(){};
 
   /**
@@ -105,6 +106,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
   EventsCodeGenerator& codeGenerator;
   EventsCodeGenerationContext& context;
   const gd::String rootType;
+  const gd::String rootObjectName;
 };
 
 }  // namespace gd

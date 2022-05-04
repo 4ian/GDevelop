@@ -16,6 +16,7 @@
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/IDE/Events/ExpressionNodeLocationFinder.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 
 namespace gd {
 class Expression;
@@ -408,13 +409,19 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitVariableNode(VariableNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+        platform,
+        globalObjectsContainer,
+        objectsContainer,
+        "", // TODO find a way to get the objectName
+        node);
     completions.push_back(ExpressionCompletionDescription::ForVariable(
         type,
         node.name,
         node.location.GetStartPosition(),
         node.location.GetEndPosition(),
-        node.objectName));
+        objectName));
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     // No completions

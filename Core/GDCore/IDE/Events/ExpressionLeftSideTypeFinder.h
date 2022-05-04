@@ -3,14 +3,13 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONTYPEFINDER_H
-#define GDCORE_EXPRESSIONTYPEFINDER_H
+#ifndef GDCORE_EXPRESSIONLEFTSIDETYPEFINDER_H
+#define GDCORE_EXPRESSIONLEFTSIDETYPEFINDER_H
 
 #include <memory>
 #include <vector>
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
-#include "GDCore/IDE/Events/ExpressionLeftSideTypeFinder.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
@@ -35,7 +34,7 @@ namespace gd {
  *
  * \see gd::ExpressionParser2
  */
-class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
+class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWorker {
  public:
 
   /**
@@ -45,9 +44,8 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   static const gd::String GetType(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
-                      const gd::String &rootType,
                       gd::ExpressionNode& node) {
-    gd::ExpressionTypeFinder typeFinder(platform, globalObjectsContainer, objectsContainer, rootType);
+    gd::ExpressionLeftSideTypeFinder typeFinder(platform, globalObjectsContainer, objectsContainer);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
@@ -61,28 +59,25 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     return type;
   };
 
-  virtual ~ExpressionTypeFinder(){};
+  virtual ~ExpressionLeftSideTypeFinder(){};
 
  protected:
-  ExpressionTypeFinder(const gd::Platform &platform_,
+  ExpressionLeftSideTypeFinder(const gd::Platform &platform_,
                        const gd::ObjectsContainer &globalObjectsContainer_,
-                       const gd::ObjectsContainer &objectsContainer_,
-                       const gd::String &rootType_)
+                       const gd::ObjectsContainer &objectsContainer_)
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
-        rootType(rootType_),
-        type("unknown"),
-        child(nullptr) {};
+        type("unknown") {};
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
-    VisitParent(node);
+    node.expression->Visit(*this);
   }
   void OnVisitOperatorNode(OperatorNode& node) override {
-    VisitParent(node);
+    node.leftHandSide->Visit(*this);
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
-    VisitParent(node);
+    node.factor->Visit(*this);
   }
   void OnVisitNumberNode(NumberNode& node) override {
     type = "number";
@@ -90,80 +85,38 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   void OnVisitTextNode(TextNode& node) override {
     type = "string";
   }
+  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
+    const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
+        platform, globalObjectsContainer, objectsContainer, node);
+    if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
+      type = "unknown";
+    }
+    else {
+      type = metadata.GetReturnType();
+    }
+  }
   void OnVisitVariableNode(VariableNode& node) override {
-    VisitParent(node);
+    type = "unknown";
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
-    VisitParent(node);
+    type = "unknown";
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    VisitParent(node);
+    type = "unknown";
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
-    VisitParent(node);
+    type = "unknown";
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    VisitParent(node);
+    type = "unknown";
   }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
-    // TODO Should it be unknown if it is the node in GetType?
-    // TODO Should it go back down and give the left side type?
-    type = "number|string";
-  }
-  void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    if (child == nullptr) {
-      const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
-          platform, globalObjectsContainer, objectsContainer, node);
-      if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
-        VisitParent(node);
-      }
-      else {
-        type = metadata.GetReturnType();
-      }
-    }
-    else {
-      const gd::ParameterMetadata* parameterMetadata = MetadataProvider::GetFunctionCallParameterMetadata(
-          platform, 
-          globalObjectsContainer,
-          objectsContainer,
-          node,
-          *child);
-      if (parameterMetadata == nullptr || parameterMetadata->GetType().empty()) {
-        type = "unknown";
-      }
-      else {
-        type = parameterMetadata->GetType();
-      }
-    }
+    type = "unknown";
   }
 
  private:
-  inline void VisitParent(ExpressionNode& node) {
-    child = &node;
-    if (node.parent != nullptr) {
-      node.parent->Visit(*this);
-    }
-    else if (rootType == "number|string") {
-      auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
-          platform, 
-          globalObjectsContainer,
-          objectsContainer,
-          node);
-      if (leftSideType == "number" || leftSideType == "string") {
-        type = leftSideType;
-      }
-      else {
-        type = rootType;
-      }
-    }
-    else {
-      type = rootType;
-    }
-  }
-
   gd::String type;
-  ExpressionNode *child;
 
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
@@ -173,4 +126,4 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
 
 }  // namespace gd
 
-#endif  // GDCORE_EXPRESSIONTYPEFINDER_H
+#endif  // GDCORE_EXPRESSIONLEFTSIDETYPEFINDER_H

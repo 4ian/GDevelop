@@ -26,37 +26,38 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 
 namespace gd {
 
 gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     EventsCodeGenerator& codeGenerator,
     EventsCodeGenerationContext& context,
-    const gd::String& type,
+    const gd::String& rootType,
     const gd::String& expression,
-    const gd::String& objectName) {
+    const gd::String& rootObjectName) {
   gd::ExpressionParser2 parser;
-  ExpressionCodeGenerator generator(type, codeGenerator, context);
+  ExpressionCodeGenerator generator(rootType, rootObjectName, codeGenerator, context);
 
   auto node = parser.ParseExpression(expression);
   if (!node) {
     std::cout << "Error: error while parsing: \"" << expression << "\" ("
-              << type << ")" << std::endl;
+              << rootType << ")" << std::endl;
 
-    return generator.GenerateDefaultValue(type);
+    return generator.GenerateDefaultValue(rootType);
   }
 
   gd::ExpressionValidator validator(codeGenerator.GetPlatform(),
                                     codeGenerator.GetGlobalObjectsAndGroups(),
                                     codeGenerator.GetObjectsAndGroups(),
-                                    type);
+                                    rootType);
   node->Visit(validator);
   if (!validator.GetErrors().empty()) {
     std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
-              << "\" in: \"" << expression << "\" (" << type << ")"
+              << "\" in: \"" << expression << "\" (" << rootType << ")"
               << std::endl;
 
-    return generator.GenerateDefaultValue(type);
+    return generator.GenerateDefaultValue(rootType);
   }
 
   node->Visit(generator);
@@ -99,7 +100,7 @@ void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
 void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   // This "translation" from the type to an enum could be avoided
   // if all types were moved to an enum.
-  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+  auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
                                             codeGenerator.GetGlobalObjectsAndGroups(),
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,
@@ -110,9 +111,13 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
           : ((type == "scenevar")
                  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
-
+  auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
+                                        codeGenerator.GetGlobalObjectsAndGroups(),
+                                        codeGenerator.GetObjectsAndGroups(),
+                                        rootObjectName,
+                                        node);
   output += codeGenerator.GenerateGetVariable(
-      node.name, scope, context, node.objectName);
+      node.name, scope, context, objectName);
   if (node.child) node.child->Visit(*this);
 }
 
@@ -124,7 +129,7 @@ void ExpressionCodeGenerator::OnVisitVariableAccessorNode(
 
 void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
     VariableBracketAccessorNode& node) {
-  ExpressionCodeGenerator generator("string", codeGenerator, context);
+  ExpressionCodeGenerator generator("string", "", codeGenerator, context);
   node.expression->Visit(generator);
   output +=
       codeGenerator.GenerateVariableBracketAccessor(generator.GetOutput());
@@ -132,7 +137,7 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
 }
 
 void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
-  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+  auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
                                             codeGenerator.GetGlobalObjectsAndGroups(),
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,
@@ -148,8 +153,11 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
                     ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                     : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
-      // TODO find a way to get the node.objectName
-      auto objectName = "";
+      auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
+                                            codeGenerator.GetGlobalObjectsAndGroups(),
+                                            codeGenerator.GetObjectsAndGroups(),
+                                            rootObjectName,
+                                            node);
       output += codeGenerator.GenerateGetVariable(
           node.identifierName, scope, context, objectName);
       if (!node.childIdentifierName.empty()) {
@@ -165,7 +173,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
 }
 
 void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
-  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+  auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
                                             codeGenerator.GetGlobalObjectsAndGroups(),
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,
@@ -354,11 +362,17 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
 
     auto& parameterMetadata = expressionMetadata.parameters[i];
     if (!parameterMetadata.IsCodeOnly()) {
-      ExpressionCodeGenerator generator(parameterMetadata.GetType(), codeGenerator, context);
       if (nonCodeOnlyParameterIndex < parameters.size()) {
+        auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(codeGenerator.GetPlatform(),
+                                              codeGenerator.GetGlobalObjectsAndGroups(),
+                                              codeGenerator.GetObjectsAndGroups(),
+                                              rootObjectName,
+                                              *parameters[nonCodeOnlyParameterIndex].get());
+        ExpressionCodeGenerator generator(parameterMetadata.GetType(), objectName, codeGenerator, context);
         parameters[nonCodeOnlyParameterIndex]->Visit(generator);
         parametersCode += generator.GetOutput();
       } else if (parameterMetadata.IsOptional()) {
+        ExpressionCodeGenerator generator(parameterMetadata.GetType(), "", codeGenerator, context);
         // Optional parameters default value were not parsed at the time of the
         // expression parsing. Parse them now.
         ExpressionParser2 parser;
@@ -420,7 +434,7 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
-  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+  auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
                                             codeGenerator.GetGlobalObjectsAndGroups(),
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,
@@ -430,7 +444,7 @@ void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {
 
 void ExpressionCodeGenerator::OnVisitObjectFunctionNameNode(
     ObjectFunctionNameNode& node) {
-  auto type = ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
+  auto type = gd::ExpressionTypeFinder::GetType(codeGenerator.GetPlatform(),
                                             codeGenerator.GetGlobalObjectsAndGroups(),
                                             codeGenerator.GetObjectsAndGroups(),
                                             rootType,

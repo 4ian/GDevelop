@@ -429,6 +429,20 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
       if (parameterIndex < 0) {
         return nullptr;
       }
+      return MetadataProvider::GetFunctionCallParameterMetadata(
+          platform, 
+          globalObjectsContainer,
+          objectsContainer,
+          functionCall,
+          parameterIndex);
+}
+
+  const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    int parameterIndex) {
       // Search the parameter metadata index skipping invisible ones.
       size_t visibleParameterIndex = 0;
       size_t metadataParameterIndex =

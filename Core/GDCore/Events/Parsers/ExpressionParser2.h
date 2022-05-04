@@ -265,9 +265,9 @@ class GD_CORE_API ExpressionParser2 {
       ExpressionParserLocation dotLocation = SkipChar();
       SkipAllWhitespaces();
       return ObjectFunctionOrBehaviorFunction(
-          name, nameLocation, dotLocation, "");
+          name, nameLocation, dotLocation);
     } else if (CheckIfChar(IsOpeningSquareBracket)) {
-      return Variable("", name, nameLocation);
+      return Variable(name, nameLocation);
     }
     else {
       auto identifier = gd::make_unique<IdentifierNode>(name);
@@ -278,9 +278,8 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
-  std::unique_ptr<VariableNode> Variable(
-      const gd::String &objectName, const gd::String &name, gd::ExpressionParserLocation nameLocation) {
-    auto variable = gd::make_unique<VariableNode>(name, objectName);
+  std::unique_ptr<VariableNode> Variable(const gd::String &name, gd::ExpressionParserLocation nameLocation) {
+    auto variable = gd::make_unique<VariableNode>(name);
     variable->child = VariableAccessorOrVariableBracketAccessor();
 
     variable->location = ExpressionParserLocation(
@@ -357,8 +356,7 @@ class GD_CORE_API ExpressionParser2 {
   ObjectFunctionOrBehaviorFunction(
       const gd::String &parentIdentifier,
       const ExpressionParserLocation &parentIdentifierLocation,
-      const ExpressionParserLocation &parentIdentifierDotLocation,
-      const gd::String &objectName) {
+      const ExpressionParserLocation &parentIdentifierDotLocation) {
     auto childIdentifierAndLocation = ReadIdentifierName();
     const gd::String &childIdentifierName = childIdentifierAndLocation.name;
     const auto &childIdentifierNameLocation =
@@ -396,7 +394,8 @@ class GD_CORE_API ExpressionParser2 {
           parametersNode.closingParenthesisLocation;
       return std::move(function);
     } else if (CheckIfChar(IsDot) || CheckIfChar(IsOpeningSquareBracket)) {
-      auto variable = gd::make_unique<VariableNode>(parentIdentifier, objectName);
+      // TODO remove the object name attribute as it can't be set from here without metadata
+      auto variable = gd::make_unique<VariableNode>(parentIdentifier);
       auto child =
           gd::make_unique<VariableAccessorNode>(childIdentifierName);
       child->child = VariableAccessorOrVariableBracketAccessor();

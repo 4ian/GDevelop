@@ -279,7 +279,7 @@ namespace gdjs {
        * @param id - The other client's ID.
        */
       export const connectAsync = (id: string): AsyncTask => {
-        if (peer === null) return new gdjs.ResolvingTask();
+        if (peer === null) return new gdjs.ResolveTask();
         return new P2PConnectionTask(peer.connect(id));
       };
 

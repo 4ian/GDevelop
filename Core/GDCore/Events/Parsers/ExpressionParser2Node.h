@@ -247,16 +247,14 @@ struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public Expres
  * \see gd::VariableBracketAccessorNode
  */
 struct GD_CORE_API VariableNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
-  VariableNode(const gd::String &name_,
-               const gd::String &objectName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(), name(name_), objectName(objectName_){};
+  VariableNode(const gd::String &name_)
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(), name(name_){};
   virtual ~VariableNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitVariableNode(*this);
   };
 
   gd::String name;
-  gd::String objectName;
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
       child;  // Can be nullptr if no accessor

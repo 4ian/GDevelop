@@ -186,62 +186,65 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   }
 
   // TODO: reverse the order of diagnostic?
-
   size_t writtenParametersFirstIndex =
       ExpressionParser2::WrittenParametersFirstIndex(
           function.objectName, function.behaviorName);
+  int metadataIndex = writtenParametersFirstIndex;
   for (int parameterIndex = 0; parameterIndex < function.parameters.size(); parameterIndex++) {
     auto& parameter = function.parameters[parameterIndex];
-    auto& parameterMetadata = metadata.GetParameters()[writtenParametersFirstIndex + parameterIndex];
-
-    if (parameterMetadata.IsCodeOnly()) {
-      // Do nothing, code only parameters are not written in expressions.
-      continue;
+    while (metadata.GetParameters()[metadataIndex].IsCodeOnly()) {
+      // The sizes are already checked above.
+      metadataIndex++;
     }
-    auto currentParentType = parentType;
-    parentType = stringToType(parameterMetadata.GetType());
-    parameter->Visit(*this);
-    parentType = currentParentType;
+    auto& parameterMetadata = metadata.GetParameters()[metadataIndex];
 
-    const gd::String &expectedParameterType = parameterMetadata.GetType();
-    if (gd::ParameterMetadata::IsExpression("number", expectedParameterType)) {
-      if (childType != Type::Number) {
-        // TODO error
-      }
-    } else if (gd::ParameterMetadata::IsExpression("string", expectedParameterType)) {
-      if (childType != Type::String) {
-        // TODO error
-      }
-    } else if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
-      if (childType != Type::Variable) {
-        // TODO error
-      }
-    } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
-      if (auto identifierNode =
-        dynamic_cast<IdentifierNode *>(parameter.get())) {
-        // Memorize the last object name. By convention, parameters that
-        // require an object (mainly, "objectvar" and "behavior") should be
-        // placed after the object in the list of parameters (if possible,
-        // just after). Search "lastObjectName" in the codebase for other
-        // place where this convention is enforced.
-        lastObjectName = identifierNode->identifierName;
-      }
-      else {
+    if (!parameterMetadata.IsOptional() || dynamic_cast<EmptyNode*>(parameter.get()) == nullptr) {
+      auto currentParentType = parentType;
+      parentType = stringToType(parameterMetadata.GetType());
+      parameter->Visit(*this);
+      parentType = currentParentType;
+      
+      const gd::String &expectedParameterType = parameterMetadata.GetType();
+      if (gd::ParameterMetadata::IsExpression("number", expectedParameterType)) {
+        if (childType != Type::Number) {
+          // TODO error or already checked in children?
+        }
+      } else if (gd::ParameterMetadata::IsExpression("string", expectedParameterType)) {
+        if (childType != Type::String) {
+          // TODO error or already checked in children?
+        }
+      } else if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
+        if (childType != Type::Variable) {
+          // TODO error or already checked in children?
+        }
+      } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
+        if (auto identifierNode =
+          dynamic_cast<IdentifierNode *>(parameter.get())) {
+          // Memorize the last object name. By convention, parameters that
+          // require an object (mainly, "objectvar" and "behavior") should be
+          // placed after the object in the list of parameters (if possible,
+          // just after). Search "lastObjectName" in the codebase for other
+          // place where this convention is enforced.
+          lastObjectName = identifierNode->identifierName;
+        }
+        else {
+          RaiseError(
+                  "malformed_object_parameter",
+                  _("An object name was expected but something else was "
+                    "written. Enter just the name of the object for this "
+                    "parameter."),
+                parameter->location);
+        }
+      } else {
         RaiseError(
-                "malformed_object_parameter",
-                _("An object name was expected but something else was "
-                  "written. Enter just the name of the object for this "
-                  "parameter."),
-              parameter->location);
+                "unknown_parameter_type",
+                _("This function is improperly set up. Reach out to the "
+                  "extension developer or a GDevelop maintainer to fix "
+                  "this issue"),
+                parameter->location);
       }
-    } else {
-      RaiseError(
-              "unknown_parameter_type",
-              _("This function is improperly set up. Reach out to the "
-                "extension developer or a GDevelop maintainer to fix "
-                "this issue"),
-              parameter->location);
     }
+    metadataIndex++;
   }
   return returnType;
 }

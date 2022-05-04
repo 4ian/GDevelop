@@ -16,51 +16,79 @@ type Props = {|
   onChangeVerticeY: (value: number) => void,
 |};
 
-const VerticeRow = (props: Props) => (
-  <ThemeConsumer>
-    {muiTheme => (
-      <TableRow
-        style={{
-          backgroundColor: muiTheme.list.itemsBackgroundColor,
-        }}
-      >
-        <TableRowColumn />
-        <TableRowColumn style={styles.coordinateColumn}>
-          <TextField
-            margin="none"
-            value={props.verticeX}
-            type="number"
-            id="vertice-x"
-            onChange={(e, value) =>
-              props.onChangeVerticeX(parseFloat(value || 0))
-            }
-          />
-        </TableRowColumn>
-        <TableRowColumn style={styles.coordinateColumn}>
-          <TextField
-            margin="none"
-            value={props.verticeY}
-            type="number"
-            id="vertice-y"
-            onChange={(e, value) =>
-              props.onChangeVerticeY(parseFloat(value || 0))
-            }
-          />
-        </TableRowColumn>
-        <TableRowColumn style={styles.toolColumn}>
-          {!!props.onRemove && (
-            <IconButton
-              size="small"
-              onClick={props.onRemove}
-              disabled={!props.canRemove}
-            >
-              <Delete />
-            </IconButton>
-          )}
-        </TableRowColumn>
-      </TableRow>
-    )}
-  </ThemeConsumer>
-);
+const VerticeRow = ({ verticeX, verticeY, ...props }: Props) => {
+  const [verticeXInputValue, setVerticeXInputValue] = React.useState<string>(
+    verticeX.toString()
+  );
+  const [verticeYInputValue, setVerticeYInputValue] = React.useState<string>(
+    verticeY.toString()
+  );
+  React.useEffect(
+    () => {
+      setVerticeXInputValue(verticeX.toString());
+    },
+    [verticeX]
+  );
+  React.useEffect(
+    () => {
+      setVerticeYInputValue(verticeY.toString());
+    },
+    [verticeY]
+  );
+  return (
+    <ThemeConsumer>
+      {muiTheme => (
+        <TableRow
+          style={{
+            backgroundColor: muiTheme.list.itemsBackgroundColor,
+          }}
+        >
+          <TableRowColumn />
+          <TableRowColumn style={styles.coordinateColumn}>
+            <TextField
+              margin="none"
+              value={verticeXInputValue}
+              type="number"
+              id="vertice-x"
+              onChange={(e, value) => {
+                setVerticeXInputValue(value);
+                const valueAsNumber = parseFloat(value);
+                if (!isNaN(valueAsNumber)) {
+                  props.onChangeVerticeX(valueAsNumber);
+                }
+              }}
+            />
+          </TableRowColumn>
+          <TableRowColumn style={styles.coordinateColumn}>
+            <TextField
+              margin="none"
+              value={verticeYInputValue}
+              type="number"
+              id="vertice-y"
+              onChange={(e, value) => {
+                setVerticeXInputValue(value);
+                const valueAsNumber = parseFloat(value);
+                if (!isNaN(valueAsNumber)) {
+                  props.onChangeVerticeY(valueAsNumber);
+                }
+              }}
+            />
+          </TableRowColumn>
+          <TableRowColumn style={styles.toolColumn}>
+            {!!props.onRemove && (
+              <IconButton
+                size="small"
+                onClick={props.onRemove}
+                disabled={!props.canRemove}
+              >
+                <Delete />
+              </IconButton>
+            )}
+          </TableRowColumn>
+        </TableRow>
+      )}
+    </ThemeConsumer>
+  );
+};
 
 export default VerticeRow;

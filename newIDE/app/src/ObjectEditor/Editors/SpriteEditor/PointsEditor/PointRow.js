@@ -27,13 +27,32 @@ type Props = {|
   isAutomatic?: Boolean,
 |};
 
-const PointRow = ({ onMouseLeave, ...props }: Props) => {
+const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
   const onLeave = React.useCallback(
     () => {
       onMouseLeave(null);
     },
     [onMouseLeave]
   );
+  const [pointXInputValue, setPointXInputValue] = React.useState<string>(
+    pointX.toString()
+  );
+  const [pointYInputValue, setPointYInputValue] = React.useState<string>(
+    pointY.toString()
+  );
+  React.useEffect(
+    () => {
+      setPointXInputValue(pointX.toString());
+    },
+    [pointX]
+  );
+  React.useEffect(
+    () => {
+      setPointYInputValue(pointY.toString());
+    },
+    [pointY]
+  );
+
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -77,12 +96,16 @@ const PointRow = ({ onMouseLeave, ...props }: Props) => {
                     ? { color: muiTheme.listItem.selectedTextColor }
                     : undefined
                 }
-                value={props.pointX}
+                value={pointXInputValue}
                 type="number"
                 id="point-x"
-                onChange={(e, value) =>
-                  props.onChangePointX(parseFloat(value || 0))
-                }
+                onChange={(e, value) => {
+                  setPointXInputValue(value);
+                  const valueAsNumber = parseFloat(value);
+                  if (!isNaN(valueAsNumber)) {
+                    props.onChangePointX(valueAsNumber);
+                  }
+                }}
               />
             ) : (
               <Text noMargin>
@@ -99,12 +122,16 @@ const PointRow = ({ onMouseLeave, ...props }: Props) => {
                     ? { color: muiTheme.listItem.selectedTextColor }
                     : undefined
                 }
-                value={props.pointY}
+                value={pointYInputValue}
                 type="number"
                 id="point-y"
-                onChange={(e, value) =>
-                  props.onChangePointY(parseFloat(value || 0))
-                }
+                onChange={(e, value) => {
+                  setPointYInputValue(value);
+                  const valueAsNumber = parseFloat(value);
+                  if (!isNaN(valueAsNumber)) {
+                    props.onChangePointY(valueAsNumber);
+                  }
+                }}
               />
             ) : (
               <Text noMargin>

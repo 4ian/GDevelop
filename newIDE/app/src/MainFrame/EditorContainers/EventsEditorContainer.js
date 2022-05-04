@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import EventsSheet, { type EventsSheetInterface } from '../../EventsSheet';
+import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
 import {
   type RenderEditorContainerProps,
   type RenderEditorContainerPropsWithRef,
@@ -53,6 +54,21 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
     return project.getLayout(projectItemName);
   }
 
+  onBeginCreateEventsFunction = () => {
+    sendEventsExtractedAsFunction({
+      step: 'begin',
+      parentEditor: 'scene-events-editor',
+    });
+  };
+
+  onCreateEventsFunction = (extensionName, eventsFunction) => {
+    this.props.onCreateEventsFunction(
+      extensionName,
+      eventsFunction,
+      'scene-events-editor'
+    );
+  };
+
   render() {
     const { project, projectItemName } = this.props;
     const layout = this.getLayout();
@@ -70,7 +86,8 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         onChooseResource={this.props.onChooseResource}
         resourceExternalEditors={this.props.resourceExternalEditors}
         openInstructionOrExpression={this.props.openInstructionOrExpression}
-        onCreateEventsFunction={this.props.onCreateEventsFunction}
+        onCreateEventsFunction={this.onCreateEventsFunction}
+        onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
         unsavedChanges={this.props.unsavedChanges}
         project={project}
         scope={{

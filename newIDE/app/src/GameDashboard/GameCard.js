@@ -1,45 +1,22 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { Card, CardActions, CardHeader, Chip, Paper } from '@material-ui/core';
+import { Card, CardActions, CardHeader, Chip } from '@material-ui/core';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
-import TimelineIcon from '@material-ui/icons/Timeline';
-import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
-import TuneIcon from '@material-ui/icons/Tune';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
-import FlatButton from '../UI/FlatButton';
-import EmptyMessage from '../UI/EmptyMessage';
-
-const styles = {
-  image: {
-    display: 'block',
-    objectFit: 'cover',
-  },
-  thumbnail: {
-    width: 240,
-    height: 135,
-  },
-};
+import { GameThumbnail } from './GameThumbnail';
 
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
-  onOpenDetails: () => void,
-  onOpenBuilds: () => void,
-  onOpenAnalytics: () => void,
+  onOpenGameManager: () => void,
 |};
 
-export const GameCard = ({
-  game,
-  isCurrentGame,
-  onOpenDetails,
-  onOpenBuilds,
-  onOpenAnalytics,
-}: Props) => {
+export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
   const openGameUrl = () => {
     const url = getGameUrl(game);
     if (!url) return;
@@ -49,31 +26,11 @@ export const GameCard = ({
     <I18n>
       {({ i18n }) => (
         <Card key={game.id}>
-          <Line>
-            {game.thumbnailUrl ? (
-              <img
-                src={game.thumbnailUrl}
-                style={{
-                  ...styles.image,
-                  ...styles.thumbnail,
-                }}
-                alt={game.gameName}
-                title={game.gameName}
-              />
-            ) : (
-              <Paper
-                variant="outlined"
-                style={{
-                  ...styles.thumbnail,
-                  whiteSpace: 'normal',
-                  display: 'flex',
-                }}
-              >
-                <EmptyMessage>
-                  <Trans>No thumbnail set</Trans>
-                </EmptyMessage>
-              </Paper>
-            )}
+          <ResponsiveLineStackLayout>
+            <GameThumbnail
+              gameName={game.gameName}
+              thumbnailUrl={game.thumbnailUrl}
+            />
             <Column expand>
               <CardHeader
                 title={game.gameName}
@@ -95,7 +52,13 @@ export const GameCard = ({
                         <Spacer />
                         <Chip
                           size="small"
-                          label={<Trans>Published on Liluo</Trans>}
+                          label={
+                            game.discoverable ? (
+                              <Trans>Discoverable on Liluo.io</Trans>
+                            ) : (
+                              <Trans>Published on Liluo.io</Trans>
+                            )
+                          }
                         />
                       </>
                     )}
@@ -110,30 +73,19 @@ export const GameCard = ({
                 >
                   {game.publicWebBuildId && (
                     <RaisedButton
-                      label={<Trans>Open</Trans>}
+                      label={<Trans>Open in browser</Trans>}
                       onClick={openGameUrl}
-                      primary
                     />
                   )}
-                  <FlatButton
-                    icon={<TuneIcon />}
-                    label={<Trans>Details</Trans>}
-                    onClick={onOpenDetails}
-                  />
-                  <FlatButton
-                    icon={<PlaylistPlayIcon />}
-                    label={<Trans>Builds</Trans>}
-                    onClick={onOpenBuilds}
-                  />
-                  <FlatButton
-                    icon={<TimelineIcon />}
-                    label={<Trans>Analytics</Trans>}
-                    onClick={onOpenAnalytics}
+                  <RaisedButton
+                    label={<Trans>Manage game</Trans>}
+                    onClick={onOpenGameManager}
+                    primary
                   />
                 </ResponsiveLineStackLayout>
               </CardActions>
             </Column>
-          </Line>
+          </ResponsiveLineStackLayout>
         </Card>
       )}
     </I18n>

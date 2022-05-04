@@ -9,6 +9,10 @@ import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import {
+  sendExtensionDetailsOpened,
+  sendExtensionAddedToProject,
+} from '../../Utils/Analytics/EventSender';
 
 const styles = {
   searchBar: {
@@ -111,6 +115,7 @@ export const ExtensionStore = ({
                   extensionShortHeader={extensionShortHeader}
                   matches={getExtensionsMatches(extensionShortHeader)}
                   onChoose={() => {
+                    sendExtensionDetailsOpened(extensionShortHeader.name);
                     setSelectedExtensionShortHeader(extensionShortHeader);
                   }}
                 />
@@ -121,12 +126,11 @@ export const ExtensionStore = ({
       </ResponsiveWindowMeasurer>
       {!!selectedExtensionShortHeader && (
         <ExtensionInstallDialog
+          project={project}
           isInstalling={isInstalling}
           extensionShortHeader={selectedExtensionShortHeader}
-          alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
-            selectedExtensionShortHeader.name
-          )}
           onInstall={async () => {
+            sendExtensionAddedToProject(selectedExtensionShortHeader.name);
             const wasInstalled = await onInstall(selectedExtensionShortHeader);
             if (wasInstalled) setSelectedExtensionShortHeader(null);
           }}

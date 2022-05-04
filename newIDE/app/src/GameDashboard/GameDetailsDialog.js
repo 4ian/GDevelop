@@ -1,6 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
@@ -13,6 +12,7 @@ import {
   deleteGame,
   getPublicGame,
   setGameUserAcls,
+  setGameSlug,
   getAclsFromUserIds,
   getCategoryName,
 } from '../Utils/GDevelopServices/Game';
@@ -41,13 +41,14 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
   PublicGamePropertiesDialog,
   type PartialGameChange,
-} from '../ProjectManager/PublicGamePropertiesDialog';
+} from './PublicGamePropertiesDialog';
 import TextField from '../UI/TextField';
 import KeyboardIcon from '@material-ui/icons/Keyboard';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
-import { showErrorBox } from '../UI/Messages/MessageBox';
+import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
+import LeaderboardAdmin from './LeaderboardAdmin';
 
 const styles = {
   tableRowStatColumn: {
@@ -55,7 +56,11 @@ const styles = {
   },
 };
 
-export type GamesDetailsTab = 'details' | 'builds' | 'analytics';
+export type GamesDetailsTab =
+  | 'details'
+  | 'builds'
+  | 'analytics'
+  | 'leaderboards';
 
 type Props = {|
   game: Game,
@@ -81,10 +86,16 @@ export const GameDetailsDialog = ({
   const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
     null
   );
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [
+    gameUnregisterErrorText,
+    setGameUnregisterErrorText,
+  ] = React.useState<?string>(null);
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
+  const [isGameUpdating, setIsGameUpdating] = React.useState(false);
 
   const yesterdayIsoDate = formatISO(subDays(new Date(), 1), {
     representation: 'date',
@@ -152,51 +163,113 @@ export const GameDetailsDialog = ({
     [loadPublicGame]
   );
 
+  const handleGameUpdated = React.useCallback(
+    (updatedGame: Game) => {
+      // Set Public Game to null to show the loader.
+      // It will be refetched thanks to loadPublicGame, because Game is updated.
+      setPublicGame(null);
+      onGameUpdated(updatedGame);
+    },
+    [onGameUpdated]
+  );
+
   const updateGameFromProject = async (
     partialGameChange: PartialGameChange,
     i18n: I18nType
-  ) => {
-    if (!project || !profile) return;
+  ): Promise<boolean> => {
+    if (!project || !profile) return false;
     const { id } = profile;
 
-    // Set public game to null as it will be refetched automatically by the callback above.
-    setPublicGame(null);
+    const ownerIds = partialGameChange.ownerIds;
+    if (!ownerIds || !ownerIds.length) {
+      showWarningBox(
+        i18n._(
+          t`You must select at least one user to be the owner of the game.`
+        ),
+        { delayToNextTick: true }
+      );
+      return false;
+    }
+
     try {
+      setIsGameUpdating(true);
       const gameId = project.getProjectUuid();
       const updatedGame = await updateGame(getAuthorizationHeader, id, gameId, {
         authorName: project.getAuthor() || 'Unspecified publisher',
-        gameName: project.getName() || 'Untitle game',
+        gameName: project.getName() || 'Untitled game',
         categories: project.getCategories().toJSArray() || [],
         description: project.getDescription() || '',
         playWithKeyboard: project.isPlayableWithKeyboard(),
         playWithGamepad: project.isPlayableWithGamepad(),
         playWithMobile: project.isPlayableWithMobile(),
         orientation: project.getOrientation(),
-        // The thumbnailUrl is updated only when a build is made public.
+        discoverable: partialGameChange.discoverable,
       });
+      if (
+        partialGameChange.userSlug &&
+        partialGameChange.gameSlug &&
+        partialGameChange.userSlug === profile.username
+      ) {
+        try {
+          await setGameSlug(
+            getAuthorizationHeader,
+            id,
+            gameId,
+            partialGameChange.userSlug,
+            partialGameChange.gameSlug
+          );
+        } catch (error) {
+          console.error(
+            'Unable to update the game slug:',
+            error.response || error.message
+          );
+          showErrorBox({
+            message:
+              i18n._(
+                t`Unable to update the game slug. A slug must be 6 to 30 characters long and only contains letters, digits or dashes.`
+              ) +
+              ' ' +
+              i18n._(t`Verify your internet connection or try again later.`),
+            rawError: error,
+            errorId: 'game-slug-update-error',
+          });
+          setIsGameUpdating(false);
+          return false;
+        }
+      }
       try {
         const authorAcls = getAclsFromUserIds(
           project.getAuthorIds().toJSArray()
         );
-        const ownerAcls = getAclsFromUserIds(partialGameChange.ownerIds);
+        const ownerAcls = getAclsFromUserIds(ownerIds);
         await setGameUserAcls(getAuthorizationHeader, id, gameId, {
           ownership: ownerAcls,
           author: authorAcls,
         });
       } catch (error) {
-        console.error('Unable to update the game owners or authors:', error);
+        console.error(
+          'Unable to update the game owners or authors:',
+          error.response || error.message
+        );
         showErrorBox({
           message:
-            i18n._(t`Unable to update the game owners or authors.`) +
+            i18n._(
+              t`Unable to update the game owners or authors. Have you removed yourself from the owners?`
+            ) +
             ' ' +
             i18n._(t`Verify your internet connection or try again later.`),
           rawError: error,
           errorId: 'game-acls-update-error',
         });
+        setIsGameUpdating(false);
+        return false;
       }
-      onGameUpdated(updatedGame);
+      handleGameUpdated(updatedGame);
     } catch (error) {
-      console.error('Unable to update the game:', error);
+      console.error(
+        'Unable to update the game:',
+        error.response || error.message
+      );
       showErrorBox({
         message:
           i18n._(t`Unable to update the game details.`) +
@@ -205,18 +278,39 @@ export const GameDetailsDialog = ({
         rawError: error,
         errorId: 'game-details-update-error',
       });
+      setIsGameUpdating(false);
+      return false;
     }
+
+    setIsGameUpdating(false);
+    return true;
   };
 
-  const unregisterGame = async () => {
+  const unregisterGame = async (i18n: I18nType) => {
     if (!profile) return;
     const { id } = profile;
-
+    setGameUnregisterErrorText(null);
+    setIsLoading(true);
     try {
+      setIsGameUpdating(true);
       await deleteGame(getAuthorizationHeader, id, game.id);
       onGameDeleted();
     } catch (error) {
       console.error('Unable to delete the game:', error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.code === 'game-deletion/leaderboards-exist'
+      ) {
+        setGameUnregisterErrorText(
+          i18n._(
+            t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
+          )
+        );
+      }
+    } finally {
+      setIsGameUpdating(false);
+      setIsLoading(false);
     }
   };
 
@@ -226,8 +320,7 @@ export const GameDetailsDialog = ({
 
       const { id } = profile;
       try {
-        // Set public game to null as it will be refetched automatically by the callback above.
-        setPublicGame(null);
+        setIsGameUpdating(true);
         const updatedGame = await updateGame(
           getAuthorizationHeader,
           id,
@@ -236,12 +329,14 @@ export const GameDetailsDialog = ({
             publicWebBuildId: null,
           }
         );
-        onGameUpdated(updatedGame);
+        handleGameUpdated(updatedGame);
       } catch (err) {
         console.error('Unable to update the game', err);
+      } finally {
+        setIsGameUpdating(false);
       }
     },
-    [game, getAuthorizationHeader, profile, onGameUpdated]
+    [game, getAuthorizationHeader, profile, handleGameUpdated]
   );
 
   const authorUsernames =
@@ -268,25 +363,41 @@ export const GameDetailsDialog = ({
           }
           open
           noMargin
-          onRequestClose={onClose}
+          flexColumnBody
+          fullHeight={currentTab === 'leaderboards'}
+          onRequestClose={() => {
+            if (!isLoading) onClose();
+          }}
           maxWidth="md"
           actions={[
             <FlatButton
               label={<Trans>Close</Trans>}
+              disabled={isLoading}
               onClick={onClose}
               key="close"
             />,
           ]}
           secondaryActions={[
-            <HelpButton key="help" helpPagePath="/interface/games-dashboard" />,
+            <HelpButton
+              key="help"
+              helpPagePath={
+                currentTab === 'leaderboards'
+                  ? '/interface/games-dashboard/leaderboard-administration'
+                  : '/interface/games-dashboard'
+              }
+            />,
           ]}
         >
           <Tabs value={currentTab} onChange={setCurrentTab}>
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
             <Tab label={<Trans>Analytics</Trans>} value="analytics" />
+            <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
-          <Line>
+          <Line expand>
+            {currentTab === 'leaderboards' ? (
+              <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
+            ) : null}
             {currentTab === 'details' ? (
               publicGameError ? (
                 <PlaceholderError onRetry={loadPublicGame}>
@@ -437,9 +548,10 @@ export const GameDetailsDialog = ({
 
                         if (!answer) return;
 
-                        unregisterGame();
+                        unregisterGame(i18n);
                       }}
                       label={<Trans>Unregister this game</Trans>}
+                      disabled={isGameUpdating}
                     />
                     <Spacer />
                     {publicGame.publicWebBuildId && (
@@ -447,14 +559,15 @@ export const GameDetailsDialog = ({
                         <RaisedButton
                           onClick={() => {
                             const answer = Window.showConfirmDialog(
-                              'Are you sure you want to unpublish this game? \n\nThis will make your Liluo unique game URL not accessible anymore. \n\nYou can decide anytime to publish it again.'
+                              'Are you sure you want to unpublish this game? \n\nThis will make your Liluo.io unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
                             );
 
                             if (!answer) return;
 
                             unpublishGame();
                           }}
-                          label={<Trans>Unpublish from Liluo</Trans>}
+                          label={<Trans>Unpublish from Liluo.io</Trans>}
+                          disabled={isGameUpdating}
                         />
                         <Spacer />
                       </>
@@ -463,9 +576,14 @@ export const GameDetailsDialog = ({
                       primary
                       onClick={() => setIsPublicGamePropertiesDialogOpen(true)}
                       label={<Trans>Edit game details</Trans>}
-                      disabled={!isGameOpenedAsProject}
+                      disabled={!isGameOpenedAsProject || isGameUpdating}
                     />
                   </Line>
+                  {gameUnregisterErrorText ? (
+                    <PlaceholderError kind="error">
+                      {gameUnregisterErrorText}
+                    </PlaceholderError>
+                  ) : null}
                 </ColumnStackLayout>
               )
             ) : null}
@@ -644,16 +762,21 @@ export const GameDetailsDialog = ({
               )
             ) : null}
           </Line>
-          {publicGame && project && (
+          {publicGame && project && isPublicGamePropertiesDialogOpen && (
             <PublicGamePropertiesDialog
-              open={isPublicGamePropertiesDialogOpen}
               project={project}
               publicGame={publicGame}
-              onApply={partialGameChange => {
-                setIsPublicGamePropertiesDialogOpen(false);
-                updateGameFromProject(partialGameChange, i18n);
+              onApply={async partialGameChange => {
+                const isGameUpdated = await updateGameFromProject(
+                  partialGameChange,
+                  i18n
+                );
+                if (isGameUpdated) {
+                  setIsPublicGamePropertiesDialogOpen(false);
+                }
               }}
               onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
+              isLoading={isGameUpdating}
             />
           )}
         </Dialog>

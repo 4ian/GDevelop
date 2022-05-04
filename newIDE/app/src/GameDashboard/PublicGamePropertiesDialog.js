@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import PublicGameProperties from './PublicGameProperties';
+import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
 import RaisedButton from '../UI/RaisedButton';
 import {
   displayProjectErrorsBox,
@@ -11,12 +11,16 @@ import {
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 /**
  * Changes that are not stored in the Project.
  */
 export type PartialGameChange = {|
-  ownerIds: Array<string>,
+  ownerIds?: Array<string>,
+  userSlug?: string,
+  gameSlug?: string,
+  discoverable?: boolean,
 |};
 
 /**
@@ -33,10 +37,10 @@ type PublicProjectProperties = {|
   orientation: string,
 |};
 
-function applyPublicPropertiesToProject(
+export const applyPublicPropertiesToProject = (
   project: gdProject,
   newProperties: PublicProjectProperties
-) {
+) => {
   const t = str => str; //TODO
   const { name, authorIds, description, categories } = newProperties;
   project.setName(name);
@@ -53,23 +57,25 @@ function applyPublicPropertiesToProject(
   project.setOrientation(newProperties.orientation);
 
   return displayProjectErrorsBox(t, getProjectPropertiesErrors(t, project));
-}
+};
 
 type Props = {|
   project: gdProject,
   publicGame: PublicGame,
-  open: boolean,
   onClose: () => void,
-  onApply: (partialGameChange: PartialGameChange) => void,
+  onApply: (partialGameChange: PartialGameChange) => Promise<void>,
+  isLoading: boolean,
 |};
 
 export const PublicGamePropertiesDialog = ({
   project,
   publicGame,
-  open,
   onClose,
   onApply,
+  isLoading,
 }: Props) => {
+  const { profile } = React.useContext(AuthenticatedUserContext);
+
   const publicGameAuthorIds = publicGame.authors.map(author => author.id);
   const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
@@ -89,10 +95,17 @@ export const PublicGamePropertiesDialog = ({
     publicGame.playWithMobile
   );
   const [orientation, setOrientation] = React.useState(publicGame.orientation);
+  const [userSlug, setUserSlug] = React.useState(
+    publicGame.userSlug || (profile && profile.username) || ''
+  );
+  const [gameSlug, setGameSlug] = React.useState(
+    publicGame.gameSlug || cleanUpGameSlug(publicGame.gameName)
+  );
+  const [discoverable, setDiscoverable] = React.useState(
+    publicGame.discoverable
+  );
 
-  if (!open) return null;
-
-  const onSave = () => {
+  const onSave = async () => {
     if (
       applyPublicPropertiesToProject(project, {
         name,
@@ -105,7 +118,7 @@ export const PublicGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      onApply({ ownerIds });
+      await onApply({ ownerIds, userSlug, gameSlug, discoverable });
     }
   };
 
@@ -115,12 +128,14 @@ export const PublicGamePropertiesDialog = ({
       key="back"
       primary={false}
       onClick={onClose}
+      disabled={isLoading}
     />,
     <RaisedButton
       label={<Trans>Save</Trans>}
       primary
       onClick={onSave}
       key="save"
+      disabled={isLoading}
     />,
   ];
 
@@ -130,7 +145,7 @@ export const PublicGamePropertiesDialog = ({
       onRequestClose={onClose}
       actions={actions}
       cannotBeDismissed={false}
-      open={open}
+      open
     >
       <PublicGameProperties
         name={name}
@@ -152,6 +167,14 @@ export const PublicGamePropertiesDialog = ({
         playWithMobile={playWithMobile}
         setOrientation={setOrientation}
         orientation={orientation}
+        setUserSlug={setUserSlug}
+        userSlug={userSlug}
+        setGameSlug={setGameSlug}
+        gameSlug={gameSlug}
+        setDiscoverable={setDiscoverable}
+        discoverable={discoverable}
+        displayThumbnail
+        thumbnailUrl={publicGame.thumbnailUrl}
       />
     </Dialog>
   );

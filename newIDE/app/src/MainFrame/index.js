@@ -5,6 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
+import HomeIcon from '@material-ui/icons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -132,6 +133,8 @@ import {
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import OnboardingDialog from './Onboarding/OnboardingDialog';
+import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
+import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1377,7 +1380,7 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          label: i18n._(t`Home`),
+          icon: <HomeIcon role="img" titleAccess="Home" />,
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,
           key: 'start page',
@@ -1385,7 +1388,7 @@ const MainFrame = (props: Props) => {
         }),
       }));
     },
-    [i18n, setState]
+    [setState]
   );
 
   const _openDebugger = React.useCallback(
@@ -1469,10 +1472,19 @@ const MainFrame = (props: Props) => {
 
   const onCreateEventsFunction = (
     extensionName: string,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    editorIdentifier:
+      | 'scene-events-editor'
+      | 'extension-events-editor'
+      | 'external-events-editor'
   ) => {
     const { currentProject } = state;
     if (!currentProject) return;
+
+    sendEventsExtractedAsFunction({
+      step: 'end',
+      parentEditor: editorIdentifier,
+    });
 
     // Names are assumed to be already validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
@@ -1945,21 +1957,38 @@ const MainFrame = (props: Props) => {
     if (shouldCloseDialog)
       await setState(state => ({ ...state, createDialogOpen: false }));
 
-    await getStorageProviderOperations(storageProvider);
-    let state;
+    let state: ?State;
     if (project) state = await loadFromProject(project, fileMetadata);
     else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
 
-    if (state) {
-      if (state.currentProject) {
-        const { currentProject } = state;
-        currentProject.resetProjectUuid();
-        if (projectName) currentProject.setName(projectName);
+    if (!state) return;
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    currentProject.resetProjectUuid();
+    currentProject.setVersion('1.0.0');
+    if (projectName) currentProject.setName(projectName);
+    openSceneOrProjectManager({
+      currentProject: currentProject,
+      editorTabs: editorTabs,
+    });
+
+    const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
+      storageProvider
+    );
+    const { onSaveProject } = storageProviderOperations;
+
+    if (onSaveProject && fileMetadata) {
+      try {
+        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
+
+        if (wasSaved) {
+          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+        }
+      } catch (rawError) {
+        // Do not prevent creating the project.
+        console.error("Couldn't save the project after creation.", rawError);
       }
-      openSceneOrProjectManager({
-        currentProject: state.currentProject,
-        editorTabs: state.editorTabs,
-      });
     }
   };
 
@@ -2162,86 +2191,92 @@ const MainFrame = (props: Props) => {
         onTabActived={(editorTab: EditorTab) => _onEditorTabActived(editorTab)}
         onDropTab={onDropEditorTab}
       />
-      {getEditors(state.editorTabs).map((editorTab, id) => {
-        const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
-        return (
-          <TabContentContainer key={editorTab.key} active={isCurrentTab}>
-            <CommandsContextScopedProvider active={isCurrentTab}>
-              <ErrorBoundary>
-                {editorTab.renderEditorContainer({
-                  isActive: isCurrentTab,
-                  extraEditorProps: editorTab.extraEditorProps,
-                  project: currentProject,
-                  ref: editorRef => (editorTab.editorRef = editorRef),
-                  setToolbar: editorToolbar =>
-                    setEditorToolbar(editorToolbar, isCurrentTab),
-                  onChangeSubscription: () => openSubscriptionDialog(true),
-                  projectItemName: editorTab.projectItemName,
-                  setPreviewedLayout,
-                  onOpenExternalEvents: openExternalEvents,
-                  onOpenEvents: (sceneName: string) =>
-                    openLayout(sceneName, {
-                      openEventsEditor: true,
-                      openSceneEditor: false,
-                    }),
-                  previewDebuggerServer,
-                  hotReloadPreviewButtonProps,
-                  onOpenLayout: name =>
-                    openLayout(name, {
-                      openEventsEditor: true,
-                      openSceneEditor: false,
-                    }),
-                  resourceSources: props.resourceSources,
-                  onChooseResource,
-                  resourceExternalEditors,
-                  onCreateEventsFunction,
-                  openInstructionOrExpression,
-                  unsavedChanges: unsavedChanges,
-                  canOpen: !!props.storageProviders.filter(
-                    ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
-                  ).length,
-                  onOpen: () => chooseProject(),
-                  onOpenRecentFile: openFromFileMetadataWithStorageProvider,
-                  onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
-                  onCreateBlank: onCreateBlank,
-                  onOpenProjectAfterCreation: onOpenProjectAfterCreation,
-                  onOpenProjectManager: () => openProjectManager(true),
-                  onCloseProject: () => askToCloseProject(),
-                  onOpenTutorials: () => onOpenTutorials(),
-                  onOpenGamesShowcase: () => onOpenGamesShowcase(),
-                  onOpenExamples: () => onOpenExamples(),
-                  onOpenProfile: () => openProfileDialogWithTab('profile'),
-                  onOpenHelpFinder: () => openHelpFinderDialog(true),
-                  onOpenLanguageDialog: () => openLanguageDialog(true),
-                  onLoadEventsFunctionsExtensions: () =>
-                    eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
-                      currentProject
-                    ),
-                  onDeleteResource: (
-                    resource: gdResource,
-                    cb: boolean => void
-                  ) => {
-                    // TODO: Project wide refactoring of objects/events using the resource
-                    cb(true);
-                  },
-                  onRenameResource: (
-                    resource: gdResource,
-                    newName: string,
-                    cb: boolean => void
-                  ) => {
-                    if (currentProject)
-                      renameResourcesInProject(currentProject, {
-                        [resource.getName()]: newName,
-                      });
+      <LeaderboardProvider
+        gameId={
+          state.currentProject ? state.currentProject.getProjectUuid() : ''
+        }
+      >
+        {getEditors(state.editorTabs).map((editorTab, id) => {
+          const isCurrentTab = getCurrentTabIndex(state.editorTabs) === id;
+          return (
+            <TabContentContainer key={editorTab.key} active={isCurrentTab}>
+              <CommandsContextScopedProvider active={isCurrentTab}>
+                <ErrorBoundary>
+                  {editorTab.renderEditorContainer({
+                    isActive: isCurrentTab,
+                    extraEditorProps: editorTab.extraEditorProps,
+                    project: currentProject,
+                    ref: editorRef => (editorTab.editorRef = editorRef),
+                    setToolbar: editorToolbar =>
+                      setEditorToolbar(editorToolbar, isCurrentTab),
+                    onChangeSubscription: () => openSubscriptionDialog(true),
+                    projectItemName: editorTab.projectItemName,
+                    setPreviewedLayout,
+                    onOpenExternalEvents: openExternalEvents,
+                    onOpenEvents: (sceneName: string) =>
+                      openLayout(sceneName, {
+                        openEventsEditor: true,
+                        openSceneEditor: false,
+                      }),
+                    previewDebuggerServer,
+                    hotReloadPreviewButtonProps,
+                    onOpenLayout: name =>
+                      openLayout(name, {
+                        openEventsEditor: true,
+                        openSceneEditor: false,
+                      }),
+                    resourceSources: props.resourceSources,
+                    onChooseResource,
+                    resourceExternalEditors,
+                    onCreateEventsFunction,
+                    openInstructionOrExpression,
+                    unsavedChanges: unsavedChanges,
+                    canOpen: !!props.storageProviders.filter(
+                      ({ hiddenInOpenDialog }) => !hiddenInOpenDialog
+                    ).length,
+                    onOpen: () => chooseProject(),
+                    onOpenRecentFile: openFromFileMetadataWithStorageProvider,
+                    onCreateFromExampleShortHeader: onCreateFromExampleShortHeader,
+                    onCreateBlank: onCreateBlank,
+                    onOpenProjectAfterCreation: onOpenProjectAfterCreation,
+                    onOpenProjectManager: () => openProjectManager(true),
+                    onCloseProject: () => askToCloseProject(),
+                    onOpenTutorials: () => onOpenTutorials(),
+                    onOpenGamesShowcase: () => onOpenGamesShowcase(),
+                    onOpenExamples: () => onOpenExamples(),
+                    onOpenProfile: () => openProfileDialogWithTab('profile'),
+                    onOpenHelpFinder: () => openHelpFinderDialog(true),
+                    onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onLoadEventsFunctionsExtensions: () =>
+                      eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+                        currentProject
+                      ),
+                    onDeleteResource: (
+                      resource: gdResource,
+                      cb: boolean => void
+                    ) => {
+                      // TODO: Project wide refactoring of objects/events using the resource
+                      cb(true);
+                    },
+                    onRenameResource: (
+                      resource: gdResource,
+                      newName: string,
+                      cb: boolean => void
+                    ) => {
+                      if (currentProject)
+                        renameResourcesInProject(currentProject, {
+                          [resource.getName()]: newName,
+                        });
 
-                    cb(true);
-                  },
-                })}
-              </ErrorBoundary>
-            </CommandsContextScopedProvider>
-          </TabContentContainer>
-        );
-      })}
+                      cb(true);
+                    },
+                  })}
+                </ErrorBoundary>
+              </CommandsContextScopedProvider>
+            </TabContentContainer>
+          );
+        })}
+      </LeaderboardProvider>
       <CommandPalette ref={commandPaletteRef} />
       <LoaderModal show={showLoader} />
       <HelpFinder
@@ -2266,6 +2301,7 @@ const MainFrame = (props: Props) => {
             openSubscriptionDialog(true);
           },
           project: state.currentProject,
+          onSaveProject: saveProject,
         })}
       {!!renderCreateDialog &&
         state.createDialogOpen &&

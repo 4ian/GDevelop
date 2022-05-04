@@ -9,6 +9,7 @@
 #if defined(GD_IDE_ONLY)
 #include <map>
 #include <memory>
+
 #include "GDCore/String.h"
 namespace gd {
 class Project;
@@ -151,15 +152,16 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is "object", "objectPtr" or
-   * "objectList".
+   * \brief Return true if the type of the parameter is representing one object
+   * (or more, i.e: an object group).
    *
    * \see gd::ParameterMetadata::GetType
    */
   static bool IsObject(const gd::String &parameterType) {
     return parameterType == "object" || parameterType == "objectPtr" ||
            parameterType == "objectList" ||
-           parameterType == "objectListWithoutPicking";
+           parameterType == "objectListOrEmptyIfJustDeclared" ||
+           parameterType == "objectListOrEmptyWithoutPicking";
   }
 
   /**
@@ -196,7 +198,8 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "objectPointName" ||
              parameterType == "objectAnimationName" ||
              parameterType == "functionParameterName" ||
-             parameterType == "externalLayoutName";
+             parameterType == "externalLayoutName" ||
+             parameterType == "leaderboardId";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";

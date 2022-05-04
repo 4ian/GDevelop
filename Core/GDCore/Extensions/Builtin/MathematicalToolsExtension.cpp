@@ -230,12 +230,30 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddParameter("expression", _("Expression"));
 
   extension
+      .AddExpression("ceilTo",
+                     _("Ceil (round up) to a decimal point"),
+                     _("Round number up to the Nth decimal place"),
+                     "",
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Expression"))
+      .AddParameter("expression", _("Expression"), "", true);
+
+  extension
       .AddExpression("floor",
                      _("Floor (round down)"),
                      _("Round number down to an integer"),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
+
+  extension
+      .AddExpression("floorTo",
+                     _("Floor (round down) to a decimal point"),
+                     _("Round number down to the Nth decimal place"),
+                     "",
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Expression"))
+      .AddParameter("expression", _("Expression"), "", true);
 
   extension
       .AddExpression("cos",
@@ -294,6 +312,15 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
+
+  extension
+      .AddExpression("roundTo",
+                     _("Round to a decimal point"),
+                     _("Round a number to the Nth decimal place"),
+                     "",
+                     "res/mathfunction.png")
+      .AddParameter("expression", _("Expression"))
+      .AddParameter("expression", _("Expression"), "", true);
 
   extension
       .AddExpression("exp",

@@ -35,7 +35,7 @@ module.exports = {
       )
       .setExtensionHelpPath('/all-features/leaderboards')
       .setCategory('Leaderboards')
-      .addInstructionOrExpressionGroupMetadata(_('Leaderboards'))
+      .addInstructionOrExpressionGroupMetadata(_('Leaderboards (experimental)'))
       .setIcon('JsPlatform/Extensions/leaderboard.svg');
 
     extension
@@ -59,20 +59,6 @@ module.exports = {
         false
       )
       .addParameter('string', _('Name to register for the player'), '', false)
-      .addParameter(
-        'scenevar',
-        _('Variable where to store the saved score (optional)'),
-        '',
-        true
-      )
-      .addParameter(
-        'scenevar',
-        _(
-          'Variable where to store the error message (optional, if an error occurs)'
-        ),
-        '',
-        true
-      )
       .setHelpPath('/all-features/leaderboards')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Leaderboards/sha256.js')

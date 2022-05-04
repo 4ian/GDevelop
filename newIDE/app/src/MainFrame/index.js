@@ -134,6 +134,7 @@ import {
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import OnboardingDialog from './Onboarding/OnboardingDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
+import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1471,10 +1472,19 @@ const MainFrame = (props: Props) => {
 
   const onCreateEventsFunction = (
     extensionName: string,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    editorIdentifier:
+      | 'scene-events-editor'
+      | 'extension-events-editor'
+      | 'external-events-editor'
   ) => {
     const { currentProject } = state;
     if (!currentProject) return;
+
+    sendEventsExtractedAsFunction({
+      step: 'end',
+      parentEditor: editorIdentifier,
+    });
 
     // Names are assumed to be already validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
@@ -1947,21 +1957,38 @@ const MainFrame = (props: Props) => {
     if (shouldCloseDialog)
       await setState(state => ({ ...state, createDialogOpen: false }));
 
-    await getStorageProviderOperations(storageProvider);
-    let state;
+    let state: ?State;
     if (project) state = await loadFromProject(project, fileMetadata);
     else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
 
-    if (state) {
-      if (state.currentProject) {
-        const { currentProject } = state;
-        currentProject.resetProjectUuid();
-        if (projectName) currentProject.setName(projectName);
+    if (!state) return;
+    const { currentProject, editorTabs } = state;
+    if (!currentProject) return;
+
+    currentProject.resetProjectUuid();
+    currentProject.setVersion('1.0.0');
+    if (projectName) currentProject.setName(projectName);
+    openSceneOrProjectManager({
+      currentProject: currentProject,
+      editorTabs: editorTabs,
+    });
+
+    const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
+      storageProvider
+    );
+    const { onSaveProject } = storageProviderOperations;
+
+    if (onSaveProject && fileMetadata) {
+      try {
+        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
+
+        if (wasSaved) {
+          if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+        }
+      } catch (rawError) {
+        // Do not prevent creating the project.
+        console.error("Couldn't save the project after creation.", rawError);
       }
-      openSceneOrProjectManager({
-        currentProject: state.currentProject,
-        editorTabs: state.editorTabs,
-      });
     }
   };
 

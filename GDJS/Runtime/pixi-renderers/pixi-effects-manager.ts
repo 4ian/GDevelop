@@ -116,9 +116,12 @@ namespace gdjs {
       effectAdded =
         this.updateAllEffectParameters(rendererEffects, effectData) &&
         effectAdded;
-      effectAdded =
-        this.applyEffect(rendererObject, rendererEffects[effectData.name]) &&
-        effectAdded;
+
+      if (rendererEffects[effectData.name]) {
+        effectAdded =
+          this.applyEffect(rendererObject, rendererEffects[effectData.name]) &&
+          effectAdded;
+      }
       return effectAdded;
     }
 

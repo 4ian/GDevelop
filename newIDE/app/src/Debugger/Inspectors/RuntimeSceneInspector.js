@@ -48,6 +48,8 @@ const transform = runtimeScene => {
       runtimeScene._layers && runtimeScene._layers.items
         ? mapValues(runtimeScene._layers.items, transformLayer)
         : null,
+    'Actions waiting to be finished':
+      runtimeScene._asyncTasksManager.tasksWithCallback.length,
   };
 };
 

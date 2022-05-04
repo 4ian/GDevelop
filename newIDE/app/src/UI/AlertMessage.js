@@ -39,7 +39,7 @@ const AlertMessage = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
-    <Paper elevation={10} square>
+    <Paper variant="outlined">
       <Column expand>
         <ResponsiveLineStackLayout
           alignItems="center"

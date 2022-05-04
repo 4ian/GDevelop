@@ -78,6 +78,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`The bounding box is an imaginary rectangle surrounding the object collision mask. Even if the object X and Y positions are not changed, this rectangle can change if the object is rotated or if an animation is being played. Usually you should use actions and conditions related to the object position or center, but the bounding box can be useful to deal with the area of the object.`,
     };
   }
+  if (type === 'PickedInstancesCount') {
+    return {
+      kind: 'info',
+      message: t`If no previous condition or action used the specified object(s), the picked instances count will be 0.`,
+    };
+  }
   if (type === 'CompareTimer') {
     return {
       kind: 'info',

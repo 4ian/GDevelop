@@ -218,8 +218,8 @@ void EventsListSerialization::UnserializeEventsFrom(
       event = std::make_shared<EmptyEvent>();
     }
 
-    event->SetDisabled(eventElem.GetBoolAttribute("disabled"));
-    event->SetFolded(eventElem.GetBoolAttribute("folded"));
+    event->SetDisabled(eventElem.GetBoolAttribute("disabled", false));
+    event->SetFolded(eventElem.GetBoolAttribute("folded", false));
 
     list.InsertEvent(event, list.GetEventsCount());
   }
@@ -232,8 +232,8 @@ void EventsListSerialization::SerializeEventsTo(const EventsList& list,
     const gd::BaseEvent& event = list.GetEvent(j);
     SerializerElement& eventElem = events.AddChild("event");
 
-    eventElem.SetAttribute("disabled", event.IsDisabled());
-    eventElem.SetAttribute("folded", event.IsFolded());
+    if (event.IsDisabled()) eventElem.SetAttribute("disabled", event.IsDisabled());
+    if (event.IsFolded()) eventElem.SetAttribute("folded", event.IsFolded());
     eventElem.AddChild("type").SetValue(event.GetType());
 
     event.SerializeTo(eventElem);

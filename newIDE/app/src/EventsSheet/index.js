@@ -120,6 +120,7 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
 |};
 
@@ -1093,6 +1094,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     getSelectedEvents(this.state.selection).forEach(event =>
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
+
+    this.props.onBeginCreateEventsFunction();
 
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),

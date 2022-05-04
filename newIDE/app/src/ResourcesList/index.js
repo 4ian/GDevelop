@@ -256,7 +256,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => this._editName(resource),
       },
       {
-        label: i18n._(t`Remove`),
+        label: i18n._(t`Delete`),
         click: () => this._deleteResource(resource),
       },
       { type: 'separator' },

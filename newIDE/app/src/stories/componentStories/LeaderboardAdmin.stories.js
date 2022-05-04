@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
@@ -11,7 +10,6 @@ import {
   type Leaderboard,
   type LeaderboardSortOption,
 } from '../../Utils/GDevelopServices/Play';
-import { Column } from '../../UI/Grid';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
 export default {
@@ -20,6 +18,7 @@ export default {
   decorators: [paperDecorator, muiDecorator],
 };
 
+const primaryLeaderboardIndex = 2;
 const mockedLeaderboards = Array(5)
   .fill(0)
   .map((_, index) => ({
@@ -30,6 +29,7 @@ const mockedLeaderboards = Array(5)
     startDatetime: '2021-11-18T10:19:50.417Z',
     playerUnicityDisplayChoice: index % 2 === 0 ? 'PREFER_UNIQUE' : 'FREE',
     visibility: index % 3 === 0 ? 'HIDDEN' : 'PUBLIC',
+    primary: index === primaryLeaderboardIndex ? true : undefined,
   }));
 const mockedEntries = Array(8)
   .fill(0)
@@ -98,7 +98,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
 
 export const WithErrors = () => (
   <MockLeaderboardProvider>
-    <FixedHeightFlexContainer height={500}>
+    <FixedHeightFlexContainer height={600}>
       <LeaderboardAdmin onLoading={() => action('onLoading')} />
     </FixedHeightFlexContainer>
   </MockLeaderboardProvider>

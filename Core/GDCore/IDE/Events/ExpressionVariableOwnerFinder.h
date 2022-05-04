@@ -127,7 +127,7 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
     if (parameterIndex == 0) {
       return;
     }
-    // TODO Could there be a behavior paramater in between?
+    // TODO Could there be a behavior or other variable paramater in between?
     const gd::ParameterMetadata* previousParameterMetadata = MetadataProvider::GetFunctionCallParameterMetadata(
     platform, 
     globalObjectsContainer,

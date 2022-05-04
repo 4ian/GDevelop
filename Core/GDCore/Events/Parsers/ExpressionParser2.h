@@ -503,19 +503,23 @@ class GD_CORE_API ExpressionParser2 {
     size_t parameterIndex =
         WrittenParametersFirstIndex(objectName, behaviorName);
 
+    bool previousCharacterIsParameterSeparator = false;
     while (!IsEndReached()) {
       SkipAllWhitespaces();
 
-      if (CheckIfChar(IsClosingParenthesis)) {
+      if (CheckIfChar(IsClosingParenthesis) && !previousCharacterIsParameterSeparator) {
         auto closingParenthesisLocation = SkipChar();
         return ParametersNode{
             std::move(parameters), nullptr, closingParenthesisLocation};
       }
-      auto parameter = Expression();
+      bool isEmptyParameter = CheckIfChar(IsParameterSeparator)
+          || CheckIfChar(IsClosingParenthesis) && previousCharacterIsParameterSeparator;
+      auto parameter = isEmptyParameter ? gd::make_unique<EmptyNode>() : Expression();
       parameter->parent = functionCallNode;
       parameters.push_back(std::move(parameter));
 
       SkipAllWhitespaces();
+      previousCharacterIsParameterSeparator = CheckIfChar(IsParameterSeparator);
       SkipIfChar(IsParameterSeparator);
       parameterIndex++;
     }

@@ -1005,7 +1005,15 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "number");
       node->Visit(validator);
-      // TODO fix: The list of parameters is not terminated.
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("MyExtension::MouseX(,0)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
   }

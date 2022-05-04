@@ -372,10 +372,9 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
 
   SECTION("Valid variables") {
     SECTION("Test 1") {
-      // TODO check if there acn be side effect to be an IdentifierNode
-      REQUIRE(CheckNodeAtLocationIs<gd::VariableNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::IdentifierNode>(
                   parser, "myVariable", 0) == true);
-      REQUIRE(CheckNodeAtLocationIs<gd::VariableNode>(
+      REQUIRE(CheckNodeAtLocationIs<gd::IdentifierNode>(
                   parser, "myVariable", 9) == true);
       REQUIRE(CheckNoNodeAtLocation(parser, "myVariable", 10) ==
               true);
@@ -386,13 +385,14 @@ TEST_CASE("ExpressionNodeLocationFinder", "[common][events]") {
 
       auto var1Node =
           gd::ExpressionNodeLocationFinder::GetNodeAtPosition(*node, 0);
-      REQUIRE(dynamic_cast<gd::VariableNode*>(var1Node) != nullptr);
-      REQUIRE(dynamic_cast<gd::VariableNode&>(*var1Node).name == "Var1");
+      REQUIRE(dynamic_cast<gd::IdentifierNode*>(var1Node) != nullptr);
+      REQUIRE(dynamic_cast<gd::IdentifierNode&>(*var1Node).identifierName == "Var1");
 
+      // It's actually the same node.
       auto child1Node =
           gd::ExpressionNodeLocationFinder::GetNodeAtPosition(*node, 4);
-      REQUIRE(dynamic_cast<gd::VariableAccessorNode*>(child1Node) != nullptr);
-      REQUIRE(dynamic_cast<gd::VariableAccessorNode&>(*child1Node).name ==
+      REQUIRE(dynamic_cast<gd::IdentifierNode*>(child1Node) != nullptr);
+      REQUIRE(dynamic_cast<gd::IdentifierNode&>(*child1Node).childIdentifierName ==
               "Child1");
     }
     SECTION("Test 3") {

@@ -23,6 +23,9 @@ const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
 const MIN_ZOOM_FACTOR = 0.1;
 
+const getBoundedZoomFactor = (zoom: number): number =>
+  Math.min(MAX_ZOOM_FACTOR, Math.max(MIN_ZOOM_FACTOR, zoom));
+
 const styles = {
   previewImagePixelated: {
     imageRendering: getPixelatedImageRendering(),
@@ -113,6 +116,7 @@ const ImagePreview = (props: Props) => {
     imageZoomFactor: 1,
     ...loadStateFrom(props),
   });
+  const isResizeObserverReady = React.useRef<boolean>(false);
 
   React.useEffect(
     () => {
@@ -137,6 +141,27 @@ const ImagePreview = (props: Props) => {
     setState(state => ({ ...state, errored: true }));
   };
 
+  const adaptZoomToImage = (
+    containerHeight: number,
+    containerWidth: number
+  ) => {
+    const { imageHeight, imageWidth } = state;
+    let zoomFactor;
+    if (!imageHeight || !imageWidth) {
+      zoomFactor = 1;
+    } else {
+      const idealZoomFactors = [
+        containerWidth / imageWidth,
+        containerHeight / imageHeight,
+      ];
+      zoomFactor = getBoundedZoomFactor(Math.min(...idealZoomFactors));
+    }
+    setState(state => ({
+      ...state,
+      imageZoomFactor: zoomFactor,
+    }));
+  };
+
   const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
@@ -157,10 +182,7 @@ const ImagePreview = (props: Props) => {
   const zoomTo = (imageZoomFactor: number) => {
     setState(state => ({
       ...state,
-      imageZoomFactor: Math.min(
-        MAX_ZOOM_FACTOR,
-        Math.max(MIN_ZOOM_FACTOR, imageZoomFactor)
-      ),
+      imageZoomFactor: getBoundedZoomFactor(imageZoomFactor),
     }));
   };
 
@@ -173,6 +195,14 @@ const ImagePreview = (props: Props) => {
       {({ contentRect, measureRef }) => {
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
+        if (
+          !!containerWidth &&
+          !!containerHeight &&
+          !isResizeObserverReady.current
+        ) {
+          adaptZoomToImage(containerHeight, containerWidth);
+          isResizeObserverReady.current = true;
+        }
         const { resourceName, renderOverlay, fixedHeight, project } = props;
         const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
 

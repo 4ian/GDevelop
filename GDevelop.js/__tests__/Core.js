@@ -3561,10 +3561,16 @@ describe('libGD.js', function () {
         expect(vectorVector2f.at(1).get_x()).toBe(2);
         expect(vectorVector2f.at(2).get_x()).toBe(3);
 
+        gd.moveVector2fInVector(vectorVector2f, 2, 0)
+        expect(vectorVector2f.at(0).get_x()).toBe(3);
+        expect(vectorVector2f.at(1).get_x()).toBe(1);
+        expect(vectorVector2f.at(2).get_x()).toBe(2);
+
         gd.removeFromVectorVector2f(vectorVector2f, 1);
         expect(vectorVector2f.size()).toBe(2);
-        expect(vectorVector2f.at(0).get_x()).toBe(1);
-        expect(vectorVector2f.at(1).get_x()).toBe(3);
+        expect(vectorVector2f.at(0).get_x()).toBe(3);
+        expect(vectorVector2f.at(1).get_x()).toBe(2);
+
 
         vectorVector2f.clear();
         expect(vectorVector2f.size()).toBe(0);

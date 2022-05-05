@@ -2,9 +2,11 @@
 import * as React from 'react';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 
+export const dropIndicatorColor = '#18dcf2';
+
 const styles = {
   dropIndicator: {
-    borderTop: '2px solid #18dcf2',
+    borderTop: `2px solid ${dropIndicatorColor}`,
     height: 0,
     marginTop: '-1px',
     marginBottom: '-1px',

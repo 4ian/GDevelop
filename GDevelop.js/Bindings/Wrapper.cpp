@@ -342,6 +342,16 @@ void removeFromVectorVector2f(std::vector<sf::Vector2f> &vec, size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
+void moveVector2fInVector(std::vector<sf::Vector2f> &vec,
+                 size_t oldIndex,
+                 size_t newIndex) {
+  if (oldIndex >= vec.size() || newIndex >= vec.size()) return;
+
+  auto vector2f = std::move(vec.at(oldIndex));
+  vec.erase(vec.begin() + oldIndex);
+  vec.insert(vec.begin() + newIndex, std::move(vector2f));
+}
+
 void removeFromVectorParameterMetadata(std::vector<gd::ParameterMetadata> &vec,
                                        size_t pos) {
   vec.erase(vec.begin() + pos);

@@ -27,37 +27,27 @@ class ExpressionMetadata;
 
 namespace gd {
 
-// TODO documentation
 /**
- * \brief Validate that an expression is properly written by returning
- * any error attached to the nodes during parsing.
+ * \brief Find the type of the node at the left side of operations.
  *
- * \see gd::ExpressionParser2
+ * \see gd::ExpressionTypeFinder
  */
 class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWorker {
  public:
 
   /**
-   * \brief Helper function to check if a given node does not contain
-   * any error.
+   * \brief Helper function to find the type of the node at the left side of
+   * operations.
    */
   static const gd::String GetType(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
                       gd::ExpressionNode& node) {
-    gd::ExpressionLeftSideTypeFinder typeFinder(platform, globalObjectsContainer, objectsContainer);
+    gd::ExpressionLeftSideTypeFinder typeFinder(
+        platform, globalObjectsContainer, objectsContainer);
     node.Visit(typeFinder);
     return typeFinder.GetType();
   }
-
-  /**
-   * \brief Get all the errors
-   *
-   * No errors means that the expression is valid.
-   */
-  const gd::String &GetType() {
-    return type;
-  };
 
   virtual ~ExpressionLeftSideTypeFinder(){};
 
@@ -69,6 +59,10 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
         type("unknown") {};
+
+  const gd::String &GetType() {
+    return type;
+  };
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
     node.expression->Visit(*this);

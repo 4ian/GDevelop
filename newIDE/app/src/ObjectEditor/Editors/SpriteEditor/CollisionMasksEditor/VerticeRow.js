@@ -68,6 +68,9 @@ const VerticeRow = ({
         >
           {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
             connectDropTarget(
+              // Input of connectDropTarget must be an html element.
+              // So instead of using Material UI table row,
+              // the MUI class name for the component is used.
               <tr
                 className="MuiTableRow-root"
                 style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}

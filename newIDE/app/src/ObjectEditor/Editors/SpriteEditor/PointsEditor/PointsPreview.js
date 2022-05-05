@@ -103,6 +103,7 @@ const PointsPreview = (props: Props) => {
     const draggingWasDone = !!state.draggedPoint;
     if (draggingWasDone) {
       props.onPointsUpdated();
+      // Select point at the end of the drag
       if (state.draggedPointKind && state.draggedPoint) {
         props.onClickPoint(
           getPointName(state.draggedPointKind, state.draggedPoint)

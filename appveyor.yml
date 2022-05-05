@@ -51,7 +51,7 @@ build_script:
 - ps: >-
     cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
+    node --max-old-space-size=3072 scripts/build.js --config build/electron-builder-windows.yml
 
     Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
 

@@ -12,8 +12,12 @@ import { getIDEVersion, getIDEVersionWithHash } from '../../Version';
 import { loadPreferencesFromLocalStorage } from '../../MainFrame/Preferences/PreferencesProvider';
 import { getBrowserLanguageOrLocale } from '../Language';
 import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
+import optionalRequire from '../OptionalRequire';
+import Window from '../Window';
+const electron = optionalRequire('electron');
 
-const isDev = false;
+const isElectronApp = !!electron;
+const isDev = Window.isDev();
 let startupTimesSummary = null;
 
 let posthogLoaded = false;
@@ -41,6 +45,8 @@ const recordEvent = (name: string, metadata?: { [string]: any }) => {
   posthog.capture(name, {
     ...metadata,
     isInAppTutorialRunning: isUserflowRunning,
+    isInDesktopApp: isElectronApp,
+    isInWebApp: !isElectronApp,
   });
 };
 
@@ -80,6 +86,7 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       appLanguage,
       browserLanguage,
       programOpeningCount: getProgramOpeningCount(),
+      ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     };
 
     if (firebaseUser) {

@@ -16,6 +16,7 @@ import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import CheckeredBackground from '../CheckeredBackground';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
+import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
@@ -262,8 +263,7 @@ const ImagePreview = (props: Props) => {
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
-                  //TODO: Use KeyboardShortcuts
-                  if (event.metaKey || event.ctrlKey) {
+                  if (shouldZoom(event)) {
                     zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();

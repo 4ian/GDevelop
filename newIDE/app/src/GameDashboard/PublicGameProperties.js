@@ -44,6 +44,7 @@ export const cleanUpGameSlug = (gameSlug: string) => {
 
 type Props = {|
   project: gdProject,
+  disabled?: boolean,
   // Properties visible in the project properties and game dialogs.
   setName: string => void,
   name: string,
@@ -76,6 +77,7 @@ type Props = {|
 
 export function PublicGameProperties({
   project,
+  disabled,
   setName,
   name,
   categories,
@@ -106,6 +108,12 @@ export function PublicGameProperties({
   const [categoryInput, setCategoryInput] = React.useState('');
   const { profile } = React.useContext(AuthenticatedUserContext);
 
+  const hasGameSlug =
+    userSlug && userSlug.length && profile && profile.username;
+
+  const hasValidGameSlug =
+    hasGameSlug && (!profile || userSlug !== profile.username);
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -130,6 +138,7 @@ export function PublicGameProperties({
                 value={name}
                 onChange={setName}
                 autoFocus
+                disabled={disabled}
               />
               {setCategories && (
                 <SemiControlledMultiAutoComplete
@@ -164,6 +173,7 @@ export function PublicGameProperties({
                   }))}
                   fullWidth
                   optionsLimit={4}
+                  loading={disabled}
                 />
               )}
               {setDiscoverable && (
@@ -171,6 +181,7 @@ export function PublicGameProperties({
                   label={<Trans>Make your game discoverable on Liluo.io</Trans>}
                   checked={!!discoverable}
                   onCheck={(e, checked) => setDiscoverable(checked)}
+                  disabled={disabled}
                 />
               )}
             </ColumnStackLayout>
@@ -194,6 +205,7 @@ export function PublicGameProperties({
             autoFocus
             multiline
             rows={5}
+            disabled={disabled}
           />
           {setUserSlug && setGameSlug && (
             <>
@@ -204,14 +216,7 @@ export function PublicGameProperties({
                   value={userSlug || ''}
                   onChange={(e, i, value: string) => setUserSlug(value)}
                   // It's disabled if one of the condition of SelectOption is false.
-                  disabled={
-                    !(
-                      profile &&
-                      profile.username &&
-                      userSlug &&
-                      (!profile || userSlug !== profile.username)
-                    )
-                  }
+                  disabled={!hasValidGameSlug || disabled}
                 >
                   {profile && profile.username && (
                     <SelectOption
@@ -225,32 +230,16 @@ export function PublicGameProperties({
                 </SelectField>
                 <Spacer />
                 <SemiControlledTextField
-                  disabled={
-                    !(
-                      userSlug &&
-                      userSlug.length &&
-                      profile &&
-                      profile.username
-                    )
-                  }
+                  disabled={!hasGameSlug || disabled}
                   floatingLabelText={<Trans>Game name in the game URL</Trans>}
                   fullWidth
                   type="text"
-                  value={
-                    userSlug && userSlug.length && profile && profile.username
-                      ? gameSlug || ''
-                      : ''
-                  }
+                  value={hasGameSlug ? gameSlug || '' : ''}
                   onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}
                   autoFocus
                 />
               </Line>
-              {!(
-                userSlug &&
-                userSlug.length &&
-                profile &&
-                profile.username
-              ) && (
+              {!hasGameSlug && (
                 <AlertMessage kind="info">
                   <Trans>
                     Usernames are required to choose a custom game URL.
@@ -270,6 +259,7 @@ export function PublicGameProperties({
                 an example or in the community.
               </Trans>
             }
+            disabled={disabled}
           />
           {setOwnerIds && (
             <UsersAutocomplete
@@ -283,6 +273,7 @@ export function PublicGameProperties({
                   ownership.
                 </Trans>
               }
+              disabled={disabled}
             />
           )}
           <SelectField
@@ -290,6 +281,7 @@ export function PublicGameProperties({
             floatingLabelText={<Trans>Device orientation (for mobile)</Trans>}
             value={orientation}
             onChange={(e, i, value: string) => setOrientation(value)}
+            disabled={disabled}
           >
             <SelectOption value="default" primaryText={t`Platform default`} />
             <SelectOption value="landscape" primaryText={t`Landscape`} />
@@ -303,16 +295,19 @@ export function PublicGameProperties({
                   label={<Trans>Playable with a keyboard</Trans>}
                   checked={!!playWithKeyboard}
                   onCheck={(e, checked) => setPlayableWithKeyboard(checked)}
+                  disabled={disabled}
                 />
                 <Checkbox
                   label={<Trans>Playable with a gamepad</Trans>}
                   checked={!!playWithGamepad}
                   onCheck={(e, checked) => setPlayableWithGamepad(checked)}
+                  disabled={disabled}
                 />
                 <Checkbox
                   label={<Trans>Playable on mobile</Trans>}
                   checked={!!playWithMobile}
                   onCheck={(e, checked) => setPlayableWithMobile(checked)}
+                  disabled={disabled}
                 />
               </React.Fragment>
             )}

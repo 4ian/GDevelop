@@ -463,6 +463,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     SECTION("Child access") {
       {
         auto node = parser.ParseExpression(
+            "MyExtension::GetVariableAsNumber(myVariable.child1)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+                "returnVariable(getLayoutVariable(myVariable).getChild("
+                "\"child1\"))");
+      }
+      {
+        auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable.child1.child2)");
         gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                             "",

@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
+import Delete from '@material-ui/icons/Delete';
 import { TableRowColumn } from '../../../../UI/Table';
 import IconButton from '../../../../UI/IconButton';
-import Delete from '@material-ui/icons/Delete';
-import TextField from '../../../../UI/TextField';
-import styles from './styles';
+import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 import { makeDragSourceAndDropTarget } from '../../../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { dropIndicatorColor } from '../../../../UI/SortableVirtualizedItemList/DropIndicator';
 import DragHandle from '../../../../UI/DragHandle';
+import styles from './styles';
 
 type Props = {|
   parentVerticeId: string,
@@ -34,24 +34,7 @@ const VerticeRow = ({
     () => makeDragSourceAndDropTarget(`collision-mask-${parentVerticeId}`),
     [parentVerticeId]
   );
-  const [verticeXInputValue, setVerticeXInputValue] = React.useState<string>(
-    verticeX.toString()
-  );
-  const [verticeYInputValue, setVerticeYInputValue] = React.useState<string>(
-    verticeY.toString()
-  );
-  React.useEffect(
-    () => {
-      setVerticeXInputValue(verticeX.toString());
-    },
-    [verticeX]
-  );
-  React.useEffect(
-    () => {
-      setVerticeYInputValue(verticeY.toString());
-    },
-    [verticeY]
-  );
+
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -89,32 +72,38 @@ const VerticeRow = ({
                   </td>
                 )}
                 <TableRowColumn style={styles.coordinateColumn}>
-                  <TextField
+                  <SemiControlledTextField
                     margin="none"
-                    value={verticeXInputValue}
+                    value={verticeX.toString()}
                     type="number"
                     id="vertice-x"
-                    onChange={(e, value) => {
-                      setVerticeXInputValue(value);
+                    onChange={value => {
                       const valueAsNumber = parseFloat(value);
-                      if (!isNaN(valueAsNumber)) {
+                      if (!isNaN(valueAsNumber))
                         props.onChangeVerticeX(valueAsNumber);
-                      }
+                    }}
+                    onBlur={event => {
+                      props.onChangeVerticeX(
+                        parseFloat(event.currentTarget.value) || 0
+                      );
                     }}
                   />
                 </TableRowColumn>
                 <TableRowColumn style={styles.coordinateColumn}>
-                  <TextField
+                  <SemiControlledTextField
                     margin="none"
-                    value={verticeYInputValue}
+                    value={verticeY.toString()}
                     type="number"
                     id="vertice-y"
-                    onChange={(e, value) => {
-                      setVerticeYInputValue(value);
+                    onChange={value => {
                       const valueAsNumber = parseFloat(value);
-                      if (!isNaN(valueAsNumber)) {
+                      if (!isNaN(valueAsNumber))
                         props.onChangeVerticeY(valueAsNumber);
-                      }
+                    }}
+                    onBlur={event => {
+                      props.onChangeVerticeY(
+                        parseFloat(event.currentTarget.value) || 0
+                      );
                     }}
                   />
                 </TableRowColumn>

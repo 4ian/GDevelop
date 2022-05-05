@@ -6,6 +6,7 @@ import IconButton from '../../../../UI/IconButton';
 import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import TextField from '../../../../UI/TextField';
+import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 import Text from '../../../../UI/Text';
@@ -33,24 +34,6 @@ const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
       onMouseLeave(null);
     },
     [onMouseLeave]
-  );
-  const [pointXInputValue, setPointXInputValue] = React.useState<string>(
-    pointX.toString()
-  );
-  const [pointYInputValue, setPointYInputValue] = React.useState<string>(
-    pointY.toString()
-  );
-  React.useEffect(
-    () => {
-      setPointXInputValue(pointX.toString());
-    },
-    [pointX]
-  );
-  React.useEffect(
-    () => {
-      setPointYInputValue(pointY.toString());
-    },
-    [pointY]
   );
 
   return (
@@ -86,22 +69,25 @@ const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
           </TableRowColumn>
           <TableRowColumn style={styles.coordinateColumn}>
             {!props.isAutomatic ? (
-              <TextField
+              <SemiControlledTextField
                 margin="none"
                 inputStyle={
                   props.selected
                     ? { color: muiTheme.listItem.selectedTextColor }
                     : undefined
                 }
-                value={pointXInputValue}
+                value={pointX.toString()}
                 type="number"
                 id="point-x"
-                onChange={(e, value) => {
-                  setPointXInputValue(value);
+                onChange={value => {
                   const valueAsNumber = parseFloat(value);
-                  if (!isNaN(valueAsNumber)) {
+                  if (!isNaN(valueAsNumber))
                     props.onChangePointX(valueAsNumber);
-                  }
+                }}
+                onBlur={event => {
+                  props.onChangePointX(
+                    parseFloat(event.currentTarget.value) || 0
+                  );
                 }}
               />
             ) : (
@@ -112,22 +98,25 @@ const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
           </TableRowColumn>
           <TableRowColumn style={styles.coordinateColumn}>
             {!props.isAutomatic ? (
-              <TextField
+              <SemiControlledTextField
                 margin="none"
                 inputStyle={
                   props.selected
                     ? { color: muiTheme.listItem.selectedTextColor }
                     : undefined
                 }
-                value={pointYInputValue}
+                value={pointY.toString()}
                 type="number"
                 id="point-y"
-                onChange={(e, value) => {
-                  setPointYInputValue(value);
+                onChange={value => {
                   const valueAsNumber = parseFloat(value);
-                  if (!isNaN(valueAsNumber)) {
+                  if (!isNaN(valueAsNumber))
                     props.onChangePointY(valueAsNumber);
-                  }
+                }}
+                onBlur={event => {
+                  props.onChangePointY(
+                    parseFloat(event.currentTarget.value) || 0
+                  );
                 }}
               />
             ) : (

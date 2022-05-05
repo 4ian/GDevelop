@@ -28,8 +28,8 @@ class ExpressionMetadata;
 namespace gd {
 
 /**
- * \brief Validate that an expression is properly written by returning
- * any error attached to the nodes during parsing.
+ * \brief Find the object name that should be used as a context of the
+ * expression or sub-expression that a given node represents.
  *
  * \see gd::ExpressionParser2
  */
@@ -37,15 +37,16 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
  public:
 
   /**
-   * \brief Helper function to check if a given node does not contain
-   * any error.
+   * \brief Helper function to find the object name that should be used as a
+   * context of the expression or sub-expression that a given node represents.
    */
   static const gd::String GetObjectName(const gd::Platform &platform,
                       const gd::ObjectsContainer &globalObjectsContainer,
                       const gd::ObjectsContainer &objectsContainer,
                       const gd::String& rootObjectName,
                       gd::ExpressionNode& node) {
-    gd::ExpressionVariableOwnerFinder typeFinder(platform, globalObjectsContainer, objectsContainer, rootObjectName);
+    gd::ExpressionVariableOwnerFinder typeFinder(
+        platform, globalObjectsContainer, objectsContainer, rootObjectName);
     node.Visit(typeFinder);
     return typeFinder.GetObjectName();
   }
@@ -123,29 +124,34 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
     if (parameterIndex < 0) {
       return;
     }
-    const gd::ParameterMetadata* parameterMetadata = MetadataProvider::GetFunctionCallParameterMetadata(
-        platform, 
-        globalObjectsContainer,
-        objectsContainer,
-        functionCall,
-        parameterIndex);
-    if (parameterMetadata == nullptr || parameterMetadata->GetType() != "objectvar") {
+    const gd::ParameterMetadata* parameterMetadata =
+        MetadataProvider::GetFunctionCallParameterMetadata(
+            platform, 
+            globalObjectsContainer,
+            objectsContainer,
+            functionCall,
+            parameterIndex);
+    if (parameterMetadata == nullptr
+     || parameterMetadata->GetType() != "objectvar") {
       return;
     }
 
     objectName = functionCall.objectName;
     if (parameterIndex == 0) {
+      // TODO remove this line
       objectName = rootObjectName;
       return;
     }
     // TODO Could there be a behavior or other variable paramater in between?
-    const gd::ParameterMetadata* previousParameterMetadata = MetadataProvider::GetFunctionCallParameterMetadata(
-    platform, 
-    globalObjectsContainer,
-    objectsContainer,
-    functionCall,
-    parameterIndex - 1);
-    if (previousParameterMetadata != nullptr && gd::ParameterMetadata::IsObject(previousParameterMetadata->GetType())) {
+    const gd::ParameterMetadata* previousParameterMetadata =
+        MetadataProvider::GetFunctionCallParameterMetadata(
+            platform, 
+            globalObjectsContainer,
+            objectsContainer,
+            functionCall,
+            parameterIndex - 1);
+    if (previousParameterMetadata != nullptr
+     && gd::ParameterMetadata::IsObject(previousParameterMetadata->GetType())) {
       auto previousParameterNode = functionCall.parameters[parameterIndex - 1].get();
       IdentifierNode* objectNode = dynamic_cast<IdentifierNode*>(previousParameterNode);
       objectName = objectNode->identifierName;

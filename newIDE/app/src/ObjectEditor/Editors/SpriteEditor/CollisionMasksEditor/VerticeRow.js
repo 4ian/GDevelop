@@ -17,6 +17,8 @@ type Props = {|
   parentVerticeId: string,
   canRemove: boolean,
   onRemove: () => void,
+  onClick: () => void,
+  selected?: boolean,
   verticeX: number,
   verticeY: number,
   onChangeVerticeX: (value: number) => void,
@@ -59,9 +61,14 @@ const VerticeRow = ({
               // the MUI class name for the component is used.
               <tr
                 className="MuiTableRow-root"
-                style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
+                style={{
+                  backgroundColor: props.selected
+                    ? muiTheme.listItem.selectedBackgroundColor
+                    : muiTheme.list.itemsBackgroundColor,
+                }}
                 onMouseEnter={props.onMouseEnter}
                 onMouseLeave={props.onMouseLeave}
+                onClick={props.onClick}
               >
                 {connectDragSource(
                   <td
@@ -77,6 +84,11 @@ const VerticeRow = ({
                 <TableRowColumn style={styles.coordinateColumn}>
                   <SemiControlledTextField
                     margin="none"
+                    inputStyle={
+                      props.selected
+                        ? { color: muiTheme.listItem.selectedTextColor }
+                        : undefined
+                    }
                     value={roundTo(
                       verticeX,
                       VERTICE_COORDINATE_PRECISION
@@ -98,6 +110,11 @@ const VerticeRow = ({
                 <TableRowColumn style={styles.coordinateColumn}>
                   <SemiControlledTextField
                     margin="none"
+                    inputStyle={
+                      props.selected
+                        ? { color: muiTheme.listItem.selectedTextColor }
+                        : undefined
+                    }
                     value={roundTo(
                       verticeY,
                       VERTICE_COORDINATE_PRECISION

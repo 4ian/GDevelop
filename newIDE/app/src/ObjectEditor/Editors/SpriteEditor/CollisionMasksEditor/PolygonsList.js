@@ -35,6 +35,8 @@ type VerticesTableProps = {|
   hasWarning: boolean,
   onUpdated: () => void,
   onHoverVertice: (ptr: ?number) => void,
+  onClickVertice: (ptr: ?number) => void,
+  selectedVerticePtr: ?number,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -98,6 +100,8 @@ const VerticesTable = (props: VerticesTableProps) => {
               }}
               onMouseEnter={() => props.onHoverVertice(vertice.ptr)}
               onMouseLeave={props.onHoverVertice}
+              selected={props.selectedVerticePtr === vertice.ptr}
+              onClick={() => props.onClickVertice(vertice.ptr)}
               verticeX={vertice.get_x()}
               verticeY={vertice.get_y()}
               onChangeVerticeX={newValue => updateVerticeX(vertice, newValue)}
@@ -141,6 +145,8 @@ type PolygonSectionProps = {|
   onUpdated: () => void,
   onRemove: () => void,
   onHoverVertice: (ptr: ?number) => void,
+  onClickVertice: (ptr: ?number) => void,
+  selectedVerticePtr: ?number,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -193,6 +199,8 @@ const PolygonSection = (props: PolygonSectionProps) => {
           vertices={vertices}
           hasWarning={!isConvex}
           onHoverVertice={props.onHoverVertice}
+          onClickVertice={props.onClickVertice}
+          selectedVerticePtr={props.selectedVerticePtr}
           onUpdated={props.onUpdated}
           spriteWidth={props.spriteWidth}
           spriteHeight={props.spriteHeight}
@@ -207,6 +215,8 @@ type PolygonsListProps = {|
   onPolygonsUpdated: () => void,
   restoreCollisionMask: () => void,
   onHoverVertice: (ptr: ?number) => void,
+  onClickVertice: (ptr: ?number) => void,
+  selectedVerticePtr: ?number,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -222,6 +232,8 @@ const PolygonsList = (props: PolygonsListProps) => {
     onPolygonsUpdated,
     restoreCollisionMask,
     onHoverVertice,
+    onClickVertice,
+    selectedVerticePtr,
   } = props;
 
   const addCollisionMask = React.useCallback(
@@ -263,6 +275,8 @@ const PolygonsList = (props: PolygonsListProps) => {
                 onPolygonsUpdated();
               }}
               onHoverVertice={onHoverVertice}
+              onClickVertice={onClickVertice}
+              selectedVerticePtr={selectedVerticePtr}
               spriteWidth={spriteWidth}
               spriteHeight={spriteHeight}
             />

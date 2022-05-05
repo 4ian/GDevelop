@@ -54,6 +54,10 @@ const CollisionMasksEditor = (props: Props) => {
     highlightedVerticePtr,
     setHighlightedVerticePtr,
   ] = React.useState<?number>(null);
+  const [
+    selectedVerticePtr,
+    setSelectedVerticePtr,
+  ] = React.useState<?number>(null);
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
   // theory, they should be set to the appropriate value at their initialization,
@@ -208,6 +212,8 @@ const CollisionMasksEditor = (props: Props) => {
                   polygons={sprite.getCustomCollisionMask()}
                   onPolygonsUpdated={updateCollisionMasks}
                   highlightedVerticePtr={highlightedVerticePtr}
+                  selectedVerticePtr={selectedVerticePtr}
+                  onClickVertice={setSelectedVerticePtr}
                 />
               )
             }
@@ -252,6 +258,8 @@ const CollisionMasksEditor = (props: Props) => {
                 onPolygonsUpdated={updateCollisionMasks}
                 restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
                 onHoverVertice={setHighlightedVerticePtr}
+                onClickVertice={setSelectedVerticePtr}
+                selectedVerticePtr={selectedVerticePtr}
                 spriteWidth={spriteWidth}
                 spriteHeight={spriteHeight}
               />

@@ -50,7 +50,10 @@ const CollisionMasksEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-
+  const [
+    highlightedVerticePtr,
+    setHighlightedVerticePtr,
+  ] = React.useState<?number>(null);
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
   // theory, they should be set to the appropriate value at their initialization,
@@ -204,6 +207,7 @@ const CollisionMasksEditor = (props: Props) => {
                   isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
                   polygons={sprite.getCustomCollisionMask()}
                   onPolygonsUpdated={updateCollisionMasks}
+                  highlightedVerticePtr={highlightedVerticePtr}
                 />
               )
             }
@@ -247,6 +251,7 @@ const CollisionMasksEditor = (props: Props) => {
                 polygons={sprite.getCustomCollisionMask()}
                 onPolygonsUpdated={updateCollisionMasks}
                 restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
+                onHoverVertice={setHighlightedVerticePtr}
                 spriteWidth={spriteWidth}
                 spriteHeight={spriteHeight}
               />

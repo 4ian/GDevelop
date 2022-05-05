@@ -12,10 +12,10 @@ import Text from '../../../../UI/Text';
 
 type Props = {|
   pointName: string,
-  nameError: boolean,
+  nameError?: boolean,
   onBlur?: (ev: any) => void,
-  onRemove?: (ev: any) => void,
-  onEdit?: (ev: any) => void,
+  onRemove?: ?(ev: any) => void,
+  onEdit?: ?(ev: any) => void,
   onClick: (pointName: string) => void,
   onMouseEnter: (pointName: ?string) => void,
   onMouseLeave: (pointName: ?string) => void,
@@ -24,7 +24,7 @@ type Props = {|
   pointY: number,
   onChangePointX: (value: number) => void,
   onChangePointY: (value: number) => void,
-  isAutomatic?: Boolean,
+  isAutomatic?: boolean,
 |};
 
 const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
@@ -66,10 +66,7 @@ const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
           onMouseEnter={() => props.onMouseEnter(props.pointName)}
           onMouseLeave={onLeave}
         >
-          <TableRowColumn style={styles.handleColumn}>
-            {/* <DragHandle /> Reordering point is not supported for now */}
-          </TableRowColumn>
-          <TableRowColumn>
+          <TableRowColumn style={styles.nameColumn}>
             <TextField
               margin="none"
               inputStyle={

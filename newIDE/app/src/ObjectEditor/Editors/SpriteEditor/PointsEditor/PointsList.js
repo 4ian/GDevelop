@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -8,20 +10,15 @@ import {
   TableRow,
   TableRowColumn,
 } from '../../../../UI/Table';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import newNameGenerator from '../../../../Utils/NewNameGenerator';
 import { mapVector } from '../../../../Utils/MapFor';
 import Window from '../../../../Utils/Window';
-import styles from './styles';
-import PointRow from './PointRow';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButton from '../../../../UI/RaisedButton';
-import { Trans } from '@lingui/macro';
-import AddIcon from '@material-ui/icons/Add';
+import PointRow from './PointRow';
+import styles from './styles';
 const gd: libGDevelop = global.gd;
-
-const SortablePointRow = SortableElement(PointRow);
 
 type PointsListBodyProps = {|
   pointsContainer: gdSprite,
@@ -76,9 +73,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
     const pointName = point.getName();
 
     return (
-      <SortablePointRow
-        index={i}
-        disabled
+      <PointRow
         key={'point-' + pointName}
         pointX={point.getX()}
         pointY={point.getY()}
@@ -121,8 +116,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
   const centerPoint = pointsContainer.getCenter();
 
   const originRow = (
-    <SortablePointRow
-      index={0}
+    <PointRow
       key={'origin-point-row'}
       pointName="Origin"
       pointX={originPoint.getX()}
@@ -133,12 +127,10 @@ const PointsListBody = (props: PointsListBodyProps) => {
       onMouseLeave={props.onHoverPoint}
       onClick={props.onSelectPoint}
       selected={'Origin' === props.selectedPointName}
-      disabled
     />
   );
   const centerRow = (
-    <SortablePointRow
-      index={1}
+    <PointRow
       key={'center-point-row'}
       pointName="Center"
       isAutomatic={pointsContainer.isDefaultCenterPoint()}
@@ -150,7 +142,6 @@ const PointsListBody = (props: PointsListBodyProps) => {
       onMouseLeave={props.onHoverPoint}
       onClick={props.onSelectPoint}
       selected={'Center' === props.selectedPointName}
-      disabled
       onEdit={
         pointsContainer.isDefaultCenterPoint()
           ? () => {
@@ -173,14 +164,11 @@ const PointsListBody = (props: PointsListBodyProps) => {
   return <TableBody>{[originRow, centerRow, ...pointsRows]}</TableBody>;
 };
 
-const SortablePointsListBody = SortableContainer(PointsListBody);
-SortablePointsListBody.muiName = 'TableBody';
-
 type PointsListProps = {|
   pointsContainer: gdSprite,
   onPointsUpdated: () => void,
-  onHoverPoint: (pointName: string) => void,
-  onSelectPoint: (pointName: string) => void,
+  onHoverPoint: (pointName: ?string) => void,
+  onSelectPoint: (pointName: ?string) => void,
   selectedPointName: ?string,
 |};
 
@@ -190,29 +178,24 @@ const PointsList = (props: PointsListProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHeaderColumn style={styles.handleColumn} />
-            <TableHeaderColumn>Point name</TableHeaderColumn>
+            <TableHeaderColumn style={styles.nameColumn}>
+              <Trans>Point name</Trans>
+            </TableHeaderColumn>
             <TableHeaderColumn style={styles.coordinateColumn}>
               X
             </TableHeaderColumn>
             <TableHeaderColumn style={styles.coordinateColumn}>
               Y
             </TableHeaderColumn>
-            <TableRowColumn style={styles.toolColumn} />
+            <TableHeaderColumn style={styles.toolColumn} />
           </TableRow>
         </TableHeader>
-        <SortablePointsListBody
+        <PointsListBody
           pointsContainer={props.pointsContainer}
           onHoverPoint={props.onHoverPoint}
           onSelectPoint={props.onSelectPoint}
           selectedPointName={props.selectedPointName}
           onPointsUpdated={props.onPointsUpdated}
-          onSortEnd={({ oldIndex, newIndex }) => {
-            // Reordering points is not supported for now
-          }}
-          helperClass="sortable-helper"
-          useDragHandle
-          lockToContainerEdges
         />
       </Table>
       <Spacer />

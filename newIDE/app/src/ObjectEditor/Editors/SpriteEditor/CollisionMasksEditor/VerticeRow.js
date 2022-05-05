@@ -9,6 +9,9 @@ import { makeDragSourceAndDropTarget } from '../../../../UI/DragAndDrop/DragSour
 import { dropIndicatorColor } from '../../../../UI/SortableVirtualizedItemList/DropIndicator';
 import DragHandle from '../../../../UI/DragHandle';
 import styles from './styles';
+import { roundTo } from '../../../../Utils/Mathematics';
+
+const VERTICE_COORDINATE_PRECISION = 4;
 
 type Props = {|
   parentVerticeId: string,
@@ -74,7 +77,10 @@ const VerticeRow = ({
                 <TableRowColumn style={styles.coordinateColumn}>
                   <SemiControlledTextField
                     margin="none"
-                    value={verticeX.toString()}
+                    value={roundTo(
+                      verticeX,
+                      VERTICE_COORDINATE_PRECISION
+                    ).toString()}
                     type="number"
                     id="vertice-x"
                     onChange={value => {
@@ -92,7 +98,10 @@ const VerticeRow = ({
                 <TableRowColumn style={styles.coordinateColumn}>
                   <SemiControlledTextField
                     margin="none"
-                    value={verticeY.toString()}
+                    value={roundTo(
+                      verticeY,
+                      VERTICE_COORDINATE_PRECISION
+                    ).toString()}
                     type="number"
                     id="vertice-y"
                     onChange={value => {

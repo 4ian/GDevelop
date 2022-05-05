@@ -10,6 +10,9 @@ import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import styles from './styles';
 import ThemeConsumer from '../../../../UI/Theme/ThemeConsumer';
 import Text from '../../../../UI/Text';
+import { roundTo } from '../../../../Utils/Mathematics';
+
+const POINT_COORDINATE_PRECISION = 4;
 
 type Props = {|
   pointName: string,
@@ -76,7 +79,7 @@ const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
                     ? { color: muiTheme.listItem.selectedTextColor }
                     : undefined
                 }
-                value={pointX.toString()}
+                value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
                 type="number"
                 id="point-x"
                 onChange={value => {
@@ -105,7 +108,7 @@ const PointRow = ({ onMouseLeave, pointX, pointY, ...props }: Props) => {
                     ? { color: muiTheme.listItem.selectedTextColor }
                     : undefined
                 }
-                value={pointY.toString()}
+                value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
                 type="number"
                 id="point-y"
                 onChange={value => {

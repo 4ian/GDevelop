@@ -2556,6 +2556,7 @@ interface VectorVector2f {
     [Ref] Vector2f at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] Vector2f pt);
     void FREE_removeFromVectorVector2f(unsigned long index);
+    void FREE_moveVector2fInVector(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 

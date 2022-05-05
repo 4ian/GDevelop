@@ -6,6 +6,7 @@ declare class gdVectorVector2f {
   at(index: number): gdVector2f;
   set(index: number, pt: gdVector2f): void;
   removeFromVectorVector2f(index: number): void;
+  moveVector2fInVector(oldIndex: number, newIndex: number): void;
   clear(): void;
   delete(): void;
   ptr: number;

@@ -16,6 +16,7 @@ type Props = {|
   imageHeight: number,
   offsetTop: number,
   offsetLeft: number,
+  highlightedVerticePtr: ?number,
   imageZoomFactor: number,
   onPolygonsUpdated: () => void,
 |};
@@ -128,7 +129,11 @@ const CollisionMasksPreview = (props: Props) => {
             <circle
               onPointerDown={() => onStartDragVertex(vertex)}
               key={`polygon-${i}-vertex-${j}`}
-              fill="rgba(255,0,0,0.75)"
+              fill={
+                vertex.ptr === props.highlightedVerticePtr
+                  ? 'rgba(0,0,255,0.75)'
+                  : 'rgba(255,0,0,0.75)'
+              }
               strokeWidth={1}
               cx={vertex.get_x() * imageZoomFactor}
               cy={vertex.get_y() * imageZoomFactor}

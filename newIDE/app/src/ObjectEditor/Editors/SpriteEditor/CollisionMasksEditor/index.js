@@ -54,10 +54,9 @@ const CollisionMasksEditor = (props: Props) => {
     highlightedVerticePtr,
     setHighlightedVerticePtr,
   ] = React.useState<?number>(null);
-  const [
-    selectedVerticePtr,
-    setSelectedVerticePtr,
-  ] = React.useState<?number>(null);
+  const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
+    null
+  );
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
   // theory, they should be set to the appropriate value at their initialization,

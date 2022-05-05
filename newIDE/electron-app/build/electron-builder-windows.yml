@@ -1,0 +1,17 @@
+win:
+   target:
+     - target: nsis
+publish: never
+appx:
+   languages:
+     - EN-US
+     - ZH-HANS
+     - DE	
+     - IT	
+     - JA	
+     - PT-BR
+     - RU
+     - ES
+     - FR	
+     - SL
+  

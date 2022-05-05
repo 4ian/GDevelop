@@ -158,8 +158,8 @@ const ImagePreview = (props: Props) => {
       zoomFactor = 1;
     } else {
       const idealZoomFactors = [
-        containerWidth / imageWidth,
-        containerHeight / imageHeight,
+        containerWidth / (imageWidth + 2 * MARGIN),
+        containerHeight / (imageHeight + 2 * MARGIN),
       ];
       zoomFactor = getBoundedZoomFactor(Math.min(...idealZoomFactors));
     }

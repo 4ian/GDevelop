@@ -154,7 +154,6 @@ type State = {|
   inlineEditing: boolean,
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
-  inlineEditingChangesMade: boolean,
   inlineEditingPreviousValue: ?string,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -243,7 +242,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     inlineEditing: false,
     inlineEditingAnchorEl: null,
     inlineInstructionEditorAnchorEl: null,
-    inlineEditingChangesMade: false,
     inlineEditingPreviousValue: null,
 
     analyzedEventsContextResult: null,
@@ -805,24 +803,32 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
         : null,
-      inlineEditingChangesMade: false,
       inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
     });
   };
 
   closeParameterEditor = (shouldCancel: boolean) => {
-    if (shouldCancel) {
-      const { instruction, parameterIndex } = this.state.editedParameter;
-      if (!instruction || !this.state.inlineEditingPreviousValue) return;
-
+    const { instruction, parameterIndex } = this.state.editedParameter;
+    if (!instruction) {
+      return;
+    }
+    // If the user canceled, revert the value to the previous value, if not null.
+    if (
+      shouldCancel &&
+      typeof this.state.inlineEditingPreviousValue === 'string'
+    ) {
       instruction.setParameter(
         parameterIndex,
         this.state.inlineEditingPreviousValue
       );
-    } else {
-      if (this.state.inlineEditingChangesMade) {
-        this._saveChangesToHistory();
-      }
+    }
+    // If the user made changes, save the value to history.
+    if (
+      !shouldCancel &&
+      this.state.inlineEditingPreviousValue !==
+        instruction.getParameter(parameterIndex)
+    ) {
+      this._saveChangesToHistory();
     }
 
     const { inlineEditingAnchorEl } = this.state;
@@ -831,7 +837,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       {
         inlineEditing: false,
         inlineEditingAnchorEl: null,
-        inlineEditingChangesMade: false,
       },
       () => {
         if (inlineEditingAnchorEl) {
@@ -1462,9 +1467,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       return;
                     }
                     instruction.setParameter(parameterIndex, value);
-                    this.setState({
-                      inlineEditingChangesMade: true,
-                    });
+                    // Ask the component to re-render, so that the new parameter
+                    // set for the instruction in the state
+                    // is taken into account for the InlineParameterEditor.
+                    this.forceUpdate();
                     if (this._searchPanel)
                       this._searchPanel.markSearchResultsDirty();
                   }}

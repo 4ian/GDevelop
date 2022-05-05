@@ -3289,7 +3289,9 @@ describe('libGD.js', function () {
       type,
       expression,
       expectedError,
-      expectedErrorPosition
+      expectedErrorPosition,
+      expectedError2,
+      expectedErrorPosition2
     ) {
       const parser = new gd.ExpressionParser2();
       const expressionNode = parser.parseExpression(expression).get();
@@ -3300,7 +3302,23 @@ describe('libGD.js', function () {
         layout,
         type);
       expressionNode.visit(expressionValidator);
-      if (expectedError) {
+      if (expectedError2) {
+        expect(expressionValidator.getErrors().size()).toBe(2);
+        expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
+          expectedError
+        );
+        if (expectedErrorPosition)
+          expect(expressionValidator.getErrors().at(0).getStartPosition()).toBe(
+            expectedErrorPosition
+          );
+        expect(expressionValidator.getErrors().at(1).getMessage()).toBe(
+          expectedError2
+        );
+        if (expectedErrorPosition2)
+          expect(expressionValidator.getErrors().at(1).getStartPosition()).toBe(
+            expectedErrorPosition2
+          );
+      } else if (expectedError) {
         expect(expressionValidator.getErrors().size()).toBe(1);
         expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
           expectedError
@@ -3361,6 +3379,8 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         '3..14',
+        'More than one term was found. Verify that your expression is properly written.',
+        2,
         'No operator found. Did you forget to enter an operator (like +, -, * or /) between numbers or expressions?',
         2
       );

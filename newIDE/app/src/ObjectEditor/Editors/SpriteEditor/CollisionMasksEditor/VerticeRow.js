@@ -18,6 +18,8 @@ type Props = {|
   verticeY: number,
   onChangeVerticeX: (value: number) => void,
   onChangeVerticeY: (value: number) => void,
+  onMouseEnter: () => void,
+  onMouseLeave: () => void,
   setDragged: () => void,
   drop: () => void,
 |};
@@ -69,6 +71,8 @@ const VerticeRow = ({
               <tr
                 className="MuiTableRow-root"
                 style={{ backgroundColor: muiTheme.list.itemsBackgroundColor }}
+                onMouseEnter={props.onMouseEnter}
+                onMouseLeave={props.onMouseLeave}
               >
                 {connectDragSource(
                   <td

@@ -34,6 +34,7 @@ type VerticesTableProps = {|
   vertices: gdVectorVector2f,
   hasWarning: boolean,
   onUpdated: () => void,
+  onHoverVertice: (ptr: ?number) => void,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -95,6 +96,8 @@ const VerticesTable = (props: VerticesTableProps) => {
                 dropVertice(current, verticeIndex);
                 draggedVerticeIndex.current = null;
               }}
+              onMouseEnter={() => props.onHoverVertice(vertice.ptr)}
+              onMouseLeave={props.onHoverVertice}
               verticeX={vertice.get_x()}
               verticeY={vertice.get_y()}
               onChangeVerticeX={newValue => updateVerticeX(vertice, newValue)}
@@ -137,6 +140,7 @@ type PolygonSectionProps = {|
   polygon: gdPolygon2d,
   onUpdated: () => void,
   onRemove: () => void,
+  onHoverVertice: (ptr: ?number) => void,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -188,6 +192,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
         <VerticesTable
           vertices={vertices}
           hasWarning={!isConvex}
+          onHoverVertice={props.onHoverVertice}
           onUpdated={props.onUpdated}
           spriteWidth={props.spriteWidth}
           spriteHeight={props.spriteHeight}
@@ -201,6 +206,7 @@ type PolygonsListProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
   restoreCollisionMask: () => void,
+  onHoverVertice: (ptr: ?number) => void,
 
   // Sprite size is useful to make sure polygon vertices
   // are not put outside the sprite bounding box, which is not supported:
@@ -215,6 +221,7 @@ const PolygonsList = (props: PolygonsListProps) => {
     spriteWidth,
     onPolygonsUpdated,
     restoreCollisionMask,
+    onHoverVertice,
   } = props;
 
   const addCollisionMask = React.useCallback(
@@ -255,6 +262,7 @@ const PolygonsList = (props: PolygonsListProps) => {
                 }
                 onPolygonsUpdated();
               }}
+              onHoverVertice={onHoverVertice}
               spriteWidth={spriteWidth}
               spriteHeight={spriteHeight}
             />

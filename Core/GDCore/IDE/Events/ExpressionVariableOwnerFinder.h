@@ -138,8 +138,6 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
 
     objectName = functionCall.objectName;
     if (parameterIndex == 0) {
-      // TODO remove this line
-      objectName = rootObjectName;
       return;
     }
     // TODO Could there be a behavior or other variable paramater in between?

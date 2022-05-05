@@ -79,7 +79,12 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
-    if (variableNode != nullptr || node.parent == nullptr) {
+    if (variableNode != nullptr) {
+      // This is not possible
+      return;
+    }
+    if (node.parent == nullptr) {
+      objectName = rootObjectName;
       return;
     }
     variableNode = &node;
@@ -87,7 +92,12 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
   }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {}
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    if (variableNode != nullptr || node.parent == nullptr) {
+    if (variableNode != nullptr) {
+      // This is not possible
+      return;
+    }
+    if (node.parent == nullptr) {
+      objectName = rootObjectName;
       return;
     }
     // This node is not necessarily a variable node.
@@ -125,6 +135,7 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
 
     objectName = functionCall.objectName;
     if (parameterIndex == 0) {
+      objectName = rootObjectName;
       return;
     }
     // TODO Could there be a behavior or other variable paramater in between?

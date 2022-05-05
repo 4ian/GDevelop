@@ -434,6 +434,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setAdvancedOptionsOpen(false)}
@@ -466,6 +467,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setPointsEditorOpen(false)}
@@ -496,6 +498,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setCollisionMasksEditorOpen(false)}

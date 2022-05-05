@@ -3410,12 +3410,12 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'abs(-5, 3)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
       testExpression(
         'number',
         'MouseX("", 0, 0) + 1',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be: 0-2"
       );
     });
 
@@ -3434,7 +3434,7 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'MySpriteObject.PointX("Point", 2)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
     });
 

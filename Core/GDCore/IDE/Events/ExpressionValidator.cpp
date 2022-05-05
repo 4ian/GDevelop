@@ -88,12 +88,12 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
         RaiseTypeError(
             _("This expression exists, but it can't be used on this object."),
             function.objectNameLocation);
-        return stringToType(metadata.GetReturnType());
+        return StringToType(metadata.GetReturnType());
       }
     }
   }
 
-  Type returnType = stringToType(metadata.GetReturnType());
+  Type returnType = StringToType(metadata.GetReturnType());
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     RaiseError(
@@ -118,7 +118,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     else if (parentType != Type::Number && parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "number, but another type is expected:") +
-                              " " + typeToSting(parentType),
+                              " " + TypeToSting(parentType),
                             function.location);
       return returnType;
     }
@@ -134,7 +134,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     else if (parentType != Type::String && parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "string, but another type is expected:") +
-                              " " + typeToSting(parentType),
+                              " " + TypeToSting(parentType),
                             function.location);
       return returnType;
     }
@@ -142,7 +142,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     if (parentType != returnType) {
       RaiseTypeError(
           _("You tried to use an expression with the wrong return type:") + " " +
-            typeToSting(returnType),
+            TypeToSting(returnType),
           function.location);
       return returnType;
     }
@@ -200,7 +200,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
 
     if (!parameterMetadata.IsOptional() || dynamic_cast<EmptyNode*>(parameter.get()) == nullptr) {
       auto currentParentType = parentType;
-      parentType = stringToType(parameterMetadata.GetType());
+      parentType = StringToType(parameterMetadata.GetType());
       parameter->Visit(*this);
       parentType = currentParentType;
       
@@ -249,6 +249,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   return returnType;
 }
 
+  // TODO factorize
   const gd::String ExpressionValidator::unknownTypeString = "unknown";
   const gd::String ExpressionValidator::numberTypeString = "number";
   const gd::String ExpressionValidator::stringTypeString = "string";
@@ -257,7 +258,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   const gd::String ExpressionValidator::objectTypeString = "object";
   const gd::String ExpressionValidator::emptyTypeString = "empty";
 
-  const gd::String &ExpressionValidator::typeToSting(Type type) {
+  const gd::String &ExpressionValidator::TypeToSting(Type type) {
     switch (type) {
       case Type::Unknown:
       return unknownTypeString;
@@ -277,7 +278,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     return unknownTypeString;
   }
 
-  ExpressionValidator::Type ExpressionValidator::stringToType(const gd::String &type) {
+  ExpressionValidator::Type ExpressionValidator::StringToType(const gd::String &type) {
     if (type == "number" || gd::ParameterMetadata::IsExpression("number", type)) {
       return Type::Number;
     }

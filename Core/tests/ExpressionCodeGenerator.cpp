@@ -442,6 +442,23 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getProjectVariable(myGlobalVariable))");
       }
+      {
+        auto node = parser.ParseExpression(
+            "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam("
+            "MySpriteObject, myVariable, MyOtherSpriteObject, myOtherVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+            "getStringWith2ObjectParamAnd2ObjectVarParam(fakeObjectListOf_MySpriteObject, "
+            "getVariableForObject(MySpriteObject, myVariable), "
+            "fakeObjectListOf_MyOtherSpriteObject, "
+            "getVariableForObject(MyOtherSpriteObject, myOtherVariable))");
+      }
     }
     SECTION("Child access") {
       {

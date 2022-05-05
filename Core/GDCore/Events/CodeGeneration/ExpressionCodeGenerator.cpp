@@ -161,7 +161,7 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       output += codeGenerator.GenerateGetVariable(
           node.identifierName, scope, context, objectName);
       if (!node.childIdentifierName.empty()) {
-        // TODO handle child variable.
+        output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
   } else {
     // TODO Some case that were ObjectFunctionNameNode (without ::) will end up here.

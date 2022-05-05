@@ -122,6 +122,7 @@ type Props = {|
   ) => void,
   onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  isActive: boolean,
 |};
 
 type ComponentProps = {|
@@ -282,6 +283,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    // If the tab becomes active again, we ensure the dom is focused
+    // allowing the keyboard shortcuts to work.
+    if (!prevProps.isActive && this.props.isActive) {
+      this._ensureFocused();
+    }
   }
 
   updateToolbar() {

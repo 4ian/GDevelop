@@ -11,9 +11,10 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
   editor: ?EventsSheetInterface;
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // Prevent any update to the editor if the editor is not active,
-    // and so not visible to the user.
-    return nextProps.isActive;
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
+    return this.props.isActive || nextProps.isActive;
   }
 
   componentDidMount() {
@@ -97,6 +98,7 @@ export class EventsEditorContainer extends React.Component<RenderEditorContainer
         objectsContainer={layout}
         events={layout.getEvents()}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
+        isActive={this.props.isActive}
       />
     );
   }

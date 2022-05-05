@@ -73,6 +73,10 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
     node.factor->Visit(*this);
   }
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override {
+    node.expression->Visit(*this);
+  }
   void OnVisitNumberNode(NumberNode& node) override {
     type = "number";
   }
@@ -102,10 +106,6 @@ class GD_CORE_API ExpressionLeftSideTypeFinder : public ExpressionParser2NodeWor
     type = "unknown";
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    type = "unknown";
-  }
-  void OnVisitVariableBracketAccessorNode(
-      VariableBracketAccessorNode& node) override {
     type = "unknown";
   }
 

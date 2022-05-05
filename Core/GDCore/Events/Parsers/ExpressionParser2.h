@@ -281,6 +281,7 @@ class GD_CORE_API ExpressionParser2 {
   std::unique_ptr<VariableNode> Variable(const gd::String &name, gd::ExpressionParserLocation nameLocation) {
     auto variable = gd::make_unique<VariableNode>(name);
     variable->child = VariableAccessorOrVariableBracketAccessor();
+    variable->child->parent = variable.get();
 
     variable->location = ExpressionParserLocation(
         nameLocation.GetStartPosition(), GetCurrentPosition());
@@ -296,6 +297,7 @@ class GD_CORE_API ExpressionParser2 {
     if (CheckIfChar(IsOpeningSquareBracket)) {
       SkipChar();
       auto child = gd::make_unique<VariableBracketAccessorNode>(Expression());
+      child->expression->parent = child.get();
 
       if (!CheckIfChar(IsClosingSquareBracket)) {
         child->diagnostic =

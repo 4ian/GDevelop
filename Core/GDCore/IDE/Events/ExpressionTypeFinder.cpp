@@ -27,7 +27,7 @@ class ExpressionMetadata;
 
 namespace gd {
 
-  // TODO factorize
+  // TODO factorize in a file with an enum and helpers?
   const gd::String ExpressionTypeFinder::numberTypeString = "number";
   const gd::String ExpressionTypeFinder::stringTypeString = "string";
 

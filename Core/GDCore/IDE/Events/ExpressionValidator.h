@@ -38,7 +38,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
-        parentType(stringToType(rootType_)) ,
+        parentType(StringToType(rootType_)) ,
         childType(Type::Unknown) {};
   virtual ~ExpressionValidator(){};
 
@@ -202,7 +202,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
     else if (parentType != Type::Object && parentType != Type::Variable) {
       RaiseTypeError(
-          _("You've entered a name, but this type was expected:") + " " + typeToSting(parentType),
+          _("You've entered a name, but this type was expected:") + " " + TypeToSting(parentType),
           node.location);
     }
     childType = parentType;
@@ -268,7 +268,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
       else if (expect != Type::String && expect != Type::NumberOrString) {
         RaiseTypeError(
-            _("You entered a text, but this type was expected:") + " " + typeToSting(expect),
+            _("You entered a text, but this type was expected:") + " " + TypeToSting(expect),
             location);
       }
     }
@@ -280,14 +280,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
       else if (expect != Type::Number && expect != Type::NumberOrString) {
         RaiseTypeError(
-            _("You entered a number, but this type was expected:") + " " + typeToSting(expect),
+            _("You entered a number, but this type was expected:") + " " + TypeToSting(expect),
             location);
       }
     }
   }
 
-  static Type stringToType(const gd::String &type);
-  static const gd::String &typeToSting(Type type);
+  static Type StringToType(const gd::String &type);
+  static const gd::String &TypeToSting(Type type);
   static const gd::String unknownTypeString;
   static const gd::String numberTypeString;
   static const gd::String stringTypeString;

@@ -58,7 +58,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
    * No errors means that the expression is valid.
    */
   const gd::String &GetType() {
-    return type;
+    return ConvertSubtype(type);
   };
 
   virtual ~ExpressionTypeFinder(){};
@@ -161,6 +161,12 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       type = rootType;
     }
   }
+
+  static const gd::String numberTypeString;
+  static const gd::String stringTypeString;
+  static const gd::String variableTypeString;
+  static const gd::String objectTypeString;
+  static const gd::String &ConvertSubtype(const gd::String &type);
 
   gd::String type;
   ExpressionNode *child;

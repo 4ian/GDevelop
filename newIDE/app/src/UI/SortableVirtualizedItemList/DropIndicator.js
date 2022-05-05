@@ -2,7 +2,7 @@
 import * as React from 'react';
 import ThemeConsumer from '../Theme/ThemeConsumer';
 
-export const dropIndicatorColor = '#18dcf2'
+export const dropIndicatorColor = '#18dcf2';
 
 const styles = {
   dropIndicator: {

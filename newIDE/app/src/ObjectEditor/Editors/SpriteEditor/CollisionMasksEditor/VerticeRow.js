@@ -103,7 +103,7 @@ const VerticeRow = ({
                     type="number"
                     id="vertice-y"
                     onChange={(e, value) => {
-                      setVerticeXInputValue(value);
+                      setVerticeYInputValue(value);
                       const valueAsNumber = parseFloat(value);
                       if (!isNaN(valueAsNumber)) {
                         props.onChangeVerticeY(valueAsNumber);

@@ -239,10 +239,14 @@ struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public Expres
 };
 
 /**
- * \brief A variable, potentially with accessor to its children.
+ * \brief A variable with bracket accessor or at least 2 "dot" accessors.
  *
- * Example: MyVariable or MyVariable.MyChildren
- *
+ * Example: MyVariable[MyChildren] or MyVariable.MyChildren.MyGranChildren.
+ * 
+ * Other cases like "MyVariable" or "MyVariable.MyChildren" are IdentifierNode
+ * to allow handling ambiguities.
+ * 
+ * \see gd::IdentifierNode
  * \see gd::VariableAccessorNode
  * \see gd::VariableBracketAccessorNode
  */
@@ -296,11 +300,14 @@ struct GD_CORE_API VariableBracketAccessorNode
   std::unique_ptr<ExpressionNode> expression;
 };
 
-// TODO It is only "MyObject.Physics::LinearVelocity" now. Other cases are IdentifierNode.
 /**
  * \brief The name of a function to call on an object or the behavior
- * For example: "MyObject.Function" or "MyObject.Physics" or
- * "MyObject.Physics::LinearVelocity".
+ * For example: "MyObject.Physics::LinearVelocity".
+ * 
+ * Other cases like "MyObject.Function" or "MyObject.Physics" are IdentifierNode
+ * to allow handling ambiguities.
+ * 
+ * \see gd::IdentifierNode
  */
 struct GD_CORE_API ObjectFunctionNameNode
     : public FunctionCallOrObjectFunctionNameOrEmptyNode {

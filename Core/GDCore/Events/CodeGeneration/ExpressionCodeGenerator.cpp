@@ -179,20 +179,11 @@ void ExpressionCodeGenerator::OnVisitFunctionCallNode(FunctionCallNode& node) {
                                             rootType,
                                             node);
 
-  // TODO create an helper method to retrieve the metadata of a FunctionCallNode?
-  gd::String objectType = node.objectName.empty() ? gd::String() :
-      GetTypeOfObject(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.objectName);
-      
-  gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
-      GetTypeOfBehavior(codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups(), node.behaviorName);
-
-  const gd::ExpressionMetadata &metadata = node.behaviorName.empty() ?
-      node.objectName.empty() ?
-          MetadataProvider::GetAnyExpressionMetadata(codeGenerator.GetPlatform(), node.functionName) :
-          MetadataProvider::GetObjectAnyExpressionMetadata(
-              codeGenerator.GetPlatform(), objectType, node.functionName) : 
-      MetadataProvider::GetBehaviorAnyExpressionMetadata(
-            codeGenerator.GetPlatform(), behaviorType, node.functionName);
+  const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
+      codeGenerator.GetPlatform(),
+      codeGenerator.GetGlobalObjectsAndGroups(),
+      codeGenerator.GetObjectsAndGroups(),
+      node);
 
   if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
     output += "/* Error during generation, function not found: " +

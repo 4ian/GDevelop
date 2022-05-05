@@ -249,7 +249,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   return returnType;
 }
 
-  // TODO factorize
+  // TODO factorize in a file with an enum and helpers?
   const gd::String ExpressionValidator::unknownTypeString = "unknown";
   const gd::String ExpressionValidator::numberTypeString = "number";
   const gd::String ExpressionValidator::stringTypeString = "string";

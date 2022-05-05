@@ -28,7 +28,6 @@ class ExpressionMetadata;
 
 namespace gd {
 
-// TODO documentation
 /**
  * \brief Describe completions to be shown to the user.
  *
@@ -441,7 +440,6 @@ class GD_CORE_API ExpressionCompletionFinder
           node.location.GetStartPosition(),
           node.location.GetEndPosition()));
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
-      // TODO handle variable child
       completions.push_back(ExpressionCompletionDescription::ForVariable(
           type,
           node.identifierName,
@@ -449,7 +447,7 @@ class GD_CORE_API ExpressionCompletionFinder
           node.location.GetEndPosition(),
           // TODO Find a way to get the objectName of the variable if any.
           ""));
-    } else { // TODO check if the type is unknown because unknown could be a variable
+    } else {
       // Object function or behavior name
       if (IsCaretOn(node.identifierNameLocation)) {
         completions.push_back(ExpressionCompletionDescription::ForObject(

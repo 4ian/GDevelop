@@ -102,9 +102,20 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
-    // TODO Should it be unknown if it is the node in GetType?
-    // TODO Should it go back down and give the left side type?
-    type = "number|string";
+    if (child == nullptr) {
+      type = "unknown";
+    }
+    auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
+        platform, 
+        globalObjectsContainer,
+        objectsContainer,
+        node);
+    if (leftSideType == "number" || leftSideType == "string") {
+      type = leftSideType;
+    }
+    else {
+      type = "number|string";
+    }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (child == nullptr) {

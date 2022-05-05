@@ -46,7 +46,7 @@ export const shouldSubmit = (event: SupportedEvent) => {
  * Check if the user wants to zoom when scrolling.
  */
 export const shouldZoom = (event: SupportedEvent) => {
-  return (event.metaKey || event.ctrlKey);
+  return event.metaKey || event.ctrlKey;
 };
 
 /**

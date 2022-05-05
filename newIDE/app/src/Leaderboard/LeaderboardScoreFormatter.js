@@ -4,6 +4,7 @@ import {
   type LeaderboardScoreFormattingTime,
   type LeaderboardScoreFormatting,
 } from '../Utils/GDevelopServices/Play';
+import { roundTo } from '../Utils/Mathematics';
 
 export const orderedTimeUnits = ['hour', 'minute', 'second', 'millisecond'];
 const unitToDivider = {
@@ -46,8 +47,8 @@ export const formatCustomScore = (
   score: number,
   options: LeaderboardScoreFormattingCustom
 ): string => {
-  const roundedScore =
-    Math.round(score * 10 ** options.precision) / 10 ** options.precision;
+  const roundedScore = roundTo(score, options.precision);
+
   return `${options.prefix}${roundedScore.toFixed(
     Math.max(0, options.precision)
   )}${options.suffix}`;

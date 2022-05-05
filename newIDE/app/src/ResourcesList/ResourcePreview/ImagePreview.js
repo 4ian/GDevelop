@@ -17,6 +17,7 @@ import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import CheckeredBackground from '../CheckeredBackground';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
 import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import Slider from '../../UI/Slider';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
@@ -52,6 +53,12 @@ const styles = {
     position: 'relative',
     pointerEvents: 'none',
     margin: MARGIN,
+  },
+  sliderContainer: {
+    maxWidth: 150,
+    width: '100%',
+    display: 'flex',
+    padding: '0 10px',
   },
 };
 
@@ -257,16 +264,28 @@ const ImagePreview = (props: Props) => {
           <Column expand noMargin useFullHeight>
             <MiniToolbar>
               <IconButton
-                onClick={() => zoomBy(+0.2)}
-                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
-              >
-                <ZoomIn />
-              </IconButton>
-              <IconButton
                 onClick={() => zoomBy(-0.2)}
                 tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
               >
                 <ZoomOut />
+              </IconButton>
+              <div style={styles.sliderContainer}>
+                <Slider
+                  min={Math.log10(MIN_ZOOM_FACTOR)}
+                  max={Math.log10(MAX_ZOOM_FACTOR)}
+                  step={0.05}
+                  value={Math.log10(state.imageZoomFactor)}
+                  onChange={value => {
+                    console.log(value);
+                    zoomTo(Math.pow(10, value));
+                  }}
+                />
+              </div>
+              <IconButton
+                onClick={() => zoomBy(+0.2)}
+                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
+              >
+                <ZoomIn />
               </IconButton>
               <IconButton
                 onClick={() => zoomTo(1)}

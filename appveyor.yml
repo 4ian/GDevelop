@@ -53,7 +53,7 @@ build_script:
 
     node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
 
-    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
+    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --config build/electron-builder-windows.yml
 
     cd ..\..
 

@@ -74,7 +74,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
 
     return (
       <PointRow
-        key={'point-' + pointName}
+        key={'point-' + point.ptr}
         pointX={point.getX()}
         pointY={point.getY()}
         onChangePointX={newValue => updatePointX(point, newValue)}
@@ -91,6 +91,9 @@ const PointsListBody = (props: PointsListBodyProps) => {
             success = false;
           } else {
             point.setName(newName);
+            if (props.selectedPointName === pointName) {
+              props.onSelectPoint(newName);
+            }
             onPointsUpdated();
           }
 

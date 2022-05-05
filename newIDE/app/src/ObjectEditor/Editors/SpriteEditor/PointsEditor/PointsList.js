@@ -214,6 +214,7 @@ const PointsList = (props: PointsListProps) => {
             const point = new gd.Point(name);
             props.pointsContainer.addPoint(point);
             point.delete();
+            props.onSelectPoint(name);
             props.onPointsUpdated();
           }}
         />

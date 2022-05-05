@@ -1,5 +1,9 @@
 // @flow
 import * as React from 'react';
+import { Trans, t } from '@lingui/macro';
+import DeleteIcon from '@material-ui/icons/Delete';
+import WarningIcon from '@material-ui/icons/Warning';
+import AddIcon from '@material-ui/icons/Add';
 import {
   Table,
   TableBody,
@@ -8,7 +12,6 @@ import {
   TableRow,
   TableRowColumn,
 } from '../../../../UI/Table';
-import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapVector } from '../../../../Utils/MapFor';
 import styles from './styles';
 import VerticeRow from './VerticeRow';
@@ -19,19 +22,13 @@ import {
 } from '../../../../UI/Accordion';
 import Text from '../../../../UI/Text';
 import IconButton from '../../../../UI/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import WarningIcon from '@material-ui/icons/Warning';
-import AddIcon from '@material-ui/icons/Add';
 import FlatButton from '../../../../UI/FlatButton';
-import { Trans, t } from '@lingui/macro';
 import { Column, Line, Spacer } from '../../../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../../../UI/RaisedButtonWithSplitMenu';
 import AlertMessage from '../../../../UI/AlertMessage';
 import GDevelopThemeContext from '../../../../UI/Theme/ThemeContext';
 import ScrollView from '../../../../UI/ScrollView';
 const gd = global.gd;
-
-const SortableVerticeRow = SortableElement(VerticeRow);
 
 type VerticesTableProps = {|
   vertices: gdVectorVector2f,
@@ -45,29 +42,32 @@ type VerticesTableProps = {|
 |};
 
 const VerticesTable = (props: VerticesTableProps) => {
-  const updateVerticeX = (vertice, newValue) => {
+  const draggedVerticeIndex = React.useRef<?number>(null);
+
+  const updateVerticeX = (vertice: gdVector2f, newValue: number) => {
     // Ensure vertice stays inside the sprite bounding box.
     vertice.set_x(Math.min(props.spriteWidth, Math.max(newValue, 0)));
     props.onUpdated();
   };
 
-  const updateVerticeY = (vertice, newValue) => {
+  const updateVerticeY = (vertice: gdVector2f, newValue: number) => {
     // Ensure vertice stays inside the sprite bounding box.
     vertice.set_y(Math.min(props.spriteHeight, Math.max(newValue, 0)));
     props.onUpdated();
   };
 
+  const dropVertice = (oldIndex: number, newIndex: number) => {
+    if (oldIndex === newIndex) return;
+    gd.moveVector2fInVector(
+      props.vertices,
+      oldIndex,
+      newIndex > oldIndex ? newIndex - 1 : newIndex
+    );
+    props.onUpdated();
+  };
+
   return (
     <Column expand>
-      {props.hasWarning && (
-        <AlertMessage kind="warning">
-          <Trans>
-            The polygon is not convex. Ensure it is, otherwise the collision
-            mask won't work.
-          </Trans>
-        </AlertMessage>
-      )}
-      <Spacer />
       <Table>
         <TableHeader>
           <TableRow>
@@ -82,17 +82,25 @@ const VerticesTable = (props: VerticesTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mapVector(props.vertices, (vertice, j) => (
-            <SortableVerticeRow
-              index={j}
-              key={j}
-              disabled
+          {mapVector(props.vertices, (vertice, verticeIndex) => (
+            <VerticeRow
+              key={vertice.ptr}
+              parentVerticeId={props.vertices.ptr.toString()}
+              setDragged={() => {
+                draggedVerticeIndex.current = verticeIndex;
+              }}
+              drop={() => {
+                const { current } = draggedVerticeIndex;
+                if (!current && current !== 0) return;
+                dropVertice(current, verticeIndex);
+                draggedVerticeIndex.current = null;
+              }}
               verticeX={vertice.get_x()}
               verticeY={vertice.get_y()}
               onChangeVerticeX={newValue => updateVerticeX(vertice, newValue)}
               onChangeVerticeY={newValue => updateVerticeY(vertice, newValue)}
               onRemove={() => {
-                gd.removeFromVectorVector2f(props.vertices, j);
+                gd.removeFromVectorVector2f(props.vertices, verticeIndex);
                 props.onUpdated();
               }}
               canRemove={props.vertices.size() > 3}
@@ -100,6 +108,15 @@ const VerticesTable = (props: VerticesTableProps) => {
           ))}
         </TableBody>
       </Table>
+      <Spacer />
+      {props.hasWarning && (
+        <AlertMessage kind="warning">
+          <Trans>
+            The polygon is not convex. Ensure it is, otherwise the collision
+            mask won't work.
+          </Trans>
+        </AlertMessage>
+      )}
       <Line justifyContent="center">
         <FlatButton
           icon={<AddIcon size="small" />}
@@ -115,8 +132,6 @@ const VerticesTable = (props: VerticesTableProps) => {
     </Column>
   );
 };
-
-const SortableVerticesTable = SortableContainer(VerticesTable);
 
 type PolygonSectionProps = {|
   polygon: gdPolygon2d,
@@ -170,18 +185,12 @@ const PolygonSection = (props: PolygonSectionProps) => {
         </Text>
       </AccordionHeader>
       <AccordionBody disableGutters>
-        <SortableVerticesTable
+        <VerticesTable
           vertices={vertices}
           hasWarning={!isConvex}
           onUpdated={props.onUpdated}
           spriteWidth={props.spriteWidth}
           spriteHeight={props.spriteHeight}
-          onSortEnd={({ oldIndex, newIndex }) => {
-            // Reordering polygons is not supported for now
-          }}
-          helperClass="sortable-helper"
-          useDragHandle
-          lockToContainerEdges
         />
       </AccordionBody>
     </Accordion>

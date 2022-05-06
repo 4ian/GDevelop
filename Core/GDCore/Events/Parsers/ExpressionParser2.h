@@ -396,7 +396,6 @@ class GD_CORE_API ExpressionParser2 {
           parametersNode.closingParenthesisLocation;
       return std::move(function);
     } else if (CheckIfChar(IsDot) || CheckIfChar(IsOpeningSquareBracket)) {
-      // TODO remove the object name attribute as it can't be set from here without metadata
       auto variable = gd::make_unique<VariableNode>(parentIdentifier);
       auto child =
           gd::make_unique<VariableAccessorNode>(childIdentifierName);
@@ -418,10 +417,10 @@ class GD_CORE_API ExpressionParser2 {
 
     auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
-    // TODO update this message
     node->diagnostic = RaiseSyntaxError(
-        _("An opening parenthesis (for an object expression), or double colon "
-          "(::) was expected (for a behavior expression)."));
+        _("An opening parenthesis (for an object expression), a double colon "
+          "(:: for a behavior expression), a dot or an opening bracket (for "
+          "a child variable) where expected."));
 
     node->location = ExpressionParserLocation(
         parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());

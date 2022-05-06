@@ -205,29 +205,19 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       parentType = currentParentType;
       
       const gd::String &expectedParameterType = parameterMetadata.GetType();
-      if (gd::ParameterMetadata::IsExpression("number", expectedParameterType)) {
-        if (childType != Type::Number) {
-          // TODO error or already checked in children?
+      if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
+        if (dynamic_cast<IdentifierNode *>(parameter.get()) == nullptr
+         && dynamic_cast<VariableNode *>(parameter.get()) == nullptr) {
+          RaiseError(
+                  "malformed_variable_parameter",
+                  _("A variable name was expected but something else was "
+                    "written. Enter just the name of the variable for this "
+                    "parameter."),
+                parameter->location);
         }
-      } else if (gd::ParameterMetadata::IsExpression("string", expectedParameterType)) {
-        if (childType != Type::String) {
-          // TODO error or already checked in children?
-        }
-      } else if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
-        if (childType != Type::Variable) {
-          // TODO error or already checked in children?
-        }
-      } else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
-        if (auto identifierNode =
-          dynamic_cast<IdentifierNode *>(parameter.get())) {
-          // Memorize the last object name. By convention, parameters that
-          // require an object (mainly, "objectvar" and "behavior") should be
-          // placed after the object in the list of parameters (if possible,
-          // just after). Search "lastObjectName" in the codebase for other
-          // place where this convention is enforced.
-          lastObjectName = identifierNode->identifierName;
-        }
-        else {
+      }
+      else if (gd::ParameterMetadata::IsObject(expectedParameterType)) {
+        if (dynamic_cast<IdentifierNode *>(parameter.get()) == nullptr) {
           RaiseError(
                   "malformed_object_parameter",
                   _("An object name was expected but something else was "
@@ -235,7 +225,10 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
                     "parameter."),
                 parameter->location);
         }
-      } else {
+      }
+      // String and number are already checked in children.
+      else if (!gd::ParameterMetadata::IsExpression("number", expectedParameterType)
+            && !gd::ParameterMetadata::IsExpression("string", expectedParameterType)) {
         RaiseError(
                 "unknown_parameter_type",
                 _("This function is improperly set up. Reach out to the "

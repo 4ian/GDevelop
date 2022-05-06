@@ -459,6 +459,22 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "fakeObjectListOf_MyOtherSpriteObject, "
             "getVariableForObject(MyOtherSpriteObject, myOtherVariable))");
       }
+      {
+        auto node = parser.ParseExpression(
+            "MyExtension::GetStringWith1ObjectParamAnd2ObjectVarParam("
+            "MySpriteObject, myVariable, myOtherVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+            "getStringWith1ObjectParamAnd2ObjectVarParam(fakeObjectListOf_MySpriteObject, "
+            "getVariableForObject(MySpriteObject, myVariable), "
+            "getVariableForObject(MySpriteObject, myOtherVariable))");
+      }
     }
     SECTION("Child access") {
       {

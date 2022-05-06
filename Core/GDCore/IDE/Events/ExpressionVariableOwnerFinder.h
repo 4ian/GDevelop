@@ -136,23 +136,24 @@ class GD_CORE_API ExpressionVariableOwnerFinder : public ExpressionParser2NodeWo
       return;
     }
 
+    // The object on which the function is called is returned if no previous
+    // parameters are objects.
     objectName = functionCall.objectName;
-    if (parameterIndex == 0) {
-      return;
-    }
-    // TODO Could there be a behavior or other variable paramater in between?
-    const gd::ParameterMetadata* previousParameterMetadata =
-        MetadataProvider::GetFunctionCallParameterMetadata(
-            platform, 
-            globalObjectsContainer,
-            objectsContainer,
-            functionCall,
-            parameterIndex - 1);
-    if (previousParameterMetadata != nullptr
-     && gd::ParameterMetadata::IsObject(previousParameterMetadata->GetType())) {
-      auto previousParameterNode = functionCall.parameters[parameterIndex - 1].get();
-      IdentifierNode* objectNode = dynamic_cast<IdentifierNode*>(previousParameterNode);
-      objectName = objectNode->identifierName;
+    for (int previousIndex = parameterIndex - 1; previousIndex >= 0; previousIndex--) {
+      const gd::ParameterMetadata* previousParameterMetadata =
+          MetadataProvider::GetFunctionCallParameterMetadata(
+              platform, 
+              globalObjectsContainer,
+              objectsContainer,
+              functionCall,
+              previousIndex);
+      if (previousParameterMetadata != nullptr
+      && gd::ParameterMetadata::IsObject(previousParameterMetadata->GetType())) {
+        auto previousParameterNode = functionCall.parameters[previousIndex].get();
+        IdentifierNode* objectNode = dynamic_cast<IdentifierNode*>(previousParameterNode);
+        objectName = objectNode->identifierName;
+        return;
+      }
     }
   }
 

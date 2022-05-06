@@ -174,9 +174,10 @@ const NewVariablesList = (props: Props) => {
                               onClick={event => {
                                 event.stopPropagation();
                               }}
+                              disabled={isCollection}
                               value={
                                 isCollection
-                                  ? ''
+                                  ? `${variable.getChildrenCount()} children`
                                   : type === gd.Variable.String
                                   ? variable.getString()
                                   : type === gd.Variable.Number

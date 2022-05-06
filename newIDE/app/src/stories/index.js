@@ -2735,6 +2735,7 @@ storiesOf('EventsSheet', module)
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
           onBeginCreateEventsFunction={action('begin create events function')}
+          isActive={true}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>
@@ -2760,6 +2761,7 @@ storiesOf('EventsSheet', module)
           openInstructionOrExpression={action('open instruction or expression')}
           onCreateEventsFunction={action('create events function')}
           onBeginCreateEventsFunction={action('begin create events function')}
+          isActive={true}
         />
       </FixedHeightFlexContainer>
     </DragAndDropContextProvider>

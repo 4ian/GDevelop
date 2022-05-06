@@ -816,26 +816,25 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   closeParameterEditor = (shouldCancel: boolean) => {
     const { instruction, parameterIndex } = this.state.editedParameter;
-    if (!instruction) {
-      return;
-    }
-    // If the user canceled, revert the value to the previous value, if not null.
-    if (
-      shouldCancel &&
-      typeof this.state.inlineEditingPreviousValue === 'string'
-    ) {
-      instruction.setParameter(
-        parameterIndex,
-        this.state.inlineEditingPreviousValue
-      );
-    }
-    // If the user made changes, save the value to history.
-    if (
-      !shouldCancel &&
-      this.state.inlineEditingPreviousValue !==
-        instruction.getParameter(parameterIndex)
-    ) {
-      this._saveChangesToHistory();
+    if (instruction) {
+      // If the user canceled, revert the value to the previous value, if not null.
+      if (
+        shouldCancel &&
+        typeof this.state.inlineEditingPreviousValue === 'string'
+      ) {
+        instruction.setParameter(
+          parameterIndex,
+          this.state.inlineEditingPreviousValue
+        );
+      }
+      // If the user made changes, save the value to history.
+      if (
+        !shouldCancel &&
+        this.state.inlineEditingPreviousValue !==
+          instruction.getParameter(parameterIndex)
+      ) {
+        this._saveChangesToHistory();
+      }
     }
 
     const { inlineEditingAnchorEl } = this.state;

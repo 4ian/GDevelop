@@ -10,6 +10,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/IDE/Events/ExpressionTypeFinder.h"
+#include "GDCore/IDE/Events/ExpressionVariableOwnerFinder.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "catch.hpp"
@@ -1407,7 +1408,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   SECTION("Valid function call with object variable") {
     {
       // Note that in this test we need to use an expression with "objectvar",
-      // as the grammar of the parser depends on this parameter type
+      // as ExpressionVariableOwnerFinder depends on this parameter type
       // information.
       auto node = parser.ParseExpression(
           "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObject1, "
@@ -1427,7 +1428,40 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(identifierObject2Node.identifierName == "MyObject2");
       REQUIRE(variable1Node.identifierName == "MyVar1");
       REQUIRE(variable2Node.identifierName == "MyVar2");
-      // TODO Was the association between variable and object parameters useful somewhere?
+      
+      auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform, project, layout1, "", variable1Node);
+      REQUIRE(variable1ObjectName == "MyObject1");
+      auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform, project, layout1, "", variable2Node);
+      REQUIRE(variable2ObjectName == "MyObject2");
+    }
+  }
+
+  SECTION("Valid function call with 2 object variable from the same object") {
+    {
+      auto node = parser.ParseExpression(
+          "MyExtension::GetStringWith1ObjectParamAnd2ObjectVarParam(MyObject1, "
+          "MyVar1, MyVar2)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      auto &identifierObject1Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
+      auto &variable1Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[1]);
+      auto &variable2Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+
+      REQUIRE(identifierObject1Node.identifierName == "MyObject1");
+      REQUIRE(variable1Node.identifierName == "MyVar1");
+      REQUIRE(variable2Node.identifierName == "MyVar2");
+      
+      auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform, project, layout1, "", variable1Node);
+      REQUIRE(variable1ObjectName == "MyObject1");
+      auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform, project, layout1, "", variable2Node);
+      REQUIRE(variable2ObjectName == "MyObject1");
     }
   }
 

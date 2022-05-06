@@ -197,6 +197,17 @@ void SetupProjectWithDummyPlatform(gd::Project& project,
       .AddParameter("object", _("Object 2 parameter"))
       .AddParameter("objectvar", _("Variable for object 2"))
       .SetFunctionName("getStringWith2ObjectParamAnd2ObjectVarParam");
+  extension
+      ->AddStrExpression(
+          "GetStringWith1ObjectParamAnd2ObjectVarParam",
+          "Get string with 2 objectvar param one from the same object param",
+          "",
+          "",
+          "")
+      .AddParameter("object", _("Object 1 parameter"))
+      .AddParameter("objectvar", _("Variable for object 1"))
+      .AddParameter("objectvar", _("Variable for object 2"))
+      .SetFunctionName("getStringWith1ObjectParamAnd2ObjectVarParam");
 
   auto& object = extension->AddObject<gd::Object>(
       "Sprite", "Dummy Sprite", "Dummy sprite object", "");

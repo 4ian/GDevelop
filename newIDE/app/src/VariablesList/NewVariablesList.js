@@ -3,15 +3,19 @@ import * as React from 'react';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ExpandLess from '@material-ui/icons/ExpandLess';
+import Add from '@material-ui/icons/Add';
 import { mapFor } from '../Utils/MapFor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Checkbox from '../UI/Checkbox';
+import DragHandle from '../UI/DragHandle';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Trans } from '@lingui/macro';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
-import DragHandle from '@material-ui/icons/DragHandle';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
+import VariableTypeSelector from './VariableTypeSelector';
+import Background from '../UI/Background';
+import IconButton from '../UI/IconButton';
 const gd: libGDevelop = global.gd;
 
 type Props = {
@@ -57,9 +61,10 @@ const NewVariablesList = (props: Props) => {
     [props.variablesContainer.ptr]
   );
 
-  const DragSourceAndDropTarget = React.useMemo(() => makeDragSourceAndDropTarget(
-    'variable-editor'
-  ), []);
+  const DragSourceAndDropTarget = React.useMemo(
+    () => makeDragSourceAndDropTarget('variable-editor'),
+    []
+  );
 
   const variableTypeToLabel = {
     [gd.Variable.String]: <Trans>String</Trans>,
@@ -116,14 +121,26 @@ const NewVariablesList = (props: Props) => {
         {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
           connectDropTarget(
             <div>
-              {isOver && <DropIndicator canDrop={canDrop} />}
-              <div style={{ display: 'flex' }}>
-                {connectDragSource(<div>bonjour</div>)}
-                <TreeItem
-                  label={
-                    <Line>
-                      <Column>
+              <TreeItem
+                label={
+                  <div>
+                    {isOver && <DropIndicator canDrop={canDrop} />}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '6px 8px',
+                      }}
+                    >
+                      {connectDragSource(
+                        <span>
+                          <DragHandle color="#AAA" />
+                        </span>
+                      )}
+                      <div style={{ flex: 1 }}>
                         <SemiControlledTextField
+                          fullWidth
+                          margin="none"
                           key="name"
                           onClick={event => {
                             event.stopPropagation();
@@ -134,62 +151,84 @@ const NewVariablesList = (props: Props) => {
                             forceUpdate();
                           }}
                         />
-                      </Column>
-                      <Column>{variableTypeToLabel[variable.getType()]}</Column>
-                      <Column>
-                        <SemiControlledTextField
-                          key="value"
-                          onClick={event => {
-                            event.stopPropagation();
-                          }}
-                          value={
-                            isCollection
-                              ? ''
-                              : type === gd.Variable.String
-                              ? variable.getString()
-                              : type === gd.Variable.Number
-                              ? '' + variable.getValue()
-                              : variable.getBool().toString()
-                          }
-                          onChange={value => {
-                            onChangeValue(nodeId, value);
-                            forceUpdate();
-                          }}
-                        />
-                      </Column>
-                    </Line>
-                  }
-                  onLabelClick={event => {
-                    event.preventDefault();
-                  }}
-                  nodeId={nodeId}
-                >
-                  {!isCollection
-                    ? null
-                    : type === gd.Variable.Structure
-                    ? variable
-                        .getAllChildrenNames()
-                        .toJSArray()
-                        .map((childName, index) => {
-                          const childVariable = variable.getChild(childName);
-                          return renderVariableAndChildrenRows(
-                            childName,
-                            childVariable,
-                            depth + 1,
-                            nodeId
-                          );
-                        })
-                    : mapFor(0, variable.getChildrenCount(), index => {
-                        const childVariable = variable.getAtIndex(index);
+                      </div>
+                      <Spacer />
+                      <div
+                        style={{
+                          minWidth: 600, // TODO - See if this value should depend on the container width
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Line noMargin>
+                          <Column noMargin>
+                            <div style={{ width: 150 }}>
+                              <VariableTypeSelector
+                                variableType={variable.getType()}
+                              />
+                            </div>
+                          </Column>
+                          <Column expand>
+                            <SemiControlledTextField
+                              margin="none"
+                              key="value"
+                              onClick={event => {
+                                event.stopPropagation();
+                              }}
+                              value={
+                                isCollection
+                                  ? ''
+                                  : type === gd.Variable.String
+                                  ? variable.getString()
+                                  : type === gd.Variable.Number
+                                  ? '' + variable.getValue()
+                                  : variable.getBool().toString()
+                              }
+                              onChange={value => {
+                                onChangeValue(nodeId, value);
+                                forceUpdate();
+                              }}
+                            />
+                          </Column>
+                          {isCollection ? (
+                            <IconButton size="small" style={{ padding: 0 }}>
+                              <Add />
+                            </IconButton>
+                          ) : null}
+                        </Line>
+                      </div>
+                    </div>
+                  </div>
+                }
+                onLabelClick={event => {
+                  event.preventDefault();
+                }}
+                nodeId={nodeId}
+              >
+                {!isCollection
+                  ? null
+                  : type === gd.Variable.Structure
+                  ? variable
+                      .getAllChildrenNames()
+                      .toJSArray()
+                      .map((childName, index) => {
+                        const childVariable = variable.getChild(childName);
                         return renderVariableAndChildrenRows(
-                          '' + index,
+                          childName,
                           childVariable,
                           depth + 1,
                           nodeId
                         );
-                      })}
-                </TreeItem>
-              </div>
+                      })
+                  : mapFor(0, variable.getChildrenCount(), index => {
+                      const childVariable = variable.getAtIndex(index);
+                      return renderVariableAndChildrenRows(
+                        '' + index,
+                        childVariable,
+                        depth + 1,
+                        nodeId
+                      );
+                    })}
+              </TreeItem>
             </div>
           )
         }

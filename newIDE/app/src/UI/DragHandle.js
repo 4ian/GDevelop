@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
 import { SortableHandle } from 'react-sortable-hoc';
@@ -14,9 +15,15 @@ const styles = {
   handleColor: '#DDD',
 };
 
-const DragHandle = SortableHandle(props => (
+type Props = {|
+  disabled: boolean,
+  color?: string,
+|};
+
+const DragHandle = SortableHandle((props: Props) => (
   <span style={props.disabled ? styles.disabledHandle : styles.handle}>
-    <DragHandleIcon htmlColor={styles.handleColor} />
+    <DragHandleIcon htmlColor={props.color || styles.handleColor} />
   </span>
 ));
+
 export default DragHandle;

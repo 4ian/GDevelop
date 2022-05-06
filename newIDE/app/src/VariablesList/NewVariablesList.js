@@ -17,6 +17,7 @@ import VariableTypeSelector from './VariableTypeSelector';
 import Background from '../UI/Background';
 import IconButton from '../UI/IconButton';
 import { makeStyles } from '@material-ui/styles';
+import styles from './styles';
 const gd: libGDevelop = global.gd;
 
 const useStyles = makeStyles({
@@ -173,11 +174,9 @@ const NewVariablesList = (props: Props) => {
                           flexShrink: 0,
                         }}
                       >
-                        <Line noMargin>
+                        <Line noMargin alignItems="center">
                           <Column noMargin>
-                            <VariableTypeSelector
-                              variableType={variable.getType()}
-                            />
+                            <VariableTypeSelector variableType={type} />
                           </Column>
                           <Column expand>
                             <SemiControlledTextField
@@ -186,6 +185,12 @@ const NewVariablesList = (props: Props) => {
                               onClick={event => {
                                 event.stopPropagation();
                               }}
+                              multiline={type === gd.Variable.String}
+                              inputStyle={
+                                type === gd.Variable.String
+                                  ? styles.noPaddingMultilineTextField
+                                  : undefined
+                              }
                               disabled={isCollection}
                               value={
                                 isCollection

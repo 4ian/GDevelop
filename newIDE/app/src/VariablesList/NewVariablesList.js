@@ -16,7 +16,16 @@ import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import VariableTypeSelector from './VariableTypeSelector';
 import Background from '../UI/Background';
 import IconButton from '../UI/IconButton';
+import { makeStyles } from '@material-ui/styles';
 const gd: libGDevelop = global.gd;
+
+const useStyles = makeStyles({
+  group: {
+    borderLeft: `1px solid black`,
+    marginLeft: 7,
+    paddingLeft: 15
+  },
+});
 
 type Props = {
   variablesContainer: gdVariablesContainer,
@@ -105,6 +114,8 @@ const NewVariablesList = (props: Props) => {
 
     const nodeId = !!parentNodeId ? `${parentNodeId}.${name}` : name;
 
+    const classes = useStyles();
+
     return (
       <DragSourceAndDropTarget
         key={variable.ptr}
@@ -122,6 +133,7 @@ const NewVariablesList = (props: Props) => {
           connectDropTarget(
             <div>
               <TreeItem
+                classes={classes}
                 label={
                   <div>
                     {isOver && <DropIndicator canDrop={canDrop} />}

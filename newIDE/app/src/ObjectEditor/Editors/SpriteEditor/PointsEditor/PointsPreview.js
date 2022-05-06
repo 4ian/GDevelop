@@ -3,11 +3,29 @@ import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
 import useForceUpdate from '../../../../Utils/UseForceUpdate';
 
+const selectedPointZIndex = 900;
+const highlightedPointZIndex = 1000;
+
 const styles = {
   container: {
     position: 'relative',
     width: '100%',
     height: '100%',
+  },
+  point: {
+    position: 'absolute',
+    transform: 'translate(-6px, -5px)',
+    cursor: 'move',
+  },
+  highlightedPoint: {
+    outline: '1px solid black',
+    background: 'rgba(255, 255, 255, 0.5)',
+    zIndex: highlightedPointZIndex,
+  },
+  selectedPoint: {
+    outline: '1px solid blue',
+    background: 'rgba(255, 255, 255, 0.5)',
+    zIndex: selectedPointZIndex,
   },
 };
 
@@ -18,6 +36,20 @@ const pointKindIdentifiers = {
 };
 type PointKind = 1 | 2 | 3;
 
+const getPointName = (kind: PointKind, point: gdPoint): string =>
+  kind === pointKindIdentifiers.ORIGIN
+    ? 'Origin'
+    : kind === pointKindIdentifiers.CENTER
+    ? 'Center'
+    : point.getName();
+
+const getImageSrc = (kind: PointKind): string =>
+  kind === pointKindIdentifiers.ORIGIN
+    ? 'res/originPoint.png'
+    : kind === pointKindIdentifiers.CENTER
+    ? 'res/centerPoint.png'
+    : 'res/point.png';
+
 type Props = {|
   pointsContainer: gdSprite, // Could potentially be generalized to other things than Sprite in the future.
   imageWidth: number,
@@ -26,6 +58,9 @@ type Props = {|
   offsetLeft: number,
   imageZoomFactor: number,
   onPointsUpdated: () => void,
+  highlightedPointName: ?string,
+  selectedPointName: ?string,
+  onClickPoint: string => void,
 |};
 
 type State = {|
@@ -47,6 +82,8 @@ const PointsPreview = (props: Props) => {
     offsetTop,
     offsetLeft,
     imageZoomFactor,
+    highlightedPointName,
+    selectedPointName,
   } = props;
 
   const forceUpdate = useForceUpdate();
@@ -64,7 +101,15 @@ const PointsPreview = (props: Props) => {
 
   const onEndDragPoint = () => {
     const draggingWasDone = !!state.draggedPoint;
-    if (draggingWasDone) props.onPointsUpdated();
+    if (draggingWasDone) {
+      props.onPointsUpdated();
+      // Select point at the end of the drag
+      if (state.draggedPointKind && state.draggedPoint) {
+        props.onClickPoint(
+          getPointName(state.draggedPointKind, state.draggedPoint)
+        );
+      }
+    }
     setState({
       draggedPoint: null,
       draggedPointKind: null,
@@ -100,28 +145,20 @@ const PointsPreview = (props: Props) => {
     kind: PointKind,
     point: gdPoint
   ) => {
-    const pointName =
-      kind === pointKindIdentifiers.ORIGIN
-        ? 'Origin'
-        : kind === pointKindIdentifiers.CENTER
-        ? 'Center'
-        : point.getName();
-    const imageSrc =
-      kind === pointKindIdentifiers.ORIGIN
-        ? 'res/originPoint.png'
-        : kind === pointKindIdentifiers.CENTER
-        ? 'res/centerPoint.png'
-        : 'res/point.png';
+    const pointName = getPointName(kind, point);
     return (
       <img
-        src={imageSrc}
+        src={getImageSrc(kind)}
         title={pointName}
         style={{
-          position: 'absolute',
           left: x,
           top: y,
-          transform: 'translate(-6px, -5px)',
-          cursor: 'move',
+          ...styles.point,
+          ...(pointName === selectedPointName
+            ? styles.selectedPoint
+            : pointName === highlightedPointName
+            ? styles.highlightedPoint
+            : null),
         }}
         alt=""
         key={name}

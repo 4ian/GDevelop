@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   group: {
     borderLeft: `1px solid black`,
     marginLeft: 7,
-    paddingLeft: 15
+    paddingLeft: 15,
   },
 });
 
@@ -173,11 +173,9 @@ const NewVariablesList = (props: Props) => {
                       >
                         <Line noMargin>
                           <Column noMargin>
-                            <div style={{ width: 150 }}>
-                              <VariableTypeSelector
-                                variableType={variable.getType()}
-                              />
-                            </div>
+                            <VariableTypeSelector
+                              variableType={variable.getType()}
+                            />
                           </Column>
                           <Column expand>
                             <SemiControlledTextField

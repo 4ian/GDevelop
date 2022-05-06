@@ -25,6 +25,7 @@ const useStyles = makeStyles({
     marginLeft: 7,
     paddingLeft: 15,
   },
+  label: { padding: 0 },
 });
 
 type Props = {
@@ -141,7 +142,7 @@ const NewVariablesList = (props: Props) => {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        padding: '6px 8px',
+                        padding: '6px',
                       }}
                     >
                       {connectDragSource(
@@ -149,6 +150,7 @@ const NewVariablesList = (props: Props) => {
                           <DragHandle color="#AAA" />
                         </span>
                       )}
+                      <Spacer />
                       <div style={{ flex: 1 }}>
                         <SemiControlledTextField
                           fullWidth

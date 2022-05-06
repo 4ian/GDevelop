@@ -1423,7 +1423,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
-  SECTION("Invalid function call with object variable") {
+  SECTION("Function call with an invalid object parameter") {
     {
       // Note that in this test we need to use an expression with "objectvar",
       // as the grammar of the parser depends on this parameter type
@@ -1442,6 +1442,28 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "An object name was expected but something else was written. "
               "Enter just the name of the object for this parameter.");
+    }
+  }
+
+  SECTION("Function call with an invalid variable parameter") {
+    {
+      // Note that in this test we need to use an expression with "objectvar",
+      // as the grammar of the parser depends on this parameter type
+      // information.
+      auto node = parser.ParseExpression(
+          "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam(MyObject1, "
+          "My badly/written var1, MyObject2, MyVar2)");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "Operators (+, -, /, *) can't be used in variable names. Remove "
+              "the operator from the variable name.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "A variable name was expected but something else was written. "
+              "Enter just the name of the variable for this parameter.");
     }
   }
 

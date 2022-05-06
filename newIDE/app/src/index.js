@@ -99,6 +99,7 @@ class Bootstrapper extends Component<{}, State> {
           'libGD.js initialization done',
           performance.now(),
         ]);
+        sendProgramOpening();
 
         if (electron) {
           import(/* webpackChunkName: "local-app" */ './LocalApp')
@@ -160,4 +161,3 @@ if (rootElement) {
 
 // registerServiceWorker();
 register();
-sendProgramOpening();

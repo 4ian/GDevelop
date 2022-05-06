@@ -9,6 +9,7 @@ import { Trans } from '@lingui/macro';
 type PropsType = {
   helpPagePath: ?string,
   label?: React.Node,
+  anchor?: string,
 };
 
 /**
@@ -16,7 +17,7 @@ type PropsType = {
  */
 const HelpButton = (props: PropsType) => {
   if (!props.helpPagePath) return null;
-  const helpLink = getHelpLink(props.helpPagePath);
+  const helpLink = getHelpLink(props.helpPagePath, props.anchor);
   if (!helpLink) return null;
 
   return (

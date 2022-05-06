@@ -1,15 +1,11 @@
-//TODO: Factor with styles.js from LayersList.
+// @flow
 export default {
-  handleColumn: {
-    width: 24,
-    paddingLeft: 8,
-    paddingRight: 0,
-  },
+  nameColumn: { width: '40%' },
   coordinateColumn: {
-    width: 48,
+    width: 60,
   },
   toolColumn: {
-    width: 48,
+    width: 36,
     height: 32,
   },
 };

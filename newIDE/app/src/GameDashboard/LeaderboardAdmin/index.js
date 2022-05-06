@@ -64,6 +64,7 @@ import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
 import Text from '../../UI/Text';
 import { GameRegistration } from '../GameRegistration';
 import LeaderboardAppearanceDialog from './LeaderboardAppearanceDialog';
+import FlatButton from '../../UI/FlatButton';
 
 type Props = {| onLoading: boolean => void, project?: gdProject |};
 type ContainerProps = {| ...Props, gameId: string |};
@@ -76,6 +77,7 @@ type ApiError = {|
     | 'leaderboardNameUpdate'
     | 'leaderboardSortUpdate'
     | 'leaderboardVisibilityUpdate'
+    | 'leaderboardPrimaryUpdate'
     | 'leaderboardAppearanceUpdate'
     | 'leaderboardPlayerUnicityDisplayChoiceUpdate'
     | 'leaderboardCreation'
@@ -103,13 +105,15 @@ const styles = {
   leaderboardNameTextField: { width: 125, fontSize: 14 },
 };
 
-const getApiError = (payload: LeaderboardUpdatePayload) => ({
+const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
   action: payload.name
     ? 'leaderboardNameUpdate'
     : payload.sort
     ? 'leaderboardSortUpdate'
     : payload.visibility
     ? 'leaderboardVisibilityUpdate'
+    : payload.primary
+    ? 'leaderboardPrimaryUpdate'
     : payload.customizationSettings
     ? 'leaderboardAppearanceUpdate'
     : 'leaderboardPlayerUnicityDisplayChoiceUpdate',
@@ -127,6 +131,11 @@ const getApiError = (payload: LeaderboardUpdatePayload) => ({
     <Trans>
       An error occurred when updating the visibility of the leaderboard, please
       close the dialog, come back and try again.
+    </Trans>
+  ) : payload.primary ? (
+    <Trans>
+      An error occurred when setting the leaderboard as default, please close
+      the dialog, come back and try again.
     </Trans>
   ) : payload.customizationSettings ? (
     <Trans>
@@ -792,7 +801,11 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                           <SelectOption
                             key={leaderboard.id}
                             value={leaderboard.id}
-                            primaryText={leaderboard.name}
+                            primaryText={
+                              leaderboard.primary
+                                ? t`${leaderboard.name} (default)`
+                                : leaderboard.name
+                            }
                           />
                         ))}
                       </SelectField>
@@ -837,15 +850,34 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                           </React.Fragment>
                         ))}
                       </List>
-                      <Line>
-                        <RaisedButton
+                      <Line justifyContent="space-between">
+                        <FlatButton
                           icon={<Delete />}
                           label={<Trans>Delete</Trans>}
                           disabled={isRequestPending || isEditingName}
                           onClick={() => onDeleteLeaderboard(i18n)}
                         />
+                        <RaisedButton
+                          label={
+                            currentLeaderboard.primary ? (
+                              <Trans>Default</Trans>
+                            ) : (
+                              <Trans>Set as default</Trans>
+                            )
+                          }
+                          disabled={
+                            isRequestPending ||
+                            isEditingName ||
+                            currentLeaderboard.primary
+                          }
+                          onClick={() =>
+                            onUpdateLeaderboard(i18n, { primary: true })
+                          }
+                        />
                       </Line>
-                      {apiError && apiError.action === 'leaderboardDeletion' ? (
+                      {apiError &&
+                      (apiError.action === 'leaderboardDeletion' ||
+                        apiError.action === 'leaderboardPrimaryUpdate') ? (
                         <PlaceholderError kind="error">
                           {apiError.message}
                         </PlaceholderError>

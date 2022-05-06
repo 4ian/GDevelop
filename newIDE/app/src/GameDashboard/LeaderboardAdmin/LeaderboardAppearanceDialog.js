@@ -24,6 +24,7 @@ import {
   unitToNextSeparator,
 } from '../../Leaderboard/LeaderboardScoreFormatter';
 import AlertMessage from '../../UI/AlertMessage';
+import HelpButton from '../../UI/HelpButton';
 
 const unitToAbbreviation = {
   hour: 'HH',
@@ -31,6 +32,9 @@ const unitToAbbreviation = {
   second: 'SS',
   millisecond: 'ms',
 };
+
+const isWholeNumber = (value: any): boolean =>
+  !isNaN(value) && Number.isInteger(value);
 
 const getIdentifierFromUnits = (units: {|
   smallestUnit: LeaderboardScoreFormattingTimeUnit,
@@ -76,6 +80,8 @@ type Props = {
 const scorePreviewMaxValue = 999999999;
 const precisionMinValue = -3;
 const precisionMaxValue = 3;
+const displayedEntriesMinNumber = 1;
+const displayedEntriesMaxNumber = 25;
 
 function LeaderboardAppearanceDialog({
   open,
@@ -85,6 +91,18 @@ function LeaderboardAppearanceDialog({
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [scoreTitleError, setScoreTitleError] = React.useState<?string>(null);
+  const [
+    defaultDisplayedEntriesNumber,
+    setDefaultDisplayedEntriesNumber,
+  ] = React.useState<number>(
+    (leaderboardCustomizationSettings &&
+      leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
+      20
+  );
+  const [
+    defaultDisplayedEntriesNumberError,
+    setDefaultDisplayedEntriesNumberError,
+  ] = React.useState<?string>(null);
   const [scoreTitle, setScoreTitle] = React.useState<string>(
     leaderboardCustomizationSettings
       ? leaderboardCustomizationSettings.scoreTitle
@@ -113,6 +131,7 @@ function LeaderboardAppearanceDialog({
       ? leaderboardCustomizationSettings.scoreFormatting.precision
       : 0
   );
+  const [precisionError, setPrecisionError] = React.useState<?string>(null);
   const [timeUnits, setTimeUnits] = React.useState<string>(
     leaderboardCustomizationSettings &&
       leaderboardCustomizationSettings.scoreFormatting.type === 'time'
@@ -134,8 +153,25 @@ function LeaderboardAppearanceDialog({
       setScoreTitleError(i18n._(t`Title cannot be empty.`));
       return;
     }
+    if (!isWholeNumber(defaultDisplayedEntriesNumber)) {
+      setDefaultDisplayedEntriesNumberError(
+        i18n._(
+          t`The number of displayed entries must be a whole value between ${displayedEntriesMinNumber} and ${displayedEntriesMaxNumber}`
+        )
+      );
+      return;
+    }
+    if (!isWholeNumber(precision)) {
+      setPrecisionError(
+        i18n._(
+          t`The number of decimal places must be a whole value between ${precisionMinValue} and ${precisionMaxValue}`
+        )
+      );
+      return;
+    }
     setIsLoading(true);
     const customizationSettings = {
+      defaultDisplayedEntriesNumber,
       scoreTitle,
       scoreFormatting:
         scoreType === 'custom'
@@ -159,6 +195,12 @@ function LeaderboardAppearanceDialog({
           onRequestClose={() => {
             if (!isLoading) onClose();
           }}
+          secondaryActions={[
+            <HelpButton
+              helpPagePath="/interface/games-dashboard/leaderboard-administration"
+              anchor="change_the_appearance_of_a_leaderboard"
+            />,
+          ]}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}
@@ -174,7 +216,40 @@ function LeaderboardAppearanceDialog({
               key={'save'}
             />,
           ]}
+          onApply={() => {
+            onSaveSettings(i18n);
+          }}
         >
+          <Text size="title">
+            <Trans>Table settings</Trans>
+          </Text>
+          <Line>
+            <TextField
+              fullWidth
+              type="number"
+              floatingLabelText={<Trans>Number of entries to display</Trans>}
+              value={
+                isNaN(defaultDisplayedEntriesNumber)
+                  ? ''
+                  : defaultDisplayedEntriesNumber
+              }
+              errorText={defaultDisplayedEntriesNumberError}
+              min={displayedEntriesMinNumber}
+              max={displayedEntriesMaxNumber}
+              onChange={(e, newValue) => {
+                if (!!defaultDisplayedEntriesNumberError && !!newValue) {
+                  setDefaultDisplayedEntriesNumberError(null);
+                }
+
+                setDefaultDisplayedEntriesNumber(
+                  Math.max(
+                    displayedEntriesMinNumber,
+                    Math.min(displayedEntriesMaxNumber, parseFloat(newValue))
+                  )
+                );
+              }}
+            />
+          </Line>
           <Text size="title">
             <Trans>Score column settings</Trans>
           </Text>
@@ -259,10 +334,14 @@ function LeaderboardAppearanceDialog({
                         floatingLabelText={
                           <Trans>Round to X decimal point</Trans>
                         }
+                        errorText={precisionError}
                         value={isNaN(precision) ? '' : precision}
                         min={precisionMinValue}
                         max={precisionMaxValue}
                         onChange={(e, newValue) => {
+                          if (!!precisionError && !!newValue) {
+                            setPrecisionError(null);
+                          }
                           setPrecision(
                             Math.max(
                               precisionMinValue,

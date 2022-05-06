@@ -73,7 +73,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   void OnVisitOperatorNode(OperatorNode& node) override {
     ReportAnyError(node);
     
-    const Type thisParentType = parentType;
     node.leftHandSide->Visit(*this);
     const Type leftType = childType;
 
@@ -301,7 +300,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   std::vector<std::unique_ptr<ExpressionParserDiagnostic>> supplementalErrors;
   Type childType;
   Type parentType;
-  gd::String lastObjectName;
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;

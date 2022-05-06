@@ -1346,6 +1346,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(childNode.expression != nullptr);
       auto &textNode = dynamic_cast<gd::TextNode &>(*childNode.expression);
       REQUIRE(textNode.text == "My named children");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
 
     {
@@ -1361,6 +1365,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &grandChildNode =
           dynamic_cast<gd::VariableAccessorNode &>(*childNode.child);
       REQUIRE(grandChildNode.name == "grandChild");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 

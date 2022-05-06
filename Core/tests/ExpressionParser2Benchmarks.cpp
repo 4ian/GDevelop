@@ -23,14 +23,15 @@ TEST_CASE("ExpressionParser2 - Benchmarks", "[common][events]") {
 
   gd::ExpressionParser2 parser;
 
-  auto parseExpression = [&parser](const gd::String &expression) {
-    auto parseExpressionWithType = [&parser,
+  auto parseExpression = [&parser, &project, &platform, &layout1](const gd::String &expression) {
+    auto parseExpressionWithType = [&parser, &project, &platform, &layout1,
                                     &expression](const gd::String &type) {
       auto node = parser.ParseExpression(expression);
       REQUIRE(node != nullptr);
+      gd::ExpressionValidator validator(platform, project, layout1, type);
+      node->Visit(validator);
     };
 
-    // TODO The type is not used any more.
     parseExpressionWithType("number");
     parseExpressionWithType("string");
     parseExpressionWithType("scenevar");

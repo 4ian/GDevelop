@@ -5,6 +5,7 @@ import * as React from 'react';
 import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
 
 type Props = {|
   shouldPrompt: boolean,
@@ -44,7 +45,7 @@ export default React.memo<Props>(function CloseConfirmDialog({
               if (answer) {
                 // If answer is positive, re-trigger the close
                 delayElectronClose.current = false;
-                electron.remote.getCurrentWindow().close();
+                remote.getCurrentWindow().close();
               }
             }, 10);
 

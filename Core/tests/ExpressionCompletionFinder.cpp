@@ -20,15 +20,15 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   SetupProjectWithDummyPlatform(project, platform);
   auto& layout1 = project.InsertNewLayout("Layout1", 0);
 
-  gd::ExpressionParser2 parser(platform, project, layout1);
+  gd::ExpressionParser2 parser;
 
   auto getCompletionsFor = [&](const gd::String& type,
                                const gd::String& expression,
                                size_t location) {
-    auto node = parser.ParseExpression(type, expression);
+    auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     return gd::ExpressionCompletionFinder::GetCompletionDescriptionsFor(
-        *node, location);
+        platform, project, layout1, type, *node, location);
   };
 
   const std::vector<gd::ExpressionCompletionDescription>
@@ -65,6 +65,24 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
               expectedCompletions);
       REQUIRE(getCompletionsFor("number|string", "My", 2) ==
               expectedEmptyCompletions);
+    }
+    SECTION("Object or expression completions in a variable name") {
+      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForObject("string", "My", 0, 2),
+          gd::ExpressionCompletionDescription::ForExpression(
+              "string", "My", 0, 2)};
+      REQUIRE(getCompletionsFor("number", "MyExtension::GetVariableAsNumber(MyVariable[\"abc\" + My", 52) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number", "MyExtension::GetVariableAsNumber(MyVariable[\"abc\" + My", 53) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number", "MyExtension::GetVariableAsNumber(MyVariable[\"abc\" + My", 54) == expectedEmptyCompletions);
+    }
+    SECTION("Object or expression completions in a variable index") {
+      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForObject("number", "My", 0, 2),
+          gd::ExpressionCompletionDescription::ForExpression(
+              "number", "My", 0, 2)};
+      REQUIRE(getCompletionsFor("number", "MyExtension::GetVariableAsNumber(MyVariable[12345 + My", 52) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number", "MyExtension::GetVariableAsNumber(MyVariable[12345 + My", 53) == expectedCompletions);
+      REQUIRE(getCompletionsFor("number", "MyExtension::GetVariableAsNumber(MyVariable[12345 + My", 54) == expectedEmptyCompletions);
     }
     SECTION("Object when type is an object") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{

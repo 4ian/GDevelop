@@ -498,6 +498,7 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
 #define STATIC_FromJSON(x) FromJSON(x)
 #define STATIC_IsObject IsObject
 #define STATIC_IsBehavior IsBehavior
+#define STATIC_IsExpression IsExpression
 #define STATIC_Get Get
 #define STATIC_GetAllUseless GetAllUseless
 #define STATIC_RemoveAllUseless RemoveAllUseless

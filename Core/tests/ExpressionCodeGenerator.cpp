@@ -15,7 +15,6 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "catch.hpp"
 
-// TODO Test the generation of a objectvar expression. It must use the objectName passed in parameter.
 TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   gd::Project project;
   gd::Platform platform;
@@ -414,6 +413,18 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "fakeBadVariable");
     }
   }
+  SECTION("Valid variables") {
+    {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "myVariable", "")
+              == "getLayoutVariable(myVariable)");
+    }
+    {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "objectvar", "myVariable", "MySpriteObject")
+              == "getVariableForObject(MySpriteObject, myVariable)");
+    }
+  }
   SECTION("Valid function calls with variables") {
     SECTION("Simple access") {
       {
@@ -474,6 +485,21 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "getStringWith1ObjectParamAnd2ObjectVarParam(fakeObjectListOf_MySpriteObject, "
             "getVariableForObject(MySpriteObject, myVariable), "
             "getVariableForObject(MySpriteObject, myOtherVariable))");
+      }
+      {
+        auto node = parser.ParseExpression(
+            "MySpriteObject.GetObjectVariableAsNumber(myVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(
+            expressionCodeGenerator.GetOutput() ==
+            "MySpriteObject.returnVariable(getVariableForObject("
+            "MySpriteObject, myVariable)) ?? 0");
       }
     }
     SECTION("Child access") {

@@ -1488,6 +1488,23 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Valid object function call with 1 object variable from the object of the function") {
+    {
+      auto node = parser.ParseExpression(
+          "MySpriteObject.GetObjectVariableAsNumber(MyVar1)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      auto &variable1Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
+
+      REQUIRE(variable1Node.identifierName == "MyVar1");
+      
+      auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform, project, layout1, "MySpriteObject", variable1Node);
+      REQUIRE(variable1ObjectName == "MySpriteObject");
+    }
+  }
+
   SECTION("Function call with an invalid object parameter") {
     {
       // Note that in this test we need to use an expression with "objectvar",

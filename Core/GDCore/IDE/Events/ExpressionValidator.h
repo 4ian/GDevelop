@@ -172,7 +172,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       VariableBracketAccessorNode& node) override {
     ReportAnyError(node);
 
-    // TODO add a test on the parser with type check for accessor expression (number and string).
     Type currentParentType = parentType;
     parentType = Type::NumberOrString;
     node.expression->Visit(*this);

@@ -98,8 +98,8 @@ const PointsListBody = (props: PointsListBodyProps) => {
 
           setNameErrors(old => ({ ...old, [pointName]: !success }));
         }}
-        onMouseEnter={props.onHoverPoint}
-        onMouseLeave={props.onHoverPoint}
+        onPointerEnter={props.onHoverPoint}
+        onPointerLeave={props.onHoverPoint}
         onClick={props.onSelectPoint}
         onRemove={() => {
           const answer = Window.showConfirmDialog(
@@ -125,8 +125,8 @@ const PointsListBody = (props: PointsListBodyProps) => {
       pointY={originPoint.getY()}
       onChangePointX={updateOriginPointX}
       onChangePointY={updateOriginPointY}
-      onMouseEnter={props.onHoverPoint}
-      onMouseLeave={props.onHoverPoint}
+      onPointerEnter={props.onHoverPoint}
+      onPointerLeave={props.onHoverPoint}
       onClick={props.onSelectPoint}
       selected={'Origin' === props.selectedPointName}
     />
@@ -140,8 +140,8 @@ const PointsListBody = (props: PointsListBodyProps) => {
       pointY={centerPoint.getY()}
       onChangePointX={updateCenterPointX}
       onChangePointY={updateCenterPointY}
-      onMouseEnter={props.onHoverPoint}
-      onMouseLeave={props.onHoverPoint}
+      onPointerEnter={props.onHoverPoint}
+      onPointerLeave={props.onHoverPoint}
       onClick={props.onSelectPoint}
       selected={'Center' === props.selectedPointName}
       onEdit={

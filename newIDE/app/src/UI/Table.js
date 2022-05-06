@@ -73,8 +73,8 @@ type TableRowProps = {|
   style?: {|
     backgroundColor: string,
   |},
-  onMouseEnter?: () => void,
-  onMouseLeave?: () => void,
+  onPointerEnter?: () => void,
+  onPointerLeave?: () => void,
   onClick?: () => void,
 |};
 

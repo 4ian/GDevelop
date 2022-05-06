@@ -23,8 +23,8 @@ type Props = {|
   verticeY: number,
   onChangeVerticeX: (value: number) => void,
   onChangeVerticeY: (value: number) => void,
-  onMouseEnter: () => void,
-  onMouseLeave: () => void,
+  onPointerEnter: () => void,
+  onPointerLeave: () => void,
   setDragged: () => void,
   drop: () => void,
 |};
@@ -66,8 +66,8 @@ const VerticeRow = ({
                     ? muiTheme.listItem.selectedBackgroundColor
                     : muiTheme.list.itemsBackgroundColor,
                 }}
-                onMouseEnter={props.onMouseEnter}
-                onMouseLeave={props.onMouseLeave}
+                onPointerEnter={props.onPointerEnter}
+                onPointerLeave={props.onPointerLeave}
                 onClick={props.onClick}
               >
                 {connectDragSource(

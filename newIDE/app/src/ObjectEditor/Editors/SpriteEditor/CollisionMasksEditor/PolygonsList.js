@@ -98,8 +98,8 @@ const VerticesTable = (props: VerticesTableProps) => {
                 dropVertice(current, verticeIndex);
                 draggedVerticeIndex.current = null;
               }}
-              onMouseEnter={() => props.onHoverVertice(vertice.ptr)}
-              onMouseLeave={props.onHoverVertice}
+              onPointerEnter={() => props.onHoverVertice(vertice.ptr)}
+              onPointerLeave={props.onHoverVertice}
               selected={props.selectedVerticePtr === vertice.ptr}
               onClick={() => props.onClickVertice(vertice.ptr)}
               verticeX={vertice.get_x()}

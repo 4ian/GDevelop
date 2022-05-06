@@ -8,6 +8,7 @@ import VariableNumberIcon from './Icons/VariableNumberIcon';
 import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
+import { Spacer } from '../UI/Grid';
 const gd = global.gd;
 
 type Props = {|
@@ -23,11 +24,15 @@ const VariableTypeSelector = (props: Props) => {
     [gd.Variable.Array]: VariableArrayIcon,
     [gd.Variable.Structure]: VariableStructureIcon,
   };
-  console.log(props);
+
   const Icon = variableTypeToIcon[props.variableType];
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between" }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       <Icon fontSize="small" />
+      <Spacer />
+      <Spacer />
+      <Spacer />
       <SelectField value={props.variableType} margin="none" stopPropagationOnClick>
         <SelectOption primaryText="String" value={gd.Variable.String} />
         <SelectOption primaryText="Number" value={gd.Variable.Number} />

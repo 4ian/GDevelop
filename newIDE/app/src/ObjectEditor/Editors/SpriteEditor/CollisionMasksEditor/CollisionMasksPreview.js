@@ -134,11 +134,16 @@ const CollisionMasksPreview = (props: Props) => {
               onPointerDown={() => onStartDragVertex(vertex)}
               key={`polygon-${i}-vertex-${j}`}
               fill={
-                vertex.ptr === props.highlightedVerticePtr
-                  ? 'rgba(255,180,0,0.75)'
-                  : vertex.ptr === props.selectedVerticePtr
+                vertex.ptr === props.selectedVerticePtr
                   ? 'rgba(0,0,255,0.75)'
                   : 'rgba(255,0,0,0.75)'
+              }
+              stroke={
+                vertex.ptr === props.highlightedVerticePtr
+                  ? vertex.ptr === props.selectedVerticePtr
+                    ? 'white'
+                    : 'black'
+                  : undefined
               }
               strokeWidth={1}
               cx={vertex.get_x() * imageZoomFactor}

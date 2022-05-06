@@ -802,7 +802,7 @@ namespace gdjs {
       }
 
       return null;
-    }
+    };
   }
 
   //Register the class to let the engine use it.

@@ -1068,10 +1068,15 @@ interface Instruction {
     void SetInverted(boolean inverted);
     boolean IsInverted();
     void SetParameter(unsigned long id, [Const] DOMString value);
-    [Const, Ref] DOMString GetParameter(unsigned long id);
+    [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
     unsigned long GetParametersCount();
     [Ref] InstructionsList GetSubInstructions();
+};
+
+interface Expression {
+  [Const, Ref] DOMString GetPlainString();
+  ExpressionNode GetRootNode();
 };
 
 interface VectorPairStringTextFormatting {
@@ -1259,6 +1264,7 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+    boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -2075,7 +2081,7 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator();
+    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetErrors();
 
@@ -2109,7 +2115,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2125,9 +2131,9 @@ interface UniquePtrExpressionNode {
 };
 
 interface ExpressionParser2 {
-    void ExpressionParser2([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer);
+    void ExpressionParser2();
 
-    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString type, [Const] DOMString expression);
+    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString expression);
 };
 
 enum EventsFunction_FunctionType {

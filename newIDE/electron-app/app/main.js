@@ -80,7 +80,8 @@ app.on('ready', function() {
     y: args.y,
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
-      // Allow Node.js API access in renderer process
+      // Allow Node.js API access in renderer process, as long
+      // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
     },

@@ -21,7 +21,8 @@ function createWindow() {
     title: "GDJS_GAME_NAME",
     backgroundColor: '#000000',
     webPreferences: {
-      // Allow Node.js API access in renderer process
+      // Allow Node.js API access in renderer process, as long
+      // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
       contextIsolation: false,
     }

@@ -106,7 +106,11 @@ export default class LocalPreviewLauncher extends React.Component<
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',
           webPreferences: {
+            webSecurity: false, // Allow to access to local files,
+            // Allow Node.js API access in renderer process, as long
+            // as we've not removed dependency on it and on "@electron/remote".
             nodeIntegration: true,
+            contextIsolation: false,
           },
         },
         previewGamePath: gamePath,
@@ -152,7 +156,10 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter = (): Promise<{|
+    outputDir: string,
+    exporter: gdjsExporter,
+  |}> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 

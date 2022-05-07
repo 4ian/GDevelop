@@ -439,12 +439,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                   dependency.GetVersion() + "\",";
     }
 
-    if (!packages.empty()) {
-      // Remove the , at the end as last item cannot have , in JSON.
-      packages = packages.substr(0, packages.size() - 1);
-    }
-
-    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"",
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\",",
                              packages);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {

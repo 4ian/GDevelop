@@ -200,7 +200,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     }
     else if (parentType != Type::Object && parentType != Type::Variable) {
       RaiseTypeError(
-          _("You've entered a name, but this type was expected:") + " " + TypeToSting(parentType),
+          _("You've entered a name, but this type was expected:") + " " + TypeToString(parentType),
           node.location);
     }
     childType = parentType;
@@ -266,7 +266,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
       else if (expect != Type::String && expect != Type::NumberOrString) {
         RaiseTypeError(
-            _("You entered a text, but this type was expected:") + " " + TypeToSting(expect),
+            _("You entered a text, but this type was expected:") + " " + TypeToString(expect),
             location);
       }
     }
@@ -278,14 +278,14 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       }
       else if (expect != Type::Number && expect != Type::NumberOrString) {
         RaiseTypeError(
-            _("You entered a number, but this type was expected:") + " " + TypeToSting(expect),
+            _("You entered a number, but this type was expected:") + " " + TypeToString(expect),
             location);
       }
     }
   }
 
   static Type StringToType(const gd::String &type);
-  static const gd::String &TypeToSting(Type type);
+  static const gd::String &TypeToString(Type type);
   static const gd::String unknownTypeString;
   static const gd::String numberTypeString;
   static const gd::String stringTypeString;

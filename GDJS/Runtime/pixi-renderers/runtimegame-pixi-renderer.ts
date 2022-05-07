@@ -306,10 +306,10 @@ namespace gdjs {
      * @param height The new height, in pixels.
      */
     setWindowSize(width: float, height: float): void {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.setContentSize(width, height);
         }
@@ -322,10 +322,10 @@ namespace gdjs {
      * Center the window on screen.
      */
     centerWindow() {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.center();
         }
@@ -343,10 +343,10 @@ namespace gdjs {
       }
       if (this._isFullscreen !== enable) {
         this._isFullscreen = !!enable;
-        const electron = this.getElectron();
-        if (electron) {
+        const remote = this.getElectronRemote();
+        if (remote) {
           // Use Electron BrowserWindow API
-          const browserWindow = electron.remote.getCurrentWindow();
+          const browserWindow = remote.getCurrentWindow();
           if (browserWindow) {
             browserWindow.setFullScreen(this._isFullscreen);
           }
@@ -400,9 +400,9 @@ namespace gdjs {
      * Checks if the game is in full screen.
      */
     isFullScreen(): boolean {
-      const electron = this.getElectron();
-      if (electron) {
-        return electron.remote.getCurrentWindow().isFullScreen();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        return remote.getCurrentWindow().isFullScreen();
       }
 
       // Height check is used to detect user triggered full screen (for example F11 shortcut).
@@ -742,9 +742,9 @@ namespace gdjs {
     stopGame() {
       // Try to detect the environment to use the most adapted
       // way of closing the app
-      const electron = this.getElectron();
-      if (electron) {
-        const browserWindow = electron.remote.getCurrentWindow();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.close();
         }
@@ -786,11 +786,23 @@ namespace gdjs {
      * Get the electron module, if running as a electron renderer process.
      */
     getElectron() {
-      if (typeof require !== 'undefined') {
+      if (typeof require === 'function') {
         return require('electron');
       }
       return null;
     }
+
+    /**
+     * Helper to get the electron remote module, if running on Electron.
+     * Note that is not guaranteed to be supported in the future - avoid if possible.
+     */
+    getElectronRemote = () => {
+      if (typeof require === 'function') {
+        return require('@electron/remote');
+      }
+
+      return null;
+    };
   }
 
   //Register the class to let the engine use it.

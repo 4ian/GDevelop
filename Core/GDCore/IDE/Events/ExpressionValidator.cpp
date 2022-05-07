@@ -62,10 +62,10 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
 
   ReportAnyError(function);
   
-  gd::String objectType = function.objectName.empty() ? gd::String() :
+  gd::String objectType = function.objectName.empty() ? "" :
       GetTypeOfObject(globalObjectsContainer, objectsContainer, function.objectName);
       
-  gd::String behaviorType = function.behaviorName.empty() ? gd::String() :
+  gd::String behaviorType = function.behaviorName.empty() ? "" :
       GetTypeOfBehavior(globalObjectsContainer, objectsContainer, function.behaviorName);
 
   const gd::ExpressionMetadata &metadata = function.behaviorName.empty() ?
@@ -118,7 +118,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     else if (parentType != Type::Number && parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "number, but another type is expected:") +
-                              " " + TypeToSting(parentType),
+                              " " + TypeToString(parentType),
                             function.location);
       return returnType;
     }
@@ -134,7 +134,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     else if (parentType != Type::String && parentType != Type::NumberOrString) {
       RaiseTypeError(_("You tried to use an expression that returns a "
                               "string, but another type is expected:") +
-                              " " + TypeToSting(parentType),
+                              " " + TypeToString(parentType),
                             function.location);
       return returnType;
     }
@@ -142,7 +142,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
     if (parentType != returnType) {
       RaiseTypeError(
           _("You tried to use an expression with the wrong return type:") + " " +
-            TypeToSting(returnType),
+            TypeToString(returnType),
           function.location);
       return returnType;
     }
@@ -251,7 +251,7 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   const gd::String ExpressionValidator::objectTypeString = "object";
   const gd::String ExpressionValidator::emptyTypeString = "empty";
 
-  const gd::String &ExpressionValidator::TypeToSting(Type type) {
+  const gd::String &ExpressionValidator::TypeToString(Type type) {
     switch (type) {
       case Type::Unknown:
       return unknownTypeString;

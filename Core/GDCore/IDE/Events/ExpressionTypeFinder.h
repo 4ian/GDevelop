@@ -31,6 +31,14 @@ namespace gd {
 /**
  * \brief Find the type of the expression or sub-expression that a given node
  * represents.
+ * 
+ * The type returned by this worker is a mix of:
+ * - an expected type looking up like a parameter declaration
+ * - an actual type looking down, but only looking at the most left branch
+ *   (using ExpressionLeftSideTypeFinder)
+ *
+ * This logic was built with the constraint of following a parser that can't
+ * know the right side. Now that it is extracted, it could be enhanced if needed.
  *
  * \see gd::ExpressionParser2
  */

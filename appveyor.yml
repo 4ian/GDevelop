@@ -51,9 +51,9 @@ build_script:
 - ps: >-
     cd newIDE\electron-app
 
-    node --max-old-space-size=3072 scripts/build.js --win nsis --publish=never
+    node --max-old-space-size=3072 scripts/build.js --win nsis
 
-    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx --publish=never
+    Remove-Item -Path Env:CSC_LINK ; Remove-Item -Path Env:CSC_KEY_PASSWORD ; node scripts/build.js --skip-app-build --win appx
 
     cd ..\..
 

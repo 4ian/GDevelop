@@ -161,6 +161,7 @@ export default class LocalPreviewLauncher extends React.Component<
   _prepareExporter = (): Promise<{|
     outputDir: string,
     exporter: gdjsExporter,
+    gdjsRoot: string,
   |}> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
@@ -175,6 +176,7 @@ export default class LocalPreviewLauncher extends React.Component<
       return {
         outputDir,
         exporter,
+        gdjsRoot,
       };
     });
   };
@@ -196,7 +198,7 @@ export default class LocalPreviewLauncher extends React.Component<
         );
       })
       .then(() => this._prepareExporter())
-      .then(({ outputDir, exporter }) => {
+      .then(({ outputDir, exporter, gdjsRoot }) => {
         timeFunction(
           () => {
             const previewExportOptions = new gd.PreviewExportOptions(
@@ -227,11 +229,10 @@ export default class LocalPreviewLauncher extends React.Component<
             // Give the preview the path to the "@electron/remote" module of the editor,
             // as this is required by some features and we've not removed dependency
             // on "@electron/remote" yet.
-            // $FlowFixMe - `paths` is not known by Flow on `module`.
-            const nodeModulePath = global.module.paths[0];
             previewExportOptions.setElectronRemoteRequirePath(
               path.join(
-                nodeModulePath,
+                gdjsRoot,
+                '../preview_node_modules',
                 '@electron/remote',
                 'renderer/index.js'
               )

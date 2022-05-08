@@ -120,6 +120,8 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
     if (rightType == Type::Number) {
       if (node.op != '+' && node.op != '-') {
+        // This is actually a dead code because the parser takes them as
+        // binary operations with an empty left side which makes as much sense.
         RaiseTypeError(
           _("You've used an \"unary\" operator that is not supported. Operator "
             "should be "
@@ -199,6 +201,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
           node.location);
     }
     else if (parentType != Type::Object && parentType != Type::Variable) {
+      // It can't happen.
       RaiseTypeError(
           _("You've entered a name, but this type was expected:") + " " + TypeToString(parentType),
           node.location);
@@ -224,6 +227,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     } else if (parentType == Type::Object) {
       message = _("You must enter a valid object name.");
     } else {
+      // It can't happen.
       message = _("You must enter a valid expression.");
     }
     RaiseTypeError(message, node.location);
@@ -265,6 +269,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
                            location);
       }
       else if (expect != Type::String && expect != Type::NumberOrString) {
+        // TODO test
         RaiseTypeError(
             _("You entered a text, but this type was expected:") + " " + TypeToString(expect),
             location);
@@ -277,6 +282,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             location);
       }
       else if (expect != Type::Number && expect != Type::NumberOrString) {
+        // TODO test
         RaiseTypeError(
             _("You entered a number, but this type was expected:") + " " + TypeToString(expect),
             location);

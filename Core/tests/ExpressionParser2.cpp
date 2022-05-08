@@ -37,6 +37,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           platform, project, layout1, "string", emptyNode);
       REQUIRE(type == "string");
       REQUIRE(emptyNode.text == "");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a text (between quotes) or a valid expression call.");
     }
     {
       auto node = parser.ParseExpression("");
@@ -46,6 +52,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           platform, project, layout1, "number", emptyNode);
       REQUIRE(type == "number");
       REQUIRE(emptyNode.text == "");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a number or a valid expression call.");
     }
     {
       auto node = parser.ParseExpression("");
@@ -55,6 +67,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           platform, project, layout1, "object", emptyNode);
       REQUIRE(type == "object");
       REQUIRE(emptyNode.text == "");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "object");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a valid object name.");
     }
     {
       auto node = parser.ParseExpression(" ");
@@ -1335,6 +1353,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a variable name.");
     }
+    {
+      auto node = parser.ParseExpression("myVariable[myChild]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+            "You must enter a number or a text, wrapped inside double quotes "
+            "(example: \"Hello world\").");
+    }
   }
 
   SECTION("Valid variables") {
@@ -1349,7 +1378,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(identifierNode.identifierNameDotLocation.IsValid() == false);
       REQUIRE(identifierNode.childIdentifierNameLocation.IsValid() == false);
     }
-
     {
       auto node = parser.ParseExpression("myVariable.myChild");
       REQUIRE(node != nullptr);
@@ -1357,7 +1385,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(identifierNode.identifierName == "myVariable");
       REQUIRE(identifierNode.childIdentifierName == "myChild");
     }
-
     {
       auto node = parser.ParseExpression(
           "myVariable[ \"My named children\"  ]");
@@ -1375,7 +1402,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-
     {
       auto node = parser.ParseExpression(
           "myVariable[ \"My named children\"  ] . grandChild");

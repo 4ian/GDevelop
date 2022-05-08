@@ -154,6 +154,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       .SetStringValue(options.websocketDebuggerServerAddress);
   runtimeGameOptions.AddChild("websocketDebuggerServerPort")
       .SetStringValue(options.websocketDebuggerServerPort);
+  runtimeGameOptions.AddChild("electronRemoteRequirePath")
+      .SetStringValue(options.electronRemoteRequirePath);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -439,12 +441,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                   dependency.GetVersion() + "\",";
     }
 
-    if (!packages.empty()) {
-      // Remove the , at the end as last item cannot have , in JSON.
-      packages = packages.substr(0, packages.size() - 1);
-    }
-
-    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"",
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\",",
                              packages);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {

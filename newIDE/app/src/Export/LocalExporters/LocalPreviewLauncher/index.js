@@ -15,9 +15,10 @@ import {
   localPreviewDebuggerServer,
 } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
+const remote = optionalRequire('@electron/remote');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
+const BrowserWindow = remote ? remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -68,19 +69,20 @@ export default class LocalPreviewLauncher extends React.Component<
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
 
   _openPreviewBrowserWindow = () => {
-    if (
-      !BrowserWindow ||
-      !this.state.previewBrowserWindowConfig ||
-      !this.state.previewGamePath
-    )
+    const { previewGamePath, previewBrowserWindowConfig } = this.state;
+    if (!BrowserWindow || !previewBrowserWindowConfig || !previewGamePath)
       return;
 
     const browserWindowOptions = {
-      ...this.state.previewBrowserWindowConfig,
+      ...previewBrowserWindowConfig,
       parent: this.state.alwaysOnTop ? BrowserWindow.getFocusedWindow() : null,
     };
     const win = new BrowserWindow(browserWindowOptions);
-    win.loadURL(`file://${this.state.previewGamePath}/index.html`);
+
+    // Enable `@electron/remote` module for renderer process of the preview.
+    remote.require('@electron/remote/main').enable(win.webContents);
+
+    win.loadURL(`file://${previewGamePath}/index.html`);
     win.setMenuBarVisibility(this.state.hideMenuBar);
     win.webContents.on('devtools-opened', () => {
       this.setState({ devToolsOpen: true });
@@ -88,6 +90,7 @@ export default class LocalPreviewLauncher extends React.Component<
     win.webContents.on('devtools-closed', () => {
       this.setState({ devToolsOpen: false });
     });
+
     if (this.state.devToolsOpen) win.openDevTools();
   };
 
@@ -105,7 +108,11 @@ export default class LocalPreviewLauncher extends React.Component<
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',
           webPreferences: {
+            webSecurity: false, // Allow to access to local files,
+            // Allow Node.js API access in renderer process, as long
+            // as we've not removed dependency on it and on "@electron/remote".
             nodeIntegration: true,
+            contextIsolation: false,
           },
         },
         previewGamePath: gamePath,
@@ -151,7 +158,10 @@ export default class LocalPreviewLauncher extends React.Component<
     );
   };
 
-  _prepareExporter = (): Promise<any> => {
+  _prepareExporter = (): Promise<{|
+    outputDir: string,
+    exporter: gdjsExporter,
+  |}> => {
     return findGDJS().then(({ gdjsRoot }) => {
       console.info('GDJS found in ', gdjsRoot);
 
@@ -213,6 +223,19 @@ export default class LocalPreviewLauncher extends React.Component<
               const hash = includeFileHashs[includeFile];
               previewExportOptions.setIncludeFileHash(includeFile, hash);
             }
+
+            // Give the preview the path to the "@electron/remote" module of the editor,
+            // as this is required by some features and we've not removed dependency
+            // on "@electron/remote" yet.
+            // $FlowFixMe - `paths` is not known by Flow on `module`.
+            const nodeModulePath = global.module.paths[0];
+            previewExportOptions.setElectronRemoteRequirePath(
+              path.join(
+                nodeModulePath,
+                '@electron/remote',
+                'renderer/index.js'
+              )
+            );
 
             const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
             const shouldHotReload =

@@ -14,8 +14,8 @@ const gd: libGDevelop = global.gd;
 
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 
 const checkFileContent = (filePath: string, expectedContent: string) => {
   const time = performance.now();
@@ -145,7 +145,7 @@ export const onSaveProjectAs = (
 |}> => {
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
-  const browserWindow = electron.remote.getCurrentWindow();
+  const browserWindow = remote.getCurrentWindow();
   const options = {
     defaultPath,
     filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],

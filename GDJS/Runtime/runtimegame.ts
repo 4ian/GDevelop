@@ -30,6 +30,17 @@ namespace gdjs {
     websocketDebuggerServerAddress?: string;
     /** The port of the debugger server, to reach out using WebSocket. */
     websocketDebuggerServerPort?: string;
+
+    /**
+     * The path to require `@electron/remote` module.
+     * This is only useful in a preview, where this can't be required from
+     * `@electron/remote` directly as previews don't have any node_modules.
+     * On the contrary, a game packaged with Electron as a standalone app
+     * has its node_modules.
+     * This can be removed once there are no more dependencies on
+     * `@electron/remote` in the game engine and extensions.
+     */
+    electronRemoteRequirePath?: string;
   };
 
   /**

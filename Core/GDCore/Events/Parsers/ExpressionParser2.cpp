@@ -35,6 +35,7 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
   SkipAllWhitespaces();
   if (!CheckIfChar(IsQuote)) {
     auto text = gd::make_unique<TextNode>("");
+	// TODO Test it.
     text->diagnostic =
         RaiseSyntaxError(_("A text must start with a double quote (\")."));
     text->location =

@@ -9,14 +9,15 @@
   "repository": "github:4ian/GDevelop",
   "private": true,
   "scripts": {
-    "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install",
+    "postinstall": "npm run import-zipped-electron-extensions && cd app && npm install && cd .. && npm run copy-electron-remote-to-app-resources",
     "app-build": "node scripts/app-build.js",
     "build": "node scripts/build.js",
     "format": "prettier --write --ignore-path .gitignore \"**/*.js\"",
     "check-format": "prettier --list-different --ignore-path .gitignore \"**/*.js\"",
     "start": "electron app",
     "reload-extensions": "cd ../app/scripts && node import-GDJS-Runtime.js",
-    "import-zipped-electron-extensions": "node scripts/import-zipped-electron-extension.js ReactDeveloperTools app/extensions/"
+    "import-zipped-electron-extensions": "node scripts/import-zipped-electron-extension.js ReactDeveloperTools app/extensions/",
+    "copy-electron-remote-to-app-resources": "node scripts/copy-electron-remote-to-app-resources.js"
   },
   "build": {
     "appId": "com.gdevelop-app.ide",
@@ -68,7 +69,7 @@
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
-    "electron": "8.2.5",
+    "electron": "18.0.1",
     "electron-builder": "22.11.11",
     "electron-notarize": "^0.2.1",
     "minimist": "^1.2.3",
@@ -77,6 +78,7 @@
     "unzipper": "^0.9.11"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.8",
     "electron-is": "^2.4.0"
   }
 }

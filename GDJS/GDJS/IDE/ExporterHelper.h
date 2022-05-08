@@ -115,6 +115,17 @@ struct PreviewExportOptions {
     return *this;
   }
 
+  /**
+   * Set the path to use for the game engine to require "@electron/remote".
+   * This is because the preview is run in a folder without any node_module, but this
+   * is still required for now for some features.
+   * This should be removed once the dependency to "@electron/remote" is removed.
+   */
+  PreviewExportOptions &SetElectronRemoteRequirePath(const gd::String& electronRemoteRequirePath_) {
+    electronRemoteRequirePath = electronRemoteRequirePath_;
+    return *this;
+  }
+
   gd::Project &project;
   gd::String exportPath;
   gd::String websocketDebuggerServerAddress;
@@ -126,6 +137,7 @@ struct PreviewExportOptions {
   bool projectDataOnlyExport;
   bool fullLoadingScreen;
   unsigned int nonRuntimeScriptsCacheBurst;
+  gd::String electronRemoteRequirePath;
 };
 
 /**

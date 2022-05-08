@@ -154,6 +154,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       .SetStringValue(options.websocketDebuggerServerAddress);
   runtimeGameOptions.AddChild("websocketDebuggerServerPort")
       .SetStringValue(options.websocketDebuggerServerPort);
+  runtimeGameOptions.AddChild("electronRemoteRequirePath")
+      .SetStringValue(options.electronRemoteRequirePath);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");

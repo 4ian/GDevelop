@@ -19,7 +19,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
   export class RuntimeGamePixiRenderer {
-    _game: any;
+    _game: gdjs.RuntimeGame;
     _isFullPage: boolean = true;
 
     //Used to track if the canvas is displayed on the full page.
@@ -41,7 +41,6 @@ namespace gdjs {
     _marginTop: any;
     _marginRight: any;
     _marginBottom: any;
-    _notifySceneForResize: any;
 
     _nextFrameId: integer = 0;
 
@@ -137,7 +136,6 @@ namespace gdjs {
       window.addEventListener('resize', () => {
         this._game.onWindowInnerSizeChanged();
         this._resizeCanvas();
-        this._game._notifySceneForResize = true;
       });
 
       // Focus the canvas when created.
@@ -185,6 +183,7 @@ namespace gdjs {
             promise.catch(() => {});
           }
         } else {
+          // @ts-ignore
           window.screen.orientation.lock(gameOrientation).catch(() => {});
         }
       } catch (error) {
@@ -277,7 +276,6 @@ namespace gdjs {
       }
       this._keepRatio = enable;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -297,7 +295,6 @@ namespace gdjs {
       this._marginBottom = bottom;
       this._marginLeft = left;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -392,7 +389,6 @@ namespace gdjs {
           }
         }
         this._resizeCanvas();
-        this._notifySceneForResize = true;
       }
     }
 
@@ -798,7 +794,20 @@ namespace gdjs {
      */
     getElectronRemote = () => {
       if (typeof require === 'function') {
-        return require('@electron/remote');
+        const runtimeGameOptions = this._game.getAdditionalOptions();
+        const moduleId =
+          runtimeGameOptions && runtimeGameOptions.electronRemoteRequirePath
+            ? runtimeGameOptions.electronRemoteRequirePath
+            : '@electron/remote';
+
+        try {
+          return require(moduleId);
+        } catch (requireError) {
+          console.error(
+            `Could not load @electron/remote from "${moduleId}". Error is:`,
+            requireError
+          );
+        }
       }
 
       return null;

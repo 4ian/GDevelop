@@ -69,19 +69,20 @@ export default class LocalPreviewLauncher extends React.Component<
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
 
   _openPreviewBrowserWindow = () => {
-    if (
-      !BrowserWindow ||
-      !this.state.previewBrowserWindowConfig ||
-      !this.state.previewGamePath
-    )
+    const { previewGamePath, previewBrowserWindowConfig } = this.state;
+    if (!BrowserWindow || !previewBrowserWindowConfig || !previewGamePath)
       return;
 
     const browserWindowOptions = {
-      ...this.state.previewBrowserWindowConfig,
+      ...previewBrowserWindowConfig,
       parent: this.state.alwaysOnTop ? BrowserWindow.getFocusedWindow() : null,
     };
     const win = new BrowserWindow(browserWindowOptions);
-    win.loadURL(`file://${this.state.previewGamePath}/index.html`);
+
+    // Enable `@electron/remote` module for renderer process of the preview.
+    remote.require('@electron/remote/main').enable(win.webContents);
+
+    win.loadURL(`file://${previewGamePath}/index.html`);
     win.setMenuBarVisibility(this.state.hideMenuBar);
     win.webContents.on('devtools-opened', () => {
       this.setState({ devToolsOpen: true });
@@ -89,6 +90,7 @@ export default class LocalPreviewLauncher extends React.Component<
     win.webContents.on('devtools-closed', () => {
       this.setState({ devToolsOpen: false });
     });
+
     if (this.state.devToolsOpen) win.openDevTools();
   };
 
@@ -221,6 +223,19 @@ export default class LocalPreviewLauncher extends React.Component<
               const hash = includeFileHashs[includeFile];
               previewExportOptions.setIncludeFileHash(includeFile, hash);
             }
+
+            // Give the preview the path to the "@electron/remote" module of the editor,
+            // as this is required by some features and we've not removed dependency
+            // on "@electron/remote" yet.
+            // $FlowFixMe - `paths` is not known by Flow on `module`.
+            const nodeModulePath = global.module.paths[0];
+            previewExportOptions.setElectronRemoteRequirePath(
+              path.join(
+                nodeModulePath,
+                '@electron/remote',
+                'renderer/index.js'
+              )
+            );
 
             const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
             const shouldHotReload =

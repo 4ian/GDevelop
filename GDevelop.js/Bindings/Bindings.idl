@@ -2790,6 +2790,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
+    [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
 };
 
 [Prefix="gdjs::"]

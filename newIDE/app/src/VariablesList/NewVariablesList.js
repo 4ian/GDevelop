@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ChevronRight from '@material-ui/icons/ChevronRight';
-import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import Add from '@material-ui/icons/Add';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 import { mapFor } from '../Utils/MapFor';
@@ -19,7 +19,7 @@ import Background from '../UI/Background';
 import IconButton from '../UI/IconButton';
 import { makeStyles } from '@material-ui/styles';
 import styles from './styles';
-import NewNameGenerator from '../Utils/NewNameGenerator';
+import newNameGenerator from '../Utils/NewNameGenerator';
 import Toggle from '../UI/Toggle';
 const gd: libGDevelop = global.gd;
 
@@ -114,34 +114,26 @@ const NewVariablesList = (props: Props) => {
       parentVariable: targetVariableParent,
       name: targetName,
     } = getVariableFromNodeId(nodeId, props.variablesContainer);
-    if (!targetVariable) return;
+    if (!targetVariable || !targetName) return;
 
     const {
       variable: draggedVariable,
       parentVariable: draggedVariableParent,
       name: draggedName,
     } = getVariableFromNodeId(current, props.variablesContainer);
-    if (!draggedVariable) return;
+    if (!draggedVariable || !draggedName) return;
 
-    if (
-      !draggedVariableParent &&
-      !targetVariableParent &&
-      draggedName &&
-      targetName
-    ) {
+    if (!draggedVariableParent && !targetVariableParent) {
       const draggedIndex = props.variablesContainer.getPosition(draggedName);
       const targetIndex = props.variablesContainer.getPosition(targetName);
       props.variablesContainer.move(
         draggedIndex,
         targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
       );
-    }
-    if (
+    } else if (
       !!draggedVariableParent &&
       !!targetVariableParent &&
-      targetVariableParent === draggedVariableParent &&
-      draggedName &&
-      targetName
+      targetVariableParent === draggedVariableParent
     ) {
       if (targetVariableParent.getType() === gd.Variable.Array) {
         const draggedIndex = parseInt(draggedName, 10);
@@ -151,14 +143,11 @@ const NewVariablesList = (props: Props) => {
           targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
         );
       }
-    }
-    if (
+    } else if (
       !!draggedVariableParent &&
       !!targetVariableParent &&
       targetVariableParent.getType() === gd.Variable.Array &&
-      draggedVariableParent.getType() === gd.Variable.Array &&
-      draggedName &&
-      targetName
+      draggedVariableParent.getType() === gd.Variable.Array
     ) {
       const draggedIndex = parseInt(draggedName, 10);
       const targetIndex = parseInt(targetName, 10);
@@ -166,6 +155,52 @@ const NewVariablesList = (props: Props) => {
       targetVariableParent.insertInArray(draggedVariable, targetIndex);
 
       draggedVariableParent.removeAtIndex(draggedIndex);
+    } else if (
+      !!draggedVariableParent &&
+      !!targetVariableParent &&
+      targetVariableParent.getType() === gd.Variable.Structure &&
+      draggedVariableParent.getType() === gd.Variable.Structure
+    ) {
+      if (draggedVariableParent !== targetVariableParent) {
+        const newName = newNameGenerator(
+          draggedName,
+          name => targetVariableParent.hasChild(draggedName),
+          'CopyOf'
+        );
+        targetVariableParent.getChild(newName);
+
+        draggedVariableParent.removeChild(draggedName);
+      }
+    } else if (
+      !draggedVariableParent &&
+      !!targetVariableParent &&
+      targetVariableParent.getType() === gd.Variable.Structure
+    ) {
+      const newName = newNameGenerator(
+        draggedName,
+        name => targetVariableParent.hasChild(draggedName),
+        'CopyOf'
+      );
+      targetVariableParent.getChild(newName);
+
+      props.variablesContainer.remove(draggedName);
+    } else if (
+      !!draggedVariableParent &&
+      !targetVariableParent &&
+      draggedVariableParent.getType() === gd.Variable.Structure
+    ) {
+      const newName = newNameGenerator(
+        draggedName,
+        name => props.variablesContainer.has(draggedName),
+        'CopyOf'
+      );
+      props.variablesContainer.insert(
+        newName,
+        draggedVariable,
+        props.variablesContainer.getPosition(targetName)
+      );
+
+      draggedVariableParent.removeChild(draggedName);
     }
     forceUpdate();
   };
@@ -179,7 +214,7 @@ const NewVariablesList = (props: Props) => {
     const type = variable.getType();
 
     if (type === gd.Variable.Structure) {
-      const name = NewNameGenerator('ChildVariable', name =>
+      const name = newNameGenerator('ChildVariable', name =>
         variable.hasChild(name)
       );
       variable.getChild(name).setString('');
@@ -442,7 +477,7 @@ const NewVariablesList = (props: Props) => {
     <TreeView
       multiSelect
       defaultExpandIcon={<ChevronRight />}
-      defaultCollapseIcon={<ExpandLess />}
+      defaultCollapseIcon={<ExpandMore />}
       onNodeSelect={(event, values) => setSelectedNodes(values)}
       onNodeToggle={(event, values) => setExpandedNodes(values)}
       selected={selectedNodes}

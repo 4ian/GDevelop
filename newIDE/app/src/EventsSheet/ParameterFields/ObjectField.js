@@ -88,6 +88,8 @@ export const renderInlineObjectWithThumbnail = ({
   value,
   parameterMetadata,
   renderObjectThumbnail,
+  expressionIsValid,
+  InvalidParameterValue,
   MissingParameterValue,
 }: ParameterInlineRendererProps) => {
   if (!value && !parameterMetadata.isOptional()) {
@@ -102,7 +104,11 @@ export const renderInlineObjectWithThumbnail = ({
       })}
     >
       {renderObjectThumbnail(value)}
-      {value}
+      {expressionIsValid ? (
+        value
+      ) : (
+        <InvalidParameterValue>{value}</InvalidParameterValue>
+      )}
     </span>
   );
 };

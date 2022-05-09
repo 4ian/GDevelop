@@ -300,7 +300,6 @@ class GD_CORE_API ExpressionParser2 {
       child->expression->parent = child.get();
 
       if (!CheckIfChar(IsClosingSquareBracket)) {
-		// TODO Test it.
         child->diagnostic =
             RaiseSyntaxError(_("Missing a closing bracket. Add a closing "
                                "bracket for each opening bracket."));
@@ -471,7 +470,6 @@ class GD_CORE_API ExpressionParser2 {
     } else {
       auto node = gd::make_unique<ObjectFunctionNameNode>(
           objectName, behaviorName, functionName);
-      // TODO Test it.
       node->diagnostic = RaiseSyntaxError(
           _("An opening parenthesis was expected here to call a function."));
 
@@ -542,7 +540,6 @@ class GD_CORE_API ExpressionParser2 {
         operatorChar == '*') {
       return gd::make_unique<ExpressionParserDiagnostic>();
     }
-	// TODO Test it.
     return gd::make_unique<ExpressionParserError>(
         "invalid_operator",
         _("You've used an operator that is not supported. Operator should be "

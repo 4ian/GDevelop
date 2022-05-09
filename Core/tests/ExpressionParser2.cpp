@@ -688,6 +688,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "You must enter a number.");
     }
     {
+      auto node = parser.ParseExpression("123 ? 456");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You've used an operator that is not supported. Operator should be "
+              "either +, -, / or *.");
+    }
+    {
       auto node = parser.ParseExpression("1//2");
       REQUIRE(node != nullptr);
 
@@ -1077,6 +1088,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     REQUIRE(objectFunctionName.objectName == "MyObject");
     REQUIRE(objectFunctionName.objectFunctionOrBehaviorName == "MyBehavior");
     REQUIRE(objectFunctionName.behaviorFunctionName == "MyFunc");
+
+    gd::ExpressionValidator validator(platform, project, layout1, "number");
+    node->Visit(validator);
+    REQUIRE(validator.GetErrors().size() == 1);
+    REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+            "An opening parenthesis was expected here to call a function.");
   }
 
   SECTION("Unfinished object function name") {
@@ -1363,6 +1380,36 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
             "You must enter a number or a text, wrapped inside double quotes "
             "(example: \"Hello world\").");
+    }
+    {
+      auto node = parser.ParseExpression("myVariable[\"myChild\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+            "Missing a closing bracket. Add a closing bracket for each opening bracket.");
+    }
+    {
+      auto node = parser.ParseExpression("1234");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You entered a number, but this type was expected: variable");
+    }
+    {
+      auto node = parser.ParseExpression("\"text\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You entered a text, but this type was expected: variable");
     }
   }
 

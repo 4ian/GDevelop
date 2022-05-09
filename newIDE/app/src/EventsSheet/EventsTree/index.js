@@ -246,7 +246,7 @@ type EventsTreeProps = {|
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
 
-  onEventMoved: () => void,
+  onEventMoved: (rowPosition: number) => void,
   onScroll?: () => void,
 
   screenType: ScreenType,
@@ -373,13 +373,17 @@ export default class ThemableEventsTree extends Component<
     });
   }
 
-  scrollToEvent(event: gdBaseEvent) {
-    const row = this._getEventRow(event);
+  scrollToRow(row: number) {
     if (row !== -1) {
       if (this._list && this._list.wrappedInstance.current) {
         this._list.wrappedInstance.current.scrollToRow(row);
       }
     }
+  }
+
+  scrollToEvent(event: gdBaseEvent) {
+    const row = this._getEventRow(event);
+    this.scrollToRow(row);
   }
 
   /**
@@ -400,12 +404,16 @@ export default class ThemableEventsTree extends Component<
     this.forceEventsUpdate();
   }
 
-  _getEventRow(searchedEvent: gdBaseEvent) {
+  _getEventRow(searchedEvent: gdBaseEvent): number {
     // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(
       this.state.flatData,
       event => event.ptr === searchedEvent.ptr
     );
+  }
+
+  _getEventFromEventRow(eventRow: number): ?gdBaseEvent {
+    return this.props.events.getEventAt(eventRow);
   }
 
   _eventsToTreeData = (
@@ -527,7 +535,52 @@ export default class ThemableEventsTree extends Component<
     };
   };
 
-  _canDrag = (node: ?SortableTreeNode) => {
+  _onMoveNode = ({
+    treeData,
+    path,
+    node,
+  }: {
+    treeData: any,
+    path: Array<any>,
+    node: SortableTreeNode,
+  }) => {
+    console.log(path);
+    // Get the moved event and its list from the moved node.
+    const { event, eventsList } = node;
+    if (!event) return;
+
+    // Get the event list where the event should be moved to.
+    const targetPath = path.slice(0, -1);
+    const target = getNodeAtPath({
+      getNodeKey,
+      treeData: treeData,
+      path: targetPath,
+    });
+    const targetNode = target.node;
+    const targetEventsList =
+      targetNode && targetNode.event
+        ? targetNode.event.getSubEvents()
+        : this.props.events;
+    const targetPosition =
+      targetNode && targetNode.children ? targetNode.children.indexOf(node) : 0;
+
+    // Do the move
+    // Note that moveEventToAnotherEventsList does not invalidate the
+    // references to the event in memory - so things refering to this event like the
+    // selection in EventsSheet remain valid. This might not be needed anymore
+    // if events drag'n'drop is reworked to be similar to instructions drag'n'drop.
+    eventsList.moveEventToAnotherEventsList(
+      event,
+      targetEventsList,
+      targetPosition
+    );
+
+    this.forceEventsUpdate();
+    const rowPosition = this._getEventRow(event);
+    this.props.onEventMoved(rowPosition);
+  };
+
+  _canDrag = ({ node }: { node: ?SortableTreeNode }) => {
     return !!node && !!node.event;
   };
 

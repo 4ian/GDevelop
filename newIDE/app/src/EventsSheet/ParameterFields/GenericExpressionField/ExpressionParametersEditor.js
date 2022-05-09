@@ -66,7 +66,7 @@ export default class ExpressionParametersEditor extends React.Component<
     const expression = {
       getParametersCount: () => parametersCount,
       getParameter: index => {
-        return parameterValues[index] || '';
+        return parameterValues[index].getPlainString() || '';
       },
     };
 

@@ -27,6 +27,8 @@ declare class gdVariable {
   pushNew(): gdVariable;
   removeAtIndex(index: number): void;
   getAllChildrenArray(): gdVectorVariable;
+  moveChildInArray(oldIndex: number, newIndex: number): void;
+  insertInArray(variable: gdVariable, index: number): gdVariable;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

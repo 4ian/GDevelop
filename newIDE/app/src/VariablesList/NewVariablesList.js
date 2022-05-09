@@ -68,7 +68,7 @@ const isCollection = (variable: gdVariable): boolean =>
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
-  const draggedNode = React.useRef<any>(null);
+  const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
   const classes = useStyles();
 
@@ -105,25 +105,69 @@ const NewVariablesList = (props: Props) => {
     [gd.Variable.Structure]: <Trans>Structure</Trans>,
     [gd.Variable.Array]: <Trans>Array</Trans>,
   };
-  console.log(expandedNodes);
 
   const dropNode = nodeId => {
-    const { variable, depth } = getVariableFromNodeId(
-      nodeId,
-      props.variablesContainer
-    );
-    if (!variable) return;
-    console.log(variable.getString());
-    if (depth === 0 && props.variablesContainer.has(nodeId)) {
-      console.log(nodeId);
-      console.log(draggedNode);
-      props.variablesContainer.swap(
-        props.variablesContainer.getPosition(nodeId),
-        props.variablesContainer.getPosition(draggedNode.current)
+    const { current } = draggedNodeId;
+    if (!current) return;
+    const {
+      variable: targetVariable,
+      parentVariable: targetVariableParent,
+      name: targetName,
+    } = getVariableFromNodeId(nodeId, props.variablesContainer);
+    if (!targetVariable) return;
+
+    const {
+      variable: draggedVariable,
+      parentVariable: draggedVariableParent,
+      name: draggedName,
+    } = getVariableFromNodeId(current, props.variablesContainer);
+    if (!draggedVariable) return;
+
+    if (
+      !draggedVariableParent &&
+      !targetVariableParent &&
+      draggedName &&
+      targetName
+    ) {
+      const draggedIndex = props.variablesContainer.getPosition(draggedName);
+      const targetIndex = props.variablesContainer.getPosition(targetName);
+      props.variablesContainer.move(
+        draggedIndex,
+        targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
       );
-      draggedNode.current = null;
-      forceUpdate();
     }
+    if (
+      !!draggedVariableParent &&
+      !!targetVariableParent &&
+      targetVariableParent === draggedVariableParent &&
+      draggedName &&
+      targetName
+    ) {
+      if (targetVariableParent.getType() === gd.Variable.Array) {
+        const draggedIndex = parseInt(draggedName, 10);
+        const targetIndex = parseInt(targetName, 10);
+        targetVariableParent.moveChildInArray(
+          draggedIndex,
+          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+        );
+      }
+    }
+    if (
+      !!draggedVariableParent &&
+      !!targetVariableParent &&
+      targetVariableParent.getType() === gd.Variable.Array &&
+      draggedVariableParent.getType() === gd.Variable.Array &&
+      draggedName &&
+      targetName
+    ) {
+      const draggedIndex = parseInt(draggedName, 10);
+      const targetIndex = parseInt(targetName, 10);
+
+      targetVariableParent.insertInArray(draggedVariable, targetIndex);
+
+      draggedVariableParent.removeAtIndex(draggedIndex);
+    }
+    forceUpdate();
   };
 
   const onAddChild = (nodeId: string) => {
@@ -170,7 +214,7 @@ const NewVariablesList = (props: Props) => {
       <DragSourceAndDropTarget
         key={variable.ptr}
         beginDrag={() => {
-          draggedNode.current = nodeId;
+          draggedNodeId.current = nodeId;
           return {};
         }}
         canDrag={() => true}
@@ -201,23 +245,22 @@ const NewVariablesList = (props: Props) => {
                         </span>
                       )}
                       <Spacer />
-                      <div style={{ flex: 1 }}>
-                        <SemiControlledTextField
-                          fullWidth
-                          margin="none"
-                          key="name"
-                          disabled={parentType === gd.Variable.Array}
-                          commitOnBlur
-                          onClick={event => {
-                            event.stopPropagation();
-                          }}
-                          value={name}
-                          onChange={name => {
-                            onChangeName(nodeId, name);
-                            forceUpdate();
-                          }}
-                        />
-                      </div>
+                      <SemiControlledTextField
+                        fullWidth
+                        margin="none"
+                        key="name"
+                        disabled={parentType === gd.Variable.Array}
+                        commitOnBlur
+                        onClick={event => {
+                          event.stopPropagation();
+                        }}
+                        value={name}
+                        onChange={name => {
+                          onChangeName(nodeId, name);
+                          forceUpdate();
+                        }}
+                      />
+                      <Spacer />
                       <Spacer />
                       <div
                         style={{

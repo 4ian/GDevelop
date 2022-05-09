@@ -451,6 +451,10 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
       const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
           platform, globalObjectsContainer, objectsContainer, functionCall);
 
+      if (IsBadExpressionMetadata(metadata)) {
+        return nullptr;
+      }
+
       // TODO use a badMetadata instead of a nullptr?
       const gd::ParameterMetadata* parameterMetadata = nullptr;
       while (metadataParameterIndex <

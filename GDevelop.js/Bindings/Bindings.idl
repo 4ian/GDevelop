@@ -229,6 +229,8 @@ interface Variable {
     [Ref] Variable PushNew();
     void RemoveAtIndex([Const] unsigned long index);
     [Const, Ref] VectorVariable GetAllChildrenArray();
+    void MoveChildInArray([Const] unsigned long oldIndex, [Const] unsigned long newIndex);
+    [Ref] Variable InsertInArray([Const, Ref] Variable variable, [Const] unsigned long index);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

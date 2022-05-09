@@ -92,7 +92,7 @@ double Variable::GetValue() const {
     return value;
   } else if (type == Type::String) {
     double retVal = str.empty() ? 0.0 : str.To<double>();
-    if(std::isnan(retVal)) retVal = 0.0;
+    if (std::isnan(retVal)) retVal = 0.0;
     return retVal;
   } else if (type == Type::Boolean) {
     return boolVal ? 1.0 : 0.0;
@@ -188,11 +188,31 @@ const Variable& Variable::GetAtIndex(const size_t index) const {
   return *childrenArray.at(index);
 };
 
+void Variable::MoveChildInArray(const size_t oldIndex, const size_t newIndex) {
+  if (oldIndex >= childrenArray.size() || newIndex >= childrenArray.size())
+    return;
+
+  std::shared_ptr<gd::Variable> object = std::move(childrenArray[oldIndex]);
+  childrenArray.erase(childrenArray.begin() + oldIndex);
+  childrenArray.insert(childrenArray.begin() + newIndex, std::move(object));
+}
+
 Variable& Variable::PushNew() { return GetAtIndex(GetChildrenCount()); };
 
 void Variable::RemoveAtIndex(const size_t index) {
   if (index >= childrenArray.size()) return;
   childrenArray.erase(childrenArray.begin() + index);
+};
+
+Variable& Variable::InsertInArray(const gd::Variable& variable, const size_t index) {
+  auto newVariable = std::make_shared<gd::Variable>(variable);
+  if (index < childrenArray.size()) {
+    childrenArray.insert(childrenArray.begin() + index, newVariable);
+    return *childrenArray[index];
+  } else {
+    childrenArray.push_back(newVariable);
+    return *childrenArray.back();
+  }
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {

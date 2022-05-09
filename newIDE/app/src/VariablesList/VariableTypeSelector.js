@@ -13,7 +13,7 @@ const gd = global.gd;
 
 type Props = {|
   variableType: Variable_Type,
-  onChange: (newVariableType: Variable_Type) => void,
+  onChange: (newVariableType: string) => void,
 |};
 
 const VariableTypeSelector = (props: Props) => {
@@ -24,6 +24,13 @@ const VariableTypeSelector = (props: Props) => {
     [gd.Variable.Array]: VariableArrayIcon,
     [gd.Variable.Structure]: VariableStructureIcon,
   };
+  const variableTypeToString = {
+    [gd.Variable.String]: 'string',
+    [gd.Variable.Number]: 'number',
+    [gd.Variable.Boolean]: 'boolean',
+    [gd.Variable.Array]: 'array',
+    [gd.Variable.Structure]: 'structure',
+  };
 
   const Icon = variableTypeToIcon[props.variableType];
 
@@ -33,7 +40,14 @@ const VariableTypeSelector = (props: Props) => {
       <Spacer />
       <Spacer />
       <Spacer />
-      <SelectField value={props.variableType} margin="none" stopPropagationOnClick>
+      <SelectField
+        value={props.variableType}
+        margin="none"
+        stopPropagationOnClick
+        onChange={event =>
+          props.onChange(variableTypeToString[event.target.value])
+        }
+      >
         <SelectOption primaryText="String" value={gd.Variable.String} />
         <SelectOption primaryText="Number" value={gd.Variable.Number} />
         <SelectOption primaryText="Boolean" value={gd.Variable.Boolean} />

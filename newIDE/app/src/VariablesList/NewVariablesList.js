@@ -4,6 +4,7 @@ import { TreeView, TreeItem } from '@material-ui/lab';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import Add from '@material-ui/icons/Add';
+import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 import { mapFor } from '../Utils/MapFor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -18,6 +19,8 @@ import Background from '../UI/Background';
 import IconButton from '../UI/IconButton';
 import { makeStyles } from '@material-ui/styles';
 import styles from './styles';
+import NewNameGenerator from '../Utils/NewNameGenerator';
+import Toggle from '../UI/Toggle';
 const gd: libGDevelop = global.gd;
 
 const useStyles = makeStyles({
@@ -39,6 +42,8 @@ const getVariableFromNodeId = (
 ) => {
   const nodes = nodeId.split('.');
   let currentVariable = null;
+  let parentVariable = null;
+  let name = null;
   let depth = -1;
 
   while (depth < nodes.length - 1) {
@@ -51,15 +56,21 @@ const getVariableFromNodeId = (
     else {
       currentVariable = currentVariable.getChild(variableName);
     }
+    name = variableName;
+    if (depth === nodes.length - 2) parentVariable = currentVariable;
   }
-  return { variable: currentVariable, depth };
+  return { variable: currentVariable, depth, parentVariable, name };
 };
+
+const isCollection = (variable: gdVariable): boolean =>
+  !gd.Variable.isPrimitive(variable.getType());
 
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const draggedNode = React.useRef<any>(null);
   const forceUpdate = useForceUpdate();
+  const classes = useStyles();
 
   React.useEffect(
     () => {
@@ -71,6 +82,16 @@ const NewVariablesList = (props: Props) => {
     },
     [props.variablesContainer.ptr]
   );
+
+  const renameExpandedNode = (nodeId: string, newName: string) => {
+    const newExpandedNodes: Array<string> = [...expandedNodes];
+    const index = newExpandedNodes.indexOf(nodeId);
+    if (index === -1) return;
+    const oldNodeId = newExpandedNodes.splice(index, 1)[0];
+    const nodes = oldNodeId.split('.');
+    nodes[nodes.length - 1] = newName;
+    setExpandedNodes([...newExpandedNodes, nodes.join('.')]);
+  };
 
   const DragSourceAndDropTarget = React.useMemo(
     () => makeDragSourceAndDropTarget('variable-editor'),
@@ -105,6 +126,23 @@ const NewVariablesList = (props: Props) => {
     }
   };
 
+  const onAddChild = (nodeId: string) => {
+    const { variable } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!variable || !isCollection(variable)) return;
+    const type = variable.getType();
+
+    if (type === gd.Variable.Structure) {
+      const name = NewNameGenerator('ChildVariable', name =>
+        variable.hasChild(name)
+      );
+      variable.getChild(name).setString('');
+    } else if (type === gd.Variable.Array) variable.pushNew();
+    setExpandedNodes([...expandedNodes, nodeId]);
+  };
+
   const renderVariableAndChildrenRows = (
     name,
     variable,
@@ -114,9 +152,19 @@ const NewVariablesList = (props: Props) => {
     const type = variable.getType();
     const isCollection = !gd.Variable.isPrimitive(variable.getType());
 
-    const nodeId = !!parentNodeId ? `${parentNodeId}.${name}` : name;
+    let parentType = null;
+    let nodeId = name;
 
-    const classes = useStyles();
+    if (!!parentNodeId) {
+      nodeId = `${parentNodeId}.${name}`;
+      const { variable: parentVariable } = getVariableFromNodeId(
+        parentNodeId,
+        props.variablesContainer
+      );
+      if (!parentVariable) return;
+      parentType = parentVariable.getType();
+      console.log(parentType);
+    }
 
     return (
       <DragSourceAndDropTarget
@@ -136,6 +184,7 @@ const NewVariablesList = (props: Props) => {
             <div>
               <TreeItem
                 classes={classes}
+                nodeId={nodeId}
                 label={
                   <div>
                     {isOver && <DropIndicator canDrop={canDrop} />}
@@ -157,6 +206,8 @@ const NewVariablesList = (props: Props) => {
                           fullWidth
                           margin="none"
                           key="name"
+                          disabled={parentType === gd.Variable.Array}
+                          commitOnBlur
                           onClick={event => {
                             event.stopPropagation();
                           }}
@@ -176,39 +227,75 @@ const NewVariablesList = (props: Props) => {
                       >
                         <Line noMargin alignItems="center">
                           <Column noMargin>
-                            <VariableTypeSelector variableType={type} />
-                          </Column>
-                          <Column expand>
-                            <SemiControlledTextField
-                              margin="none"
-                              key="value"
-                              onClick={event => {
-                                event.stopPropagation();
-                              }}
-                              multiline={type === gd.Variable.String}
-                              inputStyle={
-                                type === gd.Variable.String
-                                  ? styles.noPaddingMultilineTextField
-                                  : undefined
-                              }
-                              disabled={isCollection}
-                              value={
-                                isCollection
-                                  ? `${variable.getChildrenCount()} children`
-                                  : type === gd.Variable.String
-                                  ? variable.getString()
-                                  : type === gd.Variable.Number
-                                  ? '' + variable.getValue()
-                                  : variable.getBool().toString()
-                              }
-                              onChange={value => {
-                                onChangeValue(nodeId, value);
+                            <VariableTypeSelector
+                              variableType={type}
+                              onChange={newType => {
+                                variable.castTo(newType);
                                 forceUpdate();
                               }}
                             />
                           </Column>
+                          <Column expand>
+                            {type === gd.Variable.Boolean ? (
+                              <Line noMargin>
+                                {variable.getBool() ? (
+                                  <Trans>True</Trans>
+                                ) : (
+                                  <Trans>False</Trans>
+                                )}
+                                <Spacer />
+                                <IconButton
+                                  size="small"
+                                  style={{ padding: 0 }}
+                                  onClick={() => {
+                                    onChangeValue(
+                                      nodeId,
+                                      !variable.getBool() ? 'true' : 'false'
+                                    );
+                                  }}
+                                >
+                                  <SwapHorizontal />
+                                </IconButton>
+                              </Line>
+                            ) : (
+                              <SemiControlledTextField
+                                margin="none"
+                                type={
+                                  type === gd.Variable.Number
+                                    ? 'number'
+                                    : 'text'
+                                }
+                                key="value"
+                                onClick={event => {
+                                  event.stopPropagation();
+                                }}
+                                multiline={type === gd.Variable.String}
+                                inputStyle={
+                                  type === gd.Variable.String
+                                    ? styles.noPaddingMultilineTextField
+                                    : undefined
+                                }
+                                disabled={isCollection}
+                                value={
+                                  isCollection
+                                    ? `${variable.getChildrenCount()} children`
+                                    : type === gd.Variable.String
+                                    ? variable.getString()
+                                    : variable.getValue().toString()
+                                }
+                                onChange={value => {
+                                  onChangeValue(nodeId, value);
+                                  forceUpdate();
+                                }}
+                              />
+                            )}
+                          </Column>
                           {isCollection ? (
-                            <IconButton size="small" style={{ padding: 0 }}>
+                            <IconButton
+                              size="small"
+                              style={{ padding: 0 }}
+                              onClick={() => onAddChild(nodeId)}
+                            >
                               <Add />
                             </IconButton>
                           ) : null}
@@ -220,7 +307,6 @@ const NewVariablesList = (props: Props) => {
                 onLabelClick={event => {
                   event.preventDefault();
                 }}
-                nodeId={nodeId}
               >
                 {!isCollection
                   ? null
@@ -255,8 +341,20 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onChangeName = (nodeId, newName) => {
-    props.variablesContainer.rename(nodeId, newName);
+    const { variable, parentVariable, name } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (name === null) return;
+    let hasBeenRenamed = false;
+    if (parentVariable) {
+      hasBeenRenamed = parentVariable.renameChild(name, newName);
+    } else {
+      hasBeenRenamed = props.variablesContainer.rename(name, newName);
+    }
+    if (hasBeenRenamed) renameExpandedNode(nodeId, newName);
   };
+
   const onChangeValue = (nodeId, newValue) => {
     console.log(nodeId);
     const { variable } = getVariableFromNodeId(
@@ -274,6 +372,7 @@ const NewVariablesList = (props: Props) => {
         break;
       case gd.Variable.Boolean:
         variable.setBool(newValue === 'true');
+        forceUpdate();
         break;
       default:
         console.error(

@@ -269,7 +269,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
                            location);
       }
       else if (expect != Type::String && expect != Type::NumberOrString) {
-        // TODO test
         RaiseTypeError(
             _("You entered a text, but this type was expected:") + " " + TypeToString(expect),
             location);
@@ -282,7 +281,6 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
             location);
       }
       else if (expect != Type::Number && expect != Type::NumberOrString) {
-        // TODO test
         RaiseTypeError(
             _("You entered a number, but this type was expected:") + " " + TypeToString(expect),
             location);

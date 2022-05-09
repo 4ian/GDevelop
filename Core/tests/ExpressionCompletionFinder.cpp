@@ -19,16 +19,24 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
   gd::Platform platform;
   SetupProjectWithDummyPlatform(project, platform);
   auto& layout1 = project.InsertNewLayout("Layout1", 0);
+  layout1.InsertNewObject(project, "MyExtension::Sprite", "MyObject", 0);
 
   gd::ExpressionParser2 parser;
 
-  auto getCompletionsFor = [&](const gd::String& type,
+  auto getCompletionsForWithObjectName = [&](const gd::String& type,
+                               const gd::String& objectName,
                                const gd::String& expression,
                                size_t location) {
     auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     return gd::ExpressionCompletionFinder::GetCompletionDescriptionsFor(
-        platform, project, layout1, type, *node, location);
+        platform, project, layout1, type, objectName, *node, location);
+  };
+  auto getCompletionsFor = [&](const gd::String& type,
+                               const gd::String& expression,
+                               size_t location) {
+    return getCompletionsForWithObjectName(
+        type, "", expression, location);
   };
 
   const std::vector<gd::ExpressionCompletionDescription>
@@ -160,6 +168,25 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       REQUIRE(getCompletionsFor("number",
                                 "MyExtension::GetVariableAsNumber(myVar",
                                 33) == expectedCompletions);
+    }
+    SECTION("Object function with a Variable as argument") {
+      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForVariable(
+              "objectvar", "myVar", 35, 40, "MyObject")};
+        getCompletionsForWithObjectName("number", "",
+                                "MyObject.GetObjectVariableAsNumber(myVar",
+                                35);
+      REQUIRE(getCompletionsForWithObjectName("number", "",
+                                "MyObject.GetObjectVariableAsNumber(myVar",
+                                35) == expectedCompletions);
+    }
+    SECTION("Object variable") {
+      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
+          gd::ExpressionCompletionDescription::ForVariable(
+              "objectvar", "myVar", 0, 5, "MyObject")};
+      REQUIRE(getCompletionsForWithObjectName("objectvar", "MyObject",
+                                "myVar",
+                                0) == expectedCompletions);
     }
     SECTION("Function with a Layer as argument") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{

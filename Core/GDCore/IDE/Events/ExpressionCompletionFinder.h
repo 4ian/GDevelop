@@ -296,6 +296,7 @@ class GD_CORE_API ExpressionCompletionFinder
                                const gd::ObjectsContainer &globalObjectsContainer,
                                const gd::ObjectsContainer &objectsContainer,
                                const gd::String &rootType,
+                               const gd::String &rootObjectName,
                                gd::ExpressionNode& node,
                                size_t searchedPosition) {
     gd::ExpressionNodeLocationFinder finder(searchedPosition);
@@ -310,7 +311,7 @@ class GD_CORE_API ExpressionCompletionFinder
     gd::ExpressionNode* maybeParentNodeAtLocation = finder.GetParentNode();
     gd::ExpressionCompletionFinder autocompletionProvider(
         platform, globalObjectsContainer, objectsContainer, rootType,
-        searchedPosition, maybeParentNodeAtLocation);
+        rootObjectName, searchedPosition, maybeParentNodeAtLocation);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
   }
@@ -414,7 +415,7 @@ class GD_CORE_API ExpressionCompletionFinder
         platform,
         globalObjectsContainer,
         objectsContainer,
-        "", // TODO find a way to get the objectName
+        rootObjectName,
         node);
     completions.push_back(ExpressionCompletionDescription::ForVariable(
         type,
@@ -440,13 +441,18 @@ class GD_CORE_API ExpressionCompletionFinder
           node.location.GetStartPosition(),
           node.location.GetEndPosition()));
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform,
+          globalObjectsContainer,
+          objectsContainer,
+          rootObjectName,
+          node);
       completions.push_back(ExpressionCompletionDescription::ForVariable(
           type,
           node.identifierName,
           node.location.GetStartPosition(),
           node.location.GetEndPosition(),
-          // TODO Find a way to get the objectName of the variable if any.
-          ""));
+          objectName));
     } else {
       // Object function or behavior name
       if (IsCaretOn(node.identifierNameLocation)) {
@@ -629,12 +635,14 @@ class GD_CORE_API ExpressionCompletionFinder
                              const gd::ObjectsContainer &globalObjectsContainer_,
                              const gd::ObjectsContainer &objectsContainer_,
                              const gd::String &rootType_,
+                             const gd::String &rootObjectName_,
                              size_t searchedPosition_,
                              gd::ExpressionNode* maybeParentNodeAtLocation_)
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
         rootType(rootType_),
+        rootObjectName(rootObjectName_),
         searchedPosition(searchedPosition_),
         maybeParentNodeAtLocation(maybeParentNodeAtLocation_){};
 
@@ -646,6 +654,7 @@ class GD_CORE_API ExpressionCompletionFinder
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
   const gd::String rootType;
+  const gd::String rootObjectName;
 };
 
 }  // namespace gd

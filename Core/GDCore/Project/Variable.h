@@ -291,6 +291,16 @@ class GD_CORE_API Variable {
   void RemoveAtIndex(const size_t index);
 
   /**
+   * \brief Move child in array.
+   */
+  void MoveChildInArray(const size_t oldIndex, const size_t newIndex);
+
+  /**
+   * \brief Insert child in array.
+   */
+  Variable& InsertInArray(const gd::Variable& variable, const size_t index);
+
+  /**
    * \brief Get the vector containing all the children.
    */
   const std::vector<std::shared_ptr<Variable>>& GetAllChildrenArray() const {

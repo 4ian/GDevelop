@@ -40,6 +40,7 @@ import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
+import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -322,6 +323,7 @@ class AnimationsListContainer extends React.Component<
           </Column>
         ) : (
           <React.Fragment>
+            <SpacedDismissableTutorialMessage />
             <SortableAnimationsList
               spriteObject={this.props.spriteObject}
               objectName={this.props.objectName}

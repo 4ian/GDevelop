@@ -11,7 +11,7 @@ import {
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
@@ -33,6 +33,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
+import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 
 const ObjectListItem = ({
   objectMetadata,
@@ -184,6 +185,10 @@ export default function NewObjectDialog({
     ]
   );
 
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-object-types'
+  );
+
   return (
     <Dialog
       title={<Trans>Add a new object</Trans>}
@@ -230,6 +235,11 @@ export default function NewObjectDialog({
         )}
         {currentTab === 'new-object' && (
           <ScrollView>
+            {DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
             <List>
               {Object.keys(objectsByCategory).map(category => {
                 const categoryObjectMetadata = objectsByCategory[category];

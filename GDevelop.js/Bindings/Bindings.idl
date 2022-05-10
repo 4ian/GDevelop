@@ -230,7 +230,8 @@ interface Variable {
     void RemoveAtIndex([Const] unsigned long index);
     [Const, Ref] VectorVariable GetAllChildrenArray();
     void MoveChildInArray([Const] unsigned long oldIndex, [Const] unsigned long newIndex);
-    [Ref] Variable InsertInArray([Const, Ref] Variable variable, [Const] unsigned long index);
+    boolean InsertInArray([Const, Ref] Variable variable, [Const] unsigned long index);
+    boolean InsertChild([Const] DOMString name, [Const, Ref] Variable variable);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);

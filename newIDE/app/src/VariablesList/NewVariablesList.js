@@ -1,0 +1,947 @@
+// @flow
+import * as React from 'react';
+import { TreeView, TreeItem } from '@material-ui/lab';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import Add from '@material-ui/icons/Add';
+import SwapHorizontal from '@material-ui/icons/SwapHoriz';
+import Copy from '../UI/CustomSvgIcons/Copy';
+import Paste from '../UI/CustomSvgIcons/Paste';
+import Delete from '@material-ui/icons/Delete';
+import { mapFor } from '../Utils/MapFor';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import { Column, Line, Spacer } from '../UI/Grid';
+import Checkbox from '../UI/Checkbox';
+import DragHandle from '../UI/DragHandle';
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { Trans } from '@lingui/macro';
+import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
+import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
+import VariableTypeSelector from './VariableTypeSelector';
+import Background from '../UI/Background';
+import IconButton from '../UI/IconButton';
+import { makeStyles, withStyles } from '@material-ui/styles';
+import styles from './styles';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import Toggle from '../UI/Toggle';
+import Measure from 'react-measure';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import { CLIPBOARD_KIND } from './ClipboardKind';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+import ScrollView from '../UI/ScrollView';
+const gd: libGDevelop = global.gd;
+
+const StyledTreeItem = withStyles(() => ({
+  group: {
+    borderLeft: `1px solid black`,
+    marginLeft: 7,
+    paddingLeft: 15,
+  },
+  label: { padding: 0 },
+}))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
+
+const stopEventPropagation = (event: Event) => event.stopPropagation();
+const preventEventDefaultEffect = (event: Event) => event.preventDefault();
+
+type Props = {
+  variablesContainer: gdVariablesContainer,
+};
+
+const insertInVariablesContainer = (
+  variablesContainer: gdVariablesContainer,
+  name: string,
+  serializedVariable: ?any,
+  index: ?number
+): string => {
+  const newName = newNameGenerator(
+    name,
+    name => variablesContainer.has(name),
+    serializedVariable ? 'CopyOf' : undefined
+  );
+  const newVariable = new gd.Variable();
+  if (serializedVariable) {
+    unserializeFromJSObject(newVariable, serializedVariable);
+  } else {
+    newVariable.setString('');
+  }
+  variablesContainer.insert(
+    newName,
+    newVariable,
+    index || variablesContainer.count()
+  );
+  newVariable.delete();
+  return newName;
+};
+
+const insertInVariableChildrenArray = (
+  targetParentVariable: gdVariable,
+  serializedVariable: any,
+  index: number
+) => {
+  const newVariable = new gd.Variable();
+  unserializeFromJSObject(newVariable, serializedVariable);
+  targetParentVariable.insertInArray(newVariable, index);
+  newVariable.delete();
+};
+
+const insertInVariableChildren = (
+  targetParentVariable: gdVariable,
+  name: string,
+  serializedVariable: any
+): string => {
+  const newName = newNameGenerator(
+    name,
+    _name => targetParentVariable.hasChild(_name),
+    'CopyOf'
+  );
+  const newVariable = new gd.Variable();
+  unserializeFromJSObject(newVariable, serializedVariable);
+  targetParentVariable.insertChild(newName, newVariable);
+  newVariable.delete();
+  return newName;
+};
+
+const getVariableFromNodeId = (
+  nodeId: string,
+  variablesContainer: gdVariablesContainer
+) => {
+  const nodes = nodeId.split('.');
+  let currentVariable = null;
+  let parents = [];
+  let name = null;
+  let depth = -1;
+
+  while (depth < nodes.length - 1) {
+    depth++;
+    const variableName = nodes[depth];
+    if (!currentVariable) {
+      currentVariable = variablesContainer.get(variableName);
+    } else {
+      parents.push(currentVariable);
+      if (currentVariable.getType() === gd.Variable.Array) {
+        const index = parseInt(variableName, 10);
+        if (index >= currentVariable.getChildrenCount()) {
+          return { variable: null, parents, depth, name };
+        }
+        currentVariable = currentVariable.getAtIndex(index);
+      } else {
+        if (!currentVariable.hasChild(variableName)) {
+          return { variable: null, parents, depth, name };
+        }
+        currentVariable = currentVariable.getChild(variableName);
+      }
+    }
+    name = variableName;
+  }
+  return { variable: currentVariable, depth, parents, name };
+};
+
+type MovementType =
+  | 'TopLevelToStructure'
+  | 'InsideTopLevel'
+  | 'StructureToTopLevel'
+  | 'ArrayToTopLevel'
+  | 'FromStructureToAnotherStructure'
+  | 'InsideSameStructure'
+  | 'FromArrayToAnotherArray'
+  | 'InsideSameArray'
+  | 'FromStructureToArray'
+  | 'FromArrayToStructure';
+
+const getMovementType = (
+  draggedVariableInfo,
+  targetVariableInfo
+): ?MovementType => {
+  const { parents: targetVariableParents } = targetVariableInfo;
+  const targetVariableParent =
+    targetVariableParents[targetVariableParents.length - 1];
+
+  const { parents: draggedVariableParents } = draggedVariableInfo;
+  const draggedVariableParent =
+    draggedVariableParents[draggedVariableParents.length - 1];
+
+  if (!!draggedVariableParent && !!targetVariableParent) {
+    if (
+      targetVariableParent.getType() === gd.Variable.Structure &&
+      draggedVariableParent.getType() === gd.Variable.Structure &&
+      draggedVariableParent !== targetVariableParent
+    )
+      return 'FromStructureToAnotherStructure';
+    if (
+      targetVariableParent.getType() === gd.Variable.Structure &&
+      draggedVariableParent === targetVariableParent
+    )
+      return 'InsideSameStructure';
+    if (
+      targetVariableParent.getType() === gd.Variable.Array &&
+      draggedVariableParent.getType() === gd.Variable.Array &&
+      draggedVariableParent !== targetVariableParent
+    )
+      return 'FromArrayToAnotherArray';
+    if (
+      targetVariableParent.getType() === gd.Variable.Array &&
+      draggedVariableParent === targetVariableParent
+    )
+      return 'InsideSameArray';
+    if (
+      targetVariableParent.getType() === gd.Variable.Array &&
+      draggedVariableParent.getType() === gd.Variable.Structure
+    )
+      return 'FromStructureToArray';
+    if (
+      targetVariableParent.getType() === gd.Variable.Structure &&
+      draggedVariableParent.getType() === gd.Variable.Array
+    )
+      return 'FromArrayToStructure';
+  }
+
+  if (!draggedVariableParent && !targetVariableParent) return 'InsideTopLevel';
+  if (
+    !draggedVariableParent &&
+    !!targetVariableParent &&
+    targetVariableParent.getType() === gd.Variable.Structure
+  )
+    return 'TopLevelToStructure';
+  if (
+    !!draggedVariableParent &&
+    !targetVariableParent &&
+    draggedVariableParent.getType() === gd.Variable.Structure
+  )
+    return 'StructureToTopLevel';
+  if (
+    !!draggedVariableParent &&
+    !targetVariableParent &&
+    draggedVariableParent.getType() === gd.Variable.Array
+  )
+    return 'ArrayToTopLevel';
+
+  return null;
+};
+
+const isCollection = (variable: gdVariable): boolean =>
+  !gd.Variable.isPrimitive(variable.getType());
+
+const NewVariablesList = (props: Props) => {
+  const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
+  const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
+  const [containerWidth, setContainerWidth] = React.useState<?number>(null);
+  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
+    {}
+  );
+  const draggedNodeId = React.useRef<?string>(null);
+  const forceUpdate = useForceUpdate();
+
+  const rowRightSideStyle = React.useMemo(
+    () => ({
+      minWidth: containerWidth ? Math.round(0.6 * containerWidth) : 600,
+      flexShrink: 0,
+    }),
+    [containerWidth]
+  );
+
+  React.useEffect(
+    () => {
+      setExpandedNodes(
+        mapFor(0, props.variablesContainer.count(), index =>
+          props.variablesContainer.getNameAt(index)
+        )
+      );
+    },
+    [props.variablesContainer.ptr]
+  );
+
+  const copySelection = () => {
+    Clipboard.set(
+      CLIPBOARD_KIND,
+      selectedNodes
+        .map(nodeId => {
+          const { variable, name, parents } = getVariableFromNodeId(
+            nodeId,
+            props.variablesContainer
+          );
+          if (!variable || !name) return;
+          let parentType;
+          if (parents.length === 0) {
+            parentType = gd.Variable.Structure;
+          } else {
+            const parentVariable = parents[parents.length - 1];
+            parentType = parentVariable.getType();
+          }
+          return {
+            name,
+            serializedVariable: serializeToJSObject(variable),
+            parentType,
+          };
+        })
+        .filter(Boolean)
+    );
+    forceUpdate();
+  };
+
+  const pasteSelection = () => {
+    if (!Clipboard.has(CLIPBOARD_KIND)) return;
+    const newSelectedNodes = [];
+
+    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+    const variablesContent = SafeExtractor.extractArray(clipboardContent);
+    if (!variablesContent) return;
+
+    let pastedElementOffsetIndex = 0;
+
+    variablesContent.forEach(variableContent => {
+      const name = SafeExtractor.extractStringProperty(variableContent, 'name');
+      const serializedVariable = SafeExtractor.extractObjectProperty(
+        variableContent,
+        'serializedVariable'
+      );
+      const parentType = SafeExtractor.extractNumberProperty(
+        variableContent,
+        'parentType'
+      );
+      if (!name || !serializedVariable || !parentType) return;
+
+      const pasteAtTopLevel = selectedNodes.length === 0;
+
+      if (pasteAtTopLevel) {
+        if (parentType === gd.Variable.Array) return;
+        const newName = insertInVariablesContainer(
+          props.variablesContainer,
+          name,
+          serializedVariable
+        );
+        newSelectedNodes.push(newName);
+      } else {
+        const targetNode = selectedNodes[0];
+        const {
+          name: targetVariableName,
+          parents: targetParents,
+        } = getVariableFromNodeId(targetNode, props.variablesContainer);
+        if (!targetVariableName) return;
+        if (targetParents.length === 0) {
+          if (parentType === gd.Variable.Array) return;
+          const newName = insertInVariablesContainer(
+            props.variablesContainer,
+            name,
+            serializedVariable,
+            props.variablesContainer.getPosition(targetVariableName) + 1
+          );
+          newSelectedNodes.push(newName);
+        } else {
+          const targetParentVariable = targetParents[targetParents.length - 1];
+          const targetParentType = targetParentVariable.getType();
+          if (targetParentType !== parentType) return;
+          if (targetParentType === gd.Variable.Array) {
+            const index = parseInt(targetVariableName, 10) + 1;
+            insertInVariableChildrenArray(
+              targetParentVariable,
+              serializedVariable,
+              index
+            );
+            const nodes = targetNode.split('.');
+            nodes.splice(
+              nodes.length - 1,
+              1,
+              (index + pastedElementOffsetIndex).toString()
+            );
+
+            newSelectedNodes.push(nodes.join('.'));
+            pastedElementOffsetIndex += 1;
+          } else {
+            const newName = insertInVariableChildren(
+              targetParentVariable,
+              name,
+              serializedVariable
+            );
+            const nodes = targetNode.split('.');
+            nodes.splice(nodes.length - 1, 1, newName);
+            newSelectedNodes.push(nodes.join('.'));
+          }
+        }
+      }
+    });
+    setSelectedNodes(newSelectedNodes);
+  };
+
+  const deleteSelection = () => {
+    selectedNodes.forEach(nodeId => {
+      const { name, parents } = getVariableFromNodeId(
+        nodeId,
+        props.variablesContainer
+      );
+      if (!name) return;
+      if (parents.length === 0) {
+        props.variablesContainer.remove(name);
+      } else {
+        const parentVariable = parents[parents.length - 1];
+        if (parentVariable.getType() === gd.Variable.Array) {
+          parentVariable.removeAtIndex(parseInt(name, 10));
+        } else {
+          parentVariable.removeChild(name);
+        }
+      }
+    });
+    setSelectedNodes([]);
+  };
+
+  const renameExpandedNode = (nodeId: string, newName: string) => {
+    const newExpandedNodes: Array<string> = [...expandedNodes];
+    const index = newExpandedNodes.indexOf(nodeId);
+    if (index === -1) return;
+    const oldNodeId = newExpandedNodes.splice(index, 1)[0];
+    const nodes = oldNodeId.split('.');
+    nodes[nodes.length - 1] = newName;
+    setExpandedNodes([...newExpandedNodes, nodes.join('.')]);
+  };
+
+  const DragSourceAndDropTarget = React.useMemo(
+    () => makeDragSourceAndDropTarget('variable-editor'),
+    []
+  );
+
+  const variableTypeToLabel = {
+    [gd.Variable.String]: <Trans>String</Trans>,
+    [gd.Variable.Number]: <Trans>Number</Trans>,
+    [gd.Variable.Boolean]: <Trans>Boolean</Trans>,
+    [gd.Variable.Structure]: <Trans>Structure</Trans>,
+    [gd.Variable.Array]: <Trans>Array</Trans>,
+  };
+
+  const canDrop = (nodeId: string): boolean => {
+    const { current } = draggedNodeId;
+    if (!current) return false;
+
+    const targetVariableInfo = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    const { parents: targetVariableParents } = targetVariableInfo;
+
+    const draggedVariableInfo = getVariableFromNodeId(
+      current,
+      props.variablesContainer
+    );
+    const { variable: draggedVariable } = draggedVariableInfo;
+
+    if (targetVariableParents.includes(draggedVariable)) return false;
+
+    const movementType = getMovementType(
+      draggedVariableInfo,
+      targetVariableInfo
+    );
+
+    switch (movementType) {
+      case 'InsideTopLevel':
+      case 'TopLevelToStructure':
+      case 'StructureToTopLevel':
+      case 'FromStructureToAnotherStructure':
+      case 'FromArrayToAnotherArray':
+      case 'InsideSameArray':
+        return true;
+      case 'FromStructureToArray':
+      case 'FromArrayToStructure':
+      case 'ArrayToTopLevel':
+      case 'InsideSameStructure':
+      default:
+        return false;
+    }
+  };
+
+  const dropNode = (nodeId: string): void => {
+    const { current } = draggedNodeId;
+    if (!current) return;
+
+    const targetVariableInfo = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    const {
+      parents: targetVariableParents,
+      name: targetName,
+    } = targetVariableInfo;
+    const targetVariableParent =
+      targetVariableParents[targetVariableParents.length - 1];
+    if (!targetName) return;
+
+    const draggedVariableInfo = getVariableFromNodeId(
+      current,
+      props.variablesContainer
+    );
+    const {
+      variable: draggedVariable,
+      parents: draggedVariableParents,
+      name: draggedName,
+    } = draggedVariableInfo;
+    const draggedVariableParent =
+      draggedVariableParents[draggedVariableParents.length - 1];
+    if (!draggedVariable || !draggedName) return;
+
+    if (targetVariableParents.includes(draggedVariable)) return;
+
+    const movementType = getMovementType(
+      draggedVariableInfo,
+      targetVariableInfo
+    );
+    let newName;
+    let draggedIndex;
+    let targetIndex;
+
+    switch (movementType) {
+      case 'InsideTopLevel':
+        draggedIndex = props.variablesContainer.getPosition(draggedName);
+        targetIndex = props.variablesContainer.getPosition(targetName);
+        props.variablesContainer.move(
+          draggedIndex,
+          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+        );
+        break;
+      case 'TopLevelToStructure':
+        newName = newNameGenerator(
+          draggedName,
+          name => targetVariableParent.hasChild(name),
+          'CopyOf'
+        );
+
+        targetVariableParent.insertChild(newName, draggedVariable);
+
+        props.variablesContainer.remove(draggedName);
+        break;
+      case 'StructureToTopLevel':
+        newName = newNameGenerator(
+          draggedName,
+          name => props.variablesContainer.has(name),
+          'CopyOf'
+        );
+        props.variablesContainer.insert(
+          newName,
+          draggedVariable,
+          props.variablesContainer.getPosition(targetName)
+        );
+
+        draggedVariableParent.removeChild(draggedName);
+        break;
+      case 'FromStructureToAnotherStructure':
+        newName = newNameGenerator(
+          draggedName,
+          name => targetVariableParent.hasChild(name),
+          'CopyOf'
+        );
+        targetVariableParent.insertChild(newName, draggedVariable);
+
+        draggedVariableParent.removeChild(draggedName);
+        break;
+      case 'FromArrayToAnotherArray':
+        draggedIndex = parseInt(draggedName, 10);
+        targetIndex = parseInt(targetName, 10);
+
+        targetVariableParent.insertInArray(draggedVariable, targetIndex);
+
+        draggedVariableParent.removeAtIndex(draggedIndex);
+        break;
+      case 'InsideSameArray':
+        draggedIndex = parseInt(draggedName, 10);
+        targetIndex = parseInt(targetName, 10);
+        targetVariableParent.moveChildInArray(
+          draggedIndex,
+          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+        );
+        break;
+      case 'FromStructureToArray':
+      case 'FromArrayToStructure':
+      case 'ArrayToTopLevel':
+      case 'InsideSameStructure':
+      default:
+        return;
+    }
+
+    forceUpdate();
+  };
+
+  const onAddChild = (nodeId: string) => {
+    const { variable } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!variable || !isCollection(variable)) return;
+    const type = variable.getType();
+
+    if (type === gd.Variable.Structure) {
+      const name = newNameGenerator('ChildVariable', name =>
+        variable.hasChild(name)
+      );
+      variable.getChild(name).setString('');
+    } else if (type === gd.Variable.Array) variable.pushNew();
+    setExpandedNodes([...expandedNodes, nodeId]);
+  };
+
+  const onAdd = () => {
+    const addAtTopLevel = selectedNodes.length === 0;
+
+    if (addAtTopLevel) {
+      const newName = insertInVariablesContainer(
+        props.variablesContainer,
+        'Variable',
+        null,
+        props.variablesContainer.count()
+      );
+      setSelectedNodes([newName]);
+      return;
+    }
+
+    const targetNode = selectedNodes[0];
+    const {
+      name: targetVariableName,
+      parents: targetParents,
+    } = getVariableFromNodeId(targetNode, props.variablesContainer);
+    if (!targetVariableName) return;
+    if (targetParents.length === 0) {
+      const newName = insertInVariablesContainer(
+        props.variablesContainer,
+        'Variable',
+        null,
+        props.variablesContainer.getPosition(targetVariableName) + 1
+      );
+      setSelectedNodes([newName]);
+      return;
+    }
+    return; // TODO - insert after the top level variable that contains the target. To do so, make it so that getVariableFromNodeId returns parents = [{name, nodeId, variable}]
+  };
+
+  const renderVariableAndChildrenRows = ({
+    name,
+    variable,
+    parentNodeId,
+    parentVariable,
+  }: {|
+    name: string,
+    variable: gdVariable,
+    parentNodeId?: string,
+    parentVariable?: gdVariable,
+  |}) => {
+    const type = variable.getType();
+    const isCollection = !gd.Variable.isPrimitive(type);
+
+    let parentType = null;
+    let nodeId = name;
+
+    if (!!parentNodeId) {
+      nodeId = `${parentNodeId}.${name}`;
+    }
+    if (!!parentVariable) {
+      parentType = parentVariable.getType();
+    }
+
+    return (
+      <DragSourceAndDropTarget
+        key={variable.ptr}
+        beginDrag={() => {
+          draggedNodeId.current = nodeId;
+          return {};
+        }}
+        canDrag={() => true}
+        canDrop={() => canDrop(nodeId)}
+        drop={() => {
+          dropNode(nodeId);
+        }}
+      >
+        {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
+          connectDropTarget(
+            <div>
+              <StyledTreeItem
+                nodeId={nodeId}
+                label={
+                  <div>
+                    {isOver && <DropIndicator canDrop={canDrop} />}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '6px 30px 6px 6px',
+                      }}
+                    >
+                      {connectDragSource(
+                        <span>
+                          <DragHandle color="#AAA" />
+                        </span>
+                      )}
+                      <Spacer />
+                      <SemiControlledTextField
+                        fullWidth
+                        margin="none"
+                        key="name"
+                        disabled={parentType === gd.Variable.Array}
+                        commitOnBlur
+                        onClick={stopEventPropagation}
+                        errorText={nameErrors[variable.ptr]}
+                        onChange={() => {
+                          if (nameErrors[variable.ptr]) {
+                            const newNameErrors = { ...nameErrors };
+                            delete newNameErrors[variable.ptr];
+                            setNameErrors(newNameErrors);
+                          }
+                        }}
+                        value={name}
+                        onBlur={event => {
+                          onChangeName(nodeId, event.currentTarget.value);
+                          forceUpdate();
+                        }}
+                      />
+                      <Spacer />
+                      <Spacer />
+                      <div style={rowRightSideStyle}>
+                        <Line noMargin alignItems="center">
+                          <Column noMargin>
+                            <VariableTypeSelector
+                              variableType={type}
+                              onChange={newType => {
+                                variable.castTo(newType);
+                                forceUpdate();
+                              }}
+                            />
+                          </Column>
+                          <Column expand>
+                            {type === gd.Variable.Boolean ? (
+                              <Line noMargin>
+                                {variable.getBool() ? (
+                                  <Trans>True</Trans>
+                                ) : (
+                                  <Trans>False</Trans>
+                                )}
+                                <Spacer />
+                                <IconButton
+                                  size="small"
+                                  style={{ padding: 0 }}
+                                  onClick={() => {
+                                    onChangeValue(
+                                      nodeId,
+                                      !variable.getBool() ? 'true' : 'false'
+                                    );
+                                  }}
+                                >
+                                  <SwapHorizontal />
+                                </IconButton>
+                              </Line>
+                            ) : (
+                              <SemiControlledTextField
+                                margin="none"
+                                type={
+                                  type === gd.Variable.Number
+                                    ? 'number'
+                                    : 'text'
+                                }
+                                key="value"
+                                onClick={stopEventPropagation}
+                                multiline={type === gd.Variable.String}
+                                inputStyle={
+                                  type === gd.Variable.String
+                                    ? styles.noPaddingMultilineTextField
+                                    : undefined
+                                }
+                                disabled={isCollection}
+                                value={
+                                  isCollection
+                                    ? `${variable.getChildrenCount()} children`
+                                    : type === gd.Variable.String
+                                    ? variable.getString()
+                                    : variable.getValue().toString()
+                                }
+                                onChange={value => {
+                                  onChangeValue(nodeId, value);
+                                  forceUpdate();
+                                }}
+                              />
+                            )}
+                          </Column>
+                          {isCollection ? (
+                            <IconButton
+                              size="small"
+                              style={{ padding: 0 }}
+                              onClick={() => onAddChild(nodeId)}
+                            >
+                              <Add />
+                            </IconButton>
+                          ) : null}
+                        </Line>
+                      </div>
+                    </div>
+                  </div>
+                }
+                onLabelClick={preventEventDefaultEffect}
+              >
+                {!isCollection
+                  ? null
+                  : type === gd.Variable.Structure
+                  ? variable
+                      .getAllChildrenNames()
+                      .toJSArray()
+                      .map((childName, index) => {
+                        const childVariable = variable.getChild(childName);
+                        return renderVariableAndChildrenRows({
+                          name: childName,
+                          variable: childVariable,
+                          parentNodeId: nodeId,
+                          parentVariable: variable,
+                        });
+                      })
+                  : mapFor(0, variable.getChildrenCount(), index => {
+                      const childVariable = variable.getAtIndex(index);
+                      return renderVariableAndChildrenRows({
+                        name: index.toString(),
+                        variable: childVariable,
+                        parentNodeId: nodeId,
+                        parentVariable: variable,
+                      });
+                    })}
+              </StyledTreeItem>
+            </div>
+          )
+        }
+      </DragSourceAndDropTarget>
+    );
+  };
+
+  const onChangeName = (nodeId: string, newName: ?string) => {
+    const { variable, parents, name } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (name === null) return;
+    if (!newName) {
+      if (variable) {
+        setNameErrors({
+          ...nameErrors,
+          [variable.ptr]: <Trans>Variables cannot have empty names</Trans>,
+        });
+      }
+      return;
+    }
+
+    if (newName === name) return;
+
+    let hasBeenRenamed = false;
+    if (parents.length > 0) {
+      const parentVariable = parents[parents.length - 1];
+      hasBeenRenamed = parentVariable.renameChild(name, newName);
+    } else {
+      hasBeenRenamed = props.variablesContainer.rename(name, newName);
+    }
+    if (hasBeenRenamed) {
+      renameExpandedNode(nodeId, newName);
+    } else {
+      if (variable)
+        setNameErrors({
+          ...nameErrors,
+          [variable.ptr]: (
+            <Trans>The variable name {newName} is already taken</Trans>
+          ),
+        });
+    }
+  };
+
+  const onChangeValue = (nodeId: string, newValue: string) => {
+    const { variable } = getVariableFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!variable) return;
+    switch (variable.getType()) {
+      case gd.Variable.String:
+        variable.setString(newValue);
+        break;
+      case gd.Variable.Number:
+        variable.setValue(parseFloat(newValue));
+        break;
+      case gd.Variable.Boolean:
+        variable.setBool(newValue === 'true');
+        forceUpdate();
+        break;
+      default:
+        console.error(
+          `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
+        );
+    }
+  };
+
+  const renderTree = (variablesContainer: gdVariablesContainer) => {
+    const containerVariablesTree = mapFor(
+      0,
+      variablesContainer.count(),
+      index => {
+        const variable = variablesContainer.getAt(index);
+        const name = variablesContainer.getNameAt(index);
+
+        return renderVariableAndChildrenRows({ name, variable });
+      }
+    );
+    return containerVariablesTree;
+  };
+
+  return (
+    <Measure
+      bounds
+      onResize={contentRect => {
+        setContainerWidth(contentRect.bounds.width);
+      }}
+    >
+      {({ contentRect, measureRef }) => (
+        <>
+          <Column expand noMargin>
+            <Line noMargin justifyContent="space-between">
+              <Column noMargin>
+                <Line noMargin>
+                  <FlatButton
+                    icon={<Copy />}
+                    label={<Trans>Copy</Trans>}
+                    onClick={copySelection}
+                  />
+                  <Spacer />
+                  <FlatButton
+                    icon={<Paste />}
+                    label={<Trans>Paste</Trans>}
+                    disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                    onClick={pasteSelection}
+                  />
+                  <Spacer />
+                  <FlatButton
+                    icon={<Delete />}
+                    label={<Trans>Delete</Trans>}
+                    disabled={selectedNodes.length === 0}
+                    onClick={deleteSelection}
+                  />
+                </Line>
+              </Column>
+              <Column>
+                <FlatButton
+                  primary
+                  onClick={onAdd}
+                  label={<Trans>Add variable</Trans>}
+                  icon={<Add />}
+                />
+              </Column>
+            </Line>
+            <ScrollView autoHideScrollbar>
+              <TreeView
+                ref={measureRef}
+                multiSelect
+                defaultExpandIcon={<ChevronRight />}
+                defaultCollapseIcon={<ExpandMore />}
+                onNodeSelect={(event, values) => setSelectedNodes(values)}
+                onNodeToggle={(event, values) => setExpandedNodes(values)}
+                selected={selectedNodes}
+                expanded={expandedNodes}
+              >
+                {renderTree(props.variablesContainer)}
+              </TreeView>
+            </ScrollView>
+          </Column>
+        </>
+      )}
+    </Measure>
+  );
+};
+
+export default NewVariablesList;

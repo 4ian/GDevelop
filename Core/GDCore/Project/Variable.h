@@ -6,10 +6,10 @@
 
 #ifndef GDCORE_VARIABLE_H
 #define GDCORE_VARIABLE_H
+#include <cmath>
 #include <map>
 #include <memory>
 #include <vector>
-#include <cmath>
 
 #include "GDCore/String.h"
 namespace gd {
@@ -98,7 +98,7 @@ class GD_CORE_API Variable {
   void SetValue(double val) {
     value = val;
     // NaN values are not supported by GDevelop nor the serializer.
-    if(std::isnan(value)) value = 0.0;
+    if (std::isnan(value)) value = 0.0;
     type = Type::Number;
   }
 
@@ -185,9 +185,9 @@ class GD_CORE_API Variable {
    * \brief Get the count of children that the variable has.
    */
   size_t GetChildrenCount() const {
-    return type == Type::Structure
-               ? children.size()
-               : type == Type::Array ? childrenArray.size() : 0;
+    return type == Type::Structure ? children.size()
+           : type == Type::Array   ? childrenArray.size()
+                                   : 0;
   };
 
   /** \name Structure
@@ -289,6 +289,21 @@ class GD_CORE_API Variable {
    * And shifts all the next elements back by one.
    */
   void RemoveAtIndex(const size_t index);
+
+  /**
+   * \brief Move child in array.
+   */
+  void MoveChildInArray(const size_t oldIndex, const size_t newIndex);
+
+  /**
+   * \brief Insert child in array.
+   */
+  bool InsertInArray(const gd::Variable& variable, const size_t index);
+
+  /**
+   * \brief Insert child in children map.
+   */
+  bool InsertChild(const gd::String& name, const gd::Variable& variable);
 
   /**
    * \brief Get the vector containing all the children.

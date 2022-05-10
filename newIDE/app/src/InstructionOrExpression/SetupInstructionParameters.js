@@ -66,9 +66,9 @@ export const setupInstructionParameters = (
       });
 
     if (behaviorNames.length > 0) {
-      const currentParameterValue = instruction.getParameter(
-        maybeBehaviorParameterIndex
-      );
+      const currentParameterValue = instruction
+        .getParameter(maybeBehaviorParameterIndex)
+        .getPlainString();
 
       // Set the behavior to the first matching behavior, in case a matching behavior name
       // is not already set.

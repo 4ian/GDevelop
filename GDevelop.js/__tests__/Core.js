@@ -1898,9 +1898,9 @@ describe('libGD.js', function () {
       let instr = new gd.Instruction();
       instr.setParametersCount(3);
       expect(instr.getParametersCount()).toBe(3);
-      expect(instr.getParameter(1)).toBe('');
+      expect(instr.getParameter(1).getPlainString()).toBe('');
       instr.setParameter(2, 'MyValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
       instr.delete();
     });
     it('can be cloned', function () {
@@ -1910,14 +1910,14 @@ describe('libGD.js', function () {
 
       let newInstr = instr.clone();
       expect(newInstr.getParametersCount()).toBe(3);
-      expect(newInstr.getParameter(1)).toBe('');
-      expect(newInstr.getParameter(2)).toBe('MyValue');
+      expect(newInstr.getParameter(1).getPlainString()).toBe('');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyValue');
 
       newInstr.setParameter(2, 'MyChangedValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
-      expect(newInstr.getParameter(2)).toBe('MyChangedValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyChangedValue');
       newInstr.delete();
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
 
       instr.delete();
     });
@@ -2009,9 +2009,9 @@ describe('libGD.js', function () {
       expect(list2.get(1).getType()).toBe('Type2');
       expect(list2.get(0).getParametersCount()).toBe(2);
       expect(list2.get(1).getParametersCount()).toBe(1);
-      expect(list2.get(0).getParameter(0)).toBe('Param1');
-      expect(list2.get(0).getParameter(1)).toBe('Param2');
-      expect(list2.get(1).getParameter(0)).toBe('Param3');
+      expect(list2.get(0).getParameter(0).getPlainString()).toBe('Param1');
+      expect(list2.get(0).getParameter(1).getPlainString()).toBe('Param2');
+      expect(list2.get(1).getParameter(0).getPlainString()).toBe('Param3');
 
       list2.delete();
       project.delete();
@@ -3233,18 +3233,36 @@ describe('libGD.js', function () {
       type,
       expression,
       expectedError,
-      expectedErrorPosition
+      expectedErrorPosition,
+      expectedError2,
+      expectedErrorPosition2
     ) {
-      const parser = new gd.ExpressionParser2(
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
+
+      const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
         project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
-
-      const expressionValidator = new gd.ExpressionValidator();
+        layout,
+        type);
       expressionNode.visit(expressionValidator);
-      if (expectedError) {
+      if (expectedError2) {
+        expect(expressionValidator.getErrors().size()).toBe(2);
+        expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
+          expectedError
+        );
+        if (expectedErrorPosition)
+          expect(expressionValidator.getErrors().at(0).getStartPosition()).toBe(
+            expectedErrorPosition
+          );
+        expect(expressionValidator.getErrors().at(1).getMessage()).toBe(
+          expectedError2
+        );
+        if (expectedErrorPosition2)
+          expect(expressionValidator.getErrors().at(1).getStartPosition()).toBe(
+            expectedErrorPosition2
+          );
+      } else if (expectedError) {
         expect(expressionValidator.getErrors().size()).toBe(1);
         expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
           expectedError
@@ -3305,6 +3323,8 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         '3..14',
+        'More than one term was found. Verify that your expression is properly written.',
+        2,
         'No operator found. Did you forget to enter an operator (like +, -, * or /) between numbers or expressions?',
         2
       );
@@ -3354,12 +3374,12 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'abs(-5, 3)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
       testExpression(
         'number',
         'MouseX("", 0, 0) + 1',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be: 0-2"
       );
     });
 
@@ -3378,7 +3398,7 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'MySpriteObject.PointX("Point", 2)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
     });
 
@@ -3409,14 +3429,14 @@ describe('libGD.js', function () {
       }
       const expression = expressionWithCaret.replace('|', '');
 
-      const parser = new gd.ExpressionParser2(
-        gd.JsPlatform.get(),
-        project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
       const completionDescriptions =
         gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+          gd.JsPlatform.get(),
+          project,
+          layout,
+          type,
           expressionNode,
           // We're looking for completion for the character just before the caret.
           Math.max(0, caretPosition - 1)

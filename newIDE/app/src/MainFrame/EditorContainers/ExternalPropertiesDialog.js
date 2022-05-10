@@ -83,8 +83,8 @@ export default function ExternalPropertiesDialog({
     >
       <Column>
         {helpTexts &&
-          helpTexts.map(helpText => (
-            <Line>
+          helpTexts.map((helpText, index) => (
+            <Line key={index}>
               <BackgroundText>{helpText}</BackgroundText>
             </Line>
           ))}

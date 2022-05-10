@@ -20,12 +20,12 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
 
-  gd::ExpressionParser2 parser(platform, project, layout1);
+  gd::ExpressionParser2 parser;
 
   auto testPrinter = [&parser](const gd::String &type,
                                const gd::String &expression,
                                const gd::String &expectedOutput = "") {
-    auto node = parser.ParseExpression(type, expression);
+    auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     gd::ExpressionParser2NodePrinter printer;
     node->Visit(printer);

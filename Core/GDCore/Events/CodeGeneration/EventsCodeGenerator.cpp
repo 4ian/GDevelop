@@ -668,10 +668,10 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
   if (ParameterMetadata::IsExpression("number", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "number", parameter);
+        *this, context, "number", parameter, lastObjectName);
   } else if (ParameterMetadata::IsExpression("string", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "string", parameter);
+        *this, context, "string", parameter, lastObjectName);
   } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this, context, metadata.type, parameter, lastObjectName);

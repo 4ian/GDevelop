@@ -84,6 +84,9 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'ChangeAnimation':
     case 'ChangeAnimationName':
       return ['intermediate-changing-animations'];
+    case 'PopStartedTouch':
+    case 'MouseButtonPressed':
+      return ['intermediate-touchscreen-controls'];
     default:
       return [];
   }

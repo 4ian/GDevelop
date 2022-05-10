@@ -95,6 +95,7 @@ import {
 import LeaderboardContext, {
   type LeaderboardState,
 } from '../Leaderboard/LeaderboardContext';
+import { TutorialContext } from '../Tutorial/TutorialContext';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -1355,207 +1356,219 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
               goToPreviousSearchResult,
               goToNextSearchResult,
             }) => (
-              <div
-                className="gd-events-sheet"
-                style={styles.container}
-                onKeyDown={this._keyboardShortcuts.onKeyDown}
-                onKeyUp={this._keyboardShortcuts.onKeyUp}
-                onDragOver={this._keyboardShortcuts.onDragOver}
-                ref={this._containerDiv}
-                tabIndex={0}
-              >
-                <EventsTree
-                  ref={eventsTree => (this._eventsTree = eventsTree)}
-                  key={events.ptr}
-                  onScroll={this._ensureFocused}
-                  events={events}
-                  project={project}
-                  scope={scope}
-                  globalObjectsContainer={globalObjectsContainer}
-                  objectsContainer={objectsContainer}
-                  selection={this.state.selection}
-                  onInstructionClick={this.selectInstruction}
-                  onInstructionDoubleClick={this.openInstructionEditor}
-                  onInstructionContextMenu={this.openInstructionContextMenu}
-                  onAddInstructionContextMenu={
-                    this.openAddInstructionContextMenu
-                  }
-                  onAddNewInstruction={this.openInstructionEditor}
-                  onPasteInstructions={this.pasteInstructionsInInstructionsList}
-                  onMoveToInstruction={this.moveSelectionToInstruction}
-                  onMoveToInstructionsList={
-                    this.moveSelectionToInstructionsList
-                  }
-                  onParameterClick={this.openParameterEditor}
-                  onEventClick={this.selectEvent}
-                  onEventContextMenu={this.openEventContextMenu}
-                  onAddNewEvent={(
-                    eventType: string,
-                    eventsList: gdEventsList
-                  ) => {
-                    this.addNewEvent(eventType, {
-                      eventsList,
-                      indexInList: eventsList.getEventsCount(),
-                    });
-                  }}
-                  onOpenExternalEvents={onOpenExternalEvents}
-                  onOpenLayout={onOpenLayout}
-                  searchResults={eventsSearchResultEvents}
-                  searchFocusOffset={searchFocusOffset}
-                  onEventMoved={this._onEventMoved}
-                  showObjectThumbnails={
-                    preferences.values.eventsSheetShowObjectThumbnails
-                  }
-                  screenType={screenType}
-                  windowWidth={windowWidth}
-                  eventsSheetHeight={
-                    this._containerDiv.current
-                      ? this._containerDiv.current.clientHeight
-                      : 0
-                  }
-                  fontSize={preferences.values.eventsSheetZoomLevel}
-                />
-                {this.state.showSearchPanel && (
-                  <SearchPanel
-                    ref={searchPanel => (this._searchPanel = searchPanel)}
-                    onSearchInEvents={inputs =>
-                      this._searchInEvents(searchInEvents, inputs)
-                    }
-                    onReplaceInEvents={inputs =>
-                      this._replaceInEvents(replaceInEvents, inputs)
-                    }
-                    resultsCount={
-                      eventsSearchResultEvents
-                        ? eventsSearchResultEvents.length
-                        : null
-                    }
-                    hasEventSelected={hasEventSelected(this.state.selection)}
-                    onGoToPreviousSearchResult={() =>
-                      this._ensureEventUnfolded(goToPreviousSearchResult)
-                    }
-                    onCloseSearchPanel={() => {
-                      this._closeSearchPanel();
-                    }}
-                    onGoToNextSearchResult={() =>
-                      this._ensureEventUnfolded(goToNextSearchResult)
-                    }
-                    searchFocusOffset={searchFocusOffset}
-                  />
+              <TutorialContext.Consumer>
+                {({ tutorials }) => (
+                  <div
+                    className="gd-events-sheet"
+                    style={styles.container}
+                    onKeyDown={this._keyboardShortcuts.onKeyDown}
+                    onKeyUp={this._keyboardShortcuts.onKeyUp}
+                    onDragOver={this._keyboardShortcuts.onDragOver}
+                    ref={this._containerDiv}
+                    tabIndex={0}
+                  >
+                    <EventsTree
+                      ref={eventsTree => (this._eventsTree = eventsTree)}
+                      key={events.ptr}
+                      onScroll={this._ensureFocused}
+                      events={events}
+                      project={project}
+                      scope={scope}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      selection={this.state.selection}
+                      onInstructionClick={this.selectInstruction}
+                      onInstructionDoubleClick={this.openInstructionEditor}
+                      onInstructionContextMenu={this.openInstructionContextMenu}
+                      onAddInstructionContextMenu={
+                        this.openAddInstructionContextMenu
+                      }
+                      onAddNewInstruction={this.openInstructionEditor}
+                      onPasteInstructions={
+                        this.pasteInstructionsInInstructionsList
+                      }
+                      onMoveToInstruction={this.moveSelectionToInstruction}
+                      onMoveToInstructionsList={
+                        this.moveSelectionToInstructionsList
+                      }
+                      onParameterClick={this.openParameterEditor}
+                      onEventClick={this.selectEvent}
+                      onEventContextMenu={this.openEventContextMenu}
+                      onAddNewEvent={(
+                        eventType: string,
+                        eventsList: gdEventsList
+                      ) => {
+                        this.addNewEvent(eventType, {
+                          eventsList,
+                          indexInList: eventsList.getEventsCount(),
+                        });
+                      }}
+                      onOpenExternalEvents={onOpenExternalEvents}
+                      onOpenLayout={onOpenLayout}
+                      searchResults={eventsSearchResultEvents}
+                      searchFocusOffset={searchFocusOffset}
+                      onEventMoved={this._onEventMoved}
+                      showObjectThumbnails={
+                        preferences.values.eventsSheetShowObjectThumbnails
+                      }
+                      screenType={screenType}
+                      windowWidth={windowWidth}
+                      eventsSheetHeight={
+                        this._containerDiv.current
+                          ? this._containerDiv.current.clientHeight
+                          : 0
+                      }
+                      fontSize={preferences.values.eventsSheetZoomLevel}
+                      preferences={preferences}
+                      tutorials={tutorials}
+                    />
+                    {this.state.showSearchPanel && (
+                      <SearchPanel
+                        ref={searchPanel => (this._searchPanel = searchPanel)}
+                        onSearchInEvents={inputs =>
+                          this._searchInEvents(searchInEvents, inputs)
+                        }
+                        onReplaceInEvents={inputs =>
+                          this._replaceInEvents(replaceInEvents, inputs)
+                        }
+                        resultsCount={
+                          eventsSearchResultEvents
+                            ? eventsSearchResultEvents.length
+                            : null
+                        }
+                        hasEventSelected={hasEventSelected(
+                          this.state.selection
+                        )}
+                        onGoToPreviousSearchResult={() =>
+                          this._ensureEventUnfolded(goToPreviousSearchResult)
+                        }
+                        onCloseSearchPanel={() => {
+                          this._closeSearchPanel();
+                        }}
+                        onGoToNextSearchResult={() =>
+                          this._ensureEventUnfolded(goToNextSearchResult)
+                        }
+                        searchFocusOffset={searchFocusOffset}
+                      />
+                    )}
+                    <InlineParameterEditor
+                      open={this.state.inlineEditing}
+                      anchorEl={this.state.inlineEditingAnchorEl}
+                      onRequestClose={() => {
+                        this.closeParameterEditor(
+                          /*shouldCancel=*/ preferences.values
+                            .eventsSheetCancelInlineParameter === 'cancel'
+                        );
+                      }}
+                      onApply={() => {
+                        this.closeParameterEditor(/*shouldCancel=*/ false);
+                      }}
+                      project={project}
+                      scope={scope}
+                      globalObjectsContainer={globalObjectsContainer}
+                      objectsContainer={objectsContainer}
+                      isCondition={this.state.editedParameter.isCondition}
+                      instruction={this.state.editedParameter.instruction}
+                      parameterIndex={this.state.editedParameter.parameterIndex}
+                      onChange={value => {
+                        const {
+                          instruction,
+                          parameterIndex,
+                        } = this.state.editedParameter;
+                        if (!instruction || !this.state.inlineEditing) {
+                          // Unlikely to ever happen, but maybe a component could
+                          // fire the "onChange" while the inline editor was just
+                          // dismissed.
+                          return;
+                        }
+                        instruction.setParameter(parameterIndex, value);
+                        // Ask the component to re-render, so that the new parameter
+                        // set for the instruction in the state
+                        // is taken into account for the InlineParameterEditor.
+                        this.forceUpdate();
+                        if (this._searchPanel)
+                          this._searchPanel.markSearchResultsDirty();
+                      }}
+                      resourceSources={resourceSources}
+                      onChooseResource={onChooseResource}
+                      resourceExternalEditors={resourceExternalEditors}
+                    />
+                    <ContextMenu
+                      ref={eventContextMenu =>
+                        (this.eventContextMenu = eventContextMenu)
+                      }
+                      buildMenuTemplate={this._buildEventContextMenu}
+                    />
+                    <ContextMenu
+                      ref={instructionContextMenu =>
+                        (this.instructionContextMenu = instructionContextMenu)
+                      }
+                      buildMenuTemplate={this._buildInstructionContextMenu}
+                    />
+                    {this._renderInstructionEditorDialog(
+                      // Force using the new instruction editor on touch screens.
+                      preferences.values.useNewInstructionEditorDialog ||
+                        screenType === 'touch'
+                    )}
+                    {this.state.analyzedEventsContextResult && (
+                      <EventsContextAnalyzerDialog
+                        onClose={this._closeEventsContextAnalyzer}
+                        eventsContextResult={
+                          this.state.analyzedEventsContextResult
+                        }
+                      />
+                    )}
+                    {this.state.serializedEventsToExtract && (
+                      <EventsFunctionExtractorDialog
+                        project={project}
+                        globalObjectsContainer={globalObjectsContainer}
+                        objectsContainer={objectsContainer}
+                        onClose={() =>
+                          this.setState({
+                            serializedEventsToExtract: null,
+                          })
+                        }
+                        serializedEvents={this.state.serializedEventsToExtract}
+                        onCreate={(extensionName, eventsFunction) => {
+                          onCreateEventsFunction(extensionName, eventsFunction);
+                          this._replaceSelectionByEventsFunction(
+                            extensionName,
+                            eventsFunction
+                          );
+                          this.setState({
+                            serializedEventsToExtract: null,
+                          });
+                        }}
+                      />
+                    )}
+                    {this.state.textEditedEvent && (
+                      <EventTextDialog
+                        event={this.state.textEditedEvent}
+                        onApply={() => {
+                          this.closeEventTextDialog();
+                          this._saveChangesToHistory();
+                        }}
+                        onClose={this.closeEventTextDialog}
+                      />
+                    )}
+                    <DismissableInfoBar
+                      identifier="edit-instruction-explanation"
+                      message={
+                        <Trans>
+                          Double click on a condition or action to edit it.
+                        </Trans>
+                      }
+                      touchScreenMessage={
+                        <Trans>
+                          Double tap a condition or action to edit it. Long
+                          press to show more options.
+                        </Trans>
+                      }
+                      show={hasInstructionSelected(this.state.selection)}
+                    />
+                  </div>
                 )}
-                <InlineParameterEditor
-                  open={this.state.inlineEditing}
-                  anchorEl={this.state.inlineEditingAnchorEl}
-                  onRequestClose={() => {
-                    this.closeParameterEditor(
-                      /*shouldCancel=*/ preferences.values
-                        .eventsSheetCancelInlineParameter === 'cancel'
-                    );
-                  }}
-                  onApply={() => {
-                    this.closeParameterEditor(/*shouldCancel=*/ false);
-                  }}
-                  project={project}
-                  scope={scope}
-                  globalObjectsContainer={globalObjectsContainer}
-                  objectsContainer={objectsContainer}
-                  isCondition={this.state.editedParameter.isCondition}
-                  instruction={this.state.editedParameter.instruction}
-                  parameterIndex={this.state.editedParameter.parameterIndex}
-                  onChange={value => {
-                    const {
-                      instruction,
-                      parameterIndex,
-                    } = this.state.editedParameter;
-                    if (!instruction || !this.state.inlineEditing) {
-                      // Unlikely to ever happen, but maybe a component could
-                      // fire the "onChange" while the inline editor was just
-                      // dismissed.
-                      return;
-                    }
-                    instruction.setParameter(parameterIndex, value);
-                    // Ask the component to re-render, so that the new parameter
-                    // set for the instruction in the state
-                    // is taken into account for the InlineParameterEditor.
-                    this.forceUpdate();
-                    if (this._searchPanel)
-                      this._searchPanel.markSearchResultsDirty();
-                  }}
-                  resourceSources={resourceSources}
-                  onChooseResource={onChooseResource}
-                  resourceExternalEditors={resourceExternalEditors}
-                />
-                <ContextMenu
-                  ref={eventContextMenu =>
-                    (this.eventContextMenu = eventContextMenu)
-                  }
-                  buildMenuTemplate={this._buildEventContextMenu}
-                />
-                <ContextMenu
-                  ref={instructionContextMenu =>
-                    (this.instructionContextMenu = instructionContextMenu)
-                  }
-                  buildMenuTemplate={this._buildInstructionContextMenu}
-                />
-                {this._renderInstructionEditorDialog(
-                  // Force using the new instruction editor on touch screens.
-                  preferences.values.useNewInstructionEditorDialog ||
-                    screenType === 'touch'
-                )}
-                {this.state.analyzedEventsContextResult && (
-                  <EventsContextAnalyzerDialog
-                    onClose={this._closeEventsContextAnalyzer}
-                    eventsContextResult={this.state.analyzedEventsContextResult}
-                  />
-                )}
-                {this.state.serializedEventsToExtract && (
-                  <EventsFunctionExtractorDialog
-                    project={project}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
-                    onClose={() =>
-                      this.setState({
-                        serializedEventsToExtract: null,
-                      })
-                    }
-                    serializedEvents={this.state.serializedEventsToExtract}
-                    onCreate={(extensionName, eventsFunction) => {
-                      onCreateEventsFunction(extensionName, eventsFunction);
-                      this._replaceSelectionByEventsFunction(
-                        extensionName,
-                        eventsFunction
-                      );
-                      this.setState({
-                        serializedEventsToExtract: null,
-                      });
-                    }}
-                  />
-                )}
-                {this.state.textEditedEvent && (
-                  <EventTextDialog
-                    event={this.state.textEditedEvent}
-                    onApply={() => {
-                      this.closeEventTextDialog();
-                      this._saveChangesToHistory();
-                    }}
-                    onClose={this.closeEventTextDialog}
-                  />
-                )}
-                <DismissableInfoBar
-                  identifier="edit-instruction-explanation"
-                  message={
-                    <Trans>
-                      Double click on a condition or action to edit it.
-                    </Trans>
-                  }
-                  touchScreenMessage={
-                    <Trans>
-                      Double tap a condition or action to edit it. Long press to
-                      show more options.
-                    </Trans>
-                  }
-                  show={hasInstructionSelected(this.state.selection)}
-                />
-              </div>
+              </TutorialContext.Consumer>
             )}
           </EventsSearcher>
         )}

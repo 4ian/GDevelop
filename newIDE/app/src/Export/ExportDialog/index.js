@@ -14,6 +14,7 @@ import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import TutorialButton from '../../UI/TutorialButton';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -174,6 +175,11 @@ const ExportDialog = ({
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
+        <TutorialButton
+          key="tutorial"
+          tutorialId="export-to-itch"
+          label="How to export to Itch.io"
+        />,
         <FlatButton
           key="builds"
           label={<Trans>See this game builds</Trans>}

@@ -7,7 +7,7 @@ declare class gdInstruction {
   setInverted(inverted: boolean): void;
   isInverted(): boolean;
   setParameter(id: number, value: string): void;
-  getParameter(id: number): string;
+  getParameter(id: number): gdExpression;
   setParametersCount(count: number): void;
   getParametersCount(): number;
   getSubInstructions(): gdInstructionsList;

@@ -417,11 +417,12 @@ class GD_CORE_API ExpressionParser2 {
 
     auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
-    node->diagnostic = RaiseSyntaxError(
-        _("An opening parenthesis (for an object expression), a double colon "
-          "(:: for a behavior expression), a dot or an opening bracket (for "
-          "a child variable) where expected."));
-
+    if (!CheckIfChar(IsParameterSeparator) && !CheckIfChar(IsClosingParenthesis)) {
+      node->diagnostic = RaiseSyntaxError(
+          _("An opening parenthesis (for an object expression), a double colon "
+            "(:: for a behavior expression), a dot or an opening bracket (for "
+            "a child variable) where expected."));
+    }
     node->location = ExpressionParserLocation(
         parentIdentifierLocation.GetStartPosition(), GetCurrentPosition());
     node->identifierNameLocation = parentIdentifierLocation;

@@ -417,7 +417,7 @@ class GD_CORE_API ExpressionParser2 {
 
     auto node = gd::make_unique<IdentifierNode>(
         parentIdentifier, childIdentifierName);
-    if (!CheckIfChar(IsParameterSeparator) && !CheckIfChar(IsClosingParenthesis)) {
+    if (!CheckIfChar(IsParameterSeparator) && !CheckIfChar(IsClosingParenthesis) && !IsEndReached()) {
       node->diagnostic = RaiseSyntaxError(
           _("An opening parenthesis (for an object expression), a double colon "
             "(:: for a behavior expression), a dot or an opening bracket (for "

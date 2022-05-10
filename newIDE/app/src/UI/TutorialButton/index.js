@@ -14,7 +14,7 @@ type PropsType = {|
 |};
 
 /**
- * The button that can be used in any dialog to open a Youtube tutorial
+ * The button that can be used in any dialog to open a Youtube tutorial.
  */
 const TutorialButton = (props: PropsType) => {
   const { tutorials } = React.useContext(TutorialContext);
@@ -23,7 +23,7 @@ const TutorialButton = (props: PropsType) => {
     tutorial => tutorial.id === props.tutorialId
   );
   if (!tutorial) {
-    console.warn(`Tutorial not found`);
+    console.warn(`Tutorial with id ${props.tutorialId || ''} not found`);
     return props.renderIfNotFound || null;
   }
   return (

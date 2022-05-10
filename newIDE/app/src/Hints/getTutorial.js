@@ -3,7 +3,7 @@ import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 import { type Preferences } from '../MainFrame/Preferences/PreferencesContext';
 
 /**
- * Function that returns a tutorial if it can be found, otherwise returns null.
+ * Returns a tutorial if it can be found, otherwise returns null.
  */
 const getTutorial = (
   preferences: Preferences,
@@ -18,7 +18,7 @@ const getTutorial = (
     tutorial => tutorial.id === tutorialId
   );
   if (!tutorial) {
-    console.warn(`Tutorial ${tutorialId} not found`);
+    console.warn(`Tutorial with id ${tutorialId} not found`);
     return null;
   }
 

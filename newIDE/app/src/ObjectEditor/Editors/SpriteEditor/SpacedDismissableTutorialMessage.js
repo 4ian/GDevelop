@@ -4,7 +4,7 @@ import { Column, Spacer } from '../../../UI/Grid';
 import useDismissableTutorialMessage from '../../../Hints/useDismissableTutorialMessage';
 
 /**
- * TODO : Use context directly in SpriteEditor
+ * TODO: Use context directly in SpriteEditor
  * when switching SpriteEditor class component to functional component.
  */
 const SpacedDismissableTutorialMessage = () => {

@@ -155,6 +155,20 @@ const NewVariablesList = (props: Props) => {
     ) {
       return false;
     }
+    if (
+      !draggedVariableParent &&
+      targetVariableParent &&
+      targetVariableParent.getType() === gd.Variable.Array
+    ) {
+      return false;
+    }
+    if (
+      !targetVariableParent &&
+      draggedVariableParent &&
+      draggedVariableParent.getType() === gd.Variable.Array
+    ) {
+      return false;
+    }
     if (targetVariableParents.includes(draggedVariable)) return false;
     return true;
   };

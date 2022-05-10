@@ -1427,6 +1427,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "myVariable");
       REQUIRE(identifierNode.childIdentifierName == "myChild");
+      
+      gd::ExpressionValidator validator(platform, project, layout1, "scenevar");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression(

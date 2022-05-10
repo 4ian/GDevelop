@@ -2065,6 +2065,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ))
   .add('autocompletions (expression selected)', () => (
@@ -2077,6 +2078,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={6}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ))
   .add('empty autocompletions (because exact expression)', () => (
@@ -2089,6 +2091,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ))
   .add('empty autocompletions (nothing shown)', () => (
@@ -2101,6 +2104,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ));
 

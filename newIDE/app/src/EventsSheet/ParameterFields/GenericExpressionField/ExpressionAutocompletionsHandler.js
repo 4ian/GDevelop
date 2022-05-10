@@ -9,28 +9,42 @@ import {
 export type AutocompletionsState = {|
   autocompletions: Array<ExpressionAutocompletion>,
   selectedCompletionIndex: number,
+  renderEverything: boolean,
 |};
 
 export const getAutocompletionsInitialState = (): AutocompletionsState => {
   return {
     autocompletions: [],
     selectedCompletionIndex: 0,
+    // By default, only render some completions.
+    // This is to avoid rendering a lot (100+) completions,
+    // riskying a lag/frame drops, just for them to be discarded afterwards,
+    // at each keystroke of the user.
+    renderEverything: false,
   };
 };
 
-const MAX_VISIBLE_COUNT = 25;
+/**
+ * The number of completions to be displayed in the DOM by default
+ * when no scroll or key press is made. This allows to quickly display only
+ * a few completions (fast rendering), and render everything only when
+ * the user starts to explore them.
+ */
+const DEFAULT_RENDERED_COUNT = 7;
 
-export const getRemainingCount = (state: AutocompletionsState): number => {
-  return Math.max(0, state.autocompletions.length - MAX_VISIBLE_COUNT);
+export const getNonRenderedCount = (state: AutocompletionsState): number => {
+  if (state.renderEverything) return 0;
+
+  return Math.max(0, state.autocompletions.length - DEFAULT_RENDERED_COUNT);
 };
 
-export const getVisibleAutocompletions = (
+export const getRenderedAutocompletions = (
   state: AutocompletionsState
 ): Array<ExpressionAutocompletion> => {
-  const remainingCount = getRemainingCount(state);
-  return remainingCount === 0
+  const nonRenderedCount = getNonRenderedCount(state);
+  return nonRenderedCount === 0
     ? state.autocompletions
-    : state.autocompletions.slice(0, MAX_VISIBLE_COUNT);
+    : state.autocompletions.slice(0, DEFAULT_RENDERED_COUNT);
 };
 
 export const setNewAutocompletions = (
@@ -48,6 +62,17 @@ export const setNewAutocompletions = (
   return {
     autocompletions,
     selectedCompletionIndex,
+    renderEverything: completionsChanged ? false : state.renderEverything,
+  };
+};
+
+export const handleAutocompletionsScroll = (
+  state: AutocompletionsState
+): AutocompletionsState => {
+  // If there is a scroll, we need to render all the completions.
+  return {
+    ...state,
+    renderEverything: true,
   };
 };
 
@@ -74,27 +99,28 @@ export const handleAutocompletionsKeyDown = (
 
   if (!state.autocompletions.length) return state;
 
-  const visibleAutocompletionsLength = Math.min(
-    MAX_VISIBLE_COUNT,
-    state.autocompletions.length
-  );
-
   if (event.key === 'ArrowDown') {
     event.preventDefault();
 
     return {
       ...state,
+      // If there is a browsing in the autocompletions,
+      // we need to render all the completions.
+      renderEverything: true,
       selectedCompletionIndex:
-        (state.selectedCompletionIndex + 1) % visibleAutocompletionsLength,
+        (state.selectedCompletionIndex + 1) % state.autocompletions.length,
     };
   } else if (event.key === 'ArrowUp') {
     event.preventDefault();
 
     return {
       ...state,
+      // If there is a browsing in the autocompletions,
+      // we need to render all the completions.
+      renderEverything: true,
       selectedCompletionIndex:
-        (visibleAutocompletionsLength + state.selectedCompletionIndex - 1) %
-        visibleAutocompletionsLength,
+        (state.autocompletions.length + state.selectedCompletionIndex - 1) %
+        state.autocompletions.length,
     };
   } else if (shouldCloseOrCancel(event)) {
     // Stop propagation to avoid closing the modal the

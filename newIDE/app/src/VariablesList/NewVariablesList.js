@@ -70,6 +70,9 @@ const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
+  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
+    {}
+  );
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
   const classes = useStyles();
@@ -232,25 +235,27 @@ const NewVariablesList = (props: Props) => {
     setExpandedNodes([...expandedNodes, nodeId]);
   };
 
-  const renderVariableAndChildrenRows = (
+  const renderVariableAndChildrenRows = ({
     name,
     variable,
-    depth,
-    parentNodeId: string
-  ) => {
+    parentNodeId,
+    parentVariable,
+  }: {|
+    name: string,
+    variable: gdVariable,
+    parentNodeId?: string,
+    parentVariable?: gdVariable,
+  |}) => {
     const type = variable.getType();
-    const isCollection = !gd.Variable.isPrimitive(variable.getType());
+    const isCollection = !gd.Variable.isPrimitive(type);
 
     let parentType = null;
     let nodeId = name;
 
     if (!!parentNodeId) {
       nodeId = `${parentNodeId}.${name}`;
-      const { variable: parentVariable } = getVariableFromNodeId(
-        parentNodeId,
-        props.variablesContainer
-      );
-      if (!parentVariable) return;
+    }
+    if (!!parentVariable) {
       parentType = parentVariable.getType();
     }
 
@@ -298,9 +303,17 @@ const NewVariablesList = (props: Props) => {
                         onClick={event => {
                           event.stopPropagation();
                         }}
+                        errorText={nameErrors[variable.ptr]}
+                        onChange={() => {
+                          if (nameErrors[variable.ptr]) {
+                            const newNameErrors = { ...nameErrors };
+                            delete newNameErrors[variable.ptr];
+                            setNameErrors(newNameErrors);
+                          }
+                        }}
                         value={name}
-                        onChange={name => {
-                          onChangeName(nodeId, name);
+                        onBlur={event => {
+                          onChangeName(nodeId, event.currentTarget.value);
                           forceUpdate();
                         }}
                       />
@@ -398,21 +411,21 @@ const NewVariablesList = (props: Props) => {
                       .toJSArray()
                       .map((childName, index) => {
                         const childVariable = variable.getChild(childName);
-                        return renderVariableAndChildrenRows(
-                          childName,
-                          childVariable,
-                          depth + 1,
-                          nodeId
-                        );
+                        return renderVariableAndChildrenRows({
+                          name: childName,
+                          variable: childVariable,
+                          parentNodeId: nodeId,
+                          parentVariable: variable,
+                        });
                       })
                   : mapFor(0, variable.getChildrenCount(), index => {
                       const childVariable = variable.getAtIndex(index);
-                      return renderVariableAndChildrenRows(
-                        '' + index,
-                        childVariable,
-                        depth + 1,
-                        nodeId
-                      );
+                      return renderVariableAndChildrenRows({
+                        name: index.toString(),
+                        variable: childVariable,
+                        parentNodeId: nodeId,
+                        parentVariable: variable,
+                      });
                     })}
               </TreeItem>
             </div>
@@ -422,19 +435,41 @@ const NewVariablesList = (props: Props) => {
     );
   };
 
-  const onChangeName = (nodeId, newName) => {
+  const onChangeName = (nodeId: string, newName: ?string) => {
     const { variable, parentVariable, name } = getVariableFromNodeId(
       nodeId,
       props.variablesContainer
     );
     if (name === null) return;
+    if (!newName) {
+      if (variable) {
+        setNameErrors({
+          ...nameErrors,
+          [variable.ptr]: <Trans>Variables cannot have empty names</Trans>,
+        });
+      }
+      return;
+    }
+
+    if (newName === name) return;
+
     let hasBeenRenamed = false;
     if (parentVariable) {
       hasBeenRenamed = parentVariable.renameChild(name, newName);
     } else {
       hasBeenRenamed = props.variablesContainer.rename(name, newName);
     }
-    if (hasBeenRenamed) renameExpandedNode(nodeId, newName);
+    if (hasBeenRenamed) {
+      renameExpandedNode(nodeId, newName);
+    } else {
+      if (variable)
+        setNameErrors({
+          ...nameErrors,
+          [variable.ptr]: (
+            <Trans>The variable name {newName} is already taken</Trans>
+          ),
+        });
+    }
   };
 
   const onChangeValue = (nodeId: string, newValue: string) => {
@@ -443,7 +478,6 @@ const NewVariablesList = (props: Props) => {
       props.variablesContainer
     );
     if (!variable) return;
-    console.log(variable.getValue());
     switch (variable.getType()) {
       case gd.Variable.String:
         variable.setString(newValue);
@@ -470,7 +504,7 @@ const NewVariablesList = (props: Props) => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
-        return renderVariableAndChildrenRows(name, variable, 0, '');
+        return renderVariableAndChildrenRows({ name, variable });
       }
     );
     return containerVariablesTree;

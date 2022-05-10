@@ -9,6 +9,8 @@ import useForceUpdate from '../Utils/UseForceUpdate';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
+import { Column, Line } from '../UI/Grid';
+import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 
 type Props = {|
   onCancel: () => void,
@@ -42,6 +44,9 @@ const VariablesEditorDialog = ({
     serializableObject: variablesContainer,
     onCancel,
   });
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-variables'
+  );
 
   return (
     <Dialog
@@ -84,23 +89,30 @@ const VariablesEditorDialog = ({
       flexBody
       fullHeight
     >
-      <VariablesList
-        commitVariableValueOnBlur={
-          // Reduce the number of re-renders by saving the variable value only when the field is blurred.
-          // We don't do that by default because the VariablesList can be used in a component like
-          // InstancePropertiesEditor, that can be unmounted at any time, before the text fields get a
-          // chance to be blurred.
-          true
-        }
-        variablesContainer={variablesContainer}
-        emptyPlaceholderTitle={emptyPlaceholderTitle}
-        emptyPlaceholderDescription={emptyPlaceholderDescription}
-        onSizeUpdated={
-          forceUpdate /*Force update to ensure dialog is properly positioned*/
-        }
-        onComputeAllVariableNames={onComputeAllVariableNames}
-        helpPagePath={helpPagePath}
-      />
+      <Column expand noMargin>
+        {variablesContainer.count() > 0 && DismissableTutorialMessage && (
+          <Line>
+            <Column expand>{DismissableTutorialMessage}</Column>
+          </Line>
+        )}
+        <VariablesList
+          commitVariableValueOnBlur={
+            // Reduce the number of re-renders by saving the variable value only when the field is blurred.
+            // We don't do that by default because the VariablesList can be used in a component like
+            // InstancePropertiesEditor, that can be unmounted at any time, before the text fields get a
+            // chance to be blurred.
+            true
+          }
+          variablesContainer={variablesContainer}
+          emptyPlaceholderTitle={emptyPlaceholderTitle}
+          emptyPlaceholderDescription={emptyPlaceholderDescription}
+          onSizeUpdated={
+            forceUpdate /*Force update to ensure dialog is properly positioned*/
+          }
+          onComputeAllVariableNames={onComputeAllVariableNames}
+          helpPagePath={helpPagePath}
+        />
+      </Column>
     </Dialog>
   );
 };

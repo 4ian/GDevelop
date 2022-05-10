@@ -21,6 +21,7 @@ import { makeStyles } from '@material-ui/styles';
 import styles from './styles';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Toggle from '../UI/Toggle';
+import Measure from 'react-measure';
 const gd: libGDevelop = global.gd;
 
 const useStyles = makeStyles({
@@ -68,9 +69,18 @@ const isCollection = (variable: gdVariable): boolean =>
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
+  const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
   const classes = useStyles();
+
+  const rowRightSideStyle = React.useMemo(
+    () => ({
+      minWidth: containerWidth ? Math.round(0.6 * containerWidth) : 600,
+      flexShrink: 0,
+    }),
+    [containerWidth]
+  );
 
   React.useEffect(
     () => {
@@ -242,7 +252,6 @@ const NewVariablesList = (props: Props) => {
       );
       if (!parentVariable) return;
       parentType = parentVariable.getType();
-      console.log(parentType);
     }
 
     return (
@@ -297,12 +306,7 @@ const NewVariablesList = (props: Props) => {
                       />
                       <Spacer />
                       <Spacer />
-                      <div
-                        style={{
-                          minWidth: 600, // TODO - See if this value should depend on the container width
-                          flexShrink: 0,
-                        }}
-                      >
+                      <div style={rowRightSideStyle}>
                         <Line noMargin alignItems="center">
                           <Column noMargin>
                             <VariableTypeSelector
@@ -433,8 +437,7 @@ const NewVariablesList = (props: Props) => {
     if (hasBeenRenamed) renameExpandedNode(nodeId, newName);
   };
 
-  const onChangeValue = (nodeId, newValue) => {
-    console.log(nodeId);
+  const onChangeValue = (nodeId: string, newValue: string) => {
     const { variable } = getVariableFromNodeId(
       nodeId,
       props.variablesContainer
@@ -459,7 +462,7 @@ const NewVariablesList = (props: Props) => {
     }
   };
 
-  const renderTree = variablesContainer => {
+  const renderTree = (variablesContainer: gdVariablesContainer) => {
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
@@ -474,17 +477,27 @@ const NewVariablesList = (props: Props) => {
   };
 
   return (
-    <TreeView
-      multiSelect
-      defaultExpandIcon={<ChevronRight />}
-      defaultCollapseIcon={<ExpandMore />}
-      onNodeSelect={(event, values) => setSelectedNodes(values)}
-      onNodeToggle={(event, values) => setExpandedNodes(values)}
-      selected={selectedNodes}
-      expanded={expandedNodes}
+    <Measure
+      bounds
+      onResize={contentRect => {
+        setContainerWidth(contentRect.bounds.width);
+      }}
     >
-      {renderTree(props.variablesContainer)}
-    </TreeView>
+      {({ contentRect, measureRef }) => (
+        <TreeView
+          multiSelect
+          defaultExpandIcon={<ChevronRight />}
+          defaultCollapseIcon={<ExpandMore />}
+          onNodeSelect={(event, values) => setSelectedNodes(values)}
+          onNodeToggle={(event, values) => setExpandedNodes(values)}
+          selected={selectedNodes}
+          ref={measureRef}
+          expanded={expandedNodes}
+        >
+          {renderTree(props.variablesContainer)}
+        </TreeView>
+      )}
+    </Measure>
   );
 };
 

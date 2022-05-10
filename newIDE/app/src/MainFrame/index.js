@@ -645,6 +645,7 @@ const MainFrame = (props: Props) => {
       preferences,
       eventsFunctionsExtensionsState,
       getStorageProvider,
+      getStorageProviderOperations,
       ensureResourcesAreFetched,
     ]
   );

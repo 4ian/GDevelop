@@ -32,8 +32,9 @@ import {
   getAutocompletionsInitialState,
   setNewAutocompletions,
   handleAutocompletionsKeyDown,
-  getVisibleAutocompletions,
-  getRemainingCount,
+  handleAutocompletionsScroll,
+  getRenderedAutocompletions,
+  getNonRenderedCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -291,6 +292,14 @@ export default class ExpressionField extends React.Component<Props, State> {
         }
       }, 5);
     }, 5);
+  };
+
+  _onExpressionAutocompletionsScroll = () => {
+    if (this.state.autocompletions.renderEverything) return; // Bail out early to avoid changing the state if not needed.
+
+    this.setState({
+      autocompletions: handleAutocompletionsScroll(this.state.autocompletions),
+    });
   };
 
   _insertAutocompletion = (
@@ -560,15 +569,16 @@ export default class ExpressionField extends React.Component<Props, State> {
                   <ExpressionAutocompletionsDisplayer
                     project={project}
                     anchorEl={this._inputElement}
-                    expressionAutocompletions={getVisibleAutocompletions(
+                    expressionAutocompletions={getRenderedAutocompletions(
                       this.state.autocompletions
                     )}
-                    remainingCount={getRemainingCount(
+                    remainingCount={getNonRenderedCount(
                       this.state.autocompletions
                     )}
                     selectedCompletionIndex={
                       this.state.autocompletions.selectedCompletionIndex
                     }
+                    onScroll={this._onExpressionAutocompletionsScroll}
                     onChoose={expressionAutocompletion => {
                       this._insertAutocompletion(expressionAutocompletion);
 

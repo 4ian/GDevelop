@@ -23,20 +23,13 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
 
   gd::ExpressionParser2 parser;
 
-  auto getCompletionsForWithObjectName = [&](const gd::String& type,
-                               const gd::String& objectName,
+  auto getCompletionsFor = [&](const gd::String& type,
                                const gd::String& expression,
                                size_t location) {
     auto node = parser.ParseExpression(expression);
     REQUIRE(node != nullptr);
     return gd::ExpressionCompletionFinder::GetCompletionDescriptionsFor(
-        platform, project, layout1, type, objectName, *node, location);
-  };
-  auto getCompletionsFor = [&](const gd::String& type,
-                               const gd::String& expression,
-                               size_t location) {
-    return getCompletionsForWithObjectName(
-        type, "", expression, location);
+        platform, project, layout1, type, *node, location);
   };
 
   const std::vector<gd::ExpressionCompletionDescription>
@@ -173,20 +166,12 @@ TEST_CASE("ExpressionCompletionFinder", "[common][events]") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
           gd::ExpressionCompletionDescription::ForVariable(
               "objectvar", "myVar", 35, 40, "MyObject")};
-        getCompletionsForWithObjectName("number", "",
+        getCompletionsFor("number",
                                 "MyObject.GetObjectVariableAsNumber(myVar",
                                 35);
-      REQUIRE(getCompletionsForWithObjectName("number", "",
+      REQUIRE(getCompletionsFor("number",
                                 "MyObject.GetObjectVariableAsNumber(myVar",
                                 35) == expectedCompletions);
-    }
-    SECTION("Object variable") {
-      std::vector<gd::ExpressionCompletionDescription> expectedCompletions{
-          gd::ExpressionCompletionDescription::ForVariable(
-              "objectvar", "myVar", 0, 5, "MyObject")};
-      REQUIRE(getCompletionsForWithObjectName("objectvar", "MyObject",
-                                "myVar",
-                                0) == expectedCompletions);
     }
     SECTION("Function with a Layer as argument") {
       std::vector<gd::ExpressionCompletionDescription> expectedCompletions{

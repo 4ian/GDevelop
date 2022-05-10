@@ -439,6 +439,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
                 description={<Trans>Events define the rules of a game.</Trans>}
                 actionLabel={<Trans>Add an event</Trans>}
                 helpPagePath="/events"
+                tutorialId="intro-event-system"
                 onAdd={() =>
                   this.props.onAddNewEvent(
                     'BuiltinCommonInstructions::Standard',

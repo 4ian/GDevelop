@@ -318,6 +318,7 @@ class AnimationsListContainer extends React.Component<
               description={<Trans>Animations are a sequence of images.</Trans>}
               actionLabel={<Trans>Add an animation</Trans>}
               helpPagePath="/objects/sprite"
+              tutorialId="intermediate-changing-animations"
               onAdd={this.addAnimation}
             />
           </Column>

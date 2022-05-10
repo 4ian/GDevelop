@@ -16,7 +16,10 @@ export const getAutocompletionsInitialState = (): AutocompletionsState => {
   return {
     autocompletions: [],
     selectedCompletionIndex: 0,
-    // BY default, only render some completions.
+    // By default, only render some completions.
+    // This is to avoid rendering a lot (100+) completions,
+    // riskying a lag/frame drops, just for them to be discarded afterwards,
+    // at each keystroke of the user.
     renderEverything: false,
   };
 };

@@ -430,7 +430,7 @@ const NewVariablesList = (props: Props) => {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        padding: '6px',
+                        padding: '6px 30px 6px 6px',
                       }}
                     >
                       {connectDragSource(

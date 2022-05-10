@@ -1,5 +1,6 @@
 import * as React from 'react';
 import muiDecorator from '../ThemeDecorator';
+import paperDecorator from '../PaperDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
@@ -21,5 +22,5 @@ export const New = () => (
 export default {
   title: 'NewVariablesList',
   component: NewVariablesList,
-  decorators: [muiDecorator, GDevelopJsInitializerDecorator],
+  decorators: [muiDecorator, GDevelopJsInitializerDecorator, paperDecorator],
 };

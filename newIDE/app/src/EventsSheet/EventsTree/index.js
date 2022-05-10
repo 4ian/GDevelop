@@ -288,9 +288,8 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     ) {
       this.setState({
         ...this.state,
-        treeData: this.state.treeData.slice(
-          0,
-          this.props.events.getEventsCount() + 1
+        treeData: this.state.treeData.filter(
+          data => data.key !== 'eventstree-tutorial-node'
         ),
       });
     }
@@ -429,6 +428,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
             depth: 0,
             fixedHeight: 150,
             children: [],
+            key: 'eventstree-tutorial-node',
           }
         : null,
       depth === 0 && eventsList.getEventsCount() === 0

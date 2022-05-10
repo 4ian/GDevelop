@@ -175,11 +175,14 @@ const ExportDialog = ({
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
-        <TutorialButton
-          key="tutorial"
-          tutorialId="export-to-itch"
-          label="How to export to Itch.io"
-        />,
+        exporter.exportPipeline.name === 'local-html5' ||
+        exporter.exportPipeline.name === 'browser-html5' ? (
+          <TutorialButton
+            key="tutorial"
+            tutorialId="export-to-itch"
+            label="How to export to Itch.io"
+          />
+        ) : null,
         <FlatButton
           key="builds"
           label={<Trans>See this game builds</Trans>}

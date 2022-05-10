@@ -332,21 +332,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator(platform, project, layout1, "string");
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 5);
+      REQUIRE(validator.GetErrors().size() == 4);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-          "An opening parenthesis (for an object expression), a double colon "
-          "(:: for a behavior expression), a dot or an opening bracket (for "
-          "a child variable) where expected.");
-      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "You must wrap your text inside double quotes "
               "(example: \"Hello world\").");
-      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "You must add the operator + between texts or expressions. "
               "For example: \"Your name: \" + VariableString(PlayerName).");
-      REQUIRE(validator.GetErrors()[3]->GetMessage() ==
+      REQUIRE(validator.GetErrors()[2]->GetMessage() ==
               "The expression has extra character at the end that should be "
               "removed (or completed if your expression is not finished).");
-      REQUIRE(validator.GetErrors()[4]->GetMessage() ==
+      REQUIRE(validator.GetErrors()[3]->GetMessage() ==
               "You must enter a text (between quotes) or a valid expression call.");
     }
   }
@@ -1531,6 +1527,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, project, layout1, "", variable2Node);
       REQUIRE(variable2ObjectName == "MyObject2");
+      
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 
@@ -1558,6 +1558,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto variable2ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, project, layout1, "", variable2Node);
       REQUIRE(variable2ObjectName == "MyObject1");
+      
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 
@@ -1575,6 +1579,32 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
           platform, project, layout1, "MySpriteObject", variable1Node);
       REQUIRE(variable1ObjectName == "MySpriteObject");
+      
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid object function call with 1 object variable from the object of the function with a child") {
+    {
+      auto node = parser.ParseExpression(
+          "MySpriteObject.GetObjectVariableAsNumber(MyVar1.MyChild)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
+      auto &variable1Node =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[0]);
+
+      REQUIRE(variable1Node.identifierName == "MyVar1");
+      REQUIRE(variable1Node.childIdentifierName == "MyChild");
+      
+      auto variable1ObjectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
+          platform, project, layout1, "MySpriteObject", variable1Node);
+      REQUIRE(variable1ObjectName == "MySpriteObject");
+      
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 

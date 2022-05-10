@@ -296,7 +296,6 @@ class GD_CORE_API ExpressionCompletionFinder
                                const gd::ObjectsContainer &globalObjectsContainer,
                                const gd::ObjectsContainer &objectsContainer,
                                const gd::String &rootType,
-                               const gd::String &rootObjectName,
                                gd::ExpressionNode& node,
                                size_t searchedPosition) {
     gd::ExpressionNodeLocationFinder finder(searchedPosition);
@@ -311,7 +310,7 @@ class GD_CORE_API ExpressionCompletionFinder
     gd::ExpressionNode* maybeParentNodeAtLocation = finder.GetParentNode();
     gd::ExpressionCompletionFinder autocompletionProvider(
         platform, globalObjectsContainer, objectsContainer, rootType,
-        rootObjectName, searchedPosition, maybeParentNodeAtLocation);
+        searchedPosition, maybeParentNodeAtLocation);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
   }
@@ -415,7 +414,9 @@ class GD_CORE_API ExpressionCompletionFinder
         platform,
         globalObjectsContainer,
         objectsContainer,
-        rootObjectName,
+        // Variable fields doesn't use expression completion,
+        // so the object will be found inside the expression itself.
+        "",
         node);
     completions.push_back(ExpressionCompletionDescription::ForVariable(
         type,
@@ -445,7 +446,9 @@ class GD_CORE_API ExpressionCompletionFinder
           platform,
           globalObjectsContainer,
           objectsContainer,
-          rootObjectName,
+          // Variable fields doesn't use expression completion,
+          // so the object will be found inside the expression itself.
+          "",
           node);
       completions.push_back(ExpressionCompletionDescription::ForVariable(
           type,
@@ -635,14 +638,12 @@ class GD_CORE_API ExpressionCompletionFinder
                              const gd::ObjectsContainer &globalObjectsContainer_,
                              const gd::ObjectsContainer &objectsContainer_,
                              const gd::String &rootType_,
-                             const gd::String &rootObjectName_,
                              size_t searchedPosition_,
                              gd::ExpressionNode* maybeParentNodeAtLocation_)
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
         rootType(rootType_),
-        rootObjectName(rootObjectName_),
         searchedPosition(searchedPosition_),
         maybeParentNodeAtLocation(maybeParentNodeAtLocation_){};
 
@@ -654,7 +655,6 @@ class GD_CORE_API ExpressionCompletionFinder
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
   const gd::String rootType;
-  const gd::String rootObjectName;
 };
 
 }  // namespace gd

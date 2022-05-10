@@ -421,6 +421,11 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "myVariable.myChild", "")
+              == "getLayoutVariable(myVariable).getChild(\"myChild\")");
+    }
+    {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "objectvar", "myVariable", "MySpriteObject")
               == "getVariableForObject(MySpriteObject, myVariable)");
     }

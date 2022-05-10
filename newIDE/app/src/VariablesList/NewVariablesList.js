@@ -5,6 +5,9 @@ import ChevronRight from '@material-ui/icons/ChevronRight';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Add from '@material-ui/icons/Add';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
+import Copy from '../UI/CustomSvgIcons/Copy';
+import Paste from '../UI/CustomSvgIcons/Paste';
+import Delete from '@material-ui/icons/Delete';
 import { mapFor } from '../Utils/MapFor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line, Spacer } from '../UI/Grid';
@@ -17,27 +20,90 @@ import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import VariableTypeSelector from './VariableTypeSelector';
 import Background from '../UI/Background';
 import IconButton from '../UI/IconButton';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles, withStyles } from '@material-ui/styles';
 import styles from './styles';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Toggle from '../UI/Toggle';
 import Measure from 'react-measure';
+import RaisedButton from '../UI/RaisedButton';
+import FlatButton from '../UI/FlatButton';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import { CLIPBOARD_KIND } from './ClipboardKind';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+import ScrollView from '../UI/ScrollView';
 const gd: libGDevelop = global.gd;
 
-const useStyles = makeStyles({
+const StyledTreeItem = withStyles(() => ({
   group: {
     borderLeft: `1px solid black`,
     marginLeft: 7,
     paddingLeft: 15,
   },
   label: { padding: 0 },
-});
+}))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
 
 const stopEventPropagation = (event: Event) => event.stopPropagation();
 const preventEventDefaultEffect = (event: Event) => event.preventDefault();
 
 type Props = {
   variablesContainer: gdVariablesContainer,
+};
+
+const insertInVariablesContainer = (
+  variablesContainer: gdVariablesContainer,
+  name: string,
+  serializedVariable: ?any,
+  index: ?number
+): string => {
+  const newName = newNameGenerator(
+    name,
+    name => variablesContainer.has(name),
+    serializedVariable ? 'CopyOf' : undefined
+  );
+  const newVariable = new gd.Variable();
+  if (serializedVariable) {
+    unserializeFromJSObject(newVariable, serializedVariable);
+  } else {
+    newVariable.setString('');
+  }
+  variablesContainer.insert(
+    newName,
+    newVariable,
+    index || variablesContainer.count()
+  );
+  newVariable.delete();
+  return newName;
+};
+
+const insertInVariableChildrenArray = (
+  targetParentVariable: gdVariable,
+  serializedVariable: any,
+  index: number
+) => {
+  const newVariable = new gd.Variable();
+  unserializeFromJSObject(newVariable, serializedVariable);
+  targetParentVariable.insertInArray(newVariable, index);
+  newVariable.delete();
+};
+
+const insertInVariableChildren = (
+  targetParentVariable: gdVariable,
+  name: string,
+  serializedVariable: any
+): string => {
+  const newName = newNameGenerator(
+    name,
+    _name => targetParentVariable.hasChild(_name),
+    'CopyOf'
+  );
+  const newVariable = new gd.Variable();
+  unserializeFromJSObject(newVariable, serializedVariable);
+  targetParentVariable.insertChild(newName, newVariable);
+  newVariable.delete();
+  return newName;
 };
 
 const getVariableFromNodeId = (
@@ -169,7 +235,6 @@ const NewVariablesList = (props: Props) => {
   );
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
-  const classes = useStyles();
 
   const rowRightSideStyle = React.useMemo(
     () => ({
@@ -189,6 +254,139 @@ const NewVariablesList = (props: Props) => {
     },
     [props.variablesContainer.ptr]
   );
+
+  const copySelection = () => {
+    Clipboard.set(
+      CLIPBOARD_KIND,
+      selectedNodes
+        .map(nodeId => {
+          const { variable, name, parents } = getVariableFromNodeId(
+            nodeId,
+            props.variablesContainer
+          );
+          if (!variable || !name) return;
+          let parentType;
+          if (parents.length === 0) {
+            parentType = gd.Variable.Structure;
+          } else {
+            const parentVariable = parents[parents.length - 1];
+            parentType = parentVariable.getType();
+          }
+          return {
+            name,
+            serializedVariable: serializeToJSObject(variable),
+            parentType,
+          };
+        })
+        .filter(Boolean)
+    );
+    forceUpdate();
+  };
+
+  const pasteSelection = () => {
+    if (!Clipboard.has(CLIPBOARD_KIND)) return;
+    const newSelectedNodes = [];
+
+    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+    const variablesContent = SafeExtractor.extractArray(clipboardContent);
+    if (!variablesContent) return;
+
+    let pastedElementOffsetIndex = 0;
+
+    variablesContent.forEach(variableContent => {
+      const name = SafeExtractor.extractStringProperty(variableContent, 'name');
+      const serializedVariable = SafeExtractor.extractObjectProperty(
+        variableContent,
+        'serializedVariable'
+      );
+      const parentType = SafeExtractor.extractNumberProperty(
+        variableContent,
+        'parentType'
+      );
+      if (!name || !serializedVariable || !parentType) return;
+
+      const pasteAtTopLevel = selectedNodes.length === 0;
+
+      if (pasteAtTopLevel) {
+        if (parentType === gd.Variable.Array) return;
+        const newName = insertInVariablesContainer(
+          props.variablesContainer,
+          name,
+          serializedVariable
+        );
+        newSelectedNodes.push(newName);
+      } else {
+        const targetNode = selectedNodes[0];
+        const {
+          name: targetVariableName,
+          parents: targetParents,
+        } = getVariableFromNodeId(targetNode, props.variablesContainer);
+        if (!targetVariableName) return;
+        if (targetParents.length === 0) {
+          if (parentType === gd.Variable.Array) return;
+          const newName = insertInVariablesContainer(
+            props.variablesContainer,
+            name,
+            serializedVariable,
+            props.variablesContainer.getPosition(targetVariableName) + 1
+          );
+          newSelectedNodes.push(newName);
+        } else {
+          const targetParentVariable = targetParents[targetParents.length - 1];
+          const targetParentType = targetParentVariable.getType();
+          if (targetParentType !== parentType) return;
+          if (targetParentType === gd.Variable.Array) {
+            const index = parseInt(targetVariableName, 10) + 1;
+            insertInVariableChildrenArray(
+              targetParentVariable,
+              serializedVariable,
+              index
+            );
+            const nodes = targetNode.split('.');
+            nodes.splice(
+              nodes.length - 1,
+              1,
+              (index + pastedElementOffsetIndex).toString()
+            );
+
+            newSelectedNodes.push(nodes.join('.'));
+            pastedElementOffsetIndex += 1;
+          } else {
+            const newName = insertInVariableChildren(
+              targetParentVariable,
+              name,
+              serializedVariable
+            );
+            const nodes = targetNode.split('.');
+            nodes.splice(nodes.length - 1, 1, newName);
+            newSelectedNodes.push(nodes.join('.'));
+          }
+        }
+      }
+    });
+    setSelectedNodes(newSelectedNodes);
+  };
+
+  const deleteSelection = () => {
+    selectedNodes.forEach(nodeId => {
+      const { name, parents } = getVariableFromNodeId(
+        nodeId,
+        props.variablesContainer
+      );
+      if (!name) return;
+      if (parents.length === 0) {
+        props.variablesContainer.remove(name);
+      } else {
+        const parentVariable = parents[parents.length - 1];
+        if (parentVariable.getType() === gd.Variable.Array) {
+          parentVariable.removeAtIndex(parseInt(name, 10));
+        } else {
+          parentVariable.removeChild(name);
+        }
+      }
+    });
+    setSelectedNodes([]);
+  };
 
   const renameExpandedNode = (nodeId: string, newName: string) => {
     const newExpandedNodes: Array<string> = [...expandedNodes];
@@ -380,6 +578,39 @@ const NewVariablesList = (props: Props) => {
     setExpandedNodes([...expandedNodes, nodeId]);
   };
 
+  const onAdd = () => {
+    const addAtTopLevel = selectedNodes.length === 0;
+
+    if (addAtTopLevel) {
+      const newName = insertInVariablesContainer(
+        props.variablesContainer,
+        'Variable',
+        null,
+        props.variablesContainer.count()
+      );
+      setSelectedNodes([newName]);
+      return;
+    }
+
+    const targetNode = selectedNodes[0];
+    const {
+      name: targetVariableName,
+      parents: targetParents,
+    } = getVariableFromNodeId(targetNode, props.variablesContainer);
+    if (!targetVariableName) return;
+    if (targetParents.length === 0) {
+      const newName = insertInVariablesContainer(
+        props.variablesContainer,
+        'Variable',
+        null,
+        props.variablesContainer.getPosition(targetVariableName) + 1
+      );
+      setSelectedNodes([newName]);
+      return;
+    }
+    return; // TODO - insert after the top level variable that contains the target. To do so, make it so that getVariableFromNodeId returns parents = [{name, nodeId, variable}]
+  };
+
   const renderVariableAndChildrenRows = ({
     name,
     variable,
@@ -420,8 +651,7 @@ const NewVariablesList = (props: Props) => {
         {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
           connectDropTarget(
             <div>
-              <TreeItem
-                classes={classes}
+              <StyledTreeItem
                 nodeId={nodeId}
                 label={
                   <div>
@@ -566,7 +796,7 @@ const NewVariablesList = (props: Props) => {
                         parentVariable: variable,
                       });
                     })}
-              </TreeItem>
+              </StyledTreeItem>
             </div>
           )
         }
@@ -658,18 +888,57 @@ const NewVariablesList = (props: Props) => {
       }}
     >
       {({ contentRect, measureRef }) => (
-        <TreeView
-          multiSelect
-          defaultExpandIcon={<ChevronRight />}
-          defaultCollapseIcon={<ExpandMore />}
-          onNodeSelect={(event, values) => setSelectedNodes(values)}
-          onNodeToggle={(event, values) => setExpandedNodes(values)}
-          selected={selectedNodes}
-          ref={measureRef}
-          expanded={expandedNodes}
-        >
-          {renderTree(props.variablesContainer)}
-        </TreeView>
+        <>
+          <Column expand noMargin>
+            <Line noMargin justifyContent="space-between">
+              <Column noMargin>
+                <Line noMargin>
+                  <FlatButton
+                    icon={<Copy />}
+                    label={<Trans>Copy</Trans>}
+                    onClick={copySelection}
+                  />
+                  <Spacer />
+                  <FlatButton
+                    icon={<Paste />}
+                    label={<Trans>Paste</Trans>}
+                    disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                    onClick={pasteSelection}
+                  />
+                  <Spacer />
+                  <FlatButton
+                    icon={<Delete />}
+                    label={<Trans>Delete</Trans>}
+                    disabled={selectedNodes.length === 0}
+                    onClick={deleteSelection}
+                  />
+                </Line>
+              </Column>
+              <Column>
+                <FlatButton
+                  primary
+                  onClick={onAdd}
+                  label={<Trans>Add variable</Trans>}
+                  icon={<Add />}
+                />
+              </Column>
+            </Line>
+            <ScrollView autoHideScrollbar>
+              <TreeView
+                ref={measureRef}
+                multiSelect
+                defaultExpandIcon={<ChevronRight />}
+                defaultCollapseIcon={<ExpandMore />}
+                onNodeSelect={(event, values) => setSelectedNodes(values)}
+                onNodeToggle={(event, values) => setExpandedNodes(values)}
+                selected={selectedNodes}
+                expanded={expandedNodes}
+              >
+                {renderTree(props.variablesContainer)}
+              </TreeView>
+            </ScrollView>
+          </Column>
+        </>
       )}
     </Measure>
   );

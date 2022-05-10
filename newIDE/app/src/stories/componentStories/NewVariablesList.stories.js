@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react';
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
@@ -7,15 +8,16 @@ import GDevelopJsInitializerDecorator, {
 import NewVariablesList from '../../VariablesList/NewVariablesList';
 import SerializedObjectDisplay from '../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
+import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
 export const New = () => (
   <DragAndDropContextProvider>
-    <SerializedObjectDisplay object={testProject.testLayout}>
+    <FixedHeightFlexContainer height={600}>
       <NewVariablesList
         variablesContainer={testProject.testLayout.getVariables()}
         onComputeAllVariableNames={() => []}
       />
-    </SerializedObjectDisplay>
+    </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
 );
 

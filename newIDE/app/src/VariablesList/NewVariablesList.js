@@ -46,7 +46,7 @@ const getVariableFromNodeId = (
 ) => {
   const nodes = nodeId.split('.');
   let currentVariable = null;
-  let parentVariable = null;
+  let parents = [];
   let name = null;
   let depth = -1;
 
@@ -55,15 +55,24 @@ const getVariableFromNodeId = (
     const variableName = nodes[depth];
     if (!currentVariable) {
       currentVariable = variablesContainer.get(variableName);
-    } else if (currentVariable.getType() === gd.Variable.Array)
-      currentVariable = currentVariable.getAtIndex(parseInt(variableName, 10));
-    else {
-      currentVariable = currentVariable.getChild(variableName);
+    } else {
+      parents.push(currentVariable);
+      if (currentVariable.getType() === gd.Variable.Array) {
+        const index = parseInt(variableName, 10);
+        if (index >= currentVariable.getChildrenCount()) {
+          return { variable: null, parents, depth, name };
+        }
+        currentVariable = currentVariable.getAtIndex(index);
+      } else {
+        if (!currentVariable.hasChild(variableName)) {
+          return { variable: null, parents, depth, name };
+        }
+        currentVariable = currentVariable.getChild(variableName);
+      }
     }
     name = variableName;
-    if (depth === nodes.length - 2) parentVariable = currentVariable;
   }
-  return { variable: currentVariable, depth, parentVariable, name };
+  return { variable: currentVariable, depth, parents, name };
 };
 
 const isCollection = (variable: gdVariable): boolean =>
@@ -122,22 +131,56 @@ const NewVariablesList = (props: Props) => {
     [gd.Variable.Array]: <Trans>Array</Trans>,
   };
 
-  const dropNode = nodeId => {
+  const canDrop = (nodeId: string): boolean => {
+    const { current } = draggedNodeId;
+    if (!current) return false;
+    const {
+      variable: targetVariable,
+      parents: targetVariableParents,
+    } = getVariableFromNodeId(nodeId, props.variablesContainer);
+    const targetVariableParent =
+      targetVariableParents[targetVariableParents.length - 1];
+
+    const {
+      variable: draggedVariable,
+      parents: draggedVariableParents,
+    } = getVariableFromNodeId(current, props.variablesContainer);
+    const draggedVariableParent =
+      draggedVariableParents[draggedVariableParents.length - 1];
+
+    if (
+      draggedVariableParent &&
+      targetVariableParent &&
+      draggedVariableParent.getType() !== targetVariableParent.getType()
+    ) {
+      return false;
+    }
+    if (targetVariableParents.includes(draggedVariable)) return false;
+    return true;
+  };
+
+  const dropNode = (nodeId: string): void => {
     const { current } = draggedNodeId;
     if (!current) return;
     const {
       variable: targetVariable,
-      parentVariable: targetVariableParent,
+      parents: targetVariableParents,
       name: targetName,
     } = getVariableFromNodeId(nodeId, props.variablesContainer);
+    const targetVariableParent =
+      targetVariableParents[targetVariableParents.length - 1];
     if (!targetVariable || !targetName) return;
 
     const {
       variable: draggedVariable,
-      parentVariable: draggedVariableParent,
+      parents: draggedVariableParents,
       name: draggedName,
     } = getVariableFromNodeId(current, props.variablesContainer);
+    const draggedVariableParent =
+      draggedVariableParents[draggedVariableParents.length - 1];
     if (!draggedVariable || !draggedName) return;
+
+    if (targetVariableParents.includes(draggedVariable)) return;
 
     if (!draggedVariableParent && !targetVariableParent) {
       const draggedIndex = props.variablesContainer.getPosition(draggedName);
@@ -180,10 +223,10 @@ const NewVariablesList = (props: Props) => {
       if (draggedVariableParent !== targetVariableParent) {
         const newName = newNameGenerator(
           draggedName,
-          name => targetVariableParent.hasChild(draggedName),
+          name => targetVariableParent.hasChild(name),
           'CopyOf'
         );
-        targetVariableParent.getChild(newName);
+        targetVariableParent.insertChild(newName, draggedVariable);
 
         draggedVariableParent.removeChild(draggedName);
       }
@@ -194,7 +237,7 @@ const NewVariablesList = (props: Props) => {
     ) {
       const newName = newNameGenerator(
         draggedName,
-        name => targetVariableParent.hasChild(draggedName),
+        name => targetVariableParent.hasChild(name),
         'CopyOf'
       );
 
@@ -208,7 +251,7 @@ const NewVariablesList = (props: Props) => {
     ) {
       const newName = newNameGenerator(
         draggedName,
-        name => props.variablesContainer.has(draggedName),
+        name => props.variablesContainer.has(name),
         'CopyOf'
       );
       props.variablesContainer.insert(
@@ -271,7 +314,7 @@ const NewVariablesList = (props: Props) => {
           return {};
         }}
         canDrag={() => true}
-        canDrop={() => true}
+        canDrop={() => canDrop(nodeId)}
         drop={() => {
           dropNode(nodeId);
         }}
@@ -434,7 +477,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onChangeName = (nodeId: string, newName: ?string) => {
-    const { variable, parentVariable, name } = getVariableFromNodeId(
+    const { variable, parents, name } = getVariableFromNodeId(
       nodeId,
       props.variablesContainer
     );
@@ -452,7 +495,8 @@ const NewVariablesList = (props: Props) => {
     if (newName === name) return;
 
     let hasBeenRenamed = false;
-    if (parentVariable) {
+    if (parents.length > 0) {
+      const parentVariable = parents[parents.length - 1];
       hasBeenRenamed = parentVariable.renameChild(name, newName);
     } else {
       hasBeenRenamed = props.variablesContainer.rename(name, newName);

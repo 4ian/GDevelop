@@ -14,6 +14,8 @@ import ExternalPropertiesDialog, {
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
 import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
+import HelpButton from '../../UI/HelpButton';
+import TutorialButton from '../../UI/TutorialButton';
 
 const styles = {
   container: {
@@ -174,6 +176,15 @@ export class ExternalEventsEditorContainer extends React.Component<
                 label={<Trans>Choose the scene</Trans>}
                 primary
                 onClick={this.openExternalPropertiesDialog}
+              />
+            </Line>
+            <Line justifyContent="flex-start" noMargin>
+              <TutorialButton
+                tutorialId="Intermediate-externals"
+                label="Watch the tutorial"
+                renderIfNotFound={
+                  <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                }
               />
             </Line>
           </PlaceholderMessage>

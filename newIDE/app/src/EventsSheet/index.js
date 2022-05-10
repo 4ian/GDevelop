@@ -95,6 +95,8 @@ import {
 import LeaderboardContext, {
   type LeaderboardState,
 } from '../Leaderboard/LeaderboardContext';
+import { TutorialContext } from '../Tutorial/TutorialContext';
+import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -129,6 +131,7 @@ type ComponentProps = {|
   ...Props,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
+  tutorials: ?Array<Tutorial>,
   leaderboardsManager: ?LeaderboardState,
 |};
 
@@ -1330,6 +1333,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onChooseResource,
       resourceExternalEditors,
       onCreateEventsFunction,
+      tutorials,
     } = this.props;
     if (!project) return null;
 
@@ -1414,6 +1418,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       : 0
                   }
                   fontSize={preferences.values.eventsSheetZoomLevel}
+                  preferences={preferences}
+                  tutorials={tutorials}
                 />
                 {this.state.showSearchPanel && (
                   <SearchPanel
@@ -1582,12 +1588,14 @@ const EventsSheet = (props, ref) => {
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preferences = React.useContext(PreferencesContext);
+  const { tutorials } = React.useContext(TutorialContext);
   const leaderboardsManager = React.useContext(LeaderboardContext);
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
       authenticatedUser={authenticatedUser}
       preferences={preferences}
+      tutorials={tutorials}
       leaderboardsManager={leaderboardsManager}
       {...props}
     />

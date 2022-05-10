@@ -204,15 +204,24 @@ void Variable::RemoveAtIndex(const size_t index) {
   childrenArray.erase(childrenArray.begin() + index);
 };
 
-Variable& Variable::InsertInArray(const gd::Variable& variable, const size_t index) {
+bool Variable::InsertInArray(const gd::Variable& variable, const size_t index) {
+  if (type != Type::Array) return false;
   auto newVariable = std::make_shared<gd::Variable>(variable);
   if (index < childrenArray.size()) {
     childrenArray.insert(childrenArray.begin() + index, newVariable);
-    return *childrenArray[index];
   } else {
     childrenArray.push_back(newVariable);
-    return *childrenArray.back();
   }
+  return true;
+};
+
+bool Variable::InsertChild(const gd::String& name,
+                           const gd::Variable& variable) {
+  if (type != Type::Structure || HasChild(name)) {
+    return false;
+  }
+  children[name] = std::make_shared<gd::Variable>(variable);
+  return true;
 };
 
 void Variable::SerializeTo(SerializerElement& element) const {

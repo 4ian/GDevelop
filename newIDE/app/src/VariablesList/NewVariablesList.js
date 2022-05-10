@@ -33,6 +33,9 @@ const useStyles = makeStyles({
   label: { padding: 0 },
 });
 
+const stopEventPropagation = (event: Event) => event.stopPropagation();
+const preventEventDefaultEffect = (event: Event) => event.preventDefault();
+
 type Props = {
   variablesContainer: gdVariablesContainer,
 };
@@ -194,7 +197,8 @@ const NewVariablesList = (props: Props) => {
         name => targetVariableParent.hasChild(draggedName),
         'CopyOf'
       );
-      targetVariableParent.getChild(newName);
+
+      targetVariableParent.insertChild(newName, draggedVariable);
 
       props.variablesContainer.remove(draggedName);
     } else if (
@@ -300,9 +304,7 @@ const NewVariablesList = (props: Props) => {
                         key="name"
                         disabled={parentType === gd.Variable.Array}
                         commitOnBlur
-                        onClick={event => {
-                          event.stopPropagation();
-                        }}
+                        onClick={stopEventPropagation}
                         errorText={nameErrors[variable.ptr]}
                         onChange={() => {
                           if (nameErrors[variable.ptr]) {
@@ -361,9 +363,7 @@ const NewVariablesList = (props: Props) => {
                                     : 'text'
                                 }
                                 key="value"
-                                onClick={event => {
-                                  event.stopPropagation();
-                                }}
+                                onClick={stopEventPropagation}
                                 multiline={type === gd.Variable.String}
                                 inputStyle={
                                   type === gd.Variable.String
@@ -399,9 +399,7 @@ const NewVariablesList = (props: Props) => {
                     </div>
                   </div>
                 }
-                onLabelClick={event => {
-                  event.preventDefault();
-                }}
+                onLabelClick={preventEventDefaultEffect}
               >
                 {!isCollection
                   ? null

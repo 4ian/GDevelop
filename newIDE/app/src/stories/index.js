@@ -245,6 +245,7 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import { initialPreferences } from '../MainFrame/Preferences/PreferencesContext';
 
 configureActions({
   depth: 2,
@@ -266,6 +267,17 @@ const buildFakeMenuTemplate = () => [
   {
     label: 'Option 2',
     click: action('click option 2'),
+  },
+];
+const eventsTreeTutorials = [
+  {
+    id: 'intro-event-system',
+    title: 'Event system',
+    description: 'Description 1',
+    thumbnailUrl:
+      'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
+    link: 'https://example.com/tutorial.html',
+    type: 'video',
   },
 ];
 
@@ -2593,6 +2605,8 @@ storiesOf('EventsTree', module)
             screenType={'normal'}
             windowWidth={'medium'}
             eventsSheetHeight={500}
+            preferences={initialPreferences}
+            tutorials={eventsTreeTutorials}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2632,6 +2646,8 @@ storiesOf('EventsTree', module)
             screenType={'normal'}
             windowWidth={'small'}
             eventsSheetHeight={500}
+            preferences={initialPreferences}
+            tutorials={eventsTreeTutorials}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2671,6 +2687,8 @@ storiesOf('EventsTree', module)
             screenType={'normal'}
             windowWidth={'medium'}
             eventsSheetHeight={500}
+            preferences={initialPreferences}
+            tutorials={eventsTreeTutorials}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2710,6 +2728,8 @@ storiesOf('EventsTree', module)
             screenType={'normal'}
             windowWidth={'small'}
             eventsSheetHeight={500}
+            preferences={initialPreferences}
+            tutorials={eventsTreeTutorials}
           />
         </FixedHeightFlexContainer>
       </div>

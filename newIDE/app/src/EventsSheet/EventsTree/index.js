@@ -32,6 +32,11 @@ import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 import BottomButtons from './BottomButtons';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
 import { CorsAwareImage } from '../../UI/CorsAwareImage';
+import { Line } from '../../UI/Grid';
+import { type Preferences } from '../../MainFrame/Preferences/PreferencesContext';
+import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
+import TutorialMessage from '../../Hints/TutorialMessage';
+import getTutorial from '../../Hints/getTutorial';
 const gd: libGDevelop = global.gd;
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
@@ -227,6 +232,9 @@ type EventsTreeProps = {|
   windowWidth: WidthType,
   eventsSheetHeight: number,
   fontSize?: number,
+
+  preferences: Preferences,
+  tutorials: ?Array<Tutorial>,
 |};
 
 // A node displayed by the SortableTree. Almost always represents an
@@ -265,6 +273,26 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
 
   componentDidMount() {
     this.onHeightsChanged();
+  }
+
+  componentDidUpdate(prevProps: EventsTreeProps) {
+    const {
+      values: { hiddenTutorialHints },
+    } = this.props.preferences;
+    const {
+      values: { hiddenTutorialHints: previousHiddenTutorialHints },
+    } = prevProps.preferences;
+    if (
+      hiddenTutorialHints['intro-event-system'] !==
+      previousHiddenTutorialHints['intro-event-system']
+    ) {
+      this.setState({
+        ...this.state,
+        treeData: this.state.treeData.filter(
+          data => data.key !== 'eventstree-tutorial-node'
+        ),
+      });
+    }
   }
 
   /**
@@ -362,6 +390,11 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         };
       }
     );
+    const tutorial = getTutorial(
+      this.props.preferences,
+      this.props.tutorials,
+      'intro-event-system'
+    );
 
     // Add the bottom buttons if we're at the root
     const extraNodes = [
@@ -382,6 +415,22 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
             children: [],
           }
         : null,
+      depth === 0 && eventsList.getEventsCount() !== 0 && tutorial
+        ? {
+            title: () => (
+              <Line justifyContent="center">
+                <TutorialMessage tutorial={tutorial} />
+              </Line>
+            ),
+            event: null,
+            indexInList: eventsList.getEventsCount() + 1,
+            disabled: false,
+            depth: 0,
+            fixedHeight: 150,
+            children: [],
+            key: 'eventstree-tutorial-node',
+          }
+        : null,
       depth === 0 && eventsList.getEventsCount() === 0
         ? {
             title: () => (
@@ -390,6 +439,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
                 description={<Trans>Events define the rules of a game.</Trans>}
                 actionLabel={<Trans>Add an event</Trans>}
                 helpPagePath="/events"
+                tutorialId="intro-event-system"
                 onAdd={() =>
                   this.props.onAddNewEvent(
                     'BuiltinCommonInstructions::Standard',

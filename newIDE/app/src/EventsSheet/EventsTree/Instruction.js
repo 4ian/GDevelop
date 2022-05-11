@@ -165,20 +165,15 @@ const Instruction = (props: Props) => {
           }
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
-          const parameterSubType = parameterMetadata.getType();
-          const parameterType = gd.ParameterMetadata.isExpression(
-            'number',
-            parameterSubType
-          )
-            ? 'number'
-            : gd.ParameterMetadata.isExpression('string', parameterSubType)
-            ? 'string'
-            : parameterSubType;
+          const parameterType = parameterMetadata.getType();
+          const expressionType = gd.ParameterMetadata.getExpressionValueType(
+            parameterType
+          );
           let expressionIsValid = true;
           if (
-            parameterType === 'number' ||
-            parameterType === 'string' ||
-            gd.ParameterMetadata.isExpression('variable', parameterType)
+            expressionType === 'number' ||
+            expressionType === 'string' ||
+            gd.ParameterMetadata.isExpression('variable', expressionType)
           ) {
             const expressionNode = instruction
               .getParameter(parameterIndex)
@@ -187,11 +182,11 @@ const Instruction = (props: Props) => {
               gd.JsPlatform.get(),
               globalObjectsContainer,
               objectsContainer,
-              parameterType
+              expressionType
             );
             expressionNode.visit(expressionValidator);
             expressionIsValid = expressionValidator.getErrors().size() === 0;
-          } else if (gd.ParameterMetadata.isObject(parameterType)) {
+          } else if (gd.ParameterMetadata.isObject(expressionType)) {
             const objectOrGroupName = instruction
               .getParameter(parameterIndex)
               .getPlainString();
@@ -208,7 +203,7 @@ const Instruction = (props: Props) => {
               className={classNames({
                 [selectableArea]: true,
                 [instructionParameter]: true,
-                [parameterSubType]: true,
+                [parameterType]: true,
               })}
               onClick={domEvent => {
                 props.onParameterClick(domEvent, parameterIndex);

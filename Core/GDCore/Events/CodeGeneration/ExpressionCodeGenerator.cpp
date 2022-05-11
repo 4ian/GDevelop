@@ -163,12 +163,16 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
       if (!node.childIdentifierName.empty()) {
         output += codeGenerator.GenerateVariableAccessor(node.childIdentifierName);
       }
-  } else {
-    // TODO Some case that were ObjectFunctionNameNode (without ::) will end up here.
+  } else if (node.childIdentifierName.empty()) {
     output += "/* Error during generation, unrecognized identifier type: " +
               codeGenerator.ConvertToString(type) + " with value " +
               codeGenerator.ConvertToString(node.identifierName) + " */ " +
               codeGenerator.ConvertToStringExplicit(node.identifierName);
+  }
+  else {
+    // This is for function names that are put in IdentifierNode
+    // because the type is needed to tell them appart from variables.
+    output += GenerateDefaultValue(type);
   }
 }
 

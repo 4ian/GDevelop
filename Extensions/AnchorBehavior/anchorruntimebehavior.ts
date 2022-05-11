@@ -353,7 +353,8 @@ namespace gdjs {
               this.owner.setY(
                 bottomRightCoord[1] +
                   this.owner.getY() -
-                  this.owner.getDrawableY()
+                  this.owner.getDrawableY() -
+                  this.owner.getHeight()
               );
             }
           }

@@ -374,6 +374,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
           "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
     }
   }
+  SECTION("Function name") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.GetObjectNumber");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "0");
+    }
+  }
   SECTION("Invalid variables") {
     {
       // Test an empty expression

@@ -106,39 +106,55 @@ const insertInVariableChildren = (
   return newName;
 };
 
-const getVariableFromNodeId = (
+const getDirectParentVariable = lineage =>
+  lineage[lineage.length - 1] ? lineage[lineage.length - 1].variable : null;
+
+const getVariableContextFromNodeId = (
   nodeId: string,
   variablesContainer: gdVariablesContainer
 ) => {
   const nodes = nodeId.split('.');
+  let parentVariable = null;
   let currentVariable = null;
-  let parents = [];
+  let currentVariableName = null;
+  let lineage = [];
   let name = null;
   let depth = -1;
 
   while (depth < nodes.length - 1) {
-    depth++;
-    const variableName = nodes[depth];
-    if (!currentVariable) {
-      currentVariable = variablesContainer.get(variableName);
+    depth += 1;
+    currentVariableName = nodes[depth];
+    if (!parentVariable) {
+      currentVariable = variablesContainer.get(currentVariableName);
     } else {
-      parents.push(currentVariable);
-      if (currentVariable.getType() === gd.Variable.Array) {
-        const index = parseInt(variableName, 10);
-        if (index >= currentVariable.getChildrenCount()) {
-          return { variable: null, parents, depth, name };
+      if (parentVariable.getType() === gd.Variable.Array) {
+        const index = parseInt(currentVariableName, 10);
+        if (index >= parentVariable.getChildrenCount()) {
+          return { variable: null, lineage, depth, name };
         }
-        currentVariable = currentVariable.getAtIndex(index);
+        currentVariable = parentVariable.getAtIndex(index);
       } else {
-        if (!currentVariable.hasChild(variableName)) {
-          return { variable: null, parents, depth, name };
+        if (!parentVariable.hasChild(currentVariableName)) {
+          return { variable: null, lineage, depth, name };
         }
-        currentVariable = currentVariable.getChild(variableName);
+        currentVariable = parentVariable.getChild(currentVariableName);
       }
     }
-    name = variableName;
+    if (depth < nodes.length - 1) {
+      lineage.push({
+        nodeId: nodes.slice(0, depth + 1).join('.'),
+        name: currentVariableName,
+        variable: currentVariable,
+      });
+    }
+    parentVariable = currentVariable;
   }
-  return { variable: currentVariable, depth, parents, name };
+  return {
+    variable: currentVariable,
+    name: currentVariableName,
+    depth,
+    lineage,
+  };
 };
 
 type MovementType =
@@ -154,69 +170,72 @@ type MovementType =
   | 'FromArrayToStructure';
 
 const getMovementType = (
-  draggedVariableInfo,
-  targetVariableInfo
+  draggedVariableContext,
+  targetVariableContext
 ): ?MovementType => {
-  const { parents: targetVariableParents } = targetVariableInfo;
-  const targetVariableParent =
-    targetVariableParents[targetVariableParents.length - 1];
+  const { lineage: targetVariableLineage } = targetVariableContext;
+  const targetVariableParentVariable = getDirectParentVariable(
+    targetVariableLineage
+  );
 
-  const { parents: draggedVariableParents } = draggedVariableInfo;
-  const draggedVariableParent =
-    draggedVariableParents[draggedVariableParents.length - 1];
+  const { lineage: draggedVariableLineage } = draggedVariableContext;
+  const draggedVariableParentVariable = getDirectParentVariable(
+    draggedVariableLineage
+  );
 
-  if (!!draggedVariableParent && !!targetVariableParent) {
+  if (!!draggedVariableParentVariable && !!targetVariableParentVariable) {
     if (
-      targetVariableParent.getType() === gd.Variable.Structure &&
-      draggedVariableParent.getType() === gd.Variable.Structure &&
-      draggedVariableParent !== targetVariableParent
+      targetVariableParentVariable.getType() === gd.Variable.Structure &&
+      draggedVariableParentVariable.getType() === gd.Variable.Structure &&
+      draggedVariableParentVariable !== targetVariableParentVariable
     )
       return 'FromStructureToAnotherStructure';
     if (
-      targetVariableParent.getType() === gd.Variable.Structure &&
-      draggedVariableParent === targetVariableParent
+      targetVariableParentVariable.getType() === gd.Variable.Structure &&
+      draggedVariableParentVariable === targetVariableParentVariable
     )
       return 'InsideSameStructure';
     if (
-      targetVariableParent.getType() === gd.Variable.Array &&
-      draggedVariableParent.getType() === gd.Variable.Array &&
-      draggedVariableParent !== targetVariableParent
+      targetVariableParentVariable.getType() === gd.Variable.Array &&
+      draggedVariableParentVariable.getType() === gd.Variable.Array &&
+      draggedVariableParentVariable !== targetVariableParentVariable
     )
       return 'FromArrayToAnotherArray';
     if (
-      targetVariableParent.getType() === gd.Variable.Array &&
-      draggedVariableParent === targetVariableParent
+      targetVariableParentVariable.getType() === gd.Variable.Array &&
+      draggedVariableParentVariable === targetVariableParentVariable
     )
       return 'InsideSameArray';
     if (
-      targetVariableParent.getType() === gd.Variable.Array &&
-      draggedVariableParent.getType() === gd.Variable.Structure
+      targetVariableParentVariable.getType() === gd.Variable.Array &&
+      draggedVariableParentVariable.getType() === gd.Variable.Structure
     )
       return 'FromStructureToArray';
     if (
-      targetVariableParent.getType() === gd.Variable.Structure &&
-      draggedVariableParent.getType() === gd.Variable.Array
+      targetVariableParentVariable.getType() === gd.Variable.Structure &&
+      draggedVariableParentVariable.getType() === gd.Variable.Array
     )
       return 'FromArrayToStructure';
   }
 
-  if (!draggedVariableParent && !targetVariableParent) return 'InsideTopLevel';
+  if (!draggedVariableParentVariable && !targetVariableParentVariable)
+    return 'InsideTopLevel';
   if (
-    !draggedVariableParent &&
-    !!targetVariableParent &&
-    targetVariableParent.getType() === gd.Variable.Structure
+    !draggedVariableParentVariable &&
+    !!targetVariableParentVariable &&
+    targetVariableParentVariable.getType() === gd.Variable.Structure
   )
     return 'TopLevelToStructure';
   if (
-    !!draggedVariableParent &&
-    !targetVariableParent &&
-    draggedVariableParent.getType() === gd.Variable.Structure
+    !!draggedVariableParentVariable &&
+    !targetVariableParentVariable &&
+    draggedVariableParentVariable.getType() === gd.Variable.Structure
   )
     return 'StructureToTopLevel';
   if (
-    !!draggedVariableParent &&
-    !targetVariableParent &&
-    draggedVariableParent.getType() === gd.Variable.Array
+    !!draggedVariableParentVariable &&
+    !targetVariableParentVariable &&
+    draggedVariableParentVariable.getType() === gd.Variable.Array
   )
     return 'ArrayToTopLevel';
 
@@ -260,16 +279,17 @@ const NewVariablesList = (props: Props) => {
       CLIPBOARD_KIND,
       selectedNodes
         .map(nodeId => {
-          const { variable, name, parents } = getVariableFromNodeId(
+          const { variable, name, lineage } = getVariableContextFromNodeId(
             nodeId,
             props.variablesContainer
           );
           if (!variable || !name) return;
           let parentType;
-          if (parents.length === 0) {
+
+          const parentVariable = getDirectParentVariable(lineage);
+          if (!parentVariable) {
             parentType = gd.Variable.Structure;
           } else {
-            const parentVariable = parents[parents.length - 1];
             parentType = parentVariable.getType();
           }
           return {
@@ -319,10 +339,13 @@ const NewVariablesList = (props: Props) => {
         const targetNode = selectedNodes[0];
         const {
           name: targetVariableName,
-          parents: targetParents,
-        } = getVariableFromNodeId(targetNode, props.variablesContainer);
+          lineage: targetVariableLineage,
+        } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
         if (!targetVariableName) return;
-        if (targetParents.length === 0) {
+        const targetParentVariable = getDirectParentVariable(
+          targetVariableLineage
+        );
+        if (!targetParentVariable) {
           if (parentType === gd.Variable.Array) return;
           const newName = insertInVariablesContainer(
             props.variablesContainer,
@@ -332,7 +355,6 @@ const NewVariablesList = (props: Props) => {
           );
           newSelectedNodes.push(newName);
         } else {
-          const targetParentVariable = targetParents[targetParents.length - 1];
           const targetParentType = targetParentVariable.getType();
           if (targetParentType !== parentType) return;
           if (targetParentType === gd.Variable.Array) {
@@ -369,15 +391,15 @@ const NewVariablesList = (props: Props) => {
 
   const deleteSelection = () => {
     selectedNodes.forEach(nodeId => {
-      const { name, parents } = getVariableFromNodeId(
+      const { name, lineage } = getVariableContextFromNodeId(
         nodeId,
         props.variablesContainer
       );
       if (!name) return;
-      if (parents.length === 0) {
+      const parentVariable = getDirectParentVariable(lineage);
+      if (!parentVariable) {
         props.variablesContainer.remove(name);
       } else {
-        const parentVariable = parents[parents.length - 1];
         if (parentVariable.getType() === gd.Variable.Array) {
           parentVariable.removeAtIndex(parseInt(name, 10));
         } else {
@@ -415,23 +437,26 @@ const NewVariablesList = (props: Props) => {
     const { current } = draggedNodeId;
     if (!current) return false;
 
-    const targetVariableInfo = getVariableFromNodeId(
+    const targetVariableContext = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
     );
-    const { parents: targetVariableParents } = targetVariableInfo;
+    const { lineage: targetLineage } = targetVariableContext;
 
-    const draggedVariableInfo = getVariableFromNodeId(
+    const draggedVariableContext = getVariableContextFromNodeId(
       current,
       props.variablesContainer
     );
-    const { variable: draggedVariable } = draggedVariableInfo;
+    const { variable: draggedVariable } = draggedVariableContext;
 
-    if (targetVariableParents.includes(draggedVariable)) return false;
+    const targetLineageVariables = targetLineage.map(
+      context => context.variable
+    );
+    if (targetLineageVariables.includes(draggedVariable)) return false;
 
     const movementType = getMovementType(
-      draggedVariableInfo,
-      targetVariableInfo
+      draggedVariableContext,
+      targetVariableContext
     );
 
     switch (movementType) {
@@ -455,36 +480,36 @@ const NewVariablesList = (props: Props) => {
     const { current } = draggedNodeId;
     if (!current) return;
 
-    const targetVariableInfo = getVariableFromNodeId(
+    const targetVariableContext = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
     );
-    const {
-      parents: targetVariableParents,
-      name: targetName,
-    } = targetVariableInfo;
-    const targetVariableParent =
-      targetVariableParents[targetVariableParents.length - 1];
+    const { lineage: targetLineage, name: targetName } = targetVariableContext;
+    const targetVariableParentVariable = getDirectParentVariable(targetLineage);
     if (!targetName) return;
 
-    const draggedVariableInfo = getVariableFromNodeId(
+    const draggedVariableContext = getVariableContextFromNodeId(
       current,
       props.variablesContainer
     );
     const {
       variable: draggedVariable,
-      parents: draggedVariableParents,
+      lineage: draggedLineage,
       name: draggedName,
-    } = draggedVariableInfo;
-    const draggedVariableParent =
-      draggedVariableParents[draggedVariableParents.length - 1];
+    } = draggedVariableContext;
+    const draggedVariableParentVariable = getDirectParentVariable(
+      draggedLineage
+    );
     if (!draggedVariable || !draggedName) return;
 
-    if (targetVariableParents.includes(draggedVariable)) return;
+    const targetLineageVariables = targetLineage.map(
+      context => context.variable
+    );
+    if (targetLineageVariables.includes(draggedVariable)) return;
 
     const movementType = getMovementType(
-      draggedVariableInfo,
-      targetVariableInfo
+      draggedVariableContext,
+      targetVariableContext
     );
     let newName;
     let draggedIndex;
@@ -502,11 +527,13 @@ const NewVariablesList = (props: Props) => {
       case 'TopLevelToStructure':
         newName = newNameGenerator(
           draggedName,
-          name => targetVariableParent.hasChild(name),
+          // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+          name => targetVariableParentVariable.hasChild(name),
           'CopyOf'
         );
 
-        targetVariableParent.insertChild(newName, draggedVariable);
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        targetVariableParentVariable.insertChild(newName, draggedVariable);
 
         props.variablesContainer.remove(draggedName);
         break;
@@ -522,30 +549,40 @@ const NewVariablesList = (props: Props) => {
           props.variablesContainer.getPosition(targetName)
         );
 
-        draggedVariableParent.removeChild(draggedName);
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        draggedVariableParentVariable.removeChild(draggedName);
         break;
       case 'FromStructureToAnotherStructure':
         newName = newNameGenerator(
           draggedName,
-          name => targetVariableParent.hasChild(name),
+          // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+          name => targetVariableParentVariable.hasChild(name),
           'CopyOf'
         );
-        targetVariableParent.insertChild(newName, draggedVariable);
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        targetVariableParentVariable.insertChild(newName, draggedVariable);
 
-        draggedVariableParent.removeChild(draggedName);
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        draggedVariableParentVariable.removeChild(draggedName);
         break;
       case 'FromArrayToAnotherArray':
         draggedIndex = parseInt(draggedName, 10);
         targetIndex = parseInt(targetName, 10);
 
-        targetVariableParent.insertInArray(draggedVariable, targetIndex);
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        targetVariableParentVariable.insertInArray(
+          draggedVariable,
+          targetIndex
+        );
 
-        draggedVariableParent.removeAtIndex(draggedIndex);
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        draggedVariableParentVariable.removeAtIndex(draggedIndex);
         break;
       case 'InsideSameArray':
         draggedIndex = parseInt(draggedName, 10);
         targetIndex = parseInt(targetName, 10);
-        targetVariableParent.moveChildInArray(
+        // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
+        targetVariableParentVariable.moveChildInArray(
           draggedIndex,
           targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
         );
@@ -562,7 +599,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onAddChild = (nodeId: string) => {
-    const { variable } = getVariableFromNodeId(
+    const { variable } = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
     );
@@ -595,10 +632,10 @@ const NewVariablesList = (props: Props) => {
     const targetNode = selectedNodes[0];
     const {
       name: targetVariableName,
-      parents: targetParents,
-    } = getVariableFromNodeId(targetNode, props.variablesContainer);
+      lineage: targetLineage,
+    } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
     if (!targetVariableName) return;
-    if (targetParents.length === 0) {
+    if (targetLineage.length === 0) {
       const newName = insertInVariablesContainer(
         props.variablesContainer,
         'Variable',
@@ -608,7 +645,7 @@ const NewVariablesList = (props: Props) => {
       setSelectedNodes([newName]);
       return;
     }
-    return; // TODO - insert after the top level variable that contains the target. To do so, make it so that getVariableFromNodeId returns parents = [{name, nodeId, variable}]
+    return; // TODO - insert after the top level variable that contains the target. To do so, make it so that getVariableContextFromNodeId returns parents = [{name, nodeId, variable}]
   };
 
   const renderVariableAndChildrenRows = ({
@@ -805,7 +842,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onChangeName = (nodeId: string, newName: ?string) => {
-    const { variable, parents, name } = getVariableFromNodeId(
+    const { variable, lineage, name } = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
     );
@@ -823,11 +860,11 @@ const NewVariablesList = (props: Props) => {
     if (newName === name) return;
 
     let hasBeenRenamed = false;
-    if (parents.length > 0) {
-      const parentVariable = parents[parents.length - 1];
-      hasBeenRenamed = parentVariable.renameChild(name, newName);
-    } else {
+    const parentVariable = getDirectParentVariable(lineage);
+    if (!parentVariable) {
       hasBeenRenamed = props.variablesContainer.rename(name, newName);
+    } else {
+      hasBeenRenamed = parentVariable.renameChild(name, newName);
     }
     if (hasBeenRenamed) {
       renameExpandedNode(nodeId, newName);
@@ -843,7 +880,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onChangeValue = (nodeId: string, newValue: string) => {
-    const { variable } = getVariableFromNodeId(
+    const { variable } = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
     );

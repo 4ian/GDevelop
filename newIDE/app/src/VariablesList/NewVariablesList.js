@@ -42,6 +42,71 @@ const preventEventDefaultEffect = (event: Event) => event.preventDefault();
 type Props = {
   variablesContainer: gdVariablesContainer,
 };
+const getExpandedNodeIdsFromVariables = (
+  variables: { name: string, variable: gdVariable }[],
+  accumulator: string[],
+  parentNodeId: string = ''
+): string[] => {
+  let newAccumulator = [];
+  for (const { name, variable } of variables) {
+    const nodeId = parentNodeId ? `${parentNodeId}.${name}` : name;
+    if (!variable.isFolded() && variable.getChildrenCount() > 0) {
+      newAccumulator.push(nodeId);
+    }
+    if (variable.getType() === gd.Variable.Array) {
+      const children = mapFor(0, variable.getChildrenCount(), index => ({
+        name: index.toString(),
+        variable: variable.getAtIndex(index),
+      }));
+      newAccumulator = [
+        ...newAccumulator,
+        ...getExpandedNodeIdsFromVariables(children, newAccumulator, nodeId),
+      ];
+    } else if (variable.getType() === gd.Variable.Structure) {
+      const children = variable
+        .getAllChildrenNames()
+        .toJSArray()
+        .map((childName, index) => ({
+          variable: variable.getChild(childName),
+          name: childName,
+        }));
+      newAccumulator = [
+        ...newAccumulator,
+        ...getExpandedNodeIdsFromVariables(children, newAccumulator, nodeId),
+      ];
+    }
+  }
+  return newAccumulator;
+};
+
+const getExpandedNodeIdsFromVariablesContainer = (
+  variablesContainer: gdVariablesContainer
+): string[] => {
+  const variables = [];
+  for (let index = 0; index < variablesContainer.count(); index += 1) {
+    variables.push({
+      name: variablesContainer.getNameAt(index),
+      variable: variablesContainer.getAt(index),
+    });
+  }
+  return getExpandedNodeIdsFromVariables(variables, []);
+};
+
+const foldNodesVariables = (
+  variablesContainer: gdVariablesContainer,
+  nodes: string[],
+  fold: boolean
+) => {
+  nodes.forEach(nodeId => {
+    const { variable } = getVariableContextFromNodeId(
+      nodeId,
+      variablesContainer
+    );
+    if (variable) {
+      variable.setFolded(fold);
+    }
+  });
+};
 
 const StyledTreeItem = withStyles(() => ({
   group: {
@@ -248,7 +313,9 @@ const isCollection = (variable: gdVariable): boolean =>
   !gd.Variable.isPrimitive(variable.getType());
 
 const NewVariablesList = (props: Props) => {
-  const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>([]);
+  const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
+    getExpandedNodeIdsFromVariablesContainer(props.variablesContainer)
+  );
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
@@ -264,17 +331,6 @@ const NewVariablesList = (props: Props) => {
       flexShrink: 0,
     }),
     [containerWidth]
-  );
-
-  React.useEffect(
-    () => {
-      setExpandedNodes(
-        mapFor(0, props.variablesContainer.count(), index =>
-          props.variablesContainer.getNameAt(index)
-        )
-      );
-    },
-    [props.variablesContainer.ptr]
   );
 
   const copySelection = () => {
@@ -1029,7 +1085,25 @@ const NewVariablesList = (props: Props) => {
                 defaultExpandIcon={<ChevronRight />}
                 defaultCollapseIcon={<ExpandMore />}
                 onNodeSelect={(event, values) => setSelectedNodes(values)}
-                onNodeToggle={(event, values) => setExpandedNodes(values)}
+                onNodeToggle={(event, values) => {
+                  const foldedNodes = expandedNodes.filter(
+                    node => !values.includes(node)
+                  );
+                  const unfoldedNodes = values.filter(
+                    node => !expandedNodes.includes(node)
+                  );
+                  foldNodesVariables(
+                    props.variablesContainer,
+                    foldedNodes,
+                    true
+                  );
+                  foldNodesVariables(
+                    props.variablesContainer,
+                    unfoldedNodes,
+                    false
+                  );
+                  setExpandedNodes(values);
+                }}
                 selected={selectedNodes}
                 expanded={expandedNodes}
               >

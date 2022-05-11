@@ -15,6 +15,8 @@ declare class gdVariable {
   getValue(): number;
   setBool(val: boolean): void;
   getBool(): boolean;
+  setFolded(val: boolean): void;
+  isFolded(): boolean;
   getChildrenCount(): number;
   contains(variableToSearch: gdVariable, recursive: boolean): boolean;
   hasChild(str: string): boolean;

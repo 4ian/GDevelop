@@ -311,6 +311,17 @@ class GD_CORE_API Variable {
   const std::vector<std::shared_ptr<Variable>>& GetAllChildrenArray() const {
     return childrenArray;
   }
+
+  /**
+   * \brief Set if the children must be folded.
+   */
+  void SetFolded(bool fold = true) { folded = fold; }
+
+  /**
+   * \brief True if the children should be folded in the variables editor.
+   */
+  bool IsFolded() const { return folded; }
+
   ///@}
   ///@}
 
@@ -340,6 +351,7 @@ class GD_CORE_API Variable {
    */
   static Type StringAsType(const gd::String& str);
 
+  bool folded;
   mutable Type type;
   mutable gd::String str;
   mutable double value;

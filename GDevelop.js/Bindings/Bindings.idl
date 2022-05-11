@@ -214,6 +214,8 @@ interface Variable {
     double GetValue();
     void SetBool([Const] boolean val);
     boolean GetBool();
+    void SetFolded(boolean val);
+    boolean IsFolded();
 
     unsigned long GetChildrenCount();
     boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);

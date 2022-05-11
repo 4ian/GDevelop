@@ -209,6 +209,8 @@ class GD_CORE_API ParameterMetadata {
 
   /**
    * \brief Return the expression type from the parameter type.
+   * Declinations of "number" and "string" types (like "forceMultiplier" or
+   * "sceneName") are replaced by "number" and "string".
    */
   static const gd::String &GetExpressionValueType(const gd::String &parameterType);
   static const gd::String numberType;

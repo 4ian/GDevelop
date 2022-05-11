@@ -6,6 +6,8 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import Add from '@material-ui/icons/Add';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 import Copy from '../UI/CustomSvgIcons/Copy';
+import Undo from '@material-ui/icons/Undo';
+import Redo from '@material-ui/icons/Redo';
 import Paste from '../UI/CustomSvgIcons/Paste';
 import Delete from '@material-ui/icons/Delete';
 import { mapFor } from '../Utils/MapFor';
@@ -1134,6 +1136,19 @@ const NewVariablesList = (props: Props) => {
                     label={<Trans>Delete</Trans>}
                     disabled={selectedNodes.length === 0}
                     onClick={deleteSelection}
+                  />
+                  {/* // TODO: Remove those buttons once tests are over */}
+                  <Spacer />
+                  <FlatButton
+                    icon={<Undo />}
+                    label={<Trans>Undo</Trans>}
+                    onClick={undo}
+                  />
+                  <Spacer />
+                  <FlatButton
+                    icon={<Redo />}
+                    label={<Trans>Redo</Trans>}
+                    onClick={redo}
                   />
                 </Line>
               </Column>

@@ -44,6 +44,10 @@
       "executableName": "GDevelop",
       "publish": null
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "appx": {
       "publisherDisplayName": "GDevelop game engine",
       "displayName": "GDevelop",

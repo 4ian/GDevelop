@@ -32,7 +32,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   group.AddObject("MyOtherSpriteObject");
   group.AddObject("MyFakeObjectWithUnsupportedCapability");
 
-  gd::ExpressionParser2 parser(platform, project, layout1);
+  gd::ExpressionParser2 parser;
 
   unsigned int maxDepth = 0;
   gd::EventsCodeGenerationContext context(&maxDepth);
@@ -40,8 +40,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
   SECTION("Valid text generation") {
     {
-      auto node = parser.ParseExpression("string", "\"hello world\"");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("\"hello world\"");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -49,8 +51,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello world\"");
     }
     {
-      auto node = parser.ParseExpression("string", "\"hello\"  +   \"world\" ");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("\"hello\"  +   \"world\" ");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -59,8 +63,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression(
-          "string", "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+          "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -72,8 +78,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
   SECTION("Valid number generation") {
     {
-      auto node = parser.ParseExpression("number", "12.45");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("12.45");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -85,8 +93,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   SECTION("Invalid operators generation") {
     // TODO: Should any error return directly 0 or ""?
     {
-      auto node = parser.ParseExpression("number", "12.45 +");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("12.45 +");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -94,8 +104,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.45 + 0");
     }
     {
-      auto node = parser.ParseExpression("number", "12.45 * *");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("12.45 * *");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -106,16 +118,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
   SECTION("Valid unary operator generation") {
     {
-      auto node = parser.ParseExpression("number", "-12.45");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("-12.45");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "-(12.45)");
     }
     {
-      auto node = parser.ParseExpression("number", "12.5 + -2.  /   (.3)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("12.5 + -2.  /   (.3)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
       REQUIRE(node);
       node->Visit(expressionCodeGenerator);
@@ -126,8 +142,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   SECTION("Valid function calls") {
     {
       auto node =
-          parser.ParseExpression("number", " 1 /  MyExtension::GetNumber()");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+          parser.ParseExpression(" 1 /  MyExtension::GetNumber()");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -136,8 +154,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression(
-          "number", "MyExtension::GetNumberWith2Params(12, \"hello world\")");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+          "MyExtension::GetNumberWith2Params(12, \"hello world\")");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -147,10 +167,11 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       auto node =
-          parser.ParseExpression("number",
-                                 "MyExtension::GetNumberWith2Params("
+          parser.ParseExpression("MyExtension::GetNumberWith2Params("
                                  "MyExtension::GetNumber(), \"hello world\")");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -160,8 +181,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       auto node =
-          parser.ParseExpression("number", "MySpriteObject.GetObjectNumber()");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+          parser.ParseExpression("MySpriteObject.GetObjectNumber()");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -171,9 +194,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression(
-          "string",
           "MySpriteObject.GetObjectStringWith1Param(MyExtension::GetNumber())");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -185,8 +209,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   SECTION("Valid function calls with optional arguments") {
     {
       auto node =
-          parser.ParseExpression("number", "MyExtension::MouseX(\"layer1\",)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+          parser.ParseExpression("MyExtension::MouseX(\"layer1\",)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -196,9 +222,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       // (first argument is the currentScene)
     }
     {
-      auto node = parser.ParseExpression("number",
-                                         "MyExtension::MouseX(\"layer1\",2+2)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("MyExtension::MouseX(\"layer1\",2+2)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -212,8 +239,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       "Valid function calls (deprecated way of specifying optional "
       "arguments)") {
     {
-      auto node = parser.ParseExpression("number", "MyExtension::MouseX(,)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("MyExtension::MouseX(,)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -226,12 +255,13 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   SECTION("Invalid function calls") {
     {
       auto node =
-          parser.ParseExpression("string",
-                                 "MySpriteObject.GetObjectStringWith3Param("
+          parser.ParseExpression("MySpriteObject.GetObjectStringWith3Param("
                                  "MySpriteObject.GetObjectNumber() / 2.3, "
                                  "MySpriteObject.GetObjectStringWith1Param("
                                  "MyExtension::GetNumber()), test)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -245,9 +275,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
     {
       auto node = parser.ParseExpression(
-          "number",
           "MyExtension::GetNumberWith2Params(MyExtension::GetNumber())");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -268,8 +299,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
           "0");
     }
     {
-      auto node = parser.ParseExpression("number", "MyExtension::Idontexist()");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("MyExtension::Idontexist()");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -279,10 +312,11 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "MyExtension::Idontexist */ 0");
     }
     {
-      auto node = parser.ParseExpression("number",
-                                         "MyExtension::GetNumberWith2Params(1, "
+      auto node = parser.ParseExpression("MyExtension::GetNumberWith2Params(1, "
                                          "\"2\", MyExtension::GetNumber())");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -295,9 +329,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     {
       // Capability is supported, so the expression is valid.
       auto node = parser.ParseExpression(
-          "string",
           "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -309,10 +344,11 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     {
       // Capability is not supported, so the expression is not even valid.
       auto node =
-          parser.ParseExpression("string",
-                                 "MyFakeObjectWithUnsupportedCapability."
+          parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
                                  "GetSomethingRequiringEffectCapability(123)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -324,8 +360,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       // group. The expression itself is valid, but code generation should skip
       // the objects with unsupported capability.
       auto node = parser.ParseExpression(
-          "string", "AllObjects.GetSomethingRequiringEffectCapability(123)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+          "AllObjects.GetSomethingRequiringEffectCapability(123)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);
@@ -334,6 +372,20 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
           expressionCodeGenerator.GetOutput() ==
           "MyOtherSpriteObject.getSomethingRequiringEffectCapability(123) ?? "
           "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
+    }
+  }
+  SECTION("Function name") {
+    {
+      auto node =
+          parser.ParseExpression("MySpriteObject.GetObjectNumber");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "0");
     }
   }
   SECTION("Invalid variables") {
@@ -375,12 +427,31 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "fakeBadVariable");
     }
   }
+  SECTION("Valid variables") {
+    {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "myVariable", "")
+              == "getLayoutVariable(myVariable)");
+    }
+    {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "myVariable.myChild", "")
+              == "getLayoutVariable(myVariable).getChild(\"myChild\")");
+    }
+    {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "objectvar", "myVariable", "MySpriteObject")
+              == "getVariableForObject(MySpriteObject, myVariable)");
+    }
+  }
   SECTION("Valid function calls with variables") {
     SECTION("Simple access") {
       {
         auto node = parser.ParseExpression(
-            "number", "MyExtension::GetVariableAsNumber(myVariable)");
-        gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+            "MyExtension::GetVariableAsNumber(myVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
                                                             context);
 
         REQUIRE(node);
@@ -390,9 +461,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       }
       {
         auto node = parser.ParseExpression(
-            "number",
             "MyExtension::GetGlobalVariableAsNumber(myGlobalVariable)");
-        gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
                                                             context);
 
         REQUIRE(node);
@@ -400,13 +472,76 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getProjectVariable(myGlobalVariable))");
       }
+      {
+        auto node = parser.ParseExpression(
+            "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam("
+            "MySpriteObject, myVariable, MyOtherSpriteObject, myOtherVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+            "getStringWith2ObjectParamAnd2ObjectVarParam(fakeObjectListOf_MySpriteObject, "
+            "getVariableForObject(MySpriteObject, myVariable), "
+            "fakeObjectListOf_MyOtherSpriteObject, "
+            "getVariableForObject(MyOtherSpriteObject, myOtherVariable))");
+      }
+      {
+        auto node = parser.ParseExpression(
+            "MyExtension::GetStringWith1ObjectParamAnd2ObjectVarParam("
+            "MySpriteObject, myVariable, myOtherVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("string",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+            "getStringWith1ObjectParamAnd2ObjectVarParam(fakeObjectListOf_MySpriteObject, "
+            "getVariableForObject(MySpriteObject, myVariable), "
+            "getVariableForObject(MySpriteObject, myOtherVariable))");
+      }
+      {
+        auto node = parser.ParseExpression(
+            "MySpriteObject.GetObjectVariableAsNumber(myVariable)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(
+            expressionCodeGenerator.GetOutput() ==
+            "MySpriteObject.returnVariable(getVariableForObject("
+            "MySpriteObject, myVariable)) ?? 0");
+      }
     }
     SECTION("Child access") {
       {
         auto node = parser.ParseExpression(
-            "number",
+            "MyExtension::GetVariableAsNumber(myVariable.child1)");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
+
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+                "returnVariable(getLayoutVariable(myVariable).getChild("
+                "\"child1\"))");
+      }
+      {
+        auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable.child1.child2)");
-        gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
                                                             context);
 
         REQUIRE(node);
@@ -417,10 +552,11 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       }
       {
         auto node = parser.ParseExpression(
-            "number",
             "MyExtension::GetVariableAsNumber(myVariable[ \"hello\" + "
             "\"world\" ].child2)");
-        gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
                                                             context);
 
         REQUIRE(node);
@@ -431,11 +567,12 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       }
       {
         auto node = parser.ParseExpression(
-            "number",
             "MyExtension::GetVariableAsNumber(myVariable[ \"hello\" + "
             "MySpriteObject.GetObjectStringWith1Param(MyOtherSpriteObject."
             "GetObjectVariableAsNumber(mySecondVariable)) ].child2)");
-        gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
                                                             context);
 
         REQUIRE(node);
@@ -462,8 +599,10 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   }
   SECTION("Mixed test (1)") {
     {
-      auto node = parser.ParseExpression("number", "-+-MyExtension::MouseX(,)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+      auto node = parser.ParseExpression("-+-MyExtension::MouseX(,)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
                                                           context);
 
       REQUIRE(node);

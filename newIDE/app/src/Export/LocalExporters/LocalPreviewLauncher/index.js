@@ -15,10 +15,8 @@ import {
   localPreviewDebuggerServer,
 } from './LocalPreviewDebuggerServer';
 const electron = optionalRequire('electron');
-const remote = optionalRequire('@electron/remote');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const BrowserWindow = remote ? remote.BrowserWindow : null;
 const gd: libGDevelop = global.gd;
 
 type Props = {|
@@ -34,8 +32,7 @@ type State = {|
   networkPreviewError: ?any,
   hotReloadsCount: number,
   previewGamePath: ?string,
-  devToolsOpen: boolean,
-  previewBrowserWindowConfig: ?{
+  previewBrowserWindowOptions: ?{
     width: number,
     height: number,
     useContentSize: boolean,
@@ -59,8 +56,7 @@ export default class LocalPreviewLauncher extends React.Component<
     networkPreviewPort: null,
     networkPreviewError: null,
     previewGamePath: null,
-    devToolsOpen: false,
-    previewBrowserWindowConfig: null,
+    previewBrowserWindowOptions: null,
     hotReloadsCount: 0,
     hideMenuBar: true,
     alwaysOnTop: true,
@@ -69,29 +65,17 @@ export default class LocalPreviewLauncher extends React.Component<
   _hotReloadSubscriptionChecker: ?SubscriptionChecker = null;
 
   _openPreviewBrowserWindow = () => {
-    const { previewGamePath, previewBrowserWindowConfig } = this.state;
-    if (!BrowserWindow || !previewBrowserWindowConfig || !previewGamePath)
-      return;
+    const { previewGamePath, previewBrowserWindowOptions } = this.state;
+    if (!previewBrowserWindowOptions || !previewGamePath) return;
 
-    const browserWindowOptions = {
-      ...previewBrowserWindowConfig,
-      parent: this.state.alwaysOnTop ? BrowserWindow.getFocusedWindow() : null,
-    };
-    const win = new BrowserWindow(browserWindowOptions);
+    if (!ipcRenderer) return;
 
-    // Enable `@electron/remote` module for renderer process of the preview.
-    remote.require('@electron/remote/main').enable(win.webContents);
-
-    win.loadURL(`file://${previewGamePath}/index.html`);
-    win.setMenuBarVisibility(this.state.hideMenuBar);
-    win.webContents.on('devtools-opened', () => {
-      this.setState({ devToolsOpen: true });
+    ipcRenderer.invoke('preview-open', {
+      previewBrowserWindowOptions,
+      previewGameIndexHtmlPath: `file://${previewGamePath}/index.html`,
+      alwaysOnTop: this.state.alwaysOnTop,
+      hideMenuBar: this.state.hideMenuBar,
     });
-    win.webContents.on('devtools-closed', () => {
-      this.setState({ devToolsOpen: false });
-    });
-
-    if (this.state.devToolsOpen) win.openDevTools();
   };
 
   _openPreviewWindow = (
@@ -101,7 +85,7 @@ export default class LocalPreviewLauncher extends React.Component<
   ): void => {
     this.setState(
       {
-        previewBrowserWindowConfig: {
+        previewBrowserWindowOptions: {
           width: project.getGameResolutionWidth(),
           height: project.getGameResolutionHeight(),
           useContentSize: true,

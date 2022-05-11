@@ -312,6 +312,7 @@ namespace gdjs {
             this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
           ) {
             this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
+            this.owner.setX(topLeftCoord[0]);
           } else {
             if (
               this._leftEdgeAnchor !==
@@ -340,6 +341,7 @@ namespace gdjs {
             this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
           ) {
             this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
+            this.owner.setY(topLeftCoord[1]);
           } else {
             if (
               this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE

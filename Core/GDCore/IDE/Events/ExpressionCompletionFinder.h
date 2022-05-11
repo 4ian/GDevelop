@@ -327,7 +327,7 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type, "", searchedPosition + 1, searchedPosition + 1));
     completions.push_back(ExpressionCompletionDescription::ForExpression(
@@ -337,7 +337,7 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type, "", searchedPosition + 1, searchedPosition + 1));
     completions.push_back(ExpressionCompletionDescription::ForExpression(
@@ -433,7 +433,7 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     if (gd::ParameterMetadata::IsObject(type)) {
       // Only show completions of objects if an object is required
       completions.push_back(ExpressionCompletionDescription::ForObject(
@@ -488,7 +488,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     if (!node.behaviorFunctionName.empty() ||
         node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
       // Behavior function (or behavior function being written, with the
@@ -541,7 +541,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
                                 IsCaretOn(node.closingParenthesisLocation);
 
@@ -611,7 +611,7 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type,
         node.text,

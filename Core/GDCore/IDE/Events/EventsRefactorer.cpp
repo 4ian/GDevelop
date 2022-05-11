@@ -57,7 +57,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
                      gd::ExpressionNode& node,
                      const gd::String& objectName,
                      const gd::String& objectNewName) {
-    if (ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
+    if (gd::ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
       ExpressionObjectRenamer renamer(platform, globalObjectsContainer, objectsContainer, rootType, objectName, objectNewName);
       node.Visit(renamer);
 
@@ -94,7 +94,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasDoneRenaming = true;
@@ -156,7 +156,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
                                const gd::String &rootType,
                                gd::ExpressionNode& node,
                                const gd::String& objectName) {
-    if (ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
+    if (gd::ExpressionValidator::HasNoErrors(platform, globalObjectsContainer, objectsContainer, rootType, node)) {
       ExpressionObjectFinder finder(platform, globalObjectsContainer, objectsContainer, rootType, objectName);
       node.Visit(finder);
 
@@ -193,7 +193,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     if (node.child) node.child->Visit(*this);
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
     if (gd::ParameterMetadata::IsObject(type) &&
         node.identifierName == objectName) {
       hasObject = true;

@@ -18,7 +18,6 @@ import { Trans } from '@lingui/macro';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import VariableTypeSelector from './VariableTypeSelector';
-import Background from '../UI/Background';
 import IconButton from '../UI/IconButton';
 import { makeStyles, withStyles } from '@material-ui/styles';
 import styles from './styles';
@@ -34,7 +33,15 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import ScrollView from '../UI/ScrollView';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 const gd: libGDevelop = global.gd;
+
+const stopEventPropagation = (event: Event) => event.stopPropagation();
+const preventEventDefaultEffect = (event: Event) => event.preventDefault();
+
+type Props = {
+  variablesContainer: gdVariablesContainer,
+};
 
 const StyledTreeItem = withStyles(() => ({
   group: {
@@ -44,13 +51,6 @@ const StyledTreeItem = withStyles(() => ({
   },
   label: { padding: 0 },
 }))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
-
-const stopEventPropagation = (event: Event) => event.stopPropagation();
-const preventEventDefaultEffect = (event: Event) => event.preventDefault();
-
-type Props = {
-  variablesContainer: gdVariablesContainer,
-};
 
 const insertInVariablesContainer = (
   variablesContainer: gdVariablesContainer,
@@ -254,6 +254,7 @@ const NewVariablesList = (props: Props) => {
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
 
@@ -676,6 +677,7 @@ const NewVariablesList = (props: Props) => {
     if (!!parentVariable) {
       parentType = parentVariable.getType();
     }
+    const isSelected = selectedNodes.includes(nodeId);
 
     return (
       <DragSourceAndDropTarget
@@ -696,7 +698,16 @@ const NewVariablesList = (props: Props) => {
               <StyledTreeItem
                 nodeId={nodeId}
                 label={
-                  <div>
+                  <div
+                    style={
+                      isSelected
+                        ? {
+                            backgroundColor:
+                              gdevelopTheme.listItem.selectedBackgroundColor,
+                          }
+                        : undefined
+                    }
+                  >
                     {isOver && <DropIndicator canDrop={canDrop} />}
                     <div
                       style={{
@@ -707,7 +718,13 @@ const NewVariablesList = (props: Props) => {
                     >
                       {connectDragSource(
                         <span>
-                          <DragHandle color="#AAA" />
+                          <DragHandle
+                            color={
+                              isSelected
+                                ? gdevelopTheme.listItem.selectedTextColor
+                                : '#AAA'
+                            }
+                          />
                         </span>
                       )}
                       <Spacer />
@@ -726,6 +743,13 @@ const NewVariablesList = (props: Props) => {
                             setNameErrors(newNameErrors);
                           }
                         }}
+                        inputStyle={
+                          isSelected
+                            ? {
+                                color: gdevelopTheme.listItem.selectedTextColor,
+                              }
+                            : undefined
+                        }
                         value={name}
                         onBlur={event => {
                           onChangeName(nodeId, event.currentTarget.value);
@@ -743,16 +767,29 @@ const NewVariablesList = (props: Props) => {
                                 variable.castTo(newType);
                                 forceUpdate();
                               }}
+                              isHighlighted={isSelected}
                             />
                           </Column>
                           <Column expand>
                             {type === gd.Variable.Boolean ? (
                               <Line noMargin>
-                                {variable.getBool() ? (
-                                  <Trans>True</Trans>
-                                ) : (
-                                  <Trans>False</Trans>
-                                )}
+                                <span
+                                  style={
+                                    isSelected
+                                      ? {
+                                          color:
+                                            gdevelopTheme.listItem
+                                              .selectedTextColor,
+                                        }
+                                      : undefined
+                                  }
+                                >
+                                  {variable.getBool() ? (
+                                    <Trans>True</Trans>
+                                  ) : (
+                                    <Trans>False</Trans>
+                                  )}
+                                </span>
                                 <Spacer />
                                 <IconButton
                                   size="small"
@@ -764,7 +801,14 @@ const NewVariablesList = (props: Props) => {
                                     );
                                   }}
                                 >
-                                  <SwapHorizontal />
+                                  <SwapHorizontal
+                                    htmlColor={
+                                      isSelected
+                                        ? gdevelopTheme.listItem
+                                            .selectedTextColor
+                                        : undefined
+                                    }
+                                  />
                                 </IconButton>
                               </Line>
                             ) : (
@@ -778,11 +822,18 @@ const NewVariablesList = (props: Props) => {
                                 key="value"
                                 onClick={stopEventPropagation}
                                 multiline={type === gd.Variable.String}
-                                inputStyle={
-                                  type === gd.Variable.String
+                                inputStyle={{
+                                  ...(type === gd.Variable.String
                                     ? styles.noPaddingMultilineTextField
-                                    : undefined
-                                }
+                                    : undefined),
+                                  ...(isSelected
+                                    ? {
+                                        color:
+                                          gdevelopTheme.listItem
+                                            .selectedTextColor,
+                                      }
+                                    : undefined),
+                                }}
                                 disabled={isCollection}
                                 value={
                                   isCollection
@@ -804,7 +855,13 @@ const NewVariablesList = (props: Props) => {
                               style={{ padding: 0 }}
                               onClick={() => onAddChild(nodeId)}
                             >
-                              <Add />
+                              <Add
+                                htmlColor={
+                                  isSelected
+                                    ? gdevelopTheme.listItem.selectedTextColor
+                                    : undefined
+                                }
+                              />
                             </IconButton>
                           ) : null}
                         </Line>

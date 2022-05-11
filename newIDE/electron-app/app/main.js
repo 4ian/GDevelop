@@ -20,6 +20,7 @@ const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
 const { downloadLocalFile } = require('./LocalFileDownloader');
+const { openPreviewWindow } = require('./PreviewWindow');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -151,6 +152,16 @@ app.on('ready', function() {
     console.info('Opening in browser (because of new window): ', details.url);
     electron.shell.openExternal(details.url);
     return { action: 'deny' };
+  });
+
+  ipcMain.handle('preview-open', async (event, options) => {
+    return openPreviewWindow({
+      parentWindow: mainWindow,
+      previewBrowserWindowOptions: options.previewBrowserWindowOptions,
+      previewGameIndexHtmlPath: options.previewGameIndexHtmlPath,
+      alwaysOnTop: options.alwaysOnTop,
+      hideMenuBar: options.hideMenuBar,
+    })
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {

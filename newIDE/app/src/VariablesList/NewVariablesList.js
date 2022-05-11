@@ -7,6 +7,7 @@ import Add from '@material-ui/icons/Add';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 import Copy from '../UI/CustomSvgIcons/Copy';
 import Undo from '@material-ui/icons/Undo';
+import Close from '@material-ui/icons/Close';
 import Redo from '@material-ui/icons/Redo';
 import Paste from '../UI/CustomSvgIcons/Paste';
 import Delete from '@material-ui/icons/Delete';
@@ -16,7 +17,7 @@ import { Column, Line, Spacer } from '../UI/Grid';
 import Checkbox from '../UI/Checkbox';
 import DragHandle from '../UI/DragHandle';
 import useForceUpdate from '../Utils/UseForceUpdate';
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import VariableTypeSelector from './VariableTypeSelector';
@@ -36,10 +37,55 @@ import {
 } from '../Utils/Serializer';
 import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
+import TextField from '../UI/TextField';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: Event) => event.stopPropagation();
 const preventEventDefaultEffect = (event: Event) => event.preventDefault();
+
+const hasChildThatContainsStringInNameAndValue = (
+  variable: gdVariable,
+  searchText: string
+): boolean => {
+  switch (variable.getType()) {
+    case gd.Variable.String:
+      return variable
+        .getString()
+        .normalize('NFD')
+        .toLowerCase()
+        .includes(searchText);
+    case gd.Variable.Number:
+      return variable
+        .getValue()
+        .toString()
+        .includes(searchText);
+    case gd.Variable.Array:
+      return mapFor(0, variable.getChildrenCount(), index => {
+        const childVariable = variable.getAtIndex(index);
+        return hasChildThatContainsStringInNameAndValue(
+          childVariable,
+          searchText
+        );
+      }).some(Boolean);
+    case gd.Variable.Structure:
+      return variable
+        .getAllChildrenNames()
+        .toJSArray()
+        .map(childName => {
+          const childVariable = variable.getChild(childName);
+          return (
+            childName
+              .normalize('NFD')
+              .toLowerCase()
+              .includes(searchText) ||
+            hasChildThatContainsStringInNameAndValue(childVariable, searchText)
+          );
+        })
+        .some(Boolean);
+    default:
+      return false;
+  }
+};
 
 type Props = {
   variablesContainer: gdVariablesContainer,
@@ -318,6 +364,7 @@ const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
     getExpandedNodeIdsFromVariablesContainer(props.variablesContainer)
   );
+  const [searchText, setSearchText] = React.useState<string>('');
   const [historyOffset, setHistoryOffset] = React.useState<number>(0);
   const [history, setHistory] = React.useState<any[]>([
     serializeToJSObject(props.variablesContainer),
@@ -783,6 +830,20 @@ const NewVariablesList = (props: Props) => {
     }
     const isSelected = selectedNodes.includes(nodeId);
 
+    if (
+      !!searchText &&
+      !name
+        .normalize('NFD')
+        .toLowerCase()
+        .includes(searchText.toLowerCase()) &&
+      !hasChildThatContainsStringInNameAndValue(
+        variable,
+        searchText.toLowerCase()
+      )
+    ) {
+      return null;
+    }
+
     return (
       <DragSourceAndDropTarget
         key={variable.ptr}
@@ -1115,7 +1176,7 @@ const NewVariablesList = (props: Props) => {
       {({ contentRect, measureRef }) => (
         <>
           <Column expand noMargin>
-            <Line noMargin justifyContent="space-between">
+            <Line justifyContent="space-between" alignItems="center">
               <Column noMargin>
                 <Line noMargin>
                   <FlatButton
@@ -1151,6 +1212,21 @@ const NewVariablesList = (props: Props) => {
                     onClick={redo}
                   />
                 </Line>
+              </Column>
+              <Column expand>
+                <TextField
+                  fullWidth
+                  value={searchText}
+                  onChange={(event, value) => setSearchText(value)}
+                  endAdornment={
+                    !!searchText ? (
+                      <IconButton onClick={() => setSearchText('')} edge="end">
+                        <Close />
+                      </IconButton>
+                    ) : null
+                  }
+                  hintText={t`Search in variables`}
+                />
               </Column>
               <Column>
                 <FlatButton

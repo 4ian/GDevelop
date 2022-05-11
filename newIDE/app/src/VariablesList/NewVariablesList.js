@@ -316,6 +316,10 @@ const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
     getExpandedNodeIdsFromVariablesContainer(props.variablesContainer)
   );
+  const [historyOffset, setHistoryOffset] = React.useState<number>(0);
+  const [history, setHistory] = React.useState<any[]>([
+    serializeToJSObject(props.variablesContainer),
+  ]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
@@ -332,6 +336,40 @@ const NewVariablesList = (props: Props) => {
     }),
     [containerWidth]
   );
+
+  const saveToHistory = () => {
+    const newHistory = [...history];
+    if (historyOffset) {
+      newHistory.splice(newHistory.length - historyOffset, historyOffset);
+      setHistoryOffset(0);
+    }
+    newHistory.push(serializeToJSObject(props.variablesContainer));
+    setHistory(newHistory);
+  };
+
+  const undo = () => {
+    if (historyOffset < history.length - 1) {
+      const newHistoryOffset = historyOffset + 1;
+      unserializeFromJSObject(
+        props.variablesContainer,
+        history[history.length - 1 - newHistoryOffset]
+      );
+      setHistoryOffset(newHistoryOffset);
+      forceUpdate();
+    }
+  };
+
+  const redo = () => {
+    if (historyOffset > 0) {
+      const newHistoryOffset = historyOffset - 1;
+      unserializeFromJSObject(
+        props.variablesContainer,
+        history[history.length - 1 - newHistoryOffset]
+      );
+      setHistoryOffset(newHistoryOffset);
+      forceUpdate();
+    }
+  };
 
   const copySelection = () => {
     Clipboard.set(
@@ -445,6 +483,7 @@ const NewVariablesList = (props: Props) => {
         }
       }
     });
+    saveToHistory();
     setSelectedNodes(newSelectedNodes);
   };
 
@@ -466,6 +505,7 @@ const NewVariablesList = (props: Props) => {
         }
       }
     });
+    saveToHistory();
     setSelectedNodes([]);
   };
 
@@ -573,6 +613,7 @@ const NewVariablesList = (props: Props) => {
     let newName;
     let draggedIndex;
     let targetIndex;
+    let movementHasBeenMade = true;
 
     switch (movementType) {
       case 'InsideTopLevel':
@@ -651,10 +692,12 @@ const NewVariablesList = (props: Props) => {
       case 'ArrayToTopLevel':
       case 'InsideSameStructure':
       default:
-        return;
+        movementHasBeenMade = false;
     }
-
-    forceUpdate();
+    if (movementHasBeenMade) {
+      saveToHistory();
+      forceUpdate();
+    }
   };
 
   const onAddChild = (nodeId: string) => {
@@ -671,6 +714,7 @@ const NewVariablesList = (props: Props) => {
       );
       variable.getChild(name).setString('');
     } else if (type === gd.Variable.Array) variable.pushNew();
+    saveToHistory();
     setExpandedNodes([...expandedNodes, nodeId]);
   };
 
@@ -684,6 +728,7 @@ const NewVariablesList = (props: Props) => {
         null,
         props.variablesContainer.count()
       );
+      saveToHistory();
       setSelectedNodes([newName]);
       return;
     }
@@ -707,6 +752,7 @@ const NewVariablesList = (props: Props) => {
       null,
       position
     );
+    saveToHistory();
     setSelectedNodes([newName]);
   };
 
@@ -820,7 +866,7 @@ const NewVariablesList = (props: Props) => {
                             <VariableTypeSelector
                               variableType={type}
                               onChange={newType => {
-                                variable.castTo(newType);
+                                onChangeType(nodeId, newType);
                                 forceUpdate();
                               }}
                               isHighlighted={isSelected}
@@ -891,6 +937,7 @@ const NewVariablesList = (props: Props) => {
                                     : undefined),
                                 }}
                                 disabled={isCollection}
+                                onChange={() => {}}
                                 value={
                                   isCollection
                                     ? `${variable.getChildrenCount()} children`
@@ -898,8 +945,12 @@ const NewVariablesList = (props: Props) => {
                                     ? variable.getString()
                                     : variable.getValue().toString()
                                 }
-                                onChange={value => {
-                                  onChangeValue(nodeId, value);
+                                commitOnBlur
+                                onBlur={event => {
+                                  onChangeValue(
+                                    nodeId,
+                                    event.currentTarget.value
+                                  );
                                   forceUpdate();
                                 }}
                               />
@@ -985,6 +1036,7 @@ const NewVariablesList = (props: Props) => {
       hasBeenRenamed = parentVariable.renameChild(name, newName);
     }
     if (hasBeenRenamed) {
+      saveToHistory();
       renameExpandedNode(nodeId, newName);
     } else {
       if (variable)
@@ -997,6 +1049,16 @@ const NewVariablesList = (props: Props) => {
     }
   };
 
+  const onChangeType = (nodeId: string, newType: string) => {
+    const { variable } = getVariableContextFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!variable) return;
+    variable.castTo(newType);
+    saveToHistory();
+  };
+
   const onChangeValue = (nodeId: string, newValue: string) => {
     const { variable } = getVariableContextFromNodeId(
       nodeId,
@@ -1005,20 +1067,26 @@ const NewVariablesList = (props: Props) => {
     if (!variable) return;
     switch (variable.getType()) {
       case gd.Variable.String:
+        if (variable.getString() === newValue) return;
         variable.setString(newValue);
         break;
       case gd.Variable.Number:
-        variable.setValue(parseFloat(newValue));
+        const newValueAsFloat = parseFloat(newValue);
+        if (newValueAsFloat === variable.getValue()) return;
+        variable.setValue(newValueAsFloat);
         break;
       case gd.Variable.Boolean:
-        variable.setBool(newValue === 'true');
-        forceUpdate();
+        const newBool = newValue === 'true';
+        if (newBool === variable.getBool()) return;
+        variable.setBool(newBool);
         break;
       default:
         console.error(
           `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
         );
     }
+    saveToHistory();
+    forceUpdate();
   };
 
   const renderTree = (variablesContainer: gdVariablesContainer) => {

@@ -108,6 +108,8 @@ const insertInVariableChildren = (
 
 const getDirectParentVariable = lineage =>
   lineage[lineage.length - 1] ? lineage[lineage.length - 1].variable : null;
+const getOldestAncestryVariable = lineage =>
+  lineage.length ? lineage[0] : null;
 
 const getVariableContextFromNodeId = (
   nodeId: string,
@@ -635,17 +637,20 @@ const NewVariablesList = (props: Props) => {
       lineage: targetLineage,
     } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
     if (!targetVariableName) return;
-    if (targetLineage.length === 0) {
-      const newName = insertInVariablesContainer(
-        props.variablesContainer,
-        'Variable',
-        null,
-        props.variablesContainer.getPosition(targetVariableName) + 1
-      );
-      setSelectedNodes([newName]);
-      return;
+    const oldestAncestry = getOldestAncestryVariable(targetLineage);
+    let position;
+    if (!oldestAncestry) {
+      position = props.variablesContainer.getPosition(targetVariableName) + 1;
+    } else {
+      position = props.variablesContainer.getPosition(oldestAncestry.name) + 1;
     }
-    return; // TODO - insert after the top level variable that contains the target. To do so, make it so that getVariableContextFromNodeId returns parents = [{name, nodeId, variable}]
+    const newName = insertInVariablesContainer(
+      props.variablesContainer,
+      'Variable',
+      null,
+      position
+    );
+    setSelectedNodes([newName]);
   };
 
   const renderVariableAndChildrenRows = ({

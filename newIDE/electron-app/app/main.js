@@ -110,7 +110,7 @@ app.on('ready', function() {
 
   if (isDev)
     mainWindow.webContents.session.loadExtension(
-      path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/')
+      path.join(__dirname, 'extensions/ReactDeveloperTools/4.24.3_0/')
     );
 
   // Expose program arguments (to be accessed by mainWindow)

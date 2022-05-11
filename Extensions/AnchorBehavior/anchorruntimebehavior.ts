@@ -19,14 +19,15 @@ namespace gdjs {
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
-      this._relativeToOriginalWindowSize =
-        !!behaviorData.relativeToOriginalWindowSize;
+      this._relativeToOriginalWindowSize = !!behaviorData.relativeToOriginalWindowSize;
       this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
       this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
       this._topEdgeAnchor = behaviorData.topEdgeAnchor;
       this._bottomEdgeAnchor = behaviorData.bottomEdgeAnchor;
       this._useLegacyBottomAndRightAnchors =
-        behaviorData.useLegacyWindowAnchors === undefined ? true : false;
+        behaviorData.useLegacyBottomAndRightAnchors === undefined
+          ? true
+          : behaviorData.useLegacyBottomAndRightAnchors;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -49,7 +50,7 @@ namespace gdjs {
         newBehaviorData.useLegacyTrajectory
       ) {
         this._useLegacyBottomAndRightAnchors =
-          newBehaviorData.useLegacyWindowAnchors;
+          newBehaviorData.useLegacyBottomAndRightAnchors;
       }
       if (
         oldBehaviorData.relativeToOriginalWindowSize !==
@@ -327,7 +328,8 @@ namespace gdjs {
               this.owner.setX(
                 bottomRightCoord[0] +
                   this.owner.getX() -
-                  this.owner.getDrawableX()
+                  this.owner.getDrawableX() -
+                  this.owner.getWidth()
               );
             }
           }

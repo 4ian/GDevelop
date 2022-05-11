@@ -35,6 +35,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import TextField from '../UI/TextField';
@@ -1237,38 +1238,49 @@ const NewVariablesList = (props: Props) => {
                 />
               </Column>
             </Line>
-            <ScrollView autoHideScrollbar>
-              <TreeView
-                ref={measureRef}
-                multiSelect
-                defaultExpandIcon={<ChevronRight />}
-                defaultCollapseIcon={<ExpandMore />}
-                onNodeSelect={(event, values) => setSelectedNodes(values)}
-                onNodeToggle={(event, values) => {
-                  const foldedNodes = expandedNodes.filter(
-                    node => !values.includes(node)
-                  );
-                  const unfoldedNodes = values.filter(
-                    node => !expandedNodes.includes(node)
-                  );
-                  foldNodesVariables(
-                    props.variablesContainer,
-                    foldedNodes,
-                    true
-                  );
-                  foldNodesVariables(
-                    props.variablesContainer,
-                    unfoldedNodes,
-                    false
-                  );
-                  setExpandedNodes(values);
-                }}
-                selected={selectedNodes}
-                expanded={expandedNodes}
-              >
-                {renderTree(props.variablesContainer)}
-              </TreeView>
-            </ScrollView>
+            {props.variablesContainer.count() === 0 ? (
+              <Column noMargin expand justifyContent="center">
+                <EmptyPlaceholder
+                  title={<Trans>Add a variable</Trans>}
+                  description={<Trans>Store data in variables.</Trans>}
+                  actionLabel={<Trans>Add a variable</Trans>}
+                  onAdd={onAdd}
+                />
+              </Column>
+            ) : (
+              <ScrollView autoHideScrollbar>
+                <TreeView
+                  ref={measureRef}
+                  multiSelect
+                  defaultExpandIcon={<ChevronRight />}
+                  defaultCollapseIcon={<ExpandMore />}
+                  onNodeSelect={(event, values) => setSelectedNodes(values)}
+                  onNodeToggle={(event, values) => {
+                    const foldedNodes = expandedNodes.filter(
+                      node => !values.includes(node)
+                    );
+                    const unfoldedNodes = values.filter(
+                      node => !expandedNodes.includes(node)
+                    );
+                    foldNodesVariables(
+                      props.variablesContainer,
+                      foldedNodes,
+                      true
+                    );
+                    foldNodesVariables(
+                      props.variablesContainer,
+                      unfoldedNodes,
+                      false
+                    );
+                    setExpandedNodes(values);
+                  }}
+                  selected={selectedNodes}
+                  expanded={expandedNodes}
+                >
+                  {renderTree(props.variablesContainer)}
+                </TreeView>
+              </ScrollView>
+            )}
           </Column>
         </>
       )}

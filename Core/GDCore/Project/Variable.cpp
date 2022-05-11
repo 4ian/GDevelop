@@ -226,6 +226,7 @@ bool Variable::InsertChild(const gd::String& name,
 
 void Variable::SerializeTo(SerializerElement& element) const {
   element.SetStringAttribute("type", TypeAsString(GetType()));
+  element.SetBoolAttribute("folded", IsFolded());
 
   if (type == Type::String) {
     element.SetStringAttribute("value", GetString());
@@ -263,6 +264,7 @@ void Variable::UnserializeFrom(const SerializerElement& element) {
   if (element.HasChild("children", "Children") && IsPrimitive(type))
     type = Type::Structure;
   // end of compatibility code
+  SetFolded(element.GetBoolAttribute("folded", false));
 
   if (IsPrimitive(type)) {
     if (type == Type::String) {
@@ -334,6 +336,7 @@ void Variable::RemoveRecursively(const gd::Variable& variableToRemove) {
 Variable::Variable(const Variable& other)
     : value(other.value),
       str(other.str),
+      folded(other.folded),
       boolVal(other.boolVal),
       type(other.type) {
   CopyChildren(other);
@@ -343,6 +346,7 @@ Variable& Variable::operator=(const Variable& other) {
   if (this != &other) {
     value = other.value;
     str = other.str;
+    folded = other.folded;
     boolVal = other.boolVal;
     type = other.type;
     CopyChildren(other);

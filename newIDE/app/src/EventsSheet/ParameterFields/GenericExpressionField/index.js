@@ -116,12 +116,21 @@ type Props = {|
 const MAX_ERRORS_COUNT = 10;
 
 const extractErrors = (
+  platform: gdPlatform,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  expressionType: string,
   expressionNode: gdExpressionNode
 ): {|
   errorText: ?string,
   errorHighlights: Array<Highlight>,
 |} => {
-  const expressionValidator = new gd.ExpressionValidator();
+  const expressionValidator = new gd.ExpressionValidator(
+    gd.JsPlatform.get(),
+    globalObjectsContainer,
+    objectsContainer,
+    expressionType
+  );
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getErrors();
 
@@ -370,17 +379,17 @@ export default class ExpressionField extends React.Component<Props, State> {
     // Parsing can be time consuming (~1ms for simple expression,
     // a few milliseconds for complex ones).
 
-    const parser = new gd.ExpressionParser2(
+    const parser = new gd.ExpressionParser2();
+
+    const expressionNode = parser.parseExpression(expression).get();
+
+    const { errorText, errorHighlights } = extractErrors(
       gd.JsPlatform.get(),
       globalObjectsContainer,
-      objectsContainer
+      objectsContainer,
+      expressionType,
+      expressionNode
     );
-
-    const expressionNode = parser
-      .parseExpression(expressionType, expression)
-      .get();
-
-    const { errorText, errorHighlights } = extractErrors(expressionNode);
     const extraErrorText = onExtractAdditionalErrors
       ? onExtractAdditionalErrors(expression, expressionNode)
       : null;
@@ -406,6 +415,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       ? this._inputElement.selectionStart
       : 0;
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
       expressionNode,
       cursorPosition - 1
     );

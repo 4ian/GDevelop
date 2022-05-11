@@ -75,7 +75,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
         child(nullptr) {};
 
   const gd::String &GetType() {
-    return ConvertSubtype(type);
+    return gd::ParameterMetadata::GetExpressionValueType(type);
   };
 
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
@@ -138,7 +138,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     }
     else {
       const gd::ParameterMetadata* parameterMetadata =
-          MetadataProvider::GetFunctionCallParameterMetadata(
+          gd::MetadataProvider::GetFunctionCallParameterMetadata(
               platform,
               globalObjectsContainer,
               objectsContainer,
@@ -176,12 +176,6 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       type = rootType;
     }
   }
-
-  static const gd::String numberTypeString;
-  static const gd::String stringTypeString;
-  static const gd::String variableTypeString;
-  static const gd::String objectTypeString;
-  static const gd::String &ConvertSubtype(const gd::String &type);
 
   gd::String type;
   ExpressionNode *child;

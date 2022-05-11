@@ -207,6 +207,13 @@ class GD_CORE_API ParameterMetadata {
     return false;
   }
 
+  /**
+   * \brief Return the expression type from the parameter type.
+   */
+  static const gd::String &GetExpressionValueType(const gd::String &parameterType);
+  static const gd::String numberType;
+  static const gd::String stringType;
+
   /** \name Serialization
    */
   ///@{

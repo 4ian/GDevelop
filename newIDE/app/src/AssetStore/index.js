@@ -5,7 +5,7 @@ import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
 import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
@@ -89,10 +89,11 @@ export const AssetStore = ({
             ref={searchBar}
             id="asset-store-search-bar"
           />
-          <Line justifyContent="left">
+          {!isOnHomePage && <Spacer />}
+          <Line justifyContent="left" noMargin={isOnHomePage}>
             {isOnHomePage ? (
               <Column>
-                <Text>Discover</Text>
+                <Text size="title">Discover</Text>
               </Column>
             ) : (
               <FlatButton

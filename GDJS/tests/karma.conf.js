@@ -69,6 +69,7 @@ module.exports = function (config) {
 
       //Extensions:
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/DraggableBehavior/draggableruntimebehavior.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/AnchorBehavior/anchorruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PlatformBehavior/platformerobjectruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/PlatformBehavior/platformruntimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/LinkedObjects/linkedobjects.js',

@@ -241,7 +241,7 @@ const getVariableContextFromNodeId = (
   nodeId: string,
   variablesContainer: gdVariablesContainer
 ) => {
-  const nodes = nodeId.split('.');
+  const bits = nodeId.split('.');
   let parentVariable = null;
   let currentVariable = null;
   let currentVariableName = null;
@@ -249,9 +249,9 @@ const getVariableContextFromNodeId = (
   let name = null;
   let depth = -1;
 
-  while (depth < nodes.length - 1) {
+  while (depth < bits.length - 1) {
     depth += 1;
-    currentVariableName = nodes[depth];
+    currentVariableName = bits[depth];
     if (depth === 0 && currentVariableName.startsWith(inheritedPrefix)) {
       currentVariableName = removeInheritedPrefix(currentVariableName);
     }
@@ -271,9 +271,9 @@ const getVariableContextFromNodeId = (
         currentVariable = parentVariable.getChild(currentVariableName);
       }
     }
-    if (depth < nodes.length - 1) {
+    if (depth < bits.length - 1) {
       lineage.push({
-        nodeId: nodes.slice(0, depth + 1).join('.'),
+        nodeId: bits.slice(0, depth + 1).join('.'),
         name: currentVariableName,
         variable: currentVariable,
       });
@@ -559,14 +559,14 @@ const NewVariablesList = (props: Props) => {
               serializedVariable,
               index
             );
-            const nodes = targetNode.split('.');
-            nodes.splice(
-              nodes.length - 1,
+            const bits = targetNode.split('.');
+            bits.splice(
+              bits.length - 1,
               1,
               (index + pastedElementOffsetIndex).toString()
             );
 
-            newSelectedNodes.push(nodes.join('.'));
+            newSelectedNodes.push(bits.join('.'));
             pastedElementOffsetIndex += 1;
           } else {
             const newName = insertInVariableChildren(
@@ -574,9 +574,9 @@ const NewVariablesList = (props: Props) => {
               name,
               serializedVariable
             );
-            const nodes = targetNode.split('.');
-            nodes.splice(nodes.length - 1, 1, newName);
-            newSelectedNodes.push(nodes.join('.'));
+            const bits = targetNode.split('.');
+            bits.splice(bits.length - 1, 1, newName);
+            newSelectedNodes.push(bits.join('.'));
           }
         }
       }
@@ -612,14 +612,31 @@ const NewVariablesList = (props: Props) => {
     }
   };
 
-  const renameExpandedNode = (nodeId: string, newName: string) => {
-    const newExpandedNodes: Array<string> = [...expandedNodes];
-    const index = newExpandedNodes.indexOf(nodeId);
-    if (index === -1) return;
-    const oldNodeId = newExpandedNodes.splice(index, 1)[0];
-    const nodes = oldNodeId.split('.');
-    nodes[nodes.length - 1] = newName;
-    setExpandedNodes([...newExpandedNodes, nodes.join('.')]);
+  const updateExpandedAndSelectedNodes = (nodeId: string, newName: string) => {
+    [
+      [expandedNodes, setExpandedNodes],
+      [selectedNodes, setSelectedNodes],
+    ].forEach(([list, setter]) => {
+      const newList: Array<string> = [...list];
+      const indexOfRenamedNode = newList.indexOf(nodeId);
+      if (indexOfRenamedNode === -1) return;
+      const indicesOfChildrenOfRenamedNode = newList
+        .map(otherNodeId => {
+          if (otherNodeId.startsWith(`${nodeId}.`)) {
+            return newList.indexOf(otherNodeId);
+          }
+        })
+        .filter(Boolean);
+      const originalNodeIdBits = nodeId.split('.');
+      const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
+      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].map(index => {
+        const nodeIdToChange = newList[index];
+        const bitsToChange = nodeIdToChange.split('.');
+        bitsToChange[bitsToChange.indexOf(variableName)] = newName;
+        newList.splice(index, 1, bitsToChange.join('.'));
+      });
+      setter(newList);
+    });
   };
 
   const DragSourceAndDropTarget = React.useMemo(
@@ -1193,7 +1210,7 @@ const NewVariablesList = (props: Props) => {
     }
     if (hasBeenRenamed) {
       saveToHistory();
-      renameExpandedNode(nodeId, newName);
+      updateExpandedAndSelectedNodes(nodeId, newName);
     } else {
       if (variable)
         setNameErrors({

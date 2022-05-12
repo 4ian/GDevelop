@@ -6,6 +6,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
     // @ts-ignore
     properties: { windowWidth: 1000, windowHeight: 1000 },
   });
+  const anchorBehaviorName = 'Anchor';
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [
@@ -40,7 +41,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       type: '',
       behaviors: [
         {
-          name: 'Anchor',
+          name: anchorBehaviorName,
           type: 'AnchorBehavior::AnchorBehavior',
           // @ts-ignore - properties are not typed
           rightEdgeAnchor: 0,
@@ -60,14 +61,24 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
     return object;
   }
 
+  function getAnchorBehavior(object) {
+    const behavior = object.getBehavior(anchorBehaviorName);
+    if (!(behavior instanceof gdjs.AnchorRuntimeBehavior)) {
+      throw new Error(
+        'Expected behavior to be an instance of gdjs.AnchorBehavior'
+      );
+    }
+    return behavior;
+  }
+
   describe('(anchor horizontal edge)', function () {
-    [('right', 'left')].forEach((objectEdge) => {
+    ['right', 'left'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window left (fixed)`, function () {
         var object = createObject();
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
 
-        object.getBehavior('Anchor').setAnchor(objectEdge, 1);
+        getAnchorBehavior(object).setAnchor(objectEdge, 1);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -85,7 +96,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
 
-        object.getBehavior('Anchor').setAnchor(objectEdge, 2);
+        getAnchorBehavior(object).setAnchor(objectEdge, 2);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -103,8 +114,8 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
 
-      object.getBehavior('Anchor').setAnchor('left', 1);
-      object.getBehavior('Anchor').setAnchor('right', 2);
+      getAnchorBehavior(object).setAnchor('left', 1);
+      getAnchorBehavior(object).setAnchor('right', 2);
 
       runtimeScene.renderAndStep(1000 / 60);
 
@@ -121,7 +132,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
 
-      object.getBehavior('Anchor').setAnchor('left', 3);
+      getAnchorBehavior(object).setAnchor('left', 3);
 
       runtimeScene.renderAndStep(1000 / 60);
 
@@ -141,7 +152,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
 
-        object.getBehavior('Anchor').setAnchor('top', 1);
+        getAnchorBehavior(object).setAnchor('top', 1);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -159,7 +170,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
 
-        object.getBehavior('Anchor').setAnchor('bottom', 2);
+        getAnchorBehavior(object).setAnchor('bottom', 2);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -177,8 +188,8 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
 
-      object.getBehavior('Anchor').setAnchor('top', 1);
-      object.getBehavior('Anchor').setAnchor('bottom', 2);
+      getAnchorBehavior(object).setAnchor('top', 1);
+      getAnchorBehavior(object).setAnchor('bottom', 2);
 
       runtimeScene.renderAndStep(1000 / 60);
 
@@ -195,7 +206,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
 
-      object.getBehavior('Anchor').setAnchor('top', 3);
+      getAnchorBehavior(object).setAnchor('top', 3);
 
       runtimeScene.renderAndStep(1000 / 60);
 

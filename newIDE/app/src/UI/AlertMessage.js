@@ -11,9 +11,14 @@ import FlatButton from './FlatButton';
 import Text from './Text';
 import GDevelopThemeContext from './Theme/ThemeContext';
 import { ResponsiveLineStackLayout } from './Layout';
+import Close from '@material-ui/icons/Close';
+import IconButton from './IconButton';
 
 const styles = {
   icon: { width: 28, height: 28, marginRight: 10, marginLeft: 10 },
+  topRightHideButton: { position: 'absolute', right: 0, top: 0 },
+  paper: { position: 'relative' },
+  hideIcon: { width: 16, height: 16 },
   content: { flex: 1 },
 };
 
@@ -39,54 +44,55 @@ const AlertMessage = ({
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   return (
-    <Paper variant="outlined">
+    <Paper variant="outlined" style={styles.paper}>
       <Column expand>
-        <ResponsiveLineStackLayout
-          alignItems="center"
-          justifyContent="space-between"
-          noMargin
-        >
-          <Line noMargin alignItems="center">
-            {renderLeftIcon ? (
-              <React.Fragment>
-                {renderLeftIcon()}
-                <Spacer />
-                <Spacer />
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                {kind === 'info' && <Info style={styles.icon} />}
-                {kind === 'warning' && (
-                  <Warning
-                    style={{
-                      ...styles.icon,
-                      color: gdevelopTheme.message.warning,
-                    }}
-                  />
-                )}
-                {kind === 'error' && (
-                  <Error
-                    style={{
-                      ...styles.icon,
-                      color: gdevelopTheme.message.error,
-                    }}
-                  />
-                )}
-              </React.Fragment>
-            )}
-            <Text style={styles.content}>{children}</Text>
-          </Line>
-          <ResponsiveLineStackLayout noMargin alignItems="center">
+        <Line expand>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            justifyContent="space-between"
+            noMargin
+            expand
+          >
+            <Line noMargin alignItems="center">
+              {renderLeftIcon ? (
+                <React.Fragment>
+                  {renderLeftIcon()}
+                  <Spacer />
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  {kind === 'info' && <Info style={styles.icon} />}
+                  {kind === 'warning' && (
+                    <Warning
+                      style={{
+                        ...styles.icon,
+                        color: gdevelopTheme.message.warning,
+                      }}
+                    />
+                  )}
+                  {kind === 'error' && (
+                    <Error
+                      style={{
+                        ...styles.icon,
+                        color: gdevelopTheme.message.error,
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              )}
+              <Text style={styles.content}>{children}</Text>
+            </Line>
             {renderRightButton && renderRightButton()}
-            {onHide && (
-              <FlatButton
-                label={<Trans>Hide</Trans>}
-                onClick={() => onHide()}
-              />
-            )}
           </ResponsiveLineStackLayout>
-        </ResponsiveLineStackLayout>
+        </Line>
       </Column>
+      {onHide && (
+        <div style={styles.topRightHideButton}>
+          <IconButton ariaLabel="hide" onClick={() => onHide()} size="small">
+            <Close style={styles.hideIcon} />
+          </IconButton>
+        </div>
+      )}
     </Paper>
   );
 };

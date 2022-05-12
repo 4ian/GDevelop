@@ -1281,7 +1281,7 @@ const NewVariablesList = (props: Props) => {
                   hintText={t`Search in variables`}
                 />
               </Column>
-              <Column>
+              <Column noMargin>
                 {isNarrow ? (
                   <IconButton
                     tooltip={t`Add variable`}

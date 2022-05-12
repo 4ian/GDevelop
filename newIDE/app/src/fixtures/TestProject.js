@@ -10,6 +10,7 @@ export type TestProject = {|
   spriteObject: gdSpriteObject,
   spriteObjectWithBehaviors: gdSpriteObject,
   spriteObjectWithoutBehaviors: gdSpriteObject,
+  testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -115,6 +116,24 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
   const spriteObject = new gd.SpriteObject('MySpriteObject');
   spriteObject.setType('Sprite');
+  {
+    const variablesContainer = spriteObject.getVariables();
+    variablesContainer
+      .insert('ObjectVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherObjectVariable',
+      new gd.Variable(),
+      0
+    );
+    variable.castTo('structure');
+    variable.getChild('ObjectChild1').setValue(564);
+    variable.getChild('ObjectChild2').setString('Guttentag');
+    variable.getChild('ObjectChild3').setBool(true);
+    const arrayVariable = variable.getChild('ObjectChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.pushNew().setValue(856.5);
+  }
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
   );
@@ -238,6 +257,30 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewInitialInstance();
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
+
+  const testSpriteObjectInstance = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testSpriteObjectInstance.setObjectName(spriteObject.getName());
+
+  {
+    const variablesContainer = testSpriteObjectInstance.getVariables();
+    variablesContainer
+      .insert('InstanceVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherInstanceVariable',
+      new gd.Variable(),
+      0
+    );
+    variable.castTo('structure');
+    variable.getChild('InstanceChild1').setValue(564);
+    variable.getChild('InstanceChild2').setString('Guttentag');
+    variable.getChild('InstanceChild3').setBool(true);
+    const arrayVariable = variable.getChild('InstanceChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.pushNew().setString('Bonjour');
+  }
 
   // Add layers
   testLayout.insertNewLayer('GUI', 0);
@@ -659,6 +702,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     tiledSpriteObject,
     panelSpriteObject,
     spriteObject,
+    testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,

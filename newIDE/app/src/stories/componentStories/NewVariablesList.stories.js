@@ -10,12 +10,22 @@ import SerializedObjectDisplay from '../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 
-export const New = () => (
+export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <NewVariablesList
         variablesContainer={testProject.testLayout.getVariables()}
-        onComputeAllVariableNames={() => []}
+      />
+    </FixedHeightFlexContainer>
+  </DragAndDropContextProvider>
+);
+
+export const InstanceWithObjectVariables = () => (
+  <DragAndDropContextProvider>
+    <FixedHeightFlexContainer height={600}>
+      <NewVariablesList
+        variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
+        inheritedVariablesContainer={testProject.spriteObject.getVariables()}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

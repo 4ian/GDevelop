@@ -2540,7 +2540,6 @@ interface SpriteObject {
 };
 SpriteObject implements gdObject;
 
-[Prefix="sf::"]
 interface Vector2f {
     void Vector2f();
 

@@ -6,7 +6,6 @@
 
 #ifndef SPRITE_H
 #define SPRITE_H
-#include <SFML/Graphics/Sprite.hpp>
 #include <memory>
 #include "GDCore/Extensions/Builtin/SpriteExtension/Point.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"

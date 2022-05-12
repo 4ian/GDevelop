@@ -4,7 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "Polygon2d.h"
-#include <SFML/System/Vector2.hpp>
+#include "GDCore/Vector2.h"
 #include <cmath>
 #include <iostream>
 
@@ -28,7 +28,7 @@ void Polygon2d::Move(float x, float y) {
 }
 
 void Polygon2d::ComputeEdges() const {
-  sf::Vector2f v1, v2;
+  gd::Vector2f v1, v2;
   edges.clear();
 
   for (std::size_t i = 0; i < vertices.size(); i++) {
@@ -62,8 +62,8 @@ bool Polygon2d::IsConvex() const {
   return true;
 }
 
-sf::Vector2f Polygon2d::ComputeCenter() const {
-  sf::Vector2f center;
+gd::Vector2f Polygon2d::ComputeCenter() const {
+  gd::Vector2f center;
 
   for (std::size_t i = 0; i < vertices.size(); i++) {
     center.x += vertices[i].x;
@@ -77,10 +77,10 @@ sf::Vector2f Polygon2d::ComputeCenter() const {
 
 Polygon2d Polygon2d::CreateRectangle(float width, float height) {
   Polygon2d rect;
-  rect.vertices.push_back(sf::Vector2f(-width / 2.0f, -height / 2.0f));
-  rect.vertices.push_back(sf::Vector2f(+width / 2.0f, -height / 2.0f));
-  rect.vertices.push_back(sf::Vector2f(+width / 2.0f, +height / 2.0f));
-  rect.vertices.push_back(sf::Vector2f(-width / 2.0f, +height / 2.0f));
+  rect.vertices.push_back(gd::Vector2f(-width / 2.0f, -height / 2.0f));
+  rect.vertices.push_back(gd::Vector2f(+width / 2.0f, -height / 2.0f));
+  rect.vertices.push_back(gd::Vector2f(+width / 2.0f, +height / 2.0f));
+  rect.vertices.push_back(gd::Vector2f(-width / 2.0f, +height / 2.0f));
 
   return rect;
 }

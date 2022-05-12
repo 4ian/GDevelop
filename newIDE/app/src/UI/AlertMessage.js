@@ -85,7 +85,7 @@ const AlertMessage = ({
       </Column>
       {onHide && (
         <div style={styles.topRightHideButton}>
-          <IconButton ariaLabel="hide" onClick={() => onHide()} size="small">
+          <IconButton aria-label="hide" onClick={() => onHide()} size="small">
             <Close style={styles.hideIcon} />
           </IconButton>
         </div>

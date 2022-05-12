@@ -983,7 +983,11 @@ const NewVariablesList = (props: Props) => {
                       </span>
                     )
                   )}
-                  <ResponsiveLineStackLayout expand noMargin>
+                  <ResponsiveLineStackLayout
+                    expand
+                    noMargin
+                    width={isNarrow ? 'small' : undefined}
+                  >
                     <Line alignItems="center" noMargin expand>
                       <Spacer />
                       <SemiControlledAutoComplete
@@ -1337,11 +1341,7 @@ const NewVariablesList = (props: Props) => {
           onKeyDown={keyboardShortcuts.onKeyDown}
           onKeyUp={keyboardShortcuts.onKeyUp}
         >
-          <Column
-            expand
-            noMargin
-            reverse={containerWidth ? containerWidth < 600 : false}
-          >
+          <Column expand noMargin reverse={isNarrow}>
             <Line justifyContent="space-between" alignItems="center">
               <Column noMargin>
                 <Line noMargin>

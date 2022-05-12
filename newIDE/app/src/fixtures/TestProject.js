@@ -124,14 +124,16 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const variable = variablesContainer.insert(
       'OtherObjectVariable',
       new gd.Variable(),
-      0
+      1
     );
+    variable.setFolded(false);
     variable.castTo('structure');
     variable.getChild('ObjectChild1').setValue(564);
     variable.getChild('ObjectChild2').setString('Guttentag');
     variable.getChild('ObjectChild3').setBool(true);
     const arrayVariable = variable.getChild('ObjectChild4');
     arrayVariable.castTo('array');
+    arrayVariable.setFolded(true);
     arrayVariable.pushNew().setValue(856.5);
   }
   const spriteObjectWithBehaviors = new gd.SpriteObject(
@@ -271,7 +273,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const variable = variablesContainer.insert(
       'OtherInstanceVariable',
       new gd.Variable(),
-      0
+      1
     );
     variable.castTo('structure');
     variable.getChild('InstanceChild1').setValue(564);

@@ -94,7 +94,9 @@ const hasChildThatContainsStringInNameAndValue = (
 
 type Props = {
   variablesContainer: gdVariablesContainer,
+  inheritedVariablesContainer?: gdVariablesContainer,
 };
+
 const getExpandedNodeIdsFromVariables = (
   variables: { name: string, variable: gdVariable }[],
   accumulator: string[],
@@ -133,12 +135,15 @@ const getExpandedNodeIdsFromVariables = (
 };
 
 const getExpandedNodeIdsFromVariablesContainer = (
-  variablesContainer: gdVariablesContainer
+  variablesContainer: gdVariablesContainer,
+  isInherited: boolean = false
 ): string[] => {
   const variables = [];
   for (let index = 0; index < variablesContainer.count(); index += 1) {
     variables.push({
-      name: variablesContainer.getNameAt(index),
+      name: `${
+        isInherited ? inheritedPrefix : ''
+      }${variablesContainer.getNameAt(index)}`,
       variable: variablesContainer.getAt(index),
     });
   }
@@ -244,6 +249,9 @@ const getVariableContextFromNodeId = (
   while (depth < nodes.length - 1) {
     depth += 1;
     currentVariableName = nodes[depth];
+    if (depth === 0 && currentVariableName.startsWith(inheritedPrefix)) {
+      currentVariableName = removeInheritedPrefix(currentVariableName);
+    }
     if (!parentVariable) {
       currentVariable = variablesContainer.get(currentVariableName);
     } else {
@@ -289,7 +297,7 @@ type MovementType =
   | 'FromStructureToArray'
   | 'FromArrayToStructure';
 
-const getMovementType = (
+const getMovementTypeWithinVariablesContainer = (
   draggedVariableContext,
   targetVariableContext
 ): ?MovementType => {
@@ -362,12 +370,22 @@ const getMovementType = (
   return null;
 };
 
+const inheritedPrefix = '$!';
+const removeInheritedPrefix = (str: string): string =>
+  str.slice(inheritedPrefix.length, str.length);
 const isCollection = (variable: gdVariable): boolean =>
   !gd.Variable.isPrimitive(variable.getType());
 
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
-    getExpandedNodeIdsFromVariablesContainer(props.variablesContainer)
+    getExpandedNodeIdsFromVariablesContainer(props.variablesContainer).concat(
+      props.inheritedVariablesContainer
+        ? getExpandedNodeIdsFromVariablesContainer(
+            props.inheritedVariablesContainer,
+            true
+          )
+        : []
+    )
   );
   const [searchText, setSearchText] = React.useState<string>('');
   const [historyOffset, setHistoryOffset] = React.useState<number>(0);
@@ -433,7 +451,10 @@ const NewVariablesList = (props: Props) => {
         .map(nodeId => {
           const { variable, name, lineage } = getVariableContextFromNodeId(
             nodeId,
-            props.variablesContainer
+            nodeId.startsWith(inheritedPrefix) &&
+              props.inheritedVariablesContainer
+              ? props.inheritedVariablesContainer
+              : props.variablesContainer
           );
           if (!variable || !name) return;
           let parentType;
@@ -489,6 +510,7 @@ const NewVariablesList = (props: Props) => {
         newSelectedNodes.push(newName);
       } else {
         const targetNode = selectedNodes[0];
+        if (targetNode.startsWith(inheritedPrefix)) return;
         const {
           name: targetVariableName,
           lineage: targetVariableLineage,
@@ -543,7 +565,9 @@ const NewVariablesList = (props: Props) => {
   };
 
   const deleteSelection = () => {
+    let hasBeenDeleted = false;
     selectedNodes.forEach(nodeId => {
+      if (nodeId.startsWith(inheritedPrefix)) return;
       const { name, lineage } = getVariableContextFromNodeId(
         nodeId,
         props.variablesContainer
@@ -559,9 +583,12 @@ const NewVariablesList = (props: Props) => {
           parentVariable.removeChild(name);
         }
       }
+      hasBeenDeleted = true;
     });
-    saveToHistory();
-    setSelectedNodes([]);
+    if (hasBeenDeleted) {
+      saveToHistory();
+      setSelectedNodes([]);
+    }
   };
 
   const renameExpandedNode = (nodeId: string, newName: string) => {
@@ -588,6 +615,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const canDrop = (nodeId: string): boolean => {
+    if (nodeId.startsWith(inheritedPrefix)) return false;
     const { current } = draggedNodeId;
     if (!current) return false;
 
@@ -608,7 +636,7 @@ const NewVariablesList = (props: Props) => {
     );
     if (targetLineageVariables.includes(draggedVariable)) return false;
 
-    const movementType = getMovementType(
+    const movementType = getMovementTypeWithinVariablesContainer(
       draggedVariableContext,
       targetVariableContext
     );
@@ -631,6 +659,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const dropNode = (nodeId: string): void => {
+    if (nodeId.startsWith(inheritedPrefix)) return;
     const { current } = draggedNodeId;
     if (!current) return;
 
@@ -661,7 +690,7 @@ const NewVariablesList = (props: Props) => {
     );
     if (targetLineageVariables.includes(draggedVariable)) return;
 
-    const movementType = getMovementType(
+    const movementType = getMovementTypeWithinVariablesContainer(
       draggedVariableContext,
       targetVariableContext
     );
@@ -756,6 +785,7 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onAddChild = (nodeId: string) => {
+    if (nodeId.startsWith(inheritedPrefix)) return;
     const { variable } = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer
@@ -774,7 +804,9 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onAdd = () => {
-    const addAtTopLevel = selectedNodes.length === 0;
+    const addAtTopLevel =
+      selectedNodes.length === 0 ||
+      selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
     if (addAtTopLevel) {
       const newName = insertInVariablesContainer(
@@ -816,25 +848,38 @@ const NewVariablesList = (props: Props) => {
     variable,
     parentNodeId,
     parentVariable,
+    isInherited,
   }: {|
     name: string,
     variable: gdVariable,
     parentNodeId?: string,
     parentVariable?: gdVariable,
+    isInherited: boolean,
   |}) => {
     const type = variable.getType();
     const isCollection = !gd.Variable.isPrimitive(type);
 
     let parentType = null;
-    let nodeId = name;
+    let nodeId;
+    const isTopLevel = !parentNodeId;
 
-    if (!!parentNodeId) {
+    if (!parentNodeId) {
+      if (isInherited) {
+        nodeId = `${inheritedPrefix}${name}`;
+      } else {
+        nodeId = name;
+      }
+    } else {
       nodeId = `${parentNodeId}.${name}`;
     }
     if (!!parentVariable) {
       parentType = parentVariable.getType();
     }
     const isSelected = selectedNodes.includes(nodeId);
+    const overwritesInheritedVariable =
+      !isInherited &&
+      props.inheritedVariablesContainer &&
+      props.inheritedVariablesContainer.has(name);
 
     if (
       !!searchText &&
@@ -857,7 +902,7 @@ const NewVariablesList = (props: Props) => {
           draggedNodeId.current = nodeId;
           return {};
         }}
-        canDrag={() => true}
+        canDrag={() => !isInherited}
         canDrop={() => canDrop(nodeId)}
         drop={() => {
           dropNode(nodeId);
@@ -885,16 +930,20 @@ const NewVariablesList = (props: Props) => {
                     padding: isNarrow ? '4px 4px 4px 0px' : '6px 30px 6px 6px',
                   }}
                 >
-                  {connectDragSource(
-                    <span>
-                      <DragHandle
-                        color={
-                          isSelected
-                            ? gdevelopTheme.listItem.selectedTextColor
-                            : '#AAA'
-                        }
-                      />
-                    </span>
+                  {isInherited ? (
+                    <span style={{ width: 24 }} />
+                  ) : (
+                    connectDragSource(
+                      <span>
+                        <DragHandle
+                          color={
+                            isSelected
+                              ? gdevelopTheme.listItem.selectedTextColor
+                              : '#AAA'
+                          }
+                        />
+                      </span>
+                    )
                   )}
                   <ResponsiveLineStackLayout expand noMargin>
                     <Line alignItems="center" noMargin expand>
@@ -903,7 +952,9 @@ const NewVariablesList = (props: Props) => {
                         fullWidth
                         margin="none"
                         key="name"
-                        disabled={parentType === gd.Variable.Array}
+                        disabled={
+                          isInherited || parentType === gd.Variable.Array
+                        }
                         commitOnBlur
                         onClick={stopEventPropagation}
                         errorText={nameErrors[variable.ptr]}
@@ -914,13 +965,14 @@ const NewVariablesList = (props: Props) => {
                             setNameErrors(newNameErrors);
                           }
                         }}
-                        inputStyle={
-                          isSelected
-                            ? {
-                                color: gdevelopTheme.listItem.selectedTextColor,
-                              }
-                            : undefined
-                        }
+                        inputStyle={{
+                          color: isSelected
+                            ? gdevelopTheme.listItem.selectedTextColor
+                            : gdevelopTheme.listItem.textColor,
+                          fontStyle: overwritesInheritedVariable
+                            ? 'italic'
+                            : undefined,
+                        }}
                         value={name}
                         onBlur={event => {
                           onChangeName(nodeId, event.currentTarget.value);
@@ -940,6 +992,7 @@ const NewVariablesList = (props: Props) => {
                               forceUpdate();
                             }}
                             isHighlighted={isSelected}
+                            disabled={isInherited}
                           />
                         </Column>
                         <Column expand>
@@ -962,25 +1015,30 @@ const NewVariablesList = (props: Props) => {
                                   <Trans>False</Trans>
                                 )}
                               </span>
-                              <Spacer />
-                              <IconButton
-                                size="small"
-                                style={{ padding: 0 }}
-                                onClick={() => {
-                                  onChangeValue(
-                                    nodeId,
-                                    !variable.getBool() ? 'true' : 'false'
-                                  );
-                                }}
-                              >
-                                <SwapHorizontal
-                                  htmlColor={
-                                    isSelected
-                                      ? gdevelopTheme.listItem.selectedTextColor
-                                      : undefined
-                                  }
-                                />
-                              </IconButton>
+                              {isInherited && !isTopLevel ? null : (
+                                <>
+                                  <Spacer />
+                                  <IconButton
+                                    size="small"
+                                    style={{ padding: 0 }}
+                                    onClick={() => {
+                                      onChangeValue(
+                                        nodeId,
+                                        !variable.getBool() ? 'true' : 'false'
+                                      );
+                                    }}
+                                  >
+                                    <SwapHorizontal
+                                      htmlColor={
+                                        isSelected
+                                          ? gdevelopTheme.listItem
+                                              .selectedTextColor
+                                          : undefined
+                                      }
+                                    />
+                                  </IconButton>
+                                </>
+                              )}
                             </Line>
                           ) : (
                             <SemiControlledTextField
@@ -1003,7 +1061,9 @@ const NewVariablesList = (props: Props) => {
                                     }
                                   : undefined),
                               }}
-                              disabled={isCollection}
+                              disabled={
+                                isCollection || (isInherited && !isTopLevel)
+                              }
                               onChange={() => {}}
                               value={
                                 isCollection
@@ -1023,7 +1083,7 @@ const NewVariablesList = (props: Props) => {
                             />
                           )}
                         </Column>
-                        {isCollection ? (
+                        {isCollection && !isInherited ? (
                           <IconButton
                             size="small"
                             style={{ padding: 0 }}
@@ -1059,6 +1119,7 @@ const NewVariablesList = (props: Props) => {
                       variable: childVariable,
                       parentNodeId: nodeId,
                       parentVariable: variable,
+                      isInherited,
                     });
                   })
               : mapFor(0, variable.getChildrenCount(), index => {
@@ -1068,6 +1129,7 @@ const NewVariablesList = (props: Props) => {
                     variable: childVariable,
                     parentNodeId: nodeId,
                     parentVariable: variable,
+                    isInherited,
                   });
                 })}
           </StyledTreeItem>
@@ -1126,10 +1188,46 @@ const NewVariablesList = (props: Props) => {
   };
 
   const onChangeValue = (nodeId: string, newValue: string) => {
-    const { variable } = getVariableContextFromNodeId(
-      nodeId,
-      props.variablesContainer
-    );
+    const isInherited = nodeId.startsWith(inheritedPrefix);
+    let variable;
+    if (isInherited && props.inheritedVariablesContainer) {
+      const { variable: _variable, name, depth } = getVariableContextFromNodeId(
+        nodeId,
+        props.inheritedVariablesContainer
+      );
+      if (!name || !_variable || depth > 0) return;
+      switch (_variable.getType()) {
+        case gd.Variable.String:
+          if (_variable.getString() === newValue) return;
+          break;
+        case gd.Variable.Number:
+          const newValueAsFloat = parseFloat(newValue);
+          if (newValueAsFloat === _variable.getValue()) return;
+          break;
+        case gd.Variable.Boolean:
+          const newBool = newValue === 'true';
+          if (newBool === _variable.getBool()) return;
+          break;
+      }
+      const newVariable = new gd.Variable();
+      unserializeFromJSObject(newVariable, serializeToJSObject(_variable));
+      variable = props.variablesContainer.insert(name, newVariable, 0);
+      const newSelectedNodes = [...selectedNodes];
+      const isVariableSelected = newSelectedNodes.indexOf(nodeId) !== -1;
+      if (isVariableSelected) {
+        newSelectedNodes.splice(newSelectedNodes.indexOf(nodeId), 1, name);
+        setSelectedNodes(newSelectedNodes);
+      } else {
+        setSelectedNodes([...newSelectedNodes, name]);
+      }
+      newVariable.delete();
+    } else {
+      const { variable: _variable } = getVariableContextFromNodeId(
+        nodeId,
+        props.variablesContainer
+      );
+      variable = _variable;
+    }
     if (!variable) return;
     switch (variable.getType()) {
       case gd.Variable.String:
@@ -1155,15 +1253,28 @@ const NewVariablesList = (props: Props) => {
     forceUpdate();
   };
 
-  const renderTree = (variablesContainer: gdVariablesContainer) => {
+  const renderTree = (inheritedVariables: boolean = false) => {
+    const variablesContainer =
+      inheritedVariables && props.inheritedVariablesContainer
+        ? props.inheritedVariablesContainer
+        : props.variablesContainer;
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
       index => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
+        if (inheritedVariables) {
+          if (props.variablesContainer.has(name)) {
+            return null;
+          }
+        }
 
-        return renderVariableAndChildrenRows({ name, variable });
+        return renderVariableAndChildrenRows({
+          name,
+          variable,
+          isInherited: inheritedVariables,
+        });
       }
     );
     return containerVariablesTree;
@@ -1209,7 +1320,12 @@ const NewVariablesList = (props: Props) => {
                       tooltip={t`Paste`}
                       onClick={pasteSelection}
                       size="small"
-                      disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                      disabled={
+                        !Clipboard.has(CLIPBOARD_KIND) ||
+                        selectedNodes.some(nodeId =>
+                          nodeId.startsWith(inheritedPrefix)
+                        )
+                      }
                     >
                       <Paste />
                     </IconButton>
@@ -1217,7 +1333,12 @@ const NewVariablesList = (props: Props) => {
                     <FlatButton
                       icon={<Paste />}
                       label={<Trans>Paste</Trans>}
-                      disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                      disabled={
+                        !Clipboard.has(CLIPBOARD_KIND) ||
+                        selectedNodes.some(nodeId =>
+                          nodeId.startsWith(inheritedPrefix)
+                        )
+                      }
                       onClick={pasteSelection}
                     />
                   )}
@@ -1227,7 +1348,12 @@ const NewVariablesList = (props: Props) => {
                       tooltip={t`Delete`}
                       onClick={deleteSelection}
                       size="small"
-                      disabled={selectedNodes.length === 0}
+                      disabled={
+                        selectedNodes.length === 0 ||
+                        selectedNodes.some(nodeId =>
+                          nodeId.startsWith(inheritedPrefix)
+                        )
+                      }
                     >
                       <Delete />
                     </IconButton>
@@ -1235,7 +1361,12 @@ const NewVariablesList = (props: Props) => {
                     <FlatButton
                       icon={<Delete />}
                       label={<Trans>Delete</Trans>}
-                      disabled={selectedNodes.length === 0}
+                      disabled={
+                        selectedNodes.length === 0 ||
+                        selectedNodes.some(nodeId =>
+                          nodeId.startsWith(inheritedPrefix)
+                        )
+                      }
                       onClick={deleteSelection}
                     />
                   )}
@@ -1318,11 +1449,18 @@ const NewVariablesList = (props: Props) => {
                   defaultCollapseIcon={<ExpandMore />}
                   onNodeSelect={(event, values) => setSelectedNodes(values)}
                   onNodeToggle={(event, values) => {
-                    const foldedNodes = expandedNodes.filter(
-                      node => !values.includes(node)
+                    // Inherited variables should not be modified
+                    const instanceExpandedNodes = expandedNodes.filter(
+                      node => !node.startsWith(inheritedPrefix)
                     );
-                    const unfoldedNodes = values.filter(
-                      node => !expandedNodes.includes(node)
+                    const instanceNewExpandedNodes = values.filter(
+                      node => !node.startsWith(inheritedPrefix)
+                    );
+                    const foldedNodes = instanceExpandedNodes.filter(
+                      node => !instanceNewExpandedNodes.includes(node)
+                    );
+                    const unfoldedNodes = instanceNewExpandedNodes.filter(
+                      node => !instanceExpandedNodes.includes(node)
                     );
                     foldNodesVariables(
                       props.variablesContainer,
@@ -1339,7 +1477,8 @@ const NewVariablesList = (props: Props) => {
                   selected={selectedNodes}
                   expanded={expandedNodes}
                 >
-                  {renderTree(props.variablesContainer)}
+                  {props.inheritedVariablesContainer ? renderTree(true) : null}
+                  {renderTree()}
                 </TreeView>
               </ScrollView>
             )}

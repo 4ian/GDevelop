@@ -39,6 +39,15 @@ import TextField from '../UI/TextField';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import {
+  type HistoryState,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
+  getHistoryInitialState,
+  saveToHistory,
+} from '../Utils/History';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -387,14 +396,15 @@ const NewVariablesList = (props: Props) => {
         : []
     )
   );
+  const [history, setHistory] = React.useState<HistoryState>(
+    getHistoryInitialState(props.variablesContainer, {
+      historyMaxSize: 50,
+    })
+  );
   const [searchText, setSearchText] = React.useState<string>('');
-  const [historyOffset, setHistoryOffset] = React.useState<number>(0);
   const [allVariablesNames] = React.useState<?Array<string>>(
     props.onComputeAllVariableNames ? props.onComputeAllVariableNames() : null
   );
-  const [history, setHistory] = React.useState<any[]>([
-    serializeToJSObject(props.variablesContainer),
-  ]);
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
@@ -424,43 +434,21 @@ const NewVariablesList = (props: Props) => {
         .filter(Boolean)
     : [];
 
-  const saveToHistory = () => {
-    const newHistory = [...history];
-    if (historyOffset) {
-      newHistory.splice(newHistory.length - historyOffset, historyOffset);
-      setHistoryOffset(0);
-    }
-    newHistory.push(serializeToJSObject(props.variablesContainer));
-    setHistory(newHistory);
+  const _saveToHistory = () => {
+    setHistory(saveToHistory(history, props.variablesContainer));
   };
 
-  const undo = () => {
-    if (historyOffset < history.length - 1) {
-      const newHistoryOffset = historyOffset + 1;
-      unserializeFromJSObject(
-        props.variablesContainer,
-        history[history.length - 1 - newHistoryOffset]
-      );
-      setHistoryOffset(newHistoryOffset);
-      forceUpdate();
-    }
+  const _undo = () => {
+    setHistory(undo(history, props.variablesContainer));
   };
 
-  const redo = () => {
-    if (historyOffset > 0) {
-      const newHistoryOffset = historyOffset - 1;
-      unserializeFromJSObject(
-        props.variablesContainer,
-        history[history.length - 1 - newHistoryOffset]
-      );
-      setHistoryOffset(newHistoryOffset);
-      forceUpdate();
-    }
+  const _redo = () => {
+    setHistory(redo(history, props.variablesContainer));
   };
 
   const keyboardShortcuts = new KeyboardShortcuts({
     isActive: () => true,
-    shortcutCallbacks: { onUndo: undo, onRedo: redo },
+    shortcutCallbacks: { onUndo: _undo, onRedo: _redo },
   });
 
   const copySelection = () => {
@@ -579,7 +567,7 @@ const NewVariablesList = (props: Props) => {
         }
       }
     });
-    saveToHistory();
+    _saveToHistory();
     setSelectedNodes(newSelectedNodes);
   };
 
@@ -605,7 +593,7 @@ const NewVariablesList = (props: Props) => {
       hasBeenDeleted = true;
     });
     if (hasBeenDeleted) {
-      saveToHistory();
+      _saveToHistory();
       setSelectedNodes([]);
     }
   };
@@ -813,7 +801,7 @@ const NewVariablesList = (props: Props) => {
         movementHasBeenMade = false;
     }
     if (movementHasBeenMade) {
-      saveToHistory();
+      _saveToHistory();
       forceUpdate();
     }
   };
@@ -833,7 +821,7 @@ const NewVariablesList = (props: Props) => {
       );
       variable.getChild(name).setString('');
     } else if (type === gd.Variable.Array) variable.pushNew();
-    saveToHistory();
+    _saveToHistory();
     setExpandedNodes([...expandedNodes, nodeId]);
   };
 
@@ -849,7 +837,7 @@ const NewVariablesList = (props: Props) => {
         null,
         props.variablesContainer.count()
       );
-      saveToHistory();
+      _saveToHistory();
       setSelectedNodes([newName]);
       return;
     }
@@ -873,7 +861,7 @@ const NewVariablesList = (props: Props) => {
       null,
       position
     );
-    saveToHistory();
+    _saveToHistory();
     setSelectedNodes([newName]);
   };
 
@@ -1209,7 +1197,7 @@ const NewVariablesList = (props: Props) => {
       hasBeenRenamed = parentVariable.renameChild(name, newName);
     }
     if (hasBeenRenamed) {
-      saveToHistory();
+      _saveToHistory();
       updateExpandedAndSelectedNodes(nodeId, newName);
     } else {
       if (variable)
@@ -1229,7 +1217,7 @@ const NewVariablesList = (props: Props) => {
     );
     if (!variable) return;
     variable.castTo(newType);
-    saveToHistory();
+    _saveToHistory();
   };
 
   const onChangeValue = (nodeId: string, newValue: string) => {
@@ -1295,7 +1283,7 @@ const NewVariablesList = (props: Props) => {
           `Cannot set variable with type ${variable.getType()} - are you sure it's a primitive type?`
         );
     }
-    saveToHistory();
+    _saveToHistory();
     forceUpdate();
   };
 
@@ -1419,26 +1407,38 @@ const NewVariablesList = (props: Props) => {
                   {/* // TODO: Remove those buttons once tests are over */}
                   <Spacer />
                   {isNarrow ? (
-                    <IconButton tooltip={t`Undo`} onClick={undo} size="small">
+                    <IconButton
+                      tooltip={t`Undo`}
+                      onClick={_undo}
+                      size="small"
+                      disabled={!canUndo(history)}
+                    >
                       <Undo />
                     </IconButton>
                   ) : (
                     <FlatButton
                       icon={<Undo />}
                       label={<Trans>Undo</Trans>}
-                      onClick={undo}
+                      onClick={_undo}
+                      disabled={!canUndo(history)}
                     />
                   )}
                   <Spacer />
                   {isNarrow ? (
-                    <IconButton tooltip={t`Redo`} onClick={redo} size="small">
+                    <IconButton
+                      tooltip={t`Redo`}
+                      onClick={_redo}
+                      size="small"
+                      disabled={!canRedo(history)}
+                    >
                       <Redo />
                     </IconButton>
                   ) : (
                     <FlatButton
                       icon={<Redo />}
                       label={<Trans>Redo</Trans>}
-                      onClick={redo}
+                      onClick={_redo}
+                      disabled={!canRedo(history)}
                     />
                   )}
                 </Line>

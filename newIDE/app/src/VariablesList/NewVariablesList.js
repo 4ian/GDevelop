@@ -40,6 +40,7 @@ import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import TextField from '../UI/TextField';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
+import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -443,6 +444,11 @@ const NewVariablesList = (props: Props) => {
       forceUpdate();
     }
   };
+
+  const keyboardShortcuts = new KeyboardShortcuts({
+    isActive: () => true,
+    shortcutCallbacks: { onUndo: undo, onRedo: redo },
+  });
 
   const copySelection = () => {
     Clipboard.set(
@@ -1288,7 +1294,10 @@ const NewVariablesList = (props: Props) => {
       }}
     >
       {({ contentRect, measureRef }) => (
-        <>
+        <div
+          onKeyDown={keyboardShortcuts.onKeyDown}
+          onKeyUp={keyboardShortcuts.onKeyUp}
+        >
           <Column
             expand
             noMargin
@@ -1483,7 +1492,7 @@ const NewVariablesList = (props: Props) => {
               </ScrollView>
             )}
           </Column>
-        </>
+        </div>
       )}
     </Measure>
   );

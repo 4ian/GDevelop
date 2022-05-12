@@ -9,6 +9,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <algorithm>
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"

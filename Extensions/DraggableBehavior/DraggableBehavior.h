@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #ifndef DRAGGABLEBEHAVIOR_H
 #define DRAGGABLEBEHAVIOR_H
-#include <SFML/System/Vector2.hpp>
+#include "GDCore/Vector2.h"
 #include <map>
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"

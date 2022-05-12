@@ -21,7 +21,7 @@ import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDrop
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import VariableTypeSelector from './VariableTypeSelector';
 import IconButton from '../UI/IconButton';
-import { withStyles } from '@material-ui/styles';
+import { makeStyles, withStyles } from '@material-ui/styles';
 import styles from './styles';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import Measure from 'react-measure';
@@ -175,14 +175,36 @@ const foldNodesVariables = (
   });
 };
 
-const StyledTreeItem = withStyles(() => ({
-  group: {
-    borderLeft: `1px solid black`,
-    marginLeft: 7,
-    paddingLeft: 15,
-  },
-  label: { padding: 0 },
-}))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
+const StyledTreeItem = withStyles(theme => {
+  console.log(theme);
+  return {
+    group: {
+      borderLeft: `1px solid black`,
+      marginLeft: 7,
+      paddingLeft: 15,
+    },
+    root: {
+      '&:focus': {
+        '&:focus': {
+          '> .MuiTreeItem-content .MuiTreeItem-label': {
+            backgroundColor: 'unset',
+          },
+        },
+      },
+    },
+    label: {
+      padding: 0,
+      '&:hover': {
+        backgroundColor: 'unset',
+      },
+    },
+    content: { marginTop: 5, backgroundColor: '#EEE' },
+    iconContainer: {
+      color: 'white',
+      backgroundColor: theme.palette.primary.main,
+    },
+  };
+})(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
 
 const insertInVariablesContainer = (
   variablesContainer: gdVariablesContainer,
@@ -413,6 +435,19 @@ const NewVariablesList = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
+
+  const useStylesForSelectedTreeItem = makeStyles(() => ({
+    content: {
+      marginTop: 5,
+      backgroundColor: gdevelopTheme.listItem.selectedBackgroundColor,
+    },
+    iconContainer: {
+      color: 'white',
+      backgroundColor: gdevelopTheme.listItem.selectedBackgroundColor,
+    },
+  }));
+
+  const selectedTreeItemClasses = useStylesForSelectedTreeItem();
 
   const rowRightSideStyle = React.useMemo(
     () => ({
@@ -933,6 +968,7 @@ const NewVariablesList = (props: Props) => {
         {({ connectDragSource, connectDropTarget, isOver, canDrop }) => (
           <StyledTreeItem
             nodeId={nodeId}
+            classes={isSelected ? selectedTreeItemClasses : undefined}
             label={connectDropTarget(
               <div
                 style={
@@ -1286,6 +1322,7 @@ const NewVariablesList = (props: Props) => {
     _saveToHistory();
     forceUpdate();
   };
+  console.log(containerWidth);
 
   const renderTree = (inheritedVariables: boolean = false) => {
     const variablesContainer =

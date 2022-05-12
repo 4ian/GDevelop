@@ -1175,7 +1175,11 @@ const NewVariablesList = (props: Props) => {
     >
       {({ contentRect, measureRef }) => (
         <>
-          <Column expand noMargin>
+          <Column
+            expand
+            noMargin
+            reverse={containerWidth ? containerWidth < 600 : false}
+          >
             <Line justifyContent="space-between" alignItems="center">
               <Column noMargin>
                 <Line noMargin>

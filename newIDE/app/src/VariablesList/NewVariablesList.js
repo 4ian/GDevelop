@@ -42,8 +42,11 @@ import TextField from '../UI/TextField';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 const gd: libGDevelop = global.gd;
 
-const stopEventPropagation = (event: Event) => event.stopPropagation();
-const preventEventDefaultEffect = (event: Event) => event.preventDefault();
+const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
+  event.stopPropagation();
+const preventEventDefaultEffect = (
+  event: SyntheticPointerEvent<HTMLInputElement>
+) => event.preventDefault();
 
 const hasChildThatContainsStringInNameAndValue = (
   variable: gdVariable,

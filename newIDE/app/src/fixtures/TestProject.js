@@ -255,10 +255,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   variable3.getChild('Child1').setString('Child1 str value');
   variable3.getChild('Child2').setString('7891011');
   variable3
-    .getChild('Child3')
+    .getChild('FoldedChild')
     .getChild('SubChild1')
     .setString('Hello\nMultiline\nWorld');
+  variable3.getChild('FoldedChild').setFolded(true);
   testLayoutVariables.insert('Variable3', variable3, 2);
+  const variable4 = new gd.Variable();
+  variable4.getAtIndex(0).setString('String value\nwith Multiline');
+  variable4.getAtIndex(1).setValue(4539.42);
+  variable4.getAtIndex(2).setBool(true);
+  variable4.setFolded(true);
+  testLayoutVariables.insert('FoldedArray', variable4, 3);
+  const variable5 = new gd.Variable();
+  variable5.getAtIndex(0).setString('PlayerName');
+  variable5.getAtIndex(1).setValue(25);
+  variable5.getAtIndex(2).setBool(false);
+  testLayoutVariables.insert('OtherArray', variable5, 4);
 
   //Create a few events
   //Add a new "standard" event to the scene:

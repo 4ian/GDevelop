@@ -91,18 +91,20 @@ const ProfileDialog = ({
     >
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Column noMargin>
-            <AuthenticatedUserProfileDetails
-              authenticatedUser={authenticatedUser}
-              onEditProfile={authenticatedUser.onEdit}
-              onChangeEmail={authenticatedUser.onChangeEmail}
-            />
-            <SubscriptionDetails
-              subscription={authenticatedUser.subscription}
-              onChangeSubscription={onChangeSubscription}
-            />
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
-          </Column>
+          <Line>
+            <Column expand>
+              <AuthenticatedUserProfileDetails
+                authenticatedUser={authenticatedUser}
+                onEditProfile={authenticatedUser.onEdit}
+                onChangeEmail={authenticatedUser.onChangeEmail}
+              />
+              <SubscriptionDetails
+                subscription={authenticatedUser.subscription}
+                onChangeSubscription={onChangeSubscription}
+              />
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            </Column>
+          </Line>
         ) : (
           <Column>
             <CreateProfile

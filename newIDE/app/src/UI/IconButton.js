@@ -47,6 +47,7 @@ type Props = {|
 
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
+  ariaLabel?: string,
 |};
 
 /**

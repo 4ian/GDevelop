@@ -162,47 +162,43 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}
       >
-        <Line>
-          <Column expand noMargin>
-            <Column>
-              <PropertiesEditor
-                unsavedChanges={this.props.unsavedChanges}
-                schema={this.schema.concat(instanceSchema)}
-                instances={instances}
-                onInstancesModified={this.props.onInstancesModified}
-              />
-              <Line alignItems="center" justifyContent="space-between">
-                <Text>
-                  <Trans>Instance Variables</Trans>
-                </Text>
-                <IconButton
-                  onClick={() => {
-                    this.props.editInstanceVariables(instance);
-                  }}
-                >
-                  <OpenInNew />
-                </IconButton>
-              </Line>
-            </Column>
-            <VariablesList
-              inheritedVariablesContainer={
-                object ? object.getVariables() : null
-              }
-              variablesContainer={instance.getVariables()}
-              onComputeAllVariableNames={() =>
-                object
-                  ? EventsRootVariablesFinder.findAllObjectVariables(
-                      project.getCurrentPlatform(),
-                      project,
-                      layout,
-                      object
-                    )
-                  : []
-              }
-              ref={this._instanceVariablesList}
+        <Column expand noMargin>
+          <Column>
+            <PropertiesEditor
+              unsavedChanges={this.props.unsavedChanges}
+              schema={this.schema.concat(instanceSchema)}
+              instances={instances}
+              onInstancesModified={this.props.onInstancesModified}
             />
+            <Line alignItems="center" justifyContent="space-between">
+              <Text>
+                <Trans>Instance Variables</Trans>
+              </Text>
+              <IconButton
+                onClick={() => {
+                  this.props.editInstanceVariables(instance);
+                }}
+              >
+                <OpenInNew />
+              </IconButton>
+            </Line>
           </Column>
-        </Line>
+          <VariablesList
+            inheritedVariablesContainer={object ? object.getVariables() : null}
+            variablesContainer={instance.getVariables()}
+            onComputeAllVariableNames={() =>
+              object
+                ? EventsRootVariablesFinder.findAllObjectVariables(
+                    project.getCurrentPlatform(),
+                    project,
+                    layout,
+                    object
+                  )
+                : []
+            }
+            ref={this._instanceVariablesList}
+          />
+        </Column>
       </ScrollView>
     );
   }

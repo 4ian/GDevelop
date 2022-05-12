@@ -387,6 +387,7 @@ const NewVariablesList = (props: Props) => {
     }),
     [containerWidth]
   );
+  const isNarrow = containerWidth ? containerWidth < 600 : false;
 
   const saveToHistory = () => {
     const newHistory = [...history];
@@ -863,186 +864,182 @@ const NewVariablesList = (props: Props) => {
           <StyledTreeItem
             nodeId={nodeId}
             label={connectDropTarget(
+              <div
+                style={
+                  isSelected
+                    ? {
+                        backgroundColor:
+                          gdevelopTheme.listItem.selectedBackgroundColor,
+                      }
+                    : undefined
+                }
+              >
+                {isOver && <DropIndicator canDrop={canDrop} />}
                 <div
-                  style={
-                    isSelected
-                      ? {
-                          backgroundColor:
-                            gdevelopTheme.listItem.selectedBackgroundColor,
-                        }
-                      : undefined
-                  }
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '6px 30px 6px 6px',
+                  }}
                 >
-                  {isOver && <DropIndicator canDrop={canDrop} />}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '6px 30px 6px 6px',
-                    }}
-                  >
-                    {connectDragSource(
-                      <span>
-                        <DragHandle
-                          color={
-                            isSelected
-                              ? gdevelopTheme.listItem.selectedTextColor
-                              : '#AAA'
+                  {connectDragSource(
+                    <span>
+                      <DragHandle
+                        color={
+                          isSelected
+                            ? gdevelopTheme.listItem.selectedTextColor
+                            : '#AAA'
+                        }
+                      />
+                    </span>
+                  )}
+                  <ResponsiveLineStackLayout expand noMargin>
+                    <Line alignItems="center" noMargin expand>
+                      <Spacer />
+                      <SemiControlledTextField
+                        fullWidth
+                        margin="none"
+                        key="name"
+                        disabled={parentType === gd.Variable.Array}
+                        commitOnBlur
+                        onClick={stopEventPropagation}
+                        errorText={nameErrors[variable.ptr]}
+                        onChange={() => {
+                          if (nameErrors[variable.ptr]) {
+                            const newNameErrors = { ...nameErrors };
+                            delete newNameErrors[variable.ptr];
+                            setNameErrors(newNameErrors);
                           }
-                        />
-                      </span>
-                    )}
-                    <ResponsiveLineStackLayout expand noMargin>
-                      <Line alignItems="center" noMargin expand>
-                        <Spacer />
-                        <SemiControlledTextField
-                          fullWidth
-                          margin="none"
-                          key="name"
-                          disabled={parentType === gd.Variable.Array}
-                          commitOnBlur
-                          onClick={stopEventPropagation}
-                          errorText={nameErrors[variable.ptr]}
-                          onChange={() => {
-                            if (nameErrors[variable.ptr]) {
-                              const newNameErrors = { ...nameErrors };
-                              delete newNameErrors[variable.ptr];
-                              setNameErrors(newNameErrors);
-                            }
-                          }}
-                          inputStyle={
-                            isSelected
-                              ? {
-                                  color:
-                                    gdevelopTheme.listItem.selectedTextColor,
-                                }
-                              : undefined
-                          }
-                          value={name}
-                          onBlur={event => {
-                            onChangeName(nodeId, event.currentTarget.value);
-                            forceUpdate();
-                          }}
-                        />
-                        <Spacer />
-                        <Spacer />
-                      </Line>
-                      <div style={rowRightSideStyle}>
-                        <Line noMargin alignItems="center">
-                          <Column noMargin>
-                            <VariableTypeSelector
-                              variableType={type}
-                              onChange={newType => {
-                                onChangeType(nodeId, newType);
-                                forceUpdate();
-                              }}
-                              isHighlighted={isSelected}
-                            />
-                          </Column>
-                          <Column expand>
-                            {type === gd.Variable.Boolean ? (
-                              <Line noMargin>
-                                <span
-                                  style={
-                                    isSelected
-                                      ? {
-                                          color:
-                                            gdevelopTheme.listItem
-                                              .selectedTextColor,
-                                        }
-                                      : undefined
-                                  }
-                                >
-                                  {variable.getBool() ? (
-                                    <Trans>True</Trans>
-                                  ) : (
-                                    <Trans>False</Trans>
-                                  )}
-                                </span>
-                                <Spacer />
-                                <IconButton
-                                  size="small"
-                                  style={{ padding: 0 }}
-                                  onClick={() => {
-                                    onChangeValue(
-                                      nodeId,
-                                      !variable.getBool() ? 'true' : 'false'
-                                    );
-                                  }}
-                                >
-                                  <SwapHorizontal
-                                    htmlColor={
-                                      isSelected
-                                        ? gdevelopTheme.listItem
-                                            .selectedTextColor
-                                        : undefined
-                                    }
-                                  />
-                                </IconButton>
-                              </Line>
-                            ) : (
-                              <SemiControlledTextField
-                                margin="none"
-                                type={
-                                  type === gd.Variable.Number
-                                    ? 'number'
-                                    : 'text'
-                                }
-                                key="value"
-                                onClick={stopEventPropagation}
-                                multiline={type === gd.Variable.String}
-                                inputStyle={{
-                                  ...(type === gd.Variable.String
-                                    ? styles.noPaddingMultilineTextField
-                                    : undefined),
-                                  ...(isSelected
+                        }}
+                        inputStyle={
+                          isSelected
+                            ? {
+                                color: gdevelopTheme.listItem.selectedTextColor,
+                              }
+                            : undefined
+                        }
+                        value={name}
+                        onBlur={event => {
+                          onChangeName(nodeId, event.currentTarget.value);
+                          forceUpdate();
+                        }}
+                      />
+                      <Spacer />
+                      <Spacer />
+                    </Line>
+                    <div style={rowRightSideStyle}>
+                      <Line noMargin alignItems="center">
+                        <Column noMargin>
+                          <VariableTypeSelector
+                            variableType={type}
+                            onChange={newType => {
+                              onChangeType(nodeId, newType);
+                              forceUpdate();
+                            }}
+                            isHighlighted={isSelected}
+                          />
+                        </Column>
+                        <Column expand>
+                          {type === gd.Variable.Boolean ? (
+                            <Line noMargin>
+                              <span
+                                style={
+                                  isSelected
                                     ? {
                                         color:
                                           gdevelopTheme.listItem
                                             .selectedTextColor,
                                       }
-                                    : undefined),
-                                }}
-                                disabled={isCollection}
-                                onChange={() => {}}
-                                value={
-                                  isCollection
-                                    ? `${variable.getChildrenCount()} children`
-                                    : type === gd.Variable.String
-                                    ? variable.getString()
-                                    : variable.getValue().toString()
-                                }
-                                commitOnBlur
-                                onBlur={event => {
-                                  onChangeValue(
-                                    nodeId,
-                                    event.currentTarget.value
-                                  );
-                                  forceUpdate();
-                                }}
-                              />
-                            )}
-                          </Column>
-                          {isCollection ? (
-                            <IconButton
-                              size="small"
-                              style={{ padding: 0 }}
-                              onClick={() => onAddChild(nodeId)}
-                            >
-                              <Add
-                                htmlColor={
-                                  isSelected
-                                    ? gdevelopTheme.listItem.selectedTextColor
                                     : undefined
                                 }
-                              />
-                            </IconButton>
-                          ) : null}
-                        </Line>
-                      </div>
-                    </ResponsiveLineStackLayout>
-                  </div>
+                              >
+                                {variable.getBool() ? (
+                                  <Trans>True</Trans>
+                                ) : (
+                                  <Trans>False</Trans>
+                                )}
+                              </span>
+                              <Spacer />
+                              <IconButton
+                                size="small"
+                                style={{ padding: 0 }}
+                                onClick={() => {
+                                  onChangeValue(
+                                    nodeId,
+                                    !variable.getBool() ? 'true' : 'false'
+                                  );
+                                }}
+                              >
+                                <SwapHorizontal
+                                  htmlColor={
+                                    isSelected
+                                      ? gdevelopTheme.listItem.selectedTextColor
+                                      : undefined
+                                  }
+                                />
+                              </IconButton>
+                            </Line>
+                          ) : (
+                            <SemiControlledTextField
+                              margin="none"
+                              type={
+                                type === gd.Variable.Number ? 'number' : 'text'
+                              }
+                              key="value"
+                              onClick={stopEventPropagation}
+                              multiline={type === gd.Variable.String}
+                              inputStyle={{
+                                ...(type === gd.Variable.String
+                                  ? styles.noPaddingMultilineTextField
+                                  : undefined),
+                                ...(isSelected
+                                  ? {
+                                      color:
+                                        gdevelopTheme.listItem
+                                          .selectedTextColor,
+                                    }
+                                  : undefined),
+                              }}
+                              disabled={isCollection}
+                              onChange={() => {}}
+                              value={
+                                isCollection
+                                  ? `${variable.getChildrenCount()} children`
+                                  : type === gd.Variable.String
+                                  ? variable.getString()
+                                  : variable.getValue().toString()
+                              }
+                              commitOnBlur
+                              onBlur={event => {
+                                onChangeValue(
+                                  nodeId,
+                                  event.currentTarget.value
+                                );
+                                forceUpdate();
+                              }}
+                            />
+                          )}
+                        </Column>
+                        {isCollection ? (
+                          <IconButton
+                            size="small"
+                            style={{ padding: 0 }}
+                            onClick={() => onAddChild(nodeId)}
+                          >
+                            <Add
+                              htmlColor={
+                                isSelected
+                                  ? gdevelopTheme.listItem.selectedTextColor
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                        ) : null}
+                      </Line>
+                    </div>
+                  </ResponsiveLineStackLayout>
                 </div>
+              </div>
             )}
             onLabelClick={preventEventDefaultEffect}
           >
@@ -1182,38 +1179,84 @@ const NewVariablesList = (props: Props) => {
             <Line justifyContent="space-between" alignItems="center">
               <Column noMargin>
                 <Line noMargin>
-                  <FlatButton
-                    icon={<Copy />}
-                    label={<Trans>Copy</Trans>}
-                    onClick={copySelection}
-                  />
+                  {isNarrow ? (
+                    <IconButton
+                      tooltip={t`Copy`}
+                      onClick={copySelection}
+                      size="small"
+                      disabled={selectedNodes.length === 0}
+                    >
+                      <Copy />
+                    </IconButton>
+                  ) : (
+                    <FlatButton
+                      icon={<Copy />}
+                      disabled={selectedNodes.length === 0}
+                      label={<Trans>Copy</Trans>}
+                      onClick={copySelection}
+                    />
+                  )}
                   <Spacer />
-                  <FlatButton
-                    icon={<Paste />}
-                    label={<Trans>Paste</Trans>}
-                    disabled={!Clipboard.has(CLIPBOARD_KIND)}
-                    onClick={pasteSelection}
-                  />
+                  {isNarrow ? (
+                    <IconButton
+                      tooltip={t`Paste`}
+                      onClick={pasteSelection}
+                      size="small"
+                      disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                    >
+                      <Paste />
+                    </IconButton>
+                  ) : (
+                    <FlatButton
+                      icon={<Paste />}
+                      label={<Trans>Paste</Trans>}
+                      disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                      onClick={pasteSelection}
+                    />
+                  )}
                   <Spacer />
-                  <FlatButton
-                    icon={<Delete />}
-                    label={<Trans>Delete</Trans>}
-                    disabled={selectedNodes.length === 0}
-                    onClick={deleteSelection}
-                  />
+                  {isNarrow ? (
+                    <IconButton
+                      tooltip={t`Delete`}
+                      onClick={deleteSelection}
+                      size="small"
+                      disabled={selectedNodes.length === 0}
+                    >
+                      <Delete />
+                    </IconButton>
+                  ) : (
+                    <FlatButton
+                      icon={<Delete />}
+                      label={<Trans>Delete</Trans>}
+                      disabled={selectedNodes.length === 0}
+                      onClick={deleteSelection}
+                    />
+                  )}
                   {/* // TODO: Remove those buttons once tests are over */}
                   <Spacer />
-                  <FlatButton
-                    icon={<Undo />}
-                    label={<Trans>Undo</Trans>}
-                    onClick={undo}
-                  />
+                  {isNarrow ? (
+                    <IconButton tooltip={t`Undo`} onClick={undo} size="small">
+                      <Undo />
+                    </IconButton>
+                  ) : (
+                    <FlatButton
+                      icon={<Undo />}
+                      label={<Trans>Undo</Trans>}
+                      onClick={undo}
+                    />
+                  )}
                   <Spacer />
-                  <FlatButton
-                    icon={<Redo />}
-                    label={<Trans>Redo</Trans>}
-                    onClick={redo}
-                  />
+                  {isNarrow ? (
+                    <IconButton tooltip={t`Redo`} onClick={redo} size="small">
+                      <Redo />
+                    </IconButton>
+                  ) : (
+                    <FlatButton
+                      icon={<Redo />}
+                      label={<Trans>Redo</Trans>}
+                      onClick={redo}
+                    />
+                  )}
                 </Line>
               </Column>
               <Column expand>
@@ -1232,12 +1275,22 @@ const NewVariablesList = (props: Props) => {
                 />
               </Column>
               <Column>
-                <FlatButton
-                  primary
-                  onClick={onAdd}
-                  label={<Trans>Add variable</Trans>}
-                  icon={<Add />}
-                />
+                {isNarrow ? (
+                  <IconButton
+                    tooltip={t`Add variable`}
+                    onClick={onAdd}
+                    size="small"
+                  >
+                    <Add />
+                  </IconButton>
+                ) : (
+                  <FlatButton
+                    primary
+                    onClick={onAdd}
+                    label={<Trans>Add variable</Trans>}
+                    icon={<Add />}
+                  />
+                )}
               </Column>
             </Line>
             {props.variablesContainer.count() === 0 ? (

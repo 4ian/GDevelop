@@ -13,7 +13,7 @@ const columns = 3;
 const cellSpacing = 2;
 
 const styles = {
-  grid: { marginLeft: 10, marginRight: 10 },
+  grid: { margin: '0 10px' },
   previewImage: {
     width: '100%',
   },

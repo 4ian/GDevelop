@@ -368,6 +368,24 @@ namespace gdjs {
 
     doStepPostEvents(runtimeScene) {}
 
+    // Set anchors for testing purposes.
+    setAnchor(edge, anchorType: number) {
+      switch (edge) {
+        case 'left':
+          this._leftEdgeAnchor = anchorType;
+          break;
+        case 'right':
+          this._rightEdgeAnchor = anchorType;
+          break;
+        case 'top':
+          this._topEdgeAnchor = anchorType;
+          break;
+        case 'bottom':
+          this._bottomEdgeAnchor = anchorType;
+          break;
+      }
+    }
+
     static HorizontalAnchor = {
       NONE: 0,
       WINDOW_LEFT: 1,

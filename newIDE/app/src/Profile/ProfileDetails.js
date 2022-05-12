@@ -4,7 +4,7 @@ import { Trans, t } from '@lingui/macro';
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import OpenInNew from '@material-ui/icons/OpenInNew';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Line, Spacer } from '../UI/Grid';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';

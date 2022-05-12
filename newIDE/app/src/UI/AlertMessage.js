@@ -1,13 +1,10 @@
 // @flow
-import { Trans } from '@lingui/macro';
-
 import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
 import Info from '@material-ui/icons/Info';
 import Warning from '@material-ui/icons/Warning';
 import Error from '@material-ui/icons/Error';
 import { Spacer, Line, Column } from './Grid';
-import FlatButton from './FlatButton';
 import Text from './Text';
 import GDevelopThemeContext from './Theme/ThemeContext';
 import { ResponsiveLineStackLayout } from './Layout';

@@ -26,6 +26,11 @@ export const InstanceWithObjectVariables = () => (
       <NewVariablesList
         variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
         inheritedVariablesContainer={testProject.spriteObject.getVariables()}
+        onComputeAllVariableNames={() => [
+          'VariableFromEventSheet',
+          'VariableFromSomeWhere',
+          'InstanceVariable', // already defined variable in testSpriteObjectInstance
+        ]}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>

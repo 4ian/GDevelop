@@ -39,5 +39,5 @@ export const InstanceWithObjectVariables = () => (
 export default {
   title: 'NewVariablesList',
   component: NewVariablesList,
-  decorators: [muiDecorator, GDevelopJsInitializerDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
 };

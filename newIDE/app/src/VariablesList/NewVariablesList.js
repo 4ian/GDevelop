@@ -41,6 +41,7 @@ import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import TextField from '../UI/TextField';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -96,6 +97,7 @@ const hasChildThatContainsStringInNameAndValue = (
 type Props = {
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
+  onComputeAllVariableNames?: () => Array<string>,
 };
 
 const getExpandedNodeIdsFromVariables = (
@@ -390,6 +392,9 @@ const NewVariablesList = (props: Props) => {
   );
   const [searchText, setSearchText] = React.useState<string>('');
   const [historyOffset, setHistoryOffset] = React.useState<number>(0);
+  const [allVariablesNames] = React.useState<?Array<string>>(
+    props.onComputeAllVariableNames ? props.onComputeAllVariableNames() : null
+  );
   const [history, setHistory] = React.useState<any[]>([
     serializeToJSObject(props.variablesContainer),
   ]);
@@ -410,6 +415,16 @@ const NewVariablesList = (props: Props) => {
     [containerWidth]
   );
   const isNarrow = containerWidth ? containerWidth < 600 : false;
+
+  const undefinedVariableNames = allVariablesNames
+    ? allVariablesNames
+        .map(variableName => {
+          if (!props.variablesContainer.has(variableName)) {
+            return { text: variableName, value: variableName };
+          }
+        })
+        .filter(Boolean)
+    : [];
 
   const saveToHistory = () => {
     const newHistory = [...history];
@@ -954,22 +969,24 @@ const NewVariablesList = (props: Props) => {
                   <ResponsiveLineStackLayout expand noMargin>
                     <Line alignItems="center" noMargin expand>
                       <Spacer />
-                      <SemiControlledTextField
+                      <SemiControlledAutoComplete
                         fullWidth
+                        dataSource={isTopLevel ? undefinedVariableNames : []}
                         margin="none"
                         key="name"
                         disabled={
                           isInherited || parentType === gd.Variable.Array
                         }
-                        commitOnBlur
                         onClick={stopEventPropagation}
                         errorText={nameErrors[variable.ptr]}
-                        onChange={() => {
+                        onChange={newValue => {
+                          onChangeName(nodeId, newValue);
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
                             delete newNameErrors[variable.ptr];
                             setNameErrors(newNameErrors);
                           }
+                          forceUpdate();
                         }}
                         inputStyle={{
                           color: isSelected
@@ -982,6 +999,11 @@ const NewVariablesList = (props: Props) => {
                         value={name}
                         onBlur={event => {
                           onChangeName(nodeId, event.currentTarget.value);
+                          if (nameErrors[variable.ptr]) {
+                            const newNameErrors = { ...nameErrors };
+                            delete newNameErrors[variable.ptr];
+                            setNameErrors(newNameErrors);
+                          }
                           forceUpdate();
                         }}
                       />

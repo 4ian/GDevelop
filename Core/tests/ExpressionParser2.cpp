@@ -29,7 +29,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::ExpressionParser2 parser;
 
   SECTION("Empty expression") {
-    {
+    SECTION("of type string") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
@@ -44,7 +44,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a text (between quotes) or a valid expression call.");
     }
-    {
+    SECTION("of type number") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
@@ -59,7 +59,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a number or a valid expression call.");
     }
-    {
+    SECTION("of type object") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
@@ -74,7 +74,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a valid object name.");
     }
-    {
+  }
+  SECTION("Expression with only a space") {
+    SECTION("of type string") {
       auto node = parser.ParseExpression(" ");
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
@@ -83,7 +85,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(type == "string");
       REQUIRE(emptyNode.text == "");
     }
-    {
+    SECTION("of type number") {
       auto node = parser.ParseExpression(" ");
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
@@ -92,7 +94,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(type == "number");
       REQUIRE(emptyNode.text == "");
     }
-    {
+    SECTION("of type object") {
       auto node = parser.ParseExpression(" ");
       REQUIRE(node != nullptr);
       auto &emptyNode = dynamic_cast<gd::EmptyNode &>(*node);
@@ -110,14 +112,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &textNode = dynamic_cast<gd::TextNode &>(*node);
       REQUIRE(textNode.text == "hello world");
     }
-
     {
       auto node = parser.ParseExpression("\"\"");
       REQUIRE(node != nullptr);
       auto &textNode = dynamic_cast<gd::TextNode &>(*node);
       REQUIRE(textNode.text == "");
     }
-
     {
       auto node = parser.ParseExpression("\"hello \\\"world\\\"\"");
       REQUIRE(node != nullptr);
@@ -416,6 +416,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &rightNumberNode =
           dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightNumberNode.number == "456");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
@@ -431,6 +435,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &rightTextNode =
           dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightTextNode.text == "def");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 
@@ -449,6 +457,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &rightNumberNode =
           dynamic_cast<gd::NumberNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightNumberNode.number == "456");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("\"abc\" + \"def\"");
@@ -464,6 +476,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &rightTextNode =
           dynamic_cast<gd::TextNode &>(*operatorNode.rightHandSide);
       REQUIRE(rightTextNode.text == "def");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 
@@ -479,6 +495,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("+123");
@@ -491,6 +511,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("-123.2");
@@ -503,6 +527,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123.2");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
   SECTION("valid unary operators ('number|string' type)") {
@@ -517,6 +545,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("+123");
@@ -529,6 +561,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
     {
       auto node = parser.ParseExpression("-123.2");
@@ -541,6 +577,10 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &numberNode =
           dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
       REQUIRE(numberNode.number == "123.2");
+
+      gd::ExpressionValidator validator(platform, project, layout1, "number|string");
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
     }
   }
 
@@ -835,7 +875,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Invalid identifiers") {
-    {
+    SECTION("empty identifiers") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
@@ -845,7 +885,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a valid object name.");
     }
-    {
+    SECTION("with operator") {
       auto node = parser.ParseExpression("Hello + World1");
       REQUIRE(node != nullptr);
 
@@ -859,7 +899,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Valid function calls") {
-    {
+    SECTION("without parameter") {
       auto node = parser.ParseExpression("MyExtension::GetNumber()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionCallNode &>(*node);
@@ -871,7 +911,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("number and string parameters") {
       auto node = parser.ParseExpression(
           "MyExtension::GetNumberWith2Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
@@ -884,7 +924,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("3rd optional parameter not set") {
       auto node = parser.ParseExpression(
           "MyExtension::GetNumberWith3Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
@@ -894,7 +934,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("3rd optional parameter set") {
       auto node = parser.ParseExpression(
           "MyExtension::GetNumberWith3Params(12, \"hello world\", 34)");
       REQUIRE(node != nullptr);
@@ -904,7 +944,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("object function call") {
       auto node =
           parser.ParseExpression("MySpriteObject.GetObjectNumber()");
       REQUIRE(node != nullptr);
@@ -917,7 +957,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("behavior function call") {
       auto node = parser.ParseExpression(
           "WhateverObject.WhateverBehavior::WhateverFunction()");
       REQUIRE(node != nullptr);
@@ -926,7 +966,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.objectName == "WhateverObject");
       REQUIRE(functionNode.behaviorName == "WhateverBehavior");
     }
-    {
+    SECTION("identifier parameter") {
       auto node = parser.ParseExpression(
           "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
       REQUIRE(node != nullptr);
@@ -1220,7 +1260,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Invalid function calls") {
-    {
+    SECTION("wrong name") {
       auto node = parser.ParseExpression("Idontexist(12)");
       REQUIRE(node != nullptr);
 
@@ -1233,22 +1273,38 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 14);
     }
-    {
-      auto node =
-          parser.ParseExpression("MyExtension::GetNumber(12)");
-      REQUIRE(node != nullptr);
+    SECTION("too much parameters") {
+      SECTION("on a free function") {
+        auto node =
+            parser.ParseExpression("MyExtension::GetNumber(12)");
+        REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
-      node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name. "
-              "The number of parameters must be exactly 0");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 23);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "This parameter was not expected by this expression. Remove it "
+                "or verify that you've entered the proper expression name. "
+                "The number of parameters must be exactly 0");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 23);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+      }
+      SECTION("on an object function") {
+        auto node = parser.ParseExpression("MySpriteObject.GetObjectNumber(12)");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "This parameter was not expected by this expression. Remove it "
+                "or verify that you've entered the proper expression name. "
+                "The number of parameters must be exactly 0");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 31);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 33);
+      }
     }
-    {
+    SECTION("not enough parameters") {
       auto node = parser.ParseExpression(
           "MyExtension::GetNumberWith2Params(12)");
       REQUIRE(node != nullptr);
@@ -1262,7 +1318,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 37);
     }
-    {
+    SECTION("wrong parameter type") {
       auto node = parser.ParseExpression(
           "MyExtension::GetNumberWith2Params(1, 1)");
       REQUIRE(node != nullptr);
@@ -1275,88 +1331,70 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 37);
       REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 38);
     }
-    {
-      auto node = parser.ParseExpression("MySpriteObject.GetObjectNumber(12)");
-      REQUIRE(node != nullptr);
+    SECTION("wrong return type") {
+      {
+        auto node = parser.ParseExpression("MyExtension::GetNumber()");
+        REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
-      node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "This parameter was not expected by this expression. Remove it "
-              "or verify that you've entered the proper expression name. "
-              "The number of parameters must be exactly 0");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 31);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 33);
+        gd::ExpressionValidator validator(platform, project, layout1, "string");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "You tried to use an expression that returns a number, but a "
+                "string is expected. Use `ToString` if you need to convert a "
+                "number to a string.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 24);
+      }
+      {
+        auto node = parser.ParseExpression("MyExtension::ToString()");
+        REQUIRE(node != nullptr);
+
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "You tried to use an expression that returns a string, but a "
+                "number is expected. Use `ToNumber` if you need to convert a "
+                "string to a number.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 23);
+      }
     }
-  }
-  SECTION("Invalid function calls, because of a wrong return type") {
-    {
-      auto node = parser.ParseExpression("MyExtension::GetNumber()");
-      REQUIRE(node != nullptr);
+    SECTION("finishing with namespace separator") {
+      SECTION("free function") {
+        auto node = parser.ParseExpression("MyExtension::(12)");
+        REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "string");
-      node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You tried to use an expression that returns a number, but a "
-              "string is expected. Use `ToString` if you need to convert a "
-              "number to a string.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 24);
-    }
-    {
-      auto node = parser.ParseExpression("MyExtension::ToString()");
-      REQUIRE(node != nullptr);
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "Cannot find an expression with this name: MyExtension::\nDouble "
+                "check that you've not made any typo in the name.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 17);
+      }
+      SECTION("behavior function") {
+        auto node = parser.ParseExpression("MyObject.MyBehavior::(12)");
+        REQUIRE(node != nullptr);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
-      node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You tried to use an expression that returns a string, but a "
-              "number is expected. Use `ToNumber` if you need to convert a "
-              "string to a number.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 23);
-    }
-  }
-  SECTION("Invalid free function call, finishing with namespace separator") {
-    {
-      auto node = parser.ParseExpression("MyExtension::(12)");
-      REQUIRE(node != nullptr);
+        gd::ExpressionValidator validator(platform, project, layout1, "number");
+        node->Visit(validator);
+        REQUIRE(validator.GetErrors().size() == 1);
 
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
-      node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "Cannot find an expression with this name: MyExtension::\nDouble "
-              "check that you've not made any typo in the name.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 17);
-    }
-  }
-
-  SECTION(
-      "Invalid behavior function call, finishing with namespace separator") {
-    {
-      auto node = parser.ParseExpression("MyObject.MyBehavior::(12)");
-      REQUIRE(node != nullptr);
-
-      gd::ExpressionValidator validator(platform, project, layout1, "number");
-      node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
-
-      // TODO: The error message could be improved
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "Cannot find an expression with this name: \nDouble "
-              "check that you've not made any typo in the name.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
-      REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+        // TODO: The error message could be improved
+        REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+                "Cannot find an expression with this name: \nDouble "
+                "check that you've not made any typo in the name.");
+        REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+        REQUIRE(validator.GetErrors()[0]->GetEndPosition() == 25);
+      }
     }
   }
 
   SECTION("Invalid variables") {
-    {
+    SECTION("empty variables") {
       auto node = parser.ParseExpression("");
       REQUIRE(node != nullptr);
 
@@ -1366,7 +1404,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a variable name.");
     }
-    {
+    SECTION("identifier in brackets") {
       auto node = parser.ParseExpression("myVariable[myChild]");
       REQUIRE(node != nullptr);
 
@@ -1377,7 +1415,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
             "You must enter a number or a text, wrapped inside double quotes "
             "(example: \"Hello world\").");
     }
-    {
+    SECTION("no closing bracket") {
       auto node = parser.ParseExpression("myVariable[\"myChild\"");
       REQUIRE(node != nullptr);
 
@@ -1387,7 +1425,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
             "Missing a closing bracket. Add a closing bracket for each opening bracket.");
     }
-    {
+    SECTION("number instead") {
       auto node = parser.ParseExpression("1234");
       REQUIRE(node != nullptr);
 
@@ -1397,7 +1435,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You entered a number, but this type was expected: variable");
     }
-    {
+    SECTION("string instead") {
       auto node = parser.ParseExpression("\"text\"");
       REQUIRE(node != nullptr);
 

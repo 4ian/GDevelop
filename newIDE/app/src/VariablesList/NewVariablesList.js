@@ -859,223 +859,219 @@ const NewVariablesList = (props: Props) => {
           dropNode(nodeId);
         }}
       >
-        {({ connectDragSource, connectDropTarget, isOver, canDrop }) =>
-          connectDropTarget(
-            <div>
-              <StyledTreeItem
-                nodeId={nodeId}
-                label={
+        {({ connectDragSource, connectDropTarget, isOver, canDrop }) => (
+          <StyledTreeItem
+            nodeId={nodeId}
+            label={connectDropTarget(
+                <div
+                  style={
+                    isSelected
+                      ? {
+                          backgroundColor:
+                            gdevelopTheme.listItem.selectedBackgroundColor,
+                        }
+                      : undefined
+                  }
+                >
+                  {isOver && <DropIndicator canDrop={canDrop} />}
                   <div
-                    style={
-                      isSelected
-                        ? {
-                            backgroundColor:
-                              gdevelopTheme.listItem.selectedBackgroundColor,
-                          }
-                        : undefined
-                    }
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '6px 30px 6px 6px',
+                    }}
                   >
-                    {isOver && <DropIndicator canDrop={canDrop} />}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '6px 30px 6px 6px',
-                      }}
-                    >
-                      {connectDragSource(
-                        <span>
-                          <DragHandle
-                            color={
-                              isSelected
-                                ? gdevelopTheme.listItem.selectedTextColor
-                                : '#AAA'
+                    {connectDragSource(
+                      <span>
+                        <DragHandle
+                          color={
+                            isSelected
+                              ? gdevelopTheme.listItem.selectedTextColor
+                              : '#AAA'
+                          }
+                        />
+                      </span>
+                    )}
+                    <ResponsiveLineStackLayout expand noMargin>
+                      <Line alignItems="center" noMargin expand>
+                        <Spacer />
+                        <SemiControlledTextField
+                          fullWidth
+                          margin="none"
+                          key="name"
+                          disabled={parentType === gd.Variable.Array}
+                          commitOnBlur
+                          onClick={stopEventPropagation}
+                          errorText={nameErrors[variable.ptr]}
+                          onChange={() => {
+                            if (nameErrors[variable.ptr]) {
+                              const newNameErrors = { ...nameErrors };
+                              delete newNameErrors[variable.ptr];
+                              setNameErrors(newNameErrors);
                             }
-                          />
-                        </span>
-                      )}
-                      <ResponsiveLineStackLayout expand noMargin>
-                        <Line alignItems="center" noMargin expand>
-                          <Spacer />
-                          <SemiControlledTextField
-                            fullWidth
-                            margin="none"
-                            key="name"
-                            disabled={parentType === gd.Variable.Array}
-                            commitOnBlur
-                            onClick={stopEventPropagation}
-                            errorText={nameErrors[variable.ptr]}
-                            onChange={() => {
-                              if (nameErrors[variable.ptr]) {
-                                const newNameErrors = { ...nameErrors };
-                                delete newNameErrors[variable.ptr];
-                                setNameErrors(newNameErrors);
-                              }
-                            }}
-                            inputStyle={
-                              isSelected
-                                ? {
-                                    color:
-                                      gdevelopTheme.listItem.selectedTextColor,
-                                  }
-                                : undefined
-                            }
-                            value={name}
-                            onBlur={event => {
-                              onChangeName(nodeId, event.currentTarget.value);
-                              forceUpdate();
-                            }}
-                          />
-                          <Spacer />
-                          <Spacer />
-                        </Line>
-                        <div style={rowRightSideStyle}>
-                          <Line noMargin alignItems="center">
-                            <Column noMargin>
-                              <VariableTypeSelector
-                                variableType={type}
-                                onChange={newType => {
-                                  onChangeType(nodeId, newType);
-                                  forceUpdate();
-                                }}
-                                isHighlighted={isSelected}
-                              />
-                            </Column>
-                            <Column expand>
-                              {type === gd.Variable.Boolean ? (
-                                <Line noMargin>
-                                  <span
-                                    style={
-                                      isSelected
-                                        ? {
-                                            color:
-                                              gdevelopTheme.listItem
-                                                .selectedTextColor,
-                                          }
-                                        : undefined
-                                    }
-                                  >
-                                    {variable.getBool() ? (
-                                      <Trans>True</Trans>
-                                    ) : (
-                                      <Trans>False</Trans>
-                                    )}
-                                  </span>
-                                  <Spacer />
-                                  <IconButton
-                                    size="small"
-                                    style={{ padding: 0 }}
-                                    onClick={() => {
-                                      onChangeValue(
-                                        nodeId,
-                                        !variable.getBool() ? 'true' : 'false'
-                                      );
-                                    }}
-                                  >
-                                    <SwapHorizontal
-                                      htmlColor={
-                                        isSelected
-                                          ? gdevelopTheme.listItem
-                                              .selectedTextColor
-                                          : undefined
-                                      }
-                                    />
-                                  </IconButton>
-                                </Line>
-                              ) : (
-                                <SemiControlledTextField
-                                  margin="none"
-                                  type={
-                                    type === gd.Variable.Number
-                                      ? 'number'
-                                      : 'text'
-                                  }
-                                  key="value"
-                                  onClick={stopEventPropagation}
-                                  multiline={type === gd.Variable.String}
-                                  inputStyle={{
-                                    ...(type === gd.Variable.String
-                                      ? styles.noPaddingMultilineTextField
-                                      : undefined),
-                                    ...(isSelected
+                          }}
+                          inputStyle={
+                            isSelected
+                              ? {
+                                  color:
+                                    gdevelopTheme.listItem.selectedTextColor,
+                                }
+                              : undefined
+                          }
+                          value={name}
+                          onBlur={event => {
+                            onChangeName(nodeId, event.currentTarget.value);
+                            forceUpdate();
+                          }}
+                        />
+                        <Spacer />
+                        <Spacer />
+                      </Line>
+                      <div style={rowRightSideStyle}>
+                        <Line noMargin alignItems="center">
+                          <Column noMargin>
+                            <VariableTypeSelector
+                              variableType={type}
+                              onChange={newType => {
+                                onChangeType(nodeId, newType);
+                                forceUpdate();
+                              }}
+                              isHighlighted={isSelected}
+                            />
+                          </Column>
+                          <Column expand>
+                            {type === gd.Variable.Boolean ? (
+                              <Line noMargin>
+                                <span
+                                  style={
+                                    isSelected
                                       ? {
                                           color:
                                             gdevelopTheme.listItem
                                               .selectedTextColor,
                                         }
-                                      : undefined),
-                                  }}
-                                  disabled={isCollection}
-                                  onChange={() => {}}
-                                  value={
-                                    isCollection
-                                      ? `${variable.getChildrenCount()} children`
-                                      : type === gd.Variable.String
-                                      ? variable.getString()
-                                      : variable.getValue().toString()
-                                  }
-                                  commitOnBlur
-                                  onBlur={event => {
-                                    onChangeValue(
-                                      nodeId,
-                                      event.currentTarget.value
-                                    );
-                                    forceUpdate();
-                                  }}
-                                />
-                              )}
-                            </Column>
-                            {isCollection ? (
-                              <IconButton
-                                size="small"
-                                style={{ padding: 0 }}
-                                onClick={() => onAddChild(nodeId)}
-                              >
-                                <Add
-                                  htmlColor={
-                                    isSelected
-                                      ? gdevelopTheme.listItem.selectedTextColor
                                       : undefined
                                   }
-                                />
-                              </IconButton>
-                            ) : null}
-                          </Line>
-                        </div>
-                      </ResponsiveLineStackLayout>
-                    </div>
+                                >
+                                  {variable.getBool() ? (
+                                    <Trans>True</Trans>
+                                  ) : (
+                                    <Trans>False</Trans>
+                                  )}
+                                </span>
+                                <Spacer />
+                                <IconButton
+                                  size="small"
+                                  style={{ padding: 0 }}
+                                  onClick={() => {
+                                    onChangeValue(
+                                      nodeId,
+                                      !variable.getBool() ? 'true' : 'false'
+                                    );
+                                  }}
+                                >
+                                  <SwapHorizontal
+                                    htmlColor={
+                                      isSelected
+                                        ? gdevelopTheme.listItem
+                                            .selectedTextColor
+                                        : undefined
+                                    }
+                                  />
+                                </IconButton>
+                              </Line>
+                            ) : (
+                              <SemiControlledTextField
+                                margin="none"
+                                type={
+                                  type === gd.Variable.Number
+                                    ? 'number'
+                                    : 'text'
+                                }
+                                key="value"
+                                onClick={stopEventPropagation}
+                                multiline={type === gd.Variable.String}
+                                inputStyle={{
+                                  ...(type === gd.Variable.String
+                                    ? styles.noPaddingMultilineTextField
+                                    : undefined),
+                                  ...(isSelected
+                                    ? {
+                                        color:
+                                          gdevelopTheme.listItem
+                                            .selectedTextColor,
+                                      }
+                                    : undefined),
+                                }}
+                                disabled={isCollection}
+                                onChange={() => {}}
+                                value={
+                                  isCollection
+                                    ? `${variable.getChildrenCount()} children`
+                                    : type === gd.Variable.String
+                                    ? variable.getString()
+                                    : variable.getValue().toString()
+                                }
+                                commitOnBlur
+                                onBlur={event => {
+                                  onChangeValue(
+                                    nodeId,
+                                    event.currentTarget.value
+                                  );
+                                  forceUpdate();
+                                }}
+                              />
+                            )}
+                          </Column>
+                          {isCollection ? (
+                            <IconButton
+                              size="small"
+                              style={{ padding: 0 }}
+                              onClick={() => onAddChild(nodeId)}
+                            >
+                              <Add
+                                htmlColor={
+                                  isSelected
+                                    ? gdevelopTheme.listItem.selectedTextColor
+                                    : undefined
+                                }
+                              />
+                            </IconButton>
+                          ) : null}
+                        </Line>
+                      </div>
+                    </ResponsiveLineStackLayout>
                   </div>
-                }
-                onLabelClick={preventEventDefaultEffect}
-              >
-                {!isCollection
-                  ? null
-                  : type === gd.Variable.Structure
-                  ? variable
-                      .getAllChildrenNames()
-                      .toJSArray()
-                      .map((childName, index) => {
-                        const childVariable = variable.getChild(childName);
-                        return renderVariableAndChildrenRows({
-                          name: childName,
-                          variable: childVariable,
-                          parentNodeId: nodeId,
-                          parentVariable: variable,
-                        });
-                      })
-                  : mapFor(0, variable.getChildrenCount(), index => {
-                      const childVariable = variable.getAtIndex(index);
-                      return renderVariableAndChildrenRows({
-                        name: index.toString(),
-                        variable: childVariable,
-                        parentNodeId: nodeId,
-                        parentVariable: variable,
-                      });
-                    })}
-              </StyledTreeItem>
-            </div>
-          )
-        }
+                </div>
+            )}
+            onLabelClick={preventEventDefaultEffect}
+          >
+            {!isCollection
+              ? null
+              : type === gd.Variable.Structure
+              ? variable
+                  .getAllChildrenNames()
+                  .toJSArray()
+                  .map((childName, index) => {
+                    const childVariable = variable.getChild(childName);
+                    return renderVariableAndChildrenRows({
+                      name: childName,
+                      variable: childVariable,
+                      parentNodeId: nodeId,
+                      parentVariable: variable,
+                    });
+                  })
+              : mapFor(0, variable.getChildrenCount(), index => {
+                  const childVariable = variable.getAtIndex(index);
+                  return renderVariableAndChildrenRows({
+                    name: index.toString(),
+                    variable: childVariable,
+                    parentNodeId: nodeId,
+                    parentVariable: variable,
+                  });
+                })}
+          </StyledTreeItem>
+        )}
       </DragSourceAndDropTarget>
     );
   };

@@ -16,6 +16,7 @@ type Props = {|
   variableType: Variable_Type,
   onChange: (newVariableType: string) => void,
   isHighlighted?: boolean,
+  disabled?: boolean,
 |};
 
 const VariableTypeSelector = (props: Props) => {
@@ -62,6 +63,7 @@ const VariableTypeSelector = (props: Props) => {
             ? { color: gdevelopTheme.listItem.selectedTextColor }
             : undefined
         }
+        disabled={props.disabled}
       >
         <SelectOption primaryText="String" value={gd.Variable.String} />
         <SelectOption primaryText="Number" value={gd.Variable.Number} />

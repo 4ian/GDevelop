@@ -124,7 +124,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const variable = variablesContainer.insert(
       'OtherObjectVariable',
       new gd.Variable(),
-      0
+      1
     );
     variable.castTo('structure');
     variable.getChild('ObjectChild1').setValue(564);
@@ -271,7 +271,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     const variable = variablesContainer.insert(
       'OtherInstanceVariable',
       new gd.Variable(),
-      0
+      1
     );
     variable.castTo('structure');
     variable.getChild('InstanceChild1').setValue(564);

@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
-#include <SFML/Graphics/Sprite.hpp>
 #include <iostream>
 #include "GDCore/Extensions/Builtin/SpriteExtension/Polygon2d.h"
 

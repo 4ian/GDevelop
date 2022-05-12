@@ -7,6 +7,7 @@
 #define GDCORE_EFFECTS_CONTAINER_H
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "GDCore/String.h"
 

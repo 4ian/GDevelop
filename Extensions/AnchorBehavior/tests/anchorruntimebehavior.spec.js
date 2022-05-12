@@ -1,13 +1,13 @@
 // @ts-check
 describe.only('gdjs.AnchorRuntimeBehavior', function () {
-  var runtimeGame = new gdjs.RuntimeGame({
+  const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
     resources: { resources: [] },
     // @ts-ignore
     properties: { windowWidth: 1000, windowHeight: 1000 },
   });
   const anchorBehaviorName = 'Anchor';
-  var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
   runtimeScene.loadFromScene({
     layers: [
       {
@@ -35,8 +35,8 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
     instances: [],
   });
 
-  function createObject() {
-    var object = new gdjs.TestRuntimeObject(runtimeScene, {
+  function createObject(behaviorProperties) {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
       name: 'obj1',
       type: '',
       behaviors: [
@@ -50,6 +50,7 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
           bottomEdgeAnchor: 0,
           relativeToOriginalWindowSize: true,
           useLegacyBottomAndRightAnchors: false,
+          ...behaviorProperties,
         },
       ],
       variables: [],
@@ -72,13 +73,11 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
   }
 
   describe('(anchor horizontal edge)', function () {
-    ['right', 'left'].forEach((objectEdge) => {
+    ['rightEdgeAnchor', 'leftEdgeAnchor'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window left (fixed)`, function () {
-        var object = createObject();
+        const object = createObject({ [objectEdge]: 1 });
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
-
-        getAnchorBehavior(object).setAnchor(objectEdge, 1);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -90,13 +89,11 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
         expect(object.getWidth()).to.equal(10);
       });
     });
-    ['right', 'left'].forEach((objectEdge) => {
+    ['rightEdgeAnchor', 'leftEdgeAnchor'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window right (fixed)`, function () {
-        var object = createObject();
+        const object = createObject({ [objectEdge]: 2 });
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
-
-        getAnchorBehavior(object).setAnchor(objectEdge, 2);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -110,12 +107,9 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
     });
 
     it('anchors the right and left edge of object (fixed)', function () {
-      var object = createObject();
+      const object = createObject({ leftEdgeAnchor: 1, rightEdgeAnchor: 2 });
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
-
-      getAnchorBehavior(object).setAnchor('left', 1);
-      getAnchorBehavior(object).setAnchor('right', 2);
 
       runtimeScene.renderAndStep(1000 / 60);
 
@@ -127,12 +121,10 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       expect(object.getWidth()).to.equal(1010);
     });
 
-    it('anchors the right edge of object (proportional)', function () {
-      var object = createObject();
+    it('anchors the left edge of object (proportional)', function () {
+      const object = createObject({ leftEdgeAnchor: 3 });
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
-
-      getAnchorBehavior(object).setAnchor('left', 3);
 
       runtimeScene.renderAndStep(1000 / 60);
 
@@ -146,13 +138,11 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
   });
 
   describe('(anchor vertical edge)', function () {
-    ['top', 'bottom'].forEach((objectEdge) => {
+    ['topEdgeAnchor', 'bottomEdgeAnchor'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window top (fixed)`, function () {
-        var object = createObject();
+        const object = createObject({ [objectEdge]: 1 });
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
-
-        getAnchorBehavior(object).setAnchor('top', 1);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -164,13 +154,11 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
         expect(object.getWidth()).to.equal(10);
       });
     });
-    ['top', 'bottom'].forEach((objectEdge) => {
+    ['topEdgeAnchor', 'bottomEdgeAnchor'].forEach((objectEdge) => {
       it(`anchors the ${objectEdge} edge of object to window bottom (fixed)`, function () {
-        var object = createObject();
+        const object = createObject({ [objectEdge]: 2 });
         runtimeGame.setGameResolutionSize(1000, 1000);
         object.setPosition(500, 500);
-
-        getAnchorBehavior(object).setAnchor('bottom', 2);
 
         runtimeScene.renderAndStep(1000 / 60);
 
@@ -184,12 +172,9 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
     });
 
     it('anchors the top and bottom edge of object (fixed)', function () {
-      var object = createObject();
+      const object = createObject({ topEdgeAnchor: 1, bottomEdgeAnchor: 2 });
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
-
-      getAnchorBehavior(object).setAnchor('top', 1);
-      getAnchorBehavior(object).setAnchor('bottom', 2);
 
       runtimeScene.renderAndStep(1000 / 60);
 
@@ -201,12 +186,10 @@ describe.only('gdjs.AnchorRuntimeBehavior', function () {
       expect(object.getHeight()).to.equal(1010);
     });
 
-    it('anchors the bottom edge of object (proportional)', function () {
-      var object = createObject();
+    it('anchors the top edge of object (proportional)', function () {
+      const object = createObject({ topEdgeAnchor: 3 });
       runtimeGame.setGameResolutionSize(1000, 1000);
       object.setPosition(500, 500);
-
-      getAnchorBehavior(object).setAnchor('top', 3);
 
       runtimeScene.renderAndStep(1000 / 60);
 

@@ -692,6 +692,11 @@ const NewVariablesList = (props: Props) => {
     const { current } = draggedNodeId;
     if (!current) return;
 
+    // TODO: Add logic to copy dragged variable instead of moving it if Alt/Opt key is pressed
+    // React-dnd keeps the focus when user is dragging so keyboard shortcut instance
+    // cannot detect if the key is pressed while dragging. React-dnd has issues to
+    // return event data about pressed keys when mouse is up.
+
     const targetVariableContext = getVariableContextFromNodeId(
       nodeId,
       props.variablesContainer

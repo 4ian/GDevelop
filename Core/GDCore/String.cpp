@@ -103,11 +103,11 @@ String String::FromLocale( const std::string &localizedString )
        std::locale("").name().find("UTF8") != std::string::npos)
         return FromUTF8(localizedString); //UTF8 is already the current locale
     else {
-        std::string utf8();
-        utf8.reserve((localizedString.length() + 1) * 6);
+        std::string utf8String;
+        utf8String.reserve((localizedString.length() + 1) * 6);
         // Use the current locale (std::locale("")) for conversion
-        gd::Utf8::fromAnsi(localizedString.begin(), localizedString.end(), std::back_inserter(utf8), std::locale(""));
-        return FromUTF8(utf8);
+        gd::Utf8::fromAnsi(localizedString.begin(), localizedString.end(), std::back_inserter(utf8String), std::locale(""));
+        return FromUTF8(utf8String);
     }
 #endif
 }

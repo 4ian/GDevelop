@@ -3,7 +3,13 @@ import * as React from 'react';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
 import { type AssetPacks } from '../Utils/GDevelopServices/Asset';
-import { GridListTile, GridList, Paper } from '@material-ui/core';
+import {
+  GridListTile,
+  GridList,
+  Paper,
+  makeStyles,
+  createStyles,
+} from '@material-ui/core';
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
@@ -32,6 +38,18 @@ const styles = {
   },
 };
 
+const useStylesForGridListItem = makeStyles(theme =>
+  createStyles({
+    root: {
+      '&:focus': {
+        border: `2px solid ${theme.palette.primary.main}`,
+        outline: 'none',
+      },
+      '&:focus-visible': { outline: 'unset' },
+    },
+  })
+);
+
 type Props = {|
   assetPacks: AssetPacks,
   onPackSelection: string => void,
@@ -41,6 +59,7 @@ export const AssetsHome = ({
   assetPacks: { starterPacks },
   onPackSelection,
 }: Props) => {
+  const classesForGridListItem = useStylesForGridListItem();
   return (
     <ThemeConsumer>
       {muiTheme => (
@@ -53,6 +72,7 @@ export const AssetsHome = ({
           >
             {starterPacks.map((pack, index) => (
               <GridListTile
+                classes={classesForGridListItem}
                 key={pack.tag}
                 tabIndex={0}
                 onKeyPress={(

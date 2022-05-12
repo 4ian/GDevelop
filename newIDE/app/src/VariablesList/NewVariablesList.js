@@ -14,7 +14,6 @@ import Delete from '@material-ui/icons/Delete';
 import { mapFor } from '../Utils/MapFor';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { Column, Line, Spacer } from '../UI/Grid';
-import Checkbox from '../UI/Checkbox';
 import DragHandle from '../UI/DragHandle';
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { Trans, t } from '@lingui/macro';
@@ -22,12 +21,10 @@ import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDrop
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import VariableTypeSelector from './VariableTypeSelector';
 import IconButton from '../UI/IconButton';
-import { makeStyles, withStyles } from '@material-ui/styles';
+import { withStyles } from '@material-ui/styles';
 import styles from './styles';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Toggle from '../UI/Toggle';
 import Measure from 'react-measure';
-import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
 import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
 import { CLIPBOARD_KIND } from './ClipboardKind';
@@ -422,6 +419,7 @@ const NewVariablesList = (props: Props) => {
           if (!props.variablesContainer.has(variableName)) {
             return { text: variableName, value: variableName };
           }
+          return null;
         })
         .filter(Boolean)
     : [];
@@ -477,7 +475,7 @@ const NewVariablesList = (props: Props) => {
               ? props.inheritedVariablesContainer
               : props.variablesContainer
           );
-          if (!variable || !name) return;
+          if (!variable || !name) return null;
           let parentType;
 
           const parentVariable = getDirectParentVariable(lineage);
@@ -625,11 +623,12 @@ const NewVariablesList = (props: Props) => {
           if (otherNodeId.startsWith(`${nodeId}.`)) {
             return newList.indexOf(otherNodeId);
           }
+          return null;
         })
         .filter(Boolean);
       const originalNodeIdBits = nodeId.split('.');
       const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].map(index => {
+      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].forEach(index => {
         const nodeIdToChange = newList[index];
         const bitsToChange = nodeIdToChange.split('.');
         bitsToChange[bitsToChange.indexOf(variableName)] = newName;
@@ -643,14 +642,6 @@ const NewVariablesList = (props: Props) => {
     () => makeDragSourceAndDropTarget('variable-editor'),
     []
   );
-
-  const variableTypeToLabel = {
-    [gd.Variable.String]: <Trans>String</Trans>,
-    [gd.Variable.Number]: <Trans>Number</Trans>,
-    [gd.Variable.Boolean]: <Trans>Boolean</Trans>,
-    [gd.Variable.Structure]: <Trans>Structure</Trans>,
-    [gd.Variable.Array]: <Trans>Array</Trans>,
-  };
 
   const canDrop = (nodeId: string): boolean => {
     if (nodeId.startsWith(inheritedPrefix)) return false;
@@ -1257,6 +1248,7 @@ const NewVariablesList = (props: Props) => {
           const newBool = newValue === 'true';
           if (newBool === _variable.getBool()) return;
           break;
+        default:
       }
       const newVariable = new gd.Variable();
       unserializeFromJSObject(newVariable, serializeToJSObject(_variable));
@@ -1338,6 +1330,7 @@ const NewVariablesList = (props: Props) => {
     >
       {({ contentRect, measureRef }) => (
         <div
+          style={{ flex: 1, display: 'flex' }}
           onKeyDown={keyboardShortcuts.onKeyDown}
           onKeyUp={keyboardShortcuts.onKeyUp}
         >

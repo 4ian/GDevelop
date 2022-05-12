@@ -7,7 +7,6 @@
  * @file Tests covering utf8 features from GDevelop Core.
  */
 
-#include <SFML/System/String.hpp>
 #include <exception>
 #include <iostream>
 #include <string>
@@ -19,10 +18,8 @@ TEST_CASE("Utf8 String", "[common][utf8]") {
   SECTION("ctor & conversions") {
     gd::String str = u8"UTF8 a été testé !";
 
-    sf::String sfStr = str;
     std::u32string u32str = str.ToUTF32();
 
-    REQUIRE(str == gd::String::FromSfString(sfStr));
     REQUIRE(str == gd::String::FromUTF32(u32str));
   }
 

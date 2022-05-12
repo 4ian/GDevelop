@@ -11,6 +11,7 @@
 
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8/utf8proc.h"
+#include "GDCore/Utf8/Utf.h"
 
 namespace gd
 {
@@ -86,7 +87,11 @@ String::const_iterator String::end() const
 String String::FromLocale( const std::string &localizedString )
 {
 #if defined(WINDOWS)
-    return FromUTF8(localizedString); //Don't need to use the current locale, on Windows, std::locale is always the C locale
+    std::string utf8String;
+    utf8String.reserve((localizedString.length() + 1) * 6);
+    //Don't need to use the current locale, on Windows, std::locale is always the C locale
+    gd::Utf8::fromAnsi(localizedString.begin(), localizedString.end(), std::back_inserter(utf8String));
+    return FromUTF8(utf8String);
 #elif defined(MACOS)
     return FromUTF8(localizedString); //Assume UTF8 is the current locale
 #elif defined(EMSCRIPTEN)
@@ -97,8 +102,13 @@ String String::FromLocale( const std::string &localizedString )
        std::locale("").name().find("utf8") != std::string::npos ||
        std::locale("").name().find("UTF8") != std::string::npos)
         return FromUTF8(localizedString); //UTF8 is already the current locale
-    else
-        return FromUTF8(localizedString); //Use the current locale (std::locale("")) for conversion
+    else {
+        std::string utf8();
+        utf8.reserve((localizedString.length() + 1) * 6);
+        // Use the current locale (std::locale("")) for conversion
+        gd::Utf8::fromAnsi(localizedString.begin(), localizedString.end(), std::back_inserter(utf8), std::locale(""));
+        return FromUTF8(utf8);
+    }
 #endif
 }
 
@@ -133,7 +143,12 @@ String String::FromWide( const std::wstring &wstr )
 std::string String::ToLocale() const
 {
 #if defined(WINDOWS)
-    return m_string;
+    // Prepare the output string
+    std::string output;
+    output.reserve((m_string.length() + 1) * 6);
+    // Convert
+    gd::Utf8::toAnsi(m_string.begin(), m_string.end(), std::back_inserter(output), 0);
+    return output;
 #elif defined(MACOS)
     return m_string;
 #elif defined(EMSCRIPTEN)
@@ -144,8 +159,14 @@ std::string String::ToLocale() const
        std::locale("").name().find("utf8") != std::string::npos ||
        std::locale("").name().find("UTF8") != std::string::npos)
         return m_string; //UTF8 is already the current locale on Linux
-    else
-        return m_string; //Use the current locale for conversion
+    else {
+        // Prepare the output string
+        std::string output;
+        output.reserve((m_string.length() + 1) * 6);
+        // Use the current locale for conversion
+        gd::Utf8::toAnsi(m_string.begin(), m_string.end(), std::back_inserter(output), 0, std::locale(""));
+        return output;
+    }
 #endif
 }
 

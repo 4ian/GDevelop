@@ -5,7 +5,7 @@ import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import { Column, Line, Spacer } from '../UI/Grid';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
@@ -47,11 +47,11 @@ const ProfileDetails = ({
   return profile ? (
     <I18n>
       {({ i18n }) => (
-        <Column>
+        <ColumnStackLayout noMargin>
           <ResponsiveLineStackLayout
             alignItems="center"
             justifyContent="space-between"
-            noColumnMargin
+            noMargin
           >
             <Line>
               <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
@@ -84,7 +84,7 @@ const ProfileDetails = ({
             )}
           </ResponsiveLineStackLayout>
           {isAuthenticatedUserProfile && profile.email && (
-            <Line>
+            <Line noMargin>
               <TextField
                 value={profile.email}
                 readOnly
@@ -94,7 +94,7 @@ const ProfileDetails = ({
               />
             </Line>
           )}
-          <Line>
+          <Line noMargin>
             <TextField
               value={profile.description || ''}
               readOnly
@@ -112,7 +112,7 @@ const ProfileDetails = ({
             />
           </Line>
           {isAuthenticatedUserProfile && (
-            <ResponsiveLineStackLayout justifyContent="flex-end" noColumnMargin>
+            <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
               <RaisedButton
                 label={<Trans>Change my email</Trans>}
                 onClick={onChangeEmail}
@@ -129,7 +129,7 @@ const ProfileDetails = ({
             displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
             displayNotifications={!!isAuthenticatedUserProfile}
           />
-        </Column>
+        </ColumnStackLayout>
       )}
     </I18n>
   ) : error ? (

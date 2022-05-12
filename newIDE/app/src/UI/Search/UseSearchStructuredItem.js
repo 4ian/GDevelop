@@ -120,7 +120,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   // easing random discovery of items when no search is done.
   const shuffledSearchResults = React.useMemo(
     () => {
-      if (!searchItemsById) return null;
+      if (!searchItemsById || !Object.keys(searchItemsById).length) return null;
 
       return shuffle(
         Object.keys(searchItemsById).map(id => ({

@@ -400,7 +400,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     REQUIRE(expressionCodeGenerator.GetOutput() == "0");
   }
   SECTION("Invalid variables") {
-    SECTION("empty variables")  {
+    SECTION("empty variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "") == "fakeBadVariable");
     }

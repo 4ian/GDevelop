@@ -271,6 +271,8 @@ const insertInVariableChildren = (
 
 const getDirectParentVariable = lineage =>
   lineage[lineage.length - 1] ? lineage[lineage.length - 1].variable : null;
+const getDirectParentNodeId = lineage =>
+  lineage[lineage.length - 1] ? lineage[lineage.length - 1].nodeId : null;
 const getOldestAncestryVariable = lineage =>
   lineage.length ? lineage[0] : null;
 
@@ -677,7 +679,6 @@ const NewVariablesList = (props: Props) => {
     ].forEach(([list, setter]) => {
       const newList: Array<string> = [...list];
       const indexOfRenamedNode = newList.indexOf(nodeId);
-      if (indexOfRenamedNode === -1) return;
       const indicesOfChildrenOfRenamedNode = newList
         .map(otherNodeId => {
           if (otherNodeId.startsWith(`${nodeId}${separator}`)) {
@@ -688,12 +689,51 @@ const NewVariablesList = (props: Props) => {
         .filter(Boolean);
       const originalNodeIdBits = nodeId.split(separator);
       const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].forEach(index => {
-        const nodeIdToChange = newList[index];
-        const bitsToChange = nodeIdToChange.split(separator);
-        bitsToChange[bitsToChange.indexOf(variableName)] = newName;
-        newList.splice(index, 1, bitsToChange.join(separator));
-      });
+      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
+        .filter(index => index >= 0)
+        .forEach(index => {
+          const nodeIdToChange = newList[index];
+          const bitsToChange = nodeIdToChange.split(separator);
+          bitsToChange[bitsToChange.indexOf(variableName)] = newName;
+          newList.splice(index, 1, bitsToChange.join(separator));
+        });
+      setter(newList);
+    });
+  };
+
+  const updateExpandedAndSelectedNodesFollowingNodeMove = (
+    oldNodeId: string,
+    newParentNodeId: string,
+    newName: string
+  ) => {
+    [
+      [expandedNodes, setExpandedNodes],
+      [selectedNodes, setSelectedNodes],
+    ].forEach(([list, setter]) => {
+      const newList: Array<string> = [...list];
+      const indexOfRenamedNode = newList.indexOf(oldNodeId);
+      const indicesOfChildrenOfRenamedNode = newList
+        .map(otherNodeId => {
+          if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
+            return newList.indexOf(otherNodeId);
+          }
+          return null;
+        })
+        .filter(Boolean);
+      const originalNodeIdBits = oldNodeId.split(separator);
+      const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
+      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
+        .filter(index => index >= 0)
+        .forEach(index => {
+          const nodeIdToChange = newList[index];
+          const newNodeId = nodeIdToChange.replace(
+            oldNodeId,
+            newParentNodeId
+              ? `${newParentNodeId}${separator}${newName}`
+              : newName
+          );
+          newList.splice(index, 1, newNodeId);
+        });
       setter(newList);
     });
   };
@@ -792,6 +832,7 @@ const NewVariablesList = (props: Props) => {
     let draggedIndex;
     let targetIndex;
     let movementHasBeenMade = true;
+    let parentNodeId;
 
     switch (movementType) {
       case 'InsideTopLevel':
@@ -814,6 +855,13 @@ const NewVariablesList = (props: Props) => {
         targetVariableParentVariable.insertChild(newName, draggedVariable);
 
         props.variablesContainer.remove(draggedName);
+        parentNodeId = getDirectParentNodeId(targetLineage);
+        if (parentNodeId)
+          updateExpandedAndSelectedNodesFollowingNodeMove(
+            current,
+            parentNodeId,
+            newName
+          );
         break;
       case 'StructureToTopLevel':
         newName = newNameGenerator(
@@ -829,6 +877,7 @@ const NewVariablesList = (props: Props) => {
 
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
         draggedVariableParentVariable.removeChild(draggedName);
+        updateExpandedAndSelectedNodesFollowingNodeMove(current, '', newName);
         break;
       case 'FromStructureToAnotherStructure':
         newName = newNameGenerator(
@@ -842,6 +891,13 @@ const NewVariablesList = (props: Props) => {
 
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
         draggedVariableParentVariable.removeChild(draggedName);
+        parentNodeId = getDirectParentNodeId(targetLineage);
+        if (parentNodeId)
+          updateExpandedAndSelectedNodesFollowingNodeMove(
+            current,
+            parentNodeId,
+            newName
+          );
         break;
       case 'FromArrayToAnotherArray':
         draggedIndex = parseInt(draggedName, 10);
@@ -855,15 +911,31 @@ const NewVariablesList = (props: Props) => {
 
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
         draggedVariableParentVariable.removeAtIndex(draggedIndex);
+        parentNodeId = getDirectParentNodeId(targetLineage);
+        if (parentNodeId)
+          updateExpandedAndSelectedNodesFollowingNodeMove(
+            current,
+            parentNodeId,
+            targetIndex.toString()
+          );
         break;
       case 'InsideSameArray':
         draggedIndex = parseInt(draggedName, 10);
         targetIndex = parseInt(targetName, 10);
+        const correctedTargetIndex =
+          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex;
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
         targetVariableParentVariable.moveChildInArray(
           draggedIndex,
-          targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+          correctedTargetIndex
         );
+        parentNodeId = getDirectParentNodeId(targetLineage);
+        if (parentNodeId)
+          updateExpandedAndSelectedNodesFollowingNodeMove(
+            current,
+            parentNodeId,
+            correctedTargetIndex.toString()
+          );
         break;
       case 'FromStructureToArray':
       case 'FromArrayToStructure':

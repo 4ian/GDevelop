@@ -952,6 +952,16 @@ const NewVariablesList = (props: Props) => {
     let parentType = null;
     let nodeId;
     const isTopLevel = !parentNodeId;
+    const depth = parentNodeId ? parentNodeId.split('.').length : 0;
+    const shouldWrap = !containerWidth
+      ? false
+      : containerWidth <= 750
+      ? depth >= 5
+      : containerWidth <= 850
+      ? depth >= 6
+      : containerWidth <= 950
+      ? depth >= 7
+      : depth >= 8;
 
     if (!parentNodeId) {
       if (isInherited) {
@@ -1035,7 +1045,7 @@ const NewVariablesList = (props: Props) => {
                   <ResponsiveLineStackLayout
                     expand
                     noMargin
-                    width={isNarrow ? 'small' : undefined}
+                    width={isNarrow || shouldWrap ? 'small' : undefined}
                   >
                     <Line alignItems="center" noMargin expand>
                       <Spacer />
@@ -1080,7 +1090,7 @@ const NewVariablesList = (props: Props) => {
                       <Spacer />
                       <Spacer />
                     </Line>
-                    <div style={rowRightSideStyle}>
+                    <div style={shouldWrap ? undefined : rowRightSideStyle}>
                       <Line noMargin alignItems="center">
                         <Column noMargin>
                           <VariableTypeSelector

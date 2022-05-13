@@ -51,6 +51,7 @@ type MemoizedTagsTreeProps = {|
   allItemsLabel: React.Node,
   chosenCategory: ?ChosenCategory,
   setChosenCategory: (?ChosenCategory) => void,
+  onFilterChange?: () => void,
   allFilters: Filters,
 |};
 
@@ -58,6 +59,7 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
   allItemsLabel,
   chosenCategory,
   setChosenCategory,
+  onChoiceChange,
   allFilters,
 }: MemoizedTagsTreeProps) {
   return (
@@ -68,12 +70,15 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
           : ''
       }
       defaultExpanded={[]}
-      onNodeSelect={() => {}}
+      onNodeSelect={() => onChoiceChange && onChoiceChange()}
     >
       <TreeItem
         nodeId=""
         label={allItemsLabel}
-        onLabelClick={() => setChosenCategory(null)}
+        onLabelClick={() => {
+          setChosenCategory(null);
+          onChoiceChange && onChoiceChange();
+        }}
       />
       <TagsTreeItems
         tagsTreeNodes={allFilters.tagsTree}
@@ -87,12 +92,14 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
 type Props = {|
   allItemsLabel: React.Node,
   filtersState: FiltersState,
+  onChoiceChange?: () => void,
   allFilters: ?Filters,
   error: ?Error,
 |};
 
 export const CategoryChooser = ({
   filtersState,
+  onChoiceChange,
   allFilters,
   error,
   allItemsLabel,
@@ -110,6 +117,7 @@ export const CategoryChooser = ({
       allItemsLabel={allItemsLabel}
       chosenCategory={filtersState.chosenCategory}
       setChosenCategory={filtersState.setChosenCategory}
+      onChoiceChange={onChoiceChange}
       allFilters={allFilters}
     />
   );

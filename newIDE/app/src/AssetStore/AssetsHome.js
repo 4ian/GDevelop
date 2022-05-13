@@ -108,7 +108,7 @@ export const AssetsHome = ({
                     {pack.name}
                   </Text>
                   <Text style={styles.packTitle} color="primary" size="body2">
-                    {pack.assetsCount} <Trans>Assets</Trans>
+                    <Trans>{pack.assetsCount} Assets</Trans>
                   </Text>
                 </Line>
               </Column>

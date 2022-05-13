@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import Text from '../UI/Text';
 import { type AssetPacks } from '../Utils/GDevelopServices/Asset';
@@ -14,8 +15,10 @@ import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const columns = 3;
+const columnsForSmallWindow = 2;
 const cellSpacing = 2;
 
 const styles = {
@@ -60,12 +63,14 @@ export const AssetsHome = ({
   onPackSelection,
 }: Props) => {
   const classesForGridListItem = useStylesForGridListItem();
+  const windowWidth = useResponsiveWindowWidth();
+
   return (
     <ThemeConsumer>
       {muiTheme => (
         <ScrollView>
           <GridList
-            cols={columns}
+            cols={windowWidth === 'small' ? columnsForSmallWindow : columns}
             style={styles.grid}
             cellHeight="auto"
             spacing={cellSpacing}
@@ -107,7 +112,7 @@ export const AssetsHome = ({
                         color="primary"
                         size="body2"
                       >
-                        {pack.assetsCount} Assets
+                        {pack.assetsCount} <Trans>Assets</Trans>
                       </Text>
                     </Line>
                   </Column>

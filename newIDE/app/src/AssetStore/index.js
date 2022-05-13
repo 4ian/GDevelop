@@ -93,7 +93,9 @@ export const AssetStore = ({
           <Line justifyContent="left" noMargin={isOnHomePage}>
             {isOnHomePage ? (
               <Column>
-                <Text size="title">Discover</Text>
+                <Text size="title">
+                  <Trans>Discover</Trans>
+                </Text>
               </Column>
             ) : (
               <FlatButton

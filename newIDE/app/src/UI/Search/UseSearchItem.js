@@ -4,6 +4,24 @@ import { type ChosenCategory } from './FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import SearchApi from 'js-worker-search';
 
+export interface SearchFilter<SearchItem> {
+  isSatisfiedBy(searchItem: SearchItem): boolean;
+}
+
+export class TagSearchFilter<SearchItem: { tags: Array<string> }> {
+  tags: Set<string>;
+
+  constructor(tags: Set<string> = new Set()) {
+    this.tags = tags;
+  }
+
+  isSatisfiedBy(searchItem: SearchItem): boolean {
+    return (
+      this.tags.size === 0 || searchItem.tags.some(tag => this.tags.has(tag))
+    );
+  }
+}
+
 /**
  * Filter a list of items according to the chosen category
  * and the chosen filters.
@@ -11,7 +29,8 @@ import SearchApi from 'js-worker-search';
 export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
   searchItems: ?Array<SearchItem>,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
+  chosenFilters: Set<string>,
+  searchFilters?: SearchFilter<SearchItem>
 ): ?Array<SearchItem> => {
   if (!searchItems) return null;
 
@@ -39,9 +58,14 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
 
       return true;
     })
-    .filter(({ tags }) => {
+    .filter(searchItem => {
       return (
-        chosenFilters.size === 0 || tags.some(tag => chosenFilters.has(tag))
+        (chosenFilters.size === 0 ||
+          searchItem.tags.some(tag => chosenFilters.has(tag))) &&
+        (!searchFilters ||
+          searchFilters.every(searchFilter =>
+            searchFilter.isSatisfiedBy(searchItem)
+          ))
       );
     });
 
@@ -67,7 +91,8 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   getItemDescription: SearchItem => string,
   searchText: string,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
+  chosenFilters: Set<string>,
+  searchFilters?: SearchFilter<SearchItem>
 ): ?Array<SearchItem> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<SearchItem>>(
@@ -130,7 +155,12 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       let discardSearch = false;
       if (!searchText) {
         setSearchResults(
-          filterSearchItems(shuffledSearchItems, chosenCategory, chosenFilters)
+          filterSearchItems(
+            shuffledSearchItems,
+            chosenCategory,
+            chosenFilters,
+            searchFilters
+          )
         );
       } else {
         if (!searchItemsById || !searchApi) {
@@ -166,7 +196,8 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
               filterSearchItems(
                 partialSearchResults,
                 chosenCategory,
-                chosenFilters
+                chosenFilters,
+                searchFilters
               )
             );
           });
@@ -184,6 +215,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       searchText,
       chosenCategory,
       chosenFilters,
+      searchFilters,
       searchApi,
     ]
   );

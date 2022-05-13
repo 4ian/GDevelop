@@ -13,6 +13,7 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { FiltersChooser } from '../UI/Search/FiltersChooser';
+import { TagFilter } from './FilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -54,6 +55,8 @@ export const AssetStore = ({
     filtersState,
     searchText,
     setSearchText,
+    viewportFilter,
+    setViewportFilter,
   } = React.useContext(AssetStoreContext);
 
   React.useEffect(
@@ -144,6 +147,18 @@ export const AssetStore = ({
                     </IconButton>
                   </Line>
                   <>
+                    <TagFilter
+                      filterKey="viewport"
+                      title={<Trans>Viewpoint</Trans>}
+                      tags={[
+                        { label: t`Top-down`, value: 'top-down' },
+                        { label: t`Side view`, value: 'side view' },
+                        { label: t`Isometric`, value: 'isometric' },
+                      ]}
+                      tagSearchFilter={viewportFilter}
+                      setTagSearchFilter={setViewportFilter}
+                      onFilterChange={() => setIsOnHomePage(false)}
+                    />
                     <CategoryChooser
                       allItemsLabel={<Trans>All assets</Trans>}
                       allFilters={filters}

@@ -71,7 +71,6 @@ import {
 } from './VariableToTreeNodeHandling';
 
 import VariableTypeSelector from './VariableTypeSelector';
-import styles from './styles';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 const gd: libGDevelop = global.gd;
 
@@ -754,6 +753,17 @@ const NewVariablesList = (props: Props) => {
       return null;
     }
 
+    const valueInputStyle = {};
+    if (type === gd.Variable.String) {
+      // By default, Material-UI adds some padding on top and bottom of a multiline text field.
+      // Avoid this to prevent extra spaces that would make single line strings
+      // (for variable values) not aligned with the variable name
+      valueInputStyle.padding = 0;
+    }
+    if (isSelected) {
+      valueInputStyle.color = gdevelopTheme.listItem.selectedTextColor;
+    }
+
     return (
       <DragSourceAndDropTarget
         key={variable.ptr}
@@ -916,18 +926,7 @@ const NewVariablesList = (props: Props) => {
                               key="value"
                               onClick={stopEventPropagation}
                               multiline={type === gd.Variable.String}
-                              inputStyle={{
-                                ...(type === gd.Variable.String
-                                  ? styles.noPaddingMultilineTextField
-                                  : undefined),
-                                ...(isSelected
-                                  ? {
-                                      color:
-                                        gdevelopTheme.listItem
-                                          .selectedTextColor,
-                                    }
-                                  : undefined),
-                              }}
+                              inputStyle={valueInputStyle}
                               disabled={
                                 isCollection || (isInherited && !isTopLevel)
                               }
@@ -1365,6 +1364,7 @@ const NewVariablesList = (props: Props) => {
                       description={props.emptyPlaceholderDescription}
                       actionLabel={<Trans>Add a variable</Trans>}
                       helpPagePath={props.helpPagePath || undefined}
+                      tutorialId="intermediate-advanced-variables"
                       onAdd={onAdd}
                     />
                   ) : null}

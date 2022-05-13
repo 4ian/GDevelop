@@ -44,6 +44,18 @@ const styles = {
     cursor: 'pointer',
     marginBottom: 1,
   },
+  input: {
+    fontFamily: '"Lucida Console", Monaco, monospace',
+    lineHeight: 1.4,
+  },
+  backgroundHighlightingInline: {
+    marginTop: 0, //Properly align with the text field
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  textFieldAndHightlightContainer: {
+    position: 'relative',
+  },
 };
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
@@ -93,6 +105,9 @@ type Props = {|
 
   screenType: ScreenType,
   windowWidth: WidthType,
+
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
 |};
 
 const Instruction = (props: Props) => {
@@ -102,6 +117,8 @@ const Instruction = (props: Props) => {
     onClick,
     onMoveToInstruction,
     onContextMenu,
+    globalObjectsContainer,
+    objectsContainer,
   } = props;
 
   const instrFormatter = React.useMemo(
@@ -149,6 +166,37 @@ const Instruction = (props: Props) => {
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
           const parameterType = parameterMetadata.getType();
+          const expressionType = gd.ParameterMetadata.getExpressionValueType(
+            parameterType
+          );
+          let expressionIsValid = true;
+          if (
+            expressionType === 'number' ||
+            expressionType === 'string' ||
+            gd.ParameterMetadata.isExpression('variable', expressionType)
+          ) {
+            const expressionNode = instruction
+              .getParameter(parameterIndex)
+              .getRootNode();
+            const expressionValidator = new gd.ExpressionValidator(
+              gd.JsPlatform.get(),
+              globalObjectsContainer,
+              objectsContainer,
+              expressionType
+            );
+            expressionNode.visit(expressionValidator);
+            expressionIsValid = expressionValidator.getErrors().size() === 0;
+          } else if (gd.ParameterMetadata.isObject(expressionType)) {
+            const objectOrGroupName = instruction
+              .getParameter(parameterIndex)
+              .getPlainString();
+            expressionIsValid =
+              globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
+              objectsContainer.hasObjectNamed(objectOrGroupName) ||
+              globalObjectsContainer.getObjectGroups().has(objectOrGroupName) ||
+              objectsContainer.getObjectGroups().has(objectOrGroupName);
+          }
+
           return (
             <span
               key={i}
@@ -177,6 +225,7 @@ const Instruction = (props: Props) => {
             >
               {ParameterRenderingService.renderInlineParameter({
                 value: formattedTexts.getString(i),
+                expressionIsValid,
                 parameterMetadata,
                 renderObjectThumbnail,
                 InvalidParameterValue,
@@ -352,6 +401,8 @@ const Instruction = (props: Props) => {
                 renderObjectThumbnail={props.renderObjectThumbnail}
                 screenType={props.screenType}
                 windowWidth={props.windowWidth}
+                globalObjectsContainer={props.globalObjectsContainer}
+                objectsContainer={props.objectsContainer}
               />
             )}
           </React.Fragment>

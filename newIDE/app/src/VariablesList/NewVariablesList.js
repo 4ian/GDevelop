@@ -85,6 +85,13 @@ type Props = {
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
   onComputeAllVariableNames?: () => Array<string>,
+  historyHandler?: {
+    saveToHistory: () => void,
+    undo: () => void,
+    redo: () => void,
+    canUndo: () => boolean,
+    canRedo: () => boolean,
+  },
 };
 
 const StyledTreeItem = withStyles(theme => ({
@@ -211,12 +218,21 @@ const NewVariablesList = (props: Props) => {
   };
 
   const _undo = () => {
-    setHistory(undo(history, props.variablesContainer));
+    props.historyHandler
+      ? props.historyHandler.undo()
+      : setHistory(undo(history, props.variablesContainer));
   };
 
   const _redo = () => {
-    setHistory(redo(history, props.variablesContainer));
+    props.historyHandler
+      ? props.historyHandler.redo()
+      : setHistory(redo(history, props.variablesContainer));
   };
+  const _canUndo = (): boolean =>
+    props.historyHandler ? props.historyHandler.canUndo() : canUndo(history);
+
+  const _canRedo = (): boolean =>
+    props.historyHandler ? props.historyHandler.canRedo() : canRedo(history);
 
   const keyboardShortcuts = new KeyboardShortcuts({
     isActive: () => true,
@@ -1263,7 +1279,7 @@ const NewVariablesList = (props: Props) => {
                         tooltip={t`Undo`}
                         onClick={_undo}
                         size="small"
-                        disabled={!canUndo(history)}
+                        disabled={!_canUndo()}
                       >
                         <Undo />
                       </IconButton>
@@ -1272,7 +1288,7 @@ const NewVariablesList = (props: Props) => {
                         icon={<Undo />}
                         label={<Trans>Undo</Trans>}
                         onClick={_undo}
-                        disabled={!canUndo(history)}
+                        disabled={!_canUndo()}
                       />
                     )}
                     <Spacer />
@@ -1281,7 +1297,7 @@ const NewVariablesList = (props: Props) => {
                         tooltip={t`Redo`}
                         onClick={_redo}
                         size="small"
-                        disabled={!canRedo(history)}
+                        disabled={!_canRedo()}
                       >
                         <Redo />
                       </IconButton>
@@ -1290,7 +1306,7 @@ const NewVariablesList = (props: Props) => {
                         icon={<Redo />}
                         label={<Trans>Redo</Trans>}
                         onClick={_redo}
-                        disabled={!canRedo(history)}
+                        disabled={!_canRedo()}
                       />
                     )}
                   </Line>

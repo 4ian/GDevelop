@@ -51,7 +51,7 @@ type MemoizedTagsTreeProps = {|
   allItemsLabel: React.Node,
   chosenCategory: ?ChosenCategory,
   setChosenCategory: (?ChosenCategory) => void,
-  onFilterChange?: () => void,
+  onChoiceChange?: () => void,
   allFilters: Filters,
 |};
 

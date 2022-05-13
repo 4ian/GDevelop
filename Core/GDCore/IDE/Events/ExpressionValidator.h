@@ -240,7 +240,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
   void ReportAnyError(const ExpressionNode& node) {
     if (node.diagnostic && node.diagnostic->IsError()) {
-      // Syntax errors are holden by the ATS nodes.
+      // Syntax errors are holden by the AST nodes.
       // It's fine to give pointers on them as the AST live longer than errors
       // handling.
       errors.push_back(node.diagnostic.get());
@@ -249,10 +249,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
 
   void RaiseError(const gd::String &type, 
       const gd::String &message, const ExpressionParserLocation &location) {
-    auto diagnostic = std::move(gd::make_unique<ExpressionParserError>(
-        type, message, location));
+    auto diagnostic = gd::make_unique<ExpressionParserError>(
+        type, message, location);
     errors.push_back(diagnostic.get());
-    // Errors found by the validator are not holden by the ATS nodes.
+    // Errors found by the validator are not holden by the AST nodes.
     // They must be owned by the validator to keep living while errors are
     // handled by the caller.
     supplementalErrors.push_back(std::move(diagnostic));

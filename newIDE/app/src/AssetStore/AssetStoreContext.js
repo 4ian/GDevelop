@@ -4,6 +4,7 @@ import { type FiltersState, useFilters } from '../UI/Search/FiltersChooser';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
+  type AssetPacks,
   type Author,
   type License,
   listAllAssets,
@@ -16,6 +17,7 @@ const defaultSearchText = '';
 
 type AssetStoreState = {|
   filters: ?Filters,
+  assetPacks: ?AssetPacks,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   searchResults: ?Array<AssetShortHeader>,
@@ -28,6 +30,7 @@ type AssetStoreState = {|
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
+  assetPacks: null,
   authors: null,
   licenses: null,
   searchResults: null,
@@ -65,6 +68,7 @@ export const AssetStoreStateProvider = ({
     [string]: AssetShortHeader,
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
@@ -84,7 +88,11 @@ export const AssetStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const { assetShortHeaders, filters } = await listAllAssets();
+          const {
+            assetShortHeaders,
+            filters,
+            assetPacks,
+          } = await listAllAssets();
           const authors = await listAllAuthors();
           const licenses = await listAllLicenses();
 
@@ -98,6 +106,7 @@ export const AssetStoreStateProvider = ({
           );
           setAssetShortHeadersById(assetShortHeadersById);
           setFilters(filters);
+          setAssetPacks(assetPacks);
           setAuthors(authors);
           setLicenses(licenses);
         } catch (error) {
@@ -143,6 +152,7 @@ export const AssetStoreStateProvider = ({
       searchResults,
       fetchAssetsAndFilters,
       filters,
+      assetPacks,
       authors,
       licenses,
       error,
@@ -154,6 +164,7 @@ export const AssetStoreStateProvider = ({
       searchResults,
       error,
       filters,
+      assetPacks,
       authors,
       licenses,
       searchText,

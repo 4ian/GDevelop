@@ -62,9 +62,21 @@ export type Asset = {|
   objectAssets: Array<ObjectAsset>,
 |};
 
+export type AssetPack = {|
+  name: string,
+  tag: string,
+  thumbnailUrl: string,
+  assetsCount: number,
+|};
+
+export type AssetPacks = {|
+  starterPacks: Array<AssetPack>,
+|};
+
 export type AllAssets = {|
   assetShortHeaders: Array<AssetShortHeader>,
   filters: Filters,
+  assetPacks: AssetPacks,
 |};
 
 export type Resource = {|
@@ -105,16 +117,18 @@ export const listAllAssets = (): Promise<AllAssets> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/asset`)
     .then(response => response.data)
-    .then(({ assetShortHeadersUrl, filtersUrl }) => {
-      if (!assetShortHeadersUrl || !filtersUrl) {
+    .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
+      if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
         throw new Error('Unexpected response from the resource endpoint.');
       }
       return Promise.all([
         axios.get(assetShortHeadersUrl).then(response => response.data),
         axios.get(filtersUrl).then(response => response.data),
-      ]).then(([assetShortHeaders, filters]) => ({
+        axios.get(assetPacksUrl).then(response => response.data),
+      ]).then(([assetShortHeaders, filters, assetPacks]) => ({
         assetShortHeaders,
         filters,
+        assetPacks,
       }));
     });
 };

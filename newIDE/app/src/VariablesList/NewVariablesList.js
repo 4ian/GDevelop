@@ -214,7 +214,9 @@ const NewVariablesList = (props: Props) => {
     : [];
 
   const _saveToHistory = () => {
-    setHistory(saveToHistory(history, props.variablesContainer));
+    props.historyHandler
+      ? props.historyHandler.saveToHistory()
+      : setHistory(saveToHistory(history, props.variablesContainer));
   };
 
   const _undo = () => {
@@ -1272,42 +1274,45 @@ const NewVariablesList = (props: Props) => {
                         onClick={deleteSelection}
                       />
                     )}
-                    {/* // TODO: Remove those buttons once tests are over */}
-                    <Spacer />
-                    {isNarrow ? (
-                      <IconButton
-                        tooltip={t`Undo`}
-                        onClick={_undo}
-                        size="small"
-                        disabled={!_canUndo()}
-                      >
-                        <Undo />
-                      </IconButton>
-                    ) : (
-                      <FlatButton
-                        icon={<Undo />}
-                        label={<Trans>Undo</Trans>}
-                        onClick={_undo}
-                        disabled={!_canUndo()}
-                      />
-                    )}
-                    <Spacer />
-                    {isNarrow ? (
-                      <IconButton
-                        tooltip={t`Redo`}
-                        onClick={_redo}
-                        size="small"
-                        disabled={!_canRedo()}
-                      >
-                        <Redo />
-                      </IconButton>
-                    ) : (
-                      <FlatButton
-                        icon={<Redo />}
-                        label={<Trans>Redo</Trans>}
-                        onClick={_redo}
-                        disabled={!_canRedo()}
-                      />
+                    {props.historyHandler ? null : (
+                      <>
+                        <Spacer />
+                        {isNarrow ? (
+                          <IconButton
+                            tooltip={t`Undo`}
+                            onClick={_undo}
+                            size="small"
+                            disabled={!_canUndo()}
+                          >
+                            <Undo />
+                          </IconButton>
+                        ) : (
+                          <FlatButton
+                            icon={<Undo />}
+                            label={<Trans>Undo</Trans>}
+                            onClick={_undo}
+                            disabled={!_canUndo()}
+                          />
+                        )}
+                        <Spacer />
+                        {isNarrow ? (
+                          <IconButton
+                            tooltip={t`Redo`}
+                            onClick={_redo}
+                            size="small"
+                            disabled={!_canRedo()}
+                          >
+                            <Redo />
+                          </IconButton>
+                        ) : (
+                          <FlatButton
+                            icon={<Redo />}
+                            label={<Trans>Redo</Trans>}
+                            onClick={_redo}
+                            disabled={!_canRedo()}
+                          />
+                        )}
+                      </>
                     )}
                   </Line>
                 </Column>

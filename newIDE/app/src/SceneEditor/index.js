@@ -1157,6 +1157,19 @@ export default class SceneEditor extends React.Component<Props, State> {
                   (this._propertiesEditor = propertiesEditor)
                 }
                 unsavedChanges={this.props.unsavedChanges}
+                historyHandler={{
+                  undo: this.undo,
+                  redo: this.redo,
+                  canUndo: () => canUndo(this.state.history),
+                  canRedo: () => canRedo(this.state.history),
+                  saveToHistory: () =>
+                    this.setState({
+                      history: saveToHistory(
+                        this.state.history,
+                        this.props.initialInstances
+                      ),
+                    }),
+                }}
               />
             )}
           </I18n>

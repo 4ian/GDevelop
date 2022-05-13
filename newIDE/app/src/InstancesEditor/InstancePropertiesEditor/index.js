@@ -19,6 +19,7 @@ import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import NewVariablesList from '../../VariablesList/NewVariablesList';
 
 type Props = {|
   project: gdProject,
@@ -29,6 +30,13 @@ type Props = {|
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
+  historyHandler?: {
+    saveToHistory: () => void,
+    undo: () => void,
+    redo: () => void,
+    canUndo: () => boolean,
+    canRedo: () => boolean,
+  },
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
@@ -183,21 +191,23 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
               </IconButton>
             </Line>
           </Column>
-          <VariablesList
-            inheritedVariablesContainer={object ? object.getVariables() : null}
-            variablesContainer={instance.getVariables()}
-            onComputeAllVariableNames={() =>
-              object
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    object
-                  )
-                : []
-            }
-            ref={this._instanceVariablesList}
-          />
+          {object ? (
+            <NewVariablesList
+              inheritedVariablesContainer={object.getVariables()}
+              variablesContainer={instance.getVariables()}
+              onComputeAllVariableNames={() =>
+                object
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      object
+                    )
+                  : []
+              }
+              historyHandler={this.props.historyHandler}
+            />
+          ) : null}
         </Column>
       </ScrollView>
     );

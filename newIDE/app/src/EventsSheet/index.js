@@ -1337,6 +1337,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     } = this.props;
     if (!project) return null;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const screenType = useScreenType();
 
     return (

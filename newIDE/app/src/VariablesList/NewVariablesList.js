@@ -113,7 +113,7 @@ const getExpandedNodeIdsFromVariables = (
 ): string[] => {
   let newAccumulator = [];
   for (const { name, variable } of variables) {
-    const nodeId = parentNodeId ? `${parentNodeId}.${name}` : name;
+    const nodeId = parentNodeId ? `${parentNodeId}${separator}${name}` : name;
     if (!variable.isFolded() && variable.getChildrenCount() > 0) {
       newAccumulator.push(nodeId);
     }
@@ -177,7 +177,7 @@ const foldNodesVariables = (
 
 const StyledTreeItem = withStyles(theme => ({
   group: {
-    borderLeft: `1px solid black`,
+    borderLeft: '1px solid black',
     marginLeft: 7,
     paddingLeft: 15,
   },
@@ -278,7 +278,7 @@ const getVariableContextFromNodeId = (
   nodeId: string,
   variablesContainer: gdVariablesContainer
 ) => {
-  const bits = nodeId.split('.');
+  const bits = nodeId.split(separator);
   let parentVariable = null;
   let currentVariable = null;
   let currentVariableName = null;
@@ -310,7 +310,7 @@ const getVariableContextFromNodeId = (
     }
     if (depth < bits.length - 1) {
       lineage.push({
-        nodeId: bits.slice(0, depth + 1).join('.'),
+        nodeId: bits.slice(0, depth + 1).join(separator),
         name: currentVariableName,
         variable: currentVariable,
       });
@@ -420,6 +420,7 @@ const getMovementTypeWithinVariablesContainer = (
 };
 
 const inheritedPrefix = '$!';
+const separator = '$.$';
 const removeInheritedPrefix = (str: string): string =>
   str.slice(inheritedPrefix.length, str.length);
 const isCollection = (variable: gdVariable): boolean =>
@@ -613,14 +614,14 @@ const NewVariablesList = (props: Props) => {
               serializedVariable,
               index
             );
-            const bits = targetNode.split('.');
+            const bits = targetNode.split(separator);
             bits.splice(
               bits.length - 1,
               1,
               (index + pastedElementOffsetIndex).toString()
             );
 
-            newSelectedNodes.push(bits.join('.'));
+            newSelectedNodes.push(bits.join(separator));
             pastedElementOffsetIndex += 1;
           } else {
             const newName = insertInVariableChildren(
@@ -628,9 +629,9 @@ const NewVariablesList = (props: Props) => {
               name,
               serializedVariable
             );
-            const bits = targetNode.split('.');
+            const bits = targetNode.split(separator);
             bits.splice(bits.length - 1, 1, newName);
-            newSelectedNodes.push(bits.join('.'));
+            newSelectedNodes.push(bits.join(separator));
           }
         }
       }
@@ -666,7 +667,10 @@ const NewVariablesList = (props: Props) => {
     }
   };
 
-  const updateExpandedAndSelectedNodes = (nodeId: string, newName: string) => {
+  const updateExpandedAndSelectedNodesFollowingNameChange = (
+    nodeId: string,
+    newName: string
+  ) => {
     [
       [expandedNodes, setExpandedNodes],
       [selectedNodes, setSelectedNodes],
@@ -676,19 +680,19 @@ const NewVariablesList = (props: Props) => {
       if (indexOfRenamedNode === -1) return;
       const indicesOfChildrenOfRenamedNode = newList
         .map(otherNodeId => {
-          if (otherNodeId.startsWith(`${nodeId}.`)) {
+          if (otherNodeId.startsWith(`${nodeId}${separator}`)) {
             return newList.indexOf(otherNodeId);
           }
           return null;
         })
         .filter(Boolean);
-      const originalNodeIdBits = nodeId.split('.');
+      const originalNodeIdBits = nodeId.split(separator);
       const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
       [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].forEach(index => {
         const nodeIdToChange = newList[index];
-        const bitsToChange = nodeIdToChange.split('.');
+        const bitsToChange = nodeIdToChange.split(separator);
         bitsToChange[bitsToChange.indexOf(variableName)] = newName;
-        newList.splice(index, 1, bitsToChange.join('.'));
+        newList.splice(index, 1, bitsToChange.join(separator));
       });
       setter(newList);
     });
@@ -952,7 +956,7 @@ const NewVariablesList = (props: Props) => {
     let parentType = null;
     let nodeId;
     const isTopLevel = !parentNodeId;
-    const depth = parentNodeId ? parentNodeId.split('.').length : 0;
+    const depth = parentNodeId ? parentNodeId.split(separator).length : 0;
     const shouldWrap = !containerWidth
       ? false
       : containerWidth <= 750
@@ -970,7 +974,7 @@ const NewVariablesList = (props: Props) => {
         nodeId = name;
       }
     } else {
-      nodeId = `${parentNodeId}.${name}`;
+      nodeId = `${parentNodeId}${separator}${name}`;
     }
     if (!!parentVariable) {
       parentType = parentVariable.getType();
@@ -1195,7 +1199,10 @@ const NewVariablesList = (props: Props) => {
                           <IconButton
                             size="small"
                             style={{ padding: 0 }}
-                            onClick={() => onAddChild(nodeId)}
+                            onClick={event => {
+                              stopEventPropagation(event);
+                              onAddChild(nodeId);
+                            }}
                           >
                             <Add
                               htmlColor={
@@ -1252,8 +1259,24 @@ const NewVariablesList = (props: Props) => {
       props.variablesContainer
     );
     if (name === null) return;
+    if (
+      !!variable &&
+      !!newName &&
+      (newName.startsWith(inheritedPrefix) || newName.includes(separator))
+    ) {
+      setNameErrors({
+        ...nameErrors,
+        [variable.ptr]: (
+          <Trans>
+            Variables cannot have a name that includes {inheritedPrefix} or{' '}
+            {separator}
+          </Trans>
+        ),
+      });
+      return;
+    }
     if (!newName) {
-      if (variable) {
+      if (!!variable) {
         setNameErrors({
           ...nameErrors,
           [variable.ptr]: <Trans>Variables cannot have empty names</Trans>,
@@ -1273,7 +1296,7 @@ const NewVariablesList = (props: Props) => {
     }
     if (hasBeenRenamed) {
       _saveToHistory();
-      updateExpandedAndSelectedNodes(nodeId, newName);
+      updateExpandedAndSelectedNodesFollowingNameChange(nodeId, newName);
     } else {
       if (variable)
         setNameErrors({

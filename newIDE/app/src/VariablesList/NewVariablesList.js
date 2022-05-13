@@ -748,7 +748,7 @@ const NewVariablesList = (props: Props) => {
         .includes(searchText.toLowerCase()) &&
       !hasChildThatContainsStringInNameAndValue(
         variable,
-        searchText.toLowerCase()
+        searchText.normalize('NFD').toLowerCase()
       )
     ) {
       return null;

@@ -70,7 +70,7 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
           : ''
       }
       defaultExpanded={[]}
-      onNodeSelect={() => {}}
+      onNodeSelect={() => setIsOnHomePage(false)}
     >
       <TreeItem
         nodeId=""

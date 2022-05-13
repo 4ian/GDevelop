@@ -140,7 +140,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   }
 
   SECTION("Valid function calls") {
-    {
+    SECTION("without parameter") {
       auto node =
           parser.ParseExpression(" 1 /  MyExtension::GetNumber()");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -152,7 +152,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "1 / getNumber()");
     }
-    {
+    SECTION("number and string parameters") {
       auto node = parser.ParseExpression(
           "MyExtension::GetNumberWith2Params(12, \"hello world\")");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -165,7 +165,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(12, \"hello world\")");
     }
-    {
+    SECTION("nested function call") {
       auto node =
           parser.ParseExpression("MyExtension::GetNumberWith2Params("
                                  "MyExtension::GetNumber(), \"hello world\")");
@@ -179,7 +179,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(getNumber(), \"hello world\")");
     }
-    {
+    SECTION("object function") {
       auto node =
           parser.ParseExpression("MySpriteObject.GetObjectNumber()");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -192,7 +192,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "MySpriteObject.getObjectNumber() ?? 0");
     }
-    {
+    SECTION("object function with nested free function") {
       auto node = parser.ParseExpression(
           "MySpriteObject.GetObjectStringWith1Param(MyExtension::GetNumber())");
       gd::ExpressionCodeGenerator expressionCodeGenerator("string",
@@ -207,7 +207,34 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
   SECTION("Valid function calls with optional arguments") {
-    {
+    SECTION("with optional parameter set") {
+      auto node = parser.ParseExpression("MyExtension::MouseX(\"layer1\",2+2)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getMouseX(\"\", \"layer1\", 2 + 2)");
+      // (first argument is the currentScene)
+    }
+    SECTION("with last optional parameter omit") {
+      auto node =
+          parser.ParseExpression("MyExtension::MouseX(\"layer1\")");
+      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                          "",
+                                                          codeGenerator,
+                                                          context);
+
+      REQUIRE(node);
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "getMouseX(\"\", \"layer1\", 0)");
+      // (first argument is the currentScene)
+    }
+    SECTION("with last optional parameter omit (deprecated way)") {
       auto node =
           parser.ParseExpression("MyExtension::MouseX(\"layer1\",)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -221,24 +248,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "getMouseX(\"\", \"layer1\", 0)");
       // (first argument is the currentScene)
     }
-    {
-      auto node = parser.ParseExpression("MyExtension::MouseX(\"layer1\",2+2)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
-                                                          "",
-                                                          codeGenerator,
-                                                          context);
-
-      REQUIRE(node);
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "getMouseX(\"\", \"layer1\", 2 + 2)");
-      // (first argument is the currentScene)
-    }
-  }
-  SECTION(
-      "Valid function calls (deprecated way of specifying optional "
-      "arguments)") {
-    {
+    SECTION("with explicit comma (deprecated way)") {
       auto node = parser.ParseExpression("MyExtension::MouseX(,)");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                           "",
@@ -252,8 +262,9 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       // (first argument is the currentScene)
     }
   }
+
   SECTION("Invalid function calls") {
-    {
+    SECTION("unknown identifier in parameters") {
       auto node =
           parser.ParseExpression("MySpriteObject.GetObjectStringWith3Param("
                                  "MySpriteObject.GetObjectNumber() / 2.3, "
@@ -273,32 +284,34 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "/* Error during generation, unrecognized identifier type: "
               "unknown with value test */ \"test\") ?? \"\"");
     }
-    {
-      auto node = parser.ParseExpression(
-          "MyExtension::GetNumberWith2Params(MyExtension::GetNumber())");
-      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
-                                                          "",
-                                                          codeGenerator,
-                                                          context);
+    SECTION("missing parameter") {
+      {
+        auto node = parser.ParseExpression(
+            "MyExtension::GetNumberWith2Params(MyExtension::GetNumber())");
+        gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                            "",
+                                                            codeGenerator,
+                                                            context);
 
-      REQUIRE(node);
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "getNumberWith2Params(getNumber(), /* Error during generation, "
-              "parameter not existing in the nodes */ \"\")");
+        REQUIRE(node);
+        node->Visit(expressionCodeGenerator);
+        REQUIRE(expressionCodeGenerator.GetOutput() ==
+                "getNumberWith2Params(getNumber(), /* Error during generation, "
+                "parameter not existing in the nodes */ \"\")");
+      }
+      {
+        // Using GenerateExpressionCode, the default value of 0 should be returned
+        // as expression is invalid.
+        REQUIRE(
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                "MyExtension::GetNumberWith2Params(MyExtension::GetNumber())") ==
+            "0");
+      }
     }
-    {
-      // Using GenerateExpressionCode, the default value of 0 should be returned
-      // as expression is invalid.
-      REQUIRE(
-          gd::ExpressionCodeGenerator::GenerateExpressionCode(
-              codeGenerator,
-              context,
-              "number",
-              "MyExtension::GetNumberWith2Params(MyExtension::GetNumber())") ==
-          "0");
-    }
-    {
+    SECTION("unknown function") {
       auto node = parser.ParseExpression("MyExtension::Idontexist()");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
                                                           "",
@@ -311,7 +324,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "/* Error during generation, function not found: "
               "MyExtension::Idontexist */ 0");
     }
-    {
+    SECTION("too much parameters") {
       auto node = parser.ParseExpression("MyExtension::GetNumberWith2Params(1, "
                                          "\"2\", MyExtension::GetNumber())");
       gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -325,8 +338,8 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "getNumberWith2Params(1, \"2\")");
     }
   }
-  SECTION("Invalid function calls (capabilities)") {
-    {
+  SECTION("function calls (capabilities)") {
+    SECTION("supported capability") {
       // Capability is supported, so the expression is valid.
       auto node = parser.ParseExpression(
           "MySpriteObject.GetSomethingRequiringEffectCapability(123)");
@@ -341,7 +354,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
           expressionCodeGenerator.GetOutput() ==
           "MySpriteObject.getSomethingRequiringEffectCapability(123) ?? \"\"");
     }
-    {
+    SECTION("unsupported capability") {
       // Capability is not supported, so the expression is not even valid.
       auto node =
           parser.ParseExpression("MyFakeObjectWithUnsupportedCapability."
@@ -355,7 +368,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "\"\"");
     }
-    {
+    SECTION("group with partial support") {
       // We use a group, capability is supported only by one object of the
       // group. The expression itself is valid, but code generation should skip
       // the objects with unsupported capability.
@@ -375,70 +388,73 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
   SECTION("Function name") {
-    {
-      auto node =
-          parser.ParseExpression("MySpriteObject.GetObjectNumber");
-      gd::ExpressionCodeGenerator expressionCodeGenerator("number",
-                                                          "",
-                                                          codeGenerator,
-                                                          context);
+    auto node =
+        parser.ParseExpression("MySpriteObject.GetObjectNumber");
+    gd::ExpressionCodeGenerator expressionCodeGenerator("number",
+                                                        "",
+                                                        codeGenerator,
+                                                        context);
 
-      REQUIRE(node);
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "0");
-    }
+    REQUIRE(node);
+    node->Visit(expressionCodeGenerator);
+    REQUIRE(expressionCodeGenerator.GetOutput() == "0");
   }
   SECTION("Invalid variables") {
-    {
-      // Test an empty expression
+    SECTION("empty variables")  {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "") == "fakeBadVariable");
     }
-    {
-      // Test a unary operator
+    SECTION("only an unary operator") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "objectvar", "-") ==
               "fakeBadVariable");
     }
-    {
-      // Test an operator
+    SECTION("only a binary operator") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "globalvar", "/") ==
               "fakeBadVariable");
     }
   }
   SECTION("Invalid variables, using operators") {
-    {
-      // Test a unary operator
+    SECTION("unary operation") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "objectvar", "-(var1)") ==
               "fakeBadVariable");
     }
-    {
-      // Test an operator
+    SECTION("binary operation") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "globalvar", "var1+var2") ==
               "fakeBadVariable");
     }
-    {
-      // Test multiple operators
+    SECTION("multiple operation") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "globalvar", "var1/var2/var3/var4") ==
               "fakeBadVariable");
     }
   }
   SECTION("Valid variables") {
-    {
+    SECTION("simple variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable", "")
               == "getLayoutVariable(myVariable)");
     }
-    {
+    SECTION("child dot accessor") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "scenevar", "myVariable.myChild", "")
               == "getLayoutVariable(myVariable).getChild(\"myChild\")");
     }
-    {
+    SECTION("2 children") {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "myVariable.child1.child2", "")
+              == "getLayoutVariable(myVariable).getChild(\"child1\").getChild(\"child2\")");
+    }
+    SECTION("bracket access") {
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "myVariable[ \"hello\" + "
+            "\"world\" ]", "")
+              == "getLayoutVariable(myVariable).getChild(\"hello\" + \"world\")");
+    }
+    SECTION("object variable") {
       REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator, context, "objectvar", "myVariable", "MySpriteObject")
               == "getVariableForObject(MySpriteObject, myVariable)");
@@ -446,7 +462,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
   }
   SECTION("Valid function calls with variables") {
     SECTION("Simple access") {
-      {
+      SECTION("Scene variable") {
         auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable)");
         gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -459,7 +475,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getLayoutVariable(myVariable))");
       }
-      {
+      SECTION("Global variable") {
         auto node = parser.ParseExpression(
             "MyExtension::GetGlobalVariableAsNumber(myGlobalVariable)");
         gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -472,7 +488,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
         REQUIRE(expressionCodeGenerator.GetOutput() ==
                 "returnVariable(getProjectVariable(myGlobalVariable))");
       }
-      {
+      SECTION("Variables on different objects") {
         auto node = parser.ParseExpression(
             "MyExtension::GetStringWith2ObjectParamAnd2ObjectVarParam("
             "MySpriteObject, myVariable, MyOtherSpriteObject, myOtherVariable)");
@@ -489,7 +505,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "fakeObjectListOf_MyOtherSpriteObject, "
             "getVariableForObject(MyOtherSpriteObject, myOtherVariable))");
       }
-      {
+      SECTION("Variables on the same object") {
         auto node = parser.ParseExpression(
             "MyExtension::GetStringWith1ObjectParamAnd2ObjectVarParam("
             "MySpriteObject, myVariable, myOtherVariable)");
@@ -505,7 +521,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "getVariableForObject(MySpriteObject, myVariable), "
             "getVariableForObject(MySpriteObject, myOtherVariable))");
       }
-      {
+      SECTION("Object variable with object function call") {
         auto node = parser.ParseExpression(
             "MySpriteObject.GetObjectVariableAsNumber(myVariable)");
         gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -522,7 +538,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       }
     }
     SECTION("Child access") {
-      {
+      SECTION("1 child") {
         auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable.child1)");
         gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -536,7 +552,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
                 "returnVariable(getLayoutVariable(myVariable).getChild("
                 "\"child1\"))");
       }
-      {
+      SECTION("2 children") {
         auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable.child1.child2)");
         gd::ExpressionCodeGenerator expressionCodeGenerator("number",
@@ -550,7 +566,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
                 "returnVariable(getLayoutVariable(myVariable).getChild("
                 "\"child1\").getChild(\"child2\"))");
       }
-      {
+      SECTION("bracket access") {
         auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable[ \"hello\" + "
             "\"world\" ].child2)");
@@ -565,7 +581,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
                 "returnVariable(getLayoutVariable(myVariable).getChild("
                 "\"hello\" + \"world\").getChild(\"child2\"))");
       }
-      {
+      SECTION("bracket access with nested variable") {
         auto node = parser.ParseExpression(
             "MyExtension::GetVariableAsNumber(myVariable[ \"hello\" + "
             "MySpriteObject.GetObjectStringWith1Param(MyOtherSpriteObject."

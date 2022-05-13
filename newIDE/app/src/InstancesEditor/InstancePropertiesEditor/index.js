@@ -39,7 +39,6 @@ type Props = {|
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
-  _instanceVariablesList: { current: null | VariablesList } = React.createRef();
   schema: Schema = [
     {
       name: this.props.i18n._(t`Object`),
@@ -194,6 +193,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
             <NewVariablesList
               inheritedVariablesContainer={object.getVariables()}
               variablesContainer={instance.getVariables()}
+              size="small"
               onComputeAllVariableNames={() =>
                 object
                   ? EventsRootVariablesFinder.findAllObjectVariables(

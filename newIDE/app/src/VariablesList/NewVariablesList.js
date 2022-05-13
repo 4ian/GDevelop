@@ -94,6 +94,7 @@ type Props = {
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   helpPagePath?: ?string,
+  size?: 'small',
 };
 
 const StyledTreeItem = withStyles(theme => ({
@@ -200,8 +201,9 @@ const NewVariablesList = (props: Props) => {
     [containerWidth]
   );
   const isNarrow = React.useMemo(
-    () => (containerWidth ? containerWidth < 600 : false),
-    [containerWidth]
+    () =>
+      props.size === 'small' || (containerWidth ? containerWidth < 600 : false),
+    [containerWidth, props.size]
   );
 
   const undefinedVariableNames = allVariablesNames

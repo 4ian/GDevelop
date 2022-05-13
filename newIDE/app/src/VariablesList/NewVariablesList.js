@@ -1,37 +1,29 @@
 // @flow
 import * as React from 'react';
+import Measure from 'react-measure';
+import { Trans, t } from '@lingui/macro';
+import { ClickAwayListener } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
-import ChevronRight from '@material-ui/icons/ChevronRight';
-import ExpandMore from '@material-ui/icons/ExpandMore';
+import { makeStyles, withStyles } from '@material-ui/styles';
+
 import Add from '@material-ui/icons/Add';
-import SwapHorizontal from '@material-ui/icons/SwapHoriz';
-import Copy from '../UI/CustomSvgIcons/Copy';
 import Undo from '@material-ui/icons/Undo';
 import Close from '@material-ui/icons/Close';
 import Redo from '@material-ui/icons/Redo';
-import Paste from '../UI/CustomSvgIcons/Paste';
 import Delete from '@material-ui/icons/Delete';
-import { mapFor } from '../Utils/MapFor';
-import SemiControlledTextField from '../UI/SemiControlledTextField';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import ExpandMore from '@material-ui/icons/ExpandMore';
+import SwapHorizontal from '@material-ui/icons/SwapHoriz';
+import Copy from '../UI/CustomSvgIcons/Copy';
+import Paste from '../UI/CustomSvgIcons/Paste';
+
 import { Column, Line, Spacer } from '../UI/Grid';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+import FlatButton from '../UI/FlatButton';
+import IconButton from '../UI/IconButton';
 import DragHandle from '../UI/DragHandle';
-import useForceUpdate from '../Utils/UseForceUpdate';
-import { Trans, t } from '@lingui/macro';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
-import VariableTypeSelector from './VariableTypeSelector';
-import IconButton from '../UI/IconButton';
-import { makeStyles, withStyles } from '@material-ui/styles';
-import styles from './styles';
-import newNameGenerator from '../Utils/NewNameGenerator';
-import Measure from 'react-measure';
-import FlatButton from '../UI/FlatButton';
-import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
-import { CLIPBOARD_KIND } from './ClipboardKind';
-import {
-  serializeToJSObject,
-  unserializeFromJSObject,
-} from '../Utils/Serializer';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
@@ -39,6 +31,15 @@ import TextField from '../UI/TextField';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+
+import useForceUpdate from '../Utils/UseForceUpdate';
+import { mapFor } from '../Utils/MapFor';
+import newNameGenerator from '../Utils/NewNameGenerator';
+import Clipboard, { SafeExtractor } from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 import {
   type HistoryState,
   undo,
@@ -48,7 +49,30 @@ import {
   getHistoryInitialState,
   saveToHistory,
 } from '../Utils/History';
-import { ClickAwayListener } from '@material-ui/core';
+import {
+  hasChildThatContainsStringInNameAndValue,
+  hasVariablesContainerSubChildren,
+  insertInVariableChildren,
+  insertInVariableChildrenArray,
+  insertInVariablesContainer,
+  isCollectionVariable,
+} from '../Utils/VariablesUtils';
+import {
+  foldNodesVariables,
+  getDirectParentNodeId,
+  getDirectParentVariable,
+  getExpandedNodeIdsFromVariablesContainer,
+  getMovementTypeWithinVariablesContainer,
+  getOldestAncestryVariable,
+  getVariableContextFromNodeId,
+  inheritedPrefix,
+  separator,
+  updateListOfNodesFollowingChangeName,
+} from './VariableToTreeNodeHandling';
+
+import VariableTypeSelector from './VariableTypeSelector';
+import styles from './styles';
+import { CLIPBOARD_KIND } from './ClipboardKind';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -57,151 +81,10 @@ const preventEventDefaultEffect = (
   event: SyntheticPointerEvent<HTMLInputElement>
 ) => event.preventDefault();
 
-const hasChildThatContainsStringInNameAndValue = (
-  variable: gdVariable,
-  searchText: string
-): boolean => {
-  switch (variable.getType()) {
-    case gd.Variable.String:
-      return variable
-        .getString()
-        .normalize('NFD')
-        .toLowerCase()
-        .includes(searchText);
-    case gd.Variable.Number:
-      return variable
-        .getValue()
-        .toString()
-        .includes(searchText);
-    case gd.Variable.Array:
-      return mapFor(0, variable.getChildrenCount(), index => {
-        const childVariable = variable.getAtIndex(index);
-        return hasChildThatContainsStringInNameAndValue(
-          childVariable,
-          searchText
-        );
-      }).some(Boolean);
-    case gd.Variable.Structure:
-      return variable
-        .getAllChildrenNames()
-        .toJSArray()
-        .map(childName => {
-          const childVariable = variable.getChild(childName);
-          return (
-            childName
-              .normalize('NFD')
-              .toLowerCase()
-              .includes(searchText) ||
-            hasChildThatContainsStringInNameAndValue(childVariable, searchText)
-          );
-        })
-        .some(Boolean);
-    default:
-      return false;
-  }
-};
-
 type Props = {
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
   onComputeAllVariableNames?: () => Array<string>,
-};
-
-const getExpandedNodeIdsFromVariables = (
-  variables: { name: string, variable: gdVariable }[],
-  accumulator: string[],
-  parentNodeId: string = ''
-): string[] => {
-  let newAccumulator = [];
-  for (const { name, variable } of variables) {
-    const nodeId = parentNodeId ? `${parentNodeId}${separator}${name}` : name;
-    if (!variable.isFolded() && variable.getChildrenCount() > 0) {
-      newAccumulator.push(nodeId);
-    }
-    if (variable.getType() === gd.Variable.Array) {
-      const children = mapFor(0, variable.getChildrenCount(), index => ({
-        name: index.toString(),
-        variable: variable.getAtIndex(index),
-      }));
-      newAccumulator = [
-        ...newAccumulator,
-        ...getExpandedNodeIdsFromVariables(children, newAccumulator, nodeId),
-      ];
-    } else if (variable.getType() === gd.Variable.Structure) {
-      const children = variable
-        .getAllChildrenNames()
-        .toJSArray()
-        .map((childName, index) => ({
-          variable: variable.getChild(childName),
-          name: childName,
-        }));
-      newAccumulator = [
-        ...newAccumulator,
-        ...getExpandedNodeIdsFromVariables(children, newAccumulator, nodeId),
-      ];
-    }
-  }
-  return newAccumulator;
-};
-
-const updateListOfNodesFollowingChangeName = (
-  list: string[],
-  oldNodeId: string,
-  newName: string
-) => {
-  const newList: Array<string> = [...list];
-  const indexOfRenamedNode = newList.indexOf(oldNodeId);
-  const indicesOfChildrenOfRenamedNode = newList
-    .map(otherNodeId => {
-      if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
-        return newList.indexOf(otherNodeId);
-      }
-      return null;
-    })
-    .filter(Boolean);
-  const originalNodeIdBits = oldNodeId.split(separator);
-  const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-  [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
-    .filter(index => index >= 0)
-    .forEach(index => {
-      const nodeIdToChange = newList[index];
-      const bitsToChange = nodeIdToChange.split(separator);
-      bitsToChange[bitsToChange.indexOf(variableName)] = newName;
-      newList.splice(index, 1, bitsToChange.join(separator));
-    });
-  return newList;
-};
-
-const getExpandedNodeIdsFromVariablesContainer = (
-  variablesContainer: gdVariablesContainer,
-  isInherited: boolean = false
-): string[] => {
-  const variables = [];
-  for (let index = 0; index < variablesContainer.count(); index += 1) {
-    variables.push({
-      name: `${
-        isInherited ? inheritedPrefix : ''
-      }${variablesContainer.getNameAt(index)}`,
-      variable: variablesContainer.getAt(index),
-    });
-  }
-  return getExpandedNodeIdsFromVariables(variables, []);
-};
-
-const foldNodesVariables = (
-  variablesContainer: gdVariablesContainer,
-  nodes: string[],
-  fold: boolean
-) => {
-  nodes.forEach(nodeId => {
-    const { variable } = getVariableContextFromNodeId(
-      nodeId,
-      variablesContainer
-    );
-    if (variable) {
-      variable.setFolded(fold);
-    }
-  });
 };
 
 const StyledTreeItem = withStyles(theme => ({
@@ -243,219 +126,6 @@ const StyledTreeItem = withStyles(theme => ({
   },
   content: { marginTop: 5, backgroundColor: '#E4E4E4' },
 }))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
-
-const insertInVariablesContainer = (
-  variablesContainer: gdVariablesContainer,
-  name: string,
-  serializedVariable: ?any,
-  index: ?number
-): string => {
-  const newName = newNameGenerator(
-    name,
-    name => variablesContainer.has(name),
-    serializedVariable ? 'CopyOf' : undefined
-  );
-  const newVariable = new gd.Variable();
-  if (serializedVariable) {
-    unserializeFromJSObject(newVariable, serializedVariable);
-  } else {
-    newVariable.setString('');
-  }
-  variablesContainer.insert(
-    newName,
-    newVariable,
-    index || variablesContainer.count()
-  );
-  newVariable.delete();
-  return newName;
-};
-
-const insertInVariableChildrenArray = (
-  targetParentVariable: gdVariable,
-  serializedVariable: any,
-  index: number
-) => {
-  const newVariable = new gd.Variable();
-  unserializeFromJSObject(newVariable, serializedVariable);
-  targetParentVariable.insertInArray(newVariable, index);
-  newVariable.delete();
-};
-
-const insertInVariableChildren = (
-  targetParentVariable: gdVariable,
-  name: string,
-  serializedVariable: any
-): string => {
-  const newName = newNameGenerator(
-    name,
-    _name => targetParentVariable.hasChild(_name),
-    'CopyOf'
-  );
-  const newVariable = new gd.Variable();
-  unserializeFromJSObject(newVariable, serializedVariable);
-  targetParentVariable.insertChild(newName, newVariable);
-  newVariable.delete();
-  return newName;
-};
-
-const getDirectParentVariable = lineage =>
-  lineage[lineage.length - 1] ? lineage[lineage.length - 1].variable : null;
-const getDirectParentNodeId = lineage =>
-  lineage[lineage.length - 1] ? lineage[lineage.length - 1].nodeId : null;
-const getOldestAncestryVariable = lineage =>
-  lineage.length ? lineage[0] : null;
-
-const getVariableContextFromNodeId = (
-  nodeId: string,
-  variablesContainer: gdVariablesContainer
-) => {
-  const bits = nodeId.split(separator);
-  let parentVariable = null;
-  let currentVariable = null;
-  let currentVariableName = null;
-  let lineage = [];
-  let name = null;
-  let depth = -1;
-
-  while (depth < bits.length - 1) {
-    depth += 1;
-    currentVariableName = bits[depth];
-    if (depth === 0 && currentVariableName.startsWith(inheritedPrefix)) {
-      currentVariableName = removeInheritedPrefix(currentVariableName);
-    }
-    if (!parentVariable) {
-      currentVariable = variablesContainer.get(currentVariableName);
-    } else {
-      if (parentVariable.getType() === gd.Variable.Array) {
-        const index = parseInt(currentVariableName, 10);
-        if (index >= parentVariable.getChildrenCount()) {
-          return { variable: null, lineage, depth, name };
-        }
-        currentVariable = parentVariable.getAtIndex(index);
-      } else {
-        if (!parentVariable.hasChild(currentVariableName)) {
-          return { variable: null, lineage, depth, name };
-        }
-        currentVariable = parentVariable.getChild(currentVariableName);
-      }
-    }
-    if (depth < bits.length - 1) {
-      lineage.push({
-        nodeId: bits.slice(0, depth + 1).join(separator),
-        name: currentVariableName,
-        variable: currentVariable,
-      });
-    }
-    parentVariable = currentVariable;
-  }
-  return {
-    variable: currentVariable,
-    name: currentVariableName,
-    depth,
-    lineage,
-  };
-};
-
-const hasVariablesContainerSubChildren = (
-  variablesContainer: gdVariablesContainer
-): boolean =>
-  mapFor(0, variablesContainer.count(), index => {
-    const variable = variablesContainer.getAt(index);
-
-    return isCollection(variable) && variable.getChildrenCount() > 0;
-  }).some(Boolean);
-
-type MovementType =
-  | 'TopLevelToStructure'
-  | 'InsideTopLevel'
-  | 'StructureToTopLevel'
-  | 'ArrayToTopLevel'
-  | 'FromStructureToAnotherStructure'
-  | 'InsideSameStructure'
-  | 'FromArrayToAnotherArray'
-  | 'InsideSameArray'
-  | 'FromStructureToArray'
-  | 'FromArrayToStructure';
-
-const getMovementTypeWithinVariablesContainer = (
-  draggedVariableContext,
-  targetVariableContext
-): ?MovementType => {
-  const { lineage: targetVariableLineage } = targetVariableContext;
-  const targetVariableParentVariable = getDirectParentVariable(
-    targetVariableLineage
-  );
-
-  const { lineage: draggedVariableLineage } = draggedVariableContext;
-  const draggedVariableParentVariable = getDirectParentVariable(
-    draggedVariableLineage
-  );
-
-  if (!!draggedVariableParentVariable && !!targetVariableParentVariable) {
-    if (
-      targetVariableParentVariable.getType() === gd.Variable.Structure &&
-      draggedVariableParentVariable.getType() === gd.Variable.Structure &&
-      draggedVariableParentVariable !== targetVariableParentVariable
-    )
-      return 'FromStructureToAnotherStructure';
-    if (
-      targetVariableParentVariable.getType() === gd.Variable.Structure &&
-      draggedVariableParentVariable === targetVariableParentVariable
-    )
-      return 'InsideSameStructure';
-    if (
-      targetVariableParentVariable.getType() === gd.Variable.Array &&
-      draggedVariableParentVariable.getType() === gd.Variable.Array &&
-      draggedVariableParentVariable !== targetVariableParentVariable
-    )
-      return 'FromArrayToAnotherArray';
-    if (
-      targetVariableParentVariable.getType() === gd.Variable.Array &&
-      draggedVariableParentVariable === targetVariableParentVariable
-    )
-      return 'InsideSameArray';
-    if (
-      targetVariableParentVariable.getType() === gd.Variable.Array &&
-      draggedVariableParentVariable.getType() === gd.Variable.Structure
-    )
-      return 'FromStructureToArray';
-    if (
-      targetVariableParentVariable.getType() === gd.Variable.Structure &&
-      draggedVariableParentVariable.getType() === gd.Variable.Array
-    )
-      return 'FromArrayToStructure';
-  }
-
-  if (!draggedVariableParentVariable && !targetVariableParentVariable)
-    return 'InsideTopLevel';
-  if (
-    !draggedVariableParentVariable &&
-    !!targetVariableParentVariable &&
-    targetVariableParentVariable.getType() === gd.Variable.Structure
-  )
-    return 'TopLevelToStructure';
-  if (
-    !!draggedVariableParentVariable &&
-    !targetVariableParentVariable &&
-    draggedVariableParentVariable.getType() === gd.Variable.Structure
-  )
-    return 'StructureToTopLevel';
-  if (
-    !!draggedVariableParentVariable &&
-    !targetVariableParentVariable &&
-    draggedVariableParentVariable.getType() === gd.Variable.Array
-  )
-    return 'ArrayToTopLevel';
-
-  return null;
-};
-
-const inheritedPrefix = '$!';
-const separator = '$.$';
-const removeInheritedPrefix = (str: string): string =>
-  str.slice(inheritedPrefix.length, str.length);
-const isCollection = (variable: gdVariable): boolean =>
-  !gd.Variable.isPrimitive(variable.getType());
 
 const NewVariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
@@ -511,7 +181,6 @@ const NewVariablesList = (props: Props) => {
         : undefined,
     },
   }));
-
   const selectedTreeItemClasses = useStylesForSelectedTreeItem();
 
   const rowRightSideStyle = React.useMemo(
@@ -521,7 +190,10 @@ const NewVariablesList = (props: Props) => {
     }),
     [containerWidth]
   );
-  const isNarrow = containerWidth ? containerWidth < 600 : false;
+  const isNarrow = React.useMemo(
+    () => (containerWidth ? containerWidth < 600 : false),
+    [containerWidth]
+  );
 
   const undefinedVariableNames = allVariablesNames
     ? allVariablesNames
@@ -946,7 +618,7 @@ const NewVariablesList = (props: Props) => {
       nodeId,
       props.variablesContainer
     );
-    if (!variable || !isCollection(variable)) return;
+    if (!variable || !isCollectionVariable(variable)) return;
     const type = variable.getType();
 
     if (type === gd.Variable.Structure) {
@@ -1012,13 +684,11 @@ const NewVariablesList = (props: Props) => {
     parentVariable?: gdVariable,
     isInherited: boolean,
   |}) => {
+    const isCollection = isCollectionVariable(variable);
     const type = variable.getType();
-    const isCollection = !gd.Variable.isPrimitive(type);
 
-    let parentType = null;
-    let nodeId;
-    const isTopLevel = !parentNodeId;
     const depth = parentNodeId ? parentNodeId.split(separator).length : 0;
+    const isTopLevel = depth === 0;
     const shouldWrap = !containerWidth
       ? false
       : containerWidth <= 750
@@ -1029,6 +699,8 @@ const NewVariablesList = (props: Props) => {
       ? depth >= 7
       : depth >= 8;
 
+    let parentType = null;
+    let nodeId;
     if (!parentNodeId) {
       if (isInherited) {
         nodeId = `${inheritedPrefix}${name}`;
@@ -1313,6 +985,25 @@ const NewVariablesList = (props: Props) => {
         )}
       </DragSourceAndDropTarget>
     );
+  };
+
+  const onNodeToggle = (event, values) => {
+    // Inherited variables should not be modified
+    const instanceExpandedNodes = expandedNodes.filter(
+      node => !node.startsWith(inheritedPrefix)
+    );
+    const instanceNewExpandedNodes = values.filter(
+      node => !node.startsWith(inheritedPrefix)
+    );
+    const foldedNodes = instanceExpandedNodes.filter(
+      node => !instanceNewExpandedNodes.includes(node)
+    );
+    const unfoldedNodes = instanceNewExpandedNodes.filter(
+      node => !instanceExpandedNodes.includes(node)
+    );
+    foldNodesVariables(props.variablesContainer, foldedNodes, true);
+    foldNodesVariables(props.variablesContainer, unfoldedNodes, false);
+    setExpandedNodes(values);
   };
 
   const onChangeName = (nodeId: string, newName: ?string) => {
@@ -1658,32 +1349,7 @@ const NewVariablesList = (props: Props) => {
                     defaultExpandIcon={<ChevronRight />}
                     defaultCollapseIcon={<ExpandMore />}
                     onNodeSelect={(event, values) => setSelectedNodes(values)}
-                    onNodeToggle={(event, values) => {
-                      // Inherited variables should not be modified
-                      const instanceExpandedNodes = expandedNodes.filter(
-                        node => !node.startsWith(inheritedPrefix)
-                      );
-                      const instanceNewExpandedNodes = values.filter(
-                        node => !node.startsWith(inheritedPrefix)
-                      );
-                      const foldedNodes = instanceExpandedNodes.filter(
-                        node => !instanceNewExpandedNodes.includes(node)
-                      );
-                      const unfoldedNodes = instanceNewExpandedNodes.filter(
-                        node => !instanceExpandedNodes.includes(node)
-                      );
-                      foldNodesVariables(
-                        props.variablesContainer,
-                        foldedNodes,
-                        true
-                      );
-                      foldNodesVariables(
-                        props.variablesContainer,
-                        unfoldedNodes,
-                        false
-                      );
-                      setExpandedNodes(values);
-                    }}
+                    onNodeToggle={onNodeToggle}
                     selected={selectedNodes}
                     expanded={expandedNodes}
                   >

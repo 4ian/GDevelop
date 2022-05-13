@@ -4,13 +4,12 @@ import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
-import VariablesList from './index';
-import useForceUpdate from '../Utils/UseForceUpdate';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
-import { Column, Line } from '../UI/Grid';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
+import { Column } from '../UI/Grid';
+import NewVariablesList from './NewVariablesList';
 
 type Props = {|
   onCancel: () => void,
@@ -21,6 +20,7 @@ type Props = {|
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   variablesContainer: gdVariablesContainer,
+  inheritedVariablesContainer?: gdVariablesContainer,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
   onComputeAllVariableNames: () => Array<string>,
   helpPagePath: ?string,
@@ -35,11 +35,11 @@ const VariablesEditorDialog = ({
   emptyPlaceholderTitle,
   emptyPlaceholderDescription,
   variablesContainer,
+  inheritedVariablesContainer,
   hotReloadPreviewButtonProps,
   onComputeAllVariableNames,
   helpPagePath,
 }: Props) => {
-  const forceUpdate = useForceUpdate();
   const onCancelChanges = useSerializableObjectCancelableEditor({
     serializableObject: variablesContainer,
     onCancel,
@@ -95,20 +95,12 @@ const VariablesEditorDialog = ({
             <Column expand>{DismissableTutorialMessage}</Column>
           </Line>
         )}
-        <VariablesList
-          commitVariableValueOnBlur={
-            // Reduce the number of re-renders by saving the variable value only when the field is blurred.
-            // We don't do that by default because the VariablesList can be used in a component like
-            // InstancePropertiesEditor, that can be unmounted at any time, before the text fields get a
-            // chance to be blurred.
-            true
-          }
+
+        <NewVariablesList
           variablesContainer={variablesContainer}
+          inheritedVariablesContainer={inheritedVariablesContainer}
           emptyPlaceholderTitle={emptyPlaceholderTitle}
           emptyPlaceholderDescription={emptyPlaceholderDescription}
-          onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positioned*/
-          }
           onComputeAllVariableNames={onComputeAllVariableNames}
           helpPagePath={helpPagePath}
         />

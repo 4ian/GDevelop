@@ -1135,6 +1135,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const variablesEditedAssociatedObjectName = this.state
+      .variablesEditedInstance
+      ? this.state.variablesEditedInstance.getObjectName()
+      : null;
+    const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
+      ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
+      : null;
 
     const editors = {
       properties: {
@@ -1477,66 +1484,66 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.openSetupGrid(false)}
           />
         )}
-        {!!this.state.variablesEditedInstance && (
-          <VariablesEditorDialog
-            open
-            variablesContainer={
-              this.state.variablesEditedInstance &&
-              this.state.variablesEditedInstance.getVariables()
-            }
-            onCancel={() => this.editInstanceVariables(null)}
-            onApply={() => this.editInstanceVariables(null)}
-            emptyPlaceholderTitle={
-              <Trans>Add your first instance variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                Instance variables overwrite the default values of the variables
-                of the object.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/instance-variables'}
-            title={<Trans>Instance Variables</Trans>}
-            onEditObjectVariables={() => {
-              if (!this.instancesSelection.hasSelectedInstances()) {
-                return;
+        {!!this.state.variablesEditedInstance &&
+          !!variablesEditedAssociatedObject && (
+            <VariablesEditorDialog
+              open
+              variablesContainer={this.state.variablesEditedInstance.getVariables()}
+              inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}
+              onCancel={() => this.editInstanceVariables(null)}
+              onApply={() => this.editInstanceVariables(null)}
+              emptyPlaceholderTitle={
+                <Trans>Add your first instance variable</Trans>
               }
-              const associatedObjectName = this.instancesSelection
-                .getSelectedInstances()[0]
-                .getObjectName();
-              const object = getObjectByName(
-                project,
-                layout,
-                associatedObjectName
-              );
-              if (object) {
-                this.editObject(object, 'variables');
-                this.editInstanceVariables(null);
+              emptyPlaceholderDescription={
+                <Trans>
+                  Instance variables overwrite the default values of the
+                  variables of the object.
+                </Trans>
               }
-            }}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() => {
-              const variablesEditedInstance = this.state
-                .variablesEditedInstance;
-              if (!variablesEditedInstance) {
-                return [];
+              helpPagePath={'/all-features/variables/instance-variables'}
+              title={<Trans>Instance Variables</Trans>}
+              onEditObjectVariables={() => {
+                if (!this.instancesSelection.hasSelectedInstances()) {
+                  return;
+                }
+                const associatedObjectName = this.instancesSelection
+                  .getSelectedInstances()[0]
+                  .getObjectName();
+                const object = getObjectByName(
+                  project,
+                  layout,
+                  associatedObjectName
+                );
+                if (object) {
+                  this.editObject(object, 'variables');
+                  this.editInstanceVariables(null);
+                }
+              }}
+              hotReloadPreviewButtonProps={
+                this.props.hotReloadPreviewButtonProps
               }
-              const variablesEditedObject = getObjectByName(
-                project,
-                layout,
-                variablesEditedInstance.getObjectName()
-              );
-              return variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
-          />
-        )}
+              onComputeAllVariableNames={() => {
+                const { variablesEditedInstance } = this.state;
+                if (!variablesEditedInstance) {
+                  return [];
+                }
+                const variablesEditedObject = getObjectByName(
+                  project,
+                  layout,
+                  variablesEditedInstance.getObjectName()
+                );
+                return variablesEditedObject
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      variablesEditedObject
+                    )
+                  : [];
+              }}
+            />
+          )}
         {!!this.state.layerRemoveDialogOpen && (
           <LayerRemoveDialog
             open

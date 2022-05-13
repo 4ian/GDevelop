@@ -92,6 +92,9 @@ type Props = {
     canUndo: () => boolean,
     canRedo: () => boolean,
   },
+  emptyPlaceholderTitle?: React.Node,
+  emptyPlaceholderDescription?: React.Node,
+  helpPagePath?: ?string,
 };
 
 const StyledTreeItem = withStyles(theme => ({
@@ -1355,12 +1358,16 @@ const NewVariablesList = (props: Props) => {
               </Line>
               {props.variablesContainer.count() === 0 ? (
                 <Column noMargin expand justifyContent="center">
-                  <EmptyPlaceholder
-                    title={<Trans>Add a variable</Trans>}
-                    description={<Trans>Store data in variables.</Trans>}
-                    actionLabel={<Trans>Add a variable</Trans>}
-                    onAdd={onAdd}
-                  />
+                  {props.emptyPlaceholderTitle &&
+                  props.emptyPlaceholderDescription ? (
+                    <EmptyPlaceholder
+                      title={props.emptyPlaceholderTitle}
+                      description={props.emptyPlaceholderDescription}
+                      actionLabel={<Trans>Add a variable</Trans>}
+                      helpPagePath={props.helpPagePath || undefined}
+                      onAdd={onAdd}
+                    />
+                  ) : null}
                 </Column>
               ) : (
                 <ScrollView autoHideScrollbar>

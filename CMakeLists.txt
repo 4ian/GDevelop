@@ -17,7 +17,7 @@ endmacro()
 gd_set_option(BUILD_CORE TRUE BOOL "TRUE to build GDevelop Core library")
 gd_set_option(BUILD_GDJS TRUE BOOL "TRUE to build GDevelop JS Platform")
 gd_set_option(BUILD_EXTENSIONS TRUE BOOL "TRUE to build the extensions")
-gd_set_option(BUILD_TESTS FALSE BOOL "TRUE to build the tests")
+gd_set_option(BUILD_TESTS TRUE BOOL "TRUE to build the tests")
 
 # Disable deprecated code
 set(NO_GUI TRUE CACHE BOOL "" FORCE) #Force disable old GUI related code.

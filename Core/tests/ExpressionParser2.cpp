@@ -1448,7 +1448,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Valid variables") {
-    {
+    SECTION("simple variable") {
       auto node = parser.ParseExpression("myVariable");
       REQUIRE(node != nullptr);
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
@@ -1459,7 +1459,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(identifierNode.identifierNameDotLocation.IsValid() == false);
       REQUIRE(identifierNode.childIdentifierNameLocation.IsValid() == false);
     }
-    {
+    SECTION("child with dot accessor") {
       auto node = parser.ParseExpression("myVariable.myChild");
       REQUIRE(node != nullptr);
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
@@ -1470,7 +1470,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("child with brackets accessor") {
       auto node = parser.ParseExpression(
           "myVariable[ \"My named children\"  ]");
       REQUIRE(node != nullptr);
@@ -1487,7 +1487,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
     }
-    {
+    SECTION("child with brackets then dot") {
       auto node = parser.ParseExpression(
           "myVariable[ \"My named children\"  ] . grandChild");
       REQUIRE(node != nullptr);

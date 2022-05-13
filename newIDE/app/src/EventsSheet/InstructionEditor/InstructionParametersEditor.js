@@ -323,9 +323,12 @@ export default class InstructionParametersEditor extends React.Component<
                         instruction={instruction}
                         parameterMetadata={parameterMetadata}
                         parameterIndex={i}
-                        value={instruction.getParameter(i)}
+                        value={instruction.getParameter(i).getPlainString()}
                         onChange={value => {
-                          if (instruction.getParameter(i) !== value) {
+                          if (
+                            instruction.getParameter(i).getPlainString() !==
+                            value
+                          ) {
                             instruction.setParameter(i, value);
                             this.setState({
                               isDirty: true,

@@ -35,11 +35,11 @@ describe('setupInstructionParameters', () => {
 
     // Check that parameters were created
     expect(instruction.getParametersCount()).toBe(5);
-    expect(instruction.getParameter(0)).toBe('');
-    expect(instruction.getParameter(1)).toBe('');
-    expect(instruction.getParameter(2)).toBe('');
-    expect(instruction.getParameter(3)).toBe('');
-    expect(instruction.getParameter(4)).toBe('');
+    expect(instruction.getParameter(0).getPlainString()).toBe('');
+    expect(instruction.getParameter(1).getPlainString()).toBe('');
+    expect(instruction.getParameter(2).getPlainString()).toBe('');
+    expect(instruction.getParameter(3).getPlainString()).toBe('');
+    expect(instruction.getParameter(4).getPlainString()).toBe('');
   });
 
   it('sets the proper number of parameters and the object name', () => {
@@ -74,8 +74,8 @@ describe('setupInstructionParameters', () => {
 
     // Check that parameters were created and the object name set
     expect(instruction.getParametersCount()).toBe(2);
-    expect(instruction.getParameter(0)).toBe(objectName);
-    expect(instruction.getParameter(1)).toBe('');
+    expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
+    expect(instruction.getParameter(1).getPlainString()).toBe('');
   });
 
   it('sets the proper parameters for a behavior', () => {
@@ -116,10 +116,12 @@ describe('setupInstructionParameters', () => {
 
     // Check that parameters were created, the object name and behavior set
     expect(instruction.getParametersCount()).toBe(4);
-    expect(instruction.getParameter(0)).toBe(objectName);
-    expect(instruction.getParameter(1)).toBe('PlatformerObject');
-    expect(instruction.getParameter(2)).toBe(''); // In the future, this could be set to a default value.
-    expect(instruction.getParameter(3)).toBe('');
+    expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
+    expect(instruction.getParameter(1).getPlainString()).toBe(
+      'PlatformerObject'
+    );
+    expect(instruction.getParameter(2).getPlainString()).toBe(''); // In the future, this could be set to a default value.
+    expect(instruction.getParameter(3).getPlainString()).toBe('');
   });
 
   it('sets the proper parameters for a behavior, selecting the first behavior if multiple', () => {
@@ -165,8 +167,10 @@ describe('setupInstructionParameters', () => {
 
     // Check that parameters were created, the object name and behavior set
     expect(instruction.getParametersCount()).toBe(4);
-    expect(instruction.getParameter(0)).toBe(objectName);
-    expect(instruction.getParameter(1)).toBe('FirstPlatformerObject');
+    expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
+    expect(instruction.getParameter(1).getPlainString()).toBe(
+      'FirstPlatformerObject'
+    );
   });
 
   it('sets the proper parameters for a behavior, changing it if a wrong behavior name is entered', () => {
@@ -215,8 +219,10 @@ describe('setupInstructionParameters', () => {
 
     // Check that parameters were created, the object name and behavior set
     expect(instruction.getParametersCount()).toBe(4);
-    expect(instruction.getParameter(0)).toBe(objectName);
-    expect(instruction.getParameter(1)).toBe('FirstPlatformerObject');
+    expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
+    expect(instruction.getParameter(1).getPlainString()).toBe(
+      'FirstPlatformerObject'
+    );
   });
 
   it('sets the proper parameters for a behavior, letting an existing behavior name if it is valid', () => {
@@ -265,7 +271,9 @@ describe('setupInstructionParameters', () => {
 
     // Check that parameters were created, the object name and behavior set
     expect(instruction.getParametersCount()).toBe(4);
-    expect(instruction.getParameter(0)).toBe(objectName);
-    expect(instruction.getParameter(1)).toBe('OtherPlatformerObject');
+    expect(instruction.getParameter(0).getPlainString()).toBe(objectName);
+    expect(instruction.getParameter(1).getPlainString()).toBe(
+      'OtherPlatformerObject'
+    );
   });
 });

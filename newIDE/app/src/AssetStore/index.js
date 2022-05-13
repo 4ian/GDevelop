@@ -147,7 +147,7 @@ export const AssetStore = ({
                       allItemsLabel={<Trans>All assets</Trans>}
                       allFilters={filters}
                       filtersState={filtersState}
-                      setIsOnHomePage={setIsOnHomePage}
+                      onChoiceChange={() => setIsOnHomePage(false)}
                       error={error}
                     />
                     <Subheader>

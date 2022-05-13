@@ -1,25 +1,18 @@
 // @flow
 import * as React from 'react';
 import Measure from 'react-measure';
-import { Trans, t } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 import { ClickAwayListener } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { makeStyles, withStyles } from '@material-ui/styles';
 
 import Add from '@material-ui/icons/Add';
-import Undo from '@material-ui/icons/Undo';
-import Close from '@material-ui/icons/Close';
-import Redo from '@material-ui/icons/Redo';
-import Delete from '@material-ui/icons/Delete';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
-import Copy from '../UI/CustomSvgIcons/Copy';
-import Paste from '../UI/CustomSvgIcons/Paste';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import DragHandle from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
@@ -27,7 +20,6 @@ import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
-import TextField from '../UI/TextField';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
@@ -72,6 +64,7 @@ import {
 
 import VariableTypeSelector from './VariableTypeSelector';
 import { CLIPBOARD_KIND } from './ClipboardKind';
+import VariablesListToolbar from './VariablesListToolbar';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -1202,161 +1195,33 @@ const NewVariablesList = (props: Props) => {
             onKeyUp={keyboardShortcuts.onKeyUp}
           >
             <Column expand reverse={isNarrow}>
-              <Line justifyContent="space-between" alignItems="center">
-                <Column noMargin>
-                  <Line noMargin>
-                    {isNarrow ? (
-                      <IconButton
-                        tooltip={t`Copy`}
-                        onClick={copySelection}
-                        size="small"
-                        disabled={selectedNodes.length === 0}
-                      >
-                        <Copy />
-                      </IconButton>
-                    ) : (
-                      <FlatButton
-                        icon={<Copy />}
-                        disabled={selectedNodes.length === 0}
-                        label={<Trans>Copy</Trans>}
-                        onClick={copySelection}
-                      />
-                    )}
-                    <Spacer />
-                    {isNarrow ? (
-                      <IconButton
-                        tooltip={t`Paste`}
-                        onClick={pasteSelection}
-                        size="small"
-                        disabled={
-                          !Clipboard.has(CLIPBOARD_KIND) ||
-                          selectedNodes.some(nodeId =>
-                            nodeId.startsWith(inheritedPrefix)
-                          )
-                        }
-                      >
-                        <Paste />
-                      </IconButton>
-                    ) : (
-                      <FlatButton
-                        icon={<Paste />}
-                        label={<Trans>Paste</Trans>}
-                        disabled={
-                          !Clipboard.has(CLIPBOARD_KIND) ||
-                          selectedNodes.some(nodeId =>
-                            nodeId.startsWith(inheritedPrefix)
-                          )
-                        }
-                        onClick={pasteSelection}
-                      />
-                    )}
-                    <Spacer />
-                    {isNarrow ? (
-                      <IconButton
-                        tooltip={t`Delete`}
-                        onClick={deleteSelection}
-                        size="small"
-                        disabled={
-                          selectedNodes.length === 0 ||
-                          selectedNodes.some(nodeId =>
-                            nodeId.startsWith(inheritedPrefix)
-                          )
-                        }
-                      >
-                        <Delete />
-                      </IconButton>
-                    ) : (
-                      <FlatButton
-                        icon={<Delete />}
-                        label={<Trans>Delete</Trans>}
-                        disabled={
-                          selectedNodes.length === 0 ||
-                          selectedNodes.some(nodeId =>
-                            nodeId.startsWith(inheritedPrefix)
-                          )
-                        }
-                        onClick={deleteSelection}
-                      />
-                    )}
-                    {props.historyHandler ? null : (
-                      <>
-                        <Spacer />
-                        {isNarrow ? (
-                          <IconButton
-                            tooltip={t`Undo`}
-                            onClick={_undo}
-                            size="small"
-                            disabled={!_canUndo()}
-                          >
-                            <Undo />
-                          </IconButton>
-                        ) : (
-                          <FlatButton
-                            icon={<Undo />}
-                            label={<Trans>Undo</Trans>}
-                            onClick={_undo}
-                            disabled={!_canUndo()}
-                          />
-                        )}
-                        <Spacer />
-                        {isNarrow ? (
-                          <IconButton
-                            tooltip={t`Redo`}
-                            onClick={_redo}
-                            size="small"
-                            disabled={!_canRedo()}
-                          >
-                            <Redo />
-                          </IconButton>
-                        ) : (
-                          <FlatButton
-                            icon={<Redo />}
-                            label={<Trans>Redo</Trans>}
-                            onClick={_redo}
-                            disabled={!_canRedo()}
-                          />
-                        )}
-                      </>
-                    )}
-                  </Line>
-                </Column>
-                <Column expand>
-                  <TextField
-                    fullWidth
-                    value={searchText}
-                    onChange={(event, value) => setSearchText(value)}
-                    endAdornment={
-                      !!searchText ? (
-                        <IconButton
-                          onClick={() => setSearchText('')}
-                          edge="end"
-                        >
-                          <Close />
-                        </IconButton>
-                      ) : null
-                    }
-                    hintText={t`Search in variables`}
-                  />
-                </Column>
-                <Column noMargin>
-                  {isNarrow ? (
-                    <IconButton
-                      tooltip={t`Add variable`}
-                      onClick={onAdd}
-                      size="small"
-                    >
-                      <Add />
-                    </IconButton>
-                  ) : (
-                    <FlatButton
-                      primary
-                      onClick={onAdd}
-                      label={<Trans>Add variable</Trans>}
-                      icon={<Add />}
-                    />
-                  )}
-                </Column>
-              </Line>
+              <VariablesListToolbar
+                isNarrow={isNarrow}
+                onCopy={copySelection}
+                onPaste={pasteSelection}
+                onDelete={deleteSelection}
+                canCopy={selectedNodes.length > 0}
+                canPaste={
+                  Clipboard.has(CLIPBOARD_KIND) &&
+                  selectedNodes.every(
+                    nodeId => !nodeId.startsWith(inheritedPrefix)
+                  )
+                }
+                canDelete={
+                  selectedNodes.length > 0 &&
+                  selectedNodes.every(
+                    nodeId => !nodeId.startsWith(inheritedPrefix)
+                  )
+                }
+                onUndo={_undo}
+                onRedo={_redo}
+                canUndo={_canUndo()}
+                canRedo={_canRedo()}
+                hideHistoryChangeButtons={!!props.historyHandler}
+                onAdd={onAdd}
+                searchText={searchText}
+                onChangeSearchText={setSearchText}
+              />
               {props.variablesContainer.count() === 0 ? (
                 <Column noMargin expand justifyContent="center">
                   {props.emptyPlaceholderTitle &&

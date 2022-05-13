@@ -8,8 +8,9 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
-import { Column } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import NewVariablesList from './NewVariablesList';
+import HelpButton from '../UI/HelpButton';
 
 type Props = {|
   onCancel: () => void,
@@ -56,14 +57,14 @@ const VariablesEditorDialog = ({
         <FlatButton
           label={<Trans>Cancel</Trans>}
           onClick={onCancelChanges}
-          key={'Cancel'}
+          key="Cancel"
         />,
         <FlatButton
           label={<Trans>Apply</Trans>}
           primary
           keyboardFocused
           onClick={onApply}
-          key={'Apply'}
+          key="Apply"
         />,
       ]}
       open={open}
@@ -83,6 +84,9 @@ const VariablesEditorDialog = ({
             key="hot-reload-preview-button"
             {...hotReloadPreviewButtonProps}
           />
+        ) : null,
+        helpPagePath ? (
+          <HelpButton helpPagePath={helpPagePath} key="help" />
         ) : null,
       ]}
       title={title}

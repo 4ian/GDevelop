@@ -325,6 +325,15 @@ const getVariableContextFromNodeId = (
   };
 };
 
+const hasVariablesContainerSubChildren = (
+  variablesContainer: gdVariablesContainer
+): boolean =>
+  mapFor(0, variablesContainer.count(), index => {
+    const variable = variablesContainer.getAt(index);
+
+    return isCollection(variable) && variable.getChildrenCount() > 0;
+  }).some(Boolean);
+
 type MovementType =
   | 'TopLevelToStructure'
   | 'InsideTopLevel'
@@ -445,6 +454,12 @@ const NewVariablesList = (props: Props) => {
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
 
+  const shouldHideExpandIcons =
+    !hasVariablesContainerSubChildren(props.variablesContainer) &&
+    (props.inheritedVariablesContainer
+      ? !hasVariablesContainerSubChildren(props.inheritedVariablesContainer)
+      : true);
+
   const useStylesForSelectedTreeItem = makeStyles(() => ({
     root: {
       '&.Mui-selected > .MuiTreeItem-content': {
@@ -457,6 +472,11 @@ const NewVariablesList = (props: Props) => {
       '&.isCollection > .MuiTreeItem-content > .MuiTreeItem-iconContainer': {
         backgroundColor: gdevelopTheme.listItem.selectedBackgroundColor,
       },
+      '& > .MuiTreeItem-content > .MuiTreeItem-iconContainer': shouldHideExpandIcons
+        ? {
+            display: 'none',
+          }
+        : undefined,
     },
   }));
 

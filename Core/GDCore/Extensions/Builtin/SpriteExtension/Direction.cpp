@@ -121,7 +121,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
             polygonElement.GetChild(k);
 
         polygon.vertices.push_back(
-            sf::Vector2f(verticeElement.GetDoubleAttribute("x"),
+            gd::Vector2f(verticeElement.GetDoubleAttribute("x"),
                          verticeElement.GetDoubleAttribute("y")));
       }
 

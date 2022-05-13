@@ -99,7 +99,6 @@ const VariablesEditorDialog = ({
             <Column expand>{DismissableTutorialMessage}</Column>
           </Line>
         )}
-
         <NewVariablesList
           variablesContainer={variablesContainer}
           inheritedVariablesContainer={inheritedVariablesContainer}

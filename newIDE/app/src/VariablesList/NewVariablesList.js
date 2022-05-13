@@ -1200,7 +1200,7 @@ const NewVariablesList = (props: Props) => {
             onKeyDown={keyboardShortcuts.onKeyDown}
             onKeyUp={keyboardShortcuts.onKeyUp}
           >
-            <Column expand noMargin reverse={isNarrow}>
+            <Column expand reverse={isNarrow}>
               <Line justifyContent="space-between" alignItems="center">
                 <Column noMargin>
                   <Line noMargin>

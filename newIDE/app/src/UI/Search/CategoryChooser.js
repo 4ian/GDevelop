@@ -51,6 +51,7 @@ type MemoizedTagsTreeProps = {|
   allItemsLabel: React.Node,
   chosenCategory: ?ChosenCategory,
   setChosenCategory: (?ChosenCategory) => void,
+  setIsOnHomePage: boolean => void,
   allFilters: Filters,
 |};
 
@@ -58,6 +59,7 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
   allItemsLabel,
   chosenCategory,
   setChosenCategory,
+  setIsOnHomePage,
   allFilters,
 }: MemoizedTagsTreeProps) {
   return (
@@ -73,7 +75,10 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
       <TreeItem
         nodeId=""
         label={allItemsLabel}
-        onLabelClick={() => setChosenCategory(null)}
+        onLabelClick={() => {
+          setChosenCategory(null);
+          setIsOnHomePage(false);
+        }}
       />
       <TagsTreeItems
         tagsTreeNodes={allFilters.tagsTree}
@@ -87,12 +92,14 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
 type Props = {|
   allItemsLabel: React.Node,
   filtersState: FiltersState,
+  setIsOnHomePage: boolean => void,
   allFilters: ?Filters,
   error: ?Error,
 |};
 
 export const CategoryChooser = ({
   filtersState,
+  setIsOnHomePage,
   allFilters,
   error,
   allItemsLabel,
@@ -110,6 +117,7 @@ export const CategoryChooser = ({
       allItemsLabel={allItemsLabel}
       chosenCategory={filtersState.chosenCategory}
       setChosenCategory={filtersState.setChosenCategory}
+      setIsOnHomePage={setIsOnHomePage}
       allFilters={allFilters}
     />
   );

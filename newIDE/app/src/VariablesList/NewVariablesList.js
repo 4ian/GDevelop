@@ -143,6 +143,34 @@ const getExpandedNodeIdsFromVariables = (
   return newAccumulator;
 };
 
+const updateListOfNodesFollowingChangeName = (
+  list: string[],
+  oldNodeId: string,
+  newName: string
+) => {
+  const newList: Array<string> = [...list];
+  const indexOfRenamedNode = newList.indexOf(oldNodeId);
+  const indicesOfChildrenOfRenamedNode = newList
+    .map(otherNodeId => {
+      if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
+        return newList.indexOf(otherNodeId);
+      }
+      return null;
+    })
+    .filter(Boolean);
+  const originalNodeIdBits = oldNodeId.split(separator);
+  const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
+  [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
+    .filter(index => index >= 0)
+    .forEach(index => {
+      const nodeIdToChange = newList[index];
+      const bitsToChange = nodeIdToChange.split(separator);
+      bitsToChange[bitsToChange.indexOf(variableName)] = newName;
+      newList.splice(index, 1, bitsToChange.join(separator));
+    });
+  return newList;
+};
+
 const getExpandedNodeIdsFromVariablesContainer = (
   variablesContainer: gdVariablesContainer,
   isInherited: boolean = false
@@ -670,34 +698,14 @@ const NewVariablesList = (props: Props) => {
   };
 
   const updateExpandedAndSelectedNodesFollowingNameChange = (
-    nodeId: string,
+    oldNodeId: string,
     newName: string
   ) => {
     [
       [expandedNodes, setExpandedNodes],
       [selectedNodes, setSelectedNodes],
     ].forEach(([list, setter]) => {
-      const newList: Array<string> = [...list];
-      const indexOfRenamedNode = newList.indexOf(nodeId);
-      const indicesOfChildrenOfRenamedNode = newList
-        .map(otherNodeId => {
-          if (otherNodeId.startsWith(`${nodeId}${separator}`)) {
-            return newList.indexOf(otherNodeId);
-          }
-          return null;
-        })
-        .filter(Boolean);
-      const originalNodeIdBits = nodeId.split(separator);
-      const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
-        .filter(index => index >= 0)
-        .forEach(index => {
-          const nodeIdToChange = newList[index];
-          const bitsToChange = nodeIdToChange.split(separator);
-          bitsToChange[bitsToChange.indexOf(variableName)] = newName;
-          newList.splice(index, 1, bitsToChange.join(separator));
-        });
-      setter(newList);
+      setter(updateListOfNodesFollowingChangeName(list, oldNodeId, newName));
     });
   };
 
@@ -706,36 +714,15 @@ const NewVariablesList = (props: Props) => {
     newParentNodeId: string,
     newName: string
   ) => {
-    [
-      [expandedNodes, setExpandedNodes],
-      [selectedNodes, setSelectedNodes],
-    ].forEach(([list, setter]) => {
-      const newList: Array<string> = [...list];
-      const indexOfRenamedNode = newList.indexOf(oldNodeId);
-      const indicesOfChildrenOfRenamedNode = newList
-        .map(otherNodeId => {
-          if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
-            return newList.indexOf(otherNodeId);
-          }
-          return null;
-        })
-        .filter(Boolean);
-      const originalNodeIdBits = oldNodeId.split(separator);
-      const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-      [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
-        .filter(index => index >= 0)
-        .forEach(index => {
-          const nodeIdToChange = newList[index];
-          const newNodeId = nodeIdToChange.replace(
-            oldNodeId,
-            newParentNodeId
-              ? `${newParentNodeId}${separator}${newName}`
-              : newName
-          );
-          newList.splice(index, 1, newNodeId);
-        });
-      setter(newList);
-    });
+    // TODO: Recompute list of selected nodes following a node move that changes all the values of an array.
+    setSelectedNodes([]);
+    const inheritedExpandedNodes = expandedNodes.filter(nodeId =>
+      nodeId.startsWith(inheritedPrefix)
+    );
+    setExpandedNodes([
+      ...inheritedExpandedNodes,
+      ...getExpandedNodeIdsFromVariablesContainer(props.variablesContainer),
+    ]);
   };
 
   const DragSourceAndDropTarget = React.useMemo(
@@ -833,6 +820,7 @@ const NewVariablesList = (props: Props) => {
     let targetIndex;
     let movementHasBeenMade = true;
     let parentNodeId;
+    let targetParentNodeId;
 
     switch (movementType) {
       case 'InsideTopLevel':
@@ -911,11 +899,11 @@ const NewVariablesList = (props: Props) => {
 
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
         draggedVariableParentVariable.removeAtIndex(draggedIndex);
-        parentNodeId = getDirectParentNodeId(targetLineage);
-        if (parentNodeId)
+        targetParentNodeId = getDirectParentNodeId(targetLineage);
+        if (targetParentNodeId)
           updateExpandedAndSelectedNodesFollowingNodeMove(
             current,
-            parentNodeId,
+            targetParentNodeId,
             targetIndex.toString()
           );
         break;
@@ -930,12 +918,13 @@ const NewVariablesList = (props: Props) => {
           correctedTargetIndex
         );
         parentNodeId = getDirectParentNodeId(targetLineage);
-        if (parentNodeId)
+        if (parentNodeId) {
           updateExpandedAndSelectedNodesFollowingNodeMove(
             current,
             parentNodeId,
             correctedTargetIndex.toString()
           );
+        }
         break;
       case 'FromStructureToArray':
       case 'FromArrayToStructure':
@@ -1456,7 +1445,6 @@ const NewVariablesList = (props: Props) => {
     _saveToHistory();
     forceUpdate();
   };
-  console.log(containerWidth);
 
   const renderTree = (inheritedVariables: boolean = false) => {
     const variablesContainer =

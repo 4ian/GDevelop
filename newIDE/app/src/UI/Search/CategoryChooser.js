@@ -51,7 +51,7 @@ type MemoizedTagsTreeProps = {|
   allItemsLabel: React.Node,
   chosenCategory: ?ChosenCategory,
   setChosenCategory: (?ChosenCategory) => void,
-  setIsOnHomePage: boolean => void,
+  setIsOnHomePage?: boolean => void,
   allFilters: Filters,
 |};
 
@@ -70,14 +70,14 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
           : ''
       }
       defaultExpanded={[]}
-      onNodeSelect={() => setIsOnHomePage(false)}
+      onNodeSelect={() => setIsOnHomePage && setIsOnHomePage(false)}
     >
       <TreeItem
         nodeId=""
         label={allItemsLabel}
         onLabelClick={() => {
           setChosenCategory(null);
-          setIsOnHomePage(false);
+          setIsOnHomePage && setIsOnHomePage(false);
         }}
       />
       <TagsTreeItems
@@ -92,7 +92,7 @@ const MemoizedTagsTree = React.memo<MemoizedTagsTreeProps>(function TagsTree({
 type Props = {|
   allItemsLabel: React.Node,
   filtersState: FiltersState,
-  setIsOnHomePage: boolean => void,
+  setIsOnHomePage?: boolean => void,
   allFilters: ?Filters,
   error: ?Error,
 |};

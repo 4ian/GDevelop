@@ -12,7 +12,6 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { FiltersChooser } from '../UI/Search/FiltersChooser';
-import { FilterPanel } from '../UI/Search/FilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';

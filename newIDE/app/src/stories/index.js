@@ -141,7 +141,6 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
-import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
@@ -157,7 +156,6 @@ import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import { Column, Line } from '../UI/Grid';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
@@ -207,20 +205,11 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
-import { AssetStore } from '../AssetStore';
-import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
-import { AssetCard } from '../AssetStore/AssetCard';
-import { AssetDetails } from '../AssetStore/AssetDetails';
-import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
-import { ResourceStore } from '../AssetStore/ResourceStore';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
-import { ExampleStore } from '../AssetStore/ExampleStore';
-import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
@@ -4565,28 +4554,6 @@ storiesOf('EffectsList', module)
     />
   ));
 
-storiesOf('NewObjectDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AssetStoreStateProvider>
-      <NewObjectDialog
-        project={testProject.project}
-        layout={testProject.testLayout}
-        onClose={action('onClose')}
-        onCreateNewObject={action('onCreateNewObject')}
-        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
-        events={testProject.testLayout.getEvents()}
-        objectsContainer={testProject.testLayout}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-      />
-    </AssetStoreStateProvider>
-  ));
-
 storiesOf('CommandPalette', module)
   .addDecorator(muiDecorator)
   .add('commands', () => (
@@ -4690,122 +4657,6 @@ storiesOf('HotReloadLogsDialog', module)
       ]}
       onClose={() => {}}
       onLaunchNewPreview={() => {}}
-    />
-  ));
-
-storiesOf('AssetStore', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <AssetStoreStateProvider>
-        <AssetStore
-          onOpenDetails={action('onOpenDetails')}
-          events={testProject.testLayout.getEvents()}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout}
-        />
-      </AssetStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('AssetStore/ExampleStore', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExampleStoreStateProvider>
-        <ExampleStore onOpen={action('onOpen')} isOpening={false} />
-      </ExampleStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-storiesOf('AssetStore/ExampleStore/ExampleDialog', module)
-  .addDecorator(muiDecorator)
-  .add('non existing example, from a future version', () => (
-    <ExampleDialog
-      exampleShortHeader={exampleFromFutureVersion}
-      onOpen={action('onOpen')}
-      isOpening={false}
-      onClose={action('onClose')}
-    />
-  ));
-
-storiesOf('AssetStore/ResourceStore', module)
-  .addDecorator(muiDecorator)
-  .add('resourceKind: image', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('resourceKind: audio', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('resourceKind: font', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('resourceKind: svg (for icons)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('AssetStore/AssetCard', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AssetCard
-      size={128}
-      onOpenDetails={action('onOpenDetails')}
-      assetShortHeader={fakeAssetShortHeader1}
-    />
-  ));
-
-storiesOf('AssetStore/AssetDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AssetDetails
-      canInstall={true}
-      isBeingInstalled={false}
-      onAdd={action('onAdd')}
-      onClose={action('onClose')}
-      assetShortHeader={fakeAssetShortHeader1}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout}
-      layout={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-    />
-  ))
-  .add('being installed', () => (
-    <AssetDetails
-      canInstall={false}
-      isBeingInstalled={true}
-      onAdd={action('onAdd')}
-      onClose={action('onClose')}
-      assetShortHeader={fakeAssetShortHeader1}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout}
-      layout={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
     />
   ));
 
@@ -5036,68 +4887,6 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       </AuthenticatedUserContext.Provider>
     );
   });
-
-storiesOf('AssetStore/ExtensionStore', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExtensionStoreStateProvider>
-        <ExtensionStore
-          project={testProject.project}
-          isInstalling={false}
-          onInstall={action('onInstall')}
-          showOnlyWithBehaviors={false}
-        />
-      </ExtensionStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('is installing', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExtensionStoreStateProvider>
-        <ExtensionStore
-          project={testProject.project}
-          isInstalling={true}
-          onInstall={action('onInstall')}
-          showOnlyWithBehaviors={false}
-        />
-      </ExtensionStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('showOnlyWithBehaviors', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExtensionStoreStateProvider>
-        <ExtensionStore
-          project={testProject.project}
-          isInstalling={false}
-          onInstall={action('onInstall')}
-          showOnlyWithBehaviors={true}
-        />
-      </ExtensionStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('AssetStore/ExtensionsSearchDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <I18n>
-      {({ i18n }) => (
-        <EventsFunctionsExtensionsProvider
-          i18n={i18n}
-          makeEventsFunctionCodeWriter={() => null}
-          eventsFunctionsExtensionWriter={null}
-          eventsFunctionsExtensionOpener={null}
-        >
-          <ExtensionStoreStateProvider>
-            <ExtensionsSearchDialog
-              project={testProject.project}
-              onClose={action('on close')}
-              onInstallExtension={action('onInstallExtension')}
-            />
-          </ExtensionStoreStateProvider>
-        </EventsFunctionsExtensionsProvider>
-      )}
-    </I18n>
-  ));
 
 storiesOf('GamesShowcase', module)
   .addDecorator(muiDecorator)

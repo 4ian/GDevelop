@@ -342,7 +342,7 @@ void removeFromVectorVector2f(std::vector<gd::Vector2f> &vec, size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
-void moveVector2fInVector(std::vector<sf::Vector2f> &vec,
+void moveVector2fInVector(std::vector<gd::Vector2f> &vec,
                  size_t oldIndex,
                  size_t newIndex) {
   if (oldIndex >= vec.size() || newIndex >= vec.size()) return;

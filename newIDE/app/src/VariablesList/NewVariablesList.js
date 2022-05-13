@@ -48,6 +48,7 @@ import {
   getHistoryInitialState,
   saveToHistory,
 } from '../Utils/History';
+import { ClickAwayListener } from '@material-ui/core';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -1474,223 +1475,230 @@ const NewVariablesList = (props: Props) => {
   };
 
   return (
-    <Measure
-      bounds
-      onResize={contentRect => {
-        setContainerWidth(contentRect.bounds.width);
-      }}
-    >
-      {({ contentRect, measureRef }) => (
-        <div
-          style={{ flex: 1, display: 'flex' }}
-          onKeyDown={keyboardShortcuts.onKeyDown}
-          onKeyUp={keyboardShortcuts.onKeyUp}
-        >
-          <Column expand noMargin reverse={isNarrow}>
-            <Line justifyContent="space-between" alignItems="center">
-              <Column noMargin>
-                <Line noMargin>
-                  {isNarrow ? (
-                    <IconButton
-                      tooltip={t`Copy`}
-                      onClick={copySelection}
-                      size="small"
-                      disabled={selectedNodes.length === 0}
-                    >
-                      <Copy />
-                    </IconButton>
-                  ) : (
-                    <FlatButton
-                      icon={<Copy />}
-                      disabled={selectedNodes.length === 0}
-                      label={<Trans>Copy</Trans>}
-                      onClick={copySelection}
-                    />
-                  )}
-                  <Spacer />
-                  {isNarrow ? (
-                    <IconButton
-                      tooltip={t`Paste`}
-                      onClick={pasteSelection}
-                      size="small"
-                      disabled={
-                        !Clipboard.has(CLIPBOARD_KIND) ||
-                        selectedNodes.some(nodeId =>
-                          nodeId.startsWith(inheritedPrefix)
-                        )
-                      }
-                    >
-                      <Paste />
-                    </IconButton>
-                  ) : (
-                    <FlatButton
-                      icon={<Paste />}
-                      label={<Trans>Paste</Trans>}
-                      disabled={
-                        !Clipboard.has(CLIPBOARD_KIND) ||
-                        selectedNodes.some(nodeId =>
-                          nodeId.startsWith(inheritedPrefix)
-                        )
-                      }
-                      onClick={pasteSelection}
-                    />
-                  )}
-                  <Spacer />
-                  {isNarrow ? (
-                    <IconButton
-                      tooltip={t`Delete`}
-                      onClick={deleteSelection}
-                      size="small"
-                      disabled={
-                        selectedNodes.length === 0 ||
-                        selectedNodes.some(nodeId =>
-                          nodeId.startsWith(inheritedPrefix)
-                        )
-                      }
-                    >
-                      <Delete />
-                    </IconButton>
-                  ) : (
-                    <FlatButton
-                      icon={<Delete />}
-                      label={<Trans>Delete</Trans>}
-                      disabled={
-                        selectedNodes.length === 0 ||
-                        selectedNodes.some(nodeId =>
-                          nodeId.startsWith(inheritedPrefix)
-                        )
-                      }
-                      onClick={deleteSelection}
-                    />
-                  )}
-                  {/* // TODO: Remove those buttons once tests are over */}
-                  <Spacer />
-                  {isNarrow ? (
-                    <IconButton
-                      tooltip={t`Undo`}
-                      onClick={_undo}
-                      size="small"
-                      disabled={!canUndo(history)}
-                    >
-                      <Undo />
-                    </IconButton>
-                  ) : (
-                    <FlatButton
-                      icon={<Undo />}
-                      label={<Trans>Undo</Trans>}
-                      onClick={_undo}
-                      disabled={!canUndo(history)}
-                    />
-                  )}
-                  <Spacer />
-                  {isNarrow ? (
-                    <IconButton
-                      tooltip={t`Redo`}
-                      onClick={_redo}
-                      size="small"
-                      disabled={!canRedo(history)}
-                    >
-                      <Redo />
-                    </IconButton>
-                  ) : (
-                    <FlatButton
-                      icon={<Redo />}
-                      label={<Trans>Redo</Trans>}
-                      onClick={_redo}
-                      disabled={!canRedo(history)}
-                    />
-                  )}
-                </Line>
-              </Column>
-              <Column expand>
-                <TextField
-                  fullWidth
-                  value={searchText}
-                  onChange={(event, value) => setSearchText(value)}
-                  endAdornment={
-                    !!searchText ? (
-                      <IconButton onClick={() => setSearchText('')} edge="end">
-                        <Close />
+    <ClickAwayListener onClickAway={() => setSelectedNodes([])}>
+      <Measure
+        bounds
+        onResize={contentRect => {
+          setContainerWidth(contentRect.bounds.width);
+        }}
+      >
+        {({ contentRect, measureRef }) => (
+          <div
+            style={{ flex: 1, display: 'flex' }}
+            onKeyDown={keyboardShortcuts.onKeyDown}
+            onKeyUp={keyboardShortcuts.onKeyUp}
+          >
+            <Column expand noMargin reverse={isNarrow}>
+              <Line justifyContent="space-between" alignItems="center">
+                <Column noMargin>
+                  <Line noMargin>
+                    {isNarrow ? (
+                      <IconButton
+                        tooltip={t`Copy`}
+                        onClick={copySelection}
+                        size="small"
+                        disabled={selectedNodes.length === 0}
+                      >
+                        <Copy />
                       </IconButton>
-                    ) : null
-                  }
-                  hintText={t`Search in variables`}
-                />
-              </Column>
-              <Column noMargin>
-                {isNarrow ? (
-                  <IconButton
-                    tooltip={t`Add variable`}
-                    onClick={onAdd}
-                    size="small"
-                  >
-                    <Add />
-                  </IconButton>
-                ) : (
-                  <FlatButton
-                    primary
-                    onClick={onAdd}
-                    label={<Trans>Add variable</Trans>}
-                    icon={<Add />}
+                    ) : (
+                      <FlatButton
+                        icon={<Copy />}
+                        disabled={selectedNodes.length === 0}
+                        label={<Trans>Copy</Trans>}
+                        onClick={copySelection}
+                      />
+                    )}
+                    <Spacer />
+                    {isNarrow ? (
+                      <IconButton
+                        tooltip={t`Paste`}
+                        onClick={pasteSelection}
+                        size="small"
+                        disabled={
+                          !Clipboard.has(CLIPBOARD_KIND) ||
+                          selectedNodes.some(nodeId =>
+                            nodeId.startsWith(inheritedPrefix)
+                          )
+                        }
+                      >
+                        <Paste />
+                      </IconButton>
+                    ) : (
+                      <FlatButton
+                        icon={<Paste />}
+                        label={<Trans>Paste</Trans>}
+                        disabled={
+                          !Clipboard.has(CLIPBOARD_KIND) ||
+                          selectedNodes.some(nodeId =>
+                            nodeId.startsWith(inheritedPrefix)
+                          )
+                        }
+                        onClick={pasteSelection}
+                      />
+                    )}
+                    <Spacer />
+                    {isNarrow ? (
+                      <IconButton
+                        tooltip={t`Delete`}
+                        onClick={deleteSelection}
+                        size="small"
+                        disabled={
+                          selectedNodes.length === 0 ||
+                          selectedNodes.some(nodeId =>
+                            nodeId.startsWith(inheritedPrefix)
+                          )
+                        }
+                      >
+                        <Delete />
+                      </IconButton>
+                    ) : (
+                      <FlatButton
+                        icon={<Delete />}
+                        label={<Trans>Delete</Trans>}
+                        disabled={
+                          selectedNodes.length === 0 ||
+                          selectedNodes.some(nodeId =>
+                            nodeId.startsWith(inheritedPrefix)
+                          )
+                        }
+                        onClick={deleteSelection}
+                      />
+                    )}
+                    {/* // TODO: Remove those buttons once tests are over */}
+                    <Spacer />
+                    {isNarrow ? (
+                      <IconButton
+                        tooltip={t`Undo`}
+                        onClick={_undo}
+                        size="small"
+                        disabled={!canUndo(history)}
+                      >
+                        <Undo />
+                      </IconButton>
+                    ) : (
+                      <FlatButton
+                        icon={<Undo />}
+                        label={<Trans>Undo</Trans>}
+                        onClick={_undo}
+                        disabled={!canUndo(history)}
+                      />
+                    )}
+                    <Spacer />
+                    {isNarrow ? (
+                      <IconButton
+                        tooltip={t`Redo`}
+                        onClick={_redo}
+                        size="small"
+                        disabled={!canRedo(history)}
+                      >
+                        <Redo />
+                      </IconButton>
+                    ) : (
+                      <FlatButton
+                        icon={<Redo />}
+                        label={<Trans>Redo</Trans>}
+                        onClick={_redo}
+                        disabled={!canRedo(history)}
+                      />
+                    )}
+                  </Line>
+                </Column>
+                <Column expand>
+                  <TextField
+                    fullWidth
+                    value={searchText}
+                    onChange={(event, value) => setSearchText(value)}
+                    endAdornment={
+                      !!searchText ? (
+                        <IconButton
+                          onClick={() => setSearchText('')}
+                          edge="end"
+                        >
+                          <Close />
+                        </IconButton>
+                      ) : null
+                    }
+                    hintText={t`Search in variables`}
                   />
-                )}
-              </Column>
-            </Line>
-            {props.variablesContainer.count() === 0 ? (
-              <Column noMargin expand justifyContent="center">
-                <EmptyPlaceholder
-                  title={<Trans>Add a variable</Trans>}
-                  description={<Trans>Store data in variables.</Trans>}
-                  actionLabel={<Trans>Add a variable</Trans>}
-                  onAdd={onAdd}
-                />
-              </Column>
-            ) : (
-              <ScrollView autoHideScrollbar>
-                <TreeView
-                  ref={measureRef}
-                  multiSelect
-                  defaultExpandIcon={<ChevronRight />}
-                  defaultCollapseIcon={<ExpandMore />}
-                  onNodeSelect={(event, values) => setSelectedNodes(values)}
-                  onNodeToggle={(event, values) => {
-                    // Inherited variables should not be modified
-                    const instanceExpandedNodes = expandedNodes.filter(
-                      node => !node.startsWith(inheritedPrefix)
-                    );
-                    const instanceNewExpandedNodes = values.filter(
-                      node => !node.startsWith(inheritedPrefix)
-                    );
-                    const foldedNodes = instanceExpandedNodes.filter(
-                      node => !instanceNewExpandedNodes.includes(node)
-                    );
-                    const unfoldedNodes = instanceNewExpandedNodes.filter(
-                      node => !instanceExpandedNodes.includes(node)
-                    );
-                    foldNodesVariables(
-                      props.variablesContainer,
-                      foldedNodes,
-                      true
-                    );
-                    foldNodesVariables(
-                      props.variablesContainer,
-                      unfoldedNodes,
-                      false
-                    );
-                    setExpandedNodes(values);
-                  }}
-                  selected={selectedNodes}
-                  expanded={expandedNodes}
-                >
-                  {props.inheritedVariablesContainer ? renderTree(true) : null}
-                  {renderTree()}
-                </TreeView>
-              </ScrollView>
-            )}
-          </Column>
-        </div>
-      )}
-    </Measure>
+                </Column>
+                <Column noMargin>
+                  {isNarrow ? (
+                    <IconButton
+                      tooltip={t`Add variable`}
+                      onClick={onAdd}
+                      size="small"
+                    >
+                      <Add />
+                    </IconButton>
+                  ) : (
+                    <FlatButton
+                      primary
+                      onClick={onAdd}
+                      label={<Trans>Add variable</Trans>}
+                      icon={<Add />}
+                    />
+                  )}
+                </Column>
+              </Line>
+              {props.variablesContainer.count() === 0 ? (
+                <Column noMargin expand justifyContent="center">
+                  <EmptyPlaceholder
+                    title={<Trans>Add a variable</Trans>}
+                    description={<Trans>Store data in variables.</Trans>}
+                    actionLabel={<Trans>Add a variable</Trans>}
+                    onAdd={onAdd}
+                  />
+                </Column>
+              ) : (
+                <ScrollView autoHideScrollbar>
+                  <TreeView
+                    ref={measureRef}
+                    multiSelect
+                    defaultExpandIcon={<ChevronRight />}
+                    defaultCollapseIcon={<ExpandMore />}
+                    onNodeSelect={(event, values) => setSelectedNodes(values)}
+                    onNodeToggle={(event, values) => {
+                      // Inherited variables should not be modified
+                      const instanceExpandedNodes = expandedNodes.filter(
+                        node => !node.startsWith(inheritedPrefix)
+                      );
+                      const instanceNewExpandedNodes = values.filter(
+                        node => !node.startsWith(inheritedPrefix)
+                      );
+                      const foldedNodes = instanceExpandedNodes.filter(
+                        node => !instanceNewExpandedNodes.includes(node)
+                      );
+                      const unfoldedNodes = instanceNewExpandedNodes.filter(
+                        node => !instanceExpandedNodes.includes(node)
+                      );
+                      foldNodesVariables(
+                        props.variablesContainer,
+                        foldedNodes,
+                        true
+                      );
+                      foldNodesVariables(
+                        props.variablesContainer,
+                        unfoldedNodes,
+                        false
+                      );
+                      setExpandedNodes(values);
+                    }}
+                    selected={selectedNodes}
+                    expanded={expandedNodes}
+                  >
+                    {props.inheritedVariablesContainer
+                      ? renderTree(true)
+                      : null}
+                    {renderTree()}
+                  </TreeView>
+                </ScrollView>
+              )}
+            </Column>
+          </div>
+        )}
+      </Measure>
+    </ClickAwayListener>
   );
 };
 

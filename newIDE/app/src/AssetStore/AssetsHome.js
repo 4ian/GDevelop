@@ -16,6 +16,7 @@ import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import ThemeContext from '../UI/Theme/ThemeContext';
 
 const columns = 3;
 const columnsForSmallWindow = 2;
@@ -64,64 +65,57 @@ export const AssetsHome = ({
 }: Props) => {
   const classesForGridListItem = useStylesForGridListItem();
   const windowWidth = useResponsiveWindowWidth();
+  const gdevelopTheme = React.useContext(ThemeContext);
 
   return (
-    <ThemeConsumer>
-      {muiTheme => (
-        <ScrollView>
-          <GridList
-            cols={windowWidth === 'small' ? columnsForSmallWindow : columns}
-            style={styles.grid}
-            cellHeight="auto"
-            spacing={cellSpacing}
+    <ScrollView>
+      <GridList
+        cols={windowWidth === 'small' ? columnsForSmallWindow : columns}
+        style={styles.grid}
+        cellHeight="auto"
+        spacing={cellSpacing}
+      >
+        {starterPacks.map((pack, index) => (
+          <GridListTile
+            classes={classesForGridListItem}
+            key={pack.tag}
+            tabIndex={0}
+            onKeyPress={(
+              event: SyntheticKeyboardEvent<HTMLLIElement>
+            ): void => {
+              if (shouldValidate(event)) {
+                onPackSelection(pack.tag);
+              }
+            }}
+            onClick={() => onPackSelection(pack.tag)}
           >
-            {starterPacks.map((pack, index) => (
-              <GridListTile
-                classes={classesForGridListItem}
-                key={pack.tag}
-                tabIndex={0}
-                onKeyPress={(
-                  event: SyntheticKeyboardEvent<HTMLLIElement>
-                ): void => {
-                  if (shouldValidate(event)) {
-                    onPackSelection(pack.tag);
-                  }
-                }}
-                onClick={() => onPackSelection(pack.tag)}
-              >
-                <Paper
-                  elevation={2}
-                  style={{
-                    ...styles.paper,
-                    backgroundColor: muiTheme.list.itemsBackgroundColor,
-                  }}
-                >
-                  <CorsAwareImage
-                    key={pack.name}
-                    style={styles.previewImage}
-                    src={pack.thumbnailUrl}
-                    alt={pack.name}
-                  />
-                  <Column>
-                    <Line justifyContent="space-between" noMargin>
-                      <Text style={styles.packTitle} size="body2">
-                        {pack.name}
-                      </Text>
-                      <Text
-                        style={styles.packTitle}
-                        color="primary"
-                        size="body2"
-                      >
-                        {pack.assetsCount} <Trans>Assets</Trans>
-                      </Text>
-                    </Line>
-                  </Column>
-                </Paper>
-              </GridListTile>
-            ))}
-          </GridList>
-        </ScrollView>
-      )}
-    </ThemeConsumer>
+            <Paper
+              elevation={2}
+              style={{
+                ...styles.paper,
+                backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+              }}
+            >
+              <CorsAwareImage
+                key={pack.name}
+                style={styles.previewImage}
+                src={pack.thumbnailUrl}
+                alt={pack.name}
+              />
+              <Column>
+                <Line justifyContent="space-between" noMargin>
+                  <Text style={styles.packTitle} size="body2">
+                    {pack.name}
+                  </Text>
+                  <Text style={styles.packTitle} color="primary" size="body2">
+                    {pack.assetsCount} <Trans>Assets</Trans>
+                  </Text>
+                </Line>
+              </Column>
+            </Paper>
+          </GridListTile>
+        ))}
+      </GridList>
+    </ScrollView>
   );
 };

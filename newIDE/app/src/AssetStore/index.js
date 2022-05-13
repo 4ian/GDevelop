@@ -84,7 +84,7 @@ export const AssetStore = ({
             placeholder={t`Enter your Search`}
             value={searchText}
             onChange={setSearchText}
-            onRequestSearch={() => {}}
+            onRequestSearch={() => setIsOnHomePage(false)}
             style={styles.searchBar}
             ref={searchBar}
             id="asset-store-search-bar"
@@ -147,6 +147,7 @@ export const AssetStore = ({
                       allItemsLabel={<Trans>All assets</Trans>}
                       allFilters={filters}
                       filtersState={filtersState}
+                      setIsOnHomePage={setIsOnHomePage}
                       error={error}
                     />
                     <Subheader>

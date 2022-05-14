@@ -4,6 +4,7 @@ declare class gdExpressionCodeGenerationInformation {
   setStatic(): gdExpressionCodeGenerationInformation;
   setIncludeFile(includeFile: string): gdExpressionCodeGenerationInformation;
   addIncludeFile(includeFile: string): gdExpressionCodeGenerationInformation;
+  getIncludeFiles(): gdVectorString;
   delete(): void;
   ptr: number;
 };

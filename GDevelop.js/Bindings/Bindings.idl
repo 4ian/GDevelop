@@ -1098,6 +1098,7 @@ interface ExtraInformation {
     [Ref] ExtraInformation SetMutators([Const, Ref] MapStringString mutators);
     [Ref] ExtraInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExtraInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionCodeGenerationInformation {
@@ -1105,6 +1106,7 @@ interface ExpressionCodeGenerationInformation {
     [Ref] ExpressionCodeGenerationInformation SetStatic();
     [Ref] ExpressionCodeGenerationInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExpressionCodeGenerationInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface InstructionMetadata {

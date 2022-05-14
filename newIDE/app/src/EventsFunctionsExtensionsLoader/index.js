@@ -211,7 +211,7 @@ const generateEventsFunctionExtension = (
       // a -> (b -> c)
       // b -> c
       // c -> d
-      // 
+      //
       // or from c to a:
       // a -> b
       // b -> (c -> d)

@@ -28,6 +28,10 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
     functionTypeStr = "Expression";
   else if (functionType == StringExpression)
     functionTypeStr = "StringExpression";
+  else if (functionType == ExpressionAndCondition)
+    functionTypeStr = "ExpressionAndCondition";
+  else if (functionType == StringExpressionAndCondition)
+    functionTypeStr = "StringExpressionAndCondition";
   element.SetAttribute("functionType", functionTypeStr);
 
   gd::SerializerElement& parametersElement = element.AddChild("parameters");
@@ -56,6 +60,10 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
     functionType = Expression;
   else if (functionTypeStr == "StringExpression")
     functionType = StringExpression;
+  else if (functionTypeStr == "ExpressionAndCondition")
+    functionType = ExpressionAndCondition;
+  else if (functionTypeStr == "StringExpressionAndCondition")
+    functionType = StringExpressionAndCondition;
   else
     functionType = Action;
 

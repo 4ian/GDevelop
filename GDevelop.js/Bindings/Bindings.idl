@@ -1209,6 +1209,12 @@ interface InstructionMetadata {
     [Ref] InstructionMetadata MarkAsComplex();
 
     [Ref] ExtraInformation GetCodeExtraInformation();
+
+    [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName);
+
+    [Ref] InstructionMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] InstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionMetadata {
@@ -1249,6 +1255,12 @@ interface ExpressionMetadata {
     [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
+
+    [Ref] ExpressionCodeGenerationInformation SetFunctionName([Const] DOMString functionName);
+
+    [Ref] ExpressionMetadata SetIncludeFile([Const] DOMString includeFile);
+    [Ref] ExpressionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface MultipleInstructionMetadata {
@@ -1270,10 +1282,12 @@ interface MultipleInstructionMetadata {
 
     [Ref] MultipleInstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] MultipleInstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 
     [Ref] MultipleInstructionMetadata MarkAsSimple();
     [Ref] MultipleInstructionMetadata MarkAsAdvanced();
     [Ref] MultipleInstructionMetadata MarkAsComplex();
+    [Ref] MultipleInstructionMetadata SetPrivate();
 };
 
 interface DependencyMetadata {
@@ -2241,7 +2255,9 @@ enum EventsFunction_FunctionType {
   "EventsFunction::Action",
   "EventsFunction::Condition",
   "EventsFunction::Expression",
-  "EventsFunction::StringExpression"
+  "EventsFunction::StringExpression",
+  "EventsFunction::ExpressionAndCondition",
+  "EventsFunction::StringExpressionAndCondition"
 };
 
 interface EventsFunction {

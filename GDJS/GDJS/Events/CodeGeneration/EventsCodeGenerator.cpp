@@ -560,10 +560,14 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(
   if (eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
     return "return !!eventsFunctionContext.returnValue;";
   } else if (eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::Expression) {
+             gd::EventsFunction::Expression
+          || eventsFunction.GetFunctionType() ==
+             gd::EventsFunction::ExpressionAndCondition) {
     return "return Number(eventsFunctionContext.returnValue) || 0;";
   } else if (eventsFunction.GetFunctionType() ==
-             gd::EventsFunction::StringExpression) {
+             gd::EventsFunction::StringExpression
+          || eventsFunction.GetFunctionType() ==
+             gd::EventsFunction::StringExpressionAndCondition) {
     return "return \"\" + eventsFunctionContext.returnValue;";
   }
 

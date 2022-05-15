@@ -258,6 +258,22 @@ class GD_CORE_API ExpressionMetadata {
     return codeExtraInformation;
   };
 
+  /**
+   * \brief Erase any existing include file and add the specified include.
+   */
+  ExpressionMetadata &SetIncludeFile(const gd::String &includeFile) {
+    GetCodeExtraInformation().SetIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Add a file to the already existing include files.
+   */
+  ExpressionMetadata &AddIncludeFile(const gd::String &includeFile) {
+    GetCodeExtraInformation().AddIncludeFile(includeFile);
+    return *this;
+  }
+
   ExpressionCodeGenerationInformation codeExtraInformation;
 
   bool IsShown() const { return shown; }

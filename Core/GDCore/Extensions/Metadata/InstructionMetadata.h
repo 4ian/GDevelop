@@ -463,6 +463,22 @@ class GD_CORE_API InstructionMetadata {
     return codeExtraInformation.SetFunctionName(functionName);
   }
 
+  /**
+   * \brief Erase any existing include file and add the specified include.
+   */
+  InstructionMetadata &SetIncludeFile(const gd::String &includeFile) {
+    GetCodeExtraInformation().SetIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Add a file to the already existing include files.
+   */
+  InstructionMetadata &AddIncludeFile(const gd::String &includeFile) {
+    GetCodeExtraInformation().AddIncludeFile(includeFile);
+    return *this;
+  }
+
   std::vector<ParameterMetadata> parameters;
 
  private:

@@ -56,11 +56,20 @@ const getSentenceErrorText = (
     ? ParametersIndexOffsets.ObjectFunction
     : ParametersIndexOffsets.FreeFunction;
 
+  const type = eventsFunction.getFunctionType();
+  const param0isImplicit =
+    eventsBasedBehavior &&
+    (type === gd.EventsFunction.ExpressionAndCondition ||
+      type === gd.EventsFunction.StringExpressionAndCondition);
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
     (parameter, index) => {
       if (gd.ParameterMetadata.isBehavior(parameter.getType())) {
-        return null; // Behaviors are usually not shown in sentences.
+        // Behaviors are usually not shown in sentences.
+        return null;
+      }
+      if (index === 0 && param0isImplicit) {
+        return null;
       }
 
       const expectedString = `_PARAM${index + parametersIndexOffset}_`;
@@ -214,8 +223,16 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     primaryText={t`Expression`}
                   />
                   <SelectOption
+                    value={gd.EventsFunction.ExpressionAndCondition}
+                    primaryText={t`Expression and condition`}
+                  />
+                  <SelectOption
                     value={gd.EventsFunction.StringExpression}
                     primaryText={t`String Expression`}
+                  />
+                  <SelectOption
+                    value={gd.EventsFunction.StringExpressionAndCondition}
+                    primaryText={t`String Expression and condition`}
                   />
                 </SelectField>
               </Line>
@@ -258,7 +275,15 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               <SemiControlledTextField
                 commitOnBlur
                 floatingLabelText={
-                  <Trans>Description, displayed in editor</Trans>
+                  type === gd.EventsFunction.ExpressionAndCondition ||
+                  type === gd.EventsFunction.StringExpressionAndCondition ? (
+                    <Trans>
+                      Description, displayed in editor (automatically prefixed
+                      by "Compare" or "Return")
+                    </Trans>
+                  ) : (
+                    <Trans>Description, displayed in editor</Trans>
+                  )
                 }
                 translatableHintText={getDescriptionHintText(type)}
                 fullWidth
@@ -273,10 +298,24 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             </Line>
             <Line noMargin>
               {type === gd.EventsFunction.Action ||
-              type === gd.EventsFunction.Condition ? (
+              type === gd.EventsFunction.Condition ||
+              type === gd.EventsFunction.ExpressionAndCondition ||
+              type === gd.EventsFunction.StringExpressionAndCondition ? (
                 <SemiControlledTextField
                   commitOnBlur
-                  floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}
+                  floatingLabelText={
+                    eventsBasedBehavior &&
+                    (type === gd.EventsFunction.ExpressionAndCondition ||
+                      type ===
+                        gd.EventsFunction.StringExpressionAndCondition) ? (
+                      <Trans>
+                        Sentence in Events Sheet (automatically suffixed by "of
+                        _PARAM0_")
+                      </Trans>
+                    ) : (
+                      <Trans>Sentence in Events Sheet</Trans>
+                    )
+                  }
                   translatableHintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                   fullWidth
                   value={eventsFunction.getSentence()}

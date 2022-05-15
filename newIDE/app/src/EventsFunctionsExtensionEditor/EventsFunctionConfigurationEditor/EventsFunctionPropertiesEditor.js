@@ -189,8 +189,16 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     primaryText={t`Expression`}
                   />
                   <SelectOption
+                    value={gd.EventsFunction.ExpressionAndCondition}
+                    primaryText={t`Expression and condition`}
+                  />
+                  <SelectOption
                     value={gd.EventsFunction.StringExpression}
                     primaryText={t`String Expression`}
+                  />
+                  <SelectOption
+                    value={gd.EventsFunction.StringExpressionAndCondition}
+                    primaryText={t`String Expression and condition`}
                   />
                 </SelectField>
               </Line>
@@ -248,7 +256,9 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
             </Line>
             <Line noMargin>
               {type === gd.EventsFunction.Action ||
-              type === gd.EventsFunction.Condition ? (
+              type === gd.EventsFunction.Condition ||
+              type === gd.EventsFunction.ExpressionAndCondition ||
+              type === gd.EventsFunction.StringExpressionAndCondition ? (
                 <SemiControlledTextField
                   commitOnBlur
                   floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}

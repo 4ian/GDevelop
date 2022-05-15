@@ -428,8 +428,7 @@ function generateBehavior(
 
       if (eventsFunction.isPrivate()) instructionOrExpression.setPrivate();
 
-      const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
-      codeExtraInformation
+      instructionOrExpression
         .setIncludeFile(includeFile)
         .setFunctionName(eventsFunctionMangledName);
     });

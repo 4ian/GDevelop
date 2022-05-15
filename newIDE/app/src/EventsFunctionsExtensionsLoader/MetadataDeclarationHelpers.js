@@ -255,6 +255,26 @@ export const declareInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
+  } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    return extension.addExpressionAndCondition(
+      'number',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    return extension.addExpressionAndCondition(
+      'string',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
   } else if (functionType === gd.EventsFunction.Condition) {
     return extension.addCondition(
       eventsFunction.getName(),
@@ -287,7 +307,10 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
   behaviorMetadata: gdBehaviorMetadata,
   eventsBasedBehavior: gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction
-): gdInstructionMetadata | gdExpressionMetadata => {
+):
+  | gdInstructionMetadata
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
     return behaviorMetadata.addExpression(
@@ -307,6 +330,26 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       eventsFunction.getGroup() ||
         eventsBasedBehavior.getFullName() ||
         eventsBasedBehavior.getName(),
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    return behaviorMetadata.addExpressionAndCondition(
+      'number',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsFunction.getGroup() || '',
+      getExtensionIconUrl(extension)
+    );
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    return behaviorMetadata.addExpressionAndCondition(
+      'string',
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
     );
   } else if (functionType === gd.EventsFunction.Condition) {
@@ -580,7 +623,7 @@ export const declareEventsFunctionParameters = (
         instructionOrExpression.addParameter(
           parameter.getType(),
           parameter.getDescription(),
-          '', // See below for adding the extra information
+          parameter.getExtraInfo(), // See below for adding the extra information
           parameter.isOptional()
         );
         instructionOrExpression.setParameterLongDescription(
@@ -590,17 +633,24 @@ export const declareEventsFunctionParameters = (
       } else {
         instructionOrExpression.addCodeOnlyParameter(
           parameter.getType(),
-          '' // See below for adding the extra information
+          parameter.getExtraInfo() // See below for adding the extra information
         );
       }
       // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
       // as these methods are prefixing the value passed with the extension namespace (this
       // was done to ease extension declarations when dealing with object).
-      instructionOrExpression
-        .getParameter(instructionOrExpression.getParametersCount() - 1)
-        .setExtraInfo(parameter.getExtraInfo());
+      //   instructionOrExpression
+      //     .getParameter(instructionOrExpression.getParametersCount() - 1)
+      //     .setExtraInfo(parameter.getExtraInfo());
     }
   );
+
+  const functionType = eventsFunction.getFunctionType();
+  if (functionType === gd.EventsFunction.ExpressionAndCondition) {
+    instructionOrExpression.useStandardParameters('number');
+  } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
+    instructionOrExpression.useStandardParameters('string');
+  }
 
   // By convention, latest parameter is always the eventsFunctionContext of the calling function
   // (if any).

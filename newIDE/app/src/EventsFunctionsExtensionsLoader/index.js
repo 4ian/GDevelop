@@ -304,7 +304,7 @@ const generateFreeFunction = (
  * @param functionInfos free function metadatas
  */
 const applyFunctionDependencyTransitivity = (
-  functionInfos: gdInstructionMetadata | gdExpressionMetadata
+  functionInfos: Array<gdInstructionMetadata | gdExpressionMetadata>
 ): void => {
   // Note that the iteration order doesn't matter, for instance for:
   // a -> b

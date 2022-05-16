@@ -51,6 +51,7 @@ export type Leaderboard = {|
   visibility: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
   primary?: boolean,
+  extremeAllowedScore?: number,
 |};
 
 export type LeaderboardUpdatePayload = {|
@@ -60,6 +61,7 @@ export type LeaderboardUpdatePayload = {|
   visibility?: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
   primary?: boolean,
+  extremeAllowedScore?: number | null,
 |};
 
 export type LeaderboardEntry = {|

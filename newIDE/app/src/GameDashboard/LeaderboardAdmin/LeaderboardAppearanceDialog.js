@@ -197,6 +197,7 @@ function LeaderboardAppearanceDialog({
           }}
           secondaryActions={[
             <HelpButton
+              key="help"
               helpPagePath="/interface/games-dashboard/leaderboard-administration"
               anchor="change_the_appearance_of_a_leaderboard"
             />,

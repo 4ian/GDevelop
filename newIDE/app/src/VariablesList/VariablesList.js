@@ -108,7 +108,7 @@ const StyledTreeItem = withStyles(theme => ({
   root: {
     '&:focus:not(.Mui-selected)': {
       '& > .MuiTreeItem-content': {
-        filter: 'brightness(0.85)',
+        filter: 'brightness(1.15)',
       },
       '& > .MuiTreeItem-content > .MuiTreeItem-label': {
         backgroundColor: 'unset',
@@ -116,12 +116,12 @@ const StyledTreeItem = withStyles(theme => ({
     },
     '&:hover:not(:focus)': {
       '& > .MuiTreeItem-content:hover': {
-        filter: 'brightness(0.93)',
+        filter: 'brightness(1.07)',
       },
     },
     '&.Mui-selected:hover': {
       '& > .MuiTreeItem-content:hover': {
-        filter: 'brightness(0.93)',
+        filter: 'brightness(1.07)',
       },
     },
   },

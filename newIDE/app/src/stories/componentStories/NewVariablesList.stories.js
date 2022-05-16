@@ -15,6 +15,14 @@ export const Default = () => (
     <FixedHeightFlexContainer height={600}>
       <NewVariablesList
         variablesContainer={testProject.testLayout.getVariables()}
+        emptyPlaceholderDescription="Variables help you store data"
+        emptyPlaceholderTitle="Variables"
+        helpPagePath="/variables"
+        onComputeAllVariableNames={() => [
+          'VariableFromEventSheet',
+          'VariableFromSomeWhere',
+          'InstanceVariable', // already defined variable in testSpriteObjectInstance
+        ]}
       />
     </FixedHeightFlexContainer>
   </DragAndDropContextProvider>
@@ -25,6 +33,9 @@ export const InstanceWithObjectVariables = () => (
     <FixedHeightFlexContainer height={600}>
       <NewVariablesList
         variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
+        emptyPlaceholderDescription="Variables help you store data"
+        emptyPlaceholderTitle="Variables"
+        helpPagePath="/variables"
         inheritedVariablesContainer={testProject.spriteObject.getVariables()}
         onComputeAllVariableNames={() => [
           'VariableFromEventSheet',

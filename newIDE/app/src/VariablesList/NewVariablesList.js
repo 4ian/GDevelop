@@ -1153,9 +1153,9 @@ const NewVariablesList = (props: Props) => {
     forceUpdate();
   };
 
-  const renderTree = (inheritedVariables: boolean = false) => {
+  const renderTree = (isInherited: boolean = false) => {
     const variablesContainer =
-      inheritedVariables && props.inheritedVariablesContainer
+      isInherited && props.inheritedVariablesContainer
         ? props.inheritedVariablesContainer
         : props.variablesContainer;
     const containerVariablesTree = mapFor(
@@ -1164,7 +1164,7 @@ const NewVariablesList = (props: Props) => {
       index => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
-        if (inheritedVariables) {
+        if (isInherited) {
           if (props.variablesContainer.has(name)) {
             return null;
           }
@@ -1173,7 +1173,7 @@ const NewVariablesList = (props: Props) => {
         return renderVariableAndChildrenRows({
           name,
           variable,
-          isInherited: inheritedVariables,
+          isInherited,
         });
       }
     );
@@ -1222,7 +1222,9 @@ const NewVariablesList = (props: Props) => {
                 searchText={searchText}
                 onChangeSearchText={setSearchText}
               />
-              {props.variablesContainer.count() === 0 ? (
+              {props.variablesContainer.count() === 0 &&
+              (!props.inheritedVariablesContainer ||
+                props.inheritedVariablesContainer.count() === 0) ? (
                 <Column noMargin expand justifyContent="center">
                   {props.emptyPlaceholderTitle &&
                   props.emptyPlaceholderDescription ? (

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import { IconButton, TextField } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
 
 import Add from '@material-ui/icons/Add';
 import Undo from '@material-ui/icons/Undo';
@@ -13,6 +13,7 @@ import Paste from '../UI/CustomSvgIcons/Paste';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
+import TextField from '../UI/TextField';
 
 type Props = {|
   isNarrow: boolean,

@@ -131,7 +131,7 @@ const StyledTreeItem = withStyles(theme => ({
       backgroundColor: 'unset',
     },
   },
-  content: { marginTop: 5, backgroundColor: '#E4E4E4' },
+  content: { marginTop: 5 },
 }))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
 
 const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
@@ -172,6 +172,9 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
 
   const useStylesForSelectedTreeItem = makeStyles(() => ({
     root: {
+      '& > .MuiTreeItem-content': {
+        backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+      },
       '&.Mui-selected > .MuiTreeItem-content': {
         marginTop: 5,
         backgroundColor: gdevelopTheme.listItem.selectedBackgroundColor,

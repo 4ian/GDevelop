@@ -403,6 +403,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   undo = () => {
+    // TODO: Do not clear selection so that the user can actually see
+    // the changes it is undoing (variable change, instance moved, etc.)
+    // or find a way to display a sumup of the change such as "Variable XXX
+    // in instance of Enemy changed to YYY"
     this.instancesSelection.clearSelection();
     this.setState(
       {

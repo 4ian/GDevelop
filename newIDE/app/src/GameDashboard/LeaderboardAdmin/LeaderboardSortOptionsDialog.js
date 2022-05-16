@@ -20,9 +20,6 @@ import Checkbox from '../../UI/Checkbox';
 import { FormHelperText } from '@material-ui/core';
 import { MarkdownText } from '../../UI/MarkdownText';
 
-const isWholeNumber = (value: any): boolean =>
-  value === null || Number.isInteger(value);
-
 type SortOptions = {|
   sort: LeaderboardSortOption,
   extremeAllowedScore: ?number,
@@ -30,7 +27,7 @@ type SortOptions = {|
 
 type Props = {
   open: boolean,
-  sort?: LeaderboardSortOption,
+  sort: LeaderboardSortOption,
   extremeAllowedScore?: number,
   onSave: SortOptions => Promise<void>,
   onClose: () => void,
@@ -82,10 +79,10 @@ function LeaderboardSortOptionsDialog({
         return;
       }
     }
-    if (!isWholeNumber(extremeAllowedScoreValue)) {
+    if (isNaN(extremeAllowedScoreValue)) {
       setExtremeAllowedScoreError(
         i18n._(
-          t`The extreme score must be a whole number between ${extremeAllowedScoreMin} and ${extremeAllowedScoreMax}.`
+          t`Limit cannot be empty, uncheck or fill a value between ${extremeAllowedScoreMin} and ${extremeAllowedScoreMax}.`
         )
       );
       return;
@@ -168,9 +165,9 @@ function LeaderboardSortOptionsDialog({
                   <FormHelperText style={{ display: 'inline' }}>
                     <MarkdownText
                       source={i18n._(
-                        `Any submitted score that is ${
-                          sortOrder === 'ASC' ? 'lower' : 'higher'
-                        } than the set value will not be saved in the leaderboard.`
+                        sortOrder === 'ASC'
+                          ? `Any submitted score that is lower than the set value will not be saved in the leaderboard.`
+                          : `Any submitted score that is higher than the set value will not be saved in the leaderboard.`
                       )}
                     />
                   </FormHelperText>
@@ -192,9 +189,11 @@ function LeaderboardSortOptionsDialog({
                   fullWidth
                   type="number"
                   floatingLabelText={
-                    <Trans>
-                      {sortOrder === 'ASC' ? 'Minimum' : 'Maximum'} score
-                    </Trans>
+                    sortOrder === 'ASC' ? (
+                      <Trans>Minimum score</Trans>
+                    ) : (
+                      <Trans>Maximum score</Trans>
+                    )
                   }
                   value={extremeAllowedScoreValue}
                   errorText={extremeAllowedScoreError}
@@ -205,7 +204,7 @@ function LeaderboardSortOptionsDialog({
                       setExtremeAllowedScoreError(null);
                     }
 
-                    setExtremeAllowedScoreValue(parseInt(newValue));
+                    setExtremeAllowedScoreValue(parseFloat(newValue));
                   }}
                 />
               </Line>

@@ -152,6 +152,28 @@ const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
   ),
 });
 
+const getExtremeAllowedScoreText = (
+  i18n: I18nType,
+  currentLeaderboard: Leaderboard
+) => {
+  const maxOrMin =
+    currentLeaderboard.sort === 'ASC' ? i18n._(t`min`) : i18n._(t`max`);
+  if (
+    currentLeaderboard.extremeAllowedScore === null ||
+    currentLeaderboard.extremeAllowedScore === undefined
+  ) {
+    return '';
+  }
+  let customizedScoreText = currentLeaderboard.extremeAllowedScore;
+  if (currentLeaderboard.customizationSettings) {
+    customizedScoreText = formatScore(
+      currentLeaderboard.extremeAllowedScore,
+      currentLeaderboard.customizationSettings.scoreFormatting
+    );
+  }
+  return ` (${maxOrMin}: ${customizedScoreText})`;
+};
+
 export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
@@ -489,25 +511,6 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       </Line>
     );
 
-  const getExtremeAllowedScoreText = (currentLeaderboard: Leaderboard) => {
-    const maxOrMin = currentLeaderboard.sort === 'ASC' ? 'min' : 'max';
-    if (
-      currentLeaderboard.extremeAllowedScore === null ||
-      currentLeaderboard.extremeAllowedScore === undefined
-    ) {
-      return '';
-    }
-    let customizedScoreText = currentLeaderboard.extremeAllowedScore;
-    if (currentLeaderboard.customizationSettings) {
-      customizedScoreText = formatScore(
-        // $FlowIgnore
-        currentLeaderboard.extremeAllowedScore,
-        currentLeaderboard.customizationSettings.scoreFormatting
-      );
-    }
-    return ` (${maxOrMin}: ${customizedScoreText})`;
-  };
-
   const getLeaderboardDescription = (
     i18n: I18nType,
     currentLeaderboard: Leaderboard
@@ -647,14 +650,14 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
             <Trans>
               Lower is better
               {currentLeaderboard
-                ? getExtremeAllowedScoreText(currentLeaderboard)
+                ? getExtremeAllowedScoreText(i18n, currentLeaderboard)
                 : ''}
             </Trans>
           ) : (
             <Trans>
               Higher is better
               {currentLeaderboard
-                ? getExtremeAllowedScoreText(currentLeaderboard)
+                ? getExtremeAllowedScoreText(i18n, currentLeaderboard)
                 : ''}
             </Trans>
           )}
@@ -1024,7 +1027,11 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                   setIsEditingSortOptions(false);
                 }
               }}
-              sort={currentLeaderboard ? currentLeaderboard.sort : undefined}
+              sort={
+                isEditingSortOptions && currentLeaderboard
+                  ? currentLeaderboard.sort
+                  : 'ASC'
+              }
               extremeAllowedScore={
                 currentLeaderboard
                   ? currentLeaderboard.extremeAllowedScore

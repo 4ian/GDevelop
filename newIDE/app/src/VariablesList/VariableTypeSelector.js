@@ -19,7 +19,7 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const TypeOptions = () => [
+const options = [
   <SelectOption primaryText="String" value={gd.Variable.String} />,
   <SelectOption primaryText="Number" value={gd.Variable.Number} />,
   <SelectOption primaryText="Boolean" value={gd.Variable.Boolean} />,
@@ -77,7 +77,7 @@ const VariableTypeSelector = (props: Props) => {
         }
         disabled={props.disabled}
       >
-        <TypeOptions />
+        {options}
       </SelectField>
     </div>
   );

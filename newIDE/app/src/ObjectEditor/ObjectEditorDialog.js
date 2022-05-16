@@ -23,7 +23,7 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
-import NewVariablesList from '../VariablesList/NewVariablesList';
+import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 const gd: libGDevelop = global.gd;
@@ -241,7 +241,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 <Column expand>{DismissableTutorialMessage}</Column>
               </Line>
             )}
-          <NewVariablesList
+          <VariablesList
             variablesContainer={props.object.getVariables()}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>

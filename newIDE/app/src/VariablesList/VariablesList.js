@@ -130,7 +130,7 @@ const StyledTreeItem = withStyles(theme => ({
   content: { marginTop: 5, backgroundColor: '#E4E4E4' },
 }))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
 
-const NewVariablesList = (props: Props) => {
+const VariablesList = (props: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
     getExpandedNodeIdsFromVariablesContainer(props.variablesContainer).concat(
       props.inheritedVariablesContainer
@@ -1262,4 +1262,4 @@ const NewVariablesList = (props: Props) => {
   );
 };
 
-export default NewVariablesList;
+export default VariablesList;

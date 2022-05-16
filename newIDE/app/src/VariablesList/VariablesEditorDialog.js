@@ -9,7 +9,7 @@ import HotReloadPreviewButton, {
 } from '../HotReload/HotReloadPreviewButton';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 import { Column, Line } from '../UI/Grid';
-import NewVariablesList from './NewVariablesList';
+import VariablesList from './VariablesList';
 import HelpButton from '../UI/HelpButton';
 
 type Props = {|
@@ -99,7 +99,7 @@ const VariablesEditorDialog = ({
             <Column expand>{DismissableTutorialMessage}</Column>
           </Line>
         )}
-        <NewVariablesList
+        <VariablesList
           variablesContainer={variablesContainer}
           inheritedVariablesContainer={inheritedVariablesContainer}
           emptyPlaceholderTitle={emptyPlaceholderTitle}

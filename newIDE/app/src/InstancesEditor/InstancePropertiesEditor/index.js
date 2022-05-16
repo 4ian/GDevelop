@@ -18,7 +18,7 @@ import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
-import NewVariablesList from '../../VariablesList/NewVariablesList';
+import VariablesList from '../../VariablesList/VariablesList';
 
 type Props = {|
   project: gdProject,
@@ -190,7 +190,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
             </Line>
           </Column>
           {object ? (
-            <NewVariablesList
+            <VariablesList
               inheritedVariablesContainer={object.getVariables()}
               variablesContainer={instance.getVariables()}
               size="small"

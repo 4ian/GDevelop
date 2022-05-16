@@ -5,7 +5,7 @@ import paperDecorator from '../PaperDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
-import NewVariablesList from '../../VariablesList/NewVariablesList';
+import VariablesList from '../../VariablesList/VariablesList';
 import SerializedObjectDisplay from '../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
@@ -13,7 +13,7 @@ import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
-      <NewVariablesList
+      <VariablesList
         variablesContainer={testProject.testLayout.getVariables()}
         emptyPlaceholderDescription="Variables help you store data"
         emptyPlaceholderTitle="Variables"
@@ -31,7 +31,7 @@ export const Default = () => (
 export const InstanceWithObjectVariables = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
-      <NewVariablesList
+      <VariablesList
         variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
         emptyPlaceholderDescription="Variables help you store data"
         emptyPlaceholderTitle="Variables"
@@ -48,7 +48,7 @@ export const InstanceWithObjectVariables = () => (
 );
 
 export default {
-  title: 'NewVariablesList',
-  component: NewVariablesList,
+  title: 'VariablesList',
+  component: VariablesList,
   decorators: [paperDecorator, muiDecorator, GDevelopJsInitializerDecorator],
 };

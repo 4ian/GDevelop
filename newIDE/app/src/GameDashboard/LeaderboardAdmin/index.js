@@ -28,7 +28,6 @@ import Update from '@material-ui/icons/Update';
 import Today from '@material-ui/icons/Today';
 import Sort from '@material-ui/icons/Sort';
 import PeopleAlt from '@material-ui/icons/PeopleAlt';
-import SwapVertical from '@material-ui/icons/SwapVert';
 import Refresh from '@material-ui/icons/Refresh';
 import Delete from '@material-ui/icons/Delete';
 import Visibility from '@material-ui/icons/Visibility';
@@ -65,6 +64,9 @@ import Text from '../../UI/Text';
 import { GameRegistration } from '../GameRegistration';
 import LeaderboardAppearanceDialog from './LeaderboardAppearanceDialog';
 import FlatButton from '../../UI/FlatButton';
+import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
+import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
+import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 
 type Props = {| onLoading: boolean => void, project?: gdProject |};
 type ContainerProps = {| ...Props, gameId: string |};
@@ -156,6 +158,10 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
     false
   );
+  const [
+    isEditingSortOptions,
+    setIsEditingSortOptions,
+  ] = React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
   const [isRequestPending, setIsRequestPending] = React.useState<boolean>(
     false
@@ -483,6 +489,25 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       </Line>
     );
 
+  const getExtremeAllowedScoreText = (currentLeaderboard: Leaderboard) => {
+    const maxOrMin = currentLeaderboard.sort === 'ASC' ? 'min' : 'max';
+    if (
+      currentLeaderboard.extremeAllowedScore === null ||
+      currentLeaderboard.extremeAllowedScore === undefined
+    ) {
+      return '';
+    }
+    let customizedScoreText = currentLeaderboard.extremeAllowedScore;
+    if (currentLeaderboard.customizationSettings) {
+      customizedScoreText = formatScore(
+        // $FlowIgnore
+        currentLeaderboard.extremeAllowedScore,
+        currentLeaderboard.customizationSettings.scoreFormatting
+      );
+    }
+    return ` (${maxOrMin}: ${customizedScoreText})`;
+  };
+
   const getLeaderboardDescription = (
     i18n: I18nType,
     currentLeaderboard: Leaderboard
@@ -619,9 +644,19 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       text: (
         <Text size="body2">
           {currentLeaderboard.sort === 'ASC' ? (
-            <Trans>Lower is better</Trans>
+            <Trans>
+              Lower is better
+              {currentLeaderboard
+                ? getExtremeAllowedScoreText(currentLeaderboard)
+                : ''}
+            </Trans>
           ) : (
-            <Trans>Higher is better</Trans>
+            <Trans>
+              Higher is better
+              {currentLeaderboard
+                ? getExtremeAllowedScoreText(currentLeaderboard)
+                : ''}
+            </Trans>
           )}
         </Text>
       ),
@@ -633,16 +668,12 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
         ) : null,
       secondaryAction: (
         <IconButton
-          onClick={async () => {
-            await onUpdateLeaderboard(i18n, {
-              sort: currentLeaderboard.sort === 'ASC' ? 'DESC' : 'ASC',
-            });
-          }}
-          tooltip={t`Change sort direction`}
+          onClick={() => setIsEditingSortOptions(true)}
+          tooltip={t`Edit`}
           edge="end"
           disabled={isRequestPending || isEditingName}
         >
-          <SwapVertical />
+          <Brush />
         </IconButton>
       ),
     },
@@ -975,6 +1006,30 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                   setIsEditingAppearance(false);
                 }
               }}
+            />
+          ) : null}
+          {isEditingSortOptions ? (
+            <LeaderboardSortOptionsDialog
+              open
+              onClose={() => setIsEditingSortOptions(false)}
+              onSave={async (sortOptions: {|
+                sort: LeaderboardSortOption,
+                extremeAllowedScore: ?number,
+              |}) => {
+                try {
+                  await onUpdateLeaderboard(i18n, {
+                    ...sortOptions,
+                  });
+                } finally {
+                  setIsEditingSortOptions(false);
+                }
+              }}
+              sort={currentLeaderboard ? currentLeaderboard.sort : undefined}
+              extremeAllowedScore={
+                currentLeaderboard
+                  ? currentLeaderboard.extremeAllowedScore
+                  : undefined
+              }
             />
           ) : null}
         </>

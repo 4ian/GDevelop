@@ -106,15 +106,14 @@ const LeaderboardEntriesTable = ({
                   </TableCell>
                   <TableCell>
                     <Line>
-                      <Tooltip title={'Remove entry'}>
-                        <IconButton
-                          size="small"
-                          onClick={() => onDeleteEntry(entry.id)}
-                          disabled={isLoading}
-                        >
-                          <DeleteOutline size={20} />
-                        </IconButton>
-                      </Tooltip>
+                      <IconButton
+                        size="small"
+                        onClick={() => onDeleteEntry(entry.id)}
+                        disabled={isLoading}
+                        tooltip={t`Remove entry`}
+                      >
+                        <DeleteOutline size={20} />
+                      </IconButton>
                       {erroredEntry && erroredEntry.entryId === entry.id ? (
                         <Tooltip title={erroredEntry.message}>
                           <IconButton

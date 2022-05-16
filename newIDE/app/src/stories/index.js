@@ -62,7 +62,6 @@ import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
-import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
@@ -3473,18 +3472,6 @@ storiesOf('BehaviorsEditor', module)
         onChooseResource={() => Promise.reject('Unimplemented')}
         resourceExternalEditors={fakeResourceExternalEditors}
         onUpdateBehaviorsSharedData={() => {}}
-      />
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('VariablesList', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <VariablesList
-        variablesContainer={testProject.testLayout.getVariables()}
-        onComputeAllVariableNames={() => []}
       />
     </SerializedObjectDisplay>
   ));

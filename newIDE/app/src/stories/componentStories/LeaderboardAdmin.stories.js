@@ -30,6 +30,7 @@ const mockedLeaderboards = Array(5)
     playerUnicityDisplayChoice: index % 2 === 0 ? 'PREFER_UNIQUE' : 'FREE',
     visibility: index % 3 === 0 ? 'HIDDEN' : 'PUBLIC',
     primary: index === primaryLeaderboardIndex ? true : undefined,
+    extremeAllowedScore: index % 2 === 0 ? 100 : undefined,
   }));
 const mockedEntries = Array(8)
   .fill(0)

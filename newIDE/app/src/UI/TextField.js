@@ -47,7 +47,7 @@ type Props = {|
   }) => void,
 
   // Advanced DOM events, for exceptional usage:
-  onClick?: () => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,

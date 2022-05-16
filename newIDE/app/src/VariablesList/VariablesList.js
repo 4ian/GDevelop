@@ -130,7 +130,7 @@ const StyledTreeItem = withStyles(theme => ({
   content: { marginTop: 5, backgroundColor: '#E4E4E4' },
 }))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
 
-const VariablesList = (props: Props) => {
+const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
     getExpandedNodeIdsFromVariablesContainer(props.variablesContainer).concat(
       props.inheritedVariablesContainer
@@ -147,8 +147,9 @@ const VariablesList = (props: Props) => {
     })
   );
   const [searchText, setSearchText] = React.useState<string>('');
-  const [allVariablesNames] = React.useState<?Array<string>>(
-    props.onComputeAllVariableNames ? props.onComputeAllVariableNames() : null
+  const allVariablesNames = React.useMemo<?Array<string>>(
+    () => (onComputeAllVariableNames ? onComputeAllVariableNames() : null),
+    [onComputeAllVariableNames]
   );
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);

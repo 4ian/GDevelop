@@ -39,6 +39,7 @@ type Props = {|
   helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,
+  maxLength?: number,
   max?: number,
   min?: number,
   multiline?: boolean,

@@ -135,7 +135,7 @@ function LeaderboardSortOptionsDialog({
           <Text size="title">
             <Trans>Sort order</Trans>
           </Text>
-          <ColumnStackLayout>
+          <ColumnStackLayout noMargin>
             <SelectField
               fullWidth
               value={sortOrder}

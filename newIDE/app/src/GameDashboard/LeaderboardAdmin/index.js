@@ -991,7 +991,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
               }}
             />
           ) : null}
-          {isEditingSortOptions ? (
+          {isEditingSortOptions && currentLeaderboard ? (
             <LeaderboardSortOptionsDialog
               open
               onClose={() => setIsEditingSortOptions(false)}
@@ -1007,16 +1007,8 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                   setIsEditingSortOptions(false);
                 }
               }}
-              sort={
-                isEditingSortOptions && currentLeaderboard
-                  ? currentLeaderboard.sort
-                  : 'ASC'
-              }
-              extremeAllowedScore={
-                currentLeaderboard
-                  ? currentLeaderboard.extremeAllowedScore
-                  : undefined
-              }
+              sort={currentLeaderboard.sort}
+              extremeAllowedScore={currentLeaderboard.extremeAllowedScore}
             />
           ) : null}
         </>

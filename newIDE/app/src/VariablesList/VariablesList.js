@@ -678,7 +678,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       newVariable,
       props.variablesContainer.count()
     );
-    _saveToHistory()
+    _saveToHistory();
     setSelectedNodes([inheritedVariableName]);
     setExpandedNodes([...expandedNodes, inheritedVariableName]);
     newVariable.delete();

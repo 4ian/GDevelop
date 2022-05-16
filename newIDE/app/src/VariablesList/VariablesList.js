@@ -1,12 +1,14 @@
 // @flow
 import * as React from 'react';
 import Measure from 'react-measure';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import { ClickAwayListener } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { makeStyles, withStyles } from '@material-ui/styles';
 
 import Add from '@material-ui/icons/Add';
+import Edit from '@material-ui/icons/Edit';
+import Replay from '@material-ui/icons/Replay';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import SwapHorizontal from '@material-ui/icons/SwapHoriz';
@@ -72,6 +74,8 @@ const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
 const preventEventDefaultEffect = (
   event: SyntheticPointerEvent<HTMLInputElement>
 ) => event.preventDefault();
+
+const styles = { inlineIcon: { padding: 0 }, handlePlaceholder: { width: 24 } };
 
 type Props = {
   variablesContainer: gdVariablesContainer,
@@ -361,29 +365,36 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     setSelectedNodes(newSelectedNodes);
   };
 
-  const deleteSelection = () => {
-    let hasBeenDeleted = false;
-    selectedNodes.forEach(nodeId => {
-      if (nodeId.startsWith(inheritedPrefix)) return;
-      const { name, lineage } = getVariableContextFromNodeId(
-        nodeId,
-        props.variablesContainer
-      );
-      if (!name) return;
-      const parentVariable = getDirectParentVariable(lineage);
-      if (!parentVariable) {
-        props.variablesContainer.remove(name);
+  const _deleteNode = (nodeId: string): boolean => {
+    if (nodeId.startsWith(inheritedPrefix)) return false;
+    const { name, lineage } = getVariableContextFromNodeId(
+      nodeId,
+      props.variablesContainer
+    );
+    if (!name) return false;
+    const parentVariable = getDirectParentVariable(lineage);
+    if (!parentVariable) {
+      props.variablesContainer.remove(name);
+    } else {
+      if (parentVariable.getType() === gd.Variable.Array) {
+        parentVariable.removeAtIndex(parseInt(name, 10));
       } else {
-        if (parentVariable.getType() === gd.Variable.Array) {
-          parentVariable.removeAtIndex(parseInt(name, 10));
-        } else {
-          parentVariable.removeChild(name);
-        }
+        parentVariable.removeChild(name);
       }
-      hasBeenDeleted = true;
-    });
-    if (hasBeenDeleted) {
+    }
+    return true;
+  };
+
+  const deleteNode = (nodeId: string): void => {
+    const success = _deleteNode(nodeId);
+    if (success) {
       _saveToHistory();
+    }
+  };
+
+  const deleteSelection = () => {
+    const deleteSuccesses = selectedNodes.map(_deleteNode);
+    if (deleteSuccesses.some(Boolean)) {
       setSelectedNodes([]);
     }
   };
@@ -649,6 +660,30 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     setExpandedNodes([...expandedNodes, nodeId]);
   };
 
+  const editInheritedVariable = (nodeId: string): void => {
+    if (!props.inheritedVariablesContainer) return;
+    const {
+      variable: inheritedVariable,
+      name: inheritedVariableName,
+    } = getVariableContextFromNodeId(nodeId, props.inheritedVariablesContainer);
+    if (!inheritedVariable || !inheritedVariableName) return;
+    if (props.variablesContainer.has(inheritedVariableName)) return;
+    const newVariable = new gd.Variable();
+    unserializeFromJSObject(
+      newVariable,
+      serializeToJSObject(inheritedVariable)
+    );
+    props.variablesContainer.insert(
+      inheritedVariableName,
+      newVariable,
+      props.variablesContainer.count()
+    );
+    _saveToHistory()
+    setSelectedNodes([inheritedVariableName]);
+    setExpandedNodes([...expandedNodes, inheritedVariableName]);
+    newVariable.delete();
+  };
+
   const onAdd = () => {
     const addAtTopLevel =
       selectedNodes.length === 0 ||
@@ -799,7 +834,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                   }}
                 >
                   {isInherited ? (
-                    <span style={{ width: 24 }} />
+                    <span style={styles.handlePlaceholder} />
                   ) : (
                     connectDragSource(
                       <span>
@@ -898,7 +933,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                   <Spacer />
                                   <IconButton
                                     size="small"
-                                    style={{ padding: 0 }}
+                                    style={styles.inlineIcon}
                                     onClick={() => {
                                       onChangeValue(
                                         nodeId,
@@ -953,13 +988,52 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         {isCollection && !isInherited ? (
                           <IconButton
                             size="small"
-                            style={{ padding: 0 }}
+                            style={styles.inlineIcon}
+                            tooltip={t`Add child`}
                             onClick={event => {
                               stopEventPropagation(event);
                               onAddChild(nodeId);
                             }}
                           >
                             <Add
+                              htmlColor={
+                                isSelected
+                                  ? gdevelopTheme.listItem.selectedTextColor
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                        ) : null}
+                        {isCollection && isInherited && isTopLevel ? (
+                          <IconButton
+                            size="small"
+                            tooltip={t`Edit`}
+                            style={styles.inlineIcon}
+                            onClick={event => {
+                              stopEventPropagation(event);
+                              editInheritedVariable(nodeId);
+                            }}
+                          >
+                            <Edit
+                              htmlColor={
+                                isSelected
+                                  ? gdevelopTheme.listItem.selectedTextColor
+                                  : undefined
+                              }
+                            />
+                          </IconButton>
+                        ) : null}
+                        {overwritesInheritedVariable && isTopLevel ? (
+                          <IconButton
+                            size="small"
+                            tooltip={t`Reset`}
+                            style={styles.inlineIcon}
+                            onClick={event => {
+                              stopEventPropagation(event);
+                              deleteNode(nodeId);
+                            }}
+                          >
+                            <Replay
                               htmlColor={
                                 isSelected
                                   ? gdevelopTheme.listItem.selectedTextColor

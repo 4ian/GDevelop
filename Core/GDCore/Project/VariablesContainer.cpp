@@ -88,7 +88,6 @@ Variable& VariablesContainer::Insert(const gd::String& name,
   }
 }
 
-#if defined(GD_IDE_ONLY)
 void VariablesContainer::Remove(const gd::String& varName) {
   variables.erase(
       std::remove_if(
@@ -157,7 +156,6 @@ void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
   variables.erase(variables.begin() + oldIndex);
   variables.insert(variables.begin() + newIndex, nameAndVariable);
 }
-#endif
 
 void VariablesContainer::SerializeTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("variable");

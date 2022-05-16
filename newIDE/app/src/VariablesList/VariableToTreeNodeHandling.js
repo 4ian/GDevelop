@@ -136,24 +136,21 @@ export const updateListOfNodesFollowingChangeName = (
 ) => {
   const newList: Array<string> = [...list];
   const indexOfRenamedNode = newList.indexOf(oldNodeId);
-  const indicesOfChildrenOfRenamedNode = newList
-    .map(otherNodeId => {
-      if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
-        return newList.indexOf(otherNodeId);
-      }
-      return null;
-    })
-    .filter(Boolean);
+  const indicesOfChildrenOfRenamedNode = newList.map(otherNodeId => {
+    if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
+      return newList.indexOf(otherNodeId);
+    }
+    return null;
+  });
   const originalNodeIdBits = oldNodeId.split(separator);
   const variableName = originalNodeIdBits[originalNodeIdBits.length - 1];
-  [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode]
-    .filter(index => index >= 0)
-    .forEach(index => {
-      const nodeIdToChange = newList[index];
-      const bitsToChange = nodeIdToChange.split(separator);
-      bitsToChange[bitsToChange.indexOf(variableName)] = newName;
-      newList.splice(index, 1, bitsToChange.join(separator));
-    });
+  [indexOfRenamedNode, ...indicesOfChildrenOfRenamedNode].forEach(index => {
+    if (index === null || index < 0) return;
+    const nodeIdToChange = newList[index];
+    const bitsToChange = nodeIdToChange.split(separator);
+    bitsToChange[bitsToChange.indexOf(variableName)] = newName;
+    newList.splice(index, 1, bitsToChange.join(separator));
+  });
   return newList;
 };
 

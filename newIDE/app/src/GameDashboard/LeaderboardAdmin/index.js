@@ -153,27 +153,21 @@ const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
 });
 
 const getSortOrderText = (currentLeaderboard: Leaderboard) => {
-  const isExtremeScoreLimited = !(
-    currentLeaderboard.extremeAllowedScore === null ||
-    currentLeaderboard.extremeAllowedScore === undefined
-  );
-  if (currentLeaderboard.sort === 'ASC') {
-    if (isExtremeScoreLimited) {
-      return (
-        <Trans>
-          Lower is better (min: {currentLeaderboard.extremeAllowedScore})
-        </Trans>
-      );
+  if (currentLeaderboard.extremeAllowedScore !== undefined) {
+    const formattedScore = currentLeaderboard.customizationSettings
+      ? formatScore(
+          currentLeaderboard.extremeAllowedScore,
+          currentLeaderboard.customizationSettings.scoreFormatting
+        )
+      : currentLeaderboard.extremeAllowedScore;
+    if (currentLeaderboard.sort === 'ASC') {
+      return <Trans>Lower is better (min: {formattedScore})</Trans>;
     }
-    return <Trans>Lower is better</Trans>;
+    return <Trans>Higher is better (max: {formattedScore})</Trans>;
   }
 
-  if (isExtremeScoreLimited) {
-    return (
-      <Trans>
-        Higher is better (max: {currentLeaderboard.extremeAllowedScore})
-      </Trans>
-    );
+  if (currentLeaderboard.sort === 'ASC') {
+    return <Trans>Lower is better</Trans>;
   }
   return <Trans>Higer is better</Trans>;
 };

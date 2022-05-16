@@ -89,7 +89,7 @@ const VariablesListToolbar = (props: Props) => {
         <Line noMargin>
           {buttonsToDisplay.map(
             ({ key, Icon, label, tooltip, onClick, disabled }, index) => (
-              <>
+              <React.Fragment key={key}>
                 {index > 0 ? <Spacer /> : null}
                 {props.isNarrow ? (
                   <IconButton
@@ -103,13 +103,14 @@ const VariablesListToolbar = (props: Props) => {
                   </IconButton>
                 ) : (
                   <FlatButton
+                    key={key}
                     icon={<Icon />}
                     disabled={disabled}
                     label={label}
                     onClick={onClick}
                   />
                 )}
-              </>
+              </React.Fragment>
             )
           )}
         </Line>
@@ -135,6 +136,7 @@ const VariablesListToolbar = (props: Props) => {
       <Column noMargin>
         {props.isNarrow ? (
           <IconButton
+            key="add-variable"
             tooltip={t`Add variable`}
             onClick={props.onAdd}
             size="small"
@@ -144,6 +146,7 @@ const VariablesListToolbar = (props: Props) => {
         ) : (
           <FlatButton
             primary
+            key="add-variable"
             onClick={props.onAdd}
             label={<Trans>Add variable</Trans>}
             icon={<Add />}

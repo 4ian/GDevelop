@@ -859,7 +859,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         }}
                       />
                       <Spacer />
-                      <Spacer />
                     </Line>
                     <div style={shouldWrap ? undefined : rowRightSideStyle}>
                       <Line noMargin alignItems="center">

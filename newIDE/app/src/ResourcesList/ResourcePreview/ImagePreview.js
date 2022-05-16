@@ -249,6 +249,7 @@ const ImagePreview = (props: Props) => {
           height: imageHeight ? imageHeight * imageZoomFactor : undefined,
           visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
           border: `1px solid ${frameBorderColor}`,
+          boxSizing: 'border-box',
         };
 
         const overlayStyle = {

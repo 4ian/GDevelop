@@ -115,14 +115,13 @@ const LeaderboardEntriesTable = ({
                         <DeleteOutline size={20} />
                       </IconButton>
                       {erroredEntry && erroredEntry.entryId === entry.id ? (
-                        <Tooltip title={erroredEntry.message}>
-                          <IconButton
-                            size="small"
-                            onClick={() => {}} // wrap in icon button to match above icon padding
-                          >
-                            <Error size={20} color="error" />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          size="small"
+                          onClick={() => {}} // wrap in icon button to match above icon padding
+                          tooltip={erroredEntry.message}
+                        >
+                          <Error size={20} color="error" />
+                        </IconButton>
                       ) : null}
                     </Line>
                   </TableCell>

@@ -735,6 +735,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     }
     const isSelected = selectedNodes.includes(nodeId);
     const overwritesInheritedVariable =
+      isTopLevel &&
       !isInherited &&
       props.inheritedVariablesContainer &&
       props.inheritedVariablesContainer.has(name);

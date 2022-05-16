@@ -778,6 +778,7 @@ const VariablesList = (props: Props) => {
       >
         {({ connectDragSource, connectDropTarget, isOver, canDrop }) => (
           <StyledTreeItem
+            tabIndex={-1} // necessary because MUI sets tabindex=0 on selected li, adding unnecessary additional step for tab nav
             nodeId={nodeId}
             className={
               isCollection && variable.getChildrenCount() > 0

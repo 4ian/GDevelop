@@ -33,139 +33,125 @@ type Props = {|
   onChangeSearchText: string => void,
 |};
 
-const VariablesListToolbar = (props: Props) => (
-  <Line justifyContent="space-between" alignItems="center">
-    <Column noMargin>
-      <Line noMargin>
-        {props.isNarrow ? (
-          <IconButton
-            tooltip={t`Copy`}
-            onClick={props.onCopy}
-            size="small"
-            disabled={!props.canCopy}
-          >
-            <Copy />
-          </IconButton>
-        ) : (
-          <FlatButton
-            icon={<Copy />}
-            disabled={!props.canCopy}
-            label={<Trans>Copy</Trans>}
-            onClick={props.onCopy}
-          />
-        )}
-        <Spacer />
-        {props.isNarrow ? (
-          <IconButton
-            tooltip={t`Paste`}
-            onClick={props.onPaste}
-            size="small"
-            disabled={!props.canPaste}
-          >
-            <Paste />
-          </IconButton>
-        ) : (
-          <FlatButton
-            icon={<Paste />}
-            label={<Trans>Paste</Trans>}
-            disabled={!props.canPaste}
-            onClick={props.onPaste}
-          />
-        )}
-        <Spacer />
-        {props.isNarrow ? (
-          <IconButton
-            tooltip={t`Delete`}
-            onClick={props.onDelete}
-            size="small"
-            disabled={!props.canDelete}
-          >
-            <Delete />
-          </IconButton>
-        ) : (
-          <FlatButton
-            icon={<Delete />}
-            label={<Trans>Delete</Trans>}
-            disabled={!props.canDelete}
-            onClick={props.onDelete}
-          />
-        )}
-        {props.hideHistoryChangeButtons ? null : (
-          <>
-            <Spacer />
-            {props.isNarrow ? (
+const VariablesListToolbar = (props: Props) => {
+  const buttons = [
+    {
+      key: 'copy',
+      Icon: Copy,
+      label: <Trans>Copy</Trans>,
+      tooltip: t`Copy`,
+      onClick: props.onCopy,
+      disabled: !props.canCopy,
+      display: true,
+    },
+    {
+      key: 'paste',
+      Icon: Paste,
+      label: <Trans>Paste</Trans>,
+      tooltip: t`Paste`,
+      onClick: props.onPaste,
+      disabled: !props.canPaste,
+      display: true,
+    },
+    {
+      key: 'delete',
+      Icon: Delete,
+      label: <Trans>Delete</Trans>,
+      tooltip: t`Delete`,
+      onClick: props.onDelete,
+      disabled: !props.canDelete,
+      display: true,
+    },
+    {
+      key: 'undo',
+      Icon: Undo,
+      label: <Trans>Undo</Trans>,
+      tooltip: t`Undo`,
+      onClick: props.onUndo,
+      disabled: !props.canUndo,
+      display: !props.hideHistoryChangeButtons,
+    },
+    {
+      key: 'redo',
+      Icon: Redo,
+      label: <Trans>Redo</Trans>,
+      tooltip: t`Redo`,
+      onClick: props.onRedo,
+      disabled: !props.canRedo,
+      display: !props.hideHistoryChangeButtons,
+    },
+  ];
+
+  const buttonsToDisplay = buttons.filter(button => button.display);
+  return (
+    <Line justifyContent="space-between" alignItems="center">
+      <Column noMargin>
+        <Line noMargin>
+          {buttonsToDisplay.map(
+            ({ key, Icon, label, tooltip, onClick, disabled }, index) => (
+              <>
+                {index > 0 ? <Spacer /> : null}
+                {props.isNarrow ? (
+                  <IconButton
+                    key={key}
+                    tooltip={tooltip}
+                    onClick={onClick}
+                    size="small"
+                    disabled={disabled}
+                  >
+                    <Icon />
+                  </IconButton>
+                ) : (
+                  <FlatButton
+                    icon={<Icon />}
+                    disabled={disabled}
+                    label={label}
+                    onClick={onClick}
+                  />
+                )}
+              </>
+            )
+          )}
+        </Line>
+      </Column>
+      <Column expand>
+        <TextField
+          fullWidth
+          value={props.searchText}
+          onChange={(event, value) => props.onChangeSearchText(value)}
+          endAdornment={
+            !!props.searchText ? (
               <IconButton
-                tooltip={t`Undo`}
-                onClick={props.onUndo}
-                size="small"
-                disabled={!props.canUndo}
+                onClick={() => props.onChangeSearchText('')}
+                edge="end"
               >
-                <Undo />
+                <Close />
               </IconButton>
-            ) : (
-              <FlatButton
-                icon={<Undo />}
-                label={<Trans>Undo</Trans>}
-                onClick={props.onUndo}
-                disabled={!props.canUndo}
-              />
-            )}
-            <Spacer />
-            {props.isNarrow ? (
-              <IconButton
-                tooltip={t`Redo`}
-                onClick={props.onRedo}
-                size="small"
-                disabled={!props.canRedo}
-              >
-                <Redo />
-              </IconButton>
-            ) : (
-              <FlatButton
-                icon={<Redo />}
-                label={<Trans>Redo</Trans>}
-                onClick={props.onRedo}
-                disabled={!props.canRedo}
-              />
-            )}
-          </>
-        )}
-      </Line>
-    </Column>
-    <Column expand>
-      <TextField
-        fullWidth
-        value={props.searchText}
-        onChange={(event, value) => props.onChangeSearchText(value)}
-        endAdornment={
-          !!props.searchText ? (
-            <IconButton onClick={() => props.onChangeSearchText('')} edge="end">
-              <Close />
-            </IconButton>
-          ) : null
-        }
-        hintText={t`Search in variables`}
-      />
-    </Column>
-    <Column noMargin>
-      {props.isNarrow ? (
-        <IconButton
-          tooltip={t`Add variable`}
-          onClick={props.onAdd}
-          size="small"
-        >
-          <Add />
-        </IconButton>
-      ) : (
-        <FlatButton
-          primary
-          onClick={props.onAdd}
-          label={<Trans>Add variable</Trans>}
-          icon={<Add />}
+            ) : null
+          }
+          hintText={t`Search in variables`}
         />
-      )}
-    </Column>
-  </Line>
-);
+      </Column>
+      <Column noMargin>
+        {props.isNarrow ? (
+          <IconButton
+            tooltip={t`Add variable`}
+            onClick={props.onAdd}
+            size="small"
+          >
+            <Add />
+          </IconButton>
+        ) : (
+          <FlatButton
+            primary
+            onClick={props.onAdd}
+            label={<Trans>Add variable</Trans>}
+            icon={<Add />}
+          />
+        )}
+      </Column>
+    </Line>
+  );
+};
 
 export default VariablesListToolbar;

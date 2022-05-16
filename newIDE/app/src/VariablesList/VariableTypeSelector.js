@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { t } from '@lingui/macro';
 
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
@@ -20,11 +21,11 @@ type Props = {|
 |};
 
 const options = [
-  <SelectOption primaryText="String" value={gd.Variable.String} />,
-  <SelectOption primaryText="Number" value={gd.Variable.Number} />,
-  <SelectOption primaryText="Boolean" value={gd.Variable.Boolean} />,
-  <SelectOption primaryText="Array" value={gd.Variable.Array} />,
-  <SelectOption primaryText="Structure" value={gd.Variable.Structure} />,
+  <SelectOption primaryText={t`String`} value={gd.Variable.String} />,
+  <SelectOption primaryText={t`Number`} value={gd.Variable.Number} />,
+  <SelectOption primaryText={t`Boolean`} value={gd.Variable.Boolean} />,
+  <SelectOption primaryText={t`Array`} value={gd.Variable.Array} />,
+  <SelectOption primaryText={t`Structure`} value={gd.Variable.Structure} />,
 ];
 
 const VariableTypeSelector = (props: Props) => {

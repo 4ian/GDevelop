@@ -20,6 +20,8 @@ import BackgroundText from '../UI/BackgroundText';
 import AlertMessage from '../UI/AlertMessage';
 import { GameThumbnail } from './GameThumbnail';
 
+const GAME_SLUG_MAX_LENGTH = 30;
+
 const isCyrillic = (text: string) =>
   /[БГДЖЗИЙЛПФЦЧШЩЫЭЮЯбвгджзийклмнптфцчшщыэюя]/.test(text);
 const cyrillicToLatinMapping = require('./CyrillicToLatin.json');
@@ -39,7 +41,8 @@ export const cleanUpGameSlug = (gameSlug: string) => {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]/g, '-')
-    .toLowerCase();
+    .toLowerCase()
+    .slice(0, GAME_SLUG_MAX_LENGTH);
 };
 
 type Props = {|
@@ -233,6 +236,7 @@ export function PublicGameProperties({
                   disabled={!hasGameSlug || disabled}
                   floatingLabelText={<Trans>Game name in the game URL</Trans>}
                   fullWidth
+                  maxLength={GAME_SLUG_MAX_LENGTH}
                   type="text"
                   value={hasGameSlug ? gameSlug || '' : ''}
                   onChange={gameSlug => setGameSlug(cleanUpGameSlug(gameSlug))}

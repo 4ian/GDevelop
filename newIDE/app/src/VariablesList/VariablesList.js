@@ -1192,6 +1192,7 @@ const VariablesList = (props: Props) => {
       >
         {({ contentRect, measureRef }) => (
           <div
+            ref={measureRef}
             style={{ flex: 1, display: 'flex' }}
             onKeyDown={keyboardShortcuts.onKeyDown}
             onKeyUp={keyboardShortcuts.onKeyUp}
@@ -1238,7 +1239,6 @@ const VariablesList = (props: Props) => {
               ) : (
                 <ScrollView autoHideScrollbar>
                   <TreeView
-                    ref={measureRef}
                     multiSelect
                     defaultExpandIcon={<ChevronRight />}
                     defaultCollapseIcon={<ExpandMore />}

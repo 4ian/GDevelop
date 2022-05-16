@@ -14,7 +14,6 @@ import {
 import { shouldValidate } from '../UI/KeyboardShortcuts/InteractionKeys';
 import { Line, Column } from '../UI/Grid';
 import ScrollView from '../UI/ScrollView';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import ThemeContext from '../UI/Theme/ThemeContext';
 

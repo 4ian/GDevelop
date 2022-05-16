@@ -669,7 +669,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       secondaryAction: (
         <IconButton
           onClick={() => setIsEditingSortOptions(true)}
-          tooltip={t`Change sort direction`}
+          tooltip={t`Edit`}
           edge="end"
           disabled={isRequestPending || isEditingName}
         >

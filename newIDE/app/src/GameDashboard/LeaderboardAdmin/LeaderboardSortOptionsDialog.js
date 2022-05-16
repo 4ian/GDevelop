@@ -59,7 +59,7 @@ function LeaderboardSortOptionsDialog({
   const [
     extremeAllowedScoreValue,
     setExtremeAllowedScoreValue,
-  ] = React.useState<number>(0);
+  ] = React.useState<number>(extremeAllowedScore || 0);
 
   const [sortOrder, setSortOrder] = React.useState<LeaderboardSortOption>(
     sort || 'ASC'

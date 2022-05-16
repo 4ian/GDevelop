@@ -21,11 +21,11 @@ type Props = {|
 |};
 
 const options = [
-  <SelectOption primaryText={t`String`} value={gd.Variable.String} />,
-  <SelectOption primaryText={t`Number`} value={gd.Variable.Number} />,
-  <SelectOption primaryText={t`Boolean`} value={gd.Variable.Boolean} />,
-  <SelectOption primaryText={t`Array`} value={gd.Variable.Array} />,
-  <SelectOption primaryText={t`Structure`} value={gd.Variable.Structure} />,
+  <SelectOption key="string" primaryText={t`String`} value={gd.Variable.String} />,
+  <SelectOption key="number" primaryText={t`Number`} value={gd.Variable.Number} />,
+  <SelectOption key="boolean" primaryText={t`Boolean`} value={gd.Variable.Boolean} />,
+  <SelectOption key="array" primaryText={t`Array`} value={gd.Variable.Array} />,
+  <SelectOption key="structure" primaryText={t`Structure`} value={gd.Variable.Structure} />,
 ];
 
 const VariableTypeSelector = (props: Props) => {

@@ -270,7 +270,7 @@ const NewVariablesList = (props: Props) => {
     forceUpdate();
   };
 
-  const pasteSelection = () => {
+  const pasteClipboardContent = () => {
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
     const newSelectedNodes = [];
 
@@ -292,7 +292,9 @@ const NewVariablesList = (props: Props) => {
       );
       if (!name || !serializedVariable || !parentType) return;
 
-      const pasteAtTopLevel = selectedNodes.length === 0;
+      const pasteAtTopLevel =
+        selectedNodes.length === 0 ||
+        selectedNodes.some(nodeId => nodeId.startsWith(inheritedPrefix));
 
       if (pasteAtTopLevel) {
         if (parentType === gd.Variable.Array) return;
@@ -1198,15 +1200,10 @@ const NewVariablesList = (props: Props) => {
               <VariablesListToolbar
                 isNarrow={isNarrow}
                 onCopy={copySelection}
-                onPaste={pasteSelection}
+                onPaste={pasteClipboardContent}
                 onDelete={deleteSelection}
                 canCopy={selectedNodes.length > 0}
-                canPaste={
-                  Clipboard.has(CLIPBOARD_KIND) &&
-                  selectedNodes.every(
-                    nodeId => !nodeId.startsWith(inheritedPrefix)
-                  )
-                }
+                canPaste={Clipboard.has(CLIPBOARD_KIND)}
                 canDelete={
                   selectedNodes.length > 0 &&
                   selectedNodes.every(

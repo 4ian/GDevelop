@@ -706,15 +706,17 @@ const VariablesList = (props: Props) => {
 
     const depth = parentNodeId ? parentNodeId.split(separator).length : 0;
     const isTopLevel = depth === 0;
-    const shouldWrap = !containerWidth
-      ? false
-      : containerWidth <= 750
-      ? depth >= 5
-      : containerWidth <= 850
-      ? depth >= 6
-      : containerWidth <= 950
-      ? depth >= 7
-      : depth >= 8;
+    const shouldWrap =
+      isNarrow ||
+      (!containerWidth
+        ? false
+        : containerWidth <= 750
+        ? depth >= 5
+        : containerWidth <= 850
+        ? depth >= 6
+        : containerWidth <= 950
+        ? depth >= 7
+        : depth >= 8);
 
     let parentType = null;
     let nodeId;
@@ -811,10 +813,10 @@ const VariablesList = (props: Props) => {
                   <ResponsiveLineStackLayout
                     expand
                     noMargin
-                    width={isNarrow || shouldWrap ? 'small' : undefined}
+                    width={shouldWrap ? 'small' : undefined}
                   >
                     <Line alignItems="center" noMargin expand>
-                      <Spacer />
+                      {shouldWrap ? null : <Spacer />}
                       <SemiControlledAutoComplete
                         fullWidth
                         dataSource={isTopLevel ? undefinedVariableNames : []}

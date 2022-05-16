@@ -8,7 +8,7 @@ import VariableNumberIcon from './Icons/VariableNumberIcon';
 import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
-import { LargeSpacer } from '../UI/Grid';
+import { Spacer } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 const gd = global.gd;
 
@@ -54,7 +54,7 @@ const VariableTypeSelector = (props: Props) => {
             : undefined
         }
       />
-      <LargeSpacer />
+      <Spacer />
       <SelectField
         value={props.variableType}
         margin="none"

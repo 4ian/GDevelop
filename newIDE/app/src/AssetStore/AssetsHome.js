@@ -25,6 +25,10 @@ const styles = {
   grid: { margin: '0 10px' },
   previewImage: {
     width: '100%',
+    // Prevent cumulative layout shift by enforcing
+    // the 16:9 ratio.
+    aspectRatio: '16 / 9',
+    objectFit: 'cover',
   },
   cardContainer: {
     overflow: 'hidden',

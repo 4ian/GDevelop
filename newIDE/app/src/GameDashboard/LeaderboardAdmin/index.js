@@ -152,26 +152,30 @@ const getApiError = (payload: LeaderboardUpdatePayload): ApiError => ({
   ),
 });
 
-const getExtremeAllowedScoreText = (
-  i18n: I18nType,
-  currentLeaderboard: Leaderboard
-) => {
-  const maxOrMin =
-    currentLeaderboard.sort === 'ASC' ? i18n._(t`min`) : i18n._(t`max`);
-  if (
+const getSortOrderText = (currentLeaderboard: Leaderboard) => {
+  const isExtremeScoreLimited = !(
     currentLeaderboard.extremeAllowedScore === null ||
     currentLeaderboard.extremeAllowedScore === undefined
-  ) {
-    return '';
+  );
+  if (currentLeaderboard.sort === 'ASC') {
+    if (isExtremeScoreLimited) {
+      return (
+        <Trans>
+          Lower is better (min: {currentLeaderboard.extremeAllowedScore})
+        </Trans>
+      );
+    }
+    return <Trans>Lower is better</Trans>;
   }
-  let customizedScoreText = currentLeaderboard.extremeAllowedScore;
-  if (currentLeaderboard.customizationSettings) {
-    customizedScoreText = formatScore(
-      currentLeaderboard.extremeAllowedScore,
-      currentLeaderboard.customizationSettings.scoreFormatting
+
+  if (isExtremeScoreLimited) {
+    return (
+      <Trans>
+        Higher is better (max: {currentLeaderboard.extremeAllowedScore})
+      </Trans>
     );
   }
-  return ` (${maxOrMin}: ${customizedScoreText})`;
+  return <Trans>Higer is better</Trans>;
 };
 
 export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
@@ -644,25 +648,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     {
       key: 'sort',
       avatar: <Sort />,
-      text: (
-        <Text size="body2">
-          {currentLeaderboard.sort === 'ASC' ? (
-            <Trans>
-              Lower is better
-              {currentLeaderboard
-                ? getExtremeAllowedScoreText(i18n, currentLeaderboard)
-                : ''}
-            </Trans>
-          ) : (
-            <Trans>
-              Higher is better
-              {currentLeaderboard
-                ? getExtremeAllowedScoreText(i18n, currentLeaderboard)
-                : ''}
-            </Trans>
-          )}
-        </Text>
-      ),
+      text: <Text size="body2">{getSortOrderText(currentLeaderboard)}</Text>,
       secondaryText:
         apiError && apiError.action === 'leaderboardSortUpdate' ? (
           <Text color="error" size="body2">

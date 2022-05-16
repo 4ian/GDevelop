@@ -141,7 +141,7 @@ function LeaderboardSortOptionsDialog({
               value={sortOrder}
               floatingLabelText={<Trans>Scores sort order</Trans>}
               onChange={(e, i, newValue) => {
-                // $FlowIgnore
+                // $FlowFixMe - new value is of type LeaderboardSortOption (either ASC or DESC)
                 setSortOrder(newValue);
               }}
             >

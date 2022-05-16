@@ -20,16 +20,38 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const options = [
-  <SelectOption key="string" primaryText={t`String`} value={gd.Variable.String} />,
-  <SelectOption key="number" primaryText={t`Number`} value={gd.Variable.Number} />,
-  <SelectOption key="boolean" primaryText={t`Boolean`} value={gd.Variable.Boolean} />,
-  <SelectOption key="array" primaryText={t`Array`} value={gd.Variable.Array} />,
-  <SelectOption key="structure" primaryText={t`Structure`} value={gd.Variable.Structure} />,
-];
-
 const VariableTypeSelector = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const options = React.useMemo(
+    () => [
+      <SelectOption
+        key="string"
+        primaryText={t`String`}
+        value={gd.Variable.String}
+      />,
+      <SelectOption
+        key="number"
+        primaryText={t`Number`}
+        value={gd.Variable.Number}
+      />,
+      <SelectOption
+        key="boolean"
+        primaryText={t`Boolean`}
+        value={gd.Variable.Boolean}
+      />,
+      <SelectOption
+        key="array"
+        primaryText={t`Array`}
+        value={gd.Variable.Array}
+      />,
+      <SelectOption
+        key="structure"
+        primaryText={t`Structure`}
+        value={gd.Variable.Structure}
+      />,
+    ],
+    []
+  );
   const variableTypeToIcon = React.useMemo(
     () => ({
       [gd.Variable.String]: VariableStringIcon,

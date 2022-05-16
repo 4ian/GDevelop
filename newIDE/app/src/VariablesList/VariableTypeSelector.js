@@ -21,20 +21,26 @@ type Props = {|
 
 const VariableTypeSelector = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  const variableTypeToIcon = React.useMemo(() => ({
-    [gd.Variable.String]: VariableStringIcon,
-    [gd.Variable.Number]: VariableNumberIcon,
-    [gd.Variable.Boolean]: VariableBooleanIcon,
-    [gd.Variable.Array]: VariableArrayIcon,
-    [gd.Variable.Structure]: VariableStructureIcon,
-  }), []);
-  const variableTypeToString = React.useMemo(() => ({
-    [gd.Variable.String]: 'string',
-    [gd.Variable.Number]: 'number',
-    [gd.Variable.Boolean]: 'boolean',
-    [gd.Variable.Array]: 'array',
-    [gd.Variable.Structure]: 'structure',
-  }), []);
+  const variableTypeToIcon = React.useMemo(
+    () => ({
+      [gd.Variable.String]: VariableStringIcon,
+      [gd.Variable.Number]: VariableNumberIcon,
+      [gd.Variable.Boolean]: VariableBooleanIcon,
+      [gd.Variable.Array]: VariableArrayIcon,
+      [gd.Variable.Structure]: VariableStructureIcon,
+    }),
+    []
+  );
+  const variableTypeToString = React.useMemo(
+    () => ({
+      [gd.Variable.String]: 'string',
+      [gd.Variable.Number]: 'number',
+      [gd.Variable.Boolean]: 'boolean',
+      [gd.Variable.Array]: 'array',
+      [gd.Variable.Structure]: 'structure',
+    }),
+    []
+  );
 
   const Icon = variableTypeToIcon[props.variableType];
 

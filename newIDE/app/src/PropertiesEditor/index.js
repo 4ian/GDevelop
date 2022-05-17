@@ -532,6 +532,7 @@ const PropertiesEditor = ({
             <Text displayInlineAsSpan>{field.name}</Text>
             <Spacer />
             <Text
+              allowSelection
               displayInlineAsSpan
               size="body2"
             >{`- ${additionalText}`}</Text>

@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from './MapFor';
 import newNameGenerator from './NewNameGenerator';
+import { normalizeString } from './Search';
 import { unserializeFromJSObject } from './Serializer';
 const gd: libGDevelop = global.gd;
 
@@ -10,11 +11,7 @@ export const hasChildThatContainsStringInNameOrValue = (
 ): boolean => {
   switch (variable.getType()) {
     case gd.Variable.String:
-      return variable
-        .getString()
-        .normalize('NFD')
-        .toLowerCase()
-        .includes(searchText);
+      return normalizeString(variable.getString()).includes(searchText);
     case gd.Variable.Number:
       return variable
         .getValue()
@@ -35,10 +32,7 @@ export const hasChildThatContainsStringInNameOrValue = (
         .map(childName => {
           const childVariable = variable.getChild(childName);
           return (
-            childName
-              .normalize('NFD')
-              .toLowerCase()
-              .includes(searchText) ||
+            normalizeString(childName).includes(searchText) ||
             hasChildThatContainsStringInNameOrValue(childVariable, searchText)
           );
         })

@@ -67,6 +67,7 @@ import {
 import VariableTypeSelector from './VariableTypeSelector';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import VariablesListToolbar from './VariablesListToolbar';
+import { normalizeString } from '../Utils/Search';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -797,16 +798,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       props.inheritedVariablesContainer &&
       props.inheritedVariablesContainer.has(name);
 
+    const normalizedSearchText = normalizeString(searchText);
     if (
       !!searchText &&
-      !name
-        .normalize('NFD')
-        .toLowerCase()
-        .includes(searchText.toLowerCase()) &&
-      !hasChildThatContainsStringInNameOrValue(
-        variable,
-        searchText.normalize('NFD').toLowerCase()
-      )
+      !normalizeString(name).includes(normalizedSearchText) &&
+      !hasChildThatContainsStringInNameOrValue(variable, normalizedSearchText)
     ) {
       return null;
     }

@@ -137,9 +137,9 @@ export const updateListOfNodesFollowingChangeName = (
 ) => {
   const newList: Array<string> = [...list];
   const indexOfRenamedNode = newList.indexOf(oldNodeId);
-  const indicesOfChildrenOfRenamedNode = newList.map(otherNodeId => {
+  const indicesOfChildrenOfRenamedNode = newList.map((otherNodeId, index) => {
     if (otherNodeId.startsWith(`${oldNodeId}${separator}`)) {
-      return newList.indexOf(otherNodeId);
+      return index;
     }
     return null;
   });

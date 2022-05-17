@@ -747,7 +747,7 @@ describe('libGD.js', function () {
 
   describe('gd.Variable', function () {
     let variable = null;
-    beforeAll(() => (variable = new gd.Variable()));
+    beforeEach(() => (variable = new gd.Variable()));
 
     it('should have initial value', function () {
       expect(variable.getValue()).toBe(0);
@@ -782,6 +782,24 @@ describe('libGD.js', function () {
       variable.removeChild('SecondChild');
       expect(variable.getType()).toBe(gd.Variable.Structure);
     });
+    it('can insert a child in structure', function () {
+      variable.getChild('FirstChild').setValue(1);
+      variable.getChild('SecondChild').setString('two');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      const variableToInsert = new gd.Variable();
+      variableToInsert.setString('strVariable');
+      {
+        const result = variable.insertChild('FirstChild', variableToInsert);
+        expect(result).toBe(false);
+      }
+      {
+        const result = variable.insertChild('ThirdChild', variableToInsert);
+        expect(result).toBe(true);
+      }
+      variableToInsert.delete();
+      expect(variable.hasChild('ThirdChild')).toBe(true);
+      expect(variable.getChild('ThirdChild').getString()).toBe('strVariable');
+    });
     it('can expose its children', function () {
       variable.getChild('FirstChild').setValue(1);
       variable.getChild('SecondChild').setValue(1);
@@ -810,6 +828,31 @@ describe('libGD.js', function () {
       variable.removeAtIndex(1);
       variable.removeAtIndex(0);
       expect(variable.getType()).toBe(gd.Variable.Array);
+    });
+    it('can move children inside array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(1).setValue(2);
+      variable.getAtIndex(2).setValue(3);
+      variable.getAtIndex(3).setValue(4);
+      variable.moveChildInArray(2, 0);
+      expect(variable.getAtIndex(2).getValue()).toBe(2);
+      expect(variable.getAtIndex(0).getValue()).toBe(3);
+    });
+    it('can insert child in array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(1).setValue(2);
+      variable.getAtIndex(2).setValue(3);
+      variable.getAtIndex(3).setValue(4);
+      const variableToInsert = new gd.Variable();
+      variableToInsert.setString('strVariable');
+      const result = variable.insertAtIndex(variableToInsert, 2);
+      variableToInsert.delete();
+      expect(result).toBe(true);
+      expect(variable.getAtIndex(2).getString()).toBe('strVariable');
+      expect(variable.getAtIndex(3).getValue()).toBe(3);
+      expect(variable.getAtIndex(4).getValue()).toBe(4);
     });
     it('can search inside children and remove them recursively', function () {
       let parentVariable = new gd.Variable();
@@ -3561,7 +3604,7 @@ describe('libGD.js', function () {
         expect(vectorVector2f.at(1).get_x()).toBe(2);
         expect(vectorVector2f.at(2).get_x()).toBe(3);
 
-        gd.moveVector2fInVector(vectorVector2f, 2, 0)
+        gd.moveVector2fInVector(vectorVector2f, 2, 0);
         expect(vectorVector2f.at(0).get_x()).toBe(3);
         expect(vectorVector2f.at(1).get_x()).toBe(1);
         expect(vectorVector2f.at(2).get_x()).toBe(2);
@@ -3570,7 +3613,6 @@ describe('libGD.js', function () {
         expect(vectorVector2f.size()).toBe(2);
         expect(vectorVector2f.at(0).get_x()).toBe(3);
         expect(vectorVector2f.at(1).get_x()).toBe(2);
-
 
         vectorVector2f.clear();
         expect(vectorVector2f.size()).toBe(0);

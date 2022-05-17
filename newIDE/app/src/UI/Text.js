@@ -15,6 +15,8 @@ type Props = {|
   noShrink?: boolean,
   /** Remove the margin around the text. */
   noMargin?: boolean,
+  /** Allow user to select content */
+  allowSelection?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
   /** A limited set of styling is supported. */
@@ -52,6 +54,7 @@ const Text = React.forwardRef<Props, Interface>(
       align,
       noShrink,
       noMargin,
+      allowSelection,
       displayInlineAsSpan,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
@@ -76,6 +79,8 @@ const Text = React.forwardRef<Props, Interface>(
         flexShrink: noShrink ? 0 : undefined,
         marginTop: noMargin ? 0 : 6,
         marginBottom: noMargin ? 0 : 6,
+        userSelect: allowSelection ? 'text' : undefined,
+        cursor: allowSelection ? 'text' : undefined,
       }}
       align={align || 'inherit'}
       {...otherProps}

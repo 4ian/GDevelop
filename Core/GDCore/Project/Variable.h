@@ -298,7 +298,7 @@ class GD_CORE_API Variable {
   /**
    * \brief Insert child in array.
    */
-  bool InsertInArray(const gd::Variable& variable, const size_t index);
+  bool InsertAtIndex(const gd::Variable& variable, const size_t index);
 
   /**
    * \brief Insert child in children map.

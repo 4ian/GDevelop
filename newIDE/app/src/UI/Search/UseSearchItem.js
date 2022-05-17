@@ -8,7 +8,8 @@ export interface SearchFilter<SearchItem> {
   isSatisfiedBy(searchItem: SearchItem): boolean;
 }
 
-export class TagSearchFilter<SearchItem: { tags: Array<string> }> {
+export class TagSearchFilter<SearchItem: { tags: Array<string> }>
+  implements SearchFilter<SearchItem> {
   tags: Set<string>;
 
   constructor(tags: Set<string> = new Set()) {
@@ -30,7 +31,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
   searchItems: ?Array<SearchItem>,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
-  searchFilters?: SearchFilter<SearchItem>
+  searchFilters?: Array<SearchFilter<SearchItem>>
 ): ?Array<SearchItem> => {
   if (!searchItems) return null;
 
@@ -92,7 +93,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   searchText: string,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
-  searchFilters?: SearchFilter<SearchItem>
+  searchFilters?: Array<SearchFilter<SearchItem>>
 ): ?Array<SearchItem> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<SearchItem>>(

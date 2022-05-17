@@ -301,7 +301,7 @@ class GD_CORE_API Variable {
   bool InsertAtIndex(const gd::Variable& variable, const size_t index);
 
   /**
-   * \brief Insert child in children map.
+   * \brief Insert a child in a structure.
    */
   bool InsertChild(const gd::String& name, const gd::Variable& variable);
 

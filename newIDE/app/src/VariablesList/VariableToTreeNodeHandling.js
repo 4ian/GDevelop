@@ -4,16 +4,17 @@ import { mapFor } from '../Utils/MapFor';
 const gd: libGDevelop = global.gd;
 
 type MovementType =
-  | 'TopLevelToStructure'
+  | 'ArrayToTopLevel'
+  | 'FromArrayToAnotherArray'
+  | 'FromArrayToStructure'
+  | 'FromStructureToAnotherStructure'
+  | 'FromStructureToArray'
+  | 'InsideSameArray'
+  | 'InsideSameStructure'
   | 'InsideTopLevel'
   | 'StructureToTopLevel'
-  | 'ArrayToTopLevel'
-  | 'FromStructureToAnotherStructure'
-  | 'InsideSameStructure'
-  | 'FromArrayToAnotherArray'
-  | 'InsideSameArray'
-  | 'FromStructureToArray'
-  | 'FromArrayToStructure';
+  | 'TopLevelToStructure'
+  | 'TopLevelToArray';
 
 type VariableLineage = Array<{|
   nodeId: string,
@@ -243,6 +244,12 @@ export const getMovementTypeWithinVariablesContainer = (
     targetVariableParentVariable.getType() === gd.Variable.Structure
   )
     return 'TopLevelToStructure';
+  if (
+    !draggedVariableParentVariable &&
+    !!targetVariableParentVariable &&
+    targetVariableParentVariable.getType() === gd.Variable.Array
+  )
+    return 'TopLevelToArray';
   if (
     !!draggedVariableParentVariable &&
     !targetVariableParentVariable &&

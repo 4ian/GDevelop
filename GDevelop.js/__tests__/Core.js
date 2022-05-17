@@ -795,8 +795,8 @@ describe('libGD.js', function () {
       {
         const result = variable.insertChild('ThirdChild', variableToInsert);
         expect(result).toBe(true);
-        variableToInsert.delete();
       }
+      variableToInsert.delete();
       expect(variable.hasChild('ThirdChild')).toBe(true);
       expect(variable.getChild('ThirdChild').getString()).toBe('strVariable');
     });

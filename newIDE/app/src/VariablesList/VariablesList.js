@@ -102,7 +102,6 @@ type Props = {|
 
 const StyledTreeItem = withStyles(theme => ({
   group: {
-    borderLeft: '1px solid black',
     marginLeft: 7,
     paddingLeft: 15,
   },
@@ -175,7 +174,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     (props.inheritedVariablesContainer
       ? !hasVariablesContainerSubChildren(props.inheritedVariablesContainer)
       : true);
-
   const useStylesForSelectedTreeItem = makeStyles(() => ({
     root: {
       '& > .MuiTreeItem-content': {
@@ -196,6 +194,9 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
             display: 'none',
           }
         : undefined,
+    },
+    group: {
+      borderLeft: `1px solid ${gdevelopTheme.listItem.groupTextColor}`,
     },
   }));
   const selectedTreeItemClasses = useStylesForSelectedTreeItem();

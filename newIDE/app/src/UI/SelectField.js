@@ -24,12 +24,13 @@ type Props = {|
   fullWidth?: boolean,
   children: React.Node,
   disabled?: boolean,
+  stopPropagationOnClick?: boolean,
 
   style?: {
     flex?: 1,
     width?: 'auto',
   },
-  inputStyle?: {| fontSize: 14 |},
+  inputStyle?: {| fontSize?: 14, color?: string |},
   margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
@@ -41,6 +42,7 @@ type Props = {|
 |};
 
 const INVALID_VALUE = '';
+const stopPropagation = event => event.stopPropagation();
 
 /**
  * A select field based on Material-UI select field.
@@ -90,6 +92,7 @@ export default class SelectField extends React.Component<Props, {||}> {
             label={props.floatingLabelText}
             helperText={helperText}
             value={displayedValue}
+            onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
             onChange={
               onChange
                 ? event => {

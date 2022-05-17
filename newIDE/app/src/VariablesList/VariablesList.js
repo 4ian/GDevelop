@@ -678,6 +678,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       variable.getChild(name).setString('');
     } else if (type === gd.Variable.Array) variable.pushNew();
     _saveToHistory();
+    if (variable.isFolded()) variable.setFolded(false);
     setExpandedNodes([...expandedNodes, nodeId]);
   };
 

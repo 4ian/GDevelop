@@ -4,7 +4,7 @@ import newNameGenerator from './NewNameGenerator';
 import { unserializeFromJSObject } from './Serializer';
 const gd: libGDevelop = global.gd;
 
-export const hasChildThatContainsStringInNameAndValue = (
+export const hasChildThatContainsStringInNameOrValue = (
   variable: gdVariable,
   searchText: string
 ): boolean => {
@@ -23,7 +23,7 @@ export const hasChildThatContainsStringInNameAndValue = (
     case gd.Variable.Array:
       return mapFor(0, variable.getChildrenCount(), index => {
         const childVariable = variable.getAtIndex(index);
-        return hasChildThatContainsStringInNameAndValue(
+        return hasChildThatContainsStringInNameOrValue(
           childVariable,
           searchText
         );
@@ -39,7 +39,7 @@ export const hasChildThatContainsStringInNameAndValue = (
               .normalize('NFD')
               .toLowerCase()
               .includes(searchText) ||
-            hasChildThatContainsStringInNameAndValue(childVariable, searchText)
+            hasChildThatContainsStringInNameOrValue(childVariable, searchText)
           );
         })
         .some(Boolean);

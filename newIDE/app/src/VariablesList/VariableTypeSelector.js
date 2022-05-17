@@ -22,6 +22,8 @@ type Props = {|
 
 const VariableTypeSelector = (props: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  // TODO: find a way to have those next 3 consts outside of component
+  // for performance issues without making the storybook bug.
   const options = React.useMemo(
     () => [
       <SelectOption

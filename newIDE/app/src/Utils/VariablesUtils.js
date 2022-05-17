@@ -81,7 +81,7 @@ export const insertInVariableChildrenArray = (
 ) => {
   const newVariable = new gd.Variable();
   unserializeFromJSObject(newVariable, serializedVariable);
-  targetParentVariable.insertInArray(newVariable, index);
+  targetParentVariable.insertAtIndex(newVariable, index);
   newVariable.delete();
 };
 

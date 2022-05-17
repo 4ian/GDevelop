@@ -847,7 +847,7 @@ describe('libGD.js', function () {
       variable.getAtIndex(3).setValue(4);
       const variableToInsert = new gd.Variable();
       variableToInsert.setString('strVariable');
-      const result = variable.insertInArray(variableToInsert, 2);
+      const result = variable.insertAtIndex(variableToInsert, 2);
       variableToInsert.delete();
       expect(result).toBe(true);
       expect(variable.getAtIndex(2).getString()).toBe('strVariable');

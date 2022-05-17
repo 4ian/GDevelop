@@ -597,7 +597,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         targetIndex = parseInt(targetName, 10);
 
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
-        targetVariableParentVariable.insertInArray(
+        targetVariableParentVariable.insertAtIndex(
           draggedVariable,
           targetIndex
         );

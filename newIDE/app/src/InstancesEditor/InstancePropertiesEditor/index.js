@@ -18,7 +18,9 @@ import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
-import VariablesList from '../../VariablesList/VariablesList';
+import VariablesList, {
+  type HistoryHandler,
+} from '../../VariablesList/VariablesList';
 
 type Props = {|
   project: gdProject,
@@ -29,13 +31,7 @@ type Props = {|
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
-  historyHandler?: {
-    saveToHistory: () => void,
-    undo: () => void,
-    redo: () => void,
-    canUndo: () => boolean,
-    canRedo: () => boolean,
-  },
+  historyHandler?: HistoryHandler,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {

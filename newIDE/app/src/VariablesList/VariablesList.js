@@ -1198,27 +1198,36 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     const isInherited = nodeId.startsWith(inheritedPrefix);
     let variable;
     if (isInherited && props.inheritedVariablesContainer) {
-      const { variable: _variable, name, depth } = getVariableContextFromNodeId(
+      // If user changes inherited variable, check if value is truly modified before
+      // duplicating the variable into the variables container
+      const {
+        variable: changedInheritedVariable,
+        name,
+        depth,
+      } = getVariableContextFromNodeId(
         nodeId,
         props.inheritedVariablesContainer
       );
-      if (!name || !_variable || depth > 0) return;
-      switch (_variable.getType()) {
+      if (!name || !changedInheritedVariable || depth > 0) return;
+      switch (changedInheritedVariable.getType()) {
         case gd.Variable.String:
-          if (_variable.getString() === newValue) return;
+          if (changedInheritedVariable.getString() === newValue) return;
           break;
         case gd.Variable.Number:
           const newValueAsFloat = parseFloat(newValue);
-          if (newValueAsFloat === _variable.getValue()) return;
+          if (newValueAsFloat === changedInheritedVariable.getValue()) return;
           break;
         case gd.Variable.Boolean:
           const newBool = newValue === 'true';
-          if (newBool === _variable.getBool()) return;
+          if (newBool === changedInheritedVariable.getBool()) return;
           break;
         default:
       }
       const newVariable = new gd.Variable();
-      unserializeFromJSObject(newVariable, serializeToJSObject(_variable));
+      unserializeFromJSObject(
+        newVariable,
+        serializeToJSObject(changedInheritedVariable)
+      );
       variable = props.variablesContainer.insert(name, newVariable, 0);
       const newSelectedNodes = [...selectedNodes];
       const isVariableSelected = newSelectedNodes.indexOf(nodeId) !== -1;
@@ -1230,11 +1239,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       }
       newVariable.delete();
     } else {
-      const { variable: _variable } = getVariableContextFromNodeId(
+      const { variable: changedVariable } = getVariableContextFromNodeId(
         nodeId,
         props.variablesContainer
       );
-      variable = _variable;
+      variable = changedVariable;
     }
     if (!variable) return;
     switch (variable.getType()) {

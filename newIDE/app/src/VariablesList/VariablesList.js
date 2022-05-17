@@ -60,6 +60,7 @@ import {
   getOldestAncestryVariable,
   getVariableContextFromNodeId,
   inheritedPrefix,
+  isAnAncestryOf,
   separator,
   updateListOfNodesFollowingChangeName,
 } from './VariableToTreeNodeHandling';
@@ -470,11 +471,9 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       props.variablesContainer
     );
     const { variable: draggedVariable } = draggedVariableContext;
+    if (!draggedVariable) return false;
 
-    const targetLineageVariables = targetLineage.map(
-      context => context.variable
-    );
-    if (targetLineageVariables.includes(draggedVariable)) return false;
+    if (isAnAncestryOf(draggedVariable, targetLineage)) return false;
 
     const movementType = getMovementTypeWithinVariablesContainer(
       draggedVariableContext,
@@ -531,10 +530,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     if (!draggedVariable || !draggedName) return;
 
-    const targetLineageVariables = targetLineage.map(
-      context => context.variable
-    );
-    if (targetLineageVariables.includes(draggedVariable)) return;
+    if (isAnAncestryOf(draggedVariable, targetLineage)) return;
 
     const movementType = getMovementTypeWithinVariablesContainer(
       draggedVariableContext,

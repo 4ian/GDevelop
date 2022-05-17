@@ -1110,21 +1110,35 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       props.variablesContainer
     );
     if (name === null) return;
-    if (
-      !!variable &&
-      !!newName &&
-      (newName.startsWith(inheritedPrefix) || newName.includes(separator))
-    ) {
-      setNameErrors({
-        ...nameErrors,
-        [variable.ptr]: (
-          <Trans>
-            Variables cannot have a name that includes {inheritedPrefix} or{' '}
-            {separator}
-          </Trans>
-        ),
-      });
-      return;
+    if (!!variable && !!newName) {
+      if (newName.startsWith(inheritedPrefix) || newName.includes(separator)) {
+        setNameErrors({
+          ...nameErrors,
+          [variable.ptr]: (
+            <Trans>
+              Variables cannot have a name that includes {inheritedPrefix} or{' '}
+              {separator}
+            </Trans>
+          ),
+        });
+        return;
+      }
+      if (
+        newName.match(/^[0-9].*/) ||
+        newName.includes('.') ||
+        newName.includes(',')
+      ) {
+        setNameErrors({
+          ...nameErrors,
+          [variable.ptr]: (
+            <Trans>
+              Variable names should start with a letter and cannot include a
+              comma nor a dot.
+            </Trans>
+          ),
+        });
+        return;
+      }
     }
     if (!newName) {
       if (!!variable) {

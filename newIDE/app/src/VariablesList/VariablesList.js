@@ -474,6 +474,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       case 'FromArrayToStructure':
       case 'ArrayToTopLevel':
       case 'InsideSameStructure':
+      case 'TopLevelToArray':
       default:
         return false;
     }

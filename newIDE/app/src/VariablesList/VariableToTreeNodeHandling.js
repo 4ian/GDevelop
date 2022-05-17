@@ -42,6 +42,14 @@ export const getDirectParentNodeId = (lineage: VariableLineage) =>
 export const getOldestAncestryVariable = (lineage: VariableLineage) =>
   lineage.length ? lineage[0] : null;
 
+export const isAnAncestryOf = (
+  variable: gdVariable,
+  lineage: VariableLineage
+): boolean => {
+  const lineageVariables = lineage.map(context => context.variable);
+  return lineageVariables.includes(variable);
+};
+
 export const getVariableContextFromNodeId = (
   nodeId: string,
   variablesContainer: gdVariablesContainer

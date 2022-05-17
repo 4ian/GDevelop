@@ -9,7 +9,7 @@ import VariableNumberIcon from './Icons/VariableNumberIcon';
 import VariableBooleanIcon from './Icons/VariableBooleanIcon';
 import VariableArrayIcon from './Icons/VariableArrayIcon';
 import VariableStructureIcon from './Icons/VariableStructureIcon';
-import { Spacer } from '../UI/Grid';
+import { Line, Spacer } from '../UI/Grid';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 const gd = global.gd;
 
@@ -78,7 +78,7 @@ const VariableTypeSelector = (props: Props) => {
   const Icon = variableTypeToIcon[props.variableType];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <Line alignItems="center" noMargin>
       <Icon
         fontSize="small"
         htmlColor={
@@ -104,7 +104,7 @@ const VariableTypeSelector = (props: Props) => {
       >
         {options}
       </SelectField>
-    </div>
+    </Line>
   );
 };
 

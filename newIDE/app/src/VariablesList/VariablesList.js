@@ -207,7 +207,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   );
   const isNarrow = React.useMemo(
     () =>
-      props.size === 'small' || (containerWidth ? containerWidth < 600 : false),
+      props.size === 'small' || (containerWidth ? containerWidth < 650 : false),
     [containerWidth, props.size]
   );
 
@@ -1297,6 +1297,29 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     return containerVariablesTree;
   };
 
+  const toolbar = (
+    <VariablesListToolbar
+      isNarrow={isNarrow}
+      onCopy={copySelection}
+      onPaste={pasteClipboardContent}
+      onDelete={deleteSelection}
+      canCopy={selectedNodes.length > 0}
+      canPaste={Clipboard.has(CLIPBOARD_KIND)}
+      canDelete={
+        selectedNodes.length > 0 &&
+        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix))
+      }
+      onUndo={_undo}
+      onRedo={_redo}
+      canUndo={_canUndo()}
+      canRedo={_canRedo()}
+      hideHistoryChangeButtons={!!props.historyHandler}
+      onAdd={onAdd}
+      searchText={searchText}
+      onChangeSearchText={setSearchText}
+    />
+  );
+
   return (
     <ClickAwayListener onClickAway={() => setSelectedNodes([])}>
       <Measure
@@ -1312,29 +1335,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
             onKeyDown={keyboardShortcuts.onKeyDown}
             onKeyUp={keyboardShortcuts.onKeyUp}
           >
-            <Column expand reverse={isNarrow}>
-              <VariablesListToolbar
-                isNarrow={isNarrow}
-                onCopy={copySelection}
-                onPaste={pasteClipboardContent}
-                onDelete={deleteSelection}
-                canCopy={selectedNodes.length > 0}
-                canPaste={Clipboard.has(CLIPBOARD_KIND)}
-                canDelete={
-                  selectedNodes.length > 0 &&
-                  selectedNodes.every(
-                    nodeId => !nodeId.startsWith(inheritedPrefix)
-                  )
-                }
-                onUndo={_undo}
-                onRedo={_redo}
-                canUndo={_canUndo()}
-                canRedo={_canRedo()}
-                hideHistoryChangeButtons={!!props.historyHandler}
-                onAdd={onAdd}
-                searchText={searchText}
-                onChangeSearchText={setSearchText}
-              />
+            <Column expand>
+              {isNarrow ? null : toolbar}
               {props.variablesContainer.count() === 0 &&
               (!props.inheritedVariablesContainer ||
                 props.inheritedVariablesContainer.count() === 0) ? (
@@ -1369,6 +1371,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                   </TreeView>
                 </ScrollView>
               )}
+              {isNarrow ? toolbar : null}
             </Column>
           </div>
         )}

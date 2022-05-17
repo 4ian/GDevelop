@@ -959,6 +959,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                         !variable.getBool() ? 'true' : 'false'
                                       );
                                     }}
+                                    tooltip={
+                                      !variable.getBool()
+                                        ? t`Set to true`
+                                        : t`Set to false`
+                                    }
                                   >
                                     <SwapHorizontal
                                       htmlColor={

@@ -44,7 +44,7 @@ import {
   saveToHistory,
 } from '../Utils/History';
 import {
-  hasChildThatContainsStringInNameAndValue,
+  hasChildThatContainsStringInNameOrValue,
   hasVariablesContainerSubChildren,
   insertInVariableChildren,
   insertInVariableChildrenArray,
@@ -784,7 +784,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         .normalize('NFD')
         .toLowerCase()
         .includes(searchText.toLowerCase()) &&
-      !hasChildThatContainsStringInNameAndValue(
+      !hasChildThatContainsStringInNameOrValue(
         variable,
         searchText.normalize('NFD').toLowerCase()
       )

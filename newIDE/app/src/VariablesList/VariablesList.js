@@ -408,12 +408,12 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     oldNodeId: string,
     newName: string
   ) => {
-    [
-      [expandedNodes, setExpandedNodes],
-      [selectedNodes, setSelectedNodes],
-    ].forEach(([list, setter]) => {
-      setter(updateListOfNodesFollowingChangeName(list, oldNodeId, newName));
-    });
+    setExpandedNodes(
+      updateListOfNodesFollowingChangeName(expandedNodes, oldNodeId, newName)
+    );
+    setSelectedNodes(
+      updateListOfNodesFollowingChangeName(selectedNodes, oldNodeId, newName)
+    );
   };
 
   const updateExpandedAndSelectedNodesFollowingNodeMove = (

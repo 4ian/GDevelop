@@ -11,7 +11,8 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem, TagSearchFilter } from '../UI/Search/UseSearchItem';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import { TagAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 
 const defaultSearchText = '';
 
@@ -26,6 +27,8 @@ type AssetStoreState = {|
   searchText: string,
   setSearchText: string => void,
   filtersState: FiltersState,
+  viewportFilter: TagAssetStoreSearchFilter,
+  setViewportFilter: TagAssetStoreSearchFilter => void,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -45,6 +48,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     chosenCategory: null,
     setChosenCategory: () => {},
   },
+  viewportFilter: new TagAssetStoreSearchFilter(),
+  setViewportFilter: filter => {},
 });
 
 type AssetStoreStateProviderProps = {|
@@ -77,12 +82,15 @@ export const AssetStoreStateProvider = ({
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
-  const [viewportFilter, setViewportFilter] = React.useState<TagSearchFilter>(
-    new TagSearchFilter()
+  const [
+    viewportFilter,
+    setViewportFilter,
+  ] = React.useState<TagAssetStoreSearchFilter>(
+    new TagAssetStoreSearchFilter()
   );
   // TODO Fix me: this is to give the same instance to UseSearchItem to avoid looping on the search.
   const [searchFilters, setSearchFilters] = React.useState<
-    Array<TagSearchFilte>
+    Array<SearchFilter<AssetShortHeader>>
   >([viewportFilter]);
   if (searchFilters[0] != viewportFilter) {
     setSearchFilters([viewportFilter]);

@@ -6,6 +6,7 @@ import Text from '../UI/Text';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import { ColumnStackLayout } from '../UI/Layout';
 import { TagSearchFilter } from '../UI/Search/UseSearchItem';
+import { TagAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 
 type Tag = {|
   label: ?React.Node,
@@ -16,8 +17,8 @@ type TagFilterProps = {|
   filterKey: string,
   title: ?React.Node,
   tags: Tag[],
-  tagSearchFilter: TagSearchFilter,
-  setTagSearchFilter: () => void,
+  tagSearchFilter: TagAssetStoreSearchFilter,
+  setTagSearchFilter: TagAssetStoreSearchFilter => void,
   onFilterChange: () => void,
 |};
 
@@ -50,7 +51,7 @@ export const TagFilter = ({
                       tagSearchFilter.tags.add(tag.value);
                     }
                     setTagSearchFilter(
-                      new TagSearchFilter(tagSearchFilter.tags)
+                      new TagAssetStoreSearchFilter(tagSearchFilter.tags)
                     );
                     onFilterChange();
                   }}

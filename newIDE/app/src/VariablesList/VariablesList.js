@@ -16,7 +16,7 @@ import SwapHorizontal from '@material-ui/icons/SwapHoriz';
 import { Column, Line, Spacer } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import IconButton from '../UI/IconButton';
-import DragHandle from '../UI/DragHandle';
+import { DragHandleIcon } from '../UI/DragHandle';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
@@ -841,7 +841,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                   ) : (
                     connectDragSource(
                       <span>
-                        <DragHandle
+                        <DragHandleIcon
                           color={
                             isSelected
                               ? gdevelopTheme.listItem.selectedTextColor

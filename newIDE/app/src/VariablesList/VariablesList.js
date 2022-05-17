@@ -77,22 +77,24 @@ const preventEventDefaultEffect = (
 
 const styles = { inlineIcon: { padding: 0 }, handlePlaceholder: { width: 24 } };
 
-type Props = {
+export type HistoryHandler = {|
+  saveToHistory: () => void,
+  undo: () => void,
+  redo: () => void,
+  canUndo: () => boolean,
+  canRedo: () => boolean,
+|};
+
+type Props = {|
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
   onComputeAllVariableNames?: () => Array<string>,
-  historyHandler?: {
-    saveToHistory: () => void,
-    undo: () => void,
-    redo: () => void,
-    canUndo: () => boolean,
-    canRedo: () => boolean,
-  },
+  historyHandler?: HistoryHandler,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   helpPagePath?: ?string,
   size?: 'small',
-};
+|};
 
 const StyledTreeItem = withStyles(theme => ({
   group: {

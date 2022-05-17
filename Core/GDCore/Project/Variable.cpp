@@ -226,7 +226,7 @@ bool Variable::InsertChild(const gd::String& name,
 
 void Variable::SerializeTo(SerializerElement& element) const {
   element.SetStringAttribute("type", TypeAsString(GetType()));
-  element.SetBoolAttribute("folded", IsFolded());
+  if (IsFolded()) element.SetBoolAttribute("folded", true);
 
   if (type == Type::String) {
     element.SetStringAttribute("value", GetString());

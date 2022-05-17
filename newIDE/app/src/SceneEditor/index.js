@@ -1507,23 +1507,17 @@ export default class SceneEditor extends React.Component<Props, State> {
               }
               helpPagePath={'/all-features/variables/instance-variables'}
               title={<Trans>Instance Variables</Trans>}
-              onEditObjectVariables={() => {
-                if (!this.instancesSelection.hasSelectedInstances()) {
-                  return;
-                }
-                const associatedObjectName = this.instancesSelection
-                  .getSelectedInstances()[0]
-                  .getObjectName();
-                const object = getObjectByName(
-                  project,
-                  layout,
-                  associatedObjectName
-                );
-                if (object) {
-                  this.editObject(object, 'variables');
-                  this.editInstanceVariables(null);
-                }
-              }}
+              onEditObjectVariables={
+                variablesEditedAssociatedObject
+                  ? () => {
+                      this.editObject(
+                        variablesEditedAssociatedObject,
+                        'variables'
+                      );
+                      this.editInstanceVariables(null);
+                    }
+                  : undefined
+              }
               hotReloadPreviewButtonProps={
                 this.props.hotReloadPreviewButtonProps
               }

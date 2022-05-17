@@ -2,6 +2,7 @@
 import * as React from 'react';
 import Measure from 'react-measure';
 import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { ClickAwayListener } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { makeStyles, withStyles } from '@material-ui/styles';
@@ -69,6 +70,7 @@ import VariableTypeSelector from './VariableTypeSelector';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import VariablesListToolbar from './VariablesListToolbar';
 import { normalizeString } from '../Utils/Search';
+import { I18n } from '@lingui/react';
 const gd: libGDevelop = global.gd;
 
 const stopEventPropagation = (event: SyntheticPointerEvent<HTMLInputElement>) =>
@@ -743,19 +745,22 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     setSelectedNodes([newName]);
   };
 
-  const renderVariableAndChildrenRows = ({
-    name,
-    variable,
-    parentNodeId,
-    parentVariable,
-    isInherited,
-  }: {|
-    name: string,
-    variable: gdVariable,
-    parentNodeId?: string,
-    parentVariable?: gdVariable,
-    isInherited: boolean,
-  |}) => {
+  const renderVariableAndChildrenRows = (
+    {
+      name,
+      variable,
+      parentNodeId,
+      parentVariable,
+      isInherited,
+    }: {|
+      name: string,
+      variable: gdVariable,
+      parentNodeId?: string,
+      parentVariable?: gdVariable,
+      isInherited: boolean,
+    |},
+    i18n: I18nType
+  ) => {
     const isCollection = isCollectionVariable(variable);
     const type = variable.getType();
 
@@ -983,7 +988,9 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               onChange={() => {}}
                               value={
                                 isCollection
-                                  ? `${variable.getChildrenCount()} children`
+                                  ? i18n._(
+                                      t`${variable.getChildrenCount()} children`
+                                    )
                                   : type === gd.Variable.String
                                   ? variable.getString()
                                   : variable.getValue().toString()
@@ -1072,23 +1079,29 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                   .toJSArray()
                   .map((childName, index) => {
                     const childVariable = variable.getChild(childName);
-                    return renderVariableAndChildrenRows({
-                      name: childName,
+                    return renderVariableAndChildrenRows(
+                      {
+                        name: childName,
+                        variable: childVariable,
+                        parentNodeId: nodeId,
+                        parentVariable: variable,
+                        isInherited,
+                      },
+                      i18n
+                    );
+                  })
+              : mapFor(0, variable.getChildrenCount(), index => {
+                  const childVariable = variable.getAtIndex(index);
+                  return renderVariableAndChildrenRows(
+                    {
+                      name: index.toString(),
                       variable: childVariable,
                       parentNodeId: nodeId,
                       parentVariable: variable,
                       isInherited,
-                    });
-                  })
-              : mapFor(0, variable.getChildrenCount(), index => {
-                  const childVariable = variable.getAtIndex(index);
-                  return renderVariableAndChildrenRows({
-                    name: index.toString(),
-                    variable: childVariable,
-                    parentNodeId: nodeId,
-                    parentVariable: variable,
-                    isInherited,
-                  });
+                    },
+                    i18n
+                  );
                 })}
           </StyledTreeItem>
         )}
@@ -1270,7 +1283,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     forceUpdate();
   };
 
-  const renderTree = (isInherited: boolean = false) => {
+  const renderTree = (i18n: I18nType, isInherited: boolean = false) => {
     const variablesContainer =
       isInherited && props.inheritedVariablesContainer
         ? props.inheritedVariablesContainer
@@ -1287,11 +1300,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
           }
         }
 
-        return renderVariableAndChildrenRows({
-          name,
-          variable,
-          isInherited,
-        });
+        return renderVariableAndChildrenRows(
+          {
+            name,
+            variable,
+            isInherited,
+          },
+          i18n
+        );
       }
     );
     return containerVariablesTree;
@@ -1321,62 +1337,68 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   );
 
   return (
-    <ClickAwayListener onClickAway={() => setSelectedNodes([])}>
-      <Measure
-        bounds
-        onResize={contentRect => {
-          setContainerWidth(contentRect.bounds.width);
-        }}
-      >
-        {({ contentRect, measureRef }) => (
-          <div
-            ref={measureRef}
-            style={{ flex: 1, display: 'flex' }}
-            onKeyDown={keyboardShortcuts.onKeyDown}
-            onKeyUp={keyboardShortcuts.onKeyUp}
+    <I18n>
+      {({ i18n }) => (
+        <ClickAwayListener onClickAway={() => setSelectedNodes([])}>
+          <Measure
+            bounds
+            onResize={contentRect => {
+              setContainerWidth(contentRect.bounds.width);
+            }}
           >
-            <Column expand>
-              {isNarrow ? null : toolbar}
-              {props.variablesContainer.count() === 0 &&
-              (!props.inheritedVariablesContainer ||
-                props.inheritedVariablesContainer.count() === 0) ? (
-                <Column noMargin expand justifyContent="center">
-                  {props.emptyPlaceholderTitle &&
-                  props.emptyPlaceholderDescription ? (
-                    <EmptyPlaceholder
-                      title={props.emptyPlaceholderTitle}
-                      description={props.emptyPlaceholderDescription}
-                      actionLabel={<Trans>Add a variable</Trans>}
-                      helpPagePath={props.helpPagePath || undefined}
-                      tutorialId="intermediate-advanced-variables"
-                      onAdd={onAdd}
-                    />
-                  ) : null}
+            {({ contentRect, measureRef }) => (
+              <div
+                ref={measureRef}
+                style={{ flex: 1, display: 'flex' }}
+                onKeyDown={keyboardShortcuts.onKeyDown}
+                onKeyUp={keyboardShortcuts.onKeyUp}
+              >
+                <Column expand>
+                  {isNarrow ? null : toolbar}
+                  {props.variablesContainer.count() === 0 &&
+                  (!props.inheritedVariablesContainer ||
+                    props.inheritedVariablesContainer.count() === 0) ? (
+                    <Column noMargin expand justifyContent="center">
+                      {props.emptyPlaceholderTitle &&
+                      props.emptyPlaceholderDescription ? (
+                        <EmptyPlaceholder
+                          title={props.emptyPlaceholderTitle}
+                          description={props.emptyPlaceholderDescription}
+                          actionLabel={<Trans>Add a variable</Trans>}
+                          helpPagePath={props.helpPagePath || undefined}
+                          tutorialId="intermediate-advanced-variables"
+                          onAdd={onAdd}
+                        />
+                      ) : null}
+                    </Column>
+                  ) : (
+                    <ScrollView autoHideScrollbar>
+                      <TreeView
+                        multiSelect
+                        defaultExpandIcon={<ChevronRight />}
+                        defaultCollapseIcon={<ExpandMore />}
+                        onNodeSelect={(event, values) =>
+                          setSelectedNodes(values)
+                        }
+                        onNodeToggle={onNodeToggle}
+                        selected={selectedNodes}
+                        expanded={expandedNodes}
+                      >
+                        {props.inheritedVariablesContainer
+                          ? renderTree(i18n, true)
+                          : null}
+                        {renderTree(i18n)}
+                      </TreeView>
+                    </ScrollView>
+                  )}
+                  {isNarrow ? toolbar : null}
                 </Column>
-              ) : (
-                <ScrollView autoHideScrollbar>
-                  <TreeView
-                    multiSelect
-                    defaultExpandIcon={<ChevronRight />}
-                    defaultCollapseIcon={<ExpandMore />}
-                    onNodeSelect={(event, values) => setSelectedNodes(values)}
-                    onNodeToggle={onNodeToggle}
-                    selected={selectedNodes}
-                    expanded={expandedNodes}
-                  >
-                    {props.inheritedVariablesContainer
-                      ? renderTree(true)
-                      : null}
-                    {renderTree()}
-                  </TreeView>
-                </ScrollView>
-              )}
-              {isNarrow ? toolbar : null}
-            </Column>
-          </div>
-        )}
-      </Measure>
-    </ClickAwayListener>
+              </div>
+            )}
+          </Measure>
+        </ClickAwayListener>
+      )}
+    </I18n>
   );
 };
 

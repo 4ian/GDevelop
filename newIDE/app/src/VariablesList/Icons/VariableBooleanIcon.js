@@ -10,17 +10,17 @@ export default React.memo<Props>(props => (
       fill="none"
       d="M9.5 3.5L11.8824 6L16 1"
       stroke="currentColor"
-      stroke-width="1.3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <path
       fill="none"
       d="M1 1L6 6M6 1L1 6"
       stroke="currentColor"
-      stroke-width="1.3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </SvgIcon>
 ));

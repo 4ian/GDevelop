@@ -261,18 +261,19 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
               : props.variablesContainer
           );
           if (!variable || !name) return null;
-          let parentType;
 
+          let hasName = false;
           const parentVariable = getDirectParentVariable(lineage);
-          if (!parentVariable) {
-            parentType = gd.Variable.Structure;
-          } else {
-            parentType = parentVariable.getType();
+          if (
+            !parentVariable ||
+            parentVariable.getType() === gd.Variable.Structure
+          ) {
+            hasName = true;
           }
           return {
-            name,
+            nameOrIndex: name,
             serializedVariable: serializeToJSObject(variable),
-            parentType,
+            hasName,
           };
         })
         .filter(Boolean)
@@ -291,23 +292,28 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     let pastedElementOffsetIndex = 0;
 
     variablesContent.forEach(variableContent => {
-      const name = SafeExtractor.extractStringProperty(variableContent, 'name');
+      const nameOrIndex = SafeExtractor.extractStringProperty(
+        variableContent,
+        'nameOrIndex'
+      );
       const serializedVariable = SafeExtractor.extractObjectProperty(
         variableContent,
         'serializedVariable'
       );
-      const parentType = SafeExtractor.extractNumberProperty(
+      const hasName = SafeExtractor.extractBooleanProperty(
         variableContent,
-        'parentType'
+        'hasName'
       );
-      if (!name || !serializedVariable || !parentType) return;
+      if (!nameOrIndex || !serializedVariable || hasName === null) return;
 
       const pasteAtTopLevel =
         selectedNodes.length === 0 ||
         selectedNodes.some(nodeId => nodeId.startsWith(inheritedPrefix));
 
+      const name = hasName ? nameOrIndex : null;
+
       if (pasteAtTopLevel) {
-        if (parentType === gd.Variable.Array) return;
+        if (!name) return;
         const newName = insertInVariablesContainer(
           props.variablesContainer,
           name,
@@ -317,16 +323,18 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       } else {
         const targetNode = selectedNodes[0];
         if (targetNode.startsWith(inheritedPrefix)) return;
+
         const {
           name: targetVariableName,
           lineage: targetVariableLineage,
         } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
         if (!targetVariableName) return;
+
         const targetParentVariable = getDirectParentVariable(
           targetVariableLineage
         );
         if (!targetParentVariable) {
-          if (parentType === gd.Variable.Array) return;
+          if (!name) return;
           const newName = insertInVariablesContainer(
             props.variablesContainer,
             name,
@@ -336,7 +344,14 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
           newSelectedNodes.push(newName);
         } else {
           const targetParentType = targetParentVariable.getType();
-          if (targetParentType !== parentType) return;
+
+          if (
+            (targetParentType === gd.Variable.Structure && !name) ||
+            (targetParentType === gd.Variable.Array && !!name)
+          ) {
+            // Early return if trying to paste array element in structure or vice versa
+            return;
+          }
           if (targetParentType === gd.Variable.Array) {
             const index = parseInt(targetVariableName, 10) + 1;
             insertInVariableChildrenArray(
@@ -354,6 +369,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
             newSelectedNodes.push(bits.join(separator));
             pastedElementOffsetIndex += 1;
           } else {
+            if (!name) return;
             const newName = insertInVariableChildren(
               targetParentVariable,
               name,

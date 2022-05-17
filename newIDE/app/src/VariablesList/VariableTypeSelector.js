@@ -20,12 +20,13 @@ type Props = {|
   disabled?: boolean,
 |};
 
-const VariableTypeSelector = (props: Props) => {
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-  // TODO: find a way to have those next 3 consts outside of component
-  // for performance issues without making the storybook bug.
-  const options = React.useMemo(
-    () => [
+let options;
+let variableTypeToIcon;
+let variableTypeToString;
+
+const getOptions = () => {
+  if (!options) {
+    options = [
       <SelectOption
         key="string"
         primaryText={t`String`}
@@ -51,31 +52,40 @@ const VariableTypeSelector = (props: Props) => {
         primaryText={t`Structure`}
         value={gd.Variable.Structure}
       />,
-    ],
-    []
-  );
-  const variableTypeToIcon = React.useMemo(
-    () => ({
+    ];
+  }
+  return options;
+};
+
+const getVariableTypeToIcon = () => {
+  if (!variableTypeToIcon) {
+    variableTypeToIcon = {
       [gd.Variable.String]: VariableStringIcon,
       [gd.Variable.Number]: VariableNumberIcon,
       [gd.Variable.Boolean]: VariableBooleanIcon,
       [gd.Variable.Array]: VariableArrayIcon,
       [gd.Variable.Structure]: VariableStructureIcon,
-    }),
-    []
-  );
-  const variableTypeToString = React.useMemo(
-    () => ({
+    };
+  }
+  return variableTypeToIcon;
+};
+
+const getVariableTypeToString = () => {
+  if (!variableTypeToString) {
+    variableTypeToString = {
       [gd.Variable.String]: 'string',
       [gd.Variable.Number]: 'number',
       [gd.Variable.Boolean]: 'boolean',
       [gd.Variable.Array]: 'array',
       [gd.Variable.Structure]: 'structure',
-    }),
-    []
-  );
+    };
+  }
+  return variableTypeToString;
+};
 
-  const Icon = variableTypeToIcon[props.variableType];
+const VariableTypeSelector = (props: Props) => {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const Icon = getVariableTypeToIcon()[props.variableType];
 
   return (
     <Line alignItems="center" noMargin>
@@ -93,7 +103,7 @@ const VariableTypeSelector = (props: Props) => {
         margin="none"
         stopPropagationOnClick
         onChange={event =>
-          props.onChange(variableTypeToString[event.target.value])
+          props.onChange(getVariableTypeToString()[event.target.value])
         }
         inputStyle={
           props.isHighlighted
@@ -102,7 +112,7 @@ const VariableTypeSelector = (props: Props) => {
         }
         disabled={props.disabled}
       >
-        {options}
+        {getOptions()}
       </SelectField>
     </Line>
   );

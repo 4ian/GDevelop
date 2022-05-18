@@ -437,6 +437,7 @@ export const fakeAsset1: Asset = {
   tags: ['space shooter', 'tag2'],
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -460,6 +461,7 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
   tags: ['space shooter', 'tag2'],
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -503,6 +505,7 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
   tags: ['space shooter', 'tag2'],
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -535,6 +538,7 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   tags: ['space shooter', 'tag2'],
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -567,6 +571,7 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
   tags: ['space shooter', 'tag2'],
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -642,6 +647,7 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   tags: ['space shooter', 'tag2'],
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -693,6 +699,7 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
   license: 'MIT',
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
 };
 
 export const fakeAssetShortHeader2: AssetShortHeader = {
@@ -704,6 +711,7 @@ export const fakeAssetShortHeader2: AssetShortHeader = {
   license: 'MIT',
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
 };
 
 export const fakeAssetShortHeader3: AssetShortHeader = {
@@ -715,6 +723,7 @@ export const fakeAssetShortHeader3: AssetShortHeader = {
   license: 'MIT',
   objectType: 'sprite',
   animationsCount: 1,
+  maxFramesCount: 1,
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {

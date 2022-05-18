@@ -1,9 +1,5 @@
 // @flow
-import {
-  useSearchItem,
-  TagSearchFilter,
-  SearchFilter,
-} from '../UI/Search/UseSearchItem';
+import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 
 export class TagAssetStoreSearchFilter extends TagSearchFilter<AssetShortHeader> {
@@ -55,8 +51,21 @@ export class AnimatedAssetStoreSearchFilter
   }
 
   isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      this.animated === null || searchItem.animationsCount > 1 === this.animated
-    );
+    const hasAnimatedAnimation = searchItem.maxFramesCount > 1;
+    return this.animated === null || hasAnimatedAnimation === this.animated;
+  }
+}
+
+export class StatedAssetStoreSearchFilter
+  implements SearchFilter<AssetShortHeader> {
+  stated: boolean | null;
+
+  constructor(stated: boolean | null = null) {
+    this.stated = stated;
+  }
+
+  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+    const hasAnimations = searchItem.animationsCount > 1;
+    return this.stated === null || hasAnimations === this.stated;
   }
 }

@@ -51,6 +51,20 @@ export class SafeExtractor {
     return property;
   }
 
+  static extractBooleanProperty(
+    anything: any,
+    propertyName: string
+  ): boolean | null {
+    const object = this.extractObject(anything);
+    if (!object) return null;
+
+    const property = anything[propertyName];
+
+    if (typeof property !== 'boolean') return null;
+
+    return property;
+  }
+
   static extractObjectProperty(
     anything: any,
     propertyName: string

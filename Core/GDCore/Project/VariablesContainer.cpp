@@ -4,8 +4,10 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/VariablesContainer.h"
+
 #include <algorithm>
 #include <iostream>
+
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
@@ -150,7 +152,9 @@ void VariablesContainer::Swap(std::size_t firstVariableIndex,
 }
 
 void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
-  if (oldIndex >= variables.size() || newIndex >= variables.size()) return;
+  if (oldIndex >= variables.size() || newIndex >= variables.size() ||
+      oldIndex == newIndex)
+    return;
 
   auto nameAndVariable = variables[oldIndex];
   variables.erase(variables.begin() + oldIndex);

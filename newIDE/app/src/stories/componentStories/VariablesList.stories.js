@@ -6,7 +6,6 @@ import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
 import VariablesList from '../../VariablesList/VariablesList';
-import SerializedObjectDisplay from '../SerializedObjectDisplay';
 import DragAndDropContextProvider from '../../UI/DragAndDrop/DragAndDropContextProvider';
 import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
 

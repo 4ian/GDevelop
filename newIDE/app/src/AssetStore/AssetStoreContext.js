@@ -11,9 +11,26 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem } from '../UI/Search/UseSearchItem';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import {
+  TagAssetStoreSearchFilter,
+  AnimatedAssetStoreSearchFilter,
+  ObjectTypeAssetStoreSearchFilter,
+  LicenseAssetStoreSearchFilter,
+} from './AssetStoreSearchFilter';
 
 const defaultSearchText = '';
+
+export type AssetFiltersState = {|
+  animatedFilter: AnimatedAssetStoreSearchFilter,
+  setAnimatedFilter: AnimatedAssetStoreSearchFilter => void,
+  viewportFilter: TagAssetStoreSearchFilter,
+  setViewportFilter: TagAssetStoreSearchFilter => void,
+  objectTypeFilter: ObjectTypeAssetStoreSearchFilter,
+  setObjectTypeFilter: ObjectTypeAssetStoreSearchFilter => void,
+  licenseFilter: LicenseAssetStoreSearchFilter,
+  setLicenseFilter: LicenseAssetStoreSearchFilter => void,
+|};
 
 type AssetStoreState = {|
   filters: ?Filters,
@@ -26,6 +43,7 @@ type AssetStoreState = {|
   searchText: string,
   setSearchText: string => void,
   filtersState: FiltersState,
+  assetFiltersState: AssetFiltersState,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -44,6 +62,16 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     removeFilter: () => {},
     chosenCategory: null,
     setChosenCategory: () => {},
+  },
+  assetFiltersState: {
+    animatedFilter: new AnimatedAssetStoreSearchFilter(),
+    setAnimatedFilter: filter => {},
+    viewportFilter: new TagAssetStoreSearchFilter(),
+    setViewportFilter: filter => {},
+    objectTypeFilter: new ObjectTypeAssetStoreSearchFilter(),
+    setObjectTypeFilter: filter => {},
+    licenseFilter: new LicenseAssetStoreSearchFilter(),
+    setLicenseFilter: filter => {},
   },
 });
 
@@ -76,6 +104,58 @@ export const AssetStoreStateProvider = ({
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
+
+  const [
+    animatedFilter,
+    setAnimatedFilter,
+  ] = React.useState<AnimatedAssetStoreSearchFilter>(
+    new AnimatedAssetStoreSearchFilter()
+  );
+  const [
+    viewportFilter,
+    setViewportFilter,
+  ] = React.useState<TagAssetStoreSearchFilter>(
+    new TagAssetStoreSearchFilter()
+  );
+  const [
+    objectTypeFilter,
+    setObjectTypeFilter,
+  ] = React.useState<ObjectTypeAssetStoreSearchFilter>(
+    new ObjectTypeAssetStoreSearchFilter()
+  );
+  const [
+    licenseFilter,
+    setLicenseFilter,
+  ] = React.useState<LicenseAssetStoreSearchFilter>(
+    new LicenseAssetStoreSearchFilter()
+  );
+  const assetFiltersState = {
+    animatedFilter: animatedFilter,
+    setAnimatedFilter: setAnimatedFilter,
+    viewportFilter: viewportFilter,
+    setViewportFilter: setViewportFilter,
+    objectTypeFilter: objectTypeFilter,
+    setObjectTypeFilter: setObjectTypeFilter,
+    licenseFilter: licenseFilter,
+    setLicenseFilter: setLicenseFilter,
+  };
+  // TODO Fix me: this is to give the same instance to UseSearchItem to avoid looping on the search.
+  const [searchFilters, setSearchFilters] = React.useState<
+    Array<SearchFilter<AssetShortHeader>>
+  >([viewportFilter]);
+  if (
+    searchFilters[0] !== animatedFilter ||
+    searchFilters[1] !== viewportFilter ||
+    searchFilters[2] !== objectTypeFilter ||
+    searchFilters[3] !== licenseFilter
+  ) {
+    setSearchFilters([
+      animatedFilter,
+      viewportFilter,
+      objectTypeFilter,
+      licenseFilter,
+    ]);
+  }
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -144,7 +224,8 @@ export const AssetStoreStateProvider = ({
     getAssetShortHeaderSearchTerms,
     searchText,
     chosenCategory,
-    chosenFilters
+    chosenFilters,
+    searchFilters
   );
 
   const assetStoreState = React.useMemo(
@@ -159,17 +240,19 @@ export const AssetStoreStateProvider = ({
       searchText,
       setSearchText,
       filtersState,
+      assetFiltersState,
     }),
     [
       searchResults,
-      error,
+      fetchAssetsAndFilters,
       filters,
       assetPacks,
       authors,
       licenses,
+      error,
       searchText,
       filtersState,
-      fetchAssetsAndFilters,
+      assetFiltersState,
     ]
   );
 

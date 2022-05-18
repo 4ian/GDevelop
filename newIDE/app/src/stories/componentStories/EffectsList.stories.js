@@ -3,6 +3,7 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import muiDecorator from '../ThemeDecorator';
 import paperDecorator from '../PaperDecorator';
+import themeDecorator from '../ThemeDecorator';
 import GDevelopJsInitializerDecorator, {
   testProject,
 } from '../GDevelopJsInitializerDecorator';
@@ -109,5 +110,5 @@ export const withoutEffectsForAnObject = () => (
 export default {
   title: 'EffectsList',
   component: EffectsList,
-  decorators: [paperDecorator, muiDecorator],
+  decorators: [paperDecorator, muiDecorator, themeDecorator],
 };

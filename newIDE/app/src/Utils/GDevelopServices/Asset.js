@@ -49,6 +49,7 @@ export type AssetShortHeader = {|
   license: string,
   objectType: string,
   animationsCount: number,
+  maxFramesCount: number,
 |};
 
 export type AssetHeader = {|

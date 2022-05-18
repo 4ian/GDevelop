@@ -8,6 +8,7 @@ import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
+import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
@@ -170,6 +171,7 @@ export const AssetStore = ({
                     node: { name: tag, allChildrenTags: [], children: [] },
                     parentNodes: [],
                   };
+                  sendAssetPackOpened(tag);
                   filtersState.setChosenCategory(chosenCategory);
                   setIsFiltersOpen(true);
                   setIsOnHomePage(false);

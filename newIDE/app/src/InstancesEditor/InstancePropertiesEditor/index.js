@@ -10,7 +10,6 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
-import VariablesList from '../../VariablesList';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
@@ -19,6 +18,9 @@ import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import VariablesList, {
+  type HistoryHandler,
+} from '../../VariablesList/VariablesList';
 
 type Props = {|
   project: gdProject,
@@ -29,10 +31,10 @@ type Props = {|
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
+  historyHandler?: HistoryHandler,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
-  _instanceVariablesList: { current: null | VariablesList } = React.createRef();
   schema: Schema = [
     {
       name: this.props.i18n._(t`Object`),
@@ -183,21 +185,24 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
               </IconButton>
             </Line>
           </Column>
-          <VariablesList
-            inheritedVariablesContainer={object ? object.getVariables() : null}
-            variablesContainer={instance.getVariables()}
-            onComputeAllVariableNames={() =>
-              object
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    object
-                  )
-                : []
-            }
-            ref={this._instanceVariablesList}
-          />
+          {object ? (
+            <VariablesList
+              inheritedVariablesContainer={object.getVariables()}
+              variablesContainer={instance.getVariables()}
+              size="small"
+              onComputeAllVariableNames={() =>
+                object
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      object
+                    )
+                  : []
+              }
+              historyHandler={this.props.historyHandler}
+            />
+          ) : null}
         </Column>
       </ScrollView>
     );

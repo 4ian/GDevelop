@@ -243,7 +243,6 @@ export default function EffectsList(props: Props) {
                                   flexDirection: 'column',
                                 }}
                               >
-                                <Spacer />
                                 {isOver && <DropIndicator canDrop={canDrop} />}
                                 <div
                                   style={{
@@ -344,47 +343,50 @@ export default function EffectsList(props: Props) {
                                   />
                                   <Spacer />
                                 </div>
-                                <Line expand noMargin>
-                                  <Column expand>
-                                    {!!effectType && effectMetadata ? (
-                                      <React.Fragment>
-                                        <Line>
-                                          <BackgroundText>
-                                            <MarkdownText
-                                              source={
-                                                effectMetadata.description
-                                              }
-                                            />
-                                          </BackgroundText>
-                                        </Line>
-                                        <PropertiesEditor
-                                          instances={[effect]}
-                                          schema={
-                                            effectMetadata.parametersSchema
-                                          }
-                                          project={props.project}
-                                          resourceSources={
-                                            props.resourceSources
-                                          }
-                                          onChooseResource={
-                                            props.onChooseResource
-                                          }
-                                          resourceExternalEditors={
-                                            props.resourceExternalEditors
-                                          }
-                                          renderExtraDescriptionText={
-                                            showEffectParameterNames
-                                              ? parameterName =>
-                                                  i18n._(
-                                                    t`Parameter name in events: \`${parameterName}\` `
-                                                  )
-                                              : undefined
-                                          }
-                                        />
-                                      </React.Fragment>
-                                    ) : null}
-                                  </Column>
-                                </Line>
+                                {effectType && (
+                                  <Line expand noMargin>
+                                    <Column expand>
+                                      {effectMetadata ? (
+                                        <React.Fragment>
+                                          <Line>
+                                            <BackgroundText>
+                                              <MarkdownText
+                                                source={
+                                                  effectMetadata.description
+                                                }
+                                              />
+                                            </BackgroundText>
+                                          </Line>
+                                          <PropertiesEditor
+                                            instances={[effect]}
+                                            schema={
+                                              effectMetadata.parametersSchema
+                                            }
+                                            project={props.project}
+                                            resourceSources={
+                                              props.resourceSources
+                                            }
+                                            onChooseResource={
+                                              props.onChooseResource
+                                            }
+                                            resourceExternalEditors={
+                                              props.resourceExternalEditors
+                                            }
+                                            renderExtraDescriptionText={
+                                              showEffectParameterNames
+                                                ? parameterName =>
+                                                    i18n._(
+                                                      t`Parameter name in events: \`${parameterName}\` `
+                                                    )
+                                                : undefined
+                                            }
+                                          />
+                                        </React.Fragment>
+                                      ) : null}
+                                      <Spacer />
+                                    </Column>
+                                  </Line>
+                                )}
                               </div>
                             )
                           }

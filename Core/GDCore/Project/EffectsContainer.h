@@ -91,6 +91,11 @@ class GD_CORE_API EffectsContainer {
   void RemoveEffect(const gd::String& name);
 
   /**
+   * \brief Move the specified effect at a new position in the list.
+   */
+  void MoveEffect(std::size_t oldIndex, std::size_t newIndex);
+
+  /**
    * Swap the position of two effects.
    */
   void SwapEffects(std::size_t firstEffectIndex, std::size_t secondEffectIndex);

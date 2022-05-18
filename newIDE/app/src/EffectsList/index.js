@@ -45,6 +45,18 @@ import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
+const styles = {
+  rowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  rowContent: {
+    display: 'flex',
+    flex: 1,
+    alignItems: 'center',
+  },
+};
+
 type Props = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
@@ -236,19 +248,11 @@ export default function EffectsList(props: Props) {
                             canDrop,
                           }) =>
                             connectDropTarget(
-                              <div
-                                key={effect.ptr}
-                                style={{
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                }}
-                              >
+                              <div key={effect.ptr} style={styles.rowContainer}>
                                 {isOver && <DropIndicator canDrop={canDrop} />}
                                 <div
                                   style={{
-                                    display: 'flex',
-                                    flex: 1,
-                                    alignItems: 'center',
+                                    ...styles.rowContent,
                                     backgroundColor:
                                       gdevelopTheme.list.itemsBackgroundColor,
                                   }}

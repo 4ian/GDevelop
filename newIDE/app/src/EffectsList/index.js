@@ -1,9 +1,11 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { t } from '@lingui/macro';
+import * as React from 'react';
+import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import * as React from 'react';
+import MoreVert from '@material-ui/icons/MoreVert';
+import Add from '@material-ui/icons/Add';
+
 import { Column, Line, Spacer } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
@@ -11,11 +13,8 @@ import { mapFor } from '../Utils/MapFor';
 import RaisedButton from '../UI/RaisedButton';
 import IconButton from '../UI/IconButton';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import MoreVert from '@material-ui/icons/MoreVert';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import Add from '@material-ui/icons/Add';
 import PropertiesEditor from '../PropertiesEditor';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import BackgroundText from '../UI/BackgroundText';
@@ -42,6 +41,9 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
 import { DragHandleIcon } from '../UI/DragHandle';
 import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+import Text from '../UI/Text';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type Props = {|
   project: gdProject,
@@ -71,11 +73,15 @@ export default function EffectsList(props: Props) {
   const { effectsContainer, onEffectsUpdated } = props;
   const draggedEffect = React.useRef<?gdEffect>(null);
 
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   const preferences = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const showEffectParameterNames = preferences.values.showEffectParameterNames;
   const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
-
+  const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
+    {}
+  );
   const DragSourceAndDropTarget = React.useMemo(
     () => makeDragSourceAndDropTarget('effects-list'),
     []
@@ -126,6 +132,34 @@ export default function EffectsList(props: Props) {
       draggedIndex,
       targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
     );
+    forceUpdate();
+    onEffectsUpdated();
+  };
+
+  const renameEffect = (effect: gdEffect, newName: string) => {
+    if (newName === effect.getName()) return;
+    if (nameErrors[effect.ptr]) {
+      const newNameErrors = { ...nameErrors };
+      delete newNameErrors[effect.ptr];
+      setNameErrors(newNameErrors);
+    }
+
+    if (!newName) {
+      setNameErrors({
+        ...nameErrors,
+        [effect.ptr]: <Trans>Effects cannot have empty names</Trans>,
+      });
+      return;
+    }
+
+    if (effectsContainer.hasEffectNamed(newName)) {
+      setNameErrors({
+        ...nameErrors,
+        [effect.ptr]: <Trans>The effect name {newName} is already taken</Trans>,
+      });
+      return;
+    }
+    effect.setName(newName);
     forceUpdate();
     onEffectsUpdated();
   };
@@ -211,56 +245,82 @@ export default function EffectsList(props: Props) {
                               >
                                 <Spacer />
                                 {isOver && <DropIndicator canDrop={canDrop} />}
-                                <MiniToolbar>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flex: 1,
+                                    alignItems: 'center',
+                                    backgroundColor:
+                                      gdevelopTheme.list.itemsBackgroundColor,
+                                  }}
+                                >
                                   {connectDragSource(
                                     <span>
+                                      <Spacer />
                                       <DragHandleIcon />
+                                      <Spacer />
                                     </span>
                                   )}
-                                  <MiniToolbarText firstChild>
-                                    <Trans>Effect name:</Trans>
-                                  </MiniToolbarText>
-                                  <SemiControlledTextField
-                                    margin="none"
-                                    commitOnBlur
-                                    hintText={t`Enter the effect name`}
-                                    value={effect.getName()}
-                                    onChange={newName => {
-                                      if (newName === effect.getName()) return;
-
-                                      effect.setName(newName);
-                                      forceUpdate();
-                                      onEffectsUpdated();
-                                    }}
-                                    fullWidth
-                                  />
-                                  <MiniToolbarText>
-                                    <Trans>Type:</Trans>
-                                  </MiniToolbarText>
-                                  <SelectField
-                                    margin="none"
-                                    value={effectType}
-                                    onChange={(e, i, newEffectType: string) =>
-                                      chooseEffectType(effect, newEffectType)
-                                    }
-                                    fullWidth
-                                    hintText={t`Choose the effect to apply`}
-                                  >
-                                    {allEffectMetadata.map(effectMetadata => (
-                                      <SelectOption
-                                        key={effectMetadata.type}
-                                        value={effectMetadata.type}
-                                        primaryText={effectMetadata.fullName}
-                                        disabled={
-                                          props.target === 'object' &&
-                                          effectMetadata.isMarkedAsNotWorkingForObjects
-                                        }
+                                  <ResponsiveLineStackLayout expand>
+                                    <Line noMargin expand alignItems="center">
+                                      <Text noMargin noShrink>
+                                        <Trans>Effect name:</Trans>
+                                      </Text>
+                                      <Spacer />
+                                      <SemiControlledTextField
+                                        margin="none"
+                                        commitOnBlur
+                                        errorText={nameErrors[effect.ptr]}
+                                        hintText={t`Enter the effect name`}
+                                        value={effect.getName()}
+                                        onChange={newName => {
+                                          renameEffect(effect, newName);
+                                        }}
+                                        fullWidth
                                       />
-                                    ))}
-                                  </SelectField>
+                                    </Line>
+                                    <Line noMargin expand alignItems="center">
+                                      <Text noMargin noShrink>
+                                        <Trans>Type:</Trans>
+                                      </Text>
+                                      <Spacer />
+                                      <SelectField
+                                        margin="none"
+                                        value={effectType}
+                                        onChange={(
+                                          e,
+                                          i,
+                                          newEffectType: string
+                                        ) =>
+                                          chooseEffectType(
+                                            effect,
+                                            newEffectType
+                                          )
+                                        }
+                                        fullWidth
+                                        hintText={t`Choose the effect to apply`}
+                                      >
+                                        {allEffectMetadata.map(
+                                          effectMetadata => (
+                                            <SelectOption
+                                              key={effectMetadata.type}
+                                              value={effectMetadata.type}
+                                              primaryText={
+                                                effectMetadata.fullName
+                                              }
+                                              disabled={
+                                                props.target === 'object' &&
+                                                effectMetadata.isMarkedAsNotWorkingForObjects
+                                              }
+                                            />
+                                          )
+                                        )}
+                                      </SelectField>
+                                    </Line>
+                                  </ResponsiveLineStackLayout>
                                   <ElementWithMenu
                                     element={
-                                      <IconButton>
+                                      <IconButton size="small">
                                         <MoreVert />
                                       </IconButton>
                                     }
@@ -282,7 +342,8 @@ export default function EffectsList(props: Props) {
                                       },
                                     ]}
                                   />
-                                </MiniToolbar>
+                                  <Spacer />
+                                </div>
                                 <Line expand noMargin>
                                   <Column expand>
                                     {!!effectType && effectMetadata ? (

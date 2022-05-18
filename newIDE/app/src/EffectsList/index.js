@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { mapFor } from '../Utils/MapFor';
@@ -39,6 +39,9 @@ import {
   TRIVIAL_FIRST_EFFECT,
 } from '../Utils/GDevelopServices/Badge';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { makeDragSourceAndDropTarget } from '../UI/DragAndDrop/DragSourceAndDropTarget';
+import { DragHandleIcon } from '../UI/DragHandle';
+import DropIndicator from '../UI/SortableVirtualizedItemList/DropIndicator';
 
 type Props = {|
   project: gdProject,
@@ -66,11 +69,17 @@ const getEnumeratedEffectMetadata = (
  */
 export default function EffectsList(props: Props) {
   const { effectsContainer, onEffectsUpdated } = props;
+  const draggedEffect = React.useRef<?gdEffect>(null);
 
   const preferences = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const showEffectParameterNames = preferences.values.showEffectParameterNames;
   const setShowEffectParameterNames = preferences.setShowEffectParameterNames;
+
+  const DragSourceAndDropTarget = React.useMemo(
+    () => makeDragSourceAndDropTarget('effects-list'),
+    []
+  );
 
   const allEffectMetadata = React.useMemo(
     () => enumerateEffectsMetadata(props.project),
@@ -100,6 +109,23 @@ export default function EffectsList(props: Props) {
 
   const removeEffect = (name: string) => {
     effectsContainer.removeEffect(name);
+    forceUpdate();
+    onEffectsUpdated();
+  };
+
+  const moveEffect = (targetEffect: gdEffect) => {
+    const { current } = draggedEffect;
+    if (!current) return;
+
+    const draggedIndex = effectsContainer.getEffectPosition(current.getName());
+    const targetIndex = effectsContainer.getEffectPosition(
+      targetEffect.getName()
+    );
+
+    effectsContainer.moveEffect(
+      draggedIndex,
+      targetIndex > draggedIndex ? targetIndex - 1 : targetIndex
+    );
     forceUpdate();
     onEffectsUpdated();
   };
@@ -144,118 +170,168 @@ export default function EffectsList(props: Props) {
                     </Column>
                   </Line>
                 )}
-                {mapFor(0, effectsContainer.getEffectsCount(), (i: number) => {
-                  const effect: gdEffect = effectsContainer.getEffectAt(i);
-                  const effectType = effect.getEffectType();
-                  const effectMetadata = getEnumeratedEffectMetadata(
-                    allEffectMetadata,
-                    effectType
-                  );
+                <Column noMargin>
+                  {mapFor(
+                    0,
+                    effectsContainer.getEffectsCount(),
+                    (i: number) => {
+                      const effect: gdEffect = effectsContainer.getEffectAt(i);
+                      const effectType = effect.getEffectType();
+                      const effectMetadata = getEnumeratedEffectMetadata(
+                        allEffectMetadata,
+                        effectType
+                      );
 
-                  return (
-                    <React.Fragment key={i}>
-                      <MiniToolbar>
-                        <MiniToolbarText firstChild>
-                          <Trans>Effect name:</Trans>
-                        </MiniToolbarText>
-                        <SemiControlledTextField
-                          margin="none"
-                          commitOnBlur
-                          hintText={t`Enter the effect name`}
-                          value={effect.getName()}
-                          onChange={newName => {
-                            if (newName === effect.getName()) return;
-
-                            effect.setName(newName);
-                            forceUpdate();
-                            onEffectsUpdated();
+                      return (
+                        <DragSourceAndDropTarget
+                          key={effect.ptr}
+                          beginDrag={() => {
+                            draggedEffect.current = effect;
+                            return {};
                           }}
-                          fullWidth
-                        />
-                        <MiniToolbarText>
-                          <Trans>Type:</Trans>
-                        </MiniToolbarText>
-                        <SelectField
-                          margin="none"
-                          value={effectType}
-                          onChange={(e, i, newEffectType: string) =>
-                            chooseEffectType(effect, newEffectType)
-                          }
-                          fullWidth
-                          hintText={t`Choose the effect to apply`}
+                          canDrag={() => true}
+                          canDrop={() => true}
+                          drop={() => {
+                            moveEffect(effect);
+                          }}
                         >
-                          {allEffectMetadata.map(effectMetadata => (
-                            <SelectOption
-                              key={effectMetadata.type}
-                              value={effectMetadata.type}
-                              primaryText={effectMetadata.fullName}
-                              disabled={
-                                props.target === 'object' &&
-                                effectMetadata.isMarkedAsNotWorkingForObjects
-                              }
-                            />
-                          ))}
-                        </SelectField>
-                        <ElementWithMenu
-                          element={
-                            <IconButton>
-                              <MoreVert />
-                            </IconButton>
-                          }
-                          buildMenuTemplate={(i18n: I18nType) => [
-                            {
-                              label: i18n._(t`Delete`),
-                              click: () => removeEffect(effect.getName()),
-                            },
-                            { type: 'separator' },
-                            {
-                              type: 'checkbox',
-                              label: i18n._(t`Show Parameter Names`),
-                              checked: showEffectParameterNames,
-                              click: () =>
-                                setShowEffectParameterNames(
-                                  !showEffectParameterNames
-                                ),
-                            },
-                          ]}
-                        />
-                      </MiniToolbar>
-                      <Line expand noMargin>
-                        <Column expand>
-                          {!!effectType && effectMetadata ? (
-                            <React.Fragment>
-                              <Line>
-                                <BackgroundText>
-                                  <MarkdownText
-                                    source={effectMetadata.description}
+                          {({
+                            connectDragSource,
+                            connectDropTarget,
+                            isOver,
+                            canDrop,
+                          }) =>
+                            connectDropTarget(
+                              <div
+                                key={effect.ptr}
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                }}
+                              >
+                                <Spacer />
+                                {isOver && <DropIndicator canDrop={canDrop} />}
+                                <MiniToolbar>
+                                  {connectDragSource(
+                                    <span>
+                                      <DragHandleIcon />
+                                    </span>
+                                  )}
+                                  <MiniToolbarText firstChild>
+                                    <Trans>Effect name:</Trans>
+                                  </MiniToolbarText>
+                                  <SemiControlledTextField
+                                    margin="none"
+                                    commitOnBlur
+                                    hintText={t`Enter the effect name`}
+                                    value={effect.getName()}
+                                    onChange={newName => {
+                                      if (newName === effect.getName()) return;
+
+                                      effect.setName(newName);
+                                      forceUpdate();
+                                      onEffectsUpdated();
+                                    }}
+                                    fullWidth
                                   />
-                                </BackgroundText>
-                              </Line>
-                              <PropertiesEditor
-                                instances={[effect]}
-                                schema={effectMetadata.parametersSchema}
-                                project={props.project}
-                                resourceSources={props.resourceSources}
-                                onChooseResource={props.onChooseResource}
-                                resourceExternalEditors={
-                                  props.resourceExternalEditors
-                                }
-                                renderExtraDescriptionText={
-                                  showEffectParameterNames
-                                    ? parameterName =>
-                                        i18n._(
-                                          t`Parameter name in events: \`${parameterName}\` `
-                                        )
-                                    : undefined
-                                }
-                              />
-                            </React.Fragment>
-                          ) : null}
-                        </Column>
-                      </Line>
-                    </React.Fragment>
-                  );
-                })}
+                                  <MiniToolbarText>
+                                    <Trans>Type:</Trans>
+                                  </MiniToolbarText>
+                                  <SelectField
+                                    margin="none"
+                                    value={effectType}
+                                    onChange={(e, i, newEffectType: string) =>
+                                      chooseEffectType(effect, newEffectType)
+                                    }
+                                    fullWidth
+                                    hintText={t`Choose the effect to apply`}
+                                  >
+                                    {allEffectMetadata.map(effectMetadata => (
+                                      <SelectOption
+                                        key={effectMetadata.type}
+                                        value={effectMetadata.type}
+                                        primaryText={effectMetadata.fullName}
+                                        disabled={
+                                          props.target === 'object' &&
+                                          effectMetadata.isMarkedAsNotWorkingForObjects
+                                        }
+                                      />
+                                    ))}
+                                  </SelectField>
+                                  <ElementWithMenu
+                                    element={
+                                      <IconButton>
+                                        <MoreVert />
+                                      </IconButton>
+                                    }
+                                    buildMenuTemplate={(i18n: I18nType) => [
+                                      {
+                                        label: i18n._(t`Delete`),
+                                        click: () =>
+                                          removeEffect(effect.getName()),
+                                      },
+                                      { type: 'separator' },
+                                      {
+                                        type: 'checkbox',
+                                        label: i18n._(t`Show Parameter Names`),
+                                        checked: showEffectParameterNames,
+                                        click: () =>
+                                          setShowEffectParameterNames(
+                                            !showEffectParameterNames
+                                          ),
+                                      },
+                                    ]}
+                                  />
+                                </MiniToolbar>
+                                <Line expand noMargin>
+                                  <Column expand>
+                                    {!!effectType && effectMetadata ? (
+                                      <React.Fragment>
+                                        <Line>
+                                          <BackgroundText>
+                                            <MarkdownText
+                                              source={
+                                                effectMetadata.description
+                                              }
+                                            />
+                                          </BackgroundText>
+                                        </Line>
+                                        <PropertiesEditor
+                                          instances={[effect]}
+                                          schema={
+                                            effectMetadata.parametersSchema
+                                          }
+                                          project={props.project}
+                                          resourceSources={
+                                            props.resourceSources
+                                          }
+                                          onChooseResource={
+                                            props.onChooseResource
+                                          }
+                                          resourceExternalEditors={
+                                            props.resourceExternalEditors
+                                          }
+                                          renderExtraDescriptionText={
+                                            showEffectParameterNames
+                                              ? parameterName =>
+                                                  i18n._(
+                                                    t`Parameter name in events: \`${parameterName}\` `
+                                                  )
+                                              : undefined
+                                          }
+                                        />
+                                      </React.Fragment>
+                                    ) : null}
+                                  </Column>
+                                </Line>
+                              </div>
+                            )
+                          }
+                        </DragSourceAndDropTarget>
+                      );
+                    }
+                  )}
+                </Column>
               </ScrollView>
               <Column>
                 <Line justifyContent="flex-end" expand>

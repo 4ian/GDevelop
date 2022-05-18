@@ -7,13 +7,12 @@ import Add from '@material-ui/icons/Add';
 import Undo from '@material-ui/icons/Undo';
 import Redo from '@material-ui/icons/Redo';
 import Delete from '@material-ui/icons/Delete';
-import Close from '@material-ui/icons/Close';
 import Copy from '../UI/CustomSvgIcons/Copy';
 import Paste from '../UI/CustomSvgIcons/Paste';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import FlatButton from '../UI/FlatButton';
-import TextField from '../UI/TextField';
+import SearchBar from '../UI/SearchBar';
 
 type Props = {|
   isNarrow: boolean,
@@ -116,21 +115,11 @@ const VariablesListToolbar = (props: Props) => {
         </Line>
       </Column>
       <Column expand>
-        <TextField
-          fullWidth
+        <SearchBar
           value={props.searchText}
-          onChange={(event, value) => props.onChangeSearchText(value)}
-          endAdornment={
-            !!props.searchText ? (
-              <IconButton
-                onClick={() => props.onChangeSearchText('')}
-                edge="end"
-              >
-                <Close />
-              </IconButton>
-            ) : null
-          }
-          hintText={t`Search in variables`}
+          onRequestSearch={props.onChangeSearchText}
+          onChange={props.onChangeSearchText}
+          placeholder={t`Search in variables`}
         />
       </Column>
       <Column noMargin>

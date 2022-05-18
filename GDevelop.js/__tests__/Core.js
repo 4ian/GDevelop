@@ -230,6 +230,19 @@ describe('libGD.js', function () {
       expect(effects.getEffectPosition('MyEffect2')).toBe(0);
       expect(effects.getEffectPosition('MyEffect')).toBe(1);
 
+      const effect3 = new gd.Effect();
+      effect3.setName('MyEffect3');
+
+      effects.insertEffect(effect3, 2);
+      expect(effects.hasEffectNamed('MyEffect3')).toBe(true);
+      expect(effects.getEffectsCount()).toBe(3);
+
+      effects.moveEffect(2, 0);
+
+      expect(effects.getEffectPosition('MyEffect3')).toBe(0);
+      expect(effects.getEffectPosition('MyEffect2')).toBe(1);
+      expect(effects.getEffectPosition('MyEffect')).toBe(2);
+
       layer.delete();
     });
     it('can be serialized', function () {

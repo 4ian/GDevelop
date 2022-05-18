@@ -150,7 +150,6 @@ import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 import NewInstructionEditorMenu from '../EventsSheet/InstructionEditor/NewInstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
@@ -4465,80 +4464,6 @@ storiesOf('LayersList', module)
         hotReloadPreviewButtonProps={hotReloadPreviewButtonProps}
       />
     </div>
-  ));
-
-storiesOf('EffectsList', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('with some effects (for a layer)', () => (
-    <EffectsList
-      target="layer"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.layerWithEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('with some effects (for an object)', () => (
-    <EffectsList
-      target="object"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('with an effect without effect type (for a layer)', () => (
-    <EffectsList
-      target="layer"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('without effects (for a layer)', () => (
-    <EffectsList
-      target="layer"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.layerWithoutEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('without effects (for an object)', () => (
-    <EffectsList
-      target="object"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
   ));
 
 storiesOf('CommandPalette', module)

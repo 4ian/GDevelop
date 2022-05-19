@@ -12,6 +12,7 @@
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Tools/MakeUnique.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 
 namespace gd {
 class Expression;
@@ -38,7 +39,7 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
-        parentType(StringToType(rootType_)) ,
+        parentType(StringToType(gd::ParameterMetadata::GetExpressionValueType(rootType_))),
         childType(Type::Unknown) {};
   virtual ~ExpressionValidator(){};
 

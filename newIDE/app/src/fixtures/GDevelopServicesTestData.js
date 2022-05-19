@@ -435,6 +435,9 @@ export const fakeAsset1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -456,6 +459,9 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -497,6 +503,9 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -527,6 +536,9 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -557,6 +569,9 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -630,6 +645,9 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -678,6 +696,10 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   previewImageUrls: ['res/GD-logo.png'],
   tags: ['space shooter', 'tag2'],
+  license: 'MIT',
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
 };
 
 export const fakeAssetShortHeader2: AssetShortHeader = {
@@ -686,6 +708,10 @@ export const fakeAssetShortHeader2: AssetShortHeader = {
   shortDescription: 'A zombie attacking the player and wandering around.',
   previewImageUrls: ['res/GD-logo.png'],
   tags: ['survival', 'tag2'],
+  license: 'MIT',
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
 };
 
 export const fakeAssetShortHeader3: AssetShortHeader = {
@@ -694,6 +720,10 @@ export const fakeAssetShortHeader3: AssetShortHeader = {
   shortDescription: 'A small sword.',
   previewImageUrls: ['res/GD-logo.png'],
   tags: ['medieval', 'tag2'],
+  license: 'MIT',
+  objectType: 'sprite',
+  animationsCount: 1,
+  maxFramesCount: 1,
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {

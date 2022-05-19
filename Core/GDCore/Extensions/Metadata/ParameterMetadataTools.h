@@ -32,7 +32,7 @@ class GD_CORE_API ParameterMetadataTools {
       const std::vector<gd::Expression>& parameters,
       const std::vector<gd::ParameterMetadata>& parametersMetadata,
       std::function<void(const gd::ParameterMetadata& parameterMetadata,
-                         const gd::String& parameterValue,
+                         const gd::Expression& parameterValue,
                          const gd::String& lastObjectName)> fn);
 
   /**
@@ -44,7 +44,7 @@ class GD_CORE_API ParameterMetadataTools {
       const std::vector<gd::Expression>& parameters,
       const std::vector<gd::ParameterMetadata>& parametersMetadata,
       std::function<void(const gd::ParameterMetadata& parameterMetadata,
-                         const gd::String& parameterValue,
+                         const gd::Expression& parameterValue,
                          size_t parameterIndex,
                          const gd::String& lastObjectName)> fn);
 

@@ -981,7 +981,7 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
 }
 
 gd::String EventsCodeGenerator::GenerateParameterCodes(
-    const gd::String& parameter,
+    const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
     const gd::String& lastObjectName,

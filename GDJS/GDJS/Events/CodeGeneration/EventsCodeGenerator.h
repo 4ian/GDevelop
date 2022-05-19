@@ -174,7 +174,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
  protected:
   virtual gd::String GenerateParameterCodes(
-      const gd::String& parameter,
+      const gd::Expression& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,

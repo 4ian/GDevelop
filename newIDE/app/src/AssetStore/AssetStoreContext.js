@@ -141,15 +141,15 @@ export const AssetStoreStateProvider = ({
   };
   // When one of the filter change, we need to rebuild the array
   // for the memo.
-  const [searchFilters, setSearchFilters] = React.useState<
-    Array<SearchFilter<AssetShortHeader>>
-  >([viewportFilter]);
   const currentFilters = [
     animatedFilter,
     viewportFilter,
     objectTypeFilter,
     licenseFilter,
   ];
+  const [searchFilters, setSearchFilters] = React.useState<
+    Array<SearchFilter<AssetShortHeader>>
+  >(currentFilters);
   if (searchFilters.some((filter, index) => filter !== currentFilters[index])) {
     setSearchFilters(currentFilters);
   }

@@ -46,6 +46,10 @@ export type AssetShortHeader = {|
   shortDescription: string,
   previewImageUrls: Array<string>,
   tags: Array<string>,
+  license: string,
+  objectType: string,
+  animationsCount: number,
+  maxFramesCount: number,
 |};
 
 export type AssetHeader = {|

@@ -20,6 +20,11 @@ export const Default = () => (
       onOpenDetails={action('onOpenDetails')}
       events={testProject.testLayout.getEvents()}
       project={testProject.project}
+      layout={testProject.testLayout}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceSources={[]}
+      onObjectAddedFromAsset={() => {}}
+      resourceExternalEditors={[]}
       objectsContainer={testProject.testLayout}
     />
   </AssetStoreStateProvider>

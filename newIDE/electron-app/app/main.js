@@ -21,6 +21,10 @@ const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
 const { downloadLocalFile } = require('./LocalFileDownloader');
 const { openPreviewWindow } = require('./PreviewWindow');
+const {
+  setupLocalGDJSDevelopmentWatcher,
+  closeLocalGDJSDevelopmentWatcher,
+} = require('./LocalGDJSDevelopmentWatcher');
 
 // Initialize `@electron/remote` module
 require('@electron/remote/main').initialize();
@@ -161,7 +165,7 @@ app.on('ready', function() {
       previewGameIndexHtmlPath: options.previewGameIndexHtmlPath,
       alwaysOnTop: options.alwaysOnTop,
       hideMenuBar: options.hideMenuBar,
-    })
+    });
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {
@@ -289,6 +293,15 @@ app.on('ready', function() {
 
   ipcMain.on('get-local-network-ip', event => {
     event.sender.send('local-network-ip', findLocalIp());
+  });
+
+  // LocalGDJSDevelopmentWatcher events:
+  ipcMain.on('setup-local-gdjs-development-watcher', event => {
+    setupLocalGDJSDevelopmentWatcher();
+  });
+
+  ipcMain.on('close-local-gdjs-development-watcher', event => {
+    closeLocalGDJSDevelopmentWatcher();
   });
 
   // DebuggerServer events:

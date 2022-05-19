@@ -44,28 +44,18 @@ export class LicenseAssetStoreSearchFilter
 
 export class AnimatedAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
-  animated: boolean | null;
+  mustBeAnimated: boolean | null;
+  mustHaveSeveralState: boolean;
 
-  constructor(animated: boolean | null = null) {
-    this.animated = animated;
+  constructor(mustBeAnimated: boolean, mustHaveSeveralState: boolean) {
+    this.mustBeAnimated = mustBeAnimated;
+    this.mustHaveSeveralState = mustHaveSeveralState;
   }
 
   isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    const hasAnimatedAnimation = searchItem.maxFramesCount > 1;
-    return this.animated === null || hasAnimatedAnimation === this.animated;
-  }
-}
-
-export class StatedAssetStoreSearchFilter
-  implements SearchFilter<AssetShortHeader> {
-  stated: boolean | null;
-
-  constructor(stated: boolean | null = null) {
-    this.stated = stated;
-  }
-
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    const hasAnimations = searchItem.animationsCount > 1;
-    return this.stated === null || hasAnimations === this.stated;
+    const hasAnimatedState = searchItem.maxFramesCount > 1;
+    const hasSeveralState = searchItem.animationCount > 1;
+    return this.mustBeAnimated === null || hasAnimatedState === this.animated
+    && this.mustHaveSeveralState === null || hasSeveralState === this.animated;
   }
 }

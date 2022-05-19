@@ -1,8 +1,10 @@
 # About GDevelop IDE dependencies (package.json)
 
-GDevelop relies on some dependencies that can have special requirements:
+GDevelop relies on some dependencies that can have special requirements.
 
-- **TypeScript** here is only used to check the types in the `scripts/` files. The IDE uses Flow for static typing. TypeScript is used in the game engine too (see GDJS and Extensions folders).
+## Note on TypeScript
+
+**TypeScript** here is only used to check the types in the `scripts/` files. The IDE uses Flow for static typing. TypeScript is used in the game engine too (see GDJS and Extensions folders).
 
 ## Storybook
 
@@ -12,11 +14,16 @@ GDevelop relies on some dependencies that can have special requirements:
 - `babel-loader` is specified to be the exact version required by `react-scripts` (because `react-scripts` wants the exact version and will complain if forced to use the `babel-loader` of Storybook).
   - **Try removing these extra `devDependencies`** if you upgrade Storybook or Create React App.
 
-## babel-core
+## Create React App
+
+We need `"react-error-overlay": "6.0.9"` because of https://github.com/facebook/create-react-app/issues/11773.
+Can be removed if upgrading create-react-app to v5.
+
+## LinguiJS
 
 - `"babel-core": "^7.0.0-bridge.0"` is needed for js-lingui `lingui extract` command (who runs Babel on source files).
 
-## `react-dnd`
+## Drag'n'drop handling
 
 **`react-dnd`** is used by `react-mosaic-component` and `react-sortable-tree` (but not `react-sortable-hoc`). Both must be using **the same versions** of `react-dnd` and `react-dnd-html5-backend`. Otherwise, you get blanks/not rendered components.
 
@@ -25,7 +32,7 @@ GDevelop relies on some dependencies that can have special requirements:
 > - `yarn why react-dnd`
 > - `npm ls webpack`
 
-- Latest versions of `react-sortable-hoc` seems to be breaking the lists. The exact version in which this occurs was not determined.
+Latest versions of `react-sortable-hoc` seems to be breaking the lists. The exact version in which this occurs was not determined.
 
 ## Various fixes
 

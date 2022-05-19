@@ -1,7 +1,6 @@
 #include "UsedExtensionsFinder.h"
 
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/WholeProjectRefactorer.h"

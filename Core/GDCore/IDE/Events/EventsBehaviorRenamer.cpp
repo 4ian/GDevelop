@@ -11,7 +11,6 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -118,21 +117,20 @@ bool EventsBehaviorRenamer::DoVisitInstruction(gd::Instruction& instruction,
       instruction.GetParameters(),
       metadata.GetParameters(),
       [&](const gd::ParameterMetadata& parameterMetadata,
-          const gd::String& parameterValue,
+          const gd::Expression& parameterValue,
           size_t parameterIndex,
           const gd::String& lastObjectName) {
         const gd::String& type = parameterMetadata.type;
 
         if (gd::ParameterMetadata::IsBehavior(type)) {
           if (lastObjectName == objectName) {
-            if (parameterValue == oldBehaviorName) {
+            if (parameterValue.GetPlainString() == oldBehaviorName) {
               instruction.SetParameter(parameterIndex,
                                        gd::Expression(newBehaviorName));
             }
           }
         } else {
-          gd::ExpressionParser2 parser;
-          auto node = parser.ParseExpression(parameterValue);
+          auto node = parameterValue.GetRootNode();
           if (node) {
             ExpressionBehaviorRenamer renamer(GetGlobalObjectsContainer(),
                                               GetObjectsContainer(),

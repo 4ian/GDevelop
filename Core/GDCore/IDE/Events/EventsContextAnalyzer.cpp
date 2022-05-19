@@ -9,7 +9,6 @@
 #include <vector>
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
@@ -119,7 +118,7 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
       instruction.GetParameters(),
       instrInfo.parameters,
       [this](const gd::ParameterMetadata& parameterMetadata,
-             const gd::String& parameterValue,
+             const gd::Expression& parameterValue,
              const gd::String& lastObjectName) {
         AnalyzeParameter(platform,
                          project,

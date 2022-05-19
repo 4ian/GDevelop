@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"

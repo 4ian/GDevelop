@@ -9,7 +9,6 @@
 
 #include <memory>
 #include <vector>
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/String.h"
@@ -59,7 +58,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
   static gd::String GenerateExpressionCode(EventsCodeGenerator& codeGenerator,
                                            EventsCodeGenerationContext& context,
                                            const gd::String& type,
-                                           const gd::String& expression,
+                                           const gd::Expression& expression,
                                            const gd::String& objectName = "");
 
   const gd::String& GetOutput() { return output; };

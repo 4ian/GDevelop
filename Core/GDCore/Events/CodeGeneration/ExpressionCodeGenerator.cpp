@@ -34,15 +34,14 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     EventsCodeGenerator& codeGenerator,
     EventsCodeGenerationContext& context,
     const gd::String& rootType,
-    const gd::String& expression,
+    const gd::Expression& expression,
     const gd::String& rootObjectName) {
-  gd::ExpressionParser2 parser;
   ExpressionCodeGenerator generator(rootType, rootObjectName, codeGenerator, context);
 
-  auto node = parser.ParseExpression(expression);
+  auto node = expression.GetRootNode();
   if (!node) {
-    std::cout << "Error: error while parsing: \"" << expression << "\" ("
-              << rootType << ")" << std::endl;
+    std::cout << "Error: error while parsing: \"" << expression.GetPlainString()
+              << "\" (" << rootType << ")" << std::endl;
 
     return generator.GenerateDefaultValue(rootType);
   }
@@ -54,8 +53,8 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   node->Visit(validator);
   if (!validator.GetErrors().empty()) {
     std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
-              << "\" in: \"" << expression << "\" (" << rootType << ")"
-              << std::endl;
+              << "\" in: \"" << expression.GetPlainString() << "\" ("
+              << rootType << ")" << std::endl;
 
     return generator.GenerateDefaultValue(rootType);
   }

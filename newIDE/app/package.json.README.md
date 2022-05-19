@@ -12,6 +12,11 @@ GDevelop relies on some dependencies that can have special requirements:
 - `babel-loader` is specified to be the exact version required by `react-scripts` (because `react-scripts` wants the exact version and will complain if forced to use the `babel-loader` of Storybook).
   - **Try removing these extra `devDependencies`** if you upgrade Storybook or Create React App.
 
+## react-error-overlay
+
+We nned `"react-error-overlay": "6.0.9"` because of https://github.com/facebook/create-react-app/issues/11773.
+Can be removed if upgrading create-react-app to v5.
+
 ## babel-core
 
 - `"babel-core": "^7.0.0-bridge.0"` is needed for js-lingui `lingui extract` command (who runs Babel on source files).

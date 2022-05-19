@@ -202,7 +202,7 @@ const generateEventsFunctionExtension = (
     )
     .then(functionInfos => {
       if (!options.skipCodeGeneration) {
-        applyFunctionDependencyTransitivity(functionInfos);
+        applyFunctionIncludeFilesDependencyTransitivity(functionInfos);
       }
       return extension;
     });
@@ -303,7 +303,7 @@ const generateFreeFunction = (
  * Add dependencies between functions according to transitivity.
  * @param functionInfos free function metadatas
  */
-const applyFunctionDependencyTransitivity = (
+const applyFunctionIncludeFilesDependencyTransitivity = (
   functionInfos: Array<{
     functionFile: string,
     functionMetadata: gdInstructionMetadata | gdExpressionMetadata,

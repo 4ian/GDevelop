@@ -430,6 +430,9 @@ export const fakeAsset1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
@@ -451,6 +454,9 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
@@ -492,6 +498,9 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
@@ -522,6 +531,9 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
@@ -552,6 +564,9 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
   license: 'MIT',
@@ -625,6 +640,9 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
   license: 'MIT',
@@ -672,28 +690,25 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
 };
 
 export const fakeAssetShortHeader1: AssetShortHeader = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['space shooter', 'tag2'],
-};
-
-export const fakeAssetShortHeader2: AssetShortHeader = {
-  id: '456',
-  name: 'Zombie',
-  shortDescription: 'A zombie attacking the player and wandering around.',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['survival', 'tag2'],
-};
-
-export const fakeAssetShortHeader3: AssetShortHeader = {
-  id: '789',
-  name: 'Sword',
-  shortDescription: 'A small sword.',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['medieval', 'tag2'],
+  id: 'a4eb5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  name: 'Dino Doux',
+  objectType: 'sprite',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
+  ],
+  shortDescription: 'with 6 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {

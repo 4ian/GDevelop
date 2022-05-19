@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import { Column } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import Chip from '@material-ui/core/Chip';
 import RaisedButton from '../UI/RaisedButton';
@@ -16,25 +16,21 @@ import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
+import { type ResourceSource } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import Dialog from '../UI/Dialog';
-import FlatButton from '../UI/FlatButton';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Link from '@material-ui/core/Link';
 import Window from '../Utils/Window';
-import CheckeredBackground from '../ResourcesList/CheckeredBackground';
+import { makeStyles } from '@material-ui/core';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
 
 const styles = {
   previewImagePixelated: {
-    width: '100%',
+    width: '50%',
     imageRendering: getPixelatedImageRendering(),
     padding: 15,
   },
@@ -47,13 +43,16 @@ const styles = {
   },
   verticalPreviewBackground: {
     width: 250,
+    minHeight: 150,
   },
   horizontalPreviewBackground: {
-    height: 170,
+    width: 150,
+    minHeight: 150,
   },
   chip: {
     marginBottom: 2,
     marginRight: 2,
+    cursor: 'pointer',
   },
   previewImage: {
     position: 'relative',
@@ -61,17 +60,22 @@ const styles = {
     maxHeight: '100%',
     verticalAlign: 'middle',
     pointerEvents: 'none',
-    objectFit: 'contain',
   },
 };
+
+const useChipStyles = makeStyles({
+  label: {
+    cursor: 'pointer',
+  },
+});
 
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
   resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onTagSelection: (tag: string) => void,
 
   assetShortHeader: AssetShortHeader,
   onAdd: () => void,
@@ -85,16 +89,22 @@ export const AssetDetails = ({
   layout,
   objectsContainer,
   resourceSources,
-  onChooseResource,
   resourceExternalEditors,
+  onTagSelection,
   assetShortHeader,
   onAdd,
   onClose,
   canInstall,
   isBeingInstalled,
 }: Props) => {
+  const chipStyles = useChipStyles();
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
+  const [isAssetAdded, setIsAssetAdded] = React.useState<boolean>(false);
+  const [
+    selectedAnimationName,
+    setSelectedAnimationName,
+  ] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
   const loadAsset = React.useCallback(
     () => {
@@ -102,6 +112,9 @@ export const AssetDetails = ({
         try {
           const loadedAsset = await getAsset(assetShortHeader);
           setAsset(loadedAsset);
+          setSelectedAnimationName(
+            loadedAsset.objectAssets[0].object.animations[0].name
+          );
         } catch (error) {
           console.log('Error while loading asset:', error);
           setError(error);
@@ -118,12 +131,14 @@ export const AssetDetails = ({
     [loadAsset]
   );
 
-  const canAddAsset = canInstall && !isBeingInstalled && !!asset;
+  const canAddAsset =
+    canInstall && !isBeingInstalled && !!asset && !isAssetAdded;
   const onAddAsset = React.useCallback(
     () => {
       if (canAddAsset) onAdd();
+      setIsAssetAdded(true);
     },
-    [onAdd, canAddAsset]
+    [onAdd, canAddAsset, setIsAssetAdded]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -139,34 +154,112 @@ export const AssetDetails = ({
       ? licenses.find(({ name }) => name === asset.license)
       : null;
 
+  const assetAnimations = asset
+    ? asset.objectAssets[0].object.animations
+    : null;
+
+  const getPreviewImageToDisplay = () => {
+    if (!asset || !assetAnimations || !selectedAnimationName) {
+      return assetShortHeader.previewImageUrls[0];
+    }
+
+    const animation = assetAnimations.find(
+      ({ name }) => name === selectedAnimationName
+    );
+    const animationResources = animation.directions[0].sprites.map(sprite =>
+      asset.objectAssets[0].resources.find(({ name }) => name === sprite.image)
+    );
+
+    return animationResources[0].file;
+  };
+
   return (
-    <Dialog
-      open
-      title={<Trans>Add an object from the store</Trans>}
-      onRequestClose={onClose}
-      actions={[
-        <FlatButton key="back" label={<Trans>Back</Trans>} onClick={onClose} />,
-        <LeftLoader
-          isLoading={isBeingInstalled || (!asset && !error)}
-          key="install"
-        >
-          <RaisedButton
-            primary
-            icon={<Add />}
-            label={<Trans>Add to the game</Trans>}
-            onClick={onAddAsset}
-            disabled={!canAddAsset}
-            id="add-asset-button"
-          />
-        </LeftLoader>,
-      ]}
-      onApply={onAddAsset}
-      id={'asset-details-dialog'}
-    >
-      <Column expand noMargin>
-        <ResponsiveLineStackLayout noMargin>
-          <ResponsiveWindowMeasurer>
-            {windowWidth => (
+    <Column expand noMargin>
+      <ResponsiveLineStackLayout justifyContent="space-between" noMargin>
+        <Column>
+          <Line alignItems="center" noMargin>
+            <Text size="title" displayInlineAsSpan>
+              {assetShortHeader.name}
+            </Text>
+            <Spacer />
+            {asset && (
+              <Text size="body">
+                <Trans>by</Trans>{' '}
+                {!!assetAuthors &&
+                  assetAuthors.map(author => {
+                    return (
+                      <Link
+                        key={author.name}
+                        component="button"
+                        onClick={() => {
+                          Window.openExternalURL(author.website);
+                        }}
+                      >
+                        {author.name}
+                      </Link>
+                    );
+                  })}
+              </Text>
+            )}
+          </Line>
+          <Line alignItems="center">
+            <div style={{ flexWrap: 'wrap' }}>
+              {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
+                <React.Fragment key={tag}>
+                  {index !== 0 && <Spacer />}
+                  <Chip
+                    size="small"
+                    style={styles.chip}
+                    classes={chipStyles}
+                    label={tag}
+                    onClick={() => {
+                      onTagSelection(tag);
+                    }}
+                  />
+                </React.Fragment>
+              ))}
+              {assetShortHeader.tags.length > 5 && (
+                <>
+                  <Spacer />
+                  <Chip
+                    size="small"
+                    style={styles.chip}
+                    label={
+                      <Trans>+ {assetShortHeader.tags.length - 5} tag(s)</Trans>
+                    }
+                  />
+                </>
+              )}
+            </div>
+          </Line>
+        </Column>
+        <Column alignItems="center" justifyContent="center">
+          <LeftLoader
+            isLoading={isBeingInstalled || (!asset && !error)}
+            key="install"
+          >
+            <RaisedButton
+              primary
+              label={
+                isBeingInstalled ? (
+                  <Trans>Adding to my project...</Trans>
+                ) : isAssetAdded ? (
+                  <Trans>Object added to my project</Trans>
+                ) : (
+                  <Trans>Add object to my project</Trans>
+                )
+              }
+              onClick={onAddAsset}
+              disabled={!canAddAsset}
+              id="add-asset-button"
+            />
+          </LeftLoader>
+        </Column>
+      </ResponsiveLineStackLayout>
+      <div style={{ height: 220, display: 'flex' }}>
+        <ResponsiveWindowMeasurer>
+          {windowWidth => (
+            <Column>
               <div
                 style={{
                   ...styles.previewBackground,
@@ -175,7 +268,6 @@ export const AssetDetails = ({
                     : styles.verticalPreviewBackground),
                 }}
               >
-                <CheckeredBackground />
                 <CorsAwareImage
                   style={{
                     ...styles.previewImage,
@@ -183,82 +275,67 @@ export const AssetDetails = ({
                       ? styles.previewImagePixelated
                       : undefined),
                   }}
-                  src={assetShortHeader.previewImageUrls[0]}
+                  src={getPreviewImageToDisplay()}
                   alt={assetShortHeader.name}
                 />
               </div>
-            )}
-          </ResponsiveWindowMeasurer>
-          <Column expand>
-            <div>
-              <Text size="title" displayInlineAsSpan>
-                {assetShortHeader.name}
-              </Text>{' '}
-              {assetShortHeader.shortDescription && (
-                <React.Fragment>
-                  -{' '}
-                  <Text size="body" displayInlineAsSpan>
-                    {assetShortHeader.shortDescription}
-                  </Text>
-                </React.Fragment>
-              )}
-            </div>
-            <span>
-              {assetShortHeader.tags.map(tag => (
-                <Chip size="small" style={styles.chip} label={tag} key={tag} />
-              ))}
-            </span>
-            {asset ? (
-              <React.Fragment>
-                <Text size="body">
-                  <Trans>By:</Trans>{' '}
-                  {!!assetAuthors &&
-                    assetAuthors.map(author => {
-                      return (
-                        <Link
-                          key={author.name}
-                          component="button"
-                          onClick={() => {
-                            Window.openExternalURL(author.website);
-                          }}
-                        >
-                          {author.name}
-                        </Link>
-                      );
-                    })}
-                </Text>
-                <Text size="body">
-                  {!!assetLicense && (
-                    <Trans>
-                      License:{' '}
-                      {
-                        <Link
-                          component="button"
-                          onClick={() => {
-                            Window.openExternalURL(assetLicense.website);
-                          }}
-                        >
-                          {assetLicense.name}
-                        </Link>
-                      }
-                    </Trans>
-                  )}
-                </Text>
-                <Text size="body">{asset.description}</Text>
-              </React.Fragment>
-            ) : error ? (
-              <PlaceholderError onRetry={loadAsset}>
-                <Trans>
-                  Error while loading the asset. Verify your internet connection
-                  or try again later.
-                </Trans>
-              </PlaceholderError>
-            ) : (
-              <PlaceholderLoader />
-            )}
-          </Column>
-        </ResponsiveLineStackLayout>
-      </Column>
-    </Dialog>
+              {assetAnimations &&
+                assetAnimations.length > 1 &&
+                typeof selectedAnimationName === 'string' && (
+                  <Line justifyContent="center">
+                    <SelectField
+                      value={selectedAnimationName}
+                      onChange={(e, i, newAnimationName: string) => {
+                        setSelectedAnimationName(newAnimationName);
+                      }}
+                    >
+                      {assetAnimations.map(animation => (
+                        <SelectOption
+                          key={animation.name}
+                          value={animation.name}
+                          primaryText={animation.name}
+                        />
+                      ))}
+                    </SelectField>
+                  </Line>
+                )}
+            </Column>
+          )}
+        </ResponsiveWindowMeasurer>
+        <Column expand>
+          {asset ? (
+            <React.Fragment>
+              <Text size="body">
+                {!!assetLicense && (
+                  <Trans>
+                    Type of License:{' '}
+                    {
+                      <Link
+                        component="button"
+                        onClick={() => {
+                          Window.openExternalURL(assetLicense.website);
+                        }}
+                      >
+                        {assetLicense.name}
+                      </Link>
+                    }
+                  </Trans>
+                )}
+              </Text>
+              <Text size="body">{asset.description}</Text>
+            </React.Fragment>
+          ) : error ? (
+            <PlaceholderError onRetry={loadAsset}>
+              <Trans>
+                Error while loading the asset. Verify your internet connection
+                or try again later.
+              </Trans>
+            </PlaceholderError>
+          ) : (
+            <PlaceholderLoader />
+          )}
+        </Column>
+      </div>
+    </Column>
   );
 };

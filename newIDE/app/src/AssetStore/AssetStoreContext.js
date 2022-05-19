@@ -139,22 +139,19 @@ export const AssetStoreStateProvider = ({
     licenseFilter: licenseFilter,
     setLicenseFilter: setLicenseFilter,
   };
-  // TODO Fix me: this is to give the same instance to UseSearchItem to avoid looping on the search.
+  // When one of the filter change, we need to rebuild the array
+  // for the memo.
   const [searchFilters, setSearchFilters] = React.useState<
     Array<SearchFilter<AssetShortHeader>>
   >([viewportFilter]);
-  if (
-    searchFilters[0] !== animatedFilter ||
-    searchFilters[1] !== viewportFilter ||
-    searchFilters[2] !== objectTypeFilter ||
-    searchFilters[3] !== licenseFilter
-  ) {
-    setSearchFilters([
-      animatedFilter,
-      viewportFilter,
-      objectTypeFilter,
-      licenseFilter,
-    ]);
+  const currentFilters = [
+    animatedFilter,
+    viewportFilter,
+    objectTypeFilter,
+    licenseFilter,
+  ];
+  if (searchFilters.some((filter, index) => filter !== currentFilters[index])) {
+    setSearchFilters(currentFilters);
   }
 
   const fetchAssetsAndFilters = React.useCallback(

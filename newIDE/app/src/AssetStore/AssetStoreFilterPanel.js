@@ -6,7 +6,6 @@ import { Accordion, AccordionHeader, AccordionBody } from '../UI/Accordion';
 import Text from '../UI/Text';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import { ColumnStackLayout } from '../UI/Layout';
-import { TagSearchFilter } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
   AnimatedAssetStoreSearchFilter,
@@ -15,6 +14,8 @@ import {
 } from './AssetStoreSearchFilter';
 import { type AssetFiltersState } from './AssetStoreContext';
 import { type License } from '../Utils/GDevelopServices/Asset';
+
+/** @typedef { import("../UI/Search/UseSearchItem").TagSearchFilter } TagSearchFilter */
 
 type Choice = {|
   label: ?React.Node,
@@ -189,7 +190,7 @@ export const AssetStoreFilterPanel = ({
         }}
       />
       <TagFilter
-        filterKey="Viewport"
+        filterKey="Viewpoint"
         title={<Trans>Viewpoint</Trans>}
         choices={[
           { label: t`Top-down`, value: 'top-down' },

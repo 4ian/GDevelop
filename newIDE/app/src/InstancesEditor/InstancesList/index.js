@@ -75,6 +75,7 @@ export default class InstancesList extends Component<Props, State> {
   });
 
   componentDidMount() {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     if (useShouldAutofocusSearchbar() && this._searchBar.current)
       this._searchBar.current.focus();
   }

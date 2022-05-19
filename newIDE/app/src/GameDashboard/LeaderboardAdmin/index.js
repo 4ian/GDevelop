@@ -169,7 +169,7 @@ const getSortOrderText = (currentLeaderboard: Leaderboard) => {
   if (currentLeaderboard.sort === 'ASC') {
     return <Trans>Lower is better</Trans>;
   }
-  return <Trans>Higer is better</Trans>;
+  return <Trans>Higher is better</Trans>;
 };
 
 export const LeaderboardAdmin = ({ onLoading, project }: Props) => {

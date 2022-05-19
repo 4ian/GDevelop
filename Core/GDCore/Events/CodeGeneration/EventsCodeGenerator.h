@@ -517,7 +517,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \endcode
    */
   virtual gd::String GenerateParameterCodes(
-      const gd::String& parameter,
+      const gd::Expression& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,

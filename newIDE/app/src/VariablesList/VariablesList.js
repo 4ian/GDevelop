@@ -1356,11 +1356,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
             {({ contentRect, measureRef }) => (
               <div
                 ref={measureRef}
-                style={{ flex: 1, display: 'flex' }}
+                style={{ flex: 1, display: 'flex', minHeight: 0 }}
                 onKeyDown={keyboardShortcuts.onKeyDown}
                 onKeyUp={keyboardShortcuts.onKeyUp}
               >
-                <Column expand>
+                <Column expand useFullHeight>
                   {isNarrow ? null : toolbar}
                   {props.variablesContainer.count() === 0 &&
                   (!props.inheritedVariablesContainer ||

@@ -12,25 +12,14 @@ import {
 } from '../ObjectsList/EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
 import { Column, Line } from '../UI/Grid';
-import DismissableInfoBar from '../UI/Messages/DismissableInfoBar';
 import { Tabs, Tab } from '../UI/Tabs';
 import { AssetStore } from '.';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installAsset } from './InstallAsset';
-import { AssetDetails } from './AssetDetails';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import {
-  sendAssetAddedToProject,
-  sendAssetOpened,
-  sendNewObjectCreated,
-} from '../Utils/Analytics/EventSender';
-import { showErrorBox } from '../UI/Messages/MessageBox';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
+import { sendNewObjectCreated } from '../Utils/Analytics/EventSender';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import ScrollView from '../UI/ScrollView';
 import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
@@ -94,11 +83,6 @@ export default function NewObjectDialog({
     setNewObjectDialogDefaultTab,
     getNewObjectDialogDefaultTab,
   } = React.useContext(PreferencesContext);
-  const [assetWasInstalled, setAssetWasInstalled] = React.useState(false);
-  const [openedAsset, setOpenedAsset] = React.useState<null | AssetShortHeader>(
-    null
-  );
-
   const [currentTab, setCurrentTab] = React.useState(
     getNewObjectDialogDefaultTab()
   );
@@ -122,68 +106,10 @@ export default function NewObjectDialog({
     [allObjectMetadata]
   );
 
-  const resourcesFetcher = useResourceFetcher();
   React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
     setNewObjectDialogDefaultTab,
     currentTab,
   ]);
-
-  const [
-    assetBeingInstalled,
-    setAssetBeingInstalled,
-  ] = React.useState<?AssetShortHeader>(null);
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
-  const onInstallAsset = React.useCallback(
-    (assetShortHeader: AssetShortHeader) => {
-      setAssetBeingInstalled(assetShortHeader);
-      (async () => {
-        try {
-          const installOutput = await installAsset({
-            assetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
-          });
-          sendAssetAddedToProject({
-            id: assetShortHeader.id,
-            name: assetShortHeader.name,
-          });
-          console.log('Asset successfully installed.');
-
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-
-          await resourcesFetcher.ensureResourcesAreFetched(project);
-
-          setOpenedAsset(null);
-          setAssetWasInstalled(true);
-        } catch (error) {
-          console.error('Error while installing the asset:', error);
-          showErrorBox({
-            message: `There was an error while installing the asset "${
-              assetShortHeader.name
-            }". Verify your internet connection or try again later.`,
-            rawError: error,
-            errorId: 'install-asset-error',
-          });
-        }
-
-        setAssetBeingInstalled(null);
-      })();
-    },
-    [
-      resourcesFetcher,
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      events,
-      onObjectAddedFromAsset,
-    ]
-  );
 
   const { DismissableTutorialMessage } = useDismissableTutorialMessage(
     'intro-object-types'
@@ -224,13 +150,11 @@ export default function NewObjectDialog({
             project={project}
             objectsContainer={objectsContainer}
             events={events}
-            onOpenDetails={assetShortHeader => {
-              setOpenedAsset(assetShortHeader);
-              sendAssetOpened({
-                id: assetShortHeader.id,
-                name: assetShortHeader.name,
-              });
-            }}
+            layout={layout}
+            onChooseResource={onChooseResource}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onObjectAddedFromAsset={onObjectAddedFromAsset}
           />
         )}
         {currentTab === 'new-object' && (
@@ -263,34 +187,6 @@ export default function NewObjectDialog({
           </ScrollView>
         )}
       </Column>
-      {openedAsset !== null ? (
-        <AssetDetails
-          project={project}
-          layout={layout}
-          objectsContainer={objectsContainer}
-          resourceSources={resourceSources}
-          onChooseResource={onChooseResource}
-          resourceExternalEditors={resourceExternalEditors}
-          assetShortHeader={openedAsset}
-          onAdd={() => onInstallAsset(openedAsset)}
-          onClose={() => setOpenedAsset(null)}
-          canInstall={!assetBeingInstalled}
-          isBeingInstalled={
-            !!assetBeingInstalled && assetBeingInstalled.id === openedAsset.id
-          }
-        />
-      ) : null}
-      {resourcesFetcher.renderResourceFetcherDialog()}
-      <DismissableInfoBar
-        identifier="asset-installed-explanation"
-        message={
-          <Trans>
-            The object was added to the list of objects. You can now use it on
-            the scene, in events, and customize it.
-          </Trans>
-        }
-        show={assetWasInstalled}
-      />
     </Dialog>
   );
 }

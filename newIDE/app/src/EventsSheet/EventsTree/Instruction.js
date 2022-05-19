@@ -166,14 +166,11 @@ const Instruction = (props: Props) => {
 
           const parameterMetadata = metadata.getParameter(parameterIndex);
           const parameterType = parameterMetadata.getType();
-          const expressionType = gd.ParameterMetadata.getExpressionValueType(
-            parameterType
-          );
           let expressionIsValid = true;
           if (
-            expressionType === 'number' ||
-            expressionType === 'string' ||
-            gd.ParameterMetadata.isExpression('variable', expressionType)
+            gd.ParameterMetadata.isExpression('number', parameterType) ||
+            gd.ParameterMetadata.isExpression('string', parameterType) ||
+            gd.ParameterMetadata.isExpression('variable', parameterType)
           ) {
             const expressionNode = instruction
               .getParameter(parameterIndex)
@@ -182,11 +179,11 @@ const Instruction = (props: Props) => {
               gd.JsPlatform.get(),
               globalObjectsContainer,
               objectsContainer,
-              expressionType
+              parameterType
             );
             expressionNode.visit(expressionValidator);
             expressionIsValid = expressionValidator.getErrors().size() === 0;
-          } else if (gd.ParameterMetadata.isObject(expressionType)) {
+          } else if (gd.ParameterMetadata.isObject(parameterType)) {
             const objectOrGroupName = instruction
               .getParameter(parameterIndex)
               .getPlainString();

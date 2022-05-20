@@ -1,6 +1,7 @@
 // @flow
 
 import { mapFor } from '../Utils/MapFor';
+import { normalizeString } from '../Utils/Search';
 const gd: libGDevelop = global.gd;
 
 type MovementType =
@@ -272,4 +273,84 @@ export const getMovementTypeWithinVariablesContainer = (
     return 'ArrayToTopLevel';
 
   return null;
+};
+
+export const generateListOfNodesMatchingSearchInVariable = ({
+  variable,
+  variableName,
+  nodeId,
+  searchText,
+  acc,
+}: {|
+  variable: gdVariable,
+  variableName: string,
+  nodeId: string,
+  searchText: string,
+  acc: Array<string>,
+|}): Array<string> => {
+  let newAcc;
+  switch (variable.getType()) {
+    case gd.Variable.String:
+      if (
+        normalizeString(variableName).includes(searchText) ||
+        normalizeString(variable.getString()).includes(searchText)
+      ) {
+        return [nodeId];
+      }
+      return [];
+    case gd.Variable.Number:
+      if (
+        normalizeString(variableName).includes(searchText) ||
+        variable
+          .getValue()
+          .toString()
+          .includes(searchText)
+      ) {
+        return [nodeId];
+      }
+      return [];
+    case gd.Variable.Array:
+      newAcc = [...acc];
+      if (normalizeString(variableName).includes(searchText)) {
+        newAcc.push(nodeId);
+      }
+      return mapFor(0, variable.getChildrenCount(), index => {
+        const childVariable = variable.getAtIndex(index);
+        return generateListOfNodesMatchingSearchInVariable({
+          variable: childVariable,
+          variableName: '',
+          nodeId: `${nodeId}${separator}${index}`,
+          searchText: searchText,
+          acc: newAcc,
+        });
+      }).flat();
+    case gd.Variable.Structure:
+      newAcc = [...acc];
+      if (normalizeString(variableName).includes(searchText)) {
+        newAcc.push(nodeId);
+      }
+      const childrenNodes = variable
+        .getAllChildrenNames()
+        .toJSArray()
+        .map(childName => {
+          const childVariable = variable.getChild(childName);
+
+          return Array.from(
+            new Set(
+              generateListOfNodesMatchingSearchInVariable({
+                variable: childVariable,
+                variableName: childName,
+                nodeId: `${nodeId}${separator}${childName}`,
+                searchText: searchText,
+                acc: newAcc,
+              })
+            )
+          );
+        })
+        .flat();
+
+      return [...newAcc, ...childrenNodes];
+    default:
+      return [];
+  }
 };

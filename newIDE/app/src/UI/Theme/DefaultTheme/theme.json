@@ -325,6 +325,14 @@
         }
       }
     },
+    "event-drop-indicator": {
+      "border-color": {
+        "value": "#3c4698"
+      },
+      "outline-color": {
+        "value": "#fff"
+      }
+    },
     "link": {
       "container": {
         "background-color": {

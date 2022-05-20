@@ -25,8 +25,8 @@ const defaultSearchText = '';
 export type AssetFiltersState = {|
   animatedFilter: AnimatedAssetStoreSearchFilter,
   setAnimatedFilter: AnimatedAssetStoreSearchFilter => void,
-  viewportFilter: TagAssetStoreSearchFilter,
-  setViewportFilter: TagAssetStoreSearchFilter => void,
+  viewpointFilter: TagAssetStoreSearchFilter,
+  setViewpointFilter: TagAssetStoreSearchFilter => void,
   dimensionFilter: DimensionAssetStoreSearchFilter,
   setDimensionFilter: DimensionAssetStoreSearchFilter => void,
   objectTypeFilter: ObjectTypeAssetStoreSearchFilter,
@@ -69,8 +69,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   assetFiltersState: {
     animatedFilter: new AnimatedAssetStoreSearchFilter(),
     setAnimatedFilter: filter => {},
-    viewportFilter: new TagAssetStoreSearchFilter(),
-    setViewportFilter: filter => {},
+    viewpointFilter: new TagAssetStoreSearchFilter(),
+    setViewpointFilter: filter => {},
     dimensionFilter: new DimensionAssetStoreSearchFilter(),
     setDimensionFilter: filter => {},
     objectTypeFilter: new ObjectTypeAssetStoreSearchFilter(),
@@ -117,8 +117,8 @@ export const AssetStoreStateProvider = ({
     new AnimatedAssetStoreSearchFilter()
   );
   const [
-    viewportFilter,
-    setViewportFilter,
+    viewpointFilter,
+    setViewpointFilter,
   ] = React.useState<TagAssetStoreSearchFilter>(
     new TagAssetStoreSearchFilter()
   );
@@ -143,8 +143,8 @@ export const AssetStoreStateProvider = ({
   const assetFiltersState = {
     animatedFilter: animatedFilter,
     setAnimatedFilter: setAnimatedFilter,
-    viewportFilter: viewportFilter,
-    setViewportFilter: setViewportFilter,
+    viewpointFilter: viewpointFilter,
+    setViewpointFilter: setViewpointFilter,
     dimensionFilter: dimensionFilter,
     setDimensionFilter: setDimensionFilter,
     objectTypeFilter: objectTypeFilter,
@@ -156,7 +156,7 @@ export const AssetStoreStateProvider = ({
   // for the memo.
   const currentFilters = [
     animatedFilter,
-    viewportFilter,
+    viewpointFilter,
     dimensionFilter,
     objectTypeFilter,
     licenseFilter,

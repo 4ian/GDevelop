@@ -16,6 +16,8 @@ import {
 import { type AssetFiltersState } from './AssetStoreContext';
 import { type License } from '../Utils/GDevelopServices/Asset';
 import Slider from '@material-ui/core/Slider';
+import FlatButton from '../UI/FlatButton';
+import { Line } from '../UI/Grid';
 
 /** @typedef { import("../UI/Search/UseSearchItem").TagSearchFilter } TagSearchFilter */
 
@@ -261,8 +263,8 @@ export const AssetStoreFilterPanel = ({
           { label: t`Side view`, value: 'side view' },
           { label: t`Isometric`, value: 'isometric' },
         ]}
-        searchFilter={assetFiltersState.viewportFilter}
-        setSearchFilter={assetFiltersState.setViewportFilter}
+        searchFilter={assetFiltersState.viewpointFilter}
+        setSearchFilter={assetFiltersState.setViewpointFilter}
         onFilterChange={onChoiceChange}
       />
       <RangeFilter
@@ -318,6 +320,30 @@ export const AssetStoreFilterPanel = ({
           onChoiceChange();
         }}
       />
+      <Line justifyContent="center">
+        <FlatButton
+          label={<Trans>Clear all filters</Trans>}
+          primary={false}
+          onClick={() => {
+            assetFiltersState.setAnimatedFilter(
+              new AnimatedAssetStoreSearchFilter()
+            );
+            assetFiltersState.setViewpointFilter(
+              new TagAssetStoreSearchFilter()
+            );
+            assetFiltersState.setDimensionFilter(
+              new DimensionAssetStoreSearchFilter()
+            );
+            assetFiltersState.setObjectTypeFilter(
+              new ObjectTypeAssetStoreSearchFilter()
+            );
+            assetFiltersState.setLicenseFilter(
+              new LicenseAssetStoreSearchFilter()
+            );
+            onChoiceChange();
+          }}
+        />
+      </Line>
     </>
   );
 };

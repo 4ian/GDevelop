@@ -277,6 +277,7 @@ export type SortableTreeNode = {
   nodePath: Array<number>,
   children: Array<any>,
   expanded: boolean,
+  key: number,
 
   // In case of nodes without event (buttons at the bottom of the sheet),
   // use a fixed height.
@@ -571,16 +572,14 @@ export default class ThemableEventsTree extends Component<
   _temporallyUnfoldNode = (isOverLazy: boolean, node: SortableTreeNode) => {
     if (!node.event) return;
 
-    const { event: nodeEvent } = node;
-
     const isNodeTemporallyUnfolded = !this.temporallyUnfoldedNodes.some(
-      foldedNode => foldedNode.event && nodeEvent.ptr === foldedNode.event.ptr
+      foldedNode => node.key === foldedNode.key
     );
     if (isOverLazy) {
       if (!this._hoverTimerId && !node.expanded) {
         this._hoverTimerId = window.setTimeout(() => {
           if (node.event && isNodeTemporallyUnfolded) {
-            nodeEvent.setFolded(false);
+            node.event.setFolded(false);
             this.temporallyUnfoldedNodes.push(node);
             this.forceEventsUpdate();
           }
@@ -608,8 +607,7 @@ export default class ThemableEventsTree extends Component<
     const isDragged =
       !!this.state.draggedNode &&
       (isDescendant(this.state.draggedNode, node) ||
-        node === this.state.draggedNode);
-
+        node.key === this.state.draggedNode.key);
     return (
       <DragSourceAndDropTarget
         beginDrag={() => {

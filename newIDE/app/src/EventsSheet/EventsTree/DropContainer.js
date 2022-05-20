@@ -117,7 +117,9 @@ export default function DropContainer({
   const canDropBelow =
     node.event &&
     (node.children.length === 0 ||
-      (node.children.length === 1 && node.children[0] === draggedNode));
+      (node.children.length === 1 &&
+        draggedNode &&
+        node.children[0].key === draggedNode.key));
   const canHaveSubevents = node.event && node.event.canHaveSubEvents();
   const commonProps = {
     DnDComponent: DnDComponent,

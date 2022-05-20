@@ -47,7 +47,7 @@ export const insertInVariablesContainer = (
   name: string,
   serializedVariable: ?any,
   index: ?number
-): string => {
+): { name: string, variable: gdVariable } => {
   const newName = newNameGenerator(
     name,
     name => variablesContainer.has(name),
@@ -59,13 +59,13 @@ export const insertInVariablesContainer = (
   } else {
     newVariable.setString('');
   }
-  variablesContainer.insert(
+  const variable = variablesContainer.insert(
     newName,
     newVariable,
     index || variablesContainer.count()
   );
   newVariable.delete();
-  return newName;
+  return { name: newName, variable };
 };
 
 export const insertInVariableChildrenArray = (

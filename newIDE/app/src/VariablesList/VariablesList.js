@@ -25,7 +25,9 @@ import ScrollView from '../UI/ScrollView';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
-import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
+import SemiControlledAutoComplete, {
+  type SemiControlledAutoCompleteInterface,
+} from '../UI/SemiControlledAutoComplete';
 
 import useForceUpdate from '../Utils/UseForceUpdate';
 import { mapFor } from '../Utils/MapFor';
@@ -45,7 +47,6 @@ import {
   saveToHistory,
 } from '../Utils/History';
 import {
-  hasChildThatContainsStringInNameOrValue,
   hasVariablesContainerSubChildren,
   insertInVariableChildren,
   insertInVariableChildrenArray,
@@ -169,9 +170,34 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
   );
+  const topLevelVariableNameInputRefs = React.useRef<{
+    [number]: SemiControlledAutoCompleteInterface,
+  }>({});
+  const [variablePtrToFocus, setVariablePtrToFocus] = React.useState<?number>(
+    null
+  );
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
+
+  const triggerSearch = React.useCallback(
+    () => {
+      let matchingInheritedNodes = [];
+      const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
+        props.variablesContainer,
+        normalizeString(searchText)
+      );
+      if (props.inheritedVariablesContainer) {
+        matchingInheritedNodes = generateListOfNodesMatchingSearchInVariablesContainer(
+          props.inheritedVariablesContainer,
+          normalizeString(searchText),
+          inheritedPrefix
+        );
+      }
+      setSearchMatchingNodes([...matchingNodes, ...matchingInheritedNodes]);
+    },
+    [props.inheritedVariablesContainer, props.variablesContainer, searchText]
+  );
 
   React.useEffect(
     () => {
@@ -181,24 +207,22 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         setSearchMatchingNodes([]);
       }
     },
-    [searchText]
+    [searchText, triggerSearch]
   );
 
-  const triggerSearch = () => {
-    let matchingInheritedNodes = [];
-    const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
-      props.variablesContainer,
-      normalizeString(searchText)
-    );
-    if (props.inheritedVariablesContainer) {
-      matchingInheritedNodes = generateListOfNodesMatchingSearchInVariablesContainer(
-        props.inheritedVariablesContainer,
-        normalizeString(searchText),
-        inheritedPrefix
-      );
-    }
-    setSearchMatchingNodes([...matchingNodes, ...matchingInheritedNodes]);
-  };
+  React.useEffect(
+    () => {
+      if (variablePtrToFocus) {
+        const inputRef =
+          topLevelVariableNameInputRefs.current[variablePtrToFocus];
+        if (inputRef) {
+          inputRef.focus();
+          setVariablePtrToFocus(null);
+        }
+      }
+    },
+    [variablePtrToFocus]
+  );
 
   const shouldHideExpandIcons =
     !hasVariablesContainerSubChildren(props.variablesContainer) &&
@@ -350,7 +374,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
 
       if (pasteAtTopLevel) {
         if (!name) return;
-        const newName = insertInVariablesContainer(
+        const { name: newName } = insertInVariablesContainer(
           props.variablesContainer,
           name,
           serializedVariable
@@ -371,7 +395,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         );
         if (!targetParentVariable) {
           if (!name) return;
-          const newName = insertInVariablesContainer(
+          const { name: newName } = insertInVariablesContainer(
             props.variablesContainer,
             name,
             serializedVariable,
@@ -757,7 +781,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       selectedNodes.some(node => node.startsWith(inheritedPrefix));
 
     if (addAtTopLevel) {
-      const newName = insertInVariablesContainer(
+      const { name: newName, variable } = insertInVariablesContainer(
         props.variablesContainer,
         'Variable',
         null,
@@ -765,6 +789,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       );
       _saveToHistory();
       setSelectedNodes([newName]);
+      setVariablePtrToFocus(variable.ptr);
       return;
     }
 
@@ -781,7 +806,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     } else {
       position = props.variablesContainer.getPosition(oldestAncestry.name) + 1;
     }
-    const newName = insertInVariablesContainer(
+    const { name: newName, variable } = insertInVariablesContainer(
       props.variablesContainer,
       'Variable',
       null,
@@ -789,6 +814,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     );
     _saveToHistory();
     setSelectedNodes([newName]);
+    setVariablePtrToFocus(variable.ptr);
   };
 
   const renderVariableAndChildrenRows = (
@@ -931,6 +957,13 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       {shouldWrap ? null : <Spacer />}
                       <SemiControlledAutoComplete
                         fullWidth
+                        ref={element => {
+                          if (depth === 0 && element) {
+                            topLevelVariableNameInputRefs.current[
+                              variable.ptr
+                            ] = element;
+                          }
+                        }}
                         dataSource={isTopLevel ? undefinedVariableNames : []}
                         margin="none"
                         key="name"

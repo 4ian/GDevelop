@@ -11,9 +11,29 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem } from '../UI/Search/UseSearchItem';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import {
+  TagAssetStoreSearchFilter,
+  AnimatedAssetStoreSearchFilter,
+  ObjectTypeAssetStoreSearchFilter,
+  LicenseAssetStoreSearchFilter,
+  DimensionAssetStoreSearchFilter,
+} from './AssetStoreSearchFilter';
 
 const defaultSearchText = '';
+
+export type AssetFiltersState = {|
+  animatedFilter: AnimatedAssetStoreSearchFilter,
+  setAnimatedFilter: AnimatedAssetStoreSearchFilter => void,
+  viewpointFilter: TagAssetStoreSearchFilter,
+  setViewpointFilter: TagAssetStoreSearchFilter => void,
+  dimensionFilter: DimensionAssetStoreSearchFilter,
+  setDimensionFilter: DimensionAssetStoreSearchFilter => void,
+  objectTypeFilter: ObjectTypeAssetStoreSearchFilter,
+  setObjectTypeFilter: ObjectTypeAssetStoreSearchFilter => void,
+  licenseFilter: LicenseAssetStoreSearchFilter,
+  setLicenseFilter: LicenseAssetStoreSearchFilter => void,
+|};
 
 type AssetStoreState = {|
   filters: ?Filters,
@@ -26,6 +46,7 @@ type AssetStoreState = {|
   searchText: string,
   setSearchText: string => void,
   filtersState: FiltersState,
+  assetFiltersState: AssetFiltersState,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -44,6 +65,18 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     removeFilter: () => {},
     chosenCategory: null,
     setChosenCategory: () => {},
+  },
+  assetFiltersState: {
+    animatedFilter: new AnimatedAssetStoreSearchFilter(),
+    setAnimatedFilter: filter => {},
+    viewpointFilter: new TagAssetStoreSearchFilter(),
+    setViewpointFilter: filter => {},
+    dimensionFilter: new DimensionAssetStoreSearchFilter(),
+    setDimensionFilter: filter => {},
+    objectTypeFilter: new ObjectTypeAssetStoreSearchFilter(),
+    setObjectTypeFilter: filter => {},
+    licenseFilter: new LicenseAssetStoreSearchFilter(),
+    setLicenseFilter: filter => {},
   },
 });
 
@@ -76,6 +109,64 @@ export const AssetStoreStateProvider = ({
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
+
+  const [
+    animatedFilter,
+    setAnimatedFilter,
+  ] = React.useState<AnimatedAssetStoreSearchFilter>(
+    new AnimatedAssetStoreSearchFilter()
+  );
+  const [
+    viewpointFilter,
+    setViewpointFilter,
+  ] = React.useState<TagAssetStoreSearchFilter>(
+    new TagAssetStoreSearchFilter()
+  );
+  const [
+    dimensionFilter,
+    setDimensionFilter,
+  ] = React.useState<DimensionAssetStoreSearchFilter>(
+    new DimensionAssetStoreSearchFilter()
+  );
+  const [
+    objectTypeFilter,
+    setObjectTypeFilter,
+  ] = React.useState<ObjectTypeAssetStoreSearchFilter>(
+    new ObjectTypeAssetStoreSearchFilter()
+  );
+  const [
+    licenseFilter,
+    setLicenseFilter,
+  ] = React.useState<LicenseAssetStoreSearchFilter>(
+    new LicenseAssetStoreSearchFilter()
+  );
+  const assetFiltersState = {
+    animatedFilter: animatedFilter,
+    setAnimatedFilter: setAnimatedFilter,
+    viewpointFilter: viewpointFilter,
+    setViewpointFilter: setViewpointFilter,
+    dimensionFilter: dimensionFilter,
+    setDimensionFilter: setDimensionFilter,
+    objectTypeFilter: objectTypeFilter,
+    setObjectTypeFilter: setObjectTypeFilter,
+    licenseFilter: licenseFilter,
+    setLicenseFilter: setLicenseFilter,
+  };
+  // When one of the filter change, we need to rebuild the array
+  // for the memo.
+  const currentFilters = [
+    animatedFilter,
+    viewpointFilter,
+    dimensionFilter,
+    objectTypeFilter,
+    licenseFilter,
+  ];
+  const [searchFilters, setSearchFilters] = React.useState<
+    Array<SearchFilter<AssetShortHeader>>
+  >(currentFilters);
+  if (searchFilters.some((filter, index) => filter !== currentFilters[index])) {
+    setSearchFilters(currentFilters);
+  }
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -144,7 +235,8 @@ export const AssetStoreStateProvider = ({
     getAssetShortHeaderSearchTerms,
     searchText,
     chosenCategory,
-    chosenFilters
+    chosenFilters,
+    searchFilters
   );
 
   const assetStoreState = React.useMemo(
@@ -159,17 +251,19 @@ export const AssetStoreStateProvider = ({
       searchText,
       setSearchText,
       filtersState,
+      assetFiltersState,
     }),
     [
       searchResults,
-      error,
+      fetchAssetsAndFilters,
       filters,
       assetPacks,
       authors,
       licenses,
+      error,
       searchText,
       filtersState,
-      fetchAssetsAndFilters,
+      assetFiltersState,
     ]
   );
 

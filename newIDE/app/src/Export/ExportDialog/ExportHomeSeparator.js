@@ -4,7 +4,7 @@ import { Column } from '../../UI/Grid';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
-export default () => {
+const ExportHomeSeparator = () => {
   const windowWidth = useResponsiveWindowWidth();
   const theme = React.useContext(GDevelopThemeContext);
   return (
@@ -22,3 +22,5 @@ export default () => {
     )
   );
 };
+
+export default ExportHomeSeparator;

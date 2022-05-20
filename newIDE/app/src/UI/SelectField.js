@@ -6,6 +6,20 @@ import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { computeTextFieldStyleProps } from './TextField';
 import { MarkdownText } from './MarkdownText';
+import { makeStyles } from '@material-ui/core';
+
+const INVALID_VALUE = '';
+const stopPropagation = event => event.stopPropagation();
+
+const useSelectCenterStyles = makeStyles({
+  root: {
+    textAlign: 'center',
+  },
+});
+
+export type SelectFieldInterface = {|
+  focus: () => void,
+|};
 
 type ValueProps = {|
   value: number | string,
@@ -32,6 +46,8 @@ type Props = {|
   },
   inputStyle?: {| fontSize?: 14, color?: string |},
   margin?: 'none' | 'dense',
+  disableUnderline?: true,
+  textAlign?: 'center',
 
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
@@ -41,22 +57,22 @@ type Props = {|
   hintText?: MessageDescriptor,
 |};
 
-const INVALID_VALUE = '';
-const stopPropagation = event => event.stopPropagation();
-
 /**
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-export default class SelectField extends React.Component<Props, {||}> {
-  _input = React.createRef<HTMLInputElement>();
+const SelectField = React.forwardRef<Props, SelectFieldInterface>(
+  (props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+    const focus = () => {
+      if (_input.current) _input.current.focus();
+    };
 
-  focus() {
-    if (this._input.current) this._input.current.focus();
-  }
+    const _input = React.useRef<?HTMLInputElement>(null);
+    const selectCenterStyles = useSelectCenterStyles();
 
-  render() {
-    const { props } = this;
     const onChange = props.onChange || undefined;
 
     // Dig into children props to see if the current value is valid or not.
@@ -100,15 +116,19 @@ export default class SelectField extends React.Component<Props, {||}> {
                   }
                 : undefined
             }
-            InputProps={{ style: props.inputStyle }}
+            InputProps={{
+              style: props.inputStyle,
+              disableUnderline: !!props.disableUnderline,
+            }}
             InputLabelProps={{
               shrink: true,
             }}
             SelectProps={{
               native: true,
+              classes: props.textAlign === 'center' ? selectCenterStyles : {},
             }}
             style={props.style}
-            inputRef={this._input}
+            inputRef={_input}
           >
             {!hasValidValue ? (
               <option value={INVALID_VALUE} disabled>
@@ -123,4 +143,6 @@ export default class SelectField extends React.Component<Props, {||}> {
       </I18n>
     );
   }
-}
+);
+
+export default SelectField;

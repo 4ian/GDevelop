@@ -139,6 +139,7 @@ const themeData = {
   },
 };
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   name: 'Monokai',
   themeName: 'monokai',

@@ -16,7 +16,7 @@ type Props = {|
   onEditExtensionOptions: () => void,
 |};
 
-export default (props: Props) => {
+const ChooseEventsFunctionsExtensionEditor = (props: Props) => {
   const eventsFunctionsCount = props.eventsFunctionsExtension.getEventsFunctionsCount();
   const eventsBasedBehaviorsCount = props.eventsFunctionsExtension
     .getEventsBasedBehaviors()
@@ -57,3 +57,5 @@ export default (props: Props) => {
     </I18n>
   );
 };
+
+export default ChooseEventsFunctionsExtensionEditor;

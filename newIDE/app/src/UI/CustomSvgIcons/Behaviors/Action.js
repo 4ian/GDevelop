@@ -1,6 +1,7 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default props => (
   <SvgIcon {...props} viewBox="0 0 23.109 23.124">
     <g id="Action" transform="translate(-92.011 -101.74)" fillRule="nonzero">

@@ -75,7 +75,8 @@ export const hexToRGBColor = (hex: string) => {
  */
 export const rgbColorToHex = (r: number, g: number, b: number): string => {
   const hexNumber = rgbToHexNumber(r, g, b);
-  return '#' + hexNumber.toString(16);
+  const hexString = hexNumber.toString(16);
+  return '#' + '000000'.substr(hexString.length) + hexString;
 };
 
 /**

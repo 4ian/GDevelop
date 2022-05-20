@@ -41,7 +41,7 @@ type State = {|
 |};
 
 const hexToNullableRGBColor = (color: string): RGBColor | null => {
-  return /^#{0,1}[0-9a-fA-F]{1,6}$/.test(color) ? hexToRGBColor(color) : null;
+  return /^#{0,1}[0-9a-fA-F]{6}$/.test(color) ? hexToRGBColor(color) : null;
 };
 
 export class HexColorField extends React.Component<Props, State> {
@@ -91,6 +91,12 @@ export class HexColorField extends React.Component<Props, State> {
           onChange={event => this._handleChange(event.target.value)}
           onBlur={this._handleBlur}
           ref={textField => (this._textField = textField)}
+          onKeyPress={ev => {
+            console.log(`Pressed keyCode ${ev.key}`);
+            if (ev.key === 'Enter') {
+              this._handleBlur();
+            }
+          }}
         />
         <div
           style={

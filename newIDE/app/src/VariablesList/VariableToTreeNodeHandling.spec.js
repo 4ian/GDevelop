@@ -1,6 +1,7 @@
 // @flow
 import {
   generateListOfNodesMatchingSearchInVariable,
+  generateListOfNodesMatchingSearchInVariablesContainer,
   getExpandedNodeIdsFromVariablesContainer,
   getVariableContextFromNodeId,
   separator,
@@ -185,6 +186,15 @@ describe('VariableToTreeNodeHandling', () => {
           acc: [],
         })
       ).toEqual(['parent']);
+      expect(
+        generateListOfNodesMatchingSearchInVariable({
+          variable: parent2,
+          variableName: 'parent2',
+          nodeId: 'parent2',
+          searchText: 'parent',
+          acc: [],
+        })
+      ).toEqual(['parent2']);
     });
     test('Leaf variable in array should be included if value matches', () => {
       expect(
@@ -220,6 +230,50 @@ describe('VariableToTreeNodeHandling', () => {
           acc: [],
         })
       ).toEqual([
+        `parent2${separator}structureChild`,
+        `parent2${separator}structureChild${separator}firstStructureChild`,
+        `parent2${separator}structureChild${separator}secondStructureChild`,
+      ]);
+    });
+  });
+
+  describe('generateListOfNodesMatchingSearchInVariablesContainer', () => {
+    test('First variable should be included if name matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          'parent'
+        )
+      ).toEqual(['parent', 'parent2']);
+    });
+    test('Leaf variable in array should be included if value matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          '35'
+        )
+      ).toEqual([`parent${separator}arrayChild${separator}0`]);
+    });
+    test('Leaf variable in structure should be included if value matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          'danger'
+        )
+      ).toEqual([
+        `parent2${separator}structureChild${separator}firstStructureChild`,
+      ]);
+    });
+    test('All branches should be included if each variable matches by the name and/or the value', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          'child'
+        )
+      ).toEqual([
+        `parent${separator}arrayChild`,
+        `parent${separator}stringChild`,
+        `parent2${separator}boolChild`,
         `parent2${separator}structureChild`,
         `parent2${separator}structureChild${separator}firstStructureChild`,
         `parent2${separator}structureChild${separator}secondStructureChild`,

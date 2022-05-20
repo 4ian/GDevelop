@@ -289,7 +289,13 @@ export const generateListOfNodesMatchingSearchInVariable = ({
   acc: Array<string>,
 |}): Array<string> => {
   let newAcc;
+  let childrenNodes;
   switch (variable.getType()) {
+    case gd.Variable.Boolean:
+      if (normalizeString(variableName).includes(searchText)) {
+        return [nodeId];
+      }
+      return [];
     case gd.Variable.String:
       if (
         normalizeString(variableName).includes(searchText) ||
@@ -314,7 +320,7 @@ export const generateListOfNodesMatchingSearchInVariable = ({
       if (normalizeString(variableName).includes(searchText)) {
         newAcc.push(nodeId);
       }
-      return mapFor(0, variable.getChildrenCount(), index => {
+      childrenNodes = mapFor(0, variable.getChildrenCount(), index => {
         const childVariable = variable.getAtIndex(index);
         return generateListOfNodesMatchingSearchInVariable({
           variable: childVariable,
@@ -324,12 +330,13 @@ export const generateListOfNodesMatchingSearchInVariable = ({
           acc: newAcc,
         });
       }).flat();
+      return [...newAcc, ...childrenNodes];
     case gd.Variable.Structure:
       newAcc = [...acc];
       if (normalizeString(variableName).includes(searchText)) {
         newAcc.push(nodeId);
       }
-      const childrenNodes = variable
+      childrenNodes = variable
         .getAllChildrenNames()
         .toJSArray()
         .map(childName => {
@@ -342,7 +349,7 @@ export const generateListOfNodesMatchingSearchInVariable = ({
                 variableName: childName,
                 nodeId: `${nodeId}${separator}${childName}`,
                 searchText: searchText,
-                acc: newAcc,
+                acc,
               })
             )
           );
@@ -353,4 +360,21 @@ export const generateListOfNodesMatchingSearchInVariable = ({
     default:
       return [];
   }
+};
+
+export const generateListOfNodesMatchingSearchInVariablesContainer = (
+  variablesContainer: gdVariablesContainer,
+  searchText: string
+): Array<string> => {
+  return mapFor(0, variablesContainer.count(), index => {
+    const variable = variablesContainer.getAt(index);
+    const name = variablesContainer.getNameAt(index);
+    return generateListOfNodesMatchingSearchInVariable({
+      variable,
+      variableName: name,
+      nodeId: name,
+      searchText,
+      acc: [],
+    });
+  }).flat();
 };

@@ -2,12 +2,7 @@
 import * as React from 'react';
 import { getIndentWidth, type SortableTreeNode } from '.';
 import { eventDropIndicator } from './ClassNames';
-import {
-  isDescendant,
-  moveNodeAbove,
-  moveNodeBelow,
-  moveNodeAsSubevent,
-} from './helpers';
+import { moveNodeAbove, moveNodeBelow, moveNodeAsSubevent } from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
 

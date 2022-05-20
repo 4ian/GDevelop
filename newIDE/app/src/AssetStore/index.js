@@ -151,6 +151,7 @@ export const AssetStore = ({
                       licenses={licenses || []}
                       onChoiceChange={() => setIsOnHomePage(false)}
                     />
+                    <Spacer />
                     <CategoryChooser
                       allItemsLabel={<Trans>All assets</Trans>}
                       allFilters={filters}

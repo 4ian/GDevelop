@@ -26,7 +26,8 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
     searchText: '',
   };
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (newProps.open && !this.props.open) {
       sendHelpFinderOpened();
     }

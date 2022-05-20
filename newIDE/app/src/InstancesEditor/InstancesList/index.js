@@ -80,7 +80,8 @@ export default class InstancesList extends Component<Props, State> {
       this._searchBar.current.focus();
   }
 
-  componentWillMount() {
+  // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
+  UNSAFE_componentWillMount() {
     // Functor used to display an instance row
     this.instanceRowRenderer = new gd.InitialInstanceJSFunctor();
     this.instanceRowRenderer.invoke = instancePtr => {

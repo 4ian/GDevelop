@@ -373,7 +373,7 @@ export const generateListOfNodesMatchingSearchInVariablesContainer = (
     return generateListOfNodesMatchingSearchInVariable({
       variable,
       variableName: name,
-      nodeId: prefix ? `${prefix}${name}`: name,
+      nodeId: prefix ? `${prefix}${name}` : name,
       searchText,
       acc: [],
     });

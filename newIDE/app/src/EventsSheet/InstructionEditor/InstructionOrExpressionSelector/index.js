@@ -85,6 +85,7 @@ export default class InstructionOrExpressionSelector<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar
     ) {

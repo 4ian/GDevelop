@@ -161,7 +161,7 @@ type Props = {|
   userId: string,
 |};
 
-export default ({ userId }: Props) => {
+const ContributionDetails = ({ userId }: Props) => {
   const [
     extensions,
     setExtensions,
@@ -252,3 +252,5 @@ export default ({ userId }: Props) => {
     </>
   );
 };
+
+export default ContributionDetails;

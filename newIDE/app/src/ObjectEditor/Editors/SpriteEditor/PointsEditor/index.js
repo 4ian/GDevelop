@@ -155,8 +155,11 @@ const PointsEditor = (props: Props) => {
     setSamePointsForSprites(enable);
   };
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateSamePointsToggles, [animationIndex]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updatePoints, [
     samePointsForAnimations,
     samePointsForSprites,

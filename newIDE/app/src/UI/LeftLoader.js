@@ -6,7 +6,7 @@ const styles = {
   progress: { marginRight: 8, verticalAlign: 'middle' },
 };
 
-export default ({
+const LeftLoader = ({
   children,
   isLoading,
 }: {
@@ -18,3 +18,5 @@ export default ({
     {children}
   </span>
 );
+
+export default LeftLoader;

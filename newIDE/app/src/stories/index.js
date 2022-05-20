@@ -3424,16 +3424,18 @@ storiesOf('ObjectGroupsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectGroupsList
-          globalObjectGroups={testProject.project.getObjectGroups()}
-          objectGroups={testProject.testLayout.getObjectGroups()}
-          onEditGroup={() => {}}
-          canRenameGroup={() => true}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <DragAndDropContextProvider>
+      <SerializedObjectDisplay object={testProject.testLayout}>
+        <div style={{ height: 250 }}>
+          <ObjectGroupsList
+            globalObjectGroups={testProject.project.getObjectGroups()}
+            objectGroups={testProject.testLayout.getObjectGroups()}
+            onEditGroup={() => {}}
+            canRenameGroup={() => true}
+          />
+        </div>
+      </SerializedObjectDisplay>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('BehaviorsEditor', module)

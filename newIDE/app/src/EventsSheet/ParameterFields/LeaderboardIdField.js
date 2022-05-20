@@ -8,7 +8,7 @@ import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
 } from './ParameterFieldCommons';
-import SelectField from '../../UI/SelectField';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
@@ -57,9 +57,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
-    const inputFieldRef = React.useRef<?(GenericExpressionField | SelectField)>(
-      null
-    );
+    const inputFieldRef = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
     React.useImperativeHandle(ref, () => ({
       focus: () => {
         if (inputFieldRef.current) {

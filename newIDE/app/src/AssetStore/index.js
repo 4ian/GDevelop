@@ -203,7 +203,7 @@ export const AssetStore = ({
           <>
             <Column expand noMargin useFullHeight>
               <SearchBar
-                placeholder={t`Enter your Search`}
+                placeholder={t`Search assets`}
                 value={searchText}
                 onChange={setSearchText}
                 onRequestSearch={resetAssetSelection}

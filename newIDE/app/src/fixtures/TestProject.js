@@ -276,9 +276,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
       1
     );
     variable.castTo('structure');
-    variable.getChild('InstanceChild1').setValue(564);
-    variable.getChild('InstanceChild2').setString('Guttentag');
-    variable.getChild('InstanceChild3').setBool(true);
+    variable.getChild('InstanceChild1').setValue(1995);
+    variable.getChild('InstanceChild2').setString('Hallo');
+    variable.getChild('InstanceChild3').setBool(false);
     const arrayVariable = variable.getChild('InstanceChild4');
     arrayVariable.castTo('array');
     arrayVariable.pushNew().setString('Bonjour');

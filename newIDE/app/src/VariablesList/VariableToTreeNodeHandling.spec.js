@@ -1,5 +1,7 @@
 // @flow
 import {
+  generateListOfNodesMatchingSearchInVariable,
+  generateListOfNodesMatchingSearchInVariablesContainer,
   getExpandedNodeIdsFromVariablesContainer,
   getVariableContextFromNodeId,
   separator,
@@ -26,13 +28,13 @@ describe('VariableToTreeNodeHandling', () => {
     ├── parent
     │   ├── stringChild
     │   └── arrayChild (folded)
-    │       ├── firstArrayChild
-    │       └── secondArrayChild
+    │       ├── firstArrayChild 35
+    │       └── secondArrayChild false
     └── parent2 (folded)
-        ├── boolChild
+        ├── boolChild true
         └── structureChild
-            ├── firstStructureChild
-            └── secondStructureChild
+            ├── firstStructureChild 'Danger'
+            └── secondStructureChild 'secondStructureChild'
      */
     parent = new gd.Variable();
     parent.castTo('structure');
@@ -64,7 +66,7 @@ describe('VariableToTreeNodeHandling', () => {
     structureChild.castTo('structure');
     structureChild.setFolded(false);
     firstStructureChild = new gd.Variable();
-    firstStructureChild.setString('firstStructureChild');
+    firstStructureChild.setString('Danger');
     structureChild.insertChild('firstStructureChild', firstStructureChild);
     secondStructureChild = new gd.Variable();
     secondStructureChild.setString('secondStructureChild');
@@ -169,6 +171,112 @@ describe('VariableToTreeNodeHandling', () => {
         'parent',
         `parent2${separator}newStructureChildName${separator}firstStructureChild`,
         `parent2${separator}newStructureChildName${separator}firstSecondChild`,
+      ]);
+    });
+  });
+
+  describe('generateListOfNodesMatchingSearchInVariable', () => {
+    test('First variable should be included if name matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariable({
+          variable: parent,
+          variableName: 'parent',
+          nodeId: 'parent',
+          searchText: 'parent',
+          acc: [],
+        })
+      ).toEqual(['parent']);
+      expect(
+        generateListOfNodesMatchingSearchInVariable({
+          variable: parent2,
+          variableName: 'parent2',
+          nodeId: 'parent2',
+          searchText: 'parent',
+          acc: [],
+        })
+      ).toEqual(['parent2']);
+    });
+    test('Leaf variable in array should be included if value matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariable({
+          variable: parent,
+          variableName: 'parent',
+          nodeId: 'parent',
+          searchText: '35',
+          acc: [],
+        })
+      ).toEqual([`parent${separator}arrayChild${separator}0`]);
+    });
+    test('Leaf variable in structure should be included if value matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariable({
+          variable: parent2,
+          variableName: 'parent2',
+          nodeId: 'parent2',
+          searchText: 'danger',
+          acc: [],
+        })
+      ).toEqual([
+        `parent2${separator}structureChild${separator}firstStructureChild`,
+      ]);
+    });
+    test('All branches should be included if each variable matches by the name and/or the value', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariable({
+          variable: parent2,
+          variableName: 'parent2',
+          nodeId: 'parent2',
+          searchText: 'structure',
+          acc: [],
+        })
+      ).toEqual([
+        `parent2${separator}structureChild`,
+        `parent2${separator}structureChild${separator}firstStructureChild`,
+        `parent2${separator}structureChild${separator}secondStructureChild`,
+      ]);
+    });
+  });
+
+  describe('generateListOfNodesMatchingSearchInVariablesContainer', () => {
+    test('First variable should be included if name matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          'parent'
+        )
+      ).toEqual(['parent', 'parent2']);
+    });
+    test('Leaf variable in array should be included if value matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          '35'
+        )
+      ).toEqual([`parent${separator}arrayChild${separator}0`]);
+    });
+    test('Leaf variable in structure should be included if value matches', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          'danger'
+        )
+      ).toEqual([
+        `parent2${separator}structureChild${separator}firstStructureChild`,
+      ]);
+    });
+    test('All branches should be included if each variable matches by the name and/or the value', () => {
+      expect(
+        generateListOfNodesMatchingSearchInVariablesContainer(
+          variablesContainer,
+          'child'
+        )
+      ).toEqual([
+        `parent${separator}arrayChild`,
+        `parent${separator}stringChild`,
+        `parent2${separator}boolChild`,
+        `parent2${separator}structureChild`,
+        `parent2${separator}structureChild${separator}firstStructureChild`,
+        `parent2${separator}structureChild${separator}secondStructureChild`,
       ]);
     });
   });

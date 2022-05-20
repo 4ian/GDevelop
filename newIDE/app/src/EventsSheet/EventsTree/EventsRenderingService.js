@@ -9,7 +9,7 @@ import WhileEvent from './Renderers/WhileEvent';
 import LinkEvent from './Renderers/LinkEvent';
 import JsCodeEvent from './Renderers/JsCodeEvent';
 
-export default {
+const EventsRenderingService = {
   components: {
     unknownEvent: UnknownEvent,
     'BuiltinCommonInstructions::Standard': StandardEvent,
@@ -40,3 +40,5 @@ export default {
     this.components[eventType] = renderFunction;
   },
 };
+
+export default EventsRenderingService;

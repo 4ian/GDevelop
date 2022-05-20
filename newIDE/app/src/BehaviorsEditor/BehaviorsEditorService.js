@@ -5,7 +5,7 @@ import Physics2Editor from './Editors/Physics2Editor';
 /**
  * A service returning editor components for each behavior type.
  */
-export default {
+const BehaviorsEditorService = {
   getEditor(behaviorType: string) {
     if (!this.components[behaviorType]) {
       return BehaviorPropertiesEditor; // Default properties editor
@@ -18,3 +18,5 @@ export default {
     },
   },
 };
+
+export default BehaviorsEditorService;

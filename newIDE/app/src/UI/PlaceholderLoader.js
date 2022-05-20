@@ -11,8 +11,10 @@ const styles = {
   },
 };
 
-export default props => (
+const PlaceholderLoader = props => (
   <div style={{ ...styles.containerStyle, ...props.style }}>
     <CircularProgress size={40} />
   </div>
 );
+
+export default PlaceholderLoader;

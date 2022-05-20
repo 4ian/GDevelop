@@ -18,6 +18,7 @@ export const useDebounce = (cb: any, delay: number) => {
   useEffect(() => {
     inputsRef.current = { cb, delay };
   });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(
     debounce(
       (...args: any) => {

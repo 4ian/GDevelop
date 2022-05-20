@@ -15,7 +15,7 @@ type Props = {
   justifyContent?: 'center',
 };
 
-export default ({
+const CreateProfile = ({
   message,
   onLogin,
   onCreateAccount,
@@ -47,3 +47,5 @@ export default ({
     </Line>
   </Column>
 );
+
+export default CreateProfile;

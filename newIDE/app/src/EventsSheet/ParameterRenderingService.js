@@ -153,7 +153,7 @@ const userFriendlyTypeName: { [string]: MessageDescriptor } = {
   externalLayoutName: t`Name of the external layout`,
 };
 
-export default {
+const ParameterRenderingService = {
   components,
   getParameterComponent: (rawType: string) => {
     const fieldType = gd.ParameterMetadata.isObject(rawType)
@@ -181,3 +181,5 @@ export default {
     return userFriendlyTypeName[fieldType] || null;
   },
 };
+
+export default ParameterRenderingService;

@@ -80,7 +80,7 @@ type Props = {|
  * Show an estimate of the progress of a build or the button
  * to download the artifacts.
  */
-export default ({
+const BuildProgressAndActions = ({
   build,
   game,
   onGameUpdated,
@@ -261,3 +261,5 @@ export default ({
     </I18n>
   );
 };
+
+export default BuildProgressAndActions;

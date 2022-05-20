@@ -2,16 +2,19 @@
 import { Trans } from '@lingui/macro';
 import React, { Component, type Node } from 'react';
 import findIndex from 'lodash/findIndex';
-import {
-  SortableTreeWithoutDndContext,
-  getNodeAtPath,
-} from 'react-sortable-tree';
+import { SortableTreeWithoutDndContext } from 'react-sortable-tree';
+import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
 import EventHeightsCache from './EventHeightsCache';
 import classNames from 'classnames';
-import { eventsTree, eventsTreeWithSearchResults, icon } from './ClassNames';
+import {
+  eventsTree,
+  eventsTreeWithSearchResults,
+  handle,
+  icon,
+} from './ClassNames';
 import {
   type SelectionState,
   type EventContext,
@@ -37,7 +40,13 @@ import { type Preferences } from '../../MainFrame/Preferences/PreferencesContext
 import { type Tutorial } from '../../Utils/GDevelopServices/Tutorial';
 import TutorialMessage from '../../Hints/TutorialMessage';
 import getTutorial from '../../Hints/getTutorial';
+import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
+import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
+import DropContainer from './DropContainer';
+import { isDescendant, type MoveFunctionArguments } from './helpers';
 const gd: libGDevelop = global.gd;
+
+const eventsSheetEventsDnDType = 'events-sheet-events-dnd-type';
 
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
@@ -50,13 +59,27 @@ const styles = {
   container: { flex: 1 },
   defaultEventContainer: {
     marginRight: 10,
+    position: 'relative',
   },
   smallEventContainer: {
     marginRight: 0,
+    position: 'relative',
+  },
+  eventComponentContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'stretch',
+    position: 'relative',
+  },
+  handle: {
+    margin: 0.5,
+    flexGrow: 0,
+    flexShrink: 0,
+    cursor: 'move',
   },
 };
 
-const getIndentWidth = (windowWidth: WidthType) =>
+export const getIndentWidth = (windowWidth: WidthType) =>
   windowWidth === 'small' ? smallIndentWidth : defaultIndentWidth;
 const getEventContainerStyle = (windowWidth: WidthType) =>
   windowWidth === 'small'
@@ -95,8 +118,9 @@ type EventsContainerProps = {|
   renderObjectThumbnail: string => Node,
 
   screenType: ScreenType,
-  windowWidth: WidthType,
   eventsSheetHeight: number,
+
+  connectDragSource: ConnectDragSource,
 |};
 
 /**
@@ -134,45 +158,50 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
         ref={container => (this._container = container)}
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
-        style={getEventContainerStyle(this.props.windowWidth)}
       >
         {EventComponent && (
-          <EventComponent
-            project={project}
-            scope={scope}
-            event={event}
-            globalObjectsContainer={this.props.globalObjectsContainer}
-            objectsContainer={this.props.objectsContainer}
-            selected={isEventSelected(this.props.selection, event)}
-            selection={this.props.selection}
-            leftIndentWidth={this.props.leftIndentWidth}
-            onUpdate={this._onEventUpdated}
-            onAddNewInstruction={this.props.onAddNewInstruction}
-            onPasteInstructions={this.props.onPasteInstructions}
-            onMoveToInstruction={this.props.onMoveToInstruction}
-            onMoveToInstructionsList={this.props.onMoveToInstructionsList}
-            onInstructionClick={this.props.onInstructionClick}
-            onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-            onInstructionContextMenu={this.props.onInstructionContextMenu}
-            onAddInstructionContextMenu={this.props.onAddInstructionContextMenu}
-            onParameterClick={this.props.onParameterClick}
-            onOpenExternalEvents={this.props.onOpenExternalEvents}
-            onOpenLayout={this.props.onOpenLayout}
-            disabled={
-              disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
-            }
-            renderObjectThumbnail={this.props.renderObjectThumbnail}
-            screenType={this.props.screenType}
-            windowWidth={this.props.windowWidth}
-            eventsSheetHeight={this.props.eventsSheetHeight}
-          />
+          <div style={styles.eventComponentContainer}>
+            {this.props.connectDragSource(
+              <div style={styles.handle} className={handle} />
+            )}
+            <div style={styles.container}>
+              <EventComponent
+                project={project}
+                scope={scope}
+                event={event}
+                globalObjectsContainer={this.props.globalObjectsContainer}
+                objectsContainer={this.props.objectsContainer}
+                selected={isEventSelected(this.props.selection, event)}
+                selection={this.props.selection}
+                leftIndentWidth={this.props.leftIndentWidth}
+                onUpdate={this._onEventUpdated}
+                onAddNewInstruction={this.props.onAddNewInstruction}
+                onPasteInstructions={this.props.onPasteInstructions}
+                onMoveToInstruction={this.props.onMoveToInstruction}
+                onMoveToInstructionsList={this.props.onMoveToInstructionsList}
+                onInstructionClick={this.props.onInstructionClick}
+                onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+                onInstructionContextMenu={this.props.onInstructionContextMenu}
+                onAddInstructionContextMenu={
+                  this.props.onAddInstructionContextMenu
+                }
+                onParameterClick={this.props.onParameterClick}
+                onOpenExternalEvents={this.props.onOpenExternalEvents}
+                onOpenLayout={this.props.onOpenLayout}
+                disabled={
+                  disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
+                }
+                renderObjectThumbnail={this.props.renderObjectThumbnail}
+                screenType={this.props.screenType}
+                eventsSheetHeight={this.props.eventsSheetHeight}
+              />
+            </div>
+          </div>
         )}
       </div>
     );
   }
 }
-
-const getNodeKey = ({ treeIndex }) => treeIndex;
 
 const SortableTree = ({ className, ...otherProps }) => (
   <ThemeConsumer>
@@ -239,35 +268,54 @@ type EventsTreeProps = {|
 
 // A node displayed by the SortableTree. Almost always represents an
 // event, except for the buttons at the bottom of the sheet.
-type SortableTreeNode = {
+export type SortableTreeNode = {
   eventsList: gdEventsList,
   event: ?gdBaseEvent,
   depth: number,
   disabled: boolean,
   indexInList: number,
+  nodePath: Array<number>,
+  children: Array<any>,
+  expanded: boolean,
 
   // In case of nodes without event (buttons at the bottom of the sheet),
   // use a fixed height.
   fixedHeight?: ?number,
 };
 
+type State = {
+  treeData: Array<any>,
+  flatData: Array<gdBaseEvent>,
+  draggedNode: ?SortableTreeNode,
+};
+
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event
  * can be drag'n'dropped and events rows are virtualized.
  */
-export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
+export default class ThemableEventsTree extends Component<
+  EventsTreeProps,
+  State
+> {
   static defaultProps = {
     selection: getInitialSelection(),
   };
   _list: ?any;
   eventsHeightsCache: EventHeightsCache;
+  DragSourceAndDropTarget = makeDragSourceAndDropTarget<SortableTreeNode>(
+    eventsSheetEventsDnDType
+  );
+  DropTarget = makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType);
+  temporallyUnfoldedNodes: Array<SortableTreeNode>;
+  _hoverTimerId: ?number;
 
   constructor(props: EventsTreeProps) {
     super(props);
-
+    this.temporallyUnfoldedNodes = [];
     this.eventsHeightsCache = new EventHeightsCache(this);
     this.state = {
       ...this._eventsToTreeData(props.events),
+      draggedNode: null,
     };
   }
 
@@ -359,7 +407,8 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     eventsList: gdEventsList,
     flatData: Array<gdBaseEvent> = [],
     depth: number = 0,
-    parentDisabled: boolean = false
+    parentDisabled: boolean = false,
+    path: Array<number> = []
   ) => {
     const treeData = mapFor<SortableTreeNode>(
       0,
@@ -369,6 +418,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         flatData.push(event);
 
         const disabled = parentDisabled || event.isDisabled();
+        const currentPath = path.concat(i);
 
         return {
           title: this._renderEvent,
@@ -385,8 +435,12 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
             // Hence it should not contain the folded events.
             !event.isFolded() ? flatData : [],
             depth + 1,
-            disabled
+            disabled,
+            currentPath
           ).treeData,
+          // react-sortable-tree stores path using the node's index in the flattened tree.
+          // We choose to store a path using its index in list to optimise isDescendant function.
+          nodePath: currentPath,
         };
       }
     );
@@ -459,76 +513,33 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     ].filter(Boolean);
 
     return {
+      // $FlowFixMe - We are confident treeData and extraNodes are both arrays of SortableTreeNode
       treeData: extraNodes.length ? treeData.concat(extraNodes) : treeData,
       flatData,
     };
   };
 
-  _onMoveNode = ({
-    treeData,
-    path,
-    node,
-  }: {
-    treeData: any,
-    path: Array<any>,
-    node: SortableTreeNode,
-  }) => {
-    // Get the moved event and its list from the moved node.
-    const { event, eventsList } = node;
-    if (!event) return;
-
-    // Get the event list where the event should be moved to.
-    const targetPath = path.slice(0, -1);
-    const target = getNodeAtPath({
-      getNodeKey,
-      treeData: treeData,
-      path: targetPath,
-    });
-    const targetNode = target.node;
-    const targetEventsList =
-      targetNode && targetNode.event
-        ? targetNode.event.getSubEvents()
-        : this.props.events;
-    const targetPosition =
-      targetNode && targetNode.children ? targetNode.children.indexOf(node) : 0;
-
-    // Do the move
-    // Note that moveEventToAnotherEventsList does not invalidate the
-    // references to the event in memory - so things refering to this event like the
-    // selection in EventsSheet remain valid. This might not be needed anymore
-    // if events drag'n'drop is reworked to be similar to instructions drag'n'drop.
-    eventsList.moveEventToAnotherEventsList(
-      event,
-      targetEventsList,
-      targetPosition
-    );
-
-    this.forceEventsUpdate();
-    this.props.onEventMoved();
-  };
-
-  _canDrag = ({ node }: { node: ?SortableTreeNode }) => {
+  _canDrag = (node: ?SortableTreeNode) => {
     return !!node && !!node.event;
   };
 
-  _canDrop = ({ nextParent }: { nextParent: ?SortableTreeNode }) => {
-    if (nextParent) {
-      if (nextParent.event) {
-        return nextParent.event.canHaveSubEvents();
-      }
-    }
-
-    // No "nextParent" means that we're trying to drop at the root
-    // of the events tree.
+  _canDrop = (hoveredNode: SortableTreeNode) => {
     return true;
   };
 
-  _canNodeHaveChildren = (node: ?SortableTreeNode) => {
-    if (node && node.event) {
-      return node.event.canHaveSubEvents();
+  _onDrop = (
+    moveFunction: MoveFunctionArguments => void,
+    currentNode: SortableTreeNode
+  ) => {
+    if (this.state.draggedNode) {
+      moveFunction({
+        node: this.state.draggedNode,
+        targetNode: currentNode,
+      });
     }
-
-    return false;
+    this._restoreFoldedNodes();
+    this.forceEventsUpdate();
+    this.props.onEventMoved();
   };
 
   _onVisibilityToggle = ({ node }: { node: SortableTreeNode }) => {
@@ -557,54 +568,132 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     );
   };
 
+  _temporallyUnfoldNode = (isOverLazy: boolean, node: SortableTreeNode) => {
+    if (!node.event) return;
+
+    const { event: nodeEvent } = node;
+
+    const isNodeTemporallyUnfolded = !this.temporallyUnfoldedNodes.some(
+      foldedNode => foldedNode.event && nodeEvent.ptr === foldedNode.event.ptr
+    );
+    if (isOverLazy) {
+      if (!this._hoverTimerId && !node.expanded) {
+        this._hoverTimerId = window.setTimeout(() => {
+          if (node.event && isNodeTemporallyUnfolded) {
+            nodeEvent.setFolded(false);
+            this.temporallyUnfoldedNodes.push(node);
+            this.forceEventsUpdate();
+          }
+        }, 1000);
+      }
+    } else {
+      window.clearTimeout(this._hoverTimerId);
+      this._hoverTimerId = null;
+    }
+  };
+
+  _restoreFoldedNodes = () => {
+    this.temporallyUnfoldedNodes.forEach(
+      node => node.event && node.event.setFolded(true)
+    );
+
+    this.temporallyUnfoldedNodes = [];
+    this.forceEventsUpdate();
+  };
+
   _renderEvent = ({ node }: { node: SortableTreeNode }) => {
     const { event, depth, disabled } = node;
     if (!event) return null;
+    const { DragSourceAndDropTarget, DropTarget } = this;
+    const isDragged =
+      !!this.state.draggedNode &&
+      (isDescendant(this.state.draggedNode, node) ||
+        node === this.state.draggedNode);
 
     return (
-      <EventContainer
-        project={this.props.project}
-        scope={this.props.scope}
-        globalObjectsContainer={this.props.globalObjectsContainer}
-        objectsContainer={this.props.objectsContainer}
-        event={event}
-        key={event.ptr}
-        eventsHeightsCache={this.eventsHeightsCache}
-        selection={this.props.selection}
-        leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
-        onAddNewInstruction={this.props.onAddNewInstruction}
-        onPasteInstructions={this.props.onPasteInstructions}
-        onMoveToInstruction={this.props.onMoveToInstruction}
-        onMoveToInstructionsList={this.props.onMoveToInstructionsList}
-        onInstructionClick={this.props.onInstructionClick}
-        onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-        onParameterClick={this.props.onParameterClick}
-        onEventClick={() =>
-          this.props.onEventClick({
-            eventsList: node.eventsList,
-            event: event,
-            indexInList: node.indexInList,
-          })
-        }
-        onEventContextMenu={(x, y) =>
-          this.props.onEventContextMenu(x, y, {
-            eventsList: node.eventsList,
-            event: event,
-            indexInList: node.indexInList,
-          })
-        }
-        onInstructionContextMenu={this.props.onInstructionContextMenu}
-        onAddInstructionContextMenu={this.props.onAddInstructionContextMenu}
-        onOpenExternalEvents={this.props.onOpenExternalEvents}
-        onOpenLayout={this.props.onOpenLayout}
-        disabled={
-          disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
-        }
-        renderObjectThumbnail={this._renderObjectThumbnail}
-        screenType={this.props.screenType}
-        windowWidth={this.props.windowWidth}
-        eventsSheetHeight={this.props.eventsSheetHeight}
-      />
+      <DragSourceAndDropTarget
+        beginDrag={() => {
+          this.setState({ draggedNode: node });
+          return node;
+        }}
+        canDrag={() => this._canDrag(node)}
+        canDrop={() => this._canDrop(node)}
+        // Drop operations are handled by DropContainers
+        drop={() => {
+          return;
+        }}
+        endDrag={() => this.setState({ draggedNode: null })}
+      >
+        {({ connectDragSource, connectDropTarget, isOverLazy }) => {
+          this._temporallyUnfoldNode(isOverLazy, node);
+
+          const dropTarget = (
+            <div
+              style={{
+                opacity: isDragged ? 0.5 : 1,
+                ...getEventContainerStyle(this.props.windowWidth),
+              }}
+            >
+              <EventContainer
+                project={this.props.project}
+                scope={this.props.scope}
+                globalObjectsContainer={this.props.globalObjectsContainer}
+                objectsContainer={this.props.objectsContainer}
+                event={event}
+                key={event.ptr}
+                eventsHeightsCache={this.eventsHeightsCache}
+                selection={this.props.selection}
+                leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
+                onAddNewInstruction={this.props.onAddNewInstruction}
+                onPasteInstructions={this.props.onPasteInstructions}
+                onMoveToInstruction={this.props.onMoveToInstruction}
+                onMoveToInstructionsList={this.props.onMoveToInstructionsList}
+                onInstructionClick={this.props.onInstructionClick}
+                onInstructionDoubleClick={this.props.onInstructionDoubleClick}
+                onParameterClick={this.props.onParameterClick}
+                onEventClick={() =>
+                  this.props.onEventClick({
+                    eventsList: node.eventsList,
+                    event: event,
+                    indexInList: node.indexInList,
+                  })
+                }
+                onEventContextMenu={(x, y) =>
+                  this.props.onEventContextMenu(x, y, {
+                    eventsList: node.eventsList,
+                    event: event,
+                    indexInList: node.indexInList,
+                  })
+                }
+                onInstructionContextMenu={this.props.onInstructionContextMenu}
+                onAddInstructionContextMenu={
+                  this.props.onAddInstructionContextMenu
+                }
+                onOpenExternalEvents={this.props.onOpenExternalEvents}
+                onOpenLayout={this.props.onOpenLayout}
+                disabled={
+                  disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
+                }
+                renderObjectThumbnail={this._renderObjectThumbnail}
+                screenType={this.props.screenType}
+                eventsSheetHeight={this.props.eventsSheetHeight}
+                connectDragSource={connectDragSource}
+              />
+              <DropContainer
+                node={node}
+                draggedNode={this.state.draggedNode}
+                DnDComponent={DropTarget}
+                onDrop={this._onDrop}
+                activateTargets={!isDragged && isOverLazy}
+                windowWidth={this.props.windowWidth}
+              />
+            </div>
+          );
+
+          if (!dropTarget) return null;
+          return isDragged ? dropTarget : connectDropTarget(dropTarget);
+        }}
+      </DragSourceAndDropTarget>
     );
   };
 
@@ -646,10 +735,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
           scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
-          onMoveNode={this._onMoveNode}
-          canDrag={this._canDrag}
-          canDrop={this._canDrop}
-          canNodeHaveChildren={this._canNodeHaveChildren}
+          canDrag={false}
           rowHeight={({ node }: { node: SortableTreeNode }) => {
             if (!node.event) return node.fixedHeight || 0;
 

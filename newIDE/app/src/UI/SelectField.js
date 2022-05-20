@@ -61,83 +61,88 @@ type Props = {|
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-const SelectField = (props: Props) => {
-  const _input = React.useRef<?HTMLInputElement>(null);
-  const selectCenterStyles = useSelectCenterStyles();
+const SelectField = React.forwardRef<Props, SelectFieldInterface>(
+  (props, ref) => {
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+    const focus = () => {
+      if (_input.current) _input.current.focus();
+    };
 
-  const focus = () => {
-    if (_input.current) _input.current.focus();
-  };
+    const _input = React.useRef<?HTMLInputElement>(null);
+    const selectCenterStyles = useSelectCenterStyles();
 
-  const onChange = props.onChange || undefined;
+    const onChange = props.onChange || undefined;
 
-  // Dig into children props to see if the current value is valid or not.
-  let hasValidValue = true;
-  const childrenValues = React.Children.map(props.children, child => {
-    if (child === null || !child.props) return null;
+    // Dig into children props to see if the current value is valid or not.
+    let hasValidValue = true;
+    const childrenValues = React.Children.map(props.children, child => {
+      if (child === null || !child.props) return null;
 
-    return child.props.value;
-  });
-  if (!childrenValues) {
-    console.error(
-      'SelectField has been passed no or invalid children. Only SelectOption and null are supported.'
+      return child.props.value;
+    });
+    if (!childrenValues) {
+      console.error(
+        'SelectField has been passed no or invalid children. Only SelectOption and null are supported.'
+      );
+    } else {
+      hasValidValue =
+        childrenValues.filter(childValue => childValue === props.value)
+          .length !== 0;
+    }
+    const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
+
+    const helperText = props.helperMarkdownText ? (
+      <MarkdownText source={props.helperMarkdownText} />
+    ) : null;
+
+    return (
+      <I18n>
+        {({ i18n }) => (
+          <TextField
+            select
+            {...computeTextFieldStyleProps(props)}
+            disabled={props.disabled}
+            fullWidth={props.fullWidth}
+            label={props.floatingLabelText}
+            helperText={helperText}
+            value={displayedValue}
+            onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
+            onChange={
+              onChange
+                ? event => {
+                    onChange(event, -1, event.target.value);
+                  }
+                : undefined
+            }
+            InputProps={{
+              style: props.inputStyle,
+              disableUnderline: !!props.disableUnderline,
+            }}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            SelectProps={{
+              native: true,
+              classes: props.textAlign === 'center' ? selectCenterStyles : {},
+            }}
+            style={props.style}
+            inputRef={_input}
+          >
+            {!hasValidValue ? (
+              <option value={INVALID_VALUE} disabled>
+                {props.hintText
+                  ? i18n._(props.hintText)
+                  : i18n._(t`Choose an option`)}
+              </option>
+            ) : null}
+            {props.children}
+          </TextField>
+        )}
+      </I18n>
     );
-  } else {
-    hasValidValue =
-      childrenValues.filter(childValue => childValue === props.value).length !==
-      0;
   }
-  const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
-
-  const helperText = props.helperMarkdownText ? (
-    <MarkdownText source={props.helperMarkdownText} />
-  ) : null;
-
-  return (
-    <I18n>
-      {({ i18n }) => (
-        <TextField
-          select
-          {...computeTextFieldStyleProps(props)}
-          disabled={props.disabled}
-          fullWidth={props.fullWidth}
-          label={props.floatingLabelText}
-          helperText={helperText}
-          value={displayedValue}
-          onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
-          onChange={
-            onChange
-              ? event => {
-                  onChange(event, -1, event.target.value);
-                }
-              : undefined
-          }
-          InputProps={{
-            style: props.inputStyle,
-            disableUnderline: !!props.disableUnderline,
-          }}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          SelectProps={{
-            native: true,
-            classes: props.textAlign === 'center' ? selectCenterStyles : {},
-          }}
-          style={props.style}
-          inputRef={_input}
-        >
-          {!hasValidValue ? (
-            <option value={INVALID_VALUE} disabled>
-              {props.hintText
-                ? i18n._(props.hintText)
-                : i18n._(t`Choose an option`)}
-            </option>
-          ) : null}
-          {props.children}
-        </TextField>
-      )}
-    </I18n>
-  );
-};
+);
 
 export default SelectField;

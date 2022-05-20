@@ -340,6 +340,7 @@ export const AssetDetails = ({
                         }}
                         fullWidth
                         textAlign="center"
+                        disableUnderline
                       >
                         {assetAnimations.map(animation => (
                           <SelectOption

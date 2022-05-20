@@ -36,6 +36,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
   if (!searchItems) return null;
 
   const startTime = performance.now();
+  // TODO do only one call to filter for efficiency.
   const filteredSearchItems = searchItems
     .filter(({ tags }) => {
       if (!chosenCategory) return true;

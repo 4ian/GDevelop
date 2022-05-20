@@ -55,7 +55,6 @@ export const AssetStore = ({
     assetFiltersState,
     searchText,
     setSearchText,
-    licenses,
   } = React.useContext(AssetStoreContext);
 
   React.useEffect(
@@ -148,7 +147,6 @@ export const AssetStore = ({
                   <>
                     <AssetStoreFilterPanel
                       assetFiltersState={assetFiltersState}
-                      licenses={licenses || []}
                       onChoiceChange={() => setIsOnHomePage(false)}
                     />
                     <Spacer />

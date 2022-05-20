@@ -56,7 +56,8 @@ export default class DirectionTools extends Component<Props, State> {
     previewOpen: false,
   };
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     this.setState({
       timeBetweenFrames: formatTime(
         this.props.direction.getTimeBetweenFrames()

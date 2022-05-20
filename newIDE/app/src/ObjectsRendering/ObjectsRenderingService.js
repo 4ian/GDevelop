@@ -31,7 +31,7 @@ const requirableModules = {};
  * A service containing functions that are called to render instances
  * of objects in a PIXI.Container.
  */
-export default {
+const ObjectsRenderingService = {
   renderers: {
     unknownObjectType: RenderedUnknownInstance,
     Sprite: RenderedSpriteInstance,
@@ -205,3 +205,5 @@ export default {
   PIXI, // Expose PIXI so that it can be used by renderers
   RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
 };
+
+export default ObjectsRenderingService;

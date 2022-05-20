@@ -52,7 +52,8 @@ export default class InlineParameterEditor extends React.Component<
 
   _field: ?any;
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (newProps.open && !this.props.open) ||
       newProps.instruction !== this.props.instruction

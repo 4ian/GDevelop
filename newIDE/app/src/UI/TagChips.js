@@ -30,14 +30,14 @@ type Props = {|
   onRemove?: string => void,
 |};
 
-export default ({ tags, onChange, onRemove }: Props) => {
-  if (!tags.length) return null;
-
+const TagChips = ({ tags, onChange, onRemove }: Props) => {
   const [focusedTag, setFocusedTag] = React.useState<?string>(null);
   const [removedTagIndex, setRemovedTagIndex] = React.useState<number | null>(
     null
   );
 
+  // Unsure about this warning, might be worth fixing/improving.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const tagRefs = [];
   React.useEffect(
     () => {
@@ -71,6 +71,8 @@ export default ({ tags, onChange, onRemove }: Props) => {
     else if (onRemove) onRemove(tag);
   };
 
+  if (!tags.length) return null;
+
   return (
     <div style={styles.chipContainer}>
       {tags.map(tag => {
@@ -92,3 +94,5 @@ export default ({ tags, onChange, onRemove }: Props) => {
     </div>
   );
 };
+
+export default TagChips;

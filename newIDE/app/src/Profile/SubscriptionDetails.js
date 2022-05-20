@@ -12,7 +12,7 @@ type Props = {
   onChangeSubscription: Function,
 };
 
-export default ({ subscription, onChangeSubscription }: Props) =>
+const SubscriptionDetails = ({ subscription, onChangeSubscription }: Props) =>
   subscription ? (
     <Column>
       <Line alignItems="center">
@@ -62,3 +62,5 @@ export default ({ subscription, onChangeSubscription }: Props) =>
   ) : (
     <PlaceholderLoader />
   );
+
+export default SubscriptionDetails;

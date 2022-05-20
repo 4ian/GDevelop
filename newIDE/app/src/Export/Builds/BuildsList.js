@@ -22,7 +22,7 @@ type Props = {|
   onGameUpdated?: Game => void,
 |};
 
-export default ({
+const BuildsList = ({
   builds,
   authenticatedUser,
   error,
@@ -81,3 +81,5 @@ export default ({
     </Column>
   );
 };
+
+export default BuildsList;

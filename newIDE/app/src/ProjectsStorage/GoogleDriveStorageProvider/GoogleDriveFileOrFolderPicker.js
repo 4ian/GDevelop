@@ -27,7 +27,7 @@ const styles = {
   },
 };
 
-export default (props: Props) => {
+const GoogleDriveFileOrFolderPicker = (props: Props) => {
   return (
     <div
       style={{
@@ -52,3 +52,5 @@ export default (props: Props) => {
     </div>
   );
 };
+
+export default GoogleDriveFileOrFolderPicker;

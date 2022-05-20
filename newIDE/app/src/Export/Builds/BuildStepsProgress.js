@@ -45,7 +45,7 @@ type Props = {|
  * Can be used in an exporter to show the overall progress of a build
  * (including local archiving/upload steps and remote build progress)
  */
-export default ({
+const BuildStepsProgress = ({
   exportStep,
   build,
   stepMaxProgress,
@@ -199,3 +199,5 @@ export default ({
     </Stepper>
   );
 };
+
+export default BuildStepsProgress;

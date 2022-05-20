@@ -257,7 +257,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (
       this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||

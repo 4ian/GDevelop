@@ -19,7 +19,7 @@ type Props = {|
  * A checkbox based on Material-UI Checkbox, but that can be displayed
  * without having it taking the full width of its container.
  */
-export default ({
+const InlineCheckbox = ({
   onCheck,
   disabled,
   checked,
@@ -53,3 +53,5 @@ export default ({
     checkbox
   );
 };
+
+export default InlineCheckbox;

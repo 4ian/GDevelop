@@ -33,7 +33,7 @@ type Props = {|
   width: number,
 |};
 
-export default ({
+const LayerRow = ({
   layerName,
   nameError,
   onBlur,
@@ -148,3 +148,5 @@ export default ({
     )}
   </I18n>
 );
+
+export default LayerRow;

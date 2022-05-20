@@ -112,7 +112,10 @@ const SearchPanel = (
     ]
   );
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(focusSearchField, [currentTab]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(markSearchResultsDirty, [currentTab]);
 
   const launchSearch = () => {

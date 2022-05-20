@@ -41,7 +41,7 @@ type Props = {|
   hintText?: MessageDescriptor,
 |};
 
-type SelectFieldInterface = {| focus: () => void |};
+export type SelectFieldInterface = {| focus: () => void |};
 
 const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();

@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import React, { Component } from 'react';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import SelectField from '../../UI/SelectField';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
 const operatorLabels = {
@@ -23,7 +23,7 @@ const mapTypeToOperators = {
 };
 
 export default class OperatorField extends Component<ParameterFieldProps> {
-  _field: ?SelectField;
+  _field: ?SelectFieldInterface;
   focus() {
     if (this._field && this._field.focus) this._field.focus();
   }

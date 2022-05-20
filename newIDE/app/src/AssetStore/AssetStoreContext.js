@@ -16,6 +16,7 @@ import {
   TagAssetStoreSearchFilter,
   AnimatedAssetStoreSearchFilter,
   ObjectTypeAssetStoreSearchFilter,
+  ColorAssetStoreSearchFilter,
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
@@ -31,6 +32,8 @@ export type AssetFiltersState = {|
   setDimensionFilter: DimensionAssetStoreSearchFilter => void,
   objectTypeFilter: ObjectTypeAssetStoreSearchFilter,
   setObjectTypeFilter: ObjectTypeAssetStoreSearchFilter => void,
+  colorFilter: ColorAssetStoreSearchFilter,
+  setColorFilter: ColorAssetStoreSearchFilter => void,
   licenseFilter: LicenseAssetStoreSearchFilter,
   setLicenseFilter: LicenseAssetStoreSearchFilter => void,
 |};
@@ -75,6 +78,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setDimensionFilter: filter => {},
     objectTypeFilter: new ObjectTypeAssetStoreSearchFilter(),
     setObjectTypeFilter: filter => {},
+    colorFilter: new ColorAssetStoreSearchFilter(),
+    setColorFilter: filter => {},
     licenseFilter: new LicenseAssetStoreSearchFilter(),
     setLicenseFilter: filter => {},
   },
@@ -135,6 +140,12 @@ export const AssetStoreStateProvider = ({
     new ObjectTypeAssetStoreSearchFilter()
   );
   const [
+    colorFilter,
+    setColorFilter,
+  ] = React.useState<ColorAssetStoreSearchFilter>(
+    new ColorAssetStoreSearchFilter()
+  );
+  const [
     licenseFilter,
     setLicenseFilter,
   ] = React.useState<LicenseAssetStoreSearchFilter>(
@@ -149,6 +160,8 @@ export const AssetStoreStateProvider = ({
     setDimensionFilter: setDimensionFilter,
     objectTypeFilter: objectTypeFilter,
     setObjectTypeFilter: setObjectTypeFilter,
+    colorFilter: colorFilter,
+    setColorFilter: setColorFilter,
     licenseFilter: licenseFilter,
     setLicenseFilter: setLicenseFilter,
   };
@@ -159,6 +172,7 @@ export const AssetStoreStateProvider = ({
     viewpointFilter,
     dimensionFilter,
     objectTypeFilter,
+    colorFilter,
     licenseFilter,
   ];
   const [searchFilters, setSearchFilters] = React.useState<

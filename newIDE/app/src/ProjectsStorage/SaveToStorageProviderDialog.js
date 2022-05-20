@@ -13,7 +13,11 @@ type Props = {|
   onClose: () => void,
 |};
 
-const SaveToStorageProviderDialog = ({ onClose, storageProviders, onChooseProvider }: Props) => {
+const SaveToStorageProviderDialog = ({
+  onClose,
+  storageProviders,
+  onChooseProvider,
+}: Props) => {
   return (
     <I18n>
       {({ i18n }) => (

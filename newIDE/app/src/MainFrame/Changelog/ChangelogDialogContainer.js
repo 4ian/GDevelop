@@ -7,7 +7,9 @@ type InnerContainerProps = {|
   defaultOpen: boolean,
 |};
 
-const ChangelogDialogInnerContainer = ({ defaultOpen }: InnerContainerProps) => {
+const ChangelogDialogInnerContainer = ({
+  defaultOpen,
+}: InnerContainerProps) => {
   const [open, setOpen] = React.useState(defaultOpen);
 
   return <ChangelogDialog open={open} onClose={() => setOpen(false)} />;

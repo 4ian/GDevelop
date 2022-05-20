@@ -178,11 +178,14 @@ const CollisionMasksEditor = (props: Props) => {
     setSpriteHeight(spriteHeight);
   };
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateCollisionMasks, [
     sameCollisionMasksForAnimations,
     sameCollisionMasksForSprites,
   ]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateSameCollisionMasksToggles, [animationIndex]);
 
   // Keep panes vertical for small screens, side-by-side for large screens

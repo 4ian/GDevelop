@@ -18,6 +18,20 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "newIDE/app Jest tests (current file)",
+      "program": "${workspaceFolder}/newIDE/app/node_modules/.bin/react-scripts",
+      "args": [
+        "test", "--env=node",
+        "${fileBasenameNoExtension}"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}/newIDE/app"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "GDevelop.js Jest tests (current file)",
       "program": "${workspaceFolder}/GDevelop.js/node_modules/.bin/jest",
       "args": [

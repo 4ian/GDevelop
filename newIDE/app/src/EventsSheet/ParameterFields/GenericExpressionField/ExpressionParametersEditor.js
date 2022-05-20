@@ -75,7 +75,7 @@ const ExpressionParametersEditor = ({
 
         if (parameterMetadata.isCodeOnly()) return null;
         return (
-          <>
+          <React.Fragment key={i}>
             {i > 0 && <Spacer />}
             <ParameterComponent
               expressionMetadata={expressionMetadata}
@@ -88,10 +88,9 @@ const ExpressionParametersEditor = ({
               scope={scope}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
-              key={i}
               parameterRenderingService={parameterRenderingService}
             />
-          </>
+          </React.Fragment>
         );
       })}
       {!hasNonCodeOnlyParameters(expressionMetadata) && (

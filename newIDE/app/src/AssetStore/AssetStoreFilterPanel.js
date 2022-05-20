@@ -228,8 +228,8 @@ export const AssetStoreFilterPanel = ({
         filterKey="Animation"
         title={<Trans>Animation</Trans>}
         choices={[
-          { label: t`Multiple Frames`, value: 'multiple-frames' },
-          { label: t`Multiple States`, value: 'multiple-states' },
+          { label: t`Multiple frames`, value: 'multiple-frames' },
+          { label: t`Multiple states`, value: 'multiple-states' },
         ]}
         isChoiceChecked={choice =>
           (choice === 'multiple-frames' &&
@@ -299,17 +299,21 @@ export const AssetStoreFilterPanel = ({
           onChoiceChange();
         }}
       />
-      <SetFilter
+      <MultipleChoiceFilter
         filterKey="License"
         title={<Trans>License</Trans>}
-        choices={licenses.map(license => ({
-          label: null,
-          value: license.name,
-        }))}
-        values={assetFiltersState.licenseFilter.licenses}
-        setValues={values => {
+        choices={[
+          {
+            label: t`Exclude attribution requirements`,
+            value: 'without-attribution',
+          },
+        ]}
+        isChoiceChecked={choice =>
+          assetFiltersState.licenseFilter.attributionFreeOnly
+        }
+        setChoiceChecked={(choice, checked) => {
           assetFiltersState.setLicenseFilter(
-            new LicenseAssetStoreSearchFilter(values)
+            new LicenseAssetStoreSearchFilter(checked)
           );
           onChoiceChange();
         }}

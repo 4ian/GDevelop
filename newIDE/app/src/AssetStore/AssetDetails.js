@@ -30,6 +30,7 @@ import SelectOption from '../UI/SelectOption';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ThemeContext from '../UI/Theme/ThemeContext';
+import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 
 const styles = {
   previewImagePixelated: {
@@ -184,18 +185,29 @@ export const AssetDetails = ({
   const assetAnimations = asset
     ? asset.objectAssets[0].object.animations
     : null;
+  const animation = assetAnimations
+    ? assetAnimations.find(({ name }) => name === selectedAnimationName)
+    : null;
+  const direction = animation ? animation.directions[0] : null;
+  const animationResources =
+    asset && direction
+      ? direction.sprites.map(sprite =>
+          asset.objectAssets[0].resources.find(
+            ({ name }) => name === sprite.image
+          )
+        )
+      : null;
 
   const getPreviewImageToDisplay = () => {
-    if (!asset || !assetAnimations || !selectedAnimationName) {
+    if (
+      !asset ||
+      !assetAnimations ||
+      !selectedAnimationName ||
+      !animation ||
+      !animationResources
+    ) {
       return assetShortHeader.previewImageUrls[0];
     }
-
-    const animation = assetAnimations.find(
-      ({ name }) => name === selectedAnimationName
-    );
-    const animationResources = animation.directions[0].sprites.map(sprite =>
-      asset.objectAssets[0].resources.find(({ name }) => name === sprite.image)
-    );
 
     return animationResources[0].file;
   };
@@ -295,16 +307,33 @@ export const AssetDetails = ({
                     : styles.verticalPreviewBackground),
                 }}
               >
-                <CorsAwareImage
-                  style={{
-                    ...styles.previewImage,
-                    ...(isPixelArt(assetShortHeader)
-                      ? styles.previewImagePixelated
-                      : undefined),
-                  }}
-                  src={getPreviewImageToDisplay()}
-                  alt={assetShortHeader.name}
-                />
+                {animationResources && direction ? (
+                  <AnimationPreview
+                    resourceNames={animationResources.map(({ name }) => name)}
+                    getImageSource={(resourceName: string) => {
+                      console.log(resourceName, animationResources);
+                      return animationResources.find(
+                        ({ name }) => name === resourceName
+                      ).file;
+                    }}
+                    project={project}
+                    timeBetweenFrames={direction.timeBetweenFrames}
+                    isLooping={direction.looping}
+                    hideCheckeredBackground
+                    hideControls
+                  />
+                ) : (
+                  <CorsAwareImage
+                    style={{
+                      ...styles.previewImage,
+                      ...(isPixelArt(assetShortHeader)
+                        ? styles.previewImagePixelated
+                        : undefined),
+                    }}
+                    src={getPreviewImageToDisplay()}
+                    alt={assetShortHeader.name}
+                  />
+                )}
               </div>
               {assetAnimations &&
                 assetAnimations.length > 1 &&

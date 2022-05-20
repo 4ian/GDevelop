@@ -180,6 +180,11 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
 
+  const DragSourceAndDropTarget = React.useMemo(
+    () => makeDragSourceAndDropTarget('variable-editor'),
+    []
+  );
+
   const triggerSearch = React.useCallback(
     () => {
       let matchingInheritedNodes = [];
@@ -520,11 +525,6 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       forceUpdate();
     }
   };
-
-  const DragSourceAndDropTarget = React.useMemo(
-    () => makeDragSourceAndDropTarget('variable-editor'),
-    []
-  );
 
   const canDrop = (nodeId: string): boolean => {
     if (nodeId.startsWith(inheritedPrefix)) return false;

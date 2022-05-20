@@ -1,6 +1,11 @@
 // @flow
 import { TagSearchFilter, SearchFilter } from '../UI/Search/UseSearchItem';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type RGBColor,
+  rgbToHsl,
+  hexNumberToRGBColor,
+} from '../Utils/ColorTransformer';
 
 export class TagAssetStoreSearchFilter extends TagSearchFilter<AssetShortHeader> {
   constructor(tags: Set<string> = new Set()) {
@@ -104,5 +109,57 @@ export class DimensionAssetStoreSearchFilter
         (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
           searchItem.height <= this.dimensionMax))
     );
+  }
+}
+
+/**
+ * Modulo operation (the remainder after dividing one number by another)
+ * @param x Dividend value.
+ * @param y Divisor value.
+ * @returns Return the remainder for the values.
+ */
+const mod = function(x: number, y: number): number {
+  return x - y * Math.floor(x / y);
+};
+
+export class ColorAssetStoreSearchFilter
+  implements SearchFilter<AssetShortHeader> {
+  color: RGBColor | null;
+
+  constructor(color: RGBColor | null = null) {
+    this.color = color;
+  }
+
+  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+    if (!this.color) return true;
+    const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
+    const dominantRgb = hexNumberToRGBColor(searchItem.dominantColors[0]);
+    const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);
+    const targetSaturation = targetHsl[1];
+    const dominantSaturation = dominantHsl[1];
+    let score = 0;
+    if (targetSaturation === 0) {
+      // Hue is not relevent.
+      const deltaSaturation = dominantSaturation - targetSaturation;
+      const deltaLightness = dominantHsl[2] - targetHsl[2];
+      score =
+        1 -
+        (deltaSaturation * deltaSaturation + deltaLightness * deltaLightness) /
+          2;
+    } else {
+      const deltaHue =
+        dominantSaturation === 0
+          ? 1
+          : Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
+      const deltaSaturation = dominantSaturation - targetSaturation;
+      const deltaLightness = dominantHsl[2] - targetHsl[2];
+      score =
+        1 -
+        (4 * deltaHue * deltaHue +
+          deltaSaturation * deltaSaturation +
+          deltaLightness * deltaLightness) /
+          6;
+    }
+    return score > 0.98;
   }
 }

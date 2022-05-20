@@ -12,11 +12,14 @@ import {
   ObjectTypeAssetStoreSearchFilter,
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
+  ColorAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import { type AssetFiltersState } from './AssetStoreContext';
 import Slider from '@material-ui/core/Slider';
 import FlatButton from '../UI/FlatButton';
 import { Line, Column } from '../UI/Grid';
+import { type RGBColor } from '../Utils/ColorTransformer';
+import { HexColorField } from './HexColorField';
 
 /** @typedef { import("../UI/Search/UseSearchItem").TagSearchFilter } TagSearchFilter */
 
@@ -175,6 +178,42 @@ const RangeFilter = ({
   );
 };
 
+type ColorFilterProps = {|
+  filterKey: string,
+  title: ?React.Node,
+  color: RGBColor | null,
+  setColor: (RGBColor | null) => void,
+|};
+
+const ColorFilter = ({
+  filterKey,
+  title,
+  color,
+  setColor,
+}: ColorFilterProps) => {
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Accordion key={filterKey} defaultExpanded>
+          <AccordionHeader>
+            <Text displayInlineAsSpan>{title}</Text>
+          </AccordionHeader>
+          <AccordionBody>
+            <HexColorField
+              disableAlpha
+              fullWidth
+              color={color}
+              onChange={color => {
+                setColor(color);
+              }}
+            />
+          </AccordionBody>
+        </Accordion>
+      )}
+    </I18n>
+  );
+};
+
 type AssetStoreFilterPanelProps = {|
   assetFiltersState: AssetFiltersState,
   onChoiceChange: () => void,
@@ -257,6 +296,17 @@ export const AssetStoreFilterPanel = ({
         setValues={values => {
           assetFiltersState.setObjectTypeFilter(
             new ObjectTypeAssetStoreSearchFilter(values)
+          );
+          onChoiceChange();
+        }}
+      />
+      <ColorFilter
+        filterKey="Color"
+        title={<Trans>Color</Trans>}
+        color={assetFiltersState.colorFilter.color}
+        setColor={color => {
+          assetFiltersState.setColorFilter(
+            new ColorAssetStoreSearchFilter(color)
           );
           onChoiceChange();
         }}

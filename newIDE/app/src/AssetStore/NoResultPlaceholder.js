@@ -1,9 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import Container from '@material-ui/core/Container';
-import { ColumnStackLayout } from '../UI/Layout';
-import { Column, LargeSpacer } from '../UI/Grid';
+import { Column } from '../UI/Grid';
 import { EmptyPlaceholder } from '../UI/EmptyPlaceholder';
 import RestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 

@@ -16,7 +16,7 @@ import {
 import { type AssetFiltersState } from './AssetStoreContext';
 import Slider from '@material-ui/core/Slider';
 import FlatButton from '../UI/FlatButton';
-import { Line } from '../UI/Grid';
+import { Line, Column } from '../UI/Grid';
 
 /** @typedef { import("../UI/Search/UseSearchItem").TagSearchFilter } TagSearchFilter */
 
@@ -185,7 +185,7 @@ export const AssetStoreFilterPanel = ({
   onChoiceChange,
 }: AssetStoreFilterPanelProps) => {
   return (
-    <>
+    <Column>
       <MultipleChoiceFilter
         filterKey="Animation"
         title={<Trans>Animation</Trans>}
@@ -304,6 +304,6 @@ export const AssetStoreFilterPanel = ({
           }}
         />
       </Line>
-    </>
+    </Column>
   );
 };

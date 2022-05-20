@@ -144,28 +144,12 @@ export const AssetStore = ({
                       <DoubleChevronArrow />
                     </IconButton>
                   </Line>
-                  <>
+                  <Line justifyContent="space-between" alignItems="center">
                     <AssetStoreFilterPanel
                       assetFiltersState={assetFiltersState}
                       onChoiceChange={() => setIsOnHomePage(false)}
                     />
-                    <Spacer />
-                    <CategoryChooser
-                      allItemsLabel={<Trans>All assets</Trans>}
-                      allFilters={filters}
-                      filtersState={filtersState}
-                      onChoiceChange={() => setIsOnHomePage(false)}
-                      error={error}
-                    />
-                    <Subheader>
-                      <Trans>Filters</Trans>
-                    </Subheader>
-                    <FiltersChooser
-                      allFilters={filters}
-                      filtersState={filtersState}
-                      error={error}
-                    />
-                  </>
+                  </Line>
                 </ScrollView>
               )}
             </Background>

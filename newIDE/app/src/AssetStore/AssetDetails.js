@@ -24,9 +24,12 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Link from '@material-ui/core/Link';
 import Window from '../Utils/Window';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles, Paper } from '@material-ui/core';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
+import ThemeContext from '../UI/Theme/ThemeContext';
 
 const styles = {
   previewImagePixelated: {
@@ -43,11 +46,11 @@ const styles = {
   },
   verticalPreviewBackground: {
     width: 250,
-    minHeight: 150,
+    height: 220,
   },
   horizontalPreviewBackground: {
     width: 150,
-    minHeight: 150,
+    height: 120,
   },
   chip: {
     marginBottom: 2,
@@ -61,11 +64,32 @@ const styles = {
     verticalAlign: 'middle',
     pointerEvents: 'none',
   },
+  arrowContainer: {
+    padding: 6,
+    cursor: 'pointer',
+  },
 };
 
 const useChipStyles = makeStyles({
   label: {
     cursor: 'pointer',
+  },
+});
+
+const useStylesForLeftArrow = makeStyles({
+  root: {
+    cursor: 'pointer',
+    '& > path': {
+      transform: 'translate(5px, 0px)', // Translate path inside SVG since MUI icon is not centered
+      cursor: 'pointer',
+    },
+  },
+});
+
+const useStylesForRightArrow = makeStyles({
+  root: {
+    cursor: 'pointer',
+    '& > path': { cursor: 'pointer' },
   },
 });
 
@@ -98,6 +122,9 @@ export const AssetDetails = ({
   isBeingInstalled,
 }: Props) => {
   const chipStyles = useChipStyles();
+  const leftArrowStyles = useStylesForLeftArrow();
+  const rightArrowStyles = useStylesForRightArrow();
+  const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [isAssetAdded, setIsAssetAdded] = React.useState<boolean>(false);
@@ -256,7 +283,7 @@ export const AssetDetails = ({
           </LeftLoader>
         </Column>
       </ResponsiveLineStackLayout>
-      <div style={{ height: 220, display: 'flex' }}>
+      <Line noMargin>
         <ResponsiveWindowMeasurer>
           {windowWidth => (
             <Column>
@@ -282,22 +309,70 @@ export const AssetDetails = ({
               {assetAnimations &&
                 assetAnimations.length > 1 &&
                 typeof selectedAnimationName === 'string' && (
-                  <Line justifyContent="center">
-                    <SelectField
-                      value={selectedAnimationName}
-                      onChange={(e, i, newAnimationName: string) => {
-                        setSelectedAnimationName(newAnimationName);
-                      }}
-                    >
-                      {assetAnimations.map(animation => (
-                        <SelectOption
-                          key={animation.name}
-                          value={animation.name}
-                          primaryText={animation.name}
-                        />
-                      ))}
-                    </SelectField>
-                  </Line>
+                  <Paper elevation={4} variant="outlined">
+                    <Line justifyContent="center" alignItems="center" noMargin>
+                      <div
+                        style={{
+                          ...styles.arrowContainer,
+                          backgroundColor:
+                            gdevelopTheme.list.itemsBackgroundColor,
+                        }}
+                        onClick={() => {
+                          const previousAnimationIndex = assetAnimations.findIndex(
+                            ({ name }) => name === selectedAnimationName
+                          );
+                          const newAnimationIndex =
+                            previousAnimationIndex === 0
+                              ? assetAnimations.length - 1
+                              : previousAnimationIndex - 1;
+                          setSelectedAnimationName(
+                            assetAnimations[newAnimationIndex].name
+                          );
+                        }}
+                      >
+                        <ArrowBackIos classes={leftArrowStyles} />
+                      </div>
+
+                      <SelectField
+                        value={selectedAnimationName}
+                        onChange={(e, i, newAnimationName: string) => {
+                          setSelectedAnimationName(newAnimationName);
+                        }}
+                        fullWidth
+                        textAlign="center"
+                      >
+                        {assetAnimations.map(animation => (
+                          <SelectOption
+                            key={animation.name}
+                            value={animation.name}
+                            primaryText={animation.name}
+                          />
+                        ))}
+                      </SelectField>
+                      <div
+                        style={{
+                          ...styles.arrowContainer,
+                          backgroundColor:
+                            gdevelopTheme.list.itemsBackgroundColor,
+                        }}
+                        onClick={() => {
+                          const previousAnimationIndex = assetAnimations.findIndex(
+                            ({ name }) => name === selectedAnimationName
+                          );
+                          const newAnimationIndex =
+                            previousAnimationIndex ===
+                            assetAnimations.length - 1
+                              ? 0
+                              : previousAnimationIndex + 1;
+                          setSelectedAnimationName(
+                            assetAnimations[newAnimationIndex].name
+                          );
+                        }}
+                      >
+                        <ArrowForwardIos classes={rightArrowStyles} />
+                      </div>
+                    </Line>
+                  </Paper>
                 )}
             </Column>
           )}
@@ -335,7 +410,7 @@ export const AssetDetails = ({
             <PlaceholderLoader />
           )}
         </Column>
-      </div>
+      </Line>
     </Column>
   );
 };

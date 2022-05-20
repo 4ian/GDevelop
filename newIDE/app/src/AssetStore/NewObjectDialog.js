@@ -138,7 +138,7 @@ export default function NewObjectDialog({
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>
-          <Tab label={<Trans>Search Asset Store</Trans>} value="asset-store" />
+          <Tab label={<Trans>Asset Store</Trans>} value="asset-store" />
           <Tab
             label={<Trans>New object from scratch</Trans>}
             value="new-object"

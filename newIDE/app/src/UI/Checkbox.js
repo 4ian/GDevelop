@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import MUICheckbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
 
 // Reduce checkbox size to avoid overlapping with other checkboxes.
@@ -33,11 +33,11 @@ type Props = {|
 /**
  * A text field based on Material-UI text field.
  */
-export default (props: Props) => {
+const Checkbox = (props: Props) => {
   const { onCheck } = props;
   const classes = useStyles();
   const checkbox = (
-    <Checkbox
+    <MUICheckbox
       className={classes.root}
       disabled={props.disabled}
       checked={props.checked}
@@ -60,3 +60,5 @@ export default (props: Props) => {
     checkbox
   );
 };
+
+export default Checkbox;

@@ -38,7 +38,7 @@ const styles = {
   },
 };
 
-export default (props: Props) => {
+const DrawerTopBar = (props: Props) => {
   return (
     <AppBar
       position="static"
@@ -71,3 +71,5 @@ export default (props: Props) => {
     </AppBar>
   );
 };
+
+export default DrawerTopBar;

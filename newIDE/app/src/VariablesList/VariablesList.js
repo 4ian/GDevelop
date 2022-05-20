@@ -54,6 +54,7 @@ import {
 } from '../Utils/VariablesUtils';
 import {
   foldNodesVariables,
+  generateListOfNodesMatchingSearchInVariablesContainer,
   getDirectParentNodeId,
   getDirectParentVariable,
   getExpandedNodeIdsFromVariablesContainer,
@@ -161,6 +162,9 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     [onComputeAllVariableNames]
   );
   const [selectedNodes, setSelectedNodes] = React.useState<Array<string>>([]);
+  const [searchMatchingNodes, setSearchMatchingNodes] = React.useState<
+    Array<string>
+  >([]);
   const [containerWidth, setContainerWidth] = React.useState<?number>(null);
   const [nameErrors, setNameErrors] = React.useState<{ [number]: React.Node }>(
     {}
@@ -168,6 +172,33 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
+
+  React.useEffect(
+    () => {
+      if (!!searchText) {
+        triggerSearch();
+      } else {
+        setSearchMatchingNodes([]);
+      }
+    },
+    [searchText]
+  );
+
+  const triggerSearch = () => {
+    let matchingInheritedNodes = [];
+    const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
+      props.variablesContainer,
+      normalizeString(searchText)
+    );
+    if (props.inheritedVariablesContainer) {
+      matchingInheritedNodes = generateListOfNodesMatchingSearchInVariablesContainer(
+        props.inheritedVariablesContainer,
+        normalizeString(searchText),
+        inheritedPrefix
+      );
+    }
+    setSearchMatchingNodes([...matchingNodes, ...matchingInheritedNodes]);
+  };
 
   const shouldHideExpandIcons =
     !hasVariablesContainerSubChildren(props.variablesContainer) &&
@@ -435,6 +466,15 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     setSelectedNodes(
       updateListOfNodesFollowingChangeName(selectedNodes, oldNodeId, newName)
     );
+    if (!!searchText) {
+      setSearchMatchingNodes(
+        updateListOfNodesFollowingChangeName(
+          searchMatchingNodes,
+          oldNodeId,
+          newName
+        )
+      );
+    }
   };
 
   const updateExpandedAndSelectedNodesFollowingNodeMove = (
@@ -451,6 +491,10 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       ...inheritedExpandedNodes,
       ...getExpandedNodeIdsFromVariablesContainer(props.variablesContainer),
     ]);
+    if (!!searchText) {
+      triggerSearch();
+      forceUpdate();
+    }
   };
 
   const DragSourceAndDropTarget = React.useMemo(
@@ -801,13 +845,22 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       props.inheritedVariablesContainer &&
       props.inheritedVariablesContainer.has(name);
 
-    const normalizedSearchText = normalizeString(searchText);
-    if (
-      !!searchText &&
-      !normalizeString(name).includes(normalizedSearchText) &&
-      !hasChildThatContainsStringInNameOrValue(variable, normalizedSearchText)
-    ) {
-      return null;
+    if (!!searchText) {
+      if (
+        !(
+          searchMatchingNodes.includes(nodeId) ||
+          searchMatchingNodes.includes(parentNodeId) ||
+          searchMatchingNodes.some(matchingNodeId =>
+            matchingNodeId.startsWith(nodeId)
+          )
+        )
+      ) {
+        // Display node if one of these is true:
+        // - node is in the list of nodes matching search
+        // - parent node is in the list of nodes matching search (to be able to edit direct children of searched structure)
+        // - node is an ancestry of a node in the list of nodes matching search
+        return null;
+      }
     }
 
     const valueInputStyle = {};

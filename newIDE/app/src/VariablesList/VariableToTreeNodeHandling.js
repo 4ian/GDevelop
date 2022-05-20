@@ -364,7 +364,8 @@ export const generateListOfNodesMatchingSearchInVariable = ({
 
 export const generateListOfNodesMatchingSearchInVariablesContainer = (
   variablesContainer: gdVariablesContainer,
-  searchText: string
+  searchText: string,
+  prefix?: string
 ): Array<string> => {
   return mapFor(0, variablesContainer.count(), index => {
     const variable = variablesContainer.getAt(index);
@@ -372,7 +373,7 @@ export const generateListOfNodesMatchingSearchInVariablesContainer = (
     return generateListOfNodesMatchingSearchInVariable({
       variable,
       variableName: name,
-      nodeId: name,
+      nodeId: prefix ? `${prefix}${name}`: name,
       searchText,
       acc: [],
     });

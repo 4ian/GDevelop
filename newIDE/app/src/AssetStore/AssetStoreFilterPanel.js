@@ -14,7 +14,6 @@ import {
   DimensionAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import { type AssetFiltersState } from './AssetStoreContext';
-import { type License } from '../Utils/GDevelopServices/Asset';
 import Slider from '@material-ui/core/Slider';
 import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
@@ -176,52 +175,13 @@ const RangeFilter = ({
   );
 };
 
-type BooleanFilterProps = {|
-  filterKey: string,
-  title: ?React.Node,
-  trueChoice: Choice,
-  falseChoice: Choice,
-  value: boolean | null,
-  setValue: (boolean | null) => void,
-|};
-
-const BooleanFilter = ({
-  filterKey,
-  title,
-  trueChoice,
-  falseChoice,
-  value,
-  setValue,
-}: BooleanFilterProps) => {
-  return (
-    <MultipleChoiceFilter
-      filterKey={filterKey}
-      title={title}
-      choices={[trueChoice, falseChoice]}
-      isChoiceChecked={choice =>
-        (choice === trueChoice.value && value === true) ||
-        (choice === falseChoice.value && value === false)
-      }
-      setChoiceChecked={(choice, checked) => {
-        // The value can only toggle between null and not null
-        // because only one checkbox changes at once.
-        setValue(
-          value === null ? (choice === trueChoice.value) === checked : null
-        );
-      }}
-    />
-  );
-};
-
 type AssetStoreFilterPanelProps = {|
   assetFiltersState: AssetFiltersState,
-  licenses: Array<License>,
   onChoiceChange: () => void,
 |};
 
 export const AssetStoreFilterPanel = ({
   assetFiltersState,
-  licenses,
   onChoiceChange,
 }: AssetStoreFilterPanelProps) => {
   return (

@@ -85,7 +85,10 @@ export class DimensionAssetStoreSearchFilter
   static boundMin = 8;
   static boundMax = 2048;
 
-  constructor(dimensionMin: number = 2, dimensionMax: number = 2048) {
+  constructor(
+    dimensionMin: number = DimensionAssetStoreSearchFilter.boundMin,
+    dimensionMax: number = DimensionAssetStoreSearchFilter.boundMax
+  ) {
     this.dimensionMin = dimensionMin;
     this.dimensionMax = dimensionMax;
   }

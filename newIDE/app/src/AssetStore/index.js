@@ -13,6 +13,7 @@ import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import { FiltersChooser } from '../UI/Search/FiltersChooser';
+import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -52,6 +53,7 @@ export const AssetStore = ({
     error,
     fetchAssetsAndFilters,
     filtersState,
+    assetFiltersState,
     searchText,
     setSearchText,
   } = React.useContext(AssetStoreContext);
@@ -144,6 +146,11 @@ export const AssetStore = ({
                     </IconButton>
                   </Line>
                   <>
+                    <AssetStoreFilterPanel
+                      assetFiltersState={assetFiltersState}
+                      onChoiceChange={() => setIsOnHomePage(false)}
+                    />
+                    <Spacer />
                     <CategoryChooser
                       allItemsLabel={<Trans>All assets</Trans>}
                       allFilters={filters}

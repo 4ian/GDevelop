@@ -36,6 +36,8 @@ const TagChips = ({ tags, onChange, onRemove }: Props) => {
     null
   );
 
+  // Unsure about this warning, might be worth fixing/improving.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const tagRefs = [];
   React.useEffect(
     () => {

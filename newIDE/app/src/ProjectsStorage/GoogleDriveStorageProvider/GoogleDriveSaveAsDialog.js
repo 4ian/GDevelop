@@ -27,7 +27,7 @@ type Props = {|
  * A "Save as" dialog for Google Drive, allowing to pick a file to overwrite or a folder
  * and a new filename where to save the game.
  */
-export default (props: Props) => {
+const GoogleDriveSaveAsDialog = (props: Props) => {
   const [selectedFileOrFolder, setSelectedFileOrFolder] = React.useState(
     (null: ?GoogleDriveFileOrFolder)
   );
@@ -155,3 +155,5 @@ export default (props: Props) => {
     </Dialog>
   );
 };
+
+export default GoogleDriveSaveAsDialog;

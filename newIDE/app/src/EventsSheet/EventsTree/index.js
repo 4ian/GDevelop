@@ -749,6 +749,7 @@ export default class ThemableEventsTree extends Component<
             ref: list => (this._list = list),
             onScroll: this.props.onScroll,
           }}
+          slideRegionSize={0}
         />
       </div>
     );

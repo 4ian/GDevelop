@@ -31,14 +31,26 @@ export class ObjectTypeAssetStoreSearchFilter
 
 export class LicenseAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
-  licenses: Set<string>;
+  attributionFreeOnly: boolean;
 
-  constructor(objectTypes: Set<string> = new Set()) {
-    this.licenses = objectTypes;
+  static noAttributionLicenses = [
+    'CC0 (public domain)',
+    'Apache 2.0',
+    'Trademark of GDevelop Ltd (fair use authorised in GDevelop games)',
+    'SIL Open Font License 1.1 (OFL)',
+  ];
+
+  constructor(attributionFreeOnly: boolean = false) {
+    this.attributionFreeOnly = attributionFreeOnly;
   }
 
   isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return this.licenses.size === 0 || this.licenses.has(searchItem.license);
+    return (
+      !this.attributionFreeOnly ||
+      LicenseAssetStoreSearchFilter.noAttributionLicenses.includes(
+        searchItem.license
+      )
+    );
   }
 }
 

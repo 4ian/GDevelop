@@ -11,9 +11,11 @@ import {
   AnimatedAssetStoreSearchFilter,
   ObjectTypeAssetStoreSearchFilter,
   LicenseAssetStoreSearchFilter,
+  DimensionAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import { type AssetFiltersState } from './AssetStoreContext';
 import { type License } from '../Utils/GDevelopServices/Asset';
+import Slider from '@material-ui/core/Slider';
 
 /** @typedef { import("../UI/Search/UseSearchItem").TagSearchFilter } TagSearchFilter */
 
@@ -126,6 +128,52 @@ const TagFilter = ({
   );
 };
 
+type RangeFilterProps = {|
+  filterKey: string,
+  title: ?React.Node,
+  min: number,
+  max: number,
+  step: number,
+  scale: number => number,
+  range: [number, number],
+  setRange: ([number, number]) => void,
+|};
+
+const RangeFilter = ({
+  filterKey,
+  title,
+  min,
+  max,
+  scale,
+  step,
+  range,
+  setRange,
+}: RangeFilterProps) => {
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Accordion key={filterKey} defaultExpanded>
+          <AccordionHeader>
+            <Text displayInlineAsSpan>{title}</Text>
+          </AccordionHeader>
+          <AccordionBody>
+            <Slider
+              value={range}
+              min={min}
+              max={max}
+              step={step}
+              scale={scale}
+              marks={true}
+              valueLabelDisplay="auto"
+              onChange={(event, newValue) => setRange(newValue)}
+            />
+          </AccordionBody>
+        </Accordion>
+      )}
+    </I18n>
+  );
+};
+
 type BooleanFilterProps = {|
   filterKey: string,
   title: ?React.Node,
@@ -176,15 +224,31 @@ export const AssetStoreFilterPanel = ({
 }: AssetStoreFilterPanelProps) => {
   return (
     <>
-      <BooleanFilter
+      <MultipleChoiceFilter
         filterKey="Animation"
         title={<Trans>Animation</Trans>}
-        trueChoice={{ label: t`Animated`, value: 'animated' }}
-        falseChoice={{ label: t`Unanimated`, value: 'unaimated' }}
-        value={assetFiltersState.animatedFilter.animated}
-        setValue={value => {
+        choices={[
+          { label: t`Multiple Frames`, value: 'multiple-frames' },
+          { label: t`Multiple States`, value: 'multiple-states' },
+        ]}
+        isChoiceChecked={choice =>
+          (choice === 'multiple-frames' &&
+            assetFiltersState.animatedFilter.mustBeAnimated) ||
+          (choice === 'multiple-states' &&
+            assetFiltersState.animatedFilter.mustHaveSeveralState)
+        }
+        setChoiceChecked={(choice, checked) => {
+          const animatedFilter = assetFiltersState.animatedFilter;
+          if (choice === 'multiple-frames') {
+            animatedFilter.mustBeAnimated = checked;
+          } else {
+            animatedFilter.mustHaveSeveralState = checked;
+          }
           assetFiltersState.setAnimatedFilter(
-            new AnimatedAssetStoreSearchFilter(value)
+            new AnimatedAssetStoreSearchFilter(
+              animatedFilter.mustBeAnimated,
+              animatedFilter.mustHaveSeveralState
+            )
           );
           onChoiceChange();
         }}
@@ -200,6 +264,24 @@ export const AssetStoreFilterPanel = ({
         searchFilter={assetFiltersState.viewportFilter}
         setSearchFilter={assetFiltersState.setViewportFilter}
         onFilterChange={onChoiceChange}
+      />
+      <RangeFilter
+        filterKey="PixelSize"
+        title={<Trans>Pixel size</Trans>}
+        min={Math.log2(DimensionAssetStoreSearchFilter.boundMin)}
+        max={Math.log2(DimensionAssetStoreSearchFilter.boundMax)}
+        step={0.5}
+        scale={x => Math.round(2 ** x)}
+        range={[
+          Math.log2(assetFiltersState.dimensionFilter.dimensionMin),
+          Math.log2(assetFiltersState.dimensionFilter.dimensionMax),
+        ]}
+        setRange={range => {
+          assetFiltersState.setDimensionFilter(
+            new DimensionAssetStoreSearchFilter(2 ** range[0], 2 ** range[1])
+          );
+          onChoiceChange();
+        }}
       />
       <SetFilter
         filterKey="ObjectType"

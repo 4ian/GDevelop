@@ -438,6 +438,9 @@ export const fakeAsset1: Asset = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -462,6 +465,9 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -506,6 +512,9 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -539,6 +548,9 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -572,6 +584,9 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -648,6 +663,9 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -700,6 +718,9 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
 };
 
 export const fakeAssetShortHeader2: AssetShortHeader = {
@@ -712,6 +733,9 @@ export const fakeAssetShortHeader2: AssetShortHeader = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
 };
 
 export const fakeAssetShortHeader3: AssetShortHeader = {
@@ -724,6 +748,9 @@ export const fakeAssetShortHeader3: AssetShortHeader = {
   objectType: 'sprite',
   animationsCount: 1,
   maxFramesCount: 1,
+  width: 32,
+  height: 32,
+  dominantColors: [255],
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {

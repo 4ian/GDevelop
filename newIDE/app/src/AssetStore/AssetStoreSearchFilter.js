@@ -44,18 +44,50 @@ export class LicenseAssetStoreSearchFilter
 
 export class AnimatedAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
-  mustBeAnimated: boolean | null;
+  mustBeAnimated: boolean;
   mustHaveSeveralState: boolean;
 
-  constructor(mustBeAnimated: boolean, mustHaveSeveralState: boolean) {
+  constructor(
+    mustBeAnimated: boolean = false,
+    mustHaveSeveralState: boolean = false
+  ) {
     this.mustBeAnimated = mustBeAnimated;
     this.mustHaveSeveralState = mustHaveSeveralState;
   }
 
   isSatisfiedBy(searchItem: AssetShortHeader): boolean {
     const hasAnimatedState = searchItem.maxFramesCount > 1;
-    const hasSeveralState = searchItem.animationCount > 1;
-    return this.mustBeAnimated === null || hasAnimatedState === this.animated
-    && this.mustHaveSeveralState === null || hasSeveralState === this.animated;
+    const hasSeveralState = searchItem.animationsCount > 1;
+    return (
+      (!this.mustBeAnimated || hasAnimatedState) &&
+      (!this.mustHaveSeveralState || hasSeveralState)
+    );
+  }
+}
+
+export class DimensionAssetStoreSearchFilter
+  implements SearchFilter<AssetShortHeader> {
+  dimensionMin: number;
+  dimensionMax: number;
+
+  static boundMin = 8;
+  static boundMax = 2048;
+
+  constructor(dimensionMin: number = 2, dimensionMax: number = 2048) {
+    this.dimensionMin = dimensionMin;
+    this.dimensionMax = dimensionMax;
+  }
+
+  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+    return (
+      ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
+        this.dimensionMin <= searchItem.width) &&
+        (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
+          searchItem.width <= this.dimensionMax)) ||
+      ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
+        this.dimensionMin <= searchItem.height) &&
+        (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
+          searchItem.height <= this.dimensionMax))
+    );
   }
 }

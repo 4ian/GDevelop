@@ -50,6 +50,9 @@ export type AssetShortHeader = {|
   objectType: string,
   animationsCount: number,
   maxFramesCount: number,
+  width: number,
+  height: number,
+  dominantColors: number[],
 |};
 
 export type AssetHeader = {|

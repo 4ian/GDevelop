@@ -17,6 +17,7 @@ import {
   AnimatedAssetStoreSearchFilter,
   ObjectTypeAssetStoreSearchFilter,
   LicenseAssetStoreSearchFilter,
+  DimensionAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 
 const defaultSearchText = '';
@@ -26,6 +27,8 @@ export type AssetFiltersState = {|
   setAnimatedFilter: AnimatedAssetStoreSearchFilter => void,
   viewportFilter: TagAssetStoreSearchFilter,
   setViewportFilter: TagAssetStoreSearchFilter => void,
+  dimensionFilter: DimensionAssetStoreSearchFilter,
+  setDimensionFilter: DimensionAssetStoreSearchFilter => void,
   objectTypeFilter: ObjectTypeAssetStoreSearchFilter,
   setObjectTypeFilter: ObjectTypeAssetStoreSearchFilter => void,
   licenseFilter: LicenseAssetStoreSearchFilter,
@@ -68,6 +71,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setAnimatedFilter: filter => {},
     viewportFilter: new TagAssetStoreSearchFilter(),
     setViewportFilter: filter => {},
+    dimensionFilter: new DimensionAssetStoreSearchFilter(),
+    setDimensionFilter: filter => {},
     objectTypeFilter: new ObjectTypeAssetStoreSearchFilter(),
     setObjectTypeFilter: filter => {},
     licenseFilter: new LicenseAssetStoreSearchFilter(),
@@ -118,6 +123,12 @@ export const AssetStoreStateProvider = ({
     new TagAssetStoreSearchFilter()
   );
   const [
+    dimensionFilter,
+    setDimensionFilter,
+  ] = React.useState<DimensionAssetStoreSearchFilter>(
+    new DimensionAssetStoreSearchFilter()
+  );
+  const [
     objectTypeFilter,
     setObjectTypeFilter,
   ] = React.useState<ObjectTypeAssetStoreSearchFilter>(
@@ -134,6 +145,8 @@ export const AssetStoreStateProvider = ({
     setAnimatedFilter: setAnimatedFilter,
     viewportFilter: viewportFilter,
     setViewportFilter: setViewportFilter,
+    dimensionFilter: dimensionFilter,
+    setDimensionFilter: setDimensionFilter,
     objectTypeFilter: objectTypeFilter,
     setObjectTypeFilter: setObjectTypeFilter,
     licenseFilter: licenseFilter,
@@ -144,6 +157,7 @@ export const AssetStoreStateProvider = ({
   const currentFilters = [
     animatedFilter,
     viewportFilter,
+    dimensionFilter,
     objectTypeFilter,
     licenseFilter,
   ];

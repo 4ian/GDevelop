@@ -7,7 +7,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import React, { PureComponent } from 'react';
 import TextField from '../TextField';
 import RaisedButton from '../RaisedButton';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;

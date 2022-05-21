@@ -1,5 +1,5 @@
 // @flow
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 const electron = optionalRequire('electron');
 const electronClipboard = electron ? electron.clipboard : null;
 

@@ -13,7 +13,7 @@ import ExpressionParametersEditorDialog, {
 } from './ExpressionParametersEditorDialog';
 import { hasNonCodeOnlyParameters } from './ExpressionParametersEditor';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,

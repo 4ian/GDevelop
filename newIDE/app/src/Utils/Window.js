@@ -1,6 +1,6 @@
 // @flow
 
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
 const electron = optionalRequire('electron');

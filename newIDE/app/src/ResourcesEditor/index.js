@@ -17,7 +17,7 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
-import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils.js';
+import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
 

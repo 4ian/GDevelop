@@ -7,8 +7,8 @@ import {
 import {
   isPathInProjectFolder,
   copyAllToProjectFolder,
-} from './ResourceUtils.js';
-import optionalRequire from '../Utils/OptionalRequire.js';
+} from './ResourceUtils';
+import optionalRequire from '../Utils/OptionalRequire';
 import Window from '../Utils/Window';
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;

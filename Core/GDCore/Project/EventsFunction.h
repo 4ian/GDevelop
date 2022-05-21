@@ -115,7 +115,7 @@ class GD_CORE_API EventsFunction {
     return *this;
   }
 
-  enum FunctionType { Action, Condition, Expression, StringExpression };
+  enum FunctionType { Action, Condition, Expression, StringExpression, ExpressionAndCondition, StringExpressionAndCondition };
 
   /**
    * \brief Set the type of the function

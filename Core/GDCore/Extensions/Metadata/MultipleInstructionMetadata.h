@@ -155,6 +155,20 @@ class GD_CORE_API MultipleInstructionMetadata {
   }
 
   /**
+   * \brief Get the files that must be included to use the instruction.
+   */
+  const std::vector<gd::String>& GetIncludeFiles() const {
+    if (expression)
+      return expression->GetCodeExtraInformation().GetIncludeFiles();
+    if (condition)
+      return condition->GetCodeExtraInformation().GetIncludeFiles();
+    if (action)
+      return action->GetCodeExtraInformation().GetIncludeFiles();
+    // It can't actually happen.
+    throw std::logic_error("no instruction metadata");
+  };
+
+  /**
    * \see gd::InstructionMetadata::MarkAsSimple
    */
   MultipleInstructionMetadata &MarkAsSimple() {

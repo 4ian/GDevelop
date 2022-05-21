@@ -657,9 +657,13 @@ export const declareEventsFunctionParameters = (
 
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.ExpressionAndCondition) {
-    instructionOrExpression.useStandardParameters('number');
+    ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
+      'number'
+    );
   } else if (functionType === gd.EventsFunction.StringExpressionAndCondition) {
-    instructionOrExpression.useStandardParameters('string');
+    ((instructionOrExpression: any): gdMultipleInstructionMetadata).useStandardParameters(
+      'string'
+    );
   }
 
   // By convention, latest parameter is always the eventsFunctionContext of the calling function

@@ -217,7 +217,10 @@ const generateFreeFunction = (
   codeGenerationContext: CodeGenerationContext
 ): Promise<{
   functionFile: string,
-  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  functionMetadata:
+    | gdInstructionMetadata
+    | gdExpressionMetadata
+    | gdMultipleInstructionMetadata,
 }> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extension,
@@ -305,7 +308,10 @@ const generateFreeFunction = (
 const applyFunctionIncludeFilesDependencyTransitivity = (
   functionInfos: Array<{
     functionFile: string,
-    functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+    functionMetadata:
+      | gdInstructionMetadata
+      | gdExpressionMetadata
+      | gdMultipleInstructionMetadata,
   }>
 ): void => {
   // Note that the iteration order doesn't matter, for instance for:

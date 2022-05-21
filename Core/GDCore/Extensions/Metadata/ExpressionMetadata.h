@@ -256,7 +256,7 @@ class GD_CORE_API ExpressionMetadata {
    */
   ExpressionCodeGenerationInformation& GetCodeExtraInformation() {
     return codeExtraInformation;
-  };
+  }
 
   /**
    * \brief Erase any existing include file and add the specified include.
@@ -279,7 +279,7 @@ class GD_CORE_API ExpressionMetadata {
    */
   const std::vector<gd::String>& GetIncludeFiles() const {
     return codeExtraInformation.GetIncludeFiles();
-  };
+  }
 
   ExpressionCodeGenerationInformation codeExtraInformation;
 

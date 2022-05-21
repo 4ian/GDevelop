@@ -8,7 +8,7 @@ import {
 } from './EnumerateExpressions';
 import { createTree, type TreeNode } from './CreateTree';
 import { makeTestExtensions } from '../fixtures/TestExtensions';
-import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from './EnumeratedInstructionOrExpressionMetadata';
 const gd: libGDevelop = global.gd;
 
 describe('EnumerateExpressions', () => {

@@ -1,5 +1,5 @@
 // @flow
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const fs = optionalRequire('fs');
 const remote = optionalRequire('@electron/remote');
 const dialog = remote ? remote.dialog : null;

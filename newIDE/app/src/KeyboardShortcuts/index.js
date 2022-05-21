@@ -7,7 +7,7 @@ import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import commandsList, { type CommandName } from '../CommandPalette/CommandsList';
 import isUserTyping from './IsUserTyping';
 import defaultShortcuts, { type ShortcutMap } from './DefaultShortcuts';
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
 // Valid action keys

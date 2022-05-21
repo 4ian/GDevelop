@@ -101,7 +101,7 @@ import {
 import {
   GDevelopAnalyticsApi,
   GDevelopGameApi,
-} from '../Utils/GDevelopServices/ApiConfigs.js';
+} from '../Utils/GDevelopServices/ApiConfigs';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';

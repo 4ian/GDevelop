@@ -21,7 +21,7 @@ import {
 import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, {
   useShouldAutofocusSearchbar,

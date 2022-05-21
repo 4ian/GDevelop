@@ -1,6 +1,6 @@
 // @flow
 import ResourcesLoader from '../ResourcesLoader';
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../Utils/OptionalRequire';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { toNewGdMapStringString } from '../Utils/MapStringString';
 const fs = optionalRequire('fs');

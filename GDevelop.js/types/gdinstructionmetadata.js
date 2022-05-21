@@ -37,6 +37,7 @@ declare class gdInstructionMetadata {
   setFunctionName(functionName: string): gdExtraInformation;
   setIncludeFile(includeFile: string): gdInstructionMetadata;
   addIncludeFile(includeFile: string): gdInstructionMetadata;
+  getIncludeFiles(): gdVectorString;
   delete(): void;
   ptr: number;
 };

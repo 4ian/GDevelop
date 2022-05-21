@@ -1,4 +1,4 @@
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 

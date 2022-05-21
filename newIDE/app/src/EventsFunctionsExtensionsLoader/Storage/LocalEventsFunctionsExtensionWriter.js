@@ -1,6 +1,6 @@
 // @flow
 import { serializeToJSObject } from '../../Utils/Serializer';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');

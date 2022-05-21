@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
 import TextField from '../TextField';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import RaisedButton from '../RaisedButton';
 const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');

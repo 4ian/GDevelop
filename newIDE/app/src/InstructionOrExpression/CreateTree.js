@@ -5,7 +5,7 @@ import {
   type EnumeratedInstructionOrExpressionMetadata,
   type EnumeratedInstructionMetadata,
   type EnumeratedExpressionMetadata,
-} from './EnumeratedInstructionOrExpressionMetadata.js';
+} from './EnumeratedInstructionOrExpressionMetadata';
 
 const GROUP_DELIMITER = '/';
 

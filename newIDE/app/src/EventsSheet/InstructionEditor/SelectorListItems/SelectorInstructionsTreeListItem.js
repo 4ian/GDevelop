@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ListItem, type ListItemRefType } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import { type InstructionOrExpressionTreeNode } from '../../../InstructionOrExpression/CreateTree';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
 import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';

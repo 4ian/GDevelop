@@ -3,7 +3,7 @@ import type {
   GroupWithContext,
   ObjectWithContext,
 } from '../../../ObjectsList/EnumerateObjects';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 
 // ListItem created must have consistent keys that include their type
 // (object, group, instruction) to allow them to be living

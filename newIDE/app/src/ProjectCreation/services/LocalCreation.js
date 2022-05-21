@@ -3,7 +3,7 @@ import axios from 'axios';
 import { t } from '@lingui/macro';
 
 import LocalFileStorageProvider from '../../ProjectsStorage/LocalFileStorageProvider';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import { getExample } from '../../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';

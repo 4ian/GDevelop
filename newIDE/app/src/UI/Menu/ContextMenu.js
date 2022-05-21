@@ -7,7 +7,7 @@ import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|

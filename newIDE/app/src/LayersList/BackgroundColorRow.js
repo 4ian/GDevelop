@@ -36,7 +36,7 @@ const BackgroundColorRow = ({ layout, onBackgroundColorChanged }: Props) => (
               b: layout.getBackgroundColorBlue(),
               a: 255,
             }}
-            onChangeComplete={color => {
+            onChangeComplete={(color) => {
               layout.setBackgroundColor(color.rgb.r, color.rgb.g, color.rgb.b);
               onBackgroundColorChanged();
             }}

@@ -127,14 +127,11 @@ export const PreviewOverridenOnExternalLayout = () => (
 
 export const ProjectOpenWithOtherToolbar = () => {
   const toolbar = React.useRef<?ToolbarInterface>(null);
-  React.useEffect(
-    () => {
-      if (toolbar.current) {
-        toolbar.current.setEditorToolbar(fakeEditorToolbar);
-      }
-    },
-    [toolbar]
-  );
+  React.useEffect(() => {
+    if (toolbar.current) {
+      toolbar.current.setEditorToolbar(fakeEditorToolbar);
+    }
+  }, [toolbar]);
   const component = (
     <MainFrameToolbar
       {...defaultProps}

@@ -11,7 +11,7 @@ namespace gdjs {
       return twistFilter;
     },
     updatePreRender: function (filter, target) {
-      const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter;
+      const twistFilter = filter as unknown as PIXI.filters.TwistFilter;
       twistFilter.offset.x = Math.round(
         // @ts-ignore - extra properties are stored on the filter.
         twistFilter._offsetX * target.getWidth()
@@ -22,7 +22,7 @@ namespace gdjs {
       );
     },
     updateDoubleParameter: function (filter, parameterName, value) {
-      const twistFilter = (filter as unknown) as PIXI.filters.TwistFilter;
+      const twistFilter = filter as unknown as PIXI.filters.TwistFilter;
       if (parameterName === 'radius') {
         twistFilter.radius = value;
       } else if (parameterName === 'angle') {

@@ -67,20 +67,14 @@ const ExportDialog = ({
   manualExporters,
   onlineWebExporter,
 }: Props) => {
-  const [
-    chosenExporterSection,
-    setChosenExporterSection,
-  ] = React.useState<ExporterSection>('home');
-  const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
-    false
-  );
-  const [
-    isNavigationDisabled,
-    setIsNavigationDisabled,
-  ] = React.useState<boolean>(false);
-  const [chosenExporterKey, setChosenExporterKey] = React.useState<ExporterKey>(
-    'onlinewebexport'
-  );
+  const [chosenExporterSection, setChosenExporterSection] =
+    React.useState<ExporterSection>('home');
+  const [buildsDialogOpen, setBuildsDialogOpen] =
+    React.useState<boolean>(false);
+  const [isNavigationDisabled, setIsNavigationDisabled] =
+    React.useState<boolean>(false);
+  const [chosenExporterKey, setChosenExporterKey] =
+    React.useState<ExporterKey>('onlinewebexport');
   const [game, setGame] = React.useState<?Game>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { getAuthorizationHeader, profile } = React.useContext(
@@ -99,34 +93,28 @@ const ExportDialog = ({
     setBuildsDialogOpen(true);
   };
 
-  const loadGame = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
+  const loadGame = React.useCallback(async () => {
+    if (!profile || !project) return;
 
-      const { id } = profile;
-      try {
-        const game = await getGame(
-          getAuthorizationHeader,
-          id,
-          project.getProjectUuid()
-        );
-        setGame(game);
-      } catch (err) {
-        console.error('Unable to load the game', err);
-      }
-    },
-    [project, getAuthorizationHeader, profile]
-  );
+    const { id } = profile;
+    try {
+      const game = await getGame(
+        getAuthorizationHeader,
+        id,
+        project.getProjectUuid()
+      );
+      setGame(game);
+    } catch (err) {
+      console.error('Unable to load the game', err);
+    }
+  }, [project, getAuthorizationHeader, profile]);
 
-  React.useEffect(
-    () => {
-      // Load game only once.
-      if (!game) {
-        loadGame();
-      }
-    },
-    [loadGame, game]
-  );
+  React.useEffect(() => {
+    // Load game only once.
+    if (!game) {
+      loadGame();
+    }
+  }, [loadGame, game]);
 
   if (!project) return null;
   const exporters = [
@@ -136,7 +124,7 @@ const ExportDialog = ({
   ];
 
   const exporter = exporters.find(
-    exporter => exporter.key === chosenExporterKey
+    (exporter) => exporter.key === chosenExporterKey
   );
 
   if (!exporter || !exporter.exportPipeline) return null;
@@ -218,7 +206,7 @@ const ExportDialog = ({
       )}
       {chosenExporterSection === 'automated' && (
         <Tabs value={chosenExporterKey} onChange={setChosenExporterKey}>
-          {automatedExporters.map(exporter => (
+          {automatedExporters.map((exporter) => (
             <Tab
               label={exporter.tabName}
               value={exporter.key}
@@ -230,7 +218,7 @@ const ExportDialog = ({
       )}
       {chosenExporterSection === 'manual' && (
         <Tabs value={chosenExporterKey} onChange={setChosenExporterKey}>
-          {manualExporters.map(exporter => (
+          {manualExporters.map((exporter) => (
             <Tab
               label={exporter.tabName}
               value={exporter.key}

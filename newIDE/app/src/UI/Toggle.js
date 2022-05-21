@@ -27,7 +27,9 @@ export default class Toggle extends React.Component<Props, {||}> {
         control={
           <Switch
             checked={this.props.toggled}
-            onChange={event => this.props.onToggle(event, event.target.checked)}
+            onChange={(event) =>
+              this.props.onToggle(event, event.target.checked)
+            }
             color="primary"
           />
         }

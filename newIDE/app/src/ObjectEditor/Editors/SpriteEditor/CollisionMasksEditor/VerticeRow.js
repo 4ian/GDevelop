@@ -78,9 +78,7 @@ const VerticeRow = ({
                 style={
                   isOver
                     ? {
-                        borderTop: `2px solid ${
-                          gdevelopTheme.listItem.selectedBackgroundColor
-                        }`,
+                        borderTop: `2px solid ${gdevelopTheme.listItem.selectedBackgroundColor}`,
                       }
                     : undefined
                 }
@@ -102,12 +100,12 @@ const VerticeRow = ({
                 ).toString()}
                 type="number"
                 id="vertice-x"
-                onChange={value => {
+                onChange={(value) => {
                   const valueAsNumber = parseFloat(value);
                   if (!isNaN(valueAsNumber))
                     props.onChangeVerticeX(valueAsNumber);
                 }}
-                onBlur={event => {
+                onBlur={(event) => {
                   props.onChangeVerticeX(
                     parseFloat(event.currentTarget.value) || 0
                   );
@@ -128,12 +126,12 @@ const VerticeRow = ({
                 ).toString()}
                 type="number"
                 id="vertice-y"
-                onChange={value => {
+                onChange={(value) => {
                   const valueAsNumber = parseFloat(value);
                   if (!isNaN(valueAsNumber))
                     props.onChangeVerticeY(valueAsNumber);
                 }}
-                onBlur={event => {
+                onBlur={(event) => {
                   props.onChangeVerticeY(
                     parseFloat(event.currentTarget.value) || 0
                   );

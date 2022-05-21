@@ -26,7 +26,7 @@ type Props = {|
   extensionShortHeader: ExtensionShortHeader,
   matches: ?Array<SearchMatch>,
   onChoose: () => void,
-  onHeightComputed: number => void,
+  onHeightComputed: (number) => void,
 |};
 
 export const ExtensionListItem = ({
@@ -51,7 +51,7 @@ export const ExtensionListItem = ({
     const originalField = extensionShortHeader[field];
 
     if (!matches) return originalField;
-    const nameMatches = matches.filter(match => match.key === field);
+    const nameMatches = matches.filter((match) => match.key === field);
     if (nameMatches.length === 0) return originalField;
 
     return (
@@ -78,7 +78,7 @@ export const ExtensionListItem = ({
             </Text>
             {extensionShortHeader.authors && (
               <Line>
-                {extensionShortHeader.authors.map(author => (
+                {extensionShortHeader.authors.map((author) => (
                   <UserPublicProfileChip user={author} key={author.id} />
                 ))}
               </Line>

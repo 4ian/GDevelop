@@ -16,7 +16,7 @@ export default ({
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
     onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setDialog(() => (
           <DownloadSaveAsDialog
             onDone={() => {

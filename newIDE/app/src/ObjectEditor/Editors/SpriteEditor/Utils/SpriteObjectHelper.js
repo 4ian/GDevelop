@@ -43,7 +43,7 @@ export const getCurrentElements = (
  * Return all the point names
  * @param {*} object
  */
-export const getAllPointNames = object => {
+export const getAllPointNames = (object) => {
   const allPointNames = new Set();
   for (
     let animationIndex = 0;
@@ -91,16 +91,16 @@ export const copySpritePoints = (originalSprite, destinationSprite) => {
   );
 
   destinationSprite.getAllNonDefaultPoints().clear();
-  mapVector(originalSprite.getAllNonDefaultPoints(), originalPoint => {
+  mapVector(originalSprite.getAllNonDefaultPoints(), (originalPoint) => {
     destinationSprite.addPoint(originalPoint);
   });
 };
 
 export const copyAnimationsSpritePoints = (originalSprite, animation) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       copySpritePoints(originalSprite, sprite);
     });
@@ -128,7 +128,7 @@ export const haveSamePoints = (sprite1, sprite2) => {
     return false;
 
   return every(
-    mapVector(sprite1.getAllNonDefaultPoints(), sprite1Point => {
+    mapVector(sprite1.getAllNonDefaultPoints(), (sprite1Point) => {
       if (!sprite2.hasPoint(sprite1Point.getName())) return false;
 
       return isSamePoint(
@@ -144,7 +144,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
   direction
 ) => {
   return every(
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       return haveSamePoints(sprite, originalSprite);
     })
@@ -153,7 +153,7 @@ export const allDirectionSpritesHaveSamePointsAs = (
 
 export const allSpritesHaveSamePointsAs = (originalSprite, animation) => {
   return every(
-    mapFor(0, animation.getDirectionsCount(), i => {
+    mapFor(0, animation.getDirectionsCount(), (i) => {
       const direction = animation.getDirection(i);
       return allDirectionSpritesHaveSamePointsAs(originalSprite, direction);
     })
@@ -168,7 +168,7 @@ export const copySpritePolygons = (originalSprite, destinationSprite) => {
   );
 
   destinationSprite.getCustomCollisionMask().clear();
-  mapVector(originalSprite.getCustomCollisionMask(), originalPolygon => {
+  mapVector(originalSprite.getCustomCollisionMask(), (originalPolygon) => {
     destinationSprite.getCustomCollisionMask().push_back(originalPolygon);
   });
 };
@@ -177,10 +177,10 @@ export const copyAnimationsSpriteCollisionMasks = (
   originalSprite,
   animation
 ) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       copySpritePolygons(originalSprite, sprite);
     });
@@ -227,7 +227,7 @@ export const allDirectionSpritesHaveSameCollisionMasksAs = (
   direction
 ) => {
   return every(
-    mapFor(0, direction.getSpritesCount(), j => {
+    mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
       return haveSameCollisionMasks(sprite, originalSprite);
     })
@@ -239,7 +239,7 @@ export const allSpritesHaveSameCollisionMasksAs = (
   animation
 ) => {
   return every(
-    mapFor(0, animation.getDirectionsCount(), i => {
+    mapFor(0, animation.getDirectionsCount(), (i) => {
       const direction = animation.getDirection(i);
       return allDirectionSpritesHaveSameCollisionMasksAs(
         originalSprite,
@@ -250,10 +250,10 @@ export const allSpritesHaveSameCollisionMasksAs = (
 };
 
 export const deleteSpritesFromAnimation = (animation, spritePtrs) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    const spritesToDelete = mapFor(0, direction.getSpritesCount(), j => {
+    const spritesToDelete = mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
 
       return !!spritePtrs[sprite.ptr];
@@ -271,10 +271,10 @@ export const deleteSpritesFromAnimation = (animation, spritePtrs) => {
 };
 
 export const duplicateSpritesInAnimation = (animation, spritePtrs) => {
-  mapFor(0, animation.getDirectionsCount(), i => {
+  mapFor(0, animation.getDirectionsCount(), (i) => {
     const direction = animation.getDirection(i);
 
-    const spritesToDuplicate = mapFor(0, direction.getSpritesCount(), j => {
+    const spritesToDuplicate = mapFor(0, direction.getSpritesCount(), (j) => {
       const sprite = direction.getSprite(j);
 
       return !!spritePtrs[sprite.ptr];

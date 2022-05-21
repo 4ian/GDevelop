@@ -345,7 +345,7 @@ export default class AboutDialog extends PureComponent<Props, State> {
                     </Text>
                   </Column>
                   <List>
-                    {contributors.map(contributor => (
+                    {contributors.map((contributor) => (
                       <ListItem
                         key={contributor.name}
                         primaryText={contributor.name}

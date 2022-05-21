@@ -11,11 +11,8 @@ const gd: libGDevelop = global.gd;
 describe('EnumerateObjects', () => {
   it('can enumerate objects from a project and scene', () => {
     const { project, testLayout } = makeTestProject(gd);
-    const {
-      containerObjectsList,
-      projectObjectsList,
-      allObjectsList,
-    } = enumerateObjects(project, testLayout);
+    const { containerObjectsList, projectObjectsList, allObjectsList } =
+      enumerateObjects(project, testLayout);
 
     expect(containerObjectsList).toHaveLength(15);
     expect(projectObjectsList).toHaveLength(2);
@@ -31,11 +28,8 @@ describe('EnumerateObjects', () => {
 
   it('can do a case-insensitive search in the lists of objects', () => {
     const { project, testLayout } = makeTestProject(gd);
-    const {
-      containerObjectsList,
-      projectObjectsList,
-      allObjectsList,
-    } = enumerateObjects(project, testLayout);
+    const { containerObjectsList, projectObjectsList, allObjectsList } =
+      enumerateObjects(project, testLayout);
 
     expect(
       filterObjectsList(containerObjectsList, {
@@ -89,7 +83,7 @@ describe('EnumerateObjects', () => {
     const { project, testLayout } = makeTestProject(gd);
     const objectGroupsList: GroupWithContextList = enumerateGroups(
       testLayout.getObjectGroups()
-    ).map(group => ({ group, global: false }));
+    ).map((group) => ({ group, global: false }));
 
     expect(
       filterGroupsList(objectGroupsList, {

@@ -21,7 +21,7 @@ export const Slider = () => (
     initialValue={1}
     render={(value, onChange) => (
       <SliderComponent
-        onChange={newValue => {
+        onChange={(newValue) => {
           action('onChange')(newValue);
           onChange(newValue);
         }}

@@ -11,7 +11,7 @@ export const SelectColumns = (props: Props<string>) => {
   const columns = props.getColumns();
   return (
     <Line noMargin expand>
-      {columns.map(columnName =>
+      {columns.map((columnName) =>
         props.columnsRenderer[columnName]
           ? props.columnsRenderer[columnName]()
           : null

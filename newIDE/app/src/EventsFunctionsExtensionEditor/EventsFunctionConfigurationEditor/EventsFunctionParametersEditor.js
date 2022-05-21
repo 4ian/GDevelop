@@ -113,13 +113,13 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
-    const existingParameterNames = mapVector(parameters, parameterMetadata =>
+    const existingParameterNames = mapVector(parameters, (parameterMetadata) =>
       parameterMetadata.getName()
     );
 
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
-    const newName = newNameGenerator('Parameter', name =>
+    const newName = newNameGenerator('Parameter', (name) =>
       existingParameterNames.includes(name)
     );
     newParameter.setName(newName);
@@ -140,7 +140,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
 
   _addLongDescription = (index: number) => {
     // Show the long description field
-    this.setState(state => ({
+    this.setState((state) => ({
       longDescriptionShownIndexes: {
         ...state.longDescriptionShownIndexes,
         [index]: true,
@@ -155,7 +155,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
 
     // Reset the long description and hide the field
     parameter.setLongDescription('');
-    this.setState(state => ({
+    this.setState((state) => ({
       longDescriptionShownIndexes: {
         ...state.longDescriptionShownIndexes,
         [index]: false,
@@ -174,7 +174,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
           eventsFunction,
           oldIndex,
           newIndex,
-          isDone => {
+          (isDone) => {
             if (!isDone) return;
             gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
             this.forceUpdate();
@@ -187,7 +187,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
           eventsFunction,
           oldIndex,
           newIndex,
-          isDone => {
+          (isDone) => {
             if (!isDone) return;
             gd.swapInVectorParameterMetadata(parameters, oldIndex, newIndex);
             this.forceUpdate();
@@ -257,10 +257,10 @@ export default class EventsFunctionParametersEditor extends React.Component<
       );
     }
 
-    const isParameterDisabled = index => {
+    const isParameterDisabled = (index) => {
       return !!freezeParameters || (!!eventsBasedBehavior && index < 2);
     };
-    const isParameterDescriptionAndTypeShown = index => {
+    const isParameterDescriptionAndTypeShown = (index) => {
       // The first two parameters of a behavior method should not be changed at all,
       // so we even hide their description and type to avoid cluttering the interface.
       return !eventsBasedBehavior || index >= 2;
@@ -297,7 +297,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                             margin="none"
                             hintText={t`Enter the parameter name (mandatory)`}
                             value={parameter.getName()}
-                            onChange={text => {
+                            onChange={(text) => {
                               if (!validateParameterName(i18n, text)) return;
 
                               parameter.setName(text);
@@ -527,7 +527,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               floatingLabelText={<Trans>Label</Trans>}
                               floatingLabelFixed
                               value={parameter.getDescription()}
-                              onChange={text => {
+                              onChange={(text) => {
                                 parameter.setDescription(text);
                                 this.forceUpdate();
                               }}
@@ -545,7 +545,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                               }
                               floatingLabelFixed
                               value={parameter.getLongDescription()}
-                              onChange={text => {
+                              onChange={(text) => {
                                 parameter.setLongDescription(text);
                                 this.forceUpdate();
                               }}

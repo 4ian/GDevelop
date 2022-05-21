@@ -56,17 +56,15 @@ export const filterEnumeratedInstructionOrExpressionMetadataByScope = <
   list: Array<T>,
   scope: EventsScope
 ): Array<T> => {
-  return list.filter(enumeratedInstructionOrExpressionMetadata => {
+  return list.filter((enumeratedInstructionOrExpressionMetadata) => {
     if (!enumeratedInstructionOrExpressionMetadata.isPrivate) return true;
 
     // The instruction or expression is marked as "private":
     // we now compare its scope (where it was declared) and the current scope
     // (where we are) to see if we should filter it or not.
 
-    const {
-      behaviorMetadata,
-      extension,
-    } = enumeratedInstructionOrExpressionMetadata.scope;
+    const { behaviorMetadata, extension } =
+      enumeratedInstructionOrExpressionMetadata.scope;
     const { eventsBasedBehavior, eventsFunctionsExtension } = scope;
 
     // Show private behavior functions when editing the behavior

@@ -18,15 +18,15 @@ type Props = {|
   directionIndex: number,
   spriteIndex: number,
 
-  chooseAnimation: number => void,
-  chooseDirection: number => void,
-  chooseSprite: number => void,
+  chooseAnimation: (number) => void,
+  chooseDirection: (number) => void,
+  chooseSprite: (number) => void,
 
   sameForAllAnimations: boolean,
   sameForAllSprites: boolean,
 
-  setSameForAllAnimations: boolean => void,
-  setSameForAllSprites: boolean => void,
+  setSameForAllAnimations: (boolean) => void,
+  setSameForAllSprites: (boolean) => void,
 
   setSameForAllAnimationsLabel: string | React.Node,
   setSameForAllSpritesLabel: string | React.Node,
@@ -56,17 +56,13 @@ export default class SpriteSelector extends React.Component<Props, void> {
       setSameForAllSpritesLabel,
     } = this.props;
 
-    const {
-      hasValidAnimation,
-      animation,
-      hasValidDirection,
-      direction,
-    } = getCurrentElements(
-      spriteObject,
-      animationIndex,
-      directionIndex,
-      spriteIndex
-    );
+    const { hasValidAnimation, animation, hasValidDirection, direction } =
+      getCurrentElements(
+        spriteObject,
+        animationIndex,
+        directionIndex,
+        spriteIndex
+      );
 
     return (
       <React.Fragment>
@@ -79,7 +75,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
               chooseAnimation(parseInt(value, 10) || 0)
             }
           >
-            {mapFor(0, spriteObject.getAnimationsCount(), i => {
+            {mapFor(0, spriteObject.getAnimationsCount(), (i) => {
               const animation = spriteObject.getAnimation(i);
               return (
                 <SelectOption
@@ -99,7 +95,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
                 chooseDirection(parseInt(value, 10) || 0)
               }
             >
-              {mapFor(0, animation.getDirectionsCount(), i => {
+              {mapFor(0, animation.getDirectionsCount(), (i) => {
                 return (
                   <SelectOption
                     value={i}
@@ -119,7 +115,7 @@ export default class SpriteSelector extends React.Component<Props, void> {
                 chooseSprite(parseInt(value, 10) || 0)
               }
             >
-              {mapFor(0, direction.getSpritesCount(), i => {
+              {mapFor(0, direction.getSpritesCount(), (i) => {
                 return (
                   <SelectOption
                     value={i}

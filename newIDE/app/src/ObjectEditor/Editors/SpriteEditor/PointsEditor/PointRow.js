@@ -33,7 +33,7 @@ type Props = {|
 
 const PointRow = ({ pointX, pointY, ...props }: Props) => (
   <ThemeConsumer>
-    {muiTheme => (
+    {(muiTheme) => (
       <TableRow
         style={{
           backgroundColor: props.selected
@@ -74,11 +74,11 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => (
               value={roundTo(pointX, POINT_COORDINATE_PRECISION).toString()}
               type="number"
               id="point-x"
-              onChange={value => {
+              onChange={(value) => {
                 const valueAsNumber = parseFloat(value);
                 if (!isNaN(valueAsNumber)) props.onChangePointX(valueAsNumber);
               }}
-              onBlur={event => {
+              onBlur={(event) => {
                 props.onChangePointX(
                   parseFloat(event.currentTarget.value) || 0
                 );
@@ -102,11 +102,11 @@ const PointRow = ({ pointX, pointY, ...props }: Props) => (
               value={roundTo(pointY, POINT_COORDINATE_PRECISION).toString()}
               type="number"
               id="point-y"
-              onChange={value => {
+              onChange={(value) => {
                 const valueAsNumber = parseFloat(value);
                 if (!isNaN(valueAsNumber)) props.onChangePointY(valueAsNumber);
               }}
-              onBlur={event => {
+              onBlur={(event) => {
                 props.onChangePointY(
                   parseFloat(event.currentTarget.value) || 0
                 );

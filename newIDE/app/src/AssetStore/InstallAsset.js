@@ -24,11 +24,11 @@ const toPascalCase = (str: string) => {
   return str
     .replace(/^[^A-Za-z0-9]*|[^A-Za-z0-9]*$/g, '$')
     .replace(/[^A-Za-z0-9]+/g, '$')
-    .replace(/([a-z])([A-Z])/g, function(m, a, b) {
+    .replace(/([a-z])([A-Z])/g, function (m, a, b) {
       return a + '$' + b;
     })
     .toLowerCase()
-    .replace(/(\$)(\w?)/g, function(m, a, b) {
+    .replace(/(\$)(\w?)/g, function (m, a, b) {
       return b.toUpperCase();
     });
 };
@@ -82,9 +82,8 @@ export const installResource = (
           resourceOriginIdentifier
         )
       : '';
-  const existingResourceNameWithSameFile = resourcesManager.getResourceNameWithFile(
-    resourceFileUrl
-  );
+  const existingResourceNameWithSameFile =
+    resourcesManager.getResourceNameWithFile(resourceFileUrl);
 
   if (existingResourceNameFromSameOrigin) {
     // There is a resource with the same origin, use it.
@@ -108,7 +107,7 @@ export const installResource = (
 
   unserializeFromJSObject(newResource, serializedResource);
 
-  const newName = newNameGenerator(originalResourceName, name =>
+  const newName = newNameGenerator(originalResourceName, (name) =>
     resourcesManager.hasResource(name)
   );
   newResource.setName(newName);
@@ -135,18 +134,18 @@ export const addAssetToProject = async ({
   const resourceNewNames = {};
   const createdObjects: Array<gdObject> = [];
 
-  asset.objectAssets.forEach(objectAsset => {
-    objectAsset.resources.forEach(serializedResource => {});
+  asset.objectAssets.forEach((objectAsset) => {
+    objectAsset.resources.forEach((serializedResource) => {});
   });
 
   // Create objects (and their behaviors)
-  asset.objectAssets.forEach(objectAsset => {
+  asset.objectAssets.forEach((objectAsset) => {
     const type: ?string = objectAsset.object.type;
     if (!type) throw new Error('An object has no type specified');
 
     // Insert the object
     const originalName = sanitizeObjectName(objectAsset.object.name);
-    const newName = newNameGenerator(originalName, name =>
+    const newName = newNameGenerator(originalName, (name) =>
       objectsContainer.hasObjectNamed(name)
     );
     const object = objectsContainer.insertNewObject(
@@ -168,7 +167,7 @@ export const addAssetToProject = async ({
     object.setName(newName);
 
     // Add resources used by the object
-    objectAsset.resources.forEach(serializedResource => {
+    objectAsset.resources.forEach((serializedResource) => {
       installResource(project, serializedResource, resourceNewNames);
     });
 
@@ -182,7 +181,7 @@ export const addAssetToProject = async ({
     object.exposeResources(resourcesRenamer);
     resourcesRenamer.delete();
 
-    objectAsset.customization.forEach(customization => {
+    objectAsset.customization.forEach((customization) => {
       if (customization.behaviorName) {
         const { behaviorName, behaviorType } = customization;
 
@@ -205,7 +204,7 @@ export const addAssetToProject = async ({
           behaviorType,
           behaviorName
         );
-        customization.properties.forEach(property => {
+        customization.properties.forEach((property) => {
           behavior.updateProperty(
             behaviorContent.getContent(),
             property.name,
@@ -220,11 +219,11 @@ export const addAssetToProject = async ({
 
   // Add the events after adding all objects, as we need to potentially
   // rename the objects in the inserted events.
-  asset.objectAssets.forEach(objectAsset => {
+  asset.objectAssets.forEach((objectAsset) => {
     const originalName = objectAsset.object.name;
     const newName = objectNewNames[originalName];
 
-    objectAsset.customization.forEach(customization => {
+    objectAsset.customization.forEach((customization) => {
       if (customization.events) {
         const groupEvent = new gd.GroupEvent();
         groupEvent.setName(newName);
@@ -237,7 +236,7 @@ export const addAssetToProject = async ({
         );
 
         // Find/replace the customization parameters in the events.
-        customization.parameters.forEach(parameter => {
+        customization.parameters.forEach((parameter) => {
           gd.EventsRefactorer.replaceStringInEvents(
             project,
             objectsContainer,
@@ -290,15 +289,12 @@ export const getRequiredBehaviorsFromAsset = (
 ): Array<RequiredBehavior> => {
   return uniqBy(
     flatten(
-      asset.objectAssets.map(objectAsset => {
+      asset.objectAssets.map((objectAsset) => {
         return objectAsset.customization
-          .map(customization => {
+          .map((customization) => {
             if (customization.behaviorName) {
-              const {
-                behaviorType,
-                extensionName,
-                extensionVersion,
-              } = customization;
+              const { behaviorType, extensionName, extensionVersion } =
+                customization;
               return { behaviorType, extensionName, extensionVersion };
             }
 
@@ -322,7 +318,7 @@ export const filterMissingExtensions = (
 ): Array<RequiredExtension> => {
   const loadedExtensionNames = mapVector(
     gd.asPlatform(gd.JsPlatform.get()).getAllPlatformExtensions(),
-    extension => {
+    (extension) => {
       return extension.getName();
     }
   );
@@ -337,10 +333,10 @@ export const getRequiredExtensionsForEventsFromAsset = (
 ): Array<RequiredExtension> => {
   return uniqBy(
     flatten(
-      asset.objectAssets.map(objectAsset => {
+      asset.objectAssets.map((objectAsset) => {
         return flatten(
           objectAsset.customization
-            .map(customization => {
+            .map((customization) => {
               if (customization.events) {
                 return customization.extensions;
               }
@@ -376,12 +372,13 @@ export const downloadExtensions = async (
   const extensionsRegistry = await getExtensionsRegistry();
 
   const serializedExtensions = await Promise.all(
-    uniq(extensionNames).map(extensionName => {
-      const extensionShortHeader = extensionsRegistry.extensionShortHeaders.find(
-        extensionShortHeader => {
-          return extensionShortHeader.name === extensionName;
-        }
-      );
+    uniq(extensionNames).map((extensionName) => {
+      const extensionShortHeader =
+        extensionsRegistry.extensionShortHeaders.find(
+          (extensionShortHeader) => {
+            return extensionShortHeader.name === extensionName;
+          }
+        );
       if (!extensionShortHeader) {
         throw new Error(
           'Unable to find extension ' + extensionName + ' in the registry.'
@@ -405,16 +402,15 @@ export const addSerializedExtensionsToProject = (
   serializedExtensions: Array<SerializedExtension>,
   fromExtensionStore: boolean = true
 ): Promise<void> => {
-  serializedExtensions.forEach(serializedExtension => {
+  serializedExtensions.forEach((serializedExtension) => {
     const { name } = serializedExtension;
     if (!name)
       return Promise.reject(new Error('Malformed extension (missing name).'));
 
-    const newEventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
-      name
-    )
-      ? project.getEventsFunctionsExtension(name)
-      : project.insertNewEventsFunctionsExtension(name, 0);
+    const newEventsFunctionsExtension =
+      project.hasEventsFunctionsExtensionNamed(name)
+        ? project.getEventsFunctionsExtension(name)
+        : project.insertNewEventsFunctionsExtension(name, 0);
 
     unserializeFromJSObject(
       newEventsFunctionsExtension,

@@ -63,7 +63,7 @@ type AnimationProps = {|
     newDirection: gdDirection
   ) => void,
   objectName: string,
-  onChangeName: string => void,
+  onChangeName: (string) => void,
 |};
 
 class Animation extends React.Component<AnimationProps, void> {
@@ -97,7 +97,7 @@ class Animation extends React.Component<AnimationProps, void> {
               margin="none"
               value={animation.getName()}
               hintText={t`Optional animation name`}
-              onChange={text => onChangeName(text)}
+              onChange={(text) => onChangeName(text)}
               fullWidth
             />
           </Column>
@@ -105,7 +105,7 @@ class Animation extends React.Component<AnimationProps, void> {
             <Delete />
           </IconButton>
         </MiniToolbar>
-        {mapFor(0, animation.getDirectionsCount(), i => {
+        {mapFor(0, animation.getDirectionsCount(), (i) => {
           const direction = animation.getDirection(i);
           return (
             <SpritesList
@@ -119,7 +119,7 @@ class Animation extends React.Component<AnimationProps, void> {
               onSpriteContextMenu={onSpriteContextMenu}
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
-              onReplaceByDirection={newDirection =>
+              onReplaceByDirection={(newDirection) =>
                 onReplaceDirection(i, newDirection)
               }
               objectName={objectName}
@@ -158,7 +158,7 @@ const SortableAnimationsList = SortableContainer(
     // SortableContainer would not find a root div to use).
     return (
       <ScrollView>
-        {mapFor(0, spriteObject.getAnimationsCount(), i => {
+        {mapFor(0, spriteObject.getAnimationsCount(), (i) => {
           const animation = spriteObject.getAnimation(i);
           return (
             <SortableAnimation
@@ -172,7 +172,7 @@ const SortableAnimationsList = SortableContainer(
               onChooseResource={onChooseResource}
               resourceExternalEditors={resourceExternalEditors}
               onRemove={() => onRemoveAnimation(i)}
-              onChangeName={newName => onChangeAnimationName(i, newName)}
+              onChangeName={(newName) => onChangeAnimationName(i, newName)}
               onSpriteContextMenu={onSpriteContextMenu}
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
@@ -228,7 +228,7 @@ class AnimationsListContainer extends React.Component<
     this.props.onSizeUpdated();
   };
 
-  removeAnimation = i => {
+  removeAnimation = (i) => {
     const answer = Window.showConfirmDialog(
       'Are you sure you want to remove this animation?'
     );
@@ -243,13 +243,16 @@ class AnimationsListContainer extends React.Component<
   changeAnimationName = (i, newName) => {
     const { spriteObject } = this.props;
 
-    const otherNames = mapFor(0, spriteObject.getAnimationsCount(), index => {
+    const otherNames = mapFor(0, spriteObject.getAnimationsCount(), (index) => {
       return index === i
         ? undefined // Don't check the current animation name as we're changing it.
         : spriteObject.getAnimation(index).getName();
     });
 
-    if (newName !== '' && otherNames.filter(name => name === newName).length) {
+    if (
+      newName !== '' &&
+      otherNames.filter((name) => name === newName).length
+    ) {
       showWarningBox(
         'Another animation with this name already exists. Please use another name.',
         { delayToNextTick: true }
@@ -264,7 +267,7 @@ class AnimationsListContainer extends React.Component<
   deleteSelection = () => {
     const { spriteObject } = this.props;
 
-    mapFor(0, spriteObject.getAnimationsCount(), index => {
+    mapFor(0, spriteObject.getAnimationsCount(), (index) => {
       const animation = spriteObject.getAnimation(index);
       deleteSpritesFromAnimation(animation, this.state.selectedSprites);
     });
@@ -277,7 +280,7 @@ class AnimationsListContainer extends React.Component<
   duplicateSelection = () => {
     const { spriteObject } = this.props;
 
-    mapFor(0, spriteObject.getAnimationsCount(), index => {
+    mapFor(0, spriteObject.getAnimationsCount(), (index) => {
       const animation = spriteObject.getAnimation(index);
       duplicateSpritesInAnimation(animation, this.state.selectedSprites);
     });
@@ -360,7 +363,7 @@ class AnimationsListContainer extends React.Component<
               </ResponsiveLineStackLayout>
             </Column>
             <ContextMenu
-              ref={spriteContextMenu =>
+              ref={(spriteContextMenu) =>
                 (this.spriteContextMenu = spriteContextMenu)
               }
               buildMenuTemplate={(i18n: I18nType) => [
@@ -392,10 +395,8 @@ export default function SpriteEditor({
 }: EditorProps) {
   const [pointsEditorOpen, setPointsEditorOpen] = React.useState(false);
   const [advancedOptionsOpen, setAdvancedOptionsOpen] = React.useState(false);
-  const [
-    collisionMasksEditorOpen,
-    setCollisionMasksEditorOpen,
-  ] = React.useState(false);
+  const [collisionMasksEditorOpen, setCollisionMasksEditorOpen] =
+    React.useState(false);
   const forceUpdate = useForceUpdate();
   const spriteObject = gd.asSpriteObject(object);
 

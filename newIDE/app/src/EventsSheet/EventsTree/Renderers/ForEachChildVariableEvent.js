@@ -73,8 +73,10 @@ export default class ForEachChildVariableEvent extends React.Component<
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );
-    const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
-    const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();
+    const valueIteratorName =
+      forEachChildVariableEvent.getValueIteratorVariableName();
+    const keyIteratorName =
+      forEachChildVariableEvent.getKeyIteratorVariableName();
     const iterableName = forEachChildVariableEvent.getIterableVariableName();
 
     // We should not need to use a timeout, but
@@ -160,8 +162,10 @@ export default class ForEachChildVariableEvent extends React.Component<
     const forEachChildVariableEvent = gd.asForEachChildVariableEvent(
       this.props.event
     );
-    const valueIteratorName = forEachChildVariableEvent.getValueIteratorVariableName();
-    const keyIteratorName = forEachChildVariableEvent.getKeyIteratorVariableName();
+    const valueIteratorName =
+      forEachChildVariableEvent.getValueIteratorVariableName();
+    const keyIteratorName =
+      forEachChildVariableEvent.getKeyIteratorVariableName();
     const iterableName = forEachChildVariableEvent.getIterableVariableName();
 
     return (
@@ -189,8 +193,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                   scenevar: true,
                 })}
                 style={styles.variableContainer}
-                onClick={e => this.edit('iterable', e.currentTarget)}
-                onKeyPress={event => {
+                onClick={(e) => this.edit('iterable', e.currentTarget)}
+                onKeyPress={(event) => {
                   if (shouldActivate(event)) {
                     this.edit('iterable', event.currentTarget);
                   }
@@ -219,8 +223,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                   scenevar: true,
                 })}
                 style={styles.variableContainer}
-                onClick={e => this.edit('iteratorValue', e.currentTarget)}
-                onKeyPress={event => {
+                onClick={(e) => this.edit('iteratorValue', e.currentTarget)}
+                onKeyPress={(event) => {
                   if (shouldActivate(event)) {
                     this.edit('iteratorValue', event.currentTarget);
                   }
@@ -249,8 +253,8 @@ export default class ForEachChildVariableEvent extends React.Component<
                   scenevar: true,
                 })}
                 style={styles.variableContainer}
-                onClick={e => this.edit('iteratorKey', e.currentTarget)}
-                onKeyPress={event => {
+                onClick={(e) => this.edit('iteratorKey', e.currentTarget)}
+                onKeyPress={(event) => {
                   if (shouldActivate(event)) {
                     this.edit('iteratorKey', event.currentTarget);
                   }
@@ -342,14 +346,14 @@ export default class ForEachChildVariableEvent extends React.Component<
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={valueIteratorName}
-            onChange={text => {
+            onChange={(text) => {
               forEachChildVariableEvent.setValueIteratorVariableName(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.cancelEditing}
             onApply={this.endEditing}
-            ref={iteratorField => (this._valueIteratorField = iteratorField)}
+            ref={(iteratorField) => (this._valueIteratorField = iteratorField)}
           />
         </InlinePopover>
         <InlinePopover
@@ -364,14 +368,14 @@ export default class ForEachChildVariableEvent extends React.Component<
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={keyIteratorName}
-            onChange={text => {
+            onChange={(text) => {
               forEachChildVariableEvent.setKeyIteratorVariableName(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.cancelEditing}
             onApply={this.endEditing}
-            ref={iteratorField => (this._keyIteratorField = iteratorField)}
+            ref={(iteratorField) => (this._keyIteratorField = iteratorField)}
           />
         </InlinePopover>
         <InlinePopover
@@ -386,14 +390,14 @@ export default class ForEachChildVariableEvent extends React.Component<
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={iterableName}
-            onChange={text => {
+            onChange={(text) => {
               forEachChildVariableEvent.setIterableVariableName(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.cancelEditing}
             onApply={this.endEditing}
-            ref={iterableField => (this._iterableField = iterableField)}
+            ref={(iterableField) => (this._iterableField = iterableField)}
           />
         </InlinePopover>
       </div>

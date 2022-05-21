@@ -465,7 +465,7 @@ namespace gdjs {
       return this._type === 'structure'
         ? this._children
         : this._type === 'array'
-        ? ((Object.assign({}, this._childrenArray) as unknown) as Children)
+        ? (Object.assign({}, this._childrenArray) as unknown as Children)
         : {};
     }
 

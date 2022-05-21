@@ -14,14 +14,11 @@ export const useCommand = (
 ) => {
   const commandManager = React.useContext(CommandsContext);
   const { handler } = command;
-  React.useEffect(
-    () => {
-      if (!enabled) return;
-      commandManager.registerCommand(commandName, { handler });
-      return () => commandManager.deregisterCommand(commandName);
-    },
-    [commandManager, commandName, enabled, handler]
-  );
+  React.useEffect(() => {
+    if (!enabled) return;
+    commandManager.registerCommand(commandName, { handler });
+    return () => commandManager.deregisterCommand(commandName);
+  }, [commandManager, commandName, enabled, handler]);
 };
 
 /**
@@ -34,14 +31,11 @@ export const useCommandWithOptions = (
 ) => {
   const commandManager = React.useContext(CommandsContext);
   const { generateOptions } = command;
-  React.useEffect(
-    () => {
-      if (!enabled) return;
-      commandManager.registerCommand(commandName, { generateOptions });
-      return () => commandManager.deregisterCommand(commandName);
-    },
-    [commandManager, commandName, enabled, generateOptions]
-  );
+  React.useEffect(() => {
+    if (!enabled) return;
+    commandManager.registerCommand(commandName, { generateOptions });
+    return () => commandManager.deregisterCommand(commandName);
+  }, [commandManager, commandName, enabled, generateOptions]);
 };
 
 /**

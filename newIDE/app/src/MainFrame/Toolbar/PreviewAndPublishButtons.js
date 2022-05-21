@@ -69,14 +69,10 @@ export default function PreviewAndPublishButtons({
               type: 'checkbox',
               label: previewState.overridenPreviewExternalLayoutName
                 ? i18n._(
-                    t`Start all previews from external layout ${
-                      previewState.overridenPreviewExternalLayoutName
-                    }`
+                    t`Start all previews from external layout ${previewState.overridenPreviewExternalLayoutName}`
                   )
                 : i18n._(
-                    t`Start all previews from scene ${
-                      previewState.overridenPreviewLayoutName
-                    }`
+                    t`Start all previews from scene ${previewState.overridenPreviewLayoutName}`
                   ),
               checked: previewState.isPreviewOverriden,
               click: () =>
@@ -120,7 +116,7 @@ export default function PreviewAndPublishButtons({
     ]
   );
 
-  const onClickPreview = event => {
+  const onClickPreview = (event) => {
     if (event.target) event.target.blur();
     onHotReloadPreview();
   };

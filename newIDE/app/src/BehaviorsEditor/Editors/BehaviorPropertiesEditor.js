@@ -17,7 +17,7 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
 
     const propertiesSchema = propertiesMapToSchema(
       properties,
-      behaviorContent => behavior.getProperties(behaviorContent.getContent()),
+      (behaviorContent) => behavior.getProperties(behaviorContent.getContent()),
       (behaviorContent, name, value) => {
         behavior.updateProperty(behaviorContent.getContent(), name, value);
       },

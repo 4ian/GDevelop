@@ -50,7 +50,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             margin="none"
             style={styles.sizeTextField}
             value={textObject.getCharacterSize()}
-            onChange={value => {
+            onChange={(value) => {
               textObject.setCharacterSize(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -67,7 +67,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               b: textObject.getColorB(),
               a: 255,
             }}
-            onChangeComplete={color => {
+            onChangeComplete={(color) => {
               textObject.setColor(color.rgb.r, color.rgb.g, color.rgb.b);
               this.forceUpdate();
             }}
@@ -104,7 +104,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             fullWidth
             canBeReset
             initialResourceName={textObject.getFontName()}
-            onChange={resourceName => {
+            onChange={(resourceName) => {
               textObject.setFontName(resourceName);
               this.forceUpdate();
             }}
@@ -125,7 +125,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 rows={8}
                 rowsMax={8}
                 value={textObject.getString()}
-                onChange={value => {
+                onChange={(value) => {
                   textObject.setString(value);
                   this.forceUpdate();
                   this.props.onSizeUpdated();

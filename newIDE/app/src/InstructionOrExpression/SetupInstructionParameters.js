@@ -53,7 +53,7 @@ export const setupInstructionParameters = (
         true
       )
       .toJSArray()
-      .filter(behaviorName => {
+      .filter((behaviorName) => {
         return (
           !allowedBehaviorType ||
           gd.getTypeOfBehavior(
@@ -74,7 +74,7 @@ export const setupInstructionParameters = (
       // is not already set.
       if (
         !behaviorNames.some(
-          behaviorName => currentParameterValue === behaviorName
+          (behaviorName) => currentParameterValue === behaviorName
         )
       ) {
         instruction.setParameter(maybeBehaviorParameterIndex, behaviorNames[0]);

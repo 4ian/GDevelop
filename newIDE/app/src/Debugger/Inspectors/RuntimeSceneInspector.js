@@ -25,7 +25,7 @@ type State = {|
   newObjectName: string,
 |};
 
-const transformLayer = layer => {
+const transformLayer = (layer) => {
   if (!layer) return null;
   return {
     'Camera rotation (in deg)': layer._cameraRotation,
@@ -37,7 +37,7 @@ const transformLayer = layer => {
   };
 };
 
-const transform = runtimeScene => {
+const transform = (runtimeScene) => {
   if (!runtimeScene) return null;
 
   return {
@@ -119,7 +119,7 @@ export default class RuntimeSceneInspector extends React.Component<
           enableClipboard={false}
           displayDataTypes={false}
           displayObjectSize={false}
-          onEdit={edit => handleEdit(edit, this.props)}
+          onEdit={(edit) => handleEdit(edit, this.props)}
           groupArraysAfterLength={50}
           theme="monokai"
         />
@@ -135,13 +135,13 @@ export default class RuntimeSceneInspector extends React.Component<
               <SemiControlledAutoComplete
                 hintText={t`Enter the name of the object`}
                 value={this.state.newObjectName}
-                onChange={value => {
+                onChange={(value) => {
                   this.setState({
                     newObjectName: value,
                   });
                 }}
                 dataSource={Object.keys(runtimeScene._objects.items).map(
-                  objectName => ({
+                  (objectName) => ({
                     text: objectName,
                     value: objectName,
                   })
@@ -150,7 +150,7 @@ export default class RuntimeSceneInspector extends React.Component<
                 fullWidth
               />
             )}
-            renderButton={style => (
+            renderButton={(style) => (
               <RaisedButton
                 style={style}
                 label={<Trans>Create</Trans>}

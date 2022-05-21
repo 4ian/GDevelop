@@ -77,18 +77,13 @@ const CreateProjectDialog = ({
   onCreateBlank,
   initialTab,
 }: Props) => {
-  const [currentTab, setCurrentTab] = React.useState<CreateProjectDialogTabs>(
-    initialTab
-  );
+  const [currentTab, setCurrentTab] =
+    React.useState<CreateProjectDialogTabs>(initialTab);
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
-  const [
-    preCreationDialogOpen,
-    setPreCreationDialogOpen,
-  ] = React.useState<boolean>(false);
+  const [selectedExampleShortHeader, setSelectedExampleShortShortHeader] =
+    React.useState<?ExampleShortHeader>(null);
+  const [preCreationDialogOpen, setPreCreationDialogOpen] =
+    React.useState<boolean>(false);
 
   const actions = React.useMemo(
     () => [
@@ -108,39 +103,36 @@ const CreateProjectDialog = ({
     [onClose, setPreCreationDialogOpen]
   );
 
-  const secondaryActions = React.useMemo(
-    () => {
-      if (currentTab === 'games-showcase')
-        return [
-          <FlatButton
-            key="submit-game-showcase"
-            onClick={() => {
-              Window.openExternalURL(
-                'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
-              );
-            }}
-            primary
-            icon={<PublishIcon />}
-            label={<Trans>Submit your game to the showcase</Trans>}
-          />,
-        ];
-      if (currentTab === 'examples')
-        return [
-          <FlatButton
-            key="submit-example"
-            onClick={() => {
-              Window.openExternalURL(
-                'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-              );
-            }}
-            primary
-            icon={<PublishIcon />}
-            label={<Trans>Submit your project as an example</Trans>}
-          />,
-        ];
-    },
-    [currentTab]
-  );
+  const secondaryActions = React.useMemo(() => {
+    if (currentTab === 'games-showcase')
+      return [
+        <FlatButton
+          key="submit-game-showcase"
+          onClick={() => {
+            Window.openExternalURL(
+              'https://docs.google.com/forms/d/e/1FAIpQLSfjiOnkbODuPifSGuzxYY61vB5kyMWdTZSSqkJsv3H6ePRTQA/viewform?usp=sf_link'
+            );
+          }}
+          primary
+          icon={<PublishIcon />}
+          label={<Trans>Submit your game to the showcase</Trans>}
+        />,
+      ];
+    if (currentTab === 'examples')
+      return [
+        <FlatButton
+          key="submit-example"
+          onClick={() => {
+            Window.openExternalURL(
+              'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+            );
+          }}
+          primary
+          icon={<PublishIcon />}
+          label={<Trans>Submit your project as an example</Trans>}
+        />,
+      ];
+  }, [currentTab]);
 
   if (!open) return null;
 
@@ -226,7 +218,7 @@ const CreateProjectDialog = ({
               open
               isOpening={isOpening}
               onClose={() => setPreCreationDialogOpen(false)}
-              onCreate={projectName => createProject(i18n, projectName)}
+              onCreate={(projectName) => createProject(i18n, projectName)}
             />
           )}
         </>

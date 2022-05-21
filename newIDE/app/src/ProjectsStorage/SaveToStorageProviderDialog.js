@@ -9,7 +9,7 @@ import { List, ListItem } from '../UI/List';
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
-  onChooseProvider: StorageProvider => void,
+  onChooseProvider: (StorageProvider) => void,
   onClose: () => void,
 |};
 
@@ -39,8 +39,8 @@ const SaveToStorageProviderDialog = ({
         >
           <List>
             {storageProviders
-              .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
-              .map(storageProvider => (
+              .filter((storageProvider) => !storageProvider.hiddenInSaveDialog)
+              .map((storageProvider) => (
                 <ListItem
                   key={storageProvider.internalName}
                   disabled={!!storageProvider.disabled}

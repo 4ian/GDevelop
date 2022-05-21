@@ -61,7 +61,7 @@ const rightArrowMargin = cellSpacing / 2; // Necessary because MUI adds a margin
 const skeletonNumber = 4;
 const randomNumbers = Array(skeletonNumber)
   .fill(0)
-  .map(e => Math.random());
+  .map((e) => Math.random());
 
 const styles = {
   itemTitle: {
@@ -99,7 +99,7 @@ const useStylesForGridList = makeStyles({
   },
 });
 
-const useStylesForGridListItem = makeStyles(theme =>
+const useStylesForGridListItem = makeStyles((theme) =>
   createStyles({
     root: {
       width: 'unset !important',
@@ -130,17 +130,14 @@ const Carousel = <ThumbnailType: Thumbnail>({
   error,
   displayItemTitles = true,
 }: Props<ThumbnailType>) => {
-  const [
-    shouldDisplayLeftArrow,
-    setShouldDisplayLeftArrow,
-  ] = React.useState<boolean>(false);
+  const [shouldDisplayLeftArrow, setShouldDisplayLeftArrow] =
+    React.useState<boolean>(false);
   const classesForGridList = useStylesForGridList();
   const classesForGridListItem = useStylesForGridListItem();
   const classesForLeftArrow = useStylesForLeftArrow();
   const scrollView = React.useRef<?HTMLUListElement>(null);
-  const [hoveredElement, setHoveredElement] = React.useState<?HTMLElement>(
-    null
-  );
+  const [hoveredElement, setHoveredElement] =
+    React.useState<?HTMLElement>(null);
   const areItemsSet = items && items.length > 0;
   const itemsToDisplay =
     items && items.length > 0
@@ -180,9 +177,11 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [cellWidth, imageHeight]
   );
 
-  const openLinkCallback = (link: string): (() => void) => (): void => {
-    Window.openExternalURL(link);
-  };
+  const openLinkCallback =
+    (link: string): (() => void) =>
+    (): void => {
+      Window.openExternalURL(link);
+    };
 
   const renderThumbnail = React.useCallback(
     (item: ThumbnailType | SkeletonThumbnail): ?React.Node => {
@@ -242,9 +241,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
       direction: 'left' | 'right',
       scrollViewElement: HTMLUListElement
     ): number => {
-      const visibleThumbnailsCount = getVisibleThumbnailsCount(
-        scrollViewElement
-      );
+      const visibleThumbnailsCount =
+        getVisibleThumbnailsCount(scrollViewElement);
       const scale = visibleThumbnailsCount * widthUnit;
 
       const currentScroll = scrollViewElement.scrollLeft;
@@ -279,29 +277,23 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [computeScroll]
   );
 
-  const handleScroll = React.useCallback(
-    (): void => {
-      const scrollViewElement = scrollView.current;
-      if (!scrollViewElement) return;
+  const handleScroll = React.useCallback((): void => {
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
 
-      if (!shouldDisplayLeftArrow)
-        setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
-    },
-    [shouldDisplayLeftArrow]
-  );
+    if (!shouldDisplayLeftArrow)
+      setShouldDisplayLeftArrow(scrollViewElement.scrollLeft !== 0);
+  }, [shouldDisplayLeftArrow]);
 
-  const handleScrollEnd = React.useCallback(
-    (): void => {
-      const scrollViewElement = scrollView.current;
-      if (!scrollViewElement) return;
+  const handleScrollEnd = React.useCallback((): void => {
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
 
-      scrollViewElement.scrollTo({
-        left: roundScroll(scrollViewElement.scrollLeft),
-        behavior: 'smooth',
-      });
-    },
-    [roundScroll]
-  );
+    scrollViewElement.scrollTo({
+      left: roundScroll(scrollViewElement.scrollLeft),
+      behavior: 'smooth',
+    });
+  }, [roundScroll]);
 
   const onFocusItem = React.useCallback(
     (event: SyntheticFocusEvent<HTMLLIElement>, index: number): void => {
@@ -337,21 +329,18 @@ const Carousel = <ThumbnailType: Thumbnail>({
     [getVisibleThumbnailsCount, hoveredElement, widthUnit]
   );
 
-  React.useEffect(
-    () => {
-      const scrollViewElement = scrollView.current;
-      if (!scrollViewElement) return;
+  React.useEffect(() => {
+    const scrollViewElement = scrollView.current;
+    if (!scrollViewElement) return;
 
-      // Add event listeners on component mount. There is no need to
-      // remove them with a cleanup function because scrollview element
-      // does not change and they will be destroyed when the element is
-      // removed from the DOM.
-      scrollViewElement.addEventListener('scroll', handleScroll);
-      scrollViewElement.addEventListener('touchend', handleScrollEnd);
-      scrollViewElement.addEventListener('touchleave', handleScrollEnd);
-    },
-    [handleScroll, handleScrollEnd]
-  );
+    // Add event listeners on component mount. There is no need to
+    // remove them with a cleanup function because scrollview element
+    // does not change and they will be destroyed when the element is
+    // removed from the DOM.
+    scrollViewElement.addEventListener('scroll', handleScroll);
+    scrollViewElement.addEventListener('touchend', handleScrollEnd);
+    scrollViewElement.addEventListener('touchleave', handleScrollEnd);
+  }, [handleScroll, handleScrollEnd]);
 
   return (
     <Line noMargin>
@@ -408,8 +397,8 @@ const Carousel = <ThumbnailType: Thumbnail>({
                 classes={classesForGridListItem}
                 key={item.id}
                 tabIndex={0}
-                onFocus={event => onFocusItem(event, index)}
-                onMouseEnter={event => setHoveredElement(event.currentTarget)}
+                onFocus={(event) => onFocusItem(event, index)}
+                onMouseEnter={(event) => setHoveredElement(event.currentTarget)}
                 onMouseLeave={() => setHoveredElement(null)}
                 onKeyPress={(
                   event: SyntheticKeyboardEvent<HTMLLIElement>

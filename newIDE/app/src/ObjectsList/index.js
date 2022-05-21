@@ -79,7 +79,7 @@ const getObjectWithContextName = (objectWithContext: ObjectWithContext) =>
 const isObjectWithContextGlobal = (objectWithContext: ObjectWithContext) =>
   objectWithContext.global;
 
-const getPasteLabel = isGlobalObject => {
+const getPasteLabel = (isGlobalObject) => {
   let clipboardObjectName = '';
   if (Clipboard.has(CLIPBOARD_KIND)) {
     const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
@@ -120,12 +120,12 @@ type Props = {|
 
   selectedObjectTags: SelectedTags,
   getAllObjectTags: () => Tags,
-  onChangeSelectedObjectTags: SelectedTags => void,
+  onChangeSelectedObjectTags: (SelectedTags) => void,
 
   onEditObject: (object: gdObject, initialTab: ?ObjectEditorTab) => void,
-  onObjectCreated: gdObject => void,
-  onObjectSelected: string => void,
-  onObjectPasted?: gdObject => void,
+  onObjectCreated: (gdObject) => void,
+  onObjectSelected: (string) => void,
+  onObjectPasted?: (gdObject) => void,
   canRenameObject: (newName: string) => boolean,
   onAddObjectInstance: (objectName: string) => void,
 
@@ -187,7 +187,7 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     const name = newNameGenerator(
       objectTypeToDefaultName[objectType] || 'NewObject',
-      name =>
+      (name) =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
     );
 
@@ -240,7 +240,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     // (typically, the SceneEditor will remove instances refering to the object,
     // leading to the removal of their renderer - which can keep a reference to
     // the object).
-    this.props.onDeleteObject(objectWithContext, doRemove => {
+    this.props.onDeleteObject(objectWithContext, (doRemove) => {
       if (!doRemove) return;
 
       if (global) {
@@ -293,7 +293,7 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     const newName = newNameGenerator(
       name,
-      name =>
+      (name) =>
         objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name),
       ''
     );
@@ -346,7 +346,7 @@ export default class ObjectsList extends React.Component<Props, State> {
     if (getObjectWithContextName(objectWithContext) === newName) return;
 
     if (this.props.canRenameObject(newName)) {
-      this.props.onRenameObject(objectWithContext, newName, doRename => {
+      this.props.onRenameObject(objectWithContext, newName, (doRename) => {
         if (!doRename) return;
 
         object.setName(newName);
@@ -357,28 +357,30 @@ export default class ObjectsList extends React.Component<Props, State> {
 
   _canMoveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     // Check if at least one element in the selection can be moved.
-    const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
-      objectWithContext =>
-        this.props.selectedObjectNames.indexOf(
-          objectWithContext.object.getName()
-        ) !== -1
-    );
+    const selectedObjectsWithContext =
+      this._displayedObjectWithContextsList.filter(
+        (objectWithContext) =>
+          this.props.selectedObjectNames.indexOf(
+            objectWithContext.object.getName()
+          ) !== -1
+      );
     if (
       selectedObjectsWithContext.every(
-        selectedObject =>
+        (selectedObject) =>
           selectedObject.global === destinationObjectWithContext.global
       )
     ) {
       return true;
     }
 
-    const displayedGlobalObjectsWithContext = this._displayedObjectWithContextsList.filter(
-      objectWithContext => objectWithContext.global
-    );
+    const displayedGlobalObjectsWithContext =
+      this._displayedObjectWithContextsList.filter(
+        (objectWithContext) => objectWithContext.global
+      );
 
     if (
       selectedObjectsWithContext.every(
-        selectedObject => !selectedObject.global
+        (selectedObject) => !selectedObject.global
       ) &&
       destinationObjectWithContext.global &&
       displayedGlobalObjectsWithContext.indexOf(
@@ -393,12 +395,14 @@ export default class ObjectsList extends React.Component<Props, State> {
   _moveSelectionTo = (destinationObjectWithContext: ObjectWithContext) => {
     const { project, objectsContainer } = this.props;
 
-    const displayedGlobalObjectsWithContext = this._displayedObjectWithContextsList.filter(
-      objectWithContext => objectWithContext.global
-    );
-    const displayedLocalObjectsWithContext = this._displayedObjectWithContextsList.filter(
-      objectWithContext => !objectWithContext.global
-    );
+    const displayedGlobalObjectsWithContext =
+      this._displayedObjectWithContextsList.filter(
+        (objectWithContext) => objectWithContext.global
+      );
+    const displayedLocalObjectsWithContext =
+      this._displayedObjectWithContextsList.filter(
+        (objectWithContext) => !objectWithContext.global
+      );
 
     const isDestinationItemFirstItemOfGlobalDisplayedList =
       destinationObjectWithContext.global &&
@@ -406,13 +410,14 @@ export default class ObjectsList extends React.Component<Props, State> {
         destinationObjectWithContext
       ) === 0;
 
-    const selectedObjectsWithContext = this._displayedObjectWithContextsList.filter(
-      objectWithContext =>
-        this.props.selectedObjectNames.indexOf(
-          objectWithContext.object.getName()
-        ) !== -1
-    );
-    selectedObjectsWithContext.forEach(movedObjectWithContext => {
+    const selectedObjectsWithContext =
+      this._displayedObjectWithContextsList.filter(
+        (objectWithContext) =>
+          this.props.selectedObjectNames.indexOf(
+            objectWithContext.object.getName()
+          ) !== -1
+      );
+    selectedObjectsWithContext.forEach((movedObjectWithContext) => {
       let container: gdObjectsContainer;
       let fromIndex: number;
       let toIndex: number;
@@ -512,90 +517,89 @@ export default class ObjectsList extends React.Component<Props, State> {
   _getObjectThumbnail = (objectWithContext: ObjectWithContext) =>
     this.props.getThumbnail(this.props.project, objectWithContext.object);
 
-  _renderObjectMenuTemplate = (i18n: I18nType) => (
-    objectWithContext: ObjectWithContext,
-    index: number
-  ) => {
-    const { object } = objectWithContext;
-    const objectMetadata = gd.MetadataProvider.getObjectMetadata(
-      this.props.project.getCurrentPlatform(),
-      object.getType()
-    );
-    return [
-      {
-        label: i18n._(t`Copy`),
-        click: () => this._copyObject(objectWithContext),
-      },
-      {
-        label: i18n._(t`Cut`),
-        click: () => this._cutObject(i18n, objectWithContext),
-      },
-      {
-        label: getPasteLabel(objectWithContext.global),
-        enabled: Clipboard.has(CLIPBOARD_KIND),
-        click: () => this._paste(objectWithContext),
-      },
-      {
-        label: i18n._(t`Duplicate`),
-        click: () => this._duplicateObject(objectWithContext),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Edit object`),
-        click: () => this.props.onEditObject(object),
-      },
-      {
-        label: i18n._(t`Edit object variables`),
-        click: () => this.props.onEditObject(object, 'variables'),
-      },
-      {
-        label: i18n._(t`Edit behaviors`),
-        click: () => this.props.onEditObject(object, 'behaviors'),
-      },
-      {
-        label: i18n._(t`Edit effects`),
-        click: () => this.props.onEditObject(object, 'effects'),
-        enabled: !objectMetadata.isUnsupportedBaseObjectCapability('effect'),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(objectWithContext),
-      },
-      {
-        label: i18n._(t`Set as global object`),
-        enabled: !isObjectWithContextGlobal(objectWithContext),
-        click: () => this._setAsGlobalObject(objectWithContext),
-      },
-      {
-        label: i18n._(t`Tags`),
-        submenu: buildTagsMenuTemplate({
-          noTagLabel: 'No tags',
-          getAllTags: this.props.getAllObjectTags,
-          selectedTags: getTagsFromString(object.getTags()),
-          onChange: objectTags => {
-            this._changeObjectTags(object, objectTags);
-          },
-          editTagsLabel: 'Add/edit tags...',
-          onEditTags: () => this._openEditTagDialog(object),
-        }),
-      },
-      {
-        label: i18n._(t`Delete`),
-        click: () => this._deleteObject(i18n, objectWithContext),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Add instance to the scene`),
-        click: () => this.props.onAddObjectInstance(object.getName()),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Add a new object...`),
-        click: () => this.onAddNewObject(),
-      },
-    ];
-  };
+  _renderObjectMenuTemplate =
+    (i18n: I18nType) =>
+    (objectWithContext: ObjectWithContext, index: number) => {
+      const { object } = objectWithContext;
+      const objectMetadata = gd.MetadataProvider.getObjectMetadata(
+        this.props.project.getCurrentPlatform(),
+        object.getType()
+      );
+      return [
+        {
+          label: i18n._(t`Copy`),
+          click: () => this._copyObject(objectWithContext),
+        },
+        {
+          label: i18n._(t`Cut`),
+          click: () => this._cutObject(i18n, objectWithContext),
+        },
+        {
+          label: getPasteLabel(objectWithContext.global),
+          enabled: Clipboard.has(CLIPBOARD_KIND),
+          click: () => this._paste(objectWithContext),
+        },
+        {
+          label: i18n._(t`Duplicate`),
+          click: () => this._duplicateObject(objectWithContext),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Edit object`),
+          click: () => this.props.onEditObject(object),
+        },
+        {
+          label: i18n._(t`Edit object variables`),
+          click: () => this.props.onEditObject(object, 'variables'),
+        },
+        {
+          label: i18n._(t`Edit behaviors`),
+          click: () => this.props.onEditObject(object, 'behaviors'),
+        },
+        {
+          label: i18n._(t`Edit effects`),
+          click: () => this.props.onEditObject(object, 'effects'),
+          enabled: !objectMetadata.isUnsupportedBaseObjectCapability('effect'),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Rename`),
+          click: () => this._editName(objectWithContext),
+        },
+        {
+          label: i18n._(t`Set as global object`),
+          enabled: !isObjectWithContextGlobal(objectWithContext),
+          click: () => this._setAsGlobalObject(objectWithContext),
+        },
+        {
+          label: i18n._(t`Tags`),
+          submenu: buildTagsMenuTemplate({
+            noTagLabel: 'No tags',
+            getAllTags: this.props.getAllObjectTags,
+            selectedTags: getTagsFromString(object.getTags()),
+            onChange: (objectTags) => {
+              this._changeObjectTags(object, objectTags);
+            },
+            editTagsLabel: 'Add/edit tags...',
+            onEditTags: () => this._openEditTagDialog(object),
+          }),
+        },
+        {
+          label: i18n._(t`Delete`),
+          click: () => this._deleteObject(i18n, objectWithContext),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Add instance to the scene`),
+          click: () => this.props.onAddObjectInstance(object.getName()),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Add a new object...`),
+          click: () => this.onAddNewObject(),
+        },
+      ];
+    };
 
   _onObjectModified = (shouldForceUpdateList: boolean) => {
     if (this.props.unsavedChanges)
@@ -627,7 +631,7 @@ export default class ObjectsList extends React.Component<Props, State> {
       }
     );
     const selectedObjects = this._displayedObjectWithContextsList.filter(
-      objectWithContext =>
+      (objectWithContext) =>
         this.props.selectedObjectNames.indexOf(
           objectWithContext.object.getName()
         ) !== -1
@@ -654,7 +658,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                 {({ i18n }) => (
                   <SortableVirtualizedItemList
                     key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
+                    ref={(sortableList) => (this.sortableList = sortableList)}
                     fullList={this._displayedObjectWithContextsList}
                     width={width}
                     height={height}
@@ -664,7 +668,7 @@ export default class ObjectsList extends React.Component<Props, State> {
                       return 'object-item-' + index;
                     }}
                     isItemBold={isObjectWithContextGlobal}
-                    onEditItem={objectWithContext =>
+                    onEditItem={(objectWithContext) =>
                       this.props.onEditObject(objectWithContext.object)
                     }
                     onAddNewItem={this.onAddNewObject}
@@ -688,7 +692,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         <SearchBar
           value={searchText}
           onRequestSearch={() => {}}
-          onChange={text =>
+          onChange={(text) =>
             this.setState({
               searchText: text,
             })
@@ -715,7 +719,7 @@ export default class ObjectsList extends React.Component<Props, State> {
         {tagEditedObject && (
           <EditTagsDialog
             tagsString={tagEditedObject.getTags()}
-            onEdit={tags => {
+            onEdit={(tags) => {
               this._changeObjectTags(tagEditedObject, tags);
               this._openEditTagDialog(null);
             }}

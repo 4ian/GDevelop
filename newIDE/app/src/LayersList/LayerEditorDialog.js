@@ -58,19 +58,16 @@ const LayerEditorDialog = (props: Props) => {
     onCancel: onClose,
   });
   const [currentTab, setCurrentTab] = React.useState(initialTab);
-  const { instancesCount, highestZOrder } = React.useMemo(
-    () => {
-      const zOrderFinder = new gd.HighestZOrderFinder();
-      zOrderFinder.restrictSearchToLayer(layer.getName());
+  const { instancesCount, highestZOrder } = React.useMemo(() => {
+    const zOrderFinder = new gd.HighestZOrderFinder();
+    zOrderFinder.restrictSearchToLayer(layer.getName());
 
-      initialInstances.iterateOverInstances(zOrderFinder);
-      const instancesCount = zOrderFinder.getInstancesCount();
-      const highestZOrder = zOrderFinder.getHighestZOrder();
-      zOrderFinder.delete();
-      return { instancesCount, highestZOrder };
-    },
-    [layer, initialInstances]
-  );
+    initialInstances.iterateOverInstances(zOrderFinder);
+    const instancesCount = zOrderFinder.getInstancesCount();
+    const highestZOrder = zOrderFinder.getHighestZOrder();
+    zOrderFinder.delete();
+    return { instancesCount, highestZOrder };
+  }, [layer, initialInstances]);
 
   return (
     <Dialog
@@ -175,7 +172,7 @@ const LayerEditorDialog = (props: Props) => {
                     g: layer.getAmbientLightColorGreen(),
                     b: layer.getAmbientLightColorBlue(),
                   })}
-                  onChange={color => {
+                  onChange={(color) => {
                     const rgbColor = rgbStringAndAlphaToRGBColor(color);
                     if (rgbColor) {
                       layer.setAmbientLightColor(

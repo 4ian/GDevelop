@@ -24,7 +24,7 @@ const propertiesMapToSchema = (
   const propertyNames = properties.keys();
   // Aggregate field by groups to be able to build field groups with a title.
   const fieldsByGroups = new Map<string, Array<Field>>();
-  mapFor(0, propertyNames.size(), i => {
+  mapFor(0, propertyNames.size(), (i) => {
     const name = propertyNames.at(i);
     const property = properties.get(name);
 
@@ -38,9 +38,7 @@ const propertiesMapToSchema = (
     const propertyDescription = property.getDescription();
     const valueType = property.getType().toLowerCase();
     const getLabel = (instance: Instance) => {
-      const propertyName = getProperties(instance)
-        .get(name)
-        .getLabel();
+      const propertyName = getProperties(instance).get(name).getLabel();
       if (propertyName) return propertyName;
       return (
         name.charAt(0).toUpperCase() +
@@ -59,13 +57,7 @@ const propertiesMapToSchema = (
         name,
         valueType,
         getValue: (instance: Instance): number => {
-          return (
-            parseFloat(
-              getProperties(instance)
-                .get(name)
-                .getValue()
-            ) || 0
-          ); // Consider a missing value as 0 to avoid propagating NaN.
+          return parseFloat(getProperties(instance).get(name).getValue()) || 0; // Consider a missing value as 0 to avoid propagating NaN.
         },
         setValue: (instance: Instance, newValue: number) => {
           onUpdateProperty(instance, name, '' + newValue);
@@ -79,9 +71,7 @@ const propertiesMapToSchema = (
         name,
         valueType: 'string',
         getValue: (instance: Instance): string => {
-          return getProperties(instance)
-            .get(name)
-            .getValue();
+          return getProperties(instance).get(name).getValue();
         },
         setValue: (instance: Instance, newValue: string) => {
           onUpdateProperty(instance, name, newValue);
@@ -95,11 +85,7 @@ const propertiesMapToSchema = (
         name,
         valueType,
         getValue: (instance: Instance): boolean => {
-          return (
-            getProperties(instance)
-              .get(name)
-              .getValue() === 'true'
-          );
+          return getProperties(instance).get(name).getValue() === 'true';
         },
         setValue: (instance: Instance, newValue: boolean) => {
           onUpdateProperty(instance, name, newValue ? '1' : '0');
@@ -113,15 +99,13 @@ const propertiesMapToSchema = (
       const choices = property
         .getExtraInfo()
         .toJSArray()
-        .map(value => ({ value, label: value }));
+        .map((value) => ({ value, label: value }));
       fields.push({
         name,
         valueType: 'string',
         getChoices: () => choices,
         getValue: (instance: Instance): string => {
-          return getProperties(instance)
-            .get(name)
-            .getValue();
+          return getProperties(instance).get(name).getValue();
         },
         setValue: (instance: Instance, newValue: string) => {
           onUpdateProperty(instance, name, newValue);
@@ -142,18 +126,16 @@ const propertiesMapToSchema = (
             : object
                 .getAllBehaviorNames()
                 .toJSArray()
-                .map(name =>
+                .map((name) =>
                   object.getBehavior(name).getTypeName() === behaviorType
                     ? name
                     : null
                 )
                 .filter(Boolean)
-                .map(value => ({ value, label: value }));
+                .map((value) => ({ value, label: value }));
         },
         getValue: (instance: Instance): string => {
-          return getProperties(instance)
-            .get(name)
-            .getValue();
+          return getProperties(instance).get(name).getValue();
         },
         setValue: (instance: Instance, newValue: string) => {
           onUpdateProperty(instance, name, newValue);
@@ -171,9 +153,7 @@ const propertiesMapToSchema = (
         valueType: 'resource',
         resourceKind: kind,
         getValue: (instance: Instance): string => {
-          return getProperties(instance)
-            .get(name)
-            .getValue();
+          return getProperties(instance).get(name).getValue();
         },
         setValue: (instance: Instance, newValue: string) => {
           onUpdateProperty(instance, name, newValue);
@@ -187,9 +167,7 @@ const propertiesMapToSchema = (
         name,
         valueType: 'color',
         getValue: (instance: Instance): string => {
-          return getProperties(instance)
-            .get(name)
-            .getValue();
+          return getProperties(instance).get(name).getValue();
         },
         setValue: (instance: Instance, newValue: string) => {
           onUpdateProperty(instance, name, newValue);
@@ -203,9 +181,7 @@ const propertiesMapToSchema = (
         name,
         valueType: 'textarea',
         getValue: (instance: Instance): string => {
-          return getProperties(instance)
-            .get(name)
-            .getValue();
+          return getProperties(instance).get(name).getValue();
         },
         setValue: (instance: Instance, newValue: string) => {
           onUpdateProperty(instance, name, newValue);
@@ -233,7 +209,7 @@ const propertiesMapToSchema = (
   const groupNames = [...fieldsByGroups.keys()].sort((a, b) =>
     a.localeCompare(b)
   );
-  return groupNames.map(groupName => ({
+  return groupNames.map((groupName) => ({
     name: groupName,
     type: 'column',
     title: groupName,

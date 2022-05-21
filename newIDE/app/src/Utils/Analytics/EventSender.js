@@ -143,7 +143,7 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       'B917F1DB50EE4C8949DBB374D2962845A22838B425AA43322A37138691A5270EB0358AEE45A4F61AFA7713B9765B4980517A1E276D4973A2E546EA851BF7757523706367ED430C041D2728A63BF61B5D1B2079C75E455DDDFAAC4324128AC2DB',
   });
 
-  keenClient.extendEvents(function() {
+  keenClient.extendEvents(function () {
     // Include the user public profile.
     const firebaseUser = authentication.getFirebaseUserSync();
 

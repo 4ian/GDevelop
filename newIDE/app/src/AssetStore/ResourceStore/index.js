@@ -21,7 +21,7 @@ const styles = {
 };
 
 type Props = {
-  onChoose: Resource => void,
+  onChoose: (Resource) => void,
   resourceKind: string,
 };
 
@@ -36,15 +36,12 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
     setSearchText,
   } = React.useContext(ResourceStoreContext);
 
-  React.useEffect(
-    () => {
-      fetchResourcesAndFilters();
-    },
-    [fetchResourcesAndFilters]
-  );
+  React.useEffect(() => {
+    fetchResourcesAndFilters();
+  }, [fetchResourcesAndFilters]);
 
   const searchResultsForResourceKind = searchResults
-    ? searchResults.filter(resource => resource.type === resourceKind)
+    ? searchResults.filter((resource) => resource.type === resourceKind)
     : null;
 
   return (

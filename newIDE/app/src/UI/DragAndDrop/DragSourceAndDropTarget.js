@@ -93,16 +93,18 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     sourceSpec,
     sourceCollect
   )(
-    DropTarget(reactDndType, targetSpec, targetCollect)(
-      ({ children, connectDragSource, connectDropTarget, isOver, canDrop }) => {
-        return children({
-          connectDragSource,
-          connectDropTarget,
-          isOver,
-          canDrop,
-        });
-      }
-    )
+    DropTarget(
+      reactDndType,
+      targetSpec,
+      targetCollect
+    )(({ children, connectDragSource, connectDropTarget, isOver, canDrop }) => {
+      return children({
+        connectDragSource,
+        connectDropTarget,
+        isOver,
+        canDrop,
+      });
+    })
   );
 
   return (props: Props<DraggedItemType>) => (

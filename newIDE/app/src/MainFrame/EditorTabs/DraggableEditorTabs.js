@@ -61,7 +61,7 @@ export function DraggableClosableTabs({
               draggedTabIndex = id;
               return editorTab;
             }}
-            onDrop={toHoveredIndex => {
+            onDrop={(toHoveredIndex) => {
               if (typeof draggedTabIndex === 'number') {
                 onDropTab(draggedTabIndex, id);
                 draggedTabIndex = null;
@@ -102,7 +102,7 @@ export function DraggableClosableTab({
 
   return (
     <ScreenTypeMeasurer>
-      {screenType => (
+      {(screenType) => (
         <DragSourceAndDropTarget
           beginDrag={onBeginDrag}
           canDrag={() => {

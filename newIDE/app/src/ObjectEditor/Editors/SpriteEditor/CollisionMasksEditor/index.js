@@ -50,25 +50,18 @@ const CollisionMasksEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-  const [
-    highlightedVerticePtr,
-    setHighlightedVerticePtr,
-  ] = React.useState<?number>(null);
-  const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
-    null
-  );
+  const [highlightedVerticePtr, setHighlightedVerticePtr] =
+    React.useState<?number>(null);
+  const [selectedVerticePtr, setSelectedVerticePtr] =
+    React.useState<?number>(null);
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
   // theory, they should be set to the appropriate value at their initialization,
   // for consistency of the state.
-  const [
-    sameCollisionMasksForAnimations,
-    setSameCollisionMasksForAnimations,
-  ] = React.useState(false);
-  const [
-    sameCollisionMasksForSprites,
-    setSameCollisionMasksForSprites,
-  ] = React.useState(false);
+  const [sameCollisionMasksForAnimations, setSameCollisionMasksForAnimations] =
+    React.useState(false);
+  const [sameCollisionMasksForSprites, setSameCollisionMasksForSprites] =
+    React.useState(false);
   const [spriteWidth, setSpriteWidth] = React.useState(0);
   const [spriteHeight, setSpriteHeight] = React.useState(0);
   const forceUpdate = useForceUpdate();
@@ -81,43 +74,40 @@ const CollisionMasksEditor = (props: Props) => {
     spriteIndex
   );
 
-  const updateCollisionMasks = React.useCallback(
-    () => {
-      if (animation && sprite) {
-        if (sameCollisionMasksForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
-            copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
-          });
-        } else if (sameCollisionMasksForSprites) {
-          copyAnimationsSpriteCollisionMasks(sprite, animation);
-        }
+  const updateCollisionMasks = React.useCallback(() => {
+    if (animation && sprite) {
+      if (sameCollisionMasksForAnimations) {
+        mapFor(0, spriteObject.getAnimationsCount(), (i) => {
+          const otherAnimation = spriteObject.getAnimation(i);
+          copyAnimationsSpriteCollisionMasks(sprite, otherAnimation);
+        });
+      } else if (sameCollisionMasksForSprites) {
+        copyAnimationsSpriteCollisionMasks(sprite, animation);
       }
+    }
 
-      forceUpdate(); // Refresh the preview and the list
-    },
-    [
-      animation,
-      sprite,
-      spriteObject,
-      sameCollisionMasksForAnimations,
-      sameCollisionMasksForSprites,
-      forceUpdate,
-    ]
-  );
+    forceUpdate(); // Refresh the preview and the list
+  }, [
+    animation,
+    sprite,
+    spriteObject,
+    sameCollisionMasksForAnimations,
+    sameCollisionMasksForSprites,
+    forceUpdate,
+  ]);
 
-  const chooseAnimation = index => {
+  const chooseAnimation = (index) => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
-  const chooseDirection = index => {
+  const chooseDirection = (index) => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
-  const chooseSprite = index => {
+  const chooseSprite = (index) => {
     setSpriteIndex(index);
   };
 
@@ -126,7 +116,7 @@ const CollisionMasksEditor = (props: Props) => {
 
     setSameCollisionMasksForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
+        mapFor(0, spriteObject.getAnimationsCount(), (i) => {
           const otherAnimation = spriteObject.getAnimation(i);
           return allSpritesHaveSameCollisionMasksAs(sprite, otherAnimation);
         })
@@ -206,7 +196,7 @@ const CollisionMasksEditor = (props: Props) => {
             resourcesLoader={props.resourcesLoader}
             project={props.project}
             onSize={setCurrentSpriteSize}
-            renderOverlay={overlayProps =>
+            renderOverlay={(overlayProps) =>
               hasValidSprite && (
                 <CollisionMasksPreview
                   {...overlayProps}

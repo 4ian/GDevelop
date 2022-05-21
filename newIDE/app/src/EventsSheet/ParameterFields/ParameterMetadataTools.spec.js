@@ -28,7 +28,7 @@ describe('getLastObjectParameterValue', () => {
     instruction.setParameter(1, 'MyObject');
     instruction.setParameter(2, 'MyBehavior');
 
-    const getValueForParameter = parameterIndex =>
+    const getValueForParameter = (parameterIndex) =>
       getLastObjectParameterValue({
         instructionMetadata,
         instruction,
@@ -68,7 +68,7 @@ describe('getLastObjectParameterValue', () => {
     instruction.setParameter(5, 'MyOtherBehavior');
     instruction.setParameter(6, 'MyOtherVariable');
 
-    const getValueForParameter = parameterIndex =>
+    const getValueForParameter = (parameterIndex) =>
       getLastObjectParameterValue({
         instructionMetadata,
         instruction,

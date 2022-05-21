@@ -54,15 +54,17 @@ export const makeDropTarget = <DraggedItemType>(
     };
   }
 
-  const InnerDropTarget = DropTarget(reactDndType, targetSpec, targetCollect)(
-    ({ children, connectDropTarget, isOver, canDrop }) => {
-      return children({
-        connectDropTarget,
-        isOver,
-        canDrop,
-      });
-    }
-  );
+  const InnerDropTarget = DropTarget(
+    reactDndType,
+    targetSpec,
+    targetCollect
+  )(({ children, connectDropTarget, isOver, canDrop }) => {
+    return children({
+      connectDropTarget,
+      isOver,
+      canDrop,
+    });
+  });
 
   return (props: Props<DraggedItemType>) => <InnerDropTarget {...props} />;
 };

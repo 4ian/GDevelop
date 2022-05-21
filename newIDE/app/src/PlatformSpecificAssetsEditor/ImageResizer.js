@@ -16,13 +16,13 @@ export const resizeImage = (
   if (!Jimp) return Promise.resolve(false);
 
   return Jimp.read(inputFile)
-    .then(function(jimpImage) {
+    .then(function (jimpImage) {
       return jimpImage.contain(width, height).write(outputFile);
     })
     .then(() => {
       return true;
     })
-    .catch(function(err) {
+    .catch(function (err) {
       console.error(err);
       return false;
     });

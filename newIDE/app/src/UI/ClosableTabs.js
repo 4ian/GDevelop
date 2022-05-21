@@ -78,7 +78,7 @@ type ClosableTabsProps = {|
 
 export const ClosableTabs = ({ hideLabels, children }: ClosableTabsProps) => (
   <ThemeConsumer>
-    {muiTheme => {
+    {(muiTheme) => {
       const tabItemContainerStyle = {
         maxWidth: '100%', // Tabs should take all width
         flexShrink: 0, // Tabs height should never be reduced
@@ -118,17 +118,14 @@ export function ClosableTab({
   onClick,
   onActivated,
 }: ClosableTabProps) {
-  React.useEffect(
-    () => {
-      if (active) {
-        onActivated();
-      }
-    },
-    [active, onActivated]
-  );
+  React.useEffect(() => {
+    if (active) {
+      onActivated();
+    }
+  }, [active, onActivated]);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
 
-  const openContextMenu = event => {
+  const openContextMenu = (event) => {
     event.stopPropagation();
     if (contextMenu.current) {
       contextMenu.current.open(event.clientX, event.clientY);
@@ -136,7 +133,7 @@ export function ClosableTab({
   };
 
   const closeOnMiddleClick = React.useCallback(
-    event => {
+    (event) => {
       if (event.nativeEvent && event.nativeEvent.button === 1) {
         onClose();
       }
@@ -147,7 +144,7 @@ export function ClosableTab({
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
-      event => {
+      (event) => {
         if (contextMenu.current) {
           contextMenu.current.open(event.clientX, event.clientY);
         }
@@ -158,7 +155,7 @@ export function ClosableTab({
 
   return (
     <ThemeConsumer>
-      {muiTheme => {
+      {(muiTheme) => {
         const textColor = !active
           ? muiTheme.closableTabs.textColor
           : muiTheme.closableTabs.selectedTextColor;

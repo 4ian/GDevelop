@@ -46,7 +46,7 @@ RenderedSpriteInstance.prototype = Object.create(RenderedInstance.prototype);
 /**
  * Return a URL for thumbnail of the specified object.
  */
-RenderedSpriteInstance.getThumbnail = function(
+RenderedSpriteInstance.getThumbnail = function (
   project,
   resourcesLoader,
   object
@@ -56,10 +56,7 @@ RenderedSpriteInstance.getThumbnail = function(
   if (
     spriteObject.getAnimationsCount() > 0 &&
     spriteObject.getAnimation(0).getDirectionsCount() > 0 &&
-    spriteObject
-      .getAnimation(0)
-      .getDirection(0)
-      .getSpritesCount() > 0
+    spriteObject.getAnimation(0).getDirection(0).getSpritesCount() > 0
   ) {
     const imageName = spriteObject
       .getAnimation(0)
@@ -72,7 +69,7 @@ RenderedSpriteInstance.getThumbnail = function(
   return 'res/unknown32.png';
 };
 
-RenderedSpriteInstance.prototype.updatePIXISprite = function() {
+RenderedSpriteInstance.prototype.updatePIXISprite = function () {
   this._pixiObject.anchor.x =
     this._centerX / this._pixiObject.texture.frame.width;
   this._pixiObject.anchor.y =
@@ -97,7 +94,7 @@ RenderedSpriteInstance.prototype.updatePIXISprite = function() {
     (this._centerY - this._originY) * Math.abs(this._pixiObject.scale.y);
 };
 
-RenderedSpriteInstance.prototype.updateSprite = function() {
+RenderedSpriteInstance.prototype.updateSprite = function () {
   this._sprite = null;
   this._shouldNotRotate = false;
 
@@ -131,7 +128,7 @@ RenderedSpriteInstance.prototype.updateSprite = function() {
   return true;
 };
 
-RenderedSpriteInstance.prototype.updatePIXITextureAndSprite = function() {
+RenderedSpriteInstance.prototype.updatePIXITextureAndSprite = function () {
   this.updateSprite();
   if (!this._sprite) return;
 
@@ -163,7 +160,7 @@ RenderedSpriteInstance.prototype.updatePIXITextureAndSprite = function() {
   this.updatePIXISprite();
 };
 
-RenderedSpriteInstance.prototype.update = function() {
+RenderedSpriteInstance.prototype.update = function () {
   const animation = this._instance.getRawDoubleProperty('animation');
   if (this._renderedAnimation !== animation) {
     this.updatePIXITextureAndSprite();
@@ -172,23 +169,23 @@ RenderedSpriteInstance.prototype.update = function() {
   }
 };
 
-RenderedSpriteInstance.prototype.getOriginX = function() {
+RenderedSpriteInstance.prototype.getOriginX = function () {
   if (!this._sprite || !this._pixiObject) return 0;
 
   return this._sprite.getOrigin().getX() * this._pixiObject.scale.x;
 };
 
-RenderedSpriteInstance.prototype.getOriginY = function() {
+RenderedSpriteInstance.prototype.getOriginY = function () {
   if (!this._sprite || !this._pixiObject) return 0;
 
   return this._sprite.getOrigin().getY() * this._pixiObject.scale.y;
 };
 
-RenderedSpriteInstance.prototype.getDefaultWidth = function() {
+RenderedSpriteInstance.prototype.getDefaultWidth = function () {
   return Math.abs(this._pixiObject.width);
 };
 
-RenderedSpriteInstance.prototype.getDefaultHeight = function() {
+RenderedSpriteInstance.prototype.getDefaultHeight = function () {
   return Math.abs(this._pixiObject.height);
 };
 

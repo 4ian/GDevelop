@@ -19,7 +19,7 @@ type GamesShowcaseState = {|
   allShowcasedGames: ?Array<ShowcasedGame>,
   error: ?Error,
   searchText: string,
-  setSearchText: string => void,
+  setSearchText: (string) => void,
   filtersState: FiltersState,
 |};
 
@@ -62,10 +62,8 @@ export const GamesShowcaseStateProvider = ({
   const [showcasedGamesByName, setShowcasedGamesByName] = React.useState<?{
     [string]: ShowcasedGame,
   }>(null);
-  const [
-    allShowcasedGames,
-    setAllShowcasedGames,
-  ] = React.useState<?Array<ShowcasedGame>>(null);
+  const [allShowcasedGames, setAllShowcasedGames] =
+    React.useState<?Array<ShowcasedGame>>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
@@ -73,44 +71,42 @@ export const GamesShowcaseStateProvider = ({
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
-  const fetchShowcasedGamesAndFilters = React.useCallback(
-    () => {
-      // Don't attempt to load again games and filters if they
-      // were loaded already.
-      if (showcasedGamesByName || isLoading.current) return;
+  const fetchShowcasedGamesAndFilters = React.useCallback(() => {
+    // Don't attempt to load again games and filters if they
+    // were loaded already.
+    if (showcasedGamesByName || isLoading.current) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const allShowcasedGames: AllShowcasedGames = await listAllShowcasedGames();
-          const { showcasedGames, filters } = allShowcasedGames;
-          setAllShowcasedGames(shuffle(showcasedGames));
+      try {
+        const allShowcasedGames: AllShowcasedGames =
+          await listAllShowcasedGames();
+        const { showcasedGames, filters } = allShowcasedGames;
+        setAllShowcasedGames(shuffle(showcasedGames));
 
-          const showcasedGamesByName = {};
-          showcasedGames.forEach(showcasedGame => {
-            showcasedGamesByName[showcasedGame.title] = showcasedGame;
-          });
+        const showcasedGamesByName = {};
+        showcasedGames.forEach((showcasedGame) => {
+          showcasedGamesByName[showcasedGame.title] = showcasedGame;
+        });
 
-          console.info(
-            `Loaded ${showcasedGames.length} games from the games showcase.`
-          );
-          setShowcasedGamesByName(showcasedGamesByName);
-          setFilters(filters);
-        } catch (error) {
-          console.error(
-            `Unable to load the games from the games showcase:`,
-            error
-          );
-          setError(error);
-        }
+        console.info(
+          `Loaded ${showcasedGames.length} games from the games showcase.`
+        );
+        setShowcasedGamesByName(showcasedGamesByName);
+        setFilters(filters);
+      } catch (error) {
+        console.error(
+          `Unable to load the games from the games showcase:`,
+          error
+        );
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [showcasedGamesByName, isLoading]
-  );
+      isLoading.current = false;
+    })();
+  }, [showcasedGamesByName, isLoading]);
 
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<ShowcasedGame> = useSearchItem(

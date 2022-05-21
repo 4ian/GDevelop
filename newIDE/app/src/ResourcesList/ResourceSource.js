@@ -86,7 +86,7 @@ export type ResourceSource = {
   selectResourcesHeadless?: ?(
     ChooseResourceProps
   ) => Promise<Array<gdResource>>,
-  renderComponent: ResourceSourceComponentProps => React.Node,
+  renderComponent: (ResourceSourceComponentProps) => React.Node,
 };
 
 export type ChooseResourceFunction = (

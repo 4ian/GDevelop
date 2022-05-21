@@ -8,7 +8,7 @@ const listeners: Set<() => void> = new Set();
 
 // Event listener set-up
 if (typeof window !== 'undefined') {
-  const callListeners = () => listeners.forEach(callback => callback());
+  const callListeners = () => listeners.forEach((callback) => callback());
   let timeout;
   window.addEventListener('resize', () => {
     clearTimeout(timeout);
@@ -21,13 +21,10 @@ if (typeof window !== 'undefined') {
  * while having only one resize DOM event handler.
  */
 export const useOnResize = (callback: () => void) => {
-  React.useEffect(
-    () => {
-      listeners.add(callback);
-      return () => {
-        listeners.delete(callback);
-      };
-    },
-    [callback]
-  );
+  React.useEffect(() => {
+    listeners.add(callback);
+    return () => {
+      listeners.delete(callback);
+    };
+  }, [callback]);
 };

@@ -95,10 +95,11 @@ namespace gdjs {
     }
 
     updateFontFamily(): void {
-      this._pixiObject.textStyles.default.fontFamily = this._object._runtimeScene
-        .getGame()
-        .getFontManager()
-        .getFontFamily(this._object._fontFamily);
+      this._pixiObject.textStyles.default.fontFamily =
+        this._object._runtimeScene
+          .getGame()
+          .getFontManager()
+          .getFontFamily(this._object._fontFamily);
       this._pixiObject.dirty = true;
     }
 

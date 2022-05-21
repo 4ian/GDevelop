@@ -20,7 +20,7 @@ const styles = {
 };
 
 type Props = {|
-  onChange: string => void,
+  onChange: (string) => void,
   value: string,
 |};
 
@@ -82,7 +82,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
           },
         ])
         .then(
-          data => {
+          (data) => {
             let hits = data.results[0].hits;
             console.log(hits);
 
@@ -91,7 +91,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
               error: null,
             });
           },
-          error => {
+          (error) => {
             this.setState({
               error,
             });
@@ -126,8 +126,8 @@ export default class DocSearchArea extends React.Component<Props, State> {
       result.hierarchy.lvl5,
       result.hierarchy.lvl6,
     ]
-      .filter(text => !!text)
-      .filter(text => text !== primaryText)
+      .filter((text) => !!text)
+      .filter((text) => text !== primaryText)
       .join(' - ');
 
     return (
@@ -170,7 +170,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
           </Text>
         ) : this.state.results ? (
           <List>
-            {this.state.results.map(result => this._renderResult(result))}
+            {this.state.results.map((result) => this._renderResult(result))}
           </List>
         ) : (
           <React.Fragment>

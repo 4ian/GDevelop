@@ -42,7 +42,7 @@ const ObjectsRenderingService = {
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
     'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
-  getThumbnail: function(project: gdProject, object: gdObject) {
+  getThumbnail: function (project: gdProject, object: gdObject) {
     var objectType = object.getType();
     if (this.renderers.hasOwnProperty(objectType))
       return this.renderers[objectType].getThumbnail(
@@ -57,7 +57,7 @@ const ObjectsRenderingService = {
         object
       );
   },
-  createNewInstanceRenderer: function(
+  createNewInstanceRenderer: function (
     project: gdProject,
     layout: gdLayout,
     instance: gdInitialInstance,
@@ -88,7 +88,7 @@ const ObjectsRenderingService = {
       );
     }
   },
-  registerInstanceRenderer: function(objectType: string, renderer: any) {
+  registerInstanceRenderer: function (objectType: string, renderer: any) {
     if (!renderer.getThumbnail) {
       console.warn(
         `Tried to register renderer for object "${objectType}", but getThumbnail is not defined.`
@@ -114,14 +114,14 @@ const ObjectsRenderingService = {
    * Register a module that can be then required using `requireModule`.
    * This is necessary for the web-app, as all files must be bundled.
    */
-  registerModule: function(requirePath: string, module: any) {
+  registerModule: function (requirePath: string, module: any) {
     requirableModules[requirePath] = module;
   },
   /**
    * Require a module, that was either registered using `registerModule` (i.e: on the web-app), or from
    * the specified path (if `optionalRequire` can find the file, i.e: on the electron app).
    */
-  requireModule: function(requireBasePath: string, requirePath: string): ?any {
+  requireModule: function (requireBasePath: string, requirePath: string): ?any {
     // On Electron, where modules can be required at runtime from files, require the
     // file, relative to the base path.
     if (electron && path) {

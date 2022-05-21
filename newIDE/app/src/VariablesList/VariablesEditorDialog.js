@@ -45,9 +45,8 @@ const VariablesEditorDialog = ({
     serializableObject: variablesContainer,
     onCancel,
   });
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-variables'
-  );
+  const { DismissableTutorialMessage } =
+    useDismissableTutorialMessage('intro-variables');
 
   return (
     <Dialog

@@ -21,10 +21,10 @@ const styles = {
 
 type Props = {|
   value: Array<AutocompleteOption>,
-  onChange: AutocompleteOption => void,
+  onChange: (AutocompleteOption) => void,
   dataSource: DataSource,
   inputValue: ?string,
-  onInputChange: string => void,
+  onInputChange: (string) => void,
 
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
@@ -49,13 +49,13 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           getOptionLabel={(option: AutocompleteOption) => option.text}
           getOptionDisabled={(option: AutocompleteOption) =>
             !!props.value.find(
-              element => element && element.value === option.value
+              (element) => element && element.value === option.value
             ) ||
             (props.optionsLimit && props.value.length >= props.optionsLimit)
           }
           getOptionSelected={(option, value) => option.value === value.value}
           loading={props.loading}
-          renderInput={params => (
+          renderInput={(params) => (
             <TextField
               {...params}
               InputProps={{

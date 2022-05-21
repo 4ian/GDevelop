@@ -16,13 +16,10 @@ const useDismissableTutorialMessage = (tutorialId: string) => {
   const { tutorials } = React.useContext(TutorialContext);
   const tutorial = getTutorial(preferences, tutorials, tutorialId);
 
-  const DismissableTutorialMessage = React.useMemo(
-    () => {
-      if (!tutorial) return null;
-      return <TutorialMessage tutorial={tutorial} />;
-    },
-    [tutorial]
-  );
+  const DismissableTutorialMessage = React.useMemo(() => {
+    if (!tutorial) return null;
+    return <TutorialMessage tutorial={tutorial} />;
+  }, [tutorial]);
 
   return {
     DismissableTutorialMessage,

@@ -67,7 +67,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
       exportStep
     ),
 
-  renderHeader: props => <SetupExportHeader {...props} />,
+  renderHeader: (props) => <SetupExportHeader {...props} />,
 
   renderLaunchButtonLabel: () => <Trans>Package</Trans>,
 
@@ -135,7 +135,7 @@ export const localOnlineElectronExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     outputFile: CompressionOutput
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadLocalFile(
         outputFile,
         uploadOptions,

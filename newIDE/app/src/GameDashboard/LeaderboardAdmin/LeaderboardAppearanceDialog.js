@@ -73,7 +73,7 @@ const unitSelectOptions = orderedTimeUnits.reduce(
 type Props = {
   open: boolean,
   leaderboardCustomizationSettings: ?LeaderboardCustomizationSettings,
-  onSave: LeaderboardCustomizationSettings => Promise<void>,
+  onSave: (LeaderboardCustomizationSettings) => Promise<void>,
   onClose: () => void,
 };
 
@@ -91,14 +91,12 @@ function LeaderboardAppearanceDialog({
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [scoreTitleError, setScoreTitleError] = React.useState<?string>(null);
-  const [
-    defaultDisplayedEntriesNumber,
-    setDefaultDisplayedEntriesNumber,
-  ] = React.useState<number>(
-    (leaderboardCustomizationSettings &&
-      leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
-      20
-  );
+  const [defaultDisplayedEntriesNumber, setDefaultDisplayedEntriesNumber] =
+    React.useState<number>(
+      (leaderboardCustomizationSettings &&
+        leaderboardCustomizationSettings.defaultDisplayedEntriesNumber) ||
+        20
+    );
   const [
     defaultDisplayedEntriesNumberError,
     setDefaultDisplayedEntriesNumberError,
@@ -367,7 +365,7 @@ function LeaderboardAppearanceDialog({
                         setTimeUnits(newValue)
                       }
                     >
-                      {Object.keys(unitSelectOptions).map(option => (
+                      {Object.keys(unitSelectOptions).map((option) => (
                         <SelectOption
                           key={option}
                           value={option}

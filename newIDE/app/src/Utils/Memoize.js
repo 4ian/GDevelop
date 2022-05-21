@@ -1,8 +1,8 @@
 // @flow
 
 export default function memoize<Input, Output>(
-  func: Input => Output
-): Input => Output {
+  func: (Input) => Output
+): (Input) => Output {
   const primitives = new Map<Input, Output>();
   // $FlowFixMe - WeakMap is only used when Input is an object.
   const objects = new WeakMap<Input, Output>();

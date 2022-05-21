@@ -39,7 +39,7 @@ RenderedParticleEmitterInstance.prototype = Object.create(
 /**
  * Return a URL for thumbnail of the specified object.
  */
-RenderedParticleEmitterInstance.getThumbnail = function(
+RenderedParticleEmitterInstance.getThumbnail = function (
   project,
   resourcesLoader,
   object
@@ -47,7 +47,7 @@ RenderedParticleEmitterInstance.getThumbnail = function(
   return 'CppPlatform/Extensions/particleSystemicon.png';
 };
 
-RenderedParticleEmitterInstance.prototype.update = function() {
+RenderedParticleEmitterInstance.prototype.update = function () {
   this._pixiObject.position.x = this._instance.getX();
   this._pixiObject.position.y = this._instance.getY();
   this.updateGraphics();
@@ -56,7 +56,7 @@ RenderedParticleEmitterInstance.prototype.update = function() {
 /**
  * Render the preview of the particle emitter according to the setup of the object
  */
-RenderedParticleEmitterInstance.prototype.updateGraphics = function() {
+RenderedParticleEmitterInstance.prototype.updateGraphics = function () {
   const particleEmitterObject = gd.asParticleEmitterObject(
     this._associatedObject
   );
@@ -103,19 +103,19 @@ RenderedParticleEmitterInstance.prototype.updateGraphics = function() {
   this._pixiObject.endFill();
 };
 
-RenderedParticleEmitterInstance.prototype.getDefaultWidth = function() {
+RenderedParticleEmitterInstance.prototype.getDefaultWidth = function () {
   return 128;
 };
 
-RenderedParticleEmitterInstance.prototype.getDefaultHeight = function() {
+RenderedParticleEmitterInstance.prototype.getDefaultHeight = function () {
   return 128;
 };
 
-RenderedParticleEmitterInstance.prototype.getOriginX = function() {
+RenderedParticleEmitterInstance.prototype.getOriginX = function () {
   return 64;
 };
 
-RenderedParticleEmitterInstance.prototype.getOriginY = function() {
+RenderedParticleEmitterInstance.prototype.getOriginY = function () {
   return 64;
 };
 

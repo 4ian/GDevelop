@@ -40,12 +40,11 @@ export type FetchResourcesArgs = {|
  */
 export type ResourceFetcher = {|
   getResourcesToFetch: (project: gdProject) => Array<string>,
-  fetchResources: FetchResourcesArgs => Promise<FetchedResources>,
+  fetchResources: (FetchResourcesArgs) => Promise<FetchedResources>,
 |};
 
-export const ResourceFetcherContext = React.createContext<?ResourceFetcher>(
-  null
-);
+export const ResourceFetcherContext =
+  React.createContext<?ResourceFetcher>(null);
 
 type ResourceFetcherDialogProps = {|
   progress: number,
@@ -133,9 +132,7 @@ type UseResourceFetcherOutput = {
    * Launch the fetching of the resources, if needed. For example, for the desktop
    * app, this means downloading the resources that have URLs.
    */
-  ensureResourcesAreFetched: (
-    project: gdProject
-  ) => Promise<{|
+  ensureResourcesAreFetched: (project: gdProject) => Promise<{|
     someResourcesWereFetched: boolean,
   |}>,
   /**
@@ -152,14 +149,11 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
   const resourceFetcher = React.useContext(ResourceFetcherContext);
   const [progress, setProgress] = React.useState(0);
   const [isFetching, setIsFetching] = React.useState(false);
-  const [
-    fetchedResources,
-    setFetchedResources,
-  ] = React.useState<?FetchedResources>(null);
+  const [fetchedResources, setFetchedResources] =
+    React.useState<?FetchedResources>(null);
   const [onRetry, setOnRetry] = React.useState<?RetryOrAbandonCallback>(null);
-  const [onAbandon, setOnAbandon] = React.useState<?RetryOrAbandonCallback>(
-    null
-  );
+  const [onAbandon, setOnAbandon] =
+    React.useState<?RetryOrAbandonCallback>(null);
 
   const ensureResourcesAreFetched = React.useCallback(
     async (project: gdProject) => {
@@ -194,22 +188,18 @@ export const useResourceFetcher = (): UseResourceFetcherOutput => {
 
       // An error happened. Store the errors and offer a way to
       // retry.
-      return new Promise(resolve => {
-        setOnRetry(
-          (): RetryOrAbandonCallback => () => {
-            // Launch the fetch again, and solve the promise once
-            // this new fetch resolve itself.
-            resolve(ensureResourcesAreFetched(project));
-          }
-        );
-        setOnAbandon(
-          (): RetryOrAbandonCallback => () => {
-            // Abandon: resolve immediately, closing the dialog
-            setIsFetching(false);
-            setFetchedResources(null);
-            resolve({ someResourcesWereFetched: true });
-          }
-        );
+      return new Promise((resolve) => {
+        setOnRetry((): RetryOrAbandonCallback => () => {
+          // Launch the fetch again, and solve the promise once
+          // this new fetch resolve itself.
+          resolve(ensureResourcesAreFetched(project));
+        });
+        setOnAbandon((): RetryOrAbandonCallback => () => {
+          // Abandon: resolve immediately, closing the dialog
+          setIsFetching(false);
+          setFetchedResources(null);
+          resolve({ someResourcesWereFetched: true });
+        });
 
         // Display the errors to the user:
         setFetchedResources(fetchedResources);

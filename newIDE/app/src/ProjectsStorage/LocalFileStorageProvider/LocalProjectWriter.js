@@ -87,11 +87,11 @@ const writeProjectFiles = (
     });
 
     return Promise.all(
-      partialObjects.map(partialObject => {
+      partialObjects.map((partialObject) => {
         return writeAndCheckFormattedJSONFile(
           partialObject.object,
           path.join(projectPath, partialObject.reference) + '.json'
-        ).catch(err => {
+        ).catch((err) => {
           console.error('Unable to write a partial file:', err);
           throw err;
         });
@@ -100,7 +100,7 @@ const writeProjectFiles = (
       return writeAndCheckFormattedJSONFile(
         serializedProjectObject,
         filePath
-      ).catch(err => {
+      ).catch((err) => {
         console.error('Unable to write the split project:', err);
         throw err;
       });
@@ -109,7 +109,7 @@ const writeProjectFiles = (
     return writeAndCheckFormattedJSONFile(
       serializedProjectObject,
       filePath
-    ).catch(err => {
+    ).catch((err) => {
       console.error('Unable to write the project:', err);
       throw err;
     });
@@ -190,7 +190,7 @@ export const onAutoSaveProject = (
 ): Promise<void> => {
   const autoSavePath = fileMetadata.fileIdentifier + '.autosave';
   return writeAndCheckFile(serializeToJSON(project), autoSavePath).catch(
-    err => {
+    (err) => {
       console.error(`Unable to write ${autoSavePath}:`, err);
       throw err;
     }

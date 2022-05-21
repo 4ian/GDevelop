@@ -52,9 +52,8 @@ namespace gdjs {
       const inputManager = runtimeScene.getGame().getInputManager();
 
       //Try mouse
-      const mouseDraggableManager = DraggableManager.getMouseManager(
-        runtimeScene
-      );
+      const mouseDraggableManager =
+        DraggableManager.getMouseManager(runtimeScene);
       if (
         inputManager.isMouseButtonPressed(0) &&
         !mouseDraggableManager.isDragging(this)
@@ -107,9 +106,8 @@ namespace gdjs {
     }
 
     doStepPostEvents(runtimeScene) {
-      const mouseDraggableManager = DraggableManager.getMouseManager(
-        runtimeScene
-      );
+      const mouseDraggableManager =
+        DraggableManager.getMouseManager(runtimeScene);
       mouseDraggableManager.leftPressedLastFrame = runtimeScene
         .getGame()
         .getInputManager()
@@ -174,9 +172,8 @@ namespace gdjs {
       if (!runtimeScene.touchDraggableManagers[touchId]) {
         //Create the shared manager if necessary.
         // @ts-ignore
-        runtimeScene.touchDraggableManagers[
-          touchId
-        ] = new TouchDraggableManager(runtimeScene, touchId);
+        runtimeScene.touchDraggableManagers[touchId] =
+          new TouchDraggableManager(runtimeScene, touchId);
       }
       // @ts-ignore
       return runtimeScene.touchDraggableManagers[touchId];

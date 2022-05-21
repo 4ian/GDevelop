@@ -54,42 +54,36 @@ const OnboardingDialog = () => {
       // (tip given by a tech member of Userflow - it shouldn't be removed
       // in the near future given the fact that some of their users still use it).
       'flowvisibilitychange',
-      isRunning => {
+      (isRunning) => {
         isUserflowRunning = isRunning;
       }
     );
     isUserflowInitialized = true;
   }, []);
 
-  const startUserflow = React.useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        initializeUserflow();
-        const userPreferences = loadPreferencesFromLocalStorage();
-        const appLanguage = userPreferences
-          ? userPreferences.language
-          : undefined;
-        await userflow.identify(getUserUUID(), { language: appLanguage });
-        await userflow.start('b1611206-2fae-41ac-b08c-0f8ad72d8c39');
-        setOpen(false);
-      } catch (e) {
-        // Something wrong happened, allow the user to retry.
-        console.error(
-          'An error happened while starting the onboarding flow',
-          e
-        );
-        showErrorBox({
-          message: `There was an error while starting the onboarding flow. Verify your internet connection or try again later.`,
-          rawError: e,
-          errorId: 'onboarding-start-error',
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [initializeUserflow]
-  );
+  const startUserflow = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      initializeUserflow();
+      const userPreferences = loadPreferencesFromLocalStorage();
+      const appLanguage = userPreferences
+        ? userPreferences.language
+        : undefined;
+      await userflow.identify(getUserUUID(), { language: appLanguage });
+      await userflow.start('b1611206-2fae-41ac-b08c-0f8ad72d8c39');
+      setOpen(false);
+    } catch (e) {
+      // Something wrong happened, allow the user to retry.
+      console.error('An error happened while starting the onboarding flow', e);
+      showErrorBox({
+        message: `There was an error while starting the onboarding flow. Verify your internet connection or try again later.`,
+        rawError: e,
+        errorId: 'onboarding-start-error',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [initializeUserflow]);
 
   // Open modal if this is the first time the user opens the web app.
   React.useEffect(() => {

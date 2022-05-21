@@ -169,5 +169,6 @@ namespace gdjs {
       return this._pixiObject.textHeight * this.getScale();
     }
   }
-  export const BitmapTextRuntimeObjectRenderer = BitmapTextRuntimeObjectPixiRenderer;
+  export const BitmapTextRuntimeObjectRenderer =
+    BitmapTextRuntimeObjectPixiRenderer;
 }

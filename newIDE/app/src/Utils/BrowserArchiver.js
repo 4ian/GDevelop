@@ -95,21 +95,19 @@ export const downloadUrlsToBlobs = async ({
 
         return fetch(urlWithParameters)
           .then(
-            response => {
+            (response) => {
               if (!response.ok) {
                 console.error(
                   `Error while downloading "${urlWithParameters}"`,
                   response
                 );
                 throw new Error(
-                  `Error while downloading "${urlWithParameters}" (status: ${
-                    response.status
-                  })`
+                  `Error while downloading "${urlWithParameters}" (status: ${response.status})`
                 );
               }
               return response.blob();
             },
-            error => {
+            (error) => {
               console.error(
                 `Error while downloading "${urlWithParameters}"`,
                 error
@@ -119,7 +117,7 @@ export const downloadUrlsToBlobs = async ({
               );
             }
           )
-          .then(blob => {
+          .then((blob) => {
             count++;
             onProgress(count, urlFiles.length);
             return {
@@ -159,7 +157,7 @@ export const archiveFiles = async ({
   return new Promise((resolve, reject) => {
     zipJs.createWriter(
       new zipJs.BlobWriter('application/zip'),
-      function(zipWriter) {
+      function (zipWriter) {
         eachCallback(
           blobFiles,
           ({ filePath, blob }, done) => {
@@ -208,8 +206,9 @@ export const archiveFiles = async ({
                     );
                     reject(
                       new Error(
-                        `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${sizeLimit /
-                          (1000 * 1000)} MB.`
+                        `Archive is of size ${roundFileSizeInMb} MB, which is above the limit allowed of ${
+                          sizeLimit / (1000 * 1000)
+                        } MB.`
                       )
                     );
                   }
@@ -220,7 +219,7 @@ export const archiveFiles = async ({
           }
         );
       },
-      error => {
+      (error) => {
         console.error('Error while making zip:', error);
         reject(error);
       }

@@ -29,7 +29,7 @@ export default class MouseField extends Component<ParameterFieldProps> {
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         value={value}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         onChange={(e, i, value) => this.props.onChange(value)}
       >
         <SelectOption value="Left" primaryText={t`Left (primary)`} />

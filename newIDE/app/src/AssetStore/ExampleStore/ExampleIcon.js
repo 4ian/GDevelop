@@ -27,7 +27,7 @@ export const ExampleIcon = ({ exampleShortHeader, size }: Props) => {
       <CorsAwareImage
         style={{ ...styles.icon, height: size }}
         src={
-          exampleShortHeader.previewImageUrls.find(url =>
+          exampleShortHeader.previewImageUrls.find((url) =>
             url.endsWith('thumbnail.png')
           ) || exampleShortHeader.previewImageUrls[0]
         }

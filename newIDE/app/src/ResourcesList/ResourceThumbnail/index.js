@@ -11,7 +11,7 @@ type Props = {|
   style?: Object,
   selectable?: boolean,
   selected?: boolean,
-  onSelect?: boolean => void,
+  onSelect?: (boolean) => void,
   onContextMenu?: (number, number) => void,
 |};
 

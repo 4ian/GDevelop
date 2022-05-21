@@ -282,9 +282,8 @@ describe('unsplit', () => {
     expect.assertions(1);
     return unsplit(splitObject, {
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-      getReferencePartialObject: getReferencePartialObjectInArray(
-        partialObjects
-      ),
+      getReferencePartialObject:
+        getReferencePartialObjectInArray(partialObjects),
     }).then(() => {
       expect(splitObject).toEqual(originalObject);
     });
@@ -341,9 +340,8 @@ describe('unsplit', () => {
     expect.assertions(1);
     return unsplit(splitObject, {
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-      getReferencePartialObject: getReferencePartialObjectInArray(
-        partialObjects
-      ),
+      getReferencePartialObject:
+        getReferencePartialObjectInArray(partialObjects),
       maxUnsplitDepth: 2,
     }).then(() => {
       expect(splitObject).toEqual({
@@ -405,19 +403,18 @@ describe('unsplit', () => {
     expect.assertions(1);
     return unsplit(splitObject, {
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-      getReferencePartialObject: getReferencePartialObjectInArray(
-        partialObjects
-      ),
-    }).catch(error => {
+      getReferencePartialObject:
+        getReferencePartialObjectInArray(partialObjects),
+    }).catch((error) => {
       expect(error).toEqual(new Error("Can't find /myArray/Idonotexist"));
     });
   });
 
   // Helper that "load" references from a list of partial objects returned by split.
-  const getReferencePartialObjectInArray = partialObjects => {
-    return referencePath => {
+  const getReferencePartialObjectInArray = (partialObjects) => {
+    return (referencePath) => {
       const partialObject = partialObjects.find(
-        partialObject => partialObject.reference === referencePath
+        (partialObject) => partialObject.reference === referencePath
       );
       if (partialObject === undefined) {
         return Promise.reject(new Error("Can't find " + referencePath));
@@ -440,9 +437,8 @@ describe('unsplit', () => {
     expect.assertions(1);
     return unsplit(object, {
       isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
-      getReferencePartialObject: getReferencePartialObjectInArray(
-        partialObjects
-      ),
+      getReferencePartialObject:
+        getReferencePartialObjectInArray(partialObjects),
     }).then(() => {
       const finalObjectJSON = JSON.stringify(object);
       expect(finalObjectJSON).toEqual(originalObjectJSON);

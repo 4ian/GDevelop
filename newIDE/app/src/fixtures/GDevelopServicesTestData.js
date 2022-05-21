@@ -794,8 +794,7 @@ export const showcasedGame1: ShowcasedGame = {
   ],
   links: [
     {
-      url:
-        'https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8',
+      url: 'https://itunes.apple.com/us/app/lil-bubs-hello-earth/id1123383033?mt=8',
       type: 'app-store',
     },
     {

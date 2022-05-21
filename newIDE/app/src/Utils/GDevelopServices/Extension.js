@@ -82,7 +82,7 @@ const transformTagsAsStringToTagsAsArray = <T: { tags: string }>(
   // $FlowIgnore - ignore issue with non exact types
   return {
     ...dataWithTags,
-    tags: dataWithTags.tags.split(',').map(tag => tag.trim().toLowerCase()),
+    tags: dataWithTags.tags.split(',').map((tag) => tag.trim().toLowerCase()),
   };
 };
 
@@ -100,8 +100,8 @@ export const isCompatibleWithExtension = (
 export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/extensions-registry`)
-    .then(response => response.data)
-    .then(extensionsRegistry => {
+    .then((response) => response.data)
+    .then((extensionsRegistry) => {
       return {
         ...extensionsRegistry,
         // TODO: move this to backend endpoint
@@ -115,11 +115,10 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
 export const getExtensionHeader = (
   extensionShortHeader: ExtensionShortHeader
 ): Promise<ExtensionHeader> => {
-  return axios.get(extensionShortHeader.headerUrl).then(response => {
+  return axios.get(extensionShortHeader.headerUrl).then((response) => {
     const data: ExtensionHeaderWithTagsAsString = response.data;
-    const transformedData: ExtensionHeader = transformTagsAsStringToTagsAsArray(
-      data
-    );
+    const transformedData: ExtensionHeader =
+      transformTagsAsStringToTagsAsArray(data);
     return transformedData;
   });
 };
@@ -127,11 +126,10 @@ export const getExtensionHeader = (
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | ExtensionHeader
 ): Promise<SerializedExtension> => {
-  return axios.get(extensionHeader.url).then(response => {
+  return axios.get(extensionHeader.url).then((response) => {
     const data: SerializedExtensionWithTagsAsString = response.data;
-    const transformedData: SerializedExtension = transformTagsAsStringToTagsAsArray(
-      data
-    );
+    const transformedData: SerializedExtension =
+      transformTagsAsStringToTagsAsArray(data);
     return transformedData;
   });
 };

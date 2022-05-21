@@ -32,10 +32,8 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     const classes = useStyles();
     const commandManager = React.useContext(CommandsContext);
     const [mode, setMode] = React.useState<PaletteMode>('closed');
-    const [
-      selectedCommand,
-      selectCommand,
-    ] = React.useState<null | NamedCommandWithOptions>(null);
+    const [selectedCommand, selectCommand] =
+      React.useState<null | NamedCommandWithOptions>(null);
 
     // Takes a command and if simple command, executes handler
     // If command with options, opens options of the palette
@@ -72,7 +70,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
     // Takes command name, gets command object from
     // manager and launches command accordingly
     const launchCommand = React.useCallback(
-      commandName => {
+      (commandName) => {
         const command = commandManager.getNamedCommand(commandName);
         if (!command) return;
         handleCommandChoose(command);
@@ -106,7 +104,7 @@ const CommandPalette = React.forwardRef<{||}, CommandPaletteInterface>(
                   (commandManager
                     .getAllNamedCommands()
                     .filter(
-                      command => !commandsList[command.name].ghost
+                      (command) => !commandsList[command.name].ghost
                     ): Array<NamedCommand>)
                 }
                 placeholder={t`Start typing a command...`}

@@ -85,7 +85,7 @@ export const handleAutocompletionsKeyDown = (
   }: {|
     event: SyntheticKeyboardEvent<>,
     onUpdateAutocompletions: () => void,
-    onInsertAutocompletion: ExpressionAutocompletion => void,
+    onInsertAutocompletion: (ExpressionAutocompletion) => void,
   |}
 ): AutocompletionsState => {
   if (

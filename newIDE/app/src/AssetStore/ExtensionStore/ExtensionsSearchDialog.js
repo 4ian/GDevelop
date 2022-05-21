@@ -21,7 +21,7 @@ import {
 type Props = {|
   project: gdProject,
   onClose: () => void,
-  onInstallExtension: ExtensionShortHeader => void,
+  onInstallExtension: (ExtensionShortHeader) => void,
   onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
 |};
 
@@ -35,9 +35,8 @@ export default function ExtensionsSearchDialog({
   onExtensionInstalled,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
-  const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
-    false
-  );
+  const [extensionWasInstalled, setExtensionWasInstalled] =
+    React.useState(false);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -84,7 +83,8 @@ export default function ExtensionsSearchDialog({
     }
   };
 
-  const eventsFunctionsExtensionOpener = eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
+  const eventsFunctionsExtensionOpener =
+    eventsFunctionsExtensionsState.getEventsFunctionsExtensionOpener();
 
   return (
     <I18n>
@@ -123,7 +123,7 @@ export default function ExtensionsSearchDialog({
         >
           <ExtensionStore
             isInstalling={isInstalling}
-            onInstall={async extensionShortHeader =>
+            onInstall={async (extensionShortHeader) =>
               installOrImportExtension(i18n, extensionShortHeader)
             }
             project={project}

@@ -77,7 +77,7 @@ const initializeApis = (): Promise<void> => {
       apisLoaded = true;
       apisLoadingPromise = null;
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Error while loading Google Drive APIs:', error);
       apisLoadingPromise = null;
 
@@ -106,7 +106,7 @@ export const authenticate = (): Promise<GoogleUser> => {
     }
 
     isAuthenticated = false;
-    googleAuth.isSignedIn.listen(authenticated => {
+    googleAuth.isSignedIn.listen((authenticated) => {
       console.info('Authenticated with Google APIs: ', authenticated);
       isAuthenticated = authenticated;
     });
@@ -147,7 +147,7 @@ export const patchJsonFile = (
       'Content-Type': 'application/json',
     }),
     body: content,
-  }).then(res => {
+  }).then((res) => {
     if (res.status !== 200) {
       if (res.status === 401) {
         isAuthenticated = false;
@@ -176,7 +176,7 @@ export const createNewJsonFile = (
       mimeType: 'application/json',
       fields: 'id, name, kind, size',
     })
-    .then(apiResponse => {
+    .then((apiResponse) => {
       return apiResponse.result.id;
     });
 };
@@ -213,10 +213,10 @@ const showFilePicker = ({
   selectFolderEnabled,
   showUploadView,
 }: GoogleDriveFilePickerOptions): Promise<?GoogleDriveFileOrFolder> => {
-  return authenticate().then(googleUser => {
+  return authenticate().then((googleUser) => {
     const google = global.google;
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       let picker = null;
       const pickerBuilder = new google.picker.PickerBuilder()
         .addView(
@@ -227,7 +227,7 @@ const showFilePicker = ({
         .setOAuthToken(googleUser.getAuthResponse().access_token)
         .setDeveloperKey(DEVELOPER_KEY)
         .setAppId(APP_ID) // App ID is required to correctly identify files created with the app.
-        .setCallback(data => {
+        .setCallback((data) => {
           if (
             data[google.picker.Response.ACTION] === google.picker.Action.PICKED
           ) {
@@ -312,7 +312,7 @@ export default ({
         const fileId = fileMetadata.fileIdentifier;
 
         return authenticate()
-          .then(googleUser =>
+          .then((googleUser) =>
             fetch(
               `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
               {
@@ -326,9 +326,9 @@ export default ({
             )
           )
           .then(
-            response => {
+            (response) => {
               return response.text().then(
-                fileContent => {
+                (fileContent) => {
                   return new Promise((resolve, reject) => {
                     try {
                       const dataObject = JSON.parse(fileContent);
@@ -340,7 +340,7 @@ export default ({
                     }
                   });
                 },
-                error => {
+                (error) => {
                   console.error(
                     'Error while reading the file from Google Drive API: ',
                     error
@@ -349,7 +349,7 @@ export default ({
                 }
               );
             },
-            error => {
+            (error) => {
               console.error(
                 'Error while fetching the file from Google Drive API: ',
                 error
@@ -360,10 +360,10 @@ export default ({
       },
       onOpenWithPicker: (): Promise<?FileMetadata> => {
         return authenticate()
-          .then(googleUser =>
+          .then((googleUser) =>
             showFilePicker({ selectFolderEnabled: false, showUploadView: true })
           )
-          .then(googleDriveFileOrFolder => {
+          .then((googleDriveFileOrFolder) => {
             if (!googleDriveFileOrFolder) {
               return null;
             }
@@ -378,14 +378,14 @@ export default ({
 
         const content = serializeToJSON(project);
         return authenticate()
-          .then(googleUser => patchJsonFile(fileId, googleUser, content))
+          .then((googleUser) => patchJsonFile(fileId, googleUser, content))
           .then(() => ({
             wasSaved: true,
             fileMetadata,
           }));
       },
       onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           setDialog(() => (
             <GoogleDriveSaveAsDialog
               onShowFilePicker={showFilePicker}
@@ -397,11 +397,11 @@ export default ({
                 const content = serializeToJSON(project);
 
                 if (selectedFileOrFolder.type === 'FOLDER') {
-                  return authenticate().then(googleUser =>
+                  return authenticate().then((googleUser) =>
                     createNewJsonFile(
                       selectedFileOrFolder.id,
                       newFileName
-                    ).then(newFileId =>
+                    ).then((newFileId) =>
                       patchJsonFile(newFileId, googleUser, content).then(() => {
                         closeDialog();
                         resolve({
@@ -415,7 +415,7 @@ export default ({
                   );
                 } else {
                   return authenticate()
-                    .then(googleUser =>
+                    .then((googleUser) =>
                       patchJsonFile(
                         selectedFileOrFolder.id,
                         googleUser,

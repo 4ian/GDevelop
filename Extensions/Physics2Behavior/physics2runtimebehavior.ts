@@ -47,10 +47,12 @@ namespace gdjs {
         }
 
         // Get associated behaviors
-        const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior;
-        const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior;
+        const behaviorA = contact
+          .GetFixtureA()
+          .GetBody().gdjsAssociatedBehavior;
+        const behaviorB = contact
+          .GetFixtureB()
+          .GetBody().gdjsAssociatedBehavior;
 
         // Let each behavior know about the contact against the other
         behaviorA.currentContacts.push(behaviorB);
@@ -69,10 +71,12 @@ namespace gdjs {
         }
 
         // Get associated behaviors
-        const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior;
-        const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior;
+        const behaviorA = contact
+          .GetFixtureA()
+          .GetBody().gdjsAssociatedBehavior;
+        const behaviorB = contact
+          .GetFixtureB()
+          .GetBody().gdjsAssociatedBehavior;
 
         // Remove each other contact
         let i = behaviorA.currentContacts.indexOf(behaviorB);
@@ -93,9 +97,8 @@ namespace gdjs {
     static getSharedData(runtimeScene, behaviorName) {
       // Create one if needed
       if (!runtimeScene.physics2SharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics2SharedData = new gdjs.Physics2SharedData(
           runtimeScene,
           initialData

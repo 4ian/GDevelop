@@ -37,22 +37,22 @@ const PointsListBody = (props: PointsListBodyProps) => {
     props.onPointsUpdated();
   };
 
-  const updateOriginPointX = newValue => {
+  const updateOriginPointX = (newValue) => {
     pointsContainer.getOrigin().setX(newValue);
     onPointsUpdated();
   };
 
-  const updateOriginPointY = newValue => {
+  const updateOriginPointY = (newValue) => {
     pointsContainer.getOrigin().setY(newValue);
     onPointsUpdated();
   };
 
-  const updateCenterPointX = newValue => {
+  const updateCenterPointX = (newValue) => {
     pointsContainer.getCenter().setX(newValue);
     onPointsUpdated();
   };
 
-  const updateCenterPointY = newValue => {
+  const updateCenterPointY = (newValue) => {
     pointsContainer.getCenter().setY(newValue);
     onPointsUpdated();
   };
@@ -76,12 +76,12 @@ const PointsListBody = (props: PointsListBodyProps) => {
         key={'point-' + point.ptr}
         pointX={point.getX()}
         pointY={point.getY()}
-        onChangePointX={newValue => updatePointX(point, newValue)}
-        onChangePointY={newValue => updatePointY(point, newValue)}
+        onChangePointX={(newValue) => updatePointX(point, newValue)}
+        onChangePointY={(newValue) => updatePointY(point, newValue)}
         pointName={pointName}
         selected={pointName === props.selectedPointName}
         nameError={nameErrors[pointName]}
-        onBlur={event => {
+        onBlur={(event) => {
           const newName = event.target.value;
           if (pointName === newName) return;
 
@@ -96,7 +96,7 @@ const PointsListBody = (props: PointsListBodyProps) => {
             onPointsUpdated();
           }
 
-          setNameErrors(old => ({ ...old, [pointName]: !success }));
+          setNameErrors((old) => ({ ...old, [pointName]: !success }));
         }}
         onPointerEnter={props.onHoverPoint}
         onPointerLeave={props.onHoverPoint}
@@ -207,7 +207,7 @@ const PointsList = (props: PointsListProps) => {
           icon={<AddIcon />}
           label={<Trans>Add a point</Trans>}
           onClick={() => {
-            const name = newNameGenerator('Point', name =>
+            const name = newNameGenerator('Point', (name) =>
               props.pointsContainer.hasPoint(name)
             );
             const point = new gd.Point(name);

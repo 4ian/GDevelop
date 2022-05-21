@@ -9,7 +9,8 @@ namespace gdjs {
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       // @ts-ignore - unsure why PIXI.filters is not recognised.
-      const colorMatrixFilter = (filter as unknown) as PIXI.filters.ColorMatrixFilter;
+      const colorMatrixFilter =
+        filter as unknown as PIXI.filters.ColorMatrixFilter;
       if (parameterName !== 'opacity') {
         return;
       }

@@ -49,48 +49,45 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   };
 };
 
-export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction = async ({
-  i18n,
-  exampleShortHeader,
-  settings,
-}) => {
-  const { projectName, outputPath } = settings;
-  if (!fs || !outputPath) return;
-  try {
-    const example = await getExample(exampleShortHeader);
+export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction =
+  async ({ i18n, exampleShortHeader, settings }) => {
+    const { projectName, outputPath } = settings;
+    if (!fs || !outputPath) return;
+    try {
+      const example = await getExample(exampleShortHeader);
 
-    // Prepare the folder for the example.
-    fs.mkdirsSync(outputPath);
+      // Prepare the folder for the example.
+      fs.mkdirsSync(outputPath);
 
-    // Download the project file and save it.
-    const response = await axios.get(example.projectFileUrl, {
-      responseType: 'text',
-      // Required to properly get the response as text, and not as JSON:
-      transformResponse: [data => data],
-    });
-    const projectFileContent = response.data;
-    const localFilePath = path.join(outputPath, 'game.json');
+      // Download the project file and save it.
+      const response = await axios.get(example.projectFileUrl, {
+        responseType: 'text',
+        // Required to properly get the response as text, and not as JSON:
+        transformResponse: [(data) => data],
+      });
+      const projectFileContent = response.data;
+      const localFilePath = path.join(outputPath, 'game.json');
 
-    await writeAndCheckFile(projectFileContent, localFilePath);
+      await writeAndCheckFile(projectFileContent, localFilePath);
 
-    sendNewGameCreated({
-      exampleUrl: example.projectFileUrl,
-      exampleSlug: exampleShortHeader.slug,
-    });
-    return {
-      storageProvider: LocalFileStorageProvider,
-      fileMetadata: { fileIdentifier: localFilePath },
-      projectName,
-    };
-  } catch (error) {
-    showErrorBox({
-      message:
-        i18n._(t`Unable to load the example or save it on disk.`) +
-        ' ' +
-        i18n._(t`Verify your internet connection or try again later.`),
-      rawError: error,
-      errorId: 'local-example-load-error',
-    });
-    return;
-  }
-};
+      sendNewGameCreated({
+        exampleUrl: example.projectFileUrl,
+        exampleSlug: exampleShortHeader.slug,
+      });
+      return {
+        storageProvider: LocalFileStorageProvider,
+        fileMetadata: { fileIdentifier: localFilePath },
+        projectName,
+      };
+    } catch (error) {
+      showErrorBox({
+        message:
+          i18n._(t`Unable to load the example or save it on disk.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
+        rawError: error,
+        errorId: 'local-example-load-error',
+      });
+      return;
+    }
+  };

@@ -27,7 +27,7 @@ export const loadFontFace = (fontFamily, src, descriptors = {}) => {
     );
 
     document.head.appendChild(newStyle);
-    return new FontFaceObserver(fontFamily, descriptors).load().catch(err => {
+    return new FontFaceObserver(fontFamily, descriptors).load().catch((err) => {
       console.warn(`Error while loading font ${fontFamily}`, err);
 
       throw err;

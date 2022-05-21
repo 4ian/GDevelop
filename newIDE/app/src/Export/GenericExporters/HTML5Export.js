@@ -15,7 +15,7 @@ import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
-const getIconStyle = windowWidth => ({
+const getIconStyle = (windowWidth) => ({
   height: windowWidth === 'small' ? 30 : 48,
   width: windowWidth === 'small' ? 30 : 48,
   margin: 10,

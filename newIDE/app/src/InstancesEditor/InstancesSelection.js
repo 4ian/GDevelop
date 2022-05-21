@@ -52,7 +52,7 @@ export default class InstancesSelection {
   ) {
     if (!multiselect) this.clearSelection();
 
-    instances.forEach(instance =>
+    instances.forEach((instance) =>
       this.selectInstance(instance, true, layersVisibility)
     );
   }

@@ -414,9 +414,8 @@ namespace gdjs {
       return;
     }
     if (this.dialogueData.select) {
-      this.selectedOption = gdjs.dialogueTree._normalizedOptionIndex(
-        optionIndex
-      );
+      this.selectedOption =
+        gdjs.dialogueTree._normalizedOptionIndex(optionIndex);
       this.selectedOptionUpdated = true;
     }
   };

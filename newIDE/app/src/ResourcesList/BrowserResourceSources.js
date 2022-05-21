@@ -30,7 +30,7 @@ const ResourceStoreChooser = ({
 }: ResourceStoreChooserProps) => {
   return (
     <ResourceStore
-      onChoose={resource => {
+      onChoose={(resource) => {
         const chosenResourceUrl = resource.url;
         const newResource = createNewResource();
         newResource.setFile(chosenResourceUrl);
@@ -65,17 +65,17 @@ export const UrlChooser = ({
 
     try {
       const responses = await Promise.all(
-        urls.map(async url => {
+        urls.map(async (url) => {
           return await axios.get(url, {
             timeout: 1000,
-            validateStatus: status => true,
+            validateStatus: (status) => true,
           });
         })
       );
 
       setUrlsErroredBooleanArray(
         responses.map(
-          response => !(response.status >= 200 && response.status < 400)
+          (response) => !(response.status >= 200 && response.status < 400)
         )
       );
     } catch (error) {
@@ -83,18 +83,15 @@ export const UrlChooser = ({
     }
   }, 500);
 
-  React.useEffect(
-    () => {
-      validateInputValue(inputValue);
-    },
-    [inputValue, validateInputValue]
-  );
+  React.useEffect(() => {
+    validateInputValue(inputValue);
+  }, [inputValue, validateInputValue]);
 
   return (
     <ColumnStackLayout noMargin expand>
       <Line noMargin>
         <TextFieldWithButtonLayout
-          renderButton={style => (
+          renderButton={(style) => (
             <RaisedButton
               onClick={() => {
                 const urls = options.multiSelection
@@ -102,7 +99,7 @@ export const UrlChooser = ({
                   : [inputValue];
 
                 onChooseResources(
-                  urls.map(url => {
+                  urls.map((url) => {
                     const newResource = createNewResource();
                     newResource.setFile(url);
                     newResource.setName(path.basename(url));

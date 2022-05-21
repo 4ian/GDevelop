@@ -29,7 +29,7 @@ type Props = {
   open: boolean,
   sort: LeaderboardSortOption,
   extremeAllowedScore?: number,
-  onSave: SortOptions => Promise<void>,
+  onSave: (SortOptions) => Promise<void>,
   onClose: () => void,
 };
 
@@ -45,18 +45,12 @@ function LeaderboardSortOptionsDialog({
 }: Props) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  const [
-    extremeAllowedScoreError,
-    setExtremeAllowedScoreError,
-  ] = React.useState<?string>(null);
-  const [
-    displayExtremeAllowedScoreInput,
-    setDisplayExtremeAllowedScoreInput,
-  ] = React.useState<boolean>(extremeAllowedScore !== undefined);
-  const [
-    extremeAllowedScoreValue,
-    setExtremeAllowedScoreValue,
-  ] = React.useState<number>(extremeAllowedScore || 0);
+  const [extremeAllowedScoreError, setExtremeAllowedScoreError] =
+    React.useState<?string>(null);
+  const [displayExtremeAllowedScoreInput, setDisplayExtremeAllowedScoreInput] =
+    React.useState<boolean>(extremeAllowedScore !== undefined);
+  const [extremeAllowedScoreValue, setExtremeAllowedScoreValue] =
+    React.useState<number>(extremeAllowedScore || 0);
 
   const [sortOrder, setSortOrder] = React.useState<LeaderboardSortOption>(
     sort || 'ASC'

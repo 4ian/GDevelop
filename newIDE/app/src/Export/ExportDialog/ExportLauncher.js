@@ -158,8 +158,8 @@ export default class ExportLauncher extends Component<Props, State> {
 
   registerGameIfNot = async () => {
     const profile = this.props.authenticatedUser.profile;
-    const getAuthorizationHeader = this.props.authenticatedUser
-      .getAuthorizationHeader;
+    const getAuthorizationHeader =
+      this.props.authenticatedUser.getAuthorizationHeader;
     const gameId = this.props.project.getProjectUuid();
     if (profile) {
       const userId = profile.id;
@@ -186,7 +186,7 @@ export default class ExportLauncher extends Component<Props, State> {
   };
 
   _launchWholeExport = async () => {
-    const t = str => str; //TODO;
+    const t = (str) => str; //TODO;
     const { project, exportPipeline, authenticatedUser } = this.props;
     sendExportLaunched(exportPipeline.name);
 
@@ -271,10 +271,11 @@ export default class ExportLauncher extends Component<Props, State> {
         preparedExporter
       );
       setStep('resources-download');
-      const resourcesDownloadOutput = await exportPipeline.launchResourcesDownload(
-        exportPipelineContext,
-        exportOutput
-      );
+      const resourcesDownloadOutput =
+        await exportPipeline.launchResourcesDownload(
+          exportPipelineContext,
+          exportOutput
+        );
       setStep('compress');
       const compressionOutput = await exportPipeline.launchCompression(
         exportPipelineContext,
@@ -315,8 +316,8 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen: false,
     });
 
-  _updateExportState = (updater: any => any) => {
-    this.setState(prevState => ({
+  _updateExportState = (updater: (any) => any) => {
+    this.setState((prevState) => ({
       ...prevState,
       exportState: updater(prevState.exportState),
     }));
@@ -333,12 +334,8 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen,
       exportState,
     } = this.state;
-    const {
-      project,
-      authenticatedUser,
-      exportPipeline,
-      onSaveProject,
-    } = this.props;
+    const { project, authenticatedUser, exportPipeline, onSaveProject } =
+      this.props;
     if (!project) return null;
     const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
       authenticatedUser.limits && exportPipeline.onlineBuildType

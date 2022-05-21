@@ -14,7 +14,7 @@ export default class StringField extends Component<ParameterFieldProps, void> {
     return (
       <GenericExpressionField
         expressionType="string"
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

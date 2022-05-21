@@ -20,13 +20,14 @@ const exportExtension = (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
-  const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+  const eventsFunctionsExtensionWriter =
+    eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
   if (!eventsFunctionsExtensionWriter)
     return Promise.reject(new Error('Not supported'));
 
   return eventsFunctionsExtensionWriter
     .chooseEventsFunctionExtensionFile(eventsFunctionsExtension.getName())
-    .then(pathOrUrl => {
+    .then((pathOrUrl) => {
       if (!pathOrUrl) return;
 
       eventsFunctionsExtensionWriter
@@ -84,7 +85,8 @@ export default function OptionsEditorDialog({
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
-  const eventsFunctionsExtensionWriter = eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
+  const eventsFunctionsExtensionWriter =
+    eventsFunctionsExtensionsState.getEventsFunctionsExtensionWriter();
 
   return (
     <Dialog

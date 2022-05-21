@@ -34,7 +34,7 @@ type Props = {
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
-  onOpenDetails: AssetShortHeader => void,
+  onOpenDetails: (AssetShortHeader) => void,
   focusOnMount?: boolean,
 };
 
@@ -56,30 +56,24 @@ export const AssetStore = ({
     setSearchText,
   } = React.useContext(AssetStoreContext);
 
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
+  React.useEffect(() => {
+    fetchAssetsAndFilters();
+  }, [fetchAssetsAndFilters]);
 
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isOnHomePage, setIsOnHomePage] = React.useState(true);
   const [isFiltersOpen, setIsFiltersOpen] = React.useState(false);
 
-  React.useEffect(
-    () => {
-      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
-        searchBar.current.focus();
-      }
-    },
-    [shouldAutofocusSearchbar, focusOnMount]
-  );
+  React.useEffect(() => {
+    if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
+      searchBar.current.focus();
+    }
+  }, [shouldAutofocusSearchbar, focusOnMount]);
 
   return (
     <ResponsiveWindowMeasurer>
-      {windowWidth => (
+      {(windowWidth) => (
         <Column expand noMargin useFullHeight>
           <SearchBar
             placeholder={t`Enter your Search`}
@@ -166,7 +160,7 @@ export const AssetStore = ({
             {isOnHomePage && assetPacks ? (
               <AssetsHome
                 assetPacks={assetPacks}
-                onPackSelection={tag => {
+                onPackSelection={(tag) => {
                   const chosenCategory = {
                     node: { name: tag, allChildrenTags: [], children: [] },
                     parentNodes: [],

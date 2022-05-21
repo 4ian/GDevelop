@@ -169,12 +169,13 @@ describe('EnumerateInstructions', () => {
     );
 
     // Test an object not supporting effects don't have this condition.
-    const withUnsupportedCapabilityInstructions = enumerateObjectAndBehaviorsInstructions(
-      true,
-      project,
-      layout,
-      'MyFakeObjectWithUnsupportedCapability'
-    );
+    const withUnsupportedCapabilityInstructions =
+      enumerateObjectAndBehaviorsInstructions(
+        true,
+        project,
+        layout,
+        'MyFakeObjectWithUnsupportedCapability'
+      );
     expect(withUnsupportedCapabilityInstructions).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({

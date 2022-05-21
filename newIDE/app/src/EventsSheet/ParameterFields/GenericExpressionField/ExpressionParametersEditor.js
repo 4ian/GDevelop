@@ -33,10 +33,10 @@ type State = {||};
 export const hasNonCodeOnlyParameters = (
   expressionMetadata: gdExpressionMetadata
 ) =>
-  mapFor(0, expressionMetadata.getParametersCount(), i => {
+  mapFor(0, expressionMetadata.getParametersCount(), (i) => {
     const parameterMetadata = expressionMetadata.getParameter(i);
     return !parameterMetadata.isCodeOnly();
-  }).filter(isVisible => isVisible).length !== 0;
+  }).filter((isVisible) => isVisible).length !== 0;
 
 export default class ExpressionParametersEditor extends React.Component<
   Props,
@@ -65,18 +65,19 @@ export default class ExpressionParametersEditor extends React.Component<
     const parametersCount = expressionMetadata.getParametersCount();
     const expression = {
       getParametersCount: () => parametersCount,
-      getParameter: index => {
+      getParameter: (index) => {
         return parameterValues[index] || '';
       },
     };
 
     return (
       <div style={styles.container}>
-        {mapFor(0, expressionMetadata.getParametersCount(), i => {
+        {mapFor(0, expressionMetadata.getParametersCount(), (i) => {
           const parameterMetadata = expressionMetadata.getParameter(i);
-          const ParameterComponent = parameterRenderingService.getParameterComponent(
-            parameterMetadata.getType()
-          );
+          const ParameterComponent =
+            parameterRenderingService.getParameterComponent(
+              parameterMetadata.getType()
+            );
 
           if (parameterMetadata.isCodeOnly()) return null;
           return (
@@ -86,7 +87,7 @@ export default class ExpressionParametersEditor extends React.Component<
               parameterMetadata={parameterMetadata}
               parameterIndex={i}
               value={parameterValues[i]}
-              onChange={value => this.props.onChangeParameter(i, value)}
+              onChange={(value) => this.props.onChangeParameter(i, value)}
               project={project}
               scope={scope}
               globalObjectsContainer={globalObjectsContainer}

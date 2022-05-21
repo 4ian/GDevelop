@@ -41,7 +41,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
     const { layersContainer, onEditEffects, onEdit, width } = this.props;
 
     const layersCount = layersContainer.getLayersCount();
-    const containerLayersList = mapReverseFor(0, layersCount, i => {
+    const containerLayersList = mapReverseFor(0, layersCount, (i) => {
       const layer = layersContainer.getLayerAt(i);
       const layerName = layer.getName();
       const isLightingLayer = layer.isLightingLayer();
@@ -57,7 +57,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
           effectsCount={layer.getEffects().getEffectsCount()}
           onEditEffects={() => onEditEffects(layer)}
           onEdit={() => onEdit(layer)}
-          onBlur={event => {
+          onBlur={(event) => {
             const newName = event.target.value;
             if (layerName === newName) return;
 
@@ -65,7 +65,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
             if (layersContainer.hasLayerNamed(newName)) {
               success = false;
             } else {
-              this.props.onRenameLayer(layerName, newName, doRename => {
+              this.props.onRenameLayer(layerName, newName, (doRename) => {
                 if (doRename)
                   layersContainer.getLayer(layerName).setName(newName);
               });
@@ -79,7 +79,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
             });
           }}
           onRemove={() => {
-            this.props.onRemoveLayer(layerName, doRemove => {
+            this.props.onRemoveLayer(layerName, (doRemove) => {
               if (!doRemove) return;
 
               layersContainer.removeLayer(layerName);
@@ -87,7 +87,7 @@ class LayersListBody extends Component<*, LayersListBodyState> {
             });
           }}
           isVisible={layer.getVisibility()}
-          onChangeVisibility={visible => {
+          onChangeVisibility={(visible) => {
             layer.setVisibility(visible);
             this._onLayerModified();
           }}
@@ -137,7 +137,7 @@ type State = {|
 const hasLightingLayer = (layout: gdLayout) => {
   const layersCount = layout.getLayersCount();
   return (
-    mapReverseFor(0, layersCount, i =>
+    mapReverseFor(0, layersCount, (i) =>
       layout.getLayerAt(i).isLightingLayer()
     ).filter(Boolean).length > 0
   );
@@ -146,7 +146,7 @@ const hasLightingLayer = (layout: gdLayout) => {
 export default class LayersList extends Component<Props, State> {
   _addLayer = () => {
     const { layersContainer } = this.props;
-    const name = newNameGenerator('Layer', name =>
+    const name = newNameGenerator('Layer', (name) =>
       layersContainer.hasLayerNamed(name)
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
@@ -155,7 +155,7 @@ export default class LayersList extends Component<Props, State> {
 
   _addLightingLayer = () => {
     const { layersContainer } = this.props;
-    const name = newNameGenerator('Lighting', name =>
+    const name = newNameGenerator('Lighting', (name) =>
       layersContainer.hasLayerNamed(name)
     );
     layersContainer.insertNewLayer(name, layersContainer.getLayersCount());
@@ -194,7 +194,8 @@ export default class LayersList extends Component<Props, State> {
                 onRemoveLayer={this.props.onRemoveLayer}
                 onRenameLayer={this.props.onRenameLayer}
                 onSortEnd={({ oldIndex, newIndex }) => {
-                  const layersCount = this.props.layersContainer.getLayersCount();
+                  const layersCount =
+                    this.props.layersContainer.getLayersCount();
                   this.props.layersContainer.moveLayer(
                     layersCount - 1 - oldIndex,
                     layersCount - 1 - newIndex
@@ -215,7 +216,7 @@ export default class LayersList extends Component<Props, State> {
                 primary
                 onClick={this._addLayer}
                 icon={<Add />}
-                buildMenuTemplate={i18n => [
+                buildMenuTemplate={(i18n) => [
                   {
                     label: i18n._(t`Add lighting layer`),
                     enabled: !isLightingLayerPresent,

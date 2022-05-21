@@ -27,7 +27,7 @@ const initializeApis = (): Promise<void> => {
       apisLoaded = true;
       apisLoadingPromise = null;
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Error while loading Dropbox APIs:', error);
       apisLoadingPromise = null;
 

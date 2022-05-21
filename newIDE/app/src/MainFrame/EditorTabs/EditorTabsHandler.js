@@ -25,7 +25,7 @@ type EditorRef =
 
 export type EditorTab = {|
   // The function to render the tab editor.
-  renderEditorContainer: RenderEditorContainerPropsWithRef => React.Node,
+  renderEditorContainer: (RenderEditorContainerPropsWithRef) => React.Node,
   // A reference to the editor.
   editorRef: ?EditorRef,
   // The label shown on the tab.
@@ -79,7 +79,7 @@ export const openEditorTab = (
 ): EditorTabsState => {
   const existingEditorId = findIndex(
     state.editors,
-    editor => editor.key === key
+    (editor) => editor.key === key
   );
   if (existingEditorId !== -1) {
     return {
@@ -134,14 +134,14 @@ export const closeTabsExceptIf = (
 };
 
 export const closeAllEditorTabs = (state: EditorTabsState): EditorTabsState => {
-  return closeTabsExceptIf(state, editorTab => !editorTab.closable);
+  return closeTabsExceptIf(state, (editorTab) => !editorTab.closable);
 };
 
 export const closeEditorTab = (
   state: EditorTabsState,
   chosenEditorTab: EditorTab
 ): EditorTabsState => {
-  return closeTabsExceptIf(state, editorTab => editorTab !== chosenEditorTab);
+  return closeTabsExceptIf(state, (editorTab) => editorTab !== chosenEditorTab);
 };
 
 export const closeOtherEditorTabs = (
@@ -150,7 +150,7 @@ export const closeOtherEditorTabs = (
 ): EditorTabsState => {
   return closeTabsExceptIf(
     state,
-    editorTab => !editorTab.closable || editorTab === chosenEditorTab
+    (editorTab) => !editorTab.closable || editorTab === chosenEditorTab
   );
 };
 
@@ -170,7 +170,7 @@ export const closeProjectTabs = (
   state: EditorTabsState,
   project: ?gdProject
 ) => {
-  return closeTabsExceptIf(state, editorTab => {
+  return closeTabsExceptIf(state, (editorTab) => {
     const editorProject =
       editorTab.editorRef && editorTab.editorRef.getProject();
     return !editorProject || editorProject !== project;
@@ -182,7 +182,7 @@ export const closeProjectTabs = (
  * to the project.
  */
 export const saveUiSettings = (state: EditorTabsState) => {
-  state.editors.forEach(editorTab => {
+  state.editors.forEach((editorTab) => {
     if (
       editorTab.editorRef &&
       (editorTab.editorRef instanceof SceneEditorContainer ||
@@ -198,7 +198,7 @@ export const saveUiSettings = (state: EditorTabsState) => {
  * to editors with changes to commit them (like modified extensions).
  */
 export const notifyPreviewWillStart = (state: EditorTabsState) => {
-  state.editors.forEach(editorTab => {
+  state.editors.forEach((editorTab) => {
     const editor = editorTab.editorRef;
 
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
@@ -208,7 +208,7 @@ export const notifyPreviewWillStart = (state: EditorTabsState) => {
 };
 
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
-  return closeTabsExceptIf(state, editorTab => {
+  return closeTabsExceptIf(state, (editorTab) => {
     const editor = editorTab.editorRef;
 
     if (
@@ -229,7 +229,7 @@ export const closeExternalLayoutTabs = (
   state: EditorTabsState,
   externalLayout: gdExternalLayout
 ) => {
-  return closeTabsExceptIf(state, editorTab => {
+  return closeTabsExceptIf(state, (editorTab) => {
     const editor = editorTab.editorRef;
 
     if (editor instanceof ExternalLayoutEditorContainer) {
@@ -247,7 +247,7 @@ export const closeExternalEventsTabs = (
   state: EditorTabsState,
   externalEvents: gdExternalEvents
 ) => {
-  return closeTabsExceptIf(state, editorTab => {
+  return closeTabsExceptIf(state, (editorTab) => {
     const editor = editorTab.editorRef;
     if (editor instanceof ExternalEventsEditorContainer) {
       return (
@@ -264,7 +264,7 @@ export const closeEventsFunctionsExtensionTabs = (
   state: EditorTabsState,
   eventsFunctionsExtension: gdEventsFunctionsExtension
 ) => {
-  return closeTabsExceptIf(state, editorTab => {
+  return closeTabsExceptIf(state, (editorTab) => {
     const editor = editorTab.editorRef;
     if (editor instanceof EventsFunctionsExtensionEditorContainer) {
       return (

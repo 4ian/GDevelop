@@ -125,7 +125,7 @@ const extractErrors = (
   expressionNode.visit(expressionValidator);
   const errors = expressionValidator.getErrors();
 
-  const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
+  const errorHighlights: Array<Highlight> = mapVector(errors, (error) => ({
     begin: error.getStartPosition(),
     end: error.getEndPosition() + 1,
     message: error.getMessage(),
@@ -314,23 +314,22 @@ export default class ExpressionField extends React.Component<Props, State> {
       : 0;
     const expression = this.state.validatedValue;
 
-    const {
-      expression: newExpression,
-      caretLocation: newCaretLocation,
-    } = insertAutocompletionInExpression(
-      { expression, caretLocation },
-      {
-        completion: expressionAutocompletion.completion,
-        replacementStartPosition:
-          expressionAutocompletion.replacementStartPosition,
-        replacementEndPosition: expressionAutocompletion.replacementEndPosition,
-        addParenthesis: expressionAutocompletion.addParenthesis,
-        addDot: expressionAutocompletion.addDot,
-        addParameterSeparator: expressionAutocompletion.addParameterSeparator,
-        addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
-        hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
-      }
-    );
+    const { expression: newExpression, caretLocation: newCaretLocation } =
+      insertAutocompletionInExpression(
+        { expression, caretLocation },
+        {
+          completion: expressionAutocompletion.completion,
+          replacementStartPosition:
+            expressionAutocompletion.replacementStartPosition,
+          replacementEndPosition:
+            expressionAutocompletion.replacementEndPosition,
+          addParenthesis: expressionAutocompletion.addParenthesis,
+          addDot: expressionAutocompletion.addDot,
+          addParameterSeparator: expressionAutocompletion.addParameterSeparator,
+          addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
+          hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
+        }
+      );
 
     if (this._field) {
       this._field.forceSetValue(newExpression);
@@ -394,7 +393,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       expression.length > 0 &&
       expression.charAt(expression.length - 1) === ' '
     ) {
-      this.setState(state => ({
+      this.setState((state) => ({
         errorText: formattedErrorText,
         errorHighlights,
         autocompletions: getAutocompletionsInitialState(),
@@ -405,10 +404,11 @@ export default class ExpressionField extends React.Component<Props, State> {
     const cursorPosition = this._inputElement
       ? this._inputElement.selectionStart
       : 0;
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      cursorPosition - 1
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        cursorPosition - 1
+      );
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -425,7 +425,7 @@ export default class ExpressionField extends React.Component<Props, State> {
 
     parser.delete();
 
-    this.setState(state => ({
+    this.setState((state) => ({
       errorText: formattedErrorText,
       errorHighlights,
       autocompletions: setNewAutocompletions(
@@ -498,11 +498,11 @@ export default class ExpressionField extends React.Component<Props, State> {
                   inputStyle={styles.input}
                   onChange={this._handleChange}
                   onBlur={this._handleBlur}
-                  ref={field => (this._field = field)}
+                  ref={(field) => (this._field = field)}
                   onFocus={this._handleFocus}
                   errorText={this.state.errorText}
                   onClick={() => this._enqueueValidation()}
-                  onKeyDown={event => {
+                  onKeyDown={(event) => {
                     const autocompletions = handleAutocompletionsKeyDown(
                       this.state.autocompletions,
                       {
@@ -540,7 +540,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                     }
                   >
                     <ResponsiveWindowMeasurer>
-                      {screenSize => (
+                      {(screenSize) => (
                         <Paper
                           style={
                             screenSize === 'small'
@@ -579,7 +579,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                       this.state.autocompletions.selectedCompletionIndex
                     }
                     onScroll={this._onExpressionAutocompletionsScroll}
-                    onChoose={expressionAutocompletion => {
+                    onChoose={(expressionAutocompletion) => {
                       this._insertAutocompletion(expressionAutocompletion);
 
                       setTimeout(
@@ -592,7 +592,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                 )}
             </div>
           )}
-          renderButton={style => (
+          renderButton={(style) => (
             <React.Fragment>
               {!this.props.isInline &&
                 this.props.renderExtraButton &&
@@ -625,7 +625,7 @@ export default class ExpressionField extends React.Component<Props, State> {
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             expressionMetadata={this.state.selectedExpressionInfo.metadata}
-            onDone={parameterValues => {
+            onDone={(parameterValues) => {
               if (!this.state.selectedExpressionInfo) return;
 
               this.insertExpression(

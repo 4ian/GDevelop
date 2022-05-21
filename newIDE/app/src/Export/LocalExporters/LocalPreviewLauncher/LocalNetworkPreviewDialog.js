@@ -20,14 +20,8 @@ type Props = {|
 
 export default class LocalNetworkDialog extends React.Component<Props, {}> {
   render() {
-    const {
-      url,
-      open,
-      error,
-      onExport,
-      onClose,
-      onRunPreviewLocally,
-    } = this.props;
+    const { url, open, error, onExport, onClose, onRunPreviewLocally } =
+      this.props;
     if (!open) return null;
 
     return (

@@ -21,7 +21,7 @@ type Props = {|
   open: boolean,
   onRequestClose: () => void,
   onApply: () => void,
-  onChange: string => void,
+  onChange: (string) => void,
 
   instruction: ?gdInstruction,
   isCondition: boolean,
@@ -159,7 +159,7 @@ export default class InlineParameterEditor extends React.Component<
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
           key={instruction.ptr}
-          ref={field => (this._field = field)}
+          ref={(field) => (this._field = field)}
           parameterRenderingService={ParameterRenderingService}
           isInline
           resourceSources={this.props.resourceSources}

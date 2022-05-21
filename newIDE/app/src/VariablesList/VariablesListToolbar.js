@@ -29,7 +29,7 @@ type Props = {|
   canRedo?: boolean,
   onAdd: () => void,
   searchText: string,
-  onChangeSearchText: string => void,
+  onChangeSearchText: (string) => void,
 |};
 
 const VariablesListToolbar = (props: Props) => {
@@ -81,7 +81,7 @@ const VariablesListToolbar = (props: Props) => {
     },
   ];
 
-  const buttonsToDisplay = buttons.filter(button => button.display);
+  const buttonsToDisplay = buttons.filter((button) => button.display);
   return (
     <Line justifyContent="space-between" alignItems="center">
       <Column noMargin>

@@ -129,15 +129,12 @@ export default function NewBehaviorDialog({
   );
 
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  React.useEffect(
-    () => {
-      setTimeout(() => {
-        if (shouldAutofocusSearchbar && searchBar.current)
-          searchBar.current.focus();
-      }, 20 /* Be sure that the search bar is shown */);
-    },
-    [shouldAutofocusSearchbar]
-  );
+  React.useEffect(() => {
+    setTimeout(() => {
+      if (shouldAutofocusSearchbar && searchBar.current)
+        searchBar.current.focus();
+    }, 20 /* Be sure that the search bar is shown */);
+  }, [shouldAutofocusSearchbar]);
 
   if (!open || !project) return null;
 
@@ -341,7 +338,7 @@ export default function NewBehaviorDialog({
               <ExtensionStore
                 project={project}
                 isInstalling={isInstalling}
-                onInstall={async extensionShortHeader =>
+                onInstall={async (extensionShortHeader) =>
                   onInstallExtension(i18n, extensionShortHeader)
                 }
                 showOnlyWithBehaviors

@@ -114,7 +114,7 @@ export const browserElectronExportPipeline: ExportPipeline<
     return downloadUrlsToBlobs({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -137,7 +137,7 @@ export const browserElectronExportPipeline: ExportPipeline<
       <DoneFooter
         renderGameButton={() => (
           <BlobDownloadUrlHolder blob={compressionOutput}>
-            {blobDownloadUrl => (
+            {(blobDownloadUrl) => (
               <RaisedButton
                 fullWidth
                 primary

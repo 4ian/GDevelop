@@ -70,12 +70,12 @@ export default class EventsBasedBehaviorsList extends React.Component<
   static defaultProps = {
     onDeleteEventsBasedBehavior: (
       eventsBasedBehavior: gdEventsBasedBehavior,
-      cb: boolean => void
+      cb: (boolean) => void
     ) => cb(true),
     onRenameEventsBasedBehavior: (
       eventsBasedBehavior: gdEventsBasedBehavior,
       newName: string,
-      cb: boolean => void
+      cb: (boolean) => void
     ) => cb(true),
   };
 
@@ -98,7 +98,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsBasedBehavior(eventsBasedBehavior, doRemove => {
+    this.props.onDeleteEventsBasedBehavior(eventsBasedBehavior, (doRemove) => {
       if (!doRemove) return;
 
       eventsBasedBehaviorsList.remove(eventsBasedBehavior.getName());
@@ -135,7 +135,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.props.onRenameEventsBasedBehavior(
       eventsBasedBehavior,
       newName,
-      doRename => {
+      (doRename) => {
         if (!doRename) return;
         eventsBasedBehavior.setName(newName);
         this._onEventsBasedBehaviorModified();
@@ -147,10 +147,8 @@ export default class EventsBasedBehaviorsList extends React.Component<
   _moveSelectionTo = (
     destinationEventsBasedBehavior: gdEventsBasedBehavior
   ) => {
-    const {
-      eventsBasedBehaviorsList,
-      selectedEventsBasedBehavior,
-    } = this.props;
+    const { eventsBasedBehaviorsList, selectedEventsBasedBehavior } =
+      this.props;
     if (!selectedEventsBasedBehavior) return;
 
     eventsBasedBehaviorsList.move(
@@ -195,7 +193,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
 
     const { project, eventsBasedBehaviorsList } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       eventsBasedBehaviorsList.has(name)
     );
 
@@ -215,52 +213,51 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this._onEventsBasedBehaviorModified();
   };
 
-  _renderEventsBasedBehaviorMenuTemplate = (i18n: I18nType) => (
-    eventsBasedBehavior: gdEventsBasedBehavior,
-    index: number
-  ) => {
-    return [
-      {
-        label: i18n._(t`Properties`),
-        click: () => this.props.onEditProperties(eventsBasedBehavior),
-      },
-      {
-        type: 'separator',
-      },
-      {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(eventsBasedBehavior),
-      },
-      {
-        label: i18n._(t`Delete`),
-        click: () =>
-          this._deleteEventsBasedBehavior(eventsBasedBehavior, {
-            askForConfirmation: true,
-          }),
-      },
-      {
-        type: 'separator',
-      },
-      {
-        label: i18n._(t`Copy`),
-        click: () => this._copyEventsBasedBehavior(eventsBasedBehavior),
-      },
-      {
-        label: i18n._(t`Cut`),
-        click: () => this._cutEventsBasedBehavior(eventsBasedBehavior),
-      },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
-        click: () => this._pasteEventsBasedBehavior(index),
-      },
-    ];
-  };
+  _renderEventsBasedBehaviorMenuTemplate =
+    (i18n: I18nType) =>
+    (eventsBasedBehavior: gdEventsBasedBehavior, index: number) => {
+      return [
+        {
+          label: i18n._(t`Properties`),
+          click: () => this.props.onEditProperties(eventsBasedBehavior),
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: i18n._(t`Rename`),
+          click: () => this._editName(eventsBasedBehavior),
+        },
+        {
+          label: i18n._(t`Delete`),
+          click: () =>
+            this._deleteEventsBasedBehavior(eventsBasedBehavior, {
+              askForConfirmation: true,
+            }),
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: i18n._(t`Copy`),
+          click: () => this._copyEventsBasedBehavior(eventsBasedBehavior),
+        },
+        {
+          label: i18n._(t`Cut`),
+          click: () => this._cutEventsBasedBehavior(eventsBasedBehavior),
+        },
+        {
+          label: i18n._(t`Paste`),
+          enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
+          click: () => this._pasteEventsBasedBehavior(index),
+        },
+      ];
+    };
 
   _addNewEventsBasedBehavior = () => {
     const { eventsBasedBehaviorsList } = this.props;
 
-    const name = newNameGenerator('MyBehavior', name =>
+    const name = newNameGenerator('MyBehavior', (name) =>
       eventsBasedBehaviorsList.has(name)
     );
     eventsBasedBehaviorsList.insertNew(
@@ -304,7 +301,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
                 {({ i18n }) => (
                   <SortableVirtualizedItemList
                     key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
+                    ref={(sortableList) => (this.sortableList = sortableList)}
                     fullList={list}
                     width={width}
                     height={height}
@@ -333,7 +330,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
         <SearchBar
           value={searchText}
           onRequestSearch={() => {}}
-          onChange={text =>
+          onChange={(text) =>
             this.setState({
               searchText: text,
             })

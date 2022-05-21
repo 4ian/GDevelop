@@ -36,7 +36,7 @@ const mapVector = /*:: <T, U>*/ (
   cppVector /*: CppVector<T> */,
   func /*: (T, number) => U */
 ) /*:Array<U> */ => {
-  return mapFor(0, cppVector.size(), i => func(cppVector.at(i), i));
+  return mapFor(0, cppVector.size(), (i) => func(cppVector.at(i), i));
 };
 
 module.exports = {

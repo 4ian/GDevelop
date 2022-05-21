@@ -125,7 +125,7 @@ export default class InstructionOrExpressionSelector<
     const { searchText } = this.state;
     const displayedInstructionsList: Array<SearchResult<T>> =
       !!searchText && this.searchApi
-        ? this.searchApi.search(`'${searchText}`).map(result => ({
+        ? this.searchApi.search(`'${searchText}`).map((result) => ({
             item: result.item,
             matches: tuneMatches(result, searchText),
           }))
@@ -143,7 +143,7 @@ export default class InstructionOrExpressionSelector<
 
     return (
       <ThemeConsumer>
-        {muiTheme => (
+        {(muiTheme) => (
           <div
             style={{
               backgroundColor: muiTheme.list.itemsBackgroundColor,
@@ -153,7 +153,7 @@ export default class InstructionOrExpressionSelector<
           >
             <SearchBar
               value={searchText}
-              onChange={searchText =>
+              onChange={(searchText) =>
                 this.setState({
                   searchText,
                 })
@@ -168,7 +168,7 @@ export default class InstructionOrExpressionSelector<
                   : undefined
               }
               helpPagePath={helpPagePath}
-              ref={searchBar => (this._searchBar = searchBar)}
+              ref={(searchBar) => (this._searchBar = searchBar)}
             />
             <ScrollView
               ref={
@@ -185,7 +185,8 @@ export default class InstructionOrExpressionSelector<
                         matches,
                       }) =>
                         renderInstructionOrExpressionListItem({
-                          instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                          instructionOrExpressionMetadata:
+                            enumeratedInstructionOrExpressionMetadata,
                           iconSize: iconSize,
                           onClick: () =>
                             onChoose(
@@ -193,9 +194,8 @@ export default class InstructionOrExpressionSelector<
                               enumeratedInstructionOrExpressionMetadata
                             ),
                           matches,
-                          selectedValue: getInstructionListItemValue(
-                            selectedType
-                          ),
+                          selectedValue:
+                            getInstructionListItemValue(selectedType),
                         })
                     )
                   ) : (
@@ -205,9 +205,8 @@ export default class InstructionOrExpressionSelector<
                         iconSize,
                         onChoose,
                         useSubheaders,
-                        selectedValue: getInstructionListItemValue(
-                          selectedType
-                        ),
+                        selectedValue:
+                          getInstructionListItemValue(selectedType),
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
                         getGroupIconSrc,

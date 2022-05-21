@@ -42,8 +42,8 @@ type Props = {|
   onCancel: () => void,
 
   // Object renaming:
-  onRename: string => void,
-  canRenameObject: string => boolean,
+  onRename: (string) => void,
+  canRenameObject: (string) => boolean,
 
   // Passed down to object editors:
   project: gdProject,
@@ -98,18 +98,14 @@ const InnerDialog = (props: InnerDialogProps) => {
     props.onRename(newObjectName);
   };
 
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-variables'
-  );
+  const { DismissableTutorialMessage } =
+    useDismissableTutorialMessage('intro-variables');
 
-  useEffect(
-    () => {
-      if (currentTab === 'behaviors') {
-        sendBehaviorsEditorShown({ parentEditor: 'object-editor-dialog' });
-      }
-    },
-    [currentTab]
-  );
+  useEffect(() => {
+    if (currentTab === 'behaviors') {
+      sendBehaviorsEditorShown({ parentEditor: 'object-editor-dialog' });
+    }
+  }, [currentTab]);
 
   return (
     <Dialog
@@ -197,7 +193,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 floatingLabelFixed
                 value={newObjectName}
                 hintText={t`Object Name`}
-                onChange={text => {
+                onChange={(text) => {
                   if (text === newObjectName) return;
 
                   if (props.canRenameObject(text)) {

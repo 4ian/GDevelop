@@ -39,7 +39,7 @@ const GDevelopJsInitializer = ({ children }: GDevelopJsInitializerProps) => {
       'Loading GDevelop.js and creating test extensions/test project...'
     );
     GD_STARTUP_TIMES.push(['initializeGDevelopJsCall', performance.now()]);
-    initializeGDevelopJs().then(gd => {
+    initializeGDevelopJs().then((gd) => {
       GD_STARTUP_TIMES.push(['initializeGDevelopJsDone', performance.now()]);
       // We're **updating** the global "gd" object here. This is done so that
       // the source files that are using `global.gd` have the proper reference to the

@@ -25,7 +25,7 @@ const styles = {
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<boolean>,
+  onInstall: (ExtensionShortHeader) => Promise<boolean>,
   showOnlyWithBehaviors: boolean,
 |};
 
@@ -38,10 +38,8 @@ export const ExtensionStore = ({
   onInstall,
   showOnlyWithBehaviors,
 }: Props) => {
-  const [
-    selectedExtensionShortHeader,
-    setSelectedExtensionShortHeader,
-  ] = React.useState<?ExtensionShortHeader>(null);
+  const [selectedExtensionShortHeader, setSelectedExtensionShortHeader] =
+    React.useState<?ExtensionShortHeader>(null);
   const {
     filters,
     searchResults,
@@ -52,12 +50,9 @@ export const ExtensionStore = ({
     setSearchText,
   } = React.useContext(ExtensionStoreContext);
 
-  React.useEffect(
-    () => {
-      fetchExtensionsAndFilters();
-    },
-    [fetchExtensionsAndFilters]
-  );
+  React.useEffect(() => {
+    fetchExtensionsAndFilters();
+  }, [fetchExtensionsAndFilters]);
 
   const filteredSearchResults = searchResults
     ? searchResults.filter(
@@ -81,7 +76,7 @@ export const ExtensionStore = ({
   ): SearchMatch[] => {
     if (!searchResults) return [];
     const extensionMatches = searchResults.find(
-      result => result.item.name === extensionShortHeader.name
+      (result) => result.item.name === extensionShortHeader.name
     );
     return extensionMatches ? extensionMatches.matches : [];
   };
@@ -93,7 +88,7 @@ export const ExtensionStore = ({
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {(windowWidth) => (
           <Column expand noMargin useFullHeight>
             <SearchBar
               value={searchText}

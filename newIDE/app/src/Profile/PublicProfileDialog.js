@@ -22,41 +22,32 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
   const [badges, setBadges] = React.useState<?(Badge[])>(null);
   const [error, setError] = React.useState<?Error>(null);
 
-  const fetchProfile = React.useCallback(
-    async () => {
-      if (!userId) return;
-      setProfile(null);
-      try {
-        const profile = await getUserPublicProfile(userId);
-        setProfile(profile);
-      } catch (error) {
-        setError(error);
-      }
-    },
-    [userId]
-  );
+  const fetchProfile = React.useCallback(async () => {
+    if (!userId) return;
+    setProfile(null);
+    try {
+      const profile = await getUserPublicProfile(userId);
+      setProfile(profile);
+    } catch (error) {
+      setError(error);
+    }
+  }, [userId]);
 
-  const fetchUserBadges = React.useCallback(
-    async () => {
-      if (!userId) return;
-      setBadges(null);
-      try {
-        const badges = await getUserBadges(userId);
-        setBadges(badges);
-      } catch (error) {
-        setError(error);
-      }
-    },
-    [userId]
-  );
+  const fetchUserBadges = React.useCallback(async () => {
+    if (!userId) return;
+    setBadges(null);
+    try {
+      const badges = await getUserBadges(userId);
+      setBadges(badges);
+    } catch (error) {
+      setError(error);
+    }
+  }, [userId]);
 
-  React.useEffect(
-    () => {
-      fetchProfile();
-      fetchUserBadges();
-    },
-    [userId, fetchProfile, fetchUserBadges]
-  );
+  React.useEffect(() => {
+    fetchProfile();
+    fetchUserBadges();
+  }, [userId, fetchProfile, fetchUserBadges]);
 
   const onRetry = () => {
     setError(null);

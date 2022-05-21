@@ -31,5 +31,5 @@ export type ResourceExternalEditor = {
   name: string,
   displayName: string,
   kind: ResourceKind,
-  edit: ExternalEditorOpenOptions => void,
+  edit: (ExternalEditorOpenOptions) => void,
 };

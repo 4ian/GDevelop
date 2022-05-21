@@ -40,7 +40,7 @@ const isUnavoidableLibraryWarning = ({ group, message }: Log): boolean =>
 
 type Props = {|
   project: gdProject,
-  setToolbar: React.Node => void,
+  setToolbar: (React.Node) => void,
   previewDebuggerServer: PreviewDebuggerServer,
 |};
 
@@ -130,7 +130,7 @@ export default class Debugger extends React.Component<Props, State> {
 
     // Register new callbacks
     const unregisterCallbacks = previewDebuggerServer.registerCallbacks({
-      onErrorReceived: err => {
+      onErrorReceived: (err) => {
         this.setState(
           {
             debuggerServerError: err,
@@ -211,11 +211,11 @@ export default class Debugger extends React.Component<Props, State> {
         },
       });
     } else if (data.command === 'profiler.started') {
-      this.setState(state => ({
+      this.setState((state) => ({
         profilingInProgress: { ...state.profilingInProgress, [id]: true },
       }));
     } else if (data.command === 'profiler.stopped') {
-      this.setState(state => ({
+      this.setState((state) => ({
         profilingInProgress: { ...state.profilingInProgress, [id]: false },
       }));
     } else if (data.command === 'hotReloader.logs') {
@@ -322,7 +322,7 @@ export default class Debugger extends React.Component<Props, State> {
             <DebuggerSelector
               selectedId={selectedId}
               debuggerIds={debuggerIds}
-              onChooseDebugger={id =>
+              onChooseDebugger={(id) =>
                 this.setState(
                   {
                     selectedId: id,
@@ -333,7 +333,7 @@ export default class Debugger extends React.Component<Props, State> {
             />
             {this._hasSelectedDebugger() && (
               <DebuggerContent
-                ref={debuggerContent =>
+                ref={(debuggerContent) =>
                   (this._debuggerContents[selectedId] = debuggerContent)
                 }
                 gameData={debuggerGameData[selectedId]}

@@ -16,18 +16,19 @@ const EventsRenderingService = {
     'BuiltinCommonInstructions::Group': GroupEvent,
     'BuiltinCommonInstructions::Comment': CommentEvent,
     'BuiltinCommonInstructions::ForEach': ForEachEvent,
-    'BuiltinCommonInstructions::ForEachChildVariable': ForEachChildVariableEvent,
+    'BuiltinCommonInstructions::ForEachChildVariable':
+      ForEachChildVariableEvent,
     'BuiltinCommonInstructions::Repeat': RepeatEvent,
     'BuiltinCommonInstructions::While': WhileEvent,
     'BuiltinCommonInstructions::Link': LinkEvent,
     'BuiltinCommonInstructions::JsCode': JsCodeEvent,
   },
-  getEventComponent: function(event) {
+  getEventComponent: function (event) {
     if (this.components.hasOwnProperty(event.getType()))
       return this.components[event.getType()];
     else return this.components.unknownEvent;
   },
-  registerEvent: function(eventType, renderFunction) {
+  registerEvent: function (eventType, renderFunction) {
     if (!this.components.hasOwnProperty(eventType)) {
       console.warn(
         'Tried to register renderer for events "' +

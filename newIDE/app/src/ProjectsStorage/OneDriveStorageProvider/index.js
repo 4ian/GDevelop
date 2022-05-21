@@ -27,7 +27,7 @@ const initializeApis = (): Promise<void> => {
       apisLoaded = true;
       apisLoadingPromise = null;
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Error while loading OneDrive APIs:', error);
       apisLoadingPromise = null;
 

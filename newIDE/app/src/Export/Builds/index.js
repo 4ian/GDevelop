@@ -10,7 +10,7 @@ type Props = {|
   onBuildsUpdated?: () => void,
   authenticatedUser: AuthenticatedUser,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: (Game) => void,
 |};
 type State = {|
   builds: ?Array<Build>,
@@ -53,17 +53,15 @@ export default class Builds extends Component<Props, State> {
   };
 
   _refreshBuilds = () => {
-    const {
-      getAuthorizationHeader,
-      firebaseUser,
-    } = this.props.authenticatedUser;
+    const { getAuthorizationHeader, firebaseUser } =
+      this.props.authenticatedUser;
     if (!firebaseUser) return;
     // Game is not registered yet so return an empty list of builds.
     const gameId = this.props.game.id;
     this.setState({ builds: null, error: null });
 
     getBuilds(getAuthorizationHeader, firebaseUser.uid, gameId).then(
-      builds => {
+      (builds) => {
         this.setState(
           {
             builds,

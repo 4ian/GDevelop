@@ -68,7 +68,7 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       const shouldDefineCurrentLeaderboardIfNoneSelected =
         !state.currentLeaderboard && leaderboards && leaderboards.length > 0;
       const primaryLeaderboard = leaderboards.find(
-        leaderboard => leaderboard.primary
+        (leaderboard) => leaderboard.primary
       );
       const newCurrentLeaderboard = shouldDefineCurrentLeaderboardIfNoneSelected
         ? primaryLeaderboard || leaderboards[0]
@@ -201,29 +201,26 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     pageIndex: 0,
   });
 
-  const listLeaderboards = React.useCallback(
-    async () => {
-      if (!isListingLeaderboards.current) {
-        isListingLeaderboards.current = true;
-        try {
-          dispatch({ type: 'SET_LEADERBOARDS', payload: null });
-          const fetchedLeaderboards = await listGameActiveLeaderboards(
-            authenticatedUser,
-            gameId
-          );
-          if (!fetchedLeaderboards) return;
-          fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
-          dispatch({
-            type: 'SET_LEADERBOARDS',
-            payload: fetchedLeaderboards,
-          });
-        } finally {
-          isListingLeaderboards.current = false;
-        }
+  const listLeaderboards = React.useCallback(async () => {
+    if (!isListingLeaderboards.current) {
+      isListingLeaderboards.current = true;
+      try {
+        dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+        const fetchedLeaderboards = await listGameActiveLeaderboards(
+          authenticatedUser,
+          gameId
+        );
+        if (!fetchedLeaderboards) return;
+        fetchedLeaderboards.sort((a, b) => a.name.localeCompare(b.name));
+        dispatch({
+          type: 'SET_LEADERBOARDS',
+          payload: fetchedLeaderboards,
+        });
+      } finally {
+        isListingLeaderboards.current = false;
       }
-    },
-    [gameId, authenticatedUser]
-  );
+    }
+  }, [gameId, authenticatedUser]);
 
   const createLeaderboard = React.useCallback(
     async (creationPayload: {|
@@ -269,12 +266,12 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
       let entriesToDisplay: LeaderboardDisplayData[] = [];
       if (displayOnlyBestEntry) {
-        entriesToDisplay = fetchedEntries.map(entry =>
+        entriesToDisplay = fetchedEntries.map((entry) =>
           // $FlowFixMe
           extractExtremeScoreDisplayData(entry)
         );
       } else {
-        entriesToDisplay = fetchedEntries.map(entry =>
+        entriesToDisplay = fetchedEntries.map((entry) =>
           // $FlowFixMe
           extractEntryDisplayData(entry)
         );
@@ -348,57 +345,42 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   // --- Navigation ---
 
-  const navigateToNextPage = React.useCallback(
-    async () => {
-      const nextPageUri = mapPageIndexToUri[pageIndex + 1];
-      if (!nextPageUri) return;
-      dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex + 1 });
-      await fetchEntries({ uri: nextPageUri });
-    },
-    [fetchEntries, mapPageIndexToUri, pageIndex]
-  );
+  const navigateToNextPage = React.useCallback(async () => {
+    const nextPageUri = mapPageIndexToUri[pageIndex + 1];
+    if (!nextPageUri) return;
+    dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex + 1 });
+    await fetchEntries({ uri: nextPageUri });
+  }, [fetchEntries, mapPageIndexToUri, pageIndex]);
 
-  const navigateToPreviousPage = React.useCallback(
-    async () => {
-      if (pageIndex === 1) {
-        dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
-        await fetchEntries();
-      } else {
-        const previousPageUri = mapPageIndexToUri[pageIndex - 1];
-        if (!previousPageUri) return;
-        dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex - 1 });
-        await fetchEntries({ uri: previousPageUri });
-      }
-    },
-    [fetchEntries, mapPageIndexToUri, pageIndex]
-  );
-
-  const navigateToFirstPage = React.useCallback(
-    async () => {
+  const navigateToPreviousPage = React.useCallback(async () => {
+    if (pageIndex === 1) {
       dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
       await fetchEntries();
-    },
-    [fetchEntries]
-  );
+    } else {
+      const previousPageUri = mapPageIndexToUri[pageIndex - 1];
+      if (!previousPageUri) return;
+      dispatch({ type: 'SET_PAGE_INDEX', payload: pageIndex - 1 });
+      await fetchEntries({ uri: previousPageUri });
+    }
+  }, [fetchEntries, mapPageIndexToUri, pageIndex]);
+
+  const navigateToFirstPage = React.useCallback(async () => {
+    dispatch({ type: 'SET_PAGE_INDEX', payload: 0 });
+    await fetchEntries();
+  }, [fetchEntries]);
 
   // --- Effects ---
 
-  React.useEffect(
-    () => {
-      dispatch({ type: 'SET_LEADERBOARDS', payload: null });
-      dispatch({ type: 'PURGE_NAVIGATION' });
-    },
-    [gameId]
-  );
+  React.useEffect(() => {
+    dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+    dispatch({ type: 'PURGE_NAVIGATION' });
+  }, [gameId]);
 
-  React.useEffect(
-    () => {
-      if (!currentLeaderboardId) return;
-      dispatch({ type: 'PURGE_NAVIGATION' });
-      fetchEntries();
-    },
-    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
-  );
+  React.useEffect(() => {
+    if (!currentLeaderboardId) return;
+    dispatch({ type: 'PURGE_NAVIGATION' });
+    fetchEntries();
+  }, [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]);
 
   return (
     <LeaderboardContext.Provider

@@ -106,36 +106,30 @@ export default function NewInstructionEditorDialog({
   openInstructionOrExpression,
 }: Props) {
   const forceUpdate = useForceUpdate();
-  const [
-    newInstructionEditorState,
-    newInstructionEditorSetters,
-  ] = useNewInstructionEditor({
-    instruction,
-    isCondition,
-    project,
-    isNewInstruction,
-    scope,
-    globalObjectsContainer,
-    objectsContainer,
-  });
+  const [newInstructionEditorState, newInstructionEditorSetters] =
+    useNewInstructionEditor({
+      instruction,
+      isCondition,
+      project,
+      isNewInstruction,
+      scope,
+      globalObjectsContainer,
+      objectsContainer,
+    });
   const {
     chosenObjectName,
     chosenObjectInstructionsInfo,
     chosenObjectInstructionsInfoTree,
   } = newInstructionEditorState;
-  const {
-    chooseInstruction,
-    chooseObject,
-    chooseObjectInstruction,
-  } = newInstructionEditorSetters;
+  const { chooseInstruction, chooseObject, chooseObjectInstruction } =
+    newInstructionEditorSetters;
   const hasObjectChosen =
     !!chosenObjectInstructionsInfo && !!chosenObjectInstructionsInfoTree;
   const chosenObject = chosenObjectName
     ? getObjectByName(project, scope.layout, chosenObjectName)
     : null;
-  const freeInstructionComponentRef = React.useRef<?InstructionOrObjectSelector>(
-    null
-  );
+  const freeInstructionComponentRef =
+    React.useRef<?InstructionOrObjectSelector>(null);
   const [step, setStep] = React.useState(() =>
     getInitialStepName(isNewInstruction)
   );
@@ -145,14 +139,10 @@ export default function NewInstructionEditorDialog({
   ] = React.useState(() => getInitialTab(isNewInstruction, hasObjectChosen));
   const windowWidth = useResponsiveWindowWidth();
   const instructionType: string = instruction.getType();
-  const [
-    newBehaviorDialogOpen,
-    setNewBehaviorDialogOpen,
-  ] = React.useState<boolean>(false);
-  const [
-    newExtensionDialogOpen,
-    setNewExtensionDialogOpen,
-  ] = React.useState<boolean>(false);
+  const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] =
+    React.useState<boolean>(false);
+  const [newExtensionDialogOpen, setNewExtensionDialogOpen] =
+    React.useState<boolean>(false);
 
   // Handle the back button
   const stepBackFrom = (origin: StepName, windowWidth: WidthType) => {
@@ -202,16 +192,13 @@ export default function NewInstructionEditorDialog({
   const instructionParametersEditor = React.useRef(
     (null: ?InstructionParametersEditor)
   );
-  React.useEffect(
-    () => {
-      if (step === 'parameters') {
-        if (instructionParametersEditor.current) {
-          instructionParametersEditor.current.focus();
-        }
+  React.useEffect(() => {
+    if (step === 'parameters') {
+      if (instructionParametersEditor.current) {
+        instructionParametersEditor.current.focus();
       }
-    },
-    [step]
-  );
+    }
+  }, [step]);
 
   const instructionMetadata = getInstructionMetadata({
     instructionType,
@@ -327,8 +314,8 @@ export default function NewInstructionEditorDialog({
             helpPagePath={instructionHelpPage || '/events'}
             label={
               !instructionHelpPage ||
-              (windowWidth === 'small' ||
-                step === 'object-or-free-instructions') ? (
+              windowWidth === 'small' ||
+              step === 'object-or-free-instructions' ? (
                 <Trans>Help</Trans>
               ) : isCondition ? (
                 <Trans>Help for this condition</Trans>

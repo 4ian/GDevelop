@@ -229,9 +229,8 @@ namespace gdjs {
         if (obj === null) {
           return false;
         }
-        const linkedObjectMap = LinksManager.getManager(
-          runtimeScene
-        )._getMapOfObjectsLinkedWith(obj);
+        const linkedObjectMap =
+          LinksManager.getManager(runtimeScene)._getMapOfObjectsLinkedWith(obj);
 
         let pickedSomething = false;
         for (const contextObjectName in objectsLists.items) {

@@ -123,7 +123,7 @@ export default class CommentEvent extends React.Component<
           backgroundColor: `#${backgroundColor}`,
         }}
         onClick={this.edit}
-        onKeyPress={event => {
+        onKeyPress={(event) => {
           if (shouldActivate(event)) {
             this.edit();
           }
@@ -134,7 +134,7 @@ export default class CommentEvent extends React.Component<
           <TextField
             multiline
             margin="none"
-            ref={textField => (this._textField = textField)}
+            ref={(textField) => (this._textField = textField)}
             value={commentEvent.getComment()}
             hintText={t`<Enter comment>`}
             onBlur={this.endEditing}
@@ -151,7 +151,7 @@ export default class CommentEvent extends React.Component<
             }}
             fullWidth
             id="comment-title"
-            onKeyUp={event => {
+            onKeyUp={(event) => {
               if (shouldCloseOrCancel(event)) {
                 this.endEditing();
               }
@@ -159,7 +159,7 @@ export default class CommentEvent extends React.Component<
           />
         ) : (
           <span
-            ref={selectable => (this._selectable = selectable)}
+            ref={(selectable) => (this._selectable = selectable)}
             className={classNames({
               [selectableArea]: true,
               [disabledText]: this.props.disabled,

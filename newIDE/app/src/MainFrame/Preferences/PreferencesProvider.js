@@ -93,20 +93,16 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     showTutorialHint: this._showTutorialHint.bind(this),
     showAllTutorialHints: this._showAllTutorialHints.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
-    setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
-      this
-    ),
+    setEventsSheetShowObjectThumbnails:
+      this._setEventsSheetShowObjectThumbnails.bind(this),
     setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
-    setUseNewInstructionEditorDialog: this._setUseNewInstructionEditorDialog.bind(
-      this
-    ),
-    setUseUndefinedVariablesInAutocompletion: this._setUseUndefinedVariablesInAutocompletion.bind(
-      this
-    ),
+    setUseNewInstructionEditorDialog:
+      this._setUseNewInstructionEditorDialog.bind(this),
+    setUseUndefinedVariablesInAutocompletion:
+      this._setUseUndefinedVariablesInAutocompletion.bind(this),
     setUseGDJSDevelopmentWatcher: this._setUseGDJSDevelopmentWatcher.bind(this),
-    setEventsSheetUseAssignmentOperators: this._setEventsSheetUseAssignmentOperators.bind(
-      this
-    ),
+    setEventsSheetUseAssignmentOperators:
+      this._setEventsSheetUseAssignmentOperators.bind(this),
     setEventsSheetZoomLevel: this._setEventsSheetZoomLevel.bind(this),
     setShowEffectParameterNames: this._setShowEffectParameterNames.bind(this),
     getLastUsedPath: this._getLastUsedPath.bind(this),
@@ -118,9 +114,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     removeRecentProjectFile: this._removeRecentProjectFile.bind(this),
     getAutoOpenMostRecentProject: this._getAutoOpenMostRecentProject.bind(this),
     setAutoOpenMostRecentProject: this._setAutoOpenMostRecentProject.bind(this),
-    hadProjectOpenedDuringLastSession: this._hadProjectOpenedDuringLastSession.bind(
-      this
-    ),
+    hadProjectOpenedDuringLastSession:
+      this._hadProjectOpenedDuringLastSession.bind(this),
     setHasProjectOpened: this._setHasProjectOpened.bind(this),
     setShortcutForCommand: this._setShortcutForCommand.bind(this),
     resetShortcutsToDefault: this._resetShortcutsToDefault.bind(this),
@@ -131,9 +126,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setBackdropClickBehavior: this._setBackdropClickBehavior.bind(this),
     getIsAlwaysOnTopInPreview: this._getIsAlwaysOnTopInPreview.bind(this),
     setIsAlwaysOnTopInPreview: this._setIsAlwaysOnTopInPreview.bind(this),
-    setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
-      this
-    ),
+    setEventsSheetCancelInlineParameter:
+      this._setEventsSheetCancelInlineParameter.bind(this),
   };
 
   componentDidMount() {
@@ -143,7 +137,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   _setLanguage(language: string) {
     setLanguageInDOM(language);
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           language,
@@ -157,7 +151,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     eventsSheetShowObjectThumbnails: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetShowObjectThumbnails,
@@ -169,7 +163,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutosaveOnPreview(autosaveOnPreview: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autosaveOnPreview,
@@ -181,7 +175,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setUseNewInstructionEditorDialog(useNewInstructionEditorDialog: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           useNewInstructionEditorDialog,
@@ -195,7 +189,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     useUndefinedVariablesInAutocompletion: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           useUndefinedVariablesInAutocompletion,
@@ -207,7 +201,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setUseGDJSDevelopmentWatcher(useGDJSDevelopmentWatcher: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           useGDJSDevelopmentWatcher,
@@ -221,7 +215,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     eventsSheetUseAssignmentOperators: boolean
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetUseAssignmentOperators,
@@ -233,7 +227,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setEventsSheetZoomLevel(eventsSheetZoomLevel: number) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetZoomLevel,
@@ -245,7 +239,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setShowEffectParameterNames(showEffectParameterNames: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           showEffectParameterNames,
@@ -257,7 +251,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setThemeName(themeName: string) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           themeName,
@@ -269,7 +263,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setCodeEditorThemeName(codeEditorThemeName: string) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           codeEditorThemeName,
@@ -281,7 +275,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutoDownloadUpdates(autoDownloadUpdates: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autoDownloadUpdates,
@@ -293,7 +287,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutoDisplayChangelog(autoDisplayChangelog: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autoDisplayChangelog,
@@ -307,7 +301,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     eventsSheetCancelInlineParameter: 'apply' | 'cancel'
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
@@ -341,7 +335,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
     // This is a new version: store the version number
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           lastLaunchedVersion: currentVersion,
@@ -361,7 +355,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAlertMessage(identifier: AlertMessageIdentifier, show: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenAlertMessages: {
@@ -377,7 +371,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAllAlertMessages() {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenAlertMessages: {},
@@ -389,7 +383,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showTutorialHint(identifier: string, show: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenTutorialHints: {
@@ -404,7 +398,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _showAllTutorialHints() {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hiddenTutorialHints: {},
@@ -465,7 +459,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setDefaultEditorMosaicNode(name: EditorMosaicName, node: ?EditorMosaicNode) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           defaultEditorMosaicNodes: {
@@ -485,7 +479,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setRecentProjectFiles(recents: Array<FileMetadataAndStorageProviderName>) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           recentProjectFiles: recents,
@@ -497,7 +491,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
     let recentProjectFiles = this._getRecentProjectFiles();
-    const isNotNewRecentFile = recentFile =>
+    const isNotNewRecentFile = (recentFile) =>
       JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
     this._setRecentProjectFiles(
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
@@ -508,7 +502,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
-    const isNotSadPathRecentFile = recentFileItem =>
+    const isNotSadPathRecentFile = (recentFileItem) =>
       JSON.stringify(recentFileItem) !== JSON.stringify(recentFile);
     this._setRecentProjectFiles(
       [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
@@ -524,7 +518,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setAutoOpenMostRecentProject(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           autoOpenMostRecentProject: enabled,
@@ -540,7 +534,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setHasProjectOpened(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           hasProjectOpened: enabled,
@@ -552,7 +546,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _resetShortcutsToDefault() {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, userShortcutMap: {} },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -568,7 +562,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     else updatedShortcutMap[commandName] = shortcutString;
 
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, userShortcutMap: updatedShortcutMap },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -583,7 +577,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     newObjectDialogDefaultTab: 'asset-store' | 'new-object'
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, newObjectDialogDefaultTab },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -596,7 +590,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setIsMenuBarHiddenInPreview(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           isMenuBarHiddenInPreview: enabled,
@@ -610,7 +604,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     backdropClickBehavior: 'nothing' | 'apply' | 'cancel'
   ) {
     this.setState(
-      state => ({
+      (state) => ({
         values: { ...state.values, backdropClickBehavior },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -623,7 +617,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   _setIsAlwaysOnTopInPreview(enabled: boolean) {
     this.setState(
-      state => ({
+      (state) => ({
         values: {
           ...state.values,
           isAlwaysOnTopInPreview: enabled,

@@ -199,7 +199,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 floatingLabelText={<Trans>Full name displayed in editor</Trans>}
                 hintText={getFullNameHintText(type)}
                 value={eventsFunction.getFullName()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsFunction.setFullName(text);
                   if (onConfigurationUpdated) onConfigurationUpdated();
                   this.forceUpdate();
@@ -213,14 +213,14 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 hintText={t`Leave it empty to use the default group for this extension.`}
                 fullWidth
                 value={eventsFunction.getGroup()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsFunction.setGroup(text);
                   if (onConfigurationUpdated) onConfigurationUpdated();
                   this.forceUpdate();
                 }}
                 dataSource={
                   getFunctionGroupNames
-                    ? getFunctionGroupNames().map(name => ({
+                    ? getFunctionGroupNames().map((name) => ({
                         text: name,
                         value: name,
                       }))
@@ -239,7 +239,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 fullWidth
                 multiline
                 value={eventsFunction.getDescription()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsFunction.setDescription(text);
                   if (onConfigurationUpdated) onConfigurationUpdated();
                   this.forceUpdate();
@@ -255,7 +255,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                   hintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                   fullWidth
                   value={eventsFunction.getSentence()}
-                  onChange={text => {
+                  onChange={(text) => {
                     eventsFunction.setSentence(text);
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();

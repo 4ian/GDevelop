@@ -148,17 +148,22 @@ namespace gdjs {
         gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = true;
         FBInstant.getInterstitialAdAsync(adPlacementId)
           .then(function (interstitial) {
-            gdjs.evtTools.facebookInstantGames._preloadedInterstitial = interstitial;
+            gdjs.evtTools.facebookInstantGames._preloadedInterstitial =
+              interstitial;
             return interstitial.loadAsync();
           })
           .then(function () {
-            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = false;
-            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = true;
+            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading =
+              false;
+            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded =
+              true;
             logger.info('Facebook Instant Games interstitial preloaded.');
           })
           .catch(function (err) {
-            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = false;
-            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = false;
+            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading =
+              false;
+            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded =
+              false;
             logger.error('Interstitial failed to preload: ' + err.message);
             errorVariable.setString(err.message || 'Unknown error');
           });
@@ -181,7 +186,8 @@ namespace gdjs {
             errorVariable.setString(err.message || 'Unknown error');
           })
           .then(function () {
-            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = false;
+            gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded =
+              false;
           });
       };
 
@@ -199,20 +205,26 @@ namespace gdjs {
         ) {
           return;
         }
-        gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = true;
+        gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading =
+          true;
         FBInstant.getRewardedVideoAsync(adPlacementId)
           .then(function (rewardedVideo) {
-            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideo = rewardedVideo;
+            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideo =
+              rewardedVideo;
             return rewardedVideo.loadAsync();
           })
           .then(function () {
-            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = false;
-            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = true;
+            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading =
+              false;
+            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded =
+              true;
             logger.info('Facebook Instant Games rewarded video preloaded.');
           })
           .catch(function (err) {
-            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = false;
-            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = false;
+            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading =
+              false;
+            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded =
+              false;
             logger.error('Rewarded video failed to preload: ' + err.message);
             errorVariable.setString(err.message || 'Unknown error');
           });
@@ -235,7 +247,8 @@ namespace gdjs {
             errorVariable.setString(err.message || 'Unknown error');
           })
           .then(function () {
-            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = false;
+            gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded =
+              false;
           });
       };
 

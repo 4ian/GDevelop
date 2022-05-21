@@ -107,7 +107,7 @@ export default class DeprecatedKeyboardShortcuts {
     return this.metaPressed || this.rawCtrlPressed;
   };
 
-  _onKeyDown = evt => {
+  _onKeyDown = (evt) => {
     if (!this.isFocused) return;
 
     let preventDefault = false;
@@ -189,7 +189,7 @@ export default class DeprecatedKeyboardShortcuts {
     }
   };
 
-  _onKeyUp = evt => {
+  _onKeyUp = (evt) => {
     // Always handle key up event, even if we don't have the focus,
     // for modifier keys to ensure we don't lose track of their pressed/unpressed status.
 
@@ -211,7 +211,7 @@ export default class DeprecatedKeyboardShortcuts {
     }
   };
 
-  _onMouseDown = evt => {
+  _onMouseDown = (evt) => {
     if (!this.isFocused) return;
 
     if (!isMacLike()) {
@@ -223,7 +223,7 @@ export default class DeprecatedKeyboardShortcuts {
     }
   };
 
-  _onMouseUp = evt => {
+  _onMouseUp = (evt) => {
     if (!this.isFocused) return;
 
     if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
@@ -231,7 +231,7 @@ export default class DeprecatedKeyboardShortcuts {
     }
   };
 
-  _onKeyPress = evt => {};
+  _onKeyPress = (evt) => {};
 
   _noop = () => {};
 

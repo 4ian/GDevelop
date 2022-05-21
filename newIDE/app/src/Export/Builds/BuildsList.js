@@ -19,7 +19,7 @@ type Props = {|
   error: ?Error,
   loadBuilds: () => void,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: (Game) => void,
 |};
 
 const BuildsList = ({

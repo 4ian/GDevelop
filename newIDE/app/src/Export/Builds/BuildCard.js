@@ -53,9 +53,9 @@ const getIcon = (
 type Props = {|
   build: Build,
   game: Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: (Game) => void,
   gameUpdating: boolean,
-  setGameUpdating: boolean => void,
+  setGameUpdating: (boolean) => void,
 |};
 
 export const BuildCard = ({

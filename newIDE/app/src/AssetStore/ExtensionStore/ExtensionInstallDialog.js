@@ -63,25 +63,20 @@ const ExtensionInstallDialog = ({
   const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
 
   const [error, setError] = React.useState<?Error>(null);
-  const [
-    extensionHeader,
-    setExtensionHeader,
-  ] = React.useState<?ExtensionHeader>(null);
+  const [extensionHeader, setExtensionHeader] =
+    React.useState<?ExtensionHeader>(null);
 
-  const loadExtensionheader = React.useCallback(
-    () => {
-      setError(null);
-      getExtensionHeader(extensionShortHeader).then(
-        extensionHeader => {
-          setExtensionHeader(extensionHeader);
-        },
-        error => {
-          setError(error);
-        }
-      );
-    },
-    [extensionShortHeader]
-  );
+  const loadExtensionheader = React.useCallback(() => {
+    setError(null);
+    getExtensionHeader(extensionShortHeader).then(
+      (extensionHeader) => {
+        setExtensionHeader(extensionHeader);
+      },
+      (error) => {
+        setError(error);
+      }
+    );
+  }, [extensionShortHeader]);
 
   React.useEffect(() => loadExtensionheader(), [loadExtensionheader]);
 
@@ -91,22 +86,19 @@ const ExtensionInstallDialog = ({
   );
 
   const canInstallExtension = !isInstalling && isCompatible;
-  const onInstallExtension = React.useCallback(
-    () => {
-      if (canInstallExtension) {
-        if (alreadyInstalled) {
-          const answer = Window.showConfirmDialog(
-            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?'
-          );
-          if (!answer) return;
-          onInstall();
-        } else {
-          onInstall();
-        }
+  const onInstallExtension = React.useCallback(() => {
+    if (canInstallExtension) {
+      if (alreadyInstalled) {
+        const answer = Window.showConfirmDialog(
+          'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?'
+        );
+        if (!answer) return;
+        onInstall();
+      } else {
+        onInstall();
       }
-    },
-    [onInstall, canInstallExtension, alreadyInstalled]
-  );
+    }
+  }, [onInstall, canInstallExtension, alreadyInstalled]);
 
   return (
     <Dialog
@@ -179,7 +171,7 @@ const ExtensionInstallDialog = ({
             </Text>
             <Line>
               {extensionShortHeader.authors &&
-                extensionShortHeader.authors.map(author => (
+                extensionShortHeader.authors.map((author) => (
                   <UserPublicProfileChip
                     user={author}
                     key={author.id}

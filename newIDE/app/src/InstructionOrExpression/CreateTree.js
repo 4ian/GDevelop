@@ -34,7 +34,7 @@ export const createTree = <T: EnumeratedInstructionOrExpressionMetadata>(
       pathInTree = [''];
     }
 
-    update(tree, pathInTree, groupInfo => {
+    update(tree, pathInTree, (groupInfo) => {
       const existingGroupInfo = groupInfo || {};
       return {
         ...existingGroupInfo,
@@ -65,7 +65,8 @@ export const findInTree = <T: Object>(
 
     if (typeof instructionOrGroup.type === 'string') {
       // $FlowFixMe - see above
-      const instructionInformation: EnumeratedInstructionOrExpressionMetadata = instructionOrGroup;
+      const instructionInformation: EnumeratedInstructionOrExpressionMetadata =
+        instructionOrGroup;
 
       if (instructionInformation.type === instructionType) {
         return [];

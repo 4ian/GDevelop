@@ -5,7 +5,8 @@ namespace gdjs {
       return radialBlurFilter;
     },
     updatePreRender: function (filter, target) {
-      const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter;
+      const radialBlurFilter =
+        filter as unknown as PIXI.filters.RadialBlurFilter;
       radialBlurFilter.center[0] = Math.round(
         // @ts-ignore - extra properties are stored on the filter.
         radialBlurFilter._centerX * target.getWidth()
@@ -16,7 +17,8 @@ namespace gdjs {
       );
     },
     updateDoubleParameter: function (filter, parameterName, value) {
-      const radialBlurFilter = (filter as unknown) as PIXI.filters.RadialBlurFilter;
+      const radialBlurFilter =
+        filter as unknown as PIXI.filters.RadialBlurFilter;
       if (parameterName === 'radius') {
         radialBlurFilter.radius = value < 0 ? -1 : value;
       } else if (parameterName === 'angle') {

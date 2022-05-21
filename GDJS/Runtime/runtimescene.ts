@@ -664,9 +664,8 @@ namespace gdjs {
             if (object.isHidden()) {
               rendererObject.visible = false;
             } else {
-              const cameraCoords = this._layersCameraCoordinates[
-                object.getLayer()
-              ];
+              const cameraCoords =
+                this._layersCameraCoordinates[object.getLayer()];
               if (!cameraCoords) {
                 continue;
               }

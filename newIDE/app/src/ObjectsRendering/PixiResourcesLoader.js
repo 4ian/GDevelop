@@ -41,7 +41,7 @@ export default class PixiResourcesLoader {
     loader.reset();
 
     const allResources = {};
-    resourceNames.forEach(resourceName => {
+    resourceNames.forEach((resourceName) => {
       if (!resourcesManager.hasResource(resourceName)) return;
 
       const resource = resourcesManager.getResource(resourceName);
@@ -63,7 +63,7 @@ export default class PixiResourcesLoader {
     }
 
     let loadingCount = 0;
-    const progressCallbackId = loader.onProgress.add(function() {
+    const progressCallbackId = loader.onProgress.add(function () {
       loadingCount++;
       onProgress(loadingCount, totalCount);
     });
@@ -205,7 +205,7 @@ export default class PixiResourcesLoader {
     }
 
     return loadFontFace(fontFamily, `url("${fullFilename}")`, {}).then(
-      loadedFace => {
+      (loadedFace) => {
         loadedFontFamilies[resourceName] = fontFamily;
 
         return fontFamily;
@@ -262,7 +262,7 @@ export default class PixiResourcesLoader {
       );
     }
 
-    return axios.get(fullUrl).then(response => {
+    return axios.get(fullUrl).then((response) => {
       loadedBitmapFonts[resourceName] = response;
       return response.data;
     });
@@ -293,6 +293,6 @@ export default class PixiResourcesLoader {
     const fullUrl = ResourcesLoader.getResourceFullUrl(project, resourceName, {
       isResourceForPixi: true,
     });
-    return axios.get(fullUrl).then(response => response.data);
+    return axios.get(fullUrl).then((response) => response.data);
   }
 }

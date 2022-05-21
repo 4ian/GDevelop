@@ -8,7 +8,7 @@ type State = {|
 |};
 
 type Props = {|
-  onChange: string => void,
+  onChange: (string) => void,
   value: string,
   commitOnBlur?: boolean,
   onFocus?: ({
@@ -104,9 +104,9 @@ export default class SemiControlledTextField extends React.Component<
       <TextField
         {...otherProps}
         type={type || 'text'}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         value={this.state.focused ? this.state.text : value}
-        onFocus={event => {
+        onFocus={(event) => {
           this.setState({
             focused: true,
             text: this.props.value,
@@ -121,7 +121,7 @@ export default class SemiControlledTextField extends React.Component<
 
           if (!commitOnBlur) onChange(newValue);
         }}
-        onBlur={event => {
+        onBlur={(event) => {
           onChange(event.currentTarget.value);
           this.setState({
             focused: false,

@@ -41,16 +41,16 @@ export const applyPublicPropertiesToProject = (
   project: gdProject,
   newProperties: PublicProjectProperties
 ) => {
-  const t = str => str; //TODO
+  const t = (str) => str; //TODO
   const { name, authorIds, description, categories } = newProperties;
   project.setName(name);
   const projectCategories = project.getCategories();
   projectCategories.clear();
-  categories.forEach(category => projectCategories.push_back(category));
+  categories.forEach((category) => projectCategories.push_back(category));
   project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
-  authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  authorIds.forEach((authorId) => projectAuthorIds.push_back(authorId));
   project.setPlayableWithKeyboard(newProperties.playWithKeyboard);
   project.setPlayableWithGamepad(newProperties.playWithGamepad);
   project.setPlayableWithMobile(newProperties.playWithMobile);
@@ -76,14 +76,13 @@ export const PublicGamePropertiesDialog = ({
 }: Props) => {
   const { profile } = React.useContext(AuthenticatedUserContext);
 
-  const publicGameAuthorIds = publicGame.authors.map(author => author.id);
-  const publicGameOwnerIds = publicGame.owners.map(owner => owner.id);
+  const publicGameAuthorIds = publicGame.authors.map((author) => author.id);
+  const publicGameOwnerIds = publicGame.owners.map((owner) => owner.id);
   const [name, setName] = React.useState(publicGame.gameName);
   const [categories, setCategories] = React.useState(publicGame.categories);
   const [description, setDescription] = React.useState(publicGame.description);
-  const [authorIds, setAuthorIds] = React.useState<string[]>(
-    publicGameAuthorIds
-  );
+  const [authorIds, setAuthorIds] =
+    React.useState<string[]>(publicGameAuthorIds);
   const [ownerIds, setOwnerIds] = React.useState<string[]>(publicGameOwnerIds);
   const [playWithKeyboard, setPlayableWithKeyboard] = React.useState(
     publicGame.playWithKeyboard

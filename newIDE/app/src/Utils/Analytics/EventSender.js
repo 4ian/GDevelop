@@ -273,6 +273,12 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
+export const sendAssetPackOpened = (assetPackTag: string) => {
+  recordEvent('asset_pack_opened', {
+    assetPackTag,
+  });
+};
+
 export const sendHelpFinderOpened = () => {
   recordEvent('help_finder_opened', {});
 };

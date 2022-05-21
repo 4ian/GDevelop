@@ -1,7 +1,7 @@
 // @flow
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import { type FileMetadata } from '../index';
-import { unsplit } from '../../Utils/ObjectSplitter.js';
+import { unsplit } from '../../Utils/ObjectSplitter';
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const remote = optionalRequire('@electron/remote');

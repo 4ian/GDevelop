@@ -144,19 +144,19 @@ export default class KeyboardShortcuts {
       evt.preventDefault();
       onPaste();
     }
-    if (onUndo && this._isControlOrCmdPressed() && evt.which === Z_KEY) {
-      evt.preventDefault();
-      onUndo();
-    }
     if (
-      onRedo &&
+      (onUndo || onRedo) &&
       this._isControlOrCmdPressed() &&
-      evt.shiftKey &&
       evt.which === Z_KEY
     ) {
       evt.preventDefault();
-      onRedo();
+      if (evt.shiftKey) {
+        if (onRedo) onRedo();
+      } else {
+        if (onUndo) onUndo();
+      }
     }
+
     if (onRedo && this._isControlOrCmdPressed() && evt.which === Y_KEY) {
       evt.preventDefault();
       onRedo();

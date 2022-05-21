@@ -46,7 +46,8 @@ export class DebuggerEditorContainer extends React.Component<
     // No updates to be done.
   }
 
-  componentWillReceiveProps() {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps() {
     this._checkHasSubscription();
   }
 

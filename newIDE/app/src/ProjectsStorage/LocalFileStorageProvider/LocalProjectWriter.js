@@ -1,7 +1,7 @@
 // @flow
 import { serializeToJSObject, serializeToJSON } from '../../Utils/Serializer';
 import { type FileMetadata } from '../index';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import {
   split,
   splitPaths,

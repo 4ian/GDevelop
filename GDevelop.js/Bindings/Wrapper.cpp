@@ -338,11 +338,11 @@ void removeFromVectorPolygon2d(std::vector<Polygon2d> &vec, size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
-void removeFromVectorVector2f(std::vector<sf::Vector2f> &vec, size_t pos) {
+void removeFromVectorVector2f(std::vector<gd::Vector2f> &vec, size_t pos) {
   vec.erase(vec.begin() + pos);
 }
 
-void moveVector2fInVector(std::vector<sf::Vector2f> &vec,
+void moveVector2fInVector(std::vector<gd::Vector2f> &vec,
                  size_t oldIndex,
                  size_t newIndex) {
   if (oldIndex >= vec.size() || newIndex >= vec.size()) return;
@@ -397,7 +397,7 @@ typedef std::set<gd::String> SetString;
 typedef std::vector<std::size_t> VectorInt;
 typedef std::vector<Point> VectorPoint;
 typedef std::vector<Polygon2d> VectorPolygon2d;
-typedef std::vector<sf::Vector2f> VectorVector2f;
+typedef std::vector<gd::Vector2f> VectorVector2f;
 typedef std::vector<EventsSearchResult> VectorEventsSearchResult;
 typedef std::vector<gd::ParameterMetadata> VectorParameterMetadata;
 typedef std::vector<gd::DependencyMetadata> VectorDependencyMetadata;

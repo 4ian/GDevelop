@@ -4,11 +4,11 @@ import { t } from '@lingui/macro';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
-import SelectField from '../../UI/SelectField';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 
 export default class MouseField extends Component<ParameterFieldProps> {
-  _field: ?SelectField;
+  _field: ?SelectFieldInterface;
 
   focus() {
     if (this._field) this._field.focus();

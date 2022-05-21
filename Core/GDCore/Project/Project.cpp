@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SFML/System/Utf.hpp>
 #include <cctype>
 #include <fstream>
 #include <map>

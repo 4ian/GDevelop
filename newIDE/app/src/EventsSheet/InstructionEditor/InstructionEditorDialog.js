@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import InstructionEditor from './index.js';
+import InstructionEditor from '.';
 import {
   type ResourceSource,
   type ChooseResourceFunction,

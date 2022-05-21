@@ -1,5 +1,5 @@
 // @flow
-export default {
+const styles = {
   nameColumn: { width: '40%' },
   coordinateColumn: {
     width: 60,
@@ -9,3 +9,5 @@ export default {
     height: 32,
   },
 };
+
+export default styles;

@@ -23,7 +23,6 @@ set(GDJS_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYST
 
 #Dependencies on external libraries:
 ###
-include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
 include_directories(${GDJS_include_dir})
 

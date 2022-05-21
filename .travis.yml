@@ -1,9 +1,6 @@
 # Travis CI configuration to build and run all tests
 # (and typing/formatting) for the Core, newIDE, GDJS.
 #
-# This builds GDevelop.js and store it on a S3 so it can be used to run
-# GDevelop without building it.
-#
 # See also Semaphore CI for quick tests (not building GDevelop.js, so
 # faster but not always reliable).
 
@@ -17,18 +14,7 @@ cache:
   directories:
     - $HOME/.npm
 
-services:
-  # Virtual Framebuffer 'fake' X server for SFML
-  - xvfb
-
 addons:
-  artifacts:
-    s3_region: "us-east-1"
-    target_paths:
-    - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/commit/$(git rev-parse HEAD)
-    - /$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)/latest
-    paths:
-    - Binaries/embuild/GDevelop.js
   apt:
     sources:
     - ubuntu-toolchain-r-test
@@ -36,20 +22,8 @@ addons:
     # Build dependencies:
     - cmake
     - p7zip-full
-    # SFML dependencies:
-    - libopenal-dev
-    - libjpeg-dev
-    - libglew-dev
-    - libudev-dev
-    - libxrandr-dev
-    - libsndfile1-dev
-    - libglu1-mesa-dev
-    - libfreetype6-dev
 
 before_install:
-  #Activate X Virtual Framebuffer to allow tests to
-  #use SFML.
-  - "export DISPLAY=:99.0"
   # This workaround is required to avoid libstdc++ errors (Emscripten requires a recent version of libstdc++)
   - wget -q -O libstdc++6 http://security.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.4.0-6ubuntu1~16.04.12_amd64.deb
   - sudo dpkg --force-all -i libstdc++6

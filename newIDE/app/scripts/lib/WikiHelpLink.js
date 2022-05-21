@@ -1,6 +1,6 @@
 // @ts-check
 
-const gdevelopWikiUrlRoot = 'http://wiki.compilgames.net/doku.php/gdevelop5';
+const gdevelopWikiUrlRoot = 'https://wiki.gdevelop.io/gdevelop5';
 const improperlyFormattedHelpPaths = new Set();
 
 /** @param {string} str */

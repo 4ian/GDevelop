@@ -11,7 +11,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export default ({ children }: Props) => {
+const PublicProfileProvider = ({ children }: Props) => {
   const [
     visitedPublicProfileUserId,
     setVisitedPublicProfileUserId,
@@ -52,3 +52,5 @@ export default ({ children }: Props) => {
     </React.Fragment>
   );
 };
+
+export default PublicProfileProvider;

@@ -157,7 +157,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin>
+          <Column noMargin expand>
             <Line noMargin>
               <div style={styles.propertiesContainer}>
                 {mapVector(

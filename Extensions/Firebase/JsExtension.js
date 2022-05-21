@@ -1324,7 +1324,7 @@ module.exports = {
         true
       )
       .setParameterLongDescription(
-        'See the shape of the returned data on [the wiki page](http://wiki.compilgames.net/doku.php/gdevelop5/all-features/firebase/firestore#the_query_result).'
+        'See the shape of the returned data on [the wiki page](https://wiki.gdevelop.io/gdevelop5/all-features/firebase/firestore#the_query_result).'
       )
       .addParameter(
         'scenevar',

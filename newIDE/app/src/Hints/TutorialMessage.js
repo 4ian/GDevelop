@@ -32,6 +32,7 @@ const TutorialMessage = ({ tutorial }: Props) => {
               style={{
                 maxWidth: 128,
                 maxHeight: 128,
+                borderRadius: 4,
               }}
               src={tutorial.thumbnailUrl}
             />

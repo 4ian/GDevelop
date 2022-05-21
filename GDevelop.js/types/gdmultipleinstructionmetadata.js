@@ -14,6 +14,7 @@ declare class gdMultipleInstructionMetadata {
   markAsSimple(): gdMultipleInstructionMetadata;
   markAsAdvanced(): gdMultipleInstructionMetadata;
   markAsComplex(): gdMultipleInstructionMetadata;
+  setPrivate(): gdMultipleInstructionMetadata;
   delete(): void;
   ptr: number;
 };

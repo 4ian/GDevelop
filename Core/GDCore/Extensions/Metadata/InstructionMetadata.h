@@ -206,7 +206,7 @@ class GD_CORE_API InstructionMetadata {
     if (!parameters.empty())
       parameters.back().SetLongDescription(longDescription);
     return *this;
-  };
+  }
 
   /**
    * \brief Set the additional information, used for some parameters
@@ -218,7 +218,7 @@ class GD_CORE_API InstructionMetadata {
   InstructionMetadata &SetParameterExtraInfo(const gd::String &extraInfo) {
     if (!parameters.empty()) parameters.back().SetExtraInfo(extraInfo);
     return *this;
-  };
+  }
 
   /**
    * \brief Add the default parameters for an instruction manipulating the
@@ -276,7 +276,7 @@ class GD_CORE_API InstructionMetadata {
    */
   const gd::String &GetRequiredBaseObjectCapability() const {
     return requiredBaseObjectCapability;
-  };
+  }
 
   /**
    * \brief Consider that the instruction is easy for a user to understand.

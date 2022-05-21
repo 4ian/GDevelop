@@ -18,6 +18,7 @@
     "follow-redirects": "^1.2.3",
     "iso-639-1": "^2.0.3",
     "minimist": "1.2.5",
+    "patch-package": "^6.4.7",
     "prettier": "1.15.3",
     "react-error-overlay": "^6.0.9",
     "react-scripts": "4.0.3",
@@ -87,7 +88,7 @@
     "xxhashjs": "^0.2.2"
   },
   "scripts": {
-    "postinstall": "cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources && npm run make-version-metadata",
+    "postinstall": "patch-package && cd ../../GDJS && npm install && cd ../newIDE/app && npm run import-resources && npm run make-version-metadata",
     "import-resources": "npm run import-zipped-external-editors && npm run build-theme-resources && cd scripts && node import-libGD.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-external-libs.js",
     "make-version-metadata": "cd scripts && node make-version-metadata.js",
     "make-service-worker": "cd scripts && node make-service-worker.js",

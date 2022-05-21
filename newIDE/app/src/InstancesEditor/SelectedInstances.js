@@ -108,7 +108,7 @@ export default class SelectedInstances {
       this.resizeButtons[resizeGrabbingLocation] = resizeButton;
       this._makeButton(
         resizeButton,
-        event => {
+        (event) => {
           this.onResize(event.deltaX, event.deltaY, resizeGrabbingLocation);
         },
         () => {
@@ -119,7 +119,7 @@ export default class SelectedInstances {
     }
     this._makeButton(
       this.rotateButton,
-      event => {
+      (event) => {
         this.onRotate(event.deltaX, event.deltaY);
       },
       () => {
@@ -189,12 +189,8 @@ export default class SelectedInstances {
   }
 
   render() {
-    const {
-      bigButtonSize,
-      smallButtonSize,
-      buttonPadding,
-      hitAreaPadding,
-    } = getButtonSizes(this._screenType);
+    const { bigButtonSize, smallButtonSize, buttonPadding, hitAreaPadding } =
+      getButtonSizes(this._screenType);
     const selection = this.instancesSelection.getSelectedInstances();
     let x1 = 0;
     let y1 = 0;
@@ -257,7 +253,7 @@ export default class SelectedInstances {
 
     // If there are no unlocked instances, hide the resize buttons.
     const show =
-      selection.filter(instance => !instance.isLocked()).length !== 0;
+      selection.filter((instance) => !instance.isLocked()).length !== 0;
 
     // Position the resize buttons.
     for (const grabbingLocation of resizeGrabbingLocationValues) {

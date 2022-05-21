@@ -97,7 +97,7 @@ export const getUserUsages = (
   userId: string
 ): Promise<Usages> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
         params: {
           userId,
@@ -107,7 +107,7 @@ export const getUserUsages = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getUserLimits = (
@@ -115,7 +115,7 @@ export const getUserLimits = (
   userId: string
 ): Promise<Limits> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
         params: {
           userId,
@@ -125,7 +125,7 @@ export const getUserLimits = (
         },
       })
     )
-    .then(response => response.data.limits);
+    .then((response) => response.data.limits);
 };
 
 export const getUserSubscription = (
@@ -133,7 +133,7 @@ export const getUserSubscription = (
   userId: string
 ): Promise<Subscription> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopUsageApi.baseUrl}/subscription-v2`, {
         params: {
           userId,
@@ -143,7 +143,7 @@ export const getUserSubscription = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const changeUserSubscription = (
@@ -152,7 +152,7 @@ export const changeUserSubscription = (
   newSubscriptionDetails: { planId: string | null, stripeToken?: any }
 ): Promise<Subscription> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopUsageApi.baseUrl}/subscription-v2`,
         newSubscriptionDetails,
@@ -166,7 +166,7 @@ export const changeUserSubscription = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 type UploadType = 'build' | 'preview';
@@ -180,7 +180,7 @@ export const getSignedUrl = (params: {|
 }> => {
   return axios
     .post(`${GDevelopUsageApi.baseUrl}/upload-options/signed-url`, params)
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getRedirectToCheckoutUrl = (

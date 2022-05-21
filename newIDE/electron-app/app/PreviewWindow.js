@@ -50,8 +50,7 @@ const openPreviewWindow = ({
 
   previewWindow.on('closed', event => {
     previewWindows = previewWindows.filter(
-      otherPreviewBrowserWindow =>
-        otherPreviewBrowserWindow !== previewWindow
+      otherPreviewBrowserWindow => otherPreviewBrowserWindow !== previewWindow
     );
     previewWindow = null;
   });

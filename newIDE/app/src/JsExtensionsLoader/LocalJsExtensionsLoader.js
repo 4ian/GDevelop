@@ -36,9 +36,9 @@ module.exports = function makeExtensionsLoader(
   return {
     loadAllExtensions: (_ /*: TranslationFunction */) => {
       return findJsExtensionModules({ filterExamples, onFindGDJS }).then(
-        extensionModulePaths => {
+        (extensionModulePaths) => {
           return Promise.all(
-            extensionModulePaths.map(extensionModulePath => {
+            extensionModulePaths.map((extensionModulePath) => {
               let extensionModule = null;
               try {
                 extensionModule = optionalRequire(extensionModulePath, {
@@ -101,7 +101,7 @@ module.exports = function makeExtensionsLoader(
             })
           );
         },
-        err => {
+        (err) => {
           console.error(`Unable to find JS extensions modules`);
           throw err;
         }

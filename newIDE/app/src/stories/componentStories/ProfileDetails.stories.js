@@ -28,7 +28,8 @@ export default {
       defaultValue: 'Complete profile',
       mapping: {
         'Complete profile': indieUserProfile,
-        'Without username nor bio': indieUserWithoutUsernameNorDescriptionProfile,
+        'Without username nor bio':
+          indieUserWithoutUsernameNorDescriptionProfile,
       },
     },
   },

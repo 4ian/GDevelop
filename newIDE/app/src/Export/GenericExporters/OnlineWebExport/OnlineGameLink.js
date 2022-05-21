@@ -72,12 +72,10 @@ const OnlineGameLink = ({
   errored,
   exportStep,
 }: OnlineGameLinkProps) => {
-  const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState<boolean>(
-    false
-  );
-  const [isShareDialogOpen, setIsShareDialogOpen] = React.useState<boolean>(
-    false
-  );
+  const [showCopiedInfoBar, setShowCopiedInfoBar] =
+    React.useState<boolean>(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] =
+    React.useState<boolean>(false);
   const [
     isOnlineGamePropertiesDialogOpen,
     setIsOnlineGamePropertiesDialogOpen,
@@ -100,32 +98,29 @@ const OnlineGameLink = ({
       ? gameUrl
       : getBuildArtifactUrl(build, 's3Key');
 
-  const loadGame = React.useCallback(
-    async () => {
-      const gameId = build && build.gameId;
-      if (!profile || !gameId) return;
+  const loadGame = React.useCallback(async () => {
+    const gameId = build && build.gameId;
+    if (!profile || !gameId) return;
 
-      const { id } = profile;
-      try {
-        setIsGameLoading(true);
-        const [game, slugs] = await Promise.all([
-          getGame(getAuthorizationHeader, id, gameId),
-          getGameSlugs(getAuthorizationHeader, id, gameId).catch(err => {
-            console.error('Unable to get the game slug', err);
-          }),
-        ]);
-        setGame(game);
-        if (slugs && slugs.length > 0) {
-          setSlug(slugs[0]);
-        }
-      } catch (err) {
-        console.error('Unable to load the game', err);
-      } finally {
-        setIsGameLoading(false);
+    const { id } = profile;
+    try {
+      setIsGameLoading(true);
+      const [game, slugs] = await Promise.all([
+        getGame(getAuthorizationHeader, id, gameId),
+        getGameSlugs(getAuthorizationHeader, id, gameId).catch((err) => {
+          console.error('Unable to get the game slug', err);
+        }),
+      ]);
+      setGame(game);
+      if (slugs && slugs.length > 0) {
+        setSlug(slugs[0]);
       }
-    },
-    [build, getAuthorizationHeader, profile]
-  );
+    } catch (err) {
+      console.error('Unable to load the game', err);
+    } finally {
+      setIsGameLoading(false);
+    }
+  }, [build, getAuthorizationHeader, profile]);
 
   const tryUpdateAuthors = React.useCallback(
     async (i18n: I18nType) => {
@@ -201,15 +196,12 @@ const OnlineGameLink = ({
     [build, game, getAuthorizationHeader, profile]
   );
 
-  React.useEffect(
-    () => {
-      // Load game only once
-      if (!game && isBuildComplete) {
-        loadGame();
-      }
-    },
-    [game, loadGame, isBuildComplete]
-  );
+  React.useEffect(() => {
+    // Load game only once
+    if (!game && isBuildComplete) {
+      loadGame();
+    }
+  }, [game, loadGame, isBuildComplete]);
 
   const onOpen = () => {
     if (!buildUrl) return;
@@ -240,14 +232,11 @@ const OnlineGameLink = ({
     }
   };
 
-  React.useEffect(
-    () => {
-      if (exportStep === 'done') {
-        setIsShareDialogOpen(true);
-      }
-    },
-    [exportStep]
-  );
+  React.useEffect(() => {
+    if (exportStep === 'done') {
+      setIsShareDialogOpen(true);
+    }
+  }, [exportStep]);
 
   const onGameUpdate = React.useCallback(
     async (
@@ -371,7 +360,7 @@ const OnlineGameLink = ({
                         }
                       />
                     )}
-                    renderButton={style => (
+                    renderButton={(style) => (
                       <RaisedButton
                         primary
                         label={<Trans>Open</Trans>}
@@ -472,7 +461,7 @@ const OnlineGameLink = ({
               onSaveProject={onSaveProject}
               buildId={build.id}
               onClose={() => setIsOnlineGamePropertiesDialogOpen(false)}
-              onApply={async partialGameChange => {
+              onApply={async (partialGameChange) => {
                 const isGameUpdated = await onGameUpdate(
                   partialGameChange,
                   i18n

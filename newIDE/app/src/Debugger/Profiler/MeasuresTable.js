@@ -90,7 +90,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
   };
 
   _toggleSection = (path: string) => {
-    this.setState(state => ({
+    this.setState((state) => ({
       collapsedPaths: {
         ...state.collapsedPaths,
         [path]: !state.collapsedPaths[path],
@@ -130,7 +130,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
 
     return (
       <ThemeConsumer>
-        {muiTheme => (
+        {(muiTheme) => (
           <AutoSizer>
             {({ height, width }) => (
               <Table

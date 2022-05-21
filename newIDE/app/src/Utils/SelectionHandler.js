@@ -17,7 +17,7 @@ export const clearSelection = () => getInitialSelection();
 
 export const getSelection = <T: ObjectType>(
   selection: SelectionState<T>
-): Array<T> => values(selection).filter(value => !!value);
+): Array<T> => values(selection).filter((value) => !!value);
 
 export const addToSelection = <T: ObjectType>(
   selection: SelectionState<T>,
@@ -38,5 +38,5 @@ export const isSelected = <T: ObjectType>(
 export const hasSelection = <T: ObjectType>(
   selection: SelectionState<T>
 ): boolean => {
-  return !!values(selection).filter(value => !!value).length;
+  return !!values(selection).filter((value) => !!value).length;
 };

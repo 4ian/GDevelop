@@ -55,7 +55,7 @@ export const declareExtensionDependencies = (
 ) =>
   mapVector<gdDependencyMetadata, void>(
     eventsFunctionsExtension.getAllDependencies(),
-    dependency => extension.addDependency().copyFrom(dependency)
+    (dependency) => extension.addDependency().copyFrom(dependency)
   );
 
 const getExtensionIconUrl = (extension: gdPlatformExtension) => {
@@ -92,13 +92,13 @@ export const declareBehaviorMetadata = (
   );
 
   // $FlowExpectedError - we're creating a behavior
-  generatedBehavior.updateProperty = function(
+  generatedBehavior.updateProperty = function (
     behaviorContent: gdSerializerElement,
     propertyName: string,
     newValue: string
   ) {
     const enumeratedProperty = enumeratedProperties.find(
-      enumeratedProperty => enumeratedProperty.name === propertyName
+      (enumeratedProperty) => enumeratedProperty.name === propertyName
     );
     if (!enumeratedProperty) return false;
 
@@ -122,10 +122,10 @@ export const declareBehaviorMetadata = (
   };
 
   // $FlowExpectedError - we're creating a behavior
-  generatedBehavior.getProperties = function(behaviorContent) {
+  generatedBehavior.getProperties = function (behaviorContent) {
     var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
-    enumeratedProperties.forEach(enumeratedProperty => {
+    enumeratedProperties.forEach((enumeratedProperty) => {
       const propertyName = enumeratedProperty.name;
       const propertyType = enumeratedProperty.type;
       const newProperty = toGdPropertyDescriptor(
@@ -164,8 +164,8 @@ export const declareBehaviorMetadata = (
   };
 
   // $FlowExpectedError - we're creating a behavior
-  generatedBehavior.initializeContent = function(behaviorContent) {
-    enumeratedProperties.forEach(enumeratedProperty => {
+  generatedBehavior.initializeContent = function (behaviorContent) {
+    enumeratedProperties.forEach((enumeratedProperty) => {
       const element = behaviorContent.addChild(enumeratedProperty.name);
       const propertyType: string = enumeratedProperty.type;
 
@@ -391,15 +391,13 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
     return instructionOrExpression;
   };
 
-  mapVector(eventsBasedBehavior.getPropertyDescriptors(), property => {
+  mapVector(eventsBasedBehavior.getPropertyDescriptors(), (property) => {
     const propertyType = property.getType();
     const propertyName = property.getName();
-    const getterName = gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(
-      propertyName
-    );
-    const setterName = gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(
-      propertyName
-    );
+    const getterName =
+      gd.BehaviorCodeGenerator.getBehaviorPropertyGetterName(propertyName);
+    const setterName =
+      gd.BehaviorCodeGenerator.getBehaviorPropertySetterName(propertyName);
     const propertyLabel =
       property.getLabel() || i18n._(t`${propertyName} property`);
 

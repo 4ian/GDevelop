@@ -17,39 +17,28 @@ type Props = {|
 export const GamesList = (props: Props) => {
   const [error, setError] = React.useState<?Error>(null);
   const [games, setGames] = React.useState<?Array<Game>>(null);
-  const {
-    authenticated,
-    firebaseUser,
-    getAuthorizationHeader,
-  } = React.useContext(AuthenticatedUserContext);
+  const { authenticated, firebaseUser, getAuthorizationHeader } =
+    React.useContext(AuthenticatedUserContext);
   const [openedGame, setOpenedGame] = React.useState<?Game>(null);
-  const [
-    openedGameInitialTab,
-    setOpenedGameInitialTab,
-  ] = React.useState<GamesDetailsTab>('details');
+  const [openedGameInitialTab, setOpenedGameInitialTab] =
+    React.useState<GamesDetailsTab>('details');
 
-  const loadGames = React.useCallback(
-    async () => {
-      if (!authenticated || !firebaseUser) return;
+  const loadGames = React.useCallback(async () => {
+    if (!authenticated || !firebaseUser) return;
 
-      try {
-        setError(null);
-        const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
-        setGames(games);
-      } catch (error) {
-        console.error('Error while loading user games.', error);
-        setError(error);
-      }
-    },
-    [authenticated, firebaseUser, getAuthorizationHeader]
-  );
+    try {
+      setError(null);
+      const games = await getGames(getAuthorizationHeader, firebaseUser.uid);
+      setGames(games);
+    } catch (error) {
+      console.error('Error while loading user games.', error);
+      setError(error);
+    }
+  }, [authenticated, firebaseUser, getAuthorizationHeader]);
 
-  React.useEffect(
-    () => {
-      loadGames();
-    },
-    [loadGames]
-  );
+  React.useEffect(() => {
+    loadGames();
+  }, [loadGames]);
 
   if (!authenticated) {
     return null;
@@ -74,10 +63,12 @@ export const GamesList = (props: Props) => {
   }
 
   const projectUuid = props.project ? props.project.getProjectUuid() : null;
-  const thisGame = games.find(game => !!projectUuid && game.id === projectUuid);
+  const thisGame = games.find(
+    (game) => !!projectUuid && game.id === projectUuid
+  );
   const displayedGames = [
     thisGame,
-    ...games.filter(game => game !== thisGame),
+    ...games.filter((game) => game !== thisGame),
   ].filter(Boolean);
 
   return (
@@ -90,7 +81,7 @@ export const GamesList = (props: Props) => {
           loadGames();
         }}
       />
-      {displayedGames.map(game => (
+      {displayedGames.map((game) => (
         <GameCard
           key={game.id}
           isCurrentGame={!!projectUuid && game.id === projectUuid}
@@ -113,9 +104,9 @@ export const GamesList = (props: Props) => {
           onClose={() => {
             setOpenedGame(null);
           }}
-          onGameUpdated={updatedGame => {
+          onGameUpdated={(updatedGame) => {
             setGames(
-              games.map(game => (game === openedGame ? updatedGame : game))
+              games.map((game) => (game === openedGame ? updatedGame : game))
             );
             setOpenedGame(updatedGame);
           }}

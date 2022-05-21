@@ -83,11 +83,8 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
     authenticatedUser: AuthenticatedUser,
     plan: PlanDetails
   ) => {
-    const {
-      getAuthorizationHeader,
-      subscription,
-      firebaseUser,
-    } = authenticatedUser;
+    const { getAuthorizationHeader, subscription, firebaseUser } =
+      authenticatedUser;
     if (!firebaseUser || !subscription) return;
     sendChoosePlanClicked(plan.planId);
 
@@ -179,7 +176,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
           <AuthenticatedUserContext.Consumer>
             {(authenticatedUser: AuthenticatedUser) => (
               <ThemeConsumer>
-                {muiTheme => (
+                {(muiTheme) => (
                   <Dialog
                     actions={[
                       <FlatButton
@@ -208,7 +205,7 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                         </Text>
                       </Line>
                     </Column>
-                    {getSubscriptionPlans().map(plan => (
+                    {getSubscriptionPlans().map((plan) => (
                       <Card key={plan.planId || ''} style={styles.card}>
                         <CardHeader
                           title={

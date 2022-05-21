@@ -75,7 +75,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
       exportStep
     ),
 
-  renderHeader: props => <SetupExportHeader {...props} />,
+  renderHeader: (props) => <SetupExportHeader {...props} />,
 
   renderLaunchButtonLabel: () => <Trans>Packaging for Android</Trans>,
 
@@ -128,7 +128,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     return downloadUrlsToBlobs({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -150,7 +150,7 @@ export const browserOnlineCordovaExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadBlobFile(
         blobFile,
         uploadOptions,

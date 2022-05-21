@@ -113,7 +113,7 @@ export default class ForEachEvent extends React.Component<
               [disabledText]: this.props.disabled,
             })}
             onClick={this.edit}
-            onKeyPress={event => {
+            onKeyPress={(event) => {
               if (shouldActivate(event)) {
                 this.edit(event);
               }
@@ -199,14 +199,14 @@ export default class ForEachEvent extends React.Component<
             globalObjectsContainer={this.props.globalObjectsContainer}
             objectsContainer={this.props.objectsContainer}
             value={objectName}
-            onChange={text => {
+            onChange={(text) => {
               forEachEvent.setObjectToPick(text);
               this.props.onUpdate();
             }}
             isInline
             onRequestClose={this.cancelEditing}
             onApply={this.endEditing}
-            ref={objectField => (this._objectField = objectField)}
+            ref={(objectField) => (this._objectField = objectField)}
           />
         </InlinePopover>
       </div>

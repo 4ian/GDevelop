@@ -30,7 +30,7 @@ export default class DefaultField extends React.Component<
           parameterMetadata ? parameterMetadata.getLongDescription() : undefined
         }
         onChange={(text: string) => this.props.onChange(text)}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         fullWidth
       />
     );

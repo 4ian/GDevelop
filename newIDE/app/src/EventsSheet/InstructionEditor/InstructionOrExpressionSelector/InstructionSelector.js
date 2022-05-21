@@ -27,10 +27,11 @@ const style = {
 };
 
 export default class InstructionSelector extends Component<Props, {||}> {
-  instructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition),
-    this.props.scope
-  );
+  instructionsInfo: Array<EnumeratedInstructionMetadata> =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateAllInstructions(this.props.isCondition),
+      this.props.scope
+    );
   instructionsInfoTree: InstructionTreeNode = createTree(this.instructionsInfo);
 
   render() {

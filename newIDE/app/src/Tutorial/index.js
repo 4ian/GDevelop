@@ -9,20 +9,16 @@ import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasur
 type Props = {};
 
 export const TutorialsList = (props: Props) => {
-  const { tutorials, error, fetchTutorials } = React.useContext(
-    TutorialContext
-  );
+  const { tutorials, error, fetchTutorials } =
+    React.useContext(TutorialContext);
 
-  React.useEffect(
-    () => {
-      fetchTutorials();
-    },
-    [fetchTutorials]
-  );
+  React.useEffect(() => {
+    fetchTutorials();
+  }, [fetchTutorials]);
 
   return (
     <ResponsiveWindowMeasurer>
-      {windowWidth => (
+      {(windowWidth) => (
         <Column expand noMargin useFullHeight>
           <Line
             expand
@@ -34,7 +30,7 @@ export const TutorialsList = (props: Props) => {
               onRetry={fetchTutorials}
               error={error}
               searchItems={tutorials}
-              getSearchItemUniqueId={tutorial => tutorial.id}
+              getSearchItemUniqueId={(tutorial) => tutorial.id}
               renderSearchItem={(tutorial, onHeightComputed) => (
                 <TutorialListItem
                   onHeightComputed={onHeightComputed}

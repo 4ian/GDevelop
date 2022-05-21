@@ -6,7 +6,7 @@ export type Tags = Array<string>;
 export type SelectedTags = Tags;
 
 export const removeTag = (tags: Tags, tag: string): Tags => {
-  return tags.filter(selectedTag => selectedTag !== tag);
+  return tags.filter((selectedTag) => selectedTag !== tag);
 };
 
 export const addTags = (tags: Tags, newTags: Tags): Tags => {
@@ -17,7 +17,7 @@ export type BuildTagsMenuTemplateOptions = {|
   noTagLabel: string,
   getAllTags: () => Array<string>,
   selectedTags: SelectedTags,
-  onChange: SelectedTags => void,
+  onChange: (SelectedTags) => void,
   onEditTags?: () => void,
   editTagsLabel?: string,
 |};
@@ -55,7 +55,7 @@ export const buildTagsMenuTemplate = ({
   }
 
   return allTags
-    .map(tag => ({
+    .map((tag) => ({
       type: 'checkbox',
       label: tag,
       checked: selectedTags.includes(tag),
@@ -73,7 +73,7 @@ export const buildTagsMenuTemplate = ({
 export const getTagsFromString = (tagsString: string): Tags => {
   if (tagsString.trim() === '') return [];
 
-  return tagsString.split(',').map(tag => tag.trim());
+  return tagsString.split(',').map((tag) => tag.trim());
 };
 
 export const getStringFromTags = (tags: Tags): string => {

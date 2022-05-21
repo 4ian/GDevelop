@@ -165,8 +165,10 @@ namespace gdjs {
         const newRuntimeGameOptions: RuntimeGameOptions =
           gdjs.runtimeGameOptions;
 
-        const newScriptFiles = newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
-        const projectDataOnlyExport = !!newRuntimeGameOptions.projectDataOnlyExport;
+        const newScriptFiles =
+          newRuntimeGameOptions.scriptFiles as RuntimeGameOptionsScriptFile[];
+        const projectDataOnlyExport =
+          !!newRuntimeGameOptions.projectDataOnlyExport;
 
         // Reload the changed scripts, which will have the side effects of re-running
         // the new scripts, potentially replacing the code of the free functions from
@@ -179,10 +181,11 @@ namespace gdjs {
           projectDataOnlyExport
         )
           .then(() => {
-            const changedRuntimeBehaviors = this._computeChangedRuntimeBehaviors(
-              oldBehaviorConstructors,
-              gdjs.behaviorsTypes.items
-            );
+            const changedRuntimeBehaviors =
+              this._computeChangedRuntimeBehaviors(
+                oldBehaviorConstructors,
+                gdjs.behaviorsTypes.items
+              );
             return this._hotReloadRuntimeGame(
               oldProjectData,
               newProjectData,

@@ -76,7 +76,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           backgroundColor: `rgb(${r}, ${g}, ${b})`,
         }}
         onClick={this.edit}
-        onKeyPress={event => {
+        onKeyPress={(event) => {
           if (shouldActivate(event)) {
             this.edit();
           }
@@ -85,7 +85,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
       >
         {this.state.editing ? (
           <TextField
-            ref={textField => (this._textField = textField)}
+            ref={(textField) => (this._textField = textField)}
             value={groupEvent.getName()}
             hintText={t`<Enter group name>`}
             onBlur={this.endEditing}
@@ -103,12 +103,12 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
             }}
             fullWidth
             id="group-title"
-            onKeyUp={event => {
+            onKeyUp={(event) => {
               if (shouldCloseOrCancel(event)) {
                 this.endEditing();
               }
             }}
-            onKeyPress={event => {
+            onKeyPress={(event) => {
               if (shouldValidate(event)) {
                 this.endEditing();
               }

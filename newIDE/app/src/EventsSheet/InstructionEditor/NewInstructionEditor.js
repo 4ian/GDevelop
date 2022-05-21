@@ -57,17 +57,20 @@ type NewInstructionEditorState = {|
 
 type NewInstructionEditorSetters = {|
   /** Select an instruction - which can be a free or an object instruction. */
-  chooseInstruction: (
-    type: string
-  ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  chooseInstruction: (type: string) => {|
+    ...NewInstructionEditorState,
+    instruction: gdInstruction,
+  |},
   /** Select an object, so that then this object specific instructions can be searched and selected. */
-  chooseObject: (
-    objectName: string
-  ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  chooseObject: (objectName: string) => {|
+    ...NewInstructionEditorState,
+    instruction: gdInstruction,
+  |},
   /** Select an instruction for the currently selected object. */
-  chooseObjectInstruction: (
-    type: string
-  ) => {| ...NewInstructionEditorState, instruction: gdInstruction |},
+  chooseObjectInstruction: (type: string) => {|
+    ...NewInstructionEditorState,
+    instruction: gdInstruction,
+  |},
 |};
 
 const findInstruction = (
@@ -91,15 +94,16 @@ export const useNewInstructionEditor = ({
     objectName: string,
     discardInstructionTypeIfNotInObjectInstructions: boolean
   ): NewInstructionEditorState => {
-    const chosenObjectInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateObjectAndBehaviorsInstructions(
-        isCondition,
-        globalObjectsContainer,
-        objectsContainer,
-        objectName
-      ),
-      scope
-    );
+    const chosenObjectInstructionsInfo =
+      filterEnumeratedInstructionOrExpressionMetadataByScope(
+        enumerateObjectAndBehaviorsInstructions(
+          isCondition,
+          globalObjectsContainer,
+          objectsContainer,
+          objectName
+        ),
+        scope
+      );
 
     // As we changed to a new object, verify if the instruction is still valid for this object. If not,
     // discard the chosen instruction - this is to avoid the user creating invalid instructions.

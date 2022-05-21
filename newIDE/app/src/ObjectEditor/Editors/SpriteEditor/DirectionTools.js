@@ -40,7 +40,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   project: gdProject,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  onEditWith: ResourceExternalEditor => void,
+  onEditWith: (ResourceExternalEditor) => void,
 |};
 
 type State = {|
@@ -113,7 +113,7 @@ export default class DirectionTools extends Component<Props, State> {
     return (
       <div style={styles.container}>
         <ResponsiveWindowMeasurer>
-          {windowWidth =>
+          {(windowWidth) =>
             windowWidth !== 'small' &&
             !!imageResourceExternalEditors.length && (
               <FlatButton
@@ -173,7 +173,7 @@ export default class DirectionTools extends Component<Props, State> {
               resourcesLoader={resourcesLoader}
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}
-              onChangeTimeBetweenFrames={text =>
+              onChangeTimeBetweenFrames={(text) =>
                 this.setState({ timeBetweenFrames: text })
               }
             />

@@ -143,12 +143,12 @@ export default class InstructionParametersEditor extends React.Component<
       ? getObjectParameterIndex(instructionMetadata)
       : -1;
 
-    return mapFor(0, instructionMetadata.getParametersCount(), i => {
+    return mapFor(0, instructionMetadata.getParametersCount(), (i) => {
       if (!instructionMetadata) return false;
       const parameterMetadata = instructionMetadata.getParameter(i);
 
       return isParameterVisible(parameterMetadata, i, objectParameterIndex);
-    }).filter(isVisible => isVisible).length;
+    }).filter((isVisible) => isVisible).length;
   }
 
   _openExtension = (i18n: I18nType) => {
@@ -217,9 +217,8 @@ export default class InstructionParametersEditor extends React.Component<
     if (!instructionMetadata) return this._renderEmpty();
 
     const helpPage = instructionMetadata.getHelpPath();
-    const instructionExtraInformation = getExtraInstructionInformation(
-      instructionType
-    );
+    const instructionExtraInformation =
+      getExtraInstructionInformation(instructionType);
     const tutorialIds = getInstructionTutorialIds(instructionType);
     const objectParameterIndex = objectName
       ? getObjectParameterIndex(instructionMetadata)
@@ -277,7 +276,7 @@ export default class InstructionParametersEditor extends React.Component<
               {tutorialIds.length ? (
                 <Line>
                   <ColumnStackLayout expand>
-                    {tutorialIds.map(tutorialId => (
+                    {tutorialIds.map((tutorialId) => (
                       <DismissableTutorialMessage
                         key={tutorialId}
                         tutorialId={tutorialId}
@@ -293,10 +292,9 @@ export default class InstructionParametersEditor extends React.Component<
                 id="instruction-parameters-container"
               >
                 <ColumnStackLayout noMargin>
-                  {mapFor(0, instructionMetadata.getParametersCount(), i => {
-                    const parameterMetadata = instructionMetadata.getParameter(
-                      i
-                    );
+                  {mapFor(0, instructionMetadata.getParametersCount(), (i) => {
+                    const parameterMetadata =
+                      instructionMetadata.getParameter(i);
                     if (
                       !isParameterVisible(
                         parameterMetadata,
@@ -307,9 +305,10 @@ export default class InstructionParametersEditor extends React.Component<
                       return null;
 
                     const parameterMetadataType = parameterMetadata.getType();
-                    const ParameterComponent = ParameterRenderingService.getParameterComponent(
-                      parameterMetadataType
-                    );
+                    const ParameterComponent =
+                      ParameterRenderingService.getParameterComponent(
+                        parameterMetadataType
+                      );
 
                     // Track the field count on screen, to affect the ref to the
                     // first visible field.
@@ -324,7 +323,7 @@ export default class InstructionParametersEditor extends React.Component<
                         parameterMetadata={parameterMetadata}
                         parameterIndex={i}
                         value={instruction.getParameter(i)}
-                        onChange={value => {
+                        onChange={(value) => {
                           if (instruction.getParameter(i) !== value) {
                             instruction.setParameter(i, value);
                             this.setState({
@@ -343,7 +342,7 @@ export default class InstructionParametersEditor extends React.Component<
                         resourceExternalEditors={
                           this.props.resourceExternalEditors
                         }
-                        ref={field => {
+                        ref={(field) => {
                           if (isFirstVisibleParameterField) {
                             this._firstVisibleField = field;
                           }

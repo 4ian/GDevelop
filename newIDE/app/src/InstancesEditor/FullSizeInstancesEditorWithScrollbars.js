@@ -129,7 +129,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
 
     return (
       <ScreenTypeMeasurer>
-        {screenType => (
+        {(screenType) => (
           <FullSizeMeasurer>
             {({ width, height }) => (
               <div style={styles.container}>
@@ -158,7 +158,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
                     onChange={this._handleXChange}
                     style={styles.xScrollbar}
                     orientation="horizontal"
-                    onChangeCommitted={event => event.target.blur()}
+                    onChangeCommitted={(event) => event.target.blur()}
                   />
                 )}
                 {screenType !== 'touch' && (
@@ -171,7 +171,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
                     onChange={this._handleYChange}
                     style={styles.yScrollbar}
                     orientation="vertical"
-                    onChangeCommitted={event => event.target.blur()}
+                    onChangeCommitted={(event) => event.target.blur()}
                   />
                 )}
               </div>

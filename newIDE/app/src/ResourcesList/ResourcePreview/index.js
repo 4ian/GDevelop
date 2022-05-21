@@ -66,25 +66,27 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
         );
       case 'audio':
         return (
-          <GenericIconPreview renderIcon={props => <Audiotrack {...props} />} />
+          <GenericIconPreview
+            renderIcon={(props) => <Audiotrack {...props} />}
+          />
         );
       case 'json':
         return (
           <GenericIconPreview
-            renderIcon={props => <InsertDriveFile {...props} />}
+            renderIcon={(props) => <InsertDriveFile {...props} />}
           />
         );
       case 'video':
         return (
           <GenericIconPreview
-            renderIcon={props => <VideoLibrary {...props} />}
+            renderIcon={(props) => <VideoLibrary {...props} />}
           />
         );
       case 'font':
       case 'bitmapFont':
         return (
           <GenericIconPreview
-            renderIcon={props => <FontDownload {...props} />}
+            renderIcon={(props) => <FontDownload {...props} />}
           />
         );
       default:

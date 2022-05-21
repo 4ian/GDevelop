@@ -57,7 +57,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
-  onRemoveUnusedResources: ResourceKind => void,
+  onRemoveUnusedResources: (ResourceKind) => void,
   onRemoveAllResourcesWithInvalidPath: () => void,
 |};
 
@@ -133,7 +133,7 @@ export default class ResourcesList extends React.Component<Props, State> {
 
     const allExtensions = [
       ...extensions,
-      ...extensions.map(extension => extension.toUpperCase()),
+      ...extensions.map((extension) => extension.toUpperCase()),
     ];
     const getAllFiles = (src, callback) => {
       glob(src + '/**/*.{' + allExtensions.join(',') + '}', callback);
@@ -145,7 +145,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       }
 
       const filesToCheck = new gd.VectorString();
-      allFiles.forEach(filePath =>
+      allFiles.forEach((filePath) =>
         filesToCheck.push_back(path.relative(projectPath, filePath))
       );
       const filePathsNotInResources = project
@@ -154,7 +154,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       filesToCheck.delete();
 
       mapVector(filePathsNotInResources, (relativeFilePath: string) => {
-        const resourceName = newNameGenerator(relativeFilePath, name =>
+        const resourceName = newNameGenerator(relativeFilePath, (name) =>
           resourcesManager.hasResource(name)
         );
 
@@ -223,7 +223,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    this.props.onRenameResource(resource, newName, doRename => {
+    this.props.onRenameResource(resource, newName, (doRename) => {
       if (!doRename) return;
       resource.setName(newName);
       this.forceUpdate();
@@ -247,74 +247,73 @@ export default class ResourcesList extends React.Component<Props, State> {
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _renderResourceMenuTemplate = (i18n: I18nType) => (
-    resource: gdResource,
-    _index: number
-  ): Array<MenuItemTemplate> => {
-    return [
-      {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(resource),
-      },
-      {
-        label: i18n._(t`Delete`),
-        click: () => this._deleteResource(resource),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Open File`),
-        click: () => this._openResourceFile(resource),
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Locate File`),
-        click: () => this._locateResourceFile(resource),
-        enabled: hasElectron,
-      },
-      {
-        label: i18n._(t`Copy File Path`),
-        click: () => this._copyResourceFilePath(resource),
-        enabled: hasElectron,
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Scan in the project folder for...`),
-        submenu: allResourceKindsAndMetadata.map(
-          ({ displayName, fileExtensions, createNewResource }) => ({
+  _renderResourceMenuTemplate =
+    (i18n: I18nType) =>
+    (resource: gdResource, _index: number): Array<MenuItemTemplate> => {
+      return [
+        {
+          label: i18n._(t`Rename`),
+          click: () => this._editName(resource),
+        },
+        {
+          label: i18n._(t`Delete`),
+          click: () => this._deleteResource(resource),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Open File`),
+          click: () => this._openResourceFile(resource),
+          enabled: hasElectron,
+        },
+        {
+          label: i18n._(t`Locate File`),
+          click: () => this._locateResourceFile(resource),
+          enabled: hasElectron,
+        },
+        {
+          label: i18n._(t`Copy File Path`),
+          click: () => this._copyResourceFilePath(resource),
+          enabled: hasElectron,
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Scan in the project folder for...`),
+          submenu: allResourceKindsAndMetadata.map(
+            ({ displayName, fileExtensions, createNewResource }) => ({
+              label: i18n._(displayName),
+              click: () => {
+                this._scanForNewResources(fileExtensions, createNewResource);
+              },
+              enabled: hasElectron,
+            })
+          ),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Remove unused...`),
+          submenu: allResourceKindsAndMetadata.map(({ displayName, kind }) => ({
             label: i18n._(displayName),
             click: () => {
-              this._scanForNewResources(fileExtensions, createNewResource);
+              this.props.onRemoveUnusedResources(kind);
             },
-            enabled: hasElectron,
-          })
-        ),
-      },
-      { type: 'separator' },
-      {
-        label: i18n._(t`Remove unused...`),
-        submenu: allResourceKindsAndMetadata.map(({ displayName, kind }) => ({
-          label: i18n._(displayName),
-          click: () => {
-            this.props.onRemoveUnusedResources(kind);
-          },
-        })),
-      },
-      {
-        label: i18n._(t`Remove Resources with Invalid Path`),
-        click: () => {
-          this.props.onRemoveAllResourcesWithInvalidPath();
+          })),
         },
-        enabled: hasElectron,
-      },
-    ];
-  };
+        {
+          label: i18n._(t`Remove Resources with Invalid Path`),
+          click: () => {
+            this.props.onRemoveAllResourcesWithInvalidPath();
+          },
+          enabled: hasElectron,
+        },
+      ];
+    };
 
   checkMissingPaths = () => {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
     const resourcesWithErrors = {};
-    resourceNames.forEach(resourceName => {
+    resourceNames.forEach((resourceName) => {
       resourcesWithErrors[resourceName] = getResourceFilePathStatus(
         project,
         resourceName
@@ -336,7 +335,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     const allResourcesList = resourcesManager
       .getAllResourceNames()
       .toJSArray()
-      .map(resourceName => resourcesManager.getResource(resourceName));
+      .map((resourceName) => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
     // Force List component to be mounted again if project
@@ -353,7 +352,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 {({ i18n }) => (
                   <SortableVirtualizedItemList
                     key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
+                    ref={(sortableList) => (this.sortableList = sortableList)}
                     fullList={filteredList}
                     width={width}
                     height={height}
@@ -376,7 +375,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         <SearchBar
           value={searchText}
           onRequestSearch={() => {}}
-          onChange={text =>
+          onChange={(text) =>
             this.setState({
               searchText: text,
             })

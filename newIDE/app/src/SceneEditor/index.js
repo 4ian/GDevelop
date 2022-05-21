@@ -456,7 +456,8 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     // Remember where to create the instance, when the object will be created
     this.setState({
-      newObjectInstanceSceneCoordinates: this.editor.getLastCursorSceneCoordinates(),
+      newObjectInstanceSceneCoordinates:
+        this.editor.getLastCursorSceneCoordinates(),
     });
 
     if (this._objectsList)
@@ -493,7 +494,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _onInstancesAdded = (instances: Array<gdInitialInstance>) => {
-    instances.forEach(instance => {
+    instances.forEach((instance) => {
       const infoBarDetails = onInstanceAdded(
         instance,
         this.props.layout,
@@ -518,7 +519,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
     this.setState({
       selectedObjectNames: uniq(
-        instances.map(instance => instance.getObjectName())
+        instances.map((instance) => instance.getObjectName())
       ),
     });
     this.forceUpdatePropertiesEditor();
@@ -603,7 +604,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     this._addInstanceForNewObject(object.getName());
   };
 
-  _onRemoveLayer = (layerName: string, done: boolean => void) => {
+  _onRemoveLayer = (layerName: string, done: (boolean) => void) => {
     this.setState({
       layerRemoveDialogOpen: true,
       layerRemoved: layerName,
@@ -647,56 +648,55 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onRenameLayer = (
     oldName: string,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     this.props.initialInstances.moveInstancesToLayer(oldName, newName);
     done(true);
   };
 
-  _onDeleteObject = (i18n: I18nType) => (
-    objectWithContext: ObjectWithContext,
-    done: boolean => void
-  ) => {
-    const { object, global } = objectWithContext;
-    const { project, layout } = this.props;
+  _onDeleteObject =
+    (i18n: I18nType) =>
+    (objectWithContext: ObjectWithContext, done: (boolean) => void) => {
+      const { object, global } = objectWithContext;
+      const { project, layout } = this.props;
 
-    const answer = Window.showYesNoCancelDialog(
-      i18n._(
-        t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
-      )
-    );
-
-    if (answer === 'cancel') return;
-    const shouldRemoveReferences = answer === 'yes';
-
-    // Unselect instances of the deleted object because these instances
-    // will be deleted by gd.WholeProjectRefactorer (and after that, they will
-    // be invalid references, as pointing to deleted objects).
-    this.instancesSelection.unselectInstancesOfObject(object.getName());
-
-    if (global) {
-      gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
-        project,
-        object.getName(),
-        /* isObjectGroup=*/ false,
-        shouldRemoveReferences
+      const answer = Window.showYesNoCancelDialog(
+        i18n._(
+          t`Do you want to remove all references to this object in groups and events (actions and conditions using the object)?`
+        )
       );
-    } else {
-      gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
-        project,
-        layout,
-        object.getName(),
-        /* isObjectGroup=*/ false,
-        shouldRemoveReferences
-      );
-    }
 
-    done(true);
+      if (answer === 'cancel') return;
+      const shouldRemoveReferences = answer === 'yes';
 
-    // We modified the selection, so force an update of editors dealing with it.
-    this.forceUpdatePropertiesEditor();
-    this.updateToolbar();
-  };
+      // Unselect instances of the deleted object because these instances
+      // will be deleted by gd.WholeProjectRefactorer (and after that, they will
+      // be invalid references, as pointing to deleted objects).
+      this.instancesSelection.unselectInstancesOfObject(object.getName());
+
+      if (global) {
+        gd.WholeProjectRefactorer.globalObjectOrGroupRemoved(
+          project,
+          object.getName(),
+          /* isObjectGroup=*/ false,
+          shouldRemoveReferences
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectOrGroupRemovedInLayout(
+          project,
+          layout,
+          object.getName(),
+          /* isObjectGroup=*/ false,
+          shouldRemoveReferences
+        );
+      }
+
+      done(true);
+
+      // We modified the selection, so force an update of editors dealing with it.
+      this.forceUpdatePropertiesEditor();
+      this.updateToolbar();
+    };
 
   _canObjectOrGroupUseNewName = (newName: string) => {
     const { project, layout } = this.props;
@@ -733,7 +733,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onRenameObject = (
     objectWithContext: ObjectWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
@@ -766,7 +766,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   _onDeleteGroup = (
     groupWithContext: GroupWithContext,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group, global } = groupWithContext;
     const { project, layout } = this.props;
@@ -798,7 +798,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onRenameGroup = (
     groupWithContext: GroupWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group, global } = groupWithContext;
     const { project, layout } = this.props;
@@ -830,7 +830,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   deleteSelection = () => {
     const selectedInstances = this.instancesSelection.getSelectedInstances();
-    selectedInstances.forEach(instance => {
+    selectedInstances.forEach((instance) => {
       if (instance.isLocked()) return;
       this.props.initialInstances.removeInstance(instance);
     });
@@ -873,7 +873,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     if (this.contextMenu)
       this.contextMenu.open(x, y, {
-        ignoreSelectedObjectNamesForContextMenu: !!ignoreSelectedObjectNamesForContextMenu,
+        ignoreSelectedObjectNamesForContextMenu:
+          !!ignoreSelectedObjectNamesForContextMenu,
       });
   };
 
@@ -988,7 +989,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   copySelection = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
-      .map(instance => serializeToJSObject(instance));
+      .map((instance) => serializeToJSObject(instance));
 
     if (this.editor) {
       const position = useLastCursorPosition
@@ -1010,11 +1011,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   duplicateSelection = () => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
-      .map(instance => serializeToJSObject(instance));
+      .map((instance) => serializeToJSObject(instance));
 
     if (!this.editor) return;
 
-    const newInstances = serializedSelection.map(serializedInstance => {
+    const newInstances = serializedSelection.map((serializedInstance) => {
       const instance = new gd.InitialInstance();
       unserializeFromJSObject(instance, serializedInstance);
       instance.setX(instance.getX() + 2 * MOVEMENT_BIG_DELTA);
@@ -1046,7 +1047,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const y = SafeExtractor.extractNumberProperty(clipboardContent, 'y');
     if (x === null || y === null || instancesContent === null) return;
 
-    const newInstances = instancesContent.map(serializedInstance => {
+    const newInstances = instancesContent.map((serializedInstance) => {
       const instance = new gd.InitialInstance();
       unserializeFromJSObject(instance, serializedInstance);
       instance.setX(instance.getX() - x + position[0]);
@@ -1110,7 +1111,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const tagsSet: Set<string> = new Set();
     enumerateObjects(project, layout).allObjectsList.forEach(({ object }) => {
-      getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
+      getTagsFromString(object.getTags()).forEach((tag) => tagsSet.add(tag));
     });
 
     return Array.from(tagsSet);
@@ -1123,7 +1124,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       noTagLabel: i18n._(t`No tags - add a tag to an object first`),
       getAllTags: this._getAllObjectTags,
       selectedTags: selectedObjectTags,
-      onChange: selectedObjectTags => {
+      onChange: (selectedObjectTags) => {
         this.setState({ selectedObjectTags });
       },
     });
@@ -1162,10 +1163,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                 instances={selectedInstances}
                 editInstanceVariables={this.editInstanceVariables}
                 onEditObjectByName={this.editObjectByName}
-                onInstancesModified={instances =>
+                onInstancesModified={(instances) =>
                   this.forceUpdateInstancesList()
                 }
-                ref={propertiesEditor =>
+                ref={(propertiesEditor) =>
                   (this._propertiesEditor = propertiesEditor)
                 }
                 unsavedChanges={this.props.unsavedChanges}
@@ -1202,7 +1203,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onRenameLayer={this._onRenameLayer}
             layersContainer={layout}
             unsavedChanges={this.props.unsavedChanges}
-            ref={layersList => (this._layersList = layersList)}
+            ref={(layersList) => (this._layersList = layersList)}
             hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
           />
         ),
@@ -1215,7 +1216,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             instances={initialInstances}
             selectedInstances={selectedInstances}
             onSelectInstances={this._onSelectInstances}
-            ref={instancesList => (this._instancesList = instancesList)}
+            ref={(instancesList) => (this._instancesList = instancesList)}
           />
         ),
       },
@@ -1246,7 +1247,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onRedo={this.redo}
             onZoomOut={this.zoomOut}
             onZoomIn={this.zoomIn}
-            wrappedEditorRef={editor => {
+            wrappedEditorRef={(editor) => {
               this.editor = editor;
             }}
             pauseRendering={!isActive}
@@ -1292,13 +1293,13 @@ export default class SceneEditor extends React.Component<Props, State> {
                 onAddObjectInstance={this.addInstanceAtTheCenter}
                 onObjectPasted={() => this.updateBehaviorsSharedData()}
                 selectedObjectTags={this.state.selectedObjectTags}
-                onChangeSelectedObjectTags={selectedObjectTags =>
+                onChangeSelectedObjectTags={(selectedObjectTags) =>
                   this.setState({
                     selectedObjectTags,
                   })
                 }
                 getAllObjectTags={this._getAllObjectTags}
-                ref={objectsList => (this._objectsList = objectsList)}
+                ref={(objectsList) => (this._objectsList = objectsList)}
                 unsavedChanges={this.props.unsavedChanges}
                 hotReloadPreviewButtonProps={
                   this.props.hotReloadPreviewButtonProps
@@ -1330,7 +1331,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           project={project}
           layout={layout}
           onEditObject={this.props.onEditObject || this.editObject}
-          onEditObjectVariables={object => {
+          onEditObjectVariables={(object) => {
             this.editObject(object, 'variables');
           }}
           onOpenSceneProperties={this.openSceneProperties}
@@ -1340,7 +1341,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onEditLayer={this.editLayer}
         />
         <ResponsiveWindowMeasurer>
-          {windowWidth => (
+          {(windowWidth) => (
             <PreferencesContext.Consumer>
               {({ getDefaultEditorMosaicNode, setDefaultEditorMosaicNode }) => (
                 <EditorMosaic
@@ -1353,7 +1354,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       : getDefaultEditorMosaicNode('scene-editor') ||
                         initialMosaicEditorNodes
                   }
-                  onPersistNodes={node =>
+                  onPersistNodes={(node) =>
                     setDefaultEditorMosaicNode(
                       windowWidth === 'small'
                         ? 'scene-editor-small'
@@ -1361,7 +1362,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                       node
                     )
                   }
-                  ref={editorMosaic => (this.editorMosaic = editorMosaic)}
+                  ref={(editorMosaic) => (this.editorMosaic = editorMosaic)}
                 />
               )}
             </PreferencesContext.Consumer>
@@ -1396,7 +1397,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               this.editObject(null);
             }}
             canRenameObject={this._canObjectOrGroupUseNewName}
-            onRename={newName => {
+            onRename={(newName) => {
               this._onRenameEditedObject(newName);
             }}
             onApply={() => {
@@ -1601,7 +1602,7 @@ export default class SceneEditor extends React.Component<Props, State> {
                 )}
               />
               <ContextMenu
-                ref={contextMenu => (this.contextMenu = contextMenu)}
+                ref={(contextMenu) => (this.contextMenu = contextMenu)}
                 buildMenuTemplate={(i18n, buildOptions) =>
                   this.buildContextMenu(i18n, layout, buildOptions)
                 }

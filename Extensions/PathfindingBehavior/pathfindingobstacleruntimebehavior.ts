@@ -28,9 +28,8 @@ namespace gdjs {
     static getManager(runtimeScene) {
       if (!runtimeScene.pathfindingObstaclesManager) {
         //Create the shared manager if necessary.
-        runtimeScene.pathfindingObstaclesManager = new gdjs.PathfindingObstaclesManager(
-          runtimeScene
-        );
+        runtimeScene.pathfindingObstaclesManager =
+          new gdjs.PathfindingObstaclesManager(runtimeScene);
       }
       return runtimeScene.pathfindingObstaclesManager;
     }
@@ -44,9 +43,8 @@ namespace gdjs {
       if (pathfindingObstacleBehavior.currentRBushAABB)
         pathfindingObstacleBehavior.currentRBushAABB.updateAABBFromOwner();
       else
-        pathfindingObstacleBehavior.currentRBushAABB = new gdjs.BehaviorRBushAABB(
-          pathfindingObstacleBehavior
-        );
+        pathfindingObstacleBehavior.currentRBushAABB =
+          new gdjs.BehaviorRBushAABB(pathfindingObstacleBehavior);
 
       this._obstaclesRBush.insert(pathfindingObstacleBehavior.currentRBushAABB);
     }
@@ -83,9 +81,8 @@ namespace gdjs {
       searchArea.maxX = x + radius;
       // @ts-ignore
       searchArea.maxY = y + radius;
-      const nearbyObstacles: gdjs.BehaviorRBushAABB<
-        gdjs.PathfindingObstacleRuntimeBehavior
-      >[] = this._obstaclesRBush.search(searchArea);
+      const nearbyObstacles: gdjs.BehaviorRBushAABB<gdjs.PathfindingObstacleRuntimeBehavior>[] =
+        this._obstaclesRBush.search(searchArea);
       result.length = 0;
       nearbyObstacles.forEach((nearbyObstacle) =>
         result.push(nearbyObstacle.behavior)
@@ -106,9 +103,8 @@ namespace gdjs {
     _oldHeight: float = 0;
     _manager: PathfindingObstaclesManager;
     _registeredInManager: boolean = false;
-    currentRBushAABB: gdjs.BehaviorRBushAABB<
-      PathfindingObstacleRuntimeBehavior
-    > | null = null;
+    currentRBushAABB: gdjs.BehaviorRBushAABB<PathfindingObstacleRuntimeBehavior> | null =
+      null;
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,

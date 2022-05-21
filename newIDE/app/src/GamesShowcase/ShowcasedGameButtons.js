@@ -24,7 +24,7 @@ import Microsoft from '../UI/CustomSvgIcons/Microsoft';
 import Apple from '../UI/CustomSvgIcons/Apple';
 import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
-const getFullUrl = url =>
+const getFullUrl = (url) =>
   url.startsWith('/') ? 'https://gdevelop-app.com' + url : url;
 
 const getLinkIconAndLabel = (url: string, type: string) => {

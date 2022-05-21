@@ -26,8 +26,8 @@ type ShortcutCallbacks = {|
   onUndo?: () => void,
   onRedo?: () => void,
   onSearch?: () => void,
-  onZoomOut?: KeyboardEvent => void,
-  onZoomIn?: KeyboardEvent => void,
+  onZoomOut?: (KeyboardEvent) => void,
+  onZoomIn?: (KeyboardEvent) => void,
   onEscape?: () => void,
 |};
 

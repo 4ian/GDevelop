@@ -104,7 +104,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       .toJSArray();
 
     const propertiesEditors = allBehaviorSharedDataNames
-      .map(name => {
+      .map((name) => {
         const sharedDataContent = layout.getBehaviorSharedData(name);
         const type = sharedDataContent.getTypeName();
 
@@ -123,7 +123,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         );
         const propertiesSchema = propertiesMapToSchema(
           properties,
-          sharedDataContent =>
+          (sharedDataContent) =>
             behaviorSharedData.getProperties(sharedDataContent.getContent()),
           (sharedDataContent, name, value) => {
             behaviorSharedData.updateProperty(
@@ -189,7 +189,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             fullWidth
             disableAlpha
             color={rgbColorToRGBString(this.state.backgroundColor)}
-            onChange={color =>
+            onChange={(color) =>
               this.setState({
                 backgroundColor: rgbStringAndAlphaToRGBColor(color),
               })

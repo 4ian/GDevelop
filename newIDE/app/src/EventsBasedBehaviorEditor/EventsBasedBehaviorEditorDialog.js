@@ -19,12 +19,8 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
   {||}
 > {
   render() {
-    const {
-      onApply,
-      eventsBasedBehavior,
-      eventsFunctionsExtension,
-      project,
-    } = this.props;
+    const { onApply, eventsBasedBehavior, eventsFunctionsExtension, project } =
+      this.props;
 
     return (
       <Dialog

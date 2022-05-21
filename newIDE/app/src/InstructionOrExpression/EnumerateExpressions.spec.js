@@ -147,9 +147,8 @@ describe('EnumerateExpressions', () => {
 
   it('can enumerate all expressions (type "number")', () => {
     makeTestExtensions(gd);
-    const allNumberExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number'
-    );
+    const allNumberExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('number');
     // Check a free expression:
     expect(allNumberExpressions).toContainEqual(
       expect.objectContaining({
@@ -175,9 +174,8 @@ describe('EnumerateExpressions', () => {
 
   it('can enumerate all expressions (type "string")', () => {
     makeTestExtensions(gd);
-    const allStringExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'string'
-    );
+    const allStringExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('string');
     // Check a free expression:
     expect(allStringExpressions).toContainEqual(
       expect.objectContaining({
@@ -203,9 +201,8 @@ describe('EnumerateExpressions', () => {
 
   it('can enumerate all expressions (type "number|string")', () => {
     makeTestExtensions(gd);
-    const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number|string'
-    );
+    const allExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('number|string');
     // Check a free expression:
     expect(allExpressions).toContainEqual(
       expect.objectContaining({
@@ -231,9 +228,8 @@ describe('EnumerateExpressions', () => {
   });
 
   it('can create the tree of all expressions', () => {
-    const allExpressions: Array<EnumeratedExpressionMetadata> = enumerateAllExpressions(
-      'number'
-    );
+    const allExpressions: Array<EnumeratedExpressionMetadata> =
+      enumerateAllExpressions('number');
     const allExpressionsTree = createTree(allExpressions);
 
     // Check that some free expressions are there

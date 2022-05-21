@@ -115,7 +115,7 @@ const replaceNode = (
 
 const defaultToolbarControls = [<CloseButton key="close" />];
 
-const renderMosaicWindowPreview = props => (
+const renderMosaicWindowPreview = (props) => (
   <div className="mosaic-preview">
     <div className="mosaic-window-toolbar">
       <div className="mosaic-window-title">{props.title}</div>
@@ -143,7 +143,7 @@ type Props = {|
     [string]: Editor,
   },
   limitToOneSecondaryEditor?: boolean,
-  onPersistNodes?: EditorMosaicNode => void,
+  onPersistNodes?: (EditorMosaicNode) => void,
 |};
 
 type State = {|
@@ -180,7 +180,7 @@ export default class EditorMosaic extends React.Component<Props, State> {
     if (limitToOneSecondaryEditor && editor.type === 'secondary') {
       // Replace the existing secondary editor, if any.
       const secondaryEditorName = openedEditorNames.find(
-        editorName => editors[editorName].type === 'secondary'
+        (editorName) => editors[editorName].type === 'secondary'
       );
       if (secondaryEditorName) {
         this.setState({
@@ -226,11 +226,9 @@ export default class EditorMosaic extends React.Component<Props, State> {
     const { editors } = this.props;
     return (
       <ThemeConsumer>
-        {muiTheme => (
+        {(muiTheme) => (
           <MosaicWithoutDragDropContext
-            className={`${
-              muiTheme.mosaicRootClassName
-            } mosaic-blueprint-theme mosaic-gd-theme`}
+            className={`${muiTheme.mosaicRootClassName} mosaic-blueprint-theme mosaic-gd-theme`}
             renderTile={(editorName: string, path: string) => {
               const editor = editors[editorName];
               if (!editor) {

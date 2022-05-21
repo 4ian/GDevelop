@@ -49,13 +49,13 @@ export default class ObjectAnimationNameField extends Component<
     if (object.getType() === 'Sprite') {
       const spriteObject = gd.asSpriteObject(object);
 
-      return mapFor(0, spriteObject.getAnimationsCount(), index => {
+      return mapFor(0, spriteObject.getAnimationsCount(), (index) => {
         const animationName = spriteObject.getAnimation(index).getName();
         return animationName.length > 0 ? animationName : null;
       })
         .filter(Boolean)
         .sort()
-        .map(animationName => ({
+        .map((animationName) => ({
           kind: 'Text',
           completion: `"${animationName}"`,
         }));
@@ -68,12 +68,12 @@ export default class ObjectAnimationNameField extends Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           this.getAnimationNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

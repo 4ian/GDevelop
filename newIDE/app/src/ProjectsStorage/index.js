@@ -23,9 +23,7 @@ export type FileMetadataAndStorageProviderName = {
 export type StorageProviderOperations = {|
   // Project opening:
   onOpenWithPicker?: () => Promise<?FileMetadata>,
-  onOpen?: (
-    fileMetadata: FileMetadata
-  ) => Promise<{|
+  onOpen?: (fileMetadata: FileMetadata) => Promise<{|
     content: Object,
   |}>,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
@@ -72,7 +70,7 @@ export type StorageProvider = {|
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
   renderIcon?: () => React.Node,
-  getFileMetadataFromAppArguments?: AppArguments => ?FileMetadata,
+  getFileMetadataFromAppArguments?: (AppArguments) => ?FileMetadata,
   createOperations: ({
     /** Open a dialog (a render function) */
     setDialog: (() => React.Node) => void,

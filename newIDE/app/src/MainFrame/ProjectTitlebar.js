@@ -17,22 +17,19 @@ export default function ProjectTitlebar({ fileMetadata }: Props) {
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
 
-  React.useEffect(
-    () => {
-      const title = [
-        'GDevelop 5',
-        fileMetadata
-          ? fileMetadata.fileIdentifier + (hasUnsavedChanges ? ' *' : '')
-          : '',
-      ]
-        .filter(Boolean)
-        .join(' - ');
+  React.useEffect(() => {
+    const title = [
+      'GDevelop 5',
+      fileMetadata
+        ? fileMetadata.fileIdentifier + (hasUnsavedChanges ? ' *' : '')
+        : '',
+    ]
+      .filter(Boolean)
+      .join(' - ');
 
-      Window.setTitle(title);
-      Window.setTitleBarColor(gdevelopTheme.toolbar.backgroundColor);
-    },
-    [fileMetadata, hasUnsavedChanges, gdevelopTheme.toolbar.backgroundColor]
-  );
+    Window.setTitle(title);
+    Window.setTitleBarColor(gdevelopTheme.toolbar.backgroundColor);
+  }, [fileMetadata, hasUnsavedChanges, gdevelopTheme.toolbar.backgroundColor]);
 
   return null;
 }

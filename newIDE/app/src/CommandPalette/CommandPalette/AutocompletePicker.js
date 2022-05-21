@@ -93,7 +93,7 @@ const AutocompletePicker = (
       openOnFocus
       autoHighlight
       filterOptions={filterOptions}
-      renderInput={params => (
+      renderInput={(params) => (
         <TextField
           {...params}
           placeholder={props.i18n._(props.placeholder)}
@@ -101,7 +101,7 @@ const AutocompletePicker = (
           autoFocus
         />
       )}
-      renderOption={item => (
+      renderOption={(item) => (
         <ListItem
           dense
           component="div"

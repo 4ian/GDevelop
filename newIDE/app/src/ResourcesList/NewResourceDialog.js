@@ -135,7 +135,7 @@ export const NewResourceDialog = ({
             key="import"
           />
         </Tabs>
-        {standaloneTabResourceSources.map(source => {
+        {standaloneTabResourceSources.map((source) => {
           if (currentTab !== 'standalone-' + source.name) return null;
 
           return source.renderComponent({
@@ -150,7 +150,7 @@ export const NewResourceDialog = ({
         {currentTab === 'import' ? (
           <Line expand>
             <ColumnStackLayout expand>
-              {importTabResourceSources.map(source => (
+              {importTabResourceSources.map((source) => (
                 <React.Fragment key={source.name}>
                   <Text size="title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({

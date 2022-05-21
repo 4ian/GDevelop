@@ -12,7 +12,7 @@ const gd /* TODO: add flow in this file */ = global.gd;
  * supported everywhere).
  */
 const LocalFileSystem = {
-  mkDir: function(path) {
+  mkDir: function (path) {
     try {
       fs.mkdirsSync(path);
     } catch (e) {
@@ -21,32 +21,32 @@ const LocalFileSystem = {
     }
     return true;
   },
-  dirExists: function(path) {
+  dirExists: function (path) {
     return fs.existsSync(path);
   },
-  clearDir: function(path) {
+  clearDir: function (path) {
     try {
       fs.emptyDirSync(path);
     } catch (e) {
       console.error('clearDir(' + path + ') failed: ' + e);
     }
   },
-  getTempDir: function() {
+  getTempDir: function () {
     return path.join(os.tmpdir(), `GDTMP-${getUID()}`);
   },
-  fileNameFrom: function(fullPath) {
+  fileNameFrom: function (fullPath) {
     if (this._isExternalUrl(fullPath)) return fullPath;
 
     fullPath = this._translateUrl(fullPath);
     return path.basename(fullPath);
   },
-  dirNameFrom: function(fullPath) {
+  dirNameFrom: function (fullPath) {
     if (this._isExternalUrl(fullPath)) return '';
 
     fullPath = this._translateUrl(fullPath);
     return path.dirname(fullPath).replace(/\\/g, '/');
   },
-  makeAbsolute: function(filename, baseDirectory) {
+  makeAbsolute: function (filename, baseDirectory) {
     if (this._isExternalUrl(filename)) return filename;
 
     filename = this._translateUrl(filename);
@@ -57,7 +57,7 @@ const LocalFileSystem = {
       .resolve(baseDirectory, path.normalize(filename))
       .replace(/\\/g, '/');
   },
-  makeRelative: function(filename, baseDirectory) {
+  makeRelative: function (filename, baseDirectory) {
     if (this._isExternalUrl(filename)) return filename;
 
     filename = this._translateUrl(filename);
@@ -65,7 +65,7 @@ const LocalFileSystem = {
       .relative(baseDirectory, path.normalize(filename))
       .replace(/\\/g, '/');
   },
-  isAbsolute: function(fullPath) {
+  isAbsolute: function (fullPath) {
     if (this._isExternalUrl(fullPath)) return true;
 
     if (fullPath.length === 0) return true;
@@ -75,7 +75,7 @@ const LocalFileSystem = {
       (fullPath.length > 1 && fullPath.charAt(1) === ':')
     );
   },
-  copyFile: function(source, dest) {
+  copyFile: function (source, dest) {
     //URL are not copied.
     if (this._isExternalUrl(source)) return true;
 
@@ -88,7 +88,7 @@ const LocalFileSystem = {
     }
     return true;
   },
-  writeToFile: function(file, contents) {
+  writeToFile: function (file, contents) {
     try {
       fs.outputFileSync(file, contents);
     } catch (e) {
@@ -97,7 +97,7 @@ const LocalFileSystem = {
     }
     return true;
   },
-  readFile: function(file) {
+  readFile: function (file) {
     try {
       var contents = fs.readFileSync(file);
       return contents.toString();
@@ -106,14 +106,14 @@ const LocalFileSystem = {
       return '';
     }
   },
-  readDir: function(path, ext) {
+  readDir: function (path, ext) {
     ext = ext.toUpperCase();
     var output = new gd.VectorString();
     try {
       var files = [];
       if (fs.existsSync(path)) {
         files = fs.readdirSync(path);
-        files.forEach(function(file) {
+        files.forEach(function (file) {
           if (
             ext.length === 0 ||
             file.toUpperCase().indexOf(ext, file.length - ext.length) !== -1
@@ -128,7 +128,7 @@ const LocalFileSystem = {
 
     return output;
   },
-  fileExists: function(filename) {
+  fileExists: function (filename) {
     filename = this._translateUrl(filename);
     try {
       const stat = fs.statSync(filename);
@@ -137,7 +137,7 @@ const LocalFileSystem = {
       return false;
     }
   },
-  _isExternalUrl: function(filename) {
+  _isExternalUrl: function (filename) {
     return (
       filename.startsWith('http://') ||
       filename.startsWith('https://') ||
@@ -150,7 +150,7 @@ const LocalFileSystem = {
    * Return the filename associated to the URL on the server, relative to the games directory.
    * (i.e: Transform g/mydirectory/myfile.png to mydirectory/myfile.png).
    */
-  _translateUrl: function(filename) {
+  _translateUrl: function (filename) {
     // TODO: remove
     if (filename.substr(0, 2) === 'g/' || filename.substr(0, 2) === 'g\\')
       filename = filename.substr(2);

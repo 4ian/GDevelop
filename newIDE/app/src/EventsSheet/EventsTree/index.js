@@ -73,26 +73,26 @@ type EventsContainerProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
-  onAddNewInstruction: InstructionsListContext => void,
-  onPasteInstructions: InstructionsListContext => void,
+  onAddNewInstruction: (InstructionsListContext) => void,
+  onPasteInstructions: (InstructionsListContext) => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onInstructionClick: InstructionContext => void,
-  onInstructionDoubleClick: InstructionContext => void,
+  onInstructionClick: (InstructionContext) => void,
+  onInstructionDoubleClick: (InstructionContext) => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
-  onParameterClick: ParameterContext => void,
+  onParameterClick: (ParameterContext) => void,
 
   onEventClick: (eventContext: EventContext) => void,
   onEventContextMenu: (x: number, y: number) => void,
-  onOpenExternalEvents: string => void,
-  onOpenLayout: string => void,
-  renderObjectThumbnail: string => Node,
+  onOpenExternalEvents: (string) => void,
+  onOpenLayout: (string) => void,
+  renderObjectThumbnail: (string) => Node,
 
   screenType: ScreenType,
   windowWidth: WidthType,
@@ -131,7 +131,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
 
     return (
       <div
-        ref={container => (this._container = container)}
+        ref={(container) => (this._container = container)}
         onClick={this.props.onEventClick}
         onContextMenu={this._onEventContextMenu}
         style={getEventContainerStyle(this.props.windowWidth)}
@@ -176,11 +176,9 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
 
 const SortableTree = ({ className, ...otherProps }) => (
   <ThemeConsumer>
-    {muiTheme => (
+    {(muiTheme) => (
       <SortableTreeWithoutDndContext
-        className={`${eventsTree} ${
-          muiTheme.eventsSheetRootClassName
-        } ${className}`}
+        className={`${eventsTree} ${muiTheme.eventsSheetRootClassName} ${className}`}
         {...otherProps}
       />
     )}
@@ -196,20 +194,20 @@ type EventsTreeProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
-  onAddNewInstruction: InstructionsListContext => void,
-  onPasteInstructions: InstructionsListContext => void,
+  onAddNewInstruction: (InstructionsListContext) => void,
+  onPasteInstructions: (InstructionsListContext) => void,
   onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onInstructionClick: InstructionContext => void,
-  onInstructionDoubleClick: InstructionContext => void,
+  onInstructionClick: (InstructionContext) => void,
+  onInstructionDoubleClick: (InstructionContext) => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
   onAddInstructionContextMenu: (
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
-  onParameterClick: ParameterContext => void,
+  onParameterClick: (ParameterContext) => void,
 
   onEventClick: (eventContext: EventContext) => void,
   onEventContextMenu: (
@@ -218,8 +216,8 @@ type EventsTreeProps = {|
     eventContext: EventContext
   ) => void,
   onAddNewEvent: (eventType: string, eventsList: gdEventsList) => void,
-  onOpenExternalEvents: string => void,
-  onOpenLayout: string => void,
+  onOpenExternalEvents: (string) => void,
+  onOpenLayout: (string) => void,
   showObjectThumbnails: boolean,
 
   searchResults: ?Array<gdBaseEvent>,
@@ -289,7 +287,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
       this.setState({
         ...this.state,
         treeData: this.state.treeData.filter(
-          data => data.key !== 'eventstree-tutorial-node'
+          (data) => data.key !== 'eventstree-tutorial-node'
         ),
       });
     }
@@ -351,7 +349,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(
       this.state.flatData,
-      event => event.ptr === searchedEvent.ptr
+      (event) => event.ptr === searchedEvent.ptr
     );
   }
 
@@ -364,7 +362,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     const treeData = mapFor<SortableTreeNode>(
       0,
       eventsList.getEventsCount(),
-      i => {
+      (i) => {
         const event = eventsList.getEventAt(i);
         flatData.push(event);
 
@@ -620,7 +618,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     const { event } = node;
     if (!event) return false;
 
-    return searchResults.find(highlightedEvent =>
+    return searchResults.find((highlightedEvent) =>
       gd.compare(highlightedEvent, event)
     );
   };
@@ -662,7 +660,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
             this.props.searchResults ? eventsTreeWithSearchResults : ''
           }
           reactVirtualizedListProps={{
-            ref: list => (this._list = list),
+            ref: (list) => (this._list = list),
             onScroll: this.props.onScroll,
           }}
         />

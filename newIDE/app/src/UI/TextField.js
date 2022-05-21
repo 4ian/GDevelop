@@ -211,7 +211,7 @@ export default class TextField extends React.Component<Props, {||}> {
             }
             onChange={
               onChange
-                ? event => onChange(event, event.target.value)
+                ? (event) => onChange(event, event.target.value)
                 : undefined
             }
             // Error handling:
@@ -263,9 +263,7 @@ export default class TextField extends React.Component<Props, {||}> {
                 <InputAdornment position="end">
                   {props.endAdornment}
                 </InputAdornment>
-              ) : (
-                undefined
-              ),
+              ) : undefined,
             }}
             style={
               props.style

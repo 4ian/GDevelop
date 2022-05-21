@@ -50,21 +50,17 @@ const PointsEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-  const [selectedPointName, setSelectedPointName] = React.useState<?string>(
-    null
-  );
-  const [
-    highlightedPointName,
-    setHighlightedPointName,
-  ] = React.useState<?string>(null);
+  const [selectedPointName, setSelectedPointName] =
+    React.useState<?string>(null);
+  const [highlightedPointName, setHighlightedPointName] =
+    React.useState<?string>(null);
 
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSamePointsToggles). In
   // theory, they should be set to the appropriate value at their initialization,
   // for consistency of the state.
-  const [samePointsForAnimations, setSamePointsForAnimations] = React.useState(
-    false
-  );
+  const [samePointsForAnimations, setSamePointsForAnimations] =
+    React.useState(false);
   const [samePointsForSprites, setSamePointsForSprites] = React.useState(false);
   const forceUpdate = useForceUpdate();
 
@@ -76,43 +72,40 @@ const PointsEditor = (props: Props) => {
     spriteIndex
   );
 
-  const updatePoints = React.useCallback(
-    () => {
-      if (animation && sprite) {
-        if (samePointsForAnimations) {
-          mapFor(0, spriteObject.getAnimationsCount(), i => {
-            const otherAnimation = spriteObject.getAnimation(i);
-            copyAnimationsSpritePoints(sprite, otherAnimation);
-          });
-        } else if (samePointsForSprites) {
-          copyAnimationsSpritePoints(sprite, animation);
-        }
+  const updatePoints = React.useCallback(() => {
+    if (animation && sprite) {
+      if (samePointsForAnimations) {
+        mapFor(0, spriteObject.getAnimationsCount(), (i) => {
+          const otherAnimation = spriteObject.getAnimation(i);
+          copyAnimationsSpritePoints(sprite, otherAnimation);
+        });
+      } else if (samePointsForSprites) {
+        copyAnimationsSpritePoints(sprite, animation);
       }
+    }
 
-      forceUpdate(); // Refresh the preview
-    },
-    [
-      animation,
-      sprite,
-      spriteObject,
-      samePointsForAnimations,
-      samePointsForSprites,
-      forceUpdate,
-    ]
-  );
+    forceUpdate(); // Refresh the preview
+  }, [
+    animation,
+    sprite,
+    spriteObject,
+    samePointsForAnimations,
+    samePointsForSprites,
+    forceUpdate,
+  ]);
 
-  const chooseAnimation = index => {
+  const chooseAnimation = (index) => {
     setAnimationIndex(index);
     setDirectionIndex(0);
     setSpriteIndex(0);
   };
 
-  const chooseDirection = index => {
+  const chooseDirection = (index) => {
     setDirectionIndex(index);
     setSpriteIndex(0);
   };
 
-  const chooseSprite = index => {
+  const chooseSprite = (index) => {
     setSpriteIndex(index);
   };
 
@@ -121,7 +114,7 @@ const PointsEditor = (props: Props) => {
 
     setSamePointsForAnimations(
       every(
-        mapFor(0, spriteObject.getAnimationsCount(), i => {
+        mapFor(0, spriteObject.getAnimationsCount(), (i) => {
           const otherAnimation = spriteObject.getAnimation(i);
           return allSpritesHaveSamePointsAs(sprite, otherAnimation);
         })
@@ -182,7 +175,7 @@ const PointsEditor = (props: Props) => {
             resourceName={hasValidSprite ? sprite.getImageName() : ''}
             resourcesLoader={props.resourcesLoader}
             project={props.project}
-            renderOverlay={overlayProps =>
+            renderOverlay={(overlayProps) =>
               hasValidSprite && (
                 <PointsPreview
                   {...overlayProps}

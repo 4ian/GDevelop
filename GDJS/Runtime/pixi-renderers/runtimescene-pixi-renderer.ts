@@ -57,7 +57,8 @@ namespace gdjs {
       // this._renderProfileText(); //Uncomment to display profiling times
 
       // render the PIXI container of the scene
-      this._pixiRenderer.backgroundColor = this._runtimeScene.getBackgroundColor();
+      this._pixiRenderer.backgroundColor =
+        this._runtimeScene.getBackgroundColor();
       this._pixiRenderer.render(this._pixiContainer);
     }
 
@@ -305,9 +306,8 @@ namespace gdjs {
 
       // Clean any point text from an object that is not rendered.
       for (const objectID in this._debugDrawRenderedObjectsPoints) {
-        const renderedObjectPoints = this._debugDrawRenderedObjectsPoints[
-          objectID
-        ];
+        const renderedObjectPoints =
+          this._debugDrawRenderedObjectsPoints[objectID];
         if (renderedObjectPoints.wasRendered) continue;
 
         const points = renderedObjectPoints.points;
@@ -359,10 +359,8 @@ namespace gdjs {
 
     setLayerIndex(layer: gdjs.Layer, index: float): void {
       const layerPixiRenderer: gdjs.LayerPixiRenderer = layer.getRenderer();
-      let layerPixiObject:
-        | PIXI.Container
-        | PIXI.Sprite
-        | null = layerPixiRenderer.getRendererObject();
+      let layerPixiObject: PIXI.Container | PIXI.Sprite | null =
+        layerPixiRenderer.getRendererObject();
       if (layer.isLightingLayer()) {
         layerPixiObject = layerPixiRenderer.getLightingSprite();
       }

@@ -74,7 +74,7 @@ export const ListSearchResults = <SearchItem>({
 
       return (
         <div key={key} style={style}>
-          {renderSearchItem(searchItem, height => {
+          {renderSearchItem(searchItem, (height) => {
             const heightWasUpdated = onItemHeightComputed(searchItem, height);
             if (heightWasUpdated && grid.current) {
               grid.current.recomputeGridSize(0, rowIndex);
@@ -127,7 +127,7 @@ export const ListSearchResults = <SearchItem>({
 
             return (
               <Grid
-                ref={el => {
+                ref={(el) => {
                   if (el) {
                     // Ensure the grid is recomputed for heights once it is rendered.
                     el.recomputeGridSize(0, 0);

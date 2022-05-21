@@ -6,7 +6,7 @@ namespace gdjs {
     },
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const tiltShiftFilter = (filter as unknown) as PIXI.filters.TiltShiftFilter;
+      const tiltShiftFilter = filter as unknown as PIXI.filters.TiltShiftFilter;
       if (parameterName === 'blur') {
         tiltShiftFilter.blur = value;
       } else if (parameterName === 'gradientBlur') {

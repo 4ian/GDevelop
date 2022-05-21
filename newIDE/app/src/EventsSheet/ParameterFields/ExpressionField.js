@@ -17,7 +17,7 @@ export default class ExpressionField extends Component<
     return (
       <GenericExpressionField
         expressionType="number"
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

@@ -21,7 +21,7 @@ type Props<Item> = {|
   itemName: string,
   id?: ?string,
   isBold: boolean,
-  onRename: string => void,
+  onRename: (string) => void,
   editingName: boolean,
   getThumbnail?: () => string,
   renderItemLabel?: () => React.Node,
@@ -65,15 +65,15 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
 
     return (
       <ThemeConsumer>
-        {muiTheme => {
+        {(muiTheme) => {
           const label = this.props.editingName ? (
             <TextField
               id="rename-item-field"
               margin="none"
-              ref={textField => (this.textField = textField)}
+              ref={(textField) => (this.textField = textField)}
               defaultValue={itemName}
-              onBlur={e => this.props.onRename(e.currentTarget.value)}
-              onKeyPress={event => {
+              onBlur={(e) => this.props.onRename(e.currentTarget.value)}
+              onKeyPress={(event) => {
                 if (shouldValidate(event)) {
                   if (this.textField) this.textField.blur();
                 }
@@ -148,7 +148,7 @@ class ItemRow<Item> extends React.Component<Props<Item>> {
 
                 onItemSelected(selected ? null : item);
               }}
-              onDoubleClick={event => {
+              onDoubleClick={(event) => {
                 if (event.button !== LEFT_MOUSE_BUTTON) return;
                 if (!onEdit) return;
                 if (this.props.editingName) return;

@@ -18,7 +18,7 @@ describe('setupInstructionParameters', () => {
     // Simulate that we select an instruction
     const enumeratedInstructions = enumerateFreeInstructions(false);
     const playMusicInstruction = enumeratedInstructions.find(
-      enumeratedInstruction => enumeratedInstruction.type === 'PlayMusic'
+      (enumeratedInstruction) => enumeratedInstruction.type === 'PlayMusic'
     );
 
     if (!playMusicInstruction) {
@@ -56,7 +56,8 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const setAnimationNameInstruction = enumeratedInstructions.find(
-      enumeratedInstruction => enumeratedInstruction.type === 'SetAnimationName'
+      (enumeratedInstruction) =>
+        enumeratedInstruction.type === 'SetAnimationName'
     );
 
     if (!setAnimationNameInstruction) {
@@ -97,7 +98,7 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      enumeratedInstruction =>
+      (enumeratedInstruction) =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 
@@ -146,7 +147,7 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      enumeratedInstruction =>
+      (enumeratedInstruction) =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 
@@ -193,7 +194,7 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      enumeratedInstruction =>
+      (enumeratedInstruction) =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 
@@ -243,7 +244,7 @@ describe('setupInstructionParameters', () => {
       objectName
     );
     const jumpSpeedInstruction = enumeratedInstructions.find(
-      enumeratedInstruction =>
+      (enumeratedInstruction) =>
         enumeratedInstruction.type === 'PlatformBehavior::JumpSpeed'
     );
 

@@ -17,7 +17,8 @@ type Props = {|
 |};
 
 const ChooseEventsFunctionsExtensionEditor = (props: Props) => {
-  const eventsFunctionsCount = props.eventsFunctionsExtension.getEventsFunctionsCount();
+  const eventsFunctionsCount =
+    props.eventsFunctionsExtension.getEventsFunctionsCount();
   const eventsBasedBehaviorsCount = props.eventsFunctionsExtension
     .getEventsBasedBehaviors()
     .getCount();

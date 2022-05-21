@@ -27,8 +27,8 @@ type Props = {|
 
   noGroups?: boolean,
 
-  onChoose?: string => void,
-  onChange: string => void,
+  onChoose?: (string) => void,
+  onChange: (string) => void,
   onRequestClose?: () => void,
   onApply?: () => void,
   value: string,
@@ -165,7 +165,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
     });
     const hasValidChoice =
       objectAndGroups.filter(
-        choice => choice.text !== undefined && value === choice.text
+        (choice) => choice.text !== undefined && value === choice.text
       ).length !== 0;
     const hasObjectWithRequiredCapability = checkHasRequiredCapability({
       project,
@@ -179,9 +179,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       <Trans>This object exists, but can't be used here.</Trans>
     ) : !hasValidChoice ? (
       errorTextIfInvalid
-    ) : (
-      undefined
-    );
+    ) : undefined;
 
     return (
       <SemiControlledAutoComplete
@@ -194,7 +192,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
         onApply={onApply}
         dataSource={objectAndGroups}
         errorText={errorText}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         id={id}
         {...rest}
       />

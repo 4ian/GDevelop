@@ -4303,7 +4303,8 @@ declare namespace firebase.auth {
    * @hidden
    */
   class RecaptchaVerifier_Instance
-    implements firebase.auth.ApplicationVerifier {
+    implements firebase.auth.ApplicationVerifier
+  {
     constructor(
       container: any | string,
       parameters?: Object | null,
@@ -9255,9 +9256,9 @@ declare namespace firebase.firestore {
    * `exists` property will always be true and `data()` will never return
    * 'undefined'.
    */
-  export class QueryDocumentSnapshot<T = DocumentData> extends DocumentSnapshot<
-    T
-  > {
+  export class QueryDocumentSnapshot<
+    T = DocumentData
+  > extends DocumentSnapshot<T> {
     private constructor();
 
     /**

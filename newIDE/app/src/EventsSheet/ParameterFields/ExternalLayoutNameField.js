@@ -18,7 +18,7 @@ export default class ExternalLayoutNameField extends Component<
   render() {
     const externalLayoutNames: Array<ExpressionAutocompletion> = this.props
       .project
-      ? enumerateExternalLayouts(this.props.project).map(externalLayout => ({
+      ? enumerateExternalLayouts(this.props.project).map((externalLayout) => ({
           kind: 'Text',
           completion: `"${externalLayout.getName()}"`,
         }))
@@ -27,12 +27,12 @@ export default class ExternalLayoutNameField extends Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           externalLayoutNames.filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

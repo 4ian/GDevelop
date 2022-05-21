@@ -92,7 +92,7 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   scope: EventsScope,
   currentTab: TabName,
-  onChangeTab: TabName => void,
+  onChangeTab: (TabName) => void,
   isCondition: boolean,
   focusOnMount?: boolean,
   chosenInstructionType: ?string,
@@ -125,10 +125,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   _selectedItem = React.createRef<ListItemRefType>();
 
   // Free instructions, to be displayed in a tab next to the objects.
-  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateFreeInstructions(this.props.isCondition),
-    this.props.scope
-  );
+  freeInstructionsInfo: Array<EnumeratedInstructionMetadata> =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateFreeInstructions(this.props.isCondition),
+      this.props.scope
+    );
   freeInstructionsInfoTree: InstructionOrExpressionTreeNode = createTree(
     this.freeInstructionsInfo
   );
@@ -143,20 +144,22 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   tagSearchApi = null;
 
   reEnumerateInstructions = () => {
-    this.freeInstructionsInfo = filterEnumeratedInstructionOrExpressionMetadataByScope(
-      enumerateFreeInstructions(this.props.isCondition),
-      this.props.scope
-    );
+    this.freeInstructionsInfo =
+      filterEnumeratedInstructionOrExpressionMetadataByScope(
+        enumerateFreeInstructions(this.props.isCondition),
+        this.props.scope
+      );
     this.freeInstructionsInfoTree = createTree(this.freeInstructionsInfo);
     this.forceUpdate();
   };
 
   // All the instructions, to be used when searching, so that the search is done
   // across all the instructions (including object and behaviors instructions).
-  allInstructionsInfo: Array<EnumeratedInstructionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllInstructions(this.props.isCondition),
-    this.props.scope
-  );
+  allInstructionsInfo: Array<EnumeratedInstructionMetadata> =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      enumerateAllInstructions(this.props.isCondition),
+      this.props.scope
+    );
 
   componentDidMount() {
     if (
@@ -206,25 +209,27 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
     this.setState({
       searchResults: {
         objects: this.objectSearchApi
-          ? this.objectSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.objectSearchApi.search(`'${searchText}`).map((result) => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         groups: this.groupSearchApi
-          ? this.groupSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.groupSearchApi.search(`'${searchText}`).map((result) => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
           : [],
         instructions: this.instructionSearchApi
-          ? this.instructionSearchApi.search(`'${searchText}`).map(result => ({
-              item: result.item,
-              matches: tuneMatches(result, searchText),
-            }))
+          ? this.instructionSearchApi
+              .search(`'${searchText}`)
+              .map((result) => ({
+                item: result.item,
+                matches: tuneMatches(result, searchText),
+              }))
           : [],
         tags: this.tagSearchApi
-          ? this.tagSearchApi.search(`'${searchText}`).map(result => ({
+          ? this.tagSearchApi.search(`'${searchText}`).map((result) => ({
               item: result.item,
               matches: tuneMatches(result, searchText),
             }))
@@ -249,7 +254,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       globalObjectsContainer,
       objectsContainer
     ).allObjectsList.forEach(({ object }) => {
-      getTagsFromString(object.getTags()).forEach(tag => tagsSet.add(tag));
+      getTagsFromString(object.getTags()).forEach((tag) => tagsSet.add(tag));
     });
 
     return Array.from(tagsSet);
@@ -262,7 +267,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       noTagLabel: i18n._(t`No tags - add a tag to an object first`),
       getAllTags: this._getAllObjectTags,
       selectedTags: selectedObjectTags,
-      onChange: selectedObjectTags => {
+      onChange: (selectedObjectTags) => {
         this.setState({ selectedObjectTags });
       },
     });
@@ -307,16 +312,16 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       filteredInstructionsList = searchResults.instructions;
       displayedTags = searchResults.tags;
     } else {
-      filteredObjectsList = allObjectsList.map(object => ({
+      filteredObjectsList = allObjectsList.map((object) => ({
         item: object,
         matches: [],
       }));
-      displayedObjectGroupsList = allGroupsList.map(object => ({
+      displayedObjectGroupsList = allGroupsList.map((object) => ({
         item: object,
         matches: [],
       }));
     }
-    const displayedObjectsList = filteredObjectsList.filter(searchResult =>
+    const displayedObjectsList = filteredObjectsList.filter((searchResult) =>
       filterObjectByTags(searchResult.item, selectedObjectTags)
     );
 
@@ -360,7 +365,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       <I18n key="tags">
         {({ i18n }) => (
           <ThemeConsumer>
-            {muiTheme => (
+            {(muiTheme) => (
               <div
                 style={{
                   backgroundColor: muiTheme.list.itemsBackgroundColor,
@@ -370,7 +375,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
               >
                 <SearchBar
                   value={searchText}
-                  onChange={searchText => {
+                  onChange={(searchText) => {
                     const oldSearchText = this.state.searchText;
                     if (!!searchText) this._search(searchText);
                     this.setState({
@@ -414,7 +419,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   {!isSearching && currentTab === 'objects' && (
                     <TagChips
                       tags={selectedObjectTags}
-                      onChange={selectedObjectTags =>
+                      onChange={(selectedObjectTags) =>
                         this.setState({
                           selectedObjectTags,
                         })
@@ -504,7 +509,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                         displayedInstructionsList.map(
                           ({ item: instructionMetadata, matches }) =>
                             renderInstructionOrExpressionListItem({
-                              instructionOrExpressionMetadata: instructionMetadata,
+                              instructionOrExpressionMetadata:
+                                instructionMetadata,
                               iconSize: iconSize,
                               onClick: () =>
                                 onChooseInstruction(
@@ -531,8 +537,8 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                   chosenInstructionType
                                 )
                               : undefined,
-                            initiallyOpenedPath: this
-                              .initialInstructionTypePath,
+                            initiallyOpenedPath:
+                              this.initialInstructionTypePath,
                             selectedItemRef: this._selectedItem,
                             getGroupIconSrc,
                           })}

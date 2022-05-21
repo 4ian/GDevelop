@@ -85,7 +85,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
             openInstructionOrExpression={this.props.openInstructionOrExpression}
-            ref={instructionParametersEditor =>
+            ref={(instructionParametersEditor) =>
               (this._instructionParametersEditor = instructionParametersEditor)
             }
             focusOnMount={!!instruction.getType()}

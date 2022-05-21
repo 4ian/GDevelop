@@ -40,43 +40,43 @@ export type Instances = Array<Instance>;
 // "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
   name: string,
-  getLabel?: Instance => string,
-  getDescription?: Instance => string,
-  getExtraDescription?: Instance => string,
+  getLabel?: (Instance) => string,
+  getDescription?: (Instance) => string,
+  getExtraDescription?: (Instance) => string,
   disabled?: boolean,
-  onEditButtonClick?: Instance => void,
+  onEditButtonClick?: (Instance) => void,
 |};
 
 // "Primitive" value fields are "simple" fields.
 export type PrimitiveValueField =
   | {|
       valueType: 'number',
-      getValue: Instance => number,
+      getValue: (Instance) => number,
       setValue: (instance: Instance, newValue: number) => void,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'string',
-      getValue: Instance => string,
+      getValue: (Instance) => string,
       setValue: (instance: Instance, newValue: string) => void,
       getChoices?: ?() => Array<{| value: string, label: string |}>,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'boolean',
-      getValue: Instance => boolean,
+      getValue: (Instance) => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'color',
-      getValue: Instance => string,
+      getValue: (Instance) => string,
       setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
     |}
   | {|
       valueType: 'textarea',
-      getValue: Instance => string,
+      getValue: (Instance) => string,
       setValue: (instance: Instance, newValue: string) => void,
       ...ValueFieldCommonProperties,
     |};
@@ -85,14 +85,14 @@ export type PrimitiveValueField =
 type ResourceField = {|
   valueType: 'resource',
   resourceKind: ResourceKind,
-  getValue: Instance => string,
+  getValue: (Instance) => string,
   setValue: (instance: Instance, newValue: string) => void,
   ...ValueFieldCommonProperties,
 |};
 
 type SectionTitle = {|
   name: string,
-  getValue?: Instance => string,
+  getValue?: (Instance) => string,
   nonFieldType: 'sectionTitle',
   defaultValue?: string,
 |};
@@ -100,7 +100,7 @@ type SectionTitle = {|
 type ActionButton = {|
   label: string,
   disabled: 'onValuesDifferent',
-  getValue: Instance => string,
+  getValue: (Instance) => string,
   nonFieldType: 'button',
   onClick: (instance: Instance) => void,
 |};
@@ -125,7 +125,7 @@ export type Field =
 export type Schema = Array<Field>;
 
 type Props = {|
-  onInstancesModified?: Instances => void,
+  onInstancesModified?: (Instances) => void,
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
@@ -283,7 +283,7 @@ const PropertiesEditor = ({
             key={field.name}
             checked={getFieldValue(instances, field)}
             onCheck={(event, newValue) => {
-              instances.forEach(i => setValue(i, !!newValue));
+              instances.forEach((i) => setValue(i, !!newValue));
               _onInstancesModified(instances);
             }}
             disabled={field.disabled}
@@ -299,8 +299,8 @@ const PropertiesEditor = ({
             floatingLabelText={getFieldLabel(instances, field)}
             floatingLabelFixed
             helperMarkdownText={getFieldDescription(field)}
-            onChange={newValue => {
-              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+            onChange={(newValue) => {
+              instances.forEach((i) => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
             type="number"
@@ -319,10 +319,10 @@ const PropertiesEditor = ({
             disableAlpha
             fullWidth
             color={getFieldValue(instances, field)}
-            onChange={color => {
+            onChange={(color) => {
               const rgbString =
                 color.length === 0 ? '' : rgbOrHexToRGBString(color);
-              instances.forEach(i => setValue(i, rgbString));
+              instances.forEach((i) => setValue(i, rgbString));
               _onInstancesModified(instances);
             }}
           />
@@ -333,8 +333,8 @@ const PropertiesEditor = ({
           <SemiControlledTextField
             key={field.name}
             id={field.name}
-            onChange={text => {
-              instances.forEach(i => setValue(i, text || ''));
+            onChange={(text) => {
+              instances.forEach((i) => setValue(i, text || ''));
               _onInstancesModified(instances);
             }}
             value={getFieldValue(instances, field)}
@@ -357,15 +357,15 @@ const PropertiesEditor = ({
                 floatingLabelText={getFieldLabel(instances, field)}
                 floatingLabelFixed
                 helperMarkdownText={getFieldDescription(field)}
-                onChange={newValue => {
-                  instances.forEach(i => setValue(i, newValue || ''));
+                onChange={(newValue) => {
+                  instances.forEach((i) => setValue(i, newValue || ''));
                   _onInstancesModified(instances);
                 }}
                 style={styles.field}
                 disabled={field.disabled}
               />
             )}
-            renderButton={style =>
+            renderButton={(style) =>
               onEditButtonClick ? (
                 <RaisedButton
                   style={style}
@@ -403,7 +403,7 @@ const PropertiesEditor = ({
             floatingLabelText={getFieldLabel(instances, field)}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
-              instances.forEach(i => setValue(i, parseFloat(newValue) || 0));
+              instances.forEach((i) => setValue(i, parseFloat(newValue) || 0));
               _onInstancesModified(instances);
             }}
             style={styles.field}
@@ -421,7 +421,7 @@ const PropertiesEditor = ({
             floatingLabelText={getFieldLabel(instances, field)}
             helperMarkdownText={getFieldDescription(field)}
             onChange={(event, index, newValue: string) => {
-              instances.forEach(i => setValue(i, newValue || ''));
+              instances.forEach((i) => setValue(i, newValue || ''));
               _onInstancesModified(instances);
             }}
             style={styles.field}
@@ -490,8 +490,8 @@ const PropertiesEditor = ({
           field,
           '(Multiple values)' //TODO
         )}
-        onChange={newValue => {
-          instances.forEach(i => setValue(i, newValue));
+        onChange={(newValue) => {
+          instances.forEach((i) => setValue(i, newValue));
           _onInstancesModified(instances);
         }}
         floatingLabelText={getFieldLabel(instances, field)}
@@ -550,7 +550,7 @@ const PropertiesEditor = ({
   );
 
   return renderContainer(
-    schema.map(field => {
+    schema.map((field) => {
       if (!!field.nonFieldType) {
         if (field.nonFieldType === 'sectionTitle') {
           return renderSectionTitle(field);
@@ -562,7 +562,7 @@ const PropertiesEditor = ({
         if (field.type === 'row') {
           const contentView = (
             <UnsavedChangesContext.Consumer key={field.name}>
-              {unsavedChanges => (
+              {(unsavedChanges) => (
                 <PropertiesEditor
                   project={project}
                   resourceSources={resourceSources}
@@ -593,7 +593,7 @@ const PropertiesEditor = ({
             <Subheader>{field.name}</Subheader>
             <div style={styles.subPropertiesEditorContainer}>
               <UnsavedChangesContext.Consumer key={field.name}>
-                {unsavedChanges => (
+                {(unsavedChanges) => (
                   <PropertiesEditor
                     project={project}
                     resourceSources={resourceSources}

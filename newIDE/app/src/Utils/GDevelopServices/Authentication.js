@@ -68,13 +68,13 @@ export default class Authentication {
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
     this.auth = getAuth(app);
-    onAuthStateChanged(this.auth, user => {
+    onAuthStateChanged(this.auth, (user) => {
       if (user) {
         // User has logged in or changed.
-        this._onUserUpdateCallbacks.forEach(cb => cb());
+        this._onUserUpdateCallbacks.forEach((cb) => cb());
       } else {
         // User has logged out.
-        this._onUserLogoutCallbacks.forEach(cb => cb());
+        this._onUserLogoutCallbacks.forEach((cb) => cb());
       }
     });
   }
@@ -89,20 +89,20 @@ export default class Authentication {
 
   removeEventListener = (cbToRemove: () => void | Promise<void>) => {
     this._onUserLogoutCallbacks = this._onUserLogoutCallbacks.filter(
-      cb => cb !== cbToRemove
+      (cb) => cb !== cbToRemove
     );
     this._onUserUpdateCallbacks = this._onUserUpdateCallbacks.filter(
-      cb => cb !== cbToRemove
+      (cb) => cb !== cbToRemove
     );
   };
 
   createFirebaseAccount = (form: RegisterForm): Promise<void> => {
     return createUserWithEmailAndPassword(this.auth, form.email, form.password)
-      .then(userCredentials => {
+      .then((userCredentials) => {
         // The user is now stored in `this.auth`.
         sendEmailVerification(userCredentials.user);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error while creating firebase account:', error);
         throw error;
       });
@@ -114,7 +114,7 @@ export default class Authentication {
     appLanguage: string
   ): Promise<void> => {
     return getAuthorizationHeader()
-      .then(authorizationHeader => {
+      .then((authorizationHeader) => {
         const { currentUser } = this.auth;
         if (!currentUser) {
           console.error(
@@ -145,7 +145,7 @@ export default class Authentication {
       .then(() => {
         // User successfully created
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error while creating user:', error);
         throw error;
       });
@@ -153,10 +153,10 @@ export default class Authentication {
 
   login = (form: LoginForm): Promise<void> => {
     return signInWithEmailAndPassword(this.auth, form.email, form.password)
-      .then(userCredentials => {
+      .then((userCredentials) => {
         // The user is now stored in `this.auth`.
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error while login:', error);
         throw error;
       });
@@ -217,7 +217,7 @@ export default class Authentication {
         console.log('Email successfully changed in Firebase.');
         return getAuthorizationHeader();
       })
-      .then(authorizationHeader => {
+      .then((authorizationHeader) => {
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           {
@@ -236,7 +236,7 @@ export default class Authentication {
       .then(() => {
         console.log('Email successfully changed in the GDevelop services.');
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('An error happened during email change.', error);
         throw error;
       });
@@ -248,7 +248,7 @@ export default class Authentication {
       throw new Error('Tried to get user profile while not authenticated.');
 
     return getAuthorizationHeader()
-      .then(authorizationHeader => {
+      .then((authorizationHeader) => {
         return axios.get(`${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`, {
           params: {
             userId: currentUser.uid,
@@ -258,8 +258,8 @@ export default class Authentication {
           },
         });
       })
-      .then(response => response.data)
-      .catch(error => {
+      .then((response) => response.data)
+      .catch((error) => {
         console.error('Error while fetching user:', error);
         throw error;
       });
@@ -275,7 +275,7 @@ export default class Authentication {
       throw new Error('Tried to edit user profile while not authenticated.');
 
     return getAuthorizationHeader()
-      .then(authorizationHeader => {
+      .then((authorizationHeader) => {
         const { username, description, getGameStatsEmail } = form;
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
@@ -295,8 +295,8 @@ export default class Authentication {
           }
         );
       })
-      .then(response => response.data)
-      .catch(error => {
+      .then((response) => response.data)
+      .catch((error) => {
         console.error('Error while editing user:', error);
         throw error;
       });
@@ -312,7 +312,7 @@ export default class Authentication {
       );
 
     return getAuthorizationHeader()
-      .then(authorizationHeader => {
+      .then((authorizationHeader) => {
         return axios.patch(
           `${GDevelopUserApi.baseUrl}/user/${currentUser.uid}`,
           { getGameStatsEmail: true },
@@ -322,8 +322,8 @@ export default class Authentication {
           }
         );
       })
-      .then(response => response.data)
-      .catch(error => {
+      .then((response) => response.data)
+      .catch((error) => {
         console.error('Error while accepting game stats email:', error);
         throw error;
       });
@@ -338,7 +338,7 @@ export default class Authentication {
       .then(() => {
         console.log('Logout successful.');
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('An error happened during logout.', error);
         throw error;
       });
@@ -348,7 +348,7 @@ export default class Authentication {
     const { currentUser } = this.auth;
     if (!currentUser) throw new Error('User is not authenticated.');
 
-    return currentUser.getIdToken().then(token => `Bearer ${token}`);
+    return currentUser.getIdToken().then((token) => `Bearer ${token}`);
   };
 
   isAuthenticated = (): boolean => {

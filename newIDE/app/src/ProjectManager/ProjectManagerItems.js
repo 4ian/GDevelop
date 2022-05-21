@@ -41,7 +41,7 @@ type ProjectStructureItemProps = {|
 
 export const ProjectStructureItem = (props: ProjectStructureItemProps) => (
   <ThemeConsumer>
-    {muiTheme => {
+    {(muiTheme) => {
       const {
         error,
         leftIcon,
@@ -86,7 +86,7 @@ type ItemProps = {|
   onDelete: () => void,
   addLabel: string,
   onAdd: () => void,
-  onRename: string => void,
+  onRename: (string) => void,
   onEditName: () => void,
   onCopy: () => void,
   onCut: () => void,
@@ -126,15 +126,12 @@ export const Item = ({
 }: ItemProps) => {
   const textField = React.useRef<?TextField>(null);
 
-  React.useEffect(
-    () => {
-      if (editingName)
-        setTimeout(() => {
-          if (textField.current) textField.current.focus();
-        }, 100);
-    },
-    [editingName]
-  );
+  React.useEffect(() => {
+    if (editingName)
+      setTimeout(() => {
+        if (textField.current) textField.current.focus();
+      }, 100);
+  }, [editingName]);
 
   const label = editingName ? (
     <TextField
@@ -142,8 +139,8 @@ export const Item = ({
       margin="none"
       ref={textField}
       defaultValue={primaryText}
-      onBlur={e => onRename(e.currentTarget.value)}
-      onKeyPress={event => {
+      onBlur={(e) => onRename(e.currentTarget.value)}
+      onKeyPress={(event) => {
         if (shouldValidate(event)) {
           if (textField.current) textField.current.blur();
         }
@@ -173,7 +170,7 @@ export const Item = ({
 
   return (
     <ThemeConsumer>
-      {muiTheme => (
+      {(muiTheme) => (
         <I18n>
           {({ i18n }) => (
             <ListItem
@@ -252,7 +249,7 @@ export const Item = ({
 type EventFunctionExtensionItemProps = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   onEdit: ({ [string]: ExtensionShortHeader }) => void,
-  onRename: string => void,
+  onRename: (string) => void,
   onEditName: () => void,
   isEditingName: boolean,
   onDelete: () => void,

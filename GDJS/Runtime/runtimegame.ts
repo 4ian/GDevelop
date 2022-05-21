@@ -119,7 +119,8 @@ namespace gdjs {
       this._originalWidth = this._gameResolutionWidth;
       this._originalHeight = this._gameResolutionHeight;
       this._resizeMode = this._data.properties.sizeOnStartupMode;
-      this._adaptGameResolutionAtRuntime = this._data.properties.adaptGameResolutionAtRuntime;
+      this._adaptGameResolutionAtRuntime =
+        this._data.properties.adaptGameResolutionAtRuntime;
       this._scaleMode = data.properties.scaleMode || 'linear';
       this._pixelsRounding = this._data.properties.pixelsRounding;
       this._renderer = new gdjs.RuntimeGameRenderer(
@@ -353,8 +354,10 @@ namespace gdjs {
           gdjs.RuntimeGameRenderer.getWindowInnerWidth &&
           gdjs.RuntimeGameRenderer.getWindowInnerHeight
         ) {
-          const windowInnerWidth = gdjs.RuntimeGameRenderer.getWindowInnerWidth();
-          const windowInnerHeight = gdjs.RuntimeGameRenderer.getWindowInnerHeight();
+          const windowInnerWidth =
+            gdjs.RuntimeGameRenderer.getWindowInnerWidth();
+          const windowInnerHeight =
+            gdjs.RuntimeGameRenderer.getWindowInnerHeight();
 
           // Enlarge either the width or the eight to fill the inner window space.
           let width = this._gameResolutionWidth;

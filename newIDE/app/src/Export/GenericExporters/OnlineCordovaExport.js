@@ -42,9 +42,9 @@ export const SetupExportHeader = ({
       </Line>
       <RadioGroup
         value={exportState.targets[0] || 'androidApk'}
-        onChange={event => {
+        onChange={(event) => {
           const targetName = event.target.value;
-          updateExportState(prevExportState => ({
+          updateExportState((prevExportState) => ({
             ...prevExportState,
             targets: [targetName],
           }));
@@ -71,7 +71,7 @@ export const SetupExportHeader = ({
         <FlatButton
           label={<Trans>Signing options</Trans>}
           onClick={() => {
-            updateExportState(prevExportState => ({
+            updateExportState((prevExportState) => ({
               ...prevExportState,
               signingDialogOpen: true,
             }));
@@ -88,7 +88,7 @@ export const SetupExportHeader = ({
               primary
               keyboardFocused
               onClick={() => {
-                updateExportState(prevExportState => ({
+                updateExportState((prevExportState) => ({
                   ...prevExportState,
                   signingDialogOpen: false,
                 }));
@@ -104,7 +104,7 @@ export const SetupExportHeader = ({
           open
           title={<Trans>Signing options</Trans>}
           onRequestClose={() => {
-            updateExportState(prevExportState => ({
+            updateExportState((prevExportState) => ({
               ...prevExportState,
               signingDialogOpen: false,
             }));
@@ -122,9 +122,9 @@ export const SetupExportHeader = ({
           <RadioGroup
             name="signing-keystore"
             value={exportState.keystore}
-            onChange={event => {
+            onChange={(event) => {
               const keystore = event.target.value;
-              updateExportState(prevExportState => ({
+              updateExportState((prevExportState) => ({
                 ...prevExportState,
                 keystore,
               }));

@@ -302,9 +302,8 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           platform.setCustomWidthAndHeight(300, 300);
           platform.setPosition(position[0], position[1]);
           const platformBehavior = platform.getBehavior('Platform');
-          const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
-            runtimeScene
-          );
+          const platformObstaclesManager =
+            gdjs.PlatformObjectsManager.getManager(runtimeScene);
           platformObstaclesManager.addPlatform(platformBehavior);
 
           it('can detect a platform away downward', function () {
@@ -374,9 +373,8 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           platform.setCustomWidthAndHeight(300, 300);
           platform.setPosition(position[0], position[1]);
           const platformBehavior = platform.getBehavior('Platform');
-          const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
-            runtimeScene
-          );
+          const platformObstaclesManager =
+            gdjs.PlatformObjectsManager.getManager(runtimeScene);
           platformObstaclesManager.addPlatform(platformBehavior);
 
           it('can detect an obstacle overlapping the top', function () {
@@ -404,9 +402,8 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
         platform.setCustomWidthAndHeight(200, 200);
         platform.setPosition(250, -250);
         const platformBehavior = platform.getBehavior('Platform');
-        const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
-          runtimeScene
-        );
+        const platformObstaclesManager =
+          gdjs.PlatformObjectsManager.getManager(runtimeScene);
         platformObstaclesManager.addPlatform(platformBehavior);
 
         it('can detect a tunnel ceiling', function () {
@@ -458,9 +455,8 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           collisionMasks.verticalTunnel
         );
         const platformBehavior = platform.getBehavior('Platform');
-        const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
-          runtimeScene
-        );
+        const platformObstaclesManager =
+          gdjs.PlatformObjectsManager.getManager(runtimeScene);
         platformObstaclesManager.addPlatform(platformBehavior);
 
         it('can fell inside a vertical tunnel that fit the character', function () {
@@ -495,9 +491,8 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
 
         const platform = addPlatform(runtimeScene, collisionMasks.square);
         const platformBehavior = platform.getBehavior('Platform');
-        const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
-          runtimeScene
-        );
+        const platformObstaclesManager =
+          gdjs.PlatformObjectsManager.getManager(runtimeScene);
         platformObstaclesManager.addPlatform(platformBehavior);
 
         it('can detect a platform at its exact position', function () {

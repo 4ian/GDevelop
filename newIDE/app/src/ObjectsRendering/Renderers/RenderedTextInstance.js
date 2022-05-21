@@ -47,11 +47,15 @@ RenderedTextInstance.prototype = Object.create(RenderedInstance.prototype);
 /**
  * Return a URL for thumbnail of the specified object.
  */
-RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
+RenderedTextInstance.getThumbnail = function (
+  project,
+  resourcesLoader,
+  object
+) {
   return 'CppPlatform/Extensions/texticon24.png';
 };
 
-RenderedTextInstance.prototype.update = function() {
+RenderedTextInstance.prototype.update = function () {
   const textObject = gd.asTextObject(this._associatedObject);
   this._pixiObject.text = textObject.getString();
 
@@ -76,12 +80,12 @@ RenderedTextInstance.prototype.update = function() {
     this._fontName = textObject.getFontName();
     this._pixiResourcesLoader
       .loadFontFamily(this._project, textObject.getFontName())
-      .then(fontFamily => {
+      .then((fontFamily) => {
         // Once the font is loaded, we can use the given fontFamily.
         this._fontFamily = fontFamily;
         this._styleFontDirty = true;
       })
-      .catch(err => {
+      .catch((err) => {
         // Ignore errors
         console.warn(
           'Unable to load font family for RenderedTextInstance',
@@ -129,11 +133,11 @@ RenderedTextInstance.prototype.update = function() {
   this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
 };
 
-RenderedTextInstance.prototype.getDefaultWidth = function() {
+RenderedTextInstance.prototype.getDefaultWidth = function () {
   return this._pixiObject.width;
 };
 
-RenderedTextInstance.prototype.getDefaultHeight = function() {
+RenderedTextInstance.prototype.getDefaultHeight = function () {
   return this._pixiObject.height;
 };
 

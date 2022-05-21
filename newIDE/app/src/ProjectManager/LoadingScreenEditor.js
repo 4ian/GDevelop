@@ -61,7 +61,7 @@ export const LoadingScreenEditor = ({
               resourceExternalEditors={resourceExternalEditors}
               resourceKind="image"
               resourceName={loadingScreen.getBackgroundImageResourceName()}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 loadingScreen.setBackgroundImageResourceName(resourceName);
                 forceUpdate();
               }}
@@ -73,7 +73,7 @@ export const LoadingScreenEditor = ({
               floatingLabelText={<Trans>Background color</Trans>}
               disableAlpha
               color={hexNumberToRGBString(loadingScreen.getBackgroundColor())}
-              onChange={color => {
+              onChange={(color) => {
                 loadingScreen.setBackgroundColor(rgbStringToHexNumber(color));
                 forceUpdate();
               }}
@@ -86,7 +86,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getBackgroundFadeInDuration()}
-              onChange={value => {
+              onChange={(value) => {
                 loadingScreen.setBackgroundFadeInDuration(
                   Math.max(0, parseFloat(value))
                 );
@@ -143,7 +143,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getLogoAndProgressLogoFadeInDelay()}
-              onChange={value => {
+              onChange={(value) => {
                 loadingScreen.setLogoAndProgressLogoFadeInDelay(
                   Math.max(0, parseFloat(value))
                 );
@@ -158,7 +158,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getLogoAndProgressFadeInDuration()}
-              onChange={value => {
+              onChange={(value) => {
                 loadingScreen.setLogoAndProgressFadeInDuration(
                   Math.max(0, parseFloat(value))
                 );
@@ -183,7 +183,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarMinWidth()}
-              onChange={value => {
+              onChange={(value) => {
                 loadingScreen.setProgressBarMinWidth(
                   Math.max(0, parseFloat(value))
                 );
@@ -196,7 +196,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarWidthPercent()}
-              onChange={value => {
+              onChange={(value) => {
                 loadingScreen.setProgressBarWidthPercent(
                   Math.min(100, Math.max(1, parseFloat(value)))
                 );
@@ -209,7 +209,7 @@ export const LoadingScreenEditor = ({
               fullWidth
               type="number"
               value={'' + loadingScreen.getProgressBarMaxWidth()}
-              onChange={value => {
+              onChange={(value) => {
                 loadingScreen.setProgressBarMaxWidth(
                   Math.max(0, parseFloat(value))
                 );
@@ -223,7 +223,7 @@ export const LoadingScreenEditor = ({
             fullWidth
             type="number"
             value={'' + loadingScreen.getProgressBarHeight()}
-            onChange={value => {
+            onChange={(value) => {
               loadingScreen.setProgressBarHeight(
                 Math.max(1, parseFloat(value))
               );
@@ -235,7 +235,7 @@ export const LoadingScreenEditor = ({
             floatingLabelText={<Trans>Progress bar color</Trans>}
             disableAlpha
             color={hexNumberToRGBString(loadingScreen.getProgressBarColor())}
-            onChange={color => {
+            onChange={(color) => {
               loadingScreen.setProgressBarColor(rgbStringToHexNumber(color));
               forceUpdate();
             }}
@@ -251,7 +251,7 @@ export const LoadingScreenEditor = ({
             fullWidth
             type="number"
             value={'' + loadingScreen.getMinDuration()}
-            onChange={value => {
+            onChange={(value) => {
               loadingScreen.setMinDuration(Math.max(0, parseFloat(value)));
               forceUpdate();
             }}

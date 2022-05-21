@@ -6,7 +6,7 @@ namespace gdjs {
     },
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const dotFilter = (filter as unknown) as PIXI.filters.DotFilter;
+      const dotFilter = filter as unknown as PIXI.filters.DotFilter;
       if (parameterName === 'scale') {
         dotFilter.scale = value;
       } else if (parameterName === 'angle') {

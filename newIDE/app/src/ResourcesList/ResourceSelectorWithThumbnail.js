@@ -18,7 +18,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
   resourceKind: ResourceKind,
   resourceName: string,
-  onChange: string => void,
+  onChange: (string) => void,
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,
 |};

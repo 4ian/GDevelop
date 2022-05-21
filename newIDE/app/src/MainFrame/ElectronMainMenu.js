@@ -70,15 +70,12 @@ type RootMenuTemplate =
 
 // Custom hook to register and deregister IPC listener
 const useIPCEventListener = (ipcEvent: MainMenuEvent, func) => {
-  React.useEffect(
-    () => {
-      if (!ipcRenderer) return;
-      const handler = (event, ...eventArgs) => func(...eventArgs);
-      ipcRenderer.on(ipcEvent, handler);
-      return () => ipcRenderer.removeListener(ipcEvent, handler);
-    },
-    [ipcEvent, func]
-  );
+  React.useEffect(() => {
+    if (!ipcRenderer) return;
+    const handler = (event, ...eventArgs) => func(...eventArgs);
+    ipcRenderer.on(ipcEvent, handler);
+    return () => ipcRenderer.removeListener(ipcEvent, handler);
+  }, [ipcEvent, func]);
 };
 
 const buildAndSendMenuTemplate = (
@@ -103,7 +100,7 @@ const buildAndSendMenuTemplate = (
       },
       {
         label: i18n._(t`Open Recent`),
-        submenu: recentProjectFiles.map(item => ({
+        submenu: recentProjectFiles.map((item) => ({
           label: item.fileMetadata.fileIdentifier,
           onClickSendEvent: 'main-menu-open-recent',
           eventArgs: item,
@@ -359,17 +356,14 @@ const ElectronMainMenu = (props: MainMenuProps) => {
   );
   useIPCEventListener('update-status', props.setUpdateStatus);
 
-  React.useEffect(
-    () => {
-      buildAndSendMenuTemplate(project, i18n, recentProjectFiles, shortcutMap);
-    },
-    [i18n, language, project, recentProjectFiles, shortcutMap]
-  );
+  React.useEffect(() => {
+    buildAndSendMenuTemplate(project, i18n, recentProjectFiles, shortcutMap);
+  }, [i18n, language, project, recentProjectFiles, shortcutMap]);
 
   useCommandWithOptions('OPEN_RECENT_PROJECT', true, {
     generateOptions: React.useCallback(
       () =>
-        recentProjectFiles.map(item => ({
+        recentProjectFiles.map((item) => ({
           text: item.fileMetadata.fileIdentifier,
           handler: () => onOpenRecentFile(item),
         })),

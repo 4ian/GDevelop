@@ -38,10 +38,9 @@ const formatParameterTypesString = (
   enumeratedExpressionMetadata: EnumeratedInstructionOrExpressionMetadata
 ) => {
   return getVisibleParameterTypes(enumeratedExpressionMetadata)
-    .map(type => {
-      const userFriendlyName = parameterRenderingService.getUserFriendlyTypeName(
-        type
-      );
+    .map((type) => {
+      const userFriendlyName =
+        parameterRenderingService.getUserFriendlyTypeName(type);
 
       return userFriendlyName ? i18n._(userFriendlyName) : type;
     })
@@ -277,14 +276,11 @@ export default function ExpressionAutocompletionsDisplayer({
   const selectedAutocompletionElement = React.useRef(
     (null: ?React$Component<any, any>)
   );
-  React.useEffect(
-    () => {
-      if (scrollView.current && selectedAutocompletionElement.current) {
-        scrollView.current.scrollTo(selectedAutocompletionElement.current);
-      }
-    },
-    [scrollView, selectedAutocompletionElement, selectedCompletionIndex]
-  );
+  React.useEffect(() => {
+    if (scrollView.current && selectedAutocompletionElement.current) {
+      scrollView.current.scrollTo(selectedAutocompletionElement.current);
+    }
+  }, [scrollView, selectedAutocompletionElement, selectedCompletionIndex]);
 
   if (expressionAutocompletions.length === 0) return null;
 

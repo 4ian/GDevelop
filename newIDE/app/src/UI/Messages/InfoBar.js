@@ -13,17 +13,14 @@ type Props = {|
 const InfoBar = ({ visible, touchScreenMessage, message, hide }: Props) => {
   const screenType = useScreenType();
 
-  React.useEffect(
-    () => {
-      if (visible) {
-        const timeout = setTimeout(() => {
-          hide();
-        }, 3000);
-        return () => clearTimeout(timeout);
-      }
-    },
-    [visible, hide]
-  );
+  React.useEffect(() => {
+    if (visible) {
+      const timeout = setTimeout(() => {
+        hide();
+      }, 3000);
+      return () => clearTimeout(timeout);
+    }
+  }, [visible, hide]);
 
   return (
     <Snackbar

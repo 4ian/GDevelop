@@ -15,15 +15,14 @@ type Props = {|
   onAddEvent: (eventType: string) => void,
 |};
 
-const makeMenuTemplateBuilderForEvents = (
-  onAddEvent: (eventType: string) => void
-) => () =>
-  enumerateEventsMetadata().map(metadata => {
-    return {
-      label: metadata.fullName,
-      click: () => onAddEvent(metadata.type),
-    };
-  });
+const makeMenuTemplateBuilderForEvents =
+  (onAddEvent: (eventType: string) => void) => () =>
+    enumerateEventsMetadata().map((metadata) => {
+      return {
+        label: metadata.fullName,
+        click: () => onAddEvent(metadata.type),
+      };
+    });
 
 export default function BottomButtons({ onAddEvent }: Props) {
   return (

@@ -83,18 +83,18 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  onDeleteLayout: gdLayout => void,
-  onDeleteExternalEvents: gdExternalEvents => void,
-  onDeleteExternalLayout: gdExternalLayout => void,
-  onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => void,
+  onDeleteLayout: (gdLayout) => void,
+  onDeleteExternalEvents: (gdExternalEvents) => void,
+  onDeleteExternalLayout: (gdExternalLayout) => void,
+  onDeleteEventsFunctionsExtension: (gdEventsFunctionsExtension) => void,
   onRenameLayout: (string, string) => void,
   onRenameExternalEvents: (string, string) => void,
   onRenameExternalLayout: (string, string) => void,
   onRenameEventsFunctionsExtension: (string, string) => void,
-  onOpenLayout: string => void,
-  onOpenExternalEvents: string => void,
-  onOpenExternalLayout: string => void,
-  onOpenEventsFunctionsExtension: string => void,
+  onOpenLayout: (string) => void,
+  onOpenExternalEvents: (string) => void,
+  onOpenExternalLayout: (string) => void,
+  onOpenEventsFunctionsExtension: (string) => void,
   onSaveProject: () => Promise<void>,
   onSaveProjectAs: () => void,
   onCloseProject: () => void,
@@ -110,7 +110,7 @@ type Props = {|
   freezeUpdate: boolean,
   unsavedChanges?: UnsavedChanges,
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
-  onInstallExtension: ExtensionShortHeader => void,
+  onInstallExtension: (ExtensionShortHeader) => void,
 
   // For resources:
   resourceSources: Array<ResourceSource>,
@@ -240,7 +240,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const { project } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       project.hasLayoutNamed(name)
     );
 
@@ -266,7 +266,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addLayout = (index: number, i18n: I18nType) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator(i18n._(t`Untitled scene`), name =>
+    const newName = newNameGenerator(i18n._(t`Untitled scene`), (name) =>
       project.hasLayoutNamed(name)
     );
     const newLayout = project.insertNewLayout(newName, index + 1);
@@ -290,7 +290,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const newName = newNameGenerator(
       i18n._(t`Untitled external events`),
-      name => project.hasExternalEventsNamed(name)
+      (name) => project.hasExternalEventsNamed(name)
     );
     project.insertNewExternalEvents(newName, index + 1);
     this._onProjectItemModified();
@@ -301,7 +301,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const newName = newNameGenerator(
       i18n._(t`Untitled external layout`),
-      name => project.hasExternalLayoutNamed(name)
+      (name) => project.hasExternalLayoutNamed(name)
     );
     project.insertNewExternalLayout(newName, index + 1);
     this._onProjectItemModified();
@@ -310,7 +310,7 @@ export default class ProjectManager extends React.Component<Props, State> {
   _addEventsFunctionsExtension = (index: number, i18n: I18nType) => {
     const { project } = this.props;
 
-    const newName = newNameGenerator(i18n._(t`UntitledExtension`), name =>
+    const newName = newNameGenerator(i18n._(t`UntitledExtension`), (name) =>
       isExtensionNameTaken(name, project)
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
@@ -358,7 +358,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const { project } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       project.hasExternalEventsNamed(name)
     );
 
@@ -424,7 +424,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const { project } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       project.hasExternalLayoutNamed(name)
     );
 
@@ -498,14 +498,12 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     const { project } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       isExtensionNameTaken(name, project)
     );
 
-    const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
-      newName,
-      index
-    );
+    const newEventsFunctionsExtension =
+      project.insertNewEventsFunctionsExtension(newName, index);
 
     unserializeFromJSObject(
       newEventsFunctionsExtension,
@@ -739,9 +737,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                               >
                                 <Flag color="disabled" fontSize="small" />
                               </Tooltip>
-                            ) : (
-                              undefined
-                            )
+                            ) : undefined
                           }
                           editingName={
                             renamedItemKind === 'layout' &&
@@ -751,7 +747,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                           onDelete={() => this.props.onDeleteLayout(layout)}
                           addLabel={t`Add a New Scene`}
                           onAdd={() => this._addLayout(i, i18n)}
-                          onRename={newName => {
+                          onRename={(newName) => {
                             this.props.onRenameLayout(name, newName);
                             this._onEditName(null, '');
                           }}
@@ -829,7 +825,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                           }
                           addLabel={t`Add New External Events`}
                           onAdd={() => this._addExternalEvents(i, i18n)}
-                          onRename={newName => {
+                          onRename={(newName) => {
                             this.props.onRenameExternalEvents(name, newName);
                             this._onEditName(null, '');
                           }}
@@ -905,7 +901,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                           }
                           addLabel={t`Add a New External Layout`}
                           onAdd={() => this._addExternalLayout(i, i18n)}
-                          onRename={newName => {
+                          onRename={(newName) => {
                             this.props.onRenameExternalLayout(name, newName);
                             this._onEditName(null, '');
                           }}
@@ -979,7 +975,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                             renamedItemKind === 'events-functions-extension' &&
                             renamedItemName === name
                           }
-                          onEdit={extensionShortHeadersByName =>
+                          onEdit={(extensionShortHeadersByName) =>
                             this._onEditEventsFunctionExtensionOrSeeDetails(
                               extensionShortHeadersByName,
                               eventsFunctionsExtension,
@@ -994,7 +990,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                           onAdd={() =>
                             this._addEventsFunctionsExtension(i, i18n)
                           }
-                          onRename={newName => {
+                          onRename={(newName) => {
                             this.props.onRenameEventsFunctionsExtension(
                               name,
                               newName
@@ -1065,7 +1061,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               />
             </List>
             <SearchBar
-              ref={searchBar => (this._searchBar = searchBar)}
+              ref={(searchBar) => (this._searchBar = searchBar)}
               value={searchText}
               onRequestSearch={this._onRequestSearch}
               onChange={this._onSearchChange}

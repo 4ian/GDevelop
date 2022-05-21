@@ -47,9 +47,8 @@ type Props = {|
 |};
 
 const BehaviorsEditor = (props: Props) => {
-  const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] = React.useState(
-    false
-  );
+  const [newBehaviorDialogOpen, setNewBehaviorDialogOpen] =
+    React.useState(false);
 
   const { object, project } = props;
   const allBehaviorNames = object.getAllBehaviorNames().toJSArray();
@@ -96,11 +95,12 @@ const BehaviorsEditor = (props: Props) => {
   const onRemoveBehavior = (behaviorName: string) => {
     let message =
       "Are you sure you want to remove this behavior? This can't be undone.";
-    const dependentBehaviors = gd.WholeProjectRefactorer.findDependentBehaviorNames(
-      project,
-      object,
-      behaviorName
-    ).toJSArray();
+    const dependentBehaviors =
+      gd.WholeProjectRefactorer.findDependentBehaviorNames(
+        project,
+        object,
+        behaviorName
+      ).toJSArray();
     if (dependentBehaviors.length > 0) {
       message +=
         '\nDependent behaviors will be removed too: ' +
@@ -110,7 +110,7 @@ const BehaviorsEditor = (props: Props) => {
 
     if (answer) {
       object.removeBehavior(behaviorName);
-      dependentBehaviors.forEach(name => object.removeBehavior(name));
+      dependentBehaviors.forEach((name) => object.removeBehavior(name));
       if (props.onSizeUpdated) props.onSizeUpdated();
     }
   };
@@ -151,7 +151,7 @@ const BehaviorsEditor = (props: Props) => {
                       actions={[
                         <IconButton
                           key="delete"
-                          onClick={ev => {
+                          onClick={(ev) => {
                             ev.stopPropagation();
                             onRemoveBehavior(behaviorName);
                           }}
@@ -185,12 +185,11 @@ const BehaviorsEditor = (props: Props) => {
               }
 
               const behavior = behaviorMetadata.get();
-              const BehaviorComponent = BehaviorsEditorService.getEditor(
-                behaviorTypeName
-              );
+              const BehaviorComponent =
+                BehaviorsEditorService.getEditor(behaviorTypeName);
               const tutorialIds = getBehaviorTutorialIds(behaviorTypeName);
               const enabledTutorialIds = tutorialIds.filter(
-                tutorialId => !values.hiddenTutorialHints[tutorialId]
+                (tutorialId) => !values.hiddenTutorialHints[tutorialId]
               );
               const iconUrl = behaviorMetadata.getIconFilename();
 
@@ -206,7 +205,7 @@ const BehaviorsEditor = (props: Props) => {
                       <IconButton
                         key="delete"
                         size="small"
-                        onClick={ev => {
+                        onClick={(ev) => {
                           ev.stopPropagation();
                           onRemoveBehavior(behaviorName);
                         }}
@@ -246,7 +245,7 @@ const BehaviorsEditor = (props: Props) => {
                       {enabledTutorialIds.length ? (
                         <Line>
                           <ColumnStackLayout expand>
-                            {tutorialIds.map(tutorialId => (
+                            {tutorialIds.map((tutorialId) => (
                               <DismissableTutorialMessage
                                 key={tutorialId}
                                 tutorialId={tutorialId}

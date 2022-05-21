@@ -75,7 +75,7 @@ type Props = {|
   ...InstancesEditorPropsWithoutSizeAndScroll,
   width: number,
   height: number,
-  onViewPositionChanged: ViewPosition => void,
+  onViewPositionChanged: (ViewPosition) => void,
   screenType: ScreenType,
 |};
 
@@ -152,7 +152,7 @@ export default class InstancesEditor extends Component<Props> {
 
     this.longTouchHandler = new LongTouchHandler({
       canvas: this.pixiRenderer.view,
-      onLongTouch: event =>
+      onLongTouch: (event) =>
         this.props.onContextMenu(event.clientX, event.clientY),
     });
 
@@ -175,16 +175,16 @@ export default class InstancesEditor extends Component<Props> {
       event.preventDefault();
     };
     this.pixiRenderer.view.setAttribute('tabIndex', -1);
-    this.pixiRenderer.view.addEventListener('focus', e => {
+    this.pixiRenderer.view.addEventListener('focus', (e) => {
       this.keyboardShortcuts.focus();
     });
-    this.pixiRenderer.view.addEventListener('blur', e => {
+    this.pixiRenderer.view.addEventListener('blur', (e) => {
       this.keyboardShortcuts.blur();
     });
-    this.pixiRenderer.view.addEventListener('mouseover', e => {
+    this.pixiRenderer.view.addEventListener('mouseover', (e) => {
       this.keyboardShortcuts.focus();
     });
-    this.pixiRenderer.view.addEventListener('mouseout', e => {
+    this.pixiRenderer.view.addEventListener('mouseout', (e) => {
       this.keyboardShortcuts.blur();
     });
 
@@ -198,7 +198,7 @@ export default class InstancesEditor extends Component<Props> {
       this.props.height
     );
     gesture.panable(this.backgroundArea);
-    this.backgroundArea.on('mousedown', event =>
+    this.backgroundArea.on('mousedown', (event) =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
     );
     this.backgroundArea.on(
@@ -218,19 +218,19 @@ export default class InstancesEditor extends Component<Props> {
         return false;
       }
     );
-    this.backgroundArea.on('touchstart', event => {
+    this.backgroundArea.on('touchstart', (event) => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
         return;
       }
 
       this._onBackgroundClicked(event.data.global.x, event.data.global.y);
     });
-    this.backgroundArea.on('mousemove', event => {
+    this.backgroundArea.on('mousemove', (event) => {
       const cursorX = event.data.global.x || 0;
       const cursorY = event.data.global.y || 0;
       this._onMouseMove(cursorX, cursorY);
     });
-    this.backgroundArea.on('panmove', event =>
+    this.backgroundArea.on('panmove', (event) =>
       this._onPanMove(
         event.deltaX,
         event.deltaY,
@@ -238,7 +238,7 @@ export default class InstancesEditor extends Component<Props> {
         event.data.global.y
       )
     );
-    this.backgroundArea.on('panend', event => this._onPanEnd());
+    this.backgroundArea.on('panend', (event) => this._onPanEnd());
     this.pixiContainer.addChild(this.backgroundArea);
 
     this.viewPosition = new ViewPosition({
@@ -662,7 +662,8 @@ export default class InstancesEditor extends Component<Props> {
     }
 
     if (this.keyboardShortcuts.shouldCloneInstances()) {
-      const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+      const selectedInstances =
+        this.props.instancesSelection.getSelectedInstances();
       for (var i = 0; i < selectedInstances.length; i++) {
         const instance = selectedInstances[i];
         this.props.initialInstances
@@ -715,7 +716,8 @@ export default class InstancesEditor extends Component<Props> {
       this._onInstanceClicked(instance);
     }
 
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     this.instancesMover.moveBy(
       selectedInstances,
       sceneDeltaX,
@@ -728,7 +730,8 @@ export default class InstancesEditor extends Component<Props> {
   _onMoveInstanceEnd = () => {
     this.instancesMover.endMove();
 
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesMoved(selectedInstances);
   };
 
@@ -740,7 +743,8 @@ export default class InstancesEditor extends Component<Props> {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     const forceProportional =
       this.props.screenType === 'touch' &&
       canMoveOnX(grabbingLocation) &&
@@ -759,7 +763,8 @@ export default class InstancesEditor extends Component<Props> {
   _onResizeEnd = () => {
     this.instancesResizer.endResize();
 
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesResized(selectedInstances);
   };
 
@@ -767,7 +772,8 @@ export default class InstancesEditor extends Component<Props> {
     const sceneDeltaX = deltaX / this.getZoomFactor();
     const sceneDeltaY = deltaY / this.getZoomFactor();
 
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     this.instancesRotator.rotateBy(
       selectedInstances,
       sceneDeltaX,
@@ -779,7 +785,8 @@ export default class InstancesEditor extends Component<Props> {
   _onRotateEnd = () => {
     this.instancesRotator.endRotate();
 
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesRotated(selectedInstances);
   };
 
@@ -788,11 +795,12 @@ export default class InstancesEditor extends Component<Props> {
   };
 
   moveSelection = (x: number, y: number) => {
-    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    const selectedInstances =
+      this.props.instancesSelection.getSelectedInstances();
     const unlockedSelectedInstances = selectedInstances.filter(
-      instance => !instance.isLocked()
+      (instance) => !instance.isLocked()
     );
-    unlockedSelectedInstances.forEach(instance => {
+    unlockedSelectedInstances.forEach((instance) => {
       instance.setX(instance.getX() + x);
       instance.setY(instance.getY() + y);
     });
@@ -879,7 +887,7 @@ export default class InstancesEditor extends Component<Props> {
     return (
       <DropTarget
         canDrop={() => true}
-        hover={monitor => {
+        hover={(monitor) => {
           const { _instancesAdder, viewPosition, canvasArea } = this;
           if (!_instancesAdder || !canvasArea || !viewPosition) return;
 
@@ -894,7 +902,7 @@ export default class InstancesEditor extends Component<Props> {
             this.props.selectedObjectNames
           );
         }}
-        drop={monitor => {
+        drop={(monitor) => {
           const { _instancesAdder, viewPosition, canvasArea } = this;
           if (!_instancesAdder || !canvasArea || !viewPosition) return;
 
@@ -911,9 +919,8 @@ export default class InstancesEditor extends Component<Props> {
             x - canvasRect.left,
             y - canvasRect.top
           );
-          const instances = _instancesAdder.updateTemporaryInstancePositions(
-            pos
-          );
+          const instances =
+            _instancesAdder.updateTemporaryInstancePositions(pos);
           _instancesAdder.commitTemporaryInstances();
           this.props.onInstancesAdded(instances);
         }}
@@ -928,7 +935,7 @@ export default class InstancesEditor extends Component<Props> {
 
           return connectDropTarget(
             <div
-              ref={canvasArea => (this.canvasArea = canvasArea)}
+              ref={(canvasArea) => (this.canvasArea = canvasArea)}
               style={styles.canvasArea}
             />
           );

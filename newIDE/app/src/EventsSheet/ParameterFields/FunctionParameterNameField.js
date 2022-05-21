@@ -20,7 +20,7 @@ export default class FunctionParameterNameField extends Component<
       .eventsFunction
       ? enumerateParametersUsableInExpressions(
           this.props.scope.eventsFunction
-        ).map(parameterMetadata => ({
+        ).map((parameterMetadata) => ({
           kind: 'Text',
           completion: `"${parameterMetadata.getName()}"`,
         }))
@@ -29,12 +29,12 @@ export default class FunctionParameterNameField extends Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           parameterNames.filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

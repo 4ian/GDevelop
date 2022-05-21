@@ -38,8 +38,8 @@ export default React.forwardRef<Props, ScrollViewInterface>(
         if (targetElement instanceof HTMLElement) {
           const yPosition = targetElement.getBoundingClientRect().top;
 
-          const scrollViewYPosition = scrollViewElement.getBoundingClientRect()
-            .top;
+          const scrollViewYPosition =
+            scrollViewElement.getBoundingClientRect().top;
           scrollViewElement.scrollTop += yPosition - scrollViewYPosition;
         } else {
           console.error(

@@ -50,12 +50,12 @@ export default class ObjectPointNameField extends Component<
       const spriteObject = gd.asSpriteObject(object);
 
       return getAllPointNames(spriteObject)
-        .map(spriteObjectName =>
+        .map((spriteObjectName) =>
           spriteObjectName.length > 0 ? spriteObjectName : null
         )
         .filter(Boolean)
         .sort()
-        .map(pointName => ({
+        .map((pointName) => ({
           kind: 'Text',
           completion: `"${pointName}"`,
         }));
@@ -68,12 +68,12 @@ export default class ObjectPointNameField extends Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           this.getPointNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

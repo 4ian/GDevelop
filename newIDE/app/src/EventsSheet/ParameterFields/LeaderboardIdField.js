@@ -25,29 +25,22 @@ const getInlineParameterDisplayValue = (
 ): string => {
   if (!leaderboards) return value;
   const leaderboard = leaderboards.find(
-    leaderboard => `"${leaderboard.id}"` === value
+    (leaderboard) => `"${leaderboard.id}"` === value
   );
   return leaderboard ? leaderboard.name : value;
 };
 
 const useFetchLeaderboards = () => {
-  const { leaderboards, listLeaderboards } = React.useContext(
-    LeaderboardContext
-  );
-  const fetchLeaderboards = React.useCallback(
-    async () => {
-      await listLeaderboards();
-    },
-    [listLeaderboards]
-  );
-  React.useEffect(
-    () => {
-      if (!leaderboards) {
-        fetchLeaderboards();
-      }
-    },
-    [fetchLeaderboards, leaderboards]
-  );
+  const { leaderboards, listLeaderboards } =
+    React.useContext(LeaderboardContext);
+  const fetchLeaderboards = React.useCallback(async () => {
+    await listLeaderboards();
+  }, [listLeaderboards]);
+  React.useEffect(() => {
+    if (!leaderboards) {
+      fetchLeaderboards();
+    }
+  }, [fetchLeaderboards, leaderboards]);
 
   return leaderboards;
 };
@@ -57,10 +50,8 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
-    const inputFieldRef = React.useRef<?(
-      | GenericExpressionField
-      | SelectFieldInterface
-    )>(null);
+    const inputFieldRef =
+      React.useRef<?(GenericExpressionField | SelectFieldInterface)>(null);
     React.useImperativeHandle(ref, () => ({
       focus: () => {
         if (inputFieldRef.current) {
@@ -71,7 +62,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
     const isCurrentValueInLeaderboardList =
       leaderboards &&
-      !!leaderboards.find(leaderboard => `"${leaderboard.id}"` === props.value);
+      !!leaderboards.find(
+        (leaderboard) => `"${leaderboard.id}"` === props.value
+      );
 
     const [isExpressionField, setIsExpressionField] = React.useState(
       !leaderboards || (!!props.value && !isCurrentValueInLeaderboardList)
@@ -94,7 +87,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const selectOptions = React.useMemo(
       () =>
         leaderboards && gameHasLeaderboards
-          ? leaderboards.map(leaderboard => (
+          ? leaderboards.map((leaderboard) => (
               <SelectOption
                 key={leaderboard.id}
                 value={`"${leaderboard.id}"`}
@@ -167,13 +160,13 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                   />
                 )
               }
-              renderButton={style => (
+              renderButton={(style) => (
                 <RaisedButtonWithSplitMenu
                   icon={<OpenInNew />}
                   style={style}
                   primary
                   onClick={() => setIsAdminOpen(true)}
-                  buildMenuTemplate={i18n => [
+                  buildMenuTemplate={(i18n) => [
                     {
                       label: isExpressionField
                         ? i18n._(t`Select the leaderboard from a list`)

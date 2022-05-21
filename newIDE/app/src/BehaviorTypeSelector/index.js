@@ -12,7 +12,7 @@ type Props = {|
   project: gdProject,
   objectType: string,
   value: string,
-  onChange: string => void,
+  onChange: (string) => void,
   disabled?: boolean,
 |};
 type State = {|

@@ -117,17 +117,20 @@ namespace gdjs {
 
     setViewpoint(viewpoint: string, customIsometryAngle: float): void {
       if (viewpoint === 'PixelIsometry') {
-        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-          Math.atan(0.5)
-        );
+        this._basisTransformation =
+          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+            Math.atan(0.5)
+          );
       } else if (viewpoint === 'TrueIsometry') {
-        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-          Math.PI / 6
-        );
+        this._basisTransformation =
+          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+            Math.PI / 6
+          );
       } else if (viewpoint === 'CustomIsometry') {
-        this._basisTransformation = new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
-          (customIsometryAngle * Math.PI) / 180
-        );
+        this._basisTransformation =
+          new gdjs.TopDownMovementRuntimeBehavior.IsometryTransformation(
+            (customIsometryAngle * Math.PI) / 180
+          );
       } else {
         this._basisTransformation = null;
       }
@@ -525,7 +528,8 @@ namespace gdjs {
     }
 
     export class IsometryTransformation
-      implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation {
+      implements gdjs.TopDownMovementRuntimeBehavior.BasisTransformation
+    {
       private _screen: float[][];
 
       /**

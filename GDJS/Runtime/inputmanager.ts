@@ -378,9 +378,8 @@ namespace gdjs {
      * @deprecated
      */
     popStartedTouch(): integer | undefined {
-      const publicIdentifier = this._startedTouches[
-        this._lastStartedTouchIndex
-      ];
+      const publicIdentifier =
+        this._startedTouches[this._lastStartedTouchIndex];
       this._lastStartedTouchIndex++;
       return publicIdentifier;
     }

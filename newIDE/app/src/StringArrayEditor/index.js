@@ -29,7 +29,7 @@ const StringArrayEditor = ({
             <SemiControlledTextField
               commitOnBlur
               value={item}
-              onChange={text => {
+              onChange={(text) => {
                 extraInfo[index] = text;
                 updateExtraInfo();
               }}

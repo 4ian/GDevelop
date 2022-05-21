@@ -17,7 +17,7 @@ type Props = {|
   onEdit: EditFunction,
 |};
 
-const transform = runtimeObject => {
+const transform = (runtimeObject) => {
   if (!runtimeObject) return null;
   return {
     'X position': runtimeObject.x,
@@ -59,7 +59,7 @@ const RuntimeObjectInspector = (props: Props) => (
       enableClipboard={false}
       displayDataTypes={false}
       displayObjectSize={false}
-      onEdit={edit => handleEdit(edit, props)}
+      onEdit={(edit) => handleEdit(edit, props)}
       groupArraysAfterLength={50}
       theme="monokai"
     />

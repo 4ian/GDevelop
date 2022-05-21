@@ -24,6 +24,6 @@ export type MainMenuProps = {|
   onOpenLanguage: (open?: boolean) => void,
   onOpenProfile: (open?: boolean) => void,
   onOpenGamesDashboard: (open?: boolean) => void,
-  setUpdateStatus: UpdateStatus => void,
+  setUpdateStatus: (UpdateStatus) => void,
   recentProjectFiles: Array<FileMetadataAndStorageProviderName>,
 |};

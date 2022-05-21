@@ -25,8 +25,8 @@ import {
 import { Tabs, Tab } from '../UI/Tabs';
 
 type Props = {|
-  onSearchInEvents: SearchInEventsInputs => void,
-  onReplaceInEvents: ReplaceInEventsInputs => void,
+  onSearchInEvents: (SearchInEventsInputs) => void,
+  onReplaceInEvents: (ReplaceInEventsInputs) => void,
   onCloseSearchPanel: () => void,
   resultsCount: ?number,
   hasEventSelected: boolean,
@@ -60,30 +60,22 @@ const SearchPanel = (
   const [replaceText, setReplaceText] = React.useState<string>('');
   const [matchCase, setMatchCase] = React.useState<boolean>(false);
   const [searchInActions, setSearchInActions] = React.useState<boolean>(true);
-  const [searchInConditions, setSearchInConditions] = React.useState<boolean>(
-    true
-  );
-  const [
-    searchInEventStrings,
-    setSearchInEventStrings,
-  ] = React.useState<boolean>(true);
+  const [searchInConditions, setSearchInConditions] =
+    React.useState<boolean>(true);
+  const [searchInEventStrings, setSearchInEventStrings] =
+    React.useState<boolean>(true);
   // eslint-disable-next-line no-unused-vars
-  const [searchInSelection, setSearchInSelection] = React.useState<boolean>(
-    false
-  );
-  const [searchResultsDirty, setSearchResultsDirty] = React.useState<boolean>(
-    false
-  );
+  const [searchInSelection, setSearchInSelection] =
+    React.useState<boolean>(false);
+  const [searchResultsDirty, setSearchResultsDirty] =
+    React.useState<boolean>(false);
   const [currentTab, setCurrentTab] = React.useState<
     'search-and-replace' | 'search-in-event-sentences'
   >('search-and-replace');
 
-  const isSearchOngoing = React.useCallback(
-    (): boolean => {
-      return !!searchText && !searchResultsDirty;
-    },
-    [searchText, searchResultsDirty]
-  );
+  const isSearchOngoing = React.useCallback((): boolean => {
+    return !!searchText && !searchResultsDirty;
+  }, [searchText, searchResultsDirty]);
 
   const focusSearchField = React.useCallback((): void => {
     if (searchTextField.current) searchTextField.current.focus();
@@ -99,18 +91,15 @@ const SearchPanel = (
     markSearchResultsDirty,
   }));
 
-  React.useEffect(
-    () => {
-      setSearchResultsDirty(true);
-    },
-    [
-      searchText,
-      searchInActions,
-      searchInConditions,
-      searchInEventStrings,
-      matchCase,
-    ]
-  );
+  React.useEffect(() => {
+    setSearchResultsDirty(true);
+  }, [
+    searchText,
+    searchInActions,
+    searchInConditions,
+    searchInEventStrings,
+    matchCase,
+  ]);
 
   // Note: might be worth fixing these warnings:
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -183,7 +172,7 @@ const SearchPanel = (
               onChange={(e, searchText) => {
                 setSearchText(searchText);
               }}
-              onKeyPress={event => {
+              onKeyPress={(event) => {
                 if (shouldBrowsePrevious(event)) {
                   onGoToPreviousSearchResult();
                 } else if (shouldValidate(event)) {
@@ -194,7 +183,7 @@ const SearchPanel = (
                   }
                 }
               }}
-              onKeyUp={event => {
+              onKeyUp={(event) => {
                 if (shouldCloseOrCancel(event)) {
                   onCloseSearchPanel();
                 }
@@ -225,12 +214,12 @@ const SearchPanel = (
                 onChange={(e, replaceText) => {
                   setReplaceText(replaceText);
                 }}
-                onKeyPress={event => {
+                onKeyPress={(event) => {
                   if (shouldValidate(event)) {
                     launchReplace();
                   }
                 }}
-                onKeyUp={event => {
+                onKeyUp={(event) => {
                   if (shouldCloseOrCancel(event)) {
                     onCloseSearchPanel();
                   }

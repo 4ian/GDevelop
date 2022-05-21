@@ -46,7 +46,7 @@ RenderedTiledSpriteInstance.prototype = Object.create(
 /**
  * Return a URL for thumbnail of the specified object.
  */
-RenderedTiledSpriteInstance.getThumbnail = function(
+RenderedTiledSpriteInstance.getThumbnail = function (
   project,
   resourcesLoader,
   object
@@ -60,7 +60,7 @@ RenderedTiledSpriteInstance.getThumbnail = function(
   );
 };
 
-RenderedTiledSpriteInstance.prototype.update = function() {
+RenderedTiledSpriteInstance.prototype.update = function () {
   var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
   if (this._instance.hasCustomSize()) {
     this._pixiObject.width = this._instance.getCustomWidth();
@@ -83,12 +83,12 @@ RenderedTiledSpriteInstance.prototype.update = function() {
   this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
 };
 
-RenderedTiledSpriteInstance.prototype.getDefaultWidth = function() {
+RenderedTiledSpriteInstance.prototype.getDefaultWidth = function () {
   var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
   return tiledSprite.getWidth();
 };
 
-RenderedTiledSpriteInstance.prototype.getDefaultHeight = function() {
+RenderedTiledSpriteInstance.prototype.getDefaultHeight = function () {
   var tiledSprite = gd.asTiledSpriteObject(this._associatedObject);
   return tiledSprite.getHeight();
 };

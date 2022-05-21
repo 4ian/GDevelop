@@ -75,7 +75,7 @@ type Props = {|
   events: gdEventsList,
   onClose: () => void,
   onCreateNewObject: (type: string) => void,
-  onObjectAddedFromAsset: gdObject => void,
+  onObjectAddedFromAsset: (gdObject) => void,
 |};
 
 export default function NewObjectDialog({
@@ -90,10 +90,8 @@ export default function NewObjectDialog({
   onCreateNewObject,
   onObjectAddedFromAsset,
 }: Props) {
-  const {
-    setNewObjectDialogDefaultTab,
-    getNewObjectDialogDefaultTab,
-  } = React.useContext(PreferencesContext);
+  const { setNewObjectDialogDefaultTab, getNewObjectDialogDefaultTab } =
+    React.useContext(PreferencesContext);
   const [assetWasInstalled, setAssetWasInstalled] = React.useState(false);
   const [openedAsset, setOpenedAsset] = React.useState<null | AssetShortHeader>(
     null
@@ -102,36 +100,32 @@ export default function NewObjectDialog({
   const [currentTab, setCurrentTab] = React.useState(
     getNewObjectDialogDefaultTab()
   );
-  const allObjectMetadata = React.useMemo(() => enumerateObjectTypes(project), [
-    project,
-  ]);
+  const allObjectMetadata = React.useMemo(
+    () => enumerateObjectTypes(project),
+    [project]
+  );
   const objectsByCategory: {
     [string]: Array<EnumeratedObjectMetadata>,
-  } = React.useMemo(
-    () => {
-      const objectsByCategory = {};
-      allObjectMetadata.forEach(objectMetadata => {
-        const category = objectMetadata.categoryFullName;
-        objectsByCategory[category] = [
-          ...(objectsByCategory[category] || []),
-          objectMetadata,
-        ];
-      });
-      return objectsByCategory;
-    },
-    [allObjectMetadata]
-  );
+  } = React.useMemo(() => {
+    const objectsByCategory = {};
+    allObjectMetadata.forEach((objectMetadata) => {
+      const category = objectMetadata.categoryFullName;
+      objectsByCategory[category] = [
+        ...(objectsByCategory[category] || []),
+        objectMetadata,
+      ];
+    });
+    return objectsByCategory;
+  }, [allObjectMetadata]);
 
   const resourcesFetcher = useResourceFetcher();
-  React.useEffect(() => setNewObjectDialogDefaultTab(currentTab), [
-    setNewObjectDialogDefaultTab,
-    currentTab,
-  ]);
+  React.useEffect(
+    () => setNewObjectDialogDefaultTab(currentTab),
+    [setNewObjectDialogDefaultTab, currentTab]
+  );
 
-  const [
-    assetBeingInstalled,
-    setAssetBeingInstalled,
-  ] = React.useState<?AssetShortHeader>(null);
+  const [assetBeingInstalled, setAssetBeingInstalled] =
+    React.useState<?AssetShortHeader>(null);
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -153,7 +147,7 @@ export default function NewObjectDialog({
           });
           console.log('Asset successfully installed.');
 
-          installOutput.createdObjects.forEach(object => {
+          installOutput.createdObjects.forEach((object) => {
             onObjectAddedFromAsset(object);
           });
 
@@ -164,9 +158,7 @@ export default function NewObjectDialog({
         } catch (error) {
           console.error('Error while installing the asset:', error);
           showErrorBox({
-            message: `There was an error while installing the asset "${
-              assetShortHeader.name
-            }". Verify your internet connection or try again later.`,
+            message: `There was an error while installing the asset "${assetShortHeader.name}". Verify your internet connection or try again later.`,
             rawError: error,
             errorId: 'install-asset-error',
           });
@@ -185,9 +177,8 @@ export default function NewObjectDialog({
     ]
   );
 
-  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
-    'intro-object-types'
-  );
+  const { DismissableTutorialMessage } =
+    useDismissableTutorialMessage('intro-object-types');
 
   return (
     <Dialog
@@ -224,7 +215,7 @@ export default function NewObjectDialog({
             project={project}
             objectsContainer={objectsContainer}
             events={events}
-            onOpenDetails={assetShortHeader => {
+            onOpenDetails={(assetShortHeader) => {
               setOpenedAsset(assetShortHeader);
               sendAssetOpened({
                 id: assetShortHeader.id,
@@ -241,12 +232,12 @@ export default function NewObjectDialog({
               </Line>
             )}
             <List>
-              {Object.keys(objectsByCategory).map(category => {
+              {Object.keys(objectsByCategory).map((category) => {
                 const categoryObjectMetadata = objectsByCategory[category];
                 return (
                   <React.Fragment key={category}>
                     <Subheader>{category}</Subheader>
-                    {categoryObjectMetadata.map(objectMetadata => (
+                    {categoryObjectMetadata.map((objectMetadata) => (
                       <ObjectListItem
                         key={objectMetadata.name}
                         objectMetadata={objectMetadata}

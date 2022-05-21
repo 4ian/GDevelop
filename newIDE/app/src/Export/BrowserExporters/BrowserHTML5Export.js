@@ -109,7 +109,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
     return downloadUrlsToBlobs({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -132,7 +132,7 @@ export const browserHTML5ExportPipeline: ExportPipeline<
       <DoneFooter
         renderGameButton={() => (
           <BlobDownloadUrlHolder blob={compressionOutput}>
-            {blobDownloadUrl => (
+            {(blobDownloadUrl) => (
               <RaisedButton
                 fullWidth
                 primary

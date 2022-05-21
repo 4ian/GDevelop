@@ -29,7 +29,7 @@ const styles = {
 type Props = {|
   type: 'export' | 'create-game',
   value: string,
-  onChange: string => void,
+  onChange: (string) => void,
   defaultPath?: string,
   fullWidth?: boolean,
 |};

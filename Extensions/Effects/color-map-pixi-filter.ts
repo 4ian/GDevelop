@@ -19,7 +19,7 @@ namespace gdjs {
     },
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+      const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
       if (parameterName === 'mix') {
         colorMapFilter.mix = gdjs.PixiFiltersTools.clampValue(
           value / 100,
@@ -30,7 +30,7 @@ namespace gdjs {
     },
     updateStringParameter: function (filter, parameterName, value) {},
     updateBooleanParameter: function (filter, parameterName, value) {
-      const colorMapFilter = (filter as unknown) as PIXI.filters.ColorMapFilter;
+      const colorMapFilter = filter as unknown as PIXI.filters.ColorMapFilter;
       if (parameterName === 'nearest') {
         colorMapFilter.nearest = value;
       }

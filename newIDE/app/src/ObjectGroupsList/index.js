@@ -49,7 +49,7 @@ type Props = {|
   globalObjectGroups: gdObjectGroupsContainer,
   objectGroups: gdObjectGroupsContainer,
   onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
-  onEditGroup: gdObjectGroup => void,
+  onEditGroup: (gdObjectGroup) => void,
   canRenameGroup: (newName: string) => boolean,
   onRenameGroup: (
     groupWithContext: GroupWithContext,
@@ -115,7 +115,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     const name = newNameGenerator(
       'Group',
-      name => objectGroups.has(name) || globalObjectGroups.has(name)
+      (name) => objectGroups.has(name) || globalObjectGroups.has(name)
     );
 
     objectGroups.insertNew(name, objectGroups.count());
@@ -135,7 +135,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     );
     if (!answer) return;
 
-    this.props.onDeleteGroup(groupWithContext, doRemove => {
+    this.props.onDeleteGroup(groupWithContext, (doRemove) => {
       if (!doRemove) return;
 
       if (global) {
@@ -172,7 +172,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     const newName = newNameGenerator(
       group.getName(),
-      name => container.has(name),
+      (name) => container.has(name),
       ''
     );
 
@@ -211,7 +211,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     }
 
     if (this.props.canRenameGroup(newName)) {
-      this.props.onRenameGroup(groupWithContext, newName, doRename => {
+      this.props.onRenameGroup(groupWithContext, newName, (doRename) => {
         if (!doRename) return;
 
         group.setName(newName);
@@ -325,40 +325,39 @@ export default class GroupsListContainer extends React.Component<Props, State> {
     if (this.sortableList) this.sortableList.forceUpdateGrid();
   };
 
-  _renderGroupMenuTemplate = (i18n: I18nType) => (
-    groupWithContext: GroupWithContext,
-    index: number
-  ) => [
-    {
-      label: i18n._(t`Duplicate`),
-      click: () => this._onDuplicate(groupWithContext),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Edit group`),
-      click: () => this.props.onEditGroup(groupWithContext.group),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Rename`),
-      click: () => this._onEditName(groupWithContext),
-    },
-    {
-      label: i18n._(t`Set as global group`),
-      enabled: !isGroupWithContextGlobal(groupWithContext),
-      click: () => this._setAsGlobalGroup(groupWithContext),
-      visible: this.props.canSetAsGlobalGroup !== false,
-    },
-    {
-      label: i18n._(t`Delete`),
-      click: () => this._onDelete(groupWithContext),
-    },
-    { type: 'separator' },
-    {
-      label: i18n._(t`Add a new group...`),
-      click: this.addGroup,
-    },
-  ];
+  _renderGroupMenuTemplate =
+    (i18n: I18nType) => (groupWithContext: GroupWithContext, index: number) =>
+      [
+        {
+          label: i18n._(t`Duplicate`),
+          click: () => this._onDuplicate(groupWithContext),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Edit group`),
+          click: () => this.props.onEditGroup(groupWithContext.group),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Rename`),
+          click: () => this._onEditName(groupWithContext),
+        },
+        {
+          label: i18n._(t`Set as global group`),
+          enabled: !isGroupWithContextGlobal(groupWithContext),
+          click: () => this._setAsGlobalGroup(groupWithContext),
+          visible: this.props.canSetAsGlobalGroup !== false,
+        },
+        {
+          label: i18n._(t`Delete`),
+          click: () => this._onDelete(groupWithContext),
+        },
+        { type: 'separator' },
+        {
+          label: i18n._(t`Add a new group...`),
+          click: this.addGroup,
+        },
+      ];
 
   render() {
     const { globalObjectGroups, objectGroups } = this.props;
@@ -366,10 +365,10 @@ export default class GroupsListContainer extends React.Component<Props, State> {
 
     const objectGroupsList: GroupWithContextList = enumerateGroups(
       objectGroups
-    ).map(group => ({ group, global: false }));
+    ).map((group) => ({ group, global: false }));
     const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
       globalObjectGroups
-    ).map(group => ({ group, global: true }));
+    ).map((group) => ({ group, global: true }));
     this.displayedObjectGroupsList = filterGroupsList(objectGroupsList, {
       searchText,
     });
@@ -404,7 +403,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                 {({ i18n }) => (
                   <SortableVirtualizedItemList
                     key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
+                    ref={(sortableList) => (this.sortableList = sortableList)}
                     fullList={fullList}
                     width={width}
                     height={height}
@@ -413,14 +412,14 @@ export default class GroupsListContainer extends React.Component<Props, State> {
                       return 'group-item-' + index;
                     }}
                     isItemBold={isGroupWithContextGlobal}
-                    onEditItem={groupWithContext =>
+                    onEditItem={(groupWithContext) =>
                       this.props.onEditGroup(groupWithContext.group)
                     }
                     onAddNewItem={this.addGroup}
                     addNewItemLabel={<Trans>Add a new group</Trans>}
                     addNewItemId="add-new-group-button"
                     selectedItems={[]}
-                    onItemSelected={groupWithContext => {
+                    onItemSelected={(groupWithContext) => {
                       this.setState({
                         selectedGroupWithContext: groupWithContext,
                       });
@@ -440,7 +439,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
         <SearchBar
           value={searchText}
           onRequestSearch={() => {}}
-          onChange={text =>
+          onChange={(text) =>
             this.setState({
               searchText: text,
             })

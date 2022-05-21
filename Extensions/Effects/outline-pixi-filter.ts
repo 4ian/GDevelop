@@ -6,7 +6,7 @@ namespace gdjs {
     },
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+      const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
       if (parameterName === 'thickness') {
         outlineFilter.thickness = value;
       } else if (parameterName === 'padding') {
@@ -14,7 +14,7 @@ namespace gdjs {
       }
     },
     updateStringParameter: function (filter, parameterName, value) {
-      const outlineFilter = (filter as unknown) as PIXI.filters.OutlineFilter;
+      const outlineFilter = filter as unknown as PIXI.filters.OutlineFilter;
       if (parameterName === 'color') {
         outlineFilter.color = gdjs.PixiFiltersTools.rgbOrHexToHexNumber(value);
       }

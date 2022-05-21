@@ -56,12 +56,15 @@ const computeInitialFileMetadataToOpen = (
   appArguments: AppArguments
 ): InitialStorageProviderAndFileMetadata => {
   const candidates = storageProviders
-    .map(currentStorageProvider => {
+    .map((currentStorageProvider) => {
       return {
         currentStorageProvider,
-        initialFileMetadataToOpen: currentStorageProvider.getFileMetadataFromAppArguments
-          ? currentStorageProvider.getFileMetadataFromAppArguments(appArguments)
-          : null,
+        initialFileMetadataToOpen:
+          currentStorageProvider.getFileMetadataFromAppArguments
+            ? currentStorageProvider.getFileMetadataFromAppArguments(
+                appArguments
+              )
+            : null,
       };
     })
     .filter(({ initialFileMetadataToOpen }) => !!initialFileMetadataToOpen);
@@ -130,7 +133,7 @@ export default class ProjectStorageProviders extends React.Component<
       closeDialog: this._closeDialog,
     });
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this.setState(
         {
           currentStorageProvider: newStorageProvider,

@@ -26,7 +26,7 @@ type Props = {|
   onRemove: () => void,
   isVisible: boolean,
   isLightingLayer: boolean,
-  onChangeVisibility: boolean => void,
+  onChangeVisibility: (boolean) => void,
   effectsCount: number,
   onEditEffects: () => void,
   onEdit: () => void,

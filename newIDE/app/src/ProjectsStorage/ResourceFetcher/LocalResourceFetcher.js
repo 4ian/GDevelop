@@ -21,7 +21,7 @@ const getResourcesToFetch = (project: gdProject): Array<string> => {
   const resourcesManager = project.getResourcesManager();
 
   const allResourceNames = resourcesManager.getAllResourceNames().toJSArray();
-  return allResourceNames.filter(resourceName => {
+  return allResourceNames.filter((resourceName) => {
     const resource = resourcesManager.getResource(resourceName);
 
     return isFetchableUrl(resource.getFile());
@@ -47,13 +47,13 @@ const fetchResources = async ({
 
   return PromisePool.withConcurrency(50)
     .for(resourceNames)
-    .process(async resourceName => {
+    .process(async (resourceName) => {
       const resource = resourcesManager.getResource(resourceName);
 
       const url = resource.getFile();
       const extension = path.extname(url);
       const filenameWithoutExtension = path.basename(url, extension);
-      const name = newNameGenerator(filenameWithoutExtension, name => {
+      const name = newNameGenerator(filenameWithoutExtension, (name) => {
         const tentativePath = path.join(baseAssetsPath, name) + extension;
         return (
           fs.existsSync(tentativePath) || downloadedFilePaths.has(tentativePath)

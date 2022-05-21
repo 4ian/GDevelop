@@ -15,7 +15,7 @@ const styles = {
 
 const transitionDuration = { enter: 0, exit: 150 };
 
-const LoaderModal = props => {
+const LoaderModal = (props) => {
   return (
     <Dialog open={props.show} transitionDuration={transitionDuration}>
       <DialogContent style={styles.dialogContent}>

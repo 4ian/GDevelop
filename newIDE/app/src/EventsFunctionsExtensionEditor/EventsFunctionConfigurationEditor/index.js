@@ -85,7 +85,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
   _onDeleteGroup = (
     groupWithContext: GroupWithContext,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group } = groupWithContext;
     const {
@@ -114,7 +114,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   _onRenameGroup = (
     groupWithContext: GroupWithContext,
     newName: string,
-    done: boolean => void
+    done: (boolean) => void
   ) => {
     const { group } = groupWithContext;
     const {

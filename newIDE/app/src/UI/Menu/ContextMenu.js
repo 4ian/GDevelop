@@ -23,8 +23,7 @@ const MaterialUIContextMenu = React.forwardRef<
   ContextMenuInterface
 >((props, ref) => {
   const [anchorPosition, setAnchorPosition] = React.useState<Array<number>>([
-    0,
-    0,
+    0, 0,
   ]);
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [buildOptions, setBuildOptions] = React.useState<any>({});
@@ -120,4 +119,4 @@ const ElectronContextMenuWrapper = React.forwardRef<
   );
 });
 
-export default (electron ? ElectronContextMenuWrapper : MaterialUIContextMenu);
+export default electron ? ElectronContextMenuWrapper : MaterialUIContextMenu;

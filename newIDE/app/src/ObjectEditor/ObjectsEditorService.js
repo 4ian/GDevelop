@@ -21,7 +21,7 @@ const ObjectsEditorService = {
 
     return this.editorConfigurations[objectType];
   },
-  registerEditorConfiguration: function(objectType, editorConfiguration) {
+  registerEditorConfiguration: function (objectType, editorConfiguration) {
     if (!editorConfiguration.component) {
       console.warn(
         `Tried to register editor configuration for object "${objectType}", but "component" property is not defined.`
@@ -56,12 +56,9 @@ const ObjectsEditorService = {
   getDefaultObjectJsImplementationPropertiesEditor(options) {
     return {
       component: ObjectPropertiesEditor,
-      createNewObject: object =>
-        gd
-          .asObjectJsImplementation(object)
-          .clone()
-          .release(),
-      castToObjectType: object => gd.asObjectJsImplementation(object),
+      createNewObject: (object) =>
+        gd.asObjectJsImplementation(object).clone().release(),
+      castToObjectType: (object) => gd.asObjectJsImplementation(object),
       helpPagePath: options.helpPagePath,
     };
   },
@@ -69,43 +66,43 @@ const ObjectsEditorService = {
     Sprite: {
       component: SpriteEditor,
       createNewObject: () => new gd.SpriteObject(''),
-      castToObjectType: object => gd.asSpriteObject(object),
+      castToObjectType: (object) => gd.asSpriteObject(object),
       helpPagePath: '/objects/sprite',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,
       createNewObject: () => new gd.TiledSpriteObject(''),
-      castToObjectType: object => gd.asTiledSpriteObject(object),
+      castToObjectType: (object) => gd.asTiledSpriteObject(object),
       helpPagePath: '/objects/tiled_sprite',
     },
     'PanelSpriteObject::PanelSprite': {
       component: PanelSpriteEditor,
       createNewObject: () => new gd.PanelSpriteObject(''),
-      castToObjectType: object => gd.asPanelSpriteObject(object),
+      castToObjectType: (object) => gd.asPanelSpriteObject(object),
       helpPagePath: '/objects/panel_sprite',
     },
     'TextObject::Text': {
       component: TextEditor,
       createNewObject: () => new gd.TextObject(''),
-      castToObjectType: object => gd.asTextObject(object),
+      castToObjectType: (object) => gd.asTextObject(object),
       helpPagePath: '/objects/text',
     },
     'PrimitiveDrawing::Drawer': {
       component: ShapePainterEditor,
       createNewObject: () => new gd.ShapePainterObject(''),
-      castToObjectType: object => gd.asShapePainterObject(object),
+      castToObjectType: (object) => gd.asShapePainterObject(object),
       helpPagePath: '/objects/shape_painter',
     },
     'TextEntryObject::TextEntry': {
       component: EmptyEditor,
       createNewObject: () => new gd.TextEntryObject(''),
-      castToObjectType: object => gd.asTextEntryObject(object),
+      castToObjectType: (object) => gd.asTextEntryObject(object),
       helpPagePath: '/objects/text_entry',
     },
     'ParticleSystem::ParticleEmitter': {
       component: ParticleEmitterEditor,
       createNewObject: () => new gd.ParticleEmitterObject(''),
-      castToObjectType: object => gd.asParticleEmitterObject(object),
+      castToObjectType: (object) => gd.asParticleEmitterObject(object),
       helpPagePath: '/objects/particles_emitter',
     },
   },

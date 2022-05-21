@@ -27,22 +27,20 @@ const AuthenticatedUserProfileDetails = ({
   const firebaseUser = authenticatedUser.firebaseUser;
   const isMounted = useIsMounted();
   const [emailSent, setEmailSent] = React.useState<boolean>(false);
-  const sendEmail = React.useCallback(
-    () => {
-      authenticatedUser.onSendEmailVerification();
-      setEmailSent(true);
-      setTimeout(() => {
-        if (!isMounted.current) return;
-        setEmailSent(false);
-      }, 3000);
-    },
-    [authenticatedUser, isMounted]
-  );
+  const sendEmail = React.useCallback(() => {
+    authenticatedUser.onSendEmailVerification();
+    setEmailSent(true);
+    setTimeout(() => {
+      if (!isMounted.current) return;
+      setEmailSent(false);
+    }, 3000);
+  }, [authenticatedUser, isMounted]);
 
   useTimeout(
-    React.useCallback(() => markBadgesAsSeen(authenticatedUser), [
-      authenticatedUser,
-    ]),
+    React.useCallback(
+      () => markBadgesAsSeen(authenticatedUser),
+      [authenticatedUser]
+    ),
     5000
   );
 

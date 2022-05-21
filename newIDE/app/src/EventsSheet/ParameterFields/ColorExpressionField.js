@@ -16,13 +16,13 @@ export default class ParameterColorField extends Component<ParameterFieldProps> 
     return (
       <GenericExpressionField
         expressionType="string"
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         renderExtraButton={({ style }) => (
           <ColorPicker
             style={style}
             disableAlpha
             color={rgbStringAndAlphaToRGBColor(this.props.value)}
-            onChangeComplete={color => {
+            onChangeComplete={(color) => {
               this.props.onChange(
                 '"' + color.rgb.r + ';' + color.rgb.g + ';' + color.rgb.b + '"'
               );

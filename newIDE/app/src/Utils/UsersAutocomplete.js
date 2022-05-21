@@ -37,10 +37,8 @@ export const UsersAutocomplete = ({
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [
-    completionUserPublicProfiles,
-    setCompletionUserPublicProfiles,
-  ] = React.useState<Array<UserPublicProfileSearch>>([]);
+  const [completionUserPublicProfiles, setCompletionUserPublicProfiles] =
+    React.useState<Array<UserPublicProfileSearch>>([]);
   const [error, setError] = React.useState(null);
 
   // Recalculate if the userInput has changed.
@@ -65,57 +63,46 @@ export const UsersAutocomplete = ({
   }, 500);
 
   // Call every time the userInput changes.
-  React.useEffect(
-    () => {
-      searchUserPublicProfiles();
-    },
-    [searchUserPublicProfiles, userInput]
-  );
+  React.useEffect(() => {
+    searchUserPublicProfiles();
+  }, [searchUserPublicProfiles, userInput]);
 
   // Do only once, the first time it is loaded.
-  const getUserPublicProfilesForAutocomplete = React.useCallback(
-    async () => {
-      setError(null);
-      if (!userIds.length) {
-        setUsers([]);
-        return;
-      }
-      try {
-        setLoading(true);
-        const userPublicProfilesByIds = await getUserPublicProfilesByIds(
-          userIds
-        );
-        setUsers(
-          userIds
-            .map(userId => {
-              const userPublicProfile: UserPublicProfile =
-                userPublicProfilesByIds[userId];
-              return userPublicProfile
-                ? {
-                    text: userPublicProfile.username || '(no username)',
-                    value: userPublicProfile.id,
-                  }
-                : null;
-            })
-            .filter(Boolean)
-        );
-      } catch (err) {
-        setError(err);
-        console.error('Could not load the users: ', err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [userIds]
-  );
+  const getUserPublicProfilesForAutocomplete = React.useCallback(async () => {
+    setError(null);
+    if (!userIds.length) {
+      setUsers([]);
+      return;
+    }
+    try {
+      setLoading(true);
+      const userPublicProfilesByIds = await getUserPublicProfilesByIds(userIds);
+      setUsers(
+        userIds
+          .map((userId) => {
+            const userPublicProfile: UserPublicProfile =
+              userPublicProfilesByIds[userId];
+            return userPublicProfile
+              ? {
+                  text: userPublicProfile.username || '(no username)',
+                  value: userPublicProfile.id,
+                }
+              : null;
+          })
+          .filter(Boolean)
+      );
+    } catch (err) {
+      setError(err);
+      console.error('Could not load the users: ', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [userIds]);
 
   // Do only once.
-  React.useEffect(
-    () => {
-      getUserPublicProfilesForAutocomplete();
-    },
-    [getUserPublicProfilesForAutocomplete]
-  );
+  React.useEffect(() => {
+    getUserPublicProfilesForAutocomplete();
+  }, [getUserPublicProfilesForAutocomplete]);
 
   return (
     <SemiControlledMultiAutoComplete
@@ -128,7 +115,7 @@ export const UsersAutocomplete = ({
         // change users in state
         setUsers(values);
         // call top onChange on user ids
-        onChange(values.map(option => option.value));
+        onChange(values.map((option) => option.value));
         forceUpdate();
       }}
       inputValue={userInput}

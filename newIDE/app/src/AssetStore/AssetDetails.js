@@ -96,40 +96,31 @@ export const AssetDetails = ({
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
   const [error, setError] = React.useState<?Error>(null);
-  const loadAsset = React.useCallback(
-    () => {
-      (async () => {
-        try {
-          const loadedAsset = await getAsset(assetShortHeader);
-          setAsset(loadedAsset);
-        } catch (error) {
-          console.log('Error while loading asset:', error);
-          setError(error);
-        }
-      })();
-    },
-    [assetShortHeader]
-  );
+  const loadAsset = React.useCallback(() => {
+    (async () => {
+      try {
+        const loadedAsset = await getAsset(assetShortHeader);
+        setAsset(loadedAsset);
+      } catch (error) {
+        console.log('Error while loading asset:', error);
+        setError(error);
+      }
+    })();
+  }, [assetShortHeader]);
 
-  React.useEffect(
-    () => {
-      loadAsset();
-    },
-    [loadAsset]
-  );
+  React.useEffect(() => {
+    loadAsset();
+  }, [loadAsset]);
 
   const canAddAsset = canInstall && !isBeingInstalled && !!asset;
-  const onAddAsset = React.useCallback(
-    () => {
-      if (canAddAsset) onAdd();
-    },
-    [onAdd, canAddAsset]
-  );
+  const onAddAsset = React.useCallback(() => {
+    if (canAddAsset) onAdd();
+  }, [onAdd, canAddAsset]);
 
   const assetAuthors: ?Array<Author> =
     asset && authors
       ? asset.authors
-          .map(authorName => {
+          .map((authorName) => {
             return authors.find(({ name }) => name === authorName);
           })
           .filter(Boolean)
@@ -166,7 +157,7 @@ export const AssetDetails = ({
       <Column expand noMargin>
         <ResponsiveLineStackLayout noMargin>
           <ResponsiveWindowMeasurer>
-            {windowWidth => (
+            {(windowWidth) => (
               <div
                 style={{
                   ...styles.previewBackground,
@@ -204,7 +195,7 @@ export const AssetDetails = ({
               )}
             </div>
             <span>
-              {assetShortHeader.tags.map(tag => (
+              {assetShortHeader.tags.map((tag) => (
                 <Chip size="small" style={styles.chip} label={tag} key={tag} />
               ))}
             </span>
@@ -213,7 +204,7 @@ export const AssetDetails = ({
                 <Text size="body">
                   <Trans>By:</Trans>{' '}
                   {!!assetAuthors &&
-                    assetAuthors.map(author => {
+                    assetAuthors.map((author) => {
                       return (
                         <Link
                           key={author.name}

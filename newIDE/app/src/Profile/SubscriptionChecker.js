@@ -183,7 +183,7 @@ class SubscriptionChecker extends React.Component<Props, {}> {
         {(authenticatedUser: AuthenticatedUser) => (
           <SubscriptionCheckDialog
             authenticatedUser={authenticatedUser}
-            ref={dialog => (this._dialog = dialog)}
+            ref={(dialog) => (this._dialog = dialog)}
             onChangeSubscription={this.props.onChangeSubscription}
             id={this.props.id}
             title={this.props.title}

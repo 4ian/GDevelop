@@ -47,7 +47,7 @@ const ObjectGroupEditor = ({
     group
       .getAllObjectsNames()
       .toJSArray()
-      .forEach(objectName => {
+      .forEach((objectName) => {
         const objectType = gd.getTypeOfObject(
           globalObjectsContainer,
           objectsContainer,
@@ -79,7 +79,7 @@ const ObjectGroupEditor = ({
           {group
             .getAllObjectsNames()
             .toJSArray()
-            .map(objectName => {
+            .map((objectName) => {
               return (
                 <ListItem
                   key={objectName}

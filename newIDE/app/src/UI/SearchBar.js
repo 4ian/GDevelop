@@ -26,8 +26,8 @@ import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
 
 type TagsHandler = {|
-  remove: string => void,
-  add: string => void,
+  remove: (string) => void,
+  add: (string) => void,
   chosenTags: Set<string>,
 |};
 
@@ -38,9 +38,9 @@ type Props = {|
   /** Sets placeholder for the embedded text field. */
   placeholder?: MessageDescriptor,
   /** Fired when the text value changes. */
-  onChange?: string => void,
+  onChange?: (string) => void,
   /** Fired when the search icon is clicked. */
-  onRequestSearch: string => void,
+  onRequestSearch: (string) => void,
   /** Override the inline-styles of the root element. */
   style?: Object,
   /** The value of the text field. */
@@ -172,9 +172,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     // This variable represents the value of the autocomplete, used to
     // highlight an option and to determine if an option is selectable, or
     // if an event should be fired when an option is selected.
-    const [autocompleteValue, setAutocompleteValue] = React.useState<string>(
-      parentValue
-    );
+    const [autocompleteValue, setAutocompleteValue] =
+      React.useState<string>(parentValue);
 
     const textField = React.useRef<?TextField>(null);
 
@@ -182,39 +181,33 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     const autocompleteStyles = useAutocompleteStyles();
 
     const changeValue = React.useCallback(
-      newValue => {
+      (newValue) => {
         setValue(newValue || '');
         onChange && onChange(newValue || '');
       },
       [onChange, setValue]
     );
 
-    React.useEffect(
-      () => {
-        // The value given by the parent has priority: if it changes,
-        // the search bar must display it.
-        setValue(parentValue);
-      },
-      [parentValue]
-    );
+    React.useEffect(() => {
+      // The value given by the parent has priority: if it changes,
+      // the search bar must display it.
+      setValue(parentValue);
+    }, [parentValue]);
 
     const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
     const previousChosenTagsCount = React.useRef<number>(0);
-    React.useEffect(
-      () => {
-        // Used to focus search bar when all tags have been removed.
-        // It is convenient when using keyboard to remove all tags and
-        // quickly get back to the text field.
-        if (
-          shouldAutofocusSearchbar &&
-          tagsHandler &&
-          tagsHandler.chosenTags.size === 0 &&
-          previousChosenTagsCount.current > 0
-        )
-          focus();
-      },
-      [tagsHandler, shouldAutofocusSearchbar]
-    );
+    React.useEffect(() => {
+      // Used to focus search bar when all tags have been removed.
+      // It is convenient when using keyboard to remove all tags and
+      // quickly get back to the text field.
+      if (
+        shouldAutofocusSearchbar &&
+        tagsHandler &&
+        tagsHandler.chosenTags.size === 0 &&
+        previousChosenTagsCount.current > 0
+      )
+        focus();
+    }, [tagsHandler, shouldAutofocusSearchbar]);
 
     React.useEffect(() => {
       previousChosenTagsCount.current = tagsHandler
@@ -284,7 +277,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       <I18n>
         {({ i18n }) => (
           <ThemeConsumer>
-            {muiTheme => (
+            {(muiTheme) => (
               <Column noMargin>
                 <Line noMargin>
                   <Paper
@@ -301,7 +294,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                         <Autocomplete
                           id={id}
                           options={tags.slice(0, 30)}
-                          groupBy={options => i18n._(t`Apply a filter`)}
+                          groupBy={(options) => i18n._(t`Apply a filter`)}
                           classes={autocompleteStyles}
                           freeSolo
                           fullWidth
@@ -312,10 +305,10 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                           onInputChange={handleAutocompleteInputChange}
                           onKeyPress={handleKeyPressed}
                           onBlur={handleBlur}
-                          renderOption={option => (
+                          renderOption={(option) => (
                             <Typography>{option}</Typography>
                           )}
-                          renderInput={params => (
+                          renderInput={(params) => (
                             <MuiTextField
                               margin="none"
                               {...params}
@@ -389,7 +382,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                   <Collapse in={tagsHandler.chosenTags.size > 0}>
                     <TagChips
                       tags={Array.from(tagsHandler.chosenTags)}
-                      onRemove={tag => tagsHandler.remove(tag)}
+                      onRemove={(tag) => tagsHandler.remove(tag)}
                     />
                   </Collapse>
                 )}

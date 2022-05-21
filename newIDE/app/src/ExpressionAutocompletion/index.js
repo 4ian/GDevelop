@@ -92,10 +92,10 @@ const getAutocompletionsForExpressions = (
 ): Array<ExpressionAutocompletion> => {
   return expressionMetadatas
     .filter(
-      enumeratedExpressionMetadata =>
+      (enumeratedExpressionMetadata) =>
         !isExact || enumeratedExpressionMetadata.type === prefix
     )
-    .map(enumeratedExpressionMetadata => {
+    .map((enumeratedExpressionMetadata) => {
       // All enumeratedExpressionMetadata should have a name.
       if (
         !enumeratedExpressionMetadata.name ||
@@ -118,7 +118,7 @@ const getAutocompletionsForExpressions = (
     .filter(Boolean);
 };
 
-const getAutocompletionsForFreeExpressions = function(
+const getAutocompletionsForFreeExpressions = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
@@ -128,10 +128,11 @@ const getAutocompletionsForFreeExpressions = function(
 
   const freeExpressions = enumerateFreeExpressions(type);
 
-  const filteredFreeExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    filterExpressions(freeExpressions, prefix),
-    expressionAutocompletionContext.scope
-  );
+  const filteredFreeExpressions =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      filterExpressions(freeExpressions, prefix),
+      expressionAutocompletionContext.scope
+    );
   return getAutocompletionsForExpressions(
     filteredFreeExpressions,
     prefix,
@@ -141,7 +142,7 @@ const getAutocompletionsForFreeExpressions = function(
   );
 };
 
-const getAutocompletionsForObjectExpressions = function(
+const getAutocompletionsForObjectExpressions = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
@@ -149,11 +150,8 @@ const getAutocompletionsForObjectExpressions = function(
   const type: string = completionDescription.getType();
   const objectName: string = completionDescription.getObjectName();
   const isExact: boolean = completionDescription.isExact();
-  const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
-  } = expressionAutocompletionContext;
+  const { gd, globalObjectsContainer, objectsContainer } =
+    expressionAutocompletionContext;
 
   const objectType: string = gd.getTypeOfObject(
     globalObjectsContainer,
@@ -162,10 +160,11 @@ const getAutocompletionsForObjectExpressions = function(
     /* searchInGroups= */ true
   );
   const objectExpressions = enumerateObjectExpressions(type, objectType);
-  const filteredObjectExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    filterExpressions(objectExpressions, prefix),
-    expressionAutocompletionContext.scope
-  );
+  const filteredObjectExpressions =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      filterExpressions(objectExpressions, prefix),
+      expressionAutocompletionContext.scope
+    );
 
   return getAutocompletionsForExpressions(
     filteredObjectExpressions,
@@ -176,7 +175,7 @@ const getAutocompletionsForObjectExpressions = function(
   );
 };
 
-const getAutocompletionsForBehaviorExpressions = function(
+const getAutocompletionsForBehaviorExpressions = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
@@ -184,11 +183,8 @@ const getAutocompletionsForBehaviorExpressions = function(
   const type: string = completionDescription.getType();
   const behaviorName: string = completionDescription.getBehaviorName();
   const isExact: boolean = completionDescription.isExact();
-  const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
-  } = expressionAutocompletionContext;
+  const { gd, globalObjectsContainer, objectsContainer } =
+    expressionAutocompletionContext;
 
   // TODO: could be made more precise with the object name
   const behaviorType = gd.getTypeOfBehavior(
@@ -200,10 +196,11 @@ const getAutocompletionsForBehaviorExpressions = function(
 
   const behaviorExpressions = enumerateBehaviorExpressions(type, behaviorType);
 
-  const filteredBehaviorExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    filterExpressions(behaviorExpressions, prefix),
-    expressionAutocompletionContext.scope
-  );
+  const filteredBehaviorExpressions =
+    filterEnumeratedInstructionOrExpressionMetadataByScope(
+      filterExpressions(behaviorExpressions, prefix),
+      expressionAutocompletionContext.scope
+    );
 
   return getAutocompletionsForExpressions(
     filteredBehaviorExpressions,
@@ -214,17 +211,14 @@ const getAutocompletionsForBehaviorExpressions = function(
   );
 };
 
-const getAutocompletionsForObject = function(
+const getAutocompletionsForObject = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
   const type: string = completionDescription.getType();
-  const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
-  } = expressionAutocompletionContext;
+  const { gd, globalObjectsContainer, objectsContainer } =
+    expressionAutocompletionContext;
 
   const { allObjectsList, allGroupsList } = enumerateObjectsAndGroups(
     globalObjectsContainer,
@@ -250,7 +244,8 @@ const getAutocompletionsForObject = function(
     ...filteredObjectsList.map(({ object }) => ({
       kind: 'Object',
       completion: object.getName(),
-      replacementStartPosition: completionDescription.getReplacementStartPosition(),
+      replacementStartPosition:
+        completionDescription.getReplacementStartPosition(),
       replacementEndPosition: completionDescription.getReplacementEndPosition(),
       object,
       addDot,
@@ -258,14 +253,15 @@ const getAutocompletionsForObject = function(
     ...filteredGroupsList.map(({ group }) => ({
       kind: 'Object',
       completion: group.getName(),
-      replacementStartPosition: completionDescription.getReplacementStartPosition(),
+      replacementStartPosition:
+        completionDescription.getReplacementStartPosition(),
       replacementEndPosition: completionDescription.getReplacementEndPosition(),
       addDot,
     })),
   ];
 };
 
-const getAutocompletionsForText = function(
+const getAutocompletionsForText = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
@@ -290,7 +286,7 @@ const getAutocompletionsForText = function(
   } else if (type === 'stringWithSelector') {
     autocompletionTexts = getParameterChoices(
       completionDescription.getParameterMetadata()
-    ).map(autocompletion => autocompletion.completion);
+    ).map((autocompletion) => autocompletion.completion);
   } else if (type === 'objectPointName') {
     const objectName: string = completionDescription.getObjectName();
     if (!objectName) {
@@ -306,7 +302,7 @@ const getAutocompletionsForText = function(
       const spriteObject = gd.asSpriteObject(object);
 
       autocompletionTexts = getAllPointNames(spriteObject)
-        .map(spriteObjectName =>
+        .map((spriteObjectName) =>
           spriteObjectName.length > 0 ? `"${spriteObjectName}"` : null
         )
         .filter(Boolean);
@@ -330,7 +326,7 @@ const getAutocompletionsForText = function(
       autocompletionTexts = mapFor(
         0,
         spriteObject.getAnimationsCount(),
-        index => {
+        (index) => {
           const animationName = spriteObject.getAnimation(index).getName();
           return animationName.length > 0 ? `"${animationName}"` : null;
         }
@@ -342,7 +338,7 @@ const getAutocompletionsForText = function(
     if (scope.eventsFunction) {
       autocompletionTexts = enumerateParametersUsableInExpressions(
         scope.eventsFunction
-      ).map(parameterMetadata => `"${parameterMetadata.getName()}"`);
+      ).map((parameterMetadata) => `"${parameterMetadata.getName()}"`);
     }
   }
   // To add missing string types see Core\GDCore\Extensions\Metadata\ParameterMetadata.h
@@ -350,16 +346,17 @@ const getAutocompletionsForText = function(
   const filteredTextList = filterStringList(autocompletionTexts, prefix).sort();
 
   const isLastParameter = completionDescription.isLastParameter();
-  return filteredTextList.map(text => ({
+  return filteredTextList.map((text) => ({
     kind: 'Text',
     completion: text,
-    replacementStartPosition: completionDescription.getReplacementStartPosition(),
+    replacementStartPosition:
+      completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
     addParameterSeparator: !isLastParameter,
   }));
 };
 
-const getAutocompletionsForVariable = function(
+const getAutocompletionsForVariable = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
@@ -403,15 +400,16 @@ const getAutocompletionsForVariable = function(
 
   const filteredVariablesList = filterStringList(definedVariableNames, prefix);
 
-  return filteredVariablesList.map(variableName => ({
+  return filteredVariablesList.map((variableName) => ({
     kind: 'Variable',
     completion: variableName,
-    replacementStartPosition: completionDescription.getReplacementStartPosition(),
+    replacementStartPosition:
+      completionDescription.getReplacementStartPosition(),
     replacementEndPosition: completionDescription.getReplacementEndPosition(),
   }));
 };
 
-const getAutocompletionsForBehavior = function(
+const getAutocompletionsForBehavior = function (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
   completionDescription: gdExpressionCompletionDescription
 ): Array<ExpressionAutocompletion> {
@@ -419,11 +417,8 @@ const getAutocompletionsForBehavior = function(
   const isExact: boolean = completionDescription.isExact();
   const objectName: string = completionDescription.getObjectName();
 
-  const {
-    gd,
-    globalObjectsContainer,
-    objectsContainer,
-  } = expressionAutocompletionContext;
+  const { gd, globalObjectsContainer, objectsContainer } =
+    expressionAutocompletionContext;
   return gd
     .getBehaviorsOfObject(
       globalObjectsContainer,
@@ -432,11 +427,12 @@ const getAutocompletionsForBehavior = function(
       true
     )
     .toJSArray()
-    .filter(behaviorName => behaviorName.indexOf(prefix) !== -1)
-    .map(behaviorName => ({
+    .filter((behaviorName) => behaviorName.indexOf(prefix) !== -1)
+    .map((behaviorName) => ({
       kind: 'Behavior',
       completion: behaviorName,
-      replacementStartPosition: completionDescription.getReplacementStartPosition(),
+      replacementStartPosition:
+        completionDescription.getReplacementStartPosition(),
       replacementEndPosition: completionDescription.getReplacementEndPosition(),
       addNamespaceSeparator: true,
       isExact,
@@ -450,7 +446,7 @@ export const getAutocompletionsFromDescriptions = (
   const { gd } = expressionAutocompletionContext;
 
   return flatten(
-    mapVector(expressionCompletionDescriptions, completionDescription => {
+    mapVector(expressionCompletionDescriptions, (completionDescription) => {
       const completionKind = completionDescription.getCompletionKind();
 
       if (completionKind === gd.ExpressionCompletionDescription.Expression) {
@@ -553,9 +549,10 @@ export const insertAutocompletionInExpression = (
     };
   }
 
-  const wordStartPosition: number = insertedAutocompletion.replacementStartPosition
-    ? insertedAutocompletion.replacementStartPosition
-    : 0;
+  const wordStartPosition: number =
+    insertedAutocompletion.replacementStartPosition
+      ? insertedAutocompletion.replacementStartPosition
+      : 0;
   const wordEndPosition: number = insertedAutocompletion.replacementEndPosition
     ? insertedAutocompletion.replacementEndPosition
     : expression.length;

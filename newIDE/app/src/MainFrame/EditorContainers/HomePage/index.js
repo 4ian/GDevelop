@@ -99,7 +99,7 @@ type HomePageEditorInterface = {|
 |};
 
 const prepareTutorials = (tutorials: Array<Tutorial>) =>
-  tutorials.slice(0, 16).map(tutorial => {
+  tutorials.slice(0, 16).map((tutorial) => {
     const { link, ...tutorialWithoutLink } = tutorial;
     return {
       ...tutorialWithoutLink,
@@ -170,33 +170,24 @@ export const HomePage = React.memo<Props>(
         error: exampleLoadingError,
       } = React.useContext(ExampleStoreContext);
 
-      React.useEffect(
-        () => {
-          fetchShowcasedGamesAndFilters();
-          fetchExamplesAndFilters();
-          fetchTutorials();
-        },
-        [
-          fetchExamplesAndFilters,
-          fetchShowcasedGamesAndFilters,
-          fetchTutorials,
-          getRecentProjectFiles,
-        ]
-      );
+      React.useEffect(() => {
+        fetchShowcasedGamesAndFilters();
+        fetchExamplesAndFilters();
+        fetchTutorials();
+      }, [
+        fetchExamplesAndFilters,
+        fetchShowcasedGamesAndFilters,
+        fetchTutorials,
+        getRecentProjectFiles,
+      ]);
 
-      const [
-        preCreationDialogOpen,
-        setPreCreationDialogOpen,
-      ] = React.useState<boolean>(false);
+      const [preCreationDialogOpen, setPreCreationDialogOpen] =
+        React.useState<boolean>(false);
       const [isOpening, setIsOpening] = React.useState<boolean>(false);
-      const [
-        selectedShowcasedGame,
-        setSelectedShowcasedGame,
-      ] = React.useState<?ShowcasedGame>(null);
-      const [
-        selectedExample,
-        setSelectedExample,
-      ] = React.useState<?ExampleShortHeader>(null);
+      const [selectedShowcasedGame, setSelectedShowcasedGame] =
+        React.useState<?ShowcasedGame>(null);
+      const [selectedExample, setSelectedExample] =
+        React.useState<?ExampleShortHeader>(null);
 
       const buildRecentProjectFilesMenuTemplate = React.useCallback(
         (i18n: I18nType) => {
@@ -210,7 +201,7 @@ export const HomePage = React.memo<Props>(
             ];
           }
 
-          return recentFiles.map(file => ({
+          return recentFiles.map((file) => ({
             label: file.fileMetadata.fileIdentifier,
             click: () => onOpenRecentFile(file),
           }));
@@ -222,16 +213,16 @@ export const HomePage = React.memo<Props>(
         (examples: Array<ExampleShortHeader>) =>
           examples
             .filter(
-              example =>
+              (example) =>
                 example.previewImageUrls.length &&
                 example.tags.includes('Starter')
             )
             .slice(0, 16)
-            .map(example => ({
+            .map((example) => ({
               id: example.id,
               title: example.name,
               thumbnailUrl:
-                example.previewImageUrls.find(url =>
+                example.previewImageUrls.find((url) =>
                   url.endsWith('preview.png')
                 ) || example.previewImageUrls[0],
               onClick: () => setSelectedExample(example),
@@ -241,7 +232,7 @@ export const HomePage = React.memo<Props>(
 
       const prepareShowcasedGames = React.useCallback(
         (games: Array<ShowcasedGame>) =>
-          games.slice(0, 16).map(game => ({
+          games.slice(0, 16).map((game) => ({
             id: game.title,
             title: game.title,
             thumbnailUrl: game.thumbnailUrl,
@@ -540,7 +531,7 @@ export const HomePage = React.memo<Props>(
                   open
                   isOpening={isOpening}
                   onClose={() => setPreCreationDialogOpen(false)}
-                  onCreate={options => createProject(i18n, options)}
+                  onCreate={(options) => createProject(i18n, options)}
                 />
               )}
             </>

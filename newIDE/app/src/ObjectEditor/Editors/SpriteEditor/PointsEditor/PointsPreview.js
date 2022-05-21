@@ -60,7 +60,7 @@ type Props = {|
   onPointsUpdated: () => void,
   highlightedPointName: ?string,
   selectedPointName: ?string,
-  onClickPoint: string => void,
+  onClickPoint: (string) => void,
 |};
 
 type State = {|
@@ -162,7 +162,7 @@ const PointsPreview = (props: Props) => {
         }}
         alt=""
         key={name}
-        onPointerDown={e => {
+        onPointerDown={(e) => {
           e.preventDefault(); // Disable dragging ghost image on Firefox
           onStartDragPoint(point, kind);
         }}

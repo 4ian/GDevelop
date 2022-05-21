@@ -153,12 +153,14 @@ namespace gdjs {
       }
 
       // Position the input on the container on top of the canvas.
-      const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        topLeftCanvasCoordinates
-      );
-      const bottomRightPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
-        bottomRightCanvasCoordinates
-      );
+      const topLeftPageCoordinates =
+        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+          topLeftCanvasCoordinates
+        );
+      const bottomRightPageCoordinates =
+        runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
+          bottomRightCanvasCoordinates
+        );
 
       const widthInContainer =
         bottomRightPageCoordinates[0] - topLeftPageCoordinates[0];
@@ -267,6 +269,8 @@ namespace gdjs {
     }
   }
 
-  export const TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
-  export type TextInputRuntimeObjectRenderer = TextInputRuntimeObjectPixiRenderer;
+  export const TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
+  export type TextInputRuntimeObjectRenderer =
+    TextInputRuntimeObjectPixiRenderer;
 }

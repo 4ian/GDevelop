@@ -72,7 +72,7 @@ const getEnumeratedEffectMetadata = (
   effectType: string
 ): ?EnumeratedEffectMetadata => {
   return allEffectDescriptions.find(
-    effectMetadata => effectMetadata.type === effectType
+    (effectMetadata) => effectMetadata.type === effectType
   );
 };
 
@@ -107,7 +107,7 @@ export default function EffectsList(props: Props) {
   const forceUpdate = useForceUpdate();
 
   const _addEffect = () => {
-    const newName = newNameGenerator('Effect', name =>
+    const newName = newNameGenerator('Effect', (name) =>
       effectsContainer.hasEffectNamed(name)
     );
     effectsContainer.insertNewEffect(
@@ -276,7 +276,7 @@ export default function EffectsList(props: Props) {
                                         errorText={nameErrors[effect.ptr]}
                                         hintText={t`Enter the effect name`}
                                         value={effect.getName()}
-                                        onChange={newName => {
+                                        onChange={(newName) => {
                                           renameEffect(effect, newName);
                                         }}
                                         fullWidth
@@ -304,7 +304,7 @@ export default function EffectsList(props: Props) {
                                         hintText={t`Choose the effect to apply`}
                                       >
                                         {allEffectMetadata.map(
-                                          effectMetadata => (
+                                          (effectMetadata) => (
                                             <SelectOption
                                               key={effectMetadata.type}
                                               value={effectMetadata.type}
@@ -378,7 +378,7 @@ export default function EffectsList(props: Props) {
                                             }
                                             renderExtraDescriptionText={
                                               showEffectParameterNames
-                                                ? parameterName =>
+                                                ? (parameterName) =>
                                                     i18n._(
                                                       t`Parameter name in events: \`${parameterName}\` `
                                                     )

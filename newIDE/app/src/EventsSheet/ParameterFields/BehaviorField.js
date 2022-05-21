@@ -66,7 +66,7 @@ export default class BehaviorField extends React.Component<
         true
       )
       .toJSArray()
-      .filter(behaviorName => {
+      .filter((behaviorName) => {
         return (
           !this._behaviorTypeAllowed ||
           gd.getTypeOfBehavior(
@@ -87,7 +87,7 @@ export default class BehaviorField extends React.Component<
     if (!value && !this.props.value) return null;
 
     const isValidChoice =
-      this._behaviorNames.filter(choice => this.props.value === choice)
+      this._behaviorNames.filter((choice) => this.props.value === choice)
         .length !== 0;
 
     if (!isValidChoice) return 'This behavior is not attached to the object';
@@ -148,16 +148,16 @@ export default class BehaviorField extends React.Component<
         onChange={this.props.onChange}
         onRequestClose={this.props.onRequestClose}
         onApply={this.props.onApply}
-        onBlur={event => {
+        onBlur={(event) => {
           this._doValidation(event.currentTarget.value);
         }}
-        dataSource={this._behaviorNames.map(behaviorName => ({
+        dataSource={this._behaviorNames.map((behaviorName) => ({
           text: behaviorName,
           value: behaviorName,
         }))}
         openOnFocus={!this.props.isInline}
         disabled={this._behaviorNames.length <= 1}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
       />
     );
   }

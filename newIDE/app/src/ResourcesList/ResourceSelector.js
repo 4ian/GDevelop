@@ -32,7 +32,7 @@ type Props = {|
   fullWidth?: boolean,
   canBeReset?: boolean,
   initialResourceName: string,
-  onChange: string => void,
+  onChange: (string) => void,
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
   hintText?: MessageDescriptor,
@@ -83,8 +83,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const sources = this.props.resourceSources || [];
     return [
       ...sources
-        .filter(source => source.kind === this.props.resourceKind)
-        .map(source => ({
+        .filter((source) => source.kind === this.props.resourceKind)
+        .map((source) => ({
           text: '',
           value: '',
           translatableValue: source.displayName,
@@ -100,7 +100,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
   _loadFrom(resourcesManager: gdResourcesManager) {
     this.allResourcesNames = resourcesManager.getAllResourceNames().toJSArray();
     if (this.props.resourceKind) {
-      this.allResourcesNames = this.allResourcesNames.filter(resourceName => {
+      this.allResourcesNames = this.allResourcesNames.filter((resourceName) => {
         return (
           resourcesManager.getResource(resourceName).getKind() ===
           this.props.resourceKind
@@ -108,7 +108,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       });
     }
     const resourceSourceItems = this._getResourceSourceItems();
-    const resourceItems = this.allResourcesNames.map(resourceName => ({
+    const resourceItems = this.allResourcesNames.map((resourceName) => ({
       text: resourceName,
       value: resourceName,
     }));
@@ -124,7 +124,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       multiSelection: false,
       resourceKind: this.props.resourceKind,
     })
-      .then(resources => {
+      .then((resources) => {
         if (!resources.length) return;
         const resource = resources[0];
         applyResourceDefaults(project, resource);
@@ -145,9 +145,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
         // Important, we are responsible for deleting the resources that were given to us.
         // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-        resources.forEach(resource => resource.delete());
+        resources.forEach((resource) => resource.delete());
       })
-      .catch(err => {
+      .catch((err) => {
         // Should never happen, errors should be shown in the interface.
         console.error('Unable to choose a resource', err);
       });
@@ -214,7 +214,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
           isLooping: false,
           externalEditorData: initialResourceMetadata,
         },
-        onChangesSaved: newResourceData => {
+        onChangesSaved: (newResourceData) => {
           if (!newResourceData.length) return;
 
           // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
@@ -233,7 +233,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         extraOptions: {
           externalEditorData: initialResourceMetadata,
         },
-        onChangesSaved: newResourceData => {
+        onChangesSaved: (newResourceData) => {
           // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
           resourcesLoader.burstUrlsCacheForResources(project, [
             newResourceData[0].name,
@@ -250,7 +250,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         extraOptions: {
           initialResourceMetadata,
         },
-        onChangesSaved: newResourceData => {
+        onChangesSaved: (newResourceData) => {
           this.props.onChange(newResourceData[0].name);
         },
       };
@@ -264,7 +264,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       : null;
 
     const externalEditors = this.props.resourceExternalEditors.filter(
-      externalEditor => externalEditor.kind === this.props.resourceKind
+      (externalEditor) => externalEditor.kind === this.props.resourceKind
     );
     return (
       <TextFieldWithButtonLayout
@@ -285,10 +285,10 @@ export default class ResourceSelector extends React.Component<Props, State> {
             margin={this.props.margin}
             onRequestClose={this.props.onRequestClose}
             onApply={this.props.onApply}
-            ref={autoComplete => (this._autoComplete = autoComplete)}
+            ref={(autoComplete) => (this._autoComplete = autoComplete)}
           />
         )}
-        renderButton={style => (
+        renderButton={(style) => (
           <React.Fragment>
             {this.props.canBeReset && (
               <IconButton
@@ -313,7 +313,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
                 }
                 primary
                 buildMenuTemplate={() =>
-                  externalEditors.map(externalEditor => ({
+                  externalEditors.map((externalEditor) => ({
                     label: externalEditor.displayName,
                     click: () => this._editWith(externalEditor),
                   }))

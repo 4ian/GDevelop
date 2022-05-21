@@ -13,9 +13,10 @@ const _isMacLike =
     ? true
     : false;
 
-const _isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-  typeof navigator !== 'undefined' ? navigator.userAgent : ''
-);
+const _isMobile =
+  /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    typeof navigator !== 'undefined' ? navigator.userAgent : ''
+  );
 
 export const getUserAgent = (): string => {
   return typeof navigator !== 'undefined'

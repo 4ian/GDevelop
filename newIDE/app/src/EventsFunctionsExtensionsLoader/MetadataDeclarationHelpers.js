@@ -229,6 +229,12 @@ export const isExtensionLifecycleEventsFunction = (functionName: string) => {
   );
 };
 
+export const removeTailingDot = (description: string): string => {
+  return description.endsWith('.')
+    ? description.slice(0, description.length - 1)
+    : description;
+};
+
 /**
  * Declare the instruction (action/condition) or expression for the given
  * (free) events function.
@@ -237,7 +243,10 @@ export const declareInstructionOrExpressionMetadata = (
   extension: gdPlatformExtension,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunction: gdEventsFunction
-): gdInstructionMetadata | gdExpressionMetadata => {
+):
+  | gdInstructionMetadata
+  | gdExpressionMetadata
+  | gdMultipleInstructionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
     return extension.addExpression(
@@ -260,7 +269,8 @@ export const declareInstructionOrExpressionMetadata = (
       'number',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      removeTailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
@@ -270,7 +280,8 @@ export const declareInstructionOrExpressionMetadata = (
       'string',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      removeTailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
@@ -337,7 +348,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       'number',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      removeTailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
@@ -347,7 +359,8 @@ export const declareBehaviorInstructionOrExpressionMetadata = (
       'string',
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      removeTailingDot(eventsFunction.getDescription()) ||
+        eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsFunction.getGroup() || '',
       getExtensionIconUrl(extension)
@@ -614,7 +627,10 @@ export const declareBehaviorPropertiesInstructionAndExpressions = (
  */
 export const declareEventsFunctionParameters = (
   eventsFunction: gdEventsFunction,
-  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
+  instructionOrExpression:
+    | gdInstructionMetadata
+    | gdExpressionMetadata
+    | gdMultipleInstructionMetadata
 ) => {
   mapVector(
     eventsFunction.getParameters(),
@@ -623,7 +639,7 @@ export const declareEventsFunctionParameters = (
         instructionOrExpression.addParameter(
           parameter.getType(),
           parameter.getDescription(),
-          parameter.getExtraInfo(), // See below for adding the extra information
+          parameter.getExtraInfo(),
           parameter.isOptional()
         );
         instructionOrExpression.setParameterLongDescription(
@@ -633,15 +649,9 @@ export const declareEventsFunctionParameters = (
       } else {
         instructionOrExpression.addCodeOnlyParameter(
           parameter.getType(),
-          parameter.getExtraInfo() // See below for adding the extra information
+          parameter.getExtraInfo()
         );
       }
-      // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
-      // as these methods are prefixing the value passed with the extension namespace (this
-      // was done to ease extension declarations when dealing with object).
-      //   instructionOrExpression
-      //     .getParameter(instructionOrExpression.getParametersCount() - 1)
-      //     .setExtraInfo(parameter.getExtraInfo());
     }
   );
 

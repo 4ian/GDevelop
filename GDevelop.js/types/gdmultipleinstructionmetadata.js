@@ -10,6 +10,7 @@ declare class gdMultipleInstructionMetadata {
   setGetter(getter: string): gdMultipleInstructionMetadata;
   setIncludeFile(includeFile: string): gdMultipleInstructionMetadata;
   addIncludeFile(includeFile: string): gdMultipleInstructionMetadata;
+  getIncludeFiles(): gdVectorString;
   markAsSimple(): gdMultipleInstructionMetadata;
   markAsAdvanced(): gdMultipleInstructionMetadata;
   markAsComplex(): gdMultipleInstructionMetadata;

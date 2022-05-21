@@ -1165,6 +1165,7 @@ interface InstructionMetadata {
 
     [Ref] InstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] InstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionMetadata {
@@ -1209,6 +1210,7 @@ interface ExpressionMetadata {
 
     [Ref] ExpressionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExpressionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface MultipleInstructionMetadata {
@@ -1230,6 +1232,7 @@ interface MultipleInstructionMetadata {
 
     [Ref] MultipleInstructionMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] MultipleInstructionMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 
     [Ref] MultipleInstructionMetadata MarkAsSimple();
     [Ref] MultipleInstructionMetadata MarkAsAdvanced();

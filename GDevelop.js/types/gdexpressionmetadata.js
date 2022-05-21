@@ -23,6 +23,7 @@ declare class gdExpressionMetadata {
   setFunctionName(functionName: string): gdExpressionCodeGenerationInformation;
   setIncludeFile(includeFile: string): gdExpressionMetadata;
   addIncludeFile(includeFile: string): gdExpressionMetadata;
+  getIncludeFiles(): gdVectorString;
   delete(): void;
   ptr: number;
 };

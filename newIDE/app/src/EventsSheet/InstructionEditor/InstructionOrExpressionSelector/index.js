@@ -10,7 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../../../UI/SearchBar';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
   findInTree,

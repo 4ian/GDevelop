@@ -1,5 +1,5 @@
 // @flow
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 const remote = optionalRequire('@electron/remote');
 const process = optionalRequire('process');
 

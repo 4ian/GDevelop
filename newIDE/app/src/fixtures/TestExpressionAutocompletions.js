@@ -1,6 +1,6 @@
 // @flow
 import { type ExpressionAutocompletion } from '../ExpressionAutocompletion';
-import { type EnumeratedExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { mapVector } from '../Utils/MapFor';
 
 const makeNewFakeExtension = (gd: libGDevelop) => {

@@ -12,7 +12,7 @@ import {
 import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow';
 const gd: libGDevelop = global.gd;
 

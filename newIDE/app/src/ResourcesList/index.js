@@ -11,12 +11,12 @@ import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import { mapVector } from '../Utils/MapFor';
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../Utils/OptionalRequire';
 import {
   applyResourceDefaults,
   getLocalResourceFullPath,
   getResourceFilePathStatus,
-} from './ResourceUtils.js';
+} from './ResourceUtils';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,

@@ -1,11 +1,11 @@
 // @flow
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import { LocalResourceFetcher } from './LocalResourceFetcher';
 import { makeTestProject } from '../../fixtures/TestProject';
 import path from 'path';
 const gd: libGDevelop = global.gd;
 
-jest.mock('../../Utils/OptionalRequire.js');
+jest.mock('../../Utils/OptionalRequire');
 
 const mockFn = (fn: Function): JestMockFn<any, any> => fn;
 

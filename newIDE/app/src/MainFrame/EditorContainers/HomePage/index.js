@@ -41,7 +41,7 @@ import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
-import optionalRequire from '../../../Utils/OptionalRequire.js';
+import optionalRequire from '../../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
 const styles = {

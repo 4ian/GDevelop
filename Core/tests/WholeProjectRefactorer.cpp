@@ -50,15 +50,6 @@ const gd::String &GetEventFirstActionFirstParameterString(
   return actions.Get(0).GetParameter(0).GetPlainString();
 }
 
-const gd::String &GetEventSecondActionFirstParameterString(
-    gd::BaseEvent &event) {
-  auto &actions = EnsureStandardEvent(event).GetActions();
-  REQUIRE(actions.size() >= 2);
-  REQUIRE(actions.Get(1).GetParametersCount() != 0);
-
-  return actions.Get(1).GetParameter(0).GetPlainString();
-}
-
 const gd::String &GetEventFirstConditionType(gd::BaseEvent &event) {
   auto &conditions = EnsureStandardEvent(event).GetConditions();
   REQUIRE(conditions.IsEmpty() == false);
@@ -106,6 +97,21 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       layout.GetEvents().InsertEvent(event);
     }
 
+    // Create an event in the external events referring to
+    // MyEventsExtension::MyEventsFunctionExpression
+    {
+    gd::StandardEvent event;
+    gd::Instruction action;
+    action.SetType("MyExtension::DoSomething");
+    action.SetParametersCount(1);
+    action.SetParameter(
+        0,
+        gd::Expression(
+            "1 + MyEventsExtension::MyEventsFunctionExpression(123, 456)"));
+    event.GetActions().Insert(action);
+    externalEvents.GetEvents().InsertEvent(event);
+    }
+
     {
       gd::StandardEvent event;
       // Create an event in the external events referring to
@@ -117,25 +123,11 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         condition.SetParametersCount(2);
         condition.SetParameter(
             0,
-            gd::Expression(
-                ">"));
+            gd::Expression(">"));
         condition.SetParameter(
             1,
-            gd::Expression(
-                "2 + MyEventsExtension::MyEventsFunctionExpressionAndCondition()"));
+            gd::Expression("2"));
         event.GetConditions().Insert(condition);
-      }
-      // Create an event in the external events referring to
-      // MyEventsExtension::MyEventsFunctionExpression
-      {
-        gd::Instruction action;
-        action.SetType("MyExtension::DoSomething");
-        action.SetParametersCount(1);
-        action.SetParameter(
-            0,
-            gd::Expression(
-                "1 + MyEventsExtension::MyEventsFunctionExpression(123, 456)"));
-        event.GetActions().Insert(action);
       }
       // Create an event in the external events referring to
       // MyEventsExtension::MyEventsFunctionExpressionAndCondition
@@ -181,6 +173,18 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     behaviorExpression.GetParameters().push_back(
         gd::ParameterMetadata().SetName("Object").SetType("object"));
     behaviorExpression.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Behavior")
+            .SetType("behavior")
+            .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
+
+    auto &behaviorExpressionAndCondition =
+        behaviorEventsFunctions
+            .InsertNewEventsFunction("MyBehaviorEventsFunctionExpressionAndCondition", 2)
+            .SetFunctionType(gd::EventsFunction::ExpressionAndCondition);
+    behaviorExpressionAndCondition.GetParameters().push_back(
+        gd::ParameterMetadata().SetName("Object").SetType("object"));
+    behaviorExpressionAndCondition.GetParameters().push_back(
         gd::ParameterMetadata()
             .SetName("Behavior")
             .SetType("behavior")
@@ -328,8 +332,41 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       event.GetActions().Insert(instruction);
       externalEvents.GetEvents().InsertEvent(event);
     }
-  }
 
+    {
+      gd::StandardEvent event;
+      // Create an event in the external events referring to
+      // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpressionAndCondition
+      // as a condition.
+      {
+        gd::Instruction condition;
+        condition.SetType("MyEventsExtension::MyEventsFunctionExpressionAndCondition");
+        condition.SetParametersCount(2);
+        condition.SetParameter(
+            0,
+            gd::Expression(">"));
+        condition.SetParameter(
+            1,
+            gd::Expression("5"));
+        event.GetConditions().Insert(condition);
+      }
+      // Create an event in the external events referring to
+      // MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunctionExpressionAndCondition
+      // as an expression.
+      {
+        gd::Instruction action;
+        action.SetType("MyExtension::DoSomething");
+        action.SetParametersCount(1);
+        action.SetParameter(
+            0,
+            gd::Expression("5 + "
+                            "ObjectWithMyBehavior.MyBehavior::"
+                            "MyBehaviorEventsFunctionExpressionAndCondition(123, 456, 789)"));
+        event.GetActions().Insert(action);
+      }
+      externalEvents.GetEvents().InsertEvent(event);
+    }
+  }
   return eventsExtension;
 }
 }  // namespace
@@ -759,16 +796,16 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "MyRenamedFunctionExpressionAndCondition");
 
     // Check that events function calls in expressions have been renamed
-    REQUIRE(GetEventSecondActionFirstParameterString(
+    REQUIRE(GetEventFirstActionFirstParameterString(
                 project.GetExternalEvents("ExternalEventsWithFreeFunctions")
                     .GetEvents()
-                    .GetEvent(0)) ==
+                    .GetEvent(1)) ==
             "2 + MyEventsExtension::MyRenamedFunctionExpressionAndCondition()");
     
     // Check that events function calls in instructions have been renamed
     REQUIRE(GetEventFirstConditionType(project.GetExternalEvents("ExternalEventsWithFreeFunctions")
                                         .GetEvents()
-                                        .GetEvent(0)) ==
+                                        .GetEvent(1)) ==
             "MyEventsExtension::MyRenamedFunctionExpressionAndCondition");
   }
   SECTION("(Free) events function parameter moved") {
@@ -900,7 +937,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(otherEventsBasedBehaviorSecondProperty.GetExtraInfo().at(0) ==
             "SomeOtherExtension::SomeOtherBehavior");
   }
-  SECTION("(Events based Behavior) events function renamed") {
+  SECTION("(Events based Behavior) events action renamed") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -914,12 +951,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         eventsBasedBehavior,
         "MyBehaviorEventsFunction",
         "MyRenamedBehaviorEventsFunction");
-    gd::WholeProjectRefactorer::RenameBehaviorEventsFunction(
-        project,
-        eventsExtension,
-        eventsBasedBehavior,
-        "MyBehaviorEventsFunctionExpression",
-        "MyRenamedBehaviorEventsFunctionExpression");
 
     // Check if events-based behavior methods have been renamed in
     // instructions
@@ -929,6 +960,21 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                                     .GetEvent(0)) ==
         "MyEventsExtension::MyEventsBasedBehavior::"
         "MyRenamedBehaviorEventsFunction");
+  }
+  SECTION("(Events based Behavior) events expression renamed") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    gd::WholeProjectRefactorer::RenameBehaviorEventsFunction(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunctionExpression",
+        "MyRenamedBehaviorEventsFunctionExpression");
 
     // Check events-based behavior methods have been renamed in
     // expressions
@@ -969,6 +1015,40 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "4 + "
             "ObjectWithMyBehavior::MyBehavior."
             "MyBehaviorEventsFunctionExpression");
+  }
+  SECTION("(Events based Behavior) events expression and condition renamed") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    gd::WholeProjectRefactorer::RenameBehaviorEventsFunction(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunctionExpressionAndCondition",
+        "MyRenamedBehaviorEventsFunctionExpressionAndCondition");
+
+    // Check events-based behavior methods have been renamed in
+    // expressions
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(4)) ==
+            "5 + "
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyRenamedBehaviorEventsFunctionExpressionAndCondition(123, 456, 789)");
+
+    // Check if events-based behavior methods have been renamed in
+    // instructions
+    REQUIRE(
+        GetEventFirstConditionType(project.GetLayout("ExternalEventsWithBehaviorFunctions")
+                                    .GetEvents()
+                                    .GetEvent(4)) ==
+        "MyEventsExtension::MyEventsBasedBehavior::"
+        "MyRenamedBehaviorEventsFunctionExpressionAndCondition");
   }
   SECTION("(Events based Behavior) events function parameter moved") {
     gd::Project project;

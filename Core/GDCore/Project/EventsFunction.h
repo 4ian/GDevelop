@@ -115,7 +115,7 @@ class GD_CORE_API EventsFunction {
     return *this;
   }
 
-  enum FunctionType { Action, Condition, Expression, StringExpression };
+  enum FunctionType { Action, Condition, Expression, StringExpression, ExpressionAndCondition, StringExpressionAndCondition };
 
   /**
    * \brief Set the type of the function
@@ -123,12 +123,42 @@ class GD_CORE_API EventsFunction {
   EventsFunction& SetFunctionType(FunctionType type) {
     functionType = type;
     return *this;
-  };
+  }
 
   /**
    * \brief Get the type of the function
    */
-  FunctionType GetFunctionType() const { return functionType; };
+  FunctionType GetFunctionType() const { return functionType; }
+
+  /**
+   * \brief Return true if the function is an action.
+   */
+  bool IsAction() const {
+    return functionType == gd::EventsFunction::Action;
+ }
+
+  /**
+   * \brief Return true if the function is an expression.
+   * 
+   * Note that a function can be both an expression and a condition.
+   */
+  bool IsExpression() const {
+    return functionType == gd::EventsFunction::Expression ||
+           functionType == gd::EventsFunction::StringExpression ||
+           functionType == gd::EventsFunction::ExpressionAndCondition ||
+           functionType == gd::EventsFunction::StringExpressionAndCondition;
+ }
+
+  /**
+   * \brief Return true if the function is a condition.
+   * 
+   * Note that a function can be both an expression and a condition.
+   */
+  bool IsCondition() const {
+    return functionType == gd::EventsFunction::Condition ||
+           functionType == gd::EventsFunction::ExpressionAndCondition ||
+           functionType == gd::EventsFunction::StringExpressionAndCondition;
+ }
 
   /**
    * \brief Returns true if the function is private.

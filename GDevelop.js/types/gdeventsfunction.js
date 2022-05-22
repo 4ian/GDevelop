@@ -4,6 +4,8 @@ declare class gdEventsFunction {
   static Condition: 1;
   static Expression: 2;
   static StringExpression: 3;
+  static ExpressionAndCondition: 4;
+  static StringExpressionAndCondition: 5;
   constructor(): void;
   clone(): gdEventsFunction;
   setDescription(description: string): gdEventsFunction;

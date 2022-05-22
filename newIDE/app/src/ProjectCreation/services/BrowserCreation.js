@@ -29,35 +29,32 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   };
 };
 
-export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction = async ({
-  i18n,
-  exampleShortHeader,
-  settings,
-}) => {
-  try {
-    const { projectName } = settings;
+export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction =
+  async ({ i18n, exampleShortHeader, settings }) => {
+    try {
+      const { projectName } = settings;
 
-    const example = await getExample(exampleShortHeader);
-    sendNewGameCreated({
-      exampleUrl: example.projectFileUrl,
-      exampleSlug: exampleShortHeader.slug,
-    });
-    return {
-      storageProvider: UrlStorageProvider,
-      projectName,
-      fileMetadata: {
-        fileIdentifier: example.projectFileUrl,
-      },
-    };
-  } catch (error) {
-    showErrorBox({
-      message:
-        i18n._(t`Unable to fetch the example.`) +
-        ' ' +
-        i18n._(t`Verify your internet connection or try again later.`),
-      rawError: error,
-      errorId: 'browser-example-load-error',
-    });
-    return;
-  }
-};
+      const example = await getExample(exampleShortHeader);
+      sendNewGameCreated({
+        exampleUrl: example.projectFileUrl,
+        exampleSlug: exampleShortHeader.slug,
+      });
+      return {
+        storageProvider: UrlStorageProvider,
+        projectName,
+        fileMetadata: {
+          fileIdentifier: example.projectFileUrl,
+        },
+      };
+    } catch (error) {
+      showErrorBox({
+        message:
+          i18n._(t`Unable to fetch the example.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
+        rawError: error,
+        errorId: 'browser-example-load-error',
+      });
+      return;
+    }
+  };

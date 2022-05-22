@@ -13,7 +13,7 @@ const electron = optionalRequire('electron');
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
-  onChooseProvider: StorageProvider => void,
+  onChooseProvider: (StorageProvider) => void,
   onClose: () => void,
 |};
 
@@ -43,8 +43,8 @@ const OpenFromStorageProviderDialog = ({
         >
           <List>
             {storageProviders
-              .filter(storageProvider => !storageProvider.hiddenInOpenDialog)
-              .map(storageProvider => (
+              .filter((storageProvider) => !storageProvider.hiddenInOpenDialog)
+              .map((storageProvider) => (
                 <ListItem
                   key={storageProvider.internalName}
                   disabled={!!storageProvider.disabled}

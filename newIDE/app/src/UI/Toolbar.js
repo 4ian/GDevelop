@@ -15,7 +15,7 @@ type ToolbarGroupProps = {|
 export const Toolbar = React.memo<ToolbarProps>(
   ({ children }: ToolbarProps) => (
     <ThemeConsumer>
-      {muiTheme => (
+      {(muiTheme) => (
         <div
           style={{
             backgroundColor: muiTheme.toolbar.backgroundColor,
@@ -33,7 +33,7 @@ export const Toolbar = React.memo<ToolbarProps>(
   )
 );
 
-const toolbarGroupStyle = props => ({
+const toolbarGroupStyle = (props) => ({
   flex: 1,
   display: 'flex',
   alignItems: 'center',

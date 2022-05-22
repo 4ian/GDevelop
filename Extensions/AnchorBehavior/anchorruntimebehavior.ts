@@ -19,7 +19,8 @@ namespace gdjs {
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
-      this._relativeToOriginalWindowSize = !!behaviorData.relativeToOriginalWindowSize;
+      this._relativeToOriginalWindowSize =
+        !!behaviorData.relativeToOriginalWindowSize;
       this._leftEdgeAnchor = behaviorData.leftEdgeAnchor;
       this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
       this._topEdgeAnchor = behaviorData.topEdgeAnchor;

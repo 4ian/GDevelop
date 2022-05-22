@@ -77,7 +77,7 @@ export const deduplicateInstructionsList = (
   list: Array<EnumeratedInstructionMetadata>
 ): Array<EnumeratedInstructionMetadata> => {
   let createFound = false;
-  return list.filter(enumerateInstruction => {
+  return list.filter((enumerateInstruction) => {
     if (enumerateInstruction.type === 'Create') {
       if (createFound) return false;
 
@@ -95,7 +95,7 @@ const filterInstructionsToRemove = (
   const types = typesToRemove; // Make Flow happy
   if (!types) return list;
 
-  return list.filter(metadata => types.indexOf(metadata.type) === -1);
+  return list.filter((metadata) => types.indexOf(metadata.type) === -1);
 };
 
 const enumerateExtraBehaviorInstructions = (
@@ -123,7 +123,7 @@ const enumerateExtraBehaviorInstructions = (
     ? extension.getAllConditions()
     : extension.getAllActions();
 
-  return objectExtraInstructions.map(type =>
+  return objectExtraInstructions.map((type) =>
     enumerateInstruction(prefix, type, instructionMetadataMap.get(type), scope)
   );
 };
@@ -153,7 +153,7 @@ const enumerateExtraObjectInstructions = (
     ? extension.getAllConditions()
     : extension.getAllActions();
 
-  return objectExtraInstructions.map(type =>
+  return objectExtraInstructions.map((type) =>
     enumerateInstruction(prefix, type, instructionMetadataMap.get(type), scope)
   );
 };
@@ -306,10 +306,10 @@ const orderFirstInstructionsWithoutGroup = (
   allInstructions: Array<EnumeratedInstructionMetadata>
 ) => {
   const noGroupInstructions = allInstructions.filter(
-    instructionMetadata => instructionMetadata.fullGroupName.length === 0
+    (instructionMetadata) => instructionMetadata.fullGroupName.length === 0
   );
   const instructionsWithGroups = allInstructions.filter(
-    instructionMetadata => instructionMetadata.fullGroupName.length !== 0
+    (instructionMetadata) => instructionMetadata.fullGroupName.length !== 0
   );
 
   return [...noGroupInstructions, ...instructionsWithGroups];
@@ -343,7 +343,7 @@ export const enumerateObjectAndBehaviorsInstructions = (
     )
     .toJSArray();
   const objectBehaviorTypes = new Set(
-    objectBehaviorNames.map(behaviorName =>
+    objectBehaviorNames.map((behaviorName) =>
       gd.getTypeOfBehavior(
         globalObjectsContainer,
         objectsContainer,
@@ -354,10 +354,11 @@ export const enumerateObjectAndBehaviorsInstructions = (
   );
 
   // Enumerate instructions of the object.
-  const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
-    gd.JsPlatform.get(),
-    objectType
-  );
+  const extensionAndObjectMetadata =
+    gd.MetadataProvider.getExtensionAndObjectMetadata(
+      gd.JsPlatform.get(),
+      objectType
+    );
   const extension = extensionAndObjectMetadata.getExtension();
   const objectMetadata = extensionAndObjectMetadata.getMetadata();
   const scope = { extension, objectMetadata };
@@ -384,10 +385,11 @@ export const enumerateObjectAndBehaviorsInstructions = (
   // Enumerate instructions of the base object that the object "inherits" from.
   const baseObjectType = ''; /* An empty string means the base object */
   if (objectType !== baseObjectType) {
-    const baseExtensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
-      gd.JsPlatform.get(),
-      baseObjectType
-    );
+    const baseExtensionAndObjectMetadata =
+      gd.MetadataProvider.getExtensionAndObjectMetadata(
+        gd.JsPlatform.get(),
+        baseObjectType
+      );
     const baseObjectExtension = baseExtensionAndObjectMetadata.getExtension();
 
     allInstructions = [
@@ -418,10 +420,10 @@ export const enumerateObjectAndBehaviorsInstructions = (
     const behaviorTypes = extension
       .getBehaviorsTypes()
       .toJSArray()
-      .filter(behaviorType => objectBehaviorTypes.has(behaviorType));
+      .filter((behaviorType) => objectBehaviorTypes.has(behaviorType));
 
     // eslint-disable-next-line
-    behaviorTypes.forEach(behaviorType => {
+    behaviorTypes.forEach((behaviorType) => {
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 

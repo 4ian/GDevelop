@@ -20,13 +20,13 @@ export const enumerateBehaviorsMetadata = (
   const extensionsList = platform.getAllPlatformExtensions();
 
   return flatten(
-    mapFor(0, extensionsList.size(), i => {
+    mapFor(0, extensionsList.size(), (i) => {
       const extension = extensionsList.at(i);
 
       return extension
         .getBehaviorsTypes()
         .toJSArray()
-        .map(behaviorType => ({
+        .map((behaviorType) => ({
           behaviorType,
           behaviorMetadata: extension.getBehaviorMetadata(behaviorType),
         }))
@@ -52,7 +52,7 @@ export const filterEnumeratedBehaviorMetadata = (
 
   const lowercaseSearchText = searchText.toLowerCase();
 
-  return list.filter(enumerateBehaviorsMetadata => {
+  return list.filter((enumerateBehaviorsMetadata) => {
     return (
       enumerateBehaviorsMetadata.fullName
         .toLowerCase()

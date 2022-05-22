@@ -45,7 +45,7 @@ const jss = create({
 type Props = {|
   authentication: Authentication,
   disableCheckForUpdates: boolean,
-  makeEventsFunctionCodeWriter: EventsFunctionCodeWriterCallbacks => ?EventsFunctionCodeWriter,
+  makeEventsFunctionCodeWriter: (EventsFunctionCodeWriterCallbacks) => ?EventsFunctionCodeWriter,
   eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
   eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
   resourceFetcher: ResourceFetcher,

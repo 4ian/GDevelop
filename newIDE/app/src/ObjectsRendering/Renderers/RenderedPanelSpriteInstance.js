@@ -37,7 +37,7 @@ RenderedPanelSpriteInstance.prototype = Object.create(
   RenderedInstance.prototype
 );
 
-RenderedPanelSpriteInstance.prototype.update = function() {
+RenderedPanelSpriteInstance.prototype.update = function () {
   //TODO
   // if (this._pixiObject.visible && this._wasRendered) {
   //   this._pixiObject.cacheAsBitmap = true;
@@ -71,7 +71,7 @@ RenderedPanelSpriteInstance.prototype.update = function() {
   }
 };
 
-RenderedPanelSpriteInstance.prototype.makeObjects = function() {
+RenderedPanelSpriteInstance.prototype.makeObjects = function () {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._textureName = panelSprite.getTexture();
   const texture = this._pixiResourcesLoader.getPIXITexture(
@@ -105,16 +105,16 @@ RenderedPanelSpriteInstance.prototype.makeObjects = function() {
   }
 };
 
-RenderedPanelSpriteInstance.prototype.updateAngle = function() {
+RenderedPanelSpriteInstance.prototype.updateAngle = function () {
   this._pixiObject.rotation = RenderedInstance.toRad(this._instance.getAngle());
 };
 
-RenderedPanelSpriteInstance.prototype.updatePosition = function() {
+RenderedPanelSpriteInstance.prototype.updatePosition = function () {
   this._pixiObject.x = this._instance.getX() + this._width / 2;
   this._pixiObject.y = this._instance.getY() + this._height / 2;
 };
 
-RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
+RenderedPanelSpriteInstance.prototype._updateLocalPositions = function () {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
 
   this._centerSprite.position.x = panelSprite.getLeftMargin();
@@ -159,50 +159,51 @@ RenderedPanelSpriteInstance.prototype._updateLocalPositions = function() {
     this._height - this._borderSprites[7].height;
 };
 
-RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize = function() {
-  const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
-  this._centerSprite.width = Math.max(
-    this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
-    0
-  );
-  this._centerSprite.height = Math.max(
-    this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
-    0
-  );
+RenderedPanelSpriteInstance.prototype._updateSpritesAndTexturesSize =
+  function () {
+    const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
+    this._centerSprite.width = Math.max(
+      this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
+      0
+    );
+    this._centerSprite.height = Math.max(
+      this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
+      0
+    );
 
-  //Right
-  this._borderSprites[0].width = panelSprite.getRightMargin();
-  this._borderSprites[0].height = Math.max(
-    this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
-    0
-  );
+    //Right
+    this._borderSprites[0].width = panelSprite.getRightMargin();
+    this._borderSprites[0].height = Math.max(
+      this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
+      0
+    );
 
-  //Top
-  this._borderSprites[2].height = panelSprite.getTopMargin();
-  this._borderSprites[2].width = Math.max(
-    this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
-    0
-  );
+    //Top
+    this._borderSprites[2].height = panelSprite.getTopMargin();
+    this._borderSprites[2].width = Math.max(
+      this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
+      0
+    );
 
-  //Left
-  this._borderSprites[4].width = panelSprite.getLeftMargin();
-  this._borderSprites[4].height = Math.max(
-    this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
-    0
-  );
+    //Left
+    this._borderSprites[4].width = panelSprite.getLeftMargin();
+    this._borderSprites[4].height = Math.max(
+      this._height - panelSprite.getTopMargin() - panelSprite.getBottomMargin(),
+      0
+    );
 
-  //Bottom
-  this._borderSprites[6].height = panelSprite.getBottomMargin();
-  this._borderSprites[6].width = Math.max(
-    this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
-    0
-  );
+    //Bottom
+    this._borderSprites[6].height = panelSprite.getBottomMargin();
+    this._borderSprites[6].width = Math.max(
+      this._width - panelSprite.getRightMargin() - panelSprite.getLeftMargin(),
+      0
+    );
 
-  this._wasRendered = true;
-  this._pixiObject.cacheAsBitmap = false;
-};
+    this._wasRendered = true;
+    this._pixiObject.cacheAsBitmap = false;
+  };
 
-RenderedPanelSpriteInstance.prototype.updateTexture = function() {
+RenderedPanelSpriteInstance.prototype.updateTexture = function () {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   this._textureName = panelSprite.getTexture();
   const texture = this._pixiResourcesLoader.getPIXITexture(
@@ -365,7 +366,7 @@ RenderedPanelSpriteInstance.prototype.updateTexture = function() {
   this.updatePosition();
 };
 
-RenderedPanelSpriteInstance.prototype.updateWidthHeight = function() {
+RenderedPanelSpriteInstance.prototype.updateWidthHeight = function () {
   this._pixiObject.pivot.x = this._width / 2;
   this._pixiObject.pivot.y = this._height / 2;
   this._updateSpritesAndTexturesSize();
@@ -373,12 +374,12 @@ RenderedPanelSpriteInstance.prototype.updateWidthHeight = function() {
   this.updatePosition();
 };
 
-RenderedPanelSpriteInstance.prototype.getDefaultWidth = function() {
+RenderedPanelSpriteInstance.prototype.getDefaultWidth = function () {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   return panelSprite.getWidth();
 };
 
-RenderedPanelSpriteInstance.prototype.getDefaultHeight = function() {
+RenderedPanelSpriteInstance.prototype.getDefaultHeight = function () {
   const panelSprite = gd.asPanelSpriteObject(this._associatedObject);
   return panelSprite.getHeight();
 };
@@ -386,7 +387,7 @@ RenderedPanelSpriteInstance.prototype.getDefaultHeight = function() {
 /**
  * Return a URL for thumbnail of the specified object.
  */
-RenderedPanelSpriteInstance.getThumbnail = function(
+RenderedPanelSpriteInstance.getThumbnail = function (
   project,
   resourcesLoader,
   object

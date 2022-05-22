@@ -48,8 +48,9 @@ namespace gdjs {
         ) {
           return;
         }
-        const behaviorA = contact.GetFixtureA().GetBody()
-            .gdjsAssociatedBehavior,
+        const behaviorA = contact
+            .GetFixtureA()
+            .GetBody().gdjsAssociatedBehavior,
           behaviorB = contact.GetFixtureB().GetBody().gdjsAssociatedBehavior;
         behaviorA.currentContacts.push(behaviorB);
         behaviorB.currentContacts.push(behaviorA);
@@ -68,8 +69,9 @@ namespace gdjs {
         ) {
           return;
         }
-        const behaviorA = contact.GetFixtureA().GetBody()
-            .gdjsAssociatedBehavior,
+        const behaviorA = contact
+            .GetFixtureA()
+            .GetBody().gdjsAssociatedBehavior,
           behaviorB = contact.GetFixtureB().GetBody().gdjsAssociatedBehavior;
         let i = behaviorA.currentContacts.indexOf(behaviorB);
         if (i !== -1) {

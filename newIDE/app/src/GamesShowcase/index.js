@@ -36,16 +36,13 @@ export const GamesShowcase = (props: Props) => {
     setSearchText,
   } = React.useContext(GamesShowcaseContext);
 
-  React.useEffect(
-    () => {
-      fetchShowcasedGamesAndFilters();
-    },
-    [fetchShowcasedGamesAndFilters]
-  );
+  React.useEffect(() => {
+    fetchShowcasedGamesAndFilters();
+  }, [fetchShowcasedGamesAndFilters]);
 
   return (
     <ResponsiveWindowMeasurer>
-      {windowWidth => (
+      {(windowWidth) => (
         <Column expand noMargin useFullHeight>
           <SearchBar
             value={searchText}

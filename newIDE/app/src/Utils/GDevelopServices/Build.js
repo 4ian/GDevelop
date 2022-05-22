@@ -118,7 +118,7 @@ export const buildElectron = (
   gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
         params: {
           userId,
@@ -132,7 +132,7 @@ export const buildElectron = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const buildWeb = (
@@ -142,7 +142,7 @@ export const buildWeb = (
   gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
         params: {
           userId,
@@ -156,7 +156,7 @@ export const buildWeb = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const buildCordovaAndroid = (
@@ -168,7 +168,7 @@ export const buildCordovaAndroid = (
   gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build`,
         JSON.stringify({
@@ -190,7 +190,7 @@ export const buildCordovaAndroid = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getBuild = (
@@ -199,7 +199,7 @@ export const getBuild = (
   buildId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
         params: {
           userId,
@@ -209,7 +209,7 @@ export const getBuild = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getBuilds = (
@@ -218,7 +218,7 @@ export const getBuilds = (
   gameId?: string
 ): Promise<Array<Build>> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build`, {
         params: {
           userId,
@@ -229,5 +229,5 @@ export const getBuilds = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };

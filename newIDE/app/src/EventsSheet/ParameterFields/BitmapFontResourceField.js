@@ -46,7 +46,7 @@ export default class FontResourceField extends Component<
         }
         onRequestClose={this.props.onRequestClose}
         onApply={this.props.onApply}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
       />
     );
   }

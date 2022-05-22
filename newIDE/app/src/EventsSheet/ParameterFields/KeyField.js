@@ -147,22 +147,20 @@ export default class KeyField extends Component<ParameterFieldProps, {||}> {
         fullWidth
         value={value}
         onChange={onChange}
-        dataSource={keyNames.map(keyName => ({
+        dataSource={keyNames.map((keyName) => ({
           text: keyName,
           value: keyName,
         }))}
         openOnFocus={!isInline}
         onRequestClose={onRequestClose}
         onApply={onApply}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         errorText={
           !value ? (
             <Trans>You must select a key.</Trans>
           ) : !isKeyValid(value) ? (
             <Trans>You must select a valid key. "{value}" is not valid.</Trans>
-          ) : (
-            undefined
-          )
+          ) : undefined
         }
       />
     );

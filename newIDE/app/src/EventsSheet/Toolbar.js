@@ -57,7 +57,7 @@ export class Toolbar extends PureComponent<Props> {
               />
             }
             buildMenuTemplate={() =>
-              this.props.allEventsMetadata.map(metadata => {
+              this.props.allEventsMetadata.map((metadata) => {
                 return {
                   label: metadata.fullName,
                   click: () => {

@@ -19,13 +19,13 @@ type Props<Item> = {|
   addNewItemLabel?: React.Node | string,
   addNewItemId?: string,
   onRename: (Item, string) => void,
-  renderItemLabel?: Item => React.Node,
-  getItemName: Item => string,
-  getItemThumbnail?: Item => string,
+  renderItemLabel?: (Item) => React.Node,
+  getItemName: (Item) => string,
+  getItemThumbnail?: (Item) => string,
   getItemId?: (Item, index: number) => string,
-  isItemBold?: Item => boolean,
+  isItemBold?: (Item) => boolean,
   onItemSelected: (?Item) => void,
-  onEditItem?: Item => void,
+  onEditItem?: (Item) => void,
   renamedItem: ?Item,
   erroredItems?: { [string]: '' | 'error' | 'warning' },
   buildMenuTemplate: (Item, index: number) => any,
@@ -78,7 +78,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
           renderItemLabel ? () => renderItemLabel(item) : undefined
         }
         isBold={isItemBold ? isItemBold(item) : false}
-        onRename={newName => this.props.onRename(item, newName)}
+        onRename={(newName) => this.props.onRename(item, newName)}
         editingName={nameBeingEdited}
         getThumbnail={
           getItemThumbnail ? () => getItemThumbnail(item) : undefined
@@ -113,11 +113,11 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {(windowWidth) => (
           <ScreenTypeMeasurer>
-            {screenType => (
+            {(screenType) => (
               <List
-                ref={list => (this._list = list)}
+                ref={(list) => (this._list = list)}
                 height={height}
                 rowCount={fullList.length + (onAddNewItem ? 1 : 0)}
                 rowHeight={

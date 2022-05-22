@@ -24,7 +24,7 @@ type AssetStoreState = {|
   fetchAssetsAndFilters: () => void,
   error: ?Error,
   searchText: string,
-  setSearchText: string => void,
+  setSearchText: (string) => void,
   filtersState: FiltersState,
 |};
 
@@ -77,66 +77,54 @@ export const AssetStoreStateProvider = ({
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
-  const fetchAssetsAndFilters = React.useCallback(
-    () => {
-      // Don't attempt to load again assets and filters if they
-      // were loaded already.
-      if (assetShortHeadersById || isLoading.current) return;
+  const fetchAssetsAndFilters = React.useCallback(() => {
+    // Don't attempt to load again assets and filters if they
+    // were loaded already.
+    if (assetShortHeadersById || isLoading.current) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const {
-            assetShortHeaders,
-            filters,
-            assetPacks,
-          } = await listAllAssets();
-          const authors = await listAllAuthors();
-          const licenses = await listAllLicenses();
+      try {
+        const { assetShortHeaders, filters, assetPacks } =
+          await listAllAssets();
+        const authors = await listAllAuthors();
+        const licenses = await listAllLicenses();
 
-          const assetShortHeadersById = {};
-          assetShortHeaders.forEach(assetShortHeader => {
-            assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
-          });
+        const assetShortHeadersById = {};
+        assetShortHeaders.forEach((assetShortHeader) => {
+          assetShortHeadersById[assetShortHeader.id] = assetShortHeader;
+        });
 
-          console.info(
-            `Loaded ${assetShortHeaders.length} assets from the asset store.`
-          );
-          setAssetShortHeadersById(assetShortHeadersById);
-          setFilters(filters);
-          setAssetPacks(assetPacks);
-          setAuthors(authors);
-          setLicenses(licenses);
-        } catch (error) {
-          console.error(
-            `Unable to load the assets from the asset store:`,
-            error
-          );
-          setError(error);
-        }
+        console.info(
+          `Loaded ${assetShortHeaders.length} assets from the asset store.`
+        );
+        setAssetShortHeadersById(assetShortHeadersById);
+        setFilters(filters);
+        setAssetPacks(assetPacks);
+        setAuthors(authors);
+        setLicenses(licenses);
+      } catch (error) {
+        console.error(`Unable to load the assets from the asset store:`, error);
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [assetShortHeadersById, isLoading]
-  );
+      isLoading.current = false;
+    })();
+  }, [assetShortHeadersById, isLoading]);
 
-  React.useEffect(
-    () => {
-      // Don't attempt to load again assets and filters if they
-      // were loaded already.
-      if (assetShortHeadersById || isLoading.current) return;
+  React.useEffect(() => {
+    // Don't attempt to load again assets and filters if they
+    // were loaded already.
+    if (assetShortHeadersById || isLoading.current) return;
 
-      const timeoutId = setTimeout(() => {
-        console.info('Pre-fetching assets from asset store...');
-        fetchAssetsAndFilters();
-      }, 6000);
-      return () => clearTimeout(timeoutId);
-    },
-    [fetchAssetsAndFilters, assetShortHeadersById, isLoading]
-  );
+    const timeoutId = setTimeout(() => {
+      console.info('Pre-fetching assets from asset store...');
+      fetchAssetsAndFilters();
+    }, 6000);
+    return () => clearTimeout(timeoutId);
+  }, [fetchAssetsAndFilters, assetShortHeadersById, isLoading]);
 
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(

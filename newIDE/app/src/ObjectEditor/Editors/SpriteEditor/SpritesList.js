@@ -48,7 +48,7 @@ const styles = {
 const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
     <ThemeConsumer>
-      {muiTheme => (
+      {(muiTheme) => (
         <div
           style={{
             ...thumbnailContainerStyle,
@@ -97,7 +97,7 @@ const SortableList = SortableContainer(
     return (
       <div style={styles.spritesList}>
         {[
-          ...mapFor(0, spritesCount, i => {
+          ...mapFor(0, spritesCount, (i) => {
             const sprite = direction.getSprite(i);
             return (
               <SortableSpriteThumbnail
@@ -106,7 +106,7 @@ const SortableList = SortableContainer(
                 index={i}
                 selected={!!selectedSprites[sprite.ptr]}
                 onContextMenu={(x, y) => onSpriteContextMenu(x, y, sprite)}
-                onSelect={selected => onSelectSprite(sprite, selected)}
+                onSelect={(selected) => onSelectSprite(sprite, selected)}
                 resourcesLoader={resourcesLoader}
                 project={project}
               />
@@ -136,10 +136,11 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
       direction.getSprite(0),
       direction
     );
-    allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
-      direction.getSprite(0),
-      direction
-    );
+    allDirectionSpritesHaveSameCollisionMasks =
+      allDirectionSpritesHaveSameCollisionMasksAs(
+        direction.getSprite(0),
+        direction
+      );
   }
 
   return {
@@ -179,14 +180,10 @@ export default class SpritesList extends Component<Props, void> {
   };
 
   onAddSprite = () => {
-    const {
-      resourceSources,
-      onChooseResource,
-      project,
-      direction,
-    } = this.props;
+    const { resourceSources, onChooseResource, project, direction } =
+      this.props;
     if (!resourceSources) return;
-    const sources = resourceSources.filter(source => source.kind === 'image');
+    const sources = resourceSources.filter((source) => source.kind === 'image');
     if (!sources.length) return;
 
     const {
@@ -200,8 +197,8 @@ export default class SpritesList extends Component<Props, void> {
       initialSourceName: sources[0].name,
       multiSelection: true,
       resourceKind: 'image',
-    }).then(resources => {
-      resources.forEach(resource => {
+    }).then((resources) => {
+      resources.forEach((resource) => {
         applyResourceDefaults(project, resource);
         project.getResourcesManager().addResource(resource);
 
@@ -218,7 +215,7 @@ export default class SpritesList extends Component<Props, void> {
 
       // Important, we are responsible for deleting the resources that were given to us.
       // Otherwise we have a memory leak, as calling addResource is making a copy of the resource.
-      resources.forEach(resource => resource.delete());
+      resources.forEach((resource) => resource.delete());
 
       this.forceUpdate();
     });
@@ -234,7 +231,7 @@ export default class SpritesList extends Component<Props, void> {
       objectName,
       animationName,
     } = this.props;
-    const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
+    const resourceNames = mapFor(0, direction.getSpritesCount(), (i) => {
       return direction.getSprite(i).getImageName();
     });
 
@@ -271,11 +268,11 @@ export default class SpritesList extends Component<Props, void> {
         isLooping: direction.isLooping(),
         externalEditorData,
       },
-      onChangesSaved: resources => {
+      onChangesSaved: (resources) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
-        resources.forEach(resource => {
+        resources.forEach((resource) => {
           const sprite = new gd.Sprite();
           sprite.setImageName(resource.name);
           // Restore collision masks and points

@@ -140,7 +140,7 @@ export class ExternalEventsEditorContainer extends React.Component<
       <div style={styles.container}>
         {layout && (
           <EventsSheet
-            ref={editor => (this.editor = editor)}
+            ref={(editor) => (this.editor = editor)}
             setToolbar={this.props.setToolbar}
             onOpenLayout={this.props.onOpenLayout}
             resourceSources={this.props.resourceSources}

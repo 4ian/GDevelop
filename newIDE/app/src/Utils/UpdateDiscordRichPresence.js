@@ -23,13 +23,10 @@ const updateDiscordRichPresence = (project: ?gdProject) => {
 export const useDiscordRichPresence = (project: ?gdProject) => {
   const [lastCallTime, setLastCallTime] = useState(0);
   useEffect(() => updateDiscordRichPresence(project));
-  useEffect(
-    () => {
-      if (performance.now() - lastCallTime > 60000) {
-        setLastCallTime(performance.now());
-        updateDiscordRichPresence(project);
-      }
-    },
-    [project, lastCallTime]
-  );
+  useEffect(() => {
+    if (performance.now() - lastCallTime > 60000) {
+      setLastCallTime(performance.now());
+      updateDiscordRichPresence(project);
+    }
+  }, [project, lastCallTime]);
 };

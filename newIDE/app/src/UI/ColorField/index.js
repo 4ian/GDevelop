@@ -86,11 +86,11 @@ export default class ColorField extends React.Component<Props, State> {
           type="text"
           hintText={t`Text in the format R;G;B, like 100;200;180`}
           value={this.state.color}
-          onChange={event =>
+          onChange={(event) =>
             this._handleChange(event.target.value, this.state.alpha)
           }
           onBlur={this._handleBlur}
-          ref={textField => (this._textField = textField)}
+          ref={(textField) => (this._textField = textField)}
         />
         {!this.props.disableAlpha && (
           <TextField
@@ -104,7 +104,7 @@ export default class ColorField extends React.Component<Props, State> {
               this._handleChange(this.state.color, parseFloat(value))
             }
             onBlur={this._handleBlur}
-            ref={textField => (this._textField = textField)}
+            ref={(textField) => (this._textField = textField)}
             type="number"
             step={0.1}
           />

@@ -45,7 +45,7 @@ const styles = {
 
 type Props = {|
   showcasedGame: ShowcasedGame,
-  onHeightComputed: number => void,
+  onHeightComputed: (number) => void,
 |};
 
 export const ShowcasedGameListItem = ({
@@ -56,19 +56,16 @@ export const ShowcasedGameListItem = ({
   const [isLoaded, setIsLoaded] = React.useState(false);
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const isImageLoadingRef = React.useRef(true);
-  const notifyHeightChanged = React.useCallback(
-    () => {
-      if (!isLoaded && !isImageLoadingRef.current) {
-        setIsLoaded(true);
-      }
+  const notifyHeightChanged = React.useCallback(() => {
+    if (!isLoaded && !isImageLoadingRef.current) {
+      setIsLoaded(true);
+    }
 
-      // But don't report the height while the image is loading, as it could
-      // make some "jumps" in the scroll when scrolling up.
-      if (containerRef.current && !isImageLoadingRef.current)
-        onHeightComputed(containerRef.current.getBoundingClientRect().height);
-    },
-    [onHeightComputed, isLoaded]
-  );
+    // But don't report the height while the image is loading, as it could
+    // make some "jumps" in the scroll when scrolling up.
+    if (containerRef.current && !isImageLoadingRef.current)
+      onHeightComputed(containerRef.current.getBoundingClientRect().height);
+  }, [onHeightComputed, isLoaded]);
   React.useLayoutEffect(notifyHeightChanged);
 
   const windowWidth = useResponsiveWindowWidth();

@@ -83,17 +83,13 @@ export const GameDetailsDialog = ({
     AuthenticatedUserContext
   );
   const [currentTab, setCurrentTab] = React.useState(initialTab);
-  const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
-    null
-  );
+  const [gameRollingMetrics, setGameMetrics] =
+    React.useState<?GameMetrics>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [
-    gameUnregisterErrorText,
-    setGameUnregisterErrorText,
-  ] = React.useState<?string>(null);
-  const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
-    null
-  );
+  const [gameUnregisterErrorText, setGameUnregisterErrorText] =
+    React.useState<?string>(null);
+  const [gameRollingMetricsError, setGameMetricsError] =
+    React.useState<?Error>(null);
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
   const [isGameUpdating, setIsGameUpdating] = React.useState(false);
 
@@ -110,58 +106,46 @@ export const GameDetailsDialog = ({
     setIsPublicGamePropertiesDialogOpen,
   ] = React.useState(false);
 
-  const loadGameMetrics = React.useCallback(
-    async () => {
-      if (!profile) return;
+  const loadGameMetrics = React.useCallback(async () => {
+    if (!profile) return;
 
-      const { id } = profile;
+    const { id } = profile;
 
-      setIsGameMetricsLoading(true);
-      setGameMetricsError(null);
-      try {
-        const gameRollingMetrics = await getGameMetrics(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          analyticsDate
-        );
-        setGameMetrics(gameRollingMetrics);
-      } catch (err) {
-        console.error(`Unable to load game rolling metrics:`, err);
-        setGameMetricsError(err);
-      }
-      setIsGameMetricsLoading(false);
-    },
-    [getAuthorizationHeader, profile, game, analyticsDate]
-  );
+    setIsGameMetricsLoading(true);
+    setGameMetricsError(null);
+    try {
+      const gameRollingMetrics = await getGameMetrics(
+        getAuthorizationHeader,
+        id,
+        game.id,
+        analyticsDate
+      );
+      setGameMetrics(gameRollingMetrics);
+    } catch (err) {
+      console.error(`Unable to load game rolling metrics:`, err);
+      setGameMetricsError(err);
+    }
+    setIsGameMetricsLoading(false);
+  }, [getAuthorizationHeader, profile, game, analyticsDate]);
 
-  React.useEffect(
-    () => {
-      loadGameMetrics();
-    },
-    [loadGameMetrics]
-  );
+  React.useEffect(() => {
+    loadGameMetrics();
+  }, [loadGameMetrics]);
 
-  const loadPublicGame = React.useCallback(
-    async () => {
-      setPublicGameError(null);
-      try {
-        const publicGameResponse = await getPublicGame(game.id);
-        setPublicGame(publicGameResponse);
-      } catch (err) {
-        console.error(`Unable to load the game:`, err);
-        setPublicGameError(err);
-      }
-    },
-    [game]
-  );
+  const loadPublicGame = React.useCallback(async () => {
+    setPublicGameError(null);
+    try {
+      const publicGameResponse = await getPublicGame(game.id);
+      setPublicGame(publicGameResponse);
+    } catch (err) {
+      console.error(`Unable to load the game:`, err);
+      setPublicGameError(err);
+    }
+  }, [game]);
 
-  React.useEffect(
-    () => {
-      loadPublicGame();
-    },
-    [loadPublicGame]
-  );
+  React.useEffect(() => {
+    loadPublicGame();
+  }, [loadPublicGame]);
 
   const handleGameUpdated = React.useCallback(
     (updatedGame: Game) => {
@@ -314,38 +298,35 @@ export const GameDetailsDialog = ({
     }
   };
 
-  const unpublishGame = React.useCallback(
-    async () => {
-      if (!profile) return;
+  const unpublishGame = React.useCallback(async () => {
+    if (!profile) return;
 
-      const { id } = profile;
-      try {
-        setIsGameUpdating(true);
-        const updatedGame = await updateGame(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          {
-            publicWebBuildId: null,
-          }
-        );
-        handleGameUpdated(updatedGame);
-      } catch (err) {
-        console.error('Unable to update the game', err);
-      } finally {
-        setIsGameUpdating(false);
-      }
-    },
-    [game, getAuthorizationHeader, profile, handleGameUpdated]
-  );
+    const { id } = profile;
+    try {
+      setIsGameUpdating(true);
+      const updatedGame = await updateGame(
+        getAuthorizationHeader,
+        id,
+        game.id,
+        {
+          publicWebBuildId: null,
+        }
+      );
+      handleGameUpdated(updatedGame);
+    } catch (err) {
+      console.error('Unable to update the game', err);
+    } finally {
+      setIsGameUpdating(false);
+    }
+  }, [game, getAuthorizationHeader, profile, handleGameUpdated]);
 
   const authorUsernames =
     publicGame &&
-    publicGame.authors.map(author => author.username).filter(Boolean);
+    publicGame.authors.map((author) => author.username).filter(Boolean);
 
   const ownerUsernames =
     publicGame &&
-    publicGame.owners.map(owner => owner.username).filter(Boolean);
+    publicGame.owners.map((owner) => owner.username).filter(Boolean);
 
   const isGameOpenedAsProject =
     !!project && project.getProjectUuid() === game.id;
@@ -440,9 +421,7 @@ export const GameDetailsDialog = ({
                                     ownerUsernames &&
                                     ownerUsernames.includes(username) ? (
                                       <Crown />
-                                    ) : (
-                                      undefined
-                                    )
+                                    ) : undefined
                                   }
                                   label={username}
                                   color={index === 0 ? 'primary' : 'default'}
@@ -738,7 +717,7 @@ export const GameDetailsDialog = ({
                   ) : null}
                   <Table>
                     <TableBody>
-                      {[1, 2, 3, 4, 5, 6, 7].map(dayIndex => (
+                      {[1, 2, 3, 4, 5, 6, 7].map((dayIndex) => (
                         <TableRow key={dayIndex}>
                           <TableRowColumn>
                             <Trans>Day {dayIndex} retained players</Trans>
@@ -766,7 +745,7 @@ export const GameDetailsDialog = ({
             <PublicGamePropertiesDialog
               project={project}
               publicGame={publicGame}
-              onApply={async partialGameChange => {
+              onApply={async (partialGameChange) => {
                 const isGameUpdated = await updateGameFromProject(
                   partialGameChange,
                   i18n

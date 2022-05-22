@@ -23,7 +23,11 @@ const buildMainMenuFor = (window, mainMenuTemplate) => {
         click: hasOnClick
           ? function() {
               if (menuItemTemplate.onClickSendEvent) {
-                if(args) window.webContents.send(menuItemTemplate.onClickSendEvent, args);
+                if (args)
+                  window.webContents.send(
+                    menuItemTemplate.onClickSendEvent,
+                    args
+                  );
                 else window.webContents.send(menuItemTemplate.onClickSendEvent);
               }
 

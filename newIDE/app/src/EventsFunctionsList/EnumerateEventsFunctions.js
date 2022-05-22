@@ -4,7 +4,7 @@ import { mapFor } from '../Utils/MapFor';
 export const enumerateEventsFunctions = (
   eventsFunctionsContainer: gdEventsFunctionsContainer
 ): Array<gdEventsFunction> =>
-  mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i =>
+  mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), (i) =>
     eventsFunctionsContainer.getEventsFunctionAt(i)
   );
 
@@ -18,9 +18,6 @@ export const filterEventFunctionsList = (
 
   return list.filter(
     (item: any) =>
-      item
-        .getName()
-        .toLowerCase()
-        .indexOf(lowercaseSearchText) !== -1
+      item.getName().toLowerCase().indexOf(lowercaseSearchText) !== -1
   );
 };

@@ -12,7 +12,7 @@ import Fade from '@material-ui/core/Fade';
 const SubMenuItem = ({ item, buildFromTemplate }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const anchorElement = useRef(null);
-  const setAnchorElement = useCallback(element => {
+  const setAnchorElement = useCallback((element) => {
     anchorElement.current = element;
   }, []);
 
@@ -22,7 +22,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         dense
         key={item.label}
         disabled={item.enabled === false}
-        onClick={event => {
+        onClick={(event) => {
           if (item.enabled === false) {
             return;
           }
@@ -110,7 +110,7 @@ export default class MaterialUIMenuImplementation {
             <SubMenuItem
               key={'submenu' + item.label}
               item={item}
-              buildFromTemplate={template => this.buildFromTemplate(template)}
+              buildFromTemplate={(template) => this.buildFromTemplate(template)}
             />
           );
         } else {

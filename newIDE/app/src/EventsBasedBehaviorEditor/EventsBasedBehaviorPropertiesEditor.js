@@ -97,7 +97,9 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
     const { eventsBasedBehavior } = this.props;
     const properties = eventsBasedBehavior.getPropertyDescriptors();
 
-    const newName = newNameGenerator('Property', name => properties.has(name));
+    const newName = newNameGenerator('Property', (name) =>
+      properties.has(name)
+    );
     const property = properties.insertNew(newName, properties.getCount());
     property.setType('Number');
     this.forceUpdate();
@@ -128,7 +130,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
         property.getValue()
       );
       const vectorString = new gd.VectorString();
-      newExtraInfo.forEach(item => vectorString.push_back(item));
+      newExtraInfo.forEach((item) => vectorString.push_back(item));
       property.setExtraInfo(vectorString);
       vectorString.delete();
       property.setValue(newExtraInfo[defaultValueIndex] || '');
@@ -171,7 +173,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             commitOnBlur
                             hintText={t`Enter the property name`}
                             value={property.getName()}
-                            onChange={newName => {
+                            onChange={(newName) => {
                               if (newName === property.getName()) return;
                               if (
                                 !validatePropertyName(i18n, properties, newName)
@@ -282,7 +284,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                                     : 'ABC'
                                 }
                                 value={property.getValue()}
-                                onChange={newValue => {
+                                onChange={(newValue) => {
                                   property.setValue(newValue);
                                   this.forceUpdate();
                                   this.props.onPropertiesUpdated();
@@ -373,7 +375,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                               disableAlpha
                               fullWidth
                               color={property.getValue()}
-                              onChange={color => {
+                              onChange={(color) => {
                                 property.setValue(color);
                                 this.forceUpdate();
                                 this.props.onPropertiesUpdated();
@@ -385,13 +387,13 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             hintText={t`Leave it empty to use the default group.`}
                             fullWidth
                             value={property.getGroup()}
-                            onChange={text => {
+                            onChange={(text) => {
                               property.setGroup(text);
                               this.forceUpdate();
                               this.props.onPropertiesUpdated();
                             }}
                             dataSource={this._getPropertyGroupNames().map(
-                              name => ({
+                              (name) => ({
                                 text: name,
                                 value: name,
                               })
@@ -406,7 +408,7 @@ export default class EventsBasedBehaviorPropertiesEditor extends React.Component
                             hintText={t`This should make the purpose of the property easy to understand`}
                             floatingLabelFixed
                             value={property.getLabel()}
-                            onChange={text => {
+                            onChange={(text) => {
                               property.setLabel(text);
                               this.forceUpdate();
                             }}

@@ -57,12 +57,9 @@ const UserAchievements = ({
     }
   }, []);
 
-  useEffect(
-    () => {
-      fetchAchievements();
-    },
-    [fetchAchievements]
-  );
+  useEffect(() => {
+    fetchAchievements();
+  }, [fetchAchievements]);
 
   return (
     <ResponsiveLineStackLayout>

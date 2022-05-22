@@ -126,7 +126,7 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
           initiallyFocusedFunctionName={initiallyFocusedFunctionName}
           initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
           onBehaviorEdited={this._onBehaviorEdited}
-          ref={editor => (this.editor = editor)}
+          ref={(editor) => (this.editor = editor)}
           unsavedChanges={this.props.unsavedChanges}
         />
       </div>

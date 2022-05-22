@@ -16,7 +16,7 @@ export type ParameterRenderingServiceType = {
 type CommonProps = {|
   // The parameter
   parameterMetadata?: gdParameterMetadata,
-  onChange: string => void,
+  onChange: (string) => void,
   value: string,
 
   // Context

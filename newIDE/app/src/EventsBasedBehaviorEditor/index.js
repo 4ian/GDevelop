@@ -38,13 +38,14 @@ export default class EventsBasedBehaviorEditor extends React.Component<
   };
 
   // An array containing all the object types that are using the behavior
-  _allObjectTypes: Array<string> = gd.WholeProjectRefactorer.getAllObjectTypesUsingEventsBasedBehavior(
-    this.props.project,
-    this.props.eventsFunctionsExtension,
-    this.props.eventsBasedBehavior
-  )
-    .toNewVectorString()
-    .toJSArray();
+  _allObjectTypes: Array<string> =
+    gd.WholeProjectRefactorer.getAllObjectTypesUsingEventsBasedBehavior(
+      this.props.project,
+      this.props.eventsFunctionsExtension,
+      this.props.eventsBasedBehavior
+    )
+      .toNewVectorString()
+      .toJSArray();
 
   _changeTab = (newTab: TabName) =>
     this.setState(
@@ -88,7 +89,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 commitOnBlur
                 floatingLabelText={<Trans>Name displayed in editor</Trans>}
                 value={eventsBasedBehavior.getFullName()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsBasedBehavior.setFullName(text);
                   this.forceUpdate();
                 }}
@@ -100,7 +101,7 @@ export default class EventsBasedBehaviorEditor extends React.Component<
                 floatingLabelFixed
                 hintText={t`The description of the behavior should explain what the behavior is doing to the object, and, briefly, how to use it.`}
                 value={eventsBasedBehavior.getDescription()}
-                onChange={text => {
+                onChange={(text) => {
                   eventsBasedBehavior.setDescription(text);
                   this.forceUpdate();
                 }}

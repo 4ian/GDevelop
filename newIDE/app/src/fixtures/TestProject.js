@@ -354,7 +354,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   jsCodeEvent.setInlineCode('console.log("Hello, World!");');
   jsCodeEvent.setParameterObjects('MyObject');
 
-  const makeKeyPressedCondition = key => {
+  const makeKeyPressedCondition = (key) => {
     const condition = new gd.Instruction();
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
@@ -362,7 +362,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     return condition; // This leaks memory if not deleted
   };
 
-  const makeMouseButtonPressedCondition = button => {
+  const makeMouseButtonPressedCondition = (button) => {
     const condition = new gd.Instruction();
     condition.setType('SourisBouton');
     condition.setParametersCount(2);
@@ -370,7 +370,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     return condition; // This leaks memory if not deleted
   };
 
-  const makeDeleteAction = objectToDelete => {
+  const makeDeleteAction = (objectToDelete) => {
     var action = new gd.Instruction(); //Add a simple action
     action.setType('Delete');
     action.setParametersCount(2);
@@ -486,10 +486,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const emptyEventsList = new gd.EventsList();
 
   // Events functions extension
-  const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
-    'TestExt',
-    0
-  );
+  const testEventsFunctionsExtension =
+    project.insertNewEventsFunctionsExtension('TestExt', 0);
   testEventsFunctionsExtension.setNamespace('MyExt');
   testEventsFunctionsExtension.setVersion('1.1');
   testEventsFunctionsExtension.setName('My name');
@@ -497,10 +495,8 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testEventsFunctionsExtension.setDescription('My description');
 
   // Events function
-  const testEventsFunction = testEventsFunctionsExtension.insertNewEventsFunction(
-    'MyTestFunction',
-    0
-  );
+  const testEventsFunction =
+    testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction', 0);
 
   const parameter1 = new gd.ParameterMetadata();
   parameter1.setType('objectList');

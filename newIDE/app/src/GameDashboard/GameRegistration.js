@@ -46,117 +46,99 @@ export const GameRegistration = ({
     onAcceptGameStatsEmail,
   } = React.useContext(AuthenticatedUserContext);
   const [error, setError] = React.useState<Error | null>(null);
-  const [
-    unavailableReason,
-    setUnavailableReason,
-  ] = React.useState<UnavailableReason>(null);
+  const [unavailableReason, setUnavailableReason] =
+    React.useState<UnavailableReason>(null);
   const [game, setGame] = React.useState<Game | null>(null);
-  const [registrationInProgress, setRegistrationInProgress] = React.useState(
-    false
-  );
-  const [
-    acceptGameStatsEmailInProgress,
-    setAcceptGameStatsEmailInProgress,
-  ] = React.useState(false);
+  const [registrationInProgress, setRegistrationInProgress] =
+    React.useState(false);
+  const [acceptGameStatsEmailInProgress, setAcceptGameStatsEmailInProgress] =
+    React.useState(false);
   const [detailsOpened, setDetailsOpened] = React.useState(false);
-  const [detailsInitialTab, setDetailsInitialTab] = React.useState<DetailsTab>(
-    'details'
-  );
+  const [detailsInitialTab, setDetailsInitialTab] =
+    React.useState<DetailsTab>('details');
 
-  const loadGame = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
+  const loadGame = React.useCallback(async () => {
+    if (!profile || !project) return;
 
-      const { id } = profile;
-      setError(null);
-      try {
-        const game = await getGame(
-          getAuthorizationHeader,
-          id,
-          project.getProjectUuid()
-        );
-        setUnavailableReason(null);
-        setGame(game);
-      } catch (err) {
-        console.log(err);
-        if (err.response) {
-          if (err.response.status === 403) {
-            setUnavailableReason('unauthorized');
-            return;
-          } else if (err.response.status === 404) {
-            setUnavailableReason('not-existing');
-            return;
-          }
+    const { id } = profile;
+    setError(null);
+    try {
+      const game = await getGame(
+        getAuthorizationHeader,
+        id,
+        project.getProjectUuid()
+      );
+      setUnavailableReason(null);
+      setGame(game);
+    } catch (err) {
+      console.log(err);
+      if (err.response) {
+        if (err.response.status === 403) {
+          setUnavailableReason('unauthorized');
+          return;
+        } else if (err.response.status === 404) {
+          setUnavailableReason('not-existing');
+          return;
         }
-
-        setError(err);
       }
-    },
-    [project, getAuthorizationHeader, profile]
-  );
 
-  const onRegisterGame = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
+      setError(err);
+    }
+  }, [project, getAuthorizationHeader, profile]);
 
-      const { id } = profile;
-      setRegistrationInProgress(true);
-      try {
-        await registerGame(getAuthorizationHeader, id, {
-          gameId: project.getProjectUuid(),
-          authorName: project.getAuthor() || 'Unspecified publisher',
-          gameName: project.getName() || 'Untitled game',
-        });
-        loadGame();
-        if (onGameRegistered) onGameRegistered();
-      } catch (error) {
-        console.error('Unable to register the game', error);
-        showErrorBox({
-          rawError: error,
-          errorId: 'register-game-error',
-          // TODO: i18n
-          message:
-            'Unable to register the game.' +
-            ' ' +
-            'Verify your internet connection or try again later.',
-        });
-      }
-      setRegistrationInProgress(false);
-    },
-    [getAuthorizationHeader, profile, project, loadGame, onGameRegistered]
-  );
+  const onRegisterGame = React.useCallback(async () => {
+    if (!profile || !project) return;
 
-  const _onAcceptGameStatsEmail = React.useCallback(
-    async () => {
-      if (!profile || !project) return;
+    const { id } = profile;
+    setRegistrationInProgress(true);
+    try {
+      await registerGame(getAuthorizationHeader, id, {
+        gameId: project.getProjectUuid(),
+        authorName: project.getAuthor() || 'Unspecified publisher',
+        gameName: project.getName() || 'Untitled game',
+      });
+      loadGame();
+      if (onGameRegistered) onGameRegistered();
+    } catch (error) {
+      console.error('Unable to register the game', error);
+      showErrorBox({
+        rawError: error,
+        errorId: 'register-game-error',
+        // TODO: i18n
+        message:
+          'Unable to register the game.' +
+          ' ' +
+          'Verify your internet connection or try again later.',
+      });
+    }
+    setRegistrationInProgress(false);
+  }, [getAuthorizationHeader, profile, project, loadGame, onGameRegistered]);
 
-      setAcceptGameStatsEmailInProgress(true);
-      try {
-        await onAcceptGameStatsEmail();
-      } catch (error) {
-        console.error('Unable to accept game stats email.', error);
-        showErrorBox({
-          rawError: error,
-          errorId: 'game-stats-email-error',
-          message:
-            'Unable to accept game stats email. ' +
-            ' ' +
-            'Verify your internet connection or try again later.',
-        });
-      }
-      setAcceptGameStatsEmailInProgress(false);
-    },
-    [profile, project, onAcceptGameStatsEmail]
-  );
+  const _onAcceptGameStatsEmail = React.useCallback(async () => {
+    if (!profile || !project) return;
 
-  React.useEffect(
-    () => {
-      if (!game) {
-        loadGame();
-      }
-    },
-    [loadGame, game]
-  );
+    setAcceptGameStatsEmailInProgress(true);
+    try {
+      await onAcceptGameStatsEmail();
+    } catch (error) {
+      console.error('Unable to accept game stats email.', error);
+      showErrorBox({
+        rawError: error,
+        errorId: 'game-stats-email-error',
+        message:
+          'Unable to accept game stats email. ' +
+          ' ' +
+          'Verify your internet connection or try again later.',
+      });
+    }
+    setAcceptGameStatsEmailInProgress(false);
+  }, [profile, project, onAcceptGameStatsEmail]);
+
+  React.useEffect(() => {
+    if (!game) {
+      loadGame();
+    }
+  }, [loadGame, game]);
 
   return (
     <GameRegistrationWidget
@@ -192,7 +174,7 @@ export type GameRegistrationWidgetProps = {|
   onCreateAccount: () => void,
   project?: ?gdProject,
   game: ?Game,
-  setGame: Game => void,
+  setGame: (Game) => void,
   loadGame: () => Promise<void>,
   onRegisterGame: () => Promise<void>,
   registrationInProgress: boolean,
@@ -204,7 +186,7 @@ export type GameRegistrationWidgetProps = {|
   detailsInitialTab: DetailsTab,
   setDetailsInitialTab: (string: DetailsTab) => void,
   detailsOpened: boolean,
-  setDetailsOpened: boolean => void,
+  setDetailsOpened: (boolean) => void,
   error: ?Error,
   hideLoader?: boolean,
 |};
@@ -329,7 +311,7 @@ export const GameRegistrationWidget = ({
             onClose={() => {
               setDetailsOpened(false);
             }}
-            onGameUpdated={updatedGame => {
+            onGameUpdated={(updatedGame) => {
               setGame(updatedGame);
             }}
             onGameDeleted={() => {

@@ -10,7 +10,8 @@ namespace gdjs {
          * Set the interval between auto-config updates.
          */
         export const setAutoUpdateInterval = (interval: integer) => {
-          firebase.remoteConfig().settings.minimumFetchIntervalMillis = interval;
+          firebase.remoteConfig().settings.minimumFetchIntervalMillis =
+            interval;
         };
 
         /**

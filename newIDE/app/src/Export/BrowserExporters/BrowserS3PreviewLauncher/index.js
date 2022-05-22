@@ -109,7 +109,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
     return this.getPreviewDebuggerServer()
       .startServer()
-      .catch(err => {
+      .catch((err) => {
         // Ignore any error when running the debugger server - the preview
         // can still work without it.
         console.error(
@@ -130,7 +130,8 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
         previewExportOptions.useWindowMessageDebuggerClient();
 
-        const debuggerIds = this.getPreviewDebuggerServer().getExistingDebuggerIds();
+        const debuggerIds =
+          this.getPreviewDebuggerServer().getExistingDebuggerIds();
         const lastDebuggerId = debuggerIds.length
           ? debuggerIds[debuggerIds.length - 1]
           : null;

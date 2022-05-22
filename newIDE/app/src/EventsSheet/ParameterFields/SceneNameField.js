@@ -17,7 +17,7 @@ export default class SceneNameField extends Component<
 
   render() {
     const layoutNames: Array<ExpressionAutocompletion> = this.props.project
-      ? enumerateLayouts(this.props.project).map(layout => ({
+      ? enumerateLayouts(this.props.project).map((layout) => ({
           kind: 'Text',
           completion: `"${layout.getName()}"`,
         }))
@@ -26,12 +26,12 @@ export default class SceneNameField extends Component<
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           layoutNames.filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

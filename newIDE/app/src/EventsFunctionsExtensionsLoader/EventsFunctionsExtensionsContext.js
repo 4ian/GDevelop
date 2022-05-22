@@ -36,8 +36,7 @@ const defaultState = {
   getIncludeFileHashs: () => ({}),
 };
 
-const EventsFunctionsExtensionsContext = React.createContext<EventsFunctionsExtensionsState>(
-  defaultState
-);
+const EventsFunctionsExtensionsContext =
+  React.createContext<EventsFunctionsExtensionsState>(defaultState);
 
 export default EventsFunctionsExtensionsContext;

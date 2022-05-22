@@ -149,7 +149,7 @@ export const getGameUrl = (game: ?Game, slug: ?GameSlug) => {
 export const getAclsFromUserIds = (
   ownersIds: Array<string>
 ): Array<{| userId: string, level: string |}> =>
-  ownersIds.map(ownerId => ({
+  ownersIds.map((ownerId) => ({
     userId: ownerId,
     level: 'owner',
   }));
@@ -157,14 +157,14 @@ export const getAclsFromUserIds = (
 export const listAllShowcasedGames = (): Promise<AllShowcasedGames> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/showcased-game`)
-    .then(response => response.data)
+    .then((response) => response.data)
     .then(({ gamesShowcaseUrl, filtersUrl }) => {
       if (!gamesShowcaseUrl || !filtersUrl) {
         throw new Error('Unexpected response from the resource endpoint.');
       }
       return Promise.all([
-        axios.get(gamesShowcaseUrl).then(response => response.data),
-        axios.get(filtersUrl).then(response => response.data),
+        axios.get(gamesShowcaseUrl).then((response) => response.data),
+        axios.get(filtersUrl).then((response) => response.data),
       ]).then(([showcasedGames, filters]) => ({
         showcasedGames,
         filters,
@@ -186,7 +186,7 @@ export const registerGame = (
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopGameApi.baseUrl}/game/${gameId}`,
         {
@@ -203,7 +203,7 @@ export const registerGame = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const updateGame = (
@@ -237,7 +237,7 @@ export const updateGame = (
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.patch(
         `${GDevelopGameApi.baseUrl}/game/${gameId}`,
         {
@@ -263,7 +263,7 @@ export const updateGame = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const setGameUserAcls = (
@@ -276,7 +276,7 @@ export const setGameUserAcls = (
   |}
 ): Promise<void> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopGameApi.baseUrl}/game/action/set-acls`,
         {
@@ -293,7 +293,7 @@ export const setGameUserAcls = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const setGameSlug = (
@@ -304,7 +304,7 @@ export const setGameSlug = (
   gameSlug: string
 ): Promise<void> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.post(
         `${GDevelopGameApi.baseUrl}/game/action/set-slug`,
         {
@@ -322,7 +322,7 @@ export const setGameSlug = (
         }
       )
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getGame = (
@@ -331,7 +331,7 @@ export const getGame = (
   gameId: string
 ): Promise<Game> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopGameApi.baseUrl}/game/${gameId}`, {
         params: {
           userId,
@@ -341,7 +341,7 @@ export const getGame = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const deleteGame = (
@@ -350,7 +350,7 @@ export const deleteGame = (
   gameId: string
 ): Promise<Game> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.delete(`${GDevelopGameApi.baseUrl}/game/${gameId}`, {
         params: {
           userId,
@@ -360,7 +360,7 @@ export const deleteGame = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getGames = (
@@ -368,7 +368,7 @@ export const getGames = (
   userId: string
 ): Promise<Array<Game>> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopGameApi.baseUrl}/game`, {
         params: {
           userId,
@@ -378,13 +378,13 @@ export const getGames = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getPublicGame = (gameId: string): Promise<PublicGame> => {
   return axios
     .get(`${GDevelopGameApi.baseUrl}/public-game/${gameId}`)
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getGameSlugs = (
@@ -393,7 +393,7 @@ export const getGameSlugs = (
   gameId: string
 ): Promise<Array<GameSlug>> => {
   return getAuthorizationHeader()
-    .then(authorizationHeader =>
+    .then((authorizationHeader) =>
       axios.get(`${GDevelopGameApi.baseUrl}/game-slug`, {
         params: {
           userId,
@@ -404,5 +404,5 @@ export const getGameSlugs = (
         },
       })
     )
-    .then(response => response.data);
+    .then((response) => response.data);
 };

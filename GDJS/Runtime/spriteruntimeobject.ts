@@ -454,9 +454,10 @@ namespace gdjs {
       ) {
         return;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       const oldFrame = this._currentFrame;
 
       //*Optimization*: Animation is finished, don't change the current frame
@@ -525,9 +526,10 @@ namespace gdjs {
         this._currentDirection <
           this._animations[this._currentAnimation].directions.length
       ) {
-        const direction = this._animations[this._currentAnimation].directions[
-          this._currentDirection
-        ];
+        const direction =
+          this._animations[this._currentAnimation].directions[
+            this._currentDirection
+          ];
         if (this._currentFrame < direction.frames.length) {
           this._animationFrame = direction.frames[this._currentFrame];
           if (this._animationFrame !== null) {
@@ -586,9 +588,8 @@ namespace gdjs {
             this.hitBoxes[i].vertices[j]
           );
         }
-        this.hitBoxes[i].vertices.length = this._animationFrame.customHitBoxes[
-          i
-        ].vertices.length;
+        this.hitBoxes[i].vertices.length =
+          this._animationFrame.customHitBoxes[i].vertices.length;
       }
       this.hitBoxes.length = this._animationFrame.customHitBoxes.length;
     }
@@ -715,9 +716,10 @@ namespace gdjs {
       ) {
         return;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       if (
         newFrame >= 0 &&
         newFrame < direction.frames.length &&
@@ -748,9 +750,10 @@ namespace gdjs {
       ) {
         return true;
       }
-      const direction = this._animations[this._currentAnimation].directions[
-        this._currentDirection
-      ];
+      const direction =
+        this._animations[this._currentAnimation].directions[
+          this._currentDirection
+        ];
       if (direction.loop) {
         return false;
       }

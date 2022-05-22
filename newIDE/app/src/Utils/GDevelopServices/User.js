@@ -28,13 +28,13 @@ export const searchUserPublicProfilesByUsername = (
         username: searchString,
       },
     })
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getUserBadges = (id: string): Promise<Array<Badge>> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user/${id}/badge`)
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getUserPublicProfilesByIds = (
@@ -46,7 +46,7 @@ export const getUserPublicProfilesByIds = (
         id: ids.join(','),
       },
     })
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const getUserPublicProfile = (
@@ -54,5 +54,5 @@ export const getUserPublicProfile = (
 ): Promise<UserPublicProfile> => {
   return axios
     .get(`${GDevelopUserApi.baseUrl}/user-public-profile/${id}`)
-    .then(response => response.data);
+    .then((response) => response.data);
 };

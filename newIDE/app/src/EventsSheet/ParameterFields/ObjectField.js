@@ -78,7 +78,7 @@ export default class ObjectField extends React.Component<
           !this.props
             .value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
       />
     );
   }

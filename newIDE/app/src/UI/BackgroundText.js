@@ -12,7 +12,7 @@ type Props = {|
 
 const BackgroundText = (props: Props) => (
   <ThemeConsumer>
-    {muiTheme => (
+    {(muiTheme) => (
       <Typography
         variant="body2"
         align="center"

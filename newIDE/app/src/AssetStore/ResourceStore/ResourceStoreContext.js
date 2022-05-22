@@ -22,7 +22,7 @@ type ResourceStoreState = {|
   fetchResourcesAndFilters: () => void,
   error: ?Error,
   searchText: string,
-  setSearchText: string => void,
+  setSearchText: (string) => void,
   filtersState: FiltersState,
 |};
 
@@ -67,46 +67,40 @@ export const ResourceStoreStateProvider = ({
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
-  const fetchResourcesAndFilters = React.useCallback(
-    () => {
-      // Don't attempt to load again resources and filters if they
-      // were loaded already.
-      if (resourcesByUrl || isLoading.current) return;
+  const fetchResourcesAndFilters = React.useCallback(() => {
+    // Don't attempt to load again resources and filters if they
+    // were loaded already.
+    if (resourcesByUrl || isLoading.current) return;
 
-      (async () => {
-        setError(null);
-        isLoading.current = true;
+    (async () => {
+      setError(null);
+      isLoading.current = true;
 
-        try {
-          const { resources, filters } = await listAllResources();
-          const authors = await listAllAuthors();
-          const licenses = await listAllLicenses();
+      try {
+        const { resources, filters } = await listAllResources();
+        const authors = await listAllAuthors();
+        const licenses = await listAllLicenses();
 
-          const resourcesByUrl = {};
-          resources.forEach(resource => {
-            resourcesByUrl[resource.url] = resource;
-          });
+        const resourcesByUrl = {};
+        resources.forEach((resource) => {
+          resourcesByUrl[resource.url] = resource;
+        });
 
-          console.info(
-            `Loaded ${resources.length} resources from the asset store.`
-          );
-          setResourcesByUrl(resourcesByUrl);
-          setFilters(filters);
-          setAuthors(authors);
-          setLicenses(licenses);
-        } catch (error) {
-          console.error(
-            `Unable to load the assets from the asset store:`,
-            error
-          );
-          setError(error);
-        }
+        console.info(
+          `Loaded ${resources.length} resources from the asset store.`
+        );
+        setResourcesByUrl(resourcesByUrl);
+        setFilters(filters);
+        setAuthors(authors);
+        setLicenses(licenses);
+      } catch (error) {
+        console.error(`Unable to load the assets from the asset store:`, error);
+        setError(error);
+      }
 
-        isLoading.current = false;
-      })();
-    },
-    [resourcesByUrl, isLoading]
-  );
+      isLoading.current = false;
+    })();
+  }, [resourcesByUrl, isLoading]);
 
   const { chosenCategory, chosenFilters } = filtersState;
   const searchResults: ?Array<Resource> = useSearchItem(

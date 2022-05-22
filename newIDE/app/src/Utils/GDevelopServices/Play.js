@@ -139,7 +139,7 @@ export const listGameActiveLeaderboards = async (
 export const extractNextPageUriFromLinkHeader = (
   linkHeader: string
 ): ?string => {
-  const links = linkHeader.split(',').map(link => link.trim());
+  const links = linkHeader.split(',').map((link) => link.trim());
   const mapRelationToUri = links.reduce((acc, link) => {
     const relationRegexMatch = link.match(/;\srel="(\w*)"/);
     const uriMatch = link.match(/^<(.*)>/);
@@ -239,9 +239,7 @@ export const resetLeaderboard = async (
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.put(
-    `${
-      GDevelopPlayApi.baseUrl
-    }/game/${gameId}/leaderboard/${leaderboardId}/reset`,
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/${leaderboardId}/reset`,
     {},
     {
       headers: { Authorization: authorizationHeader },
@@ -283,9 +281,7 @@ export const deleteLeaderboardEntry = async (
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.delete(
-    `${
-      GDevelopPlayApi.baseUrl
-    }/game/${gameId}/leaderboard/${leaderboardId}/entry/${entryId}`,
+    `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/${leaderboardId}/entry/${entryId}`,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },

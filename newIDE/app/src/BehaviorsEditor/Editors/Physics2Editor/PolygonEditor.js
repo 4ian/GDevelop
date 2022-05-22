@@ -81,17 +81,12 @@ export default class PolygonEditor extends React.Component<Props> {
   }
 
   render() {
-    const {
-      vertices,
-      onChangeVertexX,
-      onChangeVertexY,
-      onAdd,
-      onRemove,
-    } = this.props;
+    const { vertices, onChangeVertexX, onChangeVertexY, onAdd, onRemove } =
+      this.props;
 
     return (
       <ThemeConsumer>
-        {muiTheme => (
+        {(muiTheme) => (
           <Table>
             <TableHeader>
               <TableRow>
@@ -118,7 +113,7 @@ export default class PolygonEditor extends React.Component<Props> {
                         margin="none"
                         fullWidth
                         value={value.x.toString(10)}
-                        onChange={newValue =>
+                        onChange={(newValue) =>
                           onChangeVertexX(parseFloat(newValue) || 0, index)
                         }
                         type="number"
@@ -129,7 +124,7 @@ export default class PolygonEditor extends React.Component<Props> {
                         margin="none"
                         fullWidth
                         value={value.y.toString(10)}
-                        onChange={newValue =>
+                        onChange={(newValue) =>
                           onChangeVertexY(parseFloat(newValue) || 0, index)
                         }
                         type="number"

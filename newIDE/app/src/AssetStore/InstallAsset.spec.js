@@ -129,10 +129,7 @@ describe('InstallAsset', () => {
 
       // Verify there was not extra resource added.
       expect(
-        project
-          .getResourcesManager()
-          .getAllResourceNames()
-          .toJSArray()
+        project.getResourcesManager().getAllResourceNames().toJSArray()
       ).toEqual([
         ...originalResourceNames,
         'player-ship1.png',
@@ -171,10 +168,7 @@ describe('InstallAsset', () => {
 
       // Verify there was not extra resource added.
       expect(
-        project
-          .getResourcesManager()
-          .getAllResourceNames()
-          .toJSArray()
+        project.getResourcesManager().getAllResourceNames().toJSArray()
       ).toEqual([
         ...originalResourceNames,
         'renamed-player-ship1.png',
@@ -210,10 +204,7 @@ describe('InstallAsset', () => {
 
       // Verify there was not extra resource added
       expect(
-        project
-          .getResourcesManager()
-          .getAllResourceNames()
-          .toJSArray()
+        project.getResourcesManager().getAllResourceNames().toJSArray()
       ).toEqual([
         ...originalResourceNames,
         'player-ship1.png',
@@ -221,10 +212,7 @@ describe('InstallAsset', () => {
         'player-ship2.png',
       ]);
       expect(
-        project
-          .getResourcesManager()
-          .getResource('player-ship1.png2')
-          .getFile()
+        project.getResourcesManager().getResource('player-ship1.png2').getFile()
       ).toBe('https://example.com/player-ship1.png');
 
       // Verify the resource names used by the object
@@ -259,10 +247,7 @@ describe('InstallAsset', () => {
 
       expect(layout.hasObjectNamed('PlayerSpaceship')).toBe(true);
       expect(
-        layout
-          .getObject('PlayerSpaceship')
-          .getAllBehaviorNames()
-          .toJSArray()
+        layout.getObject('PlayerSpaceship').getAllBehaviorNames().toJSArray()
       ).toEqual(['MyBehavior']);
       expect(
         layout
@@ -785,12 +770,9 @@ describe('InstallAsset', () => {
       // Check that the object was created, with the proper behavior:
       expect(layout.getObjectsCount()).toBe(1);
       expect(layout.getObjectAt(0).getName()).toBe('PlayerSpaceship');
-      expect(
-        layout
-          .getObjectAt(0)
-          .getAllBehaviorNames()
-          .toJSArray()
-      ).toEqual(['MyBehavior']);
+      expect(layout.getObjectAt(0).getAllBehaviorNames().toJSArray()).toEqual([
+        'MyBehavior',
+      ]);
     });
   });
 });

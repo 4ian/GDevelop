@@ -195,14 +195,14 @@ export default class AuthenticatedUserProvider extends React.Component<
     // the user profile itself, to not block in case one of these calls
     // fails.
     getUserUsages(authentication.getAuthorizationHeader, firebaseUser.uid).then(
-      usages =>
+      (usages) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             usages,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading user usages:', error);
       }
     );
@@ -210,26 +210,26 @@ export default class AuthenticatedUserProvider extends React.Component<
       authentication.getAuthorizationHeader,
       firebaseUser.uid
     ).then(
-      subscription =>
+      (subscription) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             subscription,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading user subscriptions:', error);
       }
     );
     getUserLimits(authentication.getAuthorizationHeader, firebaseUser.uid).then(
-      limits =>
+      (limits) =>
         this.setState(({ authenticatedUser }) => ({
           authenticatedUser: {
             ...authenticatedUser,
             limits,
           },
         })),
-      error => {
+      (error) => {
         console.error('Error while loading user limits:', error);
       }
     );
@@ -500,7 +500,7 @@ export default class AuthenticatedUserProvider extends React.Component<
                 <EditProfileDialog
                   profile={this.state.authenticatedUser.profile}
                   onClose={() => this.openEditProfileDialog(false)}
-                  onEdit={form => this._doEdit(form, preferences)}
+                  onEdit={(form) => this._doEdit(form, preferences)}
                   editInProgress={this.state.editInProgress}
                   error={this.state.authError}
                 />
@@ -519,7 +519,7 @@ export default class AuthenticatedUserProvider extends React.Component<
               <CreateAccountDialog
                 onClose={() => this.openCreateAccountDialog(false)}
                 onGoToLogin={() => this.openLoginDialog(true)}
-                onCreateAccount={form =>
+                onCreateAccount={(form) =>
                   this._doCreateAccount(form, preferences)
                 }
                 createAccountInProgress={this.state.createAccountInProgress}

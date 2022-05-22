@@ -17,7 +17,7 @@ type Props = {|
   resourcesLoader: Object,
   project: Object,
   timeBetweenFrames: number,
-  onChangeTimeBetweenFrames: number => void,
+  onChangeTimeBetweenFrames: (number) => void,
 |};
 
 type State = {|

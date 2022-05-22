@@ -125,27 +125,24 @@ const ImagePreview = (props: Props) => {
   });
   const isResizeObserverReady = React.useRef<boolean>(false);
 
-  React.useEffect(
-    () => {
-      setState(state => ({
-        ...state,
-        ...loadStateFrom({
-          resourceName: props.resourceName,
-          project: props.project,
-          resourcesLoader: props.resourcesLoader,
-        }),
-      }));
-    },
-    [
-      props.resourceName,
-      props.project,
-      props.resourcesLoader,
-      props.resourcePath,
-    ]
-  );
+  React.useEffect(() => {
+    setState((state) => ({
+      ...state,
+      ...loadStateFrom({
+        resourceName: props.resourceName,
+        project: props.project,
+        resourcesLoader: props.resourcesLoader,
+      }),
+    }));
+  }, [
+    props.resourceName,
+    props.project,
+    props.resourcesLoader,
+    props.resourcePath,
+  ]);
 
   const handleImageError = () => {
-    setState(state => ({ ...state, errored: true }));
+    setState((state) => ({ ...state, errored: true }));
   };
 
   const adaptZoomToImage = (
@@ -163,7 +160,7 @@ const ImagePreview = (props: Props) => {
       ];
       zoomFactor = getBoundedZoomFactor(Math.min(...idealZoomFactors));
     }
-    setState(state => ({
+    setState((state) => ({
       ...state,
       imageZoomFactor: zoomFactor,
     }));
@@ -178,7 +175,7 @@ const ImagePreview = (props: Props) => {
     const imageHeight = imgElement
       ? imgElement.naturalHeight || imgElement.clientHeight
       : 0;
-    setState(state => ({ ...state, imageWidth, imageHeight }));
+    setState((state) => ({ ...state, imageWidth, imageHeight }));
     if (props.onSize) props.onSize(imageWidth, imageHeight);
   };
 
@@ -187,7 +184,7 @@ const ImagePreview = (props: Props) => {
   };
 
   const zoomTo = (imageZoomFactor: number) => {
-    setState(state => ({
+    setState((state) => ({
       ...state,
       imageZoomFactor: getBoundedZoomFactor(imageZoomFactor),
     }));
@@ -276,7 +273,7 @@ const ImagePreview = (props: Props) => {
                   max={Math.log10(MAX_ZOOM_FACTOR)}
                   step={0.05}
                   value={Math.log10(state.imageZoomFactor)}
-                  onChange={value => {
+                  onChange={(value) => {
                     console.log(value);
                     zoomTo(Math.pow(10, value));
                   }}
@@ -311,7 +308,7 @@ const ImagePreview = (props: Props) => {
                   border: `1px solid ${previewBorderColor}`,
                 }}
                 ref={measureRef}
-                onWheel={event => {
+                onWheel={(event) => {
                   const { deltaY } = event;
                   if (shouldZoom(event)) {
                     zoomBy(-deltaY / 500);

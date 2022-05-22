@@ -52,7 +52,7 @@ export const openPiskel = ({
         : null;
 
       const resourcesManager = project.getResourcesManager();
-      outputResources.forEach(resource => {
+      outputResources.forEach((resource) => {
         resource.name = path.relative(projectPath, resource.path); // Still needed for onChangesSaved()
         createOrUpdateResource(project, new gd.ImageResource(), resource.name);
       });

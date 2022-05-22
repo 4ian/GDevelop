@@ -12,7 +12,7 @@ type Props = {|
  */
 const ThemeConsumer = (props: Props) => (
   <GDevelopThemeContext.Consumer>
-    {gdevelopTheme => props.children(gdevelopTheme)}
+    {(gdevelopTheme) => props.children(gdevelopTheme)}
   </GDevelopThemeContext.Consumer>
 );
 

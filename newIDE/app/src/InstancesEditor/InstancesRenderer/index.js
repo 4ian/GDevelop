@@ -9,18 +9,18 @@ export default class InstancesRenderer {
   instances: gdInitialInstancesContainer;
   layout: gdLayout;
   viewPosition: ViewPosition;
-  onInstanceClicked: gdInitialInstance => void;
+  onInstanceClicked: (gdInitialInstance) => void;
   onInstanceRightClicked: ({|
     offsetX: number,
     offsetY: number,
     x: number,
     y: number,
   |}) => void;
-  onInstanceDoubleClicked: gdInitialInstance => void;
-  onOverInstance: gdInitialInstance => void;
-  onOutInstance: gdInitialInstance => void;
+  onInstanceDoubleClicked: (gdInitialInstance) => void;
+  onOverInstance: (gdInitialInstance) => void;
+  onOutInstance: (gdInitialInstance) => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
-  onMoveInstanceEnd: void => void;
+  onMoveInstanceEnd: (void) => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
 
   layersRenderers: { [string]: LayerRenderer };
@@ -48,18 +48,18 @@ export default class InstancesRenderer {
     instances: gdInitialInstancesContainer,
     layout: gdLayout,
     viewPosition: ViewPosition,
-    onInstanceClicked: gdInitialInstance => void,
+    onInstanceClicked: (gdInitialInstance) => void,
     onInstanceRightClicked: ({|
       offsetX: number,
       offsetY: number,
       x: number,
       y: number,
     |}) => void,
-    onInstanceDoubleClicked: gdInitialInstance => void,
-    onOverInstance: gdInitialInstance => void,
-    onOutInstance: gdInitialInstance => void,
+    onInstanceDoubleClicked: (gdInitialInstance) => void,
+    onOverInstance: (gdInitialInstance) => void,
+    onOutInstance: (gdInitialInstance) => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
-    onMoveInstanceEnd: void => void,
+    onMoveInstanceEnd: (void) => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
   }) {
     this.project = project;
@@ -109,7 +109,7 @@ export default class InstancesRenderer {
         return layerRenderer.getUnrotatedInstanceAABB(instance, bounds);
       },
       //TODO Replace by getInstanceAABB (make TransformRect uses Rectangle)
-      getInstanceRect: instance => {
+      getInstanceRect: (instance) => {
         const aabb = this.instanceMeasurer.getInstanceAABB(
           instance,
           this.temporaryRectangle

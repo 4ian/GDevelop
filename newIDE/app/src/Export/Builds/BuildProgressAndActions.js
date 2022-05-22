@@ -71,9 +71,9 @@ const downloadButtons = [
 type Props = {|
   build: Build,
   game?: ?Game,
-  onGameUpdated?: Game => void,
+  onGameUpdated?: (Game) => void,
   gameUpdating?: boolean,
-  setGameUpdating?: boolean => void,
+  setGameUpdating?: (boolean) => void,
 |};
 
 /**
@@ -230,8 +230,8 @@ const BuildProgressAndActions = ({
               )}
               <Spacer />
               {downloadButtons
-                .filter(button => !!build[button.key])
-                .map(button => (
+                .filter((button) => !!build[button.key])
+                .map((button) => (
                   <React.Fragment key={button.key}>
                     <RaisedButton
                       label={i18n._(button.displayName)}

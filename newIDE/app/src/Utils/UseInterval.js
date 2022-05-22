@@ -11,17 +11,14 @@ export const useInterval = (callback: () => void, delay: number | null) => {
     savedCallback.current = callback;
   });
 
-  useEffect(
-    () => {
-      function tick() {
-        if (savedCallback.current) savedCallback.current();
-      }
+  useEffect(() => {
+    function tick() {
+      if (savedCallback.current) savedCallback.current();
+    }
 
-      if (delay !== null) {
-        const id = setInterval(tick, delay);
-        return () => clearInterval(id);
-      }
-    },
-    [delay]
-  );
+    if (delay !== null) {
+      const id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 };

@@ -7,7 +7,7 @@ var fs = optionalRequire('fs-extra');
 const findEmptyPath = (basePath: string) => {
   if (!path) return basePath;
 
-  const folderName = generateName('My project', name => {
+  const folderName = generateName('My project', (name) => {
     try {
       fs.accessSync(path.join(basePath, name));
     } catch (ex) {

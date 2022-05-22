@@ -29,7 +29,7 @@ type Props = {|
   zoomIn: () => void,
   zoomOut: () => void,
   centerView: () => void,
-  setZoomFactor: number => void,
+  setZoomFactor: (number) => void,
   onOpenSettings?: ?() => void,
 |};
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-export default React.memo(props => (
+export default React.memo((props) => (
   <SvgIcon {...props} viewBox="0 0 528.9 511.62">
     <g id="Calque_2" data-name="Calque 2">
       <g id="Calque_4" data-name="Calque 4">

@@ -44,7 +44,7 @@ type Props = {|
 export type SelectFieldInterface = {| focus: () => void |};
 
 const INVALID_VALUE = '';
-const stopPropagation = event => event.stopPropagation();
+const stopPropagation = (event) => event.stopPropagation();
 
 /**
  * A select field based on Material-UI select field.
@@ -66,7 +66,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
 
     // Dig into children props to see if the current value is valid or not.
     let hasValidValue = true;
-    const childrenValues = React.Children.map(props.children, child => {
+    const childrenValues = React.Children.map(props.children, (child) => {
       if (child === null || !child.props) return null;
 
       return child.props.value;
@@ -77,7 +77,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
       );
     } else {
       hasValidValue =
-        childrenValues.filter(childValue => childValue === props.value)
+        childrenValues.filter((childValue) => childValue === props.value)
           .length !== 0;
     }
     const displayedValue = hasValidValue ? props.value : INVALID_VALUE;
@@ -100,7 +100,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
             onChange={
               onChange
-                ? event => {
+                ? (event) => {
                     onChange(event, -1, event.target.value);
                   }
                 : undefined

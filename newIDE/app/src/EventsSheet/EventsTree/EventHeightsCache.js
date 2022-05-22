@@ -1,7 +1,7 @@
 // @flow
 
 type WatchedComponent = {
-  +onHeightsChanged: Function => void,
+  +onHeightsChanged: (Function) => void,
 };
 
 /**

@@ -22,7 +22,7 @@ type Props = {|
   open: boolean,
   isOpening?: boolean,
   onClose: () => void,
-  onCreate: ProjectCreationSettings => void | Promise<void>,
+  onCreate: (ProjectCreationSettings) => void | Promise<void>,
 |};
 
 const ProjectPreCreationDialog = ({
@@ -31,9 +31,8 @@ const ProjectPreCreationDialog = ({
   onClose,
   onCreate,
 }: Props): React.Node => {
-  const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
-    null
-  );
+  const [projectNameError, setProjectNameError] =
+    React.useState<?React.Node>(null);
   const [projectName, setProjectName] = React.useState<string>(() =>
     generateName()
   );
@@ -41,21 +40,16 @@ const ProjectPreCreationDialog = ({
     app ? findEmptyPathInDefaultFolder(app) : ''
   );
 
-  const onValidate = React.useCallback(
-    () => {
-      if (isOpening) return;
+  const onValidate = React.useCallback(() => {
+    if (isOpening) return;
 
-      setProjectNameError(null);
-      if (!projectName) {
-        setProjectNameError(
-          <Trans>Please enter a name for your project.</Trans>
-        );
-        return;
-      }
-      onCreate({ projectName, outputPath: app ? outputPath : undefined });
-    },
-    [onCreate, projectName, outputPath, isOpening]
-  );
+    setProjectNameError(null);
+    if (!projectName) {
+      setProjectNameError(<Trans>Please enter a name for your project.</Trans>);
+      return;
+    }
+    onCreate({ projectName, outputPath: app ? outputPath : undefined });
+  }, [onCreate, projectName, outputPath, isOpening]);
 
   const _onChangeProjectName = React.useCallback(
     (event, text) => {

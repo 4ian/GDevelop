@@ -12,8 +12,9 @@ const makeMarkdownCustomRenderers = (
   allowParagraphs: boolean
 ) => ({
   // Ensure link are opened in a new page
-  root: props => (isStandaloneText ? <div {...props} /> : <span {...props} />),
-  link: props =>
+  root: (props) =>
+    isStandaloneText ? <div {...props} /> : <span {...props} />,
+  link: (props) =>
     props.href ? (
       <a href={props.href} target="_blank" rel="noopener noreferrer">
         {props.children}
@@ -21,7 +22,7 @@ const makeMarkdownCustomRenderers = (
     ) : (
       props.children
     ),
-  linkReference: props =>
+  linkReference: (props) =>
     props.href ? (
       <a href={props.href} target="_blank" rel="noopener noreferrer">
         {props.children}
@@ -30,7 +31,7 @@ const makeMarkdownCustomRenderers = (
       props.children
     ),
   // Add paragraphs only if we explictly opt in.
-  paragraph: props =>
+  paragraph: (props) =>
     isStandaloneText || allowParagraphs ? (
       <p>{props.children}</p>
     ) : (

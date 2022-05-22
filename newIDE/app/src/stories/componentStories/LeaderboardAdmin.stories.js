@@ -49,10 +49,8 @@ const leaderboardsByIds = mockedLeaderboards.reduce((acc, leaderboard) => {
 }, {});
 
 const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
-  const [
-    currentLeaderboard,
-    setCurrentLeaderboard,
-  ] = React.useState<Leaderboard>(mockedLeaderboards[3]);
+  const [currentLeaderboard, setCurrentLeaderboard] =
+    React.useState<Leaderboard>(mockedLeaderboards[3]);
   const [sort, setSort] = React.useState<LeaderboardSortOption>('ASC');
   return (
     <LeaderboardContext.Provider
@@ -72,7 +70,7 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
           throw new Error('createLeaderboard');
         },
         listLeaderboards: action('listLeaderboards'),
-        selectLeaderboard: leaderboardId => {
+        selectLeaderboard: (leaderboardId) => {
           setCurrentLeaderboard(leaderboardsByIds[leaderboardId]);
         },
         updateLeaderboard: () => {

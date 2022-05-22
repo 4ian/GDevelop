@@ -146,7 +146,7 @@ export const localOnlineWebExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     outputFile: CompressionOutput
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadLocalFile(
         outputFile,
         uploadOptions,

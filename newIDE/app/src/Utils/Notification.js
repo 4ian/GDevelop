@@ -9,7 +9,7 @@ export const hasPendingNotifications = (
 
   const { badges } = authenticatedUser;
   if (badges && badges.length > 0) {
-    return badges.some(badge => !badge.seen);
+    return badges.some((badge) => !badge.seen);
   }
 
   return false;

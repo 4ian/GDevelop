@@ -26,8 +26,8 @@ export const loadScript = (source: string): Promise<void> => {
     scriptElement.type = 'text/javascript';
     scriptElement.src = source;
     scriptElement.onload = () => resolve();
-    scriptElement.onerror = error => reject(error);
-    scriptElement.onabort = error => reject(error);
+    scriptElement.onerror = (error) => reject(error);
+    scriptElement.onabort = (error) => reject(error);
 
     body.appendChild(scriptElement);
   });

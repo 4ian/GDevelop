@@ -106,7 +106,7 @@ export default class VariableField extends Component<Props, State> {
         ])
       : definedVariableNames;
     this.setState({
-      autocompletionVariableNames: autocompletionVariableNames.map(name => ({
+      autocompletionVariableNames: autocompletionVariableNames.map((name) => ({
         text: name,
         value: name,
       })),
@@ -174,10 +174,10 @@ export default class VariableField extends Component<Props, State> {
             onApply={onApply}
             dataSource={this.state.autocompletionVariableNames}
             openOnFocus={!isInline}
-            ref={field => (this._field = field)}
+            ref={(field) => (this._field = field)}
           />
         )}
-        renderButton={style =>
+        renderButton={(style) =>
           onOpenDialog && !isInline ? (
             <RaisedButton
               icon={<OpenInNew />}

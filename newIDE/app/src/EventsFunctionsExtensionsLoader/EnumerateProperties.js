@@ -21,7 +21,7 @@ type EnumeratedProperty = {|
 export const enumerateNamedPropertyDescriptorsList = (
   namedProperties: gdNamedPropertyDescriptorsList
 ): Array<EnumeratedProperty> => {
-  return mapVector(namedProperties, namedProperty => {
+  return mapVector(namedProperties, (namedProperty) => {
     return {
       name: namedProperty.getName(),
       type: namedProperty.getType(),
@@ -47,7 +47,7 @@ export const toGdPropertyDescriptor = (
     .setValue(enumeratedProperty.value)
     .setHidden(enumeratedProperty.isHidden);
 
-  enumeratedProperty.extraInfo.forEach(extraInfo => {
+  enumeratedProperty.extraInfo.forEach((extraInfo) => {
     propertyDescriptor.addExtraInfo(extraInfo);
   });
 

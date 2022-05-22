@@ -17,18 +17,12 @@ type Props = {|
  * An icon that can be used in a ToolbarGroup of a Toolbar.
  */
 const ToolbarIcon = React.forwardRef<Props, IconButton>((props: Props, ref) => {
-  const {
-    src,
-    tooltip,
-    acceleratorString,
-    disabled,
-    onClick,
-    onContextMenu,
-  } = props;
+  const { src, tooltip, acceleratorString, disabled, onClick, onContextMenu } =
+    props;
 
   return (
     <ThemeConsumer>
-      {muiTheme => (
+      {(muiTheme) => (
         <IconButton
           onClick={onClick}
           onContextMenu={onContextMenu}

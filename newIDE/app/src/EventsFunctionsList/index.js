@@ -77,7 +77,7 @@ type Props = {|
     cb: (boolean) => void
   ) => void,
   onAddEventsFunction: (
-    (parameters: ?EventsFunctionCreationParameters) => void
+    ((parameters: ?EventsFunctionCreationParameters) => void)
   ) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
   renderHeader?: () => React.Node,
@@ -88,12 +88,12 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   static defaultProps = {
     onDeleteEventsFunction: (
       eventsFunction: gdEventsFunction,
-      cb: boolean => void
+      cb: (boolean) => void
     ) => cb(true),
     onRenameEventsFunction: (
       eventsFunction: gdEventsFunction,
       newName: string,
-      cb: boolean => void
+      cb: (boolean) => void
     ) => cb(true),
   };
 
@@ -121,7 +121,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       if (!answer) return;
     }
 
-    this.props.onDeleteEventsFunction(eventsFunction, doRemove => {
+    this.props.onDeleteEventsFunction(eventsFunction, (doRemove) => {
       if (!doRemove) return;
 
       eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
@@ -195,7 +195,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       return;
     }
 
-    this.props.onRenameEventsFunction(eventsFunction, newName, doRename => {
+    this.props.onRenameEventsFunction(eventsFunction, newName, (doRename) => {
       if (!doRename) return;
       eventsFunction.setName(newName);
       this._onEventsFunctionModified();
@@ -248,7 +248,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     const { project, eventsFunctionsContainer } = this.props;
 
-    const newName = newNameGenerator(name, name =>
+    const newName = newNameGenerator(name, (name) =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
 
@@ -275,48 +275,46 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.forceUpdate();
   }
 
-  _renderEventsFunctionMenuTemplate = (i18n: I18nType) => (
-    eventsFunction: gdEventsFunction,
-    index: number
-  ) => {
-    return [
-      {
-        label: i18n._(t`Rename`),
-        click: () => this._editName(eventsFunction),
-        enabled: this.props.canRename(eventsFunction),
-      },
-      {
-        label: eventsFunction.isPrivate()
-          ? i18n._(t`Make public`)
-          : i18n._(t`Make private`),
-        enabled: this.props.canRename(eventsFunction),
-        click: () => this._togglePrivate(eventsFunction),
-      },
-      {
-        label: i18n._(t`Delete`),
-        click: () =>
-          this._deleteEventsFunction(eventsFunction, {
-            askForConfirmation: true,
-          }),
-      },
-      {
-        type: 'separator',
-      },
-      {
-        label: i18n._(t`Copy`),
-        click: () => this._copyEventsFunction(eventsFunction),
-      },
-      {
-        label: i18n._(t`Cut`),
-        click: () => this._cutEventsFunction(eventsFunction),
-      },
-      {
-        label: i18n._(t`Paste`),
-        enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
-        click: () => this._pasteEventsFunction(index),
-      },
-    ];
-  };
+  _renderEventsFunctionMenuTemplate =
+    (i18n: I18nType) => (eventsFunction: gdEventsFunction, index: number) => {
+      return [
+        {
+          label: i18n._(t`Rename`),
+          click: () => this._editName(eventsFunction),
+          enabled: this.props.canRename(eventsFunction),
+        },
+        {
+          label: eventsFunction.isPrivate()
+            ? i18n._(t`Make public`)
+            : i18n._(t`Make private`),
+          enabled: this.props.canRename(eventsFunction),
+          click: () => this._togglePrivate(eventsFunction),
+        },
+        {
+          label: i18n._(t`Delete`),
+          click: () =>
+            this._deleteEventsFunction(eventsFunction, {
+              askForConfirmation: true,
+            }),
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: i18n._(t`Copy`),
+          click: () => this._copyEventsFunction(eventsFunction),
+        },
+        {
+          label: i18n._(t`Cut`),
+          click: () => this._cutEventsFunction(eventsFunction),
+        },
+        {
+          label: i18n._(t`Paste`),
+          enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
+          click: () => this._pasteEventsFunction(index),
+        },
+      ];
+    };
 
   _addNewEventsFunction = () => {
     const { eventsFunctionsContainer } = this.props;
@@ -329,7 +327,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
         const eventsFunctionName =
           parameters.name ||
-          newNameGenerator('Function', name =>
+          newNameGenerator('Function', (name) =>
             eventsFunctionsContainer.hasEventsFunctionNamed(name)
           );
 
@@ -374,7 +372,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                 {({ i18n }) => (
                   <SortableVirtualizedItemList
                     key={listKey}
-                    ref={sortableList => (this.sortableList = sortableList)}
+                    ref={(sortableList) => (this.sortableList = sortableList)}
                     fullList={list}
                     width={width}
                     height={height}
@@ -403,7 +401,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         <SearchBar
           value={searchText}
           onRequestSearch={() => {}}
-          onChange={text =>
+          onChange={(text) =>
             this.setState({
               searchText: text,
             })

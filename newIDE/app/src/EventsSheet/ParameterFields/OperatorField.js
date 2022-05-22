@@ -50,10 +50,10 @@ export default class OperatorField extends Component<ParameterFieldProps> {
         }
         value={this.props.value}
         onChange={(e, i, value: string) => this.props.onChange(value)}
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         hintText={t`Choose an operator`}
       >
-        {operators.map(operator => (
+        {operators.map((operator) => (
           <SelectOption
             key={operator}
             value={operator}

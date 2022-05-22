@@ -6,7 +6,7 @@ namespace gdjs {
     },
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
-      const rgbSplitFilter = (filter as unknown) as PIXI.filters.RGBSplitFilter;
+      const rgbSplitFilter = filter as unknown as PIXI.filters.RGBSplitFilter;
       if (parameterName === 'redX') {
         rgbSplitFilter.red.x = value;
       } else if (parameterName === 'redY') {

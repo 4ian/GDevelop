@@ -77,7 +77,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     } = this.props;
     const resource = resources[0];
     const sources = resourceSources.filter(
-      source => source.kind === resource.getKind()
+      (source) => source.kind === resource.getKind()
     );
     if (!sources.length) return;
     onChooseResource({
@@ -86,13 +86,13 @@ export default class ResourcePropertiesEditor extends React.Component<
       initialSourceName: sources[0].name,
       multiSelection: true,
       resourceKind: resource.getKind(),
-    }).then(resources => {
+    }).then((resources) => {
       if (!resources.length) return; // No path was chosen by the user.
       resource.setFile(resources[0].getFile());
 
       // Important, we are responsible for deleting the resources that were given to us.
       // Otherwise we have a memory leak.
-      resources.forEach(resource => resource.delete());
+      resources.forEach((resource) => resource.delete());
 
       onResourcePathUpdated();
       this.forceUpdate();
@@ -105,14 +105,14 @@ export default class ResourcePropertiesEditor extends React.Component<
     const properties = resources[0].getProperties();
     const resourceSchema = propertiesMapToSchema(
       properties,
-      resource => resource.getProperties(),
+      (resource) => resource.getProperties(),
       (resource, name, value) => resource.updateProperty(name, value)
     );
 
     return (
       <div
         style={styles.propertiesContainer}
-        key={resources.map(resource => '' + resource.ptr).join(';')}
+        key={resources.map((resource) => '' + resource.ptr).join(';')}
       >
         <PropertiesEditor
           schema={this.schema.concat(resourceSchema)}

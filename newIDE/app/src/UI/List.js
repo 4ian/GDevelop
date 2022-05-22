@@ -113,14 +113,11 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
     const [isOpen, setIsOpen] = React.useState(!!props.initiallyOpen);
     const elementWithMenu = React.useRef<?ElementWithMenu>(null);
 
-    const openContextMenu = React.useCallback(
-      () => {
-        if (elementWithMenu.current) {
-          elementWithMenu.current.open();
-        }
-      },
-      [elementWithMenu]
-    );
+    const openContextMenu = React.useCallback(() => {
+      if (elementWithMenu.current) {
+        elementWithMenu.current.open();
+      }
+    }, [elementWithMenu]);
     const longTouchForContextMenuProps = useLongTouch(openContextMenu);
 
     const renderListItemSecondaryAction = () => {

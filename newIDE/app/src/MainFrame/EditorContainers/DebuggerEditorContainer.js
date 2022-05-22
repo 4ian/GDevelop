@@ -78,10 +78,10 @@ export class DebuggerEditorContainer extends React.Component<
           project={project}
           setToolbar={this.props.setToolbar}
           previewDebuggerServer={previewDebuggerServer}
-          ref={editor => (this.editor = editor)}
+          ref={(editor) => (this.editor = editor)}
         />
         <SubscriptionChecker
-          ref={subscriptionChecker =>
+          ref={(subscriptionChecker) =>
             (this._subscriptionChecker = subscriptionChecker)
           }
           onChangeSubscription={() => {

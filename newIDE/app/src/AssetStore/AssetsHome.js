@@ -45,7 +45,7 @@ const styles = {
   },
 };
 
-const useStylesForGridListItem = makeStyles(theme =>
+const useStylesForGridListItem = makeStyles((theme) =>
   createStyles({
     root: {
       '&:focus': {
@@ -59,7 +59,7 @@ const useStylesForGridListItem = makeStyles(theme =>
 
 type Props = {|
   assetPacks: AssetPacks,
-  onPackSelection: string => void,
+  onPackSelection: (string) => void,
 |};
 
 export const AssetsHome = ({

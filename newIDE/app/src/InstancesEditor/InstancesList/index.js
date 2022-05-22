@@ -84,7 +84,7 @@ export default class InstancesList extends Component<Props, State> {
   UNSAFE_componentWillMount() {
     // Functor used to display an instance row
     this.instanceRowRenderer = new gd.InitialInstanceJSFunctor();
-    this.instanceRowRenderer.invoke = instancePtr => {
+    this.instanceRowRenderer.invoke = (instancePtr) => {
       const { searchText } = this.state;
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
@@ -166,32 +166,29 @@ export default class InstancesList extends Component<Props, State> {
   };
 
   _orderRenderedRows = () => {
-    this.renderedRows.sort(
-      (a: RenderedRowInfo, b: RenderedRowInfo): number => {
-        const direction =
-          this.state.sortDirection === SortDirection.ASC ? 1 : -1;
+    this.renderedRows.sort((a: RenderedRowInfo, b: RenderedRowInfo): number => {
+      const direction = this.state.sortDirection === SortDirection.ASC ? 1 : -1;
 
-        switch (this.state.sortBy) {
-          case 'name':
-            return compareStrings(a.name, b.name, direction);
-          case 'x':
-            return direction * (parseFloat(a.x) - parseFloat(b.x));
-          case 'y':
-            return direction * (parseFloat(a.y) - parseFloat(b.y));
-          case 'angle':
-            return direction * (parseFloat(a.angle) - parseFloat(b.angle));
-          case 'layer':
-            return compareStrings(a.layer, b.layer, direction);
-          case 'locked':
-            return direction * (Number(a.locked) - Number(b.locked));
-          case 'zOrder':
-            return direction * (parseFloat(a.zOrder) - parseFloat(b.zOrder));
+      switch (this.state.sortBy) {
+        case 'name':
+          return compareStrings(a.name, b.name, direction);
+        case 'x':
+          return direction * (parseFloat(a.x) - parseFloat(b.x));
+        case 'y':
+          return direction * (parseFloat(a.y) - parseFloat(b.y));
+        case 'angle':
+          return direction * (parseFloat(a.angle) - parseFloat(b.angle));
+        case 'layer':
+          return compareStrings(a.layer, b.layer, direction);
+        case 'locked':
+          return direction * (Number(a.locked) - Number(b.locked));
+        case 'zOrder':
+          return direction * (parseFloat(a.zOrder) - parseFloat(b.zOrder));
 
-          default:
-            return 0;
-        }
+        default:
+          return 0;
       }
-    );
+    });
   };
 
   render() {
@@ -211,7 +208,7 @@ export default class InstancesList extends Component<Props, State> {
 
     return (
       <ThemeConsumer>
-        {muiTheme => (
+        {(muiTheme) => (
           <div style={styles.container}>
             <div
               style={{ flex: 1 }}
@@ -221,7 +218,7 @@ export default class InstancesList extends Component<Props, State> {
               <AutoSizer>
                 {({ height, width }) => (
                   <RVTable
-                    ref={table => (this.table = table)}
+                    ref={(table) => (this.table = table)}
                     key={tableKey}
                     headerHeight={30}
                     height={height}
@@ -286,7 +283,7 @@ export default class InstancesList extends Component<Props, State> {
             </div>
             <SearchBar
               value={searchText}
-              onChange={searchText =>
+              onChange={(searchText) =>
                 this.setState({
                   searchText,
                 })

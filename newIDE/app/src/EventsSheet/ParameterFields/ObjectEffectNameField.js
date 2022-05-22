@@ -48,7 +48,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
 
       return enumerateEffectNames(object.getEffects())
         .sort()
-        .map(effectName => ({
+        .map((effectName) => ({
           kind: 'Text',
           completion: `"${effectName}"`,
         }));
@@ -57,7 +57,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           getEffectNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

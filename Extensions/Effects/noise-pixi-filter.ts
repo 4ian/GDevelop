@@ -8,7 +8,7 @@ namespace gdjs {
     updatePreRender: function (filter, target) {},
     updateDoubleParameter: function (filter, parameterName, value) {
       // @ts-ignore - unsure why PIXI.filters is not recognised.
-      const noiseFilter = (filter as unknown) as PIXI.filters.NoiseFilter;
+      const noiseFilter = filter as unknown as PIXI.filters.NoiseFilter;
       if (parameterName !== 'noise') {
         return;
       }

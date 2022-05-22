@@ -14,7 +14,7 @@ const editors: Array<ResourceExternalEditor> = [
     name: 'piskel-app',
     displayName: 'Edit with Piskel',
     kind: 'image',
-    edit: options => {
+    edit: (options) => {
       sendExternalEditorOpened('piskel');
       return openPiskel(options);
     },
@@ -23,7 +23,7 @@ const editors: Array<ResourceExternalEditor> = [
     name: 'Jfxr',
     displayName: 'Create/Edit a Sound effect with Jfxr (*.wav)',
     kind: 'audio',
-    edit: options => {
+    edit: (options) => {
       sendExternalEditorOpened('jfxr');
       return openJfxr(options);
     },
@@ -32,7 +32,7 @@ const editors: Array<ResourceExternalEditor> = [
     name: 'Yarn',
     displayName: 'Create/Edit a Dialogue Tree with Yarn (*.json)',
     kind: 'json',
-    edit: options => {
+    edit: (options) => {
       sendExternalEditorOpened('yarn');
       return openYarn(options);
     },

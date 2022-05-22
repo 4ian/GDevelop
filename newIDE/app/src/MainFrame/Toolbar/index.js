@@ -22,7 +22,7 @@ export type MainFrameToolbarProps = {|
 |};
 
 export type ToolbarInterface = {|
-  setEditorToolbar: any => void,
+  setEditorToolbar: (any) => void,
 |};
 
 export default React.forwardRef<MainFrameToolbarProps, ToolbarInterface>(

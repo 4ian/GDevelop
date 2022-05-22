@@ -31,7 +31,7 @@ export default class TiledSpriteEditor extends React.Component<
           resourceKind="image"
           resourceName={tiledSpriteObject.getTexture()}
           resourceExternalEditors={resourceExternalEditors}
-          onChange={resourceName => {
+          onChange={(resourceName) => {
             tiledSpriteObject.setTexture(resourceName);
             this.forceUpdate();
           }}
@@ -44,7 +44,7 @@ export default class TiledSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={tiledSpriteObject.getWidth()}
-            onChange={value => {
+            onChange={(value) => {
               tiledSpriteObject.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -55,7 +55,7 @@ export default class TiledSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={tiledSpriteObject.getHeight()}
-            onChange={value => {
+            onChange={(value) => {
               tiledSpriteObject.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}

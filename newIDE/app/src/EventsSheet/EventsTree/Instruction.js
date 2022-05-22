@@ -70,14 +70,14 @@ type Props = {|
 
   // For potential sub-instructions list:
   selection: Object,
-  onAddNewSubInstruction: InstructionsListContext => void,
-  onPasteSubInstructions: InstructionsListContext => void,
+  onAddNewSubInstruction: (InstructionsListContext) => void,
+  onPasteSubInstructions: (InstructionsListContext) => void,
   onMoveToSubInstruction: (destinationContext: InstructionContext) => void,
   onMoveToSubInstructionsList: (
     destinationContext: InstructionsListContext
   ) => void,
-  onSubInstructionClick: InstructionContext => void,
-  onSubInstructionDoubleClick: InstructionContext => void,
+  onSubInstructionClick: (InstructionContext) => void,
+  onSubInstructionDoubleClick: (InstructionContext) => void,
   onAddSubInstructionContextMenu: (
     button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
@@ -89,7 +89,7 @@ type Props = {|
     instructionContext: InstructionContext
   ) => void,
   onParameterClick: (event: any, parameterIndex: number) => void,
-  renderObjectThumbnail: string => React.Node,
+  renderObjectThumbnail: (string) => React.Node,
 
   screenType: ScreenType,
   windowWidth: WidthType,
@@ -131,7 +131,7 @@ const Instruction = (props: Props) => {
           [disabledText]: disabled,
         })}
       >
-        {mapFor(0, formattedTexts.size(), i => {
+        {mapFor(0, formattedTexts.size(), (i) => {
           const formatting = formattedTexts.getTextFormatting(i);
           const parameterIndex = formatting.getUserData();
           const isParameter =
@@ -157,7 +157,7 @@ const Instruction = (props: Props) => {
                 [instructionParameter]: true,
                 [parameterType]: true,
               })}
-              onClick={domEvent => {
+              onClick={(domEvent) => {
                 props.onParameterClick(domEvent, parameterIndex);
 
                 // On touchscreen, don't propagate the click to the instruction div,
@@ -166,7 +166,7 @@ const Instruction = (props: Props) => {
                   domEvent.stopPropagation();
                 }
               }}
-              onKeyPress={event => {
+              onKeyPress={(event) => {
                 if (shouldActivate(event)) {
                   props.onParameterClick(event, parameterIndex);
                   event.stopPropagation();
@@ -198,7 +198,7 @@ const Instruction = (props: Props) => {
   // Allow a long press to show the context menu
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
-      event => {
+      (event) => {
         onContextMenu(event.clientX, event.clientY);
       },
       [onContextMenu]
@@ -217,7 +217,7 @@ const Instruction = (props: Props) => {
         };
       }}
       canDrag={() => dragAllowed}
-      canDrop={draggedItem => draggedItem.isCondition === isCondition}
+      canDrop={(draggedItem) => draggedItem.isCondition === isCondition}
       drop={() => {
         onMoveToInstruction();
       }}
@@ -250,7 +250,7 @@ const Instruction = (props: Props) => {
               [selectableArea]: true,
               [selectedArea]: props.selected,
             })}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
 
               if (props.screenType === 'touch' && props.selected) {
@@ -260,16 +260,16 @@ const Instruction = (props: Props) => {
                 props.onClick();
               }
             }}
-            onDoubleClick={e => {
+            onDoubleClick={(e) => {
               e.stopPropagation();
               props.onDoubleClick();
             }}
-            onContextMenu={e => {
+            onContextMenu={(e) => {
               e.stopPropagation();
               onContextMenu(e.clientX, e.clientY);
             }}
             {...longTouchForContextMenuProps}
-            onKeyPress={event => {
+            onKeyPress={(event) => {
               if (shouldValidate(event)) {
                 props.onDoubleClick();
                 event.stopPropagation();
@@ -319,9 +319,10 @@ const Instruction = (props: Props) => {
           </div>
         );
 
-        const instructionDragSourceDropTargetElement = instructionDragSourceElement
-          ? connectDropTarget(instructionDragSourceElement)
-          : null;
+        const instructionDragSourceDropTargetElement =
+          instructionDragSourceElement
+            ? connectDropTarget(instructionDragSourceElement)
+            : null;
 
         return (
           <React.Fragment>

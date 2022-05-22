@@ -68,7 +68,7 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 
-type Props = {| onLoading: boolean => void, project?: gdProject |};
+type Props = {| onLoading: (boolean) => void, project?: gdProject |};
 type ContainerProps = {| ...Props, gameId: string |};
 
 type ApiError = {|
@@ -175,25 +175,19 @@ const getSortOrderText = (currentLeaderboard: Leaderboard) => {
 export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
-  const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
-    false
-  );
-  const [
-    isEditingSortOptions,
-    setIsEditingSortOptions,
-  ] = React.useState<boolean>(false);
+  const [isEditingAppearance, setIsEditingAppearance] =
+    React.useState<boolean>(false);
+  const [isEditingSortOptions, setIsEditingSortOptions] =
+    React.useState<boolean>(false);
   const [isEditingName, setIsEditingName] = React.useState<boolean>(false);
-  const [isRequestPending, setIsRequestPending] = React.useState<boolean>(
-    false
-  );
+  const [isRequestPending, setIsRequestPending] =
+    React.useState<boolean>(false);
   const [newName, setNewName] = React.useState<string>('');
   const [newNameError, setNewNameError] = React.useState<?string>(null);
   const newNameTextFieldRef = React.useRef<?TextField>(null);
   const [apiError, setApiError] = React.useState<?ApiError>(null);
-  const [
-    displayGameRegistration,
-    setDisplayGameRegistration,
-  ] = React.useState<boolean>(false);
+  const [displayGameRegistration, setDisplayGameRegistration] =
+    React.useState<boolean>(false);
 
   const {
     leaderboards,
@@ -245,36 +239,33 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     }
   };
 
-  const onListLeaderboards = React.useCallback(
-    () => {
-      const fetchAndHandleError = async () => {
-        setIsLoading(true);
-        setApiError(null);
-        try {
-          await listLeaderboards();
-        } catch (err) {
-          if (err.response && err.response.status === 404) {
-            setDisplayGameRegistration(true);
-            return;
-          }
-          console.error('An error occurred when fetching leaderboards', err);
-          setApiError({
-            action: 'leaderboardsFetching',
-            message: (
-              <Trans>
-                An error occurred when fetching the leaderboards, please close
-                the dialog and reopen it.
-              </Trans>
-            ),
-          });
-        } finally {
-          setIsLoading(false);
+  const onListLeaderboards = React.useCallback(() => {
+    const fetchAndHandleError = async () => {
+      setIsLoading(true);
+      setApiError(null);
+      try {
+        await listLeaderboards();
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          setDisplayGameRegistration(true);
+          return;
         }
-      };
-      fetchAndHandleError();
-    },
-    [setIsLoading, listLeaderboards]
-  );
+        console.error('An error occurred when fetching leaderboards', err);
+        setApiError({
+          action: 'leaderboardsFetching',
+          message: (
+            <Trans>
+              An error occurred when fetching the leaderboards, please close the
+              dialog and reopen it.
+            </Trans>
+          ),
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAndHandleError();
+  }, [setIsLoading, listLeaderboards]);
 
   const onFetchLeaderboardEntries = async () => {
     setIsLoading(true);
@@ -405,23 +396,17 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     }
   };
 
-  React.useEffect(
-    () => {
-      if (isEditingName && newNameTextFieldRef.current) {
-        newNameTextFieldRef.current.focus();
-      }
-    },
-    [isEditingName]
-  );
+  React.useEffect(() => {
+    if (isEditingName && newNameTextFieldRef.current) {
+      newNameTextFieldRef.current.focus();
+    }
+  }, [isEditingName]);
 
-  React.useEffect(
-    () => {
-      if (leaderboards === null) {
-        onListLeaderboards();
-      }
-    },
-    [leaderboards, onListLeaderboards]
-  );
+  React.useEffect(() => {
+    if (leaderboards === null) {
+      onListLeaderboards();
+    }
+  }, [leaderboards, onListLeaderboards]);
 
   React.useEffect(() => {
     if (currentLeaderboard) onFetchLeaderboardEntries();
@@ -429,14 +414,11 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     // eslint-disable-next-line
   }, []);
 
-  const onCopy = React.useCallback(
-    () => {
-      if (!currentLeaderboard) return;
-      // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
-      navigator.clipboard.writeText(currentLeaderboard.id);
-    },
-    [currentLeaderboard]
-  );
+  const onCopy = React.useCallback(() => {
+    if (!currentLeaderboard) return;
+    // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
+    navigator.clipboard.writeText(currentLeaderboard.id);
+  }, [currentLeaderboard]);
   if (!isOnline) {
     return (
       <CenteredError>
@@ -526,7 +508,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
             value={newName}
             errorText={newNameError}
             onChange={(e, text) => setNewName(text)}
-            onKeyPress={event => {
+            onKeyPress={(event) => {
               if (shouldValidate(event) && !isRequestPending) {
                 onUpdateLeaderboard(i18n, { name: newName });
               }
@@ -811,7 +793,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                           selectLeaderboard(leaderboardId);
                         }}
                       >
-                        {leaderboards.map(leaderboard => (
+                        {leaderboards.map((leaderboard) => (
                           <SelectOption
                             key={leaderboard.id}
                             value={leaderboard.id}
@@ -951,7 +933,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
                       ? currentLeaderboard.customizationSettings
                       : null
                   }
-                  onDeleteEntry={entryId => onDeleteEntry(i18n, entryId)}
+                  onDeleteEntry={(entryId) => onDeleteEntry(i18n, entryId)}
                   isLoading={isRequestPending || isEditingName}
                   navigation={{
                     goToNextPage,

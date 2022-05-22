@@ -42,7 +42,7 @@ function RenderedUnknownInstance(
   this._pixiObject.endFill();
 }
 RenderedUnknownInstance.prototype = Object.create(RenderedInstance.prototype);
-RenderedUnknownInstance.getThumbnail = function(
+RenderedUnknownInstance.getThumbnail = function (
   project,
   resourcesLoader,
   object
@@ -50,7 +50,7 @@ RenderedUnknownInstance.getThumbnail = function(
   return 'res/unknown32.png';
 };
 
-RenderedUnknownInstance.prototype.update = function() {
+RenderedUnknownInstance.prototype.update = function () {
   this._pixiObject.position.x = this._instance.getX();
   this._pixiObject.position.y = this._instance.getY();
   this._pixiObject.rotation = (this._instance.getAngle() * Math.PI) / 180.0;

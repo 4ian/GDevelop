@@ -23,7 +23,7 @@ const styles = {
 
 type Props = {|
   isOpening: boolean,
-  onOpen: ExampleShortHeader => Promise<void>,
+  onOpen: (ExampleShortHeader) => Promise<void>,
   focusOnMount?: boolean,
 |};
 
@@ -31,10 +31,8 @@ const getExampleName = (exampleShortHeader: ExampleShortHeader) =>
   exampleShortHeader.name;
 
 export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
-  const [
-    selectedExampleShortHeader,
-    setSelectedExampleShortHeader,
-  ] = React.useState<?ExampleShortHeader>(null);
+  const [selectedExampleShortHeader, setSelectedExampleShortHeader] =
+    React.useState<?ExampleShortHeader>(null);
   const {
     filters,
     searchResults,
@@ -48,20 +46,14 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const searchBarRef = React.useRef<?SearchBarInterface>(null);
 
-  React.useEffect(
-    () => {
-      fetchExamplesAndFilters();
-    },
-    [fetchExamplesAndFilters]
-  );
+  React.useEffect(() => {
+    fetchExamplesAndFilters();
+  }, [fetchExamplesAndFilters]);
 
-  React.useEffect(
-    () => {
-      if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
-        searchBarRef.current.focus();
-    },
-    [shouldAutofocusSearchbar, focusOnMount]
-  );
+  React.useEffect(() => {
+    if (focusOnMount && shouldAutofocusSearchbar && searchBarRef.current)
+      searchBarRef.current.focus();
+  }, [shouldAutofocusSearchbar, focusOnMount]);
 
   const tagsHandler = React.useMemo(
     () => ({
@@ -77,7 +69,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
   ): SearchMatch[] => {
     if (!searchResults) return [];
     const exampleMatches = searchResults.find(
-      result => result.item.id === exampleShortHeader.id
+      (result) => result.item.id === exampleShortHeader.id
     );
     return exampleMatches ? exampleMatches.matches : [];
   };
@@ -85,7 +77,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {(windowWidth) => (
           <Column expand noMargin useFullHeight>
             <SearchBar
               value={searchText}

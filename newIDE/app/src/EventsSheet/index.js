@@ -109,8 +109,8 @@ type Props = {|
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
   onOpenSettings?: ?() => void,
-  onOpenExternalEvents: string => void,
-  onOpenLayout: string => void,
+  onOpenExternalEvents: (string) => void,
+  onOpenLayout: (string) => void,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -329,7 +329,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _toggleSearchPanel = () => {
     this.setState(
-      state => {
+      (state) => {
         if (
           state.showSearchPanel &&
           this._searchPanel &&
@@ -363,7 +363,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   addSubEvents = () => {
     const { project } = this.props;
 
-    getSelectedEvents(this.state.selection).forEach(event => {
+    getSelectedEvents(this.state.selection).forEach((event) => {
       if (event.canHaveSubEvents()) {
         event
           .getSubEvents()
@@ -381,13 +381,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _selectionCanHaveSubEvents = () => {
-    return getSelectedEvents(this.state.selection).some(event => {
+    return getSelectedEvents(this.state.selection).some((event) => {
       return event.canHaveSubEvents();
     });
   };
 
   _selectionCanToggleDisabled = () => {
-    return getSelectedEvents(this.state.selection).some(event => {
+    return getSelectedEvents(this.state.selection).some((event) => {
       return event.isExecutable();
     });
   };
@@ -412,7 +412,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
 
       insertions = getSelectedEventContexts(this.state.selection).map(
-        selectedEvent => ({
+        (selectedEvent) => ({
           eventsList: selectedEvent.eventsList,
           indexInList: insertTopOfSelection
             ? selectedEvent.indexInList - 1
@@ -592,14 +592,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         ? destinationContext.instrsList.size()
         : indexInList;
 
-    const isTryingToDragAnInstructionIntoItsOwnNestedInstructions = !!selectedInstructions.filter(
-      instruction =>
+    const isTryingToDragAnInstructionIntoItsOwnNestedInstructions =
+      !!selectedInstructions.filter((instruction) =>
         containsSubInstructions(instruction, destinationContext.instrsList)
-    ).length;
+      ).length;
 
     if (isTryingToDragAnInstructionIntoItsOwnNestedInstructions) return;
 
-    selectedInstructions.forEach(instruction =>
+    selectedInstructions.forEach((instruction) =>
       destinationContext.instrsList.insert(instruction, destinationIndex)
     );
 
@@ -682,7 +682,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
     {
       label: i18n._(t`Add Other`),
-      submenu: this.state.allEventsMetadata.map(metadata => {
+      submenu: this.state.allEventsMetadata.map((metadata) => {
         return {
           label: metadata.fullName,
           click: () => {
@@ -717,7 +717,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           click: () => this.expandToLevel(-1),
         },
         { type: 'separator' },
-        ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => {
+        ...[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => {
           return {
             label: i18n._(t`Level ${index + 1}`),
             click: () => this.expandToLevel(index),
@@ -867,7 +867,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   toggleDisabled = () => {
     let shouldBeSaved = false;
-    getSelectedEvents(this.state.selection).forEach(event => {
+    getSelectedEvents(this.state.selection).forEach((event) => {
       if (event.isExecutable()) {
         event.setDisabled(!event.isDisabled());
         shouldBeSaved = true;
@@ -887,12 +887,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
     if (deleteEvents) {
-      getSelectedEvents(this.state.selection).forEach(event =>
+      getSelectedEvents(this.state.selection).forEach((event) =>
         eventsRemover.addEventToRemove(event)
       );
     }
     if (deleteInstructions) {
-      getSelectedInstructions(this.state.selection).forEach(instruction =>
+      getSelectedInstructions(this.state.selection).forEach((instruction) =>
         eventsRemover.addInstructionToRemove(instruction)
       );
     }
@@ -987,7 +987,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   _invertSelectedConditions = () => {
     getSelectedInstructionsContexts(this.state.selection).forEach(
-      instructionContext => {
+      (instructionContext) => {
         if (instructionContext.isCondition) {
           instructionContext.instruction.setInverted(
             !instructionContext.instruction.isInverted()
@@ -1081,7 +1081,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     );
 
     const eventsList = new gd.EventsList();
-    getSelectedEvents(this.state.selection).forEach(event =>
+    getSelectedEvents(this.state.selection).forEach((event) =>
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
@@ -1105,7 +1105,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   extractEventsToFunction = () => {
     const eventsList = new gd.EventsList();
 
-    getSelectedEvents(this.state.selection).forEach(event =>
+    getSelectedEvents(this.state.selection).forEach((event) =>
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
@@ -1121,7 +1121,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   moveEventsIntoNewGroup = () => {
     const eventsList = new gd.EventsList();
 
-    getSelectedEvents(this.state.selection).forEach(event =>
+    getSelectedEvents(this.state.selection).forEach((event) =>
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
@@ -1216,12 +1216,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   _renderInstructionEditorDialog = (newInstructionEditorDialog: boolean) => {
-    const {
-      project,
-      scope,
-      globalObjectsContainer,
-      objectsContainer,
-    } = this.props;
+    const { project, scope, globalObjectsContainer, objectsContainer } =
+      this.props;
 
     // Choose the dialog to use
     const Dialog = this.state.inlineInstructionEditorAnchorEl
@@ -1245,11 +1241,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         open={true}
         onCancel={() => this.closeInstructionEditor()}
         onSubmit={() => {
-          const {
-            instrsList,
-            instruction,
-            indexInList,
-          } = this.state.editedInstruction;
+          const { instrsList, instruction, indexInList } =
+            this.state.editedInstruction;
           if (!instrsList || !instruction) return;
 
           if (indexInList !== undefined && indexInList !== null) {
@@ -1286,9 +1279,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           });
         }}
       />
-    ) : (
-      undefined
-    );
+    ) : undefined;
   };
 
   /**
@@ -1342,10 +1333,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     return (
       <ResponsiveWindowMeasurer>
-        {windowWidth => (
+        {(windowWidth) => (
           <EventsSearcher
             key={events.ptr}
-            ref={eventSearcher => (this._eventSearcher = eventSearcher)}
+            ref={(eventSearcher) => (this._eventSearcher = eventSearcher)}
             events={events}
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
@@ -1370,7 +1361,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 tabIndex={0}
               >
                 <EventsTree
-                  ref={eventsTree => (this._eventsTree = eventsTree)}
+                  ref={(eventsTree) => (this._eventsTree = eventsTree)}
                   key={events.ptr}
                   onScroll={this._ensureFocused}
                   events={events}
@@ -1424,11 +1415,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 />
                 {this.state.showSearchPanel && (
                   <SearchPanel
-                    ref={searchPanel => (this._searchPanel = searchPanel)}
-                    onSearchInEvents={inputs =>
+                    ref={(searchPanel) => (this._searchPanel = searchPanel)}
+                    onSearchInEvents={(inputs) =>
                       this._searchInEvents(searchInEvents, inputs)
                     }
-                    onReplaceInEvents={inputs =>
+                    onReplaceInEvents={(inputs) =>
                       this._replaceInEvents(replaceInEvents, inputs)
                     }
                     resultsCount={
@@ -1468,11 +1459,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   isCondition={this.state.editedParameter.isCondition}
                   instruction={this.state.editedParameter.instruction}
                   parameterIndex={this.state.editedParameter.parameterIndex}
-                  onChange={value => {
-                    const {
-                      instruction,
-                      parameterIndex,
-                    } = this.state.editedParameter;
+                  onChange={(value) => {
+                    const { instruction, parameterIndex } =
+                      this.state.editedParameter;
                     if (!instruction || !this.state.inlineEditing) {
                       // Unlikely to ever happen, but maybe a component could
                       // fire the "onChange" while the inline editor was just
@@ -1492,13 +1481,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   resourceExternalEditors={resourceExternalEditors}
                 />
                 <ContextMenu
-                  ref={eventContextMenu =>
+                  ref={(eventContextMenu) =>
                     (this.eventContextMenu = eventContextMenu)
                   }
                   buildMenuTemplate={this._buildEventContextMenu}
                 />
                 <ContextMenu
-                  ref={instructionContextMenu =>
+                  ref={(instructionContextMenu) =>
                     (this.instructionContextMenu = instructionContextMenu)
                   }
                   buildMenuTemplate={this._buildInstructionContextMenu}

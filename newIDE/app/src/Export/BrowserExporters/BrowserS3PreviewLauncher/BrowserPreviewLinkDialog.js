@@ -15,7 +15,7 @@ import { openPreviewWindow } from '.';
 type Props = {|
   project: gdProject,
   url: string,
-  onPreviewWindowOpened: any => void,
+  onPreviewWindowOpened: (any) => void,
   onClose: () => void,
 |};
 

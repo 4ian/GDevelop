@@ -58,7 +58,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
       const properties = effectMetadata.getProperties();
       const parameterNames = properties.keys().toJSArray();
 
-      return parameterNames.sort().map(parameterName => ({
+      return parameterNames.sort().map((parameterName) => ({
         kind: 'Text',
         completion: `"${parameterName}"`,
       }));
@@ -67,7 +67,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           getEffectParameterNames().filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )

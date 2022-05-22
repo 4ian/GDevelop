@@ -21,18 +21,18 @@ export default class LayerRenderer {
    */
   layer: gdLayer;
   viewPosition: ViewPosition;
-  onInstanceClicked: gdInitialInstance => void;
+  onInstanceClicked: (gdInitialInstance) => void;
   onInstanceRightClicked: ({|
     offsetX: number,
     offsetY: number,
     x: number,
     y: number,
   |}) => void;
-  onInstanceDoubleClicked: gdInitialInstance => void;
-  onOverInstance: gdInitialInstance => void;
-  onOutInstance: gdInitialInstance => void;
+  onInstanceDoubleClicked: (gdInitialInstance) => void;
+  onOverInstance: (gdInitialInstance) => void;
+  onOutInstance: (gdInitialInstance) => void;
   onMoveInstance: (gdInitialInstance, number, number) => void;
-  onMoveInstanceEnd: void => void;
+  onMoveInstanceEnd: (void) => void;
   onDownInstance: (gdInitialInstance, number, number) => void;
   /**Used for instances culling on rendering */
   viewTopLeft: [number, number];
@@ -48,7 +48,12 @@ export default class LayerRenderer {
   wasUsed: boolean = false;
 
   _temporaryRectangle: Rectangle = new Rectangle();
-  _temporaryRectanglePath: Polygon = [[0, 0], [0, 0], [0, 0], [0, 0]];
+  _temporaryRectanglePath: Polygon = [
+    [0, 0],
+    [0, 0],
+    [0, 0],
+    [0, 0],
+  ];
 
   constructor({
     project,
@@ -70,18 +75,18 @@ export default class LayerRenderer {
     layout: gdLayout,
     layer: gdLayer,
     viewPosition: ViewPosition,
-    onInstanceClicked: gdInitialInstance => void,
+    onInstanceClicked: (gdInitialInstance) => void,
     onInstanceRightClicked: ({|
       offsetX: number,
       offsetY: number,
       x: number,
       y: number,
     |}) => void,
-    onInstanceDoubleClicked: gdInitialInstance => void,
-    onOverInstance: gdInitialInstance => void,
-    onOutInstance: gdInitialInstance => void,
+    onInstanceDoubleClicked: (gdInitialInstance) => void,
+    onOverInstance: (gdInitialInstance) => void,
+    onOutInstance: (gdInitialInstance) => void,
     onMoveInstance: (gdInitialInstance, number, number) => void,
-    onMoveInstanceEnd: void => void,
+    onMoveInstanceEnd: (void) => void,
     onDownInstance: (gdInitialInstance, number, number) => void,
   }) {
     this.project = project;
@@ -107,14 +112,13 @@ export default class LayerRenderer {
     // Functor used to render an instance
     this.instancesRenderer = new gd.InitialInstanceJSFunctor();
     // $FlowFixMe - invoke is not writable
-    this.instancesRenderer.invoke = instancePtr => {
+    this.instancesRenderer.invoke = (instancePtr) => {
       // $FlowFixMe - wrapPointer is not exposed
       const instance = gd.wrapPointer(instancePtr, gd.InitialInstance);
 
       //Get the "RendereredInstance" object associated to the instance and tell it to update.
-      var renderedInstance: ?RenderedInstance = this.getRendererOfInstance(
-        instance
-      );
+      var renderedInstance: ?RenderedInstance =
+        this.getRendererOfInstance(instance);
       if (!renderedInstance) return;
 
       const pixiObject = renderedInstance.getPixiObject();
@@ -248,20 +252,19 @@ export default class LayerRenderer {
       if (!associatedObject) return null;
 
       //...so let's create a renderer.
-      renderedInstance = this.renderedInstances[
-        instance.ptr
-      ] = ObjectsRenderingService.createNewInstanceRenderer(
-        this.project,
-        this.layout,
-        instance,
-        associatedObject,
-        this.pixiContainer
-      );
+      renderedInstance = this.renderedInstances[instance.ptr] =
+        ObjectsRenderingService.createNewInstanceRenderer(
+          this.project,
+          this.layout,
+          instance,
+          associatedObject,
+          this.pixiContainer
+        );
 
       renderedInstance._pixiObject.interactive = true;
       gesture.panable(renderedInstance._pixiObject);
       makeDoubleClickable(renderedInstance._pixiObject);
-      renderedInstance._pixiObject.on('click', event => {
+      renderedInstance._pixiObject.on('click', (event) => {
         if (event.data.originalEvent.button === 0)
           this.onInstanceClicked(instance);
       });
@@ -284,7 +287,7 @@ export default class LayerRenderer {
           }
         }
       );
-      renderedInstance._pixiObject.on('rightclick', interactionEvent => {
+      renderedInstance._pixiObject.on('rightclick', (interactionEvent) => {
         const {
           data: { global: viewPoint, originalEvent: event },
         } = interactionEvent;
@@ -308,7 +311,7 @@ export default class LayerRenderer {
 
         return false;
       });
-      renderedInstance._pixiObject.on('touchstart', event => {
+      renderedInstance._pixiObject.on('touchstart', (event) => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
@@ -323,14 +326,14 @@ export default class LayerRenderer {
       renderedInstance._pixiObject.on('mouseout', () => {
         this.onOutInstance(instance);
       });
-      renderedInstance._pixiObject.on('panmove', event => {
+      renderedInstance._pixiObject.on('panmove', (event) => {
         if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
           return null;
         }
 
         this.onMoveInstance(instance, event.deltaX, event.deltaY);
       });
-      renderedInstance._pixiObject.on('panend', event => {
+      renderedInstance._pixiObject.on('panend', (event) => {
         this.onMoveInstanceEnd();
       });
     }

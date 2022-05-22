@@ -10,8 +10,8 @@ export default function useStateWithCallback(initialValue) {
   const callback = React.useRef(null);
 
   const useStateWithCB = React.useCallback(
-    newValue => {
-      return new Promise(resolve => {
+    (newValue) => {
+      return new Promise((resolve) => {
         callback.current = resolve;
         setState(newValue);
       });
@@ -19,14 +19,11 @@ export default function useStateWithCallback(initialValue) {
     [setState]
   );
 
-  React.useEffect(
-    () => {
-      if (callback.current !== null) {
-        callback.current(state);
-        callback.current = null;
-      }
-    },
-    [state]
-  );
+  React.useEffect(() => {
+    if (callback.current !== null) {
+      callback.current(state);
+      callback.current = null;
+    }
+  }, [state]);
   return [state, useStateWithCB];
 }

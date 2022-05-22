@@ -91,7 +91,8 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     minFPS: project.getMinimumFPS(),
     maxFPS: project.getMaximumFPS(),
     isFolderProject: project.isFolderProject(),
-    useDeprecatedZeroAsDefaultZOrder: project.getUseDeprecatedZeroAsDefaultZOrder(),
+    useDeprecatedZeroAsDefaultZOrder:
+      project.getUseDeprecatedZeroAsDefaultZOrder(),
   };
 }
 
@@ -99,7 +100,7 @@ function applyPropertiesToProject(
   project: gdProject,
   newProperties: ProjectProperties
 ) {
-  const t = str => str; //TODO
+  const t = (str) => str; //TODO
   const {
     gameResolutionWidth,
     gameResolutionHeight,
@@ -125,7 +126,7 @@ function applyPropertiesToProject(
   project.setDescription(description);
   const projectAuthorIds = project.getAuthorIds();
   projectAuthorIds.clear();
-  authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
+  authorIds.forEach((authorId) => projectAuthorIds.push_back(authorId));
   project.setAuthor(author);
   project.setVersion(version);
   project.setPackageName(packageName);
@@ -159,10 +160,8 @@ function ProjectPropertiesDialog(props: Props) {
   let [gameResolutionHeight, setGameResolutionHeight] = React.useState(
     initialProperties.gameResolutionHeight
   );
-  let [
-    adaptGameResolutionAtRuntime,
-    setAdaptGameResolutionAtRuntime,
-  ] = React.useState(initialProperties.adaptGameResolutionAtRuntime);
+  let [adaptGameResolutionAtRuntime, setAdaptGameResolutionAtRuntime] =
+    React.useState(initialProperties.adaptGameResolutionAtRuntime);
   let [author, setAuthor] = React.useState(initialProperties.author);
   let [version, setVersion] = React.useState(initialProperties.version);
   let [packageName, setPackageName] = React.useState(
@@ -183,10 +182,8 @@ function ProjectPropertiesDialog(props: Props) {
   let [isFolderProject, setIsFolderProject] = React.useState(
     initialProperties.isFolderProject
   );
-  let [
-    useDeprecatedZeroAsDefaultZOrder,
-    setUseDeprecatedZeroAsDefaultZOrder,
-  ] = React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
+  let [useDeprecatedZeroAsDefaultZOrder, setUseDeprecatedZeroAsDefaultZOrder] =
+    React.useState(initialProperties.useDeprecatedZeroAsDefaultZOrder);
 
   const defaultPackageName = 'com.example.mygame';
   const defaultVersion = '1.0.0';
@@ -316,9 +313,7 @@ function ProjectPropertiesDialog(props: Props) {
                   value={packageName}
                   onChange={setPackageName}
                   errorText={
-                    validatePackageName(packageName) ? (
-                      undefined
-                    ) : (
+                    validatePackageName(packageName) ? undefined : (
                       <Trans>
                         The package name is containing invalid characters or not
                         following the convention "xxx.yyy.zzz" (numbers allowed
@@ -397,7 +392,7 @@ function ProjectPropertiesDialog(props: Props) {
                     fullWidth
                     type="number"
                     value={'' + gameResolutionWidth}
-                    onChange={value =>
+                    onChange={(value) =>
                       setGameResolutionWidth(Math.max(1, parseInt(value, 10)))
                     }
                   />
@@ -406,7 +401,7 @@ function ProjectPropertiesDialog(props: Props) {
                     fullWidth
                     type="number"
                     value={'' + gameResolutionHeight}
-                    onChange={value =>
+                    onChange={(value) =>
                       setGameResolutionHeight(Math.max(1, parseInt(value, 10)))
                     }
                   />
@@ -455,7 +450,7 @@ function ProjectPropertiesDialog(props: Props) {
                     fullWidth
                     type="number"
                     value={'' + minFPS}
-                    onChange={value =>
+                    onChange={(value) =>
                       setMinFPS(Math.max(0, parseInt(value, 10)))
                     }
                   />
@@ -466,7 +461,7 @@ function ProjectPropertiesDialog(props: Props) {
                     fullWidth
                     type="number"
                     value={'' + maxFPS}
-                    onChange={value =>
+                    onChange={(value) =>
                       setMaxFPS(Math.max(0, parseInt(value, 10)))
                     }
                   />

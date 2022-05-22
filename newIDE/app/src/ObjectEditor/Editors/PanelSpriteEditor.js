@@ -32,7 +32,7 @@ export default class PanelSpriteEditor extends React.Component<
           resourceExternalEditors={resourceExternalEditors}
           resourceKind="image"
           resourceName={panelSpriteObject.getTexture()}
-          onChange={resourceName => {
+          onChange={(resourceName) => {
             panelSpriteObject.setTexture(resourceName);
             this.forceUpdate();
           }}
@@ -57,7 +57,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteObject.getTopMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteObject.setTopMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -68,7 +68,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteObject.getBottomMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteObject.setBottomMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -81,7 +81,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteObject.getLeftMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteObject.setLeftMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -92,7 +92,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteObject.getRightMargin()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteObject.setRightMargin(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -105,7 +105,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteObject.getWidth()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteObject.setWidth(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}
@@ -116,7 +116,7 @@ export default class PanelSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={panelSpriteObject.getHeight()}
-            onChange={value => {
+            onChange={(value) => {
               panelSpriteObject.setHeight(parseInt(value, 10) || 0);
               this.forceUpdate();
             }}

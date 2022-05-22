@@ -41,25 +41,8 @@ type State = {|
 const desktopSizes = [512];
 const androidSizes = [192, 144, 96, 72, 48, 36];
 const iosSizes = [
-  1024,
-  180,
-  167,
-  152,
-  144,
-  120,
-  114,
-  100,
-  87,
-  80,
-  76,
-  72,
-  60,
-  58,
-  57,
-  50,
-  40,
-  29,
-  20,
+  1024, 180, 167, 152, 144, 120, 114, 100, 87, 80, 76, 72, 60, 58, 57, 50, 40,
+  29, 20,
 ];
 
 export default class PlatformSpecificAssetsDialog extends React.Component<
@@ -76,13 +59,13 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       thumbnailResourceName: project
         .getPlatformSpecificAssets()
         .get('liluo', `thumbnail`),
-      desktopIconResourceNames: desktopSizes.map(size =>
+      desktopIconResourceNames: desktopSizes.map((size) =>
         project.getPlatformSpecificAssets().get('desktop', `icon-${size}`)
       ),
-      androidIconResourceNames: androidSizes.map(size =>
+      androidIconResourceNames: androidSizes.map((size) =>
         project.getPlatformSpecificAssets().get('android', `icon-${size}`)
       ),
-      iosIconResourceNames: iosSizes.map(size =>
+      iosIconResourceNames: iosSizes.map((size) =>
         project.getPlatformSpecificAssets().get('ios', `icon-${size}`)
       ),
     };
@@ -101,7 +84,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   _generateFromFile = () => {
     const { project, resourceSources, onChooseResource } = this.props;
 
-    const sources = resourceSources.filter(source => source.kind === 'image');
+    const sources = resourceSources.filter((source) => source.kind === 'image');
     if (!sources.length) return;
 
     onChooseResource({
@@ -110,7 +93,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       initialSourceName: sources[0].name,
       multiSelection: false,
       resourceKind: 'image',
-    }).then(resources => {
+    }).then((resources) => {
       if (!resources.length || !path) {
         return;
       }
@@ -121,10 +104,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
       // Important, we are responsible for deleting the resources that were given to us.
       // Otherwise we have a memory leak.
-      resources.forEach(resource => resource.delete());
+      resources.forEach((resource) => resource.delete());
 
       Promise.all([
-        ...desktopSizes.map(size =>
+        ...desktopSizes.map((size) =>
           resizeImage(
             fullPath,
             path.join(projectPath, `desktop-icon-${size}.png`),
@@ -134,7 +117,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }
           )
         ),
-        ...androidSizes.map(size =>
+        ...androidSizes.map((size) =>
           resizeImage(
             fullPath,
             path.join(projectPath, `android-icon-${size}.png`),
@@ -144,7 +127,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }
           )
         ),
-        ...iosSizes.map(size =>
+        ...iosSizes.map((size) =>
           resizeImage(
             fullPath,
             path.join(projectPath, `ios-icon-${size}.png`),
@@ -154,7 +137,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }
           )
         ),
-      ]).then(results => {
+      ]).then((results) => {
         if (results.indexOf(false) !== -1) {
           showErrorBox({
             message: 'Some icons could not be generated!',
@@ -167,11 +150,11 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
         // Add resources to the game
         const allResourcesNames = [
-          ...desktopSizes.map(size => `desktop-icon-${size}.png`),
-          ...androidSizes.map(size => `android-icon-${size}.png`),
-          ...iosSizes.map(size => `ios-icon-${size}.png`),
+          ...desktopSizes.map((size) => `desktop-icon-${size}.png`),
+          ...androidSizes.map((size) => `android-icon-${size}.png`),
+          ...iosSizes.map((size) => `ios-icon-${size}.png`),
         ];
-        allResourcesNames.forEach(resourceName => {
+        allResourcesNames.forEach((resourceName) => {
           if (!resourcesManager.hasResource(resourceName)) {
             const imageResource = new gd.ImageResource();
             imageResource.setFile(resourceName);
@@ -192,12 +175,14 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         setTimeout(() => {
           this.setState({
             desktopIconResourceNames: desktopSizes.map(
-              size => `desktop-icon-${size}.png`
+              (size) => `desktop-icon-${size}.png`
             ),
             androidIconResourceNames: androidSizes.map(
-              size => `android-icon-${size}.png`
+              (size) => `android-icon-${size}.png`
             ),
-            iosIconResourceNames: iosSizes.map(size => `ios-icon-${size}.png`),
+            iosIconResourceNames: iosSizes.map(
+              (size) => `ios-icon-${size}.png`
+            ),
           });
         }, 200 /* Let a bit of time so that image files can be found */);
       });
@@ -286,7 +271,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             resourceExternalEditors={resourceExternalEditors}
             resourceKind="image"
             resourceName={thumbnailResourceName}
-            onChange={resourceName => {
+            onChange={(resourceName) => {
               this.setState({
                 thumbnailResourceName: resourceName,
               });
@@ -321,7 +306,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               resourceExternalEditors={resourceExternalEditors}
               resourceKind="image"
               resourceName={desktopIconResourceNames[index]}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 const newIcons = [...desktopIconResourceNames];
                 newIcons[index] = resourceName;
                 this.setState({
@@ -343,7 +328,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               resourceExternalEditors={resourceExternalEditors}
               resourceKind="image"
               resourceName={androidIconResourceNames[index]}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 const newIcons = [...androidIconResourceNames];
                 newIcons[index] = resourceName;
                 this.setState({
@@ -365,7 +350,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
               resourceKind="image"
               resourceName={iosIconResourceNames[index]}
               resourceExternalEditors={resourceExternalEditors}
-              onChange={resourceName => {
+              onChange={(resourceName) => {
                 const newIcons = [...iosIconResourceNames];
                 newIcons[index] = resourceName;
                 this.setState({

@@ -99,9 +99,9 @@ const CollisionMasksPreview = (props: Props) => {
         stroke="rgba(255,0,0,0.5)"
         strokeWidth={1}
         fillRule="evenodd"
-        points={`0,0 ${imageWidth * imageZoomFactor},0 ${imageWidth *
-          imageZoomFactor},${imageHeight * imageZoomFactor} 0,${imageHeight *
-          imageZoomFactor}`}
+        points={`0,0 ${imageWidth * imageZoomFactor},0 ${
+          imageWidth * imageZoomFactor
+        },${imageHeight * imageZoomFactor} 0,${imageHeight * imageZoomFactor}`}
       />
     );
   };
@@ -121,8 +121,9 @@ const CollisionMasksPreview = (props: Props) => {
               points={mapVector(
                 vertices,
                 (vertex, j) =>
-                  `${vertex.get_x() * imageZoomFactor},${vertex.get_y() *
-                    imageZoomFactor}`
+                  `${vertex.get_x() * imageZoomFactor},${
+                    vertex.get_y() * imageZoomFactor
+                  }`
               ).join(' ')}
             />
           );

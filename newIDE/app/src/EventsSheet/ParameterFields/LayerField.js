@@ -15,7 +15,7 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
   render() {
     const { layout } = this.props.scope;
     const layerNames: Array<ExpressionAutocompletion> = layout
-      ? mapFor(0, layout.getLayersCount(), i => {
+      ? mapFor(0, layout.getLayersCount(), (i) => {
           const layer = layout.getLayerAt(i);
           return { kind: 'Text', completion: `"${layer.getName()}"` };
         })
@@ -24,12 +24,12 @@ export default class LayerField extends Component<ParameterFieldProps, {||}> {
     return (
       <GenericExpressionField
         expressionType="string"
-        onGetAdditionalAutocompletions={expression =>
+        onGetAdditionalAutocompletions={(expression) =>
           layerNames.filter(
             ({ completion }) => completion.indexOf(expression) === 0
           )
         }
-        ref={field => (this._field = field)}
+        ref={(field) => (this._field = field)}
         {...this.props}
       />
     );

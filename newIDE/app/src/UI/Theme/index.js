@@ -49,17 +49,13 @@ export function getTheme({
   };
 }
 
-const createLtrTheme = memoize(
-  (muiThemeOptions: MuiThemeOptions): Object => {
-    return createMuiTheme(muiThemeOptions);
-  }
-);
+const createLtrTheme = memoize((muiThemeOptions: MuiThemeOptions): Object => {
+  return createMuiTheme(muiThemeOptions);
+});
 
-const createRtlTheme = memoize(
-  (muiThemeOptions: MuiThemeOptions): Object => {
-    return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
-  }
-);
+const createRtlTheme = memoize((muiThemeOptions: MuiThemeOptions): Object => {
+  return createMuiTheme(muiThemeOptions, { overrides: rtlOverrides });
+});
 
 const rtlDirection = { direction: 'rtl' };
 const rtlOrder = { order: 100 };

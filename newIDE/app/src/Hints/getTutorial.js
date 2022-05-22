@@ -15,7 +15,7 @@ const getTutorial = (
   const { values } = preferences;
   if (values.hiddenTutorialHints[tutorialId]) return null;
   const tutorial: ?Tutorial = tutorials.find(
-    tutorial => tutorial.id === tutorialId
+    (tutorial) => tutorial.id === tutorialId
   );
   if (!tutorial) {
     console.warn(`Tutorial with id ${tutorialId} not found`);

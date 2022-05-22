@@ -73,7 +73,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
       exportStep
     ),
 
-  renderHeader: props => <SetupExportHeader {...props} />,
+  renderHeader: (props) => <SetupExportHeader {...props} />,
 
   renderLaunchButtonLabel: () => <Trans>Package</Trans>,
 
@@ -126,7 +126,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     return downloadUrlsToBlobs({
       urlFiles,
       onProgress: context.updateStepProgress,
-    }).then(blobFiles => ({
+    }).then((blobFiles) => ({
       blobFiles,
       textFiles,
     }));
@@ -148,7 +148,7 @@ export const browserOnlineElectronExportPipeline: ExportPipeline<
     context: ExportPipelineContext<ExportState>,
     blobFile: Blob
   ): Promise<string> => {
-    return getBuildFileUploadOptions().then(uploadOptions => {
+    return getBuildFileUploadOptions().then((uploadOptions) => {
       return uploadBlobFile(
         blobFile,
         uploadOptions,

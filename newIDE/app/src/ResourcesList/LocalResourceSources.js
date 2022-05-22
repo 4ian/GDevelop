@@ -49,7 +49,7 @@ const localResourceSources: Array<ResourceSource> = [
         setLastUsedPath(project, kind, lastUsedPath);
 
         const outsideProjectFolderPaths = filePaths.filter(
-          path => !isPathInProjectFolder(project, path)
+          (path) => !isPathInProjectFolder(project, path)
         );
 
         if (outsideProjectFolderPaths.length) {
@@ -64,7 +64,7 @@ const localResourceSources: Array<ResourceSource> = [
           }
         }
 
-        return filePaths.map(filePath => {
+        return filePaths.map((filePath) => {
           const newResource = createNewResource();
           const projectPath = path.dirname(project.getProjectFile());
           newResource.setFile(path.relative(projectPath, filePath));

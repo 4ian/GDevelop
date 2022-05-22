@@ -15,7 +15,7 @@ export const getReleases = (): Promise<Array<Release>> => {
         last: 4,
       },
     })
-    .then(response => response.data);
+    .then((response) => response.data);
 };
 
 export const hasBreakingChange = (release: Release): boolean => {
@@ -28,5 +28,5 @@ export const findRelease = (
   releases: Array<Release>,
   name: string
 ): ?Release => {
-  return releases.find(release => release.name === name);
+  return releases.find((release) => release.name === name);
 };

@@ -104,8 +104,8 @@ const VerticesTable = (props: VerticesTableProps) => {
               onClick={() => props.onClickVertice(vertice.ptr)}
               verticeX={vertice.get_x()}
               verticeY={vertice.get_y()}
-              onChangeVerticeX={newValue => updateVerticeX(vertice, newValue)}
-              onChangeVerticeY={newValue => updateVerticeY(vertice, newValue)}
+              onChangeVerticeX={(newValue) => updateVerticeX(vertice, newValue)}
+              onChangeVerticeY={(newValue) => updateVerticeY(vertice, newValue)}
               onRemove={() => {
                 gd.removeFromVectorVector2f(props.vertices, verticeIndex);
                 props.onUpdated();
@@ -175,7 +175,7 @@ const PolygonSection = (props: PolygonSectionProps) => {
     <IconButton
       key="delete-mask"
       size="small"
-      onClick={ev => {
+      onClick={(ev) => {
         ev.stopPropagation();
         props.onRemove();
       }}
@@ -236,27 +236,18 @@ const PolygonsList = (props: PolygonsListProps) => {
     selectedVerticePtr,
   } = props;
 
-  const addCollisionMask = React.useCallback(
-    () => {
-      const newPolygon = gd.Polygon2d.createRectangle(
-        spriteWidth,
-        spriteHeight
-      );
-      newPolygon.move(spriteWidth / 2, spriteHeight / 2);
-      polygons.push_back(newPolygon);
-      onPolygonsUpdated();
-    },
-    [spriteHeight, spriteWidth, polygons, onPolygonsUpdated]
-  );
+  const addCollisionMask = React.useCallback(() => {
+    const newPolygon = gd.Polygon2d.createRectangle(spriteWidth, spriteHeight);
+    newPolygon.move(spriteWidth / 2, spriteHeight / 2);
+    polygons.push_back(newPolygon);
+    onPolygonsUpdated();
+  }, [spriteHeight, spriteWidth, polygons, onPolygonsUpdated]);
 
-  React.useEffect(
-    () => {
-      if (polygons.size() === 0) {
-        addCollisionMask();
-      }
-    },
-    [polygons, addCollisionMask]
-  );
+  React.useEffect(() => {
+    if (polygons.size() === 0) {
+      addCollisionMask();
+    }
+  }, [polygons, addCollisionMask]);
 
   return (
     <React.Fragment>
@@ -291,7 +282,7 @@ const PolygonsList = (props: PolygonsListProps) => {
               onClick={() => {
                 addCollisionMask();
               }}
-              buildMenuTemplate={i18n => [
+              buildMenuTemplate={(i18n) => [
                 {
                   label: i18n._(t`Restore the default collision mask`),
                   click: restoreCollisionMask,

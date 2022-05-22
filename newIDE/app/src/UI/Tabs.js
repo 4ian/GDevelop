@@ -7,7 +7,7 @@ import MUITab from '@material-ui/core/Tab';
 // They should be self descriptive - refer to Material UI docs otherwise.
 type TabsProps<TabName> = {|
   value?: TabName,
-  onChange: TabName => void,
+  onChange: (TabName) => void,
   children: React.Node, // Should be Tab
 |};
 

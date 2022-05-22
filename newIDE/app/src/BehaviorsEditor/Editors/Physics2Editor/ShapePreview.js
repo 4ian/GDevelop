@@ -186,14 +186,18 @@ const ShapePreview = (props: Props) => {
           fillRule="evenodd"
           points={vertices
             .map(
-              vertex =>
-                `${(vertex.x +
-                  offsetX +
-                  (polygonOrigin === 'Center' ? width / 2 : 0)) *
-                  zoomFactor},${(vertex.y +
-                  offsetY +
-                  (polygonOrigin === 'Center' ? height / 2 : 0)) *
-                  zoomFactor}`
+              (vertex) =>
+                `${
+                  (vertex.x +
+                    offsetX +
+                    (polygonOrigin === 'Center' ? width / 2 : 0)) *
+                  zoomFactor
+                },${
+                  (vertex.y +
+                    offsetY +
+                    (polygonOrigin === 'Center' ? height / 2 : 0)) *
+                  zoomFactor
+                }`
             )
             .join(' ')}
         />

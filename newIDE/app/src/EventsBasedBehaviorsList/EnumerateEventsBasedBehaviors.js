@@ -6,7 +6,7 @@ export const enumerateEventsBasedBehaviors = (
 ): Array<gdEventsBasedBehavior> =>
   mapVector(
     eventsFunctionsContainer,
-    eventsBasedBehavior => eventsBasedBehavior
+    (eventsBasedBehavior) => eventsBasedBehavior
   );
 
 export const filterEventsBasedBehaviorsList = (
@@ -19,9 +19,6 @@ export const filterEventsBasedBehaviorsList = (
 
   return list.filter(
     (item: any) =>
-      item
-        .getName()
-        .toLowerCase()
-        .indexOf(lowercaseSearchText) !== -1
+      item.getName().toLowerCase().indexOf(lowercaseSearchText) !== -1
   );
 };

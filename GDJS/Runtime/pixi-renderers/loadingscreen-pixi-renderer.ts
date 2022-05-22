@@ -52,7 +52,8 @@ namespace gdjs {
         // without a canvas.
         return;
       }
-      this._pixiRenderer.backgroundColor = this._loadingScreenData.backgroundColor;
+      this._pixiRenderer.backgroundColor =
+        this._loadingScreenData.backgroundColor;
 
       const backgroundTexture = imageManager.getPIXITexture(
         loadingScreenData.backgroundImageResourceName
@@ -151,18 +152,18 @@ namespace gdjs {
           this._startLoadingScreen();
         }
       } else if (this._state == LoadingScreenState.STARTED) {
-        const backgroundFadeInDuration = this._loadingScreenData
-          .backgroundFadeInDuration;
+        const backgroundFadeInDuration =
+          this._loadingScreenData.backgroundFadeInDuration;
         fadeIn(this._backgroundSprite, backgroundFadeInDuration, deltaTimeInMs);
 
         if (hasFadedIn(this._backgroundSprite)) {
           if (!this._backgroundReadyTimeInMs)
             this._backgroundReadyTimeInMs = timeInMs;
 
-          const logoAndProgressFadeInDuration = this._loadingScreenData
-            .logoAndProgressFadeInDuration;
-          const logoAndProgressLogoFadeInDelay = this._loadingScreenData
-            .logoAndProgressLogoFadeInDelay;
+          const logoAndProgressFadeInDuration =
+            this._loadingScreenData.logoAndProgressFadeInDuration;
+          const logoAndProgressLogoFadeInDelay =
+            this._loadingScreenData.logoAndProgressLogoFadeInDelay;
 
           if (
             timeInMs - this._backgroundReadyTimeInMs >

@@ -15,7 +15,7 @@ class MiniToolbar extends Component {
 
     return (
       <ThemeConsumer>
-        {muiTheme => (
+        {(muiTheme) => (
           <div
             style={{
               ...style,

@@ -66,10 +66,11 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser.parseExpression('number', 'My').get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      1
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        1
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -99,10 +100,11 @@ describe('ExpressionAutocompletion', () => {
     const expressionNode2 = parser
       .parseExpression('number', 'MySpriteObjectW')
       .get();
-    const completionDescriptions2 = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode2,
-      1
-    );
+    const completionDescriptions2 =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode2,
+        1
+      );
     const autocompletions2 = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -130,10 +132,11 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser.parseExpression('number', 'To').get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      1
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        1
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -170,10 +173,11 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser.parseExpression('number', 'MouseX("Ba').get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      9
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        9
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -201,10 +205,11 @@ describe('ExpressionAutocompletion', () => {
     const expressionNode = parser
       .parseExpression('number', 'MySpriteObject.Po')
       .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      16
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        16
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -238,10 +243,11 @@ describe('ExpressionAutocompletion', () => {
     const expressionNode = parser
       .parseExpression('number', 'MySpriteObject.PointX("He')
       .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      24
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        24
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -269,10 +275,11 @@ describe('ExpressionAutocompletion', () => {
     const expressionNode = parser
       .parseExpression('number', 'MySpriteObjectWithBehaviors.Plat')
       .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      28
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        28
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -301,10 +308,11 @@ describe('ExpressionAutocompletion', () => {
     const expressionNode = parser
       .parseExpression('number', 'MySpriteObjectWithBehaviors.a')
       .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      28
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        28
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,
@@ -341,10 +349,11 @@ describe('ExpressionAutocompletion', () => {
         'MySpriteObjectWithBehaviors.PlatformerObject::Jum'
       )
       .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
-      expressionNode,
-      47
-    );
+    const completionDescriptions =
+      gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+        expressionNode,
+        47
+      );
     const autocompletions = getAutocompletionsFromDescriptions(
       {
         gd,

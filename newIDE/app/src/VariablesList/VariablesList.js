@@ -102,7 +102,7 @@ type Props = {|
   size?: 'small',
 |};
 
-const StyledTreeItem = withStyles(theme => ({
+const StyledTreeItem = withStyles((theme) => ({
   group: {
     marginLeft: 7,
     paddingLeft: 15,
@@ -139,7 +139,7 @@ const StyledTreeItem = withStyles(theme => ({
     },
   },
   content: { marginTop: 5 },
-}))(props => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
+}))((props) => <TreeItem {...props} TransitionProps={{ timeout: 0 }} />);
 
 const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const [expandedNodes, setExpandedNodes] = React.useState<Array<string>>(
@@ -173,9 +173,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const topLevelVariableNameInputRefs = React.useRef<{
     [number]: SemiControlledAutoCompleteInterface,
   }>({});
-  const [variablePtrToFocus, setVariablePtrToFocus] = React.useState<?number>(
-    null
-  );
+  const [variablePtrToFocus, setVariablePtrToFocus] =
+    React.useState<?number>(null);
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const draggedNodeId = React.useRef<?string>(null);
   const forceUpdate = useForceUpdate();
@@ -185,49 +184,41 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     []
   );
 
-  const triggerSearch = React.useCallback(
-    () => {
-      let matchingInheritedNodes = [];
-      const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
-        props.variablesContainer,
-        normalizeString(searchText)
-      );
-      if (props.inheritedVariablesContainer) {
-        matchingInheritedNodes = generateListOfNodesMatchingSearchInVariablesContainer(
+  const triggerSearch = React.useCallback(() => {
+    let matchingInheritedNodes = [];
+    const matchingNodes = generateListOfNodesMatchingSearchInVariablesContainer(
+      props.variablesContainer,
+      normalizeString(searchText)
+    );
+    if (props.inheritedVariablesContainer) {
+      matchingInheritedNodes =
+        generateListOfNodesMatchingSearchInVariablesContainer(
           props.inheritedVariablesContainer,
           normalizeString(searchText),
           inheritedPrefix
         );
-      }
-      setSearchMatchingNodes([...matchingNodes, ...matchingInheritedNodes]);
-    },
-    [props.inheritedVariablesContainer, props.variablesContainer, searchText]
-  );
+    }
+    setSearchMatchingNodes([...matchingNodes, ...matchingInheritedNodes]);
+  }, [props.inheritedVariablesContainer, props.variablesContainer, searchText]);
 
-  React.useEffect(
-    () => {
-      if (!!searchText) {
-        triggerSearch();
-      } else {
-        setSearchMatchingNodes([]);
-      }
-    },
-    [searchText, triggerSearch]
-  );
+  React.useEffect(() => {
+    if (!!searchText) {
+      triggerSearch();
+    } else {
+      setSearchMatchingNodes([]);
+    }
+  }, [searchText, triggerSearch]);
 
-  React.useEffect(
-    () => {
-      if (variablePtrToFocus) {
-        const inputRef =
-          topLevelVariableNameInputRefs.current[variablePtrToFocus];
-        if (inputRef) {
-          inputRef.focus();
-          setVariablePtrToFocus(null);
-        }
+  React.useEffect(() => {
+    if (variablePtrToFocus) {
+      const inputRef =
+        topLevelVariableNameInputRefs.current[variablePtrToFocus];
+      if (inputRef) {
+        inputRef.focus();
+        setVariablePtrToFocus(null);
       }
-    },
-    [variablePtrToFocus]
-  );
+    }
+  }, [variablePtrToFocus]);
 
   const shouldHideExpandIcons =
     !hasVariablesContainerSubChildren(props.variablesContainer) &&
@@ -249,11 +240,12 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       '&.isCollection > .MuiTreeItem-content > .MuiTreeItem-iconContainer': {
         backgroundColor: gdevelopTheme.listItem.selectedBackgroundColor,
       },
-      '& > .MuiTreeItem-content > .MuiTreeItem-iconContainer': shouldHideExpandIcons
-        ? {
-            display: 'none',
-          }
-        : undefined,
+      '& > .MuiTreeItem-content > .MuiTreeItem-iconContainer':
+        shouldHideExpandIcons
+          ? {
+              display: 'none',
+            }
+          : undefined,
     },
     group: {
       borderLeft: `1px solid ${gdevelopTheme.listItem.groupTextColor}`,
@@ -276,7 +268,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
 
   const undefinedVariableNames = allVariablesNames
     ? allVariablesNames
-        .map(variableName => {
+        .map((variableName) => {
           if (!props.variablesContainer.has(variableName)) {
             return { text: variableName, value: variableName };
           }
@@ -317,7 +309,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     Clipboard.set(
       CLIPBOARD_KIND,
       selectedNodes
-        .map(nodeId => {
+        .map((nodeId) => {
           const { variable, name, lineage } = getVariableContextFromNodeId(
             nodeId,
             nodeId.startsWith(inheritedPrefix) &&
@@ -356,7 +348,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
 
     let pastedElementOffsetIndex = 0;
 
-    variablesContent.forEach(variableContent => {
+    variablesContent.forEach((variableContent) => {
       const nameOrIndex = SafeExtractor.extractStringProperty(
         variableContent,
         'nameOrIndex'
@@ -373,7 +365,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
 
       const pasteAtTopLevel =
         selectedNodes.length === 0 ||
-        selectedNodes.some(nodeId => nodeId.startsWith(inheritedPrefix));
+        selectedNodes.some((nodeId) => nodeId.startsWith(inheritedPrefix));
 
       const name = hasName ? nameOrIndex : null;
 
@@ -389,10 +381,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         const targetNode = selectedNodes[0];
         if (targetNode.startsWith(inheritedPrefix)) return;
 
-        const {
-          name: targetVariableName,
-          lineage: targetVariableLineage,
-        } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
+        const { name: targetVariableName, lineage: targetVariableLineage } =
+          getVariableContextFromNodeId(targetNode, props.variablesContainer);
         if (!targetVariableName) return;
 
         const targetParentVariable = getDirectParentVariable(
@@ -513,7 +503,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   ) => {
     // TODO: Recompute list of selected nodes following a node move that changes all the values of an array.
     setSelectedNodes([]);
-    const inheritedExpandedNodes = expandedNodes.filter(nodeId =>
+    const inheritedExpandedNodes = expandedNodes.filter((nodeId) =>
       nodeId.startsWith(inheritedPrefix)
     );
     setExpandedNodes([
@@ -596,9 +586,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       lineage: draggedLineage,
       name: draggedName,
     } = draggedVariableContext;
-    const draggedVariableParentVariable = getDirectParentVariable(
-      draggedLineage
-    );
+    const draggedVariableParentVariable =
+      getDirectParentVariable(draggedLineage);
     if (!draggedVariable || !draggedName) return;
 
     if (isAnAncestryOf(draggedVariable, targetLineage)) return;
@@ -627,7 +616,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         newName = newNameGenerator(
           draggedName,
           // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
-          name => targetVariableParentVariable.hasChild(name),
+          (name) => targetVariableParentVariable.hasChild(name),
           'CopyOf'
         );
 
@@ -646,7 +635,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       case 'StructureToTopLevel':
         newName = newNameGenerator(
           draggedName,
-          name => props.variablesContainer.has(name),
+          (name) => props.variablesContainer.has(name),
           'CopyOf'
         );
         props.variablesContainer.insert(
@@ -663,7 +652,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         newName = newNameGenerator(
           draggedName,
           // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
-          name => targetVariableParentVariable.hasChild(name),
+          (name) => targetVariableParentVariable.hasChild(name),
           'CopyOf'
         );
         // $FlowFixMe - Regarding movement type, we are confident that the variable will exist
@@ -741,7 +730,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     const type = variable.getType();
 
     if (type === gd.Variable.Structure) {
-      const name = newNameGenerator('ChildVariable', name =>
+      const name = newNameGenerator('ChildVariable', (name) =>
         variable.hasChild(name)
       );
       variable.getChild(name).setString('');
@@ -753,10 +742,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
 
   const editInheritedVariable = (nodeId: string): void => {
     if (!props.inheritedVariablesContainer) return;
-    const {
-      variable: inheritedVariable,
-      name: inheritedVariableName,
-    } = getVariableContextFromNodeId(nodeId, props.inheritedVariablesContainer);
+    const { variable: inheritedVariable, name: inheritedVariableName } =
+      getVariableContextFromNodeId(nodeId, props.inheritedVariablesContainer);
     if (!inheritedVariable || !inheritedVariableName) return;
     if (props.variablesContainer.has(inheritedVariableName)) return;
     const newVariable = new gd.Variable();
@@ -778,7 +765,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const onAdd = () => {
     const addAtTopLevel =
       selectedNodes.length === 0 ||
-      selectedNodes.some(node => node.startsWith(inheritedPrefix));
+      selectedNodes.some((node) => node.startsWith(inheritedPrefix));
 
     if (addAtTopLevel) {
       const { name: newName, variable } = insertInVariablesContainer(
@@ -794,10 +781,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     }
 
     const targetNode = selectedNodes[0];
-    const {
-      name: targetVariableName,
-      lineage: targetLineage,
-    } = getVariableContextFromNodeId(targetNode, props.variablesContainer);
+    const { name: targetVariableName, lineage: targetLineage } =
+      getVariableContextFromNodeId(targetNode, props.variablesContainer);
     if (!targetVariableName) return;
     const oldestAncestry = getOldestAncestryVariable(targetLineage);
     let position;
@@ -876,7 +861,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         !(
           searchMatchingNodes.includes(nodeId) ||
           searchMatchingNodes.includes(parentNodeId) ||
-          searchMatchingNodes.some(matchingNodeId =>
+          searchMatchingNodes.some((matchingNodeId) =>
             matchingNodeId.startsWith(nodeId)
           )
         )
@@ -957,7 +942,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       {shouldWrap ? null : <Spacer />}
                       <SemiControlledAutoComplete
                         fullWidth
-                        ref={element => {
+                        ref={(element) => {
                           if (depth === 0 && element) {
                             topLevelVariableNameInputRefs.current[
                               variable.ptr
@@ -972,7 +957,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         }
                         onClick={stopEventPropagation}
                         errorText={nameErrors[variable.ptr]}
-                        onChange={newValue => {
+                        onChange={(newValue) => {
                           onChangeName(nodeId, newValue);
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
@@ -990,7 +975,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             : undefined,
                         }}
                         value={name}
-                        onBlur={event => {
+                        onBlur={(event) => {
                           onChangeName(nodeId, event.currentTarget.value);
                           if (nameErrors[variable.ptr]) {
                             const newNameErrors = { ...nameErrors };
@@ -1007,7 +992,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                         <Column noMargin>
                           <VariableTypeSelector
                             variableType={type}
-                            onChange={newType => {
+                            onChange={(newType) => {
                               onChangeType(nodeId, newType);
                               forceUpdate();
                             }}
@@ -1089,7 +1074,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                   : variable.getValue().toString()
                               }
                               commitOnBlur
-                              onBlur={event => {
+                              onBlur={(event) => {
                                 onChangeValue(
                                   nodeId,
                                   event.currentTarget.value
@@ -1104,7 +1089,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             size="small"
                             style={styles.inlineIcon}
                             tooltip={t`Add child`}
-                            onClick={event => {
+                            onClick={(event) => {
                               stopEventPropagation(event);
                               onAddChild(nodeId);
                             }}
@@ -1123,7 +1108,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             size="small"
                             tooltip={t`Edit`}
                             style={styles.inlineIcon}
-                            onClick={event => {
+                            onClick={(event) => {
                               stopEventPropagation(event);
                               editInheritedVariable(nodeId);
                             }}
@@ -1142,7 +1127,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             size="small"
                             tooltip={t`Reset`}
                             style={styles.inlineIcon}
-                            onClick={event => {
+                            onClick={(event) => {
                               stopEventPropagation(event);
                               deleteNode(nodeId);
                             }}
@@ -1183,7 +1168,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                       i18n
                     );
                   })
-              : mapFor(0, variable.getChildrenCount(), index => {
+              : mapFor(0, variable.getChildrenCount(), (index) => {
                   const childVariable = variable.getAtIndex(index);
                   return renderVariableAndChildrenRows(
                     {
@@ -1205,16 +1190,16 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const onNodeToggle = (event, values) => {
     // Inherited variables should not be modified
     const instanceExpandedNodes = expandedNodes.filter(
-      node => !node.startsWith(inheritedPrefix)
+      (node) => !node.startsWith(inheritedPrefix)
     );
     const instanceNewExpandedNodes = values.filter(
-      node => !node.startsWith(inheritedPrefix)
+      (node) => !node.startsWith(inheritedPrefix)
     );
     const foldedNodes = instanceExpandedNodes.filter(
-      node => !instanceNewExpandedNodes.includes(node)
+      (node) => !instanceNewExpandedNodes.includes(node)
     );
     const unfoldedNodes = instanceNewExpandedNodes.filter(
-      node => !instanceExpandedNodes.includes(node)
+      (node) => !instanceExpandedNodes.includes(node)
     );
     foldNodesVariables(props.variablesContainer, foldedNodes, true);
     foldNodesVariables(props.variablesContainer, unfoldedNodes, false);
@@ -1384,7 +1369,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
-      index => {
+      (index) => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
         if (isInherited) {
@@ -1416,7 +1401,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
       canPaste={Clipboard.has(CLIPBOARD_KIND)}
       canDelete={
         selectedNodes.length > 0 &&
-        selectedNodes.every(nodeId => !nodeId.startsWith(inheritedPrefix))
+        selectedNodes.every((nodeId) => !nodeId.startsWith(inheritedPrefix))
       }
       onUndo={_undo}
       onRedo={_redo}
@@ -1435,7 +1420,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
         <ClickAwayListener onClickAway={() => setSelectedNodes([])}>
           <Measure
             bounds
-            onResize={contentRect => {
+            onResize={(contentRect) => {
               setContainerWidth(contentRect.bounds.width);
             }}
           >

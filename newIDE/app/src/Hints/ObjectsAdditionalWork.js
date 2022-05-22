@@ -67,7 +67,7 @@ const objectType = {
     onObjectAdded: (object: gdObject, layout: gdLayout, project: gdProject) => {
       const lightingLayer = getLightingLayer(layout);
       if (lightingLayer === null) {
-        const name = newNameGenerator('Lighting', name =>
+        const name = newNameGenerator('Lighting', (name) =>
           layout.hasLayerNamed(name)
         );
         layout.insertNewLayer(name, layout.getLayersCount());

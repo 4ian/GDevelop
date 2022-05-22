@@ -79,28 +79,23 @@ export default function NewInstructionEditorMenu({
   onPasteInstructions,
 }: Props) {
   const forceUpdate = useForceUpdate();
-  const [
-    newInstructionEditorState,
-    newInstructionEditorSetters,
-  ] = useNewInstructionEditor({
-    instruction,
-    isCondition,
-    project,
-    isNewInstruction,
-    scope,
-    globalObjectsContainer,
-    objectsContainer,
-  });
+  const [newInstructionEditorState, newInstructionEditorSetters] =
+    useNewInstructionEditor({
+      instruction,
+      isCondition,
+      project,
+      isNewInstruction,
+      scope,
+      globalObjectsContainer,
+      objectsContainer,
+    });
   const {
     chosenObjectName,
     chosenObjectInstructionsInfo,
     chosenObjectInstructionsInfoTree,
   } = newInstructionEditorState;
-  const {
-    chooseInstruction,
-    chooseObject,
-    chooseObjectInstruction,
-  } = newInstructionEditorSetters;
+  const { chooseInstruction, chooseObject, chooseObjectInstruction } =
+    newInstructionEditorSetters;
   // As we're in a context menu, always start from 'object-or-free-instructions' step and with 'objects' tab.
   const [step, setStep] = React.useState<StepName>(
     'object-or-free-instructions'
@@ -150,13 +145,12 @@ export default function NewInstructionEditorMenu({
       isCondition={isCondition}
       chosenInstructionType={!chosenObjectName ? instructionType : undefined}
       onChooseInstruction={(instructionType: string) => {
-        const { instruction, chosenObjectName } = chooseInstruction(
-          instructionType
-        );
+        const { instruction, chosenObjectName } =
+          chooseInstruction(instructionType);
         submitInstruction({ instruction, chosenObjectName });
       }}
       chosenObjectName={chosenObjectName}
-      onChooseObject={chosenObjectName => {
+      onChooseObject={(chosenObjectName) => {
         chooseObject(chosenObjectName);
         setStep('object-instructions');
       }}
@@ -174,9 +168,8 @@ export default function NewInstructionEditorMenu({
         instructionsInfoTree={chosenObjectInstructionsInfoTree}
         iconSize={24}
         onChoose={(instructionType: string) => {
-          const { instruction, chosenObjectName } = chooseObjectInstruction(
-            instructionType
-          );
+          const { instruction, chosenObjectName } =
+            chooseObjectInstruction(instructionType);
           submitInstruction({ instruction, chosenObjectName });
         }}
         selectedType={instructionType}

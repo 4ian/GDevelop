@@ -340,13 +340,20 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       // as a condition.
       {
         gd::Instruction condition;
-        condition.SetType("MyEventsExtension::MyEventsFunctionExpressionAndCondition");
-        condition.SetParametersCount(2);
+        condition.SetType("MyEventsExtension::MyEventsBasedBehavior::"
+            "MyBehaviorEventsFunctionExpressionAndCondition");
+        condition.SetParametersCount(4);
         condition.SetParameter(
             0,
-            gd::Expression(">"));
+            gd::Expression("ObjectWithMyBehavior"));
         condition.SetParameter(
             1,
+            gd::Expression("MyBehavior"));
+        condition.SetParameter(
+            2,
+            gd::Expression(">"));
+        condition.SetParameter(
+            3,
             gd::Expression("5"));
         event.GetConditions().Insert(condition);
       }
@@ -1044,7 +1051,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     // Check if events-based behavior methods have been renamed in
     // instructions
     REQUIRE(
-        GetEventFirstConditionType(project.GetLayout("ExternalEventsWithBehaviorFunctions")
+        GetEventFirstConditionType(project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
                                     .GetEvents()
                                     .GetEvent(4)) ==
         "MyEventsExtension::MyEventsBasedBehavior::"

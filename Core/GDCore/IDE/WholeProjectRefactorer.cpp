@@ -241,8 +241,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
       [&project, &oldName, &newName](
           const gd::EventsBasedBehavior& eventsBasedBehavior,
           const gd::EventsFunction& eventsFunction) {
-        if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
-            eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+        if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
           gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
               project,
               GetBehaviorEventsFunctionFullType(oldName,
@@ -252,10 +251,8 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
                                                 eventsBasedBehavior.GetName(),
                                                 eventsFunction.GetName()));
           ExposeProjectEvents(project, renamer);
-        } else if (eventsFunction.GetFunctionType() ==
-                       gd::EventsFunction::Expression ||
-                   eventsFunction.GetFunctionType() ==
-                       gd::EventsFunction::StringExpression) {
+        }
+        if (eventsFunction.IsExpression()) {
           // Nothing to do, expressions are not including the extension name
         }
       };
@@ -303,9 +300,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
 
   // Free expressions
   for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-    if (eventsFunction->GetFunctionType() == gd::EventsFunction::Expression ||
-        eventsFunction->GetFunctionType() ==
-            gd::EventsFunction::StringExpression) {
+    if (eventsFunction->IsExpression()) {
       renameEventsFunction(*eventsFunction);
     }
   }
@@ -314,9 +309,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
        eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
     auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
     for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-      if (eventsFunction->GetFunctionType() == gd::EventsFunction::Expression ||
-          eventsFunction->GetFunctionType() ==
-              gd::EventsFunction::StringExpression) {
+      if (eventsFunction->IsExpression()) {
         renameBehaviorEventsFunction(*eventsBasedBehavior, *eventsFunction);
       }
     }
@@ -324,8 +317,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
 
   // Free instructions
   for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
-    if (eventsFunction->GetFunctionType() == gd::EventsFunction::Action ||
-        eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
+    if (eventsFunction->IsAction() || eventsFunction->IsCondition()) {
       renameEventsFunction(*eventsFunction);
     }
   }
@@ -335,8 +327,7 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
        eventsFunctionsExtension.GetEventsBasedBehaviors().GetInternalVector()) {
     auto& behaviorEventsFunctions = eventsBasedBehavior->GetEventsFunctions();
     for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-      if (eventsFunction->GetFunctionType() == gd::EventsFunction::Action ||
-          eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
+      if (eventsFunction->IsAction() || eventsFunction->IsCondition()) {
         renameBehaviorEventsFunction(*eventsBasedBehavior, *eventsFunction);
       }
     }
@@ -393,8 +384,7 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
   const gd::EventsFunction& eventsFunction =
       eventsFunctions.GetEventsFunction(oldFunctionName);
 
-  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
-      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+  if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
         project,
         GetBehaviorEventsFunctionFullType(eventsFunctionsExtension.GetName(),
@@ -404,10 +394,8 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
                                           eventsBasedBehavior.GetName(),
                                           newFunctionName));
     ExposeProjectEvents(project, renamer);
-  } else if (eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::Expression ||
-             eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::StringExpression) {
+  }
+  if (eventsFunction.IsExpression()) {
     gd::ExpressionsRenamer renamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
     renamer.SetReplacedBehaviorExpression(
@@ -433,15 +421,12 @@ void WholeProjectRefactorer::MoveEventsFunctionParameter(
   const gd::String& eventsFunctionType = GetEventsFunctionFullType(
       eventsFunctionsExtension.GetName(), functionName);
 
-  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
-      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+  if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
         project, eventsFunctionType, oldIndex, newIndex);
     ExposeProjectEvents(project, mover);
-  } else if (eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::Expression ||
-             eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::StringExpression) {
+  }
+  if (eventsFunction.IsExpression()) {
     gd::ExpressionsParameterMover mover =
         gd::ExpressionsParameterMover(project.GetCurrentPlatform());
     mover.SetFreeExpressionMovedParameter(
@@ -468,15 +453,12 @@ void WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
                                         eventsBasedBehavior.GetName(),
                                         functionName);
 
-  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
-      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+  if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsParameterMover mover = gd::InstructionsParameterMover(
         project, eventsFunctionType, oldIndex, newIndex);
     ExposeProjectEvents(project, mover);
-  } else if (eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::Expression ||
-             eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::StringExpression) {
+  }
+  if (eventsFunction.IsExpression()) {
     gd::ExpressionsParameterMover mover =
         gd::ExpressionsParameterMover(project.GetCurrentPlatform());
     mover.SetBehaviorExpressionMovedParameter(
@@ -807,8 +789,7 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
        &eventsFunctionsExtension,
        &oldBehaviorName,
        &newBehaviorName](const gd::EventsFunction& eventsFunction) {
-        if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
-            eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+        if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
           gd::InstructionsTypeRenamer renamer = gd::InstructionsTypeRenamer(
               project,
               GetBehaviorEventsFunctionFullType(
@@ -820,10 +801,8 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
                   newBehaviorName,
                   eventsFunction.GetName()));
           ExposeProjectEvents(project, renamer);
-        } else if (eventsFunction.GetFunctionType() ==
-                       gd::EventsFunction::Expression ||
-                   eventsFunction.GetFunctionType() ==
-                       gd::EventsFunction::StringExpression) {
+        }
+        if (eventsFunction.IsExpression()) {
           // Nothing to do, expressions are not including the name of the
           // behavior
         }
@@ -870,17 +849,14 @@ void WholeProjectRefactorer::RenameEventsBasedBehavior(
 
   // Behavior expressions
   for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-    if (eventsFunction->GetFunctionType() == gd::EventsFunction::Expression ||
-        eventsFunction->GetFunctionType() ==
-            gd::EventsFunction::StringExpression) {
+    if (eventsFunction->IsExpression()) {
       renameBehaviorEventsFunction(*eventsFunction);
     }
   }
 
   // Behavior instructions
   for (auto&& eventsFunction : behaviorEventsFunctions.GetInternalVector()) {
-    if (eventsFunction->GetFunctionType() == gd::EventsFunction::Action ||
-        eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
+    if (eventsFunction->IsAction() || eventsFunction->IsCondition()) {
       renameBehaviorEventsFunction(*eventsFunction);
     }
   }
@@ -902,15 +878,12 @@ void WholeProjectRefactorer::DoRenameEventsFunction(
     const gd::EventsFunction& eventsFunction,
     const gd::String& oldFullType,
     const gd::String& newFullType) {
-  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
-      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+  if (eventsFunction.IsAction() || eventsFunction.IsCondition()) {
     gd::InstructionsTypeRenamer renamer =
         gd::InstructionsTypeRenamer(project, oldFullType, newFullType);
     ExposeProjectEvents(project, renamer);
-  } else if (eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::Expression ||
-             eventsFunction.GetFunctionType() ==
-                 gd::EventsFunction::StringExpression) {
+  }
+  if (eventsFunction.IsExpression()) {
     gd::ExpressionsRenamer renamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
     renamer.SetReplacedFreeExpression(oldFullType, newFullType);

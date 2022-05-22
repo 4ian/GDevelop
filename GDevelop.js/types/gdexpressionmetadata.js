@@ -20,6 +20,10 @@ declare class gdExpressionMetadata {
   setRequiresBaseObjectCapability(capability: string): gdExpressionMetadata;
   getRequiredBaseObjectCapability(): string;
   getCodeExtraInformation(): gdExpressionCodeGenerationInformation;
+  setFunctionName(functionName: string): gdExpressionCodeGenerationInformation;
+  setIncludeFile(includeFile: string): gdExpressionMetadata;
+  addIncludeFile(includeFile: string): gdExpressionMetadata;
+  getIncludeFiles(): gdVectorString;
   delete(): void;
   ptr: number;
 };

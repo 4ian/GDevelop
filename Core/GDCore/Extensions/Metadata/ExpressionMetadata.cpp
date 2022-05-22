@@ -44,8 +44,9 @@ gd::ExpressionMetadata& ExpressionMetadata::AddParameter(
   info.supplementaryInformation =
       // For objects/behavior, the supplementary information
       // parameter is an object/behavior type...
-      (gd::ParameterMetadata::IsObject(type) ||
+      ((gd::ParameterMetadata::IsObject(type) ||
        gd::ParameterMetadata::IsBehavior(type))
+       && !(supplementaryInformation.rfind(extensionNamespace, 0) == 0))
           ? (supplementaryInformation.empty()
                  ? ""
                  : extensionNamespace +

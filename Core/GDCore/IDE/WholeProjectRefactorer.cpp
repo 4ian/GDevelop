@@ -384,7 +384,9 @@ void WholeProjectRefactorer::RenameBehaviorEventsFunction(
   const gd::EventsFunction& eventsFunction =
       eventsFunctions.GetEventsFunction(oldFunctionName);
 
-  // The order is important
+  // Order is important: we first rename the expressions then the instructions,
+  // to avoid being unable to fetch the metadata (the types of parameters) of
+  // instructions after they are renamed.
   if (eventsFunction.IsExpression()) {
     gd::ExpressionsRenamer renamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());
@@ -879,7 +881,9 @@ void WholeProjectRefactorer::DoRenameEventsFunction(
     const gd::EventsFunction& eventsFunction,
     const gd::String& oldFullType,
     const gd::String& newFullType) {
-  // The order is important
+  // Order is important: we first rename the expressions then the instructions,
+  // to avoid being unable to fetch the metadata (the types of parameters) of
+  // instructions after they are renamed.
   if (eventsFunction.IsExpression()) {
     gd::ExpressionsRenamer renamer =
         gd::ExpressionsRenamer(project.GetCurrentPlatform());

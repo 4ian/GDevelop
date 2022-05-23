@@ -219,6 +219,11 @@ export function createGdevelopTheme(
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
         },
       },
+      dropIndicator: {
+        canDrop: styles['ThemeDropIndicatorCanDropColor'],
+        cannotDrop: styles['ThemeDropIndicatorCannotDropColor'],
+        border: styles['ThemeDropIndicatorBorderColor'],
+      },
       closableTabs: {
         fontFamily: styles['GdevelopFontFamily'],
         containerBackgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],

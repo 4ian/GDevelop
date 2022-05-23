@@ -147,12 +147,15 @@ export class ColorAssetStoreSearchFilter
         (deltaSaturation * deltaSaturation + deltaLightness * deltaLightness) /
           2;
     } else {
+      // Hue distance can only be up to 0.5 as it's looping.
+      // So, it's multiplied by 2 to cover [0, 1].
       const deltaHue =
         dominantSaturation === 0
           ? 1
-          : Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
+          : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
       const deltaSaturation = dominantSaturation - targetSaturation;
       const deltaLightness = dominantHsl[2] - targetHsl[2];
+      // Give more importance to hue as it catches human eyes.
       score =
         1 -
         (4 * deltaHue * deltaHue +
@@ -160,6 +163,6 @@ export class ColorAssetStoreSearchFilter
           deltaLightness * deltaLightness) /
           6;
     }
-    return score > 0.98;
+    return score > 0.94;
   }
 }

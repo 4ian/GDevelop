@@ -171,6 +171,7 @@ const PointsEditor = (props: Props) => {
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!props.object.getAnimationsCount()) return null;
+  const resourceName = hasValidSprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -179,8 +180,12 @@ const PointsEditor = (props: Props) => {
       renderEditor: () => (
         <Background>
           <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={props.resourcesLoader}
+            resourceName={resourceName}
+            imageSource={props.resourcesLoader.getResourceFullUrl(
+              props.project,
+              resourceName,
+              {}
+            )}
             project={props.project}
             renderOverlay={overlayProps =>
               hasValidSprite && (

@@ -4,7 +4,6 @@ import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
-import ResourcesLoader from '../../ResourcesLoader';
 import { Column } from '../../UI/Grid';
 import MiniToolbar from '../../UI/MiniToolbar';
 import ZoomIn from '@material-ui/icons/ZoomIn';
@@ -66,7 +65,7 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcePath?: string,
-  resourcesLoader: typeof ResourcesLoader,
+  imageSource: string,
   fixedHeight?: number,
   renderOverlay?: ({|
     imageWidth: number,
@@ -76,13 +75,13 @@ type Props = {|
     imageZoomFactor: number,
   |}) => React.Node,
   onSize?: (number, number) => void,
+  hideCheckeredBackground?: boolean,
 |};
 
 type State = {|
   errored: boolean,
   imageWidth: ?number,
   imageHeight: ?number,
-  imageSource: ?string,
   imageZoomFactor: number,
 |};
 
@@ -97,52 +96,26 @@ const resourceIsSmooth = (
   return imageResource.isSmooth();
 };
 
-const loadStateFrom = (newProps: {
-  project: gdProject,
-  resourceName: string,
-  resourcesLoader: typeof ResourcesLoader,
-}) => {
-  return {
-    errored: false,
-    imageSource: newProps.resourcesLoader.getResourceFullUrl(
-      newProps.project,
-      newProps.resourceName,
-      {}
-    ),
-  };
-};
-
 /**
  * Display the preview for a resource of a project with kind "image".
  */
-const ImagePreview = (props: Props) => {
+const ImagePreview = ({
+  project,
+  resourceName,
+  resourcePath,
+  imageSource,
+  fixedHeight,
+  renderOverlay,
+  onSize,
+  hideCheckeredBackground,
+}: Props) => {
   const [state, setState] = React.useState<State>({
     errored: false,
     imageWidth: null,
     imageHeight: null,
     imageZoomFactor: 1,
-    ...loadStateFrom(props),
   });
   const isResizeObserverReady = React.useRef<boolean>(false);
-
-  React.useEffect(
-    () => {
-      setState(state => ({
-        ...state,
-        ...loadStateFrom({
-          resourceName: props.resourceName,
-          project: props.project,
-          resourcesLoader: props.resourcesLoader,
-        }),
-      }));
-    },
-    [
-      props.resourceName,
-      props.project,
-      props.resourcesLoader,
-      props.resourcePath,
-    ]
-  );
 
   const handleImageError = () => {
     setState(state => ({ ...state, errored: true }));
@@ -179,7 +152,7 @@ const ImagePreview = (props: Props) => {
       ? imgElement.naturalHeight || imgElement.clientHeight
       : 0;
     setState(state => ({ ...state, imageWidth, imageHeight }));
-    if (props.onSize) props.onSize(imageWidth, imageHeight);
+    if (onSize) onSize(imageWidth, imageHeight);
   };
 
   const zoomBy = (imageZoomFactorDelta: number) => {
@@ -210,8 +183,7 @@ const ImagePreview = (props: Props) => {
           adaptZoomToImage(containerHeight, containerWidth);
           isResizeObserverReady.current = true;
         }
-        const { resourceName, renderOverlay, fixedHeight, project } = props;
-        const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
+        const { imageHeight, imageWidth, imageZoomFactor } = state;
 
         const imageLoaded = !!imageWidth && !!imageHeight && !state.errored;
 
@@ -301,7 +273,7 @@ const ImagePreview = (props: Props) => {
                 height: fixedHeight || '100%',
               }}
             >
-              <CheckeredBackground />
+              {!hideCheckeredBackground && <CheckeredBackground />}
               <div
                 dir={
                   'ltr' /* Force LTR layout to avoid issues with image positioning */

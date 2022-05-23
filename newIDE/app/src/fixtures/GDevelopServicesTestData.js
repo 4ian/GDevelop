@@ -8,10 +8,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
-import {
-  type ExtensionShortHeader,
-  type SerializedExtension,
-} from '../Utils/GDevelopServices/Extension';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
@@ -432,6 +429,8 @@ export const fakeAsset1: Asset = {
   previewImageUrls: ['res/GD-logo.png'],
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
@@ -456,6 +455,8 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
   previewImageUrls: ['res/GD-logo.png'],
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
@@ -500,6 +501,8 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
   previewImageUrls: ['res/GD-logo.png'],
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
@@ -533,6 +536,8 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   previewImageUrls: ['res/GD-logo.png'],
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
@@ -566,6 +571,8 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
   previewImageUrls: ['res/GD-logo.png'],
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
@@ -642,6 +649,8 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   previewImageUrls: ['res/GD-logo.png'],
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
@@ -695,6 +704,8 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
     'CC-BY 4.0 (Attribution to the artist is required, click for details)',
   animationsCount: 6,
   maxFramesCount: 6,
+  height: 36,
+  width: 36,
   name: 'Dino Doux',
   objectType: 'sprite',
   previewImageUrls: [

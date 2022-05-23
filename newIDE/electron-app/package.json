@@ -41,8 +41,7 @@
       "entitlements": "./build/entitlements.mac.inherit.plist"
     },
     "win": {
-      "executableName": "GDevelop",
-      "publish": null
+      "executableName": "GDevelop"
     },
     "nsis": {
       "oneClick": false,
@@ -54,7 +53,6 @@
       "publisher": "CN=B13CB8D3-97AA-422C-A394-0EE51B9ACAD3",
       "identityName": "GDevelopgameengine.GDevelop",
       "backgroundColor": "#524F9C",
-      "publish": null,
       "languages": [
         "EN-US",
         "ZH-HANS",

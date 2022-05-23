@@ -44,6 +44,13 @@ const hexToNullableRGBColor = (color: string): RGBColor | null => {
   return /^#{0,1}[0-9a-fA-F]{6}$/.test(color) ? hexToRGBColor(color) : null;
 };
 
+// TODO Decide what to do with this component.
+// Should it be merged back with ColorField?
+// The only difference is the format of the string representation,
+// but they probably have distinct usages:
+// - ColorField is for color properties and parameters
+// - this one is for a color thant won't be used in events and
+// should use the common #123456 format.
 export class HexColorField extends React.Component<Props, State> {
   state = {
     color: this.props.color
@@ -92,7 +99,6 @@ export class HexColorField extends React.Component<Props, State> {
           onBlur={this._handleBlur}
           ref={textField => (this._textField = textField)}
           onKeyPress={ev => {
-            console.log(`Pressed keyCode ${ev.key}`);
             if (ev.key === 'Enter') {
               this._handleBlur();
             }

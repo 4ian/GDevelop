@@ -1,7 +1,7 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
-import { Column } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import Chip from '@material-ui/core/Chip';
 import RaisedButton from '../UI/RaisedButton';
@@ -10,31 +10,31 @@ import {
   type Asset,
   type Author,
   getAsset,
-  isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
 import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
+import { type ResourceSource } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import Add from '@material-ui/icons/Add';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import Dialog from '../UI/Dialog';
-import FlatButton from '../UI/FlatButton';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Link from '@material-ui/core/Link';
 import Window from '../Utils/Window';
-import CheckeredBackground from '../ResourcesList/CheckeredBackground';
+import { makeStyles, Paper } from '@material-ui/core';
+import SelectField from '../UI/SelectField';
+import SelectOption from '../UI/SelectOption';
+import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
+import ThemeContext from '../UI/Theme/ThemeContext';
+import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
+import ScrollView from '../UI/ScrollView';
 
 const styles = {
   previewImagePixelated: {
-    width: '100%',
+    width: '50%',
     imageRendering: getPixelatedImageRendering(),
     padding: 15,
   },
@@ -44,16 +44,13 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-  },
-  verticalPreviewBackground: {
-    width: 250,
-  },
-  horizontalPreviewBackground: {
-    height: 170,
+    width: 300,
+    maxHeight: 350,
   },
   chip: {
     marginBottom: 2,
     marginRight: 2,
+    cursor: 'pointer',
   },
   previewImage: {
     position: 'relative',
@@ -61,17 +58,46 @@ const styles = {
     maxHeight: '100%',
     verticalAlign: 'middle',
     pointerEvents: 'none',
-    objectFit: 'contain',
+  },
+  arrowContainer: {
+    padding: 6,
+    cursor: 'pointer',
   },
 };
+
+const useChipStyles = makeStyles({
+  label: {
+    cursor: 'pointer',
+  },
+});
+
+const useStylesForLeftArrow = makeStyles({
+  root: {
+    cursor: 'pointer',
+    '& > path': {
+      transform: 'translate(5px, 0px)', // Translate path inside SVG since MUI icon is not centered
+      cursor: 'pointer',
+    },
+  },
+});
+
+const useStylesForRightArrow = makeStyles({
+  root: {
+    cursor: 'pointer',
+    '& > path': { cursor: 'pointer' },
+  },
+});
+
+const makeFirstLetterUppercase = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
 
 type Props = {|
   project: gdProject,
   layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
   resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  onTagSelection: (tag: string) => void,
 
   assetShortHeader: AssetShortHeader,
   onAdd: () => void,
@@ -85,16 +111,25 @@ export const AssetDetails = ({
   layout,
   objectsContainer,
   resourceSources,
-  onChooseResource,
   resourceExternalEditors,
+  onTagSelection,
   assetShortHeader,
   onAdd,
   onClose,
   canInstall,
   isBeingInstalled,
 }: Props) => {
+  const chipStyles = useChipStyles();
+  const leftArrowStyles = useStylesForLeftArrow();
+  const rightArrowStyles = useStylesForRightArrow();
+  const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
+  const [isAssetAdded, setIsAssetAdded] = React.useState<boolean>(false);
+  const [
+    selectedAnimationName,
+    setSelectedAnimationName,
+  ] = React.useState<?string>(null);
   const [error, setError] = React.useState<?Error>(null);
   const loadAsset = React.useCallback(
     () => {
@@ -102,6 +137,11 @@ export const AssetDetails = ({
         try {
           const loadedAsset = await getAsset(assetShortHeader);
           setAsset(loadedAsset);
+          if (loadedAsset.objectType === 'sprite') {
+            setSelectedAnimationName(
+              loadedAsset.objectAssets[0].object.animations[0].name
+            );
+          }
         } catch (error) {
           console.log('Error while loading asset:', error);
           setError(error);
@@ -118,12 +158,14 @@ export const AssetDetails = ({
     [loadAsset]
   );
 
-  const canAddAsset = canInstall && !isBeingInstalled && !!asset;
+  const canAddAsset =
+    canInstall && !isBeingInstalled && !!asset && !isAssetAdded;
   const onAddAsset = React.useCallback(
     () => {
       if (canAddAsset) onAdd();
+      setIsAssetAdded(true);
     },
-    [onAdd, canAddAsset]
+    [onAdd, canAddAsset, setIsAssetAdded]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -139,79 +181,35 @@ export const AssetDetails = ({
       ? licenses.find(({ name }) => name === asset.license)
       : null;
 
+  const assetAnimations = asset
+    ? asset.objectAssets[0].object.animations
+    : null;
+  const animation = assetAnimations
+    ? assetAnimations.find(({ name }) => name === selectedAnimationName)
+    : null;
+  const direction = animation ? animation.directions[0] : null;
+  const animationResources =
+    asset && direction
+      ? direction.sprites.map(sprite =>
+          asset.objectAssets[0].resources.find(
+            ({ name }) => name === sprite.image
+          )
+        )
+      : null;
+
   return (
-    <Dialog
-      open
-      title={<Trans>Add an object from the store</Trans>}
-      onRequestClose={onClose}
-      actions={[
-        <FlatButton key="back" label={<Trans>Back</Trans>} onClick={onClose} />,
-        <LeftLoader
-          isLoading={isBeingInstalled || (!asset && !error)}
-          key="install"
-        >
-          <RaisedButton
-            primary
-            icon={<Add />}
-            label={<Trans>Add to the game</Trans>}
-            onClick={onAddAsset}
-            disabled={!canAddAsset}
-            id="add-asset-button"
-          />
-        </LeftLoader>,
-      ]}
-      onApply={onAddAsset}
-      id={'asset-details-dialog'}
-    >
+    <ScrollView>
       <Column expand noMargin>
-        <ResponsiveLineStackLayout noMargin>
-          <ResponsiveWindowMeasurer>
-            {windowWidth => (
-              <div
-                style={{
-                  ...styles.previewBackground,
-                  ...(windowWidth === 'small'
-                    ? styles.horizontalPreviewBackground
-                    : styles.verticalPreviewBackground),
-                }}
-              >
-                <CheckeredBackground />
-                <CorsAwareImage
-                  style={{
-                    ...styles.previewImage,
-                    ...(isPixelArt(assetShortHeader)
-                      ? styles.previewImagePixelated
-                      : undefined),
-                  }}
-                  src={assetShortHeader.previewImageUrls[0]}
-                  alt={assetShortHeader.name}
-                />
-              </div>
-            )}
-          </ResponsiveWindowMeasurer>
-          <Column expand>
-            <div>
+        <Line justifyContent="space-between" noMargin>
+          <Column>
+            <Line alignItems="center" noMargin>
               <Text size="title" displayInlineAsSpan>
                 {assetShortHeader.name}
-              </Text>{' '}
-              {assetShortHeader.shortDescription && (
-                <React.Fragment>
-                  -{' '}
-                  <Text size="body" displayInlineAsSpan>
-                    {assetShortHeader.shortDescription}
-                  </Text>
-                </React.Fragment>
-              )}
-            </div>
-            <span>
-              {assetShortHeader.tags.map(tag => (
-                <Chip size="small" style={styles.chip} label={tag} key={tag} />
-              ))}
-            </span>
-            {asset ? (
-              <React.Fragment>
+              </Text>
+              <Spacer />
+              {asset && (
                 <Text size="body">
-                  <Trans>By:</Trans>{' '}
+                  <Trans>by</Trans>{' '}
                   {!!assetAuthors &&
                     assetAuthors.map(author => {
                       return (
@@ -227,10 +225,192 @@ export const AssetDetails = ({
                       );
                     })}
                 </Text>
+              )}
+            </Line>
+            <Line alignItems="center">
+              <div style={{ flexWrap: 'wrap' }}>
+                {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
+                  <React.Fragment key={tag}>
+                    {index !== 0 && <Spacer />}
+                    <Chip
+                      size="small"
+                      style={styles.chip}
+                      classes={chipStyles}
+                      label={makeFirstLetterUppercase(tag)}
+                      onClick={() => {
+                        onTagSelection(tag);
+                      }}
+                    />
+                  </React.Fragment>
+                ))}
+                {assetShortHeader.tags.length > 5 && (
+                  <>
+                    <Spacer />
+                    <Chip
+                      size="small"
+                      style={styles.chip}
+                      label={
+                        <Trans>
+                          + {assetShortHeader.tags.length - 5} tag(s)
+                        </Trans>
+                      }
+                    />
+                  </>
+                )}
+              </div>
+            </Line>
+          </Column>
+          <Column alignItems="center" justifyContent="center">
+            <LeftLoader
+              isLoading={isBeingInstalled || (!asset && !error)}
+              key="install"
+            >
+              <RaisedButton
+                primary
+                label={
+                  isBeingInstalled ? (
+                    <Trans>Adding to my project...</Trans>
+                  ) : isAssetAdded ? (
+                    <Trans>Object added to my project</Trans>
+                  ) : (
+                    <Trans>Add object to my project</Trans>
+                  )
+                }
+                onClick={onAddAsset}
+                disabled={!canAddAsset}
+                id="add-asset-button"
+              />
+            </LeftLoader>
+          </Column>
+        </Line>
+        <ResponsiveLineStackLayout noMargin>
+          <ResponsiveWindowMeasurer>
+            {windowWidth => (
+              <Column>
+                <div style={styles.previewBackground}>
+                  {asset ? (
+                    <>
+                      {asset.objectType === 'sprite' &&
+                        animationResources &&
+                        direction && (
+                          <AnimationPreview
+                            resourceNames={animationResources.map(
+                              ({ name }) => name
+                            )}
+                            getImageSource={(resourceName: string) => {
+                              return animationResources.find(
+                                ({ name }) => name === resourceName
+                              ).file;
+                            }}
+                            project={project}
+                            timeBetweenFrames={direction.timeBetweenFrames}
+                            isLooping // Always loop in the asset store.
+                            hideCheckeredBackground
+                            hideControls
+                            initialZoom={
+                              150 / Math.max(asset.width, asset.height)
+                            }
+                          />
+                        )}
+                      {(asset.objectType === 'tiled' ||
+                        asset.objectType === '9patch') && (
+                        <CorsAwareImage
+                          style={styles.previewImage}
+                          src={asset.previewImageUrls[0]}
+                          alt={asset.name}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <PlaceholderLoader />
+                  )}
+                </div>
+                {assetAnimations &&
+                  assetAnimations.length > 1 &&
+                  typeof selectedAnimationName === 'string' && (
+                    <Paper elevation={4} variant="outlined">
+                      <Line
+                        justifyContent="center"
+                        alignItems="center"
+                        noMargin
+                      >
+                        <div
+                          style={{
+                            ...styles.arrowContainer,
+                            backgroundColor:
+                              gdevelopTheme.list.itemsBackgroundColor,
+                          }}
+                          onClick={() => {
+                            const previousAnimationIndex = assetAnimations.findIndex(
+                              ({ name }) => name === selectedAnimationName
+                            );
+                            const newAnimationIndex =
+                              previousAnimationIndex === 0
+                                ? assetAnimations.length - 1
+                                : previousAnimationIndex - 1;
+                            setSelectedAnimationName(
+                              assetAnimations[newAnimationIndex].name
+                            );
+                          }}
+                        >
+                          <ArrowBackIos classes={leftArrowStyles} />
+                        </div>
+
+                        <SelectField
+                          value={selectedAnimationName}
+                          onChange={(e, i, newAnimationName: string) => {
+                            setSelectedAnimationName(newAnimationName);
+                          }}
+                          fullWidth
+                          textAlign="center"
+                          disableUnderline
+                        >
+                          {assetAnimations.map(animation => (
+                            <SelectOption
+                              key={animation.name}
+                              value={animation.name}
+                              primaryText={
+                                makeFirstLetterUppercase(animation.name) ||
+                                t`Default`
+                              }
+                            />
+                          ))}
+                        </SelectField>
+                        <div
+                          style={{
+                            ...styles.arrowContainer,
+                            backgroundColor:
+                              gdevelopTheme.list.itemsBackgroundColor,
+                          }}
+                          onClick={() => {
+                            const previousAnimationIndex = assetAnimations.findIndex(
+                              ({ name }) => name === selectedAnimationName
+                            );
+                            const newAnimationIndex =
+                              previousAnimationIndex ===
+                              assetAnimations.length - 1
+                                ? 0
+                                : previousAnimationIndex + 1;
+                            setSelectedAnimationName(
+                              assetAnimations[newAnimationIndex].name
+                            );
+                          }}
+                        >
+                          <ArrowForwardIos classes={rightArrowStyles} />
+                        </div>
+                      </Line>
+                    </Paper>
+                  )}
+              </Column>
+            )}
+          </ResponsiveWindowMeasurer>
+          <Column expand>
+            {asset ? (
+              <React.Fragment>
                 <Text size="body">
                   {!!assetLicense && (
                     <Trans>
-                      License:{' '}
+                      Type of License:{' '}
                       {
                         <Link
                           component="button"
@@ -259,6 +439,6 @@ export const AssetDetails = ({
           </Column>
         </ResponsiveLineStackLayout>
       </Column>
-    </Dialog>
+    </ScrollView>
   );
 };

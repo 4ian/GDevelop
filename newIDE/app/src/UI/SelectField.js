@@ -6,6 +6,18 @@ import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { computeTextFieldStyleProps } from './TextField';
 import { MarkdownText } from './MarkdownText';
+import { makeStyles } from '@material-ui/core';
+
+const INVALID_VALUE = '';
+const stopPropagation = event => event.stopPropagation();
+
+const useSelectCenterStyles = makeStyles({
+  root: {
+    textAlign: 'center',
+  },
+});
+
+export type SelectFieldInterface = {| focus: () => void |};
 
 type ValueProps = {|
   value: number | string,
@@ -32,6 +44,8 @@ type Props = {|
   },
   inputStyle?: {| fontSize?: 14, color?: string |},
   margin?: 'none' | 'dense',
+  disableUnderline?: true,
+  textAlign?: 'center',
 
   floatingLabelText?: React.Node,
   helperMarkdownText?: ?string,
@@ -40,11 +54,6 @@ type Props = {|
   // value (""), disabled.
   hintText?: MessageDescriptor,
 |};
-
-export type SelectFieldInterface = {| focus: () => void |};
-
-const INVALID_VALUE = '';
-const stopPropagation = event => event.stopPropagation();
 
 /**
  * A select field based on Material-UI select field.
@@ -61,6 +70,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
     React.useImperativeHandle(ref, () => ({
       focus,
     }));
+    const selectCenterStyles = useSelectCenterStyles();
 
     const onChange = props.onChange || undefined;
 
@@ -105,12 +115,16 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
                   }
                 : undefined
             }
-            InputProps={{ style: props.inputStyle }}
+            InputProps={{
+              style: props.inputStyle,
+              disableUnderline: !!props.disableUnderline,
+            }}
             InputLabelProps={{
               shrink: true,
             }}
             SelectProps={{
               native: true,
+              classes: props.textAlign === 'center' ? selectCenterStyles : {},
             }}
             style={props.style}
             inputRef={inputRef}
@@ -129,4 +143,5 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
     );
   }
 );
+
 export default SelectField;

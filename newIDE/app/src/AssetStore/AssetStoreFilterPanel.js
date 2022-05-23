@@ -21,10 +21,8 @@ import { Line, Column } from '../UI/Grid';
 import { type RGBColor } from '../Utils/ColorTransformer';
 import { HexColorField } from './HexColorField';
 
-/** @typedef { import("../UI/Search/UseSearchItem").TagSearchFilter } TagSearchFilter */
-
 type Choice = {|
-  label: ?React.Node,
+  label: React.Node,
   value: string,
 |};
 
@@ -55,7 +53,7 @@ const MultipleChoiceFilter = ({
               {choices.map(tag => (
                 <InlineCheckbox
                   key={tag.value}
-                  label={tag.label ? i18n._(tag.label) : tag.value}
+                  label={i18n._(tag.label)}
                   checked={isChoiceChecked(tag.value)}
                   onCheck={(e, checked) => setChoiceChecked(tag.value, checked)}
                 />
@@ -203,9 +201,7 @@ const ColorFilter = ({
               disableAlpha
               fullWidth
               color={color}
-              onChange={color => {
-                setColor(color);
-              }}
+              onChange={setColor}
             />
           </AccordionBody>
         </Accordion>

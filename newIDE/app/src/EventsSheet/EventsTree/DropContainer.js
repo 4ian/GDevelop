@@ -234,3 +234,65 @@ export function DropContainer({
     </div>
   );
 }
+
+export function Autoscroll({
+  direction,
+  DnDComponent,
+  activateTargets,
+  onHover,
+}: {|
+  direction: 'top' | 'bottom',
+  DnDComponent: any,
+  activateTargets: boolean,
+  onHover: () => void,
+|}) {
+  const delayActivationTimer = React.useRef<?TimeoutID>(null);
+  const [show, setShow] = React.useState(false);
+
+  // This drop target overlaps with sibling drag source and cancels drag immediatly.
+  // See: https://github.com/react-dnd/react-dnd/issues/766#issuecomment-388943403
+  // Delaying the render of the drop target seems to solve the issue.
+  React.useEffect(
+    () => {
+      if (activateTargets) {
+        delayActivationTimer.current = setTimeout(() => {
+          setShow(true);
+        }, 100);
+      } else {
+        setShow(false);
+        clearTimeout(delayActivationTimer.current);
+        delayActivationTimer.current = null;
+      }
+    },
+    [activateTargets]
+  );
+
+  return (
+    <DnDComponent
+      canDrop={() => true}
+      drop={() => {
+        return;
+      }}
+    >
+      {({ isOverLazy, connectDropTarget }) => {
+        if (isOverLazy) {
+          onHover();
+        }
+        const dropTarget = (
+          <div
+            style={{
+              width: '100%',
+              position: 'absolute',
+              ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
+              height: '10%',
+              opacity: isOverLazy ? 1 : 0,
+              backgroundColor: isOverLazy ? 'blue' : 'black',
+              zIndex: 2,
+            }}
+          />
+        );
+        return show ? connectDropTarget(dropTarget) : null;
+      }}
+    </DnDComponent>
+  );
+}

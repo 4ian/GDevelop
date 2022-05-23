@@ -42,7 +42,7 @@ import TutorialMessage from '../../Hints/TutorialMessage';
 import getTutorial from '../../Hints/getTutorial';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
-import { DropContainer } from './DropContainer';
+import { Autoscroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
 const gd: libGDevelop = global.gd;
 
@@ -288,6 +288,8 @@ type State = {
   treeData: Array<any>,
   flatData: Array<gdBaseEvent>,
   draggedNode: ?SortableTreeNode,
+  isScrolledTop: boolean,
+  isScrolledBottom: boolean,
 };
 
 /**
@@ -317,6 +319,8 @@ export default class ThemableEventsTree extends Component<
     this.state = {
       ...this._eventsToTreeData(props.events),
       draggedNode: null,
+      isScrolledTop: true,
+      isScrolledBottom: false,
     };
   }
 
@@ -579,13 +583,14 @@ export default class ThemableEventsTree extends Component<
     );
     if (isOverLazy) {
       if (!this._hoverTimerId && !node.expanded) {
-        this._hoverTimerId = window.setTimeout(() => {
-          if (node.event && !isNodeTemporallyUnfolded) {
+        if (node.event && !isNodeTemporallyUnfolded) {
+          this._hoverTimerId = window.setTimeout(() => {
+            // $FlowFixMe - Per the condition above, we are confident that node.event is not null.
             node.event.setFolded(false);
             this.temporallyUnfoldedNodes.push(node);
             this.forceEventsUpdate();
-          }
-        }, 1000);
+          }, 1000);
+        }
       }
     } else {
       window.clearTimeout(this._hoverTimerId);
@@ -724,6 +729,14 @@ export default class ThemableEventsTree extends Component<
     );
   };
 
+  _scrollUp = () => {
+    this._list && this._list.container.scrollBy({ top: -5 });
+  };
+
+  _scrollDown = () => {
+    this._list && this._list.container.scrollBy({ top: 5 });
+  };
+
   render() {
     // react-sortable-tree does the rendering by transforming treeData
     // into a flat array, the result being memoized. This hack forces
@@ -740,6 +753,22 @@ export default class ThemableEventsTree extends Component<
           '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
         }}
       >
+        <Autoscroll
+          DnDComponent={this.DropTarget}
+          direction="top"
+          activateTargets={
+            !!this.state.draggedNode && !this.state.isScrolledTop
+          }
+          onHover={this._scrollUp}
+        />
+        <Autoscroll
+          DnDComponent={this.DropTarget}
+          direction="bottom"
+          activateTargets={
+            !!this.state.draggedNode && !this.state.isScrolledBottom
+          }
+          onHover={this._scrollDown}
+        />
         <SortableTree
           treeData={treeData}
           scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}
@@ -755,8 +784,16 @@ export default class ThemableEventsTree extends Component<
           }
           reactVirtualizedListProps={{
             ref: list => (this._list = list),
-            onScroll: this.props.onScroll,
+            onScroll: event => {
+              this.props.onScroll && this.props.onScroll();
+              this.setState({
+                isScrolledTop: event.scrollTop === 0,
+                isScrolledBottom:
+                  event.clientHeight + event.scrollTop >= event.scrollHeight,
+              });
+            },
           }}
+          slideRegionSize={-10}
         />
       </div>
     );

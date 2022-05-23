@@ -50,6 +50,8 @@ export type AssetShortHeader = {|
   maxFramesCount: number,
   license: string,
   objectType: string,
+  width: number,
+  height: number,
 |};
 
 export type AssetHeader = {|

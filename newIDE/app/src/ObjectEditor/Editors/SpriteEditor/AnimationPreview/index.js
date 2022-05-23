@@ -24,19 +24,27 @@ const styles = {
 };
 
 type Props = {|
-  spritesContainer: Object,
-  resourcesLoader: Object,
-  project: Object,
+  resourceNames: string[],
+  getImageSource: (resourceName: string) => string,
+  project: gdProject,
   timeBetweenFrames: number,
-  onChangeTimeBetweenFrames: number => void,
+  onChangeTimeBetweenFrames?: number => void,
+  isLooping: boolean,
+  hideCheckeredBackground?: boolean,
+  hideControls?: boolean,
+  initialZoom?: number,
 |};
 
 const AnimationPreview = ({
-  spritesContainer,
-  resourcesLoader,
+  resourceNames,
+  getImageSource,
   project,
   timeBetweenFrames,
   onChangeTimeBetweenFrames,
+  isLooping,
+  hideCheckeredBackground,
+  hideControls,
+  initialZoom,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -53,6 +61,21 @@ const AnimationPreview = ({
   const timeBetweenFramesRef = React.useRef(timeBetweenFrames);
   const pausedRef = React.useRef(false);
   const currentFrameIndexRef = React.useRef(0);
+  const isLoopingRef = React.useRef(isLooping);
+
+  // When outside variables change, we need to update the animation callback.
+  React.useEffect(
+    () => {
+      if (timeBetweenFrames !== timeBetweenFramesRef.current) {
+        timeBetweenFramesRef.current = timeBetweenFrames;
+        setFps(Math.round(1 / timeBetweenFrames));
+      }
+      if (isLooping !== isLoopingRef.current) {
+        isLoopingRef.current = isLooping;
+      }
+    },
+    [timeBetweenFrames, isLooping]
+  );
 
   const replay = () => {
     currentFrameIndexRef.current = 0;
@@ -70,8 +93,10 @@ const AnimationPreview = ({
       const previousUpdateTimeInMs = previousTimeRef.current;
       const currentFrameIndex = currentFrameIndexRef.current;
       const currentFrameElapsedTime = currentFrameElapsedTimeRef.current;
-      const currenttimeBetweenFrames = timeBetweenFramesRef.current;
+      const currentTimeBetweenFrames = timeBetweenFramesRef.current;
       const paused = pausedRef.current;
+      const isLooping = isLoopingRef.current;
+      const numberOfFrames = resourceNames.length;
 
       if (previousUpdateTimeInMs) {
         const elapsedTime = (updateTimeInMs - previousUpdateTimeInMs) / 1000;
@@ -81,21 +106,21 @@ const AnimationPreview = ({
           currentFrameElapsedTime + (paused ? 0 : elapsedTime);
 
         // Increase frame index if time elapsed is greater than time between frames.
-        if (newFrameElapsedTime > currenttimeBetweenFrames) {
+        if (newFrameElapsedTime > currentTimeBetweenFrames) {
           const count = Math.floor(
-            newFrameElapsedTime / currenttimeBetweenFrames
+            newFrameElapsedTime / currentTimeBetweenFrames
           );
           newFrameIndex += count;
           newFrameElapsedTime =
-            newFrameElapsedTime - count * currenttimeBetweenFrames;
+            newFrameElapsedTime - count * currentTimeBetweenFrames;
           if (newFrameElapsedTime < 0) newFrameElapsedTime = 0;
         }
 
         // Reset to 0 if we reached the end of the animation.
-        if (newFrameIndex >= spritesContainer.getSpritesCount()) {
-          newFrameIndex = spritesContainer.isLooping()
-            ? newFrameIndex % spritesContainer.getSpritesCount()
-            : spritesContainer.getSpritesCount() - 1;
+        if (newFrameIndex >= numberOfFrames) {
+          newFrameIndex = isLooping
+            ? newFrameIndex % numberOfFrames
+            : numberOfFrames - 1;
         }
         if (newFrameIndex < 0) newFrameIndex = 0; //May happen if there is no frame.
 
@@ -110,7 +135,7 @@ const AnimationPreview = ({
       requestRef.current = requestAnimationFrame(updateAnimation);
       previousTimeRef.current = updateTimeInMs;
     },
-    [spritesContainer, forceUdpate]
+    [forceUdpate, resourceNames]
   );
 
   React.useEffect(
@@ -123,80 +148,90 @@ const AnimationPreview = ({
     [updateAnimation]
   );
 
-  const hasValidSprite =
-    currentFrameIndexRef.current < spritesContainer.getSpritesCount();
-  const sprite = hasValidSprite
-    ? spritesContainer.getSprite(currentFrameIndexRef.current)
-    : null;
+  // When changing animation, reset the animation.
+  if (currentFrameIndexRef.current >= resourceNames.length) {
+    currentFrameIndexRef.current = 0;
+  }
+
+  const resourceName = resourceNames[currentFrameIndexRef.current];
 
   return (
     <Column expand noOverflowParent>
       <ImagePreview
-        resourceName={sprite ? sprite.getImageName() : ''}
-        resourcesLoader={resourcesLoader}
+        resourceName={resourceName}
+        imageSource={getImageSource(resourceName)}
+        initialZoom={initialZoom}
         project={project}
+        hideCheckeredBackground={hideCheckeredBackground}
+        hideControls={hideControls}
       />
-      <Line noMargin alignItems="center">
-        <Text>
-          <Trans>FPS:</Trans>
-        </Text>
-        <Spacer />
-        <TextField
-          margin="none"
-          value={fps}
-          onChange={(e, text) => {
-            const fps = parseFloat(text);
-            if (fps > 0) {
-              setFps(fps);
-              const newTimeBetweenFrames = parseFloat((1 / fps).toFixed(4));
-              timeBetweenFramesRef.current = newTimeBetweenFrames;
-              onChangeTimeBetweenFrames(newTimeBetweenFrames);
-              replay();
-            }
-          }}
-          id="direction-time-between-frames"
-          type="number"
-          step={1}
-          min={1}
-          max={100}
-          style={styles.timeField}
-          autoFocus={true}
-        />
-        <Timer style={styles.timeIcon} />
-        <TextField
-          margin="none"
-          value={timeBetweenFramesRef.current}
-          onChange={(e, text) => {
-            const time = parseFloat(text);
-            if (time > 0) {
-              setFps(Math.round(1 / time));
-              timeBetweenFramesRef.current = time;
-              onChangeTimeBetweenFrames(time);
-              replay();
-            }
-          }}
-          id="direction-time-between-frames"
-          type="number"
-          step={0.005}
-          precision={2}
-          min={0.01}
-          max={5}
-          style={styles.timeField}
-        />
-        <FlatButton
-          icon={<Replay />}
-          label={<Trans>Replay</Trans>}
-          onClick={replay}
-        />
-        <FlatButton
-          icon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
-          label={!!pausedRef.current ? 'Play' : 'Pause'}
-          onClick={() => {
-            pausedRef.current = !pausedRef.current;
-            forceUdpate();
-          }}
-        />
-      </Line>
+      {!hideControls && (
+        <Line noMargin alignItems="center">
+          <Text>
+            <Trans>FPS:</Trans>
+          </Text>
+          <Spacer />
+          <TextField
+            margin="none"
+            value={fps}
+            onChange={(e, text) => {
+              const fps = parseFloat(text);
+              if (fps > 0) {
+                setFps(fps);
+                const newTimeBetweenFrames = parseFloat((1 / fps).toFixed(4));
+                timeBetweenFramesRef.current = newTimeBetweenFrames;
+                if (onChangeTimeBetweenFrames) {
+                  onChangeTimeBetweenFrames(newTimeBetweenFrames);
+                }
+                replay();
+              }
+            }}
+            id="direction-time-between-frames"
+            type="number"
+            step={1}
+            min={1}
+            max={100}
+            style={styles.timeField}
+            autoFocus={true}
+          />
+          <Timer style={styles.timeIcon} />
+          <TextField
+            margin="none"
+            value={timeBetweenFramesRef.current}
+            onChange={(e, text) => {
+              const time = parseFloat(text);
+              if (time > 0) {
+                setFps(Math.round(1 / time));
+                timeBetweenFramesRef.current = time;
+                if (onChangeTimeBetweenFrames) {
+                  onChangeTimeBetweenFrames(time);
+                }
+                replay();
+              }
+            }}
+            id="direction-time-between-frames"
+            type="number"
+            step={0.005}
+            precision={2}
+            min={0.01}
+            max={5}
+            style={styles.timeField}
+          />
+          <FlatButton
+            icon={<Replay />}
+            label={<Trans>Replay</Trans>}
+            onClick={replay}
+          />
+          <FlatButton
+            icon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
+            label={!!pausedRef.current ? 'Play' : 'Pause'}
+            onClick={() => {
+              pausedRef.current = !pausedRef.current;
+              forceUdpate();
+            }}
+          />
+        </Line>
+      )}
     </Column>
   );
 };

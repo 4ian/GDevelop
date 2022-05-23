@@ -42,7 +42,7 @@ import TutorialMessage from '../../Hints/TutorialMessage';
 import getTutorial from '../../Hints/getTutorial';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
-import DropContainer from './DropContainer';
+import { DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
 const gd: libGDevelop = global.gd;
 
@@ -56,7 +56,7 @@ const defaultIndentWidth = 22;
 const smallIndentWidth = 11;
 
 const styles = {
-  container: { flex: 1 },
+  container: { flex: 1, position: 'relative' },
   defaultEventContainer: {
     marginRight: 10,
     position: 'relative',
@@ -411,6 +411,7 @@ export default class ThemableEventsTree extends Component<
     parentDisabled: boolean = false,
     path: Array<number> = []
   ) => {
+    let eventIndexInFlattenedTree = 0;
     const treeData = mapFor<SortableTreeNode>(
       0,
       eventsList.getEventsCount(),
@@ -419,7 +420,8 @@ export default class ThemableEventsTree extends Component<
         flatData.push(event);
 
         const disabled = parentDisabled || event.isDisabled();
-        const currentPath = path.concat(i);
+        const currentPath = path.concat(eventIndexInFlattenedTree);
+        eventIndexInFlattenedTree += 1;
 
         return {
           title: this._renderEvent,
@@ -440,7 +442,7 @@ export default class ThemableEventsTree extends Component<
             currentPath
           ).treeData,
           // react-sortable-tree stores path using the node's index in the flattened tree.
-          // We choose to store a path using its index in list to optimise isDescendant function.
+          // We choose to store a path using its index in flatData to optimise isDescendant function.
           nodePath: currentPath,
         };
       }
@@ -572,13 +574,13 @@ export default class ThemableEventsTree extends Component<
   _temporallyUnfoldNode = (isOverLazy: boolean, node: SortableTreeNode) => {
     if (!node.event) return;
 
-    const isNodeTemporallyUnfolded = !this.temporallyUnfoldedNodes.some(
+    const isNodeTemporallyUnfolded = this.temporallyUnfoldedNodes.some(
       foldedNode => node.key === foldedNode.key
     );
     if (isOverLazy) {
       if (!this._hoverTimerId && !node.expanded) {
         this._hoverTimerId = window.setTimeout(() => {
-          if (node.event && isNodeTemporallyUnfolded) {
+          if (node.event && !isNodeTemporallyUnfolded) {
             node.event.setFolded(false);
             this.temporallyUnfoldedNodes.push(node);
             this.forceEventsUpdate();
@@ -598,6 +600,13 @@ export default class ThemableEventsTree extends Component<
 
     this.temporallyUnfoldedNodes = [];
     this.forceEventsUpdate();
+  };
+
+  _getRowHeight = ({ node }: { node: ?SortableTreeNode }) => {
+    if (!node) return 0;
+    if (!node.event) return node.fixedHeight || 0;
+
+    return this.eventsHeightsCache.getEventHeight(node.event);
   };
 
   _renderEvent = ({ node }: { node: SortableTreeNode }) => {
@@ -680,9 +689,12 @@ export default class ThemableEventsTree extends Component<
               <DropContainer
                 node={node}
                 draggedNode={this.state.draggedNode}
+                draggedNodeHeight={this._getRowHeight({
+                  node: this.state.draggedNode,
+                })}
                 DnDComponent={DropTarget}
                 onDrop={this._onDrop}
-                activateTargets={!isDragged && isOverLazy}
+                activateTargets={!isDragged && !!this.state.draggedNode}
                 windowWidth={this.props.windowWidth}
               />
             </div>
@@ -734,11 +746,7 @@ export default class ThemableEventsTree extends Component<
           onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
           canDrag={false}
-          rowHeight={({ node }: { node: SortableTreeNode }) => {
-            if (!node.event) return node.fixedHeight || 0;
-
-            return this.eventsHeightsCache.getEventHeight(node.event);
-          }}
+          rowHeight={this._getRowHeight}
           searchMethod={this._isNodeHighlighted}
           searchQuery={this.props.searchResults}
           searchFocusOffset={this.props.searchFocusOffset}
@@ -749,7 +757,6 @@ export default class ThemableEventsTree extends Component<
             ref: list => (this._list = list),
             onScroll: this.props.onScroll,
           }}
-          slideRegionSize={0}
         />
       </div>
     );

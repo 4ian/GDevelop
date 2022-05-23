@@ -72,5 +72,21 @@ export const isDescendant = (
   const parentPath = olderNode.nodePath;
   const childrenPath = childrenNode.nodePath;
   if (childrenNode.depth <= olderNode.depth) return false;
-  return parentPath[olderNode.depth] === childrenPath[olderNode.depth];
+  return parentPath.every(
+    (pathValue, index) => pathValue === childrenPath[index]
+  );
+};
+
+export const isSameDepthAndBelow = (
+  aboveNode: SortableTreeNode,
+  belowNode: SortableTreeNode
+) => {
+  if (aboveNode.depth !== belowNode.depth) return false;
+  const belowNodePath = belowNode.nodePath;
+  const aboveNodePath = aboveNode.nodePath;
+  if (belowNodePath[belowNodePath.length - 1] === 0) return false;
+  return (
+    belowNodePath[belowNodePath.length - 1] - 1 ===
+    aboveNodePath[aboveNodePath.length - 1]
+  );
 };

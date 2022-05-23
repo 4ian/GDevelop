@@ -1,13 +1,15 @@
 // @flow
 import * as React from 'react';
 import { getIndentWidth, type SortableTreeNode } from '.';
-import { moveNodeAbove, moveNodeBelow, moveNodeAsSubevent } from './helpers';
+import {
+  moveNodeAbove,
+  moveNodeBelow,
+  moveNodeAsSubevent,
+  isSameDepthAndBelow,
+} from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
-
-type ContainerPosition = 'top' | 'bottom-left' | 'bottom-right' | 'bottom';
-type IndicatorPosition = 'top' | 'bottom-right' | 'bottom';
 
 const styles = {
   dropArea: { zIndex: 1, position: 'absolute' },
@@ -19,51 +21,62 @@ const styles = {
   },
 };
 
-const getTargetPositionStyle = (position: ContainerPosition) => {
-  switch (position) {
-    case 'bottom-left':
-      return { left: '0px', bottom: '0px', top: '50%', right: '95%' };
-    case 'bottom-right':
-      return { left: '5%', right: '0px', bottom: '0px', top: '50%' };
-    case 'top':
-      return { left: '0px', right: '0px', top: '0px', bottom: '50%' };
-    case 'bottom':
-      return { left: '0px', right: '0px', top: '50%', bottom: '0px' };
-    default:
-      return {};
-  }
-};
+const getTargetPositionStyles = (
+  indentWidth: number,
+  draggedNodeHeight: number,
+  isDraggedNodeChild: boolean
+) => ({
+  'bottom-left': { left: '0px', bottom: '0px', top: '50%', width: indentWidth },
+  'bottom-right': {
+    left: `${indentWidth}px`,
+    right: '0px',
+    bottom: '0px',
+    top: '50%',
+  },
+  top: { left: '0px', right: '0px', top: '0px', bottom: '50%' },
+  bottom: { left: '0px', right: '0px', top: '50%', bottom: '0px' },
+  'bottom-bottom-left': {
+    left: isDraggedNodeChild ? '0px' : '10px',
+    top: '100%',
+    height: draggedNodeHeight,
+    width: indentWidth,
+  },
+  'bottom-bottom-right': {
+    left: isDraggedNodeChild ? `${indentWidth + 10}px` : `${indentWidth}px`,
+    right: '0px',
+    top: '100%',
+    height: draggedNodeHeight,
+  },
+});
 
-const getIndicatorPositionStyle = (
-  position: IndicatorPosition,
-  indentWidth: number
-) => {
-  switch (position) {
-    case 'bottom':
-      return { left: '0px', right: '0px', bottom: '-4px' };
-    case 'bottom-right':
-      return { left: indentWidth, right: '0px', bottom: '-4px' };
-    case 'top':
-      return { left: '0px', right: '0px', top: '-4px' };
-    default:
-      return {};
-  }
-};
+const getIndicatorPositionStyles = (indentWidth: number) => ({
+  bottom: { left: '0px', right: '0px', bottom: '-4px' },
+  'bottom-right': { left: `${indentWidth}px`, right: '0px', bottom: '-4px' },
+  top: { left: '0px', right: '0px', top: '-4px' },
+});
+
+type DropTargetContainerStyle = {|
+  left?: string,
+  right?: string,
+  top?: string,
+  bottom?: string,
+  width?: number,
+  height?: number,
+|};
 
 function DropTargetContainer({
-  containerPosition,
-  indicatorPosition,
   DnDComponent,
   canDrop,
   onDrop,
-  indentWidth,
+  style,
 }: {|
-  containerPosition: ContainerPosition,
-  indicatorPosition: IndicatorPosition,
   DnDComponent: any,
   canDrop: () => boolean,
   onDrop: () => void,
-  indentWidth: number,
+  style: {
+    dropIndicator: DropTargetContainerStyle,
+    dropArea: DropTargetContainerStyle,
+  },
 |}) {
   const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -75,7 +88,8 @@ function DropTargetContainer({
             <div
               style={{
                 ...styles.dropArea,
-                ...getTargetPositionStyle(containerPosition),
+                ...style.dropArea,
+                backgroundColor: isOver ? 'black' : 'transparent',
               }}
             />
             {/* Drop indicator */}
@@ -83,7 +97,7 @@ function DropTargetContainer({
               <div
                 style={{
                   ...styles.dropIndicator,
-                  ...getIndicatorPositionStyle(indicatorPosition, indentWidth),
+                  ...style.dropIndicator,
                   borderColor: gdevelopTheme.dropIndicator.canDrop,
                   outlineColor: gdevelopTheme.dropIndicator.border,
                 }}
@@ -96,13 +110,14 @@ function DropTargetContainer({
   );
 }
 
-export default function DropContainer({
+export function DropContainer({
   node,
   draggedNode,
   DnDComponent,
   onDrop,
   activateTargets,
   windowWidth,
+  draggedNodeHeight,
 }: {|
   node: SortableTreeNode,
   draggedNode: ?SortableTreeNode,
@@ -116,21 +131,31 @@ export default function DropContainer({
   ) => void,
   activateTargets: boolean,
   windowWidth: WidthType,
+  draggedNodeHeight: number,
 |}) {
+  const isDraggedNodeNodesOnlyChild =
+    node.children.length === 1 &&
+    !!draggedNode &&
+    node.children[0].key === draggedNode.key;
+  const isDraggedNodeSameDepthAndBelow =
+    !!draggedNode && isSameDepthAndBelow(node, draggedNode);
   // We want to allow dropping below if the event has no children OR if the only
   // child of the event is the dragged one.
   const canDropBelow =
-    node.event &&
-    (node.children.length === 0 ||
-      (node.children.length === 1 &&
-        draggedNode &&
-        node.children[0].key === draggedNode.key));
+    node.event && (node.children.length === 0 || isDraggedNodeNodesOnlyChild);
   const canHaveSubevents = node.event && node.event.canHaveSubEvents();
+  const indentWidth = getIndentWidth(windowWidth);
+
   const commonProps = {
     DnDComponent: DnDComponent,
     canDrop: () => true,
-    indentWidth: getIndentWidth(windowWidth),
   };
+  const dropAreaStyles = getTargetPositionStyles(
+    indentWidth,
+    draggedNodeHeight,
+    isDraggedNodeNodesOnlyChild
+  );
+  const indicatorStyles = getIndicatorPositionStyles(indentWidth);
   return (
     <div
       style={{
@@ -138,39 +163,70 @@ export default function DropContainer({
       }}
     >
       <DropTargetContainer
-        containerPosition="top"
-        indicatorPosition="top"
+        style={{
+          dropIndicator: indicatorStyles['top'],
+          dropArea: dropAreaStyles['top'],
+        }}
         onDrop={() => onDrop(moveNodeAbove, node)}
         {...commonProps}
       />
       {canHaveSubevents && canDropBelow && (
         <>
           <DropTargetContainer
-            containerPosition="bottom-right"
-            indicatorPosition="bottom-right"
+            style={{
+              dropIndicator: indicatorStyles['bottom-right'],
+              dropArea: dropAreaStyles['bottom-right'],
+            }}
             onDrop={() => onDrop(moveNodeAsSubevent, node)}
             {...commonProps}
           />
           <DropTargetContainer
-            containerPosition="bottom-left"
-            indicatorPosition="bottom"
+            style={{
+              dropIndicator: indicatorStyles['bottom'],
+              dropArea: dropAreaStyles['bottom-left'],
+            }}
             onDrop={() => onDrop(moveNodeBelow, node)}
             {...commonProps}
           />
+          {/* Allow dragging left/right to move below or as subevent */}
+          {(isDraggedNodeNodesOnlyChild || isDraggedNodeSameDepthAndBelow) && (
+            <>
+              <DropTargetContainer
+                style={{
+                  dropIndicator: indicatorStyles['bottom'],
+                  dropArea: dropAreaStyles['bottom-bottom-left'],
+                }}
+                onDrop={() => onDrop(moveNodeBelow, node)}
+                {...commonProps}
+              />
+              <DropTargetContainer
+                style={{
+                  dropIndicator: indicatorStyles['bottom-right'],
+                  dropArea: dropAreaStyles['bottom-bottom-right'],
+                }}
+                onDrop={() => onDrop(moveNodeAsSubevent, node)}
+                {...commonProps}
+              />
+            </>
+          )}
         </>
       )}
       {!canHaveSubevents && canDropBelow && (
         <DropTargetContainer
-          containerPosition="bottom"
-          indicatorPosition="bottom"
+          style={{
+            dropIndicator: indicatorStyles['bottom'],
+            dropArea: dropAreaStyles['bottom'],
+          }}
           onDrop={() => onDrop(moveNodeBelow, node)}
           {...commonProps}
         />
       )}
       {canHaveSubevents && !canDropBelow && (
         <DropTargetContainer
-          containerPosition="bottom"
-          indicatorPosition="bottom-right"
+          style={{
+            dropIndicator: indicatorStyles['bottom-right'],
+            dropArea: dropAreaStyles['bottom'],
+          }}
           onDrop={() => onDrop(moveNodeAsSubevent, node)}
           {...commonProps}
         />

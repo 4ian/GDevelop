@@ -143,7 +143,7 @@ export const AssetDetails = ({
             );
           }
         } catch (error) {
-          console.log('Error while loading asset:', error);
+          console.error('Error while loading asset:', error);
           setError(error);
         }
       })();

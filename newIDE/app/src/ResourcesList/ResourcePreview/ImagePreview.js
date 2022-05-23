@@ -118,7 +118,7 @@ const ImagePreview = ({
     errored: false,
     imageWidth: null,
     imageHeight: null,
-    imageZoomFactor: 1,
+    imageZoomFactor: initialZoom || 1,
     isResizeObserverReady: false,
   });
 
@@ -144,7 +144,6 @@ const ImagePreview = ({
     setState(state => ({
       ...state,
       imageZoomFactor: zoomFactor,
-      isResizeObserverReady: true,
     }));
   };
 
@@ -180,18 +179,19 @@ const ImagePreview = ({
       {({ contentRect, measureRef }) => {
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
-        if (!state.isResizeObserverReady) {
-          if (initialZoom) {
-            console.log('initial zoom');
-            setState(state => ({
-              ...state,
-              imageZoomFactor: initialZoom,
-              isResizeObserverReady: true,
-            }));
-          } else if (!!containerWidth && !!containerHeight) {
-            console.log('adpating');
+        // Once the image is loaded, adapt the zoom to the image size.
+        if (
+          !state.isResizeObserverReady &&
+          !!containerWidth &&
+          !!containerHeight
+        ) {
+          if (!initialZoom) {
             adaptZoomToImage(containerHeight, containerWidth);
           }
+          setState(state => ({
+            ...state,
+            isResizeObserverReady: true,
+          }));
         }
         const { imageHeight, imageWidth, imageZoomFactor } = state;
 
@@ -289,13 +289,11 @@ const ImagePreview = ({
                 dir={
                   'ltr' /* Force LTR layout to avoid issues with image positioning */
                 }
-                style={{
-                  ...styles.imagePreviewContainer,
-                }}
+                style={styles.imagePreviewContainer}
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
-                  if (shouldZoom(event)) {
+                  if (!hideControls && shouldZoom(event)) {
                     zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();

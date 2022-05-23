@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react';
 import { getIndentWidth, type SortableTreeNode } from '.';
-import { eventDropIndicator } from './ClassNames';
 import { moveNodeAbove, moveNodeBelow, moveNodeAsSubevent } from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 
 type ContainerPosition = 'top' | 'bottom-left' | 'bottom-right' | 'bottom';
 type IndicatorPosition = 'top' | 'bottom-right' | 'bottom';
@@ -14,6 +14,8 @@ const styles = {
   dropIndicator: {
     position: 'absolute',
     zIndex: 2,
+    border: '4px solid black',
+    outline: '1px solid white',
   },
 };
 
@@ -38,11 +40,11 @@ const getIndicatorPositionStyle = (
 ) => {
   switch (position) {
     case 'bottom':
-      return { left: '0px', right: '0px', bottom: '-3px' };
+      return { left: '0px', right: '0px', bottom: '-4px' };
     case 'bottom-right':
-      return { left: indentWidth, right: '0px', bottom: '-3px' };
+      return { left: indentWidth, right: '0px', bottom: '-4px' };
     case 'top':
-      return { left: '0px', right: '0px', top: '-3px' };
+      return { left: '0px', right: '0px', top: '-4px' };
     default:
       return {};
   }
@@ -63,6 +65,7 @@ function DropTargetContainer({
   onDrop: () => void,
   indentWidth: number,
 |}) {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   return (
     <DnDComponent canDrop={canDrop} drop={onDrop}>
       {({ isOver, connectDropTarget, canDrop }) => {
@@ -76,14 +79,16 @@ function DropTargetContainer({
               }}
             />
             {/* Drop indicator */}
-            <div
-              style={{
-                ...styles.dropIndicator,
-                ...getIndicatorPositionStyle(indicatorPosition, indentWidth),
-                visibility: canDrop && isOver ? 'visible' : 'hidden',
-              }}
-              className={eventDropIndicator}
-            />
+            {canDrop && isOver && (
+              <div
+                style={{
+                  ...styles.dropIndicator,
+                  ...getIndicatorPositionStyle(indicatorPosition, indentWidth),
+                  borderColor: gdevelopTheme.dropIndicator.canDrop,
+                  outlineColor: gdevelopTheme.dropIndicator.border,
+                }}
+              />
+            )}
           </div>
         );
       }}

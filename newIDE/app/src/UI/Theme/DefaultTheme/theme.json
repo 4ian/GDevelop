@@ -166,6 +166,23 @@
       "frame-border-color": {
         "value": "#000000"
       }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "{gdevelop.color.light-blue.value}"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#ff5c5c"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      }
     }
   },
   "input": {
@@ -323,14 +340,6 @@
         "border-top-color": {
           "value": "#ff5c5c"
         }
-      }
-    },
-    "event-drop-indicator": {
-      "border-color": {
-        "value": "#3c4698"
-      },
-      "outline-color": {
-        "value": "#fff"
       }
     },
     "link": {

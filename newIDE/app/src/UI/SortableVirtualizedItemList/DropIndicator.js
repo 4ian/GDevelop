@@ -20,8 +20,8 @@ export default function DropIndicator({ canDrop }: {| canDrop: boolean |}) {
       style={{
         ...styles.dropIndicator,
         borderColor: canDrop
-          ? gdevelopTheme.listItem.selectedBackgroundColor
-          : gdevelopTheme.listItem.selectedErrorBackgroundColor,
+          ? gdevelopTheme.dropIndicator.canDrop
+          : gdevelopTheme.dropIndicator.cannotDrop,
       }}
     />
   );

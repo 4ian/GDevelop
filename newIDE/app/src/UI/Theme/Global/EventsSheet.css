@@ -215,14 +215,6 @@
 }
 
 /**
-* Drag'n'drop indicator (events)
-*/
-.gd-events-sheet .event-drop-indicator {
-  border: 3px solid var(--event-sheet-event-drop-indicator-border-color);
-  outline: var(--event-sheet-event-drop-indicator-outline-color) solid 1px;
-}
-
-/**
 * Skinning the "Link" event
 */
 .gd-events-sheet .link-container {

@@ -4,17 +4,9 @@ import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.f
 import * as React from 'react';
 import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';
-import { Spacer } from '../../../UI/Grid';
+import { ColumnStackLayout } from '../../../UI/Layout';
 
 export type ParameterValues = Array<string>;
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-  },
-};
 
 type Props = {|
   project?: gdProject,
@@ -66,7 +58,7 @@ const ExpressionParametersEditor = ({
   };
 
   return (
-    <div style={styles.container}>
+    <ColumnStackLayout>
       {mapFor(0, expressionMetadata.getParametersCount(), i => {
         const parameterMetadata = expressionMetadata.getParameter(i);
         const ParameterComponent = parameterRenderingService.getParameterComponent(
@@ -76,7 +68,6 @@ const ExpressionParametersEditor = ({
         if (parameterMetadata.isCodeOnly()) return null;
         return (
           <React.Fragment key={i}>
-            {i > 0 && <Spacer />}
             <ParameterComponent
               expressionMetadata={expressionMetadata}
               expression={expression}
@@ -98,7 +89,7 @@ const ExpressionParametersEditor = ({
           <Trans>There is nothing to configure.</Trans>
         </EmptyMessage>
       )}
-    </div>
+    </ColumnStackLayout>
   );
 };
 

@@ -73,11 +73,8 @@ export const getInitialPreferences = () => {
 };
 
 const getPreferences = () => {
-  const initialPreferences = getInitialPreferences();
-  const localPreferences = loadPreferencesFromLocalStorage();
-  const preferences = localPreferences
-    ? { ...initialPreferences, ...localPreferences } // Merge initial preferences with local preferences in case a new value has been added to the preferences
-    : initialPreferences;
+  const preferences =
+    loadPreferencesFromLocalStorage() || getInitialPreferences();
   setLanguageInDOM(preferences.language);
   return preferences;
 };

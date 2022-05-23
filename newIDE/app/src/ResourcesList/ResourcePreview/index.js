@@ -59,7 +59,11 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
           <ImagePreview
             project={this.props.project}
             resourceName={this.props.resourceName}
-            resourcesLoader={this.props.resourcesLoader}
+            imageSource={this.props.resourcesLoader.getResourceFullUrl(
+              this.props.project,
+              this.props.resourceName,
+              {}
+            )}
             onSize={this.props.onSize}
             resourcePath={this.props.resourcePath}
           />

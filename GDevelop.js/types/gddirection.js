@@ -10,6 +10,7 @@ declare class gdDirection {
   isLooping(): boolean;
   setLoop(enable: boolean): void;
   getTimeBetweenFrames(): number;
+  getSpriteNames(): gdVectorString;
   setTimeBetweenFrames(time: number): void;
   swapSprites(first: number, second: number): void;
   moveSprite(oldIndex: number, newIndex: number): void;

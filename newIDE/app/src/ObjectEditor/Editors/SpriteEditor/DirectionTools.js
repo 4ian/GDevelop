@@ -169,13 +169,16 @@ export default class DirectionTools extends Component<Props, State> {
             flexBody
           >
             <AnimationPreview
-              spritesContainer={direction}
-              resourcesLoader={resourcesLoader}
+              resourceNames={direction.getSpriteNames().toJSArray()}
+              getImageSource={(name: string) =>
+                resourcesLoader.getResourceFullUrl(project, name, {})
+              }
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}
               onChangeTimeBetweenFrames={text =>
                 this.setState({ timeBetweenFrames: text })
               }
+              isLooping={direction.isLooping()}
             />
           </Dialog>
         )}

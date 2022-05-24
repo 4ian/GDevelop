@@ -358,7 +358,11 @@ const Physics2Editor = (props: Props) => {
             <ImagePreview
               resourceName={image}
               project={props.project}
-              resourcesLoader={resourcesLoader}
+              imageSource={resourcesLoader.getResourceFullUrl(
+                props.project,
+                image,
+                {}
+              )}
               fixedHeight={200}
               renderOverlay={overlayProps => {
                 // The result from `getProperties` is temporary, and because this renderOverlay

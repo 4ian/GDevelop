@@ -148,7 +148,7 @@ const AnimationPreview = ({
     [updateAnimation]
   );
 
-  // When changing animation, reset the animation.
+  // When changing animation, the index can be out of bounds, so reset the animation.
   if (currentFrameIndexRef.current >= resourceNames.length) {
     currentFrameIndexRef.current = 0;
   }

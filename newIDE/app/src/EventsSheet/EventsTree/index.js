@@ -753,22 +753,28 @@ export default class ThemableEventsTree extends Component<
           '--icon-size': `${Math.round(zoomLevel * 1.14)}px`,
         }}
       >
-        <Autoscroll
-          DnDComponent={this.DropTarget}
-          direction="top"
-          activateTargets={
-            !!this.state.draggedNode && !this.state.isScrolledTop
-          }
-          onHover={this._scrollUp}
-        />
-        <Autoscroll
-          DnDComponent={this.DropTarget}
-          direction="bottom"
-          activateTargets={
-            !!this.state.draggedNode && !this.state.isScrolledBottom
-          }
-          onHover={this._scrollDown}
-        />
+        {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}
+        {/* touch events are lost and the dnd does not drop anymore (hypothesis). */}
+        {this.props.screenType !== 'touchscreen' && (
+          <>
+            <Autoscroll
+              DnDComponent={this.DropTarget}
+              direction="top"
+              activateTargets={
+                !!this.state.draggedNode && !this.state.isScrolledTop
+              }
+              onHover={this._scrollUp}
+            />
+            <Autoscroll
+              DnDComponent={this.DropTarget}
+              direction="bottom"
+              activateTargets={
+                !!this.state.draggedNode && !this.state.isScrolledBottom
+              }
+              onHover={this._scrollDown}
+            />
+          </>
+        )}
         <SortableTree
           treeData={treeData}
           scaffoldBlockPxWidth={getIndentWidth(this.props.windowWidth)}
@@ -793,6 +799,9 @@ export default class ThemableEventsTree extends Component<
               });
             },
           }}
+          // Disable slideRegionSize on touchscreen because of a bug that makes scrolling
+          // uncontrollable on touchscreens. Ternary operator does not update slideRegionSize
+          // well.
           slideRegionSize={-10}
         />
       </div>

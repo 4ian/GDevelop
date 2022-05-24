@@ -11,7 +11,6 @@ import {
   type Author,
   getAsset,
 } from '../Utils/GDevelopServices/Asset';
-import { getPixelatedImageRendering } from '../Utils/CssHelpers';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -33,11 +32,6 @@ import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPrev
 import ScrollView from '../UI/ScrollView';
 
 const styles = {
-  previewImagePixelated: {
-    width: '50%',
-    imageRendering: getPixelatedImageRendering(),
-    padding: 15,
-  },
   previewBackground: {
     position: 'relative',
     display: 'flex',
@@ -65,6 +59,7 @@ const styles = {
   },
 };
 
+// Override the default style of the chip to make it look like a button.
 const useChipStyles = makeStyles({
   label: {
     cursor: 'pointer',
@@ -138,9 +133,10 @@ export const AssetDetails = ({
           const loadedAsset = await getAsset(assetShortHeader);
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {
-            setSelectedAnimationName(
-              loadedAsset.objectAssets[0].object.animations[0].name
-            );
+            // Only sprites have animations and we select the first one.
+            const firstAnimationName =
+              loadedAsset.objectAssets[0].object.animations[0].name;
+            setSelectedAnimationName(firstAnimationName);
           }
         } catch (error) {
           console.error('Error while loading asset:', error);
@@ -181,6 +177,7 @@ export const AssetDetails = ({
       ? licenses.find(({ name }) => name === asset.license)
       : null;
 
+  // For sprite animations.
   const assetAnimations = asset
     ? asset.objectAssets[0].object.animations
     : null;
@@ -371,7 +368,7 @@ export const AssetDetails = ({
                               value={animation.name}
                               primaryText={
                                 makeFirstLetterUppercase(animation.name) ||
-                                t`Default`
+                                t`Default` // Display default for animations with no name.
                               }
                             />
                           ))}

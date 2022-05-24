@@ -89,7 +89,6 @@ function DropTargetContainer({
               style={{
                 ...styles.dropArea,
                 ...style.dropArea,
-                backgroundColor: isOver ? 'black' : 'transparent',
               }}
             />
             {/* Drop indicator */}
@@ -285,8 +284,6 @@ export function Autoscroll({
               position: 'absolute',
               ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
               height: '10%',
-              opacity: isOverLazy ? 1 : 0,
-              backgroundColor: isOverLazy ? 'blue' : 'black',
               zIndex: 2,
             }}
           />

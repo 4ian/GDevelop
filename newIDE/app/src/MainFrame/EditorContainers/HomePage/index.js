@@ -436,7 +436,7 @@ export const HomePage = React.memo<Props>(
                           label={<Trans>Community Forums</Trans>}
                           onClick={() =>
                             Window.openExternalURL(
-                              'https://forum.gdevelop-app.com'
+                              'https://forum.gdevelop.io'
                             )
                           }
                         />

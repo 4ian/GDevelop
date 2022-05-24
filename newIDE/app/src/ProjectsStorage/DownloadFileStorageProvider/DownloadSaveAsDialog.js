@@ -50,7 +50,7 @@ export default class DownloadSaveAsDialog extends React.Component<Props> {
         key="download"
         label={<Trans>Download GDevelop desktop version</Trans>}
         primary={false}
-        onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
+        onClick={() => Window.openExternalURL('http://gdevelop.io')}
       />,
       <FlatButton
         key="close"

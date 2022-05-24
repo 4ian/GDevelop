@@ -4,14 +4,14 @@ contact_links:
     url: https://discord.gg/rjdYHvj
     about: Discuss on the forum or on the Discord to get help creating a game or identifying a bug.
   - name: GDevelop Forums
-    url: https://forum.gdevelop-app.com
+    url: https://forum.gdevelop.io
     about: You can also discuss game creation, new feature requests and bugs on the forum.
   - name: GDevelop Roadmap
     url: https://trello.com/b/qf0lM7k8/gdevelop-roadmap
     about: Look at the roadmap and vote on features that you want to see in GDevelop.
   - name: Submit a new game example that you created
     url: https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose
-    about: You can submit a game that you made to be added to examples in the "GDevelop-examples" repository 
+    about: You can submit a game that you made to be added to examples in the "GDevelop-examples" repository
   - name: Submit a new game extension that you created
     url: https://github.com/4ian/GDevelop-extensions/issues/new/choose
-    about: You can submit an extension that you made in the "GDevelop-extensions" repository 
+    about: You can submit an extension that you made in the "GDevelop-extensions" repository

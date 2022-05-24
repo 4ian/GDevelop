@@ -33,7 +33,7 @@ const generateExtensionFooterText = fullName => {
   return (
     `
 ---
-*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop-app.com/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
+*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
     ' ' +
     'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].'
   );

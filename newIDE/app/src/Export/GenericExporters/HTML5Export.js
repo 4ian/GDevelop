@@ -83,7 +83,7 @@ export const DoneFooter = ({
       fullWidth
       primary
       onClick={() =>
-        Window.openExternalURL('https://gdevelop-app.com/crazy-games')
+        Window.openExternalURL('https://gdevelop.io/page/crazy-games')
       }
       label={<Trans>Publish your game on CrazyGames.com</Trans>}
       icon={<CrazyGames />}
@@ -110,7 +110,7 @@ export const DoneFooter = ({
     <FlatButton
       fullWidth
       primary
-      onClick={() => Window.openExternalURL('https://gdevelop-app.com/poki')}
+      onClick={() => Window.openExternalURL('https://gdevelop.io/page/poki')}
       label={<Trans>Publish your game on Poki.com</Trans>}
       icon={<Poki />}
     />

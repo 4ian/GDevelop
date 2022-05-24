@@ -315,6 +315,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     project.insertNewEventsFunctionsExtension(newName, index + 1);
     this._onProjectItemModified();
+    return newName;
   };
 
   _moveUpLayout = (index: number) => {
@@ -633,6 +634,15 @@ export default class ProjectManager extends React.Component<Props, State> {
   _setProjectFirstLayout = (layoutName: string) => {
     this.props.project.setFirstLayout(layoutName);
     this.forceUpdate();
+  };
+
+  _onCreateNewExtension = (project: gdProject, i18n: I18nType) => {
+    const newExtensionName = this._addEventsFunctionsExtension(
+      project.getEventsFunctionsExtensionsCount(),
+      i18n
+    );
+    this.props.onOpenEventsFunctionsExtension(newExtensionName);
+    this.setState({ extensionsSearchDialogOpen: false });
   };
 
   render() {
@@ -991,9 +1001,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                               eventsFunctionsExtension
                             )
                           }
-                          onAdd={() =>
-                            this._addEventsFunctionsExtension(i, i18n)
-                          }
+                          onAdd={() => {
+                            this._addEventsFunctionsExtension(i, i18n);
+                          }}
                           onRename={newName => {
                             this.props.onRenameEventsFunctionsExtension(
                               name,
@@ -1041,23 +1051,11 @@ export default class ProjectManager extends React.Component<Props, State> {
                       );
                     })
                     .concat(
-                      <AddListItem
-                        key={'add-events-functions-extension'}
-                        primaryText={
-                          <Trans>Click to add functions and behaviors</Trans>
-                        }
-                        onClick={() =>
-                          this._addEventsFunctionsExtension(
-                            project.getEventsFunctionsExtensionsCount(),
-                            i18n
-                          )
-                        }
-                      />
-                    )
-                    .concat(
                       <SearchListItem
                         key={'extensions-search'}
-                        primaryText={<Trans>Search for new extensions</Trans>}
+                        primaryText={
+                          <Trans>Create or search for new extensions</Trans>
+                        }
                         onClick={this._openSearchExtensionDialog}
                       />
                     )
@@ -1167,6 +1165,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                   this.setState({ extensionsSearchDialogOpen: false })
                 }
                 onInstallExtension={onInstallExtension}
+                onCreateNew={() => {
+                  this._onCreateNewExtension(project, i18n);
+                }}
               />
             )}
             {openedExtensionShortHeader && openedExtensionName && (

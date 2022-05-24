@@ -28,8 +28,9 @@ export const Default = () => (
         <ExtensionStoreStateProvider>
           <ExtensionsSearchDialog
             project={testProject.project}
-            onClose={action('on close')}
+            onClose={action('onClose')}
             onInstallExtension={action('onInstallExtension')}
+            onCreateNew={action('onCreateNew')}
           />
         </ExtensionStoreStateProvider>
       </EventsFunctionsExtensionsProvider>

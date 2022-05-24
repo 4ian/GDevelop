@@ -32,6 +32,7 @@ namespace gdjs {
 
       // Contains the layers of the scene (and, optionally, debug PIXI objects).
       this._pixiContainer.sortableChildren = true;
+      this._pixiContainer.interactiveChildren = false;
       this._debugDraw = null;
     }
 

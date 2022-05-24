@@ -1069,6 +1069,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               value={searchText}
               onRequestSearch={this._onRequestSearch}
               onChange={this._onSearchChange}
+              placeholder={t`Search manager`}
             />
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog

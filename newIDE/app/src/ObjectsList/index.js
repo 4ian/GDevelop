@@ -693,6 +693,7 @@ export default class ObjectsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          placeholder={t`Search objects`}
         />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog

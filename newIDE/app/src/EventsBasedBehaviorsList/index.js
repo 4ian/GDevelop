@@ -338,6 +338,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
               searchText: text,
             })
           }
+          placeholder={t`Search behaviors`}
         />
       </Background>
     );

@@ -9,7 +9,7 @@ import { ListSearchResults } from '../UI/Search/ListSearchResults';
 import { GamesShowcaseContext } from './GamesShowcaseContext';
 import { ShowcasedGameListItem } from './ShowcasedGameListItem';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import Subheader from '../UI/Subheader';
 import { CategoryChooser } from '../UI/Search/CategoryChooser';
 
@@ -52,6 +52,7 @@ export const GamesShowcase = (props: Props) => {
             onChange={setSearchText}
             onRequestSearch={() => {}}
             style={styles.searchBar}
+            placeholder={t`Search games`}
           />
           <Line
             expand

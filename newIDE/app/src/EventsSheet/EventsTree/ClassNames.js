@@ -24,6 +24,8 @@ export const eventsTreeWithSearchResults = 'with-search-results';
 
 export const dropIndicator = 'drop-indicator';
 export const cantDropIndicator = 'cant-drop-indicator';
+export const eventDropIndicator = 'event-drop-indicator';
+export const handle = 'moveHandle';
 
 export const linkContainer = 'link-container';
 

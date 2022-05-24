@@ -11,6 +11,7 @@ type Props<DraggedItemType> = {|
   children: ({
     connectDropTarget: ConnectDropTarget,
     isOver: boolean,
+    isOverLazy: boolean,
     canDrop: boolean,
   }) => ?React.Node,
   canDrop: (item: DraggedItemType) => boolean,
@@ -21,6 +22,7 @@ type Props<DraggedItemType> = {|
 type DropTargetProps = {|
   connectDropTarget: ConnectDropTarget,
   isOver: boolean,
+  isOverLazy: boolean,
   canDrop: boolean,
 |};
 
@@ -50,15 +52,17 @@ export const makeDropTarget = <DraggedItemType>(
     return {
       connectDropTarget: connect.dropTarget(),
       isOver: monitor.isOver({ shallow: true }),
+      isOverLazy: monitor.isOver({ shallow: false }),
       canDrop: monitor.canDrop(),
     };
   }
 
   const InnerDropTarget = DropTarget(reactDndType, targetSpec, targetCollect)(
-    ({ children, connectDropTarget, isOver, canDrop }) => {
+    ({ children, connectDropTarget, isOver, isOverLazy, canDrop }) => {
       return children({
         connectDropTarget,
         isOver,
+        isOverLazy,
         canDrop,
       });
     }

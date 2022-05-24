@@ -435,9 +435,7 @@ export const HomePage = React.memo<Props>(
                           icon={<ForumIcon />}
                           label={<Trans>Community Forums</Trans>}
                           onClick={() =>
-                            Window.openExternalURL(
-                              'https://forum.gdevelop.io'
-                            )
+                            Window.openExternalURL('https://forum.gdevelop.io')
                           }
                         />
                         <FlatButton

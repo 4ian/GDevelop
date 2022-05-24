@@ -969,4 +969,5 @@ void main(void){
 
 })));
 if (typeof pixi_tilemap !== 'undefined') { Object.assign(this.PIXI.tilemap, pixi_tilemap); }
+// Disabled to avoid warnings in Chrome (see https://github.com/4ian/GDevelop/pull/3947)
 // //# sourceMappingURL=pixi-tilemap.umd.js.map

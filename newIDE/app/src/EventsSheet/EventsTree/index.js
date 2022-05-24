@@ -755,7 +755,7 @@ export default class ThemableEventsTree extends Component<
       >
         {/* Disable for touchscreen because the dragged DOM node gets deleted, the */}
         {/* touch events are lost and the dnd does not drop anymore (hypothesis). */}
-        {this.props.screenType !== 'touchscreen' && (
+        {this.props.screenType !== 'touch' && (
           <>
             <Autoscroll
               DnDComponent={this.DropTarget}

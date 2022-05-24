@@ -101,7 +101,7 @@ export default function ExtensionsSearchDialog({
               <RaisedButton
                 key="create-new"
                 onClick={onCreateNew}
-                label={<Trans>Create functions or behavior</Trans>}
+                label={<Trans>Create a new extension</Trans>}
                 icon={<Add />}
               />
             ) : null,

@@ -13,6 +13,7 @@ type Props<SearchItem> = {|
   error: ?Error,
   onRetry: () => void,
   baseSize: number,
+  noResultPlaceholder?: React.Node,
 |};
 
 const styles = {
@@ -26,6 +27,7 @@ export const BoxSearchResults = <SearchItem>({
   error,
   onRetry,
   baseSize,
+  noResultPlaceholder,
 }: Props<SearchItem>) => {
   if (!searchItems) {
     if (!error) return <PlaceholderLoader />;
@@ -41,12 +43,14 @@ export const BoxSearchResults = <SearchItem>({
     }
   } else if (searchItems.length === 0) {
     return (
-      <EmptyMessage>
-        <Trans>
-          No results returned for your search. Try something else, browse the
-          categories or create your object from scratch!
-        </Trans>
-      </EmptyMessage>
+      noResultPlaceholder || (
+        <EmptyMessage>
+          <Trans>
+            No results returned for your search. Try something else, browse the
+            categories or create your object from scratch!
+          </Trans>
+        </EmptyMessage>
+      )
     );
   }
 

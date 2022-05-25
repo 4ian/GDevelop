@@ -319,7 +319,7 @@ class AnimationsListContainer extends React.Component<
               actionLabel={<Trans>Add an animation</Trans>}
               helpPagePath="/objects/sprite"
               tutorialId="intermediate-changing-animations"
-              onAdd={this.addAnimation}
+              onAction={this.addAnimation}
             />
           </Column>
         ) : (

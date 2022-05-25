@@ -9,11 +9,12 @@
 /**
  * Draggable handle on the left of an event
  */
-.gd-events-sheet .rst__moveHandle {
+.gd-events-sheet .move-handle {
     width: 10px;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
+    margin: 0.5px;
+    flex-grow: 0;
+    flex-shrink: 0;
+    cursor: move;
 }
 
 @media only screen and (max-width: 750px) {
@@ -21,7 +22,7 @@
      * Slightly reduce the size of the handle on small screens
      * and phones (where drag'n'drop is not supported anyway).
      */
-    .gd-events-sheet .rst__moveHandle {
+    .gd-events-sheet .move-handle {
         width: 4px;
     }
 }

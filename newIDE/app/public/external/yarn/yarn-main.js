@@ -25,6 +25,7 @@ window.addEventListener('yarnReady', e => {
   yarn = e;
   yarn.app.fs = fs;
   yarn.app.electron = electron;
+  yarn.app.remote = remote;
   yarn.data.restoreFromLocalStorage(false);
   ipcRenderer.send('yarn-ready');
 });

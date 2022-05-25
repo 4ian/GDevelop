@@ -131,7 +131,12 @@ export class ColorAssetStoreSearchFilter
   }
 
   isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    if (!this.color) return true;
+    if (!this.color) {
+      return true;
+    }
+    if (searchItem.dominantColors.length === 0) {
+      return false;
+    }
     const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
     const dominantRgb = hexNumberToRGBColor(searchItem.dominantColors[0]);
     const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);

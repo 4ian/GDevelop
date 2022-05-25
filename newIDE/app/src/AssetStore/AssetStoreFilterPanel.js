@@ -201,12 +201,16 @@ const ColorFilter = ({
             <Text displayInlineAsSpan>{title}</Text>
           </AccordionHeader>
           <AccordionBody>
+            <Column expand>
+              <Line noMargin>
             <HexColorField
               disableAlpha
               fullWidth
               color={color}
               onChange={setColor}
             />
+            </Line>
+          </Column>
           </AccordionBody>
         </Accordion>
       )}

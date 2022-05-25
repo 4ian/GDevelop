@@ -230,6 +230,7 @@ export default function NewBehaviorDialog({
             <HelpButton helpPagePath="/behaviors" key="help" />,
           ]}
           open
+          onRequestClose={onClose}
           cannotBeDismissed={false}
           flexBody
           noMargin

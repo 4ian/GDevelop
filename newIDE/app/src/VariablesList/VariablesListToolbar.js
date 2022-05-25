@@ -119,7 +119,7 @@ const VariablesListToolbar = (props: Props) => {
           value={props.searchText}
           onRequestSearch={props.onChangeSearchText}
           onChange={props.onChangeSearchText}
-          placeholder={t`Search in variables`}
+          placeholder={t`Search variables`}
         />
       </Column>
       <Column noMargin>

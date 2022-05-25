@@ -14,6 +14,7 @@ import {
   sendExtensionAddedToProject,
 } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
+import { t } from '@lingui/macro';
 
 const styles = {
   searchBar: {
@@ -102,6 +103,7 @@ export const ExtensionStore = ({
               style={styles.searchBar}
               tagsHandler={tagsHandler}
               tags={filters && filters.allTags}
+              placeholder={t`Search extensions`}
             />
             {DismissableTutorialMessage && (
               <Line>

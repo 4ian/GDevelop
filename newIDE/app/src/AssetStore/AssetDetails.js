@@ -17,7 +17,6 @@ import PlaceholderError from '../UI/PlaceholderError';
 import { type ResourceSource } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
-import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Link from '@material-ui/core/Link';
@@ -39,7 +38,7 @@ const styles = {
     alignItems: 'center',
     padding: 10,
     width: 300,
-    maxHeight: 350,
+    maxHeight: 250,
   },
   chip: {
     marginBottom: 2,
@@ -281,126 +280,116 @@ export const AssetDetails = ({
           </Column>
         </Line>
         <ResponsiveLineStackLayout noMargin>
-          <ResponsiveWindowMeasurer>
-            {windowWidth => (
-              <Column>
-                <div style={styles.previewBackground}>
-                  {asset ? (
-                    <>
-                      {asset.objectType === 'sprite' &&
-                        animationResources &&
-                        direction && (
-                          <AnimationPreview
-                            resourceNames={animationResources.map(
-                              ({ name }) => name
-                            )}
-                            getImageSource={(resourceName: string) => {
-                              return animationResources.find(
-                                ({ name }) => name === resourceName
-                              ).file;
-                            }}
-                            project={project}
-                            timeBetweenFrames={direction.timeBetweenFrames}
-                            isLooping // Always loop in the asset store.
-                            hideCheckeredBackground
-                            hideControls
-                            initialZoom={
-                              150 / Math.max(asset.width, asset.height)
-                            }
-                          />
+          <Column>
+            <div style={styles.previewBackground}>
+              {asset ? (
+                <>
+                  {asset.objectType === 'sprite' &&
+                    animationResources &&
+                    direction && (
+                      <AnimationPreview
+                        resourceNames={animationResources.map(
+                          ({ name }) => name
                         )}
-                      {(asset.objectType === 'tiled' ||
-                        asset.objectType === '9patch') && (
-                        <CorsAwareImage
-                          style={styles.previewImage}
-                          src={asset.previewImageUrls[0]}
-                          alt={asset.name}
-                        />
-                      )}
-                    </>
-                  ) : (
-                    <PlaceholderLoader />
+                        getImageSource={(resourceName: string) => {
+                          return animationResources.find(
+                            ({ name }) => name === resourceName
+                          ).file;
+                        }}
+                        project={project}
+                        timeBetweenFrames={direction.timeBetweenFrames}
+                        isLooping // Always loop in the asset store.
+                        hideCheckeredBackground
+                        hideControls
+                        initialZoom={140 / Math.max(asset.width, asset.height)}
+                        fixedHeight={250}
+                      />
+                    )}
+                  {(asset.objectType === 'tiled' ||
+                    asset.objectType === '9patch') && (
+                    <CorsAwareImage
+                      style={styles.previewImage}
+                      src={asset.previewImageUrls[0]}
+                      alt={asset.name}
+                    />
                   )}
-                </div>
-                {assetAnimations &&
-                  assetAnimations.length > 1 &&
-                  typeof selectedAnimationName === 'string' && (
-                    <Paper elevation={4} variant="outlined">
-                      <Line
-                        justifyContent="center"
-                        alignItems="center"
-                        noMargin
-                      >
-                        <div
-                          style={{
-                            ...styles.arrowContainer,
-                            backgroundColor:
-                              gdevelopTheme.list.itemsBackgroundColor,
-                          }}
-                          onClick={() => {
-                            const previousAnimationIndex = assetAnimations.findIndex(
-                              ({ name }) => name === selectedAnimationName
-                            );
-                            const newAnimationIndex =
-                              previousAnimationIndex === 0
-                                ? assetAnimations.length - 1
-                                : previousAnimationIndex - 1;
-                            setSelectedAnimationName(
-                              assetAnimations[newAnimationIndex].name
-                            );
-                          }}
-                        >
-                          <ArrowBackIos classes={leftArrowStyles} />
-                        </div>
+                </>
+              ) : (
+                <PlaceholderLoader />
+              )}
+            </div>
+            {assetAnimations &&
+              assetAnimations.length > 1 &&
+              typeof selectedAnimationName === 'string' && (
+                <Paper elevation={4} variant="outlined">
+                  <Line justifyContent="center" alignItems="center" noMargin>
+                    <div
+                      style={{
+                        ...styles.arrowContainer,
+                        backgroundColor:
+                          gdevelopTheme.list.itemsBackgroundColor,
+                      }}
+                      onClick={() => {
+                        const previousAnimationIndex = assetAnimations.findIndex(
+                          ({ name }) => name === selectedAnimationName
+                        );
+                        const newAnimationIndex =
+                          previousAnimationIndex === 0
+                            ? assetAnimations.length - 1
+                            : previousAnimationIndex - 1;
+                        setSelectedAnimationName(
+                          assetAnimations[newAnimationIndex].name
+                        );
+                      }}
+                    >
+                      <ArrowBackIos classes={leftArrowStyles} />
+                    </div>
 
-                        <SelectField
-                          value={selectedAnimationName}
-                          onChange={(e, i, newAnimationName: string) => {
-                            setSelectedAnimationName(newAnimationName);
-                          }}
-                          fullWidth
-                          textAlign="center"
-                          disableUnderline
-                        >
-                          {assetAnimations.map(animation => (
-                            <SelectOption
-                              key={animation.name}
-                              value={animation.name}
-                              primaryText={
-                                makeFirstLetterUppercase(animation.name) ||
-                                t`Default` // Display default for animations with no name.
-                              }
-                            />
-                          ))}
-                        </SelectField>
-                        <div
-                          style={{
-                            ...styles.arrowContainer,
-                            backgroundColor:
-                              gdevelopTheme.list.itemsBackgroundColor,
-                          }}
-                          onClick={() => {
-                            const previousAnimationIndex = assetAnimations.findIndex(
-                              ({ name }) => name === selectedAnimationName
-                            );
-                            const newAnimationIndex =
-                              previousAnimationIndex ===
-                              assetAnimations.length - 1
-                                ? 0
-                                : previousAnimationIndex + 1;
-                            setSelectedAnimationName(
-                              assetAnimations[newAnimationIndex].name
-                            );
-                          }}
-                        >
-                          <ArrowForwardIos classes={rightArrowStyles} />
-                        </div>
-                      </Line>
-                    </Paper>
-                  )}
-              </Column>
-            )}
-          </ResponsiveWindowMeasurer>
+                    <SelectField
+                      value={selectedAnimationName}
+                      onChange={(e, i, newAnimationName: string) => {
+                        setSelectedAnimationName(newAnimationName);
+                      }}
+                      fullWidth
+                      textAlign="center"
+                      disableUnderline
+                    >
+                      {assetAnimations.map(animation => (
+                        <SelectOption
+                          key={animation.name}
+                          value={animation.name}
+                          primaryText={
+                            makeFirstLetterUppercase(animation.name) ||
+                            t`Default` // Display default for animations with no name.
+                          }
+                        />
+                      ))}
+                    </SelectField>
+                    <div
+                      style={{
+                        ...styles.arrowContainer,
+                        backgroundColor:
+                          gdevelopTheme.list.itemsBackgroundColor,
+                      }}
+                      onClick={() => {
+                        const previousAnimationIndex = assetAnimations.findIndex(
+                          ({ name }) => name === selectedAnimationName
+                        );
+                        const newAnimationIndex =
+                          previousAnimationIndex === assetAnimations.length - 1
+                            ? 0
+                            : previousAnimationIndex + 1;
+                        setSelectedAnimationName(
+                          assetAnimations[newAnimationIndex].name
+                        );
+                      }}
+                    >
+                      <ArrowForwardIos classes={rightArrowStyles} />
+                    </div>
+                  </Line>
+                </Paper>
+              )}
+          </Column>
           <Column expand>
             {asset ? (
               <React.Fragment>

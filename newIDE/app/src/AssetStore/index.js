@@ -91,12 +91,12 @@ export const AssetStore = ({
 
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [openedAssetPack, setOpenedAssetPack] = React.useState(null);
   const [
     openedAssetShortHeader,
     setOpenedAssetShortHeader,
   ] = React.useState<?AssetShortHeader>(null);
-  const [isFiltersOpen, setIsFiltersOpen] = React.useState(false);
+  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
+  const [isOnHomePage, setIsOnHomePage] = React.useState(true);
 
   const [
     assetBeingInstalled,
@@ -156,19 +156,21 @@ export const AssetStore = ({
     ]
   );
 
-  const isOnHomePage =
-    !openedAssetPack && !openedAssetShortHeader && !searchText;
-
-  const resetAssetSelection = () => {
-    setOpenedAssetPack(null);
+  const resetToDefault = () => {
+    setSearchText('');
+    filtersState.setChosenCategory(null);
     setOpenedAssetShortHeader(null);
+    clearAllFilters(assetFiltersState);
+    setIsFiltersPanelOpen(false);
+    setIsOnHomePage(true);
   };
 
+  // When a pack is selected from the home page,
+  // we set it as the chosen category and open the filters panel.
   const selectPack = (tag: string) => {
     if (!assetPacks) return;
 
     sendAssetPackOpened(tag);
-    setOpenedAssetPack(tag);
 
     const chosenCategory = {
       node: { name: tag, allChildrenTags: [], children: [] },
@@ -176,18 +178,22 @@ export const AssetStore = ({
     };
     filtersState.setChosenCategory(chosenCategory);
 
-    setIsFiltersOpen(true);
+    setIsOnHomePage(false);
+    setIsFiltersPanelOpen(true);
   };
 
+  // When a tag is selected from the asset details page,
+  // we set it as the chosen category, clear old filters and open the filters panel.
   const selectTag = (tag: string) => {
-    setOpenedAssetShortHeader(null);
-    setOpenedAssetPack(tag);
     const chosenCategory = {
       node: { name: tag, allChildrenTags: [], children: [] },
       parentNodes: [],
     };
     filtersState.setChosenCategory(chosenCategory);
-    setIsFiltersOpen(true);
+
+    clearAllFilters(assetFiltersState);
+    setOpenedAssetShortHeader(null);
+    setIsFiltersPanelOpen(true);
   };
 
   React.useEffect(
@@ -209,7 +215,9 @@ export const AssetStore = ({
                 placeholder={t`Search assets`}
                 value={searchText}
                 onChange={setSearchText}
-                onRequestSearch={resetAssetSelection}
+                onRequestSearch={() => {
+                  if (isOnHomePage) setIsOnHomePage(false);
+                }}
                 style={styles.searchBar}
                 ref={searchBar}
                 id="asset-store-search-bar"
@@ -239,10 +247,7 @@ export const AssetStore = ({
                         setOpenedAssetShortHeader(null);
                       } else {
                         // Going back from search to home.
-                        setSearchText('');
-                        filtersState.setChosenCategory(null);
-                        setIsFiltersOpen(false);
-                        resetAssetSelection();
+                        resetToDefault();
                       }
                     }}
                   />
@@ -259,12 +264,16 @@ export const AssetStore = ({
                     noFullHeight
                     noExpand
                     width={
-                      !isFiltersOpen ? 50 : windowWidth === 'small' ? 150 : 250
+                      !isFiltersPanelOpen
+                        ? 50
+                        : windowWidth === 'small'
+                        ? 205
+                        : 250
                     }
                   >
-                    {!isFiltersOpen ? (
+                    {!isFiltersPanelOpen ? (
                       <Line justifyContent="center">
-                        <IconButton onClick={() => setIsFiltersOpen(true)}>
+                        <IconButton onClick={() => setIsFiltersPanelOpen(true)}>
                           <Tune />
                         </IconButton>
                       </Line>
@@ -282,7 +291,9 @@ export const AssetStore = ({
                               </Subheader>
                             </Line>
                           </Column>
-                          <IconButton onClick={() => setIsFiltersOpen(false)}>
+                          <IconButton
+                            onClick={() => setIsFiltersPanelOpen(false)}
+                          >
                             <DoubleChevronArrow />
                           </IconButton>
                         </Line>
@@ -292,10 +303,8 @@ export const AssetStore = ({
                         >
                           <AssetStoreFilterPanel
                             assetFiltersState={assetFiltersState}
-                            onChoiceChange={category => {
-                              if (category) {
-                                setOpenedAssetPack(category.node.name);
-                              }
+                            onChoiceChange={() => {
+                              if (isOnHomePage) setIsOnHomePage(false);
                             }}
                           />
                         </Line>
@@ -310,7 +319,7 @@ export const AssetStore = ({
                     onPackSelection={selectPack}
                   />
                 )}
-                {(openedAssetPack || searchText) && !openedAssetShortHeader && (
+                {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
                     baseSize={128}
                     onRetry={fetchAssetsAndFilters}
@@ -325,7 +334,6 @@ export const AssetStore = ({
                             name: assetShortHeader.name,
                           });
                           setOpenedAssetShortHeader(assetShortHeader);
-                          setIsFiltersOpen(false);
                         }}
                         assetShortHeader={assetShortHeader}
                       />

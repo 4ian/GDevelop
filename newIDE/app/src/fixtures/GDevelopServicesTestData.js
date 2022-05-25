@@ -437,8 +437,6 @@ export const fakeAsset1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
-  width: 32,
-  height: 32,
   dominantColors: [255],
   objectAssets: [
     {
@@ -466,8 +464,6 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
-  width: 32,
-  height: 32,
   dominantColors: [255],
   objectAssets: [
     {
@@ -515,8 +511,6 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
-  width: 32,
-  height: 32,
   dominantColors: [255],
   objectAssets: [
     {
@@ -553,8 +547,6 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
-  width: 32,
-  height: 32,
   dominantColors: [255],
   objectAssets: [
     {
@@ -591,8 +583,6 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
-  width: 32,
-  height: 32,
   dominantColors: [255],
   objectAssets: [
     {
@@ -672,8 +662,6 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
-  width: 32,
-  height: 32,
   dominantColors: [255],
   objectAssets: [
     {
@@ -739,8 +727,6 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
     'enemy',
   ],
   dominantColors: [255],
-  width: 32,
-  height: 32,
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {

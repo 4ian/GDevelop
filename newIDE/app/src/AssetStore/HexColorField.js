@@ -7,6 +7,7 @@ import {
   type RGBColor,
   hexToRGBColor,
   rgbColorToHex,
+  rgbToHexNumber,
 } from '../Utils/ColorTransformer';
 
 const styles = {
@@ -36,81 +37,77 @@ type Props = {|
   color: RGBColor | null,
 |};
 
-type State = {|
-  color: string,
-|};
-
 const hexToNullableRGBColor = (color: string): RGBColor | null => {
   return /^#{0,1}[0-9a-fA-F]{6}$/.test(color) ? hexToRGBColor(color) : null;
 };
 
-// TODO Decide what to do with this component.
-// Should it be merged back with ColorField?
-// The only difference is the format of the string representation,
-// but they probably have distinct usages:
-// - ColorField is for color properties and parameters
-// - this one is for a color thant won't be used in events and
-// should use the common #123456 format.
-export class HexColorField extends React.Component<Props, State> {
-  state = {
-    color: this.props.color
-      ? rgbColorToHex(
-          this.props.color.r,
-          this.props.color.g,
-          this.props.color.b
-        )
-      : '',
-  };
+const areSameColor = (color1: RGBColor, color2: RGBColor): boolean => {
+  return (
+    (color1 && rgbToHexNumber(color1.r, color1.g, color1.b)) !==
+    (color2 && rgbToHexNumber(color2.r, color2.g, color2.b))
+  );
+};
 
-  _textField: ?TextField = null;
+/**
+ * Very similar to ColorField but it uses a #123456 format.
+ */
+export const HexColorField = ({
+  fullWidth,
+  disableAlpha,
+  id,
+  floatingLabelText,
+  helperMarkdownText,
+  onChange,
+  color,
+}: Props) => {
+  const [colorString, setColorString] = React.useState<String>(
+    color ? rgbColorToHex(color.r, color.g, color.b) : ''
+  );
 
-  _handleChange = (color: string) => {
-    const oldColor = hexToNullableRGBColor(this.state.color);
-    const newColor = hexToNullableRGBColor(color);
-    this.setState({ color });
+  // It conserves the imputed text if the color didn't changed.
+  if (areSameColor(color, hexToNullableRGBColor(colorString))) {
+    setColorString(color ? rgbColorToHex(color.r, color.g, color.b) : '');
+  }
+
+  const handleTextChange = (newStringColor: string) => {
+    const oldColor = hexToNullableRGBColor(colorString);
+    const newColor = hexToNullableRGBColor(newStringColor);
+    setColorString(newStringColor);
     if (newColor !== oldColor) {
-      this.props.onChange(newColor);
+      onChange(newColor);
     }
   };
 
-  _handlePickerChange = (color: ColorResult) => {
-    const hexString = rgbColorToHex(color.rgb.r, color.rgb.g, color.rgb.b);
-    this.setState({ color: hexString });
-    this.props.onChange(color.rgb);
+  const handlePickerChange = (color: ColorResult) => {
+    setColorString(rgbColorToHex(color.rgb.r, color.rgb.g, color.rgb.b));
+    onChange(color.rgb);
   };
 
-  render() {
-    return (
-      <div
-        style={{
-          ...styles.container,
-          width: this.props.fullWidth ? '100%' : undefined,
-        }}
-      >
-        <TextField
-          id={this.props.id}
-          fullWidth={this.props.disableAlpha}
-          floatingLabelText={this.props.floatingLabelText}
-          floatingLabelFixed
-          helperMarkdownText={this.props.helperMarkdownText}
-          type="text"
-          hintText={t`Code like #ff8844`}
-          value={this.state.color}
-          onChange={event => this._handleChange(event.target.value)}
-          ref={textField => (this._textField = textField)}
+  return (
+    <div
+      style={{
+        ...styles.container,
+        width: fullWidth ? '100%' : undefined,
+      }}
+    >
+      <TextField
+        id={id}
+        fullWidth={disableAlpha}
+        floatingLabelText={floatingLabelText}
+        floatingLabelFixed
+        helperMarkdownText={helperMarkdownText}
+        type="text"
+        hintText={t`Code like #ff8844`}
+        value={colorString}
+        onChange={event => handleTextChange(event.target.value)}
+      />
+      <div style={floatingLabelText ? styles.picker : styles.pickerNoLabel}>
+        <ColorPicker
+          disableAlpha={true}
+          onChangeComplete={handlePickerChange}
+          color={hexToNullableRGBColor(colorString)}
         />
-        <div
-          style={
-            this.props.floatingLabelText ? styles.picker : styles.pickerNoLabel
-          }
-        >
-          <ColorPicker
-            disableAlpha={true}
-            onChangeComplete={this._handlePickerChange}
-            color={hexToNullableRGBColor(this.state.color)}
-          />
-        </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};

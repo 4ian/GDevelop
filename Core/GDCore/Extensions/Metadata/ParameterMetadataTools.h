@@ -19,7 +19,7 @@ namespace gd {
 class GD_CORE_API ParameterMetadataTools {
  public:
   static void ParametersToObjectsContainer(
-      gd::Project& project,
+      const gd::Project& project,
       const std::vector<gd::ParameterMetadata>& parameters,
       gd::ObjectsContainer& outputObjectsContainer);
 

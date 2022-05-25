@@ -48,7 +48,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Construct a code generator for the specified
    * platform/project/layout.
    */
-  EventsCodeGenerator(gd::Project& project_,
+  EventsCodeGenerator(const gd::Project& project_,
                       const gd::Layout& layout,
                       const gd::Platform& platform_);
 
@@ -57,7 +57,7 @@ class GD_CORE_API EventsCodeGenerator {
    * objects/groups and platform
    */
   EventsCodeGenerator(const gd::Platform& platform,
-                      gd::ObjectsContainer& globalObjectsAndGroups_,
+                      const gd::ObjectsContainer& globalObjectsAndGroups_,
                       const gd::ObjectsContainer& objectsAndGroups_);
   virtual ~EventsCodeGenerator(){};
 
@@ -327,7 +327,7 @@ class GD_CORE_API EventsCodeGenerator {
   /**
    * \brief Get the global objects/groups used for code generation.
    */
-  gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
+  const gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
     return globalObjectsAndGroups;
   }
 
@@ -348,7 +348,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Get the project the code is being generated for.
    * \warning This is only valid if HasProjectAndLayout() is true.
    */
-  gd::Project& GetProject() const { return *project; }
+  const gd::Project& GetProject() const { return *project; }
 
   /**
    * \brief Get the layout the code is being generated for.
@@ -770,12 +770,12 @@ class GD_CORE_API EventsCodeGenerator {
 
   const gd::Platform& platform;  ///< The platform being used.
 
-  gd::ObjectsContainer& globalObjectsAndGroups;
+  const gd::ObjectsContainer& globalObjectsAndGroups;
   const gd::ObjectsContainer& objectsAndGroups;
 
   bool hasProjectAndLayout;  ///< true only if project and layout are valid
                              ///< references. If false, they should not be used.
-  gd::Project* project;      ///< The project being used.
+  const gd::Project* project;      ///< The project being used.
   const gd::Layout* scene;   ///< The scene being generated.
 
   bool errorOccurred;          ///< Must be set to true if an error occured.

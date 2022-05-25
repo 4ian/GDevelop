@@ -22,7 +22,7 @@ namespace gdjs {
  */
 class LayoutCodeGenerator {
  public:
-  LayoutCodeGenerator(gd::Project& project_)
+  LayoutCodeGenerator(const gd::Project& project_)
       : project(project_){};
 
   /**
@@ -34,7 +34,7 @@ class LayoutCodeGenerator {
       bool compilationForRuntime);
 
  private:
-  gd::Project& project;
+  const gd::Project& project;
 };
 
 }  // namespace gdjs

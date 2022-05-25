@@ -86,7 +86,7 @@ std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties() const {
   return nothing;
 }
 
-gd::BehaviorContent* Object::AddNewBehavior(gd::Project& project,
+gd::BehaviorContent* Object::AddNewBehavior(const gd::Project& project,
                                             const gd::String& type,
                                             const gd::String& name) {
   const gd::BehaviorMetadata& behaviorMetadata =

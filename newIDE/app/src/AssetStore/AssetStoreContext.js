@@ -151,22 +151,8 @@ export const AssetStoreStateProvider = ({
   ] = React.useState<LicenseAssetStoreSearchFilter>(
     new LicenseAssetStoreSearchFilter()
   );
-  const assetFiltersState = {
-    animatedFilter: animatedFilter,
-    setAnimatedFilter: setAnimatedFilter,
-    viewpointFilter: viewpointFilter,
-    setViewpointFilter: setViewpointFilter,
-    dimensionFilter: dimensionFilter,
-    setDimensionFilter: setDimensionFilter,
-    objectTypeFilter: objectTypeFilter,
-    setObjectTypeFilter: setObjectTypeFilter,
-    colorFilter: colorFilter,
-    setColorFilter: setColorFilter,
-    licenseFilter: licenseFilter,
-    setLicenseFilter: setLicenseFilter,
-  };
   // When one of the filter change, we need to rebuild the array
-  // for the memo.
+  // for the search.
   const currentFilters = [
     animatedFilter,
     viewpointFilter,
@@ -265,7 +251,20 @@ export const AssetStoreStateProvider = ({
       searchText,
       setSearchText,
       filtersState,
-      assetFiltersState,
+      assetFiltersState: {
+        animatedFilter: animatedFilter,
+        setAnimatedFilter: setAnimatedFilter,
+        viewpointFilter: viewpointFilter,
+        setViewpointFilter: setViewpointFilter,
+        dimensionFilter: dimensionFilter,
+        setDimensionFilter: setDimensionFilter,
+        objectTypeFilter: objectTypeFilter,
+        setObjectTypeFilter: setObjectTypeFilter,
+        colorFilter: colorFilter,
+        setColorFilter: setColorFilter,
+        licenseFilter: licenseFilter,
+        setLicenseFilter: setLicenseFilter,
+      },
     }),
     [
       searchResults,
@@ -277,7 +276,18 @@ export const AssetStoreStateProvider = ({
       error,
       searchText,
       filtersState,
-      assetFiltersState,
+      animatedFilter,
+      setAnimatedFilter,
+      viewpointFilter,
+      setViewpointFilter,
+      dimensionFilter,
+      setDimensionFilter,
+      objectTypeFilter,
+      setObjectTypeFilter,
+      colorFilter,
+      setColorFilter,
+      licenseFilter,
+      setLicenseFilter,
     ]
   );
 

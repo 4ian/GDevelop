@@ -100,7 +100,7 @@ export const HexColorField = ({
         floatingLabelFixed
         helperMarkdownText={helperMarkdownText}
         type="text"
-        hintText={t`Code like #ff8844`}
+        hintText={t`#ff8844`}
         value={colorString}
         onChange={event => handleTextChange(event.target.value)}
       />

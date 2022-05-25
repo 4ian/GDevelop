@@ -4,7 +4,6 @@ import { Trans } from '@lingui/macro';
 import IconButton from '../../UI/IconButton';
 import Measure from 'react-measure';
 import * as React from 'react';
-import ResourcesLoader from '../../ResourcesLoader';
 import { Column } from '../../UI/Grid';
 import MiniToolbar from '../../UI/MiniToolbar';
 import ZoomIn from '@material-ui/icons/ZoomIn';
@@ -66,7 +65,8 @@ type Props = {|
   project: gdProject,
   resourceName: string,
   resourcePath?: string,
-  resourcesLoader: typeof ResourcesLoader,
+  imageSource: string,
+  initialZoom?: number,
   fixedHeight?: number,
   renderOverlay?: ({|
     imageWidth: number,
@@ -76,14 +76,8 @@ type Props = {|
     imageZoomFactor: number,
   |}) => React.Node,
   onSize?: (number, number) => void,
-|};
-
-type State = {|
-  errored: boolean,
-  imageWidth: ?number,
-  imageHeight: ?number,
-  imageSource: ?string,
-  imageZoomFactor: number,
+  hideCheckeredBackground?: boolean,
+  hideControls?: boolean,
 |};
 
 const resourceIsSmooth = (
@@ -97,123 +91,90 @@ const resourceIsSmooth = (
   return imageResource.isSmooth();
 };
 
-const loadStateFrom = (newProps: {
-  project: gdProject,
-  resourceName: string,
-  resourcesLoader: typeof ResourcesLoader,
-}) => {
-  return {
-    errored: false,
-    imageSource: newProps.resourcesLoader.getResourceFullUrl(
-      newProps.project,
-      newProps.resourceName,
-      {}
-    ),
-  };
-};
-
 /**
  * Display the preview for a resource of a project with kind "image".
  */
-const ImagePreview = (props: Props) => {
-  const [state, setState] = React.useState<State>({
-    errored: false,
-    imageWidth: null,
-    imageHeight: null,
-    imageZoomFactor: 1,
-    ...loadStateFrom(props),
-  });
-  const isResizeObserverReady = React.useRef<boolean>(false);
-
-  React.useEffect(
-    () => {
-      setState(state => ({
-        ...state,
-        ...loadStateFrom({
-          resourceName: props.resourceName,
-          project: props.project,
-          resourcesLoader: props.resourcesLoader,
-        }),
-      }));
-    },
-    [
-      props.resourceName,
-      props.project,
-      props.resourcesLoader,
-      props.resourcePath,
-    ]
+const ImagePreview = ({
+  project,
+  resourceName,
+  resourcePath,
+  imageSource,
+  fixedHeight,
+  renderOverlay,
+  onSize,
+  hideCheckeredBackground,
+  hideControls,
+  initialZoom,
+}: Props) => {
+  const [errored, setErrored] = React.useState(false);
+  const [imageWidth, setImageWidth] = React.useState(null);
+  const [imageHeight, setImageHeight] = React.useState(null);
+  const [imageZoomFactor, setImageZoomFactor] = React.useState(
+    initialZoom || 1
+  );
+  const [isResizeObserverReady, setIsResizeObserverReady] = React.useState(
+    false
   );
 
   const handleImageError = () => {
-    setState(state => ({ ...state, errored: true }));
+    setErrored(true);
   };
 
   const adaptZoomToImage = (
     containerHeight: number,
     containerWidth: number
   ) => {
-    const { imageHeight, imageWidth } = state;
-    let zoomFactor;
-    if (!imageHeight || !imageWidth) {
-      zoomFactor = 1;
-    } else {
-      const idealZoomFactors = [
-        containerWidth / (imageWidth + 2 * MARGIN),
-        containerHeight / (imageHeight + 2 * MARGIN),
-      ];
-      zoomFactor = getBoundedZoomFactor(Math.min(...idealZoomFactors));
-    }
-    setState(state => ({
-      ...state,
-      imageZoomFactor: zoomFactor,
-    }));
+    const zoomFactor =
+      !imageHeight || !imageWidth
+        ? 1
+        : getBoundedZoomFactor(
+            Math.min(
+              containerWidth / (imageWidth + 2 * MARGIN),
+              containerHeight / (imageHeight + 2 * MARGIN)
+            )
+          );
+    setImageZoomFactor(zoomFactor);
   };
 
   const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
-    const imageWidth = imgElement
+    const newImageWidth = imgElement
       ? imgElement.naturalWidth || imgElement.clientWidth
       : 0;
-    const imageHeight = imgElement
+    const newImageHeight = imgElement
       ? imgElement.naturalHeight || imgElement.clientHeight
       : 0;
-    setState(state => ({ ...state, imageWidth, imageHeight }));
-    if (props.onSize) props.onSize(imageWidth, imageHeight);
+    setImageHeight(newImageHeight);
+    setImageWidth(newImageWidth);
+    if (onSize) onSize(newImageWidth, newImageHeight);
   };
 
   const zoomBy = (imageZoomFactorDelta: number) => {
-    zoomTo(state.imageZoomFactor + imageZoomFactorDelta);
+    zoomTo(imageZoomFactor + imageZoomFactorDelta);
   };
 
   const zoomTo = (imageZoomFactor: number) => {
-    setState(state => ({
-      ...state,
-      imageZoomFactor: getBoundedZoomFactor(imageZoomFactor),
-    }));
+    setImageZoomFactor(getBoundedZoomFactor(imageZoomFactor));
   };
 
   const theme = React.useContext(GDevelopThemeContext);
   const frameBorderColor = theme.imagePreview.frameBorderColor || '#aaa';
-  const previewBorderColor = theme.imagePreview.borderColor || '#aaa';
 
   return (
     <Measure bounds>
       {({ contentRect, measureRef }) => {
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
-        if (
-          !!containerWidth &&
-          !!containerHeight &&
-          !isResizeObserverReady.current
-        ) {
-          adaptZoomToImage(containerHeight, containerWidth);
-          isResizeObserverReady.current = true;
+        // Once the image is loaded, adapt the zoom to the image size.
+        if (!isResizeObserverReady && !!containerWidth && !!containerHeight) {
+          if (!initialZoom) {
+            adaptZoomToImage(containerHeight, containerWidth);
+          }
+          setIsResizeObserverReady(true);
         }
-        const { resourceName, renderOverlay, fixedHeight, project } = props;
-        const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
 
-        const imageLoaded = !!imageWidth && !!imageHeight && !state.errored;
+        const imageLoaded = !!imageWidth && !!imageHeight && !errored;
 
         // Centre-align the image and overlays
         const imagePositionTop = Math.max(
@@ -263,57 +224,55 @@ const ImagePreview = (props: Props) => {
 
         return (
           <Column expand noMargin useFullHeight>
-            <MiniToolbar>
-              <IconButton
-                onClick={() => zoomBy(-0.2)}
-                tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
-              >
-                <ZoomOut />
-              </IconButton>
-              <div style={styles.sliderContainer}>
-                <Slider
-                  min={Math.log10(MIN_ZOOM_FACTOR)}
-                  max={Math.log10(MAX_ZOOM_FACTOR)}
-                  step={0.05}
-                  value={Math.log10(state.imageZoomFactor)}
-                  onChange={value => {
-                    console.log(value);
-                    zoomTo(Math.pow(10, value));
-                  }}
-                />
-              </div>
-              <IconButton
-                onClick={() => zoomBy(+0.2)}
-                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
-              >
-                <ZoomIn />
-              </IconButton>
-              <IconButton
-                onClick={() => zoomTo(1)}
-                tooltip={t`Restore original size`}
-              >
-                <ZoomOutMap />
-              </IconButton>
-            </MiniToolbar>
+            {!hideControls && (
+              <MiniToolbar>
+                <IconButton
+                  onClick={() => zoomBy(-0.2)}
+                  tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
+                >
+                  <ZoomOut />
+                </IconButton>
+                <div style={styles.sliderContainer}>
+                  <Slider
+                    min={Math.log10(MIN_ZOOM_FACTOR)}
+                    max={Math.log10(MAX_ZOOM_FACTOR)}
+                    step={0.05}
+                    value={Math.log10(imageZoomFactor)}
+                    onChange={value => {
+                      zoomTo(Math.pow(10, value));
+                    }}
+                  />
+                </div>
+                <IconButton
+                  onClick={() => zoomBy(+0.2)}
+                  tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
+                >
+                  <ZoomIn />
+                </IconButton>
+                <IconButton
+                  onClick={() => zoomTo(1)}
+                  tooltip={t`Restore original size`}
+                >
+                  <ZoomOutMap />
+                </IconButton>
+              </MiniToolbar>
+            )}
             <div
               style={{
                 ...styles.contentContainer,
                 height: fixedHeight || '100%',
               }}
             >
-              <CheckeredBackground />
+              {!hideCheckeredBackground && <CheckeredBackground />}
               <div
                 dir={
                   'ltr' /* Force LTR layout to avoid issues with image positioning */
                 }
-                style={{
-                  ...styles.imagePreviewContainer,
-                  border: `1px solid ${previewBorderColor}`,
-                }}
+                style={styles.imagePreviewContainer}
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
-                  if (shouldZoom(event)) {
+                  if (!hideControls && shouldZoom(event)) {
                     zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();
@@ -322,14 +281,14 @@ const ImagePreview = (props: Props) => {
                   }
                 }}
               >
-                {!!state.errored && (
+                {!!errored && (
                   <PlaceholderMessage>
                     <Text>
                       <Trans>Unable to load the image</Trans>
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!state.errored && (
+                {!errored && (
                   <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}

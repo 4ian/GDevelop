@@ -203,19 +203,28 @@ const ColorFilter = ({
           <AccordionBody>
             <Column expand>
               <Line noMargin>
-            <HexColorField
-              disableAlpha
-              fullWidth
-              color={color}
-              onChange={setColor}
-            />
-            </Line>
-          </Column>
+                <HexColorField
+                  disableAlpha
+                  fullWidth
+                  color={color}
+                  onChange={setColor}
+                />
+              </Line>
+            </Column>
           </AccordionBody>
         </Accordion>
       )}
     </I18n>
   );
+};
+
+export const clearAllFilters = assetFiltersState => {
+  assetFiltersState.setAnimatedFilter(new AnimatedAssetStoreSearchFilter());
+  assetFiltersState.setViewpointFilter(new TagAssetStoreSearchFilter());
+  assetFiltersState.setDimensionFilter(new DimensionAssetStoreSearchFilter());
+  assetFiltersState.setObjectTypeFilter(new ObjectTypeAssetStoreSearchFilter());
+  assetFiltersState.setColorFilter(new ColorAssetStoreSearchFilter());
+  assetFiltersState.setLicenseFilter(new LicenseAssetStoreSearchFilter());
 };
 
 type AssetStoreFilterPanelProps = {|
@@ -339,21 +348,7 @@ export const AssetStoreFilterPanel = ({
           label={<Trans>Clear all filters</Trans>}
           primary={false}
           onClick={() => {
-            assetFiltersState.setAnimatedFilter(
-              new AnimatedAssetStoreSearchFilter()
-            );
-            assetFiltersState.setViewpointFilter(
-              new TagAssetStoreSearchFilter()
-            );
-            assetFiltersState.setDimensionFilter(
-              new DimensionAssetStoreSearchFilter()
-            );
-            assetFiltersState.setObjectTypeFilter(
-              new ObjectTypeAssetStoreSearchFilter()
-            );
-            assetFiltersState.setLicenseFilter(
-              new LicenseAssetStoreSearchFilter()
-            );
+            clearAllFilters(assetFiltersState);
             onChoiceChange();
           }}
         />

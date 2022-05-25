@@ -12,7 +12,10 @@ import { sendAssetPackOpened } from '../Utils/Analytics/EventSender';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
-import { AssetStoreFilterPanel } from './AssetStoreFilterPanel';
+import {
+  AssetStoreFilterPanel,
+  clearAllFilters,
+} from './AssetStoreFilterPanel';
 import { AssetStoreContext } from './AssetStoreContext';
 import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
@@ -22,13 +25,6 @@ import { AssetsHome } from './AssetsHome';
 import FlatButton from '../UI/FlatButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
-import {
-  TagAssetStoreSearchFilter,
-  AnimatedAssetStoreSearchFilter,
-  ObjectTypeAssetStoreSearchFilter,
-  LicenseAssetStoreSearchFilter,
-  DimensionAssetStoreSearchFilter,
-} from './AssetStoreSearchFilter';
 
 const styles = {
   searchBar: {
@@ -188,23 +184,7 @@ export const AssetStore = ({
                 )}
                 noResultPlaceholder={
                   <NoResultPlaceholder
-                    onClear={() => {
-                      assetFiltersState.setAnimatedFilter(
-                        new AnimatedAssetStoreSearchFilter()
-                      );
-                      assetFiltersState.setViewpointFilter(
-                        new TagAssetStoreSearchFilter()
-                      );
-                      assetFiltersState.setDimensionFilter(
-                        new DimensionAssetStoreSearchFilter()
-                      );
-                      assetFiltersState.setObjectTypeFilter(
-                        new ObjectTypeAssetStoreSearchFilter()
-                      );
-                      assetFiltersState.setLicenseFilter(
-                        new LicenseAssetStoreSearchFilter()
-                      );
-                    }}
+                    onClear={() => clearAllFilters(assetFiltersState)}
                   />
                 }
               />

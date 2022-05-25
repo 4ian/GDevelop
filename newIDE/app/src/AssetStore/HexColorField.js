@@ -65,11 +65,12 @@ export class HexColorField extends React.Component<Props, State> {
   _textField: ?TextField = null;
 
   _handleChange = (color: string) => {
+    const oldColor = hexToNullableRGBColor(this.state.color);
+    const newColor = hexToNullableRGBColor(color);
     this.setState({ color });
-  };
-
-  _handleBlur = () => {
-    this.props.onChange(hexToNullableRGBColor(this.state.color));
+    if (newColor !== oldColor) {
+      this.props.onChange(newColor);
+    }
   };
 
   _handlePickerChange = (color: ColorResult) => {
@@ -96,13 +97,7 @@ export class HexColorField extends React.Component<Props, State> {
           hintText={t`Code like #ff8844`}
           value={this.state.color}
           onChange={event => this._handleChange(event.target.value)}
-          onBlur={this._handleBlur}
           ref={textField => (this._textField = textField)}
-          onKeyPress={ev => {
-            if (ev.key === 'Enter') {
-              this._handleBlur();
-            }
-          }}
         />
         <div
           style={

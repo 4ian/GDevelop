@@ -5,7 +5,7 @@ import {
   moveNodeAbove,
   moveNodeBelow,
   moveNodeAsSubEvent,
-  isSameDepthAndBelow,
+  isSameDepthAndJustBelow,
 } from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
@@ -53,13 +53,13 @@ const getTargetPositionStyles = (
   },
   top: { left: '0px', right: '0px', top: '0px', bottom: '50%' },
   bottom: { left: '0px', right: '0px', top: '50%', bottom: '0px' },
-  'bottom-bottom-left': {
+  'below-left': {
     left: isDraggedNodeChild ? '0px' : '10px',
     top: '100%',
     height: draggedNodeHeight,
     width: indentWidth,
   },
-  'bottom-bottom-right': {
+  'below-right': {
     left: isDraggedNodeChild ? `${indentWidth + 10}px` : `${indentWidth}px`,
     right: '0px',
     top: '100%',
@@ -100,6 +100,10 @@ function DropTargetContainer({
               style={{
                 ...sharedStyles.dropArea,
                 ...style.dropArea,
+
+                // Uncomment for debugging purposes.
+                // backgroundColor: 'lightblue',
+                // opacity: isOver ? 1 : 0,
               }}
             />
             {/* Drop indicator */}
@@ -110,10 +114,6 @@ function DropTargetContainer({
                   ...style.dropIndicator,
                   borderColor: gdevelopTheme.dropIndicator.canDrop,
                   outlineColor: gdevelopTheme.dropIndicator.border,
-
-                  // Uncomment for debugging purposes.
-                  // backgroundColor: 'lightblue'
-                  // opacity: isOver ? 1 : 0
                 }}
               />
             )}
@@ -124,15 +124,7 @@ function DropTargetContainer({
   );
 }
 
-export function DropContainer({
-  node,
-  draggedNode,
-  DnDComponent,
-  onDrop,
-  activateTargets,
-  windowWidth,
-  draggedNodeHeight,
-}: {|
+type DropContainerProps = {|
   node: SortableTreeNode,
   draggedNode: SortableTreeNode,
   DnDComponent: DropTargetComponent<SortableTreeNode>,
@@ -144,29 +136,52 @@ export function DropContainer({
     node: SortableTreeNode
   ) => void,
   activateTargets: boolean,
+
+  // Computes drop areas and drop indicator indent.
   windowWidth: WidthType,
+  // Used only for the node just above dragged node if it is an only child,
+  // so that drop area covers the whole dragged node's row in height.
   draggedNodeHeight: number,
-|}) {
+|};
+
+/**
+ * DropContainer is composed of sub-containers of drop targets that allows us to identify
+ * where the mouse or touch is and drop the dragged node accordingly. At most, there will be 5
+ * drop targets: 1 at the top of the row (drop above), 2 at the bottom (drop below or as subevent
+ * while hovering target node), 2 below (drop below or as sub-event moving left/right).
+ */
+export function DropContainer({
+  node,
+  draggedNode,
+  DnDComponent,
+  onDrop,
+  activateTargets,
+  windowWidth,
+  draggedNodeHeight,
+}: DropContainerProps) {
   const isDraggedNodesOnlyChild =
     node.children.length === 1 && node.children[0].key === draggedNode.key;
-  const isDraggedNodeSameDepthAndBelow = isSameDepthAndBelow(node, draggedNode);
+  const isDraggedNodeSameDepthAndBelow = isSameDepthAndJustBelow(
+    node,
+    draggedNode
+  );
   // We want to allow dropping below if the event has no children OR if the only
   // child of the event is the dragged one.
   const canDropBelow =
     !!node.event && (node.children.length === 0 || isDraggedNodesOnlyChild);
   const canHaveSubEvents = !!node.event && node.event.canHaveSubEvents();
-  const indentWidth = getIndentWidth(windowWidth);
 
-  const commonProps = {
-    DnDComponent: DnDComponent,
-    canDrop: () => true,
-  };
+  const indentWidth = getIndentWidth(windowWidth);
   const dropAreaStyles = getTargetPositionStyles(
     indentWidth,
     draggedNodeHeight,
     isDraggedNodesOnlyChild
   );
   const indicatorStyles = getIndicatorPositionStyles(indentWidth);
+  const commonProps = {
+    DnDComponent: DnDComponent,
+    canDrop: () => true,
+  };
   return (
     <div
       style={{
@@ -205,7 +220,7 @@ export function DropContainer({
               <DropTargetContainer
                 style={{
                   dropIndicator: indicatorStyles['bottom'],
-                  dropArea: dropAreaStyles['bottom-bottom-left'],
+                  dropArea: dropAreaStyles['below-left'],
                 }}
                 onDrop={() => onDrop(moveNodeBelow, node)}
                 {...commonProps}
@@ -213,7 +228,7 @@ export function DropContainer({
               <DropTargetContainer
                 style={{
                   dropIndicator: indicatorStyles['bottom-right'],
-                  dropArea: dropAreaStyles['bottom-bottom-right'],
+                  dropArea: dropAreaStyles['below-right'],
                 }}
                 onDrop={() => onDrop(moveNodeAsSubEvent, node)}
                 {...commonProps}
@@ -296,8 +311,8 @@ export function AutoScroll({
               ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
 
               // Uncomment for debugging purposes.
-              // backgroundColor: 'black'
-              // opacity: isOver ? 1 : 0
+              // backgroundColor: 'black',
+              // opacity: isOver ? 1 : 0,
             }}
           />
         );

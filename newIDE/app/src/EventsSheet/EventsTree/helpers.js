@@ -12,11 +12,10 @@ export const moveEventToEventsList = ({
   toIndex,
 }: {
   targetEventsList: gdEventsList,
-  movingEvent: ?gdBaseEvent,
+  movingEvent: gdBaseEvent,
   initialEventsList: gdEventsList,
   toIndex: number,
 }) => {
-  if (!movingEvent) return;
   initialEventsList.moveEventToAnotherEventsList(
     movingEvent,
     targetEventsList,
@@ -28,7 +27,7 @@ export const moveNodeAsSubEvent = ({
   targetNode,
   node,
 }: MoveFunctionArguments) => {
-  if (!targetNode.event) return;
+  if (!targetNode.event || !node.event) return;
   moveEventToEventsList({
     targetEventsList: targetNode.event.getSubEvents(),
     movingEvent: node.event,
@@ -38,7 +37,7 @@ export const moveNodeAsSubEvent = ({
 };
 
 export const moveNodeBelow = ({ targetNode, node }: MoveFunctionArguments) => {
-  if (!targetNode.event) return;
+  if (!targetNode.event || !node.event) return;
   const toIndex =
     node.depth === targetNode.depth && node.indexInList < targetNode.indexInList
       ? targetNode.indexInList
@@ -52,6 +51,7 @@ export const moveNodeBelow = ({ targetNode, node }: MoveFunctionArguments) => {
 };
 
 export const moveNodeAbove = ({ targetNode, node }: MoveFunctionArguments) => {
+  if (!targetNode.event || !node.event) return;
   const toIndex =
     node.depth === targetNode.depth && node.indexInList < targetNode.indexInList
       ? targetNode.indexInList - 1
@@ -74,7 +74,7 @@ export const isDescendant = (
   return parentPath.every((pathValue, index) => pathValue === childPath[index]);
 };
 
-export const isSameDepthAndBelow = (
+export const isSameDepthAndJustBelow = (
   aboveNode: SortableTreeNode,
   belowNode: SortableTreeNode
 ) => {

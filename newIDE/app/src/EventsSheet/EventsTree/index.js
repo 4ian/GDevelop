@@ -259,17 +259,21 @@ type EventsTreeProps = {|
 |};
 
 // A node displayed by the SortableTree. Almost always represents an
-// event, except for the buttons at the bottom of the sheet.
+// event, except for the buttons at the bottom of the sheet and the tutorial.
 export type SortableTreeNode = {
+  // Necessary attributes for react-sortable-tree.
+  title: (node: { node: SortableTreeNode }) => Node,
+  children: Array<any>,
+  expanded: boolean,
+
   eventsList: gdEventsList,
   event: ?gdBaseEvent,
   depth: number,
   disabled: boolean,
   indexInList: number,
   nodePath: Array<number>,
-  children: Array<any>,
-  expanded: boolean,
-  key: number,
+  // Key is event pointer or an identification string.
+  key: number | string,
 
   // In case of nodes without event (buttons at the bottom of the sheet),
   // use a fixed height.
@@ -632,7 +636,7 @@ export default class ThemableEventsTree extends Component<
         }}
         canDrag={() => this._canDrag(node)}
         canDrop={() => this._canDrop(node)}
-        // Drop operations are handled by DropContainers
+        // Drop operations are handled by DropContainers.
         drop={() => {
           return;
         }}

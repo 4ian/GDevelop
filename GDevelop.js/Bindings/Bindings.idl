@@ -2507,6 +2507,7 @@ interface Direction {
     boolean IsLooping();
     void SetLoop(boolean enable);
     float GetTimeBetweenFrames();
+    [Const, Ref] VectorString GetSpriteNames();
     void SetTimeBetweenFrames(float time);
     void SwapSprites(unsigned long first, unsigned long second);
     void MoveSprite(unsigned long oldIndex, unsigned long newIndex);

@@ -218,6 +218,8 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     object.setTags(getStringFromTags(this.props.selectedObjectTags));
     onObjectCreated(object);
+
+    this.forceUpdateList();
   };
 
   onAddNewObject = () => {

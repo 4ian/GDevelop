@@ -501,7 +501,7 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
           title={<Trans>Create your game's first leaderboard</Trans>}
           description={<Trans>Leaderboards help retain your players</Trans>}
           actionLabel={<Trans>Create a leaderboard</Trans>}
-          onAdd={() => {
+          onAction={() => {
             onCreateLeaderboard();
           }}
           isLoading={isRequestPending}

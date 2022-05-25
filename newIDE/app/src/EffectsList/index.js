@@ -424,7 +424,7 @@ export default function EffectsList(props: Props) {
                     ? '/objects/effects'
                     : '/interface/scene-editor/layer-effects'
                 }
-                onAdd={addEffect}
+                onAction={addEffect}
               />
             </Column>
           )}

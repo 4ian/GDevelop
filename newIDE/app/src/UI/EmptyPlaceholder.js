@@ -18,8 +18,9 @@ type Props = {|
   helpPagePath?: string,
   tutorialId?: string,
   actionButtonId?: string,
-  onAdd: () => void,
+  onAction: () => void,
   isLoading?: boolean,
+  actionIcon?: React.Node,
 |};
 
 const DefaultHelpButton = ({ helpPagePath }: { helpPagePath?: string }) => (
@@ -50,9 +51,17 @@ export const EmptyPlaceholder = (props: Props) => (
           <RaisedButton
             label={props.actionLabel}
             primary
-            onClick={props.onAdd}
+            onClick={props.onAction}
             disabled={!!props.isLoading}
-            icon={props.isLoading ? <CircularProgress size={24} /> : <Add />}
+            icon={
+              props.isLoading ? (
+                <CircularProgress size={24} />
+              ) : props.actionIcon ? (
+                props.actionIcon
+              ) : (
+                <Add />
+              )
+            }
             id={props.actionButtonId}
           />
           {props.tutorialId ? (

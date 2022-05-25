@@ -130,7 +130,7 @@ const BehaviorsEditor = (props: Props) => {
             helpPagePath="/behaviors"
             tutorialId="intro-behaviors-and-functions"
             actionButtonId="add-behavior-button"
-            onAdd={() => setNewBehaviorDialogOpen(true)}
+            onAction={() => setNewBehaviorDialogOpen(true)}
           />
         </Column>
       ) : (

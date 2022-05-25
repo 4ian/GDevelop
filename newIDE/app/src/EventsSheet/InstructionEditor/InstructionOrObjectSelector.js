@@ -394,7 +394,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   placeholder={
                     isCondition
                       ? t`Search objects or conditions`
-                      : t`Search objects or action`
+                      : t`Search objects or actions`
                   }
                 />
                 {!isSearching && (

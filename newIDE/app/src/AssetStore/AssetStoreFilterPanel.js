@@ -159,16 +159,20 @@ const RangeFilter = ({
             <Text displayInlineAsSpan>{title}</Text>
           </AccordionHeader>
           <AccordionBody>
-            <Slider
-              value={range}
-              min={min}
-              max={max}
-              step={step}
-              scale={scale}
-              marks={true}
-              valueLabelDisplay="auto"
-              onChange={(event, newValue) => setRange(newValue)}
-            />
+            <Column expand>
+              <Line noMargin>
+                <Slider
+                  value={range}
+                  min={min}
+                  max={max}
+                  step={step}
+                  scale={scale}
+                  marks={true}
+                  valueLabelDisplay="auto"
+                  onChange={(event, newValue) => setRange(newValue)}
+                />
+              </Line>
+            </Column>
           </AccordionBody>
         </Accordion>
       )}

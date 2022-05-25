@@ -71,12 +71,6 @@ const styles = {
     justifyContent: 'stretch',
     position: 'relative',
   },
-  handle: {
-    margin: 0.5,
-    flexGrow: 0,
-    flexShrink: 0,
-    cursor: 'move',
-  },
 };
 
 export const getIndentWidth = (windowWidth: WidthType) =>
@@ -161,9 +155,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
       >
         {EventComponent && (
           <div style={styles.eventComponentContainer}>
-            {this.props.connectDragSource(
-              <div style={styles.handle} className={handle} />
-            )}
+            {this.props.connectDragSource(<div className={handle} />)}
             <div style={styles.container}>
               <EventComponent
                 project={project}

@@ -393,11 +393,11 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   React.useEffect(
     () => {
-      if (!currentLeaderboardId) return;
+      if (!currentLeaderboardId || !gameId) return;
       dispatch({ type: 'PURGE_NAVIGATION' });
       fetchEntries();
     },
-    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
+    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries, gameId]
   );
 
   return (

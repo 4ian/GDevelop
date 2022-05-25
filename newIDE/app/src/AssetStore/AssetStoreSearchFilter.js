@@ -107,13 +107,13 @@ export class DimensionAssetStoreSearchFilter
 }
 
 /**
- * Modulo operation (the remainder after dividing one number by another)
+ * Modulo operation
  * @param x Dividend value.
  * @param y Divisor value.
- * @returns Return the remainder for the values.
+ * @returns Return the remainder using Euclidean division.
  */
 const mod = function(x: number, y: number): number {
-  return x - y * Math.floor(x / y);
+  return ((x % y) + y) % y;
 };
 
 export class ColorAssetStoreSearchFilter

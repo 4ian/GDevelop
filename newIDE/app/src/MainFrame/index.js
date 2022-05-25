@@ -1981,6 +1981,8 @@ const MainFrame = (props: Props) => {
 
     currentProject.resetProjectUuid();
     currentProject.setVersion('1.0.0');
+    currentProject.getAuthorIds().clear();
+    currentProject.setAuthor('');
     if (projectName) currentProject.setName(projectName);
     openSceneOrProjectManager({
       currentProject: currentProject,

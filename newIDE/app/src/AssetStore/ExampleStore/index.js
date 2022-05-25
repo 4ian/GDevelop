@@ -13,6 +13,7 @@ import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMea
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
+import { t } from '@lingui/macro';
 
 const styles = {
   searchBar: {
@@ -95,6 +96,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               tagsHandler={tagsHandler}
               tags={filters && filters.defaultTags}
               ref={searchBarRef}
+              placeholder={t`Search examples`}
             />
             <Line
               expand

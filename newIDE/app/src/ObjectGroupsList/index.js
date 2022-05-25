@@ -445,6 +445,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          placeholder={t`Search object groups`}
         />
       </Background>
     );

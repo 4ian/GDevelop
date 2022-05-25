@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import {
   AutoSizer,
@@ -293,6 +293,7 @@ export default class InstancesList extends Component<Props, State> {
               }
               onRequestSearch={this._selectFirstInstance}
               ref={this._searchBar}
+              placeholder={t`Search instances`}
             />
           </div>
         )}

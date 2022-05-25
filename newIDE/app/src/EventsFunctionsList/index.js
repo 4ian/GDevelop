@@ -408,6 +408,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          placeholder={t`Search functions`}
         />
       </Background>
     );

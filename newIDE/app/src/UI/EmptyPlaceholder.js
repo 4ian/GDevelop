@@ -20,6 +20,7 @@ type Props = {|
   actionButtonId?: string,
   onAdd: () => void,
   isLoading?: boolean,
+  actionIcon?: React.Node,
 |};
 
 const DefaultHelpButton = ({ helpPagePath }: { helpPagePath?: string }) => (
@@ -52,7 +53,15 @@ export const EmptyPlaceholder = (props: Props) => (
             primary
             onClick={props.onAdd}
             disabled={!!props.isLoading}
-            icon={props.isLoading ? <CircularProgress size={24} /> : <Add />}
+            icon={
+              props.isLoading ? (
+                <CircularProgress size={24} />
+              ) : props.actionIcon ? (
+                props.actionIcon
+              ) : (
+                <Add />
+              )
+            }
             id={props.actionButtonId}
           />
           {props.tutorialId ? (

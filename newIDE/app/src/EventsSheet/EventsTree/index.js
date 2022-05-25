@@ -42,7 +42,7 @@ import TutorialMessage from '../../Hints/TutorialMessage';
 import getTutorial from '../../Hints/getTutorial';
 import { makeDragSourceAndDropTarget } from '../../UI/DragAndDrop/DragSourceAndDropTarget';
 import { makeDropTarget } from '../../UI/DragAndDrop/DropTarget';
-import { Autoscroll, DropContainer } from './DropContainer';
+import { AutoScroll, DropContainer } from './DropContainer';
 import { isDescendant, type MoveFunctionArguments } from './helpers';
 const gd: libGDevelop = global.gd;
 
@@ -309,12 +309,12 @@ export default class ThemableEventsTree extends Component<
     eventsSheetEventsDnDType
   );
   DropTarget = makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType);
-  temporallyUnfoldedNodes: Array<SortableTreeNode>;
+  temporaryUnfoldedNodes: Array<SortableTreeNode>;
   _hoverTimerId: ?number;
 
   constructor(props: EventsTreeProps) {
     super(props);
-    this.temporallyUnfoldedNodes = [];
+    this.temporaryUnfoldedNodes = [];
     this.eventsHeightsCache = new EventHeightsCache(this);
     this.state = {
       ...this._eventsToTreeData(props.events),
@@ -346,6 +346,10 @@ export default class ThemableEventsTree extends Component<
         ),
       });
     }
+  }
+
+  componentWillUnmount() {
+    this._hoverTimerI && clearTimeout(this._hoverTimerId);
   }
 
   /**
@@ -445,8 +449,6 @@ export default class ThemableEventsTree extends Component<
             disabled,
             currentPath
           ).treeData,
-          // react-sortable-tree stores path using the node's index in the flattened tree.
-          // We choose to store a path using its index in flatData to optimise isDescendant function.
           nodePath: currentPath,
         };
       }
@@ -575,19 +577,20 @@ export default class ThemableEventsTree extends Component<
     );
   };
 
-  _temporallyUnfoldNode = (isOverLazy: boolean, node: SortableTreeNode) => {
-    if (!node.event) return;
+  _temporaryUnfoldNode = (isOverLazy: boolean, node: SortableTreeNode) => {
+    const { event } = node;
+    if (!event) return;
 
-    const isNodeTemporallyUnfolded = this.temporallyUnfoldedNodes.some(
+    const isNodeTemporaryUnfolded = this.temporaryUnfoldedNodes.some(
       foldedNode => node.key === foldedNode.key
     );
     if (isOverLazy) {
       if (!this._hoverTimerId && !node.expanded) {
-        if (node.event && !isNodeTemporallyUnfolded) {
+        if (!isNodeTemporaryUnfolded) {
           this._hoverTimerId = window.setTimeout(() => {
             // $FlowFixMe - Per the condition above, we are confident that node.event is not null.
-            node.event.setFolded(false);
-            this.temporallyUnfoldedNodes.push(node);
+            event.setFolded(false);
+            this.temporaryUnfoldedNodes.push(node);
             this.forceEventsUpdate();
           }, 1000);
         }
@@ -599,11 +602,11 @@ export default class ThemableEventsTree extends Component<
   };
 
   _restoreFoldedNodes = () => {
-    this.temporallyUnfoldedNodes.forEach(
+    this.temporaryUnfoldedNodes.forEach(
       node => node.event && node.event.setFolded(true)
     );
 
-    this.temporallyUnfoldedNodes = [];
+    this.temporaryUnfoldedNodes = [];
     this.forceEventsUpdate();
   };
 
@@ -637,7 +640,7 @@ export default class ThemableEventsTree extends Component<
         endDrag={() => this.setState({ draggedNode: null })}
       >
         {({ connectDragSource, connectDropTarget, isOverLazy }) => {
-          this._temporallyUnfoldNode(isOverLazy, node);
+          this._temporaryUnfoldNode(isOverLazy, node);
 
           const dropTarget = (
             <div
@@ -691,21 +694,22 @@ export default class ThemableEventsTree extends Component<
                 eventsSheetHeight={this.props.eventsSheetHeight}
                 connectDragSource={connectDragSource}
               />
-              <DropContainer
-                node={node}
-                draggedNode={this.state.draggedNode}
-                draggedNodeHeight={this._getRowHeight({
-                  node: this.state.draggedNode,
-                })}
-                DnDComponent={DropTarget}
-                onDrop={this._onDrop}
-                activateTargets={!isDragged && !!this.state.draggedNode}
-                windowWidth={this.props.windowWidth}
-              />
+              {this.state.draggedNode && (
+                <DropContainer
+                  node={node}
+                  draggedNode={this.state.draggedNode}
+                  draggedNodeHeight={this._getRowHeight({
+                    node: this.state.draggedNode,
+                  })}
+                  DnDComponent={DropTarget}
+                  onDrop={this._onDrop}
+                  activateTargets={!isDragged && !!this.state.draggedNode}
+                  windowWidth={this.props.windowWidth}
+                />
+              )}
             </div>
           );
 
-          if (!dropTarget) return null;
           return isDragged ? dropTarget : connectDropTarget(dropTarget);
         }}
       </DragSourceAndDropTarget>
@@ -757,7 +761,7 @@ export default class ThemableEventsTree extends Component<
         {/* touch events are lost and the dnd does not drop anymore (hypothesis). */}
         {this.props.screenType !== 'touch' && (
           <>
-            <Autoscroll
+            <AutoScroll
               DnDComponent={this.DropTarget}
               direction="top"
               activateTargets={
@@ -765,7 +769,7 @@ export default class ThemableEventsTree extends Component<
               }
               onHover={this._scrollUp}
             />
-            <Autoscroll
+            <AutoScroll
               DnDComponent={this.DropTarget}
               direction="bottom"
               activateTargets={

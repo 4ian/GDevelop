@@ -24,7 +24,7 @@ export const moveEventToEventsList = ({
   );
 };
 
-export const moveNodeAsSubevent = ({
+export const moveNodeAsSubEvent = ({
   targetNode,
   node,
 }: MoveFunctionArguments) => {
@@ -40,7 +40,7 @@ export const moveNodeAsSubevent = ({
 export const moveNodeBelow = ({ targetNode, node }: MoveFunctionArguments) => {
   if (!targetNode.event) return;
   const toIndex =
-    node.indexInList < targetNode.indexInList && node.depth === targetNode.depth
+    node.depth === targetNode.depth && node.indexInList < targetNode.indexInList
       ? targetNode.indexInList
       : targetNode.indexInList + 1;
   moveEventToEventsList({
@@ -53,7 +53,7 @@ export const moveNodeBelow = ({ targetNode, node }: MoveFunctionArguments) => {
 
 export const moveNodeAbove = ({ targetNode, node }: MoveFunctionArguments) => {
   const toIndex =
-    node.indexInList < targetNode.indexInList && node.depth === targetNode.depth
+    node.depth === targetNode.depth && node.indexInList < targetNode.indexInList
       ? targetNode.indexInList - 1
       : targetNode.indexInList;
   moveEventToEventsList({
@@ -64,17 +64,14 @@ export const moveNodeAbove = ({ targetNode, node }: MoveFunctionArguments) => {
   });
 };
 
-// Optimises react-sortable-tree isDescendant that processes every children with a .some method.
 export const isDescendant = (
   olderNode: SortableTreeNode,
-  childrenNode: SortableTreeNode
+  childNode: SortableTreeNode
 ) => {
+  if (childNode.depth <= olderNode.depth) return false;
   const parentPath = olderNode.nodePath;
-  const childrenPath = childrenNode.nodePath;
-  if (childrenNode.depth <= olderNode.depth) return false;
-  return parentPath.every(
-    (pathValue, index) => pathValue === childrenPath[index]
-  );
+  const childPath = childNode.nodePath;
+  return parentPath.every((pathValue, index) => pathValue === childPath[index]);
 };
 
 export const isSameDepthAndBelow = (

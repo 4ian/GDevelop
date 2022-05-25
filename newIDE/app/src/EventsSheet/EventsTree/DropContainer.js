@@ -4,14 +4,15 @@ import { getIndentWidth, type SortableTreeNode } from '.';
 import {
   moveNodeAbove,
   moveNodeBelow,
-  moveNodeAsSubevent,
+  moveNodeAsSubEvent,
   isSameDepthAndBelow,
 } from './helpers';
 import { type WidthType } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import './style.css';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import { type DropTargetComponent } from '../../UI/DragAndDrop/DropTarget';
 
-const styles = {
+const sharedStyles = {
   dropArea: { zIndex: 1, position: 'absolute' },
   dropIndicator: {
     position: 'absolute',
@@ -19,13 +20,30 @@ const styles = {
     border: '4px solid black',
     outline: '1px solid white',
   },
+  autoScroll: {
+    width: '100%',
+    position: 'absolute',
+    height: '10%',
+    zIndex: 2,
+  },
 };
+
+type DropTargetContainerStyle = {|
+  left?: string,
+  right?: string,
+  top?: string,
+  bottom?: string,
+  width?: number,
+  height?: number,
+|};
+
+type TargetPositionStyles = { [position: string]: DropTargetContainerStyle };
 
 const getTargetPositionStyles = (
   indentWidth: number,
   draggedNodeHeight: number,
   isDraggedNodeChild: boolean
-) => ({
+): TargetPositionStyles => ({
   'bottom-left': { left: '0px', bottom: '0px', top: '50%', width: indentWidth },
   'bottom-right': {
     left: `${indentWidth}px`,
@@ -49,20 +67,13 @@ const getTargetPositionStyles = (
   },
 });
 
-const getIndicatorPositionStyles = (indentWidth: number) => ({
+const getIndicatorPositionStyles = (
+  indentWidth: number
+): TargetPositionStyles => ({
   bottom: { left: '0px', right: '0px', bottom: '-4px' },
   'bottom-right': { left: `${indentWidth}px`, right: '0px', bottom: '-4px' },
   top: { left: '0px', right: '0px', top: '-4px' },
 });
-
-type DropTargetContainerStyle = {|
-  left?: string,
-  right?: string,
-  top?: string,
-  bottom?: string,
-  width?: number,
-  height?: number,
-|};
 
 function DropTargetContainer({
   DnDComponent,
@@ -87,7 +98,7 @@ function DropTargetContainer({
             {/* Drop area */}
             <div
               style={{
-                ...styles.dropArea,
+                ...sharedStyles.dropArea,
                 ...style.dropArea,
               }}
             />
@@ -95,7 +106,7 @@ function DropTargetContainer({
             {canDrop && isOver && (
               <div
                 style={{
-                  ...styles.dropIndicator,
+                  ...sharedStyles.dropIndicator,
                   ...style.dropIndicator,
                   borderColor: gdevelopTheme.dropIndicator.canDrop,
                   outlineColor: gdevelopTheme.dropIndicator.border,
@@ -119,8 +130,8 @@ export function DropContainer({
   draggedNodeHeight,
 }: {|
   node: SortableTreeNode,
-  draggedNode: ?SortableTreeNode,
-  DnDComponent: any,
+  draggedNode: SortableTreeNode,
+  DnDComponent: DropTargetComponent<SortableTreeNode>,
   onDrop: (
     moveFunction: ({
       targetNode: SortableTreeNode,
@@ -132,17 +143,14 @@ export function DropContainer({
   windowWidth: WidthType,
   draggedNodeHeight: number,
 |}) {
-  const isDraggedNodeNodesOnlyChild =
-    node.children.length === 1 &&
-    !!draggedNode &&
-    node.children[0].key === draggedNode.key;
-  const isDraggedNodeSameDepthAndBelow =
-    !!draggedNode && isSameDepthAndBelow(node, draggedNode);
+  const isDraggedNodesOnlyChild =
+    node.children.length === 1 && node.children[0].key === draggedNode.key;
+  const isDraggedNodeSameDepthAndBelow = isSameDepthAndBelow(node, draggedNode);
   // We want to allow dropping below if the event has no children OR if the only
   // child of the event is the dragged one.
   const canDropBelow =
-    node.event && (node.children.length === 0 || isDraggedNodeNodesOnlyChild);
-  const canHaveSubevents = node.event && node.event.canHaveSubEvents();
+    !!node.event && (node.children.length === 0 || isDraggedNodesOnlyChild);
+  const canHaveSubEvents = !!node.event && node.event.canHaveSubEvents();
   const indentWidth = getIndentWidth(windowWidth);
 
   const commonProps = {
@@ -152,7 +160,7 @@ export function DropContainer({
   const dropAreaStyles = getTargetPositionStyles(
     indentWidth,
     draggedNodeHeight,
-    isDraggedNodeNodesOnlyChild
+    isDraggedNodesOnlyChild
   );
   const indicatorStyles = getIndicatorPositionStyles(indentWidth);
   return (
@@ -169,14 +177,14 @@ export function DropContainer({
         onDrop={() => onDrop(moveNodeAbove, node)}
         {...commonProps}
       />
-      {canHaveSubevents && canDropBelow && (
+      {canHaveSubEvents && canDropBelow && (
         <>
           <DropTargetContainer
             style={{
               dropIndicator: indicatorStyles['bottom-right'],
               dropArea: dropAreaStyles['bottom-right'],
             }}
-            onDrop={() => onDrop(moveNodeAsSubevent, node)}
+            onDrop={() => onDrop(moveNodeAsSubEvent, node)}
             {...commonProps}
           />
           <DropTargetContainer
@@ -188,7 +196,7 @@ export function DropContainer({
             {...commonProps}
           />
           {/* Allow dragging left/right to move below or as subevent */}
-          {(isDraggedNodeNodesOnlyChild || isDraggedNodeSameDepthAndBelow) && (
+          {(isDraggedNodesOnlyChild || isDraggedNodeSameDepthAndBelow) && (
             <>
               <DropTargetContainer
                 style={{
@@ -203,14 +211,14 @@ export function DropContainer({
                   dropIndicator: indicatorStyles['bottom-right'],
                   dropArea: dropAreaStyles['bottom-bottom-right'],
                 }}
-                onDrop={() => onDrop(moveNodeAsSubevent, node)}
+                onDrop={() => onDrop(moveNodeAsSubEvent, node)}
                 {...commonProps}
               />
             </>
           )}
         </>
       )}
-      {!canHaveSubevents && canDropBelow && (
+      {!canHaveSubEvents && canDropBelow && (
         <DropTargetContainer
           style={{
             dropIndicator: indicatorStyles['bottom'],
@@ -220,13 +228,13 @@ export function DropContainer({
           {...commonProps}
         />
       )}
-      {canHaveSubevents && !canDropBelow && (
+      {canHaveSubEvents && !canDropBelow && (
         <DropTargetContainer
           style={{
             dropIndicator: indicatorStyles['bottom-right'],
             dropArea: dropAreaStyles['bottom'],
           }}
-          onDrop={() => onDrop(moveNodeAsSubevent, node)}
+          onDrop={() => onDrop(moveNodeAsSubEvent, node)}
           {...commonProps}
         />
       )}
@@ -234,21 +242,21 @@ export function DropContainer({
   );
 }
 
-export function Autoscroll({
+export function AutoScroll({
   direction,
   DnDComponent,
   activateTargets,
   onHover,
 }: {|
   direction: 'top' | 'bottom',
-  DnDComponent: any,
+  DnDComponent: DropTargetComponent<SortableTreeNode>,
   activateTargets: boolean,
   onHover: () => void,
 |}) {
   const delayActivationTimer = React.useRef<?TimeoutID>(null);
   const [show, setShow] = React.useState(false);
 
-  // This drop target overlaps with sibling drag source and cancels drag immediatly.
+  // This drop target overlaps with sibling drag source and cancels drag immediately.
   // See: https://github.com/react-dnd/react-dnd/issues/766#issuecomment-388943403
   // Delaying the render of the drop target seems to solve the issue.
   React.useEffect(
@@ -280,11 +288,8 @@ export function Autoscroll({
         const dropTarget = (
           <div
             style={{
-              width: '100%',
-              position: 'absolute',
+              ...sharedStyles.autoScroll,
               ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
-              height: '10%',
-              zIndex: 2,
             }}
           />
         );

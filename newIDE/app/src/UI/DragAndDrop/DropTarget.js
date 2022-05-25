@@ -19,6 +19,10 @@ type Props<DraggedItemType> = {|
   drop: (monitor: DropTargetMonitor) => void,
 |};
 
+export type DropTargetComponent<DraggedItemType> = (
+  Props<DraggedItemType>
+) => React.Node;
+
 type DropTargetProps = {|
   connectDropTarget: ConnectDropTarget,
   isOver: boolean,
@@ -28,7 +32,7 @@ type DropTargetProps = {|
 
 export const makeDropTarget = <DraggedItemType>(
   reactDndType: string
-): ((Props<DraggedItemType>) => React.Node) => {
+): DropTargetComponent<DraggedItemType> => {
   const targetSpec = {
     canDrop(props: Props<DraggedItemType>, monitor: DropTargetMonitor) {
       const item = monitor.getItem();

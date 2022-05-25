@@ -21,11 +21,11 @@
 /**
  * Draggable handle on the left of an event
  */
-.gd-events-sheet .moveHandle {
+.gd-events-sheet .move-handle {
   background: var(--event-sheet-rst-move-handle-background-color);
 }
 
-.gd-events-sheet .moveHandle:hover {
+.gd-events-sheet .move-handle:hover {
   background-color: var(--event-sheet-rst-move-handle-hover-background-color);
 }
 
@@ -174,10 +174,10 @@
 .gd-events-sheet .with-search-results .rst__rowSearchMatch {
   outline: none;
 }
-.gd-events-sheet .with-search-results .rst__rowSearchMatch .moveHandle {
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .move-handle {
   background: var(--event-sheet-events-highlighted-color);
 }
-.gd-events-sheet .with-search-results .rst__rowSearchMatch .moveHandle:hover {
+.gd-events-sheet .with-search-results .rst__rowSearchMatch .move-handle:hover {
   filter: brightness(120%);
 }
 .gd-events-sheet .with-search-results .rst__rowSearchMatch .conditions-container {
@@ -189,7 +189,7 @@
   background-color: var(--event-sheet-events-highlighted-background-color);
 }
 
-.gd-events-sheet .with-search-results .rst__rowSearchFocus .moveHandle {
+.gd-events-sheet .with-search-results .rst__rowSearchFocus .move-handle {
   width: 15px;
 }
 

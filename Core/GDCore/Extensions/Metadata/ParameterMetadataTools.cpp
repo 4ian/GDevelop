@@ -14,7 +14,7 @@
 
 namespace gd {
 void ParameterMetadataTools::ParametersToObjectsContainer(
-    gd::Project& project,
+    const gd::Project& project,
     const std::vector<gd::ParameterMetadata>& parameters,
     gd::ObjectsContainer& outputObjectsContainer) {
   outputObjectsContainer.GetObjects().clear();

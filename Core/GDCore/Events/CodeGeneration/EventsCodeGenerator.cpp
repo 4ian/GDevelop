@@ -1246,7 +1246,7 @@ gd::String EventsCodeGenerator::GenerateArgumentsList(
   return argumentsStr;
 }
 
-EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
+EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
                                          const gd::Layout& layout,
                                          const gd::Platform& platform_)
     : platform(platform_),
@@ -1263,7 +1263,7 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
-    gd::ObjectsContainer& globalObjectsAndGroups_,
+    const gd::ObjectsContainer& globalObjectsAndGroups_,
     const gd::ObjectsContainer& objectsAndGroups_)
     : platform(platform_),
       globalObjectsAndGroups(globalObjectsAndGroups_),

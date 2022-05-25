@@ -460,6 +460,9 @@ export default class ThemableEventsTree extends Component<
                 onAddEvent={(eventType: string) =>
                   this.props.onAddNewEvent(eventType, this.props.events)
                 }
+                DnDComponent={this.DropTarget}
+                draggedNode={this.state.draggedNode}
+                rootEventsList={eventsList}
               />
             ),
             event: null,

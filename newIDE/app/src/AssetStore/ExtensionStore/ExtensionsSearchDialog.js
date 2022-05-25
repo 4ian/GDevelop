@@ -17,7 +17,6 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
-import RaisedButton from '../../UI/RaisedButton';
 import Add from '@material-ui/icons/Add';
 
 type Props = {|
@@ -97,14 +96,6 @@ export default function ExtensionsSearchDialog({
           fullHeight
           title={<Trans>Search for New Extensions</Trans>}
           actions={[
-            onCreateNew ? (
-              <RaisedButton
-                key="create-new"
-                onClick={onCreateNew}
-                label={<Trans>Create a new extension</Trans>}
-                icon={<Add />}
-              />
-            ) : null,
             <FlatButton
               key="close"
               label={<Trans>Close</Trans>}
@@ -124,6 +115,14 @@ export default function ExtensionsSearchDialog({
                   installOrImportExtension(i18n);
                 }}
                 disabled={isInstalling}
+              />
+            ) : null,
+            onCreateNew ? (
+              <FlatButton
+                key="create-new"
+                onClick={onCreateNew}
+                label={<Trans>Create a new extension</Trans>}
+                icon={<Add />}
               />
             ) : null,
           ]}

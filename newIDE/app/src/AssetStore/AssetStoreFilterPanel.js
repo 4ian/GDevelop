@@ -218,7 +218,7 @@ const ColorFilter = ({
   );
 };
 
-export const clearAllFilters = assetFiltersState => {
+export const clearAllFilters = (assetFiltersState: AssetFiltersState): void => {
   assetFiltersState.setAnimatedFilter(new AnimatedAssetStoreSearchFilter());
   assetFiltersState.setViewpointFilter(new TagAssetStoreSearchFilter());
   assetFiltersState.setDimensionFilter(new DimensionAssetStoreSearchFilter());

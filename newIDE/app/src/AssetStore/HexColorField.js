@@ -41,7 +41,10 @@ const hexToNullableRGBColor = (color: string): RGBColor | null => {
   return /^#{0,1}[0-9a-fA-F]{6}$/.test(color) ? hexToRGBColor(color) : null;
 };
 
-const areSameColor = (color1: RGBColor, color2: RGBColor): boolean => {
+const areSameColor = (
+  color1: RGBColor | null,
+  color2: RGBColor | null
+): boolean => {
   return (
     (color1 && rgbToHexNumber(color1.r, color1.g, color1.b)) !==
     (color2 && rgbToHexNumber(color2.r, color2.g, color2.b))
@@ -60,7 +63,7 @@ export const HexColorField = ({
   onChange,
   color,
 }: Props) => {
-  const [colorString, setColorString] = React.useState<String>(
+  const [colorString, setColorString] = React.useState<string>(
     color ? rgbColorToHex(color.r, color.g, color.b) : ''
   );
 

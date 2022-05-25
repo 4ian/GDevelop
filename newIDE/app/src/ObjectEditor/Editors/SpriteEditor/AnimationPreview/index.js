@@ -33,6 +33,7 @@ type Props = {|
   hideCheckeredBackground?: boolean,
   hideControls?: boolean,
   initialZoom?: number,
+  fixedHeight?: number,
 |};
 
 const AnimationPreview = ({
@@ -45,6 +46,7 @@ const AnimationPreview = ({
   hideCheckeredBackground,
   hideControls,
   initialZoom,
+  fixedHeight,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -164,6 +166,7 @@ const AnimationPreview = ({
         project={project}
         hideCheckeredBackground={hideCheckeredBackground}
         hideControls={hideControls}
+        fixedHeight={fixedHeight}
       />
       {!hideControls && (
         <Line noMargin alignItems="center">

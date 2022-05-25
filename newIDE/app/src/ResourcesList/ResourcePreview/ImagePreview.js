@@ -80,14 +80,6 @@ type Props = {|
   hideControls?: boolean,
 |};
 
-type State = {|
-  errored: boolean,
-  imageWidth: ?number,
-  imageHeight: ?number,
-  imageZoomFactor: number,
-  isResizeObserverReady: boolean,
-|};
-
 const resourceIsSmooth = (
   project: gdProject,
   resourceName: string
@@ -114,61 +106,56 @@ const ImagePreview = ({
   hideControls,
   initialZoom,
 }: Props) => {
-  const [state, setState] = React.useState<State>({
-    errored: false,
-    imageWidth: null,
-    imageHeight: null,
-    imageZoomFactor: initialZoom || 1,
-    isResizeObserverReady: false,
-  });
+  const [errored, setErrored] = React.useState(false);
+  const [imageWidth, setImageWidth] = React.useState(null);
+  const [imageHeight, setImageHeight] = React.useState(null);
+  const [imageZoomFactor, setImageZoomFactor] = React.useState(
+    initialZoom || 1
+  );
+  const [isResizeObserverReady, setIsResizeObserverReady] = React.useState(
+    false
+  );
 
   const handleImageError = () => {
-    setState(state => ({ ...state, errored: true }));
+    setErrored(true);
   };
 
   const adaptZoomToImage = (
     containerHeight: number,
     containerWidth: number
   ) => {
-    const { imageHeight, imageWidth } = state;
-    let zoomFactor;
-    if (!imageHeight || !imageWidth) {
-      zoomFactor = 1;
-    } else {
-      const idealZoomFactors = [
-        containerWidth / (imageWidth + 2 * MARGIN),
-        containerHeight / (imageHeight + 2 * MARGIN),
-      ];
-      zoomFactor = getBoundedZoomFactor(Math.min(...idealZoomFactors));
-    }
-    setState(state => ({
-      ...state,
-      imageZoomFactor: zoomFactor,
-    }));
+    const zoomFactor =
+      !imageHeight || !imageWidth
+        ? 1
+        : getBoundedZoomFactor(
+            Math.min(
+              containerWidth / (imageWidth + 2 * MARGIN),
+              containerHeight / (imageHeight + 2 * MARGIN)
+            )
+          );
+    setImageZoomFactor(zoomFactor);
   };
 
   const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
-    const imageWidth = imgElement
+    const newImageWidth = imgElement
       ? imgElement.naturalWidth || imgElement.clientWidth
       : 0;
-    const imageHeight = imgElement
+    const newImageHeight = imgElement
       ? imgElement.naturalHeight || imgElement.clientHeight
       : 0;
-    setState(state => ({ ...state, imageWidth, imageHeight }));
-    if (onSize) onSize(imageWidth, imageHeight);
+    setImageHeight(newImageHeight);
+    setImageWidth(newImageWidth);
+    if (onSize) onSize(newImageWidth, newImageHeight);
   };
 
   const zoomBy = (imageZoomFactorDelta: number) => {
-    zoomTo(state.imageZoomFactor + imageZoomFactorDelta);
+    zoomTo(imageZoomFactor + imageZoomFactorDelta);
   };
 
   const zoomTo = (imageZoomFactor: number) => {
-    setState(state => ({
-      ...state,
-      imageZoomFactor: getBoundedZoomFactor(imageZoomFactor),
-    }));
+    setImageZoomFactor(getBoundedZoomFactor(imageZoomFactor));
   };
 
   const theme = React.useContext(GDevelopThemeContext);
@@ -180,22 +167,14 @@ const ImagePreview = ({
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
         // Once the image is loaded, adapt the zoom to the image size.
-        if (
-          !state.isResizeObserverReady &&
-          !!containerWidth &&
-          !!containerHeight
-        ) {
+        if (!isResizeObserverReady && !!containerWidth && !!containerHeight) {
           if (!initialZoom) {
             adaptZoomToImage(containerHeight, containerWidth);
           }
-          setState(state => ({
-            ...state,
-            isResizeObserverReady: true,
-          }));
+          setIsResizeObserverReady(true);
         }
-        const { imageHeight, imageWidth, imageZoomFactor } = state;
 
-        const imageLoaded = !!imageWidth && !!imageHeight && !state.errored;
+        const imageLoaded = !!imageWidth && !!imageHeight && !errored;
 
         // Centre-align the image and overlays
         const imagePositionTop = Math.max(
@@ -258,7 +237,7 @@ const ImagePreview = ({
                     min={Math.log10(MIN_ZOOM_FACTOR)}
                     max={Math.log10(MAX_ZOOM_FACTOR)}
                     step={0.05}
-                    value={Math.log10(state.imageZoomFactor)}
+                    value={Math.log10(imageZoomFactor)}
                     onChange={value => {
                       zoomTo(Math.pow(10, value));
                     }}
@@ -302,14 +281,14 @@ const ImagePreview = ({
                   }
                 }}
               >
-                {!!state.errored && (
+                {!!errored && (
                   <PlaceholderMessage>
                     <Text>
                       <Trans>Unable to load the image</Trans>
                     </Text>
                   </PlaceholderMessage>
                 )}
-                {!state.errored && (
+                {!errored && (
                   <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}

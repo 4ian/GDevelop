@@ -17,18 +17,16 @@ export default {
 
 export const Default = () => (
   <AssetStoreStateProvider>
-    <FixedHeightFlexContainer height={400}>
-      <AssetStore
-        onOpenDetails={action('onOpenDetails')}
-        events={testProject.testLayout.getEvents()}
-        project={testProject.project}
-        layout={testProject.testLayout}
-        onChooseResource={() => Promise.reject('unimplemented')}
-        resourceSources={[]}
-        onObjectAddedFromAsset={() => {}}
-        resourceExternalEditors={[]}
-        objectsContainer={testProject.testLayout}
-      />
-    </FixedHeightFlexContainer>
+    <AssetStore
+      onOpenDetails={action('onOpenDetails')}
+      events={testProject.testLayout.getEvents()}
+      project={testProject.project}
+      layout={testProject.testLayout}
+      onChooseResource={() => Promise.reject('unimplemented')}
+      resourceSources={[]}
+      onObjectAddedFromAsset={() => {}}
+      resourceExternalEditors={[]}
+      objectsContainer={testProject.testLayout}
+    />
   </AssetStoreStateProvider>
 );

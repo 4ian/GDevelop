@@ -623,7 +623,7 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
 }
 
 bool ExporterHelper::ExportEffectIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    const gd::Project &project, std::vector<gd::String> &includesFiles) {
   std::set<gd::String> effectIncludes;
 
   gd::EffectsCodeGenerator::GenerateEffectsIncludeFiles(
@@ -642,7 +642,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     std::set<gd::String> eventsIncludes;
-    gd::Layout &layout = project.GetLayout(i);
+    const gd::Layout &layout = project.GetLayout(i);
     LayoutCodeGenerator layoutCodeGenerator(project);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
         layout, eventsIncludes, !exportForPreview);
@@ -664,7 +664,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 }
 
 bool ExporterHelper::ExportExternalSourceFiles(
-    gd::Project &project,
+    const gd::Project &project,
     gd::String outputDir,
     std::vector<gd::String> &includesFiles) {
   const auto &allFiles = project.GetAllSourceFiles();
@@ -765,7 +765,7 @@ bool ExporterHelper::ExportIncludesAndLibs(
 }
 
 void ExporterHelper::ExportObjectAndBehaviorsIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    const gd::Project &project, std::vector<gd::String> &includesFiles) {
   auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
     for (const auto &includeFile : newIncludeFiles) {
       InsertUnique(includesFiles, includeFile);
@@ -798,7 +798,7 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
 
   addObjectsIncludeFiles(project);
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    gd::Layout &layout = project.GetLayout(i);
+    const gd::Layout &layout = project.GetLayout(i);
     addObjectsIncludeFiles(layout);
   }
 }

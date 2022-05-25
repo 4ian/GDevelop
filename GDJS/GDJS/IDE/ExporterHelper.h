@@ -232,14 +232,14 @@ class ExporterHelper {
   /**
    * \brief Add the project effects include files.
    */
-  bool ExportEffectIncludes(gd::Project &project,
+  bool ExportEffectIncludes(const gd::Project &project,
                             std::vector<gd::String> &includesFiles);
 
   /**
    * \brief Add the include files for all the objects of the project
    * and their behaviors.
    */
-  void ExportObjectAndBehaviorsIncludes(gd::Project &project,
+  void ExportObjectAndBehaviorsIncludes(const gd::Project &project,
                                         std::vector<gd::String> &includesFiles);
 
   /**
@@ -253,7 +253,7 @@ class ExporterHelper {
    * with JS files to be exported along with the project. (including
    * "ext-codeX.js" files).
    */
-  bool ExportExternalSourceFiles(gd::Project &project,
+  bool ExportExternalSourceFiles(const gd::Project &project,
                                  gd::String outputDir,
                                  std::vector<gd::String> &includesFiles);
 

@@ -110,6 +110,10 @@ function DropTargetContainer({
                   ...style.dropIndicator,
                   borderColor: gdevelopTheme.dropIndicator.canDrop,
                   outlineColor: gdevelopTheme.dropIndicator.border,
+
+                  // Uncomment for debugging purposes.
+                  // backgroundColor: 'lightblue'
+                  // opacity: isOver ? 1 : 0
                 }}
               />
             )}
@@ -290,6 +294,10 @@ export function AutoScroll({
             style={{
               ...sharedStyles.autoScroll,
               ...(direction === 'top' ? { top: 0 } : { bottom: 0 }),
+
+              // Uncomment for debugging purposes.
+              // backgroundColor: 'black'
+              // opacity: isOver ? 1 : 0
             }}
           />
         );

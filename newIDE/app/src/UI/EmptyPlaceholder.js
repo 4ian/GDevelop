@@ -18,7 +18,7 @@ type Props = {|
   helpPagePath?: string,
   tutorialId?: string,
   actionButtonId?: string,
-  onAdd: () => void,
+  onAction: () => void,
   isLoading?: boolean,
   actionIcon?: React.Node,
 |};
@@ -51,7 +51,7 @@ export const EmptyPlaceholder = (props: Props) => (
           <RaisedButton
             label={props.actionLabel}
             primary
-            onClick={props.onAdd}
+            onClick={props.onAction}
             disabled={!!props.isLoading}
             icon={
               props.isLoading ? (

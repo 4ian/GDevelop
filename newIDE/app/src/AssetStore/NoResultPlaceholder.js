@@ -21,7 +21,7 @@ export const NoResultPlaceholder = (props: Props) => (
       }
       actionLabel={<Trans>Clear all filters</Trans>}
       actionButtonId="clear-filters-button"
-      onAdd={props.onClear}
+      onAction={props.onClear}
       actionIcon={<RestoreIcon />}
     />
   </Column>

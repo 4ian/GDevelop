@@ -1460,7 +1460,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           actionLabel={<Trans>Add a variable</Trans>}
                           helpPagePath={props.helpPagePath || undefined}
                           tutorialId="intermediate-advanced-variables"
-                          onAdd={onAdd}
+                          onAction={onAdd}
                         />
                       ) : null}
                     </Column>

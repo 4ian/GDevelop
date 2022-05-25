@@ -8,6 +8,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <algorithm>
 
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/String.h"

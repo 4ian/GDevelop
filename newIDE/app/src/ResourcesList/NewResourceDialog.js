@@ -105,7 +105,7 @@ export const NewResourceDialog = ({
               <Trans>Download GDevelop to use images from your computer</Trans>
             }
             onClick={() =>
-              Window.openExternalURL('https://gdevelop-app.com/download')
+              Window.openExternalURL('https://gdevelop.io/download')
             }
           />
         ) : null,

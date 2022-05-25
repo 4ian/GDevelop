@@ -16,7 +16,8 @@ export default class VariablesEditorDialog extends Component {
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (!this.props.open && newProps.open) {
       this.setState({
         selectedLayer: '',

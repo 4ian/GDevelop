@@ -2,10 +2,17 @@
 # on the Electron runtime (newIDE/electron-app) for macOS and Linux.
 # For Windows, see the appveyor.yml file.
 
+# This also builds GDevelop.js and store it on a S3 so it can be used to run
+# GDevelop without building it from scratch.
+
+# Note that these CircleCI builds/tests are not launched on Pull Requests from forks,
+# to avoid sharing secrets.
+
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.6
 jobs:
+  # Build the **entire** app for macOS.
   build-macos:
     macos:
       xcode: 12.5.1
@@ -75,6 +82,7 @@ jobs:
           name: Deploy to S3 (latest)
           command: export PATH=~/.local/bin:$PATH && aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
 
+  # Build the **entire** app for Linux.
   build-linux:
     # CircleCI docker workers are failing if they don't have enough memory (no swap)
     resource_class: xlarge
@@ -153,10 +161,67 @@ jobs:
           name: Deploy to S3 (latest)
           command: aws s3 sync newIDE/electron-app/dist s3://gdevelop-releases/$(git rev-parse --abbrev-ref HEAD)/latest/
 
+  # Build the WebAssembly library only (so that it's cached on a S3 and easy to re-use).
+  build-gdevelop_js-wasm-only:
+    docker:
+      - image: cimg/node:16.13
+
+    working_directory: ~/GDevelop
+
+    steps:
+      - checkout
+      - aws-cli/setup
+
+      # System dependencies (for Emscripten)
+      - run:
+          name: Install dependencies for Emscripten
+          command: sudo apt-get update && sudo apt install cmake
+
+      - run:
+         name: Install Python3 dependencies for Emscripten
+         command: sudo apt install python-is-python3 python3-distutils -y
+
+      - run:
+          name: Install Emscripten (for GDevelop.js)
+          command: git clone https://github.com/juj/emsdk.git && cd emsdk && ./emsdk install 1.39.6 && ./emsdk activate 1.39.6 && cd ..
+
+      # GDevelop.js dependencies
+      - restore_cache:
+          keys:
+            - gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - gdevelop.js-linux-nodejs-dependencies-
+
+      - run:
+          name: Install GDevelop.js dependencies and build it
+          command: cd GDevelop.js && npm install && cd ..
+
+      # Build GDevelop.js (and run tests to ensure it works)
+      - run:
+          name: Build GDevelop.js
+          command: cd GDevelop.js && source ../emsdk/emsdk_env.sh && npm run build && npm test && cd ..
+
+      - save_cache:
+          paths:
+            - GDevelop.js/node_modules
+          key: gdevelop.js-linux-nodejs-dependencies-{{ checksum "GDevelop.js/package-lock.json" }}
+
+      # Upload artifacts (CircleCI)
+      - store_artifacts:
+          path: Binaries/embuild/GDevelop.js
+
+      # Upload artifacts (AWS)
+      - run:
+          name: Deploy to S3 (specific commit)
+          command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/commit/$(git rev-parse HEAD)/
+      - run:
+          name: Deploy to S3 (latest)
+          command: aws s3 sync Binaries/embuild/GDevelop.js s3://gdevelop-gdevelop.js/$(git rev-parse --abbrev-ref HEAD)/latest/
 
 workflows:
   builds:
     jobs:
+      - build-gdevelop_js-wasm-only
       - build-macos:
           filters:
             branches:

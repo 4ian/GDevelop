@@ -10,7 +10,10 @@ const getLocalNetworkIps = () => {
     .map(({ address }) => address);
 };
 
-/** @returns {?string} */
+/**
+ * Returns null if not connected to internet with an IPv4 connection.
+ * @returns {?string}
+ */
 const findLocalIp = () => {
   const ipAddresses = getLocalNetworkIps();
 

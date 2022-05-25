@@ -18,6 +18,13 @@ const outputPath = args['outputPath'];
 const electronAppPackageJson = require('../../electron-app/app/package.json');
 const version = electronAppPackageJson.version;
 
+// ℹ️ Note: the latest.yml, latest-mac.yml and latest-linux.yml are downloaded, but could also be generated
+// by computing:
+// - The SHA-512 of the file:
+//   - `shasum -a 512 GDevelop-5-Setup-5.0.xxx.exe | cut -f1 -d\  | xxd -r -p | base64` (tested on macOS).
+//   - OR using the script at https://github.com/electron-userland/electron-builder/issues/3913#issuecomment-504698845
+// - The size in bytes of the file.
+
 shell.echo(
   `⚠️ This will download the latest artifacts built for master for version ${version}. Please ensure the CI finished building everything before continuing.`
 );

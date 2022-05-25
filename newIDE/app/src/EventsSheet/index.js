@@ -95,6 +95,8 @@ import {
 import LeaderboardContext, {
   type LeaderboardState,
 } from '../Leaderboard/LeaderboardContext';
+import { TutorialContext } from '../Tutorial/TutorialContext';
+import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -122,12 +124,14 @@ type Props = {|
   ) => void,
   onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  isActive: boolean,
 |};
 
 type ComponentProps = {|
   ...Props,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
+  tutorials: ?Array<Tutorial>,
   leaderboardsManager: ?LeaderboardState,
 |};
 
@@ -154,7 +158,6 @@ type State = {|
   inlineEditing: boolean,
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
-  inlineEditingChangesMade: boolean,
   inlineEditingPreviousValue: ?string,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -243,7 +246,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     inlineEditing: false,
     inlineEditingAnchorEl: null,
     inlineInstructionEditorAnchorEl: null,
-    inlineEditingChangesMade: false,
     inlineEditingPreviousValue: null,
 
     analyzedEventsContextResult: null,
@@ -284,6 +286,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    // If the tab becomes active again, we ensure the dom is focused
+    // allowing the keyboard shortcuts to work.
+    if (!prevProps.isActive && this.props.isActive) {
+      this._ensureFocused();
+    }
   }
 
   updateToolbar() {
@@ -805,22 +813,29 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
         : null,
-      inlineEditingChangesMade: false,
       inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
     });
   };
 
   closeParameterEditor = (shouldCancel: boolean) => {
-    if (shouldCancel) {
-      const { instruction, parameterIndex } = this.state.editedParameter;
-      if (!instruction || !this.state.inlineEditingPreviousValue) return;
-
-      instruction.setParameter(
-        parameterIndex,
-        this.state.inlineEditingPreviousValue
-      );
-    } else {
-      if (this.state.inlineEditingChangesMade) {
+    const { instruction, parameterIndex } = this.state.editedParameter;
+    if (instruction) {
+      // If the user canceled, revert the value to the previous value, if not null.
+      if (
+        shouldCancel &&
+        typeof this.state.inlineEditingPreviousValue === 'string'
+      ) {
+        instruction.setParameter(
+          parameterIndex,
+          this.state.inlineEditingPreviousValue
+        );
+      }
+      // If the user made changes, save the value to history.
+      if (
+        !shouldCancel &&
+        this.state.inlineEditingPreviousValue !==
+          instruction.getParameter(parameterIndex)
+      ) {
         this._saveChangesToHistory();
       }
     }
@@ -831,7 +846,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       {
         inlineEditing: false,
         inlineEditingAnchorEl: null,
-        inlineEditingChangesMade: false,
       },
       () => {
         if (inlineEditingAnchorEl) {
@@ -1319,9 +1333,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onChooseResource,
       resourceExternalEditors,
       onCreateEventsFunction,
+      tutorials,
     } = this.props;
     if (!project) return null;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const screenType = useScreenType();
 
     return (
@@ -1403,6 +1419,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       : 0
                   }
                   fontSize={preferences.values.eventsSheetZoomLevel}
+                  preferences={preferences}
+                  tutorials={tutorials}
                 />
                 {this.state.showSearchPanel && (
                   <SearchPanel
@@ -1462,9 +1480,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       return;
                     }
                     instruction.setParameter(parameterIndex, value);
-                    this.setState({
-                      inlineEditingChangesMade: true,
-                    });
+                    // Ask the component to re-render, so that the new parameter
+                    // set for the instruction in the state
+                    // is taken into account for the InlineParameterEditor.
+                    this.forceUpdate();
                     if (this._searchPanel)
                       this._searchPanel.markSearchResultsDirty();
                   }}
@@ -1570,12 +1589,14 @@ const EventsSheet = (props, ref) => {
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preferences = React.useContext(PreferencesContext);
+  const { tutorials } = React.useContext(TutorialContext);
   const leaderboardsManager = React.useContext(LeaderboardContext);
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
       authenticatedUser={authenticatedUser}
       preferences={preferences}
+      tutorials={tutorials}
       leaderboardsManager={leaderboardsManager}
       {...props}
     />

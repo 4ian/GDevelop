@@ -142,7 +142,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
         <ColumnStackLayout noMargin>
           <BackgroundText>
             <MarkdownText
-              translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop-app.com/legal/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
+              translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
             />
           </BackgroundText>
           <UsernameField

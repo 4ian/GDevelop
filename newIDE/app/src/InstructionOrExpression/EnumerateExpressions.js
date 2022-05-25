@@ -2,10 +2,10 @@
 import {
   type EnumeratedExpressionMetadata,
   type InstructionOrExpressionScope,
-} from './EnumeratedInstructionOrExpressionMetadata.js';
+} from './EnumeratedInstructionOrExpressionMetadata';
 import { mapVector } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
-import { getExtensionPrefix } from './EnumerateInstructions.js';
+import { getExtensionPrefix } from './EnumerateInstructions';
 const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';

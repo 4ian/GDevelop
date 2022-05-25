@@ -4,7 +4,6 @@
 # consist in a few lines containing calls to these functions.
 
 macro(gd_add_extension_includes)
-	include_directories(${sfml_include_dir})
 	include_directories(${GDCORE_include_dir})
 endmacro()
 
@@ -81,7 +80,6 @@ function(gd_extension_link_libraries target_name)
 		#Nothing.
 	ELSE()
 		target_link_libraries(${target_name} GDCore)
-		target_link_libraries(${target_name} ${sfml_LIBRARIES})
 	ENDIF()
 endfunction()
 

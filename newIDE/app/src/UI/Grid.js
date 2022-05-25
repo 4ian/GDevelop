@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-const marginsSize = 4;
+const marginsSize = 8;
 
 /**
  * A Line in the standard GDevelop grid to position components.
@@ -47,8 +47,8 @@ export const Column = (props: {|
   <div
     style={{
       display: 'flex',
-      marginLeft: props.noMargin ? 0 : marginsSize * 2,
-      marginRight: props.noMargin ? 0 : marginsSize * 2,
+      marginLeft: props.noMargin ? 0 : marginsSize,
+      marginRight: props.noMargin ? 0 : marginsSize,
       flexDirection: 'column',
       alignItems: props.alignItems || 'stretch',
       justifyContent: props.justifyContent,

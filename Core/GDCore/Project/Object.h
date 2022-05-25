@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
-#include <SFML/System/Vector2.hpp>
+#include "GDCore/Vector2.h"
 #include <map>
 #include <memory>
 #include <vector>

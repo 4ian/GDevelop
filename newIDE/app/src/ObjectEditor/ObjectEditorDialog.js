@@ -23,8 +23,9 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import EffectsList from '../EffectsList';
-import VariablesList from '../VariablesList/index';
+import VariablesList from '../VariablesList/VariablesList';
 import { sendBehaviorsEditorShown } from '../Utils/Analytics/EventSender';
+import useDismissableTutorialMessage from '../Hints/useDismissableTutorialMessage';
 const gd: libGDevelop = global.gd;
 
 export type ObjectEditorTab =
@@ -96,6 +97,10 @@ const InnerDialog = (props: InnerDialogProps) => {
     // override the name.
     props.onRename(newObjectName);
   };
+
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-variables'
+  );
 
   useEffect(
     () => {
@@ -229,20 +234,27 @@ const InnerDialog = (props: InnerDialogProps) => {
         />
       )}
       {currentTab === 'variables' && (
-        <VariablesList
-          variablesContainer={props.object.getVariables()}
-          emptyPlaceholderTitle={<Trans>Add your first object variable</Trans>}
-          emptyPlaceholderDescription={
-            <Trans>
-              These variables hold additional information on an object.
-            </Trans>
-          }
-          helpPagePath={'/all-features/variables/object-variables'}
-          onSizeUpdated={
-            forceUpdate /*Force update to ensure dialog is properly positioned*/
-          }
-          onComputeAllVariableNames={props.onComputeAllVariableNames}
-        />
+        <Column expand noMargin>
+          {props.object.getVariables().count() > 0 &&
+            DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
+          <VariablesList
+            variablesContainer={props.object.getVariables()}
+            emptyPlaceholderTitle={
+              <Trans>Add your first object variable</Trans>
+            }
+            emptyPlaceholderDescription={
+              <Trans>
+                These variables hold additional information on an object.
+              </Trans>
+            }
+            helpPagePath={'/all-features/variables/object-variables'}
+            onComputeAllVariableNames={props.onComputeAllVariableNames}
+          />
+        </Column>
       )}
       {currentTab === 'effects' && (
         <EffectsList
@@ -276,11 +288,13 @@ export default class ObjectEditorDialog extends Component<Props, State> {
     objectName: '',
   };
 
-  componentWillMount() {
+  // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
+  UNSAFE_componentWillMount() {
     this._loadFrom(this.props.object);
   }
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.object !== newProps.object)

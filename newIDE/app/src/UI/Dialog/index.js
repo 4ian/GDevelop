@@ -96,7 +96,7 @@ type DialogContentStyle = {
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-export default (props: Props) => {
+const Dialog = (props: Props) => {
   const {
     onApply,
     secondaryActions,
@@ -207,3 +207,5 @@ export default (props: Props) => {
     </DialogMaterialUI>
   );
 };
+
+export default Dialog;

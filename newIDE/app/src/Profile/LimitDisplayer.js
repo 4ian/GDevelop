@@ -14,7 +14,11 @@ type Props = {|
   onChangeSubscription: Function,
 |};
 
-export default ({ subscription, limit, onChangeSubscription }: Props) => {
+const LimitDisplayer = ({
+  subscription,
+  limit,
+  onChangeSubscription,
+}: Props) => {
   if (!limit) return <PlaceholderLoader />;
   const hasSubscription = subscription && !!subscription.planId;
   const noSubscription = subscription && !subscription.planId;
@@ -63,3 +67,5 @@ export default ({ subscription, limit, onChangeSubscription }: Props) => {
     </Column>
   );
 };
+
+export default LimitDisplayer;

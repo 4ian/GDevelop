@@ -27,7 +27,8 @@ type State = {|
 export default class ResourcePreview extends React.PureComponent<Props, State> {
   state = this._loadFrom(this.props);
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       newProps.resourceName !== this.props.resourceName ||
       newProps.project !== this.props.project ||

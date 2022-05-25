@@ -24,12 +24,13 @@ type Props = {|
   fullWidth?: boolean,
   children: React.Node,
   disabled?: boolean,
+  stopPropagationOnClick?: boolean,
 
   style?: {
     flex?: 1,
     width?: 'auto',
   },
-  inputStyle?: {| fontSize: 14 |},
+  inputStyle?: {| fontSize?: 14, color?: string |},
   margin?: 'none' | 'dense',
 
   floatingLabelText?: React.Node,
@@ -40,21 +41,27 @@ type Props = {|
   hintText?: MessageDescriptor,
 |};
 
+export type SelectFieldInterface = {| focus: () => void |};
+
 const INVALID_VALUE = '';
+const stopPropagation = event => event.stopPropagation();
 
 /**
  * A select field based on Material-UI select field.
  * To be used with `SelectOption`.
  */
-export default class SelectField extends React.Component<Props, {||}> {
-  _input = React.createRef<HTMLInputElement>();
+const SelectField = React.forwardRef<Props, SelectFieldInterface>(
+  (props, ref) => {
+    const inputRef = React.useRef<?HTMLInputElement>(null);
 
-  focus() {
-    if (this._input.current) this._input.current.focus();
-  }
+    const focus = () => {
+      if (inputRef.current) inputRef.current.focus();
+    };
 
-  render() {
-    const { props } = this;
+    React.useImperativeHandle(ref, () => ({
+      focus,
+    }));
+
     const onChange = props.onChange || undefined;
 
     // Dig into children props to see if the current value is valid or not.
@@ -90,6 +97,7 @@ export default class SelectField extends React.Component<Props, {||}> {
             label={props.floatingLabelText}
             helperText={helperText}
             value={displayedValue}
+            onClick={props.stopPropagationOnClick ? stopPropagation : undefined}
             onChange={
               onChange
                 ? event => {
@@ -105,7 +113,7 @@ export default class SelectField extends React.Component<Props, {||}> {
               native: true,
             }}
             style={props.style}
-            inputRef={this._input}
+            inputRef={inputRef}
           >
             {!hasValidValue ? (
               <option value={INVALID_VALUE} disabled>
@@ -120,4 +128,5 @@ export default class SelectField extends React.Component<Props, {||}> {
       </I18n>
     );
   }
-}
+);
+export default SelectField;

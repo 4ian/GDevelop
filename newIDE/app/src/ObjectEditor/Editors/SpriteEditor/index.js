@@ -40,6 +40,7 @@ import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
+import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -317,11 +318,13 @@ class AnimationsListContainer extends React.Component<
               description={<Trans>Animations are a sequence of images.</Trans>}
               actionLabel={<Trans>Add an animation</Trans>}
               helpPagePath="/objects/sprite"
+              tutorialId="intermediate-changing-animations"
               onAdd={this.addAnimation}
             />
           </Column>
         ) : (
           <React.Fragment>
+            <SpacedDismissableTutorialMessage />
             <SortableAnimationsList
               spriteObject={this.props.spriteObject}
               objectName={this.props.objectName}
@@ -434,6 +437,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setAdvancedOptionsOpen(false)}
@@ -466,6 +470,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setPointsEditorOpen(false)}
@@ -496,6 +501,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setCollisionMasksEditorOpen(false)}

@@ -49,8 +49,10 @@ export class TableHeader extends React.Component<TableHeaderProps, {||}> {
 type TableHeaderColumnProps = {|
   children?: React.Node, // Text of the column
   style?: {|
-    textAlign: 'left' | 'right',
-    paddingRight: number,
+    height?: number,
+    width?: number | string,
+    textAlign?: 'left' | 'right',
+    paddingRight?: number,
   |},
 |};
 
@@ -71,6 +73,9 @@ type TableRowProps = {|
   style?: {|
     backgroundColor: string,
   |},
+  onPointerEnter?: () => void,
+  onPointerLeave?: () => void,
+  onClick?: () => void,
 |};
 
 /**
@@ -85,7 +90,8 @@ export class TableRow extends React.Component<TableRowProps, {||}> {
 type TableRowColumnProps = {|
   children?: React.Node, // Content for the cell
   style?: {|
-    width?: number,
+    height?: number,
+    width?: number | string,
     paddingLeft?: number,
     paddingRight?: number,
     textAlign?: string,

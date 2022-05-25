@@ -82,6 +82,12 @@ export default class VariableField extends Component<Props, State> {
     this.updateAutocompletions();
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.variablesContainer !== this.props.variablesContainer) {
+      this.updateAutocompletions();
+    }
+  }
+
   /**
    * Can be called to set up or force updating the variables list.
    */

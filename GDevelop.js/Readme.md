@@ -2,7 +2,7 @@
 
 This is the port of GDevelop core classes to WebAssembly+JavaScript. This allows [GDevelop Core libraries](https://github.com/4ian/GDevelop) to run in a browser or on Node.js.
 
-> 🎮 GDevelop is a full-featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop-app.com).
+> 🎮 GDevelop is a full-featured, cross-platform, open-source game development software requiring no programming skills. Download it on [the official website](https://gdevelop.io).
 
 ## How to build
 
@@ -66,4 +66,4 @@ See the [CMakeLists.txt](./CMakeLists.txt) for the arguments passed to the Emscr
 ## Documentation
 
 - The file [Bindings.idl](https://github.com/4ian/GDevelop/blob/master/GDevelop.js/Bindings/Bindings.idl) describes all the classes available in GDevelop.js.
-- Refer to [GDevelop documentation](https://docs.gdevelop-app.com/GDCore%20Documentation/) for detailed documentation of the original C++ classes.
+- Refer to [GDevelop documentation](https://docs.gdevelop.io/GDCore%20Documentation/) for detailed documentation of the original C++ classes.

@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
-  "homepage": "https://gdevelop-app.com",
+  "homepage": "https://gdevelop.io",
   "//": "We use esbuild for a near instant build (important for quick feedback loop when developing). Typechecking is a separate process as much longer.",
   "devDependencies": {
     "@types/electron": "^1.6.10",

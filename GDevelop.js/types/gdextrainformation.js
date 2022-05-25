@@ -6,6 +6,7 @@ declare class gdExtraInformation {
   setMutators(mutators: gdMapStringString): gdExtraInformation;
   setIncludeFile(includeFile: string): gdExtraInformation;
   addIncludeFile(includeFile: string): gdExtraInformation;
+  getIncludeFiles(): gdVectorString;
   delete(): void;
   ptr: number;
 };

@@ -50,7 +50,13 @@ const CollisionMasksEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
-
+  const [
+    highlightedVerticePtr,
+    setHighlightedVerticePtr,
+  ] = React.useState<?number>(null);
+  const [selectedVerticePtr, setSelectedVerticePtr] = React.useState<?number>(
+    null
+  );
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSameCollisionMasksToggles). In
   // theory, they should be set to the appropriate value at their initialization,
@@ -172,11 +178,14 @@ const CollisionMasksEditor = (props: Props) => {
     setSpriteHeight(spriteHeight);
   };
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateCollisionMasks, [
     sameCollisionMasksForAnimations,
     sameCollisionMasksForSprites,
   ]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateSameCollisionMasksToggles, [animationIndex]);
 
   // Keep panes vertical for small screens, side-by-side for large screens
@@ -204,6 +213,9 @@ const CollisionMasksEditor = (props: Props) => {
                   isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
                   polygons={sprite.getCustomCollisionMask()}
                   onPolygonsUpdated={updateCollisionMasks}
+                  highlightedVerticePtr={highlightedVerticePtr}
+                  selectedVerticePtr={selectedVerticePtr}
+                  onClickVertice={setSelectedVerticePtr}
                 />
               )
             }
@@ -247,6 +259,9 @@ const CollisionMasksEditor = (props: Props) => {
                 polygons={sprite.getCustomCollisionMask()}
                 onPolygonsUpdated={updateCollisionMasks}
                 restoreCollisionMask={() => onSetCollisionMaskAutomatic(true)}
+                onHoverVertice={setHighlightedVerticePtr}
+                onClickVertice={setSelectedVerticePtr}
+                selectedVerticePtr={selectedVerticePtr}
                 spriteWidth={spriteWidth}
                 spriteHeight={spriteHeight}
               />

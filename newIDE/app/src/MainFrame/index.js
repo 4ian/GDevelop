@@ -581,11 +581,24 @@ const MainFrame = (props: Props) => {
 
   const loadFromProject = React.useCallback(
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
-      if (fileMetadata)
-        preferences.insertRecentProjectFile({
-          fileMetadata,
-          storageProviderName: getStorageProvider().internalName,
-        });
+      if (fileMetadata) {
+        const storageProvider = getStorageProvider();
+        const storageProviderOperations = await getStorageProviderOperations(
+          storageProvider
+        );
+        const { onSaveProject } = storageProviderOperations;
+
+        // Only save the project in the recent files if the storage provider
+        // is able to save. Otherwise, it means nothing to consider this as
+        // a recent file: we must wait for the user to save in a "real" storage
+        // (like locally or on Google Drive).
+        if (onSaveProject) {
+          preferences.insertRecentProjectFile({
+            fileMetadata,
+            storageProviderName: storageProvider.internalName,
+          });
+        }
+      }
 
       await closeProject();
 
@@ -632,6 +645,7 @@ const MainFrame = (props: Props) => {
       preferences,
       eventsFunctionsExtensionsState,
       getStorageProvider,
+      getStorageProviderOperations,
       ensureResourcesAreFetched,
     ]
   );

@@ -16,11 +16,16 @@ import { CorsAwareImage } from '../../UI/CorsAwareImage';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import CheckeredBackground from '../CheckeredBackground';
 import { getPixelatedImageRendering } from '../../Utils/CssHelpers';
+import { shouldZoom } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import Slider from '../../UI/Slider';
 const gd: libGDevelop = global.gd;
 
 const MARGIN = 50;
 const MAX_ZOOM_FACTOR = 10;
 const MIN_ZOOM_FACTOR = 0.1;
+
+const getBoundedZoomFactor = (zoom: number): number =>
+  Math.min(MAX_ZOOM_FACTOR, Math.max(MIN_ZOOM_FACTOR, zoom));
 
 const styles = {
   previewImagePixelated: {
@@ -48,6 +53,12 @@ const styles = {
     position: 'relative',
     pointerEvents: 'none',
     margin: MARGIN,
+  },
+  sliderContainer: {
+    maxWidth: 150,
+    width: '100%',
+    display: 'flex',
+    padding: '0 10px',
   },
 };
 
@@ -112,6 +123,7 @@ const ImagePreview = (props: Props) => {
     imageZoomFactor: 1,
     ...loadStateFrom(props),
   });
+  const isResizeObserverReady = React.useRef<boolean>(false);
 
   React.useEffect(
     () => {
@@ -136,6 +148,27 @@ const ImagePreview = (props: Props) => {
     setState(state => ({ ...state, errored: true }));
   };
 
+  const adaptZoomToImage = (
+    containerHeight: number,
+    containerWidth: number
+  ) => {
+    const { imageHeight, imageWidth } = state;
+    let zoomFactor;
+    if (!imageHeight || !imageWidth) {
+      zoomFactor = 1;
+    } else {
+      const idealZoomFactors = [
+        containerWidth / (imageWidth + 2 * MARGIN),
+        containerHeight / (imageHeight + 2 * MARGIN),
+      ];
+      zoomFactor = getBoundedZoomFactor(Math.min(...idealZoomFactors));
+    }
+    setState(state => ({
+      ...state,
+      imageZoomFactor: zoomFactor,
+    }));
+  };
+
   const handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
@@ -156,10 +189,7 @@ const ImagePreview = (props: Props) => {
   const zoomTo = (imageZoomFactor: number) => {
     setState(state => ({
       ...state,
-      imageZoomFactor: Math.min(
-        MAX_ZOOM_FACTOR,
-        Math.max(MIN_ZOOM_FACTOR, imageZoomFactor)
-      ),
+      imageZoomFactor: getBoundedZoomFactor(imageZoomFactor),
     }));
   };
 
@@ -172,6 +202,14 @@ const ImagePreview = (props: Props) => {
       {({ contentRect, measureRef }) => {
         const containerWidth = contentRect.bounds.width;
         const containerHeight = contentRect.bounds.height;
+        if (
+          !!containerWidth &&
+          !!containerHeight &&
+          !isResizeObserverReady.current
+        ) {
+          adaptZoomToImage(containerHeight, containerWidth);
+          isResizeObserverReady.current = true;
+        }
         const { resourceName, renderOverlay, fixedHeight, project } = props;
         const { imageHeight, imageWidth, imageSource, imageZoomFactor } = state;
 
@@ -211,6 +249,7 @@ const ImagePreview = (props: Props) => {
           height: imageHeight ? imageHeight * imageZoomFactor : undefined,
           visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
           border: `1px solid ${frameBorderColor}`,
+          boxSizing: 'border-box',
         };
 
         const overlayStyle = {
@@ -226,16 +265,28 @@ const ImagePreview = (props: Props) => {
           <Column expand noMargin useFullHeight>
             <MiniToolbar>
               <IconButton
-                onClick={() => zoomBy(+0.2)}
-                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
-              >
-                <ZoomIn />
-              </IconButton>
-              <IconButton
                 onClick={() => zoomBy(-0.2)}
                 tooltip={t`Zoom out (you can also use Ctrl + Mouse wheel)`}
               >
                 <ZoomOut />
+              </IconButton>
+              <div style={styles.sliderContainer}>
+                <Slider
+                  min={Math.log10(MIN_ZOOM_FACTOR)}
+                  max={Math.log10(MAX_ZOOM_FACTOR)}
+                  step={0.05}
+                  value={Math.log10(state.imageZoomFactor)}
+                  onChange={value => {
+                    console.log(value);
+                    zoomTo(Math.pow(10, value));
+                  }}
+                />
+              </div>
+              <IconButton
+                onClick={() => zoomBy(+0.2)}
+                tooltip={t`Zoom in (you can also use Ctrl + Mouse wheel)`}
+              >
+                <ZoomIn />
               </IconButton>
               <IconButton
                 onClick={() => zoomTo(1)}
@@ -262,8 +313,7 @@ const ImagePreview = (props: Props) => {
                 ref={measureRef}
                 onWheel={event => {
                   const { deltaY } = event;
-                  //TODO: Use KeyboardShortcuts
-                  if (event.metaKey || event.ctrlKey) {
+                  if (shouldZoom(event)) {
                     zoomBy(-deltaY / 500);
                     event.preventDefault();
                     event.stopPropagation();

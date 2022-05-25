@@ -20,7 +20,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "for slow motion effects).",
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/all-features/timers");
+      .SetExtensionHelpPath("/all-features/timers-and-time");
   extension.AddInstructionOrExpressionGroupMetadata(
       _("Timers and time")
   )
@@ -158,6 +158,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/timer.svg",
                  "res/timer.svg")
       .AddParameter("expression", "Time to wait in seconds")
+      .SetHelpPath("/all-features/timers-and-time/wait-action")
       .SetAsync();
 
   extension

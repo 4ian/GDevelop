@@ -21,7 +21,7 @@ import {
 import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, {
   useShouldAutofocusSearchbar,
@@ -161,6 +161,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar.current
     ) {

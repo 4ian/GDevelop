@@ -69,4 +69,5 @@ var t=require("./bufferbuilder").BufferBuilder,e=require("./bufferbuilder").bina
 },{"eventemitter3":"JJlS","./util":"BHXf","./logger":"WOs9","./socket":"wJlv","./mediaconnection":"dbHP","./dataconnection":"GBTQ","./enums":"ZRYf","./api":"in7L"}],"iTK6":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0});var e=require("./util"),r=require("./peer");exports.peerjs={Peer:r.Peer,util:e.util},exports.default=r.Peer,window.peerjs=exports.peerjs,window.Peer=r.Peer;
 },{"./util":"BHXf","./peer":"Hxpd"}]},{},["iTK6"], null)
-//# sourceMappingURL=A_peer.js.map
+// Disabled to avoid warnings in Chrome (see https://github.com/4ian/GDevelop/pull/3947)
+// //# sourceMappingURL=A_peer.js.map

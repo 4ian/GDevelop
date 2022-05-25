@@ -214,6 +214,8 @@ interface Variable {
     double GetValue();
     void SetBool([Const] boolean val);
     boolean GetBool();
+    void SetFolded(boolean val);
+    boolean IsFolded();
 
     unsigned long GetChildrenCount();
     boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
@@ -229,6 +231,9 @@ interface Variable {
     [Ref] Variable PushNew();
     void RemoveAtIndex([Const] unsigned long index);
     [Const, Ref] VectorVariable GetAllChildrenArray();
+    void MoveChildInArray([Const] unsigned long oldIndex, [Const] unsigned long newIndex);
+    boolean InsertAtIndex([Const, Ref] Variable variable, [Const] unsigned long index);
+    boolean InsertChild([Const] DOMString name, [Const, Ref] Variable variable);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -723,6 +728,7 @@ interface EffectsContainer {
   void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
   void RemoveEffect([Const] DOMString name);
   void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+  void MoveEffect(unsigned long oldIndex, unsigned long newIndex);
 
   void SerializeTo([Ref] SerializerElement element);
   void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1098,6 +1104,7 @@ interface ExtraInformation {
     [Ref] ExtraInformation SetMutators([Const, Ref] MapStringString mutators);
     [Ref] ExtraInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExtraInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionCodeGenerationInformation {
@@ -1105,6 +1112,7 @@ interface ExpressionCodeGenerationInformation {
     [Ref] ExpressionCodeGenerationInformation SetStatic();
     [Ref] ExpressionCodeGenerationInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExpressionCodeGenerationInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface InstructionMetadata {
@@ -2540,7 +2548,6 @@ interface SpriteObject {
 };
 SpriteObject implements gdObject;
 
-[Prefix="sf::"]
 interface Vector2f {
     void Vector2f();
 
@@ -2556,6 +2563,7 @@ interface VectorVector2f {
     [Ref] Vector2f at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] Vector2f pt);
     void FREE_removeFromVectorVector2f(unsigned long index);
+    void FREE_moveVector2fInVector(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 
@@ -2789,6 +2797,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
+    [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
 };
 
 [Prefix="gdjs::"]

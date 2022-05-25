@@ -13,7 +13,7 @@ This project is released under the MIT License.
 #include <vector>
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"
-#include "SFML/System/Vector2.hpp"
+#include "GDCore/Vector2.h"
 namespace gd {
 class Project;
 class SerializerElement;
@@ -43,7 +43,7 @@ class GD_EXTENSION_API PhysicsBehavior : public gd::Behavior {
       gd::SerializerElement &behaviorContent) override;
 
  private:
-  gd::String GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec,
+  gd::String GetStringFromCoordsVector(const std::vector<gd::Vector2f> &vec,
                                        char32_t coordsSep,
                                        char32_t composantSep);
   enum ShapeType {

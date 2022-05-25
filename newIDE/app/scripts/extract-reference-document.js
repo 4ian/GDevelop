@@ -123,7 +123,7 @@ const generateExtensionFooterText = ({ extension }) => {
     text:
       `
 ---
-*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [[https://gdevelop-app.com/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
+*This page is an auto-generated reference page about the **${extension.getFullName()}** feature of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
       ' ' +
       'Learn more about [[gdevelop5:all-features|all GDevelop features here]].',
   };

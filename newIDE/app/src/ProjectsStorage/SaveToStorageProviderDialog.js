@@ -13,7 +13,11 @@ type Props = {|
   onClose: () => void,
 |};
 
-export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
+const SaveToStorageProviderDialog = ({
+  onClose,
+  storageProviders,
+  onChooseProvider,
+}: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
@@ -55,3 +59,5 @@ export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
     </I18n>
   );
 };
+
+export default SaveToStorageProviderDialog;

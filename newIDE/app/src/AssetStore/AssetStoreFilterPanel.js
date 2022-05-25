@@ -253,15 +253,18 @@ export const AssetStoreFilterPanel = ({
         }
         setChoiceChecked={(choice, checked) => {
           const animatedFilter = assetFiltersState.animatedFilter;
-          if (choice === 'multiple-frames') {
-            animatedFilter.mustBeAnimated = checked;
-          } else {
-            animatedFilter.mustHaveSeveralState = checked;
-          }
+          const mustBeAnimated =
+            choice === 'multiple-frames'
+              ? checked
+              : animatedFilter.mustBeAnimated;
+          const mustHaveSeveralState =
+            choice === 'multiple-states'
+              ? checked
+              : animatedFilter.mustHaveSeveralState;
           assetFiltersState.setAnimatedFilter(
             new AnimatedAssetStoreSearchFilter(
-              animatedFilter.mustBeAnimated,
-              animatedFilter.mustHaveSeveralState
+              mustBeAnimated,
+              mustHaveSeveralState
             )
           );
           onChoiceChange();

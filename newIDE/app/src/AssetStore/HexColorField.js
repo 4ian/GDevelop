@@ -67,7 +67,7 @@ export const HexColorField = ({
     color ? rgbColorToHex(color.r, color.g, color.b) : ''
   );
 
-  // It conserves the imputed text if the color didn't changed.
+  // It keeps the inputted text if the color has not changed.
   if (areSameColor(color, hexToNullableRGBColor(colorString))) {
     setColorString(color ? rgbColorToHex(color.r, color.g, color.b) : '');
   }

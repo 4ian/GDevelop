@@ -310,7 +310,7 @@ export default class ThemableEventsTree extends Component<
   );
   DropTarget = makeDropTarget<SortableTreeNode>(eventsSheetEventsDnDType);
   temporaryUnfoldedNodes: Array<SortableTreeNode>;
-  _hoverTimerId: ?number;
+  _hoverTimerId: ?TimeoutID;
 
   constructor(props: EventsTreeProps) {
     super(props);
@@ -349,7 +349,7 @@ export default class ThemableEventsTree extends Component<
   }
 
   componentWillUnmount() {
-    this._hoverTimerI && clearTimeout(this._hoverTimerId);
+    this._hoverTimerId && clearTimeout(this._hoverTimerId);
   }
 
   /**
@@ -546,8 +546,6 @@ export default class ThemableEventsTree extends Component<
         targetNode: currentNode,
       });
     }
-    this._restoreFoldedNodes();
-    this.forceEventsUpdate();
     this.props.onEventMoved();
   };
 
@@ -617,6 +615,12 @@ export default class ThemableEventsTree extends Component<
     return this.eventsHeightsCache.getEventHeight(node.event);
   };
 
+  _onEndDrag = () => {
+    this.setState({ draggedNode: null });
+    this._restoreFoldedNodes();
+    this.forceEventsUpdate();
+  };
+
   _renderEvent = ({ node }: { node: SortableTreeNode }) => {
     const { event, depth, disabled } = node;
     if (!event) return null;
@@ -637,7 +641,7 @@ export default class ThemableEventsTree extends Component<
         drop={() => {
           return;
         }}
-        endDrag={() => this.setState({ draggedNode: null })}
+        endDrag={this._onEndDrag}
       >
         {({ connectDragSource, connectDropTarget, isOverLazy }) => {
           this._temporaryUnfoldNode(isOverLazy, node);

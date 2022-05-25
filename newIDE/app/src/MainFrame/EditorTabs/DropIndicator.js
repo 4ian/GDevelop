@@ -6,7 +6,7 @@ const styles = {
   columnDropIndicator: {
     borderRight: '1px solid',
     borderLeft: '1px solid',
-    width: 7,
+    width: 8,
     marginLeft: '-1px',
     height: '100%',
     boxSizing: 'border-box',
@@ -19,8 +19,8 @@ export function ColumnDropIndicator() {
     <div
       style={{
         ...styles.columnDropIndicator,
-        backgroundColor: gdevelopTheme.closableTabs.selectedBackgroundColor,
-        borderColor: gdevelopTheme.closableTabs.backgroundColor,
+        backgroundColor: gdevelopTheme.dropIndicator.canDrop,
+        borderColor: gdevelopTheme.dropIndicator.border,
       }}
     />
   );

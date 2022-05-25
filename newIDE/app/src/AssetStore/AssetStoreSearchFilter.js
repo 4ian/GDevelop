@@ -11,12 +11,6 @@ export class TagAssetStoreSearchFilter extends TagSearchFilter<AssetShortHeader>
   constructor(tags: Set<string> = new Set()) {
     super(tags);
   }
-
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      this.tags.size === 0 || searchItem.tags.some(tag => this.tags.has(tag))
-    );
-  }
 }
 
 export class ObjectTypeAssetStoreSearchFilter
@@ -144,7 +138,7 @@ export class ColorAssetStoreSearchFilter
     const dominantSaturation = dominantHsl[1];
     let score = 0;
     if (targetSaturation === 0) {
-      // Hue is not relevent.
+      // Hue is not relevant.
       const deltaSaturation = dominantSaturation - targetSaturation;
       const deltaLightness = dominantHsl[2] - targetHsl[2];
       score =

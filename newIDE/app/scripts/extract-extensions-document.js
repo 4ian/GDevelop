@@ -40,6 +40,22 @@ const generateExtensionFooterText = fullName => {
 };
 
 /**
+ * @param {{id: string, username: string}[]} authors
+ */
+const generateAuthorNamesWithLinks = authors => {
+  const authorAndLinks = authors
+    .map(author => {
+      if (!author.username) return null;
+
+      return `[${author.username}](https://liluo.io/${author.username})`;
+    })
+    .filter(Boolean)
+    .join(', ');
+
+  return authorAndLinks ? authorAndLinks : '(not specified)';
+};
+
+/**
  * Return the list of all extensions and their associated short headers
  * (useful as containing author public profiles information).
  */
@@ -89,9 +105,9 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
       const folderName = getExtensionFolderName(extension.name);
       const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
       const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
-      const authorUsernames = (extensionShortHeader.authors || [])
-        .map(author => author.username || null)
-        .filter(Boolean);
+      const authorNamesWithLinks = generateAuthorNamesWithLinks(
+        extensionShortHeader.authors || []
+      );
 
       const referencePageContent =
         `# ${extension.fullName}` +
@@ -100,9 +116,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
         '\n' +
         `${extension.shortDescription}\n` +
         '\n' +
-        `**Authors and contributors** to this community extension: ${
-          authorUsernames.length ? authorUsernames.join(', ') : 'not specified'
-        }.\n` +
+        `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
         '\n' +
         '---\n' +
         '\n' +

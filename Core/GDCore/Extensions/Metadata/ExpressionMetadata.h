@@ -256,7 +256,30 @@ class GD_CORE_API ExpressionMetadata {
    */
   ExpressionCodeGenerationInformation& GetCodeExtraInformation() {
     return codeExtraInformation;
-  };
+  }
+
+  /**
+   * \brief Erase any existing include file and add the specified include.
+   */
+  ExpressionMetadata &SetIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.SetIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Add a file to the already existing include files.
+   */
+  ExpressionMetadata &AddIncludeFile(const gd::String &includeFile) {
+    codeExtraInformation.AddIncludeFile(includeFile);
+    return *this;
+  }
+
+  /**
+   * \brief Get the files that must be included to use the instruction.
+   */
+  const std::vector<gd::String>& GetIncludeFiles() const {
+    return codeExtraInformation.GetIncludeFiles();
+  }
 
   ExpressionCodeGenerationInformation codeExtraInformation;
 

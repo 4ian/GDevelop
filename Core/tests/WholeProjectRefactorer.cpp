@@ -120,12 +120,18 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       {
         gd::Instruction condition;
         condition.SetType("MyEventsExtension::MyEventsFunctionExpressionAndCondition");
-        condition.SetParametersCount(2);
+        condition.SetParametersCount(4);
         condition.SetParameter(
             0,
-            gd::Expression(">"));
+            gd::Expression("111"));
         condition.SetParameter(
             1,
+            gd::Expression("222"));
+        condition.SetParameter(
+            2,
+            gd::Expression(">"));
+        condition.SetParameter(
+            3,
             gd::Expression("2"));
         event.GetConditions().Insert(condition);
       }
@@ -139,7 +145,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         action.SetParameter(
             0,
             gd::Expression(
-                "2 + MyEventsExtension::MyEventsFunctionExpressionAndCondition()"));
+                "2 + MyEventsExtension::MyEventsFunctionExpressionAndCondition(111, 222)"));
         event.GetActions().Insert(action);
       }
       externalEvents.GetEvents().InsertEvent(event);
@@ -708,6 +714,18 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvent(0)) ==
             "1 + MyRenamedExtension::MyEventsFunctionExpression(123, 456)");
 
+    // Check that events function calls from an ExpressionAndCondition have
+    // been renamed.
+    REQUIRE(GetEventFirstConditionType(project.GetExternalEvents("ExternalEventsWithFreeFunctions")
+                                        .GetEvents()
+                                        .GetEvent(1)) ==
+            "MyRenamedExtension::MyEventsFunctionExpressionAndCondition");
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithFreeFunctions")
+                    .GetEvents()
+                    .GetEvent(1)) ==
+            "2 + MyRenamedExtension::MyEventsFunctionExpressionAndCondition(111, 222)");
+
     // Check that the type of the behavior was changed in the behaviors of
     // objects. Name is *not* changed.
     REQUIRE(project.GetLayout("LayoutWithBehaviorFunctions")
@@ -807,7 +825,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 project.GetExternalEvents("ExternalEventsWithFreeFunctions")
                     .GetEvents()
                     .GetEvent(1)) ==
-            "2 + MyEventsExtension::MyRenamedFunctionExpressionAndCondition()");
+            "2 + MyEventsExtension::MyRenamedFunctionExpressionAndCondition(111, 222)");
     
     // Check that events function calls in instructions have been renamed
     REQUIRE(GetEventFirstConditionType(project.GetExternalEvents("ExternalEventsWithFreeFunctions")
@@ -815,7 +833,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                                         .GetEvent(1)) ==
             "MyEventsExtension::MyRenamedFunctionExpressionAndCondition");
   }
-  SECTION("(Free) events function parameter moved") {
+  SECTION("(Free) events action parameter moved") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -823,8 +841,6 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
 
     gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
         project, eventsExtension, "MyEventsFunction", 0, 2);
-    gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
-        project, eventsExtension, "MyEventsFunctionExpression", 0, 1);
 
     // Check that events function calls in instructions have been updated
     auto &action = static_cast<gd::StandardEvent &>(
@@ -836,6 +852,15 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     REQUIRE(action.GetParameter(0).GetPlainString() == "Second parameter");
     REQUIRE(action.GetParameter(1).GetPlainString() == "Third parameter");
     REQUIRE(action.GetParameter(2).GetPlainString() == "First parameter");
+  }
+  SECTION("(Free) events expression parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
+        project, eventsExtension, "MyEventsFunctionExpression", 0, 1);
 
     // Check that events function calls in expressions have been updated
     REQUIRE(GetEventFirstActionFirstParameterString(
@@ -843,6 +868,34 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvents()
                     .GetEvent(0)) ==
             "1 + MyEventsExtension::MyEventsFunctionExpression(456, 123)");
+  }
+  SECTION("(Free) events expression and condition parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+
+    gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
+        project, eventsExtension, "MyEventsFunctionExpressionAndCondition", 0, 1);
+
+    // Check that events function calls in expressions have been updated
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithFreeFunctions")
+                    .GetEvents()
+                    .GetEvent(1)) ==
+            "2 + MyEventsExtension::MyEventsFunctionExpressionAndCondition(222, 111)");
+    
+    // Check that events function calls in instructions have been updated
+    auto &condition = static_cast<gd::StandardEvent &>(
+                       project.GetExternalEvents("ExternalEventsWithFreeFunctions")
+                           .GetEvents()
+                           .GetEvent(1))
+                       .GetConditions()
+                       .Get(0);
+    REQUIRE(condition.GetParameter(0).GetPlainString() == "222");
+    REQUIRE(condition.GetParameter(1).GetPlainString() == "111");
+    REQUIRE(condition.GetParameter(2).GetPlainString() == ">");
+    REQUIRE(condition.GetParameter(3).GetPlainString() == "2");
   }
   SECTION("Events based Behavior renamed (instructions update)") {
     gd::Project project;

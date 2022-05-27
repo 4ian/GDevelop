@@ -289,6 +289,10 @@ export function AutoScroll({
         clearTimeout(delayActivationTimer.current);
         delayActivationTimer.current = null;
       }
+      return () => {
+        delayActivationTimer.current &&
+          clearTimeout(delayActivationTimer.current);
+      };
     },
     [activateTargets]
   );
@@ -312,7 +316,7 @@ export function AutoScroll({
 
               // Uncomment for debugging purposes.
               // backgroundColor: 'black',
-              // opacity: isOver ? 1 : 0,
+              // opacity: isOverLazy ? 1 : 0,
             }}
           />
         );

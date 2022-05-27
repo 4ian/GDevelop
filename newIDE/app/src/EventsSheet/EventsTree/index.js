@@ -280,13 +280,13 @@ export type SortableTreeNode = {
   fixedHeight?: ?number,
 };
 
-type State = {
+type State = {|
   treeData: Array<any>,
   flatData: Array<gdBaseEvent>,
   draggedNode: ?SortableTreeNode,
   isScrolledTop: boolean,
   isScrolledBottom: boolean,
-};
+|};
 
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event

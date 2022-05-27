@@ -21,10 +21,11 @@ export class ObjectTypeAssetStoreSearchFilter
     this.objectTypes = objectTypes;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      this.objectTypes.size === 0 || this.objectTypes.has(searchItem.objectType)
-    );
+  getPertinence(searchItem: AssetShortHeader): number {
+    return this.objectTypes.size === 0 ||
+      this.objectTypes.has(searchItem.objectType)
+      ? 1
+      : 0;
   }
 }
 
@@ -43,13 +44,13 @@ export class LicenseAssetStoreSearchFilter
     this.attributionFreeOnly = attributionFreeOnly;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      !this.attributionFreeOnly ||
+  getPertinence(searchItem: AssetShortHeader): number {
+    return !this.attributionFreeOnly ||
       LicenseAssetStoreSearchFilter.noAttributionLicenses.includes(
         searchItem.license
       )
-    );
+      ? 1
+      : 0;
   }
 }
 
@@ -66,13 +67,13 @@ export class AnimatedAssetStoreSearchFilter
     this.mustHaveSeveralState = mustHaveSeveralState;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+  getPertinence(searchItem: AssetShortHeader): number {
     const hasAnimatedState = searchItem.maxFramesCount > 1;
     const hasSeveralState = searchItem.animationsCount > 1;
-    return (
-      (!this.mustBeAnimated || hasAnimatedState) &&
+    return (!this.mustBeAnimated || hasAnimatedState) &&
       (!this.mustHaveSeveralState || hasSeveralState)
-    );
+      ? 1
+      : 0;
   }
 }
 
@@ -92,17 +93,17 @@ export class DimensionAssetStoreSearchFilter
     this.dimensionMax = dimensionMax;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
-        this.dimensionMin <= searchItem.width) &&
-        (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
-          searchItem.width <= this.dimensionMax)) ||
+  getPertinence(searchItem: AssetShortHeader): number {
+    return ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
+      this.dimensionMin <= searchItem.width) &&
+      (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
+        searchItem.width <= this.dimensionMax)) ||
       ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
         this.dimensionMin <= searchItem.height) &&
         (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
           searchItem.height <= this.dimensionMax))
-    );
+      ? 1
+      : 0;
   }
 }
 
@@ -124,7 +125,7 @@ export class ColorAssetStoreSearchFilter
     this.color = color;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+  getPertinence(searchItem: AssetShortHeader): boolean {
     if (!this.color) {
       return true;
     }
@@ -162,6 +163,6 @@ export class ColorAssetStoreSearchFilter
           deltaLightness * deltaLightness) /
           6;
     }
-    return score > 0.94;
+    return score;
   }
 }

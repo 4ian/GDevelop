@@ -5,7 +5,7 @@ import shuffle from 'lodash/shuffle';
 import SearchApi from 'js-worker-search';
 
 export interface SearchFilter<SearchItem> {
-  isSatisfiedBy(searchItem: SearchItem): boolean;
+  getPertinence(searchItem: SearchItem): number;
 }
 
 export class TagSearchFilter<SearchItem: { tags: Array<string> }>
@@ -16,12 +16,57 @@ export class TagSearchFilter<SearchItem: { tags: Array<string> }>
     this.tags = tags;
   }
 
-  isSatisfiedBy(searchItem: SearchItem): boolean {
+  getPertinence(searchItem: SearchItem): number {
     return (
       this.tags.size === 0 || searchItem.tags.some(tag => this.tags.has(tag))
     );
   }
 }
+
+const partialQuickSort = <Element: any>(
+  searchItems: Array<Element>,
+  getValue: (a: Element) => number,
+  pertinenceMax: number
+): void => {
+  let indexMax = searchItems.length - 1;
+  for (
+    let pivotComplement = 0.5;
+    pivotComplement > 1 / 128 && indexMax > 0;
+    pivotComplement /= 2
+  ) {
+    let pivot = pertinenceMax * (1 - pivotComplement);
+    let slidingIndexMin = 0 - 1;
+    let slidingIndexMax = indexMax + 1;
+    while (true) {
+      do {
+        slidingIndexMin++;
+      } while (
+        slidingIndexMin < indexMax &&
+        getValue(searchItems[slidingIndexMin]) > pivot
+      );
+      if (slidingIndexMin === indexMax) {
+        return;
+      }
+      do {
+        slidingIndexMax--;
+      } while (
+        slidingIndexMax > 0 &&
+        getValue(searchItems[slidingIndexMax]) < pivot
+      );
+      if (slidingIndexMax === 0) {
+        return;
+      }
+
+      if (slidingIndexMin >= slidingIndexMax) {
+        indexMax = slidingIndexMax;
+        break;
+      }
+      const swap = searchItems[slidingIndexMin];
+      searchItems[slidingIndexMin] = searchItems[slidingIndexMax];
+      searchItems[slidingIndexMax] = swap;
+    }
+  }
+};
 
 /**
  * Filter a list of items according to the chosen category
@@ -62,20 +107,42 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
     })
     .filter(searchItem => {
       return (
-        (chosenFilters.size === 0 ||
-          searchItem.tags.some(tag => chosenFilters.has(tag))) &&
-        (!searchFilters ||
-          searchFilters.every(searchFilter =>
-            searchFilter.isSatisfiedBy(searchItem)
-          ))
+        chosenFilters.size === 0 ||
+        searchItem.tags.some(tag => chosenFilters.has(tag))
       );
     });
+
+  let sortedSearchItems = filteredSearchItems;
+  if (searchFilters) {
+    let pertinenceMax = 0;
+    const weightedSearchItems = filteredSearchItems
+      .map(searchItem => {
+        let pertinence = 1;
+        for (const searchFilter of searchFilters) {
+          pertinence *= searchFilter.getPertinence(searchItem);
+          if (pertinence === 0) {
+            return null;
+          }
+        }
+        pertinenceMax = Math.max(pertinenceMax, pertinence);
+        return { pertinence: pertinence, searchItem: searchItem };
+      })
+      .filter(Boolean);
+    partialQuickSort(
+      weightedSearchItems,
+      weightedSearchItem => weightedSearchItem.pertinence,
+      pertinenceMax
+    );
+    sortedSearchItems = weightedSearchItems.map(
+      weightedSearchItem => weightedSearchItem.searchItem
+    );
+  }
 
   const totalTime = performance.now() - startTime;
   console.info(
     `Filtered items by category/filters in ${totalTime.toFixed(3)}ms.`
   );
-  return filteredSearchItems;
+  return sortedSearchItems;
 };
 
 /**

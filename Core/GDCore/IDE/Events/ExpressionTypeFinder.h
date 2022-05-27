@@ -71,7 +71,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
         rootType(rootType_),
-        type("unknown"),
+        type(ExpressionTypeFinder::unknownType),
         child(nullptr) {};
 
   const gd::String &GetType() {
@@ -88,10 +88,10 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     VisitParent(node);
   }
   void OnVisitNumberNode(NumberNode& node) override {
-    type = "number";
+    type = ExpressionTypeFinder::numberType;
   }
   void OnVisitTextNode(TextNode& node) override {
-    type = "string";
+    type = ExpressionTypeFinder::stringType;
   }
   void OnVisitVariableNode(VariableNode& node) override {
     VisitParent(node);
@@ -111,18 +111,19 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
     if (child == nullptr) {
-      type = "unknown";
+      type = ExpressionTypeFinder::unknownType;
     }
     auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
         platform, 
         globalObjectsContainer,
         objectsContainer,
         node);
-    if (leftSideType == "number" || leftSideType == "string") {
+    if (leftSideType == ExpressionTypeFinder::numberType
+     || leftSideType == ExpressionTypeFinder::stringType) {
       type = leftSideType;
     }
     else {
-      type = "number|string";
+      type = ExpressionTypeFinder::numberOrStringType;
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
@@ -145,7 +146,7 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
               node,
               *child);
       if (parameterMetadata == nullptr || parameterMetadata->GetType().empty()) {
-        type = "unknown";
+        type = ExpressionTypeFinder::unknownType;
       }
       else {
         type = parameterMetadata->GetType();
@@ -159,13 +160,14 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
     if (node.parent != nullptr) {
       node.parent->Visit(*this);
     }
-    else if (rootType == "number|string") {
+    else if (rootType == ExpressionTypeFinder::numberOrStringType) {
       auto leftSideType = gd::ExpressionLeftSideTypeFinder::GetType(
           platform, 
           globalObjectsContainer,
           objectsContainer,
           node);
-      if (leftSideType == "number" || leftSideType == "string") {
+      if (leftSideType == ExpressionTypeFinder::numberType
+       || leftSideType == ExpressionTypeFinder::stringType) {
         type = leftSideType;
       }
       else {
@@ -176,6 +178,11 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
       type = rootType;
     }
   }
+
+  static const gd::String unknownType;
+  static const gd::String numberType;
+  static const gd::String stringType;
+  static const gd::String numberOrStringType;
 
   gd::String type;
   ExpressionNode *child;

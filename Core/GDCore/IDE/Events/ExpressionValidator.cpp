@@ -206,7 +206,8 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
       parentType = currentParentType;
       
       const gd::String &expectedParameterType = parameterMetadata.GetType();
-      if (gd::ParameterMetadata::IsExpression("variable", expectedParameterType)) {
+      if (gd::ParameterMetadata::IsExpression(
+          ExpressionValidator::variableTypeString, expectedParameterType)) {
         if (dynamic_cast<IdentifierNode *>(parameter.get()) == nullptr
          && dynamic_cast<VariableNode *>(parameter.get()) == nullptr) {
           RaiseError(
@@ -228,8 +229,10 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
         }
       }
       // String and number are already checked in children.
-      else if (!gd::ParameterMetadata::IsExpression("number", expectedParameterType)
-            && !gd::ParameterMetadata::IsExpression("string", expectedParameterType)) {
+      else if (!gd::ParameterMetadata::IsExpression(
+               ExpressionValidator::numberTypeString, expectedParameterType)
+            && !gd::ParameterMetadata::IsExpression(
+              ExpressionValidator::stringTypeString, expectedParameterType)) {
         RaiseError(
                 "unknown_parameter_type",
                 _("This function is improperly set up. Reach out to the "
@@ -273,19 +276,23 @@ ExpressionValidator::Type ExpressionValidator::ValidateFunction(const gd::Functi
   }
 
   ExpressionValidator::Type ExpressionValidator::StringToType(const gd::String &type) {
-    if (type == "number" || gd::ParameterMetadata::IsExpression("number", type)) {
+    if (type == ExpressionValidator::numberTypeString
+     || gd::ParameterMetadata::IsExpression(ExpressionValidator::numberTypeString, type)) {
       return Type::Number;
     }
-    if (type == "string" || gd::ParameterMetadata::IsExpression("string", type)) {
+    if (type == ExpressionValidator::stringTypeString
+     || gd::ParameterMetadata::IsExpression(ExpressionValidator::stringTypeString, type)) {
       return Type::String;
     }
-    if (type == "number|string") {
+    if (type == ExpressionValidator::numberOrStringTypeString) {
       return Type::NumberOrString;
     }
-    if (type == "variable" || gd::ParameterMetadata::IsExpression("variable", type)) {
+    if (type == ExpressionValidator::variableTypeString
+     || gd::ParameterMetadata::IsExpression(ExpressionValidator::variableTypeString, type)) {
       return Type::Variable;
     }
-    if (type == "object" || gd::ParameterMetadata::IsObject(type)) {
+    if (type == ExpressionValidator::objectTypeString
+     || gd::ParameterMetadata::IsObject(type)) {
       return Type::Object;
     }
     return Type::Unknown;

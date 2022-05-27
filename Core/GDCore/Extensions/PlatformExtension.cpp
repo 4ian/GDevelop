@@ -346,6 +346,11 @@ gd::BehaviorMetadata& PlatformExtension::GetBehaviorMetadata(
   return badBehaviorMetadata;
 }
 
+bool PlatformExtension::HasBehavior(
+    const gd::String& behaviorType) const {
+  return behaviorsInfo.find(behaviorType) != behaviorsInfo.end();
+}
+
 gd::EffectMetadata& PlatformExtension::GetEffectMetadata(
     const gd::String& effectName) {
   if (effectsMetadata.find(effectName) != effectsMetadata.end())

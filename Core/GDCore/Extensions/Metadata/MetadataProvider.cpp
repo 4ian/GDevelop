@@ -352,28 +352,30 @@ const gd::ExpressionMetadata& MetadataProvider::GetAnyExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetExpressionMetadata(platform, exprType);
+  if (&numberExpressionMetadata != &badExpressionMetadata) {
+    return numberExpressionMetadata;
+  }
   const auto& stringExpressionMetadata =
       GetStrExpressionMetadata(platform, exprType);
-
-  return &numberExpressionMetadata != &badExpressionMetadata
-             ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+  if (&stringExpressionMetadata != &badExpressionMetadata) {
+    return stringExpressionMetadata;
+  }
+  return badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectAnyExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetObjectExpressionMetadata(platform, objectType, exprType);
+  if (&numberExpressionMetadata != &badExpressionMetadata) {
+    return numberExpressionMetadata;
+  }
   const auto& stringExpressionMetadata =
       GetObjectStrExpressionMetadata(platform, objectType, exprType);
-
-  return &numberExpressionMetadata != &badExpressionMetadata
-             ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+  if (&stringExpressionMetadata != &badExpressionMetadata) {
+    return stringExpressionMetadata;
+  }
+  return badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata&
@@ -382,14 +384,15 @@ MetadataProvider::GetBehaviorAnyExpressionMetadata(const gd::Platform& platform,
                                                    gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetBehaviorExpressionMetadata(platform, autoType, exprType);
+  if (&numberExpressionMetadata != &badExpressionMetadata) {
+    return numberExpressionMetadata;
+  }
   const auto& stringExpressionMetadata =
       GetBehaviorStrExpressionMetadata(platform, autoType, exprType);
-
-  return &numberExpressionMetadata != &badExpressionMetadata
-             ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+  if (&stringExpressionMetadata != &badExpressionMetadata) {
+    return stringExpressionMetadata;
+  }
+  return badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
@@ -397,20 +400,19 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
     const gd::ObjectsContainer &globalObjectsContainer,
     const gd::ObjectsContainer &objectsContainer,
     FunctionCallNode& node) {
-  
-  gd::String objectType = node.objectName.empty() ? gd::String() :
-      GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
-      
-  gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
-      GetTypeOfBehavior(globalObjectsContainer, objectsContainer, node.behaviorName);
-
-  return node.behaviorName.empty() ?
-      node.objectName.empty() ?
-          MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName) :
-          MetadataProvider::GetObjectAnyExpressionMetadata(
-              platform, objectType, node.functionName) : 
-      MetadataProvider::GetBehaviorAnyExpressionMetadata(
+  if (!node.objectName.empty()) {
+    gd::String objectType = node.objectName.empty() ? gd::String() :
+        GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
+    return MetadataProvider::GetObjectAnyExpressionMetadata(
+                  platform, objectType, node.functionName);
+  }
+  else if (!node.behaviorName.empty()) {
+    gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
+        GetTypeOfBehavior(globalObjectsContainer, objectsContainer, node.behaviorName);
+    return MetadataProvider::GetBehaviorAnyExpressionMetadata(
             platform, behaviorType, node.functionName);
+  }
+  return MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
 }
 
   const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(

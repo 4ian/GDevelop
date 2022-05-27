@@ -7,7 +7,9 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PolygonsList from './PolygonsList';
 import CollisionMasksPreview from './CollisionMasksPreview';
-import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSameCollisionMasksAs,
@@ -194,6 +196,7 @@ const CollisionMasksEditor = (props: Props) => {
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!props.object.getAnimationsCount()) return null;
+  const resourceName = hasValidSprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -202,8 +205,16 @@ const CollisionMasksEditor = (props: Props) => {
       renderEditor: () => (
         <Background>
           <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={props.resourcesLoader}
+            resourceName={resourceName}
+            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
+              props.project,
+              resourceName,
+              {}
+            )}
+            isImageResourceSmooth={isProjectImageResourceSmooth(
+              props.project,
+              resourceName
+            )}
             project={props.project}
             onSize={setCurrentSpriteSize}
             renderOverlay={overlayProps =>

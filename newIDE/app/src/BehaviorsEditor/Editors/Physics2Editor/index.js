@@ -8,7 +8,9 @@ import Checkbox from '../../../UI/Checkbox';
 import SelectField from '../../../UI/SelectField';
 import SelectOption from '../../../UI/SelectOption';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
 import ShapePreview from './ShapePreview';
@@ -358,10 +360,14 @@ const Physics2Editor = (props: Props) => {
             <ImagePreview
               resourceName={image}
               project={props.project}
-              imageSource={resourcesLoader.getResourceFullUrl(
+              imageResourceSource={resourcesLoader.getResourceFullUrl(
                 props.project,
                 image,
                 {}
+              )}
+              isImageResourceSmooth={isProjectImageResourceSmooth(
+                props.project,
+                image
               )}
               fixedHeight={200}
               renderOverlay={overlayProps => {

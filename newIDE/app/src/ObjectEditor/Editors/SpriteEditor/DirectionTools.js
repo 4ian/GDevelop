@@ -13,6 +13,7 @@ import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 
 const styles = {
   container: {
@@ -170,8 +171,11 @@ export default class DirectionTools extends Component<Props, State> {
           >
             <AnimationPreview
               resourceNames={direction.getSpriteNames().toJSArray()}
-              getImageSource={(name: string) =>
+              getImageResourceSource={(name: string) =>
                 resourcesLoader.getResourceFullUrl(project, name, {})
+              }
+              isImageResourceSmooth={(name: string) =>
+                isProjectImageResourceSmooth(project, name)
               }
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}

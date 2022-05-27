@@ -10,6 +10,7 @@ import {
   type Asset,
   type Author,
   getAsset,
+  isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -30,6 +31,8 @@ import ThemeContext from '../UI/Theme/ThemeContext';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView from '../UI/ScrollView';
 
+const FIXED_HEIGHT = 250;
+
 const styles = {
   previewBackground: {
     position: 'relative',
@@ -38,7 +41,7 @@ const styles = {
     alignItems: 'center',
     padding: 10,
     width: 300,
-    maxHeight: 250,
+    maxHeight: FIXED_HEIGHT,
   },
   chip: {
     marginBottom: 2,
@@ -143,6 +146,11 @@ export const AssetDetails = ({
         }
       })();
     },
+    [assetShortHeader]
+  );
+
+  const isImageResourceSmooth = React.useMemo(
+    () => !isPixelArt(assetShortHeader),
     [assetShortHeader]
   );
 
@@ -291,18 +299,19 @@ export const AssetDetails = ({
                         resourceNames={animationResources.map(
                           ({ name }) => name
                         )}
-                        getImageSource={(resourceName: string) => {
+                        getImageResourceSource={(resourceName: string) => {
                           return animationResources.find(
                             ({ name }) => name === resourceName
                           ).file;
                         }}
+                        isImageResourceSmooth={() => isImageResourceSmooth}
                         project={project}
                         timeBetweenFrames={direction.timeBetweenFrames}
                         isLooping // Always loop in the asset store.
                         hideCheckeredBackground
                         hideControls
                         initialZoom={140 / Math.max(asset.width, asset.height)}
-                        fixedHeight={250}
+                        fixedHeight={FIXED_HEIGHT}
                       />
                     )}
                   {(asset.objectType === 'tiled' ||

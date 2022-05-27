@@ -6,7 +6,9 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
 import PointsPreview from './PointsPreview';
-import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSamePointsAs,
@@ -181,10 +183,14 @@ const PointsEditor = (props: Props) => {
         <Background>
           <ImagePreview
             resourceName={resourceName}
-            imageSource={props.resourcesLoader.getResourceFullUrl(
+            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
               props.project,
               resourceName,
               {}
+            )}
+            isImageResourceSmooth={isProjectImageResourceSmooth(
+              props.project,
+              resourceName
             )}
             project={props.project}
             renderOverlay={overlayProps =>

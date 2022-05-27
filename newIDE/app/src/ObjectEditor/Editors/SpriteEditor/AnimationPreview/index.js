@@ -25,7 +25,8 @@ const styles = {
 
 type Props = {|
   resourceNames: string[],
-  getImageSource: (resourceName: string) => string,
+  getImageResourceSource: (resourceName: string) => string,
+  isImageResourceSmooth: (resourceName: string) => boolean,
   project: gdProject,
   timeBetweenFrames: number,
   onChangeTimeBetweenFrames?: number => void,
@@ -38,7 +39,8 @@ type Props = {|
 
 const AnimationPreview = ({
   resourceNames,
-  getImageSource,
+  getImageResourceSource,
+  isImageResourceSmooth,
   project,
   timeBetweenFrames,
   onChangeTimeBetweenFrames,
@@ -161,7 +163,8 @@ const AnimationPreview = ({
     <Column expand noOverflowParent>
       <ImagePreview
         resourceName={resourceName}
-        imageSource={getImageSource(resourceName)}
+        imageResourceSource={getImageResourceSource(resourceName)}
+        isImageResourceSmooth={isImageResourceSmooth(resourceName)}
         initialZoom={initialZoom}
         project={project}
         hideCheckeredBackground={hideCheckeredBackground}

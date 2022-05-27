@@ -64,8 +64,8 @@ const styles = {
 type Props = {|
   project: gdProject,
   resourceName: string,
-  resourcePath?: string,
-  imageSource: string,
+  imageResourceSource: string,
+  isImageResourceSmooth: boolean,
   initialZoom?: number,
   fixedHeight?: number,
   renderOverlay?: ({|
@@ -80,7 +80,7 @@ type Props = {|
   hideControls?: boolean,
 |};
 
-const resourceIsSmooth = (
+export const isProjectImageResourceSmooth = (
   project: gdProject,
   resourceName: string
 ): boolean => {
@@ -97,8 +97,8 @@ const resourceIsSmooth = (
 const ImagePreview = ({
   project,
   resourceName,
-  resourcePath,
-  imageSource,
+  imageResourceSource,
+  isImageResourceSmooth,
   fixedHeight,
   renderOverlay,
   onSize,
@@ -197,7 +197,7 @@ const ImagePreview = ({
           width: imageWidth ? imageWidth * imageZoomFactor : undefined,
           height: imageHeight ? imageHeight * imageZoomFactor : undefined,
           visibility: imageLoaded ? undefined : 'hidden', // TODO: Loader
-          ...(!resourceIsSmooth(project, resourceName)
+          ...(!isImageResourceSmooth
             ? styles.previewImagePixelated
             : undefined),
         };
@@ -292,7 +292,7 @@ const ImagePreview = ({
                   <CorsAwareImage
                     style={imageStyle}
                     alt={resourceName}
-                    src={imageSource}
+                    src={imageResourceSource}
                     onError={handleImageError}
                     onLoad={handleImageLoaded}
                   />

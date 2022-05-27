@@ -23,9 +23,10 @@ import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
 import Link from '@material-ui/core/Link';
 import Window from '../Utils/Window';
-import { makeStyles, Paper } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import IconButton from '../UI/IconButton';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ThemeContext from '../UI/Theme/ThemeContext';
@@ -47,7 +48,6 @@ const styles = {
   chip: {
     marginBottom: 2,
     marginRight: 2,
-    cursor: 'pointer',
   },
   previewImage: {
     position: 'relative',
@@ -58,33 +58,12 @@ const styles = {
   },
   arrowContainer: {
     padding: 6,
-    cursor: 'pointer',
+  },
+  // The left arrow SVG icon from Material-UI is not centered.
+  leftArrowSvg: {
+    transform: 'translateX(5px)',
   },
 };
-
-// Override the default style of the chip to make it look like a button.
-const useChipStyles = makeStyles({
-  label: {
-    cursor: 'pointer',
-  },
-});
-
-const useStylesForLeftArrow = makeStyles({
-  root: {
-    cursor: 'pointer',
-    '& > path': {
-      transform: 'translate(5px, 0px)', // Translate path inside SVG since MUI icon is not centered
-      cursor: 'pointer',
-    },
-  },
-});
-
-const useStylesForRightArrow = makeStyles({
-  root: {
-    cursor: 'pointer',
-    '& > path': { cursor: 'pointer' },
-  },
-});
 
 const makeFirstLetterUppercase = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
@@ -104,15 +83,17 @@ type Props = {|
   isBeingInstalled: boolean,
 |};
 
-const getObjectAssetResourcesByName = (objectAsset: ObjectAsset): {[string]: any /*(serialized gdResource)*/} => {
+const getObjectAssetResourcesByName = (
+  objectAsset: ObjectAsset
+): { [string]: any /*(serialized gdResource)*/ } => {
   const resourcesByName = {};
 
   objectAsset.resources.forEach(resource => {
     resourcesByName[resource.name] = resource;
-  })
+  });
 
   return resourcesByName;
-}
+};
 
 export const AssetDetails = ({
   project,
@@ -127,9 +108,6 @@ export const AssetDetails = ({
   canInstall,
   isBeingInstalled,
 }: Props) => {
-  const chipStyles = useChipStyles();
-  const leftArrowStyles = useStylesForLeftArrow();
-  const rightArrowStyles = useStylesForRightArrow();
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
@@ -196,7 +174,10 @@ export const AssetDetails = ({
       : null;
 
   // For sprite animations.
-  const assetResources = asset && asset.objectAssets[0] ? getObjectAssetResourcesByName(asset.objectAssets[0]) : {};
+  const assetResources =
+    asset && asset.objectAssets[0]
+      ? getObjectAssetResourcesByName(asset.objectAssets[0])
+      : {};
   const assetAnimations = asset
     ? asset.objectAssets[0].object.animations
     : null;
@@ -206,9 +187,7 @@ export const AssetDetails = ({
   const direction = animation ? animation.directions[0] : null;
   const animationResources =
     asset && direction
-      ? direction.sprites.map(sprite =>
-          assetResources[sprite.image]
-        )
+      ? direction.sprites.map(sprite => assetResources[sprite.image])
       : null;
 
   return (
@@ -249,7 +228,6 @@ export const AssetDetails = ({
                     <Chip
                       size="small"
                       style={styles.chip}
-                      classes={chipStyles}
                       label={makeFirstLetterUppercase(tag)}
                       onClick={() => {
                         onTagSelection(tag);
@@ -339,28 +317,32 @@ export const AssetDetails = ({
             {assetAnimations &&
               assetAnimations.length > 1 &&
               typeof selectedAnimationName === 'string' && (
-                <Paper elevation={4} variant="outlined">
+                <Paper
+                  elevation={4}
+                  variant="outlined"
+                  style={{
+                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                  }}
+                >
                   <Line justifyContent="center" alignItems="center" noMargin>
-                    <div
-                      style={{
-                        ...styles.arrowContainer,
-                        backgroundColor:
-                          gdevelopTheme.list.itemsBackgroundColor,
-                      }}
-                      onClick={() => {
-                        const previousAnimationIndex = assetAnimations.findIndex(
-                          ({ name }) => name === selectedAnimationName
-                        );
-                        const newAnimationIndex =
-                          previousAnimationIndex === 0
-                            ? assetAnimations.length - 1
-                            : previousAnimationIndex - 1;
-                        setSelectedAnimationName(
-                          assetAnimations[newAnimationIndex].name
-                        );
-                      }}
-                    >
-                      <ArrowBackIos classes={leftArrowStyles} />
+                    <div style={styles.arrowContainer}>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const previousAnimationIndex = assetAnimations.findIndex(
+                            ({ name }) => name === selectedAnimationName
+                          );
+                          const newAnimationIndex =
+                            previousAnimationIndex === 0
+                              ? assetAnimations.length - 1
+                              : previousAnimationIndex - 1;
+                          setSelectedAnimationName(
+                            assetAnimations[newAnimationIndex].name
+                          );
+                        }}
+                      >
+                        <ArrowBackIos style={styles.leftArrowSvg} />
+                      </IconButton>
                     </div>
 
                     <SelectField
@@ -383,26 +365,25 @@ export const AssetDetails = ({
                         />
                       ))}
                     </SelectField>
-                    <div
-                      style={{
-                        ...styles.arrowContainer,
-                        backgroundColor:
-                          gdevelopTheme.list.itemsBackgroundColor,
-                      }}
-                      onClick={() => {
-                        const previousAnimationIndex = assetAnimations.findIndex(
-                          ({ name }) => name === selectedAnimationName
-                        );
-                        const newAnimationIndex =
-                          previousAnimationIndex === assetAnimations.length - 1
-                            ? 0
-                            : previousAnimationIndex + 1;
-                        setSelectedAnimationName(
-                          assetAnimations[newAnimationIndex].name
-                        );
-                      }}
-                    >
-                      <ArrowForwardIos classes={rightArrowStyles} />
+                    <div style={styles.arrowContainer}>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          const previousAnimationIndex = assetAnimations.findIndex(
+                            ({ name }) => name === selectedAnimationName
+                          );
+                          const newAnimationIndex =
+                            previousAnimationIndex ===
+                            assetAnimations.length - 1
+                              ? 0
+                              : previousAnimationIndex + 1;
+                          setSelectedAnimationName(
+                            assetAnimations[newAnimationIndex].name
+                          );
+                        }}
+                      >
+                        <ArrowForwardIos />
+                      </IconButton>
                     </div>
                   </Line>
                 </Paper>

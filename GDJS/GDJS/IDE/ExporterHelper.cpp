@@ -77,28 +77,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
 
-  gd::Project exportedProject = options.project;
   const gd::Project &immutableProject = options.project;
-
-  if (!options.fullLoadingScreen) {
-    // Most of the time, we skip the logo and minimum duration so that
-    // the preview start as soon as possible.
-    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
-    exportedProject.GetLoadingScreen().SetMinDuration(0);
-  }
-
-  // Export resources (*before* generating events as some resources filenames
-  // may be updated)
-  ExportResources(fs, exportedProject, options.exportPath);
-
-  previousTime = LogTimeSpent("Resource export", previousTime);
-
-  // Compatibility with GD <= 5.0-beta56
-  // Stay compatible with text objects declaring their font as just a filename
-  // without a font resource - by manually adding these resources.
-  AddDeprecatedFontFilesToFontResources(
-      fs, exportedProject.GetResourcesManager(), options.exportPath);
-  // end of compatibility code
 
   // Export engine libraries
   AddLibsInclude(/*pixiRenderers=*/true,
@@ -134,6 +113,28 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
     previousTime = LogTimeSpent("Events code export", previousTime);
   }
+
+  gd::Project exportedProject = options.project;
+
+  if (!options.fullLoadingScreen) {
+    // Most of the time, we skip the logo and minimum duration so that
+    // the preview start as soon as possible.
+    exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
+    exportedProject.GetLoadingScreen().SetMinDuration(0);
+  }
+
+  // Export resources (*before* generating events as some resources filenames
+  // may be updated)
+  ExportResources(fs, exportedProject, options.exportPath);
+
+  previousTime = LogTimeSpent("Resource export", previousTime);
+
+  // Compatibility with GD <= 5.0-beta56
+  // Stay compatible with text objects declaring their font as just a filename
+  // without a font resource - by manually adding these resources.
+  AddDeprecatedFontFilesToFontResources(
+      fs, exportedProject.GetResourcesManager(), options.exportPath);
+  // end of compatibility code
 
   // Strip the project (*after* generating events as the events may use stripped
   // things (objects groups...))

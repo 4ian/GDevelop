@@ -447,6 +447,11 @@ export const fakeAsset1: Asset = {
   ],
 };
 
+export const fakePixelArtAsset1: Asset = {
+  ...fakeAsset1,
+  tags: ['space shooter', 'tag2', 'pixel art'],
+};
+
 export const fakeAssetWithBehaviorCustomizations1: Asset = {
   id: '123',
   name: 'My spaceship',

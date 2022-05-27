@@ -198,8 +198,10 @@ export const listAllLicenses = (): Promise<Array<License>> => {
     .then(response => response.data);
 };
 
-export const isPixelArt = (assetShortHeader: AssetShortHeader) => {
-  return assetShortHeader.tags.some(tag => {
+export const isPixelArt = (
+  assetOrAssetShortHeader: AssetShortHeader | Asset
+): boolean => {
+  return assetOrAssetShortHeader.tags.some(tag => {
     return tag.toLowerCase() === 'pixel art';
   });
 };

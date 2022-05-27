@@ -195,7 +195,7 @@ export const AssetDetails = ({
       <Column expand noMargin>
         <Line justifyContent="space-between" noMargin>
           <Column>
-            <Line alignItems="center" noMargin>
+            <Line alignItems="baseline" noMargin>
               <Text size="title" displayInlineAsSpan>
                 {assetShortHeader.name}
               </Text>
@@ -208,9 +208,10 @@ export const AssetDetails = ({
                       return (
                         <Link
                           key={author.name}
-                          component="button"
-                          onClick={() => {
+                          href={author.website}
+                          onClick={event => {
                             Window.openExternalURL(author.website);
+                            event.preventDefault();
                           }}
                         >
                           {author.name}
@@ -398,9 +399,10 @@ export const AssetDetails = ({
                       Type of License:{' '}
                       {
                         <Link
-                          component="button"
-                          onClick={() => {
+                          href={assetLicense.website}
+                          onClick={event => {
                             Window.openExternalURL(assetLicense.website);
+                            event.preventDefault();
                           }}
                         >
                           {assetLicense.name}

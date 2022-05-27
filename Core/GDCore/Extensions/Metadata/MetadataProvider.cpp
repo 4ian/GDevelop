@@ -32,12 +32,9 @@ ExtensionAndMetadata<BehaviorMetadata>
 MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
                                                   gd::String behaviorType) {
   for (auto& extension : platform.GetAllPlatformExtensions()) {
-    auto behaviorTypes = extension->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < behaviorTypes.size(); ++j) {
-      if (behaviorTypes[j] == behaviorType)
-        return ExtensionAndMetadata<BehaviorMetadata>(
-            *extension, extension->GetBehaviorMetadata(behaviorType));
-    }
+    if (extension->HasBehavior(behaviorType))
+      return ExtensionAndMetadata<BehaviorMetadata>(
+          *extension, extension->GetBehaviorMetadata(behaviorType));
   }
 
   return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorMetadata);
@@ -204,8 +201,7 @@ MetadataProvider::GetExtensionAndBehaviorExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
   auto& extensions = platform.GetAllPlatformExtensions();
   for (auto& extension : extensions) {
-    const auto& autos = extension->GetBehaviorsTypes();
-    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+    if (extension->HasBehavior(autoType)) {
       const auto& allAutoExpressions =
           extension->GetAllExpressionsForBehavior(autoType);
       if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
@@ -294,8 +290,7 @@ MetadataProvider::GetExtensionAndBehaviorStrExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
   auto& extensions = platform.GetAllPlatformExtensions();
   for (auto& extension : extensions) {
-    const auto& autos = extension->GetBehaviorsTypes();
-    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+    if (extension->HasBehavior(autoType)) {
       const auto& allBehaviorStrExpressions =
           extension->GetAllStrExpressionsForBehavior(autoType);
       if (allBehaviorStrExpressions.find(exprType) !=
@@ -400,18 +395,20 @@ const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
     const gd::ObjectsContainer &globalObjectsContainer,
     const gd::ObjectsContainer &objectsContainer,
     FunctionCallNode& node) {
-  if (!node.objectName.empty()) {
-    gd::String objectType = node.objectName.empty() ? gd::String() :
-        GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
-    return MetadataProvider::GetObjectAnyExpressionMetadata(
-                  platform, objectType, node.functionName);
-  }
-  else if (!node.behaviorName.empty()) {
-    gd::String behaviorType = node.behaviorName.empty() ? gd::String() :
+
+  if (!node.behaviorName.empty()) {
+    gd::String behaviorType = 
         GetTypeOfBehavior(globalObjectsContainer, objectsContainer, node.behaviorName);
     return MetadataProvider::GetBehaviorAnyExpressionMetadata(
             platform, behaviorType, node.functionName);
   }
+  else if (!node.objectName.empty()) {
+    gd::String objectType = 
+        GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
+    return MetadataProvider::GetObjectAnyExpressionMetadata(
+                  platform, objectType, node.functionName);
+  }
+
   return MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
 }
 

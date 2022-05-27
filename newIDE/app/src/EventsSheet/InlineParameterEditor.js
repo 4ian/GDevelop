@@ -123,7 +123,7 @@ export default class InlineParameterEditor extends React.Component<
         instruction,
         instructionMetadata,
         objectParameterIndex !== -1
-          ? instruction.getParameter(objectParameterIndex)
+          ? instruction.getParameter(objectParameterIndex).getPlainString()
           : null
       );
     }
@@ -150,7 +150,9 @@ export default class InlineParameterEditor extends React.Component<
           instructionMetadata={this.state.instructionMetadata}
           parameterMetadata={this.state.parameterMetadata}
           parameterIndex={this.props.parameterIndex}
-          value={instruction.getParameter(this.props.parameterIndex)}
+          value={instruction
+            .getParameter(this.props.parameterIndex)
+            .getPlainString()}
           onChange={this.props.onChange}
           onRequestClose={this.props.onRequestClose}
           onApply={this._onApply}

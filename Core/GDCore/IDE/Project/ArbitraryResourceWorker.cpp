@@ -126,9 +126,10 @@ class ResourceWorkerInEventsWorker : public ArbitraryEventsWorker {
         instruction.GetParameters(),
         metadata.GetParameters(),
         [this, &instruction](const gd::ParameterMetadata& parameterMetadata,
-                             const gd::String& parameterValue,
+                             const gd::Expression& parameterExpression,
                              size_t parameterIndex,
                              const gd::String& lastObjectName) {
+          const String& parameterValue = parameterExpression.GetPlainString();
           if (parameterMetadata.GetType() ==
               "police") {  // Should be renamed fontResource
             gd::String updatedParameterValue = parameterValue;

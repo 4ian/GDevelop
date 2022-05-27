@@ -9,6 +9,7 @@ import {
   type AssetShortHeader,
   type Asset,
   type Author,
+  type ObjectAsset,
   getAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
@@ -103,6 +104,16 @@ type Props = {|
   isBeingInstalled: boolean,
 |};
 
+const getObjectAssetResourcesByName = (objectAsset: ObjectAsset): {[string]: any /*(serialized gdResource)*/} => {
+  const resourcesByName = {};
+
+  objectAsset.resources.forEach(resource => {
+    resourcesByName[resource.name] = resource;
+  })
+
+  return resourcesByName;
+}
+
 export const AssetDetails = ({
   project,
   layout,
@@ -185,6 +196,7 @@ export const AssetDetails = ({
       : null;
 
   // For sprite animations.
+  const assetResources = asset && asset.objectAssets[0] ? getObjectAssetResourcesByName(asset.objectAssets[0]) : {};
   const assetAnimations = asset
     ? asset.objectAssets[0].object.animations
     : null;
@@ -195,9 +207,7 @@ export const AssetDetails = ({
   const animationResources =
     asset && direction
       ? direction.sprites.map(sprite =>
-          asset.objectAssets[0].resources.find(
-            ({ name }) => name === sprite.image
-          )
+          assetResources[sprite.image]
         )
       : null;
 
@@ -300,9 +310,8 @@ export const AssetDetails = ({
                           ({ name }) => name
                         )}
                         getImageResourceSource={(resourceName: string) => {
-                          return animationResources.find(
-                            ({ name }) => name === resourceName
-                          ).file;
+                          const resource = assetResources[resourceName];
+                          return resource ? resource.file : '';
                         }}
                         isImageResourceSmooth={() => isImageResourceSmooth}
                         project={project}

@@ -89,10 +89,11 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       gd::StandardEvent event;
       gd::Instruction instruction;
       instruction.SetType("MyEventsExtension::MyEventsFunction");
-      instruction.SetParametersCount(3);
-      instruction.SetParameter(0, gd::Expression("First parameter"));
-      instruction.SetParameter(1, gd::Expression("Second parameter"));
-      instruction.SetParameter(2, gd::Expression("Third parameter"));
+      instruction.SetParametersCount(4);
+      instruction.SetParameter(0, gd::Expression("scene"));
+      instruction.SetParameter(1, gd::Expression("First parameter"));
+      instruction.SetParameter(2, gd::Expression("Second parameter"));
+      instruction.SetParameter(3, gd::Expression("Third parameter"));
       event.GetActions().Insert(instruction);
       layout.GetEvents().InsertEvent(event);
     }
@@ -120,18 +121,21 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       {
         gd::Instruction condition;
         condition.SetType("MyEventsExtension::MyEventsFunctionExpressionAndCondition");
-        condition.SetParametersCount(4);
+        condition.SetParametersCount(5);
         condition.SetParameter(
             0,
-            gd::Expression("111"));
+            gd::Expression("scene"));
         condition.SetParameter(
             1,
-            gd::Expression("222"));
+            gd::Expression("111"));
         condition.SetParameter(
             2,
-            gd::Expression(">"));
+            gd::Expression("222"));
         condition.SetParameter(
             3,
+            gd::Expression(">"));
+        condition.SetParameter(
+            4,
             gd::Expression("2"));
         event.GetConditions().Insert(condition);
       }
@@ -195,6 +199,14 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
             .SetName("Behavior")
             .SetType("behavior")
             .SetExtraInfo("MyExtension::MyEventsBasedBehavior"));
+    behaviorExpressionAndCondition.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Value1")
+            .SetType("expression"));
+    behaviorExpressionAndCondition.GetParameters().push_back(
+        gd::ParameterMetadata()
+            .SetName("Value2")
+            .SetType("expression"));
 
     // Add property
     eventsBasedBehavior.GetPropertyDescriptors()
@@ -226,10 +238,12 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
       gd::Instruction instruction;
       instruction.SetType(
           "MyEventsExtension::MyEventsBasedBehavior::MyBehaviorEventsFunction");
-      instruction.SetParametersCount(3);
-      instruction.SetParameter(0, gd::Expression("First parameter"));
-      instruction.SetParameter(1, gd::Expression("Second parameter"));
-      instruction.SetParameter(2, gd::Expression("Third parameter"));
+      instruction.SetParametersCount(5);
+      instruction.SetParameter(0, gd::Expression("ObjectWithMyBehavior"));
+      instruction.SetParameter(1, gd::Expression("MyBehavior"));
+      instruction.SetParameter(2, gd::Expression("First parameter"));
+      instruction.SetParameter(3, gd::Expression("Second parameter"));
+      instruction.SetParameter(4, gd::Expression("Third parameter"));
       event.GetActions().Insert(instruction);
       layout.GetEvents().InsertEvent(event);
     }
@@ -348,7 +362,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
         gd::Instruction condition;
         condition.SetType("MyEventsExtension::MyEventsBasedBehavior::"
             "MyBehaviorEventsFunctionExpressionAndCondition");
-        condition.SetParametersCount(4);
+        condition.SetParametersCount(6);
         condition.SetParameter(
             0,
             gd::Expression("ObjectWithMyBehavior"));
@@ -357,9 +371,15 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
             gd::Expression("MyBehavior"));
         condition.SetParameter(
             2,
-            gd::Expression(">"));
+            gd::Expression("111"));
         condition.SetParameter(
             3,
+            gd::Expression("222"));
+        condition.SetParameter(
+            4,
+            gd::Expression(">"));
+        condition.SetParameter(
+            5,
             gd::Expression("5"));
         event.GetConditions().Insert(condition);
       }
@@ -374,7 +394,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
             0,
             gd::Expression("5 + "
                             "ObjectWithMyBehavior.MyBehavior::"
-                            "MyBehaviorEventsFunctionExpressionAndCondition(123, 456, 789)"));
+                            "MyBehaviorEventsFunctionExpressionAndCondition(111, 222)"));
         event.GetActions().Insert(action);
       }
       externalEvents.GetEvents().InsertEvent(event);
@@ -840,7 +860,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
     gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
-        project, eventsExtension, "MyEventsFunction", 0, 2);
+        project, eventsExtension, "MyEventsFunction", 1, 3);
 
     // Check that events function calls in instructions have been updated
     auto &action = static_cast<gd::StandardEvent &>(
@@ -849,9 +869,10 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                            .GetEvent(0))
                        .GetActions()
                        .Get(0);
-    REQUIRE(action.GetParameter(0).GetPlainString() == "Second parameter");
-    REQUIRE(action.GetParameter(1).GetPlainString() == "Third parameter");
-    REQUIRE(action.GetParameter(2).GetPlainString() == "First parameter");
+    REQUIRE(action.GetParameter(0).GetPlainString() == "scene");
+    REQUIRE(action.GetParameter(1).GetPlainString() == "Second parameter");
+    REQUIRE(action.GetParameter(2).GetPlainString() == "Third parameter");
+    REQUIRE(action.GetParameter(3).GetPlainString() == "First parameter");
   }
   SECTION("(Free) events expression parameter moved") {
     gd::Project project;
@@ -859,8 +880,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
+    // The index 0 is reserved for the RuntimeScene.
     gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
-        project, eventsExtension, "MyEventsFunctionExpression", 0, 1);
+        project, eventsExtension, "MyEventsFunctionExpression", 1, 2);
 
     // Check that events function calls in expressions have been updated
     REQUIRE(GetEventFirstActionFirstParameterString(
@@ -875,8 +897,9 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
     SetupProjectWithDummyPlatform(project, platform);
     auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
 
+    // The index 0 is reserved for the RuntimeScene.
     gd::WholeProjectRefactorer::MoveEventsFunctionParameter(
-        project, eventsExtension, "MyEventsFunctionExpressionAndCondition", 0, 1);
+        project, eventsExtension, "MyEventsFunctionExpressionAndCondition", 1, 2);
 
     // Check that events function calls in expressions have been updated
     REQUIRE(GetEventFirstActionFirstParameterString(
@@ -892,10 +915,11 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                            .GetEvent(1))
                        .GetConditions()
                        .Get(0);
-    REQUIRE(condition.GetParameter(0).GetPlainString() == "222");
-    REQUIRE(condition.GetParameter(1).GetPlainString() == "111");
-    REQUIRE(condition.GetParameter(2).GetPlainString() == ">");
-    REQUIRE(condition.GetParameter(3).GetPlainString() == "2");
+    REQUIRE(condition.GetParameter(0).GetPlainString() == "scene");
+    REQUIRE(condition.GetParameter(1).GetPlainString() == "222");
+    REQUIRE(condition.GetParameter(2).GetPlainString() == "111");
+    REQUIRE(condition.GetParameter(3).GetPlainString() == ">");
+    REQUIRE(condition.GetParameter(4).GetPlainString() == "2");
   }
   SECTION("Events based Behavior renamed (instructions update)") {
     gd::Project project;
@@ -1099,7 +1123,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                     .GetEvent(4)) ==
             "5 + "
             "ObjectWithMyBehavior.MyBehavior::"
-            "MyRenamedBehaviorEventsFunctionExpressionAndCondition(123, 456, 789)");
+            "MyRenamedBehaviorEventsFunctionExpressionAndCondition(111, 222)");
 
     // Check if events-based behavior methods have been renamed in
     // instructions
@@ -1110,7 +1134,7 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         "MyEventsExtension::MyEventsBasedBehavior::"
         "MyRenamedBehaviorEventsFunctionExpressionAndCondition");
   }
-  SECTION("(Events based Behavior) events function parameter moved") {
+  SECTION("(Events based Behavior) events action parameter moved") {
     gd::Project project;
     gd::Platform platform;
     SetupProjectWithDummyPlatform(project, platform);
@@ -1123,15 +1147,8 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         eventsExtension,
         eventsBasedBehavior,
         "MyBehaviorEventsFunction",
-        0,
-        2);
-    gd::WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
-        project,
-        eventsExtension,
-        eventsBasedBehavior,
-        "MyBehaviorEventsFunctionExpression",
-        0,
-        2);
+        2,
+        4);
 
     // Check if parameters of events-based behavior methods have been moved in
     // instructions
@@ -1141,9 +1158,28 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                            .GetEvent(0))
                        .GetActions()
                        .Get(0);
-    REQUIRE(action.GetParameter(0).GetPlainString() == "Second parameter");
-    REQUIRE(action.GetParameter(1).GetPlainString() == "Third parameter");
-    REQUIRE(action.GetParameter(2).GetPlainString() == "First parameter");
+    REQUIRE(action.GetParameter(0).GetPlainString() == "ObjectWithMyBehavior");
+    REQUIRE(action.GetParameter(1).GetPlainString() == "MyBehavior");
+    REQUIRE(action.GetParameter(2).GetPlainString() == "Second parameter");
+    REQUIRE(action.GetParameter(3).GetPlainString() == "Third parameter");
+    REQUIRE(action.GetParameter(4).GetPlainString() == "First parameter");
+  }
+  SECTION("(Events based Behavior) events expression parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    // The first 2 parameters are reserved for the object and behavior.
+    gd::WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunctionExpression",
+        2,
+        4);
 
     // Check parameters of events-based behavior methods have been moved in
     // expressions
@@ -1164,6 +1200,47 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "2 + "
             "ObjectWithMyBehavior::MyBehavior."
             "MyBehaviorEventsFunctionExpression(123, 456, 789)");
+  }
+  SECTION("(Events based Behavior) events expression and condition parameter moved") {
+    gd::Project project;
+    gd::Platform platform;
+    SetupProjectWithDummyPlatform(project, platform);
+    auto &eventsExtension = SetupProjectWithEventsFunctionExtension(project);
+    auto &eventsBasedBehavior =
+        eventsExtension.GetEventsBasedBehaviors().Get("MyEventsBasedBehavior");
+
+    // The first 2 parameters are reserved for the object and behavior.
+    gd::WholeProjectRefactorer::MoveBehaviorEventsFunctionParameter(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunctionExpressionAndCondition",
+        2,
+        3);
+
+    // Check parameters of events-based behavior methods have been moved in
+    // expressions
+    REQUIRE(GetEventFirstActionFirstParameterString(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(4)) ==
+            "5 + "
+            "ObjectWithMyBehavior.MyBehavior::"
+            "MyBehaviorEventsFunctionExpressionAndCondition(222, 111)");
+    // Check if parameters of events-based behavior methods have been moved in
+    // instructions
+    auto &action = static_cast<gd::StandardEvent &>(
+                       project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                           .GetEvents()
+                           .GetEvent(4))
+                       .GetConditions()
+                       .Get(0);
+    REQUIRE(action.GetParameter(0).GetPlainString() == "ObjectWithMyBehavior");
+    REQUIRE(action.GetParameter(1).GetPlainString() == "MyBehavior");
+    REQUIRE(action.GetParameter(2).GetPlainString() == "222");
+    REQUIRE(action.GetParameter(3).GetPlainString() == "111");
+    REQUIRE(action.GetParameter(4).GetPlainString() == ">");
+    REQUIRE(action.GetParameter(5).GetPlainString() == "5");
   }
   SECTION(
       "(Events based Behavior) property (not a required behavior) renamed") {

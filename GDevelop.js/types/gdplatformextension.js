@@ -13,6 +13,7 @@ declare class gdPlatformExtension {
   addAction(name: string, fullname: string, description: string, sentence: string, group: string, icon: string, smallicon: string): gdInstructionMetadata;
   addExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addStrExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
+  addVariableExpression(name: string, fullname: string, description: string, group: string, smallicon: string): gdExpressionMetadata;
   addDependency(): gdDependencyMetadata;
   addBehavior(name: string, fullname: string, defaultName: string, description: string, group: string, icon24x24: string, className: string, instance: gdBehavior, sharedDatasInstance: gdBehaviorsSharedData): gdBehaviorMetadata;
   addObject(name: string, fullname: string, description: string, icon24x24: string, instance: gdObject): gdObjectMetadata;
@@ -43,14 +44,17 @@ declare class gdPlatformExtension {
   getAllConditions(): gdMapStringInstructionMetadata;
   getAllExpressions(): gdMapStringExpressionMetadata;
   getAllStrExpressions(): gdMapStringExpressionMetadata;
+  getAllVariableExpressions(): gdMapStringExpressionMetadata;
   getAllActionsForObject(objectType: string): gdMapStringInstructionMetadata;
   getAllConditionsForObject(objectType: string): gdMapStringInstructionMetadata;
   getAllExpressionsForObject(objectType: string): gdMapStringExpressionMetadata;
   getAllStrExpressionsForObject(objectType: string): gdMapStringExpressionMetadata;
+  getAllVariableExpressionsForObject(objectType: string): gdMapStringExpressionMetadata;
   getAllActionsForBehavior(autoType: string): gdMapStringInstructionMetadata;
   getAllConditionsForBehavior(autoType: string): gdMapStringInstructionMetadata;
   getAllExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
   getAllStrExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
+  getAllVariableExpressionsForBehavior(autoType: string): gdMapStringExpressionMetadata;
   getAllProperties(): gdMapStringPropertyDescriptor;
   getAllDependencies(): gdVectorDependencyMetadata;
   static getNamespaceSeparator(): string;

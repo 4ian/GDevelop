@@ -48,7 +48,7 @@ class GD_CORE_API ExpressionParser2 {
   /**
    * Parse the given expression with the specified type.
    *
-   * \param type Type of the expression: "string", "number",
+   * \param type Type of the expression: "string", "number", "variable",
    * type supported by gd::ParameterMetadata::IsObject, types supported by
    * gd::ParameterMetadata::IsExpression or "unknown".
    * \param expression The expression to parse
@@ -201,6 +201,10 @@ class GD_CORE_API ExpressionParser2 {
         factor->diagnostic =
             RaiseTypeError(_("You entered a text, but a number was expected."),
                            expressionStartPosition);
+      else if (type == "variable")
+        factor->diagnostic = RaiseTypeError(
+            _("You entered a text, but a variable expression was expected."),
+            expressionStartPosition);
       else if (type != "string" && type != "number|string")
         factor->diagnostic = RaiseTypeError(
             _("You entered a text, but this type was expected:") + type,
@@ -229,6 +233,10 @@ class GD_CORE_API ExpressionParser2 {
         factor->diagnostic = RaiseTypeError(
             _("You entered a number, but a text was expected (in quotes)."),
             expressionStartPosition);
+      else if (type == "variable")
+        factor->diagnostic = RaiseTypeError(
+            _("You entered a number, but a variable expression was expected."),
+            expressionStartPosition);
       else if (type != "number" && type != "number|string")
         factor->diagnostic = RaiseTypeError(
             _("You entered a number, but this type was expected:") + type,
@@ -247,9 +255,9 @@ class GD_CORE_API ExpressionParser2 {
       SkipIfChar(IsClosingParenthesis);
       return factor;
     } else if (IsIdentifierAllowedChar()) {
-      // This is a place where the grammar differs according to the
-      // type being expected.
-      if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      // This is a place where the grammar differs when using non-expression
+      // variables.
+      if (gd::ParameterMetadata::IsExpression("scopedVariable", type)) {
         return Variable(type, objectName);
       } else {
         return Identifier(type);
@@ -276,7 +284,8 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(subExpression);
   };
 
-  std::unique_ptr<IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode>
+  std::unique_ptr<
+      IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode>
   Identifier(const gd::String &type) {
     auto identifierAndLocation = ReadIdentifierName();
     gd::String name = identifierAndLocation.name;
@@ -304,12 +313,25 @@ class GD_CORE_API ExpressionParser2 {
 
     if (CheckIfChar(IsOpeningParenthesis)) {
       ExpressionParserLocation openingParenthesisLocation = SkipChar();
-      return FreeFunction(type, name, nameLocation, openingParenthesisLocation);
+      std::unique_ptr<
+          FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
+          function = FreeFunction(
+              type, name, nameLocation, openingParenthesisLocation);
+      if (function->type == "variable")
+        return gd::make_unique<VariableExpressionNode>(type, std::move(function));
+      else
+        return function;
     } else if (CheckIfChar(IsDot)) {
       ExpressionParserLocation dotLocation = SkipChar();
       SkipAllWhitespaces();
-      return ObjectFunctionOrBehaviorFunction(
-          type, name, nameLocation, dotLocation);
+      std::unique_ptr<
+          FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
+          function = ObjectFunctionOrBehaviorFunction(
+              type, name, nameLocation, dotLocation);
+      if (function->type == "variable")
+        return gd::make_unique<VariableExpressionNode>(type, std::move(function));
+      else
+        return function;
     } else {
       auto identifier = gd::make_unique<IdentifierNode>(name, type);
       if (type == "string") {
@@ -434,7 +456,8 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(function);
   }
 
-  std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode>
+  std::unique_ptr<
+      FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
   ObjectFunctionOrBehaviorFunction(
       const gd::String &type,
       const gd::String &objectName,
@@ -530,7 +553,9 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(node);
   }
 
-  std::unique_ptr<FunctionCallOrObjectFunctionNameOrEmptyNode> BehaviorFunction(
+  std::unique_ptr<
+      FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
+  BehaviorFunction(
       const gd::String &type,
       const gd::String &objectName,
       const gd::String &behaviorName,

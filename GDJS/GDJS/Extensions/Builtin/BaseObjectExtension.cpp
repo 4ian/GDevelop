@@ -26,6 +26,8 @@ BaseObjectExtension::BaseObjectExtension() {
       GetAllExpressionsForObject("");
   std::map<gd::String, gd::ExpressionMetadata> &objectStrExpressions =
       GetAllStrExpressionsForObject("");
+  std::map<gd::String, gd::ExpressionMetadata> &objectsVariableExpressions =
+      GetAllVariableExpressionsForObject("");
 
   objectActions["MettreX"]
       .SetFunctionName("setX")
@@ -456,6 +458,10 @@ BaseObjectExtension::BaseObjectExtension() {
 
         return outputCode;
       });
+
+  objectsVariableExpressions["Var"]
+      .codeExtraInformation.SetStatic()
+      .SetFunctionName("(v => v)");
 
   // "AddForceTournePos" and "AddForceTourne" are deprecated and not implemented
   StripUnimplementedInstructionsAndExpressions();

@@ -23,14 +23,12 @@
 
 namespace gd {
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::InstructionMetadata>
     PlatformExtension::badConditionsMetadata;
 std::map<gd::String, gd::InstructionMetadata>
     PlatformExtension::badActionsMetadata;
 std::map<gd::String, gd::ExpressionMetadata>
     PlatformExtension::badExpressionsMetadata;
-#endif
 
 gd::InstructionMetadata& PlatformExtension::AddCondition(
     const gd::String& name,
@@ -40,7 +38,6 @@ gd::InstructionMetadata& PlatformExtension::AddCondition(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(),
                                                            nameWithNamespace,
@@ -52,7 +49,6 @@ gd::InstructionMetadata& PlatformExtension::AddCondition(
                                                            smallicon)
                                            .SetHelpPath(GetHelpPath());
   return conditionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& PlatformExtension::AddAction(
@@ -63,7 +59,6 @@ gd::InstructionMetadata& PlatformExtension::AddAction(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(GetNameSpace(),
                                                         nameWithNamespace,
@@ -75,7 +70,6 @@ gd::InstructionMetadata& PlatformExtension::AddAction(
                                                         smallicon)
                                         .SetHelpPath(GetHelpPath());
   return actionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::ExpressionMetadata& PlatformExtension::AddExpression(
@@ -84,7 +78,6 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   expressionsInfos[nameWithNamespace] = ExpressionMetadata("number",
                                                            GetNameSpace(),
@@ -95,7 +88,6 @@ gd::ExpressionMetadata& PlatformExtension::AddExpression(
                                                            smallicon)
                                             .SetHelpPath(GetHelpPath());
   return expressionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
@@ -104,7 +96,6 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name;
   strExpressionsInfos[nameWithNamespace] = ExpressionMetadata("string",
                                                               GetNameSpace(),
@@ -115,7 +106,25 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
                                                               smallicon)
                                                .SetHelpPath(GetHelpPath());
   return strExpressionsInfos[nameWithNamespace];
-#endif
+}
+
+gd::ExpressionMetadata& PlatformExtension::AddVariableExpression(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& group,
+    const gd::String& smallicon) {
+  gd::String nameWithNamespace = GetNameSpace() + name;
+  variableExpressionsInfos[nameWithNamespace] =
+      ExpressionMetadata("variable",
+                         GetNameSpace(),
+                         nameWithNamespace,
+                         fullname,
+                         description,
+                         group,
+                         smallicon)
+          .SetHelpPath(GetHelpPath());
+  return variableExpressionsInfos[nameWithNamespace];
 }
 
 gd::MultipleInstructionMetadata PlatformExtension::AddExpressionAndCondition(
@@ -135,12 +144,19 @@ gd::MultipleInstructionMetadata PlatformExtension::AddExpressionAndCondition(
                               "<subject>", descriptionSubject),
                           group,
                           icon)
-          : AddStrExpression(name,
+      : type == "string"
+          ? AddStrExpression(name,
                              fullname,
                              expressionDescriptionTemplate.FindAndReplace(
                                  "<subject>", descriptionSubject),
                              group,
-                             icon);
+                             icon)
+          : AddVariableExpression(name,
+                                  fullname,
+                                  expressionDescriptionTemplate.FindAndReplace(
+                                      "<subject>", descriptionSubject),
+                                  group,
+                                  icon);
 
   gd::String conditionDescriptionTemplate = _("Compare <subject>.");
   auto& condition = AddCondition(name,
@@ -165,7 +181,8 @@ PlatformExtension::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
-  if (type != "number" && type != "string" && type != "boolean") {
+  if (type != "number" && type != "string" && type != "boolean" &&
+      type != "variable") {
     gd::LogError(
         "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
         type + ". Verify this type is valid and supported.");
@@ -208,23 +225,28 @@ PlatformExtension::AddExpressionAndConditionAndAction(
                               "<subject>", descriptionSubject),
                           group,
                           icon)
-          : AddStrExpression(name,
-                              fullname,
-                              expressionDescriptionTemplate.FindAndReplace(
-                                  "<subject>", descriptionSubject),
-                              group,
-                              icon);
+      : type == "string"
+          ? AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon)
+          : AddVariableExpression(name,
+                                  fullname,
+                                  expressionDescriptionTemplate.FindAndReplace(
+                                      "<subject>", descriptionSubject),
+                                  group,
+                                  icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);
 }
 
-#if defined(GD_IDE_ONLY)
 gd::DependencyMetadata& PlatformExtension::AddDependency() {
   extensionDependenciesMetadata.push_back(DependencyMetadata());
   return extensionDependenciesMetadata.back();
 }
-#endif
 
 gd::ObjectMetadata& PlatformExtension::AddObject(
     const gd::String& name,
@@ -282,7 +304,6 @@ gd::EventMetadata& PlatformExtension::AddEvent(
     const gd::String& group_,
     const gd::String& smallicon_,
     std::shared_ptr<gd::BaseEvent> instance_) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace = GetNameSpace() + name_;
   eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace,
                                                      fullname_,
@@ -291,7 +312,6 @@ gd::EventMetadata& PlatformExtension::AddEvent(
                                                      smallicon_,
                                                      instance_);
   return eventsInfos[nameWithNamespace];
-#endif
 }
 
 PlatformExtension& PlatformExtension::SetExtensionInformation(
@@ -365,8 +385,6 @@ std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {
 
   return behaviors;
 }
-
-#if defined(GD_IDE_ONLY)
 
 gd::InstructionMetadata& PlatformExtension::AddDuplicatedAction(
     const gd::String& newActionName, const gd::String& copiedActionName) {
@@ -458,6 +476,11 @@ PlatformExtension::GetAllStrExpressions() {
   return strExpressionsInfos;
 }
 
+std::map<gd::String, gd::ExpressionMetadata>&
+PlatformExtension::GetAllVariableExpressions() {
+  return variableExpressionsInfos;
+}
+
 std::vector<gd::DependencyMetadata>& PlatformExtension::GetAllDependencies() {
   return extensionDependenciesMetadata;
 }
@@ -497,6 +520,14 @@ PlatformExtension::GetAllStrExpressionsForObject(gd::String objectType) {
   return badExpressionsMetadata;
 }
 
+std::map<gd::String, gd::ExpressionMetadata>&
+PlatformExtension::GetAllVariableExpressionsForObject(gd::String objectType) {
+  if (objectsInfos.find(objectType) != objectsInfos.end())
+    return objectsInfos.find(objectType)->second.variableExpressionsInfos;
+
+  return badExpressionsMetadata;
+}
+
 std::map<gd::String, gd::InstructionMetadata>&
 PlatformExtension::GetAllActionsForBehavior(gd::String autoType) {
   if (behaviorsInfo.find(autoType) != behaviorsInfo.end())
@@ -529,6 +560,14 @@ PlatformExtension::GetAllStrExpressionsForBehavior(gd::String autoType) {
   return badExpressionsMetadata;
 }
 
+std::map<gd::String, gd::ExpressionMetadata>&
+PlatformExtension::GetAllVariableExpressionsForBehavior(gd::String autoType) {
+  if (behaviorsInfo.find(autoType) != behaviorsInfo.end())
+    return behaviorsInfo.find(autoType)->second.variableExpressionsInfos;
+
+  return badExpressionsMetadata;
+}
+
 gd::BaseEventSPtr PlatformExtension::CreateEvent(
     const gd::String& eventType) const {
   if (eventsInfos.find(eventType) != eventsInfos.end()) {
@@ -546,7 +585,6 @@ gd::BaseEventSPtr PlatformExtension::CreateEvent(
 
   return std::shared_ptr<gd::BaseEvent>();
 }
-#endif
 
 CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(
     const gd::String& objectType) const {
@@ -625,7 +663,6 @@ bool PlatformExtension::IsBuiltin() const {
          builtinExtensions.end();
 }
 
-#if defined(GD_IDE_ONLY)
 void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
   for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
            GetAllActions().begin();
@@ -770,7 +807,6 @@ void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
       ++it;
   }
 }
-#endif
 
 PlatformExtension::PlatformExtension()
     : deprecated(false), category(_("General")) {}

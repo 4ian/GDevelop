@@ -107,6 +107,15 @@ class GD_CORE_API BehaviorMetadata {
                                            const gd::String& smallicon_);
 
   /**
+   * Declare a new variable expression as being part of the extension.
+   */
+  gd::ExpressionMetadata& AddVariableExpression(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& group_,
+                                           const gd::String& smallicon_);
+
+  /**
    * \brief Declare a new expression and condition as being part of the
    * behavior.
    * \note It's recommended to use this function to avoid declaring twice a
@@ -214,7 +223,6 @@ class GD_CORE_API BehaviorMetadata {
   }
 
   const gd::String& GetName() const;
-#if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDefaultName() const { return defaultName; }
   const gd::String& GetDescription() const { return description; }
@@ -235,7 +243,6 @@ class GD_CORE_API BehaviorMetadata {
    * \note An empty string means the base object, so any object.
    */
   const gd::String& GetObjectType() const { return objectType; }
-#endif
 
   /**
    * \brief Return the associated gd::Behavior, handling behavior contents.
@@ -271,26 +278,23 @@ class GD_CORE_API BehaviorMetadata {
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions() { return strExpressionsInfos; };
 
-#if defined(GD_IDE_ONLY)
   std::map<gd::String, gd::InstructionMetadata> conditionsInfos;
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::map<gd::String, gd::ExpressionMetadata> variableExpressionsInfos;
 
   std::vector<gd::String> includeFiles;
   gd::String className;
-#endif
  private:
   gd::String extensionNamespace;
   gd::String helpPath;
-#if defined(GD_IDE_ONLY)
   gd::String fullname;
   gd::String defaultName;
   gd::String description;
   gd::String group;
   gd::String iconFilename;
   gd::String objectType;
-#endif
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;

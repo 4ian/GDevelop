@@ -182,6 +182,15 @@ class GD_CORE_API PlatformExtension {
                                            const gd::String& smallicon_);
 
   /**
+   * \brief Declare a new variable expression as being part of the extension.
+   */
+  gd::ExpressionMetadata& AddVariableExpression(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& group_,
+                                           const gd::String& smallicon_);
+
+  /**
    * \brief Declare a new expression and condition as being part of the
    * extension.
    * \note It's recommended to use this function to avoid declaring twice a
@@ -499,6 +508,11 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressions();
 
   /**
+   * \see gd::PlatformExtension::GetAllActions
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllVariableExpressions();
+
+  /**
    * \brief Return a reference to a vector containing the metadata of all the
    * dependencies of the extension.
    */
@@ -532,6 +546,12 @@ class GD_CORE_API PlatformExtension {
   /**
    * \see gd::PlatformExtension::GetAllActionsForObject
    */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllVariableExpressionsForObject(
+      gd::String objectType);
+
+  /**
+   * \see gd::PlatformExtension::GetAllActionsForObject
+   */
   std::map<gd::String, gd::InstructionMetadata>& GetAllActionsForBehavior(
       gd::String autoType);
 
@@ -551,6 +571,12 @@ class GD_CORE_API PlatformExtension {
    * \see gd::PlatformExtension::GetAllActionsForObject
    */
   std::map<gd::String, gd::ExpressionMetadata>& GetAllStrExpressionsForBehavior(
+      gd::String autoType);
+
+  /**
+   * \see gd::PlatformExtension::GetAllActionsForObject
+   */
+  std::map<gd::String, gd::ExpressionMetadata>& GetAllVariableExpressionsForBehavior(
       gd::String autoType);
 
   /**
@@ -614,6 +640,7 @@ class GD_CORE_API PlatformExtension {
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::map<gd::String, gd::ExpressionMetadata> variableExpressionsInfos;
   std::vector<gd::DependencyMetadata> extensionDependenciesMetadata;
   std::map<gd::String, gd::EventMetadata> eventsInfos;
   std::map<gd::String, gd::PropertyDescriptor> extensionPropertiesMetadata;

@@ -64,6 +64,10 @@ class GD_CORE_API ExpressionFunctionRenamer
   void OnVisitVariableNode(VariableNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
+  void OnVisitVariableExpressionNode(
+      VariableExpressionNode& node) override {
+    node.child->Visit(*this);
+  }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     if (node.child) node.child->Visit(*this);
   }

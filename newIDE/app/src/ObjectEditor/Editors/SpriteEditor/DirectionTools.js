@@ -4,6 +4,7 @@ import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Timer from '@material-ui/icons/Timer';
 import FlatButton from '../../../UI/FlatButton';
+import TextButton from '../../../UI/TextButton';
 import Checkbox from '../../../UI/Checkbox';
 import Brush from '@material-ui/icons/Brush';
 import PlayArrow from '@material-ui/icons/PlayArrow';
@@ -117,7 +118,7 @@ export default class DirectionTools extends Component<Props, State> {
           {windowWidth =>
             windowWidth !== 'small' &&
             !!imageResourceExternalEditors.length && (
-              <FlatButton
+              <TextButton
                 label={imageResourceExternalEditors[0].displayName}
                 icon={<Brush />}
                 onClick={() => onEditWith(imageResourceExternalEditors[0])}
@@ -125,7 +126,7 @@ export default class DirectionTools extends Component<Props, State> {
             )
           }
         </ResponsiveWindowMeasurer>
-        <FlatButton
+        <TextButton
           label={<Trans>Preview</Trans>}
           icon={<PlayArrow />}
           onClick={() => this.openPreview(true)}

@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
-import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
+import { Tooltip } from '@material-ui/core';
+import { tooltipEnterDelay } from './Tooltip';
+import { type ButtonInterface } from './Button';
 
-// We support a subset of the props supported by Material-UI v0.x FlatButton
-// They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
@@ -24,22 +24,26 @@ type Props = {|
   |},
   target?: '_blank',
   id?: ?string,
+  // Tooltips aren't really suited for TextButtons UX-wise, but we can use them for
+  // accessibility purpose for the Toolbar.
+  exceptionalTooltipForToolbar?: React.Node,
 |};
 
 /**
- * A "outlined" button based on Material-UI button.
+ * A "text" button based on Material-UI button.
  */
-const FlatButton = React.forwardRef<Props, ButtonInterface>(
+const TextButton = React.forwardRef<Props, ButtonInterface>(
   (
     {
       label,
       primary,
       icon,
       keyboardFocused,
+      exceptionalTooltipForToolbar,
       disabled,
       id,
       ...otherProps
-    }: Props,
+    },
     ref
   ) => {
     // In theory, focus ripple is only shown after a keyboard interaction
@@ -48,9 +52,9 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
 
-    return (
+    const button = (
       <Button
-        variant="outlined"
+        variant="text"
         size="small"
         color={primary ? 'primary' : 'default'}
         autoFocus={keyboardFocused}
@@ -65,7 +69,19 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
         {label}
       </Button>
     );
+
+    return exceptionalTooltipForToolbar && !disabled ? (
+      <Tooltip
+        title={exceptionalTooltipForToolbar}
+        placement="bottom"
+        enterDelay={tooltipEnterDelay}
+      >
+        {button}
+      </Tooltip>
+    ) : (
+      button
+    );
   }
 );
 
-export default FlatButton;
+export default TextButton;

@@ -11,6 +11,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from '../KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../Layout';
 
 const styles = {
   defaultBody: {
@@ -122,9 +123,15 @@ const Dialog = (props: Props) => {
     () => (
       <React.Fragment>
         {secondaryActions && (
-          <div key="secondary-actions">{secondaryActions}</div>
+          <LineStackLayout key="secondary-actions" noMargin>
+            {secondaryActions}
+          </LineStackLayout>
         )}
-        <div key="actions">{actions}</div>
+        {actions && (
+          <LineStackLayout key="actions" noMargin>
+            {actions}
+          </LineStackLayout>
+        )}
       </React.Fragment>
     ),
     [actions, secondaryActions]

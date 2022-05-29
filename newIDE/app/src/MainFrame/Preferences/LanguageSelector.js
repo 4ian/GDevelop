@@ -3,12 +3,13 @@ import { Trans } from '@lingui/macro';
 
 import React, { useContext } from 'react';
 import SelectField from '../../UI/SelectField';
-import FlatButton from '../../UI/FlatButton';
 import SelectOption from '../../UI/SelectOption';
 import { Column, Line } from '../../UI/Grid';
 import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
 import LocalesMetadata from '../../locales/LocalesMetadata';
+import Text from '../../UI/Text';
+import Link from '@material-ui/core/Link';
 
 type Props = {|
   onLanguageChanged: (language: string) => void,
@@ -51,7 +52,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
 
   return (
     <Column noMargin>
-      <Line expand>
+      <Line noMargin expand>
         <SelectField
           floatingLabelText={<Trans>Choose GDevelop language</Trans>}
           value={values.language}
@@ -70,16 +71,21 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
           )}
         </SelectField>
       </Line>
-      <Line expand>
-        <FlatButton
-          primary
-          label={<Trans>Help to translate GD in your language</Trans>}
-          onClick={() =>
-            Window.openExternalURL('https://crowdin.com/project/gdevelop')
-          }
-          fullWidth
-        />
-      </Line>
+        <Text>
+          <Trans>
+            You can {' '}
+            <Link
+              href={'https://crowdin.com/project/gdevelop'}
+              onClick={event => {
+                Window.openExternalURL('https://crowdin.com/project/gdevelop');
+                event.preventDefault();
+              }}
+            >
+              help to translate GDevelop in your language
+            </Link>
+            .
+          </Trans>
+        </Text>
     </Column>
   );
 };

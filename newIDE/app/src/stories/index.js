@@ -155,9 +155,11 @@ import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingD
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
+import { LineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
+import TextButton from '../UI/TextButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
@@ -233,6 +235,7 @@ import {
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
 import { initialPreferences } from '../MainFrame/Preferences/PreferencesContext';
+import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
   depth: 2,
@@ -242,8 +245,6 @@ configureActions({
 addDecorator(GDevelopJsInitializerDecorator);
 
 // No i18n in this file
-
-const Placeholder = () => <div>Placeholder component</div>;
 
 const buildFakeMenuTemplate = () => [
   {
@@ -281,32 +282,74 @@ storiesOf('Welcome', module)
   .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/Buttons', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Column>
-      <Line>
+    <ColumnStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton label="Raised button" onClick={action('onClick')} />
+        <RaisedButton
+          icon={<CloudDownload />}
+          label="Raised button"
+          onClick={action('onClick')}
+        />
         <RaisedButton
           label="Primary Raised button"
           primary
           onClick={action('onClick')}
         />
-      </Line>
-      <Line>
+        <RaisedButton
+          icon={<CloudDownload />}
+          label="Primary Raised button"
+          primary
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <FlatButton label="Flat button" onClick={action('onClick')} />
+        <FlatButton
+          icon={<CloudDownload />}
+          label="Flat button"
+          onClick={action('onClick')}
+        />
         <FlatButton
           label="Primary Flat button"
           primary
           onClick={action('onClick')}
         />
-      </Line>
-      <Line>
+        <FlatButton
+          icon={<CloudDownload />}
+          label="Primary Flat button"
+          primary
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
+        <TextButton label="Text button" onClick={action('onClick')} />
+        <TextButton
+          icon={<CloudDownload />}
+          label="Text button"
+          onClick={action('onClick')}
+        />
+        <TextButton
+          primary
+          label="Primary Text button"
+          onClick={action('onClick')}
+        />
+        <TextButton
+          icon={<CloudDownload />}
+          primary
+          label="Primary Text button"
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons with split menus:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton
           label="Traditional Raised button"
           onClick={action('onClick')}
@@ -335,11 +378,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           onClick={action('onClick')}
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons with menus:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton
           label="Traditional Raised button"
           onClick={action('onClick')}
@@ -359,11 +402,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Icons with menu:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <ElementWithMenu
           element={
             <ToolbarIcon
@@ -381,11 +424,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           }
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>In a mini toolbar:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <MiniToolbar>
           <MiniToolbarText firstChild>Some text:</MiniToolbarText>
           <IconButton>
@@ -410,8 +453,8 @@ storiesOf('UI Building Blocks/Buttons', module)
             ]}
           />
         </MiniToolbar>
-      </Line>
-    </Column>
+      </LineStackLayout>
+    </ColumnStackLayout>
   ));
 
 storiesOf('UI Building Blocks/SelectField', module)

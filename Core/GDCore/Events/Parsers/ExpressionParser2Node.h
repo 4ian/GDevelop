@@ -177,7 +177,8 @@ struct GD_CORE_API TextNode : public ExpressionNode {
   gd::String text;
 };
 
-struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
+struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode
+    : public ExpressionNode {
   VariableAccessorOrVariableBracketAccessorNode() : ExpressionNode(""){};
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode> child;
@@ -243,9 +244,10 @@ struct GD_CORE_API VariableBracketAccessorNode
   std::unique_ptr<ExpressionNode> expression;
 };
 
-struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
+struct GD_CORE_API
+    IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode
     : public ExpressionNode {
-  IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(
+  IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode(
       const gd::String &type)
       : ExpressionNode(type){};
 };
@@ -254,9 +256,10 @@ struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
  * \brief An identifier node, usually representing an object or a function name.
  */
 struct GD_CORE_API IdentifierNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode {
   IdentifierNode(const gd::String &identifierName_, const gd::String &type_)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode(
+            type_),
         identifierName(identifierName_){};
   virtual ~IdentifierNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
@@ -266,12 +269,34 @@ struct GD_CORE_API IdentifierNode
   gd::String identifierName;
 };
 
-struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
-  FunctionCallOrObjectFunctionNameOrEmptyNode(const gd::String &type)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type){};
-  virtual ~FunctionCallOrObjectFunctionNameOrEmptyNode(){};
+struct GD_CORE_API
+    FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode {
+  FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(
+      const gd::String &type)
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrVariableExpressionNodeOrEmptyNode(
+            type){};
+  virtual ~FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(){};
   void Visit(ExpressionParser2NodeWorker &worker) override{};
+};
+
+struct VariableExpressionNode
+    : public FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode {
+  VariableExpressionNode(
+      const gd::String &type_,
+      std::unique_ptr<
+          FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
+          expression_)
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
+        child(std::move(expression_)){};
+  virtual ~VariableExpressionNode(){};
+  virtual void Visit(ExpressionParser2NodeWorker &worker) {
+    worker.OnVisitVariableExpressionNode(*this);
+  };
+
+  std::unique_ptr<
+      FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode>
+      child;
 };
 
 /**
@@ -280,18 +305,18 @@ struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
  * "MyObject.Physics::LinearVelocity".
  */
 struct GD_CORE_API ObjectFunctionNameNode
-    : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+    : public FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode {
   ObjectFunctionNameNode(const gd::String &type_,
                          const gd::String &objectName_,
                          const gd::String &objectFunctionOrBehaviorName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
         objectName(objectName_),
         objectFunctionOrBehaviorName(objectFunctionOrBehaviorName_) {}
   ObjectFunctionNameNode(const gd::String &type_,
                          const gd::String &objectName_,
                          const gd::String &behaviorName_,
                          const gd::String &behaviorFunctionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
         objectName(objectName_),
         objectFunctionOrBehaviorName(behaviorName_),
         behaviorFunctionName(behaviorFunctionName_) {}
@@ -332,13 +357,14 @@ struct GD_CORE_API ObjectFunctionNameNode
  * For example: "MyExtension::MyFunction(1, 2)", "MyObject.Function()" or
  * "MyObject.Physics::LinearVelocity()".
  */
-struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+struct GD_CORE_API FunctionCallNode
+    : public FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode {
   /** \brief Construct a free function call node. */
   FunctionCallNode(const gd::String &type_,
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                    const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
@@ -349,7 +375,7 @@ struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrE
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                    const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
         objectName(objectName_),
         parameters(std::move(parameters_)),
         expressionMetadata(expressionMetadata_),
@@ -362,7 +388,7 @@ struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrE
                    std::vector<std::unique_ptr<ExpressionNode>> parameters_,
                    const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
         objectName(objectName_),
         behaviorName(behaviorName_),
         parameters(std::move(parameters_)),
@@ -400,9 +426,11 @@ struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrE
  * \brief An empty node, used when parsing failed/a syntax error was
  * encountered and any other node could not make sense.
  */
-struct GD_CORE_API EmptyNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+struct GD_CORE_API EmptyNode
+    : public FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode {
   EmptyNode(const gd::String &type_, const gd::String &text_ = "")
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_), text(text_){};
+      : FunctionCallOrObjectFunctionNameOrVariableExpressionOrEmptyNode(type_),
+        text(text_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);

@@ -9,6 +9,7 @@ declare class gdPreviewExportOptions {
   setProjectDataOnlyExport(enable: boolean): gdPreviewExportOptions;
   setFullLoadingScreen(enable: boolean): gdPreviewExportOptions;
   setNonRuntimeScriptsCacheBurst(value: number): gdPreviewExportOptions;
+  setElectronRemoteRequirePath(electronRemoteRequirePath: string): gdPreviewExportOptions;
   delete(): void;
   ptr: number;
 };

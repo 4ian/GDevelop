@@ -24,9 +24,8 @@ import {
 } from '../ExportPipeline.flow';
 import {
   ExplanationHeader,
-  WebProjectLink,
+  OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
-import { type BuildStep } from '../Builds/BuildStepsProgress';
 const gd: libGDevelop = global.gd;
 
 type ExportState = null;
@@ -73,12 +72,20 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
-  renderCustomStepsProgress: (
-    build: ?Build,
-    errored: boolean,
-    exportStep: BuildStep
-  ) => (
-    <WebProjectLink build={build} errored={errored} exportStep={exportStep} />
+  renderCustomStepsProgress: ({
+    build,
+    project,
+    onSaveProject,
+    errored,
+    exportStep,
+  }) => (
+    <OnlineGameLink
+      build={build}
+      project={project}
+      onSaveProject={onSaveProject}
+      errored={errored}
+      exportStep={exportStep}
+    />
   ),
 
   prepareExporter: (

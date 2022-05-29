@@ -4,8 +4,10 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Project/VariablesContainer.h"
+
 #include <algorithm>
 #include <iostream>
+
 #include "GDCore/Project/Variable.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/String.h"
@@ -88,7 +90,6 @@ Variable& VariablesContainer::Insert(const gd::String& name,
   }
 }
 
-#if defined(GD_IDE_ONLY)
 void VariablesContainer::Remove(const gd::String& varName) {
   variables.erase(
       std::remove_if(
@@ -151,13 +152,14 @@ void VariablesContainer::Swap(std::size_t firstVariableIndex,
 }
 
 void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex) {
-  if (oldIndex >= variables.size() || newIndex >= variables.size()) return;
+  if (oldIndex >= variables.size() || newIndex >= variables.size() ||
+      oldIndex == newIndex)
+    return;
 
   auto nameAndVariable = variables[oldIndex];
   variables.erase(variables.begin() + oldIndex);
   variables.insert(variables.begin() + newIndex, nameAndVariable);
 }
-#endif
 
 void VariablesContainer::SerializeTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("variable");

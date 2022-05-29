@@ -249,7 +249,7 @@ module.exports = {
     extension
       .addAction(
         'CreateBasicAccount',
-        _('Create account with with email'),
+        _('Create account with email'),
         _('Create an account with email and password as credentials.'),
         _('Create account with email _PARAM0_ and password _PARAM1_'),
         _('Authentication'),
@@ -1324,7 +1324,7 @@ module.exports = {
         true
       )
       .setParameterLongDescription(
-        'See the shape of the returned data on [the wiki page](http://wiki.compilgames.net/doku.php/gdevelop5/all-features/firebase/firestore#the_query_result).'
+        'See the shape of the returned data on [the wiki page](https://wiki.gdevelop.io/gdevelop5/all-features/firebase/firestore#the_query_result).'
       )
       .addParameter(
         'scenevar',

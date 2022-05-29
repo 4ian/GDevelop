@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SFML/System/Utf.hpp>
 #include <cctype>
 #include <fstream>
 #include <map>
@@ -66,6 +65,9 @@ Project::Project()
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       useExternalSourceFiles(false),
+      isPlayableWithKeyboard(false),
+      isPlayableWithGamepad(false),
+      isPlayableWithMobile(false),
       currentPlatform(NULL),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
@@ -536,6 +538,27 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
   }
 
+  categories.clear();
+  auto& categoriesElement = propElement.GetChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < categoriesElement.GetChildrenCount(); ++i) {
+    categories.push_back(categoriesElement.GetChild(i).GetStringValue());
+  }
+
+  auto& playableDevicesElement = propElement.GetChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < playableDevicesElement.GetChildrenCount(); ++i) {
+    const auto& playableDevice =
+        playableDevicesElement.GetChild(i).GetStringValue();
+    if (playableDevice == "keyboard") {
+      isPlayableWithKeyboard = true;
+    } else if (playableDevice == "gamepad") {
+      isPlayableWithGamepad = true;
+    } else if (playableDevice == "mobile") {
+      isPlayableWithMobile = true;
+    }
+  }
+
   // Compatibility with GD <= 5.0.0-beta101
   if (VersionWrapper::IsOlderOrEqual(
           gdMajorVersion, gdMinorVersion, gdBuildVersion, 0, 4, 0, 98, 0) &&
@@ -736,6 +759,24 @@ void Project::SerializeTo(SerializerElement& element) const {
     authorIdsElement.AddChild("").SetStringValue(authorId);
   }
 
+  auto& categoriesElement = propElement.AddChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (const auto& category : categories) {
+    categoriesElement.AddChild("").SetStringValue(category);
+  }
+
+  auto& playableDevicesElement = propElement.AddChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  if (isPlayableWithKeyboard) {
+    playableDevicesElement.AddChild("").SetStringValue("keyboard");
+  }
+  if (isPlayableWithGamepad) {
+    playableDevicesElement.AddChild("").SetStringValue("gamepad");
+  }
+  if (isPlayableWithMobile) {
+    playableDevicesElement.AddChild("").SetStringValue("mobile");
+  }
+
   // Compatibility with GD <= 5.0.0-beta101
   if (useDeprecatedZeroAsDefaultZOrder) {
     propElement.SetAttribute("useDeprecatedZeroAsDefaultZOrder", true);
@@ -911,6 +952,8 @@ Project& Project::operator=(const Project& other) {
 
 void Project::Init(const gd::Project& game) {
   name = game.name;
+  categories = game.categories;
+  description = game.description;
   firstLayout = game.firstLayout;
   version = game.version;
   windowWidth = game.windowWidth;
@@ -927,6 +970,9 @@ void Project::Init(const gd::Project& game) {
 
   author = game.author;
   authorIds = game.authorIds;
+  isPlayableWithKeyboard = game.isPlayableWithKeyboard;
+  isPlayableWithGamepad = game.isPlayableWithGamepad;
+  isPlayableWithMobile = game.isPlayableWithMobile;
   packageName = game.packageName;
   orientation = game.orientation;
   folderProject = game.folderProject;

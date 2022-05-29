@@ -13,6 +13,9 @@ import ExternalPropertiesDialog, {
 } from './ExternalPropertiesDialog';
 import Text from '../../UI/Text';
 import { Line } from '../../UI/Grid';
+import { sendEventsExtractedAsFunction } from '../../Utils/Analytics/EventSender';
+import HelpButton from '../../UI/HelpButton';
+import TutorialButton from '../../UI/TutorialButton';
 
 const styles = {
   container: {
@@ -36,9 +39,10 @@ export class ExternalEventsEditorContainer extends React.Component<
   };
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // Prevent any update to the editor if the editor is not active,
-    // and so not visible to the user.
-    return nextProps.isActive;
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
+    return this.props.isActive || nextProps.isActive;
   }
 
   getProject(): ?gdProject {
@@ -107,6 +111,21 @@ export class ExternalEventsEditorContainer extends React.Component<
     });
   };
 
+  onBeginCreateEventsFunction = () => {
+    sendEventsExtractedAsFunction({
+      step: 'begin',
+      parentEditor: 'external-events-editor',
+    });
+  };
+
+  onCreateEventsFunction = (extensionName, eventsFunction) => {
+    this.props.onCreateEventsFunction(
+      extensionName,
+      eventsFunction,
+      'external-events-editor'
+    );
+  };
+
   render() {
     const { project, projectItemName } = this.props;
     const externalEvents = this.getExternalEvents();
@@ -128,7 +147,8 @@ export class ExternalEventsEditorContainer extends React.Component<
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
             openInstructionOrExpression={this.props.openInstructionOrExpression}
-            onCreateEventsFunction={this.props.onCreateEventsFunction}
+            onCreateEventsFunction={this.onCreateEventsFunction}
+            onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
             unsavedChanges={this.props.unsavedChanges}
             project={project}
             scope={{
@@ -140,6 +160,7 @@ export class ExternalEventsEditorContainer extends React.Component<
             events={externalEvents.getEvents()}
             onOpenSettings={this.openExternalPropertiesDialog}
             onOpenExternalEvents={this.props.onOpenExternalEvents}
+            isActive={this.props.isActive}
           />
         )}
         {!layout && (
@@ -155,6 +176,15 @@ export class ExternalEventsEditorContainer extends React.Component<
                 label={<Trans>Choose the scene</Trans>}
                 primary
                 onClick={this.openExternalPropertiesDialog}
+              />
+            </Line>
+            <Line justifyContent="flex-start" noMargin>
+              <TutorialButton
+                tutorialId="Intermediate-externals"
+                label="Watch the tutorial"
+                renderIfNotFound={
+                  <HelpButton helpPagePath="/interface/events-editor/external-events" />
+                }
               />
             </Line>
           </PlaceholderMessage>

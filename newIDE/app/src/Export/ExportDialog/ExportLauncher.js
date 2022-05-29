@@ -23,10 +23,9 @@ import BuildStepsProgress, {
 import {
   registerGame,
   getGame,
-  updateGame,
   type Game,
   setGameUserAcls,
-  getAclsFromAuthorIds,
+  getAclsFromUserIds,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
@@ -49,6 +48,7 @@ type State = {|
 
 type Props = {|
   project: gdProject,
+  onSaveProject: () => Promise<void>,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
@@ -138,8 +138,8 @@ export default class ExportLauncher extends Component<Props, State> {
   tryUpdateAuthors = async () => {
     const profile = this.props.authenticatedUser.profile;
     if (profile) {
-      const authorAcls = getAclsFromAuthorIds(
-        this.props.project.getAuthorIds()
+      const authorAcls = getAclsFromUserIds(
+        this.props.project.getAuthorIds().toJSArray()
       );
 
       try {
@@ -147,7 +147,7 @@ export default class ExportLauncher extends Component<Props, State> {
           this.props.authenticatedUser.getAuthorizationHeader,
           profile.id,
           this.props.project.getProjectUuid(),
-          authorAcls
+          { author: authorAcls }
         );
       } catch (e) {
         // Best effort call, do not prevent exporting the game.
@@ -156,30 +156,22 @@ export default class ExportLauncher extends Component<Props, State> {
     }
   };
 
-  registerAndUpdateGame = async () => {
+  registerGameIfNot = async () => {
     const profile = this.props.authenticatedUser.profile;
     const getAuthorizationHeader = this.props.authenticatedUser
       .getAuthorizationHeader;
     const gameId = this.props.project.getProjectUuid();
-    const authorName =
-      this.props.project.getAuthor() || 'Unspecified publisher';
-    const gameName = this.props.project.getName() || 'Untitled game';
     if (profile) {
       const userId = profile.id;
       try {
-        // Try to fetch the game to see if it's registered.
+        // Try to fetch the game to see if it's registered but do not do anything with it.
         await getGame(getAuthorizationHeader, userId, gameId);
-        // Update the game details to ensure that it is up to date in GDevelop services.
-        const game = await updateGame(getAuthorizationHeader, userId, gameId, {
-          authorName,
-          gameName,
-        });
-        // We don't await for the authors update, as it is not required for publishing.
-        this.tryUpdateAuthors();
-        this.props.onGameUpdated(game);
       } catch (err) {
         if (err.response.status === 404) {
           // If the game is not registered, register it before launching the export.
+          const authorName =
+            this.props.project.getAuthor() || 'Unspecified publisher';
+          const gameName = this.props.project.getName() || 'Untitled game';
           const game = await registerGame(getAuthorizationHeader, userId, {
             gameId,
             authorName,
@@ -252,7 +244,7 @@ export default class ExportLauncher extends Component<Props, State> {
     try {
       setStep('register');
       // We await for this call, allowing to link the build to the game just registered.
-      await this.registerAndUpdateGame();
+      await this.registerGameIfNot();
     } catch {
       // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game - ignoring it.');
@@ -341,7 +333,12 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen,
       exportState,
     } = this.state;
-    const { project, authenticatedUser, exportPipeline } = this.props;
+    const {
+      project,
+      authenticatedUser,
+      exportPipeline,
+      onSaveProject,
+    } = this.props;
     if (!project) return null;
     const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
@@ -410,7 +407,13 @@ export default class ExportLauncher extends Component<Props, State> {
           )}
         {authenticatedUser.authenticated &&
           (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress(build, errored, exportStep)
+            exportPipeline.renderCustomStepsProgress({
+              build,
+              project,
+              onSaveProject,
+              errored,
+              exportStep,
+            })
           ) : (
             <Line expand>
               <BuildStepsProgress

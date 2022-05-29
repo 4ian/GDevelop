@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
@@ -9,6 +9,12 @@ import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import {
+  sendExtensionDetailsOpened,
+  sendExtensionAddedToProject,
+} from '../../Utils/Analytics/EventSender';
+import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
+import { t } from '@lingui/macro';
 
 const styles = {
   searchBar: {
@@ -81,6 +87,10 @@ export const ExtensionStore = ({
     return extensionMatches ? extensionMatches.matches : [];
   };
 
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-behaviors-and-functions'
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -93,8 +103,15 @@ export const ExtensionStore = ({
               style={styles.searchBar}
               tagsHandler={tagsHandler}
               tags={filters && filters.allTags}
+              placeholder={t`Search extensions`}
             />
+            {DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
             <ListSearchResults
+              disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
               onRetry={fetchExtensionsAndFilters}
               error={error}
               searchItems={
@@ -110,6 +127,7 @@ export const ExtensionStore = ({
                   extensionShortHeader={extensionShortHeader}
                   matches={getExtensionsMatches(extensionShortHeader)}
                   onChoose={() => {
+                    sendExtensionDetailsOpened(extensionShortHeader.name);
                     setSelectedExtensionShortHeader(extensionShortHeader);
                   }}
                 />
@@ -120,12 +138,11 @@ export const ExtensionStore = ({
       </ResponsiveWindowMeasurer>
       {!!selectedExtensionShortHeader && (
         <ExtensionInstallDialog
+          project={project}
           isInstalling={isInstalling}
           extensionShortHeader={selectedExtensionShortHeader}
-          alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
-            selectedExtensionShortHeader.name
-          )}
           onInstall={async () => {
+            sendExtensionAddedToProject(selectedExtensionShortHeader.name);
             const wasInstalled = await onInstall(selectedExtensionShortHeader);
             if (wasInstalled) setSelectedExtensionShortHeader(null);
           }}

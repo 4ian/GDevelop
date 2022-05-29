@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow.js';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import { type BuildStep } from './Builds/BuildStepsProgress';
@@ -46,11 +46,13 @@ export type ExportPipeline<
 
   isNavigationDisabled: (exportStep: BuildStep, errored: boolean) => boolean,
 
-  renderCustomStepsProgress?: (
+  renderCustomStepsProgress?: ({
     build: ?Build,
+    project: gdProject,
+    onSaveProject: () => Promise<void>,
     errored: boolean,
-    exportStep: BuildStep
-  ) => React.Node,
+    exportStep: BuildStep,
+  }) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>

@@ -13,8 +13,9 @@ import EventTextDialog, {
 } from './InstructionEditor/EventTextDialog';
 import Toolbar from './Toolbar';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
+import { getShortcutDisplayName } from '../KeyboardShortcuts';
 import InlineParameterEditor from './InlineParameterEditor';
-import ContextMenu from '../UI/Menu/ContextMenu';
+import ContextMenu, { type ContextMenuInterface } from '../UI/Menu/ContextMenu';
 import { serializeToJSObject } from '../Utils/Serializer';
 import {
   type HistoryState,
@@ -91,6 +92,11 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EVENT,
 } from '../Utils/GDevelopServices/Badge';
+import LeaderboardContext, {
+  type LeaderboardState,
+} from '../Leaderboard/LeaderboardContext';
+import { TutorialContext } from '../Tutorial/TutorialContext';
+import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
 const gd: libGDevelop = global.gd;
 
 const zoomLevel = { min: 1, max: 50 };
@@ -116,13 +122,17 @@ type Props = {|
     extensionName: string,
     eventsFunction: gdEventsFunction
   ) => void,
+  onBeginCreateEventsFunction: () => void,
   unsavedChanges?: ?UnsavedChanges,
+  isActive: boolean,
 |};
 
 type ComponentProps = {|
   ...Props,
   authenticatedUser: AuthenticatedUser,
   preferences: Preferences,
+  tutorials: ?Array<Tutorial>,
+  leaderboardsManager: ?LeaderboardState,
 |};
 
 type State = {|
@@ -148,7 +158,6 @@ type State = {|
   inlineEditing: boolean,
   inlineEditingAnchorEl: ?HTMLElement,
   inlineInstructionEditorAnchorEl: ?HTMLElement,
-  inlineEditingChangesMade: boolean,
   inlineEditingPreviousValue: ?string,
 
   analyzedEventsContextResult: ?EventsContextResult,
@@ -209,8 +218,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     },
   });
 
-  eventContextMenu: ContextMenu;
-  instructionContextMenu: ContextMenu;
+  eventContextMenu: ?ContextMenuInterface;
+  instructionContextMenu: ?ContextMenuInterface;
   addNewEvent: (
     type: string,
     context: ?EventInsertionContext
@@ -237,7 +246,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     inlineEditing: false,
     inlineEditingAnchorEl: null,
     inlineInstructionEditorAnchorEl: null,
-    inlineEditingChangesMade: false,
     inlineEditingPreviousValue: null,
 
     analyzedEventsContextResult: null,
@@ -278,6 +286,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this.state.history !== prevState.history)
       if (this.props.unsavedChanges)
         this.props.unsavedChanges.triggerUnsavedChanges();
+
+    // If the tab becomes active again, we ensure the dom is focused
+    // allowing the keyboard shortcuts to work.
+    if (!prevProps.isActive && this.props.isActive) {
+      this._ensureFocused();
+    }
   }
 
   updateToolbar() {
@@ -289,8 +303,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         onAddStandardEvent={this._addStandardEvent}
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
+        canToggleEventDisabled={hasEventSelected(this.state.selection)}
         onAddCommentEvent={this._addCommentEvent}
         onAddEvent={this.addNewEvent}
+        onToggleDisabledEvent={this.toggleDisabled}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         canUndo={canUndo(this.state.history)}
@@ -314,6 +330,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _toggleSearchPanel = () => {
     this.setState(
       state => {
+        if (
+          state.showSearchPanel &&
+          this._searchPanel &&
+          this._searchPanel.isSearchOngoing()
+        ) {
+          this._searchPanel.focus();
+          return;
+        }
         const show = !state.showSearchPanel;
         if (!show) {
           if (this._eventSearcher) this._eventSearcher.reset();
@@ -638,11 +662,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Toggle disabled`),
       click: () => this.toggleDisabled(),
       enabled: this._selectionCanToggleDisabled(),
+      accelerator: getShortcutDisplayName(
+        this.props.preferences.values.userShortcutMap[
+          'TOGGLE_EVENT_DISABLED'
+        ] || 'KeyD'
+      ),
     },
     { type: 'separator' },
     {
       label: i18n._(t`Add New Event Below`),
-      click: () => this.addNewEvent('BuiltinCommonInstructions::Standard'),
+      click: () => {
+        this.addNewEvent('BuiltinCommonInstructions::Standard');
+      },
     },
     {
       label: i18n._(t`Add Sub Event`),
@@ -654,7 +685,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       submenu: this.state.allEventsMetadata.map(metadata => {
         return {
           label: metadata.fullName,
-          click: () => this.addNewEvent(metadata.type),
+          click: () => {
+            this.addNewEvent(metadata.type);
+          },
         };
       }),
     },
@@ -730,7 +763,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       },
       () => {
         this.updateToolbar();
-        this.eventContextMenu.open(x, y);
+        if (this.eventContextMenu) this.eventContextMenu.open(x, y);
       }
     );
   };
@@ -751,7 +784,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       },
       () => {
         this.updateToolbar();
-        this.instructionContextMenu.open(x, y);
+        if (this.instructionContextMenu) this.instructionContextMenu.open(x, y);
       }
     );
   };
@@ -780,22 +813,29 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
         : null,
-      inlineEditingChangesMade: false,
       inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
     });
   };
 
   closeParameterEditor = (shouldCancel: boolean) => {
-    if (shouldCancel) {
-      const { instruction, parameterIndex } = this.state.editedParameter;
-      if (!instruction || !this.state.inlineEditingPreviousValue) return;
-
-      instruction.setParameter(
-        parameterIndex,
-        this.state.inlineEditingPreviousValue
-      );
-    } else {
-      if (this.state.inlineEditingChangesMade) {
+    const { instruction, parameterIndex } = this.state.editedParameter;
+    if (instruction) {
+      // If the user canceled, revert the value to the previous value, if not null.
+      if (
+        shouldCancel &&
+        typeof this.state.inlineEditingPreviousValue === 'string'
+      ) {
+        instruction.setParameter(
+          parameterIndex,
+          this.state.inlineEditingPreviousValue
+        );
+      }
+      // If the user made changes, save the value to history.
+      if (
+        !shouldCancel &&
+        this.state.inlineEditingPreviousValue !==
+          instruction.getParameter(parameterIndex)
+      ) {
         this._saveChangesToHistory();
       }
     }
@@ -806,7 +846,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       {
         inlineEditing: false,
         inlineEditingAnchorEl: null,
-        inlineEditingChangesMade: false,
       },
       () => {
         if (inlineEditingAnchorEl) {
@@ -827,12 +866,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   toggleDisabled = () => {
-    getSelectedEvents(this.state.selection).forEach(event =>
-      event.setDisabled(!event.isDisabled())
-    );
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    let shouldBeSaved = false;
+    getSelectedEvents(this.state.selection).forEach(event => {
+      if (event.isExecutable()) {
+        event.setDisabled(!event.isDisabled());
+        shouldBeSaved = true;
+      }
     });
+    if (shouldBeSaved) {
+      this._saveChangesToHistory(() => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      });
+    }
   };
 
   deleteSelection = ({
@@ -1064,6 +1109,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       eventsList.insertEvent(event, eventsList.getEventsCount())
     );
 
+    this.props.onBeginCreateEventsFunction();
+
     this.setState({
       serializedEventsToExtract: serializeToJSObject(eventsList),
     });
@@ -1286,9 +1333,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       onChooseResource,
       resourceExternalEditors,
       onCreateEventsFunction,
+      tutorials,
     } = this.props;
     if (!project) return null;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const screenType = useScreenType();
 
     return (
@@ -1370,6 +1419,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       : 0
                   }
                   fontSize={preferences.values.eventsSheetZoomLevel}
+                  preferences={preferences}
+                  tutorials={tutorials}
                 />
                 {this.state.showSearchPanel && (
                   <SearchPanel
@@ -1429,9 +1480,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                       return;
                     }
                     instruction.setParameter(parameterIndex, value);
-                    this.setState({
-                      inlineEditingChangesMade: true,
-                    });
+                    // Ask the component to re-render, so that the new parameter
+                    // set for the instruction in the state
+                    // is taken into account for the InlineParameterEditor.
+                    this.forceUpdate();
                     if (this._searchPanel)
                       this._searchPanel.markSearchResultsDirty();
                   }}
@@ -1537,11 +1589,15 @@ const EventsSheet = (props, ref) => {
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const preferences = React.useContext(PreferencesContext);
+  const { tutorials } = React.useContext(TutorialContext);
+  const leaderboardsManager = React.useContext(LeaderboardContext);
   return (
     <EventsSheetComponentWithoutHandle
       ref={component}
       authenticatedUser={authenticatedUser}
       preferences={preferences}
+      tutorials={tutorials}
+      leaderboardsManager={leaderboardsManager}
       {...props}
     />
   );

@@ -33,6 +33,7 @@ import {
   listObjectBehaviorsTypes,
 } from '../../Utils/Behavior';
 import ExtensionsSearchDialog from '../../AssetStore/ExtensionStore/ExtensionsSearchDialog';
+import { sendBehaviorAdded } from '../../Utils/Analytics/EventSender';
 
 const styles = {
   fullHeightSelector: {
@@ -177,7 +178,13 @@ export default function NewInstructionEditorDialog({
       defaultName
     );
 
-    if (wasBehaviorAdded) setNewBehaviorDialogOpen(false);
+    if (wasBehaviorAdded) {
+      setNewBehaviorDialogOpen(false);
+      sendBehaviorAdded({
+        behaviorType: type,
+        parentEditor: 'instruction-editor-dialog',
+      });
+    }
 
     // Re-choose the same object to force recomputation of chosenObjectInstructionsInfoTree
     // This is not done automatically because a change in the object behaviors
@@ -281,6 +288,7 @@ export default function NewInstructionEditorDialog({
         searchPlaceholderObjectName={chosenObjectName}
         searchPlaceholderIsCondition={isCondition}
         onClickMore={() => setNewBehaviorDialogOpen(true)}
+        id="object-instruction-selector"
       />
     ) : null;
 
@@ -302,6 +310,7 @@ export default function NewInstructionEditorDialog({
             disabled={!instructionType}
             onClick={onSubmit}
             key="ok"
+            id="ok-button"
           />,
         ]}
         secondaryActions={[
@@ -334,10 +343,11 @@ export default function NewInstructionEditorDialog({
         cannotBeDismissed={true}
         maxWidth={false}
         noMargin
-        flexRowBody
+        flexBody
         fullHeight={
           true /* Always use full height to avoid a very small dialog when there are not a lot of objects. */
         }
+        id="instruction-editor-dialog"
       >
         <SelectColumns
           columnsRenderer={{

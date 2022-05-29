@@ -1,5 +1,7 @@
 // @flow
-const isDev = process.env.NODE_ENV === 'development';
+import Window from '../Window';
+
+const isDev = Window.isDev();
 
 export const GDevelopGamePreviews = {
   baseUrl: `https://game-previews.gdevelop-app.com/`,
@@ -14,6 +16,14 @@ export const GDevelopGamesPlatform = {
     isDev
       ? `https://liluo.io/games/${gameId}?dev=true`
       : `https://liluo.io/games/${gameId}`,
+  getGameUrlWithSlug: (userSlug: string, gameSlug: string) =>
+    isDev
+      ? `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}?dev=true`
+      : `https://liluo.io/${userSlug.toLowerCase()}/${gameSlug.toLowerCase()}`,
+  getUserPublicProfileUrl: (userId: string, username: ?string) =>
+    username
+      ? `https://liluo.io/${username}${isDev ? '?dev=true' : ''}`
+      : `https://liluo.io/user/${userId}${isDev ? '?dev=true' : ''}`,
 };
 
 export const GDevelopBuildApi = {
@@ -65,4 +75,10 @@ export const GDevelopUserApi = {
   baseUrl: isDev
     ? 'https://yrun9q6udj.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/user',
+};
+
+export const GDevelopPlayApi = {
+  baseUrl: isDev
+    ? 'https://n9dsp0xfw6.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/play',
 };

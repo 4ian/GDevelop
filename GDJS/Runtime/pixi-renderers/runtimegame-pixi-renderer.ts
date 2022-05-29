@@ -19,7 +19,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
   export class RuntimeGamePixiRenderer {
-    _game: any;
+    _game: gdjs.RuntimeGame;
     _isFullPage: boolean = true;
 
     //Used to track if the canvas is displayed on the full page.
@@ -41,7 +41,6 @@ namespace gdjs {
     _marginTop: any;
     _marginRight: any;
     _marginBottom: any;
-    _notifySceneForResize: any;
 
     _nextFrameId: integer = 0;
 
@@ -137,7 +136,6 @@ namespace gdjs {
       window.addEventListener('resize', () => {
         this._game.onWindowInnerSizeChanged();
         this._resizeCanvas();
-        this._game._notifySceneForResize = true;
       });
 
       // Focus the canvas when created.
@@ -185,6 +183,7 @@ namespace gdjs {
             promise.catch(() => {});
           }
         } else {
+          // @ts-ignore
           window.screen.orientation.lock(gameOrientation).catch(() => {});
         }
       } catch (error) {
@@ -277,7 +276,6 @@ namespace gdjs {
       }
       this._keepRatio = enable;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -297,7 +295,6 @@ namespace gdjs {
       this._marginBottom = bottom;
       this._marginLeft = left;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -306,10 +303,10 @@ namespace gdjs {
      * @param height The new height, in pixels.
      */
     setWindowSize(width: float, height: float): void {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.setContentSize(width, height);
         }
@@ -322,10 +319,10 @@ namespace gdjs {
      * Center the window on screen.
      */
     centerWindow() {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.center();
         }
@@ -343,10 +340,10 @@ namespace gdjs {
       }
       if (this._isFullscreen !== enable) {
         this._isFullscreen = !!enable;
-        const electron = this.getElectron();
-        if (electron) {
+        const remote = this.getElectronRemote();
+        if (remote) {
           // Use Electron BrowserWindow API
-          const browserWindow = electron.remote.getCurrentWindow();
+          const browserWindow = remote.getCurrentWindow();
           if (browserWindow) {
             browserWindow.setFullScreen(this._isFullscreen);
           }
@@ -392,7 +389,6 @@ namespace gdjs {
           }
         }
         this._resizeCanvas();
-        this._notifySceneForResize = true;
       }
     }
 
@@ -400,9 +396,9 @@ namespace gdjs {
      * Checks if the game is in full screen.
      */
     isFullScreen(): boolean {
-      const electron = this.getElectron();
-      if (electron) {
-        return electron.remote.getCurrentWindow().isFullScreen();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        return remote.getCurrentWindow().isFullScreen();
       }
 
       // Height check is used to detect user triggered full screen (for example F11 shortcut).
@@ -442,7 +438,11 @@ namespace gdjs {
     /**
      * Add the standard events handler.
      */
-    bindStandardEvents(manager, window, document) {
+    bindStandardEvents(
+      manager: gdjs.InputManager,
+      window: Window,
+      document: Document
+    ) {
       const renderer = this._pixiRenderer;
       if (!renderer) return;
       const canvas = renderer.view;
@@ -451,7 +451,7 @@ namespace gdjs {
       //to game coordinates.
       const that = this;
 
-      function getEventPosition(e) {
+      function getEventPosition(e: MouseEvent | Touch) {
         const pos = [e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop];
 
         // Handle the fact that the game is stretched to fill the canvas.
@@ -460,6 +460,18 @@ namespace gdjs {
         pos[1] *=
           that._game.getGameResolutionHeight() / (that._canvasHeight || 1);
         return pos;
+      }
+
+      function isInsideCanvas(e: MouseEvent | Touch) {
+        const x = e.pageX - canvas.offsetLeft;
+        const y = e.pageY - canvas.offsetTop;
+
+        return (
+          0 <= x &&
+          x < (that._canvasWidth || 1) &&
+          0 <= y &&
+          y < (that._canvasHeight || 1)
+        );
       }
 
       //Some browsers lacks definition of some variables used to do calculations
@@ -480,6 +492,7 @@ namespace gdjs {
           document.documentElement === undefined ||
           document.documentElement === null
         ) {
+          // @ts-ignore
           document.documentElement = {};
         }
         if (isNaN(document.documentElement.scrollLeft)) {
@@ -571,6 +584,12 @@ namespace gdjs {
         );
         return false;
       };
+      canvas.onmouseleave = function (e) {
+        manager.onMouseLeave();
+      };
+      canvas.onmouseenter = function (e) {
+        manager.onMouseEnter();
+      };
       window.addEventListener(
         'click',
         function (e) {
@@ -606,6 +625,15 @@ namespace gdjs {
           for (let i = 0; i < e.changedTouches.length; ++i) {
             const pos = getEventPosition(e.changedTouches[i]);
             manager.onTouchMove(e.changedTouches[i].identifier, pos[0], pos[1]);
+            // This works because touch events are sent
+            // when they continue outside of the canvas.
+            if (manager.isSimulatingMouseWithTouch()) {
+              if (isInsideCanvas(e.changedTouches[i])) {
+                manager.onMouseEnter();
+              } else {
+                manager.onMouseLeave();
+              }
+            }
           }
         }
       });
@@ -710,9 +738,9 @@ namespace gdjs {
     stopGame() {
       // Try to detect the environment to use the most adapted
       // way of closing the app
-      const electron = this.getElectron();
-      if (electron) {
-        const browserWindow = electron.remote.getCurrentWindow();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.close();
         }
@@ -754,11 +782,36 @@ namespace gdjs {
      * Get the electron module, if running as a electron renderer process.
      */
     getElectron() {
-      if (typeof require !== 'undefined') {
+      if (typeof require === 'function') {
         return require('electron');
       }
       return null;
     }
+
+    /**
+     * Helper to get the electron remote module, if running on Electron.
+     * Note that is not guaranteed to be supported in the future - avoid if possible.
+     */
+    getElectronRemote = () => {
+      if (typeof require === 'function') {
+        const runtimeGameOptions = this._game.getAdditionalOptions();
+        const moduleId =
+          runtimeGameOptions && runtimeGameOptions.electronRemoteRequirePath
+            ? runtimeGameOptions.electronRemoteRequirePath
+            : '@electron/remote';
+
+        try {
+          return require(moduleId);
+        } catch (requireError) {
+          console.error(
+            `Could not load @electron/remote from "${moduleId}". Error is:`,
+            requireError
+          );
+        }
+      }
+
+      return null;
+    };
   }
 
   //Register the class to let the engine use it.

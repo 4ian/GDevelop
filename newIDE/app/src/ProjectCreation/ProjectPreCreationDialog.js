@@ -15,8 +15,8 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
 
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 type Props = {|
   open: boolean,
@@ -85,8 +85,10 @@ const ProjectPreCreationDialog = ({
           key="create"
           label={<Trans>Create project</Trans>}
           onClick={onValidate}
+          id="create-project-button"
         />,
       ]}
+      id="project-pre-creation-dialog"
     >
       <Column noMargin>
         <TextField

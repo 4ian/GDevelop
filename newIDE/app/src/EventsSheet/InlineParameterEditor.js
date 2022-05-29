@@ -52,7 +52,8 @@ export default class InlineParameterEditor extends React.Component<
 
   _field: ?any;
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (newProps.open && !this.props.open) ||
       newProps.instruction !== this.props.instruction
@@ -100,7 +101,8 @@ export default class InlineParameterEditor extends React.Component<
       () => {
         // Give a bit of time for the popover to mount itself
         setTimeout(() => {
-          if (this._field && this._field.focus) this._field.focus();
+          if (this._field && this._field.focus)
+            this._field.focus(/*selectAll=*/ true);
         }, 10);
       }
     );

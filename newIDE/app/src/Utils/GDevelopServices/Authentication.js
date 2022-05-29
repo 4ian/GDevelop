@@ -62,8 +62,8 @@ export type AuthError = {
 
 export default class Authentication {
   auth: Auth;
-  _onUserLogoutCallback: ?() => void | Promise<void> = null;
-  _onUserUpdateCallback: ?() => void | Promise<void> = null;
+  _onUserLogoutCallbacks: Array<() => void | Promise<void>> = [];
+  _onUserUpdateCallbacks: Array<() => void | Promise<void>> = [];
 
   constructor() {
     const app = initializeApp(GDevelopFirebaseConfig);
@@ -71,20 +71,29 @@ export default class Authentication {
     onAuthStateChanged(this.auth, user => {
       if (user) {
         // User has logged in or changed.
-        if (this._onUserUpdateCallback) this._onUserUpdateCallback();
+        this._onUserUpdateCallbacks.forEach(cb => cb());
       } else {
         // User has logged out.
-        if (this._onUserLogoutCallback) this._onUserLogoutCallback();
+        this._onUserLogoutCallbacks.forEach(cb => cb());
       }
     });
   }
 
-  setOnUserLogoutCallback = (cb: () => void | Promise<void>) => {
-    this._onUserLogoutCallback = cb;
+  addUserLogoutListener = (cb: () => void | Promise<void>) => {
+    this._onUserLogoutCallbacks.push(cb);
   };
 
-  setOnUserUpdateCallback = (cb: () => void | Promise<void>) => {
-    this._onUserUpdateCallback = cb;
+  addUserUpdateListener = (cb: () => void | Promise<void>) => {
+    this._onUserUpdateCallbacks.push(cb);
+  };
+
+  removeEventListener = (cbToRemove: () => void | Promise<void>) => {
+    this._onUserLogoutCallbacks = this._onUserLogoutCallbacks.filter(
+      cb => cb !== cbToRemove
+    );
+    this._onUserUpdateCallbacks = this._onUserUpdateCallbacks.filter(
+      cb => cb !== cbToRemove
+    );
   };
 
   createFirebaseAccount = (form: RegisterForm): Promise<void> => {
@@ -101,7 +110,8 @@ export default class Authentication {
 
   createUser = (
     getAuthorizationHeader: () => Promise<string>,
-    form: RegisterForm
+    form: RegisterForm,
+    appLanguage: string
   ): Promise<void> => {
     return getAuthorizationHeader()
       .then(authorizationHeader => {
@@ -120,6 +130,7 @@ export default class Authentication {
             id: currentUser.uid,
             email: form.email,
             username: form.username,
+            appLanguage: appLanguage,
           },
           {
             params: {
@@ -256,7 +267,8 @@ export default class Authentication {
 
   editUserProfile = async (
     getAuthorizationHeader: () => Promise<string>,
-    form: EditForm
+    form: EditForm,
+    appLanguage: string
   ) => {
     const { currentUser } = this.auth;
     if (!currentUser)
@@ -271,6 +283,7 @@ export default class Authentication {
             username,
             description,
             getGameStatsEmail,
+            appLanguage,
           },
           {
             params: {

@@ -44,6 +44,7 @@ export const renderGroupObjectsListItem = ({
         />
       }
       onClick={onClick}
+      disableAutoTranslate
     />
   );
 };

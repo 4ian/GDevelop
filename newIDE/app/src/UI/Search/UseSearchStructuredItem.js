@@ -12,7 +12,6 @@ export const sharedFuseConfiguration = {
   threshold: 0.35,
   includeMatches: true,
   ignoreLocation: true,
-  ignoreFieldNorm: true,
 };
 
 const tuneMatchIndices = (match: SearchMatch, searchText: string) => {
@@ -121,7 +120,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   // easing random discovery of items when no search is done.
   const shuffledSearchResults = React.useMemo(
     () => {
-      if (!searchItemsById) return null;
+      if (!searchItemsById || !Object.keys(searchItemsById).length) return null;
 
       return shuffle(
         Object.keys(searchItemsById).map(id => ({
@@ -150,14 +149,13 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
         const newSearchApi = new Fuse(Object.values(searchItemsById), {
           keys: [
             { name: 'name', weight: 2 },
-            { name: 'fullName', weight: 2 },
+            { name: 'fullName', weight: 5 },
             { name: 'shortDescription', weight: 1 },
           ],
           minMatchCharLength: 2,
           threshold: 0.35,
           includeMatches: true,
           ignoreLocation: true,
-          ignoreFieldNorm: true,
         });
 
         const totalTime = performance.now() - startTime;

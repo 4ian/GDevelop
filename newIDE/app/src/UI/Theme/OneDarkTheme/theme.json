@@ -175,6 +175,23 @@
       "frame-border-color": {
         "value": "#D6DEEC"
       }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "#4C5361"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#E06C75"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "#21252B"
+        }
+      }
     }
   },
   "input": {
@@ -314,6 +331,11 @@
         },
         "background-color": {
           "value": "#E06C7544"
+        }
+      },
+      "warning": {
+        "color": {
+          "value": "#E5C07B"
         }
       }
     },

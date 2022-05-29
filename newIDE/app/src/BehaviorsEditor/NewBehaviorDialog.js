@@ -76,6 +76,7 @@ const BehaviorListItem = ({
     onClick={onClick}
     style={disabled ? styles.disabledItem : undefined}
     disabled={disabled}
+    id={'behavior-item-' + behaviorMetadata.type.replace(/:/g, '-')}
   />
 );
 
@@ -229,10 +230,12 @@ export default function NewBehaviorDialog({
             <HelpButton helpPagePath="/behaviors" key="help" />,
           ]}
           open
+          onRequestClose={onClose}
           cannotBeDismissed={false}
           flexBody
           noMargin
           fullHeight
+          id="new-behavior-dialog"
         >
           <Column expand noMargin>
             <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -255,6 +258,7 @@ export default function NewBehaviorDialog({
                   }}
                   onChange={setSearchText}
                   ref={searchBar}
+                  placeholder={t`Search installed behaviors`}
                 />
                 {hasSearchNoResult && (
                   <EmptyMessage>

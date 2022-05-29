@@ -38,6 +38,7 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           canGrabPlatforms: true,
           ignoreDefaultControls: true,
           slopeMaxAngle: 60,
+          useLegacyTrajectory: false,
         },
       ],
       effects: [],

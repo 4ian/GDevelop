@@ -13,6 +13,8 @@ import AlertMessage from '../../UI/AlertMessage';
 import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
+import { showWarningBox } from '../../UI/Messages/MessageBox';
+import TutorialButton from '../../UI/TutorialButton';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -42,6 +44,7 @@ export type Exporter = {|
 
 export type ExportDialogWithoutExportsProps = {|
   project: ?gdProject,
+  onSaveProject: () => Promise<void>,
   onClose: () => void,
   onChangeSubscription: () => void,
 |};
@@ -56,6 +59,7 @@ type Props = {|
 
 const ExportDialog = ({
   project,
+  onSaveProject,
   onClose,
   allExportersRequireOnline,
   onChangeSubscription,
@@ -84,6 +88,16 @@ const ExportDialog = ({
   );
   const onlineStatus = useOnlineStatus();
   const cantExportBecauseOffline = !!allExportersRequireOnline && !onlineStatus;
+
+  const openBuildDialog = () => {
+    if (!game) {
+      showWarningBox(
+        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on Liluo.io."
+      );
+      return;
+    }
+    setBuildsDialogOpen(true);
+  };
 
   const loadGame = React.useCallback(
     async () => {
@@ -161,11 +175,19 @@ const ExportDialog = ({
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
+        exporter.exportPipeline.name === 'local-html5' ||
+        exporter.exportPipeline.name === 'browser-html5' ? (
+          <TutorialButton
+            key="tutorial"
+            tutorialId="export-to-itch"
+            label="How to export to Itch.io"
+          />
+        ) : null,
         <FlatButton
           key="builds"
           label={<Trans>See this game builds</Trans>}
-          onClick={() => setBuildsDialogOpen(true)}
-          disabled={isNavigationDisabled || !game}
+          onClick={openBuildDialog}
+          disabled={isNavigationDisabled}
         />,
       ]}
       open
@@ -186,6 +208,7 @@ const ExportDialog = ({
           setChosenExporterKey={setChosenExporterKey}
           setChosenExporterSection={setChosenExporterSection}
           project={project}
+          onSaveProject={onSaveProject}
           onChangeSubscription={onChangeSubscription}
           authenticatedUser={authenticatedUser}
           isNavigationDisabled={isNavigationDisabled}
@@ -222,6 +245,7 @@ const ExportDialog = ({
           <ExportLauncher
             exportPipeline={exporter.exportPipeline}
             project={project}
+            onSaveProject={onSaveProject}
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             key={chosenExporterKey}

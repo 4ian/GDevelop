@@ -17,6 +17,7 @@ type Props = {|
   onClick: () => void,
   selectedValue: ?string,
   matchesCoordinates: number[][],
+  id?: ?string,
 |};
 
 export const renderObjectListItem = ({
@@ -26,10 +27,12 @@ export const renderObjectListItem = ({
   onClick,
   selectedValue,
   matchesCoordinates,
+  id,
 }: Props) => {
   const objectName: string = objectWithContext.object.getName();
   return (
     <ListItem
+      id={id}
       key={getObjectListItemKey(objectWithContext)}
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(objectName)
@@ -50,6 +53,7 @@ export const renderObjectListItem = ({
         />
       }
       onClick={onClick}
+      disableAutoTranslate
     />
   );
 };

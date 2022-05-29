@@ -28,7 +28,7 @@ namespace gdjs {
 
   class TextInputRuntimeObjectPixiRenderer {
     private _object: gdjs.TextInputRuntimeObject;
-    private _input: HTMLInputElement | HTMLTextAreaElement;
+    private _input: HTMLInputElement | HTMLTextAreaElement | null = null;
     private _runtimeScene: gdjs.RuntimeScene;
     private _runtimeGame: gdjs.RuntimeGame;
 
@@ -37,14 +37,13 @@ namespace gdjs {
       this._runtimeScene = runtimeObject.getRuntimeScene();
       this._runtimeGame = this._runtimeScene.getGame();
 
-      this._input = this._createElement();
-      this._runtimeGame
-        .getRenderer()
-        .getDomElementContainer()!
-        .appendChild(this._input);
+      this._createElement();
     }
 
     _createElement() {
+      if (!!this._input)
+        throw new Error('Tried to recreate an input while it already exists.');
+
       const isTextArea = this._object.getInputType() === 'text area';
       this._input = document.createElement(isTextArea ? 'textarea' : 'input');
       this._input.style.border = '1px solid black';
@@ -57,9 +56,13 @@ namespace gdjs {
       this._input.style.display = 'none'; // Hide while object is being set up.
 
       this._input.addEventListener('input', () => {
+        if (!this._input) return;
+
         this._object.onRendererInputValueChanged(this._input.value);
       });
       this._input.addEventListener('touchstart', () => {
+        if (!this._input) return;
+
         // Focus directly when touching the input on touchscreens.
         if (document.activeElement !== this._input) this._input.focus();
       });
@@ -76,12 +79,29 @@ namespace gdjs {
       this.updateDisabled();
       this.updateReadOnly();
 
-      return this._input;
+      this._runtimeGame
+        .getRenderer()
+        .getDomElementContainer()!
+        .appendChild(this._input);
     }
 
     _destroyElement() {
       if (!this._input) return;
       this._input.remove();
+      this._input = null;
+    }
+
+    onScenePaused() {
+      // This is the only renderer that uses a DOM element. PixiJS renderers
+      // usually don't need to know if a scene is paused/resumed,
+      // because their renderers are then not used (not part of the other scene graphs).
+      // For this object, we need to remove the DOM element whenever it must
+      // be not rendered.
+      this._destroyElement();
+    }
+
+    onSceneResumed() {
+      this._createElement();
     }
 
     onDestroy() {
@@ -89,7 +109,25 @@ namespace gdjs {
     }
 
     updatePreRender() {
+      if (!this._input) return;
+
+      // Hide the input entirely if the object is hidden.
+      // Because this object is rendered as a DOM element (and not part of the PixiJS
+      // scene graph), we have to do this manually.
+      if (this._object.isHidden()) {
+        this._input.style.display = 'none';
+        return;
+      }
+
+      // Hide the input entirely if the layer is not visible.
+      // Because this object is rendered as a DOM element (and not part of the PixiJS
+      // scene graph), we have to do this manually.
       const layer = this._runtimeScene.getLayer(this._object.getLayer());
+      if (!layer.isVisible()) {
+        this._input.style.display = 'none';
+        return;
+      }
+
       const runtimeGame = this._runtimeScene.getGame();
       const runtimeGameRenderer = runtimeGame.getRenderer();
       const topLeftCanvasCoordinates = layer.convertInverseCoords(
@@ -103,7 +141,7 @@ namespace gdjs {
         0
       );
 
-      // Hide the input entirely if not visible at all
+      // Hide the input entirely if not visible at all.
       const isOutsideCanvas =
         bottomRightCanvasCoordinates[0] < 0 ||
         bottomRightCanvasCoordinates[1] < 0 ||
@@ -114,7 +152,7 @@ namespace gdjs {
         return;
       }
 
-      // Position the input on the container on top of the canvas
+      // Position the input on the container on top of the canvas.
       const topLeftPageCoordinates = runtimeGameRenderer.convertCanvasToDomElementContainerCoords(
         topLeftCanvasCoordinates
       );
@@ -145,14 +183,17 @@ namespace gdjs {
     }
 
     updateString() {
+      if (!this._input) return;
       this._input.value = this._object.getString();
     }
 
     updatePlaceholder() {
+      if (!this._input) return;
       this._input.placeholder = this._object.getPlaceholder();
     }
 
     updateFont() {
+      if (!this._input) return;
       this._input.style.fontFamily = this._runtimeScene
         .getGame()
         .getFontManager()
@@ -160,20 +201,18 @@ namespace gdjs {
     }
 
     updateOpacity() {
+      if (!this._input) return;
       this._input.style.opacity = '' + this._object.getOpacity() / 255;
     }
 
     updateInputType() {
+      if (!this._input) return;
+
       const isTextArea = this._input instanceof HTMLTextAreaElement;
       const shouldBeTextArea = this._object.getInputType() === 'text area';
       if (isTextArea !== shouldBeTextArea) {
         this._destroyElement();
         this._createElement();
-
-        this._runtimeGame
-          .getRenderer()
-          .getDomElementContainer()!
-          .appendChild(this._input);
       }
 
       const newType =
@@ -182,6 +221,8 @@ namespace gdjs {
     }
 
     updateTextColor() {
+      if (!this._input) return;
+
       this._input.style.color = formatRgbAndOpacityToCssRgba(
         this._object._getRawTextColor(),
         255
@@ -189,6 +230,8 @@ namespace gdjs {
     }
 
     updateFillColorAndOpacity() {
+      if (!this._input) return;
+
       this._input.style.backgroundColor = formatRgbAndOpacityToCssRgba(
         this._object._getRawFillColor(),
         this._object.getFillOpacity()
@@ -196,18 +239,26 @@ namespace gdjs {
     }
 
     updateBorderColorAndOpacity() {
+      if (!this._input) return;
+
       this._input.style.borderColor = formatRgbAndOpacityToCssRgba(
         this._object._getRawBorderColor(),
         this._object.getBorderOpacity()
       );
     }
     updateBorderWidth() {
+      if (!this._input) return;
+
       this._input.style.borderWidth = this._object.getBorderWidth() + 'px';
     }
     updateDisabled() {
+      if (!this._input) return;
+
       this._input.disabled = this._object.isDisabled();
     }
     updateReadOnly() {
+      if (!this._input) return;
+
       this._input.readOnly = this._object.isReadOnly();
     }
 

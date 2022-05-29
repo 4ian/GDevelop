@@ -17,10 +17,12 @@ type Props<Item> = {|
   selectedItems: Array<Item>,
   onAddNewItem?: () => void,
   addNewItemLabel?: React.Node | string,
+  addNewItemId?: string,
   onRename: (Item, string) => void,
   renderItemLabel?: Item => React.Node,
   getItemName: Item => string,
   getItemThumbnail?: Item => string,
+  getItemId?: (Item, index: number) => string,
   isItemBold?: Item => boolean,
   onItemSelected: (?Item) => void,
   onEditItem?: Item => void,
@@ -59,6 +61,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       onEditItem,
       renamedItem,
       getItemName,
+      getItemId,
       renderItemLabel,
       scaleUpItemIconWhenSelected,
     } = this.props;
@@ -70,6 +73,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       <ItemRow
         item={item}
         itemName={itemName}
+        id={getItemId ? getItemId(item, index) : undefined}
         renderItemLabel={
           renderItemLabel ? () => renderItemLabel(item) : undefined
         }
@@ -97,6 +101,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
       width,
       fullList,
       addNewItemLabel,
+      addNewItemId,
       renamedItem,
       getItemThumbnail,
       onAddNewItem,
@@ -135,6 +140,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                         <AddListItem
                           onClick={onAddNewItem}
                           primaryText={addNewItemLabel}
+                          id={addNewItemId}
                         />
                       </div>
                     );
@@ -142,13 +148,13 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
 
                   const item = fullList[index];
                   const nameBeingEdited = renamedItem === item;
-                  const selected = selectedItems.indexOf(item) !== -1;
+                  const isSelected = selectedItems.indexOf(item) !== -1;
 
                   return (
                     <div style={style} key={key}>
                       <DragSourceAndDropTarget
                         beginDrag={() => {
-                          this.props.onItemSelected(item);
+                          if (!isSelected) this.props.onItemSelected(item);
 
                           // $FlowFixMe
                           return {};
@@ -174,7 +180,7 @@ export default class SortableVirtualizedItemList<Item> extends React.Component<
                           // draggable if the item is not selected. When selected,
                           // set the whole item to be draggable.
                           const canDragOnlyIcon =
-                            screenType === 'touch' && !selected;
+                            screenType === 'touch' && !isSelected;
 
                           // Add an extra div because connectDropTarget/connectDragSource can
                           // only be used on native elements

@@ -232,7 +232,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
         click: () => this._editName(eventsBasedBehavior),
       },
       {
-        label: i18n._(t`Remove`),
+        label: i18n._(t`Delete`),
         click: () =>
           this._deleteEventsBasedBehavior(eventsBasedBehavior, {
             askForConfirmation: true,
@@ -338,6 +338,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
               searchText: text,
             })
           }
+          placeholder={t`Search behaviors`}
         />
       </Background>
     );

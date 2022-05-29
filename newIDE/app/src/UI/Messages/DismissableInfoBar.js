@@ -7,6 +7,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
+import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
 
 type Props = {|
   identifier: AlertMessageIdentifier,
@@ -24,7 +25,7 @@ const DismissableInfoBar = ({
   const preferences = React.useContext(PreferencesContext);
   const screenType = useScreenType();
 
-  return (
+  return isUserflowRunning ? null : (
     <Snackbar
       open={show && !preferences.values.hiddenAlertMessages[identifier]}
       message={

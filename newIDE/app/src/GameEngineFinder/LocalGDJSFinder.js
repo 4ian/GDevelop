@@ -1,9 +1,9 @@
 // @flow
 // Note: this file don't use export/imports nor Flow to allow its usage from Node.js
 
-const optionalRequire = require('../Utils/OptionalRequire.js');
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+const optionalRequire = require('../Utils/OptionalRequire');
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 const fs = optionalRequire('fs');
 const path = optionalRequire('path');
 const process = optionalRequire('process');

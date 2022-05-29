@@ -24,6 +24,11 @@ namespace gdjs {
       isCollidingAnyPlatform: false,
     };
 
+    /**
+     * A very small value compare to 1 pixel, yet very huge compare to rounding errors.
+     */
+    private static readonly epsilon = 2 ** -20;
+
     // Behavior configuration
 
     /** To achieve pixel-perfect precision when positioning object on platform or
@@ -107,6 +112,8 @@ namespace gdjs {
     _overlappedJumpThru: Array<gdjs.PlatformRuntimeBehavior>;
 
     private _hasReallyMoved: boolean = false;
+    /** @deprecated use _hasReallyMoved instead */
+    private _hasMovedAtLeastOnePixel: boolean = false;
     private _manager: gdjs.PlatformObjectsManager;
 
     constructor(
@@ -128,7 +135,10 @@ namespace gdjs {
       this._xGrabTolerance = behaviorData.xGrabTolerance || 10;
       this._jumpSustainTime = behaviorData.jumpSustainTime || 0;
       this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
-      this._useLegacyTrajectory = behaviorData.useLegacyTrajectory;
+      this._useLegacyTrajectory =
+        behaviorData.useLegacyTrajectory === undefined
+          ? true
+          : behaviorData.useLegacyTrajectory;
       this._canGoDownFromJumpthru = behaviorData.canGoDownFromJumpthru;
       this._slopeMaxAngle = 0;
       this.setSlopeMaxAngle(behaviorData.slopeMaxAngle);
@@ -309,6 +319,11 @@ namespace gdjs {
 
       //5) Track the movement
       this._hasReallyMoved =
+        Math.abs(object.getX() - oldX) >
+          PlatformerObjectRuntimeBehavior.epsilon ||
+        Math.abs(object.getY() - oldY) >
+          PlatformerObjectRuntimeBehavior.epsilon;
+      this._hasMovedAtLeastOnePixel =
         Math.abs(object.getX() - oldX) >= 1 ||
         Math.abs(object.getY() - oldY) >= 1;
       this._lastDeltaY = object.getY() - oldY;
@@ -778,12 +793,16 @@ namespace gdjs {
         this._findPlatformHighestRelativeYUnderObject(platform, context);
         let highestRelativeY = context.getFloorDeltaY();
         if (
-          // When following the floor, ignore jumpthrus that are higher than the character bottom.
-          this._state === this._onFloor &&
-          platform !== this._onFloor.getFloorPlatform() &&
           platform.getPlatformType() ===
             gdjs.PlatformRuntimeBehavior.JUMPTHRU &&
-          highestRelativeY < 0
+          // When following the floor, ignore jumpthrus that are higher than the character bottom.
+          ((this._state === this._onFloor &&
+            platform !== this._onFloor.getFloorPlatform() &&
+            highestRelativeY < 0) ||
+            // A jumpthrus should never constrain a character to go below.
+            // Jumpthrus are considered as obstacles at the 1st frame they are overlapping the character
+            // because it allows it to land on them, but they shouldn't push on its head.
+            context.allowedMinDeltaY !== previousAllowedMinDeltaY)
         ) {
           // Don't follow jumpthrus that are higher than the character bottom.
           // Revert side effect on the search context.
@@ -1536,9 +1555,27 @@ namespace gdjs {
 
     /**
      * Check if the Platformer Object is moving.
+     *
+     * When walking or climbing on a ladder,
+     * a speed of less than one pixel per frame won't be detected.
+     *
      * @returns Returns true if it is moving and false if not.
+     * @deprecated use isMovingEvenALittle instead
      */
     isMoving(): boolean {
+      return (
+        (this._hasMovedAtLeastOnePixel &&
+          (this._currentSpeed !== 0 || this._state === this._onLadder)) ||
+        this._jumping.getCurrentJumpSpeed() !== 0 ||
+        this._currentFallSpeed !== 0
+      );
+    }
+
+    /**
+     * Check if the Platformer Object is moving.
+     * @returns Returns true if it is moving and false if not.
+     */
+    isMovingEvenALittle(): boolean {
       return (
         (this._hasReallyMoved &&
           (this._currentSpeed !== 0 || this._state === this._onLadder)) ||

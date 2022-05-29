@@ -13,6 +13,7 @@ import AnimationPreview from './AnimationPreview';
 import ResourcesLoader from '../../../ResourcesLoader';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { isProjectImageResourceSmooth } from '../../../ResourcesList/ResourcePreview/ImagePreview';
 
 const styles = {
   container: {
@@ -56,7 +57,8 @@ export default class DirectionTools extends Component<Props, State> {
     previewOpen: false,
   };
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     this.setState({
       timeBetweenFrames: formatTime(
         this.props.direction.getTimeBetweenFrames()
@@ -168,13 +170,19 @@ export default class DirectionTools extends Component<Props, State> {
             flexBody
           >
             <AnimationPreview
-              spritesContainer={direction}
-              resourcesLoader={resourcesLoader}
+              resourceNames={direction.getSpriteNames().toJSArray()}
+              getImageResourceSource={(name: string) =>
+                resourcesLoader.getResourceFullUrl(project, name, {})
+              }
+              isImageResourceSmooth={(name: string) =>
+                isProjectImageResourceSmooth(project, name)
+              }
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}
               onChangeTimeBetweenFrames={text =>
                 this.setState({ timeBetweenFrames: text })
               }
+              isLooping={direction.isLooping()}
             />
           </Dialog>
         )}

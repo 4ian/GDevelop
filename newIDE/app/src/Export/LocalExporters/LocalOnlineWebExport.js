@@ -11,16 +11,15 @@ import { uploadLocalFile } from './LocalFileUploader';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { findGDJS } from '../../GameEngineFinder/LocalGDJSFinder';
 import { archiveLocalFolder } from '../../Utils/LocalArchiver';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import localFileSystem from './LocalFileSystem';
 import {
   type ExportPipeline,
   type ExportPipelineContext,
 } from '../ExportPipeline.flow';
-import { type BuildStep } from '../Builds/BuildStepsProgress';
 import {
   ExplanationHeader,
-  WebProjectLink,
+  OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
@@ -67,12 +66,20 @@ export const localOnlineWebExportPipeline: ExportPipeline<
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
-  renderCustomStepsProgress: (
-    build: ?Build,
-    errored: boolean,
-    exportStep: BuildStep
-  ) => (
-    <WebProjectLink build={build} errored={errored} exportStep={exportStep} />
+  renderCustomStepsProgress: ({
+    build,
+    project,
+    onSaveProject,
+    errored,
+    exportStep,
+  }) => (
+    <OnlineGameLink
+      build={build}
+      project={project}
+      onSaveProject={onSaveProject}
+      errored={errored}
+      exportStep={exportStep}
+    />
   ),
 
   prepareExporter: (

@@ -13,7 +13,7 @@ import ExpressionParametersEditorDialog, {
 } from './ExpressionParametersEditorDialog';
 import { hasNonCodeOnlyParameters } from './ExpressionParametersEditor';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type ParameterFieldProps } from '../ParameterFieldCommons';
 import BackgroundHighlighting, {
   type Highlight,
@@ -32,8 +32,9 @@ import {
   getAutocompletionsInitialState,
   setNewAutocompletions,
   handleAutocompletionsKeyDown,
-  getVisibleAutocompletions,
-  getRemainingCount,
+  handleAutocompletionsScroll,
+  getRenderedAutocompletions,
+  getNonRenderedCount,
 } from './ExpressionAutocompletionsHandler';
 import ExpressionAutocompletionsDisplayer from './ExpressionAutocompletionsDisplayer';
 import { ResponsiveWindowMeasurer } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -179,9 +180,17 @@ export default class ExpressionField extends React.Component<Props, State> {
     }
   }
 
-  focus = () => {
+  focus = (selectAll: boolean = false) => {
     if (this._field) {
       this._field.focus();
+      if (selectAll) {
+        if (this._inputElement) {
+          this._inputElement.setSelectionRange(
+            0,
+            this.props.value.toString().length
+          );
+        }
+      }
       this._enqueueValidation();
     }
   };
@@ -283,6 +292,14 @@ export default class ExpressionField extends React.Component<Props, State> {
         }
       }, 5);
     }, 5);
+  };
+
+  _onExpressionAutocompletionsScroll = () => {
+    if (this.state.autocompletions.renderEverything) return; // Bail out early to avoid changing the state if not needed.
+
+    this.setState({
+      autocompletions: handleAutocompletionsScroll(this.state.autocompletions),
+    });
   };
 
   _insertAutocompletion = (
@@ -552,15 +569,16 @@ export default class ExpressionField extends React.Component<Props, State> {
                   <ExpressionAutocompletionsDisplayer
                     project={project}
                     anchorEl={this._inputElement}
-                    expressionAutocompletions={getVisibleAutocompletions(
+                    expressionAutocompletions={getRenderedAutocompletions(
                       this.state.autocompletions
                     )}
-                    remainingCount={getRemainingCount(
+                    remainingCount={getNonRenderedCount(
                       this.state.autocompletions
                     )}
                     selectedCompletionIndex={
                       this.state.autocompletions.selectedCompletionIndex
                     }
+                    onScroll={this._onExpressionAutocompletionsScroll}
                     onChoose={expressionAutocompletion => {
                       this._insertAutocompletion(expressionAutocompletion);
 

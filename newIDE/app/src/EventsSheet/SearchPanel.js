@@ -18,6 +18,7 @@ import {
 import RaisedButton from '../UI/RaisedButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import {
+  shouldBrowsePrevious,
   shouldCloseOrCancel,
   shouldValidate,
 } from '../UI/KeyboardShortcuts/InteractionKeys';
@@ -37,6 +38,7 @@ type Props = {|
 export type SearchPanelInterface = {|
   focus: () => void,
   markSearchResultsDirty: () => void,
+  isSearchOngoing: () => boolean,
 |};
 
 const SearchPanel = (
@@ -53,19 +55,6 @@ const SearchPanel = (
   ref
 ) => {
   const searchTextField = React.useRef<?TextField>(null);
-
-  const focusSearchField = React.useCallback((): void => {
-    if (searchTextField.current) searchTextField.current.focus();
-  }, []);
-
-  const markSearchResultsDirty = React.useCallback((): void => {
-    setSearchResultsDirty(true);
-  }, []);
-
-  React.useImperativeHandle(ref, () => ({
-    focus: focusSearchField,
-    markSearchResultsDirty,
-  }));
 
   const [searchText, setSearchText] = React.useState<string>('');
   const [replaceText, setReplaceText] = React.useState<string>('');
@@ -89,6 +78,27 @@ const SearchPanel = (
     'search-and-replace' | 'search-in-event-sentences'
   >('search-and-replace');
 
+  const isSearchOngoing = React.useCallback(
+    (): boolean => {
+      return !!searchText && !searchResultsDirty;
+    },
+    [searchText, searchResultsDirty]
+  );
+
+  const focusSearchField = React.useCallback((): void => {
+    if (searchTextField.current) searchTextField.current.focus();
+  }, []);
+
+  const markSearchResultsDirty = React.useCallback((): void => {
+    setSearchResultsDirty(true);
+  }, []);
+
+  React.useImperativeHandle(ref, () => ({
+    isSearchOngoing,
+    focus: focusSearchField,
+    markSearchResultsDirty,
+  }));
+
   React.useEffect(
     () => {
       setSearchResultsDirty(true);
@@ -102,7 +112,10 @@ const SearchPanel = (
     ]
   );
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(focusSearchField, [currentTab]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(markSearchResultsDirty, [currentTab]);
 
   const launchSearch = () => {
@@ -171,7 +184,9 @@ const SearchPanel = (
                 setSearchText(searchText);
               }}
               onKeyPress={event => {
-                if (shouldValidate(event)) {
+                if (shouldBrowsePrevious(event)) {
+                  onGoToPreviousSearchResult();
+                } else if (shouldValidate(event)) {
                   if (!searchResultsDirty) {
                     onGoToNextSearchResult();
                   } else {

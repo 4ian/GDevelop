@@ -10,7 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../../../UI/SearchBar';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
   findInTree,
@@ -58,6 +58,7 @@ type Props<T> = {|
   helpPagePath?: ?string,
   style?: Object,
   onClickMore?: () => void,
+  id?: ?string,
 |};
 type State<T> = {|
   searchText: string,
@@ -84,6 +85,7 @@ export default class InstructionOrExpressionSelector<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar
     ) {
@@ -118,6 +120,7 @@ export default class InstructionOrExpressionSelector<
       helpPagePath,
       style,
       onClickMore,
+      id,
     } = this.props;
     const { searchText } = this.state;
     const displayedInstructionsList: Array<SearchResult<T>> =
@@ -146,6 +149,7 @@ export default class InstructionOrExpressionSelector<
               backgroundColor: muiTheme.list.itemsBackgroundColor,
               ...style,
             }}
+            id={id}
           >
             <SearchBar
               value={searchText}

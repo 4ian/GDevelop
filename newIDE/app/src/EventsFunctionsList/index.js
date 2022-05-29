@@ -293,7 +293,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         click: () => this._togglePrivate(eventsFunction),
       },
       {
-        label: i18n._(t`Remove`),
+        label: i18n._(t`Delete`),
         click: () =>
           this._deleteEventsFunction(eventsFunction, {
             askForConfirmation: true,
@@ -408,6 +408,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          placeholder={t`Search functions`}
         />
       </Background>
     );

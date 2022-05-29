@@ -20,9 +20,9 @@ const styles = {
     padding: 0,
     overflowX: 'hidden',
   },
-  flexRowBody: {
+  flexColumnBody: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
   },
   flexBody: {
     display: 'flex',
@@ -70,7 +70,7 @@ type Props = {|
   children: React.Node, // The content of the dialog
 
   // Display:
-  flexRowBody?: boolean, //Check if necessary
+  flexColumnBody?: boolean,
   flexBody?: boolean,
 
   // Size
@@ -80,6 +80,8 @@ type Props = {|
   // Style:
   noMargin?: boolean,
   noTitleMargin?: boolean,
+
+  id?: ?string,
 |};
 
 // Help Flow to understand the type of the dialog content style.
@@ -87,14 +89,14 @@ type DialogContentStyle = {
   padding?: 0,
   overflowX?: 'hidden',
   display?: 'flex',
-  flexDirection?: 'row',
+  flexDirection?: 'row' | 'column',
 };
 
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-export default (props: Props) => {
+const Dialog = (props: Props) => {
   const {
     onApply,
     secondaryActions,
@@ -105,10 +107,11 @@ export default (props: Props) => {
     noMargin,
     title,
     children,
-    flexRowBody,
+    flexColumnBody,
     flexBody,
     fullHeight,
     noTitleMargin,
+    id,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
@@ -129,7 +132,7 @@ export default (props: Props) => {
 
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-    ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
+    ...((flexColumnBody ? styles.flexColumnBody : {}): DialogContentStyle),
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
 
@@ -181,7 +184,7 @@ export default (props: Props) => {
       className={classNames({
         'safe-area-aware-container': size === 'small',
       })}
-      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
+      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {}, id }}
       maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
       disableBackdropClick={false}
       onKeyDown={handleKeyDown}
@@ -204,3 +207,5 @@ export default (props: Props) => {
     </DialogMaterialUI>
   );
 };
+
+export default Dialog;

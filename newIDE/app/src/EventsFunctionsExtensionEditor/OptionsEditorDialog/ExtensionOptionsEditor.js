@@ -209,6 +209,10 @@ export const ExtensionOptionsEditor = ({
                 value: 'Ads',
               },
               {
+                text: 'Audio',
+                value: 'Audio',
+              },
+              {
                 text: 'Advanced',
                 value: 'Advanced',
               },

@@ -6,17 +6,17 @@
 
 #ifndef PARAMETER_METADATA_H
 #define PARAMETER_METADATA_H
-#include "GDCore/String.h"
 #include <map>
 #include <memory>
 
+#include "GDCore/String.h"
 namespace gd {
 class Project;
 class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 class SerializerElement;
-} // namespace gd
+}  // namespace gd
 
 namespace gd {
 
@@ -27,7 +27,7 @@ namespace gd {
  * \ingroup Events
  */
 class GD_CORE_API ParameterMetadata {
-public:
+ public:
   ParameterMetadata();
   virtual ~ParameterMetadata(){};
 
@@ -151,15 +151,16 @@ public:
   }
 
   /**
-   * \brief Return true if the type of the parameter is "object", "objectPtr" or
-   * "objectList".
+   * \brief Return true if the type of the parameter is representing one object
+   * (or more, i.e: an object group).
    *
    * \see gd::ParameterMetadata::GetType
    */
   static bool IsObject(const gd::String &parameterType) {
     return parameterType == "object" || parameterType == "objectPtr" ||
            parameterType == "objectList" ||
-           parameterType == "objectListWithoutPicking";
+           parameterType == "objectListOrEmptyIfJustDeclared" ||
+           parameterType == "objectListOrEmptyWithoutPicking";
   }
 
   /**
@@ -195,7 +196,9 @@ public:
              parameterType == "objectEffectParameterName" ||
              parameterType == "objectPointName" ||
              parameterType == "objectAnimationName" ||
-             parameterType == "functionParameterName";
+             parameterType == "functionParameterName" ||
+             parameterType == "externalLayoutName" ||
+             parameterType == "leaderboardId";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar" || parameterType == "variable";
@@ -222,21 +225,21 @@ public:
 
   // TODO: Deprecated public fields. Any direct usage should be moved to
   // getter/setter.
-  gd::String type;                     ///< Parameter type
-  gd::String supplementaryInformation; ///< Used if needed
-  bool optional;                       ///< True if the parameter is optional
+  gd::String type;                      ///< Parameter type
+  gd::String supplementaryInformation;  ///< Used if needed
+  bool optional;                        ///< True if the parameter is optional
 
-  gd::String description; ///< Description shown in editor
-  bool codeOnly; ///< True if parameter is relative to code generation only,
-                 ///< i.e. must not be shown in editor
-private:
-  gd::String longDescription; ///< Long description shown in the editor.
-  gd::String defaultValue;    ///< Used as a default value in editor or if an
-                              ///< optional parameter is empty.
-  gd::String name;            ///< The name of the parameter to be used in code
-                              ///< generation. Optional.
+  gd::String description;  ///< Description shown in editor
+  bool codeOnly;  ///< True if parameter is relative to code generation only,
+                  ///< i.e. must not be shown in editor
+ private:
+  gd::String longDescription;  ///< Long description shown in the editor.
+  gd::String defaultValue;     ///< Used as a default value in editor or if an
+                               ///< optional parameter is empty.
+  gd::String name;             ///< The name of the parameter to be used in code
+                               ///< generation. Optional.
 };
 
-} // namespace gd
+}  // namespace gd
 
-#endif // PARAMETER_METADATA_H
+#endif  // PARAMETER_METADATA_H

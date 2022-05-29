@@ -1,9 +1,9 @@
 // @flow
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import newNameGenerator from '../../Utils/NewNameGenerator';
 import { type ResourceFetcher, type FetchResourcesArgs } from '.';
 import PromisePool from '@supercharge/promise-pool';
-import { retryIfFailed } from '../../Utils/RetryIfFailed.js';
+import { retryIfFailed } from '../../Utils/RetryIfFailed';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const fs = optionalRequire('fs-extra');

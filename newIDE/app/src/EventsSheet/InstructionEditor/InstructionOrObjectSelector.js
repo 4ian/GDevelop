@@ -21,7 +21,7 @@ import {
 import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, {
   useShouldAutofocusSearchbar,
@@ -161,6 +161,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar.current
     ) {
@@ -179,7 +180,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
       {
         ...sharedFuseConfiguration,
         keys: [
-          { name: 'displayedName', weight: 2 },
+          { name: 'displayedName', weight: 5 },
           { name: 'fullGroupName', weight: 1 },
         ],
       }
@@ -390,6 +391,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   }
                   style={styles.searchBar}
                   ref={this._searchBar}
+                  placeholder={
+                    isCondition
+                      ? t`Search objects or conditions`
+                      : t`Search objects or actions`
+                  }
                 />
                 {!isSearching && (
                   <Tabs value={currentTab} onChange={onChangeTab}>
@@ -425,7 +431,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                       {(isSearching || currentTab === 'objects') && (
                         <React.Fragment>
                           {displayedObjectsList.map(
-                            ({ item: objectWithContext, matches }) =>
+                            ({ item: objectWithContext, matches }, index) =>
                               renderObjectListItem({
                                 project: project,
                                 objectWithContext: objectWithContext,
@@ -442,6 +448,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                                       chosenObjectName
                                     )
                                   : undefined,
+                                id: 'object-item-' + index,
                               })
                           )}
 
@@ -486,6 +493,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                             onClick={() => {
                               this._selectTag(tag);
                             }}
+                            disableAutoTranslate
                           />
                         ))}
                       {isSearching && displayedInstructionsList.length > 0 && (

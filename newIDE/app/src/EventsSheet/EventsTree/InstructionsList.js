@@ -147,6 +147,8 @@ export default function InstructionsList({
     );
   });
 
+  // Note: might be worth fixing this warning:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const instructionsListContext = {
     instrsList,
     isCondition: areConditions,
@@ -158,6 +160,7 @@ export default function InstructionsList({
   ) : (
     <Trans>Add action</Trans>
   );
+
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
       event => {
@@ -210,6 +213,9 @@ export default function InstructionsList({
                 }}
                 {...longTouchForContextMenuProps}
                 ref={addButton}
+                id={
+                  areConditions ? 'add-condition-button' : 'add-action-button'
+                }
               >
                 {addButtonLabel || addButtonDefaultLabel}
               </button>

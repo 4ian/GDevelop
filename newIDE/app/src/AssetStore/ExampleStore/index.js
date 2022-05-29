@@ -12,6 +12,8 @@ import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
+import { t } from '@lingui/macro';
 
 const styles = {
   searchBar: {
@@ -94,6 +96,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               tagsHandler={tagsHandler}
               tags={filters && filters.defaultTags}
               ref={searchBarRef}
+              placeholder={t`Search examples`}
             />
             <Line
               expand
@@ -102,6 +105,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               }
             >
               <ListSearchResults
+                disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
                 onRetry={fetchExamplesAndFilters}
                 error={error}
                 searchItems={
@@ -115,6 +119,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                     exampleShortHeader={exampleShortHeader}
                     matches={getExampleMatches(exampleShortHeader)}
                     onChoose={() => {
+                      sendExampleDetailsOpened(exampleShortHeader.slug);
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}
                     onOpen={() => {

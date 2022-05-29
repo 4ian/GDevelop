@@ -17,6 +17,8 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.getMouseX");
   GetAllConditions()["MouseY"].SetFunctionName(
       "gdjs.evtTools.input.getMouseY");
+  GetAllConditions()["IsMouseInsideCanvas"].SetFunctionName(
+      "gdjs.evtTools.input.isMouseInsideCanvas");
   GetAllConditions()["SourisX"].SetFunctionName(
       "gdjs.evtTools.input.getMouseX"); // Deprecated
   GetAllConditions()["SourisY"].SetFunctionName(
@@ -53,9 +55,9 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.getMouseY");  // Deprecated
 
   GetAllConditions()["PopStartedTouch"].SetFunctionName(
-      "gdjs.evtTools.input.popStartedTouch");
+      "gdjs.evtTools.input.popStartedTouch");  // Deprecated
   GetAllConditions()["PopEndedTouch"].SetFunctionName(
-      "gdjs.evtTools.input.popEndedTouch");
+      "gdjs.evtTools.input.popEndedTouch");  // Deprecated
 
   GetAllConditions()["TouchX"].SetFunctionName("gdjs.evtTools.input.getTouchX");
   GetAllConditions()["TouchY"].SetFunctionName("gdjs.evtTools.input.getTouchY");
@@ -65,9 +67,18 @@ MouseExtension::MouseExtension() {
       "gdjs.evtTools.input.getTouchY");
 
   GetAllExpressions()["LastTouchId"].SetFunctionName(
-      "gdjs.evtTools.input.getLastTouchId");
+      "gdjs.evtTools.input.getLastTouchId");  // Deprecated
   GetAllExpressions()["LastEndedTouchId"].SetFunctionName(
-      "gdjs.evtTools.input.getLastEndedTouchId");
+      "gdjs.evtTools.input.getLastEndedTouchId");  // Deprecated
+
+  GetAllConditions()["HasAnyTouchStarted"].SetFunctionName(
+      "gdjs.evtTools.input.hasAnyTouchStarted");
+  GetAllConditions()["HasTouchEnded"].SetFunctionName(
+      "gdjs.evtTools.input.hasTouchEnded");
+  GetAllExpressions()["StartedTouchCount"].SetFunctionName(
+      "gdjs.evtTools.input.getStartedTouchCount");
+  GetAllExpressions()["StartedTouchId"].SetFunctionName(
+      "gdjs.evtTools.input.getStartedTouchIdentifier");
 
   GetAllExpressions()["MouseWheelDelta"].SetFunctionName(
       "gdjs.evtTools.input.getMouseWheelDelta");

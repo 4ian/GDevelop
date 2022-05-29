@@ -17,6 +17,11 @@ import { type EditorMosaicNode } from '../../UI/EditorMosaic';
 import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
 import defaultShortcuts from '../../KeyboardShortcuts/DefaultShortcuts';
 import { type CommandName } from '../../CommandPalette/CommandsList';
+import {
+  getBrowserLanguageOrLocale,
+  setLanguageInDOM,
+  selectLanguageOrLocale,
+} from '../../Utils/Language';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -30,9 +35,53 @@ type State = Preferences;
 const LocalStorageItem = 'gd-preferences';
 const MAX_RECENT_FILES_COUNT = 20;
 
+export const loadPreferencesFromLocalStorage = (): ?PreferencesValues => {
+  try {
+    const persistedState = localStorage.getItem(LocalStorageItem);
+    if (!persistedState) return null;
+
+    const values = JSON.parse(persistedState);
+
+    // "Migrate" non existing properties to their default values
+    // (useful when upgrading the preferences to a new version where
+    // a new preference was added).
+    for (const key in initialPreferences.values) {
+      if (
+        initialPreferences.values.hasOwnProperty(key) &&
+        typeof values[key] === 'undefined'
+      ) {
+        values[key] = initialPreferences.values[key];
+      }
+    }
+
+    return values;
+  } catch (e) {
+    return null;
+  }
+};
+
+export const getInitialPreferences = () => {
+  let languageOrLocale = 'en';
+  const browserLanguageOrLocale = getBrowserLanguageOrLocale();
+  if (browserLanguageOrLocale)
+    languageOrLocale = selectLanguageOrLocale(
+      browserLanguageOrLocale,
+      languageOrLocale
+    );
+
+  return { ...initialPreferences.values, language: languageOrLocale };
+};
+
+const getPreferences = () => {
+  const preferences =
+    loadPreferencesFromLocalStorage() || getInitialPreferences();
+  setLanguageInDOM(preferences.language);
+  return preferences;
+};
+
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
-    values: this._loadValuesFromLocalStorage() || initialPreferences.values,
+    values: getPreferences(),
     setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
@@ -92,6 +141,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _setLanguage(language: string) {
+    setLanguageInDOM(language);
     this.setState(
       state => ({
         values: {
@@ -362,31 +412,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       }),
       () => this._persistValuesToLocalStorage(this.state)
     );
-  }
-
-  _loadValuesFromLocalStorage(): ?PreferencesValues {
-    try {
-      const persistedState = localStorage.getItem(LocalStorageItem);
-      if (!persistedState) return null;
-
-      const values = JSON.parse(persistedState);
-
-      // "Migrate" non existing properties to their default values
-      // (useful when upgrading the preferences to a new version where
-      // a new preference was added).
-      for (const key in initialPreferences.values) {
-        if (
-          initialPreferences.values.hasOwnProperty(key) &&
-          typeof values[key] === 'undefined'
-        ) {
-          values[key] = initialPreferences.values[key];
-        }
-      }
-
-      return values;
-    } catch (e) {
-      return null;
-    }
   }
 
   _persistValuesToLocalStorage(preferences: Preferences) {

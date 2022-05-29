@@ -41,6 +41,7 @@ import Tune from '@material-ui/icons/Tune';
 import { type UnsavedChanges } from '../MainFrame/UnsavedChangesContext';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 import { getParametersIndexOffset } from '../EventsFunctionsExtensionsLoader';
+import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 
 const gd: libGDevelop = global.gd;
 
@@ -57,7 +58,11 @@ type Props = {|
   ) => void,
   onCreateEventsFunction: (
     extensionName: string,
-    eventsFunction: gdEventsFunction
+    eventsFunction: gdEventsFunction,
+    editorIdentifier:
+      | 'scene-events-editor'
+      | 'extension-events-editor'
+      | 'external-events-editor'
   ) => void,
   onBehaviorEdited?: () => Promise<void>,
   initiallyFocusedFunctionName: ?string,
@@ -668,6 +673,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     // Do nothing otherwise to avoid costly and useless extra renders.
   };
 
+  onBeginCreateEventsFunction = () => {
+    sendEventsExtractedAsFunction({
+      step: 'begin',
+      parentEditor: 'extension-events-editor',
+    });
+  };
+
+  onCreateEventsFunction = (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
+    this.props.onCreateEventsFunction(
+      extensionName,
+      eventsFunction,
+      'extension-events-editor'
+    );
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
     const {
@@ -776,9 +799,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   this.props.openInstructionOrExpression
                 }
                 setToolbar={this.props.setToolbar}
-                onCreateEventsFunction={this.props.onCreateEventsFunction}
+                onBeginCreateEventsFunction={this.onBeginCreateEventsFunction}
+                onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={this._editOptions}
                 unsavedChanges={this.props.unsavedChanges}
+                isActive={true}
               />
             </Background>
           ) : (

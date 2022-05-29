@@ -13,7 +13,7 @@ const closeServer = () => {
 
 /** @param {WebSocket.Server} wsServer */
 const getServerAddress = wsServer => ({
-  address: findLocalIp(),
+  address: findLocalIp() || '127.0.0.1',
   port: wsServer.address().port,
 });
 

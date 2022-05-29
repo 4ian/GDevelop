@@ -10,7 +10,7 @@ import AddCircleOutline from '@material-ui/icons/AddCircleOutline';
 
 import FlatButton from '../../../UI/FlatButton';
 import IconButton from '../../../UI/IconButton';
-import { Line, Spacer } from '../../../UI/Grid';
+import { LargeSpacer, Line, Spacer } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
 import Carousel from '../../../UI/Carousel';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
@@ -41,7 +41,7 @@ import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
-import optionalRequire from '../../../Utils/OptionalRequire.js';
+import optionalRequire from '../../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
 const styles = {
@@ -109,13 +109,6 @@ const prepareTutorials = (tutorials: Array<Tutorial>) =>
       },
     };
   });
-
-const betweenCarouselSpacerCount = 6;
-
-const renderBetweenCarouselSpace = (offset: number = 0) =>
-  Array(betweenCarouselSpacerCount)
-    .fill(0)
-    .map((e, index) => <Spacer key={`spacer${index + offset}`} />);
 
 export const HomePage = React.memo<Props>(
   React.forwardRef<Props, HomePageEditorInterface>(
@@ -321,6 +314,7 @@ export const HomePage = React.memo<Props>(
                                 setPreCreationDialogOpen(true);
                               }}
                               icon={<AddCircleOutline />}
+                              id="home-create-blank-project-button"
                             />
                           )}
                           {!project && canOpen && (
@@ -345,6 +339,7 @@ export const HomePage = React.memo<Props>(
                                 onClick={() => {
                                   onCloseProject();
                                 }}
+                                id="home-close-project-button"
                               />
                             </>
                           )}
@@ -371,7 +366,7 @@ export const HomePage = React.memo<Props>(
                         )
                       }
                     />
-                    {renderBetweenCarouselSpace()}
+                    <LargeSpacer />
                     <Carousel
                       title={<Trans>Learn game making</Trans>}
                       items={tutorials ? prepareTutorials(tutorials) : null}
@@ -392,7 +387,7 @@ export const HomePage = React.memo<Props>(
                         )
                       }
                     />
-                    {renderBetweenCarouselSpace(betweenCarouselSpacerCount)}
+                    <LargeSpacer />
                     <Carousel
                       title={<Trans>Games made by the community</Trans>}
                       items={
@@ -401,6 +396,14 @@ export const HomePage = React.memo<Props>(
                           : null
                       }
                       displayItemTitles
+                      additionalAction={
+                        <RaisedButton
+                          label={<Trans>Play on Liluo.io</Trans>}
+                          onClick={() =>
+                            Window.openExternalURL('https://liluo.io')
+                          }
+                        />
+                      }
                       onBrowseAllClick={onOpenGamesShowcase}
                       browseAllLabel={<Trans>Browse all</Trans>}
                       error={
@@ -432,9 +435,7 @@ export const HomePage = React.memo<Props>(
                           icon={<ForumIcon />}
                           label={<Trans>Community Forums</Trans>}
                           onClick={() =>
-                            Window.openExternalURL(
-                              'https://forum.gdevelop-app.com'
-                            )
+                            Window.openExternalURL('https://forum.gdevelop.io')
                           }
                         />
                         <FlatButton

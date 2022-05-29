@@ -220,12 +220,12 @@ const buildAndSendMenuTemplate = (
     submenu: [
       {
         label: i18n._(t`GDevelop website`),
-        onClickOpenLink: 'http://gdevelop-app.com',
+        onClickOpenLink: 'http://gdevelop.io',
       },
       { type: 'separator' },
       {
         label: i18n._(t`Community Forums`),
-        onClickOpenLink: 'https://forum.gdevelop-app.com',
+        onClickOpenLink: 'https://forum.gdevelop.io',
       },
       {
         label: i18n._(t`Community Discord Chat`),
@@ -234,7 +234,7 @@ const buildAndSendMenuTemplate = (
       { type: 'separator' },
       {
         label: i18n._(t`Contribute to GDevelop`),
-        onClickOpenLink: 'https://gdevelop-app.com/contribute/',
+        onClickOpenLink: 'https://gdevelop.io/page/contribute',
       },
       {
         label: i18n._(t`Create Extensions for GDevelop`),

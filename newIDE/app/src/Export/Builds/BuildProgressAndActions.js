@@ -80,7 +80,7 @@ type Props = {|
  * Show an estimate of the progress of a build or the button
  * to download the artifacts.
  */
-export default ({
+const BuildProgressAndActions = ({
   build,
   game,
   onGameUpdated,
@@ -216,14 +216,14 @@ export default ({
             <Line expand justifyContent="flex-end">
               {game && !!build.s3Key && !isBuildPublished && (
                 <RaisedButton
-                  label={<Trans>Publish this build on Liluo</Trans>}
+                  label={<Trans>Publish this build on Liluo.io</Trans>}
                   onClick={() => onUpdatePublicBuild(build.id)}
                   disabled={gameUpdating}
                 />
               )}
               {game && !!build.s3Key && isBuildPublished && (
                 <FlatButton
-                  label={<Trans>Unpublish this build from Liluo</Trans>}
+                  label={<Trans>Unpublish this build from Liluo.io</Trans>}
                   onClick={() => onUpdatePublicBuild(null)}
                   disabled={gameUpdating}
                 />
@@ -261,3 +261,5 @@ export default ({
     </I18n>
   );
 };
+
+export default BuildProgressAndActions;

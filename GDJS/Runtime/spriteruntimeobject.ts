@@ -1187,6 +1187,17 @@ namespace gdjs {
     }
 
     /**
+     * Change the size of the object.
+     *
+     * @param newWidth The new width of the object, in pixels.
+     * @param newHeight The new height of the object, in pixels.
+     */
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
+    }
+
+    /**
      * Change the scale on X and Y axis of the object.
      *
      * @param newScale The new scale (must be greater than 0).

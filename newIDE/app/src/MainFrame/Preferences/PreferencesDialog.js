@@ -19,15 +19,19 @@ import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
+import LanguageSelector from './LanguageSelector';
 const electron = optionalRequire('electron');
 
 type Props = {|
   i18n: I18n,
-  onClose: Function,
+  onClose: (languageDidChange: boolean) => void,
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const [currentTab, setCurrentTab] = React.useState('preferences');
+  const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
+    false
+  );
   const {
     values,
     setThemeName,
@@ -60,10 +64,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           key="close"
           label={<Trans>Close</Trans>}
           primary={false}
-          onClick={onClose}
+          onClick={() => onClose(languageDidChange)}
         />,
       ]}
-      onRequestClose={onClose}
+      onRequestClose={() => onClose(languageDidChange)}
       cannotBeDismissed={true}
       open
       noTitleMargin
@@ -78,6 +82,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     >
       {currentTab === 'preferences' && (
         <Column>
+          <Text size="title">
+            <Trans>Language</Trans>
+          </Text>
+          <LanguageSelector
+            onLanguageChanged={() => {
+              setLanguageDidChange(true);
+            }}
+          />
           <Text size="title">
             <Trans>Appearance</Trans>
           </Text>
@@ -365,14 +377,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
         </Column>
       )}
       {currentTab === 'shortcuts' && (
-        <Column>
-          <ShortcutsList
-            i18n={i18n}
-            userShortcutMap={values.userShortcutMap}
-            onEdit={setShortcutForCommand}
-            onReset={resetShortcutsToDefault}
-          />
-        </Column>
+        <Line expand>
+          <Column expand>
+            <ShortcutsList
+              i18n={i18n}
+              userShortcutMap={values.userShortcutMap}
+              onEdit={setShortcutForCommand}
+              onReset={resetShortcutsToDefault}
+            />
+          </Column>
+        </Line>
       )}
     </Dialog>
   );

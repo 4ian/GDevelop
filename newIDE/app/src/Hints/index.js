@@ -37,7 +37,7 @@ export const getExtraObjectsInformation = (): {
   'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
-      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button bellow.`,
+      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button below.`,
     },
     {
       kind: 'info',
@@ -78,6 +78,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
       message: t`The bounding box is an imaginary rectangle surrounding the object collision mask. Even if the object X and Y positions are not changed, this rectangle can change if the object is rotated or if an animation is being played. Usually you should use actions and conditions related to the object position or center, but the bounding box can be useful to deal with the area of the object.`,
     };
   }
+  if (type === 'PickedInstancesCount') {
+    return {
+      kind: 'info',
+      message: t`If no previous condition or action used the specified object(s), the picked instances count will be 0.`,
+    };
+  }
   if (type === 'CompareTimer') {
     return {
       kind: 'info',
@@ -88,6 +94,12 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`To start a timer, don't forget to use the action "Start (or reset) an object timer" in another event.`,
+    };
+  }
+  if (type === 'FixCamera') {
+    return {
+      kind: 'info',
+      message: t`Please prefer using the new action "Enforce camera boundaries" which is more flexible.`,
     };
   }
   if (type === 'BitmapText::Scale') {

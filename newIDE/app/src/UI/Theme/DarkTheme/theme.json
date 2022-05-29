@@ -165,6 +165,23 @@
       "frame-border-color": {
         "value": "#dddddd"
       }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "{gdevelop.color.dark-blue.value}"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#ff5c5c"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      }
     }
   },
   "input": {
@@ -304,6 +321,11 @@
         },
         "background-color": {
           "value": "rgba(238, 255, 0, 0.05)"
+        }
+      },
+      "warning": {
+        "color": {
+          "value": "#ffa500"
         }
       }
     },

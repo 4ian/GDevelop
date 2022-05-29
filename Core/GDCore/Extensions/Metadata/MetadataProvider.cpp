@@ -354,22 +354,22 @@ MetadataProvider::GetExtensionAndObjectVariableExpressionMetadata(
   for (auto& extension : extensions) {
     const auto& objects = extension->GetExtensionObjectsTypes();
     if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
-      const auto& allObjectStrExpressions =
+      const auto& allObjectVariableExpressions =
           extension->GetAllVariableExpressionsForObject(objectType);
-      if (allObjectStrExpressions.find(exprType) !=
-          allObjectStrExpressions.end())
+      if (allObjectVariableExpressions.find(exprType) !=
+          allObjectVariableExpressions.end())
         return ExtensionAndMetadata<ExpressionMetadata>(
-            *extension, allObjectStrExpressions.find(exprType)->second);
+            *extension, allObjectVariableExpressions.find(exprType)->second);
     }
   }
 
   // Then check in functions of "Base object".
   for (auto& extension : extensions) {
-    const auto& allObjectStrExpressions =
+    const auto& allObjectVariableExpressions =
         extension->GetAllVariableExpressionsForObject("");
-    if (allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end())
+    if (allObjectVariableExpressions.find(exprType) != allObjectVariableExpressions.end())
       return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allObjectStrExpressions.find(exprType)->second);
+          *extension, allObjectVariableExpressions.find(exprType)->second);
   }
 
   return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
@@ -391,23 +391,23 @@ MetadataProvider::GetExtensionAndBehaviorVariableExpressionMetadata(
   for (auto& extension : extensions) {
     const auto& autos = extension->GetBehaviorsTypes();
     if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
-      const auto& allBehaviorStrExpressions =
+      const auto& allBehaviorVariableExpressions =
           extension->GetAllVariableExpressionsForBehavior(autoType);
-      if (allBehaviorStrExpressions.find(exprType) !=
-          allBehaviorStrExpressions.end())
+      if (allBehaviorVariableExpressions.find(exprType) !=
+          allBehaviorVariableExpressions.end())
         return ExtensionAndMetadata<ExpressionMetadata>(
-            *extension, allBehaviorStrExpressions.find(exprType)->second);
+            *extension, allBehaviorVariableExpressions.find(exprType)->second);
     }
   }
 
   // Then check in functions of "Base object".
   for (auto& extension : extensions) {
-    const auto& allBehaviorStrExpressions =
+    const auto& allBehaviorVariableExpressions =
         extension->GetAllVariableExpressionsForBehavior("");
-    if (allBehaviorStrExpressions.find(exprType) !=
-        allBehaviorStrExpressions.end())
+    if (allBehaviorVariableExpressions.find(exprType) !=
+        allBehaviorVariableExpressions.end())
       return ExtensionAndMetadata<ExpressionMetadata>(
-          *extension, allBehaviorStrExpressions.find(exprType)->second);
+          *extension, allBehaviorVariableExpressions.find(exprType)->second);
   }
 
   return ExtensionAndMetadata<ExpressionMetadata>(badExtension,

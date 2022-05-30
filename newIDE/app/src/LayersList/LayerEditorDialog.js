@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import { ColumnStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -94,10 +94,9 @@ const LayerEditorDialog = (props: Props) => {
           onClick={onCancelChanges}
           key={'Cancel'}
         />,
-        <FlatButton
-          label={<Trans>Apply</Trans>}
+        <DialogPrimaryButton
+label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onClose}
           key={'Apply'}
         />,

@@ -3,13 +3,12 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import { PublicGameProperties, cleanUpGameSlug } from './PublicGameProperties';
-import RaisedButton from '../UI/RaisedButton';
 import {
   displayProjectErrorsBox,
   getProjectPropertiesErrors,
 } from '../Utils/ProjectErrorsChecker';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
@@ -130,7 +129,7 @@ export const PublicGamePropertiesDialog = ({
       onClick={onClose}
       disabled={isLoading}
     />,
-    <RaisedButton
+    <DialogPrimaryButton
       label={<Trans>Save</Trans>}
       primary
       onClick={onSave}

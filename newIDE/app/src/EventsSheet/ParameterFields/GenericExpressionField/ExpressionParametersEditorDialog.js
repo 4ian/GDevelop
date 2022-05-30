@@ -2,9 +2,8 @@
 import React from 'react';
 import { Trans } from '@lingui/macro';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
-import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
-import Dialog from '../../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 
@@ -54,9 +53,9 @@ const ExpressionParametersEditorDialog = ({
       cannotBeDismissed={true}
       open
       actions={[
-        <FlatButton
-          key="apply"
-          label={<Trans>Apply</Trans>}
+        <DialogPrimaryButton
+key="apply"
+label={<Trans>Apply</Trans>}
           primary
           onClick={() => onDone(parameterValues)}
         />,

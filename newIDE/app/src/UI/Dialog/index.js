@@ -12,6 +12,7 @@ import {
   shouldSubmit,
 } from '../KeyboardShortcuts/InteractionKeys';
 import { LineStackLayout } from '../Layout';
+import RaisedButton from '../RaisedButton';
 
 const styles = {
   defaultBody: {
@@ -92,6 +93,8 @@ type DialogContentStyle = {
   display?: 'flex',
   flexDirection?: 'row' | 'column',
 };
+
+export const DialogPrimaryButton = RaisedButton;
 
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions

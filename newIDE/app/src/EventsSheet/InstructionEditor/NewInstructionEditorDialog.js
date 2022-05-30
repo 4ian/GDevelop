@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import {
   type ResourceSource,
@@ -303,10 +303,9 @@ export default function NewInstructionEditorDialog({
             onClick={onCancel}
             key="cancel"
           />,
-          <FlatButton
+          <DialogPrimaryButton
             label={<Trans>Ok</Trans>}
             primary={true}
-            keyboardFocused={false}
             disabled={!instructionType}
             onClick={onSubmit}
             key="ok"

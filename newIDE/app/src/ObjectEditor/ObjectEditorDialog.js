@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import React, { Component, useEffect } from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -128,12 +128,11 @@ const InnerDialog = (props: InnerDialogProps) => {
           label={<Trans>Cancel</Trans>}
           onClick={onCancelChanges}
         />,
-        <FlatButton
+        <DialogPrimaryButton
           key="apply"
           label={<Trans>Apply</Trans>}
           id="apply-button"
           primary
-          keyboardFocused
           onClick={onApply}
         />,
       ]}

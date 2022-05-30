@@ -54,8 +54,8 @@ const ExpressionParametersEditorDialog = ({
       open
       actions={[
         <DialogPrimaryButton
-key="apply"
-label={<Trans>Apply</Trans>}
+          key="apply"
+          label={<Trans>Apply</Trans>}
           primary
           onClick={() => onDone(parameterValues)}
         />,

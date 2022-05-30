@@ -56,10 +56,9 @@ export default function SetupGridDialog(props: Props) {
           onClick={onCancel}
         />,
         <DialogPrimaryButton
-key="apply"
-label={<Trans>Apply</Trans>}
+          key="apply"
+          label={<Trans>Apply</Trans>}
           primary={true}
-
           onClick={props.onApply}
         />,
       ]}

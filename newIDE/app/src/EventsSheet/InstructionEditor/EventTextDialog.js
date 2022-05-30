@@ -157,7 +157,6 @@ const EventTextDialog = (props: Props) => {
           key={'Apply'}
           label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onApply}
         />,
       ]}

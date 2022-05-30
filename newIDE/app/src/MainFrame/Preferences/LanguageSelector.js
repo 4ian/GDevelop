@@ -71,21 +71,21 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
           )}
         </SelectField>
       </Line>
-        <Text>
-          <Trans>
-            You can {' '}
-            <Link
-              href={'https://crowdin.com/project/gdevelop'}
-              onClick={event => {
-                Window.openExternalURL('https://crowdin.com/project/gdevelop');
-                event.preventDefault();
-              }}
-            >
-              help to translate GDevelop in your language
-            </Link>
-            .
-          </Trans>
-        </Text>
+      <Text>
+        <Trans>
+          You can{' '}
+          <Link
+            href={'https://crowdin.com/project/gdevelop'}
+            onClick={event => {
+              Window.openExternalURL('https://crowdin.com/project/gdevelop');
+              event.preventDefault();
+            }}
+          >
+            help to translate GDevelop in your language
+          </Link>
+          .
+        </Trans>
+      </Text>
     </Column>
   );
 };

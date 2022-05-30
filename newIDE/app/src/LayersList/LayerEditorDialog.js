@@ -95,7 +95,7 @@ const LayerEditorDialog = (props: Props) => {
           key={'Cancel'}
         />,
         <DialogPrimaryButton
-label={<Trans>Apply</Trans>}
+          label={<Trans>Apply</Trans>}
           primary
           onClick={onClose}
           key={'Apply'}

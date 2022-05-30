@@ -245,8 +245,8 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         onClick={this.props.onClose}
       />,
       <DialogPrimaryButton
-key="apply"
-label={<Trans>Apply</Trans>}
+        key="apply"
+        label={<Trans>Apply</Trans>}
         primary={true}
         onClick={this.onApply}
       />,

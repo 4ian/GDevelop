@@ -93,7 +93,6 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         label={<Trans>Ok</Trans>}
         key="ok"
         primary={true}
-        keyboardFocused={true}
         onClick={this._onApply}
       />,
     ];

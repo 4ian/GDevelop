@@ -125,44 +125,47 @@ export class ColorAssetStoreSearchFilter
     this.color = color;
   }
 
-  getPertinence(searchItem: AssetShortHeader): boolean {
+  getPertinence(searchItem: AssetShortHeader): number {
     if (!this.color) {
-      return true;
+      return 1;
     }
-    if (searchItem.dominantColors.length === 0) {
-      return false;
+    // Not zero because the item should not be excluded.
+    let scoreMax = Number.MIN_VALUE;
+    for (const dominantColor of searchItem.dominantColors) {
+      const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
+      const dominantRgb = hexNumberToRGBColor(dominantColor);
+      const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);
+      const targetSaturation = targetHsl[1];
+      const dominantSaturation = dominantHsl[1];
+      let score = 0;
+      if (targetSaturation === 0) {
+        // Hue is not relevant.
+        const deltaSaturation = dominantSaturation - targetSaturation;
+        const deltaLightness = dominantHsl[2] - targetHsl[2];
+        score =
+          1 -
+          (deltaSaturation * deltaSaturation +
+            deltaLightness * deltaLightness) /
+            2;
+      } else {
+        // Hue distance can only be up to 0.5 as it's looping.
+        // So, it's multiplied by 2 to cover [0, 1].
+        const deltaHue =
+          dominantSaturation === 0
+            ? 1
+            : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
+        const deltaSaturation = dominantSaturation - targetSaturation;
+        const deltaLightness = dominantHsl[2] - targetHsl[2];
+        // Give more importance to hue as it catches human eyes.
+        score =
+          1 -
+          (4 * deltaHue * deltaHue +
+            deltaSaturation * deltaSaturation +
+            deltaLightness * deltaLightness) /
+            6;
+      }
+      scoreMax = Math.max(scoreMax, score);
     }
-    const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
-    const dominantRgb = hexNumberToRGBColor(searchItem.dominantColors[0]);
-    const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);
-    const targetSaturation = targetHsl[1];
-    const dominantSaturation = dominantHsl[1];
-    let score = 0;
-    if (targetSaturation === 0) {
-      // Hue is not relevant.
-      const deltaSaturation = dominantSaturation - targetSaturation;
-      const deltaLightness = dominantHsl[2] - targetHsl[2];
-      score =
-        1 -
-        (deltaSaturation * deltaSaturation + deltaLightness * deltaLightness) /
-          2;
-    } else {
-      // Hue distance can only be up to 0.5 as it's looping.
-      // So, it's multiplied by 2 to cover [0, 1].
-      const deltaHue =
-        dominantSaturation === 0
-          ? 1
-          : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
-      const deltaSaturation = dominantSaturation - targetSaturation;
-      const deltaLightness = dominantHsl[2] - targetHsl[2];
-      // Give more importance to hue as it catches human eyes.
-      score =
-        1 -
-        (4 * deltaHue * deltaHue +
-          deltaSaturation * deltaSaturation +
-          deltaLightness * deltaLightness) /
-          6;
-    }
-    return score;
+    return scoreMax;
   }
 }

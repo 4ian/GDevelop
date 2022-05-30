@@ -17,24 +17,42 @@ export class TagSearchFilter<SearchItem: { tags: Array<string> }>
   }
 
   getPertinence(searchItem: SearchItem): number {
-    return (
-      this.tags.size === 0 || searchItem.tags.some(tag => this.tags.has(tag))
-    );
+    return this.tags.size === 0 ||
+      searchItem.tags.some(tag => this.tags.has(tag))
+      ? 1
+      : 0;
   }
 }
 
-const partialQuickSort = <Element: any>(
+/**
+ * Approximately sort the elements from biggest to smallest.
+ *
+ * It does a quick sort but only on the left side. It means that elements with
+ * a poor pertinence won't be sorted as well as the one with a good pertinence.
+ *
+ * This allows a O(n) complexity in most cases, but still a O(n²) in worst
+ * cases scenario (when all the values are the same).
+ */
+export const partialQuickSort = <Element: any>(
   searchItems: Array<Element>,
   getValue: (a: Element) => number,
-  pertinenceMax: number
+  valueMin: number,
+  valueMax: number
 ): void => {
+  if (valueMin >= valueMax) {
+    // All values are the same.
+    return;
+  }
   let indexMax = searchItems.length - 1;
+  // Values are between 0 and pertinenceMax.
+  // Each pass ensures that elements are on the good side of the pivot.
+  // With a pertinenceMax of 1, the pivot takes the values: 0.5, 0.25, 0.125...
   for (
     let pivotComplement = 0.5;
     pivotComplement > 1 / 128 && indexMax > 0;
     pivotComplement /= 2
   ) {
-    let pivot = pertinenceMax * (1 - pivotComplement);
+    let pivot = valueMin + (valueMax - valueMin) * (1 - pivotComplement);
     let slidingIndexMin = 0 - 1;
     let slidingIndexMax = indexMax + 1;
     while (true) {
@@ -45,7 +63,10 @@ const partialQuickSort = <Element: any>(
         getValue(searchItems[slidingIndexMin]) > pivot
       );
       if (slidingIndexMin === indexMax) {
-        return;
+        // All the values are on the left side.
+        // They must be sorted.
+        // Let's try with the next pivot value.
+        break;
       }
       do {
         slidingIndexMax--;
@@ -54,10 +75,14 @@ const partialQuickSort = <Element: any>(
         getValue(searchItems[slidingIndexMax]) < pivot
       );
       if (slidingIndexMax === 0) {
+        // All the values are on the right side.
+        // As the pivot converge on the maximum value,
+        // The sort is finished.
         return;
       }
 
       if (slidingIndexMin >= slidingIndexMax) {
+        // All values are on the good side of the pivot.
         indexMax = slidingIndexMax;
         break;
       }
@@ -114,6 +139,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
 
   let sortedSearchItems = filteredSearchItems;
   if (searchFilters) {
+    let pertinenceMin = 1;
     let pertinenceMax = 0;
     const weightedSearchItems = filteredSearchItems
       .map(searchItem => {
@@ -124,6 +150,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
             return null;
           }
         }
+        pertinenceMin = Math.min(pertinenceMin, pertinence);
         pertinenceMax = Math.max(pertinenceMax, pertinence);
         return { pertinence: pertinence, searchItem: searchItem };
       })
@@ -131,6 +158,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
     partialQuickSort(
       weightedSearchItems,
       weightedSearchItem => weightedSearchItem.pertinence,
+      pertinenceMin,
       pertinenceMax
     );
     sortedSearchItems = weightedSearchItems.map(

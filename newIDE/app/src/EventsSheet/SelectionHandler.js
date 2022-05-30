@@ -135,11 +135,25 @@ export const clearSelection = (): SelectionState => {
   return getInitialSelection();
 };
 
+// Create selectEvents?
+export const selectEventAfterHistoryChange = (
+  selection: SelectionState,
+  eventContext: EventContext
+): SelectionState => {
+  return {
+    ...selection,
+    selectedEvents: {
+      [eventContext.event.ptr]: eventContext,
+    },
+  };
+};
+
 export const selectEvent = (
   selection: SelectionState,
   eventContext: EventContext,
   multiSelection: boolean = false
 ): SelectionState => {
+  console.log('eventContext', eventContext);
   const event = eventContext.event;
   if (isEventSelected(selection, event)) return selection;
 
@@ -158,6 +172,7 @@ export const selectInstruction = (
   instructionContext: InstructionContext,
   multiSelection: boolean = false
 ): SelectionState => {
+  console.log('instructionContext', instructionContext);
   const instruction: gdInstruction = instructionContext.instruction;
   if (isInstructionSelected(selection, instruction)) return selection;
 
@@ -176,6 +191,7 @@ export const selectInstructionsList = (
   instructionsListContext: InstructionsListContext,
   multiSelection: boolean = false
 ): SelectionState => {
+  console.log('instructionsListContext', instructionsListContext);
   const instructionsList: gdInstructionsList =
     instructionsListContext.instrsList;
   if (isInstructionsListSelected(selection, instructionsList)) return selection;

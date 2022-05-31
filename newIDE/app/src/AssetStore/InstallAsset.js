@@ -168,6 +168,7 @@ export const addAssetToProject = async ({
       project
     );
 
+    object.setAssetStoreId(asset.id);
     // The name was overwritten after unserialization.
     object.setName(newName);
 

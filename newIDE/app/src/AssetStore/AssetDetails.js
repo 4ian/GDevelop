@@ -70,7 +70,6 @@ const makeFirstLetterUppercase = (str: string) =>
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -97,7 +96,6 @@ const getObjectAssetResourcesByName = (
 
 export const AssetDetails = ({
   project,
-  layout,
   objectsContainer,
   resourceSources,
   resourceExternalEditors,

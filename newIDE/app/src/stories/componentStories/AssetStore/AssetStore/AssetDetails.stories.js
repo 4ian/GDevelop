@@ -19,7 +19,6 @@ export const Default = () => (
   <AssetStoreStateProvider>
     <AssetDetails
       project={testProject.project}
-      layout={testProject.testLayout}
       objectsContainer={testProject.testLayout}
       resourceSources={[]}
       resourceExternalEditors={fakeResourceExternalEditors}
@@ -37,7 +36,6 @@ export const BeingInstalled = () => (
   <AssetStoreStateProvider>
     <AssetDetails
       project={testProject.project}
-      layout={testProject.testLayout}
       objectsContainer={testProject.testLayout}
       resourceSources={[]}
       resourceExternalEditors={fakeResourceExternalEditors}
@@ -55,7 +53,6 @@ export const AddedToProject = () => (
   <AssetStoreStateProvider>
     <AssetDetails
       project={testProject.project}
-      layout={testProject.testLayout}
       objectsContainer={testProject.testLayout}
       resourceSources={[]}
       resourceExternalEditors={fakeResourceExternalEditors}

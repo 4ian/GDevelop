@@ -78,8 +78,8 @@ type Props = {|
   assetShortHeader: AssetShortHeader,
   onAdd: () => void,
   onClose: () => void,
-  isAddedToProject: boolean,
-  isBeingAddedToProject: boolean,
+  isAddedToScene: boolean,
+  isBeingAddedToScene: boolean,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -103,8 +103,8 @@ export const AssetDetails = ({
   assetShortHeader,
   onAdd,
   onClose,
-  isAddedToProject,
-  isBeingAddedToProject,
+  isAddedToScene,
+  isBeingAddedToScene,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
@@ -147,7 +147,7 @@ export const AssetDetails = ({
     [loadAsset]
   );
 
-  const canAddAsset = !isBeingAddedToProject && !!asset;
+  const canAddAsset = !isBeingAddedToScene && !!asset;
   const onAddAsset = React.useCallback(
     () => {
       if (canAddAsset) onAdd();
@@ -250,18 +250,18 @@ export const AssetDetails = ({
           </Column>
           <Column alignItems="center" justifyContent="center">
             <LeftLoader
-              isLoading={isBeingAddedToProject || (!asset && !error)}
+              isLoading={isBeingAddedToScene || (!asset && !error)}
               key="install"
             >
               <RaisedButton
-                primary={!isAddedToProject}
+                primary={!isAddedToScene}
                 label={
-                  isBeingAddedToProject ? (
-                    <Trans>Adding to my project...</Trans>
-                  ) : isAddedToProject ? (
-                    <Trans>Add object again to my project</Trans>
+                  isBeingAddedToScene ? (
+                    <Trans>Adding to scene...</Trans>
+                  ) : isAddedToScene ? (
+                    <Trans>Add object again to my scene</Trans>
                   ) : (
-                    <Trans>Add object to my project</Trans>
+                    <Trans>Add object to my scene</Trans>
                   )
                 }
                 onClick={onAddAsset}

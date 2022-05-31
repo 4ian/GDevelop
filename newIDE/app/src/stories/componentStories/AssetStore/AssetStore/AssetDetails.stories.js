@@ -26,8 +26,8 @@ export const Default = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      isAddedToProject={false}
-      isBeingAddedToProject={false}
+      isAddedToScene={false}
+      isBeingAddedToScene={false}
     />
   </AssetStoreStateProvider>
 );
@@ -43,8 +43,8 @@ export const BeingInstalled = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      isAddedToProject={false}
-      isBeingAddedToProject={true}
+      isAddedToScene={false}
+      isBeingAddedToScene={true}
     />
   </AssetStoreStateProvider>
 );
@@ -60,8 +60,8 @@ export const AddedToProject = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      isAddedToProject={true}
-      isBeingAddedToProject={false}
+      isAddedToScene={true}
+      isBeingAddedToScene={false}
     />
   </AssetStoreStateProvider>
 );

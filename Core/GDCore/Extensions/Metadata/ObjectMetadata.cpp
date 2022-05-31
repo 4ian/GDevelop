@@ -26,11 +26,9 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
     : extensionNamespace(extensionNamespace_),
       blueprintObject(blueprintObject_) {
   name = name_;
-#if defined(GD_IDE_ONLY)
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   iconFilename = icon24x24;
-#endif
   createFunPtr =
       [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
     if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
@@ -55,11 +53,9 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                CreateFunPtr createFunPtrP)
     : extensionNamespace(extensionNamespace_) {
   name = name_;
-#if defined(GD_IDE_ONLY)
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   iconFilename = icon24x24;
-#endif
   createFunPtr = createFunPtrP;
 }
 
@@ -71,7 +67,6 @@ gd::InstructionMetadata& ObjectMetadata::AddCondition(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       extensionNamespace.empty() ? name : extensionNamespace + name;
   conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -85,7 +80,6 @@ gd::InstructionMetadata& ObjectMetadata::AddCondition(
                                            .SetHelpPath(GetHelpPath())
                                            .SetIsObjectInstruction();
   return conditionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddAction(
@@ -96,7 +90,6 @@ gd::InstructionMetadata& ObjectMetadata::AddAction(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       extensionNamespace.empty() ? name : extensionNamespace + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -110,7 +103,6 @@ gd::InstructionMetadata& ObjectMetadata::AddAction(
                                         .SetHelpPath(GetHelpPath())
                                         .SetIsObjectInstruction();
   return actionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddScopedCondition(
@@ -121,10 +113,9 @@ gd::InstructionMetadata& ObjectMetadata::AddScopedCondition(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       GetName().empty()
-          ? name // Don't insert a namespace separator for the base object.
+          ? name  // Don't insert a namespace separator for the base object.
           : GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
 
   conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -138,7 +129,6 @@ gd::InstructionMetadata& ObjectMetadata::AddScopedCondition(
                                            .SetHelpPath(GetHelpPath())
                                            .SetIsObjectInstruction();
   return conditionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::InstructionMetadata& ObjectMetadata::AddScopedAction(
@@ -149,10 +139,9 @@ gd::InstructionMetadata& ObjectMetadata::AddScopedAction(
     const gd::String& group,
     const gd::String& icon,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       GetName().empty()
-          ? name // Don't insert a namespace separator for the base object.
+          ? name  // Don't insert a namespace separator for the base object.
           : GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
 
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
@@ -166,7 +155,6 @@ gd::InstructionMetadata& ObjectMetadata::AddScopedAction(
                                         .SetHelpPath(GetHelpPath())
                                         .SetIsObjectInstruction();
   return actionsInfos[nameWithNamespace];
-#endif
 }
 
 gd::ExpressionMetadata& ObjectMetadata::AddExpression(
@@ -175,7 +163,6 @@ gd::ExpressionMetadata& ObjectMetadata::AddExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   // Be careful, objects expression do not have namespace (not necessary as
   // objects inherits from only one derived object).
   expressionsInfos[name] = ExpressionMetadata("number",
@@ -188,7 +175,6 @@ gd::ExpressionMetadata& ObjectMetadata::AddExpression(
                                .SetHelpPath(GetHelpPath());
 
   return expressionsInfos[name];
-#endif
 }
 
 gd::ExpressionMetadata& ObjectMetadata::AddStrExpression(
@@ -197,7 +183,6 @@ gd::ExpressionMetadata& ObjectMetadata::AddStrExpression(
     const gd::String& description,
     const gd::String& group,
     const gd::String& smallicon) {
-#if defined(GD_IDE_ONLY)
   // Be careful, objects expression do not have namespace (not necessary as
   // objects inherits from only one derived object).
   strExpressionsInfos[name] = ExpressionMetadata("string",
@@ -210,7 +195,26 @@ gd::ExpressionMetadata& ObjectMetadata::AddStrExpression(
                                   .SetHelpPath(GetHelpPath());
 
   return strExpressionsInfos[name];
-#endif
+}
+
+gd::ExpressionMetadata& ObjectMetadata::AddVariableExpression(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& group,
+    const gd::String& smallicon) {
+  // Be careful, objects expression do not have namespace (not necessary as
+  // objects inherits from only one derived object).
+  variableExpressionsInfos[name] = ExpressionMetadata("variable",
+                                                      extensionNamespace,
+                                                      name,
+                                                      fullname,
+                                                      description,
+                                                      group,
+                                                      smallicon)
+                                       .SetHelpPath(GetHelpPath());
+
+  return variableExpressionsInfos[name];
 }
 
 gd::MultipleInstructionMetadata ObjectMetadata::AddExpressionAndCondition(
@@ -230,12 +234,19 @@ gd::MultipleInstructionMetadata ObjectMetadata::AddExpressionAndCondition(
                               "<subject>", descriptionSubject),
                           group,
                           icon)
-          : AddStrExpression(name,
+      : type == "string"
+          ? AddStrExpression(name,
                              fullname,
                              expressionDescriptionTemplate.FindAndReplace(
                                  "<subject>", descriptionSubject),
                              group,
-                             icon);
+                             icon)
+          : AddVariableExpression(name,
+                                  fullname,
+                                  expressionDescriptionTemplate.FindAndReplace(
+                                      "<subject>", descriptionSubject),
+                                  group,
+                                  icon);
 
   gd::String conditionDescriptionTemplate = _("Compare <subject>.");
   auto& condition =
@@ -261,7 +272,8 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
     const gd::String& sentenceName,
     const gd::String& group,
     const gd::String& icon) {
-  if (type != "number" && type != "string" && type != "boolean") {
+  if (type != "number" && type != "string" && type != "boolean" &&
+      type != "variable") {
     gd::LogError(
         "Unrecognised type passed to AddExpressionAndConditionAndAction: " +
         type + ". Verify this type is valid and supported.");
@@ -291,9 +303,9 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
       icon,
       icon);
 
-
   if (type == "boolean") {
-    return MultipleInstructionMetadata::WithConditionAndAction(condition, action);
+    return MultipleInstructionMetadata::WithConditionAndAction(condition,
+                                                               action);
   }
 
   gd::String expressionDescriptionTemplate = _("Return <subject>.");
@@ -305,12 +317,19 @@ ObjectMetadata::AddExpressionAndConditionAndAction(
                               "<subject>", descriptionSubject),
                           group,
                           icon)
-          : AddStrExpression(name,
-                            fullname,
-                            expressionDescriptionTemplate.FindAndReplace(
-                                "<subject>", descriptionSubject),
-                            group,
-                            icon);
+      : type == "string"
+          ? AddStrExpression(name,
+                             fullname,
+                             expressionDescriptionTemplate.FindAndReplace(
+                                 "<subject>", descriptionSubject),
+                             group,
+                             icon)
+          : AddVariableExpression(name,
+                                  fullname,
+                                  expressionDescriptionTemplate.FindAndReplace(
+                                      "<subject>", descriptionSubject),
+                                  group,
+                                  icon);
 
   return MultipleInstructionMetadata::WithExpressionAndConditionAndAction(
       expression, condition, action);
@@ -349,39 +368,29 @@ gd::InstructionMetadata& ObjectMetadata::AddDuplicatedCondition(
 }
 
 ObjectMetadata& ObjectMetadata::SetFullName(const gd::String& fullname_) {
-#if defined(GD_IDE_ONLY)
   fullname = fullname_;
-#endif
   return *this;
 }
 
 ObjectMetadata& ObjectMetadata::SetHelpUrl(const gd::String& helpUrl_) {
-#if defined(GD_IDE_ONLY)
   helpUrl = helpUrl_;
-#endif
   return *this;
 }
 
 ObjectMetadata& ObjectMetadata::SetDescription(const gd::String& description_) {
-#if defined(GD_IDE_ONLY)
   description = description_;
-#endif
   return *this;
 }
 
 ObjectMetadata& ObjectMetadata::SetIncludeFile(const gd::String& includeFile) {
-#if defined(GD_IDE_ONLY)
   includeFiles.clear();
   includeFiles.push_back(includeFile);
-#endif
   return *this;
 }
 ObjectMetadata& ObjectMetadata::AddIncludeFile(const gd::String& includeFile) {
-#if defined(GD_IDE_ONLY)
   if (std::find(includeFiles.begin(), includeFiles.end(), includeFile) ==
       includeFiles.end())
     includeFiles.push_back(includeFile);
-#endif
   return *this;
 }
 

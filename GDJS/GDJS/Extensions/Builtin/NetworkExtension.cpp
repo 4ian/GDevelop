@@ -22,7 +22,26 @@ NetworkExtension::NetworkExtension() {
       "gdjs.evtTools.network.sendAsyncRequest");
   GetAllActions()["EnableMetrics"].SetFunctionName(
       "gdjs.evtTools.network.enableMetrics");
+  GetAllActions()["JSONToVariableStructure"].SetFunctionName(
+      "gdjs.evtTools.network.jsonToVariableStructure");
+  GetAllActions()["JSONToGlobalVariableStructure"].SetFunctionName(
+      "gdjs.evtTools.network.jsonToVariableStructure");
+  GetAllActions()["JSONToObjectVariableStructure"].SetFunctionName(
+      "gdjs.evtTools.network.jsonToObjectVariableStructure");
+
+
+  GetAllStrExpressions()["VarToJSON"].SetFunctionName(
+      "gdjs.evtTools.network.variableStructureToJSON");
+  GetAllStrExpressions()["ToJSON"].SetFunctionName(
+      "gdjs.evtTools.network.variableStructureToJSON");
+  GetAllStrExpressions()["GlobalVarToJSON"].SetFunctionName(
+      "gdjs.evtTools.network.variableStructureToJSON");
+  GetAllStrExpressions()["ObjectVarToJSON"].SetFunctionName(
+      "gdjs.evtTools.network.objectVariableStructureToJSON");
   GetAllActions()["LaunchFile"].SetFunctionName("gdjs.evtTools.window.openURL");
+
+  GetAllVariableExpressions()["FromJSON"].SetFunctionName(
+      "new gdjs.Variable().fromJSON");
 
   StripUnimplementedInstructionsAndExpressions();
 }

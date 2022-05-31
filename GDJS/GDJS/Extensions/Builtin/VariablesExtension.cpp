@@ -95,6 +95,11 @@ VariablesExtension::VariablesExtension() {
   GetAllActions()["GlobalVariableRemoveAt"].SetFunctionName(
       "gdjs.evtTools.variable.variableRemoveAt");
 
+  GetAllActions()["SetBooleanVariable"].SetFunctionName(
+      "gdjs.evtTools.variable.setVariableBoolean");
+  GetAllActions()["SceneVar"].SetFunctionName("(v => v)");
+  GetAllActions()["GlobalVar"].SetFunctionName("(v => v)");
+
   GetAllActions()["ModVarScene"].codeExtraInformation.SetCustomCodeGenerator(
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,

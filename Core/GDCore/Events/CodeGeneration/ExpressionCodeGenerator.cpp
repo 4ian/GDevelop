@@ -109,6 +109,18 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
   if (node.child) node.child->Visit(*this);
 }
 
+void ExpressionCodeGenerator::OnVisitVariableExpressionNode(
+    VariableExpressionNode& node) {
+  output += "((";
+  node.child->Visit(*this);
+  output += ")";
+  if (node.type != "variable")
+    output += codeGenerator.GenerateVariableValueGetter(
+        node.type == "number" ? gd::Variable::Type::Number
+                              : gd::Variable::Type::String);
+  output += ")";
+};
+
 void ExpressionCodeGenerator::OnVisitVariableAccessorNode(
     VariableAccessorNode& node) {
   output += codeGenerator.GenerateVariableAccessor(node.name);

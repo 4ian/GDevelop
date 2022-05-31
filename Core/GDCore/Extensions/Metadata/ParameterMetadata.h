@@ -6,7 +6,6 @@
 
 #ifndef PARAMETER_METADATA_H
 #define PARAMETER_METADATA_H
-#if defined(GD_IDE_ONLY)
 #include <map>
 #include <memory>
 
@@ -202,6 +201,9 @@ class GD_CORE_API ParameterMetadata {
              parameterType == "leaderboardId";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
+             parameterType == "scenevar" || parameterType == "variable";
+    } else if (type == "scopedVariable") {
+      return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";
     }
     return false;
@@ -240,5 +242,4 @@ class GD_CORE_API ParameterMetadata {
 
 }  // namespace gd
 
-#endif
 #endif  // PARAMETER_METADATA_H

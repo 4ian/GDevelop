@@ -4,9 +4,11 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/IDE/Events/EventsContextAnalyzer.h"
+
 #include <map>
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
@@ -50,6 +52,10 @@ class GD_CORE_API ExpressionObjectsAnalyzer
   void OnVisitVariableNode(VariableNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
+  void OnVisitVariableExpressionNode(
+      VariableExpressionNode& node) override {
+    node.child->Visit(*this);
+  }
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
@@ -68,7 +74,8 @@ class GD_CORE_API ExpressionObjectsAnalyzer
       context.AddObjectName(node.objectName);
 
       if (!node.behaviorFunctionName.empty()) {
-        context.AddBehaviorName(node.objectName, node.objectFunctionOrBehaviorName);
+        context.AddBehaviorName(node.objectName,
+                                node.objectFunctionOrBehaviorName);
       }
     }
   }

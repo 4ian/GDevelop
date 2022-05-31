@@ -148,6 +148,89 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
           "res/actions/net.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("yesorno", _("Enable the metrics?"));
+
+  extension
+      .AddAction(
+          "JSONToVariableStructure",
+          _("Convert JSON to a scene variable"),
+          _("Parse a JSON object and store it into a scene variable"),
+          _("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
+          _("Network"),
+          "res/actions/net24.png",
+          "res/actions/net.png")
+      .AddParameter("string", _("JSON string"))
+      .AddParameter("scenevar", _("Variable where store the JSON object"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("JSONToGlobalVariableStructure",
+                 _("Convert JSON to global variable"),
+                 _("Parse a JSON object and store it into a global variable"),
+                 _("Parse JSON string _PARAM0_ and store it into global "
+                   "variable _PARAM1_"),
+                 _("Network"),
+                 "res/actions/net24.png",
+                 "res/actions/net.png")
+      .AddParameter("string", _("JSON string"))
+      .AddParameter("globalvar",
+                    _("Global variable where store the JSON object"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddAction("JSONToObjectVariableStructure",
+                 _("Convert JSON to object variable"),
+                 _("Parse a JSON object and store it into an object variable"),
+                 _("Parse JSON string _PARAM0_ and store it into variable "
+                   "_PARAM2_ of _PARAM1_"),
+                 _("Network"),
+                 "res/actions/net24.png",
+                 "res/actions/net.png")
+      .AddParameter("string", _("JSON string"))
+      .AddParameter("objectPtr", _("Object"))
+      .AddParameter("objectvar",
+                    _("Object variable where store the JSON object"))
+      .MarkAsAdvanced();
+
+  extension
+      .AddVariableExpression("FromJSON",
+                             _("JSON to Variable"),
+                             _("Creates a variable from a JSON string."),
+                             _("Network"),
+                             "res/conditions/toujours24.png")
+      .AddParameter("string", "The JSON string");
+
+  extension
+      .AddStrExpression("VarToJSON",
+                        _("Convert a variable to JSON"),
+                        _("Convert a variable to JSON"),
+                        _("Conversion"),
+                        "res/conditions/toujours24.png")
+      .AddParameter("variable", _("Variable to be stringified"));
+
+  extension
+      .AddStrExpression("ToJSON",
+                        _("Convert scene variable to JSON"),
+                        _("Convert a scene variable to JSON"),
+                        _("Conversion"),
+                        "res/conditions/toujours24.png")
+      .AddParameter("scenevar", _("Scene variable to be stringified"));
+
+  extension
+      .AddStrExpression("GlobalVarToJSON",
+                        _("Convert global variable to JSON"),
+                        _("Convert a global variable to JSON"),
+                        _("Conversion"),
+                        "res/conditions/toujours24.png")
+      .AddParameter("globalvar", _("The global variable to be stringified"));
+
+  extension
+      .AddStrExpression("ObjectVarToJSON",
+                        _("Convert object variable to JSON"),
+                        _("Convert an object variable to JSON"),
+                        _("Conversion"),
+                        "res/conditions/toujours24.png")
+      .AddParameter("objectPtr", _("The object with the variable"))
+      .AddParameter("objectvar", _("The object variable to be stringified"));
 }
 
 }  // namespace gd

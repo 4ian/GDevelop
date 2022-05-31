@@ -123,6 +123,15 @@ class GD_CORE_API ObjectMetadata {
                                            const gd::String& smallicon_);
 
   /**
+   * \brief Declare a new variable expression as being part of the extension.
+   */
+  gd::ExpressionMetadata& AddVariableExpression(const gd::String& name_,
+                                           const gd::String& fullname_,
+                                           const gd::String& description_,
+                                           const gd::String& group_,
+                                           const gd::String& smallicon_);
+
+  /**
    * \brief Declare a new expression and condition as being part of the
    * object.
    * \note It's recommended to use this function to avoid declaring twice a
@@ -288,6 +297,7 @@ class GD_CORE_API ObjectMetadata {
   std::map<gd::String, gd::InstructionMetadata> actionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> expressionsInfos;
   std::map<gd::String, gd::ExpressionMetadata> strExpressionsInfos;
+  std::map<gd::String, gd::ExpressionMetadata> variableExpressionsInfos;
 
   std::vector<gd::String> includeFiles;
   gd::String className;

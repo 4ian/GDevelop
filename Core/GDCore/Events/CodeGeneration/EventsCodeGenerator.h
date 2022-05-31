@@ -12,6 +12,7 @@
 
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/Project/Variable.h"
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
@@ -540,6 +541,21 @@ class GD_CORE_API EventsCodeGenerator {
     }
 
     return "getVariableForObject(" + objectName + ", " + variableName + ")";
+  }
+
+  /**
+   * \brief Generate the code to get the value of a variable.
+   *
+   * \note This returns a value, so collection types cannot be used here!
+   */
+  virtual gd::String GenerateVariableValueGetter(
+      const gd::Variable::Type& type) {
+    if (type == gd::Variable::Type::Number)
+      return ".getAsNumber()";
+    else if (type == gd::Variable::Type::Boolean)
+      return ".getAsBoolean()";
+    else
+      return ".getAsString()";
   }
 
   /**

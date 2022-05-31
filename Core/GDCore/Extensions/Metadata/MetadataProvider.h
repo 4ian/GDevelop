@@ -147,6 +147,32 @@ class GD_CORE_API MetadataProvider {
                                                gd::String exprType);
 
   /**
+   * Get information about a variable expression, and its associated extension.
+   * Works for free expressions.
+   */
+  static ExtensionAndMetadata<ExpressionMetadata>
+  GetExtensionAndVariableExpressionMetadata(const gd::Platform& platform,
+                                       gd::String exprType);
+
+  /**
+   * Get information about a variable expression, and its associated extension.
+   * Works for object expressions.
+   */
+  static ExtensionAndMetadata<ExpressionMetadata>
+  GetExtensionAndObjectVariableExpressionMetadata(const gd::Platform& platform,
+                                             gd::String objectType,
+                                             gd::String exprType);
+
+  /**
+   * Get information about a variable expression, and its associated extension.
+   * Works for behavior expressions.
+   */
+  static ExtensionAndMetadata<ExpressionMetadata>
+  GetExtensionAndBehaviorVariableExpressionMetadata(const gd::Platform& platform,
+                                               gd::String autoType,
+                                               gd::String exprType);
+
+  /**
    * Get the metadata about a behavior.
    */
   static const BehaviorMetadata& GetBehaviorMetadata(
@@ -218,6 +244,27 @@ class GD_CORE_API MetadataProvider {
    * Works for behavior expressions.
    */
   static const gd::ExpressionMetadata& GetBehaviorStrExpressionMetadata(
+      const gd::Platform& platform, gd::String autoType, gd::String exprType);
+
+  /**
+   * Get information about a string expression from its type
+   * Works for free expressions.
+   */
+  static const gd::ExpressionMetadata& GetVariableExpressionMetadata(
+      const gd::Platform& platform, gd::String exprType);
+
+  /**
+   * Get information about a string expression from its type
+   * Works for object expressions.
+   */
+  static const gd::ExpressionMetadata& GetObjectVariableExpressionMetadata(
+      const gd::Platform& platform, gd::String objectType, gd::String exprType);
+
+  /**
+   * Get information about a string expression from its type
+   * Works for behavior expressions.
+   */
+  static const gd::ExpressionMetadata& GetBehaviorVariableExpressionMetadata(
       const gd::Platform& platform, gd::String autoType, gd::String exprType);
 
   /**

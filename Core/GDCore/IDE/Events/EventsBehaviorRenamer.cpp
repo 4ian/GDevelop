@@ -66,6 +66,10 @@ class GD_CORE_API ExpressionBehaviorRenamer
   void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
     if (node.child) node.child->Visit(*this);
   }
+  void OnVisitVariableExpressionNode(
+      VariableExpressionNode& node) override {
+    node.child->Visit(*this);
+  }
   void OnVisitVariableBracketAccessorNode(
       VariableBracketAccessorNode& node) override {
     node.expression->Visit(*this);
@@ -75,16 +79,18 @@ class GD_CORE_API ExpressionBehaviorRenamer
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     if (!node.behaviorFunctionName.empty()) {
       // Behavior function name
-      if (node.objectName == objectName && node.objectFunctionOrBehaviorName == oldBehaviorName) {
-          node.objectFunctionOrBehaviorName = newBehaviorName;
-          hasDoneRenaming = true;
+      if (node.objectName == objectName &&
+          node.objectFunctionOrBehaviorName == oldBehaviorName) {
+        node.objectFunctionOrBehaviorName = newBehaviorName;
+        hasDoneRenaming = true;
       }
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     if (!node.behaviorName.empty()) {
       // Behavior function call
-      if (node.objectName == objectName && node.behaviorName == oldBehaviorName) {
+      if (node.objectName == objectName &&
+          node.behaviorName == oldBehaviorName) {
         node.behaviorName = newBehaviorName;
         hasDoneRenaming = true;
       }

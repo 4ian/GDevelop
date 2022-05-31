@@ -30,6 +30,7 @@ export const Default = () => (
       onClose={() => {}}
       canInstall={true}
       isBeingInstalled={false}
+      onOpenDetails={assetShortHeader => {}}
     />
   </AssetStoreStateProvider>
 );
@@ -48,6 +49,7 @@ export const BeingInstalled = () => (
       onClose={() => {}}
       canInstall={true}
       isBeingInstalled={true}
+      onOpenDetails={assetShortHeader => {}}
     />
   </AssetStoreStateProvider>
 );

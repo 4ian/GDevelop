@@ -1,9 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
 import BackgroundText from '../UI/BackgroundText';
 import { Column, Line } from '../UI/Grid';
 import Text from '../UI/Text';
@@ -29,7 +28,7 @@ export const OpenConfirmDialog = ({
           primary={false}
           onClick={onClose}
         />,
-        <RaisedButton
+        <DialogPrimaryButton
           label={<Trans>Open the project</Trans>}
           key="open-project"
           primary

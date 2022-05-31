@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import FlatButton from '../FlatButton';
+import TextButton from '../TextButton';
 import Window from '../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../Tutorial/TutorialContext';
@@ -27,7 +27,7 @@ const TutorialButton = (props: PropsType) => {
     return props.renderIfNotFound || null;
   }
   return (
-    <FlatButton
+    <TextButton
       onClick={() => {
         if (tutorial.link) {
           Window.openExternalURL(tutorial.link);

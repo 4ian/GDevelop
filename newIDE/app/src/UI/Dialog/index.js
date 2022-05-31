@@ -11,6 +11,8 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from '../KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../Layout';
+import RaisedButton from '../RaisedButton';
 
 const styles = {
   defaultBody: {
@@ -92,6 +94,8 @@ type DialogContentStyle = {
   flexDirection?: 'row' | 'column',
 };
 
+export const DialogPrimaryButton = RaisedButton;
+
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
@@ -122,9 +126,15 @@ const Dialog = (props: Props) => {
     () => (
       <React.Fragment>
         {secondaryActions && (
-          <div key="secondary-actions">{secondaryActions}</div>
+          <LineStackLayout key="secondary-actions" noMargin>
+            {secondaryActions}
+          </LineStackLayout>
         )}
-        <div key="actions">{actions}</div>
+        {actions && (
+          <LineStackLayout key="actions" noMargin>
+            {actions}
+          </LineStackLayout>
+        )}
       </React.Fragment>
     ),
     [actions, secondaryActions]

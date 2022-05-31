@@ -76,6 +76,46 @@ export const TextFieldWithButtonLayout = ({
   );
 };
 
+type LineStackLayoutProps = {|
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  noMargin?: boolean,
+  children: React.Node,
+|};
+
+export const LineStackLayout = ({
+  alignItems,
+  justifyContent,
+  expand,
+  noMargin,
+  children,
+}: LineStackLayoutProps) => {
+  let isFirstChild = true;
+  return (
+    <Line
+      alignItems={alignItems}
+      justifyContent={justifyContent}
+      expand={expand}
+      noMargin={noMargin}
+    >
+      {React.Children.map(children, (child, index) => {
+        if (!child) return null;
+
+        const addSpacers = !isFirstChild;
+        isFirstChild = false;
+
+        return (
+          <React.Fragment>
+            {addSpacers && <Spacer />}
+            {child}
+          </React.Fragment>
+        );
+      })}
+    </Line>
+  );
+};
+
 type ResponsiveLineStackLayoutProps = {|
   alignItems?: string,
   justifyContent?: string,
@@ -99,33 +139,20 @@ export const ResponsiveLineStackLayout = ({
   children,
 }: ResponsiveLineStackLayoutProps) => {
   const windowWidth = useResponsiveWindowWidth();
-  let isFirstChild = true;
 
   return (width || windowWidth) === 'small' ? (
     <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
       {children}
     </ColumnStackLayout>
   ) : (
-    <Line
+    <LineStackLayout
       alignItems={alignItems}
       justifyContent={justifyContent}
       expand={expand}
       noMargin={noMargin}
     >
-      {React.Children.map(children, (child, index) => {
-        if (!child) return null;
-
-        const addSpacers = !isFirstChild;
-        isFirstChild = false;
-
-        return (
-          <React.Fragment>
-            {addSpacers && <Spacer />}
-            {child}
-          </React.Fragment>
-        );
-      })}
-    </Line>
+      {children}
+    </LineStackLayout>
   );
 };
 

@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { enumerateEventsFunctionsExtensions } from '../../ProjectManager/EnumerateProjectItems';
 import { Line, Column, Spacer } from '../../UI/Grid';
@@ -150,7 +150,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             label={<Trans>Cancel</Trans>}
             onClick={onClose}
           />,
-          <FlatButton
+          <DialogPrimaryButton
             key="create"
             label={<Trans>Create</Trans>}
             primary

@@ -2,7 +2,7 @@
 import { t } from '@lingui/macro';
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Column, Line } from '../../UI/Grid';
 import GoogleDriveFileOrFolderPicker from './GoogleDriveFileOrFolderPicker';
@@ -98,7 +98,7 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
           onClick={props.onCancel}
         />,
         <LeftLoader key="save" isLoading={saving}>
-          <FlatButton
+          <DialogPrimaryButton
             label={<Trans>Save</Trans>}
             primary
             disabled={!canSave()}

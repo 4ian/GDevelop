@@ -15,7 +15,7 @@
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
   color: white !important;
   font-weight: 400 !important;
-  font-family: var(--gdevelop-font-family);
+  font-family: var(--gdevelop-classic-font-family);
   font-size: 15px; /* Same as ClosableTabs font size */
 }
 

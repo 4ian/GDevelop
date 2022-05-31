@@ -38,7 +38,7 @@
         "value": "{gdevelop.color.selection.value}"
       },
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "text": {
@@ -359,7 +359,7 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "layout": {
@@ -410,7 +410,7 @@
           "value": "#4c92ff"
         },
         "color": {
-          "value": "white"
+          "value": "#FFFFFF"
         }
       }
     }

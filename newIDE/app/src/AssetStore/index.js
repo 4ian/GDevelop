@@ -46,6 +46,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import Dialog from '../UI/Dialog';
 import { LinearProgress } from '@material-ui/core';
+import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
 
 const styles = {
   searchBar: {
@@ -118,7 +119,11 @@ export const AssetStore = ({
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
   ] = React.useState<boolean>(false);
-  const [addedAssetIds, setAddedAssetIds] = React.useState<Array<string>>([]);
+
+  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
+  const addedAssetIds = containerObjectsList
+    .map(({ object }) => object.getAssetStoreId())
+    .filter(Boolean);
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -143,7 +148,6 @@ export const AssetStore = ({
             name: assetShortHeader.name,
           });
           console.log('Asset successfully installed.');
-          setAddedAssetIds(addedAssetIds.concat(assetShortHeader.id));
 
           installOutput.createdObjects.forEach(object => {
             onObjectAddedFromAsset(object);
@@ -171,7 +175,6 @@ export const AssetStore = ({
       objectsContainer,
       events,
       onObjectAddedFromAsset,
-      addedAssetIds,
     ]
   );
 
@@ -194,11 +197,6 @@ export const AssetStore = ({
           console.log('Asset pack successfully installed.');
           setIsAssetBeingInstalled(false);
           setIsAssetPackAdded(true);
-          setAddedAssetIds(
-            addedAssetIds.concat(
-              ...searchResults.map(assetShortHeader => assetShortHeader.id)
-            )
-          );
 
           setIsAssetPackDialogInstallOpen(false);
 
@@ -229,7 +227,6 @@ export const AssetStore = ({
       events,
       onObjectAddedFromAsset,
       searchResults,
-      addedAssetIds,
     ]
   );
 
@@ -468,7 +465,6 @@ export const AssetStore = ({
                 {openedAssetShortHeader && (
                   <AssetDetails
                     project={project}
-                    layout={layout}
                     objectsContainer={objectsContainer}
                     resourceSources={resourceSources}
                     resourceExternalEditors={resourceExternalEditors}

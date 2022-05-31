@@ -44,7 +44,7 @@ describe('partialQuickSort', () => {
     const elements = [0.2, 0.1, 0.6, 0.4, 1, 0.3, 0.8, 0.5, 0.7, 0.9];
     partialQuickSort(elements, a => a, 0.1, 1);
     expect(elements).toStrictEqual(
-      //
+      // prettier-ignore
       [1, 0.9, 0.8, 0.6, 0.7, 0.3, 0.4, 0.5, 0.1, 0.2]
     );
   });
@@ -52,7 +52,7 @@ describe('partialQuickSort', () => {
     const elements = [0.2, 0.1, 0.15, 0.4, 1, 0.3, 0.25, 0.45, 0.35];
     partialQuickSort(elements, a => a, 0.1, 1);
     expect(elements).toStrictEqual(
-      //
+      // prettier-ignore
       [1, 0.1, 0.15, 0.4, 0.2, 0.3, 0.25, 0.45, 0.35]
     );
   });

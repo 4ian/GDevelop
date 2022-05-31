@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -28,8 +27,8 @@ export const Default = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      canInstall={true}
-      isBeingInstalled={false}
+      isAddedToProject={false}
+      isBeingAddedToProject={false}
     />
   </AssetStoreStateProvider>
 );
@@ -46,8 +45,26 @@ export const BeingInstalled = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      canInstall={true}
-      isBeingInstalled={true}
+      isAddedToProject={false}
+      isBeingAddedToProject={true}
+    />
+  </AssetStoreStateProvider>
+);
+
+export const AddedToProject = () => (
+  <AssetStoreStateProvider>
+    <AssetDetails
+      project={testProject.project}
+      layout={testProject.testLayout}
+      objectsContainer={testProject.testLayout}
+      resourceSources={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onTagSelection={() => {}}
+      assetShortHeader={fakeAssetShortHeader1}
+      onAdd={() => {}}
+      onClose={() => {}}
+      isAddedToProject={true}
+      isBeingAddedToProject={false}
     />
   </AssetStoreStateProvider>
 );

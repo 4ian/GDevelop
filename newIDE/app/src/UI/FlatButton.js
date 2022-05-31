@@ -3,6 +3,7 @@ import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 // We support a subset of the props supported by Material-UI v0.x FlatButton
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -48,9 +49,11 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
 
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
     return (
       <Button
-        variant="outlined"
+        variant={gdevelopTheme.isModern ? 'outlined' : 'text'}
         size="small"
         color={primary ? 'primary' : 'default'}
         autoFocus={keyboardFocused}

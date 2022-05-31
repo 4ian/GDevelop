@@ -552,6 +552,8 @@ interface gdObject {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetAssetStoreId([Const] DOMString assetStoreId);
+    [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
     void SetTags([Const] DOMString tags);

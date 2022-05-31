@@ -79,8 +79,8 @@ type Props = {|
   assetShortHeader: AssetShortHeader,
   onAdd: () => void,
   onClose: () => void,
-  canInstall: boolean,
-  isBeingInstalled: boolean,
+  isAddedToProject: boolean,
+  isBeingAddedToProject: boolean,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -105,13 +105,12 @@ export const AssetDetails = ({
   assetShortHeader,
   onAdd,
   onClose,
-  canInstall,
-  isBeingInstalled,
+  isAddedToProject,
+  isBeingAddedToProject,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
-  const [isAssetAdded, setIsAssetAdded] = React.useState<boolean>(false);
   const [
     selectedAnimationName,
     setSelectedAnimationName,
@@ -150,14 +149,12 @@ export const AssetDetails = ({
     [loadAsset]
   );
 
-  const canAddAsset =
-    canInstall && !isBeingInstalled && !!asset && !isAssetAdded;
+  const canAddAsset = !isBeingAddedToProject && !!asset;
   const onAddAsset = React.useCallback(
     () => {
       if (canAddAsset) onAdd();
-      setIsAssetAdded(true);
     },
-    [onAdd, canAddAsset, setIsAssetAdded]
+    [onAdd, canAddAsset]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -255,16 +252,16 @@ export const AssetDetails = ({
           </Column>
           <Column alignItems="center" justifyContent="center">
             <LeftLoader
-              isLoading={isBeingInstalled || (!asset && !error)}
+              isLoading={isBeingAddedToProject || (!asset && !error)}
               key="install"
             >
               <RaisedButton
-                primary
+                primary={!isAddedToProject}
                 label={
-                  isBeingInstalled ? (
+                  isBeingAddedToProject ? (
                     <Trans>Adding to my project...</Trans>
-                  ) : isAssetAdded ? (
-                    <Trans>Object added to my project</Trans>
+                  ) : isAddedToProject ? (
+                    <Trans>Add object again to my project</Trans>
                   ) : (
                     <Trans>Add object to my project</Trans>
                   )

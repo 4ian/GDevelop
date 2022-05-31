@@ -32,7 +32,7 @@ import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ThemeContext from '../UI/Theme/ThemeContext';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView from '../UI/ScrollView';
-import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import { BoxSearchResultsNoScroll } from '../UI/Search/BoxSearchResultsNoScroll';
 import { AssetCard } from './AssetCard';
 import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
@@ -449,18 +449,23 @@ export const AssetDetails = ({
             )}
           </Column>
         </ResponsiveLineStackLayout>
-      </Column>
-    </ScrollView>
         <Line
         expand
         overflow={
           'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
         }
       >
-          <BoxSearchResults
+        <Column>
+          <Text>{"TEST"}</Text>
+          <Text>{"TEST"}</Text>
+          <Text>{"TEST"}</Text>
+          <Text>{"TEST"}</Text>
+          <Text>{"TEST"}</Text>
+          </Column>
+          <BoxSearchResultsNoScroll
             baseSize={128}
             onRetry={fetchAssetsAndFilters}
-            error={[]}
+            error={filterError}
             searchItems={searchResults}//{searchResults}
             renderSearchItem={(assetShortHeader, size) => (
               <AssetCard
@@ -472,6 +477,8 @@ export const AssetDetails = ({
             noResultPlaceholder={<></>}
           />
         </Line>
+      </Column>
+    </ScrollView>
     </Column>
   );
 };

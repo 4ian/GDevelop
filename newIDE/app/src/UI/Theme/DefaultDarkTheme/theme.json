@@ -50,13 +50,13 @@
         "value": "#3E4452"
       },
       "color": {
-        "value": "#F5F5F7"
+        "value": "#EAEAEA"
       }
     },
     "text": {
       "default": {
         "color": {
-          "value": "#F5F5F7"
+          "value": "#EAEAEA"
         }
       },
       "secondary": {
@@ -71,7 +71,7 @@
       },
       "contrast": {
         "color": {
-          "value": "#F5F5F7"
+          "value": "#EAEAEA"
         }
       },
       "highlighted": {

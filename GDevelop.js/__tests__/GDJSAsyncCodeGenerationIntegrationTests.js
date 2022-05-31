@@ -21,8 +21,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -35,7 +33,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 parameters: ['SuccessVariable', '+', '1'],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -66,8 +63,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -88,7 +83,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 parameters: ['SuccessVariable', '+', '2'],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -125,8 +119,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -143,7 +135,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -191,8 +182,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -219,7 +208,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -276,8 +264,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [
               {
@@ -293,8 +279,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             ],
             events: [
               {
-                disabled: false,
-                folded: false,
                 type: 'BuiltinCommonInstructions::Standard',
                 conditions: [],
                 actions: [
@@ -314,7 +298,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     ],
                   },
                 ],
-                events: [],
               },
             ],
           },
@@ -391,8 +374,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -403,8 +384,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             ],
             events: [
               {
-                disabled: false,
-                folded: false,
                 type: 'BuiltinCommonInstructions::Standard',
                 conditions: [
                   {
@@ -429,7 +408,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     ],
                   },
                 ],
-                events: [],
               },
             ],
           },
@@ -506,8 +484,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             // Do a first filtering.
             conditions: [
@@ -524,8 +500,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             ],
             events: [
               {
-                disabled: false,
-                folded: false,
                 type: 'BuiltinCommonInstructions::Standard',
                 // Filter with the more precise condition first.
                 conditions: [
@@ -537,8 +511,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [],
                 events: [
                   {
-                    disabled: false,
-                    folded: false,
                     type: 'BuiltinCommonInstructions::Standard',
                     // Filter with a less precise condition then.
                     conditions: [
@@ -569,7 +541,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                         ],
                       },
                     ],
-                    events: [],
                   },
                 ],
               },
@@ -670,8 +641,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             // Do a first filtering.
             conditions: [
@@ -688,8 +657,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             ],
             events: [
               {
-                disabled: false,
-                folded: false,
                 type: 'BuiltinCommonInstructions::Standard',
                 // Filter with the more precise condition first.
                 conditions: [
@@ -701,8 +668,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [],
                 events: [
                   {
-                    disabled: false,
-                    folded: false,
                     type: 'BuiltinCommonInstructions::Standard',
                     // Filter with a less precise condition then.
                     conditions: [
@@ -733,13 +698,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                         ],
                       },
                     ],
-                    events: [],
                   },
                   // Add an event to prevent optimisation (reuse of the same objects list)
                   // in the previous event.
                   {
-                    disabled: false,
-                    folded: false,
                     type: 'BuiltinCommonInstructions::Standard',
                     conditions: [
                       {
@@ -753,7 +715,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                       },
                     ],
                     actions: [],
-                    events: [],
                   },
                 ],
               },
@@ -854,8 +815,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -866,8 +825,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
             ],
             events: [
               {
-                disabled: false,
-                folded: false,
                 type: 'BuiltinCommonInstructions::Standard',
                 conditions: [
                   {
@@ -878,8 +835,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 actions: [],
                 events: [
                   {
-                    disabled: false,
-                    folded: false,
                     type: 'BuiltinCommonInstructions::Standard',
                     conditions: [
                       {
@@ -909,13 +864,10 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                         ],
                       },
                     ],
-                    events: [],
                   },
                   // Add an event to prevent optimisation (reuse of the same objects list)
                   // in the previous event.
                   {
-                    disabled: false,
-                    folded: false,
                     type: 'BuiltinCommonInstructions::Standard',
                     conditions: [
                       {
@@ -929,7 +881,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                       },
                     ],
                     actions: [],
-                    events: [],
                   },
                 ],
               },
@@ -1021,8 +972,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -1062,7 +1011,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1171,8 +1119,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -1203,7 +1149,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1314,8 +1259,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [
               {
@@ -1360,7 +1303,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1490,8 +1432,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -1531,7 +1471,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1690,7 +1629,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1799,7 +1737,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1917,7 +1854,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -1997,8 +1933,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [
               {
@@ -2038,7 +1972,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -2148,8 +2081,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [
               {
@@ -2193,7 +2124,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 ],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -2310,8 +2240,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const eventsSerializerElement = gd.Serializer.fromJSON(
         JSON.stringify([
           {
-            disabled: false,
-            folded: false,
             type: 'BuiltinCommonInstructions::Standard',
             conditions: [],
             actions: [
@@ -2336,7 +2264,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                 parameters: ['SuccessVariable', '+', '1'],
               },
             ],
-            events: [],
           },
         ])
       );
@@ -2509,7 +2436,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     ],
                   },
                 ],
-                events: [],
               },
             ],
           },
@@ -2610,7 +2536,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               parameters: ['Counter', '=', '0'],
             },
           ],
-          events: [],
         },
         {
           infiniteLoopWarning: true,
@@ -2646,7 +2571,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               ],
             },
           ],
-          events: [],
         },
       ]);
 
@@ -2728,7 +2652,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               parameters: ['Counter', '=', '0'],
             },
           ],
-          events: [],
         },
         {
           infiniteLoopWarning: true,
@@ -2775,7 +2698,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                   ],
                 },
               ],
-              events: [],
             },
           ],
         },
@@ -2800,8 +2722,7 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       const runCompiledEvents = generateCompiledEventsForEventsFunction(
         gd,
         project,
-        eventsFunction,
-        true
+        eventsFunction
       );
 
       eventsFunction.delete();
@@ -2880,7 +2801,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               ],
             },
           ],
-          events: [],
         },
       ]);
 
@@ -3018,7 +2938,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
               parameters: ['MyOtherParamObject', 'TestVariable', '+', '4'],
             },
           ],
-          events: [],
         },
       ]);
 
@@ -3272,7 +3191,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
                     ],
                   },
                 ],
-                events: [],
               },
             ],
           },

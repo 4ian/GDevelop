@@ -52,8 +52,10 @@ void WhileEvent::SerializeTo(SerializerElement& element) const {
       conditions, element.AddChild("conditions"));
   gd::EventsListSerialization::SerializeInstructionsTo(
       actions, element.AddChild("actions"));
-  gd::EventsListSerialization::SerializeEventsTo(events,
-                                                 element.AddChild("events"));
+
+  if (!events.IsEmpty())
+    gd::EventsListSerialization::SerializeEventsTo(events,
+                                                  element.AddChild("events"));
 }
 
 void WhileEvent::UnserializeFrom(gd::Project& project,
@@ -68,8 +70,12 @@ void WhileEvent::UnserializeFrom(gd::Project& project,
       project, conditions, element.GetChild("conditions", 0, "Conditions"));
   gd::EventsListSerialization::UnserializeInstructionsFrom(
       project, actions, element.GetChild("actions", 0, "Actions"));
-  gd::EventsListSerialization::UnserializeEventsFrom(
-      project, events, element.GetChild("events", 0, "Events"));
+
+  events.Clear();
+  if (element.HasChild("events", "Events")) {
+    gd::EventsListSerialization::UnserializeEventsFrom(
+        project, events, element.GetChild("events", 0, "Events"));
+  }
 }
 
 }  // namespace gd

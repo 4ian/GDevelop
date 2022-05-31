@@ -53,8 +53,10 @@ void StandardEvent::SerializeTo(SerializerElement& element) const {
       conditions, element.AddChild("conditions"));
   gd::EventsListSerialization::SerializeInstructionsTo(
       actions, element.AddChild("actions"));
-  gd::EventsListSerialization::SerializeEventsTo(events,
-                                                 element.AddChild("events"));
+
+  if (!events.IsEmpty())
+    gd::EventsListSerialization::SerializeEventsTo(events,
+                                                  element.AddChild("events"));
 }
 
 void StandardEvent::UnserializeFrom(gd::Project& project,

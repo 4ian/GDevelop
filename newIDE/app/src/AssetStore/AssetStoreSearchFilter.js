@@ -117,6 +117,47 @@ const mod = function(x: number, y: number): number {
   return ((x % y) + y) % y;
 };
 
+/**
+ * @param colorA
+ * @param colorB
+ * @returns Return the similitude between the 2 colors
+ * (1 when they are the same).
+ */
+const getColorSimilitude = function(
+  colorA: RGBColor,
+  colorB: RGBColor
+): number {
+  const targetHsl = rgbToHsl(colorA.r, colorA.g, colorA.b);
+  const dominantHsl = rgbToHsl(colorB.r, colorB.g, colorB.b);
+  const targetSaturation = targetHsl[1];
+  const dominantSaturation = dominantHsl[1];
+  if (targetSaturation === 0) {
+    // Hue is not relevant.
+    const deltaSaturation = dominantSaturation - targetSaturation;
+    const deltaLightness = dominantHsl[2] - targetHsl[2];
+    return (
+      1 -
+      (deltaSaturation * deltaSaturation + deltaLightness * deltaLightness) / 2
+    );
+  }
+  // Hue distance can only be up to 0.5 as it's looping.
+  // So, it's multiplied by 2 to cover [0, 1].
+  const deltaHue =
+    dominantSaturation === 0
+      ? 1
+      : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
+  const deltaSaturation = dominantSaturation - targetSaturation;
+  const deltaLightness = dominantHsl[2] - targetHsl[2];
+  // Give more importance to hue as it catches human eyes.
+  return (
+    1 -
+    (4 * deltaHue * deltaHue +
+      deltaSaturation * deltaSaturation +
+      deltaLightness * deltaLightness) /
+      6
+  );
+};
+
 export class ColorAssetStoreSearchFilter
   implements SearchFilter<AssetShortHeader> {
   color: RGBColor | null;
@@ -126,46 +167,107 @@ export class ColorAssetStoreSearchFilter
   }
 
   getPertinence(searchItem: AssetShortHeader): number {
-    if (!this.color) {
+    const color = this.color;
+    if (!color) {
       return 1;
     }
     // Not zero because the item should not be excluded.
     let scoreMax = Number.MIN_VALUE;
     for (const dominantColor of searchItem.dominantColors) {
-      const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
       const dominantRgb = hexNumberToRGBColor(dominantColor);
-      const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);
-      const targetSaturation = targetHsl[1];
-      const dominantSaturation = dominantHsl[1];
-      let score = 0;
-      if (targetSaturation === 0) {
-        // Hue is not relevant.
-        const deltaSaturation = dominantSaturation - targetSaturation;
-        const deltaLightness = dominantHsl[2] - targetHsl[2];
-        score =
-          1 -
-          (deltaSaturation * deltaSaturation +
-            deltaLightness * deltaLightness) /
-            2;
-      } else {
-        // Hue distance can only be up to 0.5 as it's looping.
-        // So, it's multiplied by 2 to cover [0, 1].
-        const deltaHue =
-          dominantSaturation === 0
-            ? 1
-            : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
-        const deltaSaturation = dominantSaturation - targetSaturation;
-        const deltaLightness = dominantHsl[2] - targetHsl[2];
-        // Give more importance to hue as it catches human eyes.
-        score =
-          1 -
-          (4 * deltaHue * deltaHue +
-            deltaSaturation * deltaSaturation +
-            deltaLightness * deltaLightness) /
-            6;
-      }
+      const score = getColorSimilitude(dominantRgb, color);
       scoreMax = Math.max(scoreMax, score);
     }
     return scoreMax;
+  }
+}
+
+export class SimilarAssetStoreSearchFilter
+  implements SearchFilter<AssetShortHeader> {
+  other: AssetShortHeader;
+
+  constructor(other: AssetShortHeader) {
+    this.other = other;
+    console.log(this.other.tags);
+  }
+
+  getPertinence(searchItem: AssetShortHeader): number {
+    if (this.other === searchItem ||
+      this.other.objectType !== searchItem.objectType) {
+      return 0;
+    }
+
+    {
+      const hasAnimatedState = searchItem.maxFramesCount > 1;
+      const hasSeveralState = searchItem.animationsCount > 1;
+      const mustBeAnimated = this.other.maxFramesCount > 1;
+      const mustHaveSeveralState = this.other.animationsCount > 1;
+      const hasBetterAnimationOrState = ((!mustBeAnimated || hasAnimatedState) &&
+        (!mustHaveSeveralState || hasSeveralState));
+      if (!hasBetterAnimationOrState) {
+          return 0;
+        }
+    }
+
+    {
+      const isTopDown = searchItem.tags.includes('top-down');
+      const isIsometric = searchItem.tags.includes('isometric');
+      const isSideView = searchItem.tags.includes('side view');
+
+      const otherIsTopDown = this.other.tags.includes('top-down');
+      const otherIsIsometric = this.other.tags.includes('isometric');
+      const otherIsSideView = this.other.tags.includes('side view');
+
+      const areCompatible =
+        (isTopDown && otherIsTopDown) ||
+        (isIsometric && otherIsIsometric) ||
+        (isSideView && otherIsSideView) ||
+        (!isTopDown &&
+          !isIsometric &&
+          !isSideView &&
+          !otherIsTopDown &&
+          !otherIsIsometric &&
+          !otherIsSideView);
+      if (!areCompatible) {
+        return 0;
+      }
+    }
+
+    {
+      const surface = searchItem.width * searchItem.height;
+      const otherSurface = this.other.width * this.other.height;
+      const smallestSurface = Math.min(surface, otherSurface);
+      const greatestSurface = Math.max(surface, otherSurface);
+
+      if (2 * smallestSurface < greatestSurface) {
+        return 0;
+      }
+    }
+    {
+      const ratio = searchItem.width / searchItem.height;
+      const otherRatio = this.other.width / this.other.height;
+      const smallestRatio = Math.min(ratio, otherRatio);
+      const greatestRatio = Math.max(ratio, otherRatio);
+
+      if (1.5 * smallestRatio < greatestRatio) {
+        return 0;
+      }
+    }
+
+    let colorSimilitude;
+    {
+      let scoreMax = 0;
+      for (const dominantColor of searchItem.dominantColors) {
+        const dominantRgb = hexNumberToRGBColor(dominantColor);
+        for (const otherDominantColor of this.other.dominantColors) {
+          const otherDominantRgb = hexNumberToRGBColor(otherDominantColor);
+          const score = getColorSimilitude(dominantRgb, otherDominantRgb);
+          scoreMax = Math.max(scoreMax, score);
+        }
+      }
+      colorSimilitude = scoreMax;
+    }
+
+    return colorSimilitude;
   }
 }

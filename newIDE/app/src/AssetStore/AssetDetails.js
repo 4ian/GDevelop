@@ -32,6 +32,13 @@ import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ThemeContext from '../UI/Theme/ThemeContext';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView from '../UI/ScrollView';
+import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import { AssetCard } from './AssetCard';
+import { NoResultPlaceholder } from './NoResultPlaceholder';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import {
+  SimilarAssetStoreSearchFilter,
+} from './AssetStoreSearchFilter';
 
 const FIXED_HEIGHT = 250;
 
@@ -81,6 +88,7 @@ type Props = {|
   onClose: () => void,
   canInstall: boolean,
   isBeingInstalled: boolean,
+  onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -107,6 +115,7 @@ export const AssetDetails = ({
   onClose,
   canInstall,
   isBeingInstalled,
+  onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
@@ -190,7 +199,22 @@ export const AssetDetails = ({
       ? direction.sprites.map(sprite => assetResources[sprite.image])
       : null;
 
+      const similarAssetFilters = React.useMemo(() => [new SimilarAssetStoreSearchFilter(assetShortHeader)], [assetShortHeader]);
+      const {
+        error: filterError,
+        fetchAssetsAndFilters,
+        useSearchItem,
+      } = React.useContext(AssetStoreContext);
+      const searchResults = useSearchItem(
+          "",
+          null,
+          null,
+          similarAssetFilters
+        );
+  console.log("searchResults: " + (searchResults && searchResults.length));
+
   return (
+    <Column expand noMargin useFullHeight>
     <ScrollView>
       <Column expand noMargin>
         <Line justifyContent="space-between" noMargin>
@@ -427,5 +451,27 @@ export const AssetDetails = ({
         </ResponsiveLineStackLayout>
       </Column>
     </ScrollView>
+        <Line
+        expand
+        overflow={
+          'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+        }
+      >
+          <BoxSearchResults
+            baseSize={128}
+            onRetry={fetchAssetsAndFilters}
+            error={[]}
+            searchItems={searchResults}//{searchResults}
+            renderSearchItem={(assetShortHeader, size) => (
+              <AssetCard
+                size={size}
+                onOpenDetails={() => onOpenDetails(assetShortHeader)}
+                assetShortHeader={assetShortHeader}
+              />
+            )}
+            noResultPlaceholder={<></>}
+          />
+        </Line>
+    </Column>
   );
 };

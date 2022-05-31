@@ -32,6 +32,12 @@ import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ThemeContext from '../UI/Theme/ThemeContext';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView from '../UI/ScrollView';
+import { BoxSearchResultsNoScroll } from '../UI/Search/BoxSearchResultsNoScroll';
+import { AssetCard } from './AssetCard';
+import { NoResultPlaceholder } from './NoResultPlaceholder';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const FIXED_HEIGHT = 250;
 
@@ -80,6 +86,7 @@ type Props = {|
   onClose: () => void,
   isAddedToScene: boolean,
   isBeingAddedToScene: boolean,
+  onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -105,6 +112,7 @@ export const AssetDetails = ({
   onClose,
   isAddedToScene,
   isBeingAddedToScene,
+  onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
@@ -185,242 +193,280 @@ export const AssetDetails = ({
       ? direction.sprites.map(sprite => assetResources[sprite.image])
       : null;
 
+  const similarAssetFilters = React.useMemo(
+    () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
+    [assetShortHeader]
+  );
+  const {
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
+  const searchResults = useSearchItem('', null, null, similarAssetFilters);
+  const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
+
   return (
-    <ScrollView>
-      <Column expand noMargin>
-        <Line justifyContent="space-between" noMargin>
-          <Column>
-            <Line alignItems="baseline" noMargin>
-              <Text size="title" displayInlineAsSpan>
-                {assetShortHeader.name}
-              </Text>
-              <Spacer />
-              {asset && (
-                <Text size="body">
-                  <Trans>by</Trans>{' '}
-                  {!!assetAuthors &&
-                    assetAuthors.map(author => {
-                      return (
-                        <Link
-                          key={author.name}
-                          href={author.website}
-                          onClick={event => {
-                            Window.openExternalURL(author.website);
-                            event.preventDefault();
-                          }}
-                        >
-                          {author.name}
-                        </Link>
-                      );
-                    })}
+    <Column expand noMargin useFullHeight>
+      <ScrollView>
+        <Column expand noMargin>
+          <Line justifyContent="space-between" noMargin>
+            <Column>
+              <Line alignItems="baseline" noMargin>
+                <Text size="title" displayInlineAsSpan>
+                  {assetShortHeader.name}
                 </Text>
-              )}
-            </Line>
-            <Line alignItems="center">
-              <div style={{ flexWrap: 'wrap' }}>
-                {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
-                  <React.Fragment key={tag}>
-                    {index !== 0 && <Spacer />}
-                    <Chip
-                      size="small"
-                      style={styles.chip}
-                      label={makeFirstLetterUppercase(tag)}
-                      onClick={() => {
-                        onTagSelection(tag);
-                      }}
-                    />
-                  </React.Fragment>
-                ))}
-                {assetShortHeader.tags.length > 5 && (
-                  <>
-                    <Spacer />
-                    <Chip
-                      size="small"
-                      style={styles.chip}
-                      label={
-                        <Trans>
-                          + {assetShortHeader.tags.length - 5} tag(s)
-                        </Trans>
-                      }
-                    />
-                  </>
+                <Spacer />
+                {asset && (
+                  <Text size="body">
+                    <Trans>by</Trans>{' '}
+                    {!!assetAuthors &&
+                      assetAuthors.map(author => {
+                        return (
+                          <Link
+                            key={author.name}
+                            href={author.website}
+                            onClick={event => {
+                              Window.openExternalURL(author.website);
+                              event.preventDefault();
+                            }}
+                          >
+                            {author.name}
+                          </Link>
+                        );
+                      })}
+                  </Text>
                 )}
-              </div>
-            </Line>
-          </Column>
-          <Column alignItems="center" justifyContent="center">
-            <LeftLoader
-              isLoading={isBeingAddedToScene || (!asset && !error)}
-              key="install"
-            >
-              <RaisedButton
-                primary={!isAddedToScene}
-                label={
-                  isBeingAddedToScene ? (
-                    <Trans>Adding...</Trans>
-                  ) : isAddedToScene ? (
-                    <Trans>Add again</Trans>
-                  ) : (
-                    <Trans>Add to the scene</Trans>
-                  )
-                }
-                onClick={onAddAsset}
-                disabled={!canAddAsset}
-                id="add-asset-button"
-              />
-            </LeftLoader>
-          </Column>
-        </Line>
-        <ResponsiveLineStackLayout noMargin>
-          <Column>
-            <div style={styles.previewBackground}>
-              {asset ? (
-                <>
-                  {asset.objectType === 'sprite' &&
-                    animationResources &&
-                    direction && (
-                      <AnimationPreview
-                        resourceNames={animationResources.map(
-                          ({ name }) => name
-                        )}
-                        getImageResourceSource={(resourceName: string) => {
-                          const resource = assetResources[resourceName];
-                          return resource ? resource.file : '';
+              </Line>
+              <Line alignItems="center">
+                <div style={{ flexWrap: 'wrap' }}>
+                  {assetShortHeader.tags.slice(0, 5).map((tag, index) => (
+                    <React.Fragment key={tag}>
+                      {index !== 0 && <Spacer />}
+                      <Chip
+                        size="small"
+                        style={styles.chip}
+                        label={makeFirstLetterUppercase(tag)}
+                        onClick={() => {
+                          onTagSelection(tag);
                         }}
-                        isImageResourceSmooth={() => isImageResourceSmooth}
-                        project={project}
-                        timeBetweenFrames={direction.timeBetweenFrames}
-                        isLooping // Always loop in the asset store.
-                        hideCheckeredBackground
-                        hideControls
-                        initialZoom={140 / Math.max(asset.width, asset.height)}
-                        fixedHeight={FIXED_HEIGHT}
+                      />
+                    </React.Fragment>
+                  ))}
+                  {assetShortHeader.tags.length > 5 && (
+                    <>
+                      <Spacer />
+                      <Chip
+                        size="small"
+                        style={styles.chip}
+                        label={
+                          <Trans>
+                            + {assetShortHeader.tags.length - 5} tag(s)
+                          </Trans>
+                        }
+                      />
+                    </>
+                  )}
+                </div>
+              </Line>
+            </Column>
+            <Column alignItems="center" justifyContent="center">
+              <LeftLoader
+                isLoading={isBeingAddedToScene || (!asset && !error)}
+                key="install"
+              >
+                <RaisedButton
+                  primary={!isAddedToScene}
+                  label={
+                    isBeingAddedToScene ? (
+                      <Trans>Adding...</Trans>
+                    ) : isAddedToScene ? (
+                      <Trans>Add again</Trans>
+                    ) : (
+                      <Trans>Add to the scene</Trans>
+                    )
+                  }
+                  onClick={onAddAsset}
+                  disabled={!canAddAsset}
+                  id="add-asset-button"
+                />
+              </LeftLoader>
+            </Column>
+          </Line>
+          <ResponsiveLineStackLayout noMargin>
+            <Column>
+              <div style={styles.previewBackground}>
+                {asset ? (
+                  <>
+                    {asset.objectType === 'sprite' &&
+                      animationResources &&
+                      direction && (
+                        <AnimationPreview
+                          resourceNames={animationResources.map(
+                            ({ name }) => name
+                          )}
+                          getImageResourceSource={(resourceName: string) => {
+                            const resource = assetResources[resourceName];
+                            return resource ? resource.file : '';
+                          }}
+                          isImageResourceSmooth={() => isImageResourceSmooth}
+                          project={project}
+                          timeBetweenFrames={direction.timeBetweenFrames}
+                          isLooping // Always loop in the asset store.
+                          hideCheckeredBackground
+                          hideControls
+                          initialZoom={
+                            140 / Math.max(asset.width, asset.height)
+                          }
+                          fixedHeight={FIXED_HEIGHT}
+                        />
+                      )}
+                    {(asset.objectType === 'tiled' ||
+                      asset.objectType === '9patch') && (
+                      <CorsAwareImage
+                        style={styles.previewImage}
+                        src={asset.previewImageUrls[0]}
+                        alt={asset.name}
                       />
                     )}
-                  {(asset.objectType === 'tiled' ||
-                    asset.objectType === '9patch') && (
-                    <CorsAwareImage
-                      style={styles.previewImage}
-                      src={asset.previewImageUrls[0]}
-                      alt={asset.name}
-                    />
-                  )}
-                </>
+                  </>
+                ) : (
+                  <PlaceholderLoader />
+                )}
+              </div>
+              {assetAnimations &&
+                assetAnimations.length > 1 &&
+                typeof selectedAnimationName === 'string' && (
+                  <Paper
+                    elevation={4}
+                    variant="outlined"
+                    style={{
+                      backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
+                    }}
+                  >
+                    <Line justifyContent="center" alignItems="center" noMargin>
+                      <div style={styles.arrowContainer}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            const previousAnimationIndex = assetAnimations.findIndex(
+                              ({ name }) => name === selectedAnimationName
+                            );
+                            const newAnimationIndex =
+                              previousAnimationIndex === 0
+                                ? assetAnimations.length - 1
+                                : previousAnimationIndex - 1;
+                            setSelectedAnimationName(
+                              assetAnimations[newAnimationIndex].name
+                            );
+                          }}
+                        >
+                          <ArrowBackIos style={styles.leftArrowSvg} />
+                        </IconButton>
+                      </div>
+
+                      <SelectField
+                        value={selectedAnimationName}
+                        onChange={(e, i, newAnimationName: string) => {
+                          setSelectedAnimationName(newAnimationName);
+                        }}
+                        fullWidth
+                        textAlign="center"
+                        disableUnderline
+                      >
+                        {assetAnimations.map(animation => (
+                          <SelectOption
+                            key={animation.name}
+                            value={animation.name}
+                            primaryText={
+                              makeFirstLetterUppercase(animation.name) ||
+                              t`Default` // Display default for animations with no name.
+                            }
+                          />
+                        ))}
+                      </SelectField>
+                      <div style={styles.arrowContainer}>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            const previousAnimationIndex = assetAnimations.findIndex(
+                              ({ name }) => name === selectedAnimationName
+                            );
+                            const newAnimationIndex =
+                              previousAnimationIndex ===
+                              assetAnimations.length - 1
+                                ? 0
+                                : previousAnimationIndex + 1;
+                            setSelectedAnimationName(
+                              assetAnimations[newAnimationIndex].name
+                            );
+                          }}
+                        >
+                          <ArrowForwardIos />
+                        </IconButton>
+                      </div>
+                    </Line>
+                  </Paper>
+                )}
+            </Column>
+            <Column expand>
+              {asset ? (
+                <React.Fragment>
+                  <Text size="body">
+                    {!!assetLicense && (
+                      <Trans>
+                        Type of License:{' '}
+                        {
+                          <Link
+                            href={assetLicense.website}
+                            onClick={event => {
+                              Window.openExternalURL(assetLicense.website);
+                              event.preventDefault();
+                            }}
+                          >
+                            {assetLicense.name}
+                          </Link>
+                        }
+                      </Trans>
+                    )}
+                  </Text>
+                  <Text size="body">{asset.description}</Text>
+                </React.Fragment>
+              ) : error ? (
+                <PlaceholderError onRetry={loadAsset}>
+                  <Trans>
+                    Error while loading the asset. Verify your internet
+                    connection or try again later.
+                  </Trans>
+                </PlaceholderError>
               ) : (
                 <PlaceholderLoader />
               )}
-            </div>
-            {assetAnimations &&
-              assetAnimations.length > 1 &&
-              typeof selectedAnimationName === 'string' && (
-                <Paper
-                  elevation={4}
-                  variant="outlined"
-                  style={{
-                    backgroundColor: gdevelopTheme.list.itemsBackgroundColor,
-                  }}
-                >
-                  <Line justifyContent="center" alignItems="center" noMargin>
-                    <div style={styles.arrowContainer}>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const previousAnimationIndex = assetAnimations.findIndex(
-                            ({ name }) => name === selectedAnimationName
-                          );
-                          const newAnimationIndex =
-                            previousAnimationIndex === 0
-                              ? assetAnimations.length - 1
-                              : previousAnimationIndex - 1;
-                          setSelectedAnimationName(
-                            assetAnimations[newAnimationIndex].name
-                          );
-                        }}
-                      >
-                        <ArrowBackIos style={styles.leftArrowSvg} />
-                      </IconButton>
-                    </div>
-
-                    <SelectField
-                      value={selectedAnimationName}
-                      onChange={(e, i, newAnimationName: string) => {
-                        setSelectedAnimationName(newAnimationName);
-                      }}
-                      fullWidth
-                      textAlign="center"
-                      disableUnderline
-                    >
-                      {assetAnimations.map(animation => (
-                        <SelectOption
-                          key={animation.name}
-                          value={animation.name}
-                          primaryText={
-                            makeFirstLetterUppercase(animation.name) ||
-                            t`Default` // Display default for animations with no name.
-                          }
-                        />
-                      ))}
-                    </SelectField>
-                    <div style={styles.arrowContainer}>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          const previousAnimationIndex = assetAnimations.findIndex(
-                            ({ name }) => name === selectedAnimationName
-                          );
-                          const newAnimationIndex =
-                            previousAnimationIndex ===
-                            assetAnimations.length - 1
-                              ? 0
-                              : previousAnimationIndex + 1;
-                          setSelectedAnimationName(
-                            assetAnimations[newAnimationIndex].name
-                          );
-                        }}
-                      >
-                        <ArrowForwardIos />
-                      </IconButton>
-                    </div>
-                  </Line>
-                </Paper>
-              )}
-          </Column>
-          <Column expand>
-            {asset ? (
-              <React.Fragment>
-                <Text size="body">
-                  {!!assetLicense && (
-                    <Trans>
-                      Type of License:{' '}
-                      {
-                        <Link
-                          href={assetLicense.website}
-                          onClick={event => {
-                            Window.openExternalURL(assetLicense.website);
-                            event.preventDefault();
-                          }}
-                        >
-                          {assetLicense.name}
-                        </Link>
-                      }
-                    </Trans>
-                  )}
-                </Text>
-                <Text size="body">{asset.description}</Text>
-              </React.Fragment>
-            ) : error ? (
-              <PlaceholderError onRetry={loadAsset}>
-                <Trans>
-                  Error while loading the asset. Verify your internet connection
-                  or try again later.
-                </Trans>
-              </PlaceholderError>
-            ) : (
-              <PlaceholderLoader />
+            </Column>
+          </ResponsiveLineStackLayout>
+          <Text size="title" displayInlineAsSpan>
+            <Trans>You might like</Trans>
+          </Text>
+          <BoxSearchResultsNoScroll
+            baseSize={128}
+            onRetry={fetchAssetsAndFilters}
+            error={filterError}
+            searchItems={truncatedSearchResults}
+            renderSearchItem={(assetShortHeader, size) => (
+              <AssetCard
+                size={size}
+                onOpenDetails={() => onOpenDetails(assetShortHeader)}
+                assetShortHeader={assetShortHeader}
+              />
             )}
-          </Column>
-        </ResponsiveLineStackLayout>
-      </Column>
-    </ScrollView>
+            onOpenDetails={onOpenDetails}
+            noResultPlaceholder={
+              <EmptyMessage>
+                <Trans>No similar asset was found.</Trans>
+              </EmptyMessage>
+            }
+          />
+        </Column>
+      </ScrollView>
+    </Column>
   );
 };

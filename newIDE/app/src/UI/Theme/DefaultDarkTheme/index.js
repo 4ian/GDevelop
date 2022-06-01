@@ -8,5 +8,4 @@ export default createGdevelopTheme({
   isModern: true,
   rootClassNameIdentifier: 'DefaultDarkTheme',
   paletteType: 'dark',
-  gdevelopIconsCSSFilter: 'hue-rotate(19deg) saturate(90%)',
 });

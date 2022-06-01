@@ -187,6 +187,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           </Column>
           {object ? (
             <VariablesList
+              commitChangesOnBlur={false}
               inheritedVariablesContainer={object.getVariables()}
               variablesContainer={instance.getVariables()}
               size="small"

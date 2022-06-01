@@ -44,18 +44,13 @@ import { installAsset } from './InstallAsset';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import Dialog from '../UI/Dialog';
-import { LinearProgress } from '@material-ui/core';
 import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
-import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
+import { AssetPackDialog } from './AssetPackDialog';
 
 const styles = {
   searchBar: {
     // TODO: Can we put this in the search bar by default?
     flexShrink: 0,
-  },
-  linearProgress: {
-    flex: 1,
   },
 };
 
@@ -116,7 +111,6 @@ export const AssetStore = ({
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
   const [isAssetPackAdded, setIsAssetPackAdded] = React.useState(false);
-
   const [
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
@@ -126,11 +120,6 @@ export const AssetStore = ({
   const addedAssetIds = containerObjectsList
     .map(({ object }) => object.getAssetStoreId())
     .filter(Boolean);
-  const searchResultsNotAlreadyAdded = searchResults
-    ? searchResults.filter(
-        assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
-      )
-    : [];
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -174,57 +163,6 @@ export const AssetStore = ({
 
         setIsAssetBeingInstalled(false);
       })();
-    },
-    [
-      resourcesFetcher,
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      events,
-      onObjectAddedFromAsset,
-    ]
-  );
-
-  const onInstallAssetPack = React.useCallback(
-    (assetShortHeaders: Array<AssetShortHeader>) => {
-      if (!assetShortHeaders || !assetShortHeaders.length) return;
-      setIsAssetBeingInstalled(true);
-      Promise.all(
-        assetShortHeaders.map(assetShortHeader =>
-          installAsset({
-            assetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
-          })
-        )
-      )
-        .then(installOutputs => {
-          console.log('Asset pack successfully installed.');
-          setIsAssetBeingInstalled(false);
-          setIsAssetPackAdded(true);
-
-          setIsAssetPackDialogInstallOpen(false);
-
-          installOutputs.forEach(installOutput => {
-            installOutput.createdObjects.forEach(object => {
-              onObjectAddedFromAsset(object);
-            });
-          });
-
-          return resourcesFetcher.ensureResourcesAreFetched(project);
-        })
-        .catch(error => {
-          console.error('Error while installing the asset pack', error);
-          setIsAssetBeingInstalled(false);
-          showErrorBox({
-            message:
-              'There was an error while installing the asset pack. Verify your internet connection or try again later.',
-            rawError: error,
-            errorId: 'install-asset-pack-error',
-          });
-        });
     },
     [
       resourcesFetcher,
@@ -486,111 +424,20 @@ export const AssetStore = ({
             </Column>
             {resourcesFetcher.renderResourceFetcherDialog()}
             {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-              <Dialog
-                title={<Trans>{openedAssetPack.name}</Trans>}
-                open
-                cannotBeDismissed
-                actions={[
-                  <TextButton
-                    key="cancel"
-                    label={<Trans>Cancel</Trans>}
-                    disabled={isAssetBeingInstalled}
-                    onClick={() => setIsAssetPackDialogInstallOpen(false)}
-                  />,
-                  // Loading.
-                  isAssetBeingInstalled && (
-                    <TextButton
-                      key="loading"
-                      label={<Trans>Please wait...</Trans>}
-                      disabled
-                      onClick={() => {}}
-                    />
-                  ),
-                  // All assets already installed.
-                  !isAssetBeingInstalled &&
-                    searchResultsNotAlreadyAdded.length === 0 && (
-                      <RaisedButton
-                        key="install-again"
-                        label={<Trans>Install again</Trans>}
-                        primary={false}
-                        onClick={() => onInstallAssetPack(searchResults)}
-                      />
-                    ),
-                  // No assets installed.
-                  !isAssetBeingInstalled &&
-                    searchResultsNotAlreadyAdded.length ===
-                      searchResults.length && (
-                      <RaisedButton
-                        key="continue"
-                        label={<Trans>Continue</Trans>}
-                        primary
-                        onClick={() => onInstallAssetPack(searchResults)}
-                      />
-                    ),
-                  // Some assets installed.
-                  !isAssetBeingInstalled &&
-                    searchResultsNotAlreadyAdded.length !== 0 &&
-                    searchResultsNotAlreadyAdded.length !==
-                      searchResults.length && (
-                      <RaisedButtonWithSplitMenu
-                        label={<Trans>Install the missing assets</Trans>}
-                        key="install-missing"
-                        primary
-                        onClick={() =>
-                          onInstallAssetPack(searchResultsNotAlreadyAdded)
-                        }
-                        buildMenuTemplate={i18n => [
-                          {
-                            label: i18n._(t`Install all the assets`),
-                            click: () => onInstallAssetPack(searchResults),
-                          },
-                        ]}
-                      />
-                    ),
-                ]}
-                onApply={() =>
-                  searchResultsNotAlreadyAdded.length === searchResults.length
-                    ? onInstallAssetPack(searchResults)
-                    : onInstallAssetPack(searchResultsNotAlreadyAdded)
-                }
-              >
-                <Column>
-                  {isAssetBeingInstalled ? (
-                    <>
-                      <Text>
-                        <Trans>Installing assets...</Trans>
-                      </Text>
-                      <Line expand>
-                        <LinearProgress style={styles.linearProgress} />
-                      </Line>
-                    </>
-                  ) : (
-                    <Text>
-                      {searchResultsNotAlreadyAdded.length === 0 ? (
-                        <Trans>
-                          You already have this asset pack installed, do you
-                          want to add the {searchResults.length} assets again?
-                        </Trans>
-                      ) : searchResultsNotAlreadyAdded.length ===
-                        searchResults.length ? (
-                        <Trans>
-                          You're about to add {searchResults.length} assets from
-                          the asset pack. Continue?
-                        </Trans>
-                      ) : (
-                        <Trans>
-                          You already have{' '}
-                          {searchResults.length -
-                            searchResultsNotAlreadyAdded.length}{' '}
-                          asset(s) from this pack in your scene. Do you want to
-                          add the remaining{' '}
-                          {searchResultsNotAlreadyAdded.length} asset(s)?
-                        </Trans>
-                      )}
-                    </Text>
-                  )}
-                </Column>
-              </Dialog>
+              <AssetPackDialog
+                assetPack={openedAssetPack}
+                assetShortHeaders={searchResults}
+                addedAssetIds={addedAssetIds}
+                onClose={() => setIsAssetPackDialogInstallOpen(false)}
+                onAssetPackAdded={() => {
+                  setIsAssetPackAdded(true);
+                  setIsAssetPackDialogInstallOpen(false);
+                }}
+                project={project}
+                objectsContainer={objectsContainer}
+                events={events}
+                onObjectAddedFromAsset={onObjectAddedFromAsset}
+              />
             )}
           </>
         )}

@@ -112,44 +112,44 @@ export const AssetPackDialog = ({
     ]
   );
 
-  return (
-    <Dialog
-      title={<Trans>{assetPack.name}</Trans>}
-      open
-      cannotBeDismissed
-      actions={[
-        <TextButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          disabled={isAssetPackBeingInstalled}
-          onClick={onClose}
-        />,
-        // Loading.
-        isAssetPackBeingInstalled ? (
-          <TextButton
-            key="loading"
-            label={<Trans>Please wait...</Trans>}
-            disabled
-            onClick={() => {}}
-          />
-        ) : // All assets already installed.
-        allAssetsInstalled ? (
+  const dialogContent = allAssetsInstalled
+    ? {
+        actionButton: (
           <RaisedButton
             key="install-again"
             label={<Trans>Install again</Trans>}
             primary={false}
             onClick={() => onInstallAssetPack(assetShortHeaders)}
           />
-        ) : // No assets installed.
-        noAssetsInstalled ? (
+        ),
+        onApply: () => onInstallAssetPack(assetShortHeaders),
+        text: (
+          <Trans>
+            You already have this asset pack installed, do you want to add the{' '}
+            {assetShortHeaders.length} assets again?
+          </Trans>
+        ),
+      }
+    : noAssetsInstalled
+    ? {
+        actionButton: (
           <RaisedButton
             key="continue"
             label={<Trans>Continue</Trans>}
             primary
             onClick={() => onInstallAssetPack(assetShortHeaders)}
           />
-        ) : (
-          // Some assets installed.
+        ),
+        onApply: () => onInstallAssetPack(assetShortHeaders),
+        text: (
+          <Trans>
+            You're about to add {assetShortHeaders.length} assets from the asset
+            pack. Continue?
+          </Trans>
+        ),
+      }
+    : {
+        actionButton: (
           <RaisedButtonWithSplitMenu
             label={<Trans>Install the missing assets</Trans>}
             key="install-missing"
@@ -165,12 +165,45 @@ export const AssetPackDialog = ({
             ]}
           />
         ),
-      ]}
-      onApply={() => {
-        noAssetsInstalled
-          ? onInstallAssetPack(assetShortHeaders)
-          : onInstallAssetPack(missingAssetShortHeaders);
+        onApply: () => onInstallAssetPack(missingAssetShortHeaders),
+        text: (
+          <Trans>
+            You already have{' '}
+            {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
+            asset(s) from this pack in your scene. Do you want to add the
+            remaining {missingAssetShortHeaders.length} asset(s)?
+          </Trans>
+        ),
+      };
+
+  return (
+    <Dialog
+      maxWidth="sm"
+      title={assetPack.name}
+      open
+      onRequestClose={() => {
+        if (!isAssetPackBeingInstalled) onClose();
       }}
+      cannotBeDismissed
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          disabled={isAssetPackBeingInstalled}
+          onClick={onClose}
+        />,
+        isAssetPackBeingInstalled ? (
+          <FlatButton
+            key="loading"
+            label={<Trans>Please wait...</Trans>}
+            disabled
+            onClick={() => {}}
+          />
+        ) : (
+          dialogContent.actionButton
+        ),
+      ]}
+      onApply={dialogContent.onApply}
     >
       <Column>
         {isAssetPackBeingInstalled ? (
@@ -183,26 +216,7 @@ export const AssetPackDialog = ({
             </Line>
           </>
         ) : (
-          <Text>
-            {allAssetsInstalled ? (
-              <Trans>
-                You already have this asset pack installed, do you want to add
-                the {assetShortHeaders.length} assets again?
-              </Trans>
-            ) : noAssetsInstalled ? (
-              <Trans>
-                You're about to add {assetShortHeaders.length} assets from the
-                asset pack. Continue?
-              </Trans>
-            ) : (
-              <Trans>
-                You already have{' '}
-                {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
-                asset(s) from this pack in your scene. Do you want to add the
-                remaining {missingAssetShortHeaders.length} asset(s)?
-              </Trans>
-            )}
-          </Text>
+          <Text>{dialogContent.text}</Text>
         )}
       </Column>
     </Dialog>

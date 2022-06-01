@@ -85,7 +85,7 @@ class GD_CORE_API Object {
 
   /** \brief Change the asset store id of the object.
    */
-  void SetAssetStoreId(const gd::String& assetStoreIds_) { assetStoreId = assetStoreIds_; };
+  void SetAssetStoreId(const gd::String& assetStoreId_) { assetStoreId = assetStoreId_; };
 
   /** \brief Return the asset store id of the object.
    */

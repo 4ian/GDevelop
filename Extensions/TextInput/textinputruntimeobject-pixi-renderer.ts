@@ -47,6 +47,7 @@ namespace gdjs {
       const isTextArea = this._object.getInputType() === 'text area';
       this._input = document.createElement(isTextArea ? 'textarea' : 'input');
       this._input.style.border = '1px solid black';
+      this._input.autocomplete = 'off';
       this._input.style.borderRadius = '0px';
       this._input.style.backgroundColor = 'white';
       this._input.style.position = 'absolute';

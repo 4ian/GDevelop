@@ -186,14 +186,14 @@ export const AssetPackDialog = ({
       }}
       cannotBeDismissed
       actions={[
-        <FlatButton
+        <TextButton
           key="cancel"
           label={<Trans>Cancel</Trans>}
           disabled={isAssetPackBeingInstalled}
           onClick={onClose}
         />,
         isAssetPackBeingInstalled ? (
-          <FlatButton
+          <TextButton
             key="loading"
             label={<Trans>Please wait...</Trans>}
             disabled

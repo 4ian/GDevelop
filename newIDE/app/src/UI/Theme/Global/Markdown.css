@@ -1,9 +1,7 @@
 /* This is the styling applied to markdown (like the one used for Changelog). */
 
 .gd-markdown {
-  /* Use the fonts provided by the operating system(s) as possible. */
-  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
-  font-family: var(--gdevelop-font-family);
+  font-family: var(--gdevelop-classic-font-family);
 }
 
 .gd-markdown.standalone-text-container {

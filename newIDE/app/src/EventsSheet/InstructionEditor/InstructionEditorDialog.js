@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import InstructionEditor from '.';
 import {
@@ -58,11 +58,10 @@ export default class InstructionEditorDialog extends React.Component<
         primary={false}
         onClick={onCancel}
       />,
-      <FlatButton
+      <DialogPrimaryButton
         key="ok"
         label={<Trans>Ok</Trans>}
         primary={true}
-        keyboardFocused={false}
         onClick={onSubmit}
       />,
     ];

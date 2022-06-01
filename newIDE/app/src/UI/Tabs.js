@@ -2,6 +2,7 @@
 import * as React from 'react';
 import MUITabs from '@material-ui/core/Tabs';
 import MUITab from '@material-ui/core/Tab';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 // We support a subset of the props supported by Material-UI v0.x Tabs
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -14,19 +15,20 @@ type TabsProps<TabName> = {|
 /**
  * Tabs based on Material-UI Tabs.
  */
-export class Tabs<TabName> extends React.Component<TabsProps<TabName>, {||}> {
-  render() {
-    return (
-      <MUITabs
-        variant="fullWidth"
-        textColor="primary"
-        value={this.props.value}
-        onChange={(e, newValue) => this.props.onChange(newValue)}
-      >
-        {this.props.children}
-      </MUITabs>
-    );
-  }
+export function Tabs<TabName>(props: TabsProps<TabName>) {
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  return (
+    <MUITabs
+      variant="fullWidth"
+      textColor="primary"
+      indicatorColor={gdevelopTheme.isModern ? 'primary' : 'secondary'}
+      value={props.value}
+      onChange={(e, newValue) => props.onChange(newValue)}
+    >
+      {props.children}
+    </MUITabs>
+  );
 }
 
 // We support a subset of the props supported by Material-UI v0.x Tabs

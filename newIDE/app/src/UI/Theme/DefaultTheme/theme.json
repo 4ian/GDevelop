@@ -38,7 +38,7 @@
         "value": "{gdevelop.color.selection.value}"
       },
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "text": {
@@ -59,7 +59,7 @@
       },
       "contrast": {
         "color": {
-          "value": "white"
+          "value": "#FFFFFF"
         }
       },
       "highlighted": {
@@ -86,7 +86,7 @@
       },
       "empty-shadow": {
         "color": {
-          "value": "white"
+          "value": "#FFFFFF"
         }
       }
     },
@@ -271,7 +271,7 @@
     },
     "actions": {
       "background-color": {
-        "value": "white"
+        "value": "#FFFFFF"
       },
       "color": {
         "value": "black"
@@ -375,7 +375,7 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "layout": {
@@ -417,7 +417,7 @@
       },
       "even": {
         "background-color": {
-          "value": "white"
+          "value": "#FFFFFF"
         }
       },
       "selected": {
@@ -425,7 +425,7 @@
           "value": "#4c92ff"
         },
         "color": {
-          "value": "white"
+          "value": "#FFFFFF"
         }
       }
     }

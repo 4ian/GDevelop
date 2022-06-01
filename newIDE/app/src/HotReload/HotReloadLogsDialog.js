@@ -1,10 +1,9 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import { type HotReloaderLog } from '../Export/PreviewLauncher.flow';
@@ -39,7 +38,7 @@ export default function HotReloadLogsDialog({
           primary={false}
           onClick={onClose}
         />,
-        <RaisedButton
+        <DialogPrimaryButton
           icon={<NewPreviewIcon />}
           label={<Trans>Close and launch a new preview</Trans>}
           key="new-preview"

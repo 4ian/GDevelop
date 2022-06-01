@@ -11,7 +11,7 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem } from '../UI/Search/UseSearchItem';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
   AnimatedAssetStoreSearchFilter,
@@ -153,8 +153,7 @@ export const AssetStoreStateProvider = ({
   );
   // When one of the filter change, we need to rebuild the array
   // for the search.
-  const searchFilters = React.useMemo(
-    // <Array<SearchFilter<AssetShortHeader>>>
+  const searchFilters = React.useMemo<Array<SearchFilter<AssetShortHeader>>>(
     () => [
       animatedFilter,
       viewpointFilter,

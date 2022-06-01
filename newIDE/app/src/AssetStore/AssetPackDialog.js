@@ -49,6 +49,10 @@ export const AssetPackDialog = ({
   const missingAssetShortHeaders = assetShortHeaders.filter(
     assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
   );
+  const allAssetsInstalled = missingAssetShortHeaders.length === 0;
+  const noAssetsInstalled =
+    !allAssetsInstalled &&
+    missingAssetShortHeaders.length === assetShortHeaders.length;
 
   const resourcesFetcher = useResourceFetcher();
   const [
@@ -121,55 +125,49 @@ export const AssetPackDialog = ({
           onClick={onClose}
         />,
         // Loading.
-        isAssetPackBeingInstalled && (
+        isAssetPackBeingInstalled ? (
           <FlatButton
             key="loading"
             label={<Trans>Please wait...</Trans>}
             disabled
             onClick={() => {}}
           />
-        ),
-        // All assets already installed.
-        !isAssetPackBeingInstalled && missingAssetShortHeaders.length === 0 && (
+        ) : // All assets already installed.
+        allAssetsInstalled ? (
           <RaisedButton
             key="install-again"
             label={<Trans>Install again</Trans>}
             primary={false}
             onClick={() => onInstallAssetPack(assetShortHeaders)}
           />
+        ) : // No assets installed.
+        noAssetsInstalled ? (
+          <RaisedButton
+            key="continue"
+            label={<Trans>Continue</Trans>}
+            primary
+            onClick={() => onInstallAssetPack(assetShortHeaders)}
+          />
+        ) : (
+          // Some assets installed.
+          <RaisedButtonWithSplitMenu
+            label={<Trans>Install the missing assets</Trans>}
+            key="install-missing"
+            primary
+            onClick={() => {
+              onInstallAssetPack(missingAssetShortHeaders);
+            }}
+            buildMenuTemplate={i18n => [
+              {
+                label: i18n._(t`Install all the assets`),
+                click: () => onInstallAssetPack(assetShortHeaders),
+              },
+            ]}
+          />
         ),
-        // No assets installed.
-        !isAssetPackBeingInstalled &&
-          missingAssetShortHeaders.length === assetShortHeaders.length && (
-            <RaisedButton
-              key="continue"
-              label={<Trans>Continue</Trans>}
-              primary
-              onClick={() => onInstallAssetPack(assetShortHeaders)}
-            />
-          ),
-        // Some assets installed.
-        !isAssetPackBeingInstalled &&
-          missingAssetShortHeaders.length !== 0 &&
-          missingAssetShortHeaders.length !== assetShortHeaders.length && (
-            <RaisedButtonWithSplitMenu
-              label={<Trans>Install the missing assets</Trans>}
-              key="install-missing"
-              primary
-              onClick={() => {
-                onInstallAssetPack(missingAssetShortHeaders);
-              }}
-              buildMenuTemplate={i18n => [
-                {
-                  label: i18n._(t`Install all the assets`),
-                  click: () => onInstallAssetPack(assetShortHeaders),
-                },
-              ]}
-            />
-          ),
       ]}
       onApply={() => {
-        missingAssetShortHeaders.length === assetShortHeaders.length
+        noAssetsInstalled
           ? onInstallAssetPack(assetShortHeaders)
           : onInstallAssetPack(missingAssetShortHeaders);
       }}
@@ -186,12 +184,12 @@ export const AssetPackDialog = ({
           </>
         ) : (
           <Text>
-            {missingAssetShortHeaders.length === 0 ? (
+            {allAssetsInstalled ? (
               <Trans>
                 You already have this asset pack installed, do you want to add
                 the {assetShortHeaders.length} assets again?
               </Trans>
-            ) : missingAssetShortHeaders.length === assetShortHeaders.length ? (
+            ) : noAssetsInstalled ? (
               <Trans>
                 You're about to add {assetShortHeaders.length} assets from the
                 asset pack. Continue?

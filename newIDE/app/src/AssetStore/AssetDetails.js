@@ -257,11 +257,11 @@ export const AssetDetails = ({
                 primary={!isAddedToScene}
                 label={
                   isBeingAddedToScene ? (
-                    <Trans>Adding to scene...</Trans>
+                    <Trans>Adding...</Trans>
                   ) : isAddedToScene ? (
-                    <Trans>Add object again to my scene</Trans>
+                    <Trans>Add again</Trans>
                   ) : (
-                    <Trans>Add object to my scene</Trans>
+                    <Trans>Add to the scene</Trans>
                   )
                 }
                 onClick={onAddAsset}

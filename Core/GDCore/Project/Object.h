@@ -315,7 +315,7 @@ class GD_CORE_API Object {
 
  protected:
   gd::String name;  ///< The full name of the object
-  gd::String assetStoreId;  ///< The ID of the asset it the object comes from the store.
+  gd::String assetStoreId;  ///< The ID of the asset if the object comes from the store.
   gd::String type;  ///< Which type is the object. ( To test if we can do
                     ///< something reserved to some objects with it )
   std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>

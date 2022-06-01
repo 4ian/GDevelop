@@ -201,10 +201,14 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   const shuffledSearchItems: ?Array<SearchItem> = React.useMemo(
     () => {
       if (!searchItemsById) return null;
-
-      return shuffle(
-        Object.keys(searchItemsById).map(id => searchItemsById[id])
-      );
+      return shuffle(Object.values(searchItemsById));
+    },
+    [searchItemsById]
+  );
+  const sortedSearchItems: ?Array<SearchItem> = React.useMemo(
+    () => {
+      if (!searchItemsById) return null;
+      return Object.values(searchItemsById);
     },
     [searchItemsById]
   );
@@ -253,7 +257,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       if (!searchText) {
         setSearchResults(
           filterSearchItems(
-            shuffledSearchItems,
+            chosenCategory ? sortedSearchItems : shuffledSearchItems,
             chosenCategory,
             chosenFilters,
             searchFilters

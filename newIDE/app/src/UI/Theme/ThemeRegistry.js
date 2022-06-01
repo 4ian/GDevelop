@@ -8,8 +8,10 @@ import DefaultDarkTheme from './DefaultDarkTheme';
 
 /*eslint no-useless-computed-key: "off"*/
 export const themes = {
-  ['GDevelop default']: DefaultTheme,
+  // "Modern" themes:
   ['GDevelop default Dark']: DefaultDarkTheme,
+  // Old themes still based on the "old" components:
+  ['GDevelop default']: DefaultTheme,
   ['Dark']: DarkTheme,
   ['Nord']: NordTheme,
   ['Solarized Dark']: SolarizedDarkTheme,

@@ -260,8 +260,9 @@ export const initialPreferences = {
     themeName:
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'Nord'
-        : 'GDevelop default',
+        ? 'GDevelop default Dark'
+        : // TODO: Use the light theme back when it's adapted to the modern theme.
+          'GDevelop default Dark',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},

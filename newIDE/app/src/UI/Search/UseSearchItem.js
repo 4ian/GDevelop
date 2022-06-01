@@ -208,6 +208,14 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
     },
     [searchItemsById]
   );
+  const sortedSearchItems: ?Array<SearchItem> = React.useMemo(
+    () => {
+      if (!searchItemsById) return null;
+
+      return Object.keys(searchItemsById).map(id => searchItemsById[id]);
+    },
+    [searchItemsById]
+  );
 
   // Index items that have been loaded.
   React.useEffect(
@@ -253,7 +261,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       if (!searchText) {
         setSearchResults(
           filterSearchItems(
-            shuffledSearchItems,
+            chosenCategory ? sortedSearchItems : shuffledSearchItems,
             chosenCategory,
             chosenFilters,
             searchFilters

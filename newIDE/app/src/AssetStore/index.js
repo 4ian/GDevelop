@@ -13,12 +13,16 @@ import {
   sendAssetOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
+import RaisedButton from '../UI/RaisedButton';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type AssetPack,
+} from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -40,11 +44,18 @@ import { installAsset } from './InstallAsset';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import Dialog from '../UI/Dialog';
+import { LinearProgress } from '@material-ui/core';
+import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
+import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 
 const styles = {
   searchBar: {
     // TODO: Can we put this in the search bar by default?
     flexShrink: 0,
+  },
+  linearProgress: {
+    flex: 1,
   },
 };
 
@@ -95,13 +106,31 @@ export const AssetStore = ({
     openedAssetShortHeader,
     setOpenedAssetShortHeader,
   ] = React.useState<?AssetShortHeader>(null);
+  const [openedAssetPack, setOpenedAssetPack] = React.useState<?AssetPack>(
+    null
+  );
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [isOnHomePage, setIsOnHomePage] = React.useState(true);
+  const [
+    isAssetPackDialogInstallOpen,
+    setIsAssetPackDialogInstallOpen,
+  ] = React.useState(false);
+  const [isAssetPackAdded, setIsAssetPackAdded] = React.useState(false);
 
   const [
-    assetBeingInstalled,
-    setAssetBeingInstalled,
-  ] = React.useState<?AssetShortHeader>(null);
+    isAssetBeingInstalled,
+    setIsAssetBeingInstalled,
+  ] = React.useState<boolean>(false);
+
+  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
+  const addedAssetIds = containerObjectsList
+    .map(({ object }) => object.getAssetStoreId())
+    .filter(Boolean);
+  const searchResultsNotAlreadyAdded = searchResults
+    ? searchResults.filter(
+        assetShortHeader => !addedAssetIds.includes(assetShortHeader.id)
+      )
+    : [];
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
@@ -111,7 +140,7 @@ export const AssetStore = ({
 
   const onInstallAsset = React.useCallback(
     (assetShortHeader: AssetShortHeader) => {
-      setAssetBeingInstalled(assetShortHeader);
+      setIsAssetBeingInstalled(true);
       (async () => {
         try {
           const installOutput = await installAsset({
@@ -143,8 +172,59 @@ export const AssetStore = ({
           });
         }
 
-        setAssetBeingInstalled(null);
+        setIsAssetBeingInstalled(false);
       })();
+    },
+    [
+      resourcesFetcher,
+      eventsFunctionsExtensionsState,
+      project,
+      objectsContainer,
+      events,
+      onObjectAddedFromAsset,
+    ]
+  );
+
+  const onInstallAssetPack = React.useCallback(
+    (assetShortHeaders: Array<AssetShortHeader>) => {
+      if (!assetShortHeaders || !assetShortHeaders.length) return;
+      setIsAssetBeingInstalled(true);
+      Promise.all(
+        assetShortHeaders.map(assetShortHeader =>
+          installAsset({
+            assetShortHeader,
+            eventsFunctionsExtensionsState,
+            project,
+            objectsContainer,
+            events,
+          })
+        )
+      )
+        .then(installOutputs => {
+          console.log('Asset pack successfully installed.');
+          setIsAssetBeingInstalled(false);
+          setIsAssetPackAdded(true);
+
+          setIsAssetPackDialogInstallOpen(false);
+
+          installOutputs.forEach(installOutput => {
+            installOutput.createdObjects.forEach(object => {
+              onObjectAddedFromAsset(object);
+            });
+          });
+
+          return resourcesFetcher.ensureResourcesAreFetched(project);
+        })
+        .catch(error => {
+          console.error('Error while installing the asset pack', error);
+          setIsAssetBeingInstalled(false);
+          showErrorBox({
+            message:
+              'There was an error while installing the asset pack. Verify your internet connection or try again later.',
+            rawError: error,
+            errorId: 'install-asset-pack-error',
+          });
+        });
     },
     [
       resourcesFetcher,
@@ -159,6 +239,8 @@ export const AssetStore = ({
   const resetToDefault = () => {
     setSearchText('');
     filtersState.setChosenCategory(null);
+    setOpenedAssetPack(null);
+    setIsAssetPackAdded(false);
     setOpenedAssetShortHeader(null);
     clearAllFilters(assetFiltersState);
     setIsFiltersPanelOpen(false);
@@ -178,6 +260,9 @@ export const AssetStore = ({
     };
     filtersState.setChosenCategory(chosenCategory);
 
+    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
+    setOpenedAssetPack(assetPack);
+
     setIsOnHomePage(false);
     setIsFiltersPanelOpen(true);
   };
@@ -192,8 +277,29 @@ export const AssetStore = ({
     filtersState.setChosenCategory(chosenCategory);
 
     clearAllFilters(assetFiltersState);
+    setOpenedAssetPack(null);
     setOpenedAssetShortHeader(null);
     setIsFiltersPanelOpen(true);
+  };
+
+  // When something is entered in the search bar
+  // we need to ensure we leave the homepage and deselect any pack.
+  const onSearchChange = () => {
+    if (isOnHomePage) setIsOnHomePage(false);
+    if (openedAssetPack) setOpenedAssetPack(null);
+  };
+
+  // When the back button is pressed, if we were on the asset details page,
+  // we just go back to the search,
+  // if we were on the search, we reset everything to go back to the homepage.
+  const goBack = () => {
+    if (openedAssetShortHeader) {
+      // Going back from Asset page to search.
+      setOpenedAssetShortHeader(null);
+    } else {
+      // Going back from search to home.
+      resetToDefault();
+    }
   };
 
   React.useEffect(
@@ -215,44 +321,61 @@ export const AssetStore = ({
                 placeholder={t`Search assets`}
                 value={searchText}
                 onChange={setSearchText}
-                onRequestSearch={() => {
-                  if (isOnHomePage) setIsOnHomePage(false);
-                }}
+                onRequestSearch={onSearchChange}
                 style={styles.searchBar}
                 ref={searchBar}
                 id="asset-store-search-bar"
               />
               {!isOnHomePage && <Spacer />}
-              <Line justifyContent="left" noMargin>
-                {isOnHomePage ? (
-                  <Column>
+              <Column>
+                <Line
+                  justifyContent="space-between"
+                  noMargin
+                  alignItems="center"
+                >
+                  {isOnHomePage ? (
                     <Text size="title">
                       <Trans>Discover</Trans>
                     </Text>
-                  </Column>
-                ) : (
-                  <FlatButton
-                    icon={<ArrowBack />}
-                    label={
-                      openedAssetShortHeader ? (
-                        <Trans>Back</Trans>
-                      ) : (
-                        <Trans>Back to discover</Trans>
-                      )
-                    }
-                    primary={false}
-                    onClick={() => {
-                      if (openedAssetShortHeader) {
-                        // Going back from Asset page to search.
-                        setOpenedAssetShortHeader(null);
-                      } else {
-                        // Going back from search to home.
-                        resetToDefault();
-                      }
-                    }}
-                  />
-                )}
-              </Line>
+                  ) : (
+                    <>
+                      <Column expand alignItems="flex-start" noMargin>
+                        <FlatButton
+                          icon={<ArrowBack />}
+                          label={<Trans>Back</Trans>}
+                          primary={false}
+                          onClick={goBack}
+                        />
+                      </Column>
+                      {!!openedAssetPack && !openedAssetShortHeader && (
+                        <>
+                          <Column expand alignItems="center">
+                            <Text size="title" noMargin>
+                              {openedAssetPack.name}
+                            </Text>
+                          </Column>
+                          <Column expand alignItems="flex-end" noMargin>
+                            <RaisedButton
+                              primary
+                              label={
+                                isAssetPackAdded ? (
+                                  <Trans>Asset pack added</Trans>
+                                ) : (
+                                  <Trans>Add pack to my scene</Trans>
+                                )
+                              }
+                              onClick={() =>
+                                setIsAssetPackDialogInstallOpen(true)
+                              }
+                              disabled={isAssetPackAdded}
+                            />
+                          </Column>
+                        </>
+                      )}
+                    </>
+                  )}
+                </Line>
+              </Column>
               <Line
                 expand
                 overflow={
@@ -303,9 +426,7 @@ export const AssetStore = ({
                         >
                           <AssetStoreFilterPanel
                             assetFiltersState={assetFiltersState}
-                            onChoiceChange={() => {
-                              if (isOnHomePage) setIsOnHomePage(false);
-                            }}
+                            onChoiceChange={onSearchChange}
                           />
                         </Line>
                       </ScrollView>
@@ -348,7 +469,6 @@ export const AssetStore = ({
                 {openedAssetShortHeader && (
                   <AssetDetails
                     project={project}
-                    layout={layout}
                     objectsContainer={objectsContainer}
                     resourceSources={resourceSources}
                     resourceExternalEditors={resourceExternalEditors}
@@ -356,16 +476,122 @@ export const AssetStore = ({
                     assetShortHeader={openedAssetShortHeader}
                     onAdd={() => onInstallAsset(openedAssetShortHeader)}
                     onClose={() => setOpenedAssetShortHeader(null)}
-                    canInstall={!assetBeingInstalled}
-                    isBeingInstalled={
-                      !!assetBeingInstalled &&
-                      assetBeingInstalled.id === openedAssetShortHeader.id
-                    }
+                    isAddedToScene={addedAssetIds.includes(
+                      openedAssetShortHeader.id
+                    )}
+                    isBeingAddedToScene={isAssetBeingInstalled}
                   />
                 )}
               </Line>
             </Column>
             {resourcesFetcher.renderResourceFetcherDialog()}
+            {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
+              <Dialog
+                title={<Trans>{openedAssetPack.name}</Trans>}
+                open
+                cannotBeDismissed
+                actions={[
+                  <FlatButton
+                    key="cancel"
+                    label={<Trans>Cancel</Trans>}
+                    disabled={isAssetBeingInstalled}
+                    onClick={() => setIsAssetPackDialogInstallOpen(false)}
+                  />,
+                  // Loading.
+                  isAssetBeingInstalled && (
+                    <FlatButton
+                      key="loading"
+                      label={<Trans>Please wait...</Trans>}
+                      disabled
+                      onClick={() => {}}
+                    />
+                  ),
+                  // All assets already installed.
+                  !isAssetBeingInstalled &&
+                    searchResultsNotAlreadyAdded.length === 0 && (
+                      <RaisedButton
+                        key="install-again"
+                        label={<Trans>Install again</Trans>}
+                        primary={false}
+                        onClick={() => onInstallAssetPack(searchResults)}
+                      />
+                    ),
+                  // No assets installed.
+                  !isAssetBeingInstalled &&
+                    searchResultsNotAlreadyAdded.length ===
+                      searchResults.length && (
+                      <RaisedButton
+                        key="continue"
+                        label={<Trans>Continue</Trans>}
+                        primary
+                        onClick={() => onInstallAssetPack(searchResults)}
+                      />
+                    ),
+                  // Some assets installed.
+                  !isAssetBeingInstalled &&
+                    searchResultsNotAlreadyAdded.length !== 0 &&
+                    searchResultsNotAlreadyAdded.length !==
+                      searchResults.length && (
+                      <RaisedButtonWithSplitMenu
+                        label={<Trans>Install the missing assets</Trans>}
+                        key="install-missing"
+                        primary
+                        onClick={() =>
+                          onInstallAssetPack(searchResultsNotAlreadyAdded)
+                        }
+                        buildMenuTemplate={i18n => [
+                          {
+                            label: i18n._(t`Install all the assets`),
+                            click: () => onInstallAssetPack(searchResults),
+                          },
+                        ]}
+                      />
+                    ),
+                ]}
+                onApply={() =>
+                  searchResultsNotAlreadyAdded.length === searchResults.length
+                    ? onInstallAssetPack(searchResults)
+                    : onInstallAssetPack(searchResultsNotAlreadyAdded)
+                }
+              >
+                <Column>
+                  {isAssetBeingInstalled ? (
+                    <>
+                      <Text>
+                        <Trans>Installing assets...</Trans>
+                      </Text>
+                      <Line expand>
+                        <LinearProgress style={styles.linearProgress} />
+                      </Line>
+                    </>
+                  ) : (
+                    <Text>
+                      {searchResultsNotAlreadyAdded.length === 0 ? (
+                        <Trans>
+                          You already have this asset pack installed, do you
+                          want to add the {searchResults.length} assets again?
+                        </Trans>
+                      ) : searchResultsNotAlreadyAdded.length ===
+                        searchResults.length ? (
+                        <Trans>
+                          You're about to add {searchResults.length} assets from
+                          the asset pack. Continue?
+                        </Trans>
+                      ) : (
+                        <Trans>
+                          You already have{' '}
+                          {searchResults.length -
+                            searchResultsNotAlreadyAdded.length}{' '}
+                          asset(s) from this pack in your scene. Do you want to
+                          add the remaining{' '}
+                          {searchResultsNotAlreadyAdded.length} asset(s)?
+                        </Trans>
+                      )}
+                    </Text>
+                  )}
+                </Column>
+              </Dialog>
+            )}
           </>
         )}
       </ResponsiveWindowMeasurer>

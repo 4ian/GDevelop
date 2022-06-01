@@ -201,14 +201,18 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   const shuffledSearchItems: ?Array<SearchItem> = React.useMemo(
     () => {
       if (!searchItemsById) return null;
-      return shuffle(Object.values(searchItemsById));
+
+      return shuffle(
+        Object.keys(searchItemsById).map(id => searchItemsById[id])
+      );
     },
     [searchItemsById]
   );
   const sortedSearchItems: ?Array<SearchItem> = React.useMemo(
     () => {
       if (!searchItemsById) return null;
-      return Object.values(searchItemsById);
+
+      return Object.keys(searchItemsById).map(id => searchItemsById[id]);
     },
     [searchItemsById]
   );

@@ -70,7 +70,6 @@ const makeFirstLetterUppercase = (str: string) =>
 
 type Props = {|
   project: gdProject,
-  layout: ?gdLayout,
   objectsContainer: gdObjectsContainer,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -79,8 +78,8 @@ type Props = {|
   assetShortHeader: AssetShortHeader,
   onAdd: () => void,
   onClose: () => void,
-  canInstall: boolean,
-  isBeingInstalled: boolean,
+  isAddedToScene: boolean,
+  isBeingAddedToScene: boolean,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -97,7 +96,6 @@ const getObjectAssetResourcesByName = (
 
 export const AssetDetails = ({
   project,
-  layout,
   objectsContainer,
   resourceSources,
   resourceExternalEditors,
@@ -105,13 +103,12 @@ export const AssetDetails = ({
   assetShortHeader,
   onAdd,
   onClose,
-  canInstall,
-  isBeingInstalled,
+  isAddedToScene,
+  isBeingAddedToScene,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
   const [asset, setAsset] = React.useState<?Asset>(null);
-  const [isAssetAdded, setIsAssetAdded] = React.useState<boolean>(false);
   const [
     selectedAnimationName,
     setSelectedAnimationName,
@@ -150,14 +147,12 @@ export const AssetDetails = ({
     [loadAsset]
   );
 
-  const canAddAsset =
-    canInstall && !isBeingInstalled && !!asset && !isAssetAdded;
+  const canAddAsset = !isBeingAddedToScene && !!asset;
   const onAddAsset = React.useCallback(
     () => {
       if (canAddAsset) onAdd();
-      setIsAssetAdded(true);
     },
-    [onAdd, canAddAsset, setIsAssetAdded]
+    [onAdd, canAddAsset]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -255,18 +250,18 @@ export const AssetDetails = ({
           </Column>
           <Column alignItems="center" justifyContent="center">
             <LeftLoader
-              isLoading={isBeingInstalled || (!asset && !error)}
+              isLoading={isBeingAddedToScene || (!asset && !error)}
               key="install"
             >
               <RaisedButton
-                primary
+                primary={!isAddedToScene}
                 label={
-                  isBeingInstalled ? (
-                    <Trans>Adding to my project...</Trans>
-                  ) : isAssetAdded ? (
-                    <Trans>Object added to my project</Trans>
+                  isBeingAddedToScene ? (
+                    <Trans>Adding...</Trans>
+                  ) : isAddedToScene ? (
+                    <Trans>Add again</Trans>
                   ) : (
-                    <Trans>Add object to my project</Trans>
+                    <Trans>Add to the scene</Trans>
                   )
                 }
                 onClick={onAddAsset}

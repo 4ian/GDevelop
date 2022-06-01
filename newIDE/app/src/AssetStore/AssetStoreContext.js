@@ -11,7 +11,7 @@ import {
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import { useSearchItem } from '../UI/Search/UseSearchItem';
 import {
   TagAssetStoreSearchFilter,
   AnimatedAssetStoreSearchFilter,
@@ -153,20 +153,25 @@ export const AssetStoreStateProvider = ({
   );
   // When one of the filter change, we need to rebuild the array
   // for the search.
-  const currentFilters = [
-    animatedFilter,
-    viewpointFilter,
-    dimensionFilter,
-    objectTypeFilter,
-    colorFilter,
-    licenseFilter,
-  ];
-  const [searchFilters, setSearchFilters] = React.useState<
-    Array<SearchFilter<AssetShortHeader>>
-  >(currentFilters);
-  if (searchFilters.some((filter, index) => filter !== currentFilters[index])) {
-    setSearchFilters(currentFilters);
-  }
+  const searchFilters = React.useMemo(
+    // <Array<SearchFilter<AssetShortHeader>>>
+    () => [
+      animatedFilter,
+      viewpointFilter,
+      dimensionFilter,
+      objectTypeFilter,
+      colorFilter,
+      licenseFilter,
+    ],
+    [
+      animatedFilter,
+      viewpointFilter,
+      dimensionFilter,
+      objectTypeFilter,
+      colorFilter,
+      licenseFilter,
+    ]
+  );
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -252,18 +257,18 @@ export const AssetStoreStateProvider = ({
       setSearchText,
       filtersState,
       assetFiltersState: {
-        animatedFilter: animatedFilter,
-        setAnimatedFilter: setAnimatedFilter,
-        viewpointFilter: viewpointFilter,
-        setViewpointFilter: setViewpointFilter,
-        dimensionFilter: dimensionFilter,
-        setDimensionFilter: setDimensionFilter,
-        objectTypeFilter: objectTypeFilter,
-        setObjectTypeFilter: setObjectTypeFilter,
-        colorFilter: colorFilter,
-        setColorFilter: setColorFilter,
-        licenseFilter: licenseFilter,
-        setLicenseFilter: setLicenseFilter,
+        animatedFilter,
+        setAnimatedFilter,
+        viewpointFilter,
+        setViewpointFilter,
+        dimensionFilter,
+        setDimensionFilter,
+        objectTypeFilter,
+        setObjectTypeFilter,
+        colorFilter,
+        setColorFilter,
+        licenseFilter,
+        setLicenseFilter,
       },
     }),
     [
@@ -277,17 +282,11 @@ export const AssetStoreStateProvider = ({
       searchText,
       filtersState,
       animatedFilter,
-      setAnimatedFilter,
       viewpointFilter,
-      setViewpointFilter,
       dimensionFilter,
-      setDimensionFilter,
       objectTypeFilter,
-      setObjectTypeFilter,
       colorFilter,
-      setColorFilter,
       licenseFilter,
-      setLicenseFilter,
     ]
   );
 

@@ -242,6 +242,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               </Line>
             )}
           <VariablesList
+            commitChangesOnBlur
             variablesContainer={props.object.getVariables()}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>

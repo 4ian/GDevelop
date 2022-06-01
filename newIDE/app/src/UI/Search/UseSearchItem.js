@@ -100,7 +100,7 @@ export const partialQuickSort = <Element: any>(
 export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
   searchItems: ?Array<SearchItem>,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>,
+  chosenFilters: ?Set<string>,
   searchFilters?: Array<SearchFilter<SearchItem>>
 ): ?Array<SearchItem> => {
   if (!searchItems) return null;
@@ -132,6 +132,7 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
     })
     .filter(searchItem => {
       return (
+        !chosenFilters ||
         chosenFilters.size === 0 ||
         searchItem.tags.some(tag => chosenFilters.has(tag))
       );
@@ -188,7 +189,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   getItemDescription: SearchItem => string,
   searchText: string,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>,
+  chosenFilters: ?Set<string>,
   searchFilters?: Array<SearchFilter<SearchItem>>
 ): ?Array<SearchItem> => {
   const searchApiRef = React.useRef<?any>(null);

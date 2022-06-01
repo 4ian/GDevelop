@@ -109,6 +109,14 @@ export const AssetStore = ({
 
   const resourcesFetcher = useResourceFetcher();
 
+  const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
+    sendAssetOpened({
+      id: assetShortHeader.id,
+      name: assetShortHeader.name,
+    });
+    setOpenedAssetShortHeader(assetShortHeader);
+  };
+
   const onInstallAsset = React.useCallback(
     (assetShortHeader: AssetShortHeader) => {
       setAssetBeingInstalled(assetShortHeader);
@@ -328,13 +336,7 @@ export const AssetStore = ({
                     renderSearchItem={(assetShortHeader, size) => (
                       <AssetCard
                         size={size}
-                        onOpenDetails={() => {
-                          sendAssetOpened({
-                            id: assetShortHeader.id,
-                            name: assetShortHeader.name,
-                          });
-                          setOpenedAssetShortHeader(assetShortHeader);
-                        }}
+                        onOpenDetails={() => onOpenDetails(assetShortHeader)}
                         assetShortHeader={assetShortHeader}
                       />
                     )}
@@ -361,6 +363,7 @@ export const AssetStore = ({
                       !!assetBeingInstalled &&
                       assetBeingInstalled.id === openedAssetShortHeader.id
                     }
+                    onOpenDetails={onOpenDetails}
                   />
                 )}
               </Line>

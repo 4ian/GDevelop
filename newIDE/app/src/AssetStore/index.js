@@ -339,31 +339,29 @@ export const AssetStore = ({
                     </Text>
                   ) : (
                     <>
-                      <FlatButton
-                        icon={<ArrowBack />}
-                        label={
-                          openedAssetShortHeader ? (
-                            <Trans>Back</Trans>
-                          ) : (
-                            <Trans>Back to discover</Trans>
-                          )
-                        }
-                        primary={false}
-                        onClick={goBack}
-                      />
+                      <Column expand alignItems="flex-start" noMargin>
+                        <FlatButton
+                          icon={<ArrowBack />}
+                          label={<Trans>Back</Trans>}
+                          primary={false}
+                          onClick={goBack}
+                        />
+                      </Column>
                       {!!openedAssetPack && !openedAssetShortHeader && (
                         <>
-                          <Text size="title" noMargin>
-                            {openedAssetPack.name}
-                          </Text>
-                          <Column alignItems="center" justifyContent="center">
+                          <Column expand alignItems="center">
+                            <Text size="title" noMargin>
+                              {openedAssetPack.name}
+                            </Text>
+                          </Column>
+                          <Column expand alignItems="flex-end" noMargin>
                             <RaisedButton
                               primary
                               label={
                                 isAssetPackAdded ? (
                                   <Trans>Asset pack added</Trans>
                                 ) : (
-                                  <Trans>Add this pack to my scene</Trans>
+                                  <Trans>Add pack to my scene</Trans>
                                 )
                               }
                               onClick={() =>
@@ -499,40 +497,56 @@ export const AssetStore = ({
                     disabled={isAssetBeingInstalled}
                     onClick={() => setIsAssetPackDialogInstallOpen(false)}
                   />,
-                  searchResultsNotAlreadyAdded.length === 0 ? (
-                    <RaisedButton
-                      key="install-again"
-                      label={<Trans>Install again</Trans>}
-                      primary={false}
-                      disabled={isAssetBeingInstalled}
-                      onClick={() => onInstallAssetPack(searchResults)}
-                    />
-                  ) : searchResultsNotAlreadyAdded.length ===
-                    searchResults.length ? (
-                    <RaisedButton
-                      key="continue"
-                      label={<Trans>Continue</Trans>}
-                      primary
-                      disabled={isAssetBeingInstalled}
-                      onClick={() => onInstallAssetPack(searchResults)}
-                    />
-                  ) : (
-                    <RaisedButtonWithSplitMenu
-                      label={<Trans>Install the missing assets</Trans>}
-                      key="install-missing"
-                      primary
-                      onClick={() =>
-                        onInstallAssetPack(searchResultsNotAlreadyAdded)
-                      }
-                      disabled={isAssetBeingInstalled}
-                      buildMenuTemplate={i18n => [
-                        {
-                          label: i18n._(t`Install all the assets`),
-                          click: () => onInstallAssetPack(searchResults),
-                        },
-                      ]}
+                  // Loading.
+                  isAssetBeingInstalled && (
+                    <FlatButton
+                      key="loading"
+                      label={<Trans>Please wait...</Trans>}
+                      disabled
+                      onClick={() => {}}
                     />
                   ),
+                  // All assets already installed.
+                  !isAssetBeingInstalled &&
+                    searchResultsNotAlreadyAdded.length === 0 && (
+                      <RaisedButton
+                        key="install-again"
+                        label={<Trans>Install again</Trans>}
+                        primary={false}
+                        onClick={() => onInstallAssetPack(searchResults)}
+                      />
+                    ),
+                  // No assets installed.
+                  !isAssetBeingInstalled &&
+                    searchResultsNotAlreadyAdded.length ===
+                      searchResults.length && (
+                      <RaisedButton
+                        key="continue"
+                        label={<Trans>Continue</Trans>}
+                        primary
+                        onClick={() => onInstallAssetPack(searchResults)}
+                      />
+                    ),
+                  // Some assets installed.
+                  !isAssetBeingInstalled &&
+                    searchResultsNotAlreadyAdded.length !== 0 &&
+                    searchResultsNotAlreadyAdded.length !==
+                      searchResults.length && (
+                      <RaisedButtonWithSplitMenu
+                        label={<Trans>Install the missing assets</Trans>}
+                        key="install-missing"
+                        primary
+                        onClick={() =>
+                          onInstallAssetPack(searchResultsNotAlreadyAdded)
+                        }
+                        buildMenuTemplate={i18n => [
+                          {
+                            label: i18n._(t`Install all the assets`),
+                            click: () => onInstallAssetPack(searchResults),
+                          },
+                        ]}
+                      />
+                    ),
                 ]}
                 onApply={() =>
                   searchResultsNotAlreadyAdded.length === searchResults.length

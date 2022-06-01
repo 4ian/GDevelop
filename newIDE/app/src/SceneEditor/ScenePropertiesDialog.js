@@ -2,10 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
@@ -90,11 +89,10 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       //   primary={false}
       //   onClick={this.props.onClose}
       // />,
-      <FlatButton
+      <DialogPrimaryButton
         label={<Trans>Ok</Trans>}
         key="ok"
         primary={true}
-        keyboardFocused={true}
         onClick={this._onApply}
       />,
     ];

@@ -10,7 +10,7 @@ import AddCircleOutline from '@material-ui/icons/AddCircleOutline';
 
 import FlatButton from '../../../UI/FlatButton';
 import IconButton from '../../../UI/IconButton';
-import { LargeSpacer, Line, Spacer } from '../../../UI/Grid';
+import { LargeSpacer, Line, Column, Spacer } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
 import Carousel from '../../../UI/Carousel';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
@@ -421,99 +421,104 @@ export const HomePage = React.memo<Props>(
                       }
                     />
                   </div>
-                  <Line noMargin>
-                    <ResponsiveLineStackLayout
-                      alignItems="center"
-                      justifyContent="space-between"
-                      expand
-                    >
+                  <Column expand justifyContent="flex-end">
+                    <Line noMargin>
                       <ResponsiveLineStackLayout
                         noMargin
-                        justifyContent="center"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        expand
                       >
-                        <FlatButton
-                          icon={<ForumIcon />}
-                          label={<Trans>Community Forums</Trans>}
-                          onClick={() =>
-                            Window.openExternalURL('https://forum.gdevelop.io')
-                          }
-                        />
-                        <FlatButton
-                          icon={<HelpIcon />}
-                          label={<Trans>Help and documentation</Trans>}
-                          onClick={onOpenHelpFinder}
-                        />
-                        {!electron && (
-                          <RaisedButton
-                            label={
-                              <Trans>Download the full desktop version</Trans>
-                            }
+                        <ResponsiveLineStackLayout
+                          noMargin
+                          justifyContent="center"
+                        >
+                          <FlatButton
+                            icon={<ForumIcon />}
+                            label={<Trans>Community Forums</Trans>}
                             onClick={() =>
                               Window.openExternalURL(
-                                'https://gdevelop.io/download'
+                                'https://forum.gdevelop.io'
                               )
                             }
                           />
-                        )}
+                          <FlatButton
+                            icon={<HelpIcon />}
+                            label={<Trans>Help and documentation</Trans>}
+                            onClick={onOpenHelpFinder}
+                          />
+                          {!electron && (
+                            <RaisedButton
+                              label={
+                                <Trans>Download the full desktop version</Trans>
+                              }
+                              onClick={() =>
+                                Window.openExternalURL(
+                                  'https://gdevelop.io/download'
+                                )
+                              }
+                            />
+                          )}
+                        </ResponsiveLineStackLayout>
+                        <Line
+                          noMargin
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <IconButton
+                            className="icon-youtube"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://www.youtube.com/c/GDevelopApp'
+                              )
+                            }
+                            tooltip={t`Tutorials on YouTube`}
+                          />
+                          <IconButton
+                            className="icon-discord"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://discord.gg/gdevelop'
+                              )
+                            }
+                            tooltip={t`GDevelop on Discord`}
+                          />
+                          <IconButton
+                            className="icon-reddit"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://www.reddit.com/r/gdevelop'
+                              )
+                            }
+                            tooltip={t`GDevelop on Reddit`}
+                          />
+                          <IconButton
+                            className="icon-twitter"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://twitter.com/GDevelopApp'
+                              )
+                            }
+                            tooltip={t`GDevelop on Twitter`}
+                          />
+                          <IconButton
+                            className="icon-facebook"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://www.facebook.com/GDevelopApp'
+                              )
+                            }
+                            tooltip={t`GDevelop on Facebook`}
+                          />
+                          <FlatButton
+                            label={i18n.language}
+                            onClick={onOpenLanguageDialog}
+                            icon={<Language />}
+                          />
+                        </Line>
                       </ResponsiveLineStackLayout>
-                      <Line
-                        noMargin
-                        alignItems="center"
-                        justifyContent="center"
-                      >
-                        <IconButton
-                          className="icon-youtube"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://www.youtube.com/c/GDevelopApp'
-                            )
-                          }
-                          tooltip={t`Tutorials on YouTube`}
-                        />
-                        <IconButton
-                          className="icon-discord"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://discord.gg/gdevelop'
-                            )
-                          }
-                          tooltip={t`GDevelop on Discord`}
-                        />
-                        <IconButton
-                          className="icon-reddit"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://www.reddit.com/r/gdevelop'
-                            )
-                          }
-                          tooltip={t`GDevelop on Reddit`}
-                        />
-                        <IconButton
-                          className="icon-twitter"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://twitter.com/GDevelopApp'
-                            )
-                          }
-                          tooltip={t`GDevelop on Twitter`}
-                        />
-                        <IconButton
-                          className="icon-facebook"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://www.facebook.com/GDevelopApp'
-                            )
-                          }
-                          tooltip={t`GDevelop on Facebook`}
-                        />
-                        <FlatButton
-                          label={i18n.language}
-                          onClick={onOpenLanguageDialog}
-                          icon={<Language />}
-                        />
-                      </Line>
-                    </ResponsiveLineStackLayout>
-                  </Line>
+                    </Line>
+                  </Column>
                 </div>
               </ScrollBackground>
               {selectedShowcasedGame && (

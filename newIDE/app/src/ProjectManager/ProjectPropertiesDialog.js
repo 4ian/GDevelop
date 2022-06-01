@@ -7,7 +7,7 @@ import FlatButton from '../UI/FlatButton';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import {
   getProjectPropertiesErrors,
@@ -242,7 +242,7 @@ function ProjectPropertiesDialog(props: Props) {
                 onClick={onCancelChanges}
                 key="cancel"
               />,
-              <FlatButton
+              <DialogPrimaryButton
                 label={<Trans>Apply</Trans>}
                 primary={true}
                 onClick={onApply}

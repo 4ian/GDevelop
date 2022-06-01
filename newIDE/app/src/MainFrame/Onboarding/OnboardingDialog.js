@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import userflow from 'userflow.js';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { getProgramOpeningCount } from '../../Utils/Analytics/LocalStats';
@@ -11,7 +11,6 @@ import { isMobile } from '../../Utils/Platform';
 import Window from '../../Utils/Window';
 import { loadPreferencesFromLocalStorage } from '../Preferences/PreferencesProvider';
 import { getUserUUID } from '../../Utils/Analytics/UserUUID';
-import RaisedButton from '../../UI/RaisedButton';
 import { Line } from '../../UI/Grid';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -33,7 +32,7 @@ In 5 minutes, you will have:
   - Created a game
   - Learned the fundamentals of GDevelop
 
-(🇬🇧 The tour is only available in English)  
+(🇬🇧 The tour is only available in English)
 We highly recommend it!
 `;
 
@@ -111,7 +110,7 @@ const OnboardingDialog = () => {
       label={<Trans>No thanks, I'm good</Trans>}
       onClick={() => setOpen(false)}
     />,
-    <RaisedButton
+    <DialogPrimaryButton
       key="start"
       label={<Trans>Let's go!</Trans>}
       primary

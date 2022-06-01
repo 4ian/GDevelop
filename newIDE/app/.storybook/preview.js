@@ -11,7 +11,7 @@ export const globalTypes = {
     toolbar: {
       icon: 'circlehollow',
       // See theme names in ThemeRegistry.js
-      items: ['GDevelop default', 'Dark', 'Nord', 'Solarized Dark', 'One Dark'],
+      items: ['GDevelop default', 'GDevelop default Dark', 'Dark', 'Nord', 'Solarized Dark', 'One Dark'],
       showName: true,
     },
   },

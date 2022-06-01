@@ -47,7 +47,7 @@ const MaterialUIContextMenu = React.forwardRef<
     <I18n>
       {({ i18n }) => (
         <Menu
-          open={open}
+          open
           anchorPosition={{
             left: anchorPosition[0],
             top: anchorPosition[1],

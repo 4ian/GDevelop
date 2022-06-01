@@ -2,7 +2,8 @@
 import { Trans } from '@lingui/macro';
 
 import React from 'react';
-import { Column, Line, Spacer } from '../../../../UI/Grid';
+import { Column } from '../../../../UI/Grid';
+import { LineStackLayout } from '../../../../UI/Layout';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from '@material-ui/icons/Replay';
 import PlayArrow from '@material-ui/icons/PlayArrow';
@@ -160,7 +161,7 @@ const AnimationPreview = ({
   const resourceName = resourceNames[currentFrameIndexRef.current];
 
   return (
-    <Column expand noOverflowParent>
+    <Column expand noOverflowParent noMargin>
       <ImagePreview
         resourceName={resourceName}
         imageResourceSource={getImageResourceSource(resourceName)}
@@ -172,11 +173,10 @@ const AnimationPreview = ({
         fixedHeight={fixedHeight}
       />
       {!hideControls && (
-        <Line noMargin alignItems="center">
+        <LineStackLayout noMargin alignItems="center">
           <Text>
             <Trans>FPS:</Trans>
           </Text>
-          <Spacer />
           <TextField
             margin="none"
             value={fps}
@@ -236,7 +236,7 @@ const AnimationPreview = ({
               forceUdpate();
             }}
           />
-        </Line>
+        </LineStackLayout>
       )}
     </Column>
   );

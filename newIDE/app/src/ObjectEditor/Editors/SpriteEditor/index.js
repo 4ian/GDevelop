@@ -101,7 +101,7 @@ class Animation extends React.Component<AnimationProps, void> {
               fullWidth
             />
           </Column>
-          <IconButton onClick={onRemove}>
+          <IconButton size="small" onClick={onRemove}>
             <Delete />
           </IconButton>
         </MiniToolbar>

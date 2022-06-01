@@ -6,7 +6,7 @@ import * as React from 'react';
 import PublishIcon from '@material-ui/icons/Publish';
 
 import { ExampleStore } from '../AssetStore/ExampleStore';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Tabs, Tab } from '../UI/Tabs';
 import { TutorialsList } from '../Tutorial';
@@ -16,7 +16,6 @@ import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import ProjectPreCreationDialog from './ProjectPreCreationDialog';
-import RaisedButton from '../UI/RaisedButton';
 
 export type CreateProjectDialogTabs =
   | 'examples'
@@ -92,7 +91,7 @@ const CreateProjectDialog = ({
 
   const actions = React.useMemo(
     () => [
-      <RaisedButton
+      <DialogPrimaryButton
         key="create-blank"
         label={<Trans>Create a blank project</Trans>}
         primary={false}

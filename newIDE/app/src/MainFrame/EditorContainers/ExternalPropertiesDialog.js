@@ -5,7 +5,7 @@ import FlatButton from '../../UI/FlatButton';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import { mapFor } from '../../Utils/MapFor';
 import Text from '../../UI/Text';
 import BackgroundText from '../../UI/BackgroundText';
@@ -57,11 +57,10 @@ export default function ExternalPropertiesDialog({
       primary={false}
       onClick={onClose}
     />,
-    <FlatButton
+    <DialogPrimaryButton
       key="choose"
       label={<Trans>Choose</Trans>}
       primary
-      keyboardFocused
       onClick={onClick}
       disabled={!selectedLayoutName}
     />,

@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import Text from '../UI/Text';
@@ -40,7 +40,7 @@ export default class VariablesEditorDialog extends Component {
         label={<Trans>Remove objects</Trans>}
         onClick={() => this.props.onClose(true, null)}
       />,
-      <FlatButton
+      <DialogPrimaryButton
         key="move"
         label={<Trans>Move objects</Trans>}
         primary={true}

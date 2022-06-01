@@ -4,8 +4,7 @@ import { t } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import TextField from '../UI/TextField';
 import {
   type RegisterForm,
@@ -115,7 +114,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             onClick={onClose}
           />,
           <LeftLoader isLoading={createAccountInProgress} key="create-account">
-            <RaisedButton
+            <DialogPrimaryButton
               label={<Trans>Create my account</Trans>}
               primary
               disabled={!this._canCreateAccount()}

@@ -3,9 +3,8 @@ import { Trans } from '@lingui/macro';
 import Refresh from '@material-ui/icons/Refresh';
 import * as React from 'react';
 
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
 import { Column, Spacer } from '../UI/Grid';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import TextField from '../UI/TextField';
@@ -79,7 +78,7 @@ const ProjectPreCreationDialog = ({
           label={<Trans>Cancel</Trans>}
           onClick={onClose}
         />,
-        <RaisedButton
+        <DialogPrimaryButton
           primary
           disabled={isOpening}
           key="create"

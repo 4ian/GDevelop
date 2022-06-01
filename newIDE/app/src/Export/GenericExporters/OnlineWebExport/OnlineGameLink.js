@@ -20,7 +20,7 @@ import InfoBar from '../../../UI/Messages/InfoBar';
 import IconButton from '../../../UI/IconButton';
 import { CircularProgress, LinearProgress } from '@material-ui/core';
 import FlatButton from '../../../UI/FlatButton';
-import Dialog from '../../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import {
   EmailShareButton,
   FacebookShareButton,
@@ -324,7 +324,7 @@ const OnlineGameLink = ({
     />,
     // Ensure there is a game loaded, meaning the user owns the game.
     game && buildUrl && !isBuildPublished && (
-      <RaisedButton
+      <DialogPrimaryButton
         key="publish"
         label={<Trans>Verify and Publish to Liluo.io</Trans>}
         primary

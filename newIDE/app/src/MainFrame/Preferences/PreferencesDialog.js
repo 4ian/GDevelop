@@ -20,6 +20,7 @@ import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
+import Link from '@material-ui/core/Link';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -125,16 +126,24 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           </ResponsiveLineStackLayout>
           <Line noMargin>
             <Text>
-              <Trans>You can contribute and create your own themes: </Trans>
+              <Trans>
+                You can contribute and{' '}
+                <Link
+                  href={
+                    'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
+                  }
+                  onClick={event => {
+                    Window.openExternalURL(
+                      'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
+                    );
+                    event.preventDefault();
+                  }}
+                >
+                  create your own themes
+                </Link>
+                .
+              </Trans>
             </Text>
-            <FlatButton
-              label={<Trans>Learn more</Trans>}
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://github.com/4ian/GDevelop/tree/master/newIDE#theming'
-                );
-              }}
-            />
           </Line>
           <Text size="title">
             <Trans>Layouts</Trans>

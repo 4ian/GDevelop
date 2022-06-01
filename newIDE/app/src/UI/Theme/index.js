@@ -14,6 +14,7 @@ import './Global/Markdown.css';
 import './Global/Scrollbar.css';
 import './Global/Mosaic.css';
 import './Global/Table.css';
+import './Global/Font.css';
 
 export type Theme = $Exact<typeof DefaultTheme>;
 export const themes = themeList;

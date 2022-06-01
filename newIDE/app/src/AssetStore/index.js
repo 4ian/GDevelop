@@ -31,7 +31,7 @@ import { NoResultPlaceholder } from './NoResultPlaceholder';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 import Subheader from '../UI/Subheader';
 import { AssetsHome } from './AssetsHome';
-import FlatButton from '../UI/FlatButton';
+import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
@@ -231,7 +231,7 @@ export const AssetStore = ({
                     </Text>
                   </Column>
                 ) : (
-                  <FlatButton
+                  <TextButton
                     icon={<ArrowBack />}
                     label={
                       openedAssetShortHeader ? (

@@ -13,6 +13,7 @@ export const Default = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
+        commitChangesOnBlur
         variablesContainer={testProject.testLayout.getVariables()}
         emptyPlaceholderDescription="Variables help you store data"
         emptyPlaceholderTitle="Variables"
@@ -31,6 +32,7 @@ export const InstanceWithObjectVariables = () => (
   <DragAndDropContextProvider>
     <FixedHeightFlexContainer height={600}>
       <VariablesList
+        commitChangesOnBlur
         variablesContainer={testProject.testSpriteObjectInstance.getVariables()}
         emptyPlaceholderDescription="Variables help you store data"
         emptyPlaceholderTitle="Variables"

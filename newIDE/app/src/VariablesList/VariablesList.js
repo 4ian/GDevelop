@@ -965,6 +965,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             ] = element;
                           }
                         }}
+                        commitOnInputChange={!props.commitChangesOnBlur}
                         dataSource={isTopLevel ? undefinedVariableNames : []}
                         margin="none"
                         key="name"

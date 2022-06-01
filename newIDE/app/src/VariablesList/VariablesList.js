@@ -94,12 +94,16 @@ export type HistoryHandler = {|
 type Props = {|
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
+  /** Callback executed at mount to compute suggestions. */
   onComputeAllVariableNames?: () => Array<string>,
+  /** To specify if history should be handled by parent. */
   historyHandler?: HistoryHandler,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   helpPagePath?: ?string,
+  /** If set to false, it will commit changes to variables on each input change. It can be expensive, but useful when VariablesList can be unmounted at any time. */
   commitChangesOnBlur: boolean,
+  /** If set to small, will collapse variable row by default. */
   size?: 'small',
 |};
 

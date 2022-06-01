@@ -152,7 +152,7 @@
         "pvalue": "rgb(110, 42, 42)",
         "value": "#6e2a2a"
       },
-      "#FFFFFF": {
+      "white": {
         "value": "#fff"
       }
     },

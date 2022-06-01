@@ -5,7 +5,7 @@ import shuffle from 'lodash/shuffle';
 import SearchApi from 'js-worker-search';
 
 export interface SearchFilter<SearchItem> {
-  isSatisfiedBy(searchItem: SearchItem): boolean;
+  getPertinence(searchItem: SearchItem): number;
 }
 
 export class TagSearchFilter<SearchItem: { tags: Array<string> }>
@@ -16,12 +16,82 @@ export class TagSearchFilter<SearchItem: { tags: Array<string> }>
     this.tags = tags;
   }
 
-  isSatisfiedBy(searchItem: SearchItem): boolean {
-    return (
-      this.tags.size === 0 || searchItem.tags.some(tag => this.tags.has(tag))
-    );
+  getPertinence(searchItem: SearchItem): number {
+    return this.tags.size === 0 ||
+      searchItem.tags.some(tag => this.tags.has(tag))
+      ? 1
+      : 0;
   }
 }
+
+/**
+ * Approximately sort the elements from biggest to smallest.
+ *
+ * It does a quick sort but only on the left side. It means that elements with
+ * a poor pertinence won't be sorted as well as the one with a good pertinence.
+ *
+ * This allows a O(n) complexity in most cases, but still a O(n²) in worst
+ * cases scenario (when all the values are the same).
+ */
+export const partialQuickSort = <Element: any>(
+  searchItems: Array<Element>,
+  getValue: (a: Element) => number,
+  valueMin: number,
+  valueMax: number
+): void => {
+  if (valueMin >= valueMax) {
+    // All values are the same.
+    return;
+  }
+  let indexMax = searchItems.length - 1;
+  // Values are between 0 and pertinenceMax.
+  // Each pass ensures that elements are on the good side of the pivot.
+  // With a pertinenceMax of 1, the pivot takes the values: 0.5, 0.25, 0.125...
+  for (
+    let pivotComplement = 0.5;
+    pivotComplement > 1 / 128 && indexMax > 0;
+    pivotComplement /= 2
+  ) {
+    let pivot = valueMin + (valueMax - valueMin) * (1 - pivotComplement);
+    let slidingIndexMin = 0 - 1;
+    let slidingIndexMax = indexMax + 1;
+    while (true) {
+      do {
+        slidingIndexMin++;
+      } while (
+        slidingIndexMin < indexMax &&
+        getValue(searchItems[slidingIndexMin]) > pivot
+      );
+      if (slidingIndexMin === indexMax) {
+        // All the values are on the left side.
+        // They must be sorted.
+        // Let's try with the next pivot value.
+        break;
+      }
+      do {
+        slidingIndexMax--;
+      } while (
+        slidingIndexMax > 0 &&
+        getValue(searchItems[slidingIndexMax]) < pivot
+      );
+      if (slidingIndexMax === 0) {
+        // All the values are on the right side.
+        // As the pivot converge on the maximum value,
+        // The sort is finished.
+        return;
+      }
+
+      if (slidingIndexMin >= slidingIndexMax) {
+        // All values are on the good side of the pivot.
+        indexMax = slidingIndexMax;
+        break;
+      }
+      const swap = searchItems[slidingIndexMin];
+      searchItems[slidingIndexMin] = searchItems[slidingIndexMax];
+      searchItems[slidingIndexMax] = swap;
+    }
+  }
+};
 
 /**
  * Filter a list of items according to the chosen category
@@ -62,20 +132,45 @@ export const filterSearchItems = <SearchItem: { tags: Array<string> }>(
     })
     .filter(searchItem => {
       return (
-        (chosenFilters.size === 0 ||
-          searchItem.tags.some(tag => chosenFilters.has(tag))) &&
-        (!searchFilters ||
-          searchFilters.every(searchFilter =>
-            searchFilter.isSatisfiedBy(searchItem)
-          ))
+        chosenFilters.size === 0 ||
+        searchItem.tags.some(tag => chosenFilters.has(tag))
       );
     });
+
+  let sortedSearchItems = filteredSearchItems;
+  if (searchFilters) {
+    let pertinenceMin = 1;
+    let pertinenceMax = 0;
+    const weightedSearchItems = filteredSearchItems
+      .map(searchItem => {
+        let pertinence = 1;
+        for (const searchFilter of searchFilters) {
+          pertinence *= searchFilter.getPertinence(searchItem);
+          if (pertinence === 0) {
+            return null;
+          }
+        }
+        pertinenceMin = Math.min(pertinenceMin, pertinence);
+        pertinenceMax = Math.max(pertinenceMax, pertinence);
+        return { pertinence: pertinence, searchItem: searchItem };
+      })
+      .filter(Boolean);
+    partialQuickSort(
+      weightedSearchItems,
+      weightedSearchItem => weightedSearchItem.pertinence,
+      pertinenceMin,
+      pertinenceMax
+    );
+    sortedSearchItems = weightedSearchItems.map(
+      weightedSearchItem => weightedSearchItem.searchItem
+    );
+  }
 
   const totalTime = performance.now() - startTime;
   console.info(
     `Filtered items by category/filters in ${totalTime.toFixed(3)}ms.`
   );
-  return filteredSearchItems;
+  return sortedSearchItems;
 };
 
 /**

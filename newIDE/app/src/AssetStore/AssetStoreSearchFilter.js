@@ -21,10 +21,11 @@ export class ObjectTypeAssetStoreSearchFilter
     this.objectTypes = objectTypes;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      this.objectTypes.size === 0 || this.objectTypes.has(searchItem.objectType)
-    );
+  getPertinence(searchItem: AssetShortHeader): number {
+    return this.objectTypes.size === 0 ||
+      this.objectTypes.has(searchItem.objectType)
+      ? 1
+      : 0;
   }
 }
 
@@ -43,13 +44,13 @@ export class LicenseAssetStoreSearchFilter
     this.attributionFreeOnly = attributionFreeOnly;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      !this.attributionFreeOnly ||
+  getPertinence(searchItem: AssetShortHeader): number {
+    return !this.attributionFreeOnly ||
       LicenseAssetStoreSearchFilter.noAttributionLicenses.includes(
         searchItem.license
       )
-    );
+      ? 1
+      : 0;
   }
 }
 
@@ -66,13 +67,13 @@ export class AnimatedAssetStoreSearchFilter
     this.mustHaveSeveralState = mustHaveSeveralState;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+  getPertinence(searchItem: AssetShortHeader): number {
     const hasAnimatedState = searchItem.maxFramesCount > 1;
     const hasSeveralState = searchItem.animationsCount > 1;
-    return (
-      (!this.mustBeAnimated || hasAnimatedState) &&
+    return (!this.mustBeAnimated || hasAnimatedState) &&
       (!this.mustHaveSeveralState || hasSeveralState)
-    );
+      ? 1
+      : 0;
   }
 }
 
@@ -92,17 +93,17 @@ export class DimensionAssetStoreSearchFilter
     this.dimensionMax = dimensionMax;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
-    return (
-      ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
-        this.dimensionMin <= searchItem.width) &&
-        (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
-          searchItem.width <= this.dimensionMax)) ||
+  getPertinence(searchItem: AssetShortHeader): number {
+    return ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
+      this.dimensionMin <= searchItem.width) &&
+      (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
+        searchItem.width <= this.dimensionMax)) ||
       ((this.dimensionMin === DimensionAssetStoreSearchFilter.boundMin ||
         this.dimensionMin <= searchItem.height) &&
         (this.dimensionMin === DimensionAssetStoreSearchFilter.boundMax ||
           searchItem.height <= this.dimensionMax))
-    );
+      ? 1
+      : 0;
   }
 }
 
@@ -124,44 +125,47 @@ export class ColorAssetStoreSearchFilter
     this.color = color;
   }
 
-  isSatisfiedBy(searchItem: AssetShortHeader): boolean {
+  getPertinence(searchItem: AssetShortHeader): number {
     if (!this.color) {
-      return true;
+      return 1;
     }
-    if (searchItem.dominantColors.length === 0) {
-      return false;
+    // Not zero because the item should not be excluded.
+    let scoreMax = Number.MIN_VALUE;
+    for (const dominantColor of searchItem.dominantColors) {
+      const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
+      const dominantRgb = hexNumberToRGBColor(dominantColor);
+      const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);
+      const targetSaturation = targetHsl[1];
+      const dominantSaturation = dominantHsl[1];
+      let score = 0;
+      if (targetSaturation === 0) {
+        // Hue is not relevant.
+        const deltaSaturation = dominantSaturation - targetSaturation;
+        const deltaLightness = dominantHsl[2] - targetHsl[2];
+        score =
+          1 -
+          (deltaSaturation * deltaSaturation +
+            deltaLightness * deltaLightness) /
+            2;
+      } else {
+        // Hue distance can only be up to 0.5 as it's looping.
+        // So, it's multiplied by 2 to cover [0, 1].
+        const deltaHue =
+          dominantSaturation === 0
+            ? 1
+            : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
+        const deltaSaturation = dominantSaturation - targetSaturation;
+        const deltaLightness = dominantHsl[2] - targetHsl[2];
+        // Give more importance to hue as it catches human eyes.
+        score =
+          1 -
+          (4 * deltaHue * deltaHue +
+            deltaSaturation * deltaSaturation +
+            deltaLightness * deltaLightness) /
+            6;
+      }
+      scoreMax = Math.max(scoreMax, score);
     }
-    const targetHsl = rgbToHsl(this.color.r, this.color.g, this.color.b);
-    const dominantRgb = hexNumberToRGBColor(searchItem.dominantColors[0]);
-    const dominantHsl = rgbToHsl(dominantRgb.r, dominantRgb.g, dominantRgb.b);
-    const targetSaturation = targetHsl[1];
-    const dominantSaturation = dominantHsl[1];
-    let score = 0;
-    if (targetSaturation === 0) {
-      // Hue is not relevant.
-      const deltaSaturation = dominantSaturation - targetSaturation;
-      const deltaLightness = dominantHsl[2] - targetHsl[2];
-      score =
-        1 -
-        (deltaSaturation * deltaSaturation + deltaLightness * deltaLightness) /
-          2;
-    } else {
-      // Hue distance can only be up to 0.5 as it's looping.
-      // So, it's multiplied by 2 to cover [0, 1].
-      const deltaHue =
-        dominantSaturation === 0
-          ? 1
-          : 2 * Math.abs(mod(dominantHsl[0] - targetHsl[0] + 0.5, 1) - 0.5);
-      const deltaSaturation = dominantSaturation - targetSaturation;
-      const deltaLightness = dominantHsl[2] - targetHsl[2];
-      // Give more importance to hue as it catches human eyes.
-      score =
-        1 -
-        (4 * deltaHue * deltaHue +
-          deltaSaturation * deltaSaturation +
-          deltaLightness * deltaLightness) /
-          6;
-    }
-    return score > 0.94;
+    return scoreMax;
   }
 }

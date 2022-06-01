@@ -99,6 +99,7 @@ type Props = {|
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   helpPagePath?: ?string,
+  commitChangesOnBlur: boolean,
   size?: 'small',
 |};
 
@@ -1078,7 +1079,10 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               disabled={
                                 isCollection || (isInherited && !isTopLevel)
                               }
-                              onChange={() => {}}
+                              onChange={newValue => {
+                                onChangeValue(nodeId, newValue);
+                                forceUpdate();
+                              }}
                               value={
                                 isCollection
                                   ? i18n._(
@@ -1088,14 +1092,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                   ? variable.getString()
                                   : variable.getValue().toString()
                               }
-                              commitOnBlur
-                              onBlur={event => {
-                                onChangeValue(
-                                  nodeId,
-                                  event.currentTarget.value
-                                );
-                                forceUpdate();
-                              }}
+                              commitOnBlur={props.commitChangesOnBlur}
                             />
                           )}
                         </Column>

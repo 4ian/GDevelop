@@ -316,6 +316,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
     },
     [
       shuffledSearchItems,
+      sortedSearchItems,
       searchItemsById,
       searchText,
       chosenCategory,

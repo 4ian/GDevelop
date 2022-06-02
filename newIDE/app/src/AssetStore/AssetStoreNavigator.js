@@ -44,7 +44,7 @@ export const useNavigation = (): NavigationState => {
     previousPages,
     getCurrentPage: () => previousPages[previousPages.length - 1],
     backToPreviousPage: () => {
-      if (previousPages.length > 2) {
+      if (previousPages.length > 1) {
         previousPages.pop();
         setCurrentPage(previousPages[previousPages.length - 1]);
       }

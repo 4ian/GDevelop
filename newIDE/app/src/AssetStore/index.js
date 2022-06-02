@@ -157,13 +157,6 @@ export const AssetStore = ({
     ]
   );
 
-  const resetToDefault = () => {
-    setSearchText('');
-    navigationState.openHome();
-    clearAllFilters(assetFiltersState);
-    setIsFiltersPanelOpen(false);
-  };
-
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
   const selectPack = (tag: string) => {
@@ -222,13 +215,10 @@ export const AssetStore = ({
                     label={<Trans>Back</Trans>}
                     primary={false}
                     onClick={() => {
-                      // TODO blackbox it in the navigator.
-                      if (navigationState.previousPages.length > 2) {
-                        // Going back from Asset page to search.
-                        navigationState.backToPreviousPage();
-                      } else {
-                        // Going back from search to home.
-                        resetToDefault();
+                      navigationState.backToPreviousPage();
+                      if (navigationState.getCurrentPage().isOnHomePage) {
+                        clearAllFilters(assetFiltersState);
+                        setIsFiltersPanelOpen(false);
                       }
                     }}
                   />

@@ -112,7 +112,29 @@ export const AssetPackDialog = ({
     ]
   );
 
-  const dialogContent = allAssetsInstalled
+  const dialogContent = isAssetPackBeingInstalled
+    ? {
+        actionButton: (
+          <TextButton
+            key="loading"
+            label={<Trans>Please wait...</Trans>}
+            disabled
+            onClick={() => {}}
+          />
+        ),
+        onApply: () => {},
+        content: (
+          <>
+            <Text>
+              <Trans>Installing assets...</Trans>
+            </Text>
+            <Line expand>
+              <LinearProgress style={styles.linearProgress} />
+            </Line>
+          </>
+        ),
+      }
+    : allAssetsInstalled
     ? {
         actionButton: (
           <RaisedButton
@@ -123,11 +145,13 @@ export const AssetPackDialog = ({
           />
         ),
         onApply: () => onInstallAssetPack(assetShortHeaders),
-        text: (
-          <Trans>
-            You already have this asset pack installed, do you want to add the{' '}
-            {assetShortHeaders.length} assets again?
-          </Trans>
+        content: (
+          <Text>
+            <Trans>
+              You already have this asset pack installed, do you want to add the{' '}
+              {assetShortHeaders.length} assets again?
+            </Trans>
+          </Text>
         ),
       }
     : noAssetsInstalled
@@ -141,11 +165,13 @@ export const AssetPackDialog = ({
           />
         ),
         onApply: () => onInstallAssetPack(assetShortHeaders),
-        text: (
-          <Trans>
-            You're about to add {assetShortHeaders.length} assets from the asset
-            pack. Continue?
-          </Trans>
+        content: (
+          <Text>
+            <Trans>
+              You're about to add {assetShortHeaders.length} assets from the
+              asset pack. Continue?
+            </Trans>
+          </Text>
         ),
       }
     : {
@@ -166,13 +192,15 @@ export const AssetPackDialog = ({
           />
         ),
         onApply: () => onInstallAssetPack(missingAssetShortHeaders),
-        text: (
-          <Trans>
-            You already have{' '}
-            {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
-            asset(s) from this pack in your scene. Do you want to add the
-            remaining {missingAssetShortHeaders.length} asset(s)?
-          </Trans>
+        content: (
+          <Text>
+            <Trans>
+              You already have{' '}
+              {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
+              asset(s) from this pack in your scene. Do you want to add the
+              remaining {missingAssetShortHeaders.length} asset(s)?
+            </Trans>
+          </Text>
         ),
       };
 
@@ -192,33 +220,11 @@ export const AssetPackDialog = ({
           disabled={isAssetPackBeingInstalled}
           onClick={onClose}
         />,
-        isAssetPackBeingInstalled ? (
-          <TextButton
-            key="loading"
-            label={<Trans>Please wait...</Trans>}
-            disabled
-            onClick={() => {}}
-          />
-        ) : (
-          dialogContent.actionButton
-        ),
+        dialogContent.actionButton,
       ]}
       onApply={dialogContent.onApply}
     >
-      <Column>
-        {isAssetPackBeingInstalled ? (
-          <>
-            <Text>
-              <Trans>Installing assets...</Trans>
-            </Text>
-            <Line expand>
-              <LinearProgress style={styles.linearProgress} />
-            </Line>
-          </>
-        ) : (
-          <Text>{dialogContent.text}</Text>
-        )}
-      </Column>
+      <Column>{dialogContent.content}</Column>
     </Dialog>
   );
 };

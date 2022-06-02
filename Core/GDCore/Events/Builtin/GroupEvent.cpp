@@ -29,9 +29,9 @@ vector<gd::String> GroupEvent::GetAllSearchableStrings() const {
 
 bool GroupEvent::ReplaceAllSearchableStrings(
     std::vector<gd::String> newSearchableString) {
-  bool isGroupNameModified = newSearchableString[0] != name;
+  if (newSearchableString[0] == name) return false;
   SetName(newSearchableString[0]);
-  return isGroupNameModified;
+  return true;
 }
 
 void GroupEvent::SerializeTo(SerializerElement& element) const {

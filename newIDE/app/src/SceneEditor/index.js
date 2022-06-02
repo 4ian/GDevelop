@@ -1195,12 +1195,10 @@ export default class SceneEditor extends React.Component<Props, State> {
                   canUndo: () => canUndo(this.state.history),
                   canRedo: () => canRedo(this.state.history),
                   saveToHistory: () =>
-                    // TODO: pass actionType as argument of saveToHistory
                     this.setState({
                       history: saveToHistory(
                         this.state.history,
-                        this.props.initialInstances,
-                        'EDIT'
+                        this.props.initialInstances
                       ),
                     }),
                 }}

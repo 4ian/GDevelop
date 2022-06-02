@@ -11,13 +11,13 @@ import { serializeToJSObject, unserializeFromJSObject } from './Serializer';
 export type RevertableActionType = 'ADD' | 'DELETE' | 'EDIT';
 
 export type UndoAction = {|
-  type: RevertableActionType,
+  type?: RevertableActionType,
   valueBeforeChange: Object,
   changeContext: any,
 |};
 
 export type RedoAction = {|
-  type: RevertableActionType,
+  type?: RevertableActionType,
   valueAfterChange: Object,
   changeContext: any,
 |};
@@ -69,11 +69,11 @@ export const canUndo = (history: HistoryState): boolean => {
  */
 export const saveToHistory = (
   history: HistoryState,
-  newCurrentSerializedValue: gdSerializable,
-  actionType: RevertableActionType,
+  newCurrentSerializableValue: gdSerializable,
+  actionType?: RevertableActionType,
   changeContext?: any
 ): HistoryState => {
-  const newCurrentValue = serializeToJSObject(newCurrentSerializedValue);
+  const newCurrentValue = serializeToJSObject(newCurrentSerializableValue);
   // Add the current state to the previous actions.
   const newPreviousActions = [
     ...history.previousActions,

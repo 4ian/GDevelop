@@ -15,11 +15,11 @@ export type InstructionContext = {|
 |};
 
 // Used for history management.
-type EventContainer = {| eventContainer: gdBaseEvent |};
+type LocatingEvent = {| locatingEvent: gdBaseEvent |};
 
-export type InstructionContextWithEventContainer = {
+export type InstructionContextWithLocatingEvent = {
   ...InstructionContext,
-  ...EventContainer,
+  ...LocatingEvent,
 };
 
 export type ParameterContext = {|
@@ -31,9 +31,9 @@ export type ParameterContext = {|
   domEvent?: any,
 |};
 
-export type ParameterContextWithEventContainer = {
+export type ParameterContextWithLocatingEvent = {
   ...ParameterContext,
-  ...EventContainer,
+  ...LocatingEvent,
 };
 
 export type EventContext = {|
@@ -43,7 +43,7 @@ export type EventContext = {|
 |};
 
 export type SelectionState = {
-  selectedInstructions: { [number]: InstructionContextWithEventContainer },
+  selectedInstructions: { [number]: InstructionContextWithLocatingEvent },
   selectedInstructionsLists: { [number]: InstructionsListContext },
   selectedEvents: { [number]: EventContext },
 };
@@ -74,23 +74,23 @@ export const getSelectedInstructions = (
   selection: SelectionState
 ): Array<gdInstruction> => {
   return values(selection.selectedInstructions).map(
-    (instructionContext: InstructionContextWithEventContainer) =>
+    (instructionContext: InstructionContextWithLocatingEvent) =>
       instructionContext.instruction
   );
 };
 
-export const getSelectedInstructionsEventContainers = (
+export const getSelectedInstructionsLocatingEvents = (
   selection: SelectionState
 ): Array<gdBaseEvent> => {
   return values(selection.selectedInstructions).map(
-    (instructionContext: InstructionContextWithEventContainer) =>
-      instructionContext.eventContainer
+    (instructionContext: InstructionContextWithLocatingEvent) =>
+      instructionContext.locatingEvent
   );
 };
 
 export const getSelectedInstructionsContexts = (
   selection: SelectionState
-): Array<InstructionContextWithEventContainer> => {
+): Array<InstructionContextWithLocatingEvent> => {
   return values(selection.selectedInstructions);
 };
 
@@ -190,7 +190,7 @@ export const selectInstruction = (
     ...existingSelection,
     selectedInstructions: {
       ...existingSelection.selectedInstructions,
-      [instruction.ptr]: { ...instructionContext, eventContainer: event },
+      [instruction.ptr]: { ...instructionContext, locatingEvent: event },
     },
   };
 };

@@ -449,11 +449,7 @@ export default class ThemableEventsTree extends Component<
     );
     return rowIndexes
       .map(rowIndex => {
-        if (
-          !flatDataTree[rowIndex] ||
-          (this.state.flatData.length < rowIndex || rowIndex < 0)
-        )
-          return null;
+        if (!flatDataTree[rowIndex]) return null;
         const {
           node: { event, eventsList, indexInList },
         } = flatDataTree[rowIndex];
@@ -716,52 +712,27 @@ export default class ThemableEventsTree extends Component<
                 eventsHeightsCache={this.eventsHeightsCache}
                 selection={this.props.selection}
                 leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
-                onAddNewInstruction={instructionsListContext => {
-                  node.event &&
-                    this.props.onAddNewInstruction(
-                      node.event,
-                      instructionsListContext
-                    );
-                }}
-                onPasteInstructions={instructionsListContext => {
-                  node.event &&
-                    this.props.onPasteInstructions(
-                      node.event,
-                      instructionsListContext
-                    );
-                }}
-                onMoveToInstruction={instructionContext => {
-                  node.event &&
-                    this.props.onMoveToInstruction(
-                      node.event,
-                      instructionContext
-                    );
-                }}
-                onMoveToInstructionsList={instructionContext => {
-                  node.event &&
-                    this.props.onMoveToInstructionsList(
-                      node.event,
-                      instructionContext
-                    );
-                }}
-                onInstructionClick={instructionContext => {
-                  node.event &&
-                    this.props.onInstructionClick(
-                      node.event,
-                      instructionContext
-                    );
-                }}
-                onInstructionDoubleClick={instructionContext => {
-                  node.event &&
-                    this.props.onInstructionDoubleClick(
-                      node.event,
-                      instructionContext
-                    );
-                }}
-                onParameterClick={parameterContext => {
-                  node.event &&
-                    this.props.onParameterClick(node.event, parameterContext);
-                }}
+                onAddNewInstruction={instructionsListContext =>
+                  this.props.onAddNewInstruction(event, instructionsListContext)
+                }
+                onPasteInstructions={instructionsListContext =>
+                  this.props.onPasteInstructions(event, instructionsListContext)
+                }
+                onMoveToInstruction={instructionContext =>
+                  this.props.onMoveToInstruction(event, instructionContext)
+                }
+                onMoveToInstructionsList={instructionContext =>
+                  this.props.onMoveToInstructionsList(event, instructionContext)
+                }
+                onInstructionClick={instructionContext =>
+                  this.props.onInstructionClick(event, instructionContext)
+                }
+                onInstructionDoubleClick={instructionContext =>
+                  this.props.onInstructionDoubleClick(event, instructionContext)
+                }
+                onParameterClick={parameterContext =>
+                  this.props.onParameterClick(event, parameterContext)
+                }
                 onEventClick={() =>
                   this.props.onEventClick({
                     eventsList: node.eventsList,
@@ -776,14 +747,12 @@ export default class ThemableEventsTree extends Component<
                     indexInList: node.indexInList,
                   })
                 }
-                onInstructionContextMenu={(...args) => {
-                  node.event &&
-                    this.props.onInstructionContextMenu(node.event, ...args);
-                }}
-                onAddInstructionContextMenu={(...args) => {
-                  node.event &&
-                    this.props.onAddInstructionContextMenu(node.event, ...args);
-                }}
+                onInstructionContextMenu={(...args) =>
+                  this.props.onInstructionContextMenu(event, ...args)
+                }
+                onAddInstructionContextMenu={(...args) =>
+                  this.props.onAddInstructionContextMenu(event, ...args)
+                }
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
                 onOpenLayout={this.props.onOpenLayout}
                 disabled={

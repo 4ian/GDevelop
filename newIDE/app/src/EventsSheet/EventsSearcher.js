@@ -121,8 +121,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
     const resultEventsWithDuplicates = mapFor(
       0,
       eventsSearchResults.size(),
-      i => {
-        const eventsSearchResult = eventsSearchResults.at(i);
+      eventIndex => {
+        const eventsSearchResult = eventsSearchResults.at(eventIndex);
         return eventsSearchResult.isEventValid()
           ? eventsSearchResult.getEvent()
           : null;
@@ -239,8 +239,6 @@ export default class EventsSearcher extends React.Component<Props, State> {
       return;
     }
 
-    // Store a list of unique events, because browsing for results in the events
-    // tree is made event by event.
     this._resultEvents = this._deduplicateEventSearchResults(
       eventsSearchResults
     );

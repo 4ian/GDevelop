@@ -33,7 +33,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
-  type InstructionContextWithEventContainer,
+  type InstructionContextWithLocatingEvent,
   getInitialSelection,
   selectEvent,
   selectInstruction,
@@ -47,7 +47,7 @@ import {
   clearSelection,
   getSelectedEventContexts,
   getSelectedInstructionsContexts,
-  getSelectedInstructionsEventContainers,
+  getSelectedInstructionsLocatingEvents,
   selectEventsAfterHistoryChange,
 } from './SelectionHandler';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
@@ -107,7 +107,7 @@ const zoomLevel = { min: 1, max: 50 };
 
 export type ChangeContext = {|
   events?: Array<EventContext>,
-  instructions?: Array<InstructionContextWithEventContainer>,
+  instructions?: Array<InstructionContextWithLocatingEvent>,
 |};
 
 type Props = {|
@@ -153,7 +153,7 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     indexInList: ?number,
-    eventContainer: ?gdBaseEvent,
+    locatingEvent: ?gdBaseEvent,
   },
   editedParameter: {
     // TODO: This could be adapted to be a ParameterContext
@@ -161,7 +161,7 @@ type State = {|
     instruction: ?gdInstruction,
     instrsList: ?gdInstructionsList,
     parameterIndex: number,
-    eventContainer: ?gdBaseEvent,
+    locatingEvent: ?gdBaseEvent,
   },
 
   selection: SelectionState,
@@ -246,14 +246,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       instruction: null,
       instrsList: null,
       indexInList: 0,
-      eventContainer: null,
+      locatingEvent: null,
     },
     editedParameter: {
       isCondition: true,
       instruction: null,
       instrsList: null,
       parameterIndex: 0,
-      eventContainer: null,
+      locatingEvent: null,
     },
 
     selection: getInitialSelection(),
@@ -396,8 +396,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this._eventsTree.forceEventsUpdate(() => {
         const positions = this._getChangedEventRows(newSubEvents);
         this._saveChangesToHistory('ADD', {
-          previous: positions,
-          next: positions,
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
         });
       });
   };
@@ -465,7 +465,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         const positions = this._getChangedEventRows(newEvents);
         this._saveChangesToHistory(
           'ADD',
-          { previous: positions, next: positions },
+          { positionsBeforeAction: positions, positionAfterAction: positions },
           () => {
             if (!context && !hasEventsSelected) {
               currentTree.scrollToRow(currentTree.getEventRow(newEvents[0]));
@@ -494,8 +494,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this.state.textEditedEvent) {
       const positions = this._getChangedEventRows([this.state.textEditedEvent]);
       this._saveChangesToHistory('EDIT', {
-        previous: positions,
-        next: positions,
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
       });
     }
     this.setState({
@@ -547,15 +547,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   ];
 
   openAddInstructionContextMenu = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     button: HTMLButtonElement,
     instructionsListContext: InstructionsListContext
   ) => {
-    this.openInstructionEditor(eventContainer, instructionsListContext, button);
+    this.openInstructionEditor(locatingEvent, instructionsListContext, button);
   };
 
   openInstructionEditor = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     instructionContext: InstructionContext | InstructionsListContext,
     inlineInstructionEditorAnchorEl?: ?HTMLButtonElement = null
   ) => {
@@ -578,13 +578,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instructionContext.indexInList !== undefined
             ? instructionContext.indexInList
             : undefined,
-        eventContainer,
+        locatingEvent,
       },
     });
   };
 
   closeInstructionEditor(saveChanges: boolean = false) {
-    const { instruction, eventContainer } = this.state.editedInstruction;
+    const { instruction, locatingEvent } = this.state.editedInstruction;
 
     this.setState(
       {
@@ -593,7 +593,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instruction: null,
           instrsList: null,
           indexInList: 0,
-          eventContainer: null,
+          locatingEvent: null,
         },
       },
       () => {
@@ -603,11 +603,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         if (instruction) {
           instruction.delete();
         }
-        if (saveChanges && eventContainer) {
-          const positions = this._getChangedEventRows([eventContainer]);
+        if (saveChanges && locatingEvent) {
+          const positions = this._getChangedEventRows([locatingEvent]);
           this._saveChangesToHistory('EDIT', {
-            previous: positions,
-            next: positions,
+            positionsBeforeAction: positions,
+            positionAfterAction: positions,
           });
         }
       }
@@ -615,11 +615,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   }
 
   moveSelectionToInstruction = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     destinationContext: InstructionContext
   ) => {
     this.moveSelectionToInstructionsList(
-      eventContainer,
+      locatingEvent,
       {
         instrsList: destinationContext.instrsList,
         isCondition: destinationContext.isCondition,
@@ -629,7 +629,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   moveSelectionToInstructionsList = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     destinationContext: InstructionsListContext,
     indexInList: ?number = undefined
   ) => {
@@ -650,22 +650,22 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       destinationContext.instrsList.insert(instruction, destinationIndex)
     );
 
-    const eventContainers = getSelectedInstructionsEventContainers(
+    const locatingEvents = getSelectedInstructionsLocatingEvents(
       this.state.selection
     );
-    const previousPositions = this._getChangedEventRows(eventContainers);
-    const nextPosition = this._getChangedEventRows([eventContainer]);
+    const previousPositions = this._getChangedEventRows(locatingEvents);
+    const nextPosition = this._getChangedEventRows([locatingEvent]);
 
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
       this.deleteSelection({ deleteEvents: false, shouldSaveInHistory: false });
       this._saveChangesToHistory('EDIT', {
-        previous: previousPositions,
-        next: nextPosition,
+        positionsBeforeAction: previousPositions,
+        positionAfterAction: nextPosition,
       });
     } else {
       this._saveChangesToHistory('EDIT', {
-        previous: previousPositions,
-        next: nextPosition,
+        positionsBeforeAction: previousPositions,
+        positionAfterAction: nextPosition,
       });
     }
   };
@@ -829,7 +829,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   openInstructionContextMenu = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     x: number,
     y: number,
     instructionContext: InstructionContext
@@ -838,7 +838,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this.setState(
       {
         selection: selectInstruction(
-          eventContainer,
+          locatingEvent,
           this.state.selection,
           instructionContext,
           multiSelect
@@ -852,14 +852,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   selectInstruction = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     instructionContext: InstructionContext
   ) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
       {
         selection: selectInstruction(
-          eventContainer,
+          locatingEvent,
           this.state.selection,
           instructionContext,
           multiSelect
@@ -870,13 +870,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   openParameterEditor = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     parameterContext: ParameterContext
   ) => {
     const { instruction, parameterIndex } = parameterContext;
 
     this.setState({
-      editedParameter: { eventContainer, ...parameterContext },
+      editedParameter: { locatingEvent, ...parameterContext },
       inlineEditing: true,
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
@@ -889,10 +889,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     const {
       instruction,
       parameterIndex,
-      eventContainer,
+      locatingEvent,
     } = this.state.editedParameter;
     if (instruction) {
-      // If the user canceled, revert the value to the previous value, if not null.
+      // If the user canceled, revert the value to the positionsBeforeAction value, if not null.
       if (
         shouldCancel &&
         typeof this.state.inlineEditingPreviousValue === 'string'
@@ -907,12 +907,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         !shouldCancel &&
         this.state.inlineEditingPreviousValue !==
           instruction.getParameter(parameterIndex) &&
-        eventContainer
+        locatingEvent
       ) {
-        const positions = this._getChangedEventRows([eventContainer]);
+        const positions = this._getChangedEventRows([locatingEvent]);
         this._saveChangesToHistory('EDIT', {
-          previous: positions,
-          next: positions,
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
         });
       }
     }
@@ -956,8 +956,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this._saveChangesToHistory(
         'DELETE',
         {
-          previous: positions,
-          next: positions,
+          positionsBeforeAction: positions,
+          positionAfterAction: positions,
         },
         () => {
           if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -988,7 +988,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         eventsRemover.addInstructionToRemove(instruction)
       );
       eventsWithDeletion = eventsWithDeletion.concat(
-        getSelectedInstructionsEventContainers(this.state.selection)
+        getSelectedInstructionsLocatingEvents(this.state.selection)
       );
     }
 
@@ -1010,8 +1010,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         // If there is at least one edited instruction,
         shouldSaveInHistory &&
           this._saveChangesToHistory('DELETE', {
-            previous: positions,
-            next: positions,
+            positionsBeforeAction: positions,
+            positionAfterAction: positions,
           });
         // Deletion of an event/instruction will remove it from the DOM,
         // potentially losing the focus on the associated DOM elements. Ensure
@@ -1045,8 +1045,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     this._saveChangesToHistory(
       'ADD',
       {
-        previous: positions,
-        next: positions,
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1063,15 +1063,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     ) {
       return;
     }
-    const eventContainers = getSelectedInstructionsEventContainers(
+    const locatingEvents = getSelectedInstructionsLocatingEvents(
       this.state.selection
     );
-    const positions = this._getChangedEventRows(eventContainers);
+    const positions = this._getChangedEventRows(locatingEvents);
     this._saveChangesToHistory(
       'EDIT',
       {
-        previous: positions,
-        next: positions,
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1088,7 +1088,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   };
 
   pasteInstructionsInInstructionsList = (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     instructionsListContext: InstructionsListContext
   ) => {
     if (
@@ -1099,12 +1099,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     ) {
       return;
     }
-    const positions = this._getChangedEventRows([eventContainer]);
+    const positions = this._getChangedEventRows([locatingEvent]);
     this._saveChangesToHistory(
       'EDIT',
       {
-        previous: positions,
-        next: positions,
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1123,15 +1123,15 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       }
     );
 
-    const eventContainer = getSelectedInstructionsEventContainers(
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
       this.state.selection
     );
-    const positions = this._getChangedEventRows(eventContainer);
+    const positions = this._getChangedEventRows(locatingEvent);
     this._saveChangesToHistory(
       'EDIT',
       {
-        previous: positions,
-        next: positions,
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
       },
       () => {
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -1150,7 +1150,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
   _saveChangesToHistory = (
     // actionType is defined from the point of view of the event.
     actionType: RevertableActionType,
-    positions: { previous: Array<number>, next: Array<number> },
+    positions: {
+      positionsBeforeAction: Array<number>,
+      positionAfterAction: Array<number>,
+    },
     cb: ?Function
   ) => {
     this.setState(
@@ -1179,8 +1182,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    if (this._eventsTree)
-      this._eventsTree.forceEventsUpdate(() => {
+    const { _eventsTree: eventsTree } = this;
+    if (eventsTree)
+      eventsTree.forceEventsUpdate(() => {
         const {
           changeContext: { positions },
           type,
@@ -1188,8 +1192,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           newEventsHistory.futureActions.length - 1
         ];
         // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
-        if (this._eventsTree)
-          this._eventsTree.scrollToRow(positions.previous[0]);
+        eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
 
         let newSelection: SelectionState = getInitialSelection();
         // If it is a DELETE or EDIT, then the element will be present, so we can select them.
@@ -1197,9 +1200,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         if (type === 'ADD') {
           newSelection = clearSelection();
         } else {
-          const eventContexts = this._eventsTree
-            ? this._eventsTree.getEventContextAtRowIndexes(positions.previous)
-            : [];
+          const eventContexts = eventsTree.getEventContextAtRowIndexes(
+            positions.positionsBeforeAction
+          );
           newSelection = selectEventsAfterHistoryChange(eventContexts);
         }
         this.setState(
@@ -1221,8 +1224,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    if (this._eventsTree)
-      this._eventsTree.forceEventsUpdate(() => {
+    const { _eventsTree: eventsTree } = this;
+    if (eventsTree)
+      eventsTree.forceEventsUpdate(() => {
         const {
           changeContext: { positions },
           type,
@@ -1230,16 +1234,16 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           newEventsHistory.previousActions.length - 1
         ];
         // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
-        if (this._eventsTree) this._eventsTree.scrollToRow(positions.next);
+        eventsTree.scrollToRow(positions.positionAfterAction);
         // If it is a ADD or EDIT, then the element will be present, so we can select them.
         // If it is a DELETE, then they will not be present, so we can't select them.
         let newSelection: SelectionState = getInitialSelection();
         if (type === 'DELETE') {
           newSelection = clearSelection();
         } else {
-          const eventContexts = this._eventsTree
-            ? this._eventsTree.getEventContextAtRowIndexes(positions.next)
-            : [];
+          const eventContexts = eventsTree.getEventContextAtRowIndexes(
+            positions.positionAfterAction
+          );
           newSelection = selectEventsAfterHistoryChange(eventContexts);
         }
 
@@ -1405,14 +1409,10 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
     if (modifiedEvents) {
       const positions = this._getChangedEventRows(modifiedEvents);
-      this._saveChangesToHistory(
-        'EDIT',
-        {
-          previous: positions,
-          next: positions,
-        },
-        () => {}
-      );
+      this._saveChangesToHistory('EDIT', {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      });
     }
   };
 
@@ -1432,8 +1432,8 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // This could be refactored and put here if the drag'n'drop of events
     // is reworked at some point.
     this._saveChangesToHistory('EDIT', {
-      previous: [previousRowIndex],
-      next: [nextRowIndex],
+      positionsBeforeAction: [previousRowIndex],
+      positionAfterAction: [nextRowIndex],
     });
   };
 
@@ -1502,12 +1502,12 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           const {
             instrsList,
             isCondition,
-            eventContainer,
+            locatingEvent,
           } = this.state.editedInstruction;
           if (!instrsList) return;
 
-          eventContainer &&
-            this.pasteInstructionsInInstructionsList(eventContainer, {
+          locatingEvent &&
+            this.pasteInstructionsInInstructionsList(locatingEvent, {
               instrsList,
               isCondition,
             });

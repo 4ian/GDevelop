@@ -234,7 +234,6 @@ function ProjectPropertiesDialog(props: Props) {
       {({ i18n }) => (
         <React.Fragment>
           <Dialog
-            onApply={onApply}
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}
@@ -265,9 +264,10 @@ function ProjectPropertiesDialog(props: Props) {
                 />
               ) : null,
             ]}
+            onRequestClose={onCancelChanges}
+            onApply={onApply}
             noTitleMargin
             open={props.open}
-            onRequestClose={onCancelChanges}
             fullHeight
             flexBody
             title={

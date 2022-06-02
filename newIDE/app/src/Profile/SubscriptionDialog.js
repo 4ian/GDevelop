@@ -190,7 +190,6 @@ export default class SubscriptionDialog extends React.Component<Props, State> {
                       />,
                     ]}
                     onRequestClose={onClose}
-                    cannotBeDismissed={true}
                     open={open}
                     noMargin
                   >

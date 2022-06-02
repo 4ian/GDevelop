@@ -23,7 +23,6 @@ const SaveToStorageProviderDialog = ({
       {({ i18n }) => (
         <Dialog
           title={<Trans>Choose where to save the project to</Trans>}
-          onRequestClose={onClose}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}
@@ -32,7 +31,7 @@ const SaveToStorageProviderDialog = ({
               onClick={onClose}
             />,
           ]}
-          cannotBeDismissed={true}
+          onRequestClose={onClose}
           open
           noMargin
           maxWidth="sm"

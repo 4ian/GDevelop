@@ -99,7 +99,6 @@ export const OnlineGamePropertiesDialog = ({
   return (
     <Dialog
       title={<Trans>Verify your game info before publishing</Trans>}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           label={<Trans>Back</Trans>}
@@ -125,6 +124,10 @@ export const OnlineGamePropertiesDialog = ({
         />,
       ]}
       cannotBeDismissed={isLoading}
+      onRequestClose={onClose}
+      onApply={() => {
+        onPublish({ saveProject: true });
+      }}
       open
     >
       <PublicGameProperties

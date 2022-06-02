@@ -350,6 +350,11 @@ const OnlineGameLink = ({
               actions={dialogActions}
               open
               onRequestClose={() => setIsShareDialogOpen(false)}
+              onApply={() => {
+                if (game && buildUrl && !isBuildPublished) {
+                  setIsOnlineGamePropertiesDialogOpen(true);
+                }
+              }}
             >
               {buildUrl && !isGameLoading ? (
                 <Column noMargin>

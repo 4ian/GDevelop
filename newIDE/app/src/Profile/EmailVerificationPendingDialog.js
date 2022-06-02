@@ -54,9 +54,10 @@ export default function EmailVerificationPendingDialog({
         ),
       ]}
       maxWidth="sm"
-      cannotBeDismissed={true}
       open
       noMargin
+      onRequestClose={onClose}
+      onApply={onClose}
     >
       {!isVerified ? (
         <Column>

@@ -126,10 +126,10 @@ export default function ExtensionsSearchDialog({
               />
             ) : null,
           ]}
-          cannotBeDismissed={true}
           flexBody
           open
           noMargin
+          cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
         >
           <ExtensionStore

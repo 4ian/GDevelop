@@ -30,7 +30,6 @@ export default function HotReloadLogsDialog({
   return (
     <Dialog
       title={<Trans>Restarting the preview from scratch is required</Trans>}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -49,8 +48,8 @@ export default function HotReloadLogsDialog({
       secondaryActions={[
         <HelpButton key="help" helpPagePath={'/interface/preview'} />,
       ]}
+      onRequestClose={onClose}
       open
-      cannotBeDismissed
     >
       <ColumnStackLayout noMargin>
         <Text>

@@ -365,9 +365,6 @@ export const GameDetailsDialog = ({
           noMargin
           flexColumnBody
           fullHeight={currentTab === 'leaderboards'}
-          onRequestClose={() => {
-            if (!isLoading) onClose();
-          }}
           maxWidth="md"
           actions={[
             <FlatButton
@@ -387,6 +384,8 @@ export const GameDetailsDialog = ({
               }
             />,
           ]}
+          onRequestClose={onClose}
+          cannotBeDismissed={isLoading}
         >
           <Tabs value={currentTab} onChange={setCurrentTab}>
             <Tab label={<Trans>Details</Trans>} value="details" />

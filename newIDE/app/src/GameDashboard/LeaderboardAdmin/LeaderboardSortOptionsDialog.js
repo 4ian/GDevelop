@@ -102,9 +102,6 @@ function LeaderboardSortOptionsDialog({
         <Dialog
           open={open}
           maxWidth="sm"
-          onRequestClose={() => {
-            if (!isLoading) onClose();
-          }}
           secondaryActions={[
             <HelpButton
               key="help"
@@ -127,6 +124,8 @@ function LeaderboardSortOptionsDialog({
               key={'save'}
             />,
           ]}
+          cannotBeDismissed={isLoading}
+          onRequestClose={onClose}
           onApply={() => {
             onSaveSettings(i18n);
           }}

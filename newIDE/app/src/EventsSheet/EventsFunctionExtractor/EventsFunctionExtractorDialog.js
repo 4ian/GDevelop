@@ -136,7 +136,6 @@ export default class EventsFunctionExtractorDialog extends React.Component<
 
     return (
       <Dialog
-        onApply={onApply}
         title={<Trans>Extract the events in a function</Trans>}
         secondaryActions={[
           <HelpButton
@@ -160,9 +159,10 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             onClick={onApply}
           />,
         ]}
-        cannotBeDismissed={true}
         open
+        cannotBeDismissed
         onRequestClose={onClose}
+        onApply={onApply}
         noMargin
       >
         <Column noMargin>

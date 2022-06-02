@@ -482,12 +482,11 @@ export default function SpriteEditor({
               key="help"
             />,
           ]}
-          cannotBeDismissed={true}
+          onRequestClose={() => setPointsEditorOpen(false)}
           noMargin
           maxWidth="lg"
           flexBody
           fullHeight
-          onRequestClose={() => setPointsEditorOpen(false)}
           open={pointsEditorOpen}
         >
           <PointsEditor
@@ -517,7 +516,6 @@ export default function SpriteEditor({
           maxWidth="lg"
           flexBody
           fullHeight
-          cannotBeDismissed={true}
           onRequestClose={() => setCollisionMasksEditorOpen(false)}
           open={collisionMasksEditorOpen}
         >

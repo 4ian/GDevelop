@@ -69,7 +69,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
         />,
       ]}
       onRequestClose={() => onClose(languageDidChange)}
-      cannotBeDismissed={true}
       open
       noTitleMargin
       maxWidth="sm"

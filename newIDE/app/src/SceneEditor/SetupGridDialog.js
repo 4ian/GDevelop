@@ -46,7 +46,6 @@ export default function SetupGridDialog(props: Props) {
 
   return (
     <Dialog
-      onApply={props.onApply}
       title={<Trans>Edit Grid Options</Trans>}
       actions={[
         <FlatButton
@@ -62,9 +61,9 @@ export default function SetupGridDialog(props: Props) {
           onClick={props.onApply}
         />,
       ]}
-      cannotBeDismissed={true}
-      open
       onRequestClose={onCancel}
+      onApply={props.onApply}
+      open
       maxWidth="sm"
       noMargin
     >

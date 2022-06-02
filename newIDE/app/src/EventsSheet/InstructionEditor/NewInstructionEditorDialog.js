@@ -295,7 +295,6 @@ export default function NewInstructionEditorDialog({
   return (
     <>
       <Dialog
-        onApply={instructionType ? onSubmit : null}
         actions={[
           <FlatButton
             label={<Trans>Cancel</Trans>}
@@ -339,7 +338,7 @@ export default function NewInstructionEditorDialog({
         ]}
         open={open}
         onRequestClose={onCancel}
-        cannotBeDismissed={true}
+        onApply={instructionType ? onSubmit : null}
         maxWidth={false}
         noMargin
         flexBody

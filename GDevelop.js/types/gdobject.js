@@ -4,6 +4,8 @@ declare class gdObject {
   clone(): gdUniquePtrObject;
   setName(name: string): void;
   getName(): string;
+  setAssetStoreId(assetStoreId: string): void;
+  getAssetStoreId(): string;
   setType(type: string): void;
   getType(): string;
   setTags(tags: string): void;

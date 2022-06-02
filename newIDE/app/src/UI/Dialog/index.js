@@ -67,7 +67,7 @@ type Props = {|
    */
   onApply?: ?() => void,
 
-  cannotBeDismissed?: boolean, // Currently unused.
+  cannotBeDismissed?: boolean, // If set to true, any click outside will not do anything.
 
   children: React.Node, // The content of the dialog
 
@@ -116,6 +116,7 @@ const Dialog = (props: Props) => {
     fullHeight,
     noTitleMargin,
     id,
+    cannotBeDismissed,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
@@ -151,6 +152,7 @@ const Dialog = (props: Props) => {
       if (reason === 'escapeKeyDown') {
         if (onRequestClose) onRequestClose();
       } else if (reason === 'backdropClick') {
+        if (!!cannotBeDismissed) return;
         if (backdropClickBehavior === 'cancel') {
           if (onRequestClose) onRequestClose();
         } else if (backdropClickBehavior === 'apply') {
@@ -161,7 +163,7 @@ const Dialog = (props: Props) => {
         }
       }
     },
-    [onRequestClose, onApply, backdropClickBehavior]
+    [onRequestClose, onApply, backdropClickBehavior, cannotBeDismissed]
   );
 
   const handleKeyDown = React.useCallback(

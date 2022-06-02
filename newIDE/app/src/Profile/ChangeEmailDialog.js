@@ -69,7 +69,7 @@ export default class ChangeEmailDialog extends Component<Props, State> {
         }}
         onApply={this._onChangeEmail}
         maxWidth="sm"
-        cannotBeDismissed={true}
+        cannotBeDismissed={changeEmailInProgress}
         open
       >
         <ColumnStackLayout noMargin>

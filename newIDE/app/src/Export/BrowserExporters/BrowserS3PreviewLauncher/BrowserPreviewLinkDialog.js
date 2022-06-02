@@ -56,7 +56,6 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
               />,
             ]}
             onApply={this._makeOnOpen(i18n)}
-            cannotBeDismissed={true}
             open
           >
             <Line>

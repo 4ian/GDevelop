@@ -49,8 +49,8 @@ const ExpressionParametersEditorDialog = ({
 
   return (
     <Dialog
+      onApply={() => onDone(parameterValues)}
       title={<Trans>Enter the expression parameters</Trans>}
-      cannotBeDismissed={true}
       open
       actions={[
         <DialogPrimaryButton

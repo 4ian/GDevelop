@@ -91,7 +91,7 @@ export default class EditDialog extends Component<Props, State> {
         }}
         maxWidth="sm"
         onApply={this._onEdit}
-        cannotBeDismissed={true}
+        cannotBeDismissed={editInProgress}
         open
       >
         <ColumnStackLayout noMargin>

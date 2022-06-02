@@ -143,7 +143,7 @@ export const PublicGamePropertiesDialog = ({
       title={<Trans>Game info</Trans>}
       onRequestClose={onClose}
       actions={actions}
-      cannotBeDismissed={false}
+      onApply={onSave}
       open
     >
       <PublicGameProperties

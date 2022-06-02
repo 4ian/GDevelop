@@ -76,7 +76,6 @@ export default function ExternalPropertiesDialog({
       open={open}
       title={title}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       maxWidth="sm"
       onApply={onClick}
     >

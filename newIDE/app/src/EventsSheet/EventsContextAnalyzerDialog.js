@@ -71,7 +71,6 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     return (
       <Dialog
         actions={actions}
-        cannotBeDismissed={false}
         open
         onRequestClose={onClose}
       >

@@ -54,7 +54,6 @@ export default function EmailVerificationPendingDialog({
         ),
       ]}
       maxWidth="sm"
-      cannotBeDismissed={true}
       open
       noMargin
     >

@@ -32,7 +32,6 @@ const SaveToStorageProviderDialog = ({
               onClick={onClose}
             />,
           ]}
-          cannotBeDismissed={true}
           open
           noMargin
           maxWidth="sm"

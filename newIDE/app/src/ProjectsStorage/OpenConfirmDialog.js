@@ -35,7 +35,6 @@ export const OpenConfirmDialog = ({
           onClick={onConfirm}
         />,
       ]}
-      cannotBeDismissed={true}
       open
       maxWidth="sm"
     >

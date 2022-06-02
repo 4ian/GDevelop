@@ -183,7 +183,7 @@ const CreateProjectDialog = ({
             title={<Trans>Create a new project</Trans>}
             actions={actions}
             secondaryActions={secondaryActions}
-            cannotBeDismissed={false}
+            onApply={() => setPreCreationDialogOpen(true)}
             onRequestClose={onClose}
             open={open}
             noMargin

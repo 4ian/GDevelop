@@ -51,7 +51,6 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
-      onApply={onApply}
       noMargin
       actions={[
         <FlatButton
@@ -67,7 +66,7 @@ const VariablesEditorDialog = ({
         />,
       ]}
       open={open}
-      cannotBeDismissed={true}
+      onApply={onApply}
       onRequestClose={onCancelChanges}
       secondaryActions={[
         onEditObjectVariables ? (

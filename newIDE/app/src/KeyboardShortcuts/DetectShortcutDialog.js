@@ -50,7 +50,7 @@ const DetectShortcutDialog = (props: Props) => {
       open
       title={<Trans>Set shortcut</Trans>}
       onRequestClose={props.onClose}
-      cannotBeDismissed={false}
+      onApply={onApply}
       maxWidth="xs"
       actions={[
         <FlatButton

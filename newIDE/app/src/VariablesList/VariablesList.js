@@ -293,7 +293,8 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
   const _saveToHistory = () => {
     props.historyHandler
       ? props.historyHandler.saveToHistory()
-      : setHistory(saveToHistory(history, props.variablesContainer));
+      : // TODO: pass actionType as argument of saveToHistory
+        setHistory(saveToHistory(history, props.variablesContainer, 'EDIT'));
   };
 
   const _undo = () => {

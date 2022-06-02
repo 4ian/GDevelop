@@ -2,7 +2,10 @@
 import { Trans } from '@lingui/macro';
 import React, { Component, type Node } from 'react';
 import findIndex from 'lodash/findIndex';
-import { SortableTreeWithoutDndContext } from 'react-sortable-tree';
+import {
+  SortableTreeWithoutDndContext,
+  getFlatDataFromTree,
+} from 'react-sortable-tree';
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
@@ -217,20 +220,45 @@ type EventsTreeProps = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
-  onAddNewInstruction: InstructionsListContext => void,
-  onPasteInstructions: InstructionsListContext => void,
-  onMoveToInstruction: (destinationContext: InstructionContext) => void,
+  onAddNewInstruction: (
+    eventContainer: gdBaseEvent,
+    InstructionsListContext
+  ) => void,
+  onPasteInstructions: (
+    eventContainer: gdBaseEvent,
+    InstructionsListContext
+  ) => void,
+  onMoveToInstruction: (
+    eventContainer: gdBaseEvent,
+    destinationContext: InstructionContext
+  ) => void,
   onMoveToInstructionsList: (
+    eventContainer: gdBaseEvent,
     destinationContext: InstructionsListContext
   ) => void,
-  onInstructionClick: InstructionContext => void,
-  onInstructionDoubleClick: InstructionContext => void,
-  onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
+  onInstructionClick: (
+    eventContainer: gdBaseEvent,
+    instructionContext: InstructionContext
+  ) => void,
+  onInstructionDoubleClick: (
+    eventContainer: gdBaseEvent,
+    instructionContext: InstructionContext
+  ) => void,
+  onInstructionContextMenu: (
+    eventContainer: gdBaseEvent,
+    x: number,
+    y: number,
+    InstructionContext
+  ) => void,
   onAddInstructionContextMenu: (
+    eventContainer: gdBaseEvent,
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
-  onParameterClick: ParameterContext => void,
+  onParameterClick: (
+    eventContainer: gdBaseEvent,
+    parameterContext: ParameterContext
+  ) => void,
 
   onEventClick: (eventContext: EventContext) => void,
   onEventContextMenu: (
@@ -246,7 +274,7 @@ type EventsTreeProps = {|
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
 
-  onEventMoved: () => void,
+  onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
   onScroll?: () => void,
 
   screenType: ScreenType,
@@ -287,6 +315,8 @@ type State = {|
   isScrolledTop: boolean,
   isScrolledBottom: boolean,
 |};
+
+const getNodeKey = ({ treeIndex }) => treeIndex;
 
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event
@@ -373,11 +403,12 @@ export default class ThemableEventsTree extends Component<
     });
   }
 
-  scrollToEvent(event: gdBaseEvent) {
-    const row = this._getEventRow(event);
+  scrollToRow(row: number) {
     if (row !== -1) {
-      if (this._list && this._list.wrappedInstance.current) {
-        this._list.wrappedInstance.current.scrollToRow(row);
+      const currentList = this._list;
+      if (currentList) {
+        const listWrapper = currentList.wrappedInstance.current;
+        listWrapper && listWrapper.scrollToRow(row);
       }
     }
   }
@@ -400,12 +431,35 @@ export default class ThemableEventsTree extends Component<
     this.forceEventsUpdate();
   }
 
-  _getEventRow(searchedEvent: gdBaseEvent) {
+  getEventRow(searchedEvent: gdBaseEvent) {
     // TODO: flatData could be replaced by a hashmap of events to row index
     return findIndex(
       this.state.flatData,
       event => event.ptr === searchedEvent.ptr
     );
+  }
+
+  getEventContextAtRowIndexes(rowIndexes: Array<number>): Array<EventContext> {
+    const flatDataTree: Array<{ node: SortableTreeNode }> = getFlatDataFromTree(
+      {
+        treeData: this.state.treeData,
+        getNodeKey,
+        ignoreCollapsed: true,
+      }
+    );
+    return rowIndexes
+      .map(rowIndex => {
+        if (
+          !flatDataTree[rowIndex] ||
+          (this.state.flatData.length < rowIndex || rowIndex < 0)
+        )
+          return null;
+        const {
+          node: { event, eventsList, indexInList },
+        } = flatDataTree[rowIndex];
+        return event ? { event, eventsList, indexInList } : null;
+      })
+      .filter(Boolean);
   }
 
   _eventsToTreeData = (
@@ -415,7 +469,6 @@ export default class ThemableEventsTree extends Component<
     parentDisabled: boolean = false,
     path: Array<number> = []
   ) => {
-    let eventIndexInFlattenedTree = 0;
     const treeData = mapFor<SortableTreeNode>(
       0,
       eventsList.getEventsCount(),
@@ -424,8 +477,7 @@ export default class ThemableEventsTree extends Component<
         flatData.push(event);
 
         const disabled = parentDisabled || event.isDisabled();
-        const currentPath = path.concat(eventIndexInFlattenedTree);
-        eventIndexInFlattenedTree += 1;
+        const currentPath = path.concat(flatData.length - 1);
 
         return {
           title: this._renderEvent,
@@ -536,16 +588,18 @@ export default class ThemableEventsTree extends Component<
   };
 
   _onDrop = (
-    moveFunction: MoveFunctionArguments => void,
+    moveFunction: MoveFunctionArguments => number,
     currentNode: SortableTreeNode
   ) => {
-    if (this.state.draggedNode) {
-      moveFunction({
-        node: this.state.draggedNode,
+    const draggedNode = this.state.draggedNode;
+    if (draggedNode) {
+      const nextRowIndex = moveFunction({
+        node: draggedNode,
         targetNode: currentNode,
       });
+      const { nodePath } = draggedNode;
+      this.props.onEventMoved(nodePath[nodePath.length - 1], nextRowIndex);
     }
-    this.props.onEventMoved();
   };
 
   _onVisibilityToggle = ({ node }: { node: SortableTreeNode }) => {
@@ -662,13 +716,52 @@ export default class ThemableEventsTree extends Component<
                 eventsHeightsCache={this.eventsHeightsCache}
                 selection={this.props.selection}
                 leftIndentWidth={depth * getIndentWidth(this.props.windowWidth)}
-                onAddNewInstruction={this.props.onAddNewInstruction}
-                onPasteInstructions={this.props.onPasteInstructions}
-                onMoveToInstruction={this.props.onMoveToInstruction}
-                onMoveToInstructionsList={this.props.onMoveToInstructionsList}
-                onInstructionClick={this.props.onInstructionClick}
-                onInstructionDoubleClick={this.props.onInstructionDoubleClick}
-                onParameterClick={this.props.onParameterClick}
+                onAddNewInstruction={instructionsListContext => {
+                  node.event &&
+                    this.props.onAddNewInstruction(
+                      node.event,
+                      instructionsListContext
+                    );
+                }}
+                onPasteInstructions={instructionsListContext => {
+                  node.event &&
+                    this.props.onPasteInstructions(
+                      node.event,
+                      instructionsListContext
+                    );
+                }}
+                onMoveToInstruction={instructionContext => {
+                  node.event &&
+                    this.props.onMoveToInstruction(
+                      node.event,
+                      instructionContext
+                    );
+                }}
+                onMoveToInstructionsList={instructionContext => {
+                  node.event &&
+                    this.props.onMoveToInstructionsList(
+                      node.event,
+                      instructionContext
+                    );
+                }}
+                onInstructionClick={instructionContext => {
+                  node.event &&
+                    this.props.onInstructionClick(
+                      node.event,
+                      instructionContext
+                    );
+                }}
+                onInstructionDoubleClick={instructionContext => {
+                  node.event &&
+                    this.props.onInstructionDoubleClick(
+                      node.event,
+                      instructionContext
+                    );
+                }}
+                onParameterClick={parameterContext => {
+                  node.event &&
+                    this.props.onParameterClick(node.event, parameterContext);
+                }}
                 onEventClick={() =>
                   this.props.onEventClick({
                     eventsList: node.eventsList,
@@ -683,10 +776,14 @@ export default class ThemableEventsTree extends Component<
                     indexInList: node.indexInList,
                   })
                 }
-                onInstructionContextMenu={this.props.onInstructionContextMenu}
-                onAddInstructionContextMenu={
-                  this.props.onAddInstructionContextMenu
-                }
+                onInstructionContextMenu={(...args) => {
+                  node.event &&
+                    this.props.onInstructionContextMenu(node.event, ...args);
+                }}
+                onAddInstructionContextMenu={(...args) => {
+                  node.event &&
+                    this.props.onAddInstructionContextMenu(node.event, ...args);
+                }}
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
                 onOpenLayout={this.props.onOpenLayout}
                 disabled={
@@ -805,6 +902,7 @@ export default class ThemableEventsTree extends Component<
                   event.clientHeight + event.scrollTop >= event.scrollHeight,
               });
             },
+            scrollToAlignment: 'center',
           }}
           // Disable slideRegionSize on touchscreen because of a bug that makes scrolling
           // uncontrollable on touchscreens. Ternary operator does not update slideRegionSize

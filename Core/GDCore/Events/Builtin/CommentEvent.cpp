@@ -23,8 +23,9 @@ vector<gd::String> CommentEvent::GetAllSearchableStrings() const {
 
 bool CommentEvent::ReplaceAllSearchableStrings(
     std::vector<gd::String> newSearchableString) {
+  bool isCommentModified = newSearchableString[0] != com1;
   SetComment(newSearchableString[0]);
-  return newSearchableString[0] == com1;
+  return isCommentModified;
 }
 
 void CommentEvent::SerializeTo(SerializerElement &element) const {

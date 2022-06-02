@@ -50,7 +50,6 @@ const ExpressionParametersEditorDialog = ({
   return (
     <Dialog
       title={<Trans>Enter the expression parameters</Trans>}
-      cannotBeDismissed={true}
       open
       actions={[
         <DialogPrimaryButton
@@ -62,6 +61,7 @@ const ExpressionParametersEditorDialog = ({
       ]}
       noMargin
       onRequestClose={onRequestClose}
+      onApply={() => onDone(parameterValues)}
     >
       <Column>
         <div style={styles.minHeightContainer}>

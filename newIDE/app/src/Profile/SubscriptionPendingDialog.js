@@ -53,8 +53,8 @@ export default function SubscriptionPendingDialog({
           />
         ),
       ]}
+      onRequestClose={onClose}
       maxWidth="sm"
-      cannotBeDismissed={true}
       open
       noMargin
     >

@@ -27,7 +27,6 @@ const OpenFromStorageProviderDialog = ({
       {({ i18n }) => (
         <Dialog
           title={<Trans>Choose where to load the project from</Trans>}
-          onRequestClose={onClose}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}
@@ -36,7 +35,7 @@ const OpenFromStorageProviderDialog = ({
               onClick={onClose}
             />,
           ]}
-          cannotBeDismissed={false}
+          onRequestClose={onClose}
           open
           noMargin
           maxWidth="sm"

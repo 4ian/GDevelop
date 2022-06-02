@@ -129,7 +129,6 @@ export default function NewObjectDialog({
         />,
       ]}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       open
       flexBody
       noMargin

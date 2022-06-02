@@ -55,8 +55,8 @@ export default class BrowserPreviewLinkDialog extends Component<Props> {
                 onClick={this._makeOnOpen(i18n)}
               />,
             ]}
+            onRequestClose={this.props.onClose}
             onApply={this._makeOnOpen(i18n)}
-            cannotBeDismissed={true}
             open
           >
             <Line>

@@ -88,7 +88,6 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
   return (
     <Dialog
       title={<Trans>Save on Google Drive</Trans>}
-      onApply={save}
       actions={[
         <FlatButton
           key="cancel"
@@ -106,9 +105,10 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
           />
         </LeftLoader>,
       ]}
-      cannotBeDismissed={true}
-      open
+      cannotBeDismissed={saving}
       onRequestClose={cancel}
+      onApply={save}
+      open
       maxWidth="sm"
     >
       <Column noMargin>

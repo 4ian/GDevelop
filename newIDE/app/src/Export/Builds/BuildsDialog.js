@@ -31,7 +31,6 @@ const BuildsDialog = ({
   return (
     <Dialog
       title={<Trans>Your game builds</Trans>}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
@@ -43,7 +42,7 @@ const BuildsDialog = ({
       secondaryActions={[
         <HelpButton key="help" helpPagePath={'/publishing'} />,
       ]}
-      cannotBeDismissed={false}
+      onRequestClose={onClose}
       open={open}
       noMargin
     >

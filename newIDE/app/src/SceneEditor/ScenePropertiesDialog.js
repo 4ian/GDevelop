@@ -159,10 +159,9 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             }}
           />,
         ]}
-        open={this.props.open}
-        cannotBeDismissed={true}
-        onApply={this._onApply}
         onRequestClose={this.props.onClose}
+        onApply={this._onApply}
+        open={this.props.open}
         maxWidth="sm"
       >
         <ColumnStackLayout expand noMargin>

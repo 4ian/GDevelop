@@ -150,8 +150,6 @@ const ExportDialog = ({
           <Trans>Build manually</Trans>
         ) : null
       }
-      onRequestClose={onClose}
-      cannotBeDismissed={false}
       actions={[
         chosenExporterSection !== 'home' && (
           <FlatButton
@@ -190,6 +188,7 @@ const ExportDialog = ({
           disabled={isNavigationDisabled}
         />,
       ]}
+      onRequestClose={onClose}
       open
       noMargin
     >

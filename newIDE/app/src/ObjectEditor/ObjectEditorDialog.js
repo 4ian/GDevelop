@@ -113,15 +113,7 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   return (
     <Dialog
-      onApply={onApply}
       key={props.object && props.object.ptr}
-      secondaryActions={[
-        <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,
-        <HotReloadPreviewButton
-          key="hot-reload-preview-button"
-          {...props.hotReloadPreviewButtonProps}
-        />,
-      ]}
       actions={[
         <FlatButton
           key="cancel"
@@ -136,10 +128,17 @@ const InnerDialog = (props: InnerDialogProps) => {
           onClick={onApply}
         />,
       ]}
-      noMargin
+      secondaryActions={[
+        <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,
+        <HotReloadPreviewButton
+          key="hot-reload-preview-button"
+          {...props.hotReloadPreviewButtonProps}
+        />,
+      ]}
       onRequestClose={onCancelChanges}
-      cannotBeDismissed={true}
+      onApply={onApply}
       open={props.open}
+      noMargin
       noTitleMargin
       fullHeight
       flexBody

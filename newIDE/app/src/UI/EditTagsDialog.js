@@ -78,10 +78,9 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             disabled={!this._canEdit()}
           />,
         ]}
-        cannotBeDismissed={false}
-        open
-        onApply={() => this._onEdit(tags)}
         onRequestClose={onCancel}
+        onApply={() => this._onEdit(tags)}
+        open
       >
         <TextField
           fullWidth

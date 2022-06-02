@@ -82,7 +82,7 @@ export const ResourceFetcherDialog = ({
           key="close"
         />,
       ]}
-      cannotBeDismissed={true}
+      cannotBeDismissed={!hasErrors}
       noMargin
       open
       maxWidth="sm"

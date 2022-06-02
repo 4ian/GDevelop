@@ -74,7 +74,6 @@ const LayerEditorDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={onClose}
       noMargin
       open
       title={<Trans>Edit Layer Properties</Trans>}
@@ -102,6 +101,7 @@ const LayerEditorDialog = (props: Props) => {
         />,
       ]}
       onRequestClose={onCancelChanges}
+      onApply={onClose}
       fullHeight
       flexBody
     >

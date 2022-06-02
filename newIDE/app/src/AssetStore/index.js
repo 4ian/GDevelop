@@ -76,15 +76,14 @@ export const AssetStore = ({
     searchResults,
     error,
     fetchAssetsAndFilters,
-    filtersState,
-    assetFiltersState,
     isOnHomePage,
     setIsOnHomePage,
-    openedAssetShortHeader,
-    setOpenedAssetShortHeader,
+    navigationState,
     searchText,
     setSearchText,
+    assetFiltersState,
   } = React.useContext(AssetStoreContext);
+  const { openedAssetShortHeader } = navigationState.getCurrentPage();
 
   React.useEffect(
     () => {
@@ -159,8 +158,7 @@ export const AssetStore = ({
 
   const resetToDefault = () => {
     setSearchText('');
-    filtersState.setChosenCategory(null);
-    setOpenedAssetShortHeader(null);
+    navigationState.openHome();
     clearAllFilters(assetFiltersState);
     setIsFiltersPanelOpen(false);
     setIsOnHomePage(true);
@@ -173,11 +171,7 @@ export const AssetStore = ({
 
     sendAssetPackOpened(tag);
 
-    const chosenCategory = {
-      node: { name: tag, allChildrenTags: [], children: [] },
-      parentNodes: [],
-    };
-    filtersState.setChosenCategory(chosenCategory);
+    navigationState.openTagPage(tag);
 
     setIsOnHomePage(false);
     setIsFiltersPanelOpen(true);
@@ -186,14 +180,8 @@ export const AssetStore = ({
   // When a tag is selected from the asset details page,
   // we set it as the chosen category, clear old filters and open the filters panel.
   const selectTag = (tag: string) => {
-    const chosenCategory = {
-      node: { name: tag, allChildrenTags: [], children: [] },
-      parentNodes: [],
-    };
-    filtersState.setChosenCategory(chosenCategory);
-
+    navigationState.openTagPage(tag);
     clearAllFilters(assetFiltersState);
-    setOpenedAssetShortHeader(null);
     setIsFiltersPanelOpen(true);
   };
 
@@ -234,18 +222,13 @@ export const AssetStore = ({
                 ) : (
                   <TextButton
                     icon={<ArrowBack />}
-                    label={
-                      openedAssetShortHeader ? (
-                        <Trans>Back</Trans>
-                      ) : (
-                        <Trans>Back to discover</Trans>
-                      )
-                    }
+                    label={<Trans>Back</Trans>}
                     primary={false}
                     onClick={() => {
-                      if (openedAssetShortHeader) {
+                      // TODO blackbox it in the navigator.
+                      if (navigationState.previousPages.length > 2) {
                         // Going back from Asset page to search.
-                        setOpenedAssetShortHeader(null);
+                        navigationState.backToPreviousPage();
                       } else {
                         // Going back from search to home.
                         resetToDefault();
@@ -334,7 +317,7 @@ export const AssetStore = ({
                             id: assetShortHeader.id,
                             name: assetShortHeader.name,
                           });
-                          setOpenedAssetShortHeader(assetShortHeader);
+                          navigationState.openDetailPage(assetShortHeader);
                         }}
                         assetShortHeader={assetShortHeader}
                       />
@@ -356,7 +339,7 @@ export const AssetStore = ({
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onAdd={() => onInstallAsset(openedAssetShortHeader)}
-                    onClose={() => setOpenedAssetShortHeader(null)}
+                    onClose={() => navigationState.backToPreviousPage()}
                     canInstall={!assetBeingInstalled}
                     isBeingInstalled={
                       !!assetBeingInstalled &&

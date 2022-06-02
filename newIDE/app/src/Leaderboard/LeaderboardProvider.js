@@ -407,6 +407,27 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     [currentLeaderboardId, displayOnlyBestEntry, fetchEntries, gameId]
   );
 
+  const previousCurrentLeaderboardId = React.useRef<?string>(null);
+  const previousCurrentLeaderboardResetLaunchedAt = React.useRef<?string>(null);
+
+  React.useEffect(
+    () => {
+      if (
+        previousCurrentLeaderboardId.current === currentLeaderboardId &&
+        !!previousCurrentLeaderboardResetLaunchedAt.current &&
+        !!currentLeaderboard &&
+        !currentLeaderboard.resetLaunchedAt
+      ) {
+        fetchEntries();
+      }
+      previousCurrentLeaderboardId.current = currentLeaderboardId;
+      previousCurrentLeaderboardResetLaunchedAt.current = currentLeaderboard
+        ? currentLeaderboard.resetLaunchedAt
+        : null;
+    },
+    [currentLeaderboard, currentLeaderboardId, fetchEntries]
+  );
+
   useInterval(
     () => {
       listLeaderboards(true);
@@ -414,7 +435,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
     !leaderboardsByIds ||
       Object.values(leaderboardsByIds).every(
         // $FlowFixMe
-        leaderboard => !leaderboard.resetLaunchedAt
+        (leaderboard: Leaderboard) => !leaderboard.resetLaunchedAt
       )
       ? null
       : 5000

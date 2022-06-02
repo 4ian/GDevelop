@@ -102,7 +102,6 @@ export class SubscriptionCheckDialog extends React.Component<
             onClick={this._closeDialog}
           />,
         ]}
-        cannotBeDismissed={false}
         onRequestClose={this._closeDialog}
         open={open}
         title={

@@ -482,7 +482,6 @@ export default function SpriteEditor({
               key="help"
             />,
           ]}
-          cannotBeDismissed={true}
           noMargin
           maxWidth="lg"
           flexBody
@@ -517,7 +516,6 @@ export default function SpriteEditor({
           maxWidth="lg"
           flexBody
           fullHeight
-          cannotBeDismissed={true}
           onRequestClose={() => setCollisionMasksEditorOpen(false)}
           open={collisionMasksEditorOpen}
         >

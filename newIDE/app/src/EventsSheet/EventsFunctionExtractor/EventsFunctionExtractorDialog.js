@@ -160,7 +160,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             onClick={onApply}
           />,
         ]}
-        cannotBeDismissed={true}
+        cannotBeDismissed
         open
         onRequestClose={onClose}
         noMargin

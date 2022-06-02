@@ -270,7 +270,6 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}
-        cannotBeDismissed={true}
         onRequestClose={this.props.onClose}
       >
         <ColumnStackLayout noMargin>

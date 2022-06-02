@@ -120,7 +120,6 @@ export function ExampleDialog({
           />
         </LeftLoader>,
       ]}
-      cannotBeDismissed={false}
       open
       onRequestClose={onClose}
       onApply={onOpenExample}

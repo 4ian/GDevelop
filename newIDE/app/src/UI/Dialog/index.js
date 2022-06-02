@@ -65,7 +65,7 @@ type Props = {|
    * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
    * single `onRequestClose`.
    */
-  onApply?: ?() => void,
+  onApply?: ?() => void | Promise<void>,
 
   cannotBeDismissed?: boolean, // Currently unused.
 
@@ -116,6 +116,7 @@ const Dialog = (props: Props) => {
     fullHeight,
     noTitleMargin,
     id,
+    cannotBeDismissed,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
@@ -148,6 +149,7 @@ const Dialog = (props: Props) => {
 
   const onCloseDialog = React.useCallback(
     (event: any, reason: string) => {
+      if (!!cannotBeDismissed) return;
       if (reason === 'escapeKeyDown') {
         if (onRequestClose) onRequestClose();
       } else if (reason === 'backdropClick') {
@@ -161,7 +163,7 @@ const Dialog = (props: Props) => {
         }
       }
     },
-    [onRequestClose, onApply, backdropClickBehavior]
+    [onRequestClose, onApply, backdropClickBehavior, cannotBeDismissed]
   );
 
   const handleKeyDown = React.useCallback(

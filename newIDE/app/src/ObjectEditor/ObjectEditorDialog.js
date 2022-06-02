@@ -138,7 +138,6 @@ const InnerDialog = (props: InnerDialogProps) => {
       ]}
       noMargin
       onRequestClose={onCancelChanges}
-      cannotBeDismissed={true}
       open={props.open}
       noTitleMargin
       fullHeight

@@ -71,7 +71,6 @@ export default class InstructionEditorDialog extends React.Component<
         onApply={onSubmit}
         actions={actions}
         open={open}
-        cannotBeDismissed={true}
         onRequestClose={onCancel}
         maxWidth={false}
         flexBody

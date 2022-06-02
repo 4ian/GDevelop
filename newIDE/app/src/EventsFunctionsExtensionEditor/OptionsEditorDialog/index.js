@@ -112,7 +112,6 @@ export default function OptionsEditorDialog({
           key={'close'}
         />,
       ]}
-      cannotBeDismissed={true}
       open={open}
       noTitleMargin
       title={
@@ -147,11 +146,10 @@ export default function OptionsEditorDialog({
               onClick={() => {
                 setExportDialogOpen(false);
               }}
-              key={'close'}
+              key="close"
             />,
           ]}
           open
-          cannotBeDismissed={false}
           onRequestClose={() => {
             setExportDialogOpen(false);
           }}

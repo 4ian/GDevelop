@@ -77,7 +77,6 @@ const ProfileDialog = ({
         ),
       ]}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       open={open}
       noMargin
       fullHeight

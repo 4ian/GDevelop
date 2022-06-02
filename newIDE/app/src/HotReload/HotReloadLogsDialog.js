@@ -50,7 +50,6 @@ export default function HotReloadLogsDialog({
         <HelpButton key="help" helpPagePath={'/interface/preview'} />,
       ]}
       open
-      cannotBeDismissed
     >
       <ColumnStackLayout noMargin>
         <Text>

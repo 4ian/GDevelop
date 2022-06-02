@@ -106,7 +106,7 @@ const GoogleDriveSaveAsDialog = (props: Props) => {
           />
         </LeftLoader>,
       ]}
-      cannotBeDismissed={true}
+      cannotBeDismissed={saving}
       open
       onRequestClose={cancel}
       maxWidth="sm"

@@ -151,7 +151,6 @@ const ExportDialog = ({
         ) : null
       }
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       actions={[
         chosenExporterSection !== 'home' && (
           <FlatButton

@@ -61,7 +61,6 @@ const LanguageDialog = ({ open, onClose }: Props) => {
               />,
             ]}
             onRequestClose={() => onClose(languageDidChange)}
-            cannotBeDismissed={false}
             open={open}
             title={<Trans>Language</Trans>}
           >

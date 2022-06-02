@@ -291,7 +291,6 @@ export const ExtensionOptionsEditor = ({
                   }}
                 />,
               ]}
-              cannotBeDismissed={false}
               open
               noMargin
             >

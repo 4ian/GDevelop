@@ -43,7 +43,6 @@ const BuildsDialog = ({
       secondaryActions={[
         <HelpButton key="help" helpPagePath={'/publishing'} />,
       ]}
-      cannotBeDismissed={false}
       open={open}
       noMargin
     >

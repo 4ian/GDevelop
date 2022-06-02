@@ -143,7 +143,6 @@ const EventTextDialog = (props: Props) => {
       onApply={onApply}
       title={<Trans>Edit the event text</Trans>}
       onRequestClose={onClose}
-      cannotBeDismissed={true}
       open
       noMargin
       actions={[

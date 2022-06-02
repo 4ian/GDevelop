@@ -231,7 +231,6 @@ export default function NewBehaviorDialog({
           ]}
           open
           onRequestClose={onClose}
-          cannotBeDismissed={false}
           flexBody
           noMargin
           fullHeight

@@ -32,7 +32,6 @@ const LeaderboardDialog = ({ onClose, open, project }: Props) => {
         />,
       ]}
       open={open}
-      cannotBeDismissed={true}
       onRequestClose={() => {
         if (!isLoading) onClose();
       }}

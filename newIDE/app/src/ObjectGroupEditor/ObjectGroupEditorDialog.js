@@ -49,7 +49,6 @@ const ObjectGroupEditorDialog = ({
         />,
       ]}
       noMargin
-      cannotBeDismissed={true}
       onRequestClose={onCancelChanges}
       open
       title={`Edit ${group.getName()} group`}

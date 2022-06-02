@@ -46,6 +46,10 @@ type AssetStoreState = {|
   searchResults: ?Array<AssetShortHeader>,
   fetchAssetsAndFilters: () => void,
   error: ?Error,
+  isOnHomePage: boolean,
+  setIsOnHomePage: boolean => void,
+  openedAssetShortHeader: ?AssetShortHeader,
+  setOpenedAssetShortHeader: (?AssetShortHeader) => void,
   searchText: string,
   setSearchText: string => void,
   filtersState: FiltersState,
@@ -60,6 +64,10 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   searchResults: null,
   fetchAssetsAndFilters: () => {},
   error: null,
+  isOnHomePage: true,
+  setIsOnHomePage: () => {},
+  openedAssetShortHeader: null,
+  setOpenedAssetShortHeader: () => {},
   searchText: '',
   setSearchText: () => {},
   filtersState: {
@@ -112,6 +120,11 @@ export const AssetStoreStateProvider = ({
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
+  const [isOnHomePage, setIsOnHomePage] = React.useState(true);
+  const [
+    openedAssetShortHeader,
+    setOpenedAssetShortHeader,
+  ] = React.useState<?AssetShortHeader>(null);
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const filtersState = useFilters();
 
@@ -252,6 +265,10 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       error,
+      isOnHomePage,
+      setIsOnHomePage,
+      openedAssetShortHeader,
+      setOpenedAssetShortHeader,
       searchText,
       setSearchText,
       filtersState,
@@ -278,6 +295,8 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       error,
+      isOnHomePage,
+      openedAssetShortHeader,
       searchText,
       filtersState,
       animatedFilter,

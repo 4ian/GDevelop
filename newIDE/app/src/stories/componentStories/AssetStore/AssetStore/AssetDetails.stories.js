@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -20,7 +19,6 @@ export const Default = () => (
   <AssetStoreStateProvider>
     <AssetDetails
       project={testProject.project}
-      layout={testProject.testLayout}
       objectsContainer={testProject.testLayout}
       resourceSources={[]}
       resourceExternalEditors={fakeResourceExternalEditors}
@@ -28,8 +26,8 @@ export const Default = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      canInstall={true}
-      isBeingInstalled={false}
+      isAddedToScene={false}
+      isBeingAddedToScene={false}
     />
   </AssetStoreStateProvider>
 );
@@ -38,7 +36,6 @@ export const BeingInstalled = () => (
   <AssetStoreStateProvider>
     <AssetDetails
       project={testProject.project}
-      layout={testProject.testLayout}
       objectsContainer={testProject.testLayout}
       resourceSources={[]}
       resourceExternalEditors={fakeResourceExternalEditors}
@@ -46,8 +43,25 @@ export const BeingInstalled = () => (
       assetShortHeader={fakeAssetShortHeader1}
       onAdd={() => {}}
       onClose={() => {}}
-      canInstall={true}
-      isBeingInstalled={true}
+      isAddedToScene={false}
+      isBeingAddedToScene={true}
+    />
+  </AssetStoreStateProvider>
+);
+
+export const AddedToProject = () => (
+  <AssetStoreStateProvider>
+    <AssetDetails
+      project={testProject.project}
+      objectsContainer={testProject.testLayout}
+      resourceSources={[]}
+      resourceExternalEditors={fakeResourceExternalEditors}
+      onTagSelection={() => {}}
+      assetShortHeader={fakeAssetShortHeader1}
+      onAdd={() => {}}
+      onClose={() => {}}
+      isAddedToScene={true}
+      isBeingAddedToScene={false}
     />
   </AssetStoreStateProvider>
 );

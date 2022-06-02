@@ -65,7 +65,7 @@ type Props = {|
    * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
    * single `onRequestClose`.
    */
-  onApply?: ?() => void,
+  onApply?: ?() => void | Promise<void>,
 
   cannotBeDismissed?: boolean, // Currently unused.
 

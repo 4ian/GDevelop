@@ -140,10 +140,7 @@ const EventTextDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={onApply}
       title={<Trans>Edit the event text</Trans>}
-      onRequestClose={onClose}
-      cannotBeDismissed={true}
       open
       noMargin
       actions={[
@@ -160,6 +157,8 @@ const EventTextDialog = (props: Props) => {
           onClick={onApply}
         />,
       ]}
+      onRequestClose={onClose}
+      onApply={onApply}
     >
       <Column noMargin>
         <MiniToolbar>

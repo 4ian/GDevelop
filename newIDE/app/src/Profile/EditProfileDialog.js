@@ -86,12 +86,10 @@ export default class EditDialog extends Component<Props, State> {
       <Dialog
         title={<Trans>Edit your GDevelop profile</Trans>}
         actions={actions}
-        onRequestClose={() => {
-          if (!editInProgress) onClose();
-        }}
         maxWidth="sm"
+        cannotBeDismissed={editInProgress}
+        onRequestClose={onClose}
         onApply={this._onEdit}
-        cannotBeDismissed={true}
         open
       >
         <ColumnStackLayout noMargin>

@@ -102,12 +102,10 @@ export default class LoginDialog extends Component<Props, State> {
             />
           </RightLoader>,
         ]}
+        cannotBeDismissed={loginInProgress || forgotPasswordInProgress}
+        onRequestClose={onClose}
         onApply={this._onLogin}
-        onRequestClose={() => {
-          if (!loginInProgress && !forgotPasswordInProgress) onClose();
-        }}
         maxWidth="sm"
-        cannotBeDismissed={true}
         open
       >
         <ColumnStackLayout noMargin>
@@ -156,7 +154,6 @@ export default class LoginDialog extends Component<Props, State> {
           />
         </ColumnStackLayout>
         <Dialog
-          cannotBeDismissed={true}
           open={resetPasswordDialogOpen}
           title={<Trans>Reset your password</Trans>}
           actions={[
@@ -166,6 +163,8 @@ export default class LoginDialog extends Component<Props, State> {
               onClick={onCloseResetPasswordDialog}
             />,
           ]}
+          cannotBeDismissed={forgotPasswordInProgress}
+          onRequestClose={onCloseResetPasswordDialog}
         >
           <Column noMargin>
             <Text>

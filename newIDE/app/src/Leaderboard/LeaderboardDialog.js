@@ -32,10 +32,8 @@ const LeaderboardDialog = ({ onClose, open, project }: Props) => {
         />,
       ]}
       open={open}
-      cannotBeDismissed={true}
-      onRequestClose={() => {
-        if (!isLoading) onClose();
-      }}
+      cannotBeDismissed={isLoading}
+      onRequestClose={onClose}
       title={<Trans>Leaderboards</Trans>}
       flexBody
       fullHeight

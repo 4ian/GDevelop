@@ -64,12 +64,10 @@ export default class ChangeEmailDialog extends Component<Props, State> {
       <Dialog
         title={<Trans>Change your email</Trans>}
         actions={actions}
-        onRequestClose={() => {
-          if (!changeEmailInProgress) onClose();
-        }}
-        onApply={this._onChangeEmail}
         maxWidth="sm"
-        cannotBeDismissed={true}
+        cannotBeDismissed={changeEmailInProgress}
+        onRequestClose={onClose}
+        onApply={this._onChangeEmail}
         open
       >
         <ColumnStackLayout noMargin>

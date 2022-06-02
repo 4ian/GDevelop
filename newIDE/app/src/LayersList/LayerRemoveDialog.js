@@ -61,9 +61,9 @@ export default class VariablesEditorDialog extends Component {
       <Dialog
         title={<Trans>Objects on {this.props.layerRemoved}</Trans>}
         actions={actions}
-        cannotBeDismissed={false}
         open={this.props.open}
         onRequestClose={this.props.onCancel}
+        onApply={() => this.props.onClose(true, this.state.selectedLayer)}
       >
         <Text>
           <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>

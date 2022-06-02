@@ -315,7 +315,6 @@ export const DebuggerConsole = ({
         <Dialog
           open
           title={<Trans>Select log groups to display</Trans>}
-          onRequestClose={() => setEditingHiddenGroups(false)}
           actions={[
             <FlatButton
               key="close"
@@ -324,6 +323,7 @@ export const DebuggerConsole = ({
               onClick={() => setEditingHiddenGroups(false)}
             />,
           ]}
+          onRequestClose={() => setEditingHiddenGroups(false)}
           onApply={() => setEditingHiddenGroups(false)}
         >
           <Column>

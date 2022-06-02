@@ -125,7 +125,7 @@ const OnboardingDialog = () => {
       actions={actions}
       open={open}
       onRequestClose={() => setOpen(false)}
-      cannotBeDismissed={false}
+      onApply={startUserflow}
       maxWidth="xs"
     >
       <ColumnStackLayout noMargin>

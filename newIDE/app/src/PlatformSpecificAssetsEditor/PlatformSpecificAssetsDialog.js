@@ -266,12 +266,11 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     return (
       <Dialog
-        onApply={this.onApply}
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}
-        cannotBeDismissed={true}
         onRequestClose={this.props.onClose}
+        onApply={this.onApply}
       >
         <ColumnStackLayout noMargin>
           <Text>

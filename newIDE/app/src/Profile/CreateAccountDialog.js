@@ -130,12 +130,12 @@ export default class CreateAccountDialog extends Component<Props, State> {
             onClick={onGoToLogin}
           />,
         ]}
+        cannotBeDismissed={createAccountInProgress}
         onApply={this._onCreateAccount}
         onRequestClose={() => {
           if (!createAccountInProgress) onClose();
         }}
         maxWidth="sm"
-        cannotBeDismissed={true}
         open
       >
         <ColumnStackLayout noMargin>

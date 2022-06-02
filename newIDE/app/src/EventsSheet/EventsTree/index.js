@@ -109,6 +109,7 @@ type EventsContainerProps = {|
   onParameterClick: ParameterContext => void,
 
   onEventClick: (eventContext: EventContext) => void,
+  onEndEditingEvent: () => void,
   onEventContextMenu: (x: number, y: number) => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
@@ -180,6 +181,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
                 onAddInstructionContextMenu={
                   this.props.onAddInstructionContextMenu
                 }
+                onEndEditingEvent={this.props.onEndEditingEvent}
                 onParameterClick={this.props.onParameterClick}
                 onOpenExternalEvents={this.props.onOpenExternalEvents}
                 onOpenLayout={this.props.onOpenLayout}
@@ -221,42 +223,42 @@ type EventsTreeProps = {|
   objectsContainer: gdObjectsContainer,
   selection: SelectionState,
   onAddNewInstruction: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     InstructionsListContext
   ) => void,
   onPasteInstructions: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     InstructionsListContext
   ) => void,
   onMoveToInstruction: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     destinationContext: InstructionContext
   ) => void,
   onMoveToInstructionsList: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     destinationContext: InstructionsListContext
   ) => void,
   onInstructionClick: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     instructionContext: InstructionContext
   ) => void,
   onInstructionDoubleClick: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     instructionContext: InstructionContext
   ) => void,
   onInstructionContextMenu: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     x: number,
     y: number,
     InstructionContext
   ) => void,
   onAddInstructionContextMenu: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     HTMLButtonElement,
     InstructionsListContext
   ) => void,
   onParameterClick: (
-    eventContainer: gdBaseEvent,
+    locatingEvent: gdBaseEvent,
     parameterContext: ParameterContext
   ) => void,
 
@@ -275,6 +277,7 @@ type EventsTreeProps = {|
   searchFocusOffset: ?number,
 
   onEventMoved: (previousRowIndex: number, nextRowIndex: number) => void,
+  onEndEditingEvent: (event: gdBaseEvent) => void,
   onScroll?: () => void,
 
   screenType: ScreenType,
@@ -740,6 +743,7 @@ export default class ThemableEventsTree extends Component<
                     indexInList: node.indexInList,
                   })
                 }
+                onEndEditingEvent={() => this.props.onEndEditingEvent(event)}
                 onEventContextMenu={(x, y) =>
                   this.props.onEventContextMenu(x, y, {
                     eventsList: node.eventsList,

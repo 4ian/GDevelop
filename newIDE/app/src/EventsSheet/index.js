@@ -873,6 +873,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     locatingEvent: gdBaseEvent,
     parameterContext: ParameterContext
   ) => {
+    // Prevent state from changing when clicking on a parameter with inline parameter
+    // editor (it will close the editor).
+    if (this.state.editedParameter.instruction) return;
     const { instruction, parameterIndex } = parameterContext;
 
     this.setState({
@@ -921,6 +924,13 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
     this.setState(
       {
+        editedParameter: {
+          isCondition: true,
+          instruction: null,
+          instrsList: null,
+          parameterIndex: 0,
+          locatingEvent: null,
+        },
         inlineEditing: false,
         inlineEditingAnchorEl: null,
       },
@@ -1137,6 +1147,14 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
       }
     );
+  };
+
+  _onEndEditingStringEvent = (event: gdBaseEvent) => {
+    const eventRowIndex = this._getChangedEventRows([event]);
+    this._saveChangesToHistory('EDIT', {
+      positionsBeforeAction: eventRowIndex,
+      positionAfterAction: eventRowIndex,
+    });
   };
 
   _getChangedEventRows = (events: Array<gdBaseEvent>) => {
@@ -1635,6 +1653,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                   searchResults={eventsSearchResultEvents}
                   searchFocusOffset={searchFocusOffset}
                   onEventMoved={this._onEventMoved}
+                  onEndEditingEvent={this._onEndEditingStringEvent}
                   showObjectThumbnails={
                     preferences.values.eventsSheetShowObjectThumbnails
                   }

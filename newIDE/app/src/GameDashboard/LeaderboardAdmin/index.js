@@ -68,7 +68,12 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 
-type Props = {| onLoading: boolean => void, project?: gdProject |};
+type Props = {|
+  onLoading: boolean => void,
+  project?: gdProject,
+  leaderboardIdToSelectAtOpening?: string,
+|};
+
 type ContainerProps = {| ...Props, gameId: string |};
 
 type ApiError = {|
@@ -172,7 +177,11 @@ const getSortOrderText = (currentLeaderboard: Leaderboard) => {
   return <Trans>Higher is better</Trans>;
 };
 
-export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
+export const LeaderboardAdmin = ({
+  onLoading,
+  project,
+  leaderboardIdToSelectAtOpening,
+}: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -434,6 +443,14 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     // This has to be executed on component mount to refresh entries on each admin opening
     // eslint-disable-next-line
   }, []);
+
+  React.useEffect(
+    () => {
+      if (!!leaderboardIdToSelectAtOpening)
+        selectLeaderboard(leaderboardIdToSelectAtOpening);
+    },
+    [leaderboardIdToSelectAtOpening, selectLeaderboard]
+  );
 
   const onCopy = React.useCallback(
     () => {

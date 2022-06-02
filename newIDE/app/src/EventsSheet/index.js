@@ -492,7 +492,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   closeEventTextDialog = () => {
     if (this.state.textEditedEvent) {
-      const positions = this._getChangedEventRows(this.state.textEditedEvent);
+      const positions = this._getChangedEventRows([this.state.textEditedEvent]);
       this._saveChangesToHistory('EDIT', {
         previous: positions,
         next: positions,
@@ -1766,7 +1766,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
                 )}
                 {this.state.textEditedEvent && (
                   <EventTextDialog
-                    event={this.state.textEditedEvent.event}
+                    event={this.state.textEditedEvent}
                     onApply={() => {
                       this.closeEventTextDialog();
                     }}

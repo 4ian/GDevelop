@@ -76,14 +76,15 @@ export const AssetStore = ({
     searchResults,
     error,
     fetchAssetsAndFilters,
-    isOnHomePage,
-    setIsOnHomePage,
     navigationState,
     searchText,
     setSearchText,
     assetFiltersState,
   } = React.useContext(AssetStoreContext);
-  const { openedAssetShortHeader } = navigationState.getCurrentPage();
+  const {
+    openedAssetShortHeader,
+    isOnHomePage,
+  } = navigationState.getCurrentPage();
 
   React.useEffect(
     () => {
@@ -161,7 +162,6 @@ export const AssetStore = ({
     navigationState.openHome();
     clearAllFilters(assetFiltersState);
     setIsFiltersPanelOpen(false);
-    setIsOnHomePage(true);
   };
 
   // When a pack is selected from the home page,
@@ -173,7 +173,6 @@ export const AssetStore = ({
 
     navigationState.openTagPage(tag);
 
-    setIsOnHomePage(false);
     setIsFiltersPanelOpen(true);
   };
 
@@ -204,9 +203,7 @@ export const AssetStore = ({
                 placeholder={t`Search assets`}
                 value={searchText}
                 onChange={setSearchText}
-                onRequestSearch={() => {
-                  if (isOnHomePage) setIsOnHomePage(false);
-                }}
+                onRequestSearch={() => navigationState.openSearchIfNeeded()}
                 style={styles.searchBar}
                 ref={searchBar}
                 id="asset-store-search-bar"
@@ -287,9 +284,9 @@ export const AssetStore = ({
                         >
                           <AssetStoreFilterPanel
                             assetFiltersState={assetFiltersState}
-                            onChoiceChange={() => {
-                              if (isOnHomePage) setIsOnHomePage(false);
-                            }}
+                            onChoiceChange={() =>
+                              navigationState.openSearchIfNeeded()
+                            }
                           />
                         </Line>
                       </ScrollView>

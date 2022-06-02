@@ -51,8 +51,6 @@ type AssetStoreState = {|
   searchResults: ?Array<AssetShortHeader>,
   fetchAssetsAndFilters: () => void,
   error: ?Error,
-  isOnHomePage: boolean,
-  setIsOnHomePage: boolean => void,
   searchText: string,
   setSearchText: string => void,
   assetFiltersState: AssetFiltersState,
@@ -68,8 +66,6 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   searchResults: null,
   fetchAssetsAndFilters: () => {},
   error: null,
-  isOnHomePage: true,
-  setIsOnHomePage: () => {},
   searchText: '',
   setSearchText: () => {},
   assetFiltersState: {
@@ -89,6 +85,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   navigationState: {
     previousPages: [],
     getCurrentPage: () => ({
+      isOnHomePage: true,
       openedAssetShortHeader: null,
       filtersState: {
         chosenFilters: new Set(),
@@ -100,10 +97,12 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     }),
     backToPreviousPage: () => {},
     openHome: () => {},
+    openSearchIfNeeded: () => {},
     openTagPage: string => {},
     openDetailPage: string => {},
   },
   currentPage: {
+    isOnHomePage: true,
     openedAssetShortHeader: null,
     filtersState: {
       chosenFilters: new Set(),
@@ -142,7 +141,6 @@ export const AssetStoreStateProvider = ({
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const [isOnHomePage, setIsOnHomePage] = React.useState(true);
   const [searchText, setSearchText] = React.useState(defaultSearchText);
   const navigationState = useNavigation();
 
@@ -287,8 +285,6 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       error,
-      isOnHomePage,
-      setIsOnHomePage,
       navigationState,
       currentPage,
       searchText,
@@ -316,7 +312,6 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       error,
-      isOnHomePage,
       navigationState,
       currentPage,
       searchText,

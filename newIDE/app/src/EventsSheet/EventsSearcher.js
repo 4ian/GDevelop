@@ -40,7 +40,10 @@ type Props = {|
     eventsSearchResultEvents: ?Array<gdBaseEvent>,
     searchFocusOffset: ?number,
     searchInEvents: (SearchInEventsInputs, cb: () => void) => void,
-    replaceInEvents: ReplaceInEventsInputs => void,
+    replaceInEvents: (
+      ReplaceInEventsInputs,
+      cb: () => void
+    ) => ?Array<gdBaseEvent>,
     goToNextSearchResult: () => ?gdBaseEvent,
     goToPreviousSearchResult: () => ?gdBaseEvent,
     clearSearchResults: () => void,
@@ -112,15 +115,37 @@ export default class EventsSearcher extends React.Component<Props, State> {
     });
   };
 
-  _doReplaceInEvents = ({
-    searchInSelection,
-    searchText,
-    replaceText,
-    matchCase,
-    searchInConditions,
-    searchInActions,
-    searchInEventStrings,
-  }: ReplaceInEventsInputs) => {
+  _deduplicateEventSearchResults = (
+    eventsSearchResults: gdVectorEventsSearchResult
+  ) => {
+    const resultEventsWithDuplicates = mapFor(
+      0,
+      eventsSearchResults.size(),
+      eventIndex => {
+        const eventsSearchResult = eventsSearchResults.at(eventIndex);
+        return eventsSearchResult.isEventValid()
+          ? eventsSearchResult.getEvent()
+          : null;
+      }
+    ).filter(Boolean);
+
+    // Store a list of unique events, because browsing for results in the events
+    // tree is made event by event.
+    return uniqBy<gdBaseEvent>(resultEventsWithDuplicates, event => event.ptr);
+  };
+
+  _doReplaceInEvents = (
+    {
+      searchInSelection,
+      searchText,
+      replaceText,
+      matchCase,
+      searchInConditions,
+      searchInActions,
+      searchInEventStrings,
+    }: ReplaceInEventsInputs,
+    cb: () => void
+  ): ?Array<gdBaseEvent> => {
     const { globalObjectsContainer, objectsContainer, events } = this.props;
 
     if (searchInSelection) {
@@ -131,7 +156,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     }
     if (!replaceText) return;
 
-    gd.EventsRefactorer.replaceStringInEvents(
+    const modifiedEvents = gd.EventsRefactorer.replaceStringInEvents(
       globalObjectsContainer,
       objectsContainer,
       events,
@@ -142,6 +167,22 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInActions,
       searchInEventStrings
     );
+    if (!modifiedEvents) return null;
+
+    if (this.state.eventsSearchResults) {
+      this.state.eventsSearchResults.delete();
+    }
+    this.setState(
+      {
+        eventsSearchResults: modifiedEvents.clone(),
+        searchFocusOffset: null,
+      },
+      () => {
+        this._updateListOfResultEvents();
+        cb();
+      }
+    );
+    return this._deduplicateEventSearchResults(modifiedEvents);
   };
 
   _doSearchInEvents = (
@@ -198,20 +239,9 @@ export default class EventsSearcher extends React.Component<Props, State> {
       return;
     }
 
-    const resultEventsWithDuplicates = mapFor(
-      0,
-      eventsSearchResults.size(),
-      i => {
-        const eventsSearchResult = eventsSearchResults.at(i);
-        return eventsSearchResult.isEventValid()
-          ? eventsSearchResult.getEvent()
-          : null;
-      }
-    ).filter(Boolean);
-
-    // Store a list of unique events, because browsing for results in the events
-    // tree is made event by event.
-    this._resultEvents = uniqBy(resultEventsWithDuplicates, event => event.ptr);
+    this._resultEvents = this._deduplicateEventSearchResults(
+      eventsSearchResults
+    );
   };
 
   _goToSearchResults = (step: number): ?gdBaseEvent => {

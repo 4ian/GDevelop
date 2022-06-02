@@ -131,8 +131,6 @@ const SearchPanel = (
   };
 
   const launchReplace = () => {
-    launchSearch();
-
     onReplaceInEvents({
       searchInSelection,
       searchText,

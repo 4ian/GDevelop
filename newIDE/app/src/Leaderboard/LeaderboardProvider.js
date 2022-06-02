@@ -71,11 +71,14 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       const primaryLeaderboard = leaderboards.find(
         leaderboard => leaderboard.primary
       );
+      const currentLeaderboardUpdated = state.currentLeaderboard
+        ? leaderboardsByIds[state.currentLeaderboard.id]
+        : undefined;
+      const fallBackLeaderboard =
+        currentLeaderboardUpdated || state.currentLeaderboard;
       const newCurrentLeaderboard = shouldDefineCurrentLeaderboardIfNoneSelected
         ? primaryLeaderboard || leaderboards[0]
-        : (state.currentLeaderboard &&
-            leaderboardsByIds[state.currentLeaderboard.id]) ||
-          state.currentLeaderboard;
+        : fallBackLeaderboard;
       return {
         ...state,
         leaderboardsByIds,
@@ -205,11 +208,12 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   });
 
   const listLeaderboards = React.useCallback(
-    async (silent?: boolean) => {
+    async (shouldNotClearBeforeFetching?: boolean) => {
       if (!isListingLeaderboards.current) {
         isListingLeaderboards.current = true;
         try {
-          if (!silent) dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+          if (!shouldNotClearBeforeFetching)
+            dispatch({ type: 'SET_LEADERBOARDS', payload: null });
           const fetchedLeaderboards = await listGameActiveLeaderboards(
             authenticatedUser,
             gameId

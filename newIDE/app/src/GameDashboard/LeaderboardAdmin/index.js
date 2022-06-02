@@ -635,7 +635,7 @@ export const LeaderboardAdmin = ({
             {i18n.date(currentLeaderboard.resetLaunchedAt, {
               dateStyle: 'short',
               timeStyle: 'short',
-            })}
+            })}. Please wait a few minutes...
           </Trans>
         </Text>
       ) : (

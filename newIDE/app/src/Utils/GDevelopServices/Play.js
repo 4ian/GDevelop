@@ -51,6 +51,7 @@ export type Leaderboard = {|
   visibility: LeaderboardVisibilityOption,
   customizationSettings?: LeaderboardCustomizationSettings,
   primary?: boolean,
+  resetLaunchedAt?: string,
   extremeAllowedScore?: number,
 |};
 

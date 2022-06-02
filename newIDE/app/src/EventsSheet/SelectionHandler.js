@@ -14,6 +14,14 @@ export type InstructionContext = {|
   indexInList: number,
 |};
 
+// Used for history management.
+type EventContainer = {| eventContainer: gdBaseEvent |};
+
+export type InstructionContextWithEventContainer = {
+  ...InstructionContext,
+  ...EventContainer,
+};
+
 export type ParameterContext = {|
   isCondition: boolean,
   instrsList: gdInstructionsList,
@@ -23,6 +31,11 @@ export type ParameterContext = {|
   domEvent?: any,
 |};
 
+export type ParameterContextWithEventContainer = {
+  ...ParameterContext,
+  ...EventContainer,
+};
+
 export type EventContext = {|
   eventsList: gdEventsList,
   event: gdBaseEvent,
@@ -30,7 +43,7 @@ export type EventContext = {|
 |};
 
 export type SelectionState = {
-  selectedInstructions: { [number]: InstructionContext },
+  selectedInstructions: { [number]: InstructionContextWithEventContainer },
   selectedInstructionsLists: { [number]: InstructionsListContext },
   selectedEvents: { [number]: EventContext },
 };
@@ -61,13 +74,23 @@ export const getSelectedInstructions = (
   selection: SelectionState
 ): Array<gdInstruction> => {
   return values(selection.selectedInstructions).map(
-    (instructionContext: InstructionContext) => instructionContext.instruction
+    (instructionContext: InstructionContextWithEventContainer) =>
+      instructionContext.instruction
+  );
+};
+
+export const getSelectedInstructionsEventContainers = (
+  selection: SelectionState
+): Array<gdBaseEvent> => {
+  return values(selection.selectedInstructions).map(
+    (instructionContext: InstructionContextWithEventContainer) =>
+      instructionContext.eventContainer
   );
 };
 
 export const getSelectedInstructionsContexts = (
   selection: SelectionState
-): Array<InstructionContext> => {
+): Array<InstructionContextWithEventContainer> => {
   return values(selection.selectedInstructions);
 };
 
@@ -154,6 +177,7 @@ export const selectEvent = (
 };
 
 export const selectInstruction = (
+  event: gdBaseEvent,
   selection: SelectionState,
   instructionContext: InstructionContext,
   multiSelection: boolean = false
@@ -166,7 +190,7 @@ export const selectInstruction = (
     ...existingSelection,
     selectedInstructions: {
       ...existingSelection.selectedInstructions,
-      [instruction.ptr]: instructionContext,
+      [instruction.ptr]: { ...instructionContext, eventContainer: event },
     },
   };
 };
@@ -188,4 +212,16 @@ export const selectInstructionsList = (
       [instructionsList.ptr]: instructionsListContext,
     },
   };
+};
+
+export const selectEventsAfterHistoryChange = (
+  eventContexts: Array<EventContext>
+) => {
+  let newSelection = getInitialSelection();
+
+  eventContexts.forEach(eventContext => {
+    newSelection.selectedEvents[eventContext.event.ptr] = eventContext;
+  });
+
+  return newSelection;
 };

@@ -78,6 +78,10 @@ export const AssetStore = ({
     fetchAssetsAndFilters,
     filtersState,
     assetFiltersState,
+    isOnHomePage,
+    setIsOnHomePage,
+    openedAssetShortHeader,
+    setOpenedAssetShortHeader,
     searchText,
     setSearchText,
   } = React.useContext(AssetStoreContext);
@@ -91,12 +95,9 @@ export const AssetStore = ({
 
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [
-    openedAssetShortHeader,
-    setOpenedAssetShortHeader,
-  ] = React.useState<?AssetShortHeader>(null);
-  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
-  const [isOnHomePage, setIsOnHomePage] = React.useState(true);
+  const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(
+    !isOnHomePage && !openedAssetShortHeader
+  );
 
   const [
     assetBeingInstalled,

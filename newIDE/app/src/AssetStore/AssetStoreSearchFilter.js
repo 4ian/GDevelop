@@ -188,7 +188,6 @@ export class SimilarAssetStoreSearchFilter
 
   constructor(other: AssetShortHeader) {
     this.other = other;
-    console.log(this.other.tags);
   }
 
   getPertinence(searchItem: AssetShortHeader): number {

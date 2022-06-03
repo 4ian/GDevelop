@@ -112,6 +112,9 @@ export const AssetsHome = ({
                   </Text>
                   <Text style={styles.packTitle} color="primary" size="body2">
                     <Trans>{pack.assetsCount} Assets</Trans>
+                    {pack.userFriendlyPrice
+                      ? ' - ' + pack.userFriendlyPrice
+                      : null}
                   </Text>
                 </Line>
               </Column>

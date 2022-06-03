@@ -436,7 +436,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
     type = project.GetObject(name).GetType();
 
   // Search in groups
-  if (searchInGroups) {
+  else if (searchInGroups) {
     for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {
       if (layout.GetObjectGroups()[i].GetName() == name) {
         // A group has the name searched
@@ -497,18 +497,16 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
                                          gd::String name,
                                          bool searchInGroups) {
   for (std::size_t i = 0; i < layout.GetObjectsCount(); ++i) {
-    vector<gd::String> behaviors = layout.GetObject(i).GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      if (layout.GetObject(i).GetBehavior(behaviors[j]).GetName() == name)
-        return layout.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
+    const auto &object = layout.GetObject(i);
+    if (object.HasBehaviorNamed(name)) {
+      return object.GetBehavior(name).GetTypeName();
     }
   }
 
   for (std::size_t i = 0; i < project.GetObjectsCount(); ++i) {
-    vector<gd::String> behaviors = project.GetObject(i).GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      if (project.GetObject(i).GetBehavior(behaviors[j]).GetName() == name)
-        return project.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
+    const auto &object = project.GetObject(i);
+    if (object.HasBehaviorNamed(name)) {
+      return object.GetBehavior(name).GetTypeName();
     }
   }
 

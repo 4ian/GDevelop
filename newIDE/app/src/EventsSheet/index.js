@@ -884,7 +884,9 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       inlineEditingAnchorEl: parameterContext.domEvent
         ? parameterContext.domEvent.currentTarget
         : null,
-      inlineEditingPreviousValue: instruction.getParameter(parameterIndex),
+      inlineEditingPreviousValue: instruction
+        .getParameter(parameterIndex)
+        .getPlainString(),
     });
   };
 

@@ -1,10 +1,14 @@
 // @flow
 import * as React from 'react';
 import { type FiltersState } from '../UI/Search/FiltersChooser';
-import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
+import {
+  type AssetShortHeader,
+  type AssetPack,
+} from '../Utils/GDevelopServices/Asset';
 
 export type AssetStorePageState = {|
   isOnHomePage: boolean,
+  openedAssetPack: ?AssetPack,
   openedAssetShortHeader: ?AssetShortHeader,
   filtersState: FiltersState,
   ignoreTextualSearch: boolean,
@@ -17,12 +21,14 @@ export type NavigationState = {|
   openHome: () => void,
   openSearchIfNeeded: () => void,
   openTagPage: string => void,
+  openPackPage: AssetPack => void,
   openDetailPage: AssetShortHeader => void,
 |};
 
-const homePage: AssetStorePageState = {
+export const assetStoreHomePageState: AssetStorePageState = {
   isOnHomePage: true,
   openedAssetShortHeader: null,
+  openedAssetPack: null,
   filtersState: {
     chosenCategory: null,
     chosenFilters: new Set(),
@@ -35,7 +41,7 @@ const homePage: AssetStorePageState = {
 
 export const useNavigation = (): NavigationState => {
   const [currentPage, setCurrentPage] = React.useState<AssetStorePageState>(
-    homePage
+    assetStoreHomePageState
   );
   // TODO It works because the currentPage changes but this is hacky.
   const [previousPages] = React.useState<Array<AssetStorePageState>>([
@@ -53,7 +59,7 @@ export const useNavigation = (): NavigationState => {
     },
     openHome: () => {
       previousPages.length = 0;
-      previousPages.push(homePage);
+      previousPages.push(assetStoreHomePageState);
       setCurrentPage(previousPages[previousPages.length - 1]);
     },
     openSearchIfNeeded: () => {
@@ -62,6 +68,7 @@ export const useNavigation = (): NavigationState => {
         previousPages.push({
           isOnHomePage: false,
           openedAssetShortHeader: null,
+          openedAssetPack: null,
           filtersState: {
             chosenCategory: null,
             chosenFilters: new Set(),
@@ -78,9 +85,29 @@ export const useNavigation = (): NavigationState => {
       previousPages.push({
         isOnHomePage: false,
         openedAssetShortHeader: null,
+        openedAssetPack: null,
         filtersState: {
           chosenCategory: {
             node: { name: tag, allChildrenTags: [], children: [] },
+            parentNodes: [],
+          },
+          chosenFilters: new Set(),
+          addFilter: () => {},
+          removeFilter: () => {},
+          setChosenCategory: () => {},
+        },
+        ignoreTextualSearch: true,
+      });
+      setCurrentPage(previousPages[previousPages.length - 1]);
+    },
+    openPackPage: (assetPack: AssetPack) => {
+      previousPages.push({
+        isOnHomePage: false,
+        openedAssetShortHeader: null,
+        openedAssetPack: assetPack,
+        filtersState: {
+          chosenCategory: {
+            node: { name: assetPack.tag, allChildrenTags: [], children: [] },
             parentNodes: [],
           },
           chosenFilters: new Set(),
@@ -96,6 +123,7 @@ export const useNavigation = (): NavigationState => {
       previousPages.push({
         isOnHomePage: false,
         openedAssetShortHeader: assetShortHeader,
+        openedAssetPack: null,
         filtersState: {
           chosenCategory: null,
           chosenFilters: new Set(),

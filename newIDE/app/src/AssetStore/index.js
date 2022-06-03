@@ -88,8 +88,9 @@ export const AssetStore = ({
     assetFiltersState,
   } = React.useContext(AssetStoreContext);
   const {
-    openedAssetShortHeader,
     isOnHomePage,
+    openedAssetPack,
+    openedAssetShortHeader,
   } = navigationState.getCurrentPage();
 
   React.useEffect(
@@ -101,9 +102,6 @@ export const AssetStore = ({
 
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [openedAssetPack, setOpenedAssetPack] = React.useState<?AssetPack>(
-    null
-  );
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
     isAssetPackDialogInstallOpen,
@@ -180,7 +178,11 @@ export const AssetStore = ({
 
     sendAssetPackOpened(tag);
 
-    navigationState.openTagPage(tag);
+    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
+    // This can't actually be false.
+    if (assetPack) {
+      navigationState.openPackPage(assetPack);
+    }
 
     setIsFiltersPanelOpen(true);
   };
@@ -188,7 +190,13 @@ export const AssetStore = ({
   // When a tag is selected from the asset details page,
   // we set it as the chosen category, clear old filters and open the filters panel.
   const selectTag = (tag: string) => {
-    navigationState.openTagPage(tag);
+    const assetPack =
+      assetPacks && assetPacks.starterPacks.find(pack => pack.tag === tag);
+    if (assetPack) {
+      navigationState.openPackPage(assetPack);
+    } else {
+      navigationState.openTagPage(tag);
+    }
     clearAllFilters(assetFiltersState);
     setIsFiltersPanelOpen(true);
   };
@@ -240,15 +248,16 @@ export const AssetStore = ({
                           icon={<ArrowBack />}
                           label={<Trans>Back</Trans>}
                           primary={false}
-                    onClick={() => {
-                      navigationState.backToPreviousPage();
-                      if (navigationState.getCurrentPage().isOnHomePage) {
-                        clearAllFilters(assetFiltersState);
-                        setIsFiltersPanelOpen(false);
-                      }
+                          onClick={() => {
+                            navigationState.backToPreviousPage();
+                            if (navigationState.getCurrentPage().isOnHomePage) {
+                              clearAllFilters(assetFiltersState);
+                              setIsFiltersPanelOpen(false);
+                            }
+                          }}
                         />
                       </Column>
-                      {!!openedAssetPack && !openedAssetShortHeader && (
+                      {openedAssetPack && (
                         <>
                           <Column expand alignItems="center">
                             <Text size="title" noMargin>

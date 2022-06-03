@@ -24,6 +24,7 @@ import {
   type NavigationState,
   type AssetStorePageState,
   useNavigation,
+  assetStoreHomePageState,
 } from './AssetStoreNavigator';
 
 const defaultSearchText = '';
@@ -83,37 +84,16 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     setLicenseFilter: filter => {},
   },
   navigationState: {
-    previousPages: [],
-    getCurrentPage: () => ({
-      isOnHomePage: true,
-      openedAssetShortHeader: null,
-      filtersState: {
-        chosenFilters: new Set(),
-        addFilter: () => {},
-        removeFilter: () => {},
-        chosenCategory: null,
-        setChosenCategory: () => {},
-      },
-      ignoreTextualSearch: false,
-    }),
+    previousPages: [assetStoreHomePageState],
+    getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => {},
     openHome: () => {},
     openSearchIfNeeded: () => {},
     openTagPage: string => {},
-    openDetailPage: string => {},
+    openPackPage: AssetPack => {},
+    openDetailPage: stAssetShortHeaderring => {},
   },
-  currentPage: {
-    isOnHomePage: true,
-    openedAssetShortHeader: null,
-    filtersState: {
-      chosenFilters: new Set(),
-      addFilter: () => {},
-      removeFilter: () => {},
-      chosenCategory: null,
-      setChosenCategory: () => {},
-    },
-    ignoreTextualSearch: false,
-  },
+  currentPage: assetStoreHomePageState,
 });
 
 type AssetStoreStateProviderProps = {|

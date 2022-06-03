@@ -20,10 +20,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import {
-  type AssetShortHeader,
-  type AssetPack,
-} from '../Utils/GDevelopServices/Asset';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -47,6 +44,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
 import { AssetPackDialog } from './AssetPackDialog';
+import Home from '@material-ui/icons/Home';
 
 const styles = {
   searchBar: {
@@ -83,15 +81,16 @@ export const AssetStore = ({
     searchResults,
     error,
     fetchAssetsAndFilters,
-    filtersState,
-    assetFiltersState,
-    isOnHomePage,
-    setIsOnHomePage,
-    openedAssetShortHeader,
-    setOpenedAssetShortHeader,
+    navigationState,
     searchText,
     setSearchText,
+    assetFiltersState,
   } = React.useContext(AssetStoreContext);
+  const {
+    isOnHomePage,
+    openedAssetPack,
+    openedAssetShortHeader,
+  } = navigationState.getCurrentPage();
 
   React.useEffect(
     () => {
@@ -102,9 +101,6 @@ export const AssetStore = ({
 
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
-  const [openedAssetPack, setOpenedAssetPack] = React.useState<?AssetPack>(
-    null
-  );
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
   const [
     isAssetPackDialogInstallOpen,
@@ -132,7 +128,7 @@ export const AssetStore = ({
       id: assetShortHeader.id,
       name: assetShortHeader.name,
     });
-    setOpenedAssetShortHeader(assetShortHeader);
+    navigationState.openDetailPage(assetShortHeader);
   };
 
   const onInstallAsset = React.useCallback(
@@ -182,17 +178,6 @@ export const AssetStore = ({
     ]
   );
 
-  const resetToDefault = () => {
-    setSearchText('');
-    filtersState.setChosenCategory(null);
-    setOpenedAssetPack(null);
-    setIsAssetPackAdded(false);
-    setOpenedAssetShortHeader(null);
-    clearAllFilters(assetFiltersState);
-    setIsFiltersPanelOpen(false);
-    setIsOnHomePage(true);
-  };
-
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
   const selectPack = (tag: string) => {
@@ -200,59 +185,28 @@ export const AssetStore = ({
 
     sendAssetPackOpened(tag);
 
-    const assetPack = assetPacks.starterPacks.find(
-      assetPack => assetPack.tag === tag
-    );
+    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
+
     if (assetPack && assetPack.externalWebLink) {
       Window.openExternalURL(assetPack.externalWebLink);
-      return;
+    } else if (assetPack) {
+      navigationState.openPackPage(assetPack);
+      setIsFiltersPanelOpen(true);
     }
-
-    const chosenCategory = {
-      node: { name: tag, allChildrenTags: [], children: [] },
-      parentNodes: [],
-    };
-    filtersState.setChosenCategory(chosenCategory);
-
-    setOpenedAssetPack(assetPack);
-
-    setIsOnHomePage(false);
-    setIsFiltersPanelOpen(true);
   };
 
   // When a tag is selected from the asset details page,
   // we set it as the chosen category, clear old filters and open the filters panel.
   const selectTag = (tag: string) => {
-    const chosenCategory = {
-      node: { name: tag, allChildrenTags: [], children: [] },
-      parentNodes: [],
-    };
-    filtersState.setChosenCategory(chosenCategory);
-
-    clearAllFilters(assetFiltersState);
-    setOpenedAssetPack(null);
-    setOpenedAssetShortHeader(null);
-    setIsFiltersPanelOpen(true);
-  };
-
-  // When something is entered in the search bar
-  // we need to ensure we leave the homepage and deselect any pack.
-  const onSearchChange = () => {
-    if (isOnHomePage) setIsOnHomePage(false);
-    if (openedAssetPack) setOpenedAssetPack(null);
-  };
-
-  // When the back button is pressed, if we were on the asset details page,
-  // we just go back to the search,
-  // if we were on the search, we reset everything to go back to the homepage.
-  const goBack = () => {
-    if (openedAssetShortHeader) {
-      // Going back from Asset page to search.
-      setOpenedAssetShortHeader(null);
+    const assetPack =
+      assetPacks && assetPacks.starterPacks.find(pack => pack.tag === tag);
+    if (assetPack) {
+      navigationState.openPackPage(assetPack);
     } else {
-      // Going back from search to home.
-      resetToDefault();
+      navigationState.openTagPage(tag);
     }
+    clearAllFilters(assetFiltersState);
+    setIsFiltersPanelOpen(true);
   };
 
   React.useEffect(
@@ -270,15 +224,37 @@ export const AssetStore = ({
         {windowWidth => (
           <>
             <Column expand noMargin useFullHeight>
-              <SearchBar
-                placeholder={t`Search assets`}
-                value={searchText}
-                onChange={setSearchText}
-                onRequestSearch={onSearchChange}
-                style={styles.searchBar}
-                ref={searchBar}
-                id="asset-store-search-bar"
-              />
+              <Line>
+                <Spacer />
+                <IconButton
+                  key="back-discover"
+                  tooltip={t`Back to discover`}
+                  onClick={() => {
+                    navigationState.openHome();
+                    setIsFiltersPanelOpen(false);
+                    clearAllFilters(assetFiltersState);
+                  }}
+                  size="small"
+                >
+                  <Home />
+                </IconButton>
+                <Column expand useFullHeight>
+                  <SearchBar
+                    placeholder={t`Search assets`}
+                    value={searchText}
+                    onChange={setSearchText}
+                    onRequestSearch={() => {
+                      // Clear the history
+                      navigationState.activateTextualSearch();
+                      navigationState.clearHistory();
+                      setIsFiltersPanelOpen(true);
+                    }}
+                    style={styles.searchBar}
+                    ref={searchBar}
+                    id="asset-store-search-bar"
+                  />
+                </Column>
+              </Line>
               {!isOnHomePage && <Spacer />}
               <Column>
                 <Line
@@ -297,10 +273,16 @@ export const AssetStore = ({
                           icon={<ArrowBack />}
                           label={<Trans>Back</Trans>}
                           primary={false}
-                          onClick={goBack}
+                          onClick={() => {
+                            navigationState.backToPreviousPage();
+                            if (navigationState.getCurrentPage().isOnHomePage) {
+                              clearAllFilters(assetFiltersState);
+                              setIsFiltersPanelOpen(false);
+                            }
+                          }}
                         />
                       </Column>
-                      {!!openedAssetPack && !openedAssetShortHeader && (
+                      {openedAssetPack && (
                         <>
                           <Column expand alignItems="center">
                             <Text size="title" noMargin>
@@ -379,7 +361,9 @@ export const AssetStore = ({
                         >
                           <AssetStoreFilterPanel
                             assetFiltersState={assetFiltersState}
-                            onChoiceChange={onSearchChange}
+                            onChoiceChange={() =>
+                              navigationState.openSearchIfNeeded()
+                            }
                           />
                         </Line>
                       </ScrollView>
@@ -422,7 +406,7 @@ export const AssetStore = ({
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onAdd={() => onInstallAsset(openedAssetShortHeader)}
-                    onClose={() => setOpenedAssetShortHeader(null)}
+                    onClose={() => navigationState.backToPreviousPage()}
                     isAddedToScene={addedAssetIds.includes(
                       openedAssetShortHeader.id
                     )}

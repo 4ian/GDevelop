@@ -51,7 +51,7 @@ Project::Project()
     : name(_("Project")),
       version("1.0.0"),
       packageName("com.example.gamename"),
-      templateSlug(""),
+      templateSlug(NULL),
       orientation("landscape"),
       folderProject(false),
       windowWidth(800),

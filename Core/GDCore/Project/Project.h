@@ -995,7 +995,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
   bool isPlayableWithMobile;   ///< The project is playable on a mobile.
   gd::String packageName;  ///< Game package name
-  gd::String templateSlug;
+  gd::String templateSlug; ///< The slug of the template from which is game is
+                           ///< created.
   gd::String orientation;  ///< Lock game orientation (on mobile devices).
                            ///< "default", "landscape" or "portrait".
   bool

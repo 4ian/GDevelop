@@ -179,10 +179,12 @@ export const registerGame = (
     gameId,
     gameName,
     authorName,
+    templateSlug,
   }: {|
     gameId: string,
     gameName: string,
     authorName: string,
+    templateSlug: string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -192,6 +194,7 @@ export const registerGame = (
         {
           gameName,
           authorName,
+          templateSlug,
         },
         {
           params: {

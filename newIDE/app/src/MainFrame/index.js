@@ -1960,12 +1960,14 @@ const MainFrame = (props: Props) => {
     storageProvider,
     fileMetadata,
     projectName,
+    templateSlug,
     shouldCloseDialog,
   }: {|
     project?: gdProject,
     storageProvider: ?StorageProvider,
     fileMetadata: ?FileMetadata,
     projectName?: string,
+    templateSlug?: string,
     shouldCloseDialog?: boolean,
   |}) => {
     if (shouldCloseDialog)
@@ -1983,7 +1985,9 @@ const MainFrame = (props: Props) => {
     currentProject.setVersion('1.0.0');
     currentProject.getAuthorIds().clear();
     currentProject.setAuthor('');
+    if (templateSlug) currentProject.setTemplateSlug(templateSlug);
     if (projectName) currentProject.setName(projectName);
+
     openSceneOrProjectManager({
       currentProject: currentProject,
       editorTabs: editorTabs,

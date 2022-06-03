@@ -5,6 +5,9 @@ export type MoveFunctionArguments = {
   node: SortableTreeNode,
 };
 
+const getRowIndexOfNode = (node: SortableTreeNode) =>
+  node.nodePath[node.nodePath.length - 1];
+
 export const moveEventToEventsList = ({
   targetEventsList,
   movingEvent,
@@ -34,6 +37,11 @@ export const moveNodeAsSubEvent = ({
     initialEventsList: node.eventsList,
     toIndex: 0,
   });
+  const previousRowIndex = getRowIndexOfNode(node);
+  const targetRowIndex = getRowIndexOfNode(targetNode);
+  return previousRowIndex <= targetRowIndex
+    ? targetRowIndex
+    : targetRowIndex + 1;
 };
 
 export const moveNodeBelow = ({ targetNode, node }: MoveFunctionArguments) => {
@@ -48,6 +56,11 @@ export const moveNodeBelow = ({ targetNode, node }: MoveFunctionArguments) => {
     initialEventsList: node.eventsList,
     toIndex,
   });
+  const previousRowIndex = getRowIndexOfNode(node);
+  const targetRowIndex = getRowIndexOfNode(targetNode);
+  return previousRowIndex <= targetRowIndex
+    ? targetRowIndex
+    : targetRowIndex + 1;
 };
 
 export const moveNodeAbove = ({ targetNode, node }: MoveFunctionArguments) => {
@@ -62,6 +75,11 @@ export const moveNodeAbove = ({ targetNode, node }: MoveFunctionArguments) => {
     initialEventsList: node.eventsList,
     toIndex,
   });
+  const previousRowIndex = getRowIndexOfNode(node);
+  const targetRowIndex = getRowIndexOfNode(targetNode);
+  return previousRowIndex <= targetRowIndex
+    ? targetRowIndex - 1
+    : targetRowIndex;
 };
 
 export const isDescendant = (

@@ -8,6 +8,7 @@ import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
+import Window from '../Utils/Window';
 import {
   sendAssetAddedToProject,
   sendAssetOpened,
@@ -19,9 +20,7 @@ import {
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
-import {
-  type AssetShortHeader,
-} from '../Utils/GDevelopServices/Asset';
+import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
 import {
@@ -187,12 +186,14 @@ export const AssetStore = ({
     sendAssetPackOpened(tag);
 
     const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
-    // This can't actually be false.
-    if (assetPack) {
-      navigationState.openPackPage(assetPack);
-    }
 
-    setIsFiltersPanelOpen(true);
+    if (assetPack && assetPack.externalWebLink) {
+      Window.openExternalURL(assetPack.externalWebLink);
+      return;
+    } else if (assetPack) {
+      navigationState.openPackPage(assetPack);
+      setIsFiltersPanelOpen(true);
+    }
   };
 
   // When a tag is selected from the asset details page,

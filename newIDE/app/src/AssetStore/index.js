@@ -189,7 +189,6 @@ export const AssetStore = ({
 
     if (assetPack && assetPack.externalWebLink) {
       Window.openExternalURL(assetPack.externalWebLink);
-      return;
     } else if (assetPack) {
       navigationState.openPackPage(assetPack);
       setIsFiltersPanelOpen(true);

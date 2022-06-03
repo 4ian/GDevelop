@@ -217,20 +217,37 @@ export const AssetStore = ({
         {windowWidth => (
           <>
             <Column expand noMargin useFullHeight>
-              <SearchBar
-                placeholder={t`Search assets`}
-                value={searchText}
-                onChange={setSearchText}
-                onRequestSearch={() => {
-                  // Clear the history
-                  navigationState.openHome();
-                  navigationState.openSearchIfNeeded();
-                  setIsFiltersPanelOpen(true);
-                }}
-                style={styles.searchBar}
-                ref={searchBar}
-                id="asset-store-search-bar"
-              />
+              <Line>
+                <Spacer />
+                <IconButton
+                  key="back-discover"
+                  tooltip={t`Back to discover`}
+                  onClick={() => {
+                    navigationState.openHome();
+                    setIsFiltersPanelOpen(false);
+                  }}
+                  size="small"
+                >
+                  <Home />
+                </IconButton>
+                <Spacer />
+                <Column expand noMargin useFullHeight>
+                  <SearchBar
+                    placeholder={t`Search assets`}
+                    value={searchText}
+                    onChange={setSearchText}
+                    onRequestSearch={() => {
+                      // Clear the history
+                      navigationState.openHome();
+                      navigationState.openSearchIfNeeded();
+                      setIsFiltersPanelOpen(true);
+                    }}
+                    style={styles.searchBar}
+                    ref={searchBar}
+                    id="asset-store-search-bar"
+                  />
+                </Column>
+              </Line>
               {!isOnHomePage && <Spacer />}
               <Column>
                 <Line
@@ -245,33 +262,18 @@ export const AssetStore = ({
                   ) : (
                     <>
                       <Column expand alignItems="flex-start" noMargin>
-                        <Line>
-                          <IconButton
-                            key="back-discover"
-                            tooltip={t`Back to discover`}
-                            onClick={() => {
-                              navigationState.openHome();
+                        <TextButton
+                          icon={<ArrowBack />}
+                          label={<Trans>Back</Trans>}
+                          primary={false}
+                          onClick={() => {
+                            navigationState.backToPreviousPage();
+                            if (navigationState.getCurrentPage().isOnHomePage) {
+                              clearAllFilters(assetFiltersState);
                               setIsFiltersPanelOpen(false);
-                            }}
-                            size="small"
-                          >
-                            <Home />
-                          </IconButton>
-                          <TextButton
-                            icon={<ArrowBack />}
-                            label={<Trans>Back</Trans>}
-                            primary={false}
-                            onClick={() => {
-                              navigationState.backToPreviousPage();
-                              if (
-                                navigationState.getCurrentPage().isOnHomePage
-                              ) {
-                                clearAllFilters(assetFiltersState);
-                                setIsFiltersPanelOpen(false);
-                              }
-                            }}
-                          />
-                        </Line>
+                            }
+                          }}
+                        />
                       </Column>
                       {openedAssetPack && (
                         <>

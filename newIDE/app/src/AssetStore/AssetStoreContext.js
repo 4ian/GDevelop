@@ -20,6 +20,7 @@ import {
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
+import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 
 const defaultSearchText = '';
 
@@ -54,6 +55,12 @@ type AssetStoreState = {|
   setSearchText: string => void,
   filtersState: FiltersState,
   assetFiltersState: AssetFiltersState,
+  useSearchItem: (
+    searchText: string,
+    chosenCategory: ?ChosenCategory,
+    chosenFilters: ?Set<string>,
+    searchFilters: Array<SearchFilter<AssetShortHeader>>
+  ) => ?Array<AssetShortHeader>,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
@@ -91,6 +98,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     licenseFilter: new LicenseAssetStoreSearchFilter(),
     setLicenseFilter: filter => {},
   },
+  useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
+    null,
 });
 
 type AssetStoreStateProviderProps = {|
@@ -286,6 +295,20 @@ export const AssetStoreStateProvider = ({
         licenseFilter,
         setLicenseFilter,
       },
+      useSearchItem: (
+        searchText,
+        chosenCategory,
+        chosenFilters,
+        searchFilters
+      ) =>
+        useSearchItem(
+          assetShortHeadersById,
+          getAssetShortHeaderSearchTerms,
+          searchText,
+          chosenCategory,
+          chosenFilters,
+          searchFilters
+        ),
     }),
     [
       searchResults,
@@ -305,6 +328,8 @@ export const AssetStoreStateProvider = ({
       objectTypeFilter,
       colorFilter,
       licenseFilter,
+      setLicenseFilter,
+      assetShortHeadersById,
     ]
   );
 

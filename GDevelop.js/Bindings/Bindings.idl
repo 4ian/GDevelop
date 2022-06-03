@@ -385,6 +385,8 @@ interface Project {
     void SetPlayableWithMobile(boolean playable);
     void SetPackageName([Const] DOMString packageName);
     [Const, Ref] DOMString GetPackageName();
+    void SetTemplateSlug([Const] DOMString templateSlug);
+    [Const, Ref] DOMString GetTemplateSlug();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
     void SetProjectUuid([Const] DOMString projectUuid);

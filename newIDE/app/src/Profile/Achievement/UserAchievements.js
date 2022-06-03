@@ -52,7 +52,7 @@ const UserAchievements = ({
       const achievements = await getAchievements();
       setAchievements(achievements);
     } catch (err) {
-      console.log(`Error when fetching achievements: ${err}`);
+      console.error(`Error when fetching achievements: ${err}`);
       setDisplayError(true);
     }
   }, []);

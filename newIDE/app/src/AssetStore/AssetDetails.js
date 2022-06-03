@@ -32,6 +32,10 @@ import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
 import ThemeContext from '../UI/Theme/ThemeContext';
 import AnimationPreview from '../ObjectEditor/Editors/SpriteEditor/AnimationPreview';
 import ScrollView from '../UI/ScrollView';
+import { AssetCard } from './AssetCard';
+import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
+import EmptyMessage from '../UI/EmptyMessage';
+import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 
 const FIXED_HEIGHT = 250;
 
@@ -43,7 +47,7 @@ const styles = {
     alignItems: 'center',
     padding: 10,
     width: 300,
-    maxHeight: FIXED_HEIGHT,
+    height: FIXED_HEIGHT,
   },
   chip: {
     marginBottom: 2,
@@ -63,6 +67,11 @@ const styles = {
   leftArrowSvg: {
     transform: 'translateX(5px)',
   },
+  scrollView: {
+    // This is needed to make the scroll view take the full height of the container,
+    // allowing the Autosizer of the BoxSearchResults to be visible.
+    display: 'flex',
+  },
 };
 
 const makeFirstLetterUppercase = (str: string) =>
@@ -80,6 +89,7 @@ type Props = {|
   onClose: () => void,
   isAddedToScene: boolean,
   isBeingAddedToScene: boolean,
+  onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -105,6 +115,7 @@ export const AssetDetails = ({
   onClose,
   isAddedToScene,
   isBeingAddedToScene,
+  onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
@@ -185,8 +196,20 @@ export const AssetDetails = ({
       ? direction.sprites.map(sprite => assetResources[sprite.image])
       : null;
 
+  const similarAssetFilters = React.useMemo(
+    () => [new SimilarAssetStoreSearchFilter(assetShortHeader)],
+    [assetShortHeader]
+  );
+  const {
+    error: filterError,
+    fetchAssetsAndFilters,
+    useSearchItem,
+  } = React.useContext(AssetStoreContext);
+  const searchResults = useSearchItem('', null, null, similarAssetFilters);
+  const truncatedSearchResults = searchResults && searchResults.slice(0, 60);
+
   return (
-    <ScrollView>
+    <ScrollView style={styles.scrollView}>
       <Column expand noMargin>
         <Line justifyContent="space-between" noMargin>
           <Column>
@@ -420,6 +443,41 @@ export const AssetDetails = ({
             )}
           </Column>
         </ResponsiveLineStackLayout>
+        {asset && (
+          <>
+            <Column>
+              <Text size="title" displayInlineAsSpan>
+                <Trans>You might like</Trans>
+              </Text>
+            </Column>
+            <Line expand noMargin>
+              <Column expand>
+                <BoxSearchResults
+                  baseSize={128}
+                  onRetry={fetchAssetsAndFilters}
+                  error={filterError}
+                  searchItems={truncatedSearchResults}
+                  renderSearchItem={(assetShortHeader, size) => (
+                    <AssetCard
+                      size={size}
+                      onOpenDetails={() => {
+                        setAsset(null);
+                        onOpenDetails(assetShortHeader);
+                      }}
+                      assetShortHeader={assetShortHeader}
+                    />
+                  )}
+                  noResultPlaceholder={
+                    <EmptyMessage>
+                      <Trans>No similar asset was found.</Trans>
+                    </EmptyMessage>
+                  }
+                  noScroll
+                />
+              </Column>
+            </Line>
+          </>
+        )}
       </Column>
     </ScrollView>
   );

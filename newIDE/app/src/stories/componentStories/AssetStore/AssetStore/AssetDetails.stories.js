@@ -28,6 +28,7 @@ export const Default = () => (
       onClose={() => {}}
       isAddedToScene={false}
       isBeingAddedToScene={false}
+      onOpenDetails={assetShortHeader => {}}
     />
   </AssetStoreStateProvider>
 );
@@ -45,6 +46,7 @@ export const BeingInstalled = () => (
       onClose={() => {}}
       isAddedToScene={false}
       isBeingAddedToScene={true}
+      onOpenDetails={assetShortHeader => {}}
     />
   </AssetStoreStateProvider>
 );
@@ -62,6 +64,7 @@ export const AddedToProject = () => (
       onClose={() => {}}
       isAddedToScene={true}
       isBeingAddedToScene={false}
+      onOpenDetails={assetShortHeader => {}}
     />
   </AssetStoreStateProvider>
 );

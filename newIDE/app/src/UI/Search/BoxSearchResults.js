@@ -13,6 +13,9 @@ type Props<SearchItem> = {|
   error: ?Error,
   onRetry: () => void,
   baseSize: number,
+  // If true, the grid will take the whole height of the container without scroll,
+  // so make sure to limit the number of items to a reasonable number for performance.
+  noScroll?: boolean,
   noResultPlaceholder?: React.Node,
 |};
 
@@ -28,6 +31,7 @@ export const BoxSearchResults = <SearchItem>({
   onRetry,
   baseSize,
   noResultPlaceholder,
+  noScroll,
 }: Props<SearchItem>) => {
   if (!searchItems) {
     if (!error) return <PlaceholderLoader />;
@@ -67,6 +71,9 @@ export const BoxSearchResults = <SearchItem>({
               1,
               Math.ceil(searchItems.length / columnCount)
             );
+            const rowHeight = columnWidth; // Square items.
+            const gridHeight = noScroll ? rowHeight * rowCount : height;
+            const gridWidth = width;
 
             function cellRenderer({ columnIndex, key, rowIndex, style }) {
               const indexInList = rowIndex * columnCount + columnIndex;
@@ -86,11 +93,11 @@ export const BoxSearchResults = <SearchItem>({
 
             return (
               <Grid
-                width={width}
-                height={height}
+                width={gridWidth}
+                height={gridHeight}
                 columnCount={columnCount}
                 columnWidth={columnWidth}
-                rowHeight={columnWidth}
+                rowHeight={rowHeight}
                 rowCount={rowCount}
                 cellRenderer={cellRenderer}
                 style={styles.grid}

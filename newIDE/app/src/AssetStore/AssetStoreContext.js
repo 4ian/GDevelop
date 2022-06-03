@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import { type FiltersState, useFilters } from '../UI/Search/FiltersChooser';
+import { type FiltersState } from '../UI/Search/FiltersChooser';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
@@ -20,6 +20,12 @@ import {
   LicenseAssetStoreSearchFilter,
   DimensionAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
+import {
+  type NavigationState,
+  type AssetStorePageState,
+  useNavigation,
+  assetStoreHomePageState,
+} from './AssetStoreNavigator';
 import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 
 const defaultSearchText = '';
@@ -47,14 +53,11 @@ type AssetStoreState = {|
   searchResults: ?Array<AssetShortHeader>,
   fetchAssetsAndFilters: () => void,
   error: ?Error,
-  isOnHomePage: boolean,
-  setIsOnHomePage: boolean => void,
-  openedAssetShortHeader: ?AssetShortHeader,
-  setOpenedAssetShortHeader: (?AssetShortHeader) => void,
   searchText: string,
   setSearchText: string => void,
-  filtersState: FiltersState,
   assetFiltersState: AssetFiltersState,
+  navigationState: NavigationState,
+  currentPage: AssetStorePageState,
   useSearchItem: (
     searchText: string,
     chosenCategory: ?ChosenCategory,
@@ -71,19 +74,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   searchResults: null,
   fetchAssetsAndFilters: () => {},
   error: null,
-  isOnHomePage: true,
-  setIsOnHomePage: () => {},
-  openedAssetShortHeader: null,
-  setOpenedAssetShortHeader: () => {},
   searchText: '',
   setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
-  },
   assetFiltersState: {
     animatedFilter: new AnimatedAssetStoreSearchFilter(),
     setAnimatedFilter: filter => {},
@@ -98,6 +90,19 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     licenseFilter: new LicenseAssetStoreSearchFilter(),
     setLicenseFilter: filter => {},
   },
+  navigationState: {
+    previousPages: [assetStoreHomePageState],
+    getCurrentPage: () => assetStoreHomePageState,
+    backToPreviousPage: () => {},
+    openHome: () => {},
+    clearHistory: () => {},
+    openSearchIfNeeded: () => {},
+    activateTextualSearch: () => {},
+    openTagPage: string => {},
+    openPackPage: AssetPack => {},
+    openDetailPage: stAssetShortHeaderring => {},
+  },
+  currentPage: assetStoreHomePageState,
   useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
     null,
 });
@@ -129,13 +134,8 @@ export const AssetStoreStateProvider = ({
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const [isOnHomePage, setIsOnHomePage] = React.useState(true);
-  const [
-    openedAssetShortHeader,
-    setOpenedAssetShortHeader,
-  ] = React.useState<?AssetShortHeader>(null);
   const [searchText, setSearchText] = React.useState(defaultSearchText);
-  const filtersState = useFilters();
+  const navigationState = useNavigation();
 
   const [
     animatedFilter,
@@ -255,11 +255,12 @@ export const AssetStoreStateProvider = ({
     [fetchAssetsAndFilters, assetShortHeadersById, isLoading]
   );
 
-  const { chosenCategory, chosenFilters } = filtersState;
+  const currentPage = navigationState.getCurrentPage();
+  const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
     getAssetShortHeaderSearchTerms,
-    searchText,
+    currentPage.ignoreTextualSearch ? '' : searchText,
     chosenCategory,
     chosenFilters,
     searchFilters
@@ -274,13 +275,10 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       error,
-      isOnHomePage,
-      setIsOnHomePage,
-      openedAssetShortHeader,
-      setOpenedAssetShortHeader,
+      navigationState,
+      currentPage,
       searchText,
       setSearchText,
-      filtersState,
       assetFiltersState: {
         animatedFilter,
         setAnimatedFilter,
@@ -318,10 +316,9 @@ export const AssetStoreStateProvider = ({
       authors,
       licenses,
       error,
-      isOnHomePage,
-      openedAssetShortHeader,
+      navigationState,
+      currentPage,
       searchText,
-      filtersState,
       animatedFilter,
       viewpointFilter,
       dimensionFilter,

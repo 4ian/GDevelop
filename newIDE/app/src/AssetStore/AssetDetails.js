@@ -468,9 +468,11 @@ export const AssetDetails = ({
                     />
                   )}
                   noResultPlaceholder={
-                    <EmptyMessage>
-                      <Trans>No similar asset was found.</Trans>
-                    </EmptyMessage>
+                    <Line>
+                      <EmptyMessage>
+                        <Trans>No similar asset was found.</Trans>
+                      </EmptyMessage>
+                    </Line>
                   }
                   noScroll
                 />

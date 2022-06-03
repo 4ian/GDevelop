@@ -39,31 +39,32 @@ export const assetStoreHomePageState: AssetStorePageState = {
   ignoreTextualSearch: false,
 };
 
+type AssetStorePageHistory = {|
+  previousPages: Array<AssetStorePageState>,
+|};
+
 export const useNavigation = (): NavigationState => {
-  const [currentPage, setCurrentPage] = React.useState<AssetStorePageState>(
-    assetStoreHomePageState
-  );
-  // TODO It works because the currentPage changes but this is hacky.
-  const [previousPages] = React.useState<Array<AssetStorePageState>>([
-    currentPage,
-  ]);
+  const [history, setHistory] = React.useState<AssetStorePageHistory>({
+    previousPages: [assetStoreHomePageState],
+  });
+  const previousPages = history.previousPages;
+  const currentPage = previousPages[previousPages.length - 1];
 
   return {
     previousPages,
-    getCurrentPage: () => previousPages[previousPages.length - 1],
+    getCurrentPage: () => currentPage,
     backToPreviousPage: () => {
       if (previousPages.length > 1) {
         previousPages.pop();
-        setCurrentPage(previousPages[previousPages.length - 1]);
+        setHistory({ previousPages });
       }
     },
     openHome: () => {
       previousPages.length = 0;
       previousPages.push(assetStoreHomePageState);
-      setCurrentPage(previousPages[previousPages.length - 1]);
+      setHistory({ previousPages });
     },
     openSearchIfNeeded: () => {
-      const currentPage = previousPages[previousPages.length - 1];
       if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
         previousPages.push({
           isOnHomePage: false,
@@ -78,7 +79,7 @@ export const useNavigation = (): NavigationState => {
           },
           ignoreTextualSearch: false,
         });
-        setCurrentPage(previousPages[previousPages.length - 1]);
+        setHistory({ previousPages });
       }
     },
     openTagPage: (tag: string) => {
@@ -98,7 +99,7 @@ export const useNavigation = (): NavigationState => {
         },
         ignoreTextualSearch: true,
       });
-      setCurrentPage(previousPages[previousPages.length - 1]);
+      setHistory({ previousPages });
     },
     openPackPage: (assetPack: AssetPack) => {
       previousPages.push({
@@ -117,7 +118,7 @@ export const useNavigation = (): NavigationState => {
         },
         ignoreTextualSearch: true,
       });
-      setCurrentPage(previousPages[previousPages.length - 1]);
+      setHistory({ previousPages });
     },
     openDetailPage: (assetShortHeader: AssetShortHeader) => {
       previousPages.push({
@@ -133,7 +134,7 @@ export const useNavigation = (): NavigationState => {
         },
         ignoreTextualSearch: true,
       });
-      setCurrentPage(previousPages[previousPages.length - 1]);
+      setHistory({ previousPages });
     },
   };
 };

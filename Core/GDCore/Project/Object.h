@@ -247,7 +247,7 @@ class GD_CORE_API Object {
    * \return A pointer to the newly added behavior content. NULL if the creation
    * failed.
    */
-  gd::BehaviorContent* AddNewBehavior(gd::Project& project,
+  gd::BehaviorContent* AddNewBehavior(const gd::Project& project,
                                       const gd::String& type,
                                       const gd::String& name);
 

@@ -78,6 +78,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   std::vector<gd::String> includesFiles;
 
   gd::Project exportedProject = options.project;
+  const gd::Project &immutableProject = options.project;
 
   if (!options.fullLoadingScreen) {
     // Most of the time, we skip the logo and minimum duration so that
@@ -105,26 +106,26 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
                  options.useWindowMessageDebuggerClient,
-                 exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+                 immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
   // Export files for object and behaviors
-  ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+  ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
-  ExportEffectIncludes(exportedProject, includesFiles);
+  ExportEffectIncludes(immutableProject, includesFiles);
 
   previousTime = LogTimeSpent("Include files export", previousTime);
 
   if (!options.projectDataOnlyExport) {
     // Generate events code
-    if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
+    if (!ExportEventsCode(immutableProject, codeOutputDir, includesFiles, true))
       return false;
 
     // Export source files
     if (!ExportExternalSourceFiles(
-            exportedProject, codeOutputDir, includesFiles)) {
+            immutableProject, codeOutputDir, includesFiles)) {
       gd::LogError(
           _("Error during exporting! Unable to export source files:\n") +
           lastError);
@@ -623,7 +624,7 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
 }
 
 bool ExporterHelper::ExportEffectIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    const gd::Project &project, std::vector<gd::String> &includesFiles) {
   std::set<gd::String> effectIncludes;
 
   gd::EffectsCodeGenerator::GenerateEffectsIncludeFiles(
@@ -634,7 +635,7 @@ bool ExporterHelper::ExportEffectIncludes(
   return true;
 }
 
-bool ExporterHelper::ExportEventsCode(gd::Project &project,
+bool ExporterHelper::ExportEventsCode(const gd::Project &project,
                                       gd::String outputDir,
                                       std::vector<gd::String> &includesFiles,
                                       bool exportForPreview) {
@@ -642,7 +643,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     std::set<gd::String> eventsIncludes;
-    gd::Layout &layout = project.GetLayout(i);
+    const gd::Layout &layout = project.GetLayout(i);
     LayoutCodeGenerator layoutCodeGenerator(project);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
         layout, eventsIncludes, !exportForPreview);
@@ -664,7 +665,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 }
 
 bool ExporterHelper::ExportExternalSourceFiles(
-    gd::Project &project,
+    const gd::Project &project,
     gd::String outputDir,
     std::vector<gd::String> &includesFiles) {
   const auto &allFiles = project.GetAllSourceFiles();
@@ -765,7 +766,7 @@ bool ExporterHelper::ExportIncludesAndLibs(
 }
 
 void ExporterHelper::ExportObjectAndBehaviorsIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    const gd::Project &project, std::vector<gd::String> &includesFiles) {
   auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
     for (const auto &includeFile : newIncludeFiles) {
       InsertUnique(includesFiles, includeFile);
@@ -798,7 +799,7 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
 
   addObjectsIncludeFiles(project);
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    gd::Layout &layout = project.GetLayout(i);
+    const gd::Layout &layout = project.GetLayout(i);
     addObjectsIncludeFiles(layout);
   }
 }

@@ -443,6 +443,7 @@ export default class ThemableEventsTree extends Component<
   }
 
   getEventContextAtRowIndexes(rowIndexes: Array<number>): Array<EventContext> {
+    // We use flatDataTree instead of this.state.flatData because we need the events contexts too.
     const flatDataTree: Array<{ node: SortableTreeNode }> = getFlatDataFromTree(
       {
         treeData: this.state.treeData,

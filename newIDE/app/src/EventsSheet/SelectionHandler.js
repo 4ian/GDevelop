@@ -14,9 +14,11 @@ export type InstructionContext = {|
   indexInList: number,
 |};
 
-// Locates the event of the selected element. It will be used to compute the
-// event sheet's row that will be saved in history so that the event can be selected
-// on undo or redo.
+/**
+ * Locates the event of the selected element. It will be used to compute the
+ * event sheet's row that will be saved in history so that the event can be selected
+ * on undo or redo.
+ */
 type LocatingEvent = {| locatingEvent: gdBaseEvent |};
 
 export type InstructionContextWithLocatingEvent = {

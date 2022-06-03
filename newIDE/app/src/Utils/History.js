@@ -111,7 +111,7 @@ export const undo = (
     return history;
   }
 
-  // Unserialize the events of the previous action and
+  // Unserialize the object(s) of the previous action and
   // move the current value to the future actions to allow redo.
   const previousAction =
     history.previousActions[history.previousActions.length - 1];
@@ -155,7 +155,7 @@ export const redo = (
     return history;
   }
 
-  // Unserialize the events of the future action and
+  // Unserialize the object(s) of the future action and
   // move the future action to the previous actions to allow undo.
   const futureAction = history.futureActions[history.futureActions.length - 1];
   const newCurrentValue = futureAction.valueAfterChange;

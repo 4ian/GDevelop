@@ -238,7 +238,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
 
   state = {
     eventsHistory: getHistoryInitialState(this.props.events, {
-      historyMaxSize: 50,
+      historyMaxSize: 100,
     }),
 
     editedInstruction: {
@@ -654,18 +654,18 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       this.state.selection
     );
     const previousPositions = this._getChangedEventRows(locatingEvents);
-    const nextPosition = this._getChangedEventRows([locatingEvent]);
+    const nextPositions = this._getChangedEventRows([locatingEvent]);
 
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
       this.deleteSelection({ deleteEvents: false, shouldSaveInHistory: false });
       this._saveChangesToHistory('EDIT', {
         positionsBeforeAction: previousPositions,
-        positionAfterAction: nextPosition,
+        positionAfterAction: nextPositions,
       });
     } else {
       this._saveChangesToHistory('EDIT', {
         positionsBeforeAction: previousPositions,
-        positionAfterAction: nextPosition,
+        positionAfterAction: nextPositions,
       });
     }
   };
@@ -1201,36 +1201,36 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
     const { _eventsTree: eventsTree } = this;
-    if (eventsTree)
-      eventsTree.forceEventsUpdate(() => {
-        const {
-          changeContext: { positions },
-          type,
-        } = newEventsHistory.futureActions[
-          newEventsHistory.futureActions.length - 1
-        ];
-        // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
-        eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
+    if (!eventsTree) return;
+    eventsTree.forceEventsUpdate(() => {
+      const {
+        changeContext: { positions },
+        type,
+      } = newEventsHistory.futureActions[
+        newEventsHistory.futureActions.length - 1
+      ];
+      // Whether it is an ADD, EDIT or DELETE, scroll to the place where it was done.
+      eventsTree.scrollToRow(positions.positionsBeforeAction[0]);
 
-        let newSelection: SelectionState = getInitialSelection();
-        // If it is a DELETE or EDIT, then the element will be present, so we can select them.
-        // If it is an ADD, then it will not be present, so we can't select them.
-        if (type === 'ADD') {
-          newSelection = clearSelection();
-        } else {
-          const eventContexts = eventsTree.getEventContextAtRowIndexes(
-            positions.positionsBeforeAction
-          );
-          newSelection = selectEventsAfterHistoryChange(eventContexts);
-        }
-        this.setState(
-          {
-            selection: newSelection,
-            eventsHistory: newEventsHistory,
-          },
-          () => this.updateToolbar()
+      let newSelection: SelectionState = getInitialSelection();
+      // If it is a DELETE or EDIT, then the element will be present, so we can select them.
+      // If it is an ADD, then it will not be present, so we can't select them.
+      if (type === 'ADD') {
+        newSelection = clearSelection();
+      } else {
+        const eventContexts = eventsTree.getEventContextAtRowIndexes(
+          positions.positionsBeforeAction
         );
-      });
+        newSelection = selectEventsAfterHistoryChange(eventContexts);
+      }
+      this.setState(
+        {
+          selection: newSelection,
+          eventsHistory: newEventsHistory,
+        },
+        () => this.updateToolbar()
+      );
+    });
   };
 
   redo = () => {
@@ -1243,36 +1243,36 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
     const { _eventsTree: eventsTree } = this;
-    if (eventsTree)
-      eventsTree.forceEventsUpdate(() => {
-        const {
-          changeContext: { positions },
-          type,
-        } = newEventsHistory.previousActions[
-          newEventsHistory.previousActions.length - 1
-        ];
-        // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
-        eventsTree.scrollToRow(positions.positionAfterAction);
-        // If it is a ADD or EDIT, then the element will be present, so we can select them.
-        // If it is a DELETE, then they will not be present, so we can't select them.
-        let newSelection: SelectionState = getInitialSelection();
-        if (type === 'DELETE') {
-          newSelection = clearSelection();
-        } else {
-          const eventContexts = eventsTree.getEventContextAtRowIndexes(
-            positions.positionAfterAction
-          );
-          newSelection = selectEventsAfterHistoryChange(eventContexts);
-        }
-
-        this.setState(
-          {
-            selection: newSelection,
-            eventsHistory: newEventsHistory,
-          },
-          () => this.updateToolbar()
+    if (!eventsTree) return;
+    eventsTree.forceEventsUpdate(() => {
+      const {
+        changeContext: { positions },
+        type,
+      } = newEventsHistory.previousActions[
+        newEventsHistory.previousActions.length - 1
+      ];
+      // Whether it was an ADD, EDIT or DELETE, scroll to the place where it will happen.
+      eventsTree.scrollToRow(positions.positionAfterAction);
+      // If it is a ADD or EDIT, then the element will be present, so we can select them.
+      // If it is a DELETE, then they will not be present, so we can't select them.
+      let newSelection: SelectionState = getInitialSelection();
+      if (type === 'DELETE') {
+        newSelection = clearSelection();
+      } else {
+        const eventContexts = eventsTree.getEventContextAtRowIndexes(
+          positions.positionAfterAction
         );
-      });
+        newSelection = selectEventsAfterHistoryChange(eventContexts);
+      }
+
+      this.setState(
+        {
+          selection: newSelection,
+          eventsHistory: newEventsHistory,
+        },
+        () => this.updateToolbar()
+      );
+    });
   };
 
   onZoomEvent = (
@@ -1424,7 +1424,6 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
         if (this._eventsTree) this._eventsTree.forceEventsUpdate();
       });
     });
-    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
     if (modifiedEvents.length) {
       const positions = this._getChangedEventRows(modifiedEvents);
       this._saveChangesToHistory('EDIT', {

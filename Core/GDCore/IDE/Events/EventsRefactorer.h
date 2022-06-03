@@ -113,7 +113,7 @@ class GD_CORE_API EventsRefactorer {
   /**
    * Replace all occurrences of a gd::String in events
    *
-   * \return A vector of all events modified.
+   * \return A vector of all modified events.
    */
   static std::vector<EventsSearchResult> ReplaceStringInEvents(
       gd::ObjectsContainer& project,

@@ -19,6 +19,8 @@ export type Props = {|
   width?: number,
   height?: number,
   onEditorMounted?: () => void,
+  onFocus: () => void,
+  onBlur: () => void,
 |};
 
 const monacoEditorOptions = {
@@ -55,7 +57,16 @@ export class CodeEditor extends React.Component<Props, State> {
     }
   };
 
+  setUpSaveOnEditorBlur = (editor: any) => {
+    editor.onDidBlurEditorText(this.props.onBlur);
+  };
+  setUpEditorFocus = (editor: any) => {
+    editor.onDidFocusEditorText(this.props.onFocus);
+  };
+
   setupEditorCompletions = (editor: any, monaco: any) => {
+    this.setUpEditorFocus(editor);
+    this.setUpSaveOnEditorBlur(editor);
     if (!monacoCompletionsInitialized) {
       monacoCompletionsInitialized = true;
 

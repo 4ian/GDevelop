@@ -132,7 +132,7 @@ type DropContainerProps = {|
     moveFunction: ({
       targetNode: SortableTreeNode,
       node: SortableTreeNode,
-    }) => void,
+    }) => number,
     node: SortableTreeNode
   ) => void,
   activateTargets: boolean,

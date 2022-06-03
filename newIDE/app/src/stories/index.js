@@ -2637,6 +2637,7 @@ storiesOf('EventsTree', module)
             eventsSheetHeight={500}
             preferences={initialPreferences}
             tutorials={eventsTreeTutorials}
+            onEndEditingEvent={action('end editing event')}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2678,6 +2679,7 @@ storiesOf('EventsTree', module)
             eventsSheetHeight={500}
             preferences={initialPreferences}
             tutorials={eventsTreeTutorials}
+            onEndEditingEvent={action('end editing event')}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2719,6 +2721,7 @@ storiesOf('EventsTree', module)
             eventsSheetHeight={500}
             preferences={initialPreferences}
             tutorials={eventsTreeTutorials}
+            onEndEditingEvent={action('end editing event')}
           />
         </FixedHeightFlexContainer>
       </div>
@@ -2760,6 +2763,7 @@ storiesOf('EventsTree', module)
             eventsSheetHeight={500}
             preferences={initialPreferences}
             tutorials={eventsTreeTutorials}
+            onEndEditingEvent={action('end editing event')}
           />
         </FixedHeightFlexContainer>
       </div>

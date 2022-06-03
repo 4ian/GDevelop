@@ -21,7 +21,11 @@ export type LeaderboardState = {|
     name: string,
     sort: LeaderboardSortOption,
   |}) => Promise<?Leaderboard>,
-  listLeaderboards: () => Promise<void>,
+  listLeaderboards: (
+    ?{
+      shouldClearBeforeFetching?: boolean,
+    }
+  ) => Promise<void>,
   selectLeaderboard: (id: string) => void,
   setDisplayOnlyBestEntry: boolean => void,
   updateLeaderboard: (payload: LeaderboardUpdatePayload) => Promise<void>,

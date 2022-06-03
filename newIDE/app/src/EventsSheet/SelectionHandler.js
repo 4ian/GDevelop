@@ -14,7 +14,9 @@ export type InstructionContext = {|
   indexInList: number,
 |};
 
-// Used for history management.
+// Locates the event of the selected element. It will be used to compute the
+// event sheet's row that will be saved in history so that the event can be selected
+// on undo or redo.
 type LocatingEvent = {| locatingEvent: gdBaseEvent |};
 
 export type InstructionContextWithLocatingEvent = {
@@ -30,11 +32,6 @@ export type ParameterContext = {|
   parameterIndex: number,
   domEvent?: any,
 |};
-
-export type ParameterContextWithLocatingEvent = {
-  ...ParameterContext,
-  ...LocatingEvent,
-};
 
 export type EventContext = {|
   eventsList: gdEventsList,

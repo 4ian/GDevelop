@@ -1416,7 +1416,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
     doReplaceInEvents: (
       inputs: ReplaceInEventsInputs,
       cb: () => void
-    ) => ?Array<gdBaseEvent>,
+    ) => Array<gdBaseEvent>,
     inputs: ReplaceInEventsInputs
   ) => {
     const modifiedEvents = doReplaceInEvents(inputs, () => {
@@ -1425,7 +1425,7 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       });
     });
     if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-    if (modifiedEvents) {
+    if (modifiedEvents.length) {
       const positions = this._getChangedEventRows(modifiedEvents);
       this._saveChangesToHistory('EDIT', {
         positionsBeforeAction: positions,

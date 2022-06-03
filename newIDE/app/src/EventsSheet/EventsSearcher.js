@@ -43,7 +43,7 @@ type Props = {|
     replaceInEvents: (
       ReplaceInEventsInputs,
       cb: () => void
-    ) => ?Array<gdBaseEvent>,
+    ) => Array<gdBaseEvent>,
     goToNextSearchResult: () => ?gdBaseEvent,
     goToPreviousSearchResult: () => ?gdBaseEvent,
     clearSearchResults: () => void,
@@ -145,7 +145,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInEventStrings,
     }: ReplaceInEventsInputs,
     cb: () => void
-  ): ?Array<gdBaseEvent> => {
+  ): Array<gdBaseEvent> => {
     const { globalObjectsContainer, objectsContainer, events } = this.props;
 
     if (searchInSelection) {
@@ -154,7 +154,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
       // function to be done in C++.
       console.error('Replace in selection is not implemented yet');
     }
-    if (!replaceText) return;
+    if (!replaceText) return [];
 
     const modifiedEvents = gd.EventsRefactorer.replaceStringInEvents(
       globalObjectsContainer,
@@ -167,7 +167,6 @@ export default class EventsSearcher extends React.Component<Props, State> {
       searchInActions,
       searchInEventStrings
     );
-    if (!modifiedEvents) return null;
 
     if (this.state.eventsSearchResults) {
       this.state.eventsSearchResults.delete();

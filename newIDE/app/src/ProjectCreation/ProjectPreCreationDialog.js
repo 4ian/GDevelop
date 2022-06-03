@@ -66,11 +66,10 @@ const ProjectPreCreationDialog = ({
 
   return (
     <Dialog
+      id="project-pre-creation-dialog"
       title={<Trans>New Project</Trans>}
       maxWidth="sm"
       open={open}
-      onApply={onValidate}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           disabled={isOpening}
@@ -87,7 +86,9 @@ const ProjectPreCreationDialog = ({
           id="create-project-button"
         />,
       ]}
-      id="project-pre-creation-dialog"
+      cannotBeDismissed={isOpening}
+      onRequestClose={onClose}
+      onApply={onValidate}
     >
       <Column noMargin>
         <TextField

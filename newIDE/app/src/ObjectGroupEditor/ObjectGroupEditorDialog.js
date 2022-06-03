@@ -32,7 +32,6 @@ const ObjectGroupEditorDialog = ({
 
   return (
     <Dialog
-      onApply={onApply}
       key={group.ptr}
       actions={[
         <FlatButton
@@ -49,8 +48,8 @@ const ObjectGroupEditorDialog = ({
         />,
       ]}
       noMargin
-      cannotBeDismissed={true}
       onRequestClose={onCancelChanges}
+      onApply={onApply}
       open
       title={`Edit ${group.getName()} group`}
     >

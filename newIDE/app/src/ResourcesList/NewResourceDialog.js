@@ -94,9 +94,16 @@ export const NewResourceDialog = ({
   return (
     <Dialog
       open
-      onRequestClose={onClose}
       fullHeight
       flexBody
+      actions={[
+        <FlatButton
+          key="close"
+          label={<Trans>Close</Trans>}
+          primary
+          onClick={onClose}
+        />,
+      ]}
       secondaryActions={[
         !electron && screenType !== 'touch' ? (
           <FlatButton
@@ -110,14 +117,7 @@ export const NewResourceDialog = ({
           />
         ) : null,
       ]}
-      actions={[
-        <FlatButton
-          key="close"
-          label={<Trans>Close</Trans>}
-          primary
-          onClick={onClose}
-        />,
-      ]}
+      onRequestClose={onClose}
       noMargin
     >
       <Column expand noMargin>

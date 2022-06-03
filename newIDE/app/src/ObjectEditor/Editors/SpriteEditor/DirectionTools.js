@@ -163,8 +163,8 @@ export default class DirectionTools extends Component<Props, State> {
               />,
             ]}
             noMargin
-            cannotBeDismissed={false}
             onRequestClose={() => this.openPreview(false)}
+            onApply={() => this.openPreview(false)}
             open={this.state.previewOpen}
             fullHeight
             flexBody

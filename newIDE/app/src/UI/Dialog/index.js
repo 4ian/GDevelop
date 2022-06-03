@@ -59,6 +59,7 @@ type Props = {|
    * of changes.
    */
   onRequestClose?: () => void,
+
   /**
    * If specified, will be called when the dialog is dismissed in a way where changes
    * must be kept or when using the submit keyboard shortcut.
@@ -67,7 +68,12 @@ type Props = {|
    */
   onApply?: ?() => void | Promise<void>,
 
-  cannotBeDismissed?: boolean, // Currently unused.
+  /**
+   * If specified, allows to prevent closing the dialog by clicking outside.
+   * This is useful for dialogs that either are in a loading state so we don't want to allow closing it,
+   * or for dialogs that may apply significant changes and we don't want the user to misclick.
+   */
+  cannotBeDismissed?: boolean,
 
   children: React.Node, // The content of the dialog
 
@@ -116,6 +122,7 @@ const Dialog = (props: Props) => {
     fullHeight,
     noTitleMargin,
     id,
+    cannotBeDismissed,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
@@ -148,6 +155,7 @@ const Dialog = (props: Props) => {
 
   const onCloseDialog = React.useCallback(
     (event: any, reason: string) => {
+      if (!!cannotBeDismissed) return;
       if (reason === 'escapeKeyDown') {
         if (onRequestClose) onRequestClose();
       } else if (reason === 'backdropClick') {
@@ -161,7 +169,7 @@ const Dialog = (props: Props) => {
         }
       }
     },
-    [onRequestClose, onApply, backdropClickBehavior]
+    [onRequestClose, onApply, backdropClickBehavior, cannotBeDismissed]
   );
 
   const handleKeyDown = React.useCallback(

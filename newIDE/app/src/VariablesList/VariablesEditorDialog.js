@@ -51,7 +51,6 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
-      onApply={onApply}
       noMargin
       actions={[
         <FlatButton
@@ -66,9 +65,6 @@ const VariablesEditorDialog = ({
           key="Apply"
         />,
       ]}
-      open={open}
-      cannotBeDismissed={true}
-      onRequestClose={onCancelChanges}
       secondaryActions={[
         onEditObjectVariables ? (
           <FlatButton
@@ -88,6 +84,9 @@ const VariablesEditorDialog = ({
           <HelpButton helpPagePath={helpPagePath} key="help" />
         ) : null,
       ]}
+      onRequestClose={onCancelChanges}
+      onApply={onApply}
+      open={open}
       title={title}
       flexBody
       fullHeight

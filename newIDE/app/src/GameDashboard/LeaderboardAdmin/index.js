@@ -68,7 +68,12 @@ import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
 
-type Props = {| onLoading: boolean => void, project?: gdProject |};
+type Props = {|
+  onLoading: boolean => void,
+  project?: gdProject,
+  leaderboardIdToSelectAtOpening?: string,
+|};
+
 type ContainerProps = {| ...Props, gameId: string |};
 
 type ApiError = {|
@@ -172,7 +177,11 @@ const getSortOrderText = (currentLeaderboard: Leaderboard) => {
   return <Trans>Higher is better</Trans>;
 };
 
-export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
+export const LeaderboardAdmin = ({
+  onLoading,
+  project,
+  leaderboardIdToSelectAtOpening,
+}: Props) => {
   const isOnline = useOnlineStatus();
   const windowWidth = useResponsiveWindowWidth();
   const [isEditingAppearance, setIsEditingAppearance] = React.useState<boolean>(
@@ -337,12 +346,18 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
       console.error('An error occurred when resetting leaderboard', err);
       setApiError({
         action: 'leaderboardReset',
-        message: (
-          <Trans>
-            An error occurred when resetting the leaderboard, please close the
-            dialog, come back and try again.
-          </Trans>
-        ),
+        message:
+          err.status && err.status === 409 ? (
+            <Trans>
+              This leaderboard is already resetting, please wait a bit, close
+              the dialog, come back and try again.
+            </Trans>
+          ) : (
+            <Trans>
+              An error occurred when resetting the leaderboard, please close the
+              dialog, come back and try again.
+            </Trans>
+          ),
       });
     } finally {
       setIsLoading(false);
@@ -428,6 +443,14 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     // This has to be executed on component mount to refresh entries on each admin opening
     // eslint-disable-next-line
   }, []);
+
+  React.useEffect(
+    () => {
+      if (!!leaderboardIdToSelectAtOpening)
+        selectLeaderboard(leaderboardIdToSelectAtOpening);
+    },
+    [leaderboardIdToSelectAtOpening, selectLeaderboard]
+  );
 
   const onCopy = React.useCallback(
     () => {
@@ -605,7 +628,18 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
     {
       key: 'startDatetime',
       avatar: <Today />,
-      text: (
+      text: currentLeaderboard.resetLaunchedAt ? (
+        <Text size="body2">
+          <Trans>
+            Reset requested the{' '}
+            {i18n.date(currentLeaderboard.resetLaunchedAt, {
+              dateStyle: 'short',
+              timeStyle: 'short',
+            })}
+            . Please wait a few minutes...
+          </Trans>
+        </Text>
+      ) : (
         <Tooltip
           title={i18n._(
             t`Date from which entries are taken into account: ${i18n.date(
@@ -633,7 +667,11 @@ export const LeaderboardAdmin = ({ onLoading, project }: Props) => {
           onClick={() => onResetLeaderboard(i18n)}
           tooltip={t`Reset leaderboard`}
           edge="end"
-          disabled={isRequestPending || isEditingName}
+          disabled={
+            isRequestPending ||
+            isEditingName ||
+            !!currentLeaderboard.resetLaunchedAt
+          }
         >
           <Update />
         </IconButton>

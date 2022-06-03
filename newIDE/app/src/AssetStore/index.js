@@ -46,6 +46,7 @@ import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
 import { AssetPackDialog } from './AssetPackDialog';
+import Home from '@material-ui/icons/Home';
 
 const styles = {
   searchBar: {
@@ -244,18 +245,33 @@ export const AssetStore = ({
                   ) : (
                     <>
                       <Column expand alignItems="flex-start" noMargin>
-                        <TextButton
-                          icon={<ArrowBack />}
-                          label={<Trans>Back</Trans>}
-                          primary={false}
-                          onClick={() => {
-                            navigationState.backToPreviousPage();
-                            if (navigationState.getCurrentPage().isOnHomePage) {
-                              clearAllFilters(assetFiltersState);
+                        <Line>
+                          <IconButton
+                            key="back-discover"
+                            tooltip={t`Back to discover`}
+                            onClick={() => {
+                              navigationState.openHome();
                               setIsFiltersPanelOpen(false);
-                            }
-                          }}
-                        />
+                            }}
+                            size="small"
+                          >
+                            <Home />
+                          </IconButton>
+                          <TextButton
+                            icon={<ArrowBack />}
+                            label={<Trans>Back</Trans>}
+                            primary={false}
+                            onClick={() => {
+                              navigationState.backToPreviousPage();
+                              if (
+                                navigationState.getCurrentPage().isOnHomePage
+                              ) {
+                                clearAllFilters(assetFiltersState);
+                                setIsFiltersPanelOpen(false);
+                              }
+                            }}
+                          />
+                        </Line>
                       </Column>
                       {openedAssetPack && (
                         <>

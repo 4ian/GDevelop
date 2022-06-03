@@ -19,6 +19,7 @@ export type NavigationState = {|
   getCurrentPage: () => AssetStorePageState,
   backToPreviousPage: () => void,
   openHome: () => void,
+  clearHistory: () => void,
   openSearchIfNeeded: () => void,
   openTagPage: string => void,
   openPackPage: AssetPack => void,
@@ -48,11 +49,10 @@ export const useNavigation = (): NavigationState => {
     previousPages: [assetStoreHomePageState],
   });
   const previousPages = history.previousPages;
-  const currentPage = previousPages[previousPages.length - 1];
 
   return {
     previousPages,
-    getCurrentPage: () => currentPage,
+    getCurrentPage: () => previousPages[previousPages.length - 1],
     backToPreviousPage: () => {
       if (previousPages.length > 1) {
         previousPages.pop();
@@ -64,7 +64,15 @@ export const useNavigation = (): NavigationState => {
       previousPages.push(assetStoreHomePageState);
       setHistory({ previousPages });
     },
+    clearHistory: () => {
+      const currentPage = previousPages[previousPages.length - 1];
+      previousPages.length = 0;
+      previousPages.push(assetStoreHomePageState);
+      previousPages.push(currentPage);
+      setHistory({ previousPages });
+    },
     openSearchIfNeeded: () => {
+      const currentPage = previousPages[previousPages.length - 1];
       if (currentPage.isOnHomePage || currentPage.openedAssetShortHeader) {
         previousPages.push({
           isOnHomePage: false,
@@ -79,6 +87,9 @@ export const useNavigation = (): NavigationState => {
           },
           ignoreTextualSearch: false,
         });
+        setHistory({ previousPages });
+      } else if (currentPage.ignoreTextualSearch) {
+        currentPage.ignoreTextualSearch = false;
         setHistory({ previousPages });
       }
     },

@@ -225,6 +225,7 @@ export const AssetStore = ({
                   onClick={() => {
                     navigationState.openHome();
                     setIsFiltersPanelOpen(false);
+                    clearAllFilters(assetFiltersState);
                   }}
                   size="small"
                 >
@@ -238,8 +239,8 @@ export const AssetStore = ({
                     onChange={setSearchText}
                     onRequestSearch={() => {
                       // Clear the history
-                      navigationState.openHome();
                       navigationState.openSearchIfNeeded();
+                      navigationState.clearHistory();
                       setIsFiltersPanelOpen(true);
                     }}
                     style={styles.searchBar}

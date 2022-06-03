@@ -276,7 +276,10 @@ export const HomePage = React.memo<Props>(
 
           setPreCreationDialogOpen(false);
           setSelectedExample(null);
-          onOpenProjectAfterCreation({ ...projectMetadata });
+          onOpenProjectAfterCreation({
+            ...projectMetadata,
+            templateSlug: selectedExample ? selectedExample.slug : undefined,
+          });
         } finally {
           setIsOpening(false);
         }

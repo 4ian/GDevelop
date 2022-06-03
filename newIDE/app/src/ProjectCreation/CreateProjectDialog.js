@@ -27,6 +27,7 @@ export type OnOpenProjectAfterCreationFunction = ({|
   storageProvider: ?StorageProvider,
   fileMetadata: ?FileMetadata,
   projectName?: string,
+  templateSlug?: string,
   shouldCloseDialog?: boolean,
 |}) => Promise<void>;
 

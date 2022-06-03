@@ -106,6 +106,7 @@ export const GameRegistration = ({
           gameId: project.getProjectUuid(),
           authorName: project.getAuthor() || 'Unspecified publisher',
           gameName: project.getName() || 'Untitled game',
+          templateSlug: project.getTemplateSlug(),
         });
         loadGame();
         if (onGameRegistered) onGameRegistered();

@@ -171,11 +171,13 @@ export default class ExportLauncher extends Component<Props, State> {
           // If the game is not registered, register it before launching the export.
           const authorName =
             this.props.project.getAuthor() || 'Unspecified publisher';
+          const templateSlug = this.props.project.getTemplateSlug();
           const gameName = this.props.project.getName() || 'Untitled game';
           const game = await registerGame(getAuthorizationHeader, userId, {
             gameId,
             authorName,
             gameName,
+            templateSlug,
           });
           // We don't await for the authors update, as it is not required for publishing.
           this.tryUpdateAuthors();

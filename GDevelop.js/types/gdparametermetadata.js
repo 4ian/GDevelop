@@ -19,6 +19,7 @@ declare class gdParameterMetadata {
   setDefaultValue(defaultValue_: string): gdParameterMetadata;
   static isObject(param: string): boolean;
   static isBehavior(param: string): boolean;
+  static isExpression(type_: string, parameterType: string): boolean;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

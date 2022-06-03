@@ -74,6 +74,8 @@ export type AssetPack = {|
   tag: string,
   thumbnailUrl: string,
   assetsCount: number,
+  externalWebLink?: ?string,
+  userFriendlyPrice?: ?string,
 |};
 
 export type AssetPacks = {|

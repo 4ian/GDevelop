@@ -8,6 +8,7 @@ import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
+import Window from '../Utils/Window';
 import {
   sendAssetAddedToProject,
   sendAssetOpened,
@@ -199,13 +200,20 @@ export const AssetStore = ({
 
     sendAssetPackOpened(tag);
 
+    const assetPack = assetPacks.starterPacks.find(
+      assetPack => assetPack.tag === tag
+    );
+    if (assetPack && assetPack.externalWebLink) {
+      Window.openExternalURL(assetPack.externalWebLink);
+      return;
+    }
+
     const chosenCategory = {
       node: { name: tag, allChildrenTags: [], children: [] },
       parentNodes: [],
     };
     filtersState.setChosenCategory(chosenCategory);
 
-    const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
     setOpenedAssetPack(assetPack);
 
     setIsOnHomePage(false);

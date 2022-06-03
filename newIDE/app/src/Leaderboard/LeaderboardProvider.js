@@ -208,11 +208,11 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   });
 
   const listLeaderboards = React.useCallback(
-    async (shouldNotClearBeforeFetching?: boolean) => {
+    async (options: ?{ shouldClearBeforeFetching?: boolean }) => {
       if (!isListingLeaderboards.current) {
         isListingLeaderboards.current = true;
         try {
-          if (!shouldNotClearBeforeFetching)
+          if (options && options.shouldClearBeforeFetching)
             dispatch({ type: 'SET_LEADERBOARDS', payload: null });
           const fetchedLeaderboards = await listGameActiveLeaderboards(
             authenticatedUser,
@@ -430,7 +430,7 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   useInterval(
     () => {
-      listLeaderboards(true);
+      listLeaderboards({ shouldClearBeforeFetching: false });
     },
     !leaderboardsByIds ||
       Object.values(leaderboardsByIds).every(

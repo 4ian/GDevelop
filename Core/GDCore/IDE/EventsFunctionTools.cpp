@@ -18,7 +18,7 @@
 namespace gd {
 
 void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
-    gd::Project& project,
+    const gd::Project& project,
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
@@ -36,7 +36,7 @@ void EventsFunctionTools::FreeEventsFunctionToObjectsContainer(
 }
 
 void EventsFunctionTools::BehaviorEventsFunctionToObjectsContainer(
-    gd::Project& project,
+    const gd::Project& project,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::EventsFunction& eventsFunction,
     gd::ObjectsContainer& outputGlobalObjectsContainer,

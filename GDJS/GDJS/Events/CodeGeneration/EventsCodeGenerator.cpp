@@ -33,7 +33,6 @@ using namespace std;
 namespace gdjs {
 
 gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
-    gd::Project& project,
     gdjs::EventsCodeGenerator& codeGenerator,
     gd::String fullyQualifiedFunctionName,
     gd::String functionArgumentsCode,
@@ -89,7 +88,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
 }
 
 gd::String EventsCodeGenerator::GenerateLayoutCode(
-    gd::Project& project,
+    const gd::Project& project,
     const gd::Layout& scene,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -99,7 +98,6 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      project,
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       "runtimeScene",
@@ -128,7 +126,6 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      project,
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
@@ -191,7 +188,6 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           "Behavior");
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      project,
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
@@ -981,7 +977,7 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
 }
 
 gd::String EventsCodeGenerator::GenerateParameterCodes(
-    const gd::String& parameter,
+    const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
     const gd::String& lastObjectName,
@@ -1224,7 +1220,7 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
          ConvertToStringExplicit(section) + "); }";
 }
 
-EventsCodeGenerator::EventsCodeGenerator(gd::Project& project,
+EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project,
                                          const gd::Layout& layout)
     : gd::EventsCodeGenerator(project, layout, JsPlatform::Get()) {}
 

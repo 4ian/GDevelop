@@ -658,7 +658,7 @@ gd::String EventsCodeGenerator::GenerateActionsListCode(
 }
 
 gd::String EventsCodeGenerator::GenerateParameterCodes(
-    const gd::String& parameter,
+    const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
     const gd::String& lastObjectName,
@@ -668,19 +668,20 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
   if (ParameterMetadata::IsExpression("number", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "number", parameter);
+        *this, context, "number", parameter, lastObjectName);
   } else if (ParameterMetadata::IsExpression("string", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, "string", parameter);
+        *this, context, "string", parameter, lastObjectName);
   } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this, context, metadata.type, parameter, lastObjectName);
   } else if (ParameterMetadata::IsObject(metadata.type)) {
     // It would be possible to run a gd::ExpressionCodeGenerator if later
     // objects can have nested objects, or function returning objects.
-    argOutput = GenerateObject(parameter, metadata.type, context);
+    argOutput = GenerateObject(parameter.GetPlainString(), metadata.type, context);
   } else if (metadata.type == "relationalOperator") {
-    argOutput += parameter == "=" ? "==" : parameter;
+    auto parameterString = parameter.GetPlainString();
+    argOutput += parameterString == "=" ? "==" : parameterString;
     if (argOutput != "==" && argOutput != "<" && argOutput != ">" &&
         argOutput != "<=" && argOutput != ">=" && argOutput != "!=") {
       cout << "Warning: Bad relational operator: Set to == by default." << endl;
@@ -689,7 +690,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
     argOutput = "\"" + argOutput + "\"";
   } else if (metadata.type == "operator") {
-    argOutput += parameter;
+    argOutput += parameter.GetPlainString();
     if (argOutput != "=" && argOutput != "+" && argOutput != "-" &&
         argOutput != "/" && argOutput != "*") {
       cout << "Warning: Bad operator: Set to = by default." << endl;
@@ -698,9 +699,9 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
 
     argOutput = "\"" + argOutput + "\"";
   } else if (ParameterMetadata::IsBehavior(metadata.type)) {
-    argOutput = GenerateGetBehaviorNameCode(parameter);
+    argOutput = GenerateGetBehaviorNameCode(parameter.GetPlainString());
   } else if (metadata.type == "key") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
   } else if (metadata.type == "audioResource" ||
              metadata.type == "bitmapFontResource" ||
              metadata.type == "fontResource" ||
@@ -710,15 +711,17 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
              // Deprecated, old parameter names:
              metadata.type == "password" || metadata.type == "musicfile" ||
              metadata.type == "soundfile" || metadata.type == "police") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
   } else if (metadata.type == "mouse") {
-    argOutput = "\"" + ConvertToString(parameter) + "\"";
+    argOutput = "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
   } else if (metadata.type == "yesorno") {
-    argOutput += (parameter == "yes" || parameter == "oui") ? GenerateTrue()
+    auto parameterString = parameter.GetPlainString();
+    argOutput += (parameterString == "yes" || parameterString == "oui") ? GenerateTrue()
                                                             : GenerateFalse();
   } else if (metadata.type == "trueorfalse") {
+    auto parameterString = parameter.GetPlainString();
     // This is duplicated in AdvancedExtension.cpp for GDJS
-    argOutput += (parameter == "True" || parameter == "Vrai") ? GenerateTrue()
+    argOutput += (parameterString == "True" || parameterString == "Vrai") ? GenerateTrue()
                                                               : GenerateFalse();
   }
   // Code only parameter type
@@ -738,7 +741,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       if (!metadata.type.empty())
         cout << "Warning: Unknown type of parameter \"" << metadata.type
              << "\"." << std::endl;
-      argOutput += "\"" + ConvertToString(parameter) + "\"";
+      argOutput += "\"" + ConvertToString(parameter.GetPlainString()) + "\"";
     }
   }
 
@@ -758,7 +761,7 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
       parametersInfo,
       [this, &context, &supplementaryParametersTypes, &arguments](
           const gd::ParameterMetadata& parameterMetadata,
-          const gd::String& parameterValue,
+          const gd::Expression& parameterValue,
           const gd::String& lastObjectName) {
         gd::String argOutput =
             GenerateParameterCodes(parameterValue,
@@ -1243,7 +1246,7 @@ gd::String EventsCodeGenerator::GenerateArgumentsList(
   return argumentsStr;
 }
 
-EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
+EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project_,
                                          const gd::Layout& layout,
                                          const gd::Platform& platform_)
     : platform(platform_),
@@ -1260,7 +1263,7 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
 
 EventsCodeGenerator::EventsCodeGenerator(
     const gd::Platform& platform_,
-    gd::ObjectsContainer& globalObjectsAndGroups_,
+    const gd::ObjectsContainer& globalObjectsAndGroups_,
     const gd::ObjectsContainer& objectsAndGroups_)
     : platform(platform_),
       globalObjectsAndGroups(globalObjectsAndGroups_),

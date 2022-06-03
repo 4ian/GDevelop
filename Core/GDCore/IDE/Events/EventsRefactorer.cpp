@@ -18,8 +18,8 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
-#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/IDE/Events/InstructionSentenceFormatter.h"
+#include "GDCore/Project/ObjectsContainer.h"
 
 using namespace std;
 
@@ -535,16 +535,19 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
   }
 }
 
-void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
-                                             gd::ObjectsContainer& layout,
-                                             gd::EventsList& events,
-                                             gd::String toReplace,
-                                             gd::String newString,
-                                             bool matchCase,
-                                             bool inConditions,
-                                             bool inActions,
-                                             bool inEventStrings) {
+std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
+    gd::EventsList& events,
+    gd::String toReplace,
+    gd::String newString,
+    bool matchCase,
+    bool inConditions,
+    bool inActions,
+    bool inEventStrings) {
+  vector<EventsSearchResult> modifiedEvents;
   for (std::size_t i = 0; i < events.size(); ++i) {
+    bool eventModified = false;
     if (inConditions) {
       vector<gd::InstructionsList*> conditionsVectors =
           events[i].GetAllConditionsVectors();
@@ -556,6 +559,13 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                       toReplace,
                                       newString,
                                       matchCase);
+        if (conditionsModified && !eventModified) {
+          modifiedEvents.push_back(EventsSearchResult(
+              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+              &events,
+              i));
+          eventModified = true;
+        }
       }
     }
 
@@ -569,25 +579,45 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                                       toReplace,
                                                       newString,
                                                       matchCase);
+        if (actionsModified && !eventModified) {
+          modifiedEvents.push_back(EventsSearchResult(
+              std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+              &events,
+              i));
+          eventModified = true;
+        }
       }
     }
 
     if (inEventStrings) {
       bool eventStringModified = ReplaceStringInEventSearchableStrings(
           project, layout, events[i], toReplace, newString, matchCase);
+      if (eventStringModified && !eventModified) {
+        modifiedEvents.push_back(EventsSearchResult(
+            std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
+            &events,
+            i));
+        eventModified = true;
+      }
     }
 
-    if (events[i].CanHaveSubEvents())
-      ReplaceStringInEvents(project,
-                            layout,
-                            events[i].GetSubEvents(),
-                            toReplace,
-                            newString,
-                            matchCase,
-                            inConditions,
-                            inActions,
-                            inEventStrings);
+    if (events[i].CanHaveSubEvents()) {
+      std::vector<EventsSearchResult> modifiedSubEvent =
+          ReplaceStringInEvents(project,
+                                layout,
+                                events[i].GetSubEvents(),
+                                toReplace,
+                                newString,
+                                matchCase,
+                                inConditions,
+                                inActions,
+                                inEventStrings);
+      std::copy(modifiedSubEvent.begin(),
+                modifiedSubEvent.end(),
+                std::back_inserter(modifiedEvents));
+    }
   }
+  return modifiedEvents;
 }
 
 gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context,
@@ -718,14 +748,16 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
     bool inEventSentences) {
   vector<EventsSearchResult> results;
 
-  const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
+  const gd::String& ignored_characters =
+      EventsRefactorer::searchIgnoredCharacters;
 
-  search.replace_if(search.begin(),
-                    search.end(),
-                    [ignored_characters](const char &c) {
-                      return ignored_characters.find(c) != gd::String::npos;
-                    },
-                    "");
+  search.replace_if(
+      search.begin(),
+      search.end(),
+      [ignored_characters](const char& c) {
+        return ignored_characters.find(c) != gd::String::npos;
+      },
+      "");
   search = search.LeftTrim().RightTrim();
   search.RemoveConsecutiveOccurrences(search.begin(), search.end(), ' ');
 
@@ -737,8 +769,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
           events[i].GetAllConditionsVectors();
       for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
         if (!eventAddedInResults &&
-            SearchStringInConditions(
-                platform, *conditionsVectors[j], search, matchCase, inEventSentences)) {
+            SearchStringInConditions(platform,
+                                     *conditionsVectors[j],
+                                     search,
+                                     matchCase,
+                                     inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -751,9 +786,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
       vector<gd::InstructionsList*> actionsVectors =
           events[i].GetAllActionsVectors();
       for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
-        if (!eventAddedInResults &&
-            SearchStringInActions(
-                platform, *actionsVectors[j], search, matchCase, inEventSentences)) {
+        if (!eventAddedInResults && SearchStringInActions(platform,
+                                                          *actionsVectors[j],
+                                                          search,
+                                                          matchCase,
+                                                          inEventSentences)) {
           results.push_back(EventsSearchResult(
               std::weak_ptr<gd::BaseEvent>(events.GetEventSmartPtr(i)),
               &events,
@@ -790,12 +827,11 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
   return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(
-    const gd::Platform& platform,
-    gd::InstructionsList& actions,
-    gd::String search,
-    bool matchCase,
-    bool inSentences) {
+bool EventsRefactorer::SearchStringInActions(const gd::Platform& platform,
+                                             gd::InstructionsList& actions,
+                                             gd::String search,
+                                             bool matchCase,
+                                             bool inSentences) {
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
     for (std::size_t pNb = 0; pNb < actions[aId].GetParameters().size();
          ++pNb) {
@@ -826,27 +862,30 @@ bool EventsRefactorer::SearchStringInActions(
   return false;
 }
 
-bool EventsRefactorer::SearchStringInFormattedText(
-    const gd::Platform& platform,
-    gd::Instruction& instruction,
-    gd::String search,
-    bool matchCase,
-    bool isCondition) {
+bool EventsRefactorer::SearchStringInFormattedText(const gd::Platform& platform,
+                                                   gd::Instruction& instruction,
+                                                   gd::String search,
+                                                   bool matchCase,
+                                                   bool isCondition) {
   const auto& metadata = isCondition
-                            ? gd::MetadataProvider::GetConditionMetadata(
-                                  platform, instruction.GetType())
-                            : gd::MetadataProvider::GetActionMetadata(
-                                  platform, instruction.GetType());
-  gd::String completeSentence = gd::InstructionSentenceFormatter::Get()->GetFullText(instruction, metadata);
+                             ? gd::MetadataProvider::GetConditionMetadata(
+                                   platform, instruction.GetType())
+                             : gd::MetadataProvider::GetActionMetadata(
+                                   platform, instruction.GetType());
+  gd::String completeSentence =
+      gd::InstructionSentenceFormatter::Get()->GetFullText(instruction,
+                                                           metadata);
 
-  const gd::String& ignored_characters = EventsRefactorer::searchIgnoredCharacters;
+  const gd::String& ignored_characters =
+      EventsRefactorer::searchIgnoredCharacters;
 
-  completeSentence.replace_if(completeSentence.begin(),
-                              completeSentence.end(),
-                              [ignored_characters](const char &c) {
-                                return ignored_characters.find(c) != gd::String::npos;
-                              },
-                              "");
+  completeSentence.replace_if(
+      completeSentence.begin(),
+      completeSentence.end(),
+      [ignored_characters](const char& c) {
+        return ignored_characters.find(c) != gd::String::npos;
+      },
+      "");
 
   completeSentence.RemoveConsecutiveOccurrences(
       completeSentence.begin(), completeSentence.end(), ' ');

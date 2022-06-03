@@ -7,6 +7,7 @@
 #define GDCORE_EVENTSREFACTORER_H
 #include <memory>
 #include <vector>
+
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
@@ -18,7 +19,7 @@ class ExternalEvents;
 class BaseEvent;
 class Instruction;
 typedef std::shared_ptr<gd::BaseEvent> BaseEventSPtr;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -43,10 +44,11 @@ class GD_CORE_API EventsSearchResult {
   bool IsEventsListValid() const { return eventsList != nullptr; }
 
   /**
-   * \brief Get the events list containing the event pointed by the EventsSearchResult.
-   * \warning Only call this when IsEventsListValid returns true.
+   * \brief Get the events list containing the event pointed by the
+   * EventsSearchResult. \warning Only call this when IsEventsListValid returns
+   * true.
    */
-  const gd::EventsList & GetEventsList() const { return *eventsList; }
+  const gd::EventsList& GetEventsList() const { return *eventsList; }
 
   std::size_t GetPositionInList() const { return positionInList; }
 
@@ -56,7 +58,7 @@ class GD_CORE_API EventsSearchResult {
    * \brief Get the event pointed by the EventsSearchResult.
    * \warning Only call this when IsEventValid returns true.
    */
-  const gd::BaseEvent & GetEvent() const { return *event.lock(); }
+  const gd::BaseEvent& GetEvent() const { return *event.lock(); }
 };
 
 /**
@@ -98,27 +100,31 @@ class GD_CORE_API EventsRefactorer {
    * \return A vector containing EventsSearchResult objects filled with events
    * containing the string
    */
-  static std::vector<EventsSearchResult> SearchInEvents(const gd::Platform& platform,
-                                                        gd::EventsList& events,
-                                                        gd::String search,
-                                                        bool matchCase,
-                                                        bool inConditions,
-                                                        bool inActions,
-                                                        bool inEventStrings,
-                                                        bool inEventSentences);
+  static std::vector<EventsSearchResult> SearchInEvents(
+      const gd::Platform& platform,
+      gd::EventsList& events,
+      gd::String search,
+      bool matchCase,
+      bool inConditions,
+      bool inActions,
+      bool inEventStrings,
+      bool inEventSentences);
 
   /**
    * Replace all occurrences of a gd::String in events
+   *
+   * \return A vector of all modified events.
    */
-  static void ReplaceStringInEvents(gd::ObjectsContainer& project,
-                                    gd::ObjectsContainer& layout,
-                                    gd::EventsList& events,
-                                    gd::String toReplace,
-                                    gd::String newString,
-                                    bool matchCase,
-                                    bool inConditions,
-                                    bool inActions,
-                                    bool inEventString);
+  static std::vector<EventsSearchResult> ReplaceStringInEvents(
+      gd::ObjectsContainer& project,
+      gd::ObjectsContainer& layout,
+      gd::EventsList& events,
+      gd::String toReplace,
+      gd::String newString,
+      bool matchCase,
+      bool inConditions,
+      bool inActions,
+      bool inEventString);
 
   virtual ~EventsRefactorer(){};
 
@@ -148,20 +154,21 @@ class GD_CORE_API EventsRefactorer {
                                        gd::InstructionsList& instructions,
                                        gd::String oldName,
                                        gd::String newName);
-   /**
+  /**
    * Replace all occurrences of an object name by another name in an expression
    * with the specified metadata
    * ( include : objects or objects in math/text expressions ).
    *
    * \return true if something was modified.
    */
-  static bool RenameObjectInEventParameters(const gd::Platform& platform,
-                                            gd::ObjectsContainer& project,
-                                            gd::ObjectsContainer& layout,
-                                            gd::Expression& expression,
-                                            gd::ParameterMetadata parameterMetadata,
-                                            gd::String oldName,
-                                            gd::String newName);
+  static bool RenameObjectInEventParameters(
+      const gd::Platform& platform,
+      gd::ObjectsContainer& project,
+      gd::ObjectsContainer& layout,
+      gd::Expression& expression,
+      gd::ParameterMetadata parameterMetadata,
+      gd::String oldName,
+      gd::String newName);
 
   /**
    * Remove all conditions of the list using an object

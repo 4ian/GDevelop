@@ -77,8 +77,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
 
+  // TODO Try to remove side effects to avoid the copy
+  // that destroys the AST in cache.
   gd::Project exportedProject = options.project;
-  const gd::Project &immutableProject = options.project;
+  const gd::Project &immutableProject = exportedProject;
 
   if (!options.fullLoadingScreen) {
     // Most of the time, we skip the logo and minimum duration so that

@@ -186,10 +186,14 @@ export const AssetStore = ({
     sendAssetPackOpened(tag);
 
     const assetPack = assetPacks.starterPacks.find(pack => pack.tag === tag);
+    if (!assetPack) {
+      // This can't actually happen.
+      return;
+    }
 
-    if (assetPack && assetPack.externalWebLink) {
+    if (assetPack.externalWebLink) {
       Window.openExternalURL(assetPack.externalWebLink);
-    } else if (assetPack) {
+    } else {
       navigationState.openPackPage(assetPack);
       setIsFiltersPanelOpen(true);
     }

@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type FiltersState } from '../UI/Search/FiltersChooser';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,

@@ -444,41 +444,39 @@ export const AssetDetails = ({
           </Column>
         </ResponsiveLineStackLayout>
         {asset && (
-          <>
-            <Column>
+          <Column expand>
+            <Line noMargin>
               <Text size="title" displayInlineAsSpan>
                 <Trans>You might like</Trans>
               </Text>
-            </Column>
-            <Line expand noMargin>
-              <Column expand>
-                <BoxSearchResults
-                  baseSize={128}
-                  onRetry={fetchAssetsAndFilters}
-                  error={filterError}
-                  searchItems={truncatedSearchResults}
-                  renderSearchItem={(assetShortHeader, size) => (
-                    <AssetCard
-                      size={size}
-                      onOpenDetails={() => {
-                        setAsset(null);
-                        onOpenDetails(assetShortHeader);
-                      }}
-                      assetShortHeader={assetShortHeader}
-                    />
-                  )}
-                  noResultPlaceholder={
-                    <Line>
-                      <EmptyMessage>
-                        <Trans>No similar asset was found.</Trans>
-                      </EmptyMessage>
-                    </Line>
-                  }
-                  noScroll
-                />
-              </Column>
             </Line>
-          </>
+            <Line expand noMargin justifyContent="center">
+              <BoxSearchResults
+                baseSize={128}
+                onRetry={fetchAssetsAndFilters}
+                error={filterError}
+                searchItems={truncatedSearchResults}
+                renderSearchItem={(assetShortHeader, size) => (
+                  <AssetCard
+                    size={size}
+                    onOpenDetails={() => {
+                      setAsset(null);
+                      onOpenDetails(assetShortHeader);
+                    }}
+                    assetShortHeader={assetShortHeader}
+                  />
+                )}
+                noResultPlaceholder={
+                  <Line alignItems="flex-start">
+                    <EmptyMessage>
+                      <Trans>No similar asset was found.</Trans>
+                    </EmptyMessage>
+                  </Line>
+                }
+                noScroll
+              />
+            </Line>
+          </Column>
         )}
       </Column>
     </ScrollView>

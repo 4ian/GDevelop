@@ -33,6 +33,7 @@ export type EventRendererProps = {
     InstructionsListContext
   ) => void,
   onParameterClick: ParameterContext => void,
+  onEndEditingEvent: () => void,
   selection: any,
 
   onOpenLayout: string => void,

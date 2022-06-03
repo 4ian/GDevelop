@@ -509,7 +509,11 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'ADD'
+        ),
       },
       () => this.updateToolbar()
     );
@@ -532,7 +536,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
@@ -541,7 +549,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesResized = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
@@ -550,7 +562,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
@@ -841,7 +857,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState(
       {
         selectedObjectNames: [],
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'DELETE'
+        ),
       },
       () => {
         this.updateToolbar();

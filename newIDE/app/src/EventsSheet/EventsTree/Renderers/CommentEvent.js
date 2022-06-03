@@ -44,6 +44,7 @@ const styles = {
 
 type State = {|
   editing: boolean,
+  editingPreviousValue: ?string,
 |};
 
 export default class CommentEvent extends React.Component<
@@ -52,15 +53,18 @@ export default class CommentEvent extends React.Component<
 > {
   state = {
     editing: false,
+    editingPreviousValue: null,
   };
 
   _selectable: ?HTMLSpanElement;
   _textField: ?TextField;
 
   edit = () => {
+    const commentEvent = gd.asCommentEvent(this.props.event);
     this.setState(
       {
         editing: true,
+        editingPreviousValue: commentEvent.getComment(),
       },
       () => {
         if (this._textField) this._textField.focus();
@@ -78,10 +82,15 @@ export default class CommentEvent extends React.Component<
 
   endEditing = () => {
     if (!this._textField) return;
+    const commentEvent = gd.asCommentEvent(this.props.event);
+    if (this.state.editingPreviousValue !== commentEvent.getComment()) {
+      this.props.onEndEditingEvent();
+    }
 
     this.setState(
       {
         editing: false,
+        editingPreviousValue: null,
       },
       () => this.props.onUpdate()
     );

@@ -8,7 +8,6 @@ import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
-import Window from '../Utils/Window';
 import {
   sendAssetAddedToProject,
   sendAssetOpened,
@@ -22,7 +21,6 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import {
   type AssetShortHeader,
-  type AssetPack,
 } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';

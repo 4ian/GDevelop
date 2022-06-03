@@ -16,6 +16,7 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
+  type AssetPacks,
 } from '../Utils/GDevelopServices/Asset';
 
 export const indieFirebaseUser: FirebaseUser = {
@@ -900,4 +901,102 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
     'Health (life points and damages for objects)',
   ],
   gdevelopVersion: '',
+};
+
+export const fakeAssetPacks: AssetPacks = {
+  starterPacks: [
+    {
+      name: 'GDevelop Platformer',
+      tag: 'platformer',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
+      assetsCount: 16,
+    },
+    {
+      name: 'Space Shooter',
+      tag: 'space shooter',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+      assetsCount: 140,
+    },
+    {
+      name: 'Tanks',
+      tag: 'tank pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
+      assetsCount: 32,
+    },
+    {
+      name: 'Pixel Adventure',
+      tag: 'pixel adventure pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
+      assetsCount: 80,
+    },
+    {
+      name: 'Fake Paid External',
+      tag: 'pirate bomb pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
+      assetsCount: 48,
+      externalWebLink: 'https://example.com',
+      userFriendlyPrice: '$4.99',
+    },
+    {
+      name: 'Particles',
+      tag: 'pixel effects pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
+      assetsCount: 20,
+    },
+    {
+      name: 'Emotes',
+      tag: 'emote',
+      thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
+      assetsCount: 176,
+    },
+    {
+      name: 'Dinosaurus Characters',
+      tag: '24x24 dino characters',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
+      assetsCount: 5,
+    },
+    {
+      name: 'Fake Paid Spinning Items',
+      tag: '16x16 pixel art spinning items',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
+      assetsCount: 30,
+      userFriendlyPrice: '$4.99',
+    },
+    {
+      name: 'RPG Items #2',
+      tag: '16x16 pixel art rpg items',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
+      assetsCount: 64,
+    },
+    {
+      name: 'RPG Items',
+      tag: '16x16 rpg item pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
+      assetsCount: 144,
+    },
+    {
+      name: 'Fantasy Icons',
+      tag: '32x32 fantasy icons pack v2',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
+      assetsCount: 285,
+    },
+    {
+      name: 'On-Screen Controls',
+      tag: 'on-screen controls',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
+      assetsCount: 287,
+    },
+  ],
 };

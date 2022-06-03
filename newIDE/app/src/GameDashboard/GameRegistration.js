@@ -78,7 +78,7 @@ export const GameRegistration = ({
         setUnavailableReason(null);
         setGame(game);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         if (err.response) {
           if (err.response.status === 403) {
             setUnavailableReason('unauthorized');

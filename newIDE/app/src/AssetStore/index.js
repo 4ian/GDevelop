@@ -214,6 +214,10 @@ export const AssetStore = ({
     setIsFiltersPanelOpen(true);
   };
 
+  const capitalize = (str: string) => {
+    return str ? str[0].toUpperCase() + str.substr(1) : '';
+  };
+
   React.useEffect(
     () => {
       if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
@@ -291,7 +295,9 @@ export const AssetStore = ({
                         <>
                           <Column expand alignItems="center">
                             <Text size="title" noMargin>
-                              {filtersState.chosenCategory.node.name}
+                              {capitalize(
+                                filtersState.chosenCategory.node.name
+                              )}
                             </Text>
                           </Column>
                           <Column expand alignItems="flex-end" noMargin />

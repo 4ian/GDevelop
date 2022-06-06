@@ -273,7 +273,7 @@ export const AssetStore = ({
                     </Text>
                   ) : (
                     <>
-                      <Column alignItems="flex-start" noMargin>
+                      <Column expand alignItems="flex-start" noMargin>
                         <TextButton
                           icon={<ArrowBack />}
                           label={<Trans>Back</Trans>}
@@ -288,11 +288,14 @@ export const AssetStore = ({
                         />
                       </Column>
                       {!openedAssetPack && filtersState.chosenCategory && (
-                        <Column expand alignItems="center">
-                          <Text size="title" noMargin>
-                            {filtersState.chosenCategory.node.name}
-                          </Text>
-                        </Column>
+                        <>
+                          <Column expand alignItems="center">
+                            <Text size="title" noMargin>
+                              {filtersState.chosenCategory.node.name}
+                            </Text>
+                          </Column>
+                          <Column expand alignItems="flex-end" noMargin />
+                        </>
                       )}
                       {openedAssetPack && (
                         <>
@@ -301,7 +304,7 @@ export const AssetStore = ({
                               {openedAssetPack.name}
                             </Text>
                           </Column>
-                          <Column alignItems="flex-end" noMargin>
+                          <Column expand alignItems="flex-end" noMargin>
                             <RaisedButton
                               primary
                               label={

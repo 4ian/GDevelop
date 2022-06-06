@@ -214,12 +214,14 @@ export const AssetPackDialog = ({
       }}
       cannotBeDismissed
       actions={[
-        <TextButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          disabled={isAssetPackBeingInstalled}
-          onClick={onClose}
-        />,
+        // Installing a pack is not cancelable, so we hide the button while installing.
+        !isAssetPackBeingInstalled ? (
+          <TextButton
+            key="cancel"
+            label={<Trans>Cancel</Trans>}
+            onClick={onClose}
+          />
+        ) : null,
         dialogContent.actionButton,
       ]}
       onApply={dialogContent.onApply}

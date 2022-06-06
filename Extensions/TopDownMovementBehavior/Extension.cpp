@@ -1,5 +1,4 @@
 /**
-
 GDevelop - Top-down movement Behavior Extension
 Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
@@ -105,9 +104,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("stringWithSelector",
-                    _("Key"),
-                    "[\"Left\", \"Right\", \"Up\", \"Down\"]")
+      .AddParameter("string", _("Key"))
       .MarkAsAdvanced()
       .SetFunctionName("SimulateControl")
       .SetIncludeFile(

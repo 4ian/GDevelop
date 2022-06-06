@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import Chip from '@material-ui/core/Chip';
+import Chip from '../UI/Chip';
 import randomColor from 'randomcolor';
 import { type Tags, removeTag } from '../Utils/TagsHelper';
 

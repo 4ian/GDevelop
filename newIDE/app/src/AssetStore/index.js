@@ -90,6 +90,7 @@ export const AssetStore = ({
     isOnHomePage,
     openedAssetPack,
     openedAssetShortHeader,
+    filtersState,
   } = navigationState.getCurrentPage();
 
   React.useEffect(
@@ -213,6 +214,10 @@ export const AssetStore = ({
     setIsFiltersPanelOpen(true);
   };
 
+  const capitalize = (str: string) => {
+    return str ? str[0].toUpperCase() + str.substr(1) : '';
+  };
+
   React.useEffect(
     () => {
       if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
@@ -286,6 +291,19 @@ export const AssetStore = ({
                           }}
                         />
                       </Column>
+                      {!openedAssetPack && filtersState.chosenCategory && (
+                        <>
+                          <Column expand alignItems="center">
+                            <Text size="title" noMargin>
+                              {capitalize(
+                                filtersState.chosenCategory.node.name
+                              )}
+                            </Text>
+                          </Column>
+                          {/* to center the title */}
+                          <Column expand alignItems="flex-end" noMargin />
+                        </>
+                      )}
                       {openedAssetPack && (
                         <>
                           <Column expand alignItems="center">

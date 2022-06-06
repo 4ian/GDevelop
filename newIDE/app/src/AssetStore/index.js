@@ -300,6 +300,7 @@ export const AssetStore = ({
                               )}
                             </Text>
                           </Column>
+                          {/* to center the title */}
                           <Column expand alignItems="flex-end" noMargin />
                         </>
                       )}

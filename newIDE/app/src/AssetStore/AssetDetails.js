@@ -3,7 +3,7 @@ import { t, Trans } from '@lingui/macro';
 import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import Chip from '@material-ui/core/Chip';
+import Chip from '../UI/Chip';
 import RaisedButton from '../UI/RaisedButton';
 import {
   type AssetShortHeader,

@@ -3,7 +3,13 @@ import * as React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
-import { FormGroup, FormHelperText } from '@material-ui/core';
+import { FormGroup, FormHelperText, makeStyles } from '@material-ui/core';
+
+const useLabelStyles = makeStyles({
+  root: {
+    cursor: 'default',
+  },
+});
 
 type Props = {|
   label?: ?React.Node,
@@ -28,6 +34,7 @@ const InlineCheckbox = ({
   checkedIcon,
   tooltipOrHelperText,
 }: Props) => {
+  const labelClasses = useLabelStyles();
   const checkbox = (
     <Checkbox
       disabled={disabled}
@@ -42,7 +49,11 @@ const InlineCheckbox = ({
   );
   return label ? (
     <FormGroup>
-      <FormControlLabel control={checkbox} label={label} />
+      <FormControlLabel
+        control={checkbox}
+        label={label}
+        classes={labelClasses}
+      />
       {tooltipOrHelperText && (
         <FormHelperText>{tooltipOrHelperText}</FormHelperText>
       )}

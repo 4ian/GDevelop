@@ -169,7 +169,7 @@
     "drop-indicator": {
       "can-drop": {
         "color": {
-          "value": "{gdevelop.color.dark-blue.value}"
+          "value": "#dddddd"
         }
       },
       "cannot-drop": {

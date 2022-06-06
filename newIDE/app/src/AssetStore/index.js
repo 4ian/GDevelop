@@ -240,8 +240,9 @@ export const AssetStore = ({
                   tooltip={t`Back to discover`}
                   onClick={() => {
                     navigationState.openHome();
-                    setIsFiltersPanelOpen(false);
                     clearAllFilters(assetFiltersState);
+                    setIsFiltersPanelOpen(false);
+                    setIsAssetPackAdded(false);
                   }}
                   size="small"
                 >
@@ -287,6 +288,7 @@ export const AssetStore = ({
                             if (navigationState.getCurrentPage().isOnHomePage) {
                               clearAllFilters(assetFiltersState);
                               setIsFiltersPanelOpen(false);
+                              setIsAssetPackAdded(false);
                             }
                           }}
                         />

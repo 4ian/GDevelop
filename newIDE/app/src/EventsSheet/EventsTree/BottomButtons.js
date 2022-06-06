@@ -14,7 +14,7 @@ const styles = {
     cursor: 'pointer',
   },
   dropIndicator: {
-    border: '4px solid black',
+    border: '2px solid black',
     outline: '1px solid white',
   },
 };

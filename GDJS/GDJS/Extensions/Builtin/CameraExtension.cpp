@@ -106,6 +106,9 @@ CameraExtension::CameraExtension() {
 
   GetAllActions()["SetLayerAmbientLightColor"].SetFunctionName(
       "gdjs.evtTools.camera.setLayerAmbientLightColor");
+  
+  GetAllConditions()["CameraZoom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraZoom");
 
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

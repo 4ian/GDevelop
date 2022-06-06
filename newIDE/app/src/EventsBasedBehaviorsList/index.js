@@ -338,6 +338,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
           placeholder={t`Search behaviors`}
         />
       </Background>

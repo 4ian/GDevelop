@@ -382,6 +382,7 @@ export default class ResourcesList extends React.Component<Props, State> {
             })
           }
           placeholder={t`Search resources`}
+          aspect="integrated-search-bar"
         />
       </Background>
     );

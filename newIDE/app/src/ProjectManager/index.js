@@ -1068,6 +1068,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               onRequestSearch={this._onRequestSearch}
               onChange={this._onSearchChange}
               placeholder={t`Search in project`}
+              aspect="integrated-search-bar"
             />
             {this.state.projectVariablesEditorOpen && (
               <VariablesEditorDialog

@@ -19,7 +19,7 @@ import { type EventsScope } from '../../InstructionOrExpression/EventsScope.flow
 import { SelectColumns } from '../../UI/Reponsive/SelectColumns';
 import useForceUpdate from '../../Utils/UseForceUpdate';
 import { setupInstructionParameters } from '../../InstructionOrExpression/SetupInstructionParameters';
-import FlatButton from '../../UI/FlatButton';
+import TextButton from '../../UI/TextButton';
 import Paste from '../../UI/CustomSvgIcons/Paste';
 import { Line } from '../../UI/Grid';
 
@@ -215,7 +215,7 @@ export default function NewInstructionEditorMenu({
         }}
       />
       <Line noMargin justifyContent="flex-end">
-        <FlatButton
+        <TextButton
           label={
             isCondition ? (
               <Trans>Paste condition(s)</Trans>

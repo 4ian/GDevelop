@@ -15,13 +15,6 @@ import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
 import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
 import { t } from '@lingui/macro';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 type Props = {|
   isOpening: boolean,
   onOpen: ExampleShortHeader => Promise<void>,
@@ -92,7 +85,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               value={searchText}
               onChange={setSearchText}
               onRequestSearch={() => {}}
-              style={styles.searchBar}
+              aspect="add-margins-only-if-modern-theme"
               tagsHandler={tagsHandler}
               tags={filters && filters.defaultTags}
               ref={searchBarRef}
@@ -103,6 +96,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               overflow={
                 'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
               }
+              noMargin
             >
               <ListSearchResults
                 disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.

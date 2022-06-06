@@ -294,6 +294,7 @@ export default class InstancesList extends Component<Props, State> {
               onRequestSearch={this._selectFirstInstance}
               ref={this._searchBar}
               placeholder={t`Search instances`}
+              aspect="integrated-search-bar"
             />
           </div>
         )}

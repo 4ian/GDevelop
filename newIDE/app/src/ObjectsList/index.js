@@ -695,6 +695,7 @@ export default class ObjectsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
           placeholder={t`Search objects`}
         />
         {this.state.newObjectDialogOpen && (

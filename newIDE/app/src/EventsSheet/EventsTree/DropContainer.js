@@ -17,7 +17,7 @@ const sharedStyles = {
   dropIndicator: {
     position: 'absolute',
     zIndex: 2,
-    border: '4px solid black',
+    border: '2px solid black',
     outline: '1px solid white',
   },
   autoScroll: {
@@ -70,9 +70,9 @@ const getTargetPositionStyles = (
 const getIndicatorPositionStyles = (
   indentWidth: number
 ): TargetPositionStyles => ({
-  bottom: { left: '0px', right: '0px', bottom: '-4px' },
-  'bottom-right': { left: `${indentWidth}px`, right: '0px', bottom: '-4px' },
-  top: { left: '0px', right: '0px', top: '-4px' },
+  bottom: { left: '0px', right: '0px', bottom: '-2px' },
+  'bottom-right': { left: `${indentWidth}px`, right: '0px', bottom: '-2px' },
+  top: { left: '0px', right: '0px', top: '-2px' },
 });
 
 function DropTargetContainer({

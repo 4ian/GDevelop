@@ -90,6 +90,7 @@ export const AssetStore = ({
     isOnHomePage,
     openedAssetPack,
     openedAssetShortHeader,
+    filtersState,
   } = navigationState.getCurrentPage();
 
   React.useEffect(
@@ -286,6 +287,16 @@ export const AssetStore = ({
                           }}
                         />
                       </Column>
+                      {!openedAssetPack && filtersState.chosenCategory && (
+                        <>
+                          <Column expand alignItems="center">
+                            <Text size="title" noMargin>
+                              {filtersState.chosenCategory.node.name}
+                            </Text>
+                          </Column>
+                          <Column expand alignItems="flex-end" noMargin />
+                        </>
+                      )}
                       {openedAssetPack && (
                         <>
                           <Column expand alignItems="center">

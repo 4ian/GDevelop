@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
@@ -244,11 +244,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         primary={false}
         onClick={this.props.onClose}
       />,
-      <FlatButton
+      <DialogPrimaryButton
         key="apply"
         label={<Trans>Apply</Trans>}
         primary={true}
-        keyboardFocused={true}
         onClick={this.onApply}
       />,
     ];
@@ -267,12 +266,11 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     return (
       <Dialog
-        onApply={this.onApply}
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}
-        cannotBeDismissed={true}
         onRequestClose={this.props.onClose}
+        onApply={this.onApply}
       >
         <ColumnStackLayout noMargin>
           <Text>

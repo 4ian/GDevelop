@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
@@ -51,7 +51,6 @@ const VariablesEditorDialog = ({
 
   return (
     <Dialog
-      onApply={onApply}
       noMargin
       actions={[
         <FlatButton
@@ -59,17 +58,13 @@ const VariablesEditorDialog = ({
           onClick={onCancelChanges}
           key="Cancel"
         />,
-        <FlatButton
+        <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onApply}
           key="Apply"
         />,
       ]}
-      open={open}
-      cannotBeDismissed={true}
-      onRequestClose={onCancelChanges}
       secondaryActions={[
         onEditObjectVariables ? (
           <FlatButton
@@ -89,6 +84,9 @@ const VariablesEditorDialog = ({
           <HelpButton helpPagePath={helpPagePath} key="help" />
         ) : null,
       ]}
+      onRequestClose={onCancelChanges}
+      onApply={onApply}
+      open={open}
       title={title}
       flexBody
       fullHeight
@@ -100,6 +98,7 @@ const VariablesEditorDialog = ({
           </Line>
         )}
         <VariablesList
+          commitChangesOnBlur
           variablesContainer={variablesContainer}
           inheritedVariablesContainer={inheritedVariablesContainer}
           emptyPlaceholderTitle={emptyPlaceholderTitle}

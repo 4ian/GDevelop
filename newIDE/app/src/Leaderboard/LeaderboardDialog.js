@@ -11,9 +11,15 @@ type Props = {|
   onClose: () => void,
   open: boolean,
   project: gdProject,
+  leaderboardId?: string,
 |};
 
-const LeaderboardDialog = ({ onClose, open, project }: Props) => {
+const LeaderboardDialog = ({
+  onClose,
+  open,
+  project,
+  leaderboardId,
+}: Props) => {
   const [isLoading, setIsLoading] = React.useState(false);
   return (
     <Dialog
@@ -32,15 +38,17 @@ const LeaderboardDialog = ({ onClose, open, project }: Props) => {
         />,
       ]}
       open={open}
-      cannotBeDismissed={true}
-      onRequestClose={() => {
-        if (!isLoading) onClose();
-      }}
+      cannotBeDismissed={isLoading}
+      onRequestClose={onClose}
       title={<Trans>Leaderboards</Trans>}
       flexBody
       fullHeight
     >
-      <LeaderboardAdmin onLoading={setIsLoading} project={project} />
+      <LeaderboardAdmin
+        onLoading={setIsLoading}
+        project={project}
+        leaderboardIdToSelectAtOpening={leaderboardId}
+      />
     </Dialog>
   );
 };

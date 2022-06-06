@@ -192,6 +192,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 onClose={() => setIsAdminOpen(false)}
                 open={isAdminOpen}
                 project={props.project}
+                leaderboardId={
+                  isCurrentValueInLeaderboardList
+                    ? props.value.replace(/"/g, '')
+                    : undefined
+                }
               />
             )}
           </>

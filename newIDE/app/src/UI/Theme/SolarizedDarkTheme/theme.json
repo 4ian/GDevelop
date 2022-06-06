@@ -38,7 +38,7 @@
         "value": "#047AA6"
       },
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "text": {
@@ -164,6 +164,23 @@
       },
       "frame-border-color": {
         "value": "#dcdcdc"
+      }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "#047AA6"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#BF616A"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
       }
     }
   },

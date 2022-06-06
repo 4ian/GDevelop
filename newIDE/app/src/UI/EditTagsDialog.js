@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import Dialog from './Dialog';
+import Dialog, { DialogPrimaryButton } from './Dialog';
 import TextField from './TextField';
 import FlatButton from './FlatButton';
 import { Trans } from '@lingui/macro';
@@ -64,7 +64,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             primary={false}
             onClick={onCancel}
           />,
-          <FlatButton
+          <DialogPrimaryButton
             key="add"
             label={
               this.props.tagsString && !tags.length ? (
@@ -78,10 +78,9 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             disabled={!this._canEdit()}
           />,
         ]}
-        cannotBeDismissed={false}
-        open
-        onApply={() => this._onEdit(tags)}
         onRequestClose={onCancel}
+        onApply={() => this._onEdit(tags)}
+        open
       >
         <TextField
           fullWidth

@@ -2,9 +2,8 @@
 import React from 'react';
 import { Trans } from '@lingui/macro';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
-import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
-import Dialog from '../../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 
@@ -51,10 +50,9 @@ const ExpressionParametersEditorDialog = ({
   return (
     <Dialog
       title={<Trans>Enter the expression parameters</Trans>}
-      cannotBeDismissed={true}
       open
       actions={[
-        <FlatButton
+        <DialogPrimaryButton
           key="apply"
           label={<Trans>Apply</Trans>}
           primary
@@ -63,6 +61,7 @@ const ExpressionParametersEditorDialog = ({
       ]}
       noMargin
       onRequestClose={onRequestClose}
+      onApply={() => onDone(parameterValues)}
     >
       <Column>
         <div style={styles.minHeightContainer}>

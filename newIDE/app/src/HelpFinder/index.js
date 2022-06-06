@@ -50,7 +50,6 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
     return (
       <Dialog
         title={<Trans>Help!</Trans>}
-        onRequestClose={onClose}
         actions={[
           <FlatButton
             label={<Trans>Close</Trans>}
@@ -79,7 +78,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
             label={<Trans>Browse the documentation</Trans>}
           />,
         ]}
-        cannotBeDismissed={false}
+        onRequestClose={onClose}
         open={open}
       >
         <DocSearchArea

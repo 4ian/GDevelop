@@ -552,6 +552,8 @@ interface gdObject {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetAssetStoreId([Const] DOMString assetStoreId);
+    [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
     void SetTags([Const] DOMString tags);
@@ -1074,10 +1076,15 @@ interface Instruction {
     void SetInverted(boolean inverted);
     boolean IsInverted();
     void SetParameter(unsigned long id, [Const] DOMString value);
-    [Const, Ref] DOMString GetParameter(unsigned long id);
+    [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
     unsigned long GetParametersCount();
     [Ref] InstructionsList GetSubInstructions();
+};
+
+interface Expression {
+  [Const, Ref] DOMString GetPlainString();
+  ExpressionNode GetRootNode();
 };
 
 interface VectorPairStringTextFormatting {
@@ -1267,6 +1274,7 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+    boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1935,7 +1943,7 @@ interface VectorEventsSearchResult {
 interface EventsRefactorer {
     void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
     void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString name);
-    void STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
+    [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
 
@@ -2083,7 +2091,7 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator();
+    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetErrors();
 
@@ -2117,7 +2125,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2133,9 +2141,9 @@ interface UniquePtrExpressionNode {
 };
 
 interface ExpressionParser2 {
-    void ExpressionParser2([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer);
+    void ExpressionParser2();
 
-    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString type, [Const] DOMString expression);
+    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString expression);
 };
 
 enum EventsFunction_FunctionType {
@@ -2507,6 +2515,7 @@ interface Direction {
     boolean IsLooping();
     void SetLoop(boolean enable);
     float GetTimeBetweenFrames();
+    [Const, Ref] VectorString GetSpriteNames();
     void SetTimeBetweenFrames(float time);
     void SwapSprites(unsigned long first, unsigned long second);
     void MoveSprite(unsigned long oldIndex, unsigned long newIndex);

@@ -4,7 +4,7 @@ import { t } from '@lingui/macro';
 import React, { Component, useEffect } from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
 import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -113,8 +113,21 @@ const InnerDialog = (props: InnerDialogProps) => {
 
   return (
     <Dialog
-      onApply={onApply}
       key={props.object && props.object.ptr}
+      actions={[
+        <FlatButton
+          key="cancel"
+          label={<Trans>Cancel</Trans>}
+          onClick={onCancelChanges}
+        />,
+        <DialogPrimaryButton
+          key="apply"
+          label={<Trans>Apply</Trans>}
+          id="apply-button"
+          primary
+          onClick={onApply}
+        />,
+      ]}
       secondaryActions={[
         <HelpButton key="help-button" helpPagePath={props.helpPagePath} />,
         <HotReloadPreviewButton
@@ -122,25 +135,10 @@ const InnerDialog = (props: InnerDialogProps) => {
           {...props.hotReloadPreviewButtonProps}
         />,
       ]}
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          onClick={onCancelChanges}
-        />,
-        <FlatButton
-          key="apply"
-          label={<Trans>Apply</Trans>}
-          id="apply-button"
-          primary
-          keyboardFocused
-          onClick={onApply}
-        />,
-      ]}
-      noMargin
       onRequestClose={onCancelChanges}
-      cannotBeDismissed={true}
+      onApply={onApply}
       open={props.open}
+      noMargin
       noTitleMargin
       fullHeight
       flexBody
@@ -242,6 +240,7 @@ const InnerDialog = (props: InnerDialogProps) => {
               </Line>
             )}
           <VariablesList
+            commitChangesOnBlur
             variablesContainer={props.object.getVariables()}
             emptyPlaceholderTitle={
               <Trans>Add your first object variable</Trans>

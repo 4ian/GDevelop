@@ -40,7 +40,6 @@ const CreateProfile = ({
         primary
       />
       <Spacer />
-      <Spacer />
       <BackgroundText>or</BackgroundText>
       <Spacer />
       <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />

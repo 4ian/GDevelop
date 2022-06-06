@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
+import { type ButtonInterface } from './Button';
 import { Spacer } from './Grid';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 // We support a subset of the props supported by Material-UI v0.x RaisedButton
 // They should be self descriptive - refer to Material UI docs otherwise.
@@ -30,28 +32,37 @@ type Props = {|
 /**
  * A raised button based on Material-UI button.
  */
-export default class RaisedButton extends React.Component<Props, {||}> {
-  render() {
-    const { label, primary, icon, ...otherProps } = this.props;
-
+const RaisedButton = React.forwardRef<Props, ButtonInterface>(
+  ({ label, primary, icon, ...otherProps }: Props, ref) => {
     // In theory, focus ripple is only shown after a keyboard interaction
     // (see https://github.com/mui-org/material-ui/issues/12067). However, as
     // it's important to get focus right in the whole app, make the ripple
     // always visible to be sure we're getting focusing right.
     const focusRipple = true;
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     return (
       <Button
         variant="contained"
         size="small"
-        color={primary ? 'primary' : 'default'}
+        disableElevation={gdevelopTheme.isModern}
+        color={
+          primary
+            ? gdevelopTheme.isModern
+              ? 'secondary'
+              : 'primary'
+            : 'default'
+        }
         focusRipple={focusRipple}
         {...otherProps}
+        ref={ref}
       >
         {icon}
-        {icon && <Spacer />}
+        {!!icon && !!label && <Spacer />}
         {label}
       </Button>
     );
   }
-}
+);
+
+export default RaisedButton;

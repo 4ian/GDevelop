@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
@@ -140,10 +140,7 @@ const EventTextDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={onApply}
       title={<Trans>Edit the event text</Trans>}
-      onRequestClose={onClose}
-      cannotBeDismissed={true}
       open
       noMargin
       actions={[
@@ -153,14 +150,15 @@ const EventTextDialog = (props: Props) => {
           primary={false}
           onClick={onClose}
         />,
-        <FlatButton
+        <DialogPrimaryButton
           key={'Apply'}
           label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onApply}
         />,
       ]}
+      onRequestClose={onClose}
+      onApply={onApply}
     >
       <Column noMargin>
         <MiniToolbar>

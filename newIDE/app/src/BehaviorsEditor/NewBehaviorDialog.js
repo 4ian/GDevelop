@@ -230,7 +230,7 @@ export default function NewBehaviorDialog({
             <HelpButton helpPagePath="/behaviors" key="help" />,
           ]}
           open
-          cannotBeDismissed={false}
+          onRequestClose={onClose}
           flexBody
           noMargin
           fullHeight
@@ -257,6 +257,7 @@ export default function NewBehaviorDialog({
                   }}
                   onChange={setSearchText}
                   ref={searchBar}
+                  placeholder={t`Search installed behaviors`}
                 />
                 {hasSearchNoResult && (
                   <EmptyMessage>

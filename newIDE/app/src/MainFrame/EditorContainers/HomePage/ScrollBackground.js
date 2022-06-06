@@ -6,7 +6,7 @@ const styles = {
   scrollContainer: {
     flex: 1,
     display: 'flex',
-    overflowY: 'scroll',
+    overflowY: 'auto',
   },
 };
 

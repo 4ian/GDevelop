@@ -44,6 +44,7 @@ type Props = {|
   id?: ?string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
   onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  commitOnInputChange?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
   errorText?: React.Node,
@@ -264,6 +265,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     ): void => {
       setInputValue(value);
       if (!isMenuOpen) setIsMenuOpen(true);
+      if (props.commitOnInputChange) props.onChange(value);
     };
 
     return (

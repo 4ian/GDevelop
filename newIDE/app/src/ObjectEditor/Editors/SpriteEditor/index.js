@@ -101,7 +101,7 @@ class Animation extends React.Component<AnimationProps, void> {
               fullWidth
             />
           </Column>
-          <IconButton onClick={onRemove}>
+          <IconButton size="small" onClick={onRemove}>
             <Delete />
           </IconButton>
         </MiniToolbar>
@@ -319,7 +319,7 @@ class AnimationsListContainer extends React.Component<
               actionLabel={<Trans>Add an animation</Trans>}
               helpPagePath="/objects/sprite"
               tutorialId="intermediate-changing-animations"
-              onAdd={this.addAnimation}
+              onAction={this.addAnimation}
             />
           </Column>
         ) : (
@@ -482,12 +482,11 @@ export default function SpriteEditor({
               key="help"
             />,
           ]}
-          cannotBeDismissed={true}
+          onRequestClose={() => setPointsEditorOpen(false)}
           noMargin
           maxWidth="lg"
           flexBody
           fullHeight
-          onRequestClose={() => setPointsEditorOpen(false)}
           open={pointsEditorOpen}
         >
           <PointsEditor
@@ -517,7 +516,6 @@ export default function SpriteEditor({
           maxWidth="lg"
           flexBody
           fullHeight
-          cannotBeDismissed={true}
           onRequestClose={() => setCollisionMasksEditorOpen(false)}
           open={collisionMasksEditorOpen}
         >

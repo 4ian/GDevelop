@@ -13,7 +13,9 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/Project/Layout.h"  // For GetTypeOfObject and GetTypeOfBehavior
 #include "GDCore/String.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 
 using namespace std;
 
@@ -30,12 +32,9 @@ ExtensionAndMetadata<BehaviorMetadata>
 MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
                                                   gd::String behaviorType) {
   for (auto& extension : platform.GetAllPlatformExtensions()) {
-    auto behaviorTypes = extension->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < behaviorTypes.size(); ++j) {
-      if (behaviorTypes[j] == behaviorType)
-        return ExtensionAndMetadata<BehaviorMetadata>(
-            *extension, extension->GetBehaviorMetadata(behaviorType));
-    }
+    if (extension->HasBehavior(behaviorType))
+      return ExtensionAndMetadata<BehaviorMetadata>(
+          *extension, extension->GetBehaviorMetadata(behaviorType));
   }
 
   return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorMetadata);
@@ -202,8 +201,7 @@ MetadataProvider::GetExtensionAndBehaviorExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
   auto& extensions = platform.GetAllPlatformExtensions();
   for (auto& extension : extensions) {
-    const auto& autos = extension->GetBehaviorsTypes();
-    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+    if (extension->HasBehavior(autoType)) {
       const auto& allAutoExpressions =
           extension->GetAllExpressionsForBehavior(autoType);
       if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
@@ -292,8 +290,7 @@ MetadataProvider::GetExtensionAndBehaviorStrExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
   auto& extensions = platform.GetAllPlatformExtensions();
   for (auto& extension : extensions) {
-    const auto& autos = extension->GetBehaviorsTypes();
-    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+    if (extension->HasBehavior(autoType)) {
       const auto& allBehaviorStrExpressions =
           extension->GetAllStrExpressionsForBehavior(autoType);
       if (allBehaviorStrExpressions.find(exprType) !=
@@ -350,28 +347,30 @@ const gd::ExpressionMetadata& MetadataProvider::GetAnyExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetExpressionMetadata(platform, exprType);
+  if (&numberExpressionMetadata != &badExpressionMetadata) {
+    return numberExpressionMetadata;
+  }
   const auto& stringExpressionMetadata =
       GetStrExpressionMetadata(platform, exprType);
-
-  return &numberExpressionMetadata != &badExpressionMetadata
-             ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+  if (&stringExpressionMetadata != &badExpressionMetadata) {
+    return stringExpressionMetadata;
+  }
+  return badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectAnyExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetObjectExpressionMetadata(platform, objectType, exprType);
+  if (&numberExpressionMetadata != &badExpressionMetadata) {
+    return numberExpressionMetadata;
+  }
   const auto& stringExpressionMetadata =
       GetObjectStrExpressionMetadata(platform, objectType, exprType);
-
-  return &numberExpressionMetadata != &badExpressionMetadata
-             ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+  if (&stringExpressionMetadata != &badExpressionMetadata) {
+    return stringExpressionMetadata;
+  }
+  return badExpressionMetadata;
 }
 
 const gd::ExpressionMetadata&
@@ -380,14 +379,98 @@ MetadataProvider::GetBehaviorAnyExpressionMetadata(const gd::Platform& platform,
                                                    gd::String exprType) {
   const auto& numberExpressionMetadata =
       GetBehaviorExpressionMetadata(platform, autoType, exprType);
+  if (&numberExpressionMetadata != &badExpressionMetadata) {
+    return numberExpressionMetadata;
+  }
   const auto& stringExpressionMetadata =
       GetBehaviorStrExpressionMetadata(platform, autoType, exprType);
+  if (&stringExpressionMetadata != &badExpressionMetadata) {
+    return stringExpressionMetadata;
+  }
+  return badExpressionMetadata;
+}
 
-  return &numberExpressionMetadata != &badExpressionMetadata
-             ? numberExpressionMetadata
-             : &stringExpressionMetadata != &badExpressionMetadata
-                   ? stringExpressionMetadata
-                   : badExpressionMetadata;
+const gd::ExpressionMetadata& MetadataProvider::GetFunctionCallMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& node) {
+
+  if (!node.behaviorName.empty()) {
+    gd::String behaviorType = 
+        GetTypeOfBehavior(globalObjectsContainer, objectsContainer, node.behaviorName);
+    return MetadataProvider::GetBehaviorAnyExpressionMetadata(
+            platform, behaviorType, node.functionName);
+  }
+  else if (!node.objectName.empty()) {
+    gd::String objectType = 
+        GetTypeOfObject(globalObjectsContainer, objectsContainer, node.objectName);
+    return MetadataProvider::GetObjectAnyExpressionMetadata(
+                  platform, objectType, node.functionName);
+  }
+
+  return MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName);
+}
+
+  const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    ExpressionNode& parameter) {
+      int parameterIndex = -1;
+      for (int i = 0; i < functionCall.parameters.size(); i++) {
+        if (functionCall.parameters.at(i).get() == &parameter) {
+          parameterIndex = i;
+          break;
+        }
+      }
+      if (parameterIndex < 0) {
+        return nullptr;
+      }
+      return MetadataProvider::GetFunctionCallParameterMetadata(
+          platform, 
+          globalObjectsContainer,
+          objectsContainer,
+          functionCall,
+          parameterIndex);
+}
+
+  const gd::ParameterMetadata* MetadataProvider::GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    int parameterIndex) {
+      // Search the parameter metadata index skipping invisible ones.
+      size_t visibleParameterIndex = 0;
+      size_t metadataParameterIndex =
+          ExpressionParser2::WrittenParametersFirstIndex(
+              functionCall.objectName, functionCall.behaviorName);
+      const gd::ExpressionMetadata &metadata = MetadataProvider::GetFunctionCallMetadata(
+          platform, globalObjectsContainer, objectsContainer, functionCall);
+
+      if (IsBadExpressionMetadata(metadata)) {
+        return nullptr;
+      }
+
+      // TODO use a badMetadata instead of a nullptr?
+      const gd::ParameterMetadata* parameterMetadata = nullptr;
+      while (metadataParameterIndex <
+             metadata.parameters.size()) {
+        if (!metadata.parameters[metadataParameterIndex]
+                 .IsCodeOnly()) {
+          if (visibleParameterIndex == parameterIndex) {
+            parameterMetadata = &metadata.parameters[metadataParameterIndex];
+          }
+          visibleParameterIndex++;
+        }
+        metadataParameterIndex++;
+      }
+      const int visibleParameterCount = visibleParameterIndex;
+      // It can be null if there are too many parameters in the expression, this text node is
+      // not actually linked to a parameter expected by the function call.
+      return parameterMetadata;
 }
 
 MetadataProvider::~MetadataProvider() {}

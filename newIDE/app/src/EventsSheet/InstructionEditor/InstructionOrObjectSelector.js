@@ -391,6 +391,11 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   }
                   style={styles.searchBar}
                   ref={this._searchBar}
+                  placeholder={
+                    isCondition
+                      ? t`Search objects or conditions`
+                      : t`Search objects or actions`
+                  }
                 />
                 {!isSearching && (
                   <Tabs value={currentTab} onChange={onChangeTab}>

@@ -4,10 +4,9 @@ import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { ColumnStackLayout } from '../../UI/Layout';
-import RaisedButton from '../../UI/RaisedButton';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import Text from '../../UI/Text';
@@ -103,9 +102,6 @@ function LeaderboardSortOptionsDialog({
         <Dialog
           open={open}
           maxWidth="sm"
-          onRequestClose={() => {
-            if (!isLoading) onClose();
-          }}
           secondaryActions={[
             <HelpButton
               key="help"
@@ -120,7 +116,7 @@ function LeaderboardSortOptionsDialog({
               onClick={onClose}
               key={'cancel'}
             />,
-            <RaisedButton
+            <DialogPrimaryButton
               primary
               label={<Trans>Save</Trans>}
               disabled={isLoading}
@@ -128,6 +124,8 @@ function LeaderboardSortOptionsDialog({
               key={'save'}
             />,
           ]}
+          cannotBeDismissed={isLoading}
+          onRequestClose={onClose}
           onApply={() => {
             onSaveSettings(i18n);
           }}

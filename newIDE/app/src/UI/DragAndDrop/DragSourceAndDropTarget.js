@@ -16,12 +16,14 @@ type Props<DraggedItemType> = {|
     connectDragSource: ConnectDragSource,
     connectDropTarget: ConnectDropTarget,
     isOver: boolean,
+    isOverLazy: boolean,
     canDrop: boolean,
   }) => ?React.Node,
   beginDrag: () => DraggedItemType,
   canDrag?: (item: DraggedItemType) => boolean,
   canDrop: (item: DraggedItemType) => boolean,
   drop: () => void,
+  endDrag?: () => void,
 |};
 
 type DragSourceProps = {|
@@ -31,6 +33,7 @@ type DragSourceProps = {|
 type DropTargetProps = {|
   connectDropTarget: ConnectDropTarget,
   isOver: boolean,
+  isOverLazy: boolean,
   canDrop: boolean,
 |};
 
@@ -52,6 +55,9 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     },
     beginDrag(props: InnerDragSourceAndDropTargetProps<DraggedItemType>) {
       return props.beginDrag();
+    },
+    endDrag(props: Props<DraggedItemType>, monitor: DragSourceMonitor) {
+      if (props.endDrag) props.endDrag();
     },
   };
 
@@ -84,6 +90,7 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     return {
       connectDropTarget: connect.dropTarget(),
       isOver: monitor.isOver({ shallow: true }),
+      isOverLazy: monitor.isOver({ shallow: false }),
       canDrop: monitor.canDrop(),
     };
   }
@@ -94,11 +101,19 @@ export const makeDragSourceAndDropTarget = <DraggedItemType>(
     sourceCollect
   )(
     DropTarget(reactDndType, targetSpec, targetCollect)(
-      ({ children, connectDragSource, connectDropTarget, isOver, canDrop }) => {
+      ({
+        children,
+        connectDragSource,
+        connectDropTarget,
+        isOver,
+        isOverLazy,
+        canDrop,
+      }) => {
         return children({
           connectDragSource,
           connectDropTarget,
           isOver,
+          isOverLazy,
           canDrop,
         });
       }

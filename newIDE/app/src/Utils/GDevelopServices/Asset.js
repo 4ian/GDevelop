@@ -46,6 +46,13 @@ export type AssetShortHeader = {|
   shortDescription: string,
   previewImageUrls: Array<string>,
   tags: Array<string>,
+  license: string,
+  objectType: string,
+  animationsCount: number,
+  maxFramesCount: number,
+  width: number,
+  height: number,
+  dominantColors: number[],
 |};
 
 export type AssetHeader = {|
@@ -67,6 +74,8 @@ export type AssetPack = {|
   tag: string,
   thumbnailUrl: string,
   assetsCount: number,
+  externalWebLink?: ?string,
+  userFriendlyPrice?: ?string,
 |};
 
 export type AssetPacks = {|
@@ -191,8 +200,10 @@ export const listAllLicenses = (): Promise<Array<License>> => {
     .then(response => response.data);
 };
 
-export const isPixelArt = (assetShortHeader: AssetShortHeader) => {
-  return assetShortHeader.tags.some(tag => {
+export const isPixelArt = (
+  assetOrAssetShortHeader: AssetShortHeader | Asset
+): boolean => {
+  return assetOrAssetShortHeader.tags.some(tag => {
     return tag.toLowerCase() === 'pixel art';
   });
 };

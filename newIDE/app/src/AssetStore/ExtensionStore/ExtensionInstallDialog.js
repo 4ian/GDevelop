@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import {
   type ExtensionShortHeader,
@@ -21,7 +21,6 @@ import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
 import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
-import RaisedButton from '../../UI/RaisedButton';
 import Window from '../../Utils/Window';
 import { useExtensionUpdate } from './UseExtensionUpdates';
 
@@ -119,7 +118,7 @@ const ExtensionInstallDialog = ({
           disabled={isInstalling}
         />,
         <LeftLoader isLoading={isInstalling} key="install">
-          <RaisedButton
+          <DialogPrimaryButton
             label={
               !isCompatible ? (
                 <Trans>Not compatible</Trans>
@@ -150,9 +149,10 @@ const ExtensionInstallDialog = ({
             ]
           : undefined
       }
-      cannotBeDismissed={false}
       open
+      cannotBeDismissed={isInstalling}
       onRequestClose={onClose}
+      onApply={onInstallExtension}
     >
       <ColumnStackLayout expand noMargin>
         {!isCompatible && (

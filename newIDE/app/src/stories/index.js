@@ -155,9 +155,11 @@ import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingD
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { Column, Line } from '../UI/Grid';
+import { LineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
+import TextButton from '../UI/TextButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
@@ -233,6 +235,7 @@ import {
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
 import { initialPreferences } from '../MainFrame/Preferences/PreferencesContext';
+import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
   depth: 2,
@@ -243,8 +246,6 @@ addDecorator(GDevelopJsInitializerDecorator);
 
 // No i18n in this file
 
-const Placeholder = () => <div>Placeholder component</div>;
-
 const buildFakeMenuTemplate = () => [
   {
     label: 'Option 1',
@@ -254,17 +255,6 @@ const buildFakeMenuTemplate = () => [
   {
     label: 'Option 2',
     click: action('click option 2'),
-  },
-];
-const eventsTreeTutorials = [
-  {
-    id: 'intro-event-system',
-    title: 'Event system',
-    description: 'Description 1',
-    thumbnailUrl:
-      'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
-    link: 'https://example.com/tutorial.html',
-    type: 'video',
   },
 ];
 
@@ -281,32 +271,74 @@ storiesOf('Welcome', module)
   .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/Buttons', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Column>
-      <Line>
+    <ColumnStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton label="Raised button" onClick={action('onClick')} />
+        <RaisedButton
+          icon={<CloudDownload />}
+          label="Raised button"
+          onClick={action('onClick')}
+        />
         <RaisedButton
           label="Primary Raised button"
           primary
           onClick={action('onClick')}
         />
-      </Line>
-      <Line>
+        <RaisedButton
+          icon={<CloudDownload />}
+          label="Primary Raised button"
+          primary
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <FlatButton label="Flat button" onClick={action('onClick')} />
+        <FlatButton
+          icon={<CloudDownload />}
+          label="Flat button"
+          onClick={action('onClick')}
+        />
         <FlatButton
           label="Primary Flat button"
           primary
           onClick={action('onClick')}
         />
-      </Line>
-      <Line>
+        <FlatButton
+          icon={<CloudDownload />}
+          label="Primary Flat button"
+          primary
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
+        <TextButton label="Text button" onClick={action('onClick')} />
+        <TextButton
+          icon={<CloudDownload />}
+          label="Text button"
+          onClick={action('onClick')}
+        />
+        <TextButton
+          primary
+          label="Primary Text button"
+          onClick={action('onClick')}
+        />
+        <TextButton
+          icon={<CloudDownload />}
+          primary
+          label="Primary Text button"
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons with split menus:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton
           label="Traditional Raised button"
           onClick={action('onClick')}
@@ -335,11 +367,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           onClick={action('onClick')}
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons with menus:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton
           label="Traditional Raised button"
           onClick={action('onClick')}
@@ -359,11 +391,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Icons with menu:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <ElementWithMenu
           element={
             <ToolbarIcon
@@ -381,11 +413,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           }
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>In a mini toolbar:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <MiniToolbar>
           <MiniToolbarText firstChild>Some text:</MiniToolbarText>
           <IconButton>
@@ -410,8 +442,8 @@ storiesOf('UI Building Blocks/Buttons', module)
             ]}
           />
         </MiniToolbar>
-      </Line>
-    </Column>
+      </LineStackLayout>
+    </ColumnStackLayout>
   ));
 
 storiesOf('UI Building Blocks/SelectField', module)
@@ -2554,228 +2586,6 @@ storiesOf('ExternalPropertiesDialog', module)
         "And there's another one!",
       ]}
     />
-  ));
-
-storiesOf('EventsTree', module)
-  .addDecorator(muiDecorator)
-  .add('default, medium screen (scope: in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.testLayout.getEvents()}
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'medium'}
-            eventsSheetHeight={500}
-            preferences={initialPreferences}
-            tutorials={eventsTreeTutorials}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ))
-  .add('default, small screen (scope: in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.testLayout.getEvents()}
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'small'}
-            eventsSheetHeight={500}
-            preferences={initialPreferences}
-            tutorials={eventsTreeTutorials}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ))
-  .add('default, medium screen (scope: not in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.testLayout.getEvents()}
-            project={testProject.project}
-            scope={{}}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'medium'}
-            eventsSheetHeight={500}
-            preferences={initialPreferences}
-            tutorials={eventsTreeTutorials}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ))
-  .add('empty, small screen (scope: in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.emptyEventsList}
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'small'}
-            eventsSheetHeight={500}
-            preferences={initialPreferences}
-            tutorials={eventsTreeTutorials}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ));
-
-storiesOf('EventsSheet', module)
-  .addDecorator(muiDecorator)
-  .add('default (no scope)', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={500}>
-        <EventsSheet
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          events={testProject.testLayout.getEvents()}
-          onOpenExternalEvents={action('Open external events')}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenLayout={action('open layout')}
-          onOpenSettings={action('open settings')}
-          setToolbar={() => {}}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCreateEventsFunction={action('create events function')}
-          onBeginCreateEventsFunction={action('begin create events function')}
-          isActive={true}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
-  ))
-  .add('empty (no events) (no scope)', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={500}>
-        <EventsSheet
-          project={testProject.project}
-          scope={{ layout: testProject.emptyLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.emptyLayout}
-          events={testProject.emptyLayout.getEvents()}
-          onOpenExternalEvents={action('Open external events')}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenLayout={action('open layout')}
-          onOpenSettings={action('open settings')}
-          setToolbar={() => {}}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCreateEventsFunction={action('create events function')}
-          onBeginCreateEventsFunction={action('begin create events function')}
-          isActive={true}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)

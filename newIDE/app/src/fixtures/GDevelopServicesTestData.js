@@ -8,10 +8,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
-import {
-  type ExtensionShortHeader,
-  type SerializedExtension,
-} from '../Utils/GDevelopServices/Extension';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
@@ -19,6 +16,7 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
+  type AssetPacks,
 } from '../Utils/GDevelopServices/Asset';
 
 export const indieFirebaseUser: FirebaseUser = {
@@ -430,11 +428,17 @@ export const fakeAsset1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -444,6 +448,11 @@ export const fakeAsset1: Asset = {
   ],
 };
 
+export const fakePixelArtAsset1: Asset = {
+  ...fakeAsset1,
+  tags: ['space shooter', 'tag2', 'pixel art'],
+};
+
 export const fakeAssetWithBehaviorCustomizations1: Asset = {
   id: '123',
   name: 'My spaceship',
@@ -451,11 +460,17 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -492,11 +507,17 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -522,11 +543,17 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -552,11 +579,17 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -625,11 +658,17 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -672,28 +711,28 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
 };
 
 export const fakeAssetShortHeader1: AssetShortHeader = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['space shooter', 'tag2'],
-};
-
-export const fakeAssetShortHeader2: AssetShortHeader = {
-  id: '456',
-  name: 'Zombie',
-  shortDescription: 'A zombie attacking the player and wandering around.',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['survival', 'tag2'],
-};
-
-export const fakeAssetShortHeader3: AssetShortHeader = {
-  id: '789',
-  name: 'Sword',
-  shortDescription: 'A small sword.',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['medieval', 'tag2'],
+  id: 'a4eb5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Dino Doux',
+  objectType: 'sprite',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
+  ],
+  shortDescription: 'with 6 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
@@ -862,4 +901,102 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
     'Health (life points and damages for objects)',
   ],
   gdevelopVersion: '',
+};
+
+export const fakeAssetPacks: AssetPacks = {
+  starterPacks: [
+    {
+      name: 'GDevelop Platformer',
+      tag: 'platformer',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
+      assetsCount: 16,
+    },
+    {
+      name: 'Space Shooter',
+      tag: 'space shooter',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+      assetsCount: 140,
+    },
+    {
+      name: 'Tanks',
+      tag: 'tank pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
+      assetsCount: 32,
+    },
+    {
+      name: 'Pixel Adventure',
+      tag: 'pixel adventure pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
+      assetsCount: 80,
+    },
+    {
+      name: 'Fake Paid External',
+      tag: 'pirate bomb pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
+      assetsCount: 48,
+      externalWebLink: 'https://example.com',
+      userFriendlyPrice: '$4.99',
+    },
+    {
+      name: 'Particles',
+      tag: 'pixel effects pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
+      assetsCount: 20,
+    },
+    {
+      name: 'Emotes',
+      tag: 'emote',
+      thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
+      assetsCount: 176,
+    },
+    {
+      name: 'Dinosaurus Characters',
+      tag: '24x24 dino characters',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
+      assetsCount: 5,
+    },
+    {
+      name: 'Fake Paid Spinning Items',
+      tag: '16x16 pixel art spinning items',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
+      assetsCount: 30,
+      userFriendlyPrice: '$4.99',
+    },
+    {
+      name: 'RPG Items #2',
+      tag: '16x16 pixel art rpg items',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
+      assetsCount: 64,
+    },
+    {
+      name: 'RPG Items',
+      tag: '16x16 rpg item pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
+      assetsCount: 144,
+    },
+    {
+      name: 'Fantasy Icons',
+      tag: '32x32 fantasy icons pack v2',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
+      assetsCount: 285,
+    },
+    {
+      name: 'On-Screen Controls',
+      tag: 'on-screen controls',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
+      assetsCount: 287,
+    },
+  ],
 };

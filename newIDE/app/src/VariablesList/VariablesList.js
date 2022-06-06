@@ -94,11 +94,16 @@ export type HistoryHandler = {|
 type Props = {|
   variablesContainer: gdVariablesContainer,
   inheritedVariablesContainer?: gdVariablesContainer,
+  /** Callback executed at mount to compute suggestions. */
   onComputeAllVariableNames?: () => Array<string>,
+  /** To specify if history should be handled by parent. */
   historyHandler?: HistoryHandler,
   emptyPlaceholderTitle?: React.Node,
   emptyPlaceholderDescription?: React.Node,
   helpPagePath?: ?string,
+  /** If set to false, it will commit changes to variables on each input change. It can be expensive, but useful when VariablesList can be unmounted at any time. */
+  commitChangesOnBlur: boolean,
+  /** If set to small, will collapse variable row by default. */
   size?: 'small',
 |};
 
@@ -964,6 +969,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                             ] = element;
                           }
                         }}
+                        commitOnInputChange={!props.commitChangesOnBlur}
                         dataSource={isTopLevel ? undefinedVariableNames : []}
                         margin="none"
                         key="name"
@@ -1078,7 +1084,10 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                               disabled={
                                 isCollection || (isInherited && !isTopLevel)
                               }
-                              onChange={() => {}}
+                              onChange={newValue => {
+                                onChangeValue(nodeId, newValue);
+                                forceUpdate();
+                              }}
                               value={
                                 isCollection
                                   ? i18n._(
@@ -1088,14 +1097,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                                   ? variable.getString()
                                   : variable.getValue().toString()
                               }
-                              commitOnBlur
-                              onBlur={event => {
-                                onChangeValue(
-                                  nodeId,
-                                  event.currentTarget.value
-                                );
-                                forceUpdate();
-                              }}
+                              commitOnBlur={props.commitChangesOnBlur}
                             />
                           )}
                         </Column>
@@ -1460,7 +1462,7 @@ const VariablesList = ({ onComputeAllVariableNames, ...props }: Props) => {
                           actionLabel={<Trans>Add a variable</Trans>}
                           helpPagePath={props.helpPagePath || undefined}
                           tutorialId="intermediate-advanced-variables"
-                          onAdd={onAdd}
+                          onAction={onAdd}
                         />
                       ) : null}
                     </Column>

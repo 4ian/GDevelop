@@ -47,11 +47,7 @@ const makeTestContext = () => {
     'Draggable'
   );
 
-  const parser = new gd.ExpressionParser2(
-    gd.JsPlatform.get(),
-    project,
-    testLayout
-  );
+  const parser = new gd.ExpressionParser2();
 
   return {
     project,
@@ -65,8 +61,12 @@ describe('ExpressionAutocompletion', () => {
     const { project, testLayout, parser } = makeTestContext();
     const scope = { layout: testLayout };
 
-    const expressionNode = parser.parseExpression('number', 'My').get();
+    const expressionNode = parser.parseExpression('My').get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       1
     );
@@ -96,10 +96,12 @@ describe('ExpressionAutocompletion', () => {
       ])
     );
 
-    const expressionNode2 = parser
-      .parseExpression('number', 'MySpriteObjectW')
-      .get();
+    const expressionNode2 = parser.parseExpression('MySpriteObjectW').get();
     const completionDescriptions2 = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode2,
       1
     );
@@ -129,8 +131,12 @@ describe('ExpressionAutocompletion', () => {
     const { project, testLayout, parser } = makeTestContext();
     const scope = { layout: testLayout };
 
-    const expressionNode = parser.parseExpression('number', 'To').get();
+    const expressionNode = parser.parseExpression('To').get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       1
     );
@@ -169,8 +175,12 @@ describe('ExpressionAutocompletion', () => {
     const { project, testLayout, parser } = makeTestContext();
     const scope = { layout: testLayout };
 
-    const expressionNode = parser.parseExpression('number', 'MouseX("Ba').get();
+    const expressionNode = parser.parseExpression('MouseX("Ba').get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       9
     );
@@ -198,10 +208,12 @@ describe('ExpressionAutocompletion', () => {
     const { project, testLayout, parser } = makeTestContext();
     const scope = { layout: testLayout };
 
-    const expressionNode = parser
-      .parseExpression('number', 'MySpriteObject.Po')
-      .get();
+    const expressionNode = parser.parseExpression('MySpriteObject.Po').get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       16
     );
@@ -236,9 +248,13 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser
-      .parseExpression('number', 'MySpriteObject.PointX("He')
+      .parseExpression('MySpriteObject.PointX("He')
       .get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       24
     );
@@ -267,9 +283,13 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser
-      .parseExpression('number', 'MySpriteObjectWithBehaviors.Plat')
+      .parseExpression('MySpriteObjectWithBehaviors.Plat')
       .get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       28
     );
@@ -299,9 +319,13 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser
-      .parseExpression('number', 'MySpriteObjectWithBehaviors.a')
+      .parseExpression('MySpriteObjectWithBehaviors.a')
       .get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       28
     );
@@ -336,12 +360,13 @@ describe('ExpressionAutocompletion', () => {
     const scope = { layout: testLayout };
 
     const expressionNode = parser
-      .parseExpression(
-        'number',
-        'MySpriteObjectWithBehaviors.PlatformerObject::Jum'
-      )
+      .parseExpression('MySpriteObjectWithBehaviors.PlatformerObject::Jum')
       .get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
       expressionNode,
       47
     );

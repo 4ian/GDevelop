@@ -7,6 +7,9 @@ const useStyles = makeStyles({
   root: {
     cursor: 'default',
   },
+  deleteIcon: {
+    cursor: 'default', // Hover is enough, no need for a different cursor.
+  },
 });
 
 type Props = {|

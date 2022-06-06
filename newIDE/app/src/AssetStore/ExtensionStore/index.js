@@ -16,13 +16,6 @@ import {
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
 import { t } from '@lingui/macro';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
@@ -100,7 +93,7 @@ export const ExtensionStore = ({
               value={searchText}
               onChange={setSearchText}
               onRequestSearch={() => {}}
-              style={styles.searchBar}
+              aspect="add-margins-only-if-modern-theme"
               tagsHandler={tagsHandler}
               tags={filters && filters.allTags}
               placeholder={t`Search extensions`}

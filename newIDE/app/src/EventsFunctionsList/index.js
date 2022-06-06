@@ -408,6 +408,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
           placeholder={t`Search functions`}
         />
       </Background>

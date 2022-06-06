@@ -46,13 +46,6 @@ import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
 import { AssetPackDialog } from './AssetPackDialog';
 import Home from '@material-ui/icons/Home';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 type Props = {
   project: gdProject,
   objectsContainer: gdObjectsContainer,
@@ -253,7 +246,6 @@ export const AssetStore = ({
                       navigationState.clearHistory();
                       setIsFiltersPanelOpen(true);
                     }}
-                    style={styles.searchBar}
                     ref={searchBar}
                     id="asset-store-search-bar"
                   />

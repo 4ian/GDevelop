@@ -177,6 +177,7 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                 <Trans>Instance Variables</Trans>
               </Text>
               <IconButton
+                size="small"
                 onClick={() => {
                   this.props.editInstanceVariables(instance);
                 }}

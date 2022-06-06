@@ -13,13 +13,6 @@ import Subheader from '../../UI/Subheader';
 import { CategoryChooser } from '../../UI/Search/CategoryChooser';
 import { t, Trans } from '@lingui/macro';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 type Props = {
   onChoose: Resource => void,
   resourceKind: string,
@@ -53,7 +46,7 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
         value={searchText}
         onChange={setSearchText}
         onRequestSearch={() => {}}
-        style={styles.searchBar}
+        aspect="add-margins-only-if-modern-theme"
         placeholder={t`Search resources`}
       />
       <Line

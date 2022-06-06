@@ -13,13 +13,6 @@ import { t, Trans } from '@lingui/macro';
 import Subheader from '../UI/Subheader';
 import { CategoryChooser } from '../UI/Search/CategoryChooser';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 const getShowcasedGameTitle = (showcasedGame: ShowcasedGame) =>
   showcasedGame.title;
 
@@ -51,7 +44,7 @@ export const GamesShowcase = (props: Props) => {
             value={searchText}
             onChange={setSearchText}
             onRequestSearch={() => {}}
-            style={styles.searchBar}
+            aspect="add-margins-only-if-modern-theme"
             placeholder={t`Search games`}
           />
           <Line
@@ -59,6 +52,7 @@ export const GamesShowcase = (props: Props) => {
             overflow={
               'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
             }
+            noMargin
           >
             <Background
               noFullHeight

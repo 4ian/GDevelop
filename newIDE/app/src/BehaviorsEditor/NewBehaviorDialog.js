@@ -255,6 +255,7 @@ export default function NewBehaviorDialog({
                       chooseBehavior(i18n, deprecatedBehaviors[0]);
                     }
                   }}
+                  aspect="add-margins-only-if-modern-theme"
                   onChange={setSearchText}
                   ref={searchBar}
                   placeholder={t`Search installed behaviors`}

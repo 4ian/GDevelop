@@ -445,6 +445,7 @@ export default class GroupsListContainer extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
           placeholder={t`Search object groups`}
         />
       </Background>

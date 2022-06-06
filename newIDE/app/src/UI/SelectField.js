@@ -11,11 +11,13 @@ import { makeStyles } from '@material-ui/core';
 const INVALID_VALUE = '';
 const stopPropagation = event => event.stopPropagation();
 
-const useSelectCenterStyles = makeStyles({
-  root: {
-    textAlign: 'center',
-  },
-});
+const useSelectStyles = textAlign =>
+  makeStyles({
+    root: {
+      textAlign: textAlign || 'left',
+      cursor: 'default',
+    },
+  })();
 
 export type SelectFieldInterface = {| focus: () => void |};
 
@@ -70,7 +72,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
     React.useImperativeHandle(ref, () => ({
       focus,
     }));
-    const selectCenterStyles = useSelectCenterStyles();
+    const selectStyles = useSelectStyles(props.textAlign);
 
     const onChange = props.onChange || undefined;
 
@@ -124,7 +126,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
             }}
             SelectProps={{
               native: true,
-              classes: props.textAlign === 'center' ? selectCenterStyles : {},
+              classes: selectStyles,
             }}
             style={props.style}
             inputRef={inputRef}

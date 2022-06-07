@@ -179,7 +179,7 @@
     "drop-indicator": {
       "can-drop": {
         "color": {
-          "value": "#4C5361"
+          "value": "#D6DEEC"
         }
       },
       "cannot-drop": {

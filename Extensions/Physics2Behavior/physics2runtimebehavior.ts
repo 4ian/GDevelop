@@ -1456,8 +1456,11 @@ namespace gdjs {
       // If there is no body, set a new one
       if (this._body === null) {
         this.createBody();
-        return 0;
       }
+
+      // Wake up the object
+      this._body.SetAwake(true);
+
       return this._body.GetMass();
     }
 
@@ -1465,8 +1468,11 @@ namespace gdjs {
       // If there is no body, set a new one
       if (this._body === null) {
         this.createBody();
-        return 0;
       }
+
+      // Wake up the object
+      this._body.SetAwake(true);
+
       return this._body.GetInertia();
     }
 

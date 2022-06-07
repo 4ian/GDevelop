@@ -74,7 +74,7 @@ namespace gdjs {
         return runtimeScene.getLayer(layer).getCameraHeight();
       };
 
-      export const getCameraLeft = function (
+      export const getCameraLeftBorder = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
         cameraId: integer
@@ -88,7 +88,7 @@ namespace gdjs {
         );
       };
 
-      export const getCameraRight = function (
+      export const getCameraRightBorder = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
         cameraId: integer
@@ -102,7 +102,7 @@ namespace gdjs {
         );
       };
 
-      export const getCameraTop = function (
+      export const getCameraTopBorder = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
         cameraId: integer
@@ -116,7 +116,7 @@ namespace gdjs {
         );
       };
 
-      export const getCameraBottom = function (
+      export const getCameraBottomBorder = function (
         runtimeScene: gdjs.RuntimeScene,
         layer: string,
         cameraId: integer
@@ -125,7 +125,7 @@ namespace gdjs {
           return 0;
         }
         return (
-          getCameraY(runtimeScene, layer, cameraId) -
+          getCameraY(runtimeScene, layer, cameraId) +
           getCameraHeight(runtimeScene, layer, cameraId) / 2
         );
       };

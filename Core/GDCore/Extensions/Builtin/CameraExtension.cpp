@@ -119,7 +119,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddExpressionAndCondition(
           "number",
-          "CameraLeftBorder",
+          "CameraBorderLeft",
           _("Camera left border position"),
           _("the position of the left border of a camera"),
           _("the position of the left border of camera _PARAM2_ of layer "
@@ -136,7 +136,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddExpressionAndCondition(
           "number",
-          "CameraRightBorder",
+          "CameraBorderRight",
           _("Camera right border position"),
           _("the position of the right border of a camera"),
           _("the position of the right border of camera _PARAM2_ of layer "
@@ -153,7 +153,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddExpressionAndCondition(
           "number",
-          "CameraTopBorder",
+          "CameraBorderTop",
           _("Camera top border position"),
           _("the position of the top border of a camera"),
           _("the position of the top border of camera _PARAM2_ of layer "
@@ -170,7 +170,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
   extension
       .AddExpressionAndCondition(
           "number",
-          "CameraBottomBorder",
+          "CameraBorderBottom",
           _("Camera bottom border position"),
           _("the position of the bottom border of a camera"),
           _("the position of the bottom border of camera _PARAM2_ of layer "

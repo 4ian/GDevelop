@@ -45,14 +45,14 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.getCameraWidth");
   GetAllConditions()["CameraHeight"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraHeight");
-  GetAllConditions()["CameraLeftBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraLeftBorder");
-  GetAllConditions()["CameraRightBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraRightBorder");
-  GetAllConditions()["CameraTopBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraTopBorder");
-  GetAllConditions()["CameraBottomBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraBottomBorder");
+  GetAllConditions()["CameraBorderLeft"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderLeft");
+  GetAllConditions()["CameraBorderRight"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderRight");
+  GetAllConditions()["CameraBorderTop"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderTop");
+  GetAllConditions()["CameraBorderBottom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderBottom");
   GetAllActions()["ShowLayer"].SetFunctionName(
       "gdjs.evtTools.camera.showLayer");
   GetAllActions()["HideLayer"].SetFunctionName(
@@ -82,14 +82,14 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.getCameraY");
   GetAllExpressions()["CameraCenterX"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraX");
-  GetAllExpressions()["CameraLeftBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraLeftBorder");
-  GetAllExpressions()["CameraRightBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraRightBorder");
-  GetAllExpressions()["CameraTopBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraTopBorder");
-  GetAllExpressions()["CameraBottomBorder"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraBottomBorder");
+  GetAllExpressions()["CameraBorderLeft"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderLeft");
+  GetAllExpressions()["CameraBorderRight"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderRight");
+  GetAllExpressions()["CameraBorderTop"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderTop");
+  GetAllExpressions()["CameraBorderBottom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderBottom");
   GetAllExpressions()["CameraAngle"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraRotation");
   GetAllExpressions()["CameraRotation"].SetFunctionName(

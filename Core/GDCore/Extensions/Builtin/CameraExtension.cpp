@@ -121,8 +121,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "number",
           "CameraLeft",
           _("Camera left border position"),
-          _("the left border of a camera of a layer"),
-          _("the left border of camera _PARAM2_ of layer _PARAM1_"),
+          _("the position of the left border of a camera"),
+          _("the position of the left border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -137,8 +138,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "number",
           "CameraRight",
           _("Camera right border position"),
-          _("the right border of a camera of a layer"),
-          _("the right border of camera _PARAM2_ of layer _PARAM1_"),
+          _("the position of the right border of a camera"),
+          _("the position of the right border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -153,8 +155,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "number",
           "CameraTop",
           _("Camera top border position"),
-          _("the top border of a camera of a layer"),
-          _("the top border of camera _PARAM2_ of layer _PARAM1_"),
+          _("the position of the top border of a camera"),
+          _("the position of the top border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")
@@ -169,8 +172,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "number",
           "CameraBottom",
           _("Camera bottom border position"),
-          _("the bottom border of a camera of a layer"),
-          _("the bottom border of camera _PARAM2_ of layer _PARAM1_"),
+          _("the position of the bottom border of a camera"),
+          _("the position of the bottom border of camera _PARAM2_ of layer "
+            "_PARAM1_"),
           "",
           "res/conditions/camera24.png")
       .AddCodeOnlyParameter("currentScene", "")

@@ -9,18 +9,37 @@ import {
 } from './ResourceSource';
 import { ResourceStore } from '../AssetStore/ResourceStore';
 import path from 'path';
-import { Line } from '../UI/Grid';
+import { Column, Line } from '../UI/Grid';
 import { ColumnStackLayout, TextFieldWithButtonLayout } from '../UI/Layout';
 import RaisedButton from '../UI/RaisedButton';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import { useDebounce } from '../Utils/UseDebounce';
 import axios from 'axios';
 import AlertMessage from '../UI/AlertMessage';
+import { Accordion, AccordionBody, AccordionHeader } from '../UI/Accordion';
+import { MiniToolbarText } from '../UI/MiniToolbar';
+import { MarkdownText } from '../UI/MarkdownText';
 
 type ResourceStoreChooserProps = {
   options: ChooseResourceOptions,
   onChooseResources: (resources: Array<gdResource>) => void,
   createNewResource: () => gdResource,
+};
+
+const getUrlsFromInputValue = (value: string, multiSelection: boolean) => {
+  const urls = value.split('\n').filter(Boolean);
+
+  return multiSelection ? urls : urls.slice(0, 1);
+};
+
+const getDisplayedListOfErroredIndices = dataUrlsErroredBooleanArray => {
+  return dataUrlsErroredBooleanArray
+    .map((isErrored, index) => {
+      if (isErrored) return '#' + (index + 1);
+      return null;
+    })
+    .filter(Boolean)
+    .join(', ');
 };
 
 const ResourceStoreChooser = ({
@@ -50,45 +69,85 @@ export const UrlChooser = ({
   createNewResource,
 }: ResourceStoreChooserProps) => {
   const [inputValue, setInputValue] = React.useState('');
+  const [dataUrlInputValue, setDataUrlInputValue] = React.useState<string>('');
   const [error, setError] = React.useState<?Error>(null);
+  const [dataUrlError, setDataUrlError] = React.useState<?Error>(null);
   const [urlsErroredBooleanArray, setUrlsErroredBooleanArray] = React.useState<
     boolean[]
   >([]);
+  const [
+    dataUrlsErroredBooleanArray,
+    setDataUrlsErroredBooleanArray,
+  ] = React.useState<boolean[]>([]);
   const hasErroredUrls = !!urlsErroredBooleanArray.filter(Boolean).length;
+  const hasErroredDataUrls = !!dataUrlsErroredBooleanArray.filter(Boolean)
+    .length;
 
-  const validateInputValue = useDebounce(async (inputValue: string) => {
-    const urls = options.multiSelection
-      ? inputValue.split('\n').filter(Boolean)
-      : [inputValue];
-    setError(null);
-    setUrlsErroredBooleanArray([]);
+  const validateInputValue = useDebounce(
+    async ({ value, isDataUrl }: { value: string, isDataUrl: boolean }) => {
+      const urls = getUrlsFromInputValue(value, options.multiSelection);
+      const setValidationError = isDataUrl ? setDataUrlError : setError;
+      const setValidationArrayError = isDataUrl
+        ? setDataUrlsErroredBooleanArray
+        : setUrlsErroredBooleanArray;
 
-    try {
-      const responses = await Promise.all(
-        urls.map(async url => {
-          return await axios.get(url, {
-            timeout: 1000,
-            validateStatus: status => true,
-          });
-        })
-      );
+      setValidationError(null);
+      setValidationArrayError([]);
 
-      setUrlsErroredBooleanArray(
-        responses.map(
-          response => !(response.status >= 200 && response.status < 400)
-        )
-      );
-    } catch (error) {
-      setError(error);
-    }
-  }, 500);
+      try {
+        const responses = await Promise.all(
+          urls.map(async url => {
+            return await axios.get(url, {
+              timeout: 1000,
+              validateStatus: status => true,
+            });
+          })
+        );
+
+        setValidationArrayError(
+          responses.map(
+            response => !(response.status >= 200 && response.status < 400)
+          )
+        );
+      } catch (error) {
+        setValidationError(error);
+      }
+    },
+    500
+  );
+
+  const onClick = () => {
+    const urls = getUrlsFromInputValue(
+      `${inputValue}\n${dataUrlInputValue}`,
+      options.multiSelection
+    );
+    onChooseResources(
+      urls.map(url => {
+        const newResource = createNewResource();
+        newResource.setFile(url);
+        newResource.setName(path.basename(url));
+        newResource.setOrigin('url', url);
+
+        return newResource;
+      })
+    );
+  };
 
   React.useEffect(
     () => {
-      validateInputValue(inputValue);
+      validateInputValue({ value: inputValue, isDataUrl: false });
     },
     [inputValue, validateInputValue]
   );
+  React.useEffect(
+    () => {
+      validateInputValue({ value: dataUrlInputValue, isDataUrl: true });
+    },
+    [dataUrlInputValue, validateInputValue]
+  );
+
+  const canApply =
+    !error && !dataUrlError && !hasErroredDataUrls && !hasErroredUrls;
 
   return (
     <ColumnStackLayout noMargin expand>
@@ -96,26 +155,11 @@ export const UrlChooser = ({
         <TextFieldWithButtonLayout
           renderButton={style => (
             <RaisedButton
-              onClick={() => {
-                const urls = options.multiSelection
-                  ? inputValue.split('\n').filter(Boolean)
-                  : [inputValue];
-
-                onChooseResources(
-                  urls.map(url => {
-                    const newResource = createNewResource();
-                    newResource.setFile(url);
-                    newResource.setName(path.basename(url));
-                    newResource.setOrigin('url', url);
-
-                    return newResource;
-                  })
-                );
-              }}
+              onClick={onClick}
               primary
               label={<Trans>Choose</Trans>}
               style={style}
-              disabled={!!error || hasErroredUrls}
+              disabled={!canApply}
             />
           )}
           renderTextField={() => (
@@ -142,14 +186,8 @@ export const UrlChooser = ({
                 ) : hasErroredUrls ? (
                   <Trans>
                     Unable to verify URLs{' '}
-                    {urlsErroredBooleanArray
-                      .map((isErrored, index) => {
-                        if (isErrored) return '#' + (index + 1);
-                        return null;
-                      })
-                      .filter(Boolean)
-                      .join(', ')}
-                    . Please check they are correct.
+                    {getDisplayedListOfErroredIndices(urlsErroredBooleanArray)}.
+                    Please check they are correct.
                   </Trans>
                 ) : null
               }
@@ -165,6 +203,68 @@ export const UrlChooser = ({
           stored inside the game.
         </Trans>
       </AlertMessage>
+      <Accordion>
+        <AccordionHeader>
+          <MiniToolbarText firstChild>
+            <Trans>Advanced options</Trans>{' '}
+          </MiniToolbarText>
+        </AccordionHeader>
+        <AccordionBody>
+          <Column noMargin expand>
+            <Line>
+              <TextFieldWithButtonLayout
+                renderButton={style => (
+                  <RaisedButton
+                    onClick={onClick}
+                    primary
+                    label={<Trans>Choose</Trans>}
+                    style={style}
+                    disabled={!canApply}
+                  />
+                )}
+                renderTextField={() => (
+                  <SemiControlledTextField
+                    floatingLabelText={
+                      options.multiSelection ? (
+                        <Trans>Data URL(s) (one per line)</Trans>
+                      ) : (
+                        <Trans>Data URL</Trans>
+                      )
+                    }
+                    value={dataUrlInputValue}
+                    onChange={setDataUrlInputValue}
+                    multiline={options.multiSelection}
+                    rows={1}
+                    rowsMax={5}
+                    fullWidth
+                    errorText={
+                      dataUrlError ? (
+                        <Trans>
+                          There was an error verifying the data URL(s). Please
+                          check they are correct.
+                        </Trans>
+                      ) : hasErroredDataUrls ? (
+                        <Trans>
+                          Unable to verify data URLs{' '}
+                          {getDisplayedListOfErroredIndices(
+                            dataUrlsErroredBooleanArray
+                          )}
+                          . Please check they are correct.
+                        </Trans>
+                      ) : null
+                    }
+                  />
+                )}
+              />
+            </Line>
+            <AlertMessage kind="info">
+              <MarkdownText
+                translatableSource={t`You can also specify [Data URLs](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs). The resource will be stored in the project file so we recommend you only use this method to add small resources (< 10kB).`}
+              />
+            </AlertMessage>
+          </Column>
+        </AccordionBody>
+      </Accordion>
     </ColumnStackLayout>
   );
 };

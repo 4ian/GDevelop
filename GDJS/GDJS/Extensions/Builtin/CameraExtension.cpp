@@ -26,10 +26,10 @@ CameraExtension::CameraExtension() {
   GetAllActions()["SetCameraY"]  // Deprecated
       .SetFunctionName("gdjs.evtTools.camera.setCameraY")
       .SetGetter("gdjs.evtTools.camera.getCameraY");
-  GetAllActions()["CameraCenterX"]
+  GetAllActions()["SetCameraCenterX"]
       .SetFunctionName("gdjs.evtTools.camera.setCameraX")
       .SetGetter("gdjs.evtTools.camera.getCameraX");
-  GetAllActions()["CameraCenterY"]
+  GetAllActions()["SetCameraCenterY"]
       .SetFunctionName("gdjs.evtTools.camera.setCameraY")
       .SetGetter("gdjs.evtTools.camera.getCameraY");
 

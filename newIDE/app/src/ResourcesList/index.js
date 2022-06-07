@@ -292,12 +292,23 @@ export default class ResourcesList extends React.Component<Props, State> {
       { type: 'separator' },
       {
         label: i18n._(t`Remove unused...`),
-        submenu: allResourceKindsAndMetadata.map(({ displayName, kind }) => ({
-          label: i18n._(displayName),
-          click: () => {
-            this.props.onRemoveUnusedResources(kind);
-          },
-        })),
+        submenu: allResourceKindsAndMetadata
+          .map(({ displayName, kind }) => ({
+            label: i18n._(displayName),
+            click: () => {
+              this.props.onRemoveUnusedResources(kind);
+            },
+          }))
+          .concat([
+            {
+              label: i18n._('All resources'),
+              click: () => {
+                allResourceKindsAndMetadata.forEach(resource => {
+                  this.props.onRemoveUnusedResources(resource.kind);
+                });
+              },
+            },
+          ]),
       },
       {
         label: i18n._(t`Remove Resources with Invalid Path`),

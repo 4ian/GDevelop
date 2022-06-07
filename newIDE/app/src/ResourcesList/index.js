@@ -300,10 +300,12 @@ export default class ResourcesList extends React.Component<Props, State> {
           }))
           .concat([
             {
-              label: i18n._('All resources'),
+              label: i18n._(t`Resources (any kind)`),
               click: () => {
-                allResourceKindsAndMetadata.forEach(resource => {
-                  this.props.onRemoveUnusedResources(resource.kind);
+                allResourceKindsAndMetadata.forEach(resourceKindAndMetadata => {
+                  this.props.onRemoveUnusedResources(
+                    resourceKindAndMetadata.kind
+                  );
                 });
               },
             },

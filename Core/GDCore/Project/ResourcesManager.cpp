@@ -189,6 +189,9 @@ std::map<gd::String, gd::PropertyDescriptor> AudioResource::GetProperties()
   properties[_("Preload as music")]
       .SetValue(preloadAsMusic ? "true" : "false")
       .SetType("Boolean");
+  properties[_("Preload as file")]
+      .SetValue(preloadAsFile ? "true" : "false")
+      .SetType("Boolean");
 
   return properties;
 }
@@ -199,6 +202,8 @@ bool AudioResource::UpdateProperty(const gd::String& name,
     preloadAsSound = value == "1";
   else if (name == _("Preload as music"))
     preloadAsMusic = value == "1";
+  else if (name == _("Preload as file"))
+    preloadAsFile = value == "1";
 
   return true;
 }

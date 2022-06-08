@@ -28,7 +28,7 @@ type Props = {|
   assetShortHeaders: Array<AssetShortHeader>,
   addedAssetIds: Array<string>,
   onClose: () => void,
-  onAssetPackAdded: () => void,
+  onAssetsAdded: () => void,
   project: gdProject,
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
@@ -40,7 +40,7 @@ export const AssetPackDialog = ({
   assetShortHeaders,
   addedAssetIds,
   onClose,
-  onAssetPackAdded,
+  onAssetsAdded,
   project,
   objectsContainer,
   events,
@@ -56,18 +56,18 @@ export const AssetPackDialog = ({
 
   const resourcesFetcher = useResourceFetcher();
   const [
-    isAssetPackBeingInstalled,
-    setIsAssetPackBeingInstalled,
+    areAssetsBeingInstalled,
+    setAreAssetsBeingInstalled,
   ] = React.useState<boolean>(false);
 
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
 
-  const onInstallAssetPack = React.useCallback(
+  const onInstallAssets = React.useCallback(
     async (assetShortHeaders: Array<AssetShortHeader>) => {
       if (!assetShortHeaders || !assetShortHeaders.length) return;
-      setIsAssetPackBeingInstalled(true);
+      setAreAssetsBeingInstalled(true);
       try {
         const installOutputs = await Promise.all(
           assetShortHeaders.map(assetShortHeader =>
@@ -88,14 +88,14 @@ export const AssetPackDialog = ({
 
         await resourcesFetcher.ensureResourcesAreFetched(project);
 
-        setIsAssetPackBeingInstalled(false);
-        onAssetPackAdded();
+        setAreAssetsBeingInstalled(false);
+        onAssetsAdded();
       } catch (error) {
-        setIsAssetPackBeingInstalled(false);
-        console.error('Error while installing the asset pack', error);
+        setAreAssetsBeingInstalled(false);
+        console.error('Error while installing the assets', error);
         showErrorBox({
           message:
-            'There was an error while installing the asset pack. Verify your internet connection or try again later.',
+            'There was an error while installing the assets. Verify your internet connection or try again later.',
           rawError: error,
           errorId: 'install-asset-pack-error',
         });
@@ -108,11 +108,11 @@ export const AssetPackDialog = ({
       objectsContainer,
       events,
       onObjectAddedFromAsset,
-      onAssetPackAdded,
+      onAssetsAdded,
     ]
   );
 
-  const dialogContent = isAssetPackBeingInstalled
+  const dialogContent = areAssetsBeingInstalled
     ? {
         actionButton: (
           <TextButton
@@ -141,15 +141,15 @@ export const AssetPackDialog = ({
             key="install-again"
             label={<Trans>Install again</Trans>}
             primary={false}
-            onClick={() => onInstallAssetPack(assetShortHeaders)}
+            onClick={() => onInstallAssets(assetShortHeaders)}
           />
         ),
-        onApply: () => onInstallAssetPack(assetShortHeaders),
+        onApply: () => onInstallAssets(assetShortHeaders),
         content: (
           <Text>
             <Trans>
-              You already have this asset pack installed, do you want to add the{' '}
-              {assetShortHeaders.length} assets again?
+              You already have these {assetShortHeaders.length} assets
+              installed, do you want to add them again?
             </Trans>
           </Text>
         ),
@@ -161,15 +161,14 @@ export const AssetPackDialog = ({
             key="continue"
             label={<Trans>Continue</Trans>}
             primary
-            onClick={() => onInstallAssetPack(assetShortHeaders)}
+            onClick={() => onInstallAssets(assetShortHeaders)}
           />
         ),
-        onApply: () => onInstallAssetPack(assetShortHeaders),
+        onApply: () => onInstallAssets(assetShortHeaders),
         content: (
           <Text>
             <Trans>
-              You're about to add {assetShortHeaders.length} assets from the
-              asset pack. Continue?
+              You're about to add {assetShortHeaders.length} assets. Continue?
             </Trans>
           </Text>
         ),
@@ -181,24 +180,24 @@ export const AssetPackDialog = ({
             key="install-missing"
             primary
             onClick={() => {
-              onInstallAssetPack(missingAssetShortHeaders);
+              onInstallAssets(missingAssetShortHeaders);
             }}
             buildMenuTemplate={i18n => [
               {
                 label: i18n._(t`Install all the assets`),
-                click: () => onInstallAssetPack(assetShortHeaders),
+                click: () => onInstallAssets(assetShortHeaders),
               },
             ]}
           />
         ),
-        onApply: () => onInstallAssetPack(missingAssetShortHeaders),
+        onApply: () => onInstallAssets(missingAssetShortHeaders),
         content: (
           <Text>
             <Trans>
               You already have{' '}
               {assetShortHeaders.length - missingAssetShortHeaders.length}{' '}
-              asset(s) from this pack in your scene. Do you want to add the
-              remaining {missingAssetShortHeaders.length} asset(s)?
+              asset(s) in your scene. Do you want to add the remaining{' '}
+              {missingAssetShortHeaders.length} one(s)?
             </Trans>
           </Text>
         ),
@@ -210,12 +209,12 @@ export const AssetPackDialog = ({
       title={assetPack.name}
       open
       onRequestClose={() => {
-        if (!isAssetPackBeingInstalled) onClose();
+        if (!areAssetsBeingInstalled) onClose();
       }}
       cannotBeDismissed
       actions={[
-        // Installing a pack is not cancelable, so we hide the button while installing.
-        !isAssetPackBeingInstalled ? (
+        // Installing a list of assets is not cancelable, so we hide the button while installing.
+        !areAssetsBeingInstalled ? (
           <TextButton
             key="cancel"
             label={<Trans>Cancel</Trans>}

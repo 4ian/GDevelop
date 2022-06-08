@@ -100,7 +100,6 @@ export const AssetStore = ({
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
   ] = React.useState(false);
-  const [isAssetPackAdded, setIsAssetPackAdded] = React.useState(false);
   const [
     isAssetBeingInstalled,
     setIsAssetBeingInstalled,
@@ -235,7 +234,6 @@ export const AssetStore = ({
                     navigationState.openHome();
                     clearAllFilters(assetFiltersState);
                     setIsFiltersPanelOpen(false);
-                    setIsAssetPackAdded(false);
                   }}
                   size="small"
                 >
@@ -280,7 +278,6 @@ export const AssetStore = ({
                             if (navigationState.getCurrentPage().isOnHomePage) {
                               clearAllFilters(assetFiltersState);
                               setIsFiltersPanelOpen(false);
-                              setIsAssetPackAdded(false);
                             }
                           }}
                         />
@@ -308,17 +305,11 @@ export const AssetStore = ({
                           <Column expand alignItems="flex-end" noMargin>
                             <RaisedButton
                               primary
-                              label={
-                                isAssetPackAdded ? (
-                                  <Trans>Asset pack added</Trans>
-                                ) : (
-                                  <Trans>Add pack to my scene</Trans>
-                                )
-                              }
+                              label={<Trans>Add all assets to my scene</Trans>}
                               onClick={() =>
                                 setIsAssetPackDialogInstallOpen(true)
                               }
-                              disabled={isAssetPackAdded}
+                              disabled={searchResults.length === 0}
                             />
                           </Column>
                         </>
@@ -377,9 +368,9 @@ export const AssetStore = ({
                         >
                           <AssetStoreFilterPanel
                             assetFiltersState={assetFiltersState}
-                            onChoiceChange={() =>
-                              navigationState.openSearchIfNeeded()
-                            }
+                            onChoiceChange={() => {
+                              navigationState.openSearchIfNeeded();
+                            }}
                           />
                         </Line>
                       </ScrollView>
@@ -439,8 +430,7 @@ export const AssetStore = ({
                 assetShortHeaders={searchResults}
                 addedAssetIds={addedAssetIds}
                 onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetPackAdded={() => {
-                  setIsAssetPackAdded(true);
+                onAssetsAdded={() => {
                   setIsAssetPackDialogInstallOpen(false);
                 }}
                 project={project}

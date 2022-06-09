@@ -135,6 +135,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import OnboardingDialog from './Onboarding/OnboardingDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import { getFile, getToken } from '../Utils/GDevelopServices/Project';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -1630,6 +1631,10 @@ const MainFrame = (props: Props) => {
     ]
   );
 
+  const fetchCookie = async (projectId: string) => {
+    await getToken(projectId);
+  };
+
   const chooseProject = React.useCallback(
     () => {
       if (
@@ -1665,6 +1670,11 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations(storageProvider).then(() => {
         openFromFileMetadata(fileMetadata)
           .then(state => {
+            if (state && state.currentProject) {
+              const projectId = state.currentProject.getProjectUuid();
+              console.log(projectId);
+              fetchCookie(projectId).then(getFile);
+            }
             if (state)
               openSceneOrProjectManager({
                 currentProject: state.currentProject,

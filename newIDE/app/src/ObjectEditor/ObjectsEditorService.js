@@ -48,9 +48,6 @@ const ObjectsEditorService = {
       return;
     }
 
-    console.info(
-      `Properly registered editor configuration for object "${objectType}".`
-    );
     this.editorConfigurations[objectType] = editorConfiguration;
   },
   getDefaultObjectJsImplementationPropertiesEditor(options) {

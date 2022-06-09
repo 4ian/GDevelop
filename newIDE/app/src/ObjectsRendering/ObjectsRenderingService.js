@@ -107,7 +107,6 @@ const ObjectsRenderingService = {
       return;
     }
 
-    console.info(`Properly registered renderer for object "${objectType}".`);
     this.renderers[objectType] = renderer;
   },
   /**

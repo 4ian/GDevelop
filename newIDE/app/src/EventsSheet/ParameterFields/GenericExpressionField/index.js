@@ -425,8 +425,7 @@ class ExpressionField extends React.Component<
       objectsContainer,
       expressionType,
       expressionNode,
-      cursorPosition - 1,
-      /*ignoreNodeType=*/ useAllExpressionTypes
+      cursorPosition - 1
     );
     const newAutocompletions = getAutocompletionsFromDescriptions(
       {

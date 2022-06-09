@@ -82,3 +82,7 @@ export const GDevelopPlayApi = {
     ? 'https://n9dsp0xfw6.execute-api.us-east-1.amazonaws.com/dev'
     : 'https://api.gdevelop-app.com/play',
 };
+
+export const GDevelopProjectApi = {
+  baseUrl: 'https://api-local.gdevelop.io:3010/dev'
+}

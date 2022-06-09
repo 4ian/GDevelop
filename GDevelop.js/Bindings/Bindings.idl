@@ -2127,7 +2127,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location, boolean ignoreNodeType);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 

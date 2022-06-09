@@ -56,6 +56,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setBackdropClickBehavior,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
+    setEventsSheetUseAllExpressionTypes,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -278,6 +279,20 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                 <Trans>
                   Suggest names of variables used in events but not declared in
                   the list of variables
+                </Trans>
+              }
+            />
+          </Line>
+          <Line>
+            <Toggle
+              onToggle={(e, check) =>
+                setEventsSheetUseAllExpressionTypes(check)
+              }
+              toggled={values.eventsSheetUseAllExpressionTypes}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Suggest all expressions regardless of returned type.
                 </Trans>
               }
             />

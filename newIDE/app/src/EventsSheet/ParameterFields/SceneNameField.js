@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionFieldInterface,
+} from './GenericExpressionField';
 import { enumerateLayouts } from '../../ProjectManager/EnumerateProjectItems';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
@@ -9,7 +11,7 @@ export default class SceneNameField extends Component<
   ParameterFieldProps,
   void
 > {
-  _field: ?GenericExpressionField;
+  _field: ?ExpressionFieldInterface;
 
   focus(selectAll: boolean = false) {
     if (this._field) this._field.focus(selectAll);

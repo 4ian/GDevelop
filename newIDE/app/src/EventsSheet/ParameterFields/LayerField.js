@@ -2,11 +2,13 @@
 import React, { Component } from 'react';
 import { mapFor } from '../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionFieldInterface,
+} from './GenericExpressionField';
 import { type ExpressionAutocompletion } from '../../ExpressionAutocompletion';
 
 export default class LayerField extends Component<ParameterFieldProps, {||}> {
-  _field: ?GenericExpressionField;
+  _field: ?ExpressionFieldInterface;
 
   focus(selectAll: boolean = false) {
     if (this._field) this._field.focus(selectAll);

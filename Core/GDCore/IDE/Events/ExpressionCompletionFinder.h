@@ -297,7 +297,8 @@ class GD_CORE_API ExpressionCompletionFinder
                                const gd::ObjectsContainer &objectsContainer,
                                const gd::String &rootType,
                                gd::ExpressionNode& node,
-                               size_t searchedPosition) {
+                               size_t searchedPosition,
+                               bool ignoreNodeType = false) {
     gd::ExpressionNodeLocationFinder finder(searchedPosition);
     node.Visit(finder);
     gd::ExpressionNode* nodeAtLocation = finder.GetNode();
@@ -309,8 +310,13 @@ class GD_CORE_API ExpressionCompletionFinder
 
     gd::ExpressionNode* maybeParentNodeAtLocation = finder.GetParentNode();
     gd::ExpressionCompletionFinder autocompletionProvider(
-        platform, globalObjectsContainer, objectsContainer, rootType,
-        searchedPosition, maybeParentNodeAtLocation);
+        platform,
+        globalObjectsContainer,
+        objectsContainer,
+        rootType,
+        searchedPosition,
+        maybeParentNodeAtLocation,
+        ignoreNodeType);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
   }
@@ -327,7 +333,13 @@ class GD_CORE_API ExpressionCompletionFinder
 
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type, "", searchedPosition + 1, searchedPosition + 1));
     completions.push_back(ExpressionCompletionDescription::ForExpression(
@@ -337,7 +349,13 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions.
   }
   void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type, "", searchedPosition + 1, searchedPosition + 1));
     completions.push_back(ExpressionCompletionDescription::ForExpression(
@@ -391,7 +409,8 @@ class GD_CORE_API ExpressionCompletionFinder
         return;
       }
 
-      const gd::String& type = parameterMetadata->GetType();
+      const gd::String& type =
+          (ignoreNodeType) ? "number|string" : parameterMetadata->GetType();
       if (type == "string") {
         // No completions for an arbitrary string.
         return;
@@ -409,7 +428,13 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitVariableNode(VariableNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     auto objectName = gd::ExpressionVariableOwnerFinder::GetObjectName(
         platform,
         globalObjectsContainer,
@@ -433,7 +458,13 @@ class GD_CORE_API ExpressionCompletionFinder
     // No completions
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     if (gd::ParameterMetadata::IsObject(type)) {
       // Only show completions of objects if an object is required
       completions.push_back(ExpressionCompletionDescription::ForObject(
@@ -488,7 +519,13 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     if (!node.behaviorFunctionName.empty() ||
         node.behaviorNameNamespaceSeparatorLocation.IsValid()) {
       // Behavior function (or behavior function being written, with the
@@ -541,7 +578,13 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     bool isCaretOnParenthesis = IsCaretOn(node.openingParenthesisLocation) ||
                                 IsCaretOn(node.closingParenthesisLocation);
 
@@ -611,7 +654,13 @@ class GD_CORE_API ExpressionCompletionFinder
     }
   }
   void OnVisitEmptyNode(EmptyNode& node) override {
-    auto type = gd::ExpressionTypeFinder::GetType(platform, globalObjectsContainer, objectsContainer, rootType, node);
+    auto type = (ignoreNodeType)
+                    ? "number|string"
+                    : gd::ExpressionTypeFinder::GetType(platform,
+                                                        globalObjectsContainer,
+                                                        objectsContainer,
+                                                        rootType,
+                                                        node);
     completions.push_back(ExpressionCompletionDescription::ForObject(
         type,
         node.text,
@@ -639,22 +688,25 @@ class GD_CORE_API ExpressionCompletionFinder
                              const gd::ObjectsContainer &objectsContainer_,
                              const gd::String &rootType_,
                              size_t searchedPosition_,
-                             gd::ExpressionNode* maybeParentNodeAtLocation_)
+                             gd::ExpressionNode* maybeParentNodeAtLocation_,
+                             bool ignoreNodeType_ = false)
       : platform(platform_),
         globalObjectsContainer(globalObjectsContainer_),
         objectsContainer(objectsContainer_),
         rootType(rootType_),
+        ignoreNodeType(ignoreNodeType_),
         searchedPosition(searchedPosition_),
         maybeParentNodeAtLocation(maybeParentNodeAtLocation_){};
 
   std::vector<ExpressionCompletionDescription> completions;
   size_t searchedPosition;
   gd::ExpressionNode* maybeParentNodeAtLocation;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
   const gd::String rootType;
+  bool ignoreNodeType;
 };
 
 }  // namespace gd

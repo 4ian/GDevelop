@@ -43,17 +43,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.0.135
   extension.AddDuplicatedCondition("CameraX", "CameraCenterX")
       .SetHidden();  // Deprecated
   extension.AddDuplicatedExpression("CameraX", "CameraCenterX")
       .SetHidden();  // Deprecated
-
-  extension.AddDuplicatedAction("CameraX", "CameraCenterX")
+  extension.AddDuplicatedAction("SetCameraX", "SetCameraCenterX")
       .SetHidden();  // Deprecated
+
   extension.AddDuplicatedAction("CameraX", "SetCameraX")
       .SetHidden();  // Deprecated
+
   extension.AddDuplicatedExpression("VueX", "CameraX")
       .SetHidden();  // Deprecated
+  // end of compatibility code
 
   extension
       .AddExpressionAndConditionAndAction(
@@ -72,17 +75,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
       .SetDefaultValue("0")
       .MarkAsAdvanced();
 
+  // Compatibility with GD <= 5.0.135
   extension.AddDuplicatedCondition("CameraY", "CameraCenterY")
       .SetHidden();  // Deprecated
   extension.AddDuplicatedExpression("CameraY", "CameraCenterY")
       .SetHidden();  // Deprecated
-
-  extension.AddDuplicatedAction("CameraY", "CameraCenterY")
+  extension.AddDuplicatedAction("SetCameraY", "SetCameraCenterY")
       .SetHidden();  // Deprecated
+
   extension.AddDuplicatedAction("CameraY", "SetCameraY")
       .SetHidden();  // Deprecated
+
   extension.AddDuplicatedExpression("VueY", "CameraY")
       .SetHidden();  // Deprecated
+  // end of compatibility code
 
   extension
       .AddExpressionAndCondition(

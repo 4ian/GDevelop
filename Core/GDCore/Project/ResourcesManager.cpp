@@ -184,10 +184,16 @@ std::map<gd::String, gd::PropertyDescriptor> AudioResource::GetProperties()
     const {
   std::map<gd::String, gd::PropertyDescriptor> properties;
   properties[_("Preload as sound")]
+      .SetDescription(_("Loads the fully decoded file into cache, so it can be played right away as Sound with no further delays."))
       .SetValue(preloadAsSound ? "true" : "false")
       .SetType("Boolean");
   properties[_("Preload as music")]
+      .SetDescription(_("Prepares the file for immediate streaming as Music (does not wait for complete download)."))
       .SetValue(preloadAsMusic ? "true" : "false")
+      .SetType("Boolean");
+  properties[_("Preload in cache")]
+      .SetDescription(_("Loads the complete file into cache, but does not decode it into memory until requested."))
+      .SetValue(preloadInCache ? "true" : "false")
       .SetType("Boolean");
 
   return properties;
@@ -199,6 +205,8 @@ bool AudioResource::UpdateProperty(const gd::String& name,
     preloadAsSound = value == "1";
   else if (name == _("Preload as music"))
     preloadAsMusic = value == "1";
+  else if (name == _("Preload in cache"))
+    preloadInCache = value == "1";
 
   return true;
 }
@@ -569,6 +577,7 @@ void AudioResource::UnserializeFrom(const SerializerElement& element) {
   SetFile(element.GetStringAttribute("file"));
   SetPreloadAsMusic(element.GetBoolAttribute("preloadAsMusic"));
   SetPreloadAsSound(element.GetBoolAttribute("preloadAsSound"));
+  SetPreloadInCache(element.GetBoolAttribute("preloadInCache"));
 }
 
 void AudioResource::SerializeTo(SerializerElement& element) const {
@@ -576,6 +585,7 @@ void AudioResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("file", GetFile());
   element.SetAttribute("preloadAsMusic", PreloadAsMusic());
   element.SetAttribute("preloadAsSound", PreloadAsSound());
+  element.SetAttribute("preloadInCache", PreloadInCache());
 }
 
 void FontResource::SetFile(const gd::String& newFile) {

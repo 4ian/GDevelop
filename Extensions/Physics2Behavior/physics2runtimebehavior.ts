@@ -52,8 +52,21 @@ namespace gdjs {
         const behaviorB = contact.GetFixtureB().GetBody()
           .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
 
-        behaviorA.contactsStartedBetweenFrames.push(behaviorB);
-        behaviorB.contactsStartedBetweenFrames.push(behaviorA);
+        // There might be contacts that end during the frame and
+        // start again right away. It is considered a glitch
+        // and should not be detected.
+        let i = behaviorA.contactsEndedBetweenFrames.indexOf(behaviorB);
+        if (i !== -1) {
+          behaviorA.contactsEndedBetweenFrames.splice(i, 1);
+        } else {
+          behaviorA.contactsStartedBetweenFrames.push(behaviorB);
+        }
+        i = behaviorB.contactsStartedBetweenFrames.indexOf(behaviorA);
+        if (i !== -1) {
+          behaviorB.contactsStartedBetweenFrames.splice(i, 1);
+        } else {
+          behaviorB.contactsStartedBetweenFrames.push(behaviorA);
+        }
       };
       this.contactListener.EndContact = function (contactPtr) {
         // Get the contact

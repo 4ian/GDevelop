@@ -120,10 +120,13 @@ const getAutocompletionsForExpressions = (
 
 const getAutocompletionsForFreeExpressions = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
+  completionDescription: gdExpressionCompletionDescription,
+  useAllExpressionTypes: boolean
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
-  const type: string = completionDescription.getType();
+  const type: string = useAllExpressionTypes
+    ? 'number|string'
+    : completionDescription.getType();
   const isExact: boolean = completionDescription.isExact();
 
   const freeExpressions = enumerateFreeExpressions(type);
@@ -143,10 +146,13 @@ const getAutocompletionsForFreeExpressions = function(
 
 const getAutocompletionsForObjectExpressions = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
+  completionDescription: gdExpressionCompletionDescription,
+  useAllExpressionTypes: boolean
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
-  const type: string = completionDescription.getType();
+  const type: string = useAllExpressionTypes
+    ? 'number|string'
+    : completionDescription.getType();
   const objectName: string = completionDescription.getObjectName();
   const isExact: boolean = completionDescription.isExact();
   const {
@@ -178,10 +184,13 @@ const getAutocompletionsForObjectExpressions = function(
 
 const getAutocompletionsForBehaviorExpressions = function(
   expressionAutocompletionContext: ExpressionAutocompletionContext,
-  completionDescription: gdExpressionCompletionDescription
+  completionDescription: gdExpressionCompletionDescription,
+  useAllExpressionTypes: boolean
 ): Array<ExpressionAutocompletion> {
   const prefix: string = completionDescription.getPrefix();
-  const type: string = completionDescription.getType();
+  const type: string = useAllExpressionTypes
+    ? 'number|string'
+    : completionDescription.getType();
   const behaviorName: string = completionDescription.getBehaviorName();
   const isExact: boolean = completionDescription.isExact();
   const {
@@ -445,7 +454,8 @@ const getAutocompletionsForBehavior = function(
 
 export const getAutocompletionsFromDescriptions = (
   expressionAutocompletionContext: ExpressionAutocompletionContext,
-  expressionCompletionDescriptions: gdVectorExpressionCompletionDescription
+  expressionCompletionDescriptions: gdVectorExpressionCompletionDescription,
+  useAllExpressionTypes: boolean
 ): Array<ExpressionAutocompletion> => {
   const { gd } = expressionAutocompletionContext;
 
@@ -460,17 +470,20 @@ export const getAutocompletionsFromDescriptions = (
         if (behaviorName) {
           return getAutocompletionsForBehaviorExpressions(
             expressionAutocompletionContext,
-            completionDescription
+            completionDescription,
+            useAllExpressionTypes
           );
         } else if (objectName) {
           return getAutocompletionsForObjectExpressions(
             expressionAutocompletionContext,
-            completionDescription
+            completionDescription,
+            useAllExpressionTypes
           );
         } else {
           return getAutocompletionsForFreeExpressions(
             expressionAutocompletionContext,
-            completionDescription
+            completionDescription,
+            useAllExpressionTypes
           );
         }
       } else if (completionKind === gd.ExpressionCompletionDescription.Object) {

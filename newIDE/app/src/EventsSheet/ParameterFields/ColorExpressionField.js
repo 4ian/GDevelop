@@ -1,12 +1,14 @@
 // @flow
 import React, { Component } from 'react';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionFieldInterface,
+} from './GenericExpressionField';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import { rgbStringAndAlphaToRGBColor } from '../../Utils/ColorTransformer';
 
 export default class ParameterColorField extends Component<ParameterFieldProps> {
-  _field: ?GenericExpressionField;
+  _field: ?ExpressionFieldInterface;
 
   focus(selectAll: boolean = false) {
     if (this._field) this._field.focus(selectAll);

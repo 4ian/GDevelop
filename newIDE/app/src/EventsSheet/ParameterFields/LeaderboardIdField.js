@@ -15,7 +15,9 @@ import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionFieldInterface,
+} from './GenericExpressionField';
 import { breakUuid } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 
@@ -58,7 +60,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
     const inputFieldRef = React.useRef<?(
-      | GenericExpressionField
+      | ExpressionFieldInterface
       | SelectFieldInterface
     )>(null);
     React.useImperativeHandle(ref, () => ({

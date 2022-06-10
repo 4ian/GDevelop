@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionFieldInterface,
+} from './GenericExpressionField';
 import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
@@ -12,7 +14,7 @@ import { enumerateEffectNames } from '../../EffectsList/EnumerateEffects';
 
 export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
   function ObjectEffectNameField(props: ParameterFieldProps, ref) {
-    const field = React.useRef<?GenericExpressionField>(null);
+    const field = React.useRef<?ExpressionFieldInterface>(null);
     React.useImperativeHandle(ref, () => ({
       focus: (selectAll: boolean = false) => {
         if (field.current) field.current.focus(selectAll);

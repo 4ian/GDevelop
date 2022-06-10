@@ -78,7 +78,8 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toHaveLength(2);
     expect(autocompletions).toEqual(
@@ -113,10 +114,41 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions2
+      completionDescriptions2,
+      false
     );
     expect(autocompletions2).toHaveLength(1);
     expect(autocompletions2).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'MySpriteObjectWithBehaviors',
+          addDot: true,
+          kind: 'Object',
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode2,
+      1
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toHaveLength(1);
+    expect(autocompletionsWithAllTypes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           completion: 'MySpriteObjectWithBehaviors',
@@ -148,7 +180,8 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
       expect.arrayContaining([
@@ -164,6 +197,59 @@ describe('ExpressionAutocompletion', () => {
         }),
         expect.objectContaining({
           completion: 'TouchX',
+          addParenthesis: true,
+          isExact: false,
+        }),
+      ])
+    );
+    expect(autocompletions).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'ToString',
+          addParenthesis: true,
+          isExact: false,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode,
+      1
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'ToDeg',
+          addParenthesis: true,
+          isExact: false,
+        }),
+        expect.objectContaining({
+          completion: 'ToRad',
+          addParenthesis: true,
+          isExact: false,
+        }),
+        expect.objectContaining({
+          completion: 'TouchX',
+          addParenthesis: true,
+          isExact: false,
+        }),
+        expect.objectContaining({
+          completion: 'ToString',
           addParenthesis: true,
           isExact: false,
         }),
@@ -192,9 +278,38 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: '"Background"',
+          addParameterSeparator: true,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode,
+      9
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           completion: '"Background"',
@@ -208,7 +323,7 @@ describe('ExpressionAutocompletion', () => {
     const { project, testLayout, parser } = makeTestContext();
     const scope = { layout: testLayout };
 
-    const expressionNode = parser.parseExpression('MySpriteObject.Po').get();
+    const expressionNode = parser.parseExpression('MySpriteObject.Ani').get();
     const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
       gd.JsPlatform.get(),
       project,
@@ -225,17 +340,66 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          completion: 'PointX',
+          completion: 'Animation',
           addParenthesis: true,
           isExact: false,
         }),
         expect.objectContaining({
-          completion: 'PointY',
+          completion: 'AnimationSpeedScale',
+          addParenthesis: true,
+          isExact: false,
+        }),
+      ])
+    );
+    expect(autocompletions).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'AnimationName',
+          addParenthesis: true,
+          isExact: false,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode,
+      16
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'Animation',
+          addParenthesis: true,
+          isExact: false,
+        }),
+        expect.objectContaining({
+          completion: 'AnimationSpeedScale',
+          addParenthesis: true,
+          isExact: false,
+        }),
+        expect.objectContaining({
+          completion: 'AnimationName',
           addParenthesis: true,
           isExact: false,
         }),
@@ -266,9 +430,38 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: '"Head"',
+          addParameterSeparator: false,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode,
+      24
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           completion: '"Head"',
@@ -301,9 +494,39 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'PlatformerObject',
+          addNamespaceSeparator: true,
+          isExact: false,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode,
+      28
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           completion: 'PlatformerObject',
@@ -337,9 +560,44 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'PlatformerObject',
+          addNamespaceSeparator: true,
+          isExact: false,
+        }),
+        expect.objectContaining({
+          completion: 'PlatformerObject',
+          addNamespaceSeparator: true,
+          isExact: false,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'number',
+      expressionNode,
+      28
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           completion: 'PlatformerObject',
@@ -378,9 +636,39 @@ describe('ExpressionAutocompletion', () => {
         objectsContainer: testLayout,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      false
     );
     expect(autocompletions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          completion: 'JumpSpeed',
+          addParenthesis: true,
+          isExact: false,
+        }),
+      ])
+    );
+
+    const completionDescriptionsWithAllTypes = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+      gd.JsPlatform.get(),
+      project,
+      testLayout,
+      'string',
+      expressionNode,
+      47
+    );
+    const autocompletionsWithAllTypes = getAutocompletionsFromDescriptions(
+      {
+        gd,
+        project: project,
+        globalObjectsContainer: project,
+        objectsContainer: testLayout,
+        scope,
+      },
+      completionDescriptionsWithAllTypes,
+      true
+    );
+    expect(autocompletionsWithAllTypes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           completion: 'JumpSpeed',

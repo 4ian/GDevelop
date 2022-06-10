@@ -44,7 +44,11 @@ const freeActionsToAddToBehavior: ExtensionsExtraInstructions = {};
 
 const freeConditionsToAddToBehavior: ExtensionsExtraInstructions = {
   Physics2: {
-    'Physics2::Physics2Behavior': ['Physics2::Collision'],
+    'Physics2::Physics2Behavior': [
+      'Physics2::Collision',
+      'Physics2::CollisionStarted',
+      'Physics2::CollisionStopped',
+    ],
   },
 };
 

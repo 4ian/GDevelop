@@ -1,5 +1,3 @@
-// @ts-check
-
 // TODO: find a way to add assertions at events time to enable this test.
 describe.skip('Physics2RuntimeBehavior', () => {
   describe('Contacts computation', () => {
@@ -96,6 +94,9 @@ describe.skip('Physics2RuntimeBehavior', () => {
       movingObject.setPosition(500, 780);
       const staticObjectBehavior = staticObject.getBehavior('Physics2');
       const movingObjectBehavior = movingObject.getBehavior('Physics2');
+      if (!staticObjectBehavior || !movingObjectBehavior) {
+        throw new Error("Behaviors not found, test cannot be run.")
+      }
       movingObjectBehavior.setLinearVelocityY(40000);
       // behavior.applyImpulse(0, 10000, 0, 0);
 

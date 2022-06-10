@@ -129,6 +129,8 @@ export const AssetDetails = ({
     () => {
       (async () => {
         try {
+          // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
+          setAsset(null);
           const loadedAsset = await getAsset(assetShortHeader);
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {

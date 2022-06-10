@@ -48,13 +48,12 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
 
-        // Let each behavior know about the contact against the other
-        behaviorA.currentContacts.push(behaviorB);
-        behaviorB.currentContacts.push(behaviorA);
+        behaviorA.contactsStartedBetweenFrames.push(behaviorB);
+        behaviorB.contactsStartedBetweenFrames.push(behaviorA);
       };
       this.contactListener.EndContact = function (contactPtr) {
         // Get the contact
@@ -70,19 +69,12 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
 
-        // Remove each other contact
-        let i = behaviorA.currentContacts.indexOf(behaviorB);
-        if (i !== -1) {
-          behaviorA.currentContacts.splice(i, 1);
-        }
-        i = behaviorB.currentContacts.indexOf(behaviorA);
-        if (i !== -1) {
-          behaviorB.currentContacts.splice(i, 1);
-        }
+        behaviorA.contactsEndedBetweenFrames.push(behaviorB);
+        behaviorB.contactsEndedBetweenFrames.push(behaviorA);
       };
       this.contactListener.PreSolve = function () {};
       this.contactListener.PostSolve = function () {};
@@ -93,9 +85,8 @@ namespace gdjs {
     static getSharedData(runtimeScene, behaviorName) {
       // Create one if needed
       if (!runtimeScene.physics2SharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics2SharedData = new gdjs.Physics2SharedData(
           runtimeScene,
           initialData
@@ -241,6 +232,8 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
+    contactsStartedBetweenFrames: Array<any>;
+    contactsEndedBetweenFrames: Array<any>;
     currentContacts: any;
     _body: any = null;
     _sharedData: any;
@@ -281,6 +274,12 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
+      this.contactsStartedBetweenFrames =
+        behaviorData.contactsStartedBetweenFrames || [];
+      this.contactsStartedBetweenFrames.length = 0;
+      this.contactsEndedBetweenFrames =
+        behaviorData.contactsEndedBetweenFrames || [];
+      this.contactsEndedBetweenFrames.length = 0;
       this.currentContacts = behaviorData.currentContacts || [];
       this.currentContacts.length = 0;
       this._sharedData = Physics2SharedData.getSharedData(
@@ -741,10 +740,27 @@ namespace gdjs {
       this._objectOldX = this.owner.getX();
       this._objectOldY = this.owner.getY();
       this._objectOldAngle = this.owner.getAngle();
+
+      this.currentContacts =
+        gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+          this.currentContacts,
+          this.contactsStartedBetweenFrames,
+          this.contactsEndedBetweenFrames
+        );
     }
 
     doStepPostEvents(runtimeScene) {
       this._updateBodyFromObject();
+
+      // Reset contacts that happened in-between frames
+      this.contactsStartedBetweenFrames.splice(
+        0,
+        this.contactsStartedBetweenFrames.length
+      );
+      this.contactsEndedBetweenFrames.splice(
+        0,
+        this.contactsEndedBetweenFrames.length
+      );
 
       // Reset world step to update next frame
       this._sharedData.stepped = false;

@@ -309,8 +309,12 @@ class GD_CORE_API ExpressionCompletionFinder
 
     gd::ExpressionNode* maybeParentNodeAtLocation = finder.GetParentNode();
     gd::ExpressionCompletionFinder autocompletionProvider(
-        platform, globalObjectsContainer, objectsContainer, rootType,
-        searchedPosition, maybeParentNodeAtLocation);
+        platform,
+        globalObjectsContainer,
+        objectsContainer,
+        rootType,
+        searchedPosition,
+        maybeParentNodeAtLocation);
     nodeAtLocation->Visit(autocompletionProvider);
     return autocompletionProvider.GetCompletionDescriptions();
   }
@@ -650,7 +654,7 @@ class GD_CORE_API ExpressionCompletionFinder
   std::vector<ExpressionCompletionDescription> completions;
   size_t searchedPosition;
   gd::ExpressionNode* maybeParentNodeAtLocation;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;

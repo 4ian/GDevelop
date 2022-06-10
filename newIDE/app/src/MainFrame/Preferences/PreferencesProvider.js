@@ -134,6 +134,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
+    setEventsSheetUseAllExpressionTypes: this._setEventsSheetUseAllExpressionTypes.bind(
+      this
+    ),
   };
 
   componentDidMount() {
@@ -311,6 +314,20 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetUseAllExpressionTypes(
+    eventsSheetUseAllExpressionTypes: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetUseAllExpressionTypes,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

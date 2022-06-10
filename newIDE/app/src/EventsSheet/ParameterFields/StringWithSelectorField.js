@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import GenericExpressionField from './GenericExpressionField';
+import GenericExpressionField, {
+  type ExpressionFieldInterface,
+} from './GenericExpressionField';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import { getParameterChoices } from './ParameterMetadataTools';
 
@@ -8,7 +10,7 @@ export default class StringWithSelectorField extends Component<
   ParameterFieldProps,
   {||}
 > {
-  _field: ?GenericExpressionField;
+  _field: ?ExpressionFieldInterface;
 
   focus(selectAll: boolean = false) {
     if (this._field) this._field.focus(selectAll);

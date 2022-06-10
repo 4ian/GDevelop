@@ -42,6 +42,7 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from '../../../UI/KeyboardShortcuts/InteractionKeys';
+import PreferencesContext from '../../../MainFrame/Preferences/PreferencesContext';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -163,7 +164,10 @@ const extractErrors = (
   return { errorText, errorHighlights };
 };
 
-export default class ExpressionField extends React.Component<Props, State> {
+class ExpressionField extends React.Component<
+  {| ...Props, useAllExpressionTypes: boolean |},
+  State
+> {
   _field: ?SemiControlledTextField = null;
   _fieldElement: ?Element = null;
   _inputElement: ?HTMLInputElement = null;
@@ -371,6 +375,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       scope,
       onGetAdditionalAutocompletions,
       onExtractAdditionalErrors,
+      useAllExpressionTypes,
     } = this.props;
     if (!project) return null;
 
@@ -430,7 +435,8 @@ export default class ExpressionField extends React.Component<Props, State> {
         objectsContainer,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      useAllExpressionTypes
     );
     const allNewAutocompletions = onGetAdditionalAutocompletions
       ? onGetAdditionalAutocompletions(expression).concat(newAutocompletions)
@@ -566,7 +572,11 @@ export default class ExpressionField extends React.Component<Props, State> {
                             onChoose={(type, expression) => {
                               this._handleExpressionChosen(expression);
                             }}
-                            expressionType={expressionType}
+                            expressionType={
+                              this.props.useAllExpressionTypes
+                                ? 'number|string'
+                                : expressionType
+                            }
                             focusOnMount
                             scope={scope}
                           />
@@ -663,3 +673,35 @@ export default class ExpressionField extends React.Component<Props, State> {
     );
   }
 }
+
+export type ExpressionFieldInterface = {|
+  focus: (selectAll?: boolean) => void,
+|};
+
+// GenericExpressionField is a wrapper so that the component can use multiple
+// context in class methods while correctly exposing the interface.
+const GenericExpressionField = (props, ref) => {
+  React.useImperativeHandle(ref, () => ({
+    focus,
+  }));
+
+  const component = React.useRef<?ExpressionField>(null);
+  const focus = (selectAll?: boolean) => {
+    if (component.current) component.current.focus(selectAll);
+  };
+
+  const {
+    values: { eventsSheetUseAllExpressionTypes },
+  } = React.useContext(PreferencesContext);
+  return (
+    <ExpressionField
+      ref={component}
+      useAllExpressionTypes={eventsSheetUseAllExpressionTypes}
+      {...props}
+    />
+  );
+};
+
+export default React.forwardRef<Props, ExpressionFieldInterface>(
+  GenericExpressionField
+);

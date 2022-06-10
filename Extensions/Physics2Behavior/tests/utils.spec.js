@@ -5,15 +5,14 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const items = ['A', 'B', 'C'];
     const startedItems = [];
     const endedItems = [];
-    const expectedResolvedItems = items;
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    const expectedResolvedItems = [...items];
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 
@@ -22,14 +21,13 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const startedItems = ['Z', 'Q'];
     const endedItems = [];
     const expectedResolvedItems = [...items, ...startedItems];
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 
@@ -38,14 +36,13 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const startedItems = [];
     const endedItems = ['Z', 'B', 'R'];
     const expectedResolvedItems = ['A', 'C'];
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 
@@ -53,15 +50,14 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const items = ['A', 'B', 'C'];
     const startedItems = ['Z', 'X'];
     const endedItems = ['Z', 'X'];
-    const expectedResolvedItems = items;
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    const expectedResolvedItems = [...items];
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 
@@ -70,14 +66,13 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const startedItems = ['Z', 'X', 'W'];
     const endedItems = ['Z', 'A', 'X'];
     const expectedResolvedItems = ['B', 'C', 'W'];
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 
@@ -86,14 +81,13 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const startedItems = ['Z', 'Z'];
     const endedItems = ['Z'];
     const expectedResolvedItems = [...items, 'Z'];
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 
@@ -102,14 +96,13 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     const startedItems = ['C'];
     const endedItems = ['C', 'C'];
     const expectedResolvedItems = ['A', 'B'];
-    const resolvedItems =
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        items,
-        startedItems,
-        endedItems
-      );
-    for (let i = 0; i < resolvedItems.length; i++) {
-      expect(resolvedItems[i]).to.be(expectedResolvedItems[i]);
+    gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+      items,
+      startedItems,
+      endedItems
+    );
+    for (let i = 0; i < items.length; i++) {
+      expect(items[i]).to.be(expectedResolvedItems[i]);
     }
   });
 });

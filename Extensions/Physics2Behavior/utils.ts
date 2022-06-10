@@ -4,7 +4,7 @@ namespace gdjs {
       current: Array<T>,
       started: Array<T>,
       ended: Array<T>
-    ): Array<T> => {
+    ): void => {
       const endedDuplicate = [...ended]
       started.forEach((startedItem) => {
         const isAlsoEndedIndex = endedDuplicate.indexOf(startedItem);
@@ -20,7 +20,6 @@ namespace gdjs {
           current.splice(index, 1);
         }
       });
-      return current;
     };
   }
 }

@@ -754,12 +754,11 @@ namespace gdjs {
       this._objectOldY = this.owner.getY();
       this._objectOldAngle = this.owner.getAngle();
 
-      this.currentContacts =
-        gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-          this.currentContacts,
-          this.contactsStartedBetweenFrames,
-          this.contactsEndedBetweenFrames
-        );
+      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+        this.currentContacts,
+        this.contactsStartedBetweenFrames,
+        this.contactsEndedBetweenFrames
+      );
     }
 
     doStepPostEvents(runtimeScene) {

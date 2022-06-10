@@ -3829,6 +3829,18 @@ namespace gdjs {
             return true;
           }
         }
+        // If a contact has started between frames and ended right away, it
+        // won't appear in current contacts but the condition should return
+        // true anyway.
+        for (
+          let i = 0, len = behavior1.contactsStartedBetweenFrames.length;
+          i < len;
+          ++i
+        ) {
+          if (behavior1.contactsStartedBetweenFrames[i].owner === object2) {
+            return true;
+          }
+        }
       }
 
       // No contact found

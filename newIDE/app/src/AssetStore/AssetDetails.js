@@ -38,6 +38,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 
 const FIXED_HEIGHT = 250;
+const FIXED_WIDTH = 300;
 
 const styles = {
   previewBackground: {
@@ -46,7 +47,7 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     padding: 10,
-    width: 300,
+    width: FIXED_WIDTH,
     height: FIXED_HEIGHT,
   },
   chip: {
@@ -298,43 +299,44 @@ export const AssetDetails = ({
         </Line>
         <ResponsiveLineStackLayout noMargin>
           <Column>
-            <div style={styles.previewBackground}>
-              {asset ? (
-                <>
-                  {asset.objectType === 'sprite' &&
-                    animationResources &&
-                    direction && (
-                      <AnimationPreview
-                        resourceNames={animationResources.map(
-                          ({ name }) => name
-                        )}
-                        getImageResourceSource={(resourceName: string) => {
-                          const resource = assetResources[resourceName];
-                          return resource ? resource.file : '';
-                        }}
-                        isImageResourceSmooth={() => isImageResourceSmooth}
-                        project={project}
-                        timeBetweenFrames={direction.timeBetweenFrames}
-                        isLooping // Always loop in the asset store.
-                        hideCheckeredBackground
-                        hideControls
-                        initialZoom={140 / Math.max(asset.width, asset.height)}
-                        fixedHeight={FIXED_HEIGHT}
-                      />
-                    )}
-                  {(asset.objectType === 'tiled' ||
-                    asset.objectType === '9patch') && (
+            {asset ? (
+              <>
+                {asset.objectType === 'sprite' &&
+                  animationResources &&
+                  direction && (
+                    <AnimationPreview
+                      resourceNames={animationResources.map(({ name }) => name)}
+                      getImageResourceSource={(resourceName: string) => {
+                        const resource = assetResources[resourceName];
+                        return resource ? resource.file : '';
+                      }}
+                      isImageResourceSmooth={() => isImageResourceSmooth}
+                      project={project}
+                      timeBetweenFrames={direction.timeBetweenFrames}
+                      isLooping // Always loop in the asset store.
+                      hideCheckeredBackground
+                      hideControls
+                      initialZoom={140 / Math.max(asset.width, asset.height)}
+                      fixedHeight={FIXED_HEIGHT}
+                      fixedWidth={FIXED_WIDTH}
+                    />
+                  )}
+                {(asset.objectType === 'tiled' ||
+                  asset.objectType === '9patch') && (
+                  <div style={styles.previewBackground}>
                     <CorsAwareImage
                       style={styles.previewImage}
                       src={asset.previewImageUrls[0]}
                       alt={asset.name}
                     />
-                  )}
-                </>
-              ) : (
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={styles.previewBackground}>
                 <PlaceholderLoader />
-              )}
-            </div>
+              </div>
+            )}
             {assetAnimations &&
               assetAnimations.length > 1 &&
               typeof selectedAnimationName === 'string' && (

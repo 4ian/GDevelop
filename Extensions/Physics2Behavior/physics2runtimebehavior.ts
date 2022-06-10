@@ -3859,6 +3859,58 @@ namespace gdjs {
       // No contact found
       return false;
     }
+
+    // Collision
+    static startedCollisionTest(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics2RuntimeBehavior;
+      if (!!behavior1) {
+        for (
+          let i = 0, len = behavior1.contactsStartedBetweenFrames.length;
+          i < len;
+          ++i
+        ) {
+          if (behavior1.contactsStartedBetweenFrames[i].owner === object2) {
+            return true;
+          }
+        }
+      }
+
+      // No contact found
+      return false;
+    }
+
+    // Collision
+    static stoppedCollisionTest(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics2RuntimeBehavior;
+      if (!!behavior1) {
+        for (
+          let i = 0, len = behavior1.contactsEndedBetweenFrames.length;
+          i < len;
+          ++i
+        ) {
+          if (behavior1.contactsEndedBetweenFrames[i].owner === object2) {
+            return true;
+          }
+        }
+      }
+
+      // No contact found
+      return false;
+    }
   }
   gdjs.registerBehavior(
     'Physics2::Physics2Behavior',

@@ -15,6 +15,36 @@ namespace gdjs {
       );
     };
 
+    export const objectsStartedColliding = function (
+      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      behaviorName: string,
+      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      inverted: boolean
+    ) {
+      return gdjs.evtTools.object.twoListsTest(
+        gdjs.Physics2RuntimeBehavior.startedCollisionTest,
+        objectsLists1,
+        objectsLists2,
+        inverted,
+        behaviorName
+      );
+    };
+
+    export const objectsStoppedColliding = function (
+      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      behaviorName: string,
+      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      inverted: boolean
+    ) {
+      return gdjs.evtTools.object.twoListsTest(
+        gdjs.Physics2RuntimeBehavior.stoppedCollisionTest,
+        objectsLists1,
+        objectsLists2,
+        inverted,
+        behaviorName
+      );
+    };
+
     export const setTimeScale = function (objectsLists, behavior, timeScale) {
       const lists = gdjs.staticArray(gdjs.physics2.setTimeScale);
       objectsLists.values(lists);

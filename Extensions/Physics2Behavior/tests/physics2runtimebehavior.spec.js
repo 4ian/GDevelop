@@ -120,7 +120,7 @@ describe.skip('Physics2RuntimeBehavior', () => {
         stepIndex++;
       }
       if (!hasChecked) {
-        throw new Error('Contact did not happen, nothing was tested.')
+        throw new Error('Contact did not happen, nothing was tested.');
       }
     });
   });

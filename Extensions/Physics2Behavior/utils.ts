@@ -5,7 +5,7 @@ namespace gdjs {
       started: Array<T>,
       ended: Array<T>
     ): void => {
-      const endedDuplicate = [...ended]
+      const endedDuplicate = [...ended];
       started.forEach((startedItem) => {
         const isAlsoEndedIndex = endedDuplicate.indexOf(startedItem);
         if (isAlsoEndedIndex !== -1) {

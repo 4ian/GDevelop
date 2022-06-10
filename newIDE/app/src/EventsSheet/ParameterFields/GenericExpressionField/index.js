@@ -435,7 +435,8 @@ class ExpressionField extends React.Component<
         objectsContainer,
         scope,
       },
-      completionDescriptions
+      completionDescriptions,
+      useAllExpressionTypes
     );
     const allNewAutocompletions = onGetAdditionalAutocompletions
       ? onGetAdditionalAutocompletions(expression).concat(newAutocompletions)

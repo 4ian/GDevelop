@@ -13,7 +13,6 @@ const appBarHeight = 32;
 
 type Props = {|
   title: React.Node,
-  displayLeftCloseButton?: boolean,
   displayRightCloseButton?: boolean,
   onClose: () => void,
 |};
@@ -45,13 +44,9 @@ const DrawerTopBar = (props: Props) => {
       style={styles.appBar}
       className="safe-area-aware-top-margin"
       color="primary"
+      elevation={0}
     >
       <Toolbar style={styles.toolbar}>
-        {props.displayLeftCloseButton && (
-          <IconButton onClick={props.onClose} edge="start" color="inherit">
-            <Close />
-          </IconButton>
-        )}
         <Tooltip
           title={props.title}
           placement="bottom"
@@ -63,7 +58,12 @@ const DrawerTopBar = (props: Props) => {
         </Tooltip>
 
         {props.displayRightCloseButton && (
-          <IconButton onClick={props.onClose} edge="end" color="inherit">
+          <IconButton
+            onClick={props.onClose}
+            edge="end"
+            color="inherit"
+            size="small"
+          >
             <Close />
           </IconButton>
         )}

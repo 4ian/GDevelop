@@ -16,8 +16,7 @@ const delay = 600; // ms
 const moveTolerance = 10; // px
 
 /**
- * Listen for a long touch on a canvas. Useful for platforms (Safari on iOS)
- * not supporting "contextmenu" event.
+ * Listen for a long touch on a canvas. Usually used to simulate the equivalent of a right click.
  *
  * A long press is characterized by starting a touch and staying pressed, without
  * moving too far from the initial position (to avoid being confused with a drag/scroll).

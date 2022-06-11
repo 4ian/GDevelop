@@ -30,6 +30,7 @@
 #include "GDCore/String.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDJS/Events/Builtin/JsCodeEvent.h"
+#include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 
 using namespace std;
 using namespace gd;
@@ -39,6 +40,93 @@ namespace gdjs {
 CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
+
+  GetAllConditions()["Toujours"].SetFunctionName(
+      "gdjs.evtTools.common.logicalNegation");
+  GetAllConditions()["BuiltinCommonInstructions::Always"].SetFunctionName(
+      "gdjs.evtTools.common.logicalNegation");
+
+  GetAllConditions()["Egal"].codeExtraInformation.SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String value1Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String value2Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[2].GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val";
+
+        if (instruction.GetParameters()[1].GetPlainString() == "=" ||
+            instruction.GetParameters()[1].GetPlainString().empty())
+          return resultingBoolean + " = (" + value1Code + " == " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == ">")
+          return resultingBoolean + " = (" + value1Code + " > " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "<")
+          return resultingBoolean + " = (" + value1Code + " < " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "<=")
+          return resultingBoolean + " = (" + value1Code + " <= " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == ">=")
+          return resultingBoolean + " = (" + value1Code + " >= " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
+          return resultingBoolean + " = (" + value1Code + " != " + value2Code +
+                 ");\n";
+
+        return gd::String("");
+      });
+  GetAllConditions()["BuiltinCommonInstructions::CompareNumbers"]
+      .codeExtraInformation = GetAllConditions()["Egal"].codeExtraInformation;
+
+  GetAllConditions()["StrEqual"].codeExtraInformation.SetCustomCodeGenerator(
+      [](gd::Instruction& instruction,
+         gd::EventsCodeGenerator& codeGenerator,
+         gd::EventsCodeGenerationContext& context) {
+        gd::String value1Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[0].GetPlainString());
+
+        gd::String value2Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[2].GetPlainString());
+
+        gd::String resultingBoolean =
+            codeGenerator.GenerateBooleanFullName("conditionTrue", context) +
+            ".val";
+
+        if (instruction.GetParameters()[1].GetPlainString() == "=")
+          return resultingBoolean + " = (" + value1Code + " == " + value2Code +
+                 ");\n";
+        else if (instruction.GetParameters()[1].GetPlainString() == "!=")
+          return resultingBoolean + " = (" + value1Code + " != " + value2Code +
+                 ");\n";
+
+        return gd::String("");
+      });
+  GetAllConditions()["BuiltinCommonInstructions::CompareStrings"]
+      .codeExtraInformation =
+      GetAllConditions()["StrEqual"].codeExtraInformation;
 
   GetAllEvents()["BuiltinCommonInstructions::Link"]
       .SetCodeGenerator([](gd::BaseEvent& event_,
@@ -130,7 +218,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               // "MyObject" will both have to declare a "MyObject" object list.
               gd::EventsCodeGenerationContext context;
               context.InheritsFrom(parentContext);
-              context.ForbidReuse();  // TODO: This may not be necessary
+              context.ForbidReuse();   // TODO: This may not be necessary (to be investigated/heavily tested).
 
               gd::String conditionCode = codeGenerator.GenerateConditionCode(
                   conditions[cId],
@@ -194,7 +282,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               //"OR" condition must declare objects list, but without getting
               // the objects from the scene. Lists are either empty or come from
               // a parent event.
-              parentContext.ObjectsListWithoutPickingNeeded(*it);
+              parentContext.ObjectsListNeededOrEmptyIfJustDeclared(*it);
               // We need to duplicate the object lists : The "final" ones will
               // be filled with objects by conditions, but they will have no
               // incidence on further conditions, as conditions use "normal"
@@ -278,7 +366,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               outputCode +=
                   codeGenerator.GenerateBooleanFullName(
                       "condition" + gd::String::From(i) + "IsTrue", context) +
-                  ".val = true;\n";
+                  ".val = false;\n";
             }
 
             for (unsigned int cId = 0; cId < conditions.size(); ++cId) {
@@ -351,11 +439,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Prevent code generation if the event is empty, as this would
         // get the game stuck in a never ending loop.
-        if (
-          event.GetWhileConditions().empty() &&
-          event.GetConditions().empty() &&
-          event.GetActions().empty()
-        )
+        if (event.GetWhileConditions().empty() &&
+            event.GetConditions().empty() && event.GetActions().empty())
           return gd::String(
               "\n// While event not generated to prevent an infinite loop.\n");
 
@@ -409,6 +494,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         outputCode += "if (" + ifPredicat + ") {\n";
         outputCode += actionsCode;
         outputCode += "\n{ //Subevents: \n";
+        // TODO: check (and heavily test) if sub events should be generated before
+        // the call to GenerateObjectsDeclarationCode.
         outputCode +=
             codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
         outputCode += "} //Subevents end.\n";
@@ -467,6 +554,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             !event.GetValueIteratorVariableName().empty();
         bool keyIteratorExists = !event.GetKeyIteratorVariableName().empty();
 
+        // clang-format off
         // Define references to variables (if they exist)
         if (keyIteratorExists)
           outputCode +=
@@ -513,6 +601,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             "        // Arrays are passed by reference like JS objects\n"
             "        $VALUE_ITERATOR_REFERENCE.replaceChildrenArray($STRUCTURE_CHILD_VARIABLE.getAllChildrenArray());\n"
             "    } else console.warn(\"Cannot identify type: \", type);\n";
+        // clang-format on
 
         // Now do the rest of standard event code generation
         outputCode += objectDeclaration;
@@ -669,7 +758,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         // picked again)
         gd::EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext);
-        context.ForbidReuse();
+        context.ForbidReuse(); // TODO: This may not be necessary (to be investigated/heavily tested).
 
         for (unsigned int i = 0; i < realObjects.size(); ++i)
           context.EmptyObjectsListNeeded(realObjects[i]);

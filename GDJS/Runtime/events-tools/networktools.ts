@@ -28,7 +28,16 @@ namespace gdjs {
         errorVar: gdjs.Variable
       ) {
         const onError = (err) => {
-          errorVar.setString('' + err);
+          if (
+            err instanceof ProgressEvent &&
+            err.currentTarget &&
+            err.currentTarget instanceof XMLHttpRequest &&
+            err.currentTarget.status === 0
+          ) {
+            errorVar.setString('REQUEST_NOT_SENT');
+          } else {
+            errorVar.setString('' + err);
+          }
         };
         try {
           const request = new XMLHttpRequest();

@@ -6,14 +6,14 @@ import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 
-export default class BitmapFontResourceField extends Component<
+export default class FontResourceField extends Component<
   ParameterFieldProps,
   void
 > {
   _field: ?ResourceSelector;
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {

@@ -26,7 +26,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       "TopDownMovementBehavior",
       _("Top-down movement (4 or 8 directions)"),
       "TopDownMovement",
-      _("Objects with this behavior can be moved left, up, right, and "
+      _("Move objects left, up, right, and "
         "down (and, optionally, diagonally)."),
       "",
       "CppPlatform/Extensions/topdownmovementicon.png",
@@ -105,7 +105,9 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
          "res/conditions/keyboard.png")
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
-      .AddParameter("string", _("Key"))
+      .AddParameter("stringWithSelector",
+                    _("Key"),
+                    "[\"Left\", \"Right\", \"Up\", \"Down\"]")
       .MarkAsAdvanced()
       .SetFunctionName("SimulateControl")
       .SetIncludeFile(
@@ -142,6 +144,28 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SimulateStick")
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
+
+    aut.AddScopedCondition("IsUsingControl",
+                  _("Control pressed or simulated"),
+                  _("A control was applied from a default control or simulated by an action."),
+                  _("_PARAM0_ has the _PARAM2_ key pressed or simulated"),
+                  _("Controls"),
+                  "res/conditions/keyboard24.png",
+                  "res/conditions/keyboard.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+        .AddParameter("stringWithSelector",
+                    _("Key"),
+                    "[\"Left\", \"Right\", \"Up\", \"Down\", \"Stick\"]")
+        .MarkAsAdvanced();
+
+  aut.AddExpression("StickAngle",
+                    _("Stick angle"),
+                    _("Return the angle of the simulated stick input (in degrees)"),
+                    _("Controls"),
+                    "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior");
 
   aut.AddCondition("IsMoving",
                    _("Is moving"),
@@ -529,6 +553,30 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("GetYVelocity")
       .SetIncludeFile(
           "TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
+
+  aut.AddScopedAction("SetVelocityX",
+                _("Speed on the X axis"),
+                _("Change the speed on the X axis of the movement"),
+                _("the speed on the X axis of the movement"),
+                _("Movement"),
+                "CppPlatform/Extensions/topdownmovementicon24.png",
+                "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  aut.AddScopedAction("SetVelocityY",
+                _("Speed on the Y axis"),
+                _("Change the speed on the Y axis of the movement"),
+                _("the speed on the Y axis of the movement"),
+                _("Movement"),
+                "CppPlatform/Extensions/topdownmovementicon24.png",
+                "CppPlatform/Extensions/topdownmovementicon16.png")
+      .AddParameter("object", _("Object"))
+      .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
+      .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
 
   aut.AddExpressionAndConditionAndAction("number",
                     "MovementAngleOffset",

@@ -12,6 +12,9 @@ import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import AlertMessage from '../../UI/AlertMessage';
 import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
+import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
+import { showWarningBox } from '../../UI/Messages/MessageBox';
+import TutorialButton from '../../UI/TutorialButton';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -41,6 +44,7 @@ export type Exporter = {|
 
 export type ExportDialogWithoutExportsProps = {|
   project: ?gdProject,
+  onSaveProject: () => Promise<void>,
   onClose: () => void,
   onChangeSubscription: () => void,
 |};
@@ -55,6 +59,7 @@ type Props = {|
 
 const ExportDialog = ({
   project,
+  onSaveProject,
   onClose,
   allExportersRequireOnline,
   onChangeSubscription,
@@ -69,12 +74,59 @@ const ExportDialog = ({
   const [buildsDialogOpen, setBuildsDialogOpen] = React.useState<boolean>(
     false
   );
+  const [
+    isNavigationDisabled,
+    setIsNavigationDisabled,
+  ] = React.useState<boolean>(false);
   const [chosenExporterKey, setChosenExporterKey] = React.useState<ExporterKey>(
     'onlinewebexport'
   );
+  const [game, setGame] = React.useState<?Game>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { getAuthorizationHeader, profile } = React.useContext(
+    AuthenticatedUserContext
+  );
   const onlineStatus = useOnlineStatus();
   const cantExportBecauseOffline = !!allExportersRequireOnline && !onlineStatus;
+
+  const openBuildDialog = () => {
+    if (!game) {
+      showWarningBox(
+        "Either this game is not registered or you are not its owner, so you can't see the builds or publish a build to the game page on Liluo.io."
+      );
+      return;
+    }
+    setBuildsDialogOpen(true);
+  };
+
+  const loadGame = React.useCallback(
+    async () => {
+      if (!profile || !project) return;
+
+      const { id } = profile;
+      try {
+        const game = await getGame(
+          getAuthorizationHeader,
+          id,
+          project.getProjectUuid()
+        );
+        setGame(game);
+      } catch (err) {
+        console.error('Unable to load the game', err);
+      }
+    },
+    [project, getAuthorizationHeader, profile]
+  );
+
+  React.useEffect(
+    () => {
+      // Load game only once.
+      if (!game) {
+        loadGame();
+      }
+    },
+    [loadGame, game]
+  );
 
   if (!project) return null;
   const exporters = [
@@ -98,8 +150,6 @@ const ExportDialog = ({
           <Trans>Build manually</Trans>
         ) : null
       }
-      onRequestClose={onClose}
-      cannotBeDismissed={false}
       actions={[
         chosenExporterSection !== 'home' && (
           <FlatButton
@@ -110,6 +160,7 @@ const ExportDialog = ({
               setChosenExporterSection('home');
               setChosenExporterKey('onlinewebexport');
             }}
+            disabled={isNavigationDisabled}
           />
         ),
         <FlatButton
@@ -117,18 +168,27 @@ const ExportDialog = ({
           key="close"
           primary={false}
           onClick={onClose}
+          disabled={isNavigationDisabled}
         />,
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
-        exporter.key !== 'onlinewebexport' && (
-          <FlatButton
-            key="builds"
-            label={<Trans>See all my builds</Trans>}
-            onClick={() => setBuildsDialogOpen(true)}
+        exporter.exportPipeline.name === 'local-html5' ||
+        exporter.exportPipeline.name === 'browser-html5' ? (
+          <TutorialButton
+            key="tutorial"
+            tutorialId="export-to-itch"
+            label="How to export to Itch.io"
           />
-        ),
+        ) : null,
+        <FlatButton
+          key="builds"
+          label={<Trans>See this game builds</Trans>}
+          onClick={openBuildDialog}
+          disabled={isNavigationDisabled}
+        />,
       ]}
+      onRequestClose={onClose}
       open
       noMargin
     >
@@ -147,8 +207,12 @@ const ExportDialog = ({
           setChosenExporterKey={setChosenExporterKey}
           setChosenExporterSection={setChosenExporterSection}
           project={project}
+          onSaveProject={onSaveProject}
           onChangeSubscription={onChangeSubscription}
           authenticatedUser={authenticatedUser}
+          isNavigationDisabled={isNavigationDisabled}
+          setIsNavigationDisabled={setIsNavigationDisabled}
+          onGameUpdated={setGame}
         />
       )}
       {chosenExporterSection === 'automated' && (
@@ -158,6 +222,7 @@ const ExportDialog = ({
               label={exporter.tabName}
               value={exporter.key}
               key={exporter.key}
+              disabled={isNavigationDisabled}
             />
           ))}
         </Tabs>
@@ -169,6 +234,7 @@ const ExportDialog = ({
               label={exporter.tabName}
               value={exporter.key}
               key={exporter.key}
+              disabled={isNavigationDisabled}
             />
           ))}
         </Tabs>
@@ -178,17 +244,24 @@ const ExportDialog = ({
           <ExportLauncher
             exportPipeline={exporter.exportPipeline}
             project={project}
+            onSaveProject={onSaveProject}
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
             key={chosenExporterKey}
+            setIsNavigationDisabled={setIsNavigationDisabled}
+            onGameUpdated={setGame}
           />
         </div>
       )}
-      <BuildsDialog
-        open={buildsDialogOpen}
-        onClose={() => setBuildsDialogOpen(false)}
-        authenticatedUser={authenticatedUser}
-      />
+      {game && (
+        <BuildsDialog
+          open={buildsDialogOpen}
+          onClose={() => setBuildsDialogOpen(false)}
+          authenticatedUser={authenticatedUser}
+          game={game}
+          onGameUpdated={setGame}
+        />
+      )}
     </Dialog>
   );
 };

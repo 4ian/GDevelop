@@ -7,6 +7,12 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { useResponsiveWindowWidth } from '../Reponsive/ResponsiveWindowMeasurer';
 import classNames from 'classnames';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
+import {
+  shouldCloseOrCancel,
+  shouldSubmit,
+} from '../KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../Layout';
+import RaisedButton from '../RaisedButton';
 
 const styles = {
   defaultBody: {
@@ -16,9 +22,9 @@ const styles = {
     padding: 0,
     overflowX: 'hidden',
   },
-  flexRowBody: {
+  flexColumnBody: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
   },
   flexBody: {
     display: 'flex',
@@ -40,33 +46,39 @@ const styles = {
 type Props = {|
   open?: boolean,
   title?: React.Node,
-  actions?: React.Node,
-  secondaryActions?: React.Node,
+  actions?: Array<?React.Node>,
+  secondaryActions?: Array<?React.Node>,
 
   /**
    * Callback called when the dialog is asking to be closed
    * (either by Escape key or a click outside, according to preferences).
    * This is the default way of closing a dialog and should almost always be
-   * specified - unless your dialog is an representing an uninteruptible process.
+   * specified - unless your dialog is representing an uninteruptible process.
    *
    * If `onApply` is also specified, this must be interpreted as a "cancelling"
    * of changes.
    */
   onRequestClose?: () => void,
+
   /**
-   * Is specified, will be called when the dialog is dismissed in a way where changes
-   * must be kept.
+   * If specified, will be called when the dialog is dismissed in a way where changes
+   * must be kept or when using the submit keyboard shortcut.
    * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
    * single `onRequestClose`.
    */
-  onApply?: ?() => void,
+  onApply?: ?() => void | Promise<void>,
 
-  cannotBeDismissed?: boolean, // Currently unused.
+  /**
+   * If specified, allows to prevent closing the dialog by clicking outside.
+   * This is useful for dialogs that either are in a loading state so we don't want to allow closing it,
+   * or for dialogs that may apply significant changes and we don't want the user to misclick.
+   */
+  cannotBeDismissed?: boolean,
 
   children: React.Node, // The content of the dialog
 
   // Display:
-  flexRowBody?: boolean, //Check if necessary
+  flexColumnBody?: boolean,
   flexBody?: boolean,
 
   // Size
@@ -76,6 +88,8 @@ type Props = {|
   // Style:
   noMargin?: boolean,
   noTitleMargin?: boolean,
+
+  id?: ?string,
 |};
 
 // Help Flow to understand the type of the dialog content style.
@@ -83,14 +97,16 @@ type DialogContentStyle = {
   padding?: 0,
   overflowX?: 'hidden',
   display?: 'flex',
-  flexDirection?: 'row',
+  flexDirection?: 'row' | 'column',
 };
+
+export const DialogPrimaryButton = RaisedButton;
 
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-export default (props: Props) => {
+const Dialog = (props: Props) => {
   const {
     onApply,
     secondaryActions,
@@ -101,56 +117,95 @@ export default (props: Props) => {
     noMargin,
     title,
     children,
-    flexRowBody,
+    flexColumnBody,
     flexBody,
     fullHeight,
     noTitleMargin,
+    id,
+    cannotBeDismissed,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const size = useResponsiveWindowWidth();
 
-  const dialogActions = secondaryActions ? (
-    <React.Fragment>
-      <div key="secondary-actions">{secondaryActions}</div>
-      <div key="actions">{actions}</div>
-    </React.Fragment>
-  ) : (
-    actions
+  const dialogActions = React.useMemo(
+    () => (
+      <React.Fragment>
+        {secondaryActions && (
+          <LineStackLayout key="secondary-actions" noMargin>
+            {secondaryActions}
+          </LineStackLayout>
+        )}
+        {actions && (
+          <LineStackLayout key="actions" noMargin>
+            {actions}
+          </LineStackLayout>
+        )}
+      </React.Fragment>
+    ),
+    [actions, secondaryActions]
   );
 
   const dialogContentStyle: DialogContentStyle = {
     ...(noMargin ? styles.noMarginBody : styles.defaultBody),
-    ...((flexRowBody ? styles.flexRowBody : {}): DialogContentStyle),
+    ...((flexColumnBody ? styles.flexColumnBody : {}): DialogContentStyle),
     ...((flexBody ? styles.flexBody : {}): DialogContentStyle),
   };
+
+  const onCloseDialog = React.useCallback(
+    (event: any, reason: string) => {
+      if (!!cannotBeDismissed) return;
+      if (reason === 'escapeKeyDown') {
+        if (onRequestClose) onRequestClose();
+      } else if (reason === 'backdropClick') {
+        if (backdropClickBehavior === 'cancel') {
+          if (onRequestClose) onRequestClose();
+        } else if (backdropClickBehavior === 'apply') {
+          if (onApply) onApply();
+          else if (onRequestClose) onRequestClose();
+        } else if (backdropClickBehavior === 'nothing') {
+          return;
+        }
+      }
+    },
+    [onRequestClose, onApply, backdropClickBehavior, cannotBeDismissed]
+  );
+
+  const handleKeyDown = React.useCallback(
+    (event: SyntheticKeyboardEvent<HTMLElement>) => {
+      // When specifying a onKeyDown props, the MUIDialog does not handle
+      // the close on escape key feature anymore so it should be handled here.
+      if (shouldCloseOrCancel(event)) {
+        onCloseDialog(event, 'escapeKeyDown');
+        event.stopPropagation();
+        return;
+      }
+
+      if (onApply && shouldSubmit(event)) {
+        event.stopPropagation();
+        const element = document.activeElement;
+        if (element) element.blur();
+
+        onApply();
+      }
+    },
+    [onCloseDialog, onApply]
+  );
 
   return (
     <DialogMaterialUI
       open={open}
-      onClose={(event: any, reason: string) => {
-        if (reason === 'escapeKeyDown') {
-          if (onRequestClose) onRequestClose();
-        } else if (reason === 'backdropClick') {
-          if (backdropClickBehavior === 'cancel') {
-            if (onRequestClose) onRequestClose();
-          } else if (backdropClickBehavior === 'apply') {
-            if (onApply) onApply();
-            else if (onRequestClose) onRequestClose();
-          } else if (backdropClickBehavior === 'nothing') {
-            return;
-          }
-        }
-      }}
+      onClose={onCloseDialog}
       fullWidth
       fullScreen={size === 'small'}
       className={classNames({
         'safe-area-aware-container': size === 'small',
       })}
-      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {} }}
+      PaperProps={{ style: fullHeight ? styles.fullHeightModal : {}, id }}
       maxWidth={maxWidth !== undefined ? maxWidth : 'md'}
       disableBackdropClick={false}
+      onKeyDown={handleKeyDown}
     >
       {title && (
         <DialogTitle style={noTitleMargin ? styles.noTitleMargin : undefined}>
@@ -170,3 +225,5 @@ export default (props: Props) => {
     </DialogMaterialUI>
   );
 };
+
+export default Dialog;

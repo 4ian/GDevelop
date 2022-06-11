@@ -7,7 +7,7 @@ When a game is previewed or exported, there are multiple concepts that are being
 GDevelop is built on **platforms**. A platform is the term used in GDevelop codebase to describe the class that:
 
 - provides the _code generator for events_,
-- provides the _generator that export a whole game_ (or a preview), taking a [`gd::Project`](http://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_project.html) as argument and copying all resources, exporting files, launching the _code generator for events_.
+- provides the _generator that export a whole game_ (or a preview), taking a [`gd::Project`](http://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_project.html) as argument and copying all resources, exporting files, launching the _code generator for events_.
 - provides the **game engine**, also called _Runtime_, is also provided by the platform. You can think of it as a set of files that are copied next to the game resource and events.
 - stores extensions, which can be considered as small parts of the game engine that can be used and copied into the final game.
 

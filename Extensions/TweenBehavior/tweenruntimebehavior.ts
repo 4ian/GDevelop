@@ -208,10 +208,10 @@ namespace gdjs {
 
     /**
      * Add an object variable tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param variable The object variable to store the tweened value
      * @param fromValue Start value
-     * @param toVaue End value
+     * @param toValue End value
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
      * @param destroyObjectWhenFinished Destroy this object when the tween ends
@@ -243,7 +243,7 @@ namespace gdjs {
 
     /**
      * Add an object position tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param toY The target Y position
      * @param easingValue Type of easing
@@ -279,7 +279,7 @@ namespace gdjs {
 
     /**
      * Add an object X position tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toX The target X position
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -310,7 +310,7 @@ namespace gdjs {
 
     /**
      * Add an object Y position tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toY The target Y position
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -341,7 +341,7 @@ namespace gdjs {
 
     /**
      * Add an object angle tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toAngle The target angle
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -374,7 +374,7 @@ namespace gdjs {
 
     /**
      * Add an object scale tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param toScaleY The target Y-scale
      * @param easingValue Type of easing
@@ -432,7 +432,7 @@ namespace gdjs {
 
     /**
      * Add an object X-scale tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toScaleX The target X-scale
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -477,7 +477,7 @@ namespace gdjs {
 
     /**
      * Add an object scale y tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toScaleY The target Y-scale
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -522,7 +522,7 @@ namespace gdjs {
 
     /**
      * Add an object opacity tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toOpacity The target opacity
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -558,7 +558,7 @@ namespace gdjs {
 
     /**
      * Add an object color tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toColorStr The target color
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -661,7 +661,7 @@ namespace gdjs {
 
     /**
      * Add an object color HSL tween, with the "to" color given using HSL (H: any number, S and L: 0-100).
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toHue The target hue, or the same as the from color's hue if blank
      * @param animateHue, include hue in calculations, as can't set this to -1 as default to ignore
      * @param toSaturation The target saturation, or the same as the from color's saturation if blank
@@ -741,7 +741,7 @@ namespace gdjs {
 
     /**
      * Add a text object character size tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toSize The target character size
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -777,7 +777,7 @@ namespace gdjs {
 
     /**
      * Add an object width tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toWidth The target width
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -810,7 +810,7 @@ namespace gdjs {
 
     /**
      * Add an object height tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param toHeight The target height
      * @param easingValue Type of easing
      * @param durationValue Duration in milliseconds
@@ -843,7 +843,7 @@ namespace gdjs {
 
     /**
      * Tween is playing.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     isPlaying(identifier: string): boolean {
       return this._tweenExists(identifier) && this._tweenIsPlaying(identifier);
@@ -851,7 +851,7 @@ namespace gdjs {
 
     /**
      * Tween exists.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @returns The tween exists
      */
     exists(identifier: string): boolean {
@@ -860,7 +860,7 @@ namespace gdjs {
 
     /**
      * Tween has finished.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     hasFinished(identifier: string): boolean {
       return (
@@ -870,7 +870,7 @@ namespace gdjs {
 
     /**
      * Pause a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     pauseTween(identifier: string) {
       if (
@@ -883,7 +883,7 @@ namespace gdjs {
 
     /**
      * Stop a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @param jumpToDest Move to destination
      */
     stopTween(identifier: string, jumpToDest: boolean) {
@@ -897,7 +897,7 @@ namespace gdjs {
 
     /**
      * Resume a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     resumeTween(identifier: string) {
       if (
@@ -910,7 +910,7 @@ namespace gdjs {
 
     /**
      * Remove a tween.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      */
     removeTween(identifier: string) {
       if (!this._tweenExists(identifier)) return;
@@ -925,7 +925,7 @@ namespace gdjs {
 
     /**
      * Get tween progress.
-     * @param identifier Unique id to idenfify the tween
+     * @param identifier Unique id to identify the tween
      * @returns Progress of playing tween animation (between 0.0 and 1.0)
      */
     getProgress(identifier: string): float {
@@ -1059,7 +1059,7 @@ namespace gdjs {
     const shiftyJsScene = runtimeScene.shiftyJsScene;
     if (!shiftyJsScene) return;
 
-    // Stop and explictly remove all tweenables to be sure to drop
+    // Stop and explicitly remove all tweenables to be sure to drop
     // all references to the tweenables of the scene.
     shiftyJsScene.stop(false);
     shiftyJsScene.empty();

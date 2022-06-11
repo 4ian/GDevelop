@@ -58,6 +58,8 @@ export const browserElectronExportPipeline: ExportPipeline<
 
   canLaunchBuild: () => true,
 
+  isNavigationDisabled: () => false,
+
   renderHeader: () => <ExplanationHeader />,
 
   renderLaunchButtonLabel: () => <Trans>Package</Trans>,

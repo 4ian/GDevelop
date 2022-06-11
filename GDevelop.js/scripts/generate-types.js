@@ -18,7 +18,6 @@ const idlTempFolder = fs.mkdtempSync('gdevelopjs-cleaned-bindings-idl');
 // are not supported by the webidl2.js parser used by "webidl-tools".
 shell.cp('-f', 'Bindings/Bindings.idl', idlTempFolder);
 const idlFile = path.join(idlTempFolder, 'Bindings.idl');
-shell.sed('-i', /\[Prefix="sf::"\]/, '// Removed sf prefix', idlFile);
 shell.sed('-i', /\[Prefix="gdjs::"\]/, '//Removed gdjs prefix', idlFile);
 shell.sed(
   '-i',
@@ -198,6 +197,12 @@ type ParticleEmitterObject_RendererType = 0 | 1 | 2`
       'declare class gdVectorString {',
       'declare class gdVectorString {\n  toJSArray(): Array<string>;',
       'types/gdvectorstring.js'
+    );
+    shell.sed(
+      '-i',
+      'declare class gdVectorInt {',
+      'declare class gdVectorInt {\n  toJSArray(): Array<number>;',
+      'types/gdvectorint.js'
     );
     shell.sed(
       '-i',

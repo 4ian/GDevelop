@@ -10,6 +10,7 @@ export type TestProject = {|
   spriteObject: gdSpriteObject,
   spriteObjectWithBehaviors: gdSpriteObject,
   spriteObjectWithoutBehaviors: gdSpriteObject,
+  testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -56,6 +57,14 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const resource3 = new gd.ImageResource();
   const resource4 = new gd.ImageResource();
   const audioResource1 = new gd.AudioResource();
+  const videoResource1 = new gd.VideoResource();
+  const videoResource2 = new gd.VideoResource();
+  const fontResource = new gd.FontResource();
+  const bitmapFontResource1 = new gd.BitmapFontResource();
+  const bitmapFontResource2 = new gd.BitmapFontResource();
+  const jsonResource1 = new gd.JsonResource();
+  const jsonResource2 = new gd.JsonResource();
+  const jsonResource3 = new gd.JsonResource();
   resource1.setName('fake-image1.png');
   resource1.setFile('fake-image1.png');
   resource2.setName('fake-image2.png');
@@ -66,27 +75,79 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   resource4.setFile('res/powered-pixijs.png');
   audioResource1.setName('fake-audio1.mp3');
   audioResource1.setFile('fake-audio1.mp3');
+  videoResource1.setName('fake-video1.mp4');
+  videoResource1.setFile('fake-video1.mp4');
+  videoResource2.setName('fake-video2.mp4');
+  videoResource2.setFile('fake-video2.mp4');
+  fontResource.setName('font.ttf');
+  fontResource.setFile('font.ttf');
+  bitmapFontResource1.setName('bmfont.xml');
+  bitmapFontResource1.setFile('bmfont.xml');
+  bitmapFontResource2.setName('super-font.fnt');
+  bitmapFontResource2.setFile('super-font.fnt');
+  jsonResource1.setName('levelData.json');
+  jsonResource1.setFile('levelData.json');
+  jsonResource2.setName('InventoryData.json');
+  jsonResource2.setFile('InventoryData.json');
+  jsonResource3.setName('text-data.json');
+  jsonResource3.setFile('text-data.json');
   project.getResourcesManager().addResource(resource1);
   project.getResourcesManager().addResource(resource2);
   project.getResourcesManager().addResource(resource3);
   project.getResourcesManager().addResource(resource4);
   project.getResourcesManager().addResource(audioResource1);
+  project.getResourcesManager().addResource(videoResource1);
+  project.getResourcesManager().addResource(videoResource2);
+  project.getResourcesManager().addResource(fontResource);
+  project.getResourcesManager().addResource(bitmapFontResource1);
+  project.getResourcesManager().addResource(bitmapFontResource2);
+  project.getResourcesManager().addResource(jsonResource1);
+  project.getResourcesManager().addResource(jsonResource2);
+  project.getResourcesManager().addResource(jsonResource3);
 
   // Create and expose some objects
   const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
+  shapePainterObject.setType('PrimitiveDrawing::Drawer');
   const textObject = new gd.TextObject('MyTextObject');
+  textObject.setType('TextObject::Text');
   const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
+  tiledSpriteObject.setType('TiledSpriteObject::TiledSprite');
   const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
+  panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
   const spriteObject = new gd.SpriteObject('MySpriteObject');
+  spriteObject.setType('Sprite');
+  {
+    const variablesContainer = spriteObject.getVariables();
+    variablesContainer
+      .insert('ObjectVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherObjectVariable',
+      new gd.Variable(),
+      1
+    );
+    variable.setFolded(false);
+    variable.castTo('structure');
+    variable.getChild('ObjectChild1').setValue(564);
+    variable.getChild('ObjectChild2').setString('Guttentag');
+    variable.getChild('ObjectChild3').setBool(true);
+    const arrayVariable = variable.getChild('ObjectChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.setFolded(true);
+    arrayVariable.pushNew().setValue(856.5);
+  }
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
   );
+  spriteObjectWithBehaviors.setType('Sprite');
   const spriteObjectWithoutBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithoutBehaviors'
   );
+  spriteObjectWithoutBehaviors.setType('Sprite');
   const spriteObjectWithLongName = new gd.SpriteObject(
     'MySpriteObject_With_A_Veeeerrryyyyyyyyy_Looooooooooooong_Name'
   );
+  spriteObjectWithLongName.setType('Sprite');
 
   {
     const animation = new gd.Animation();
@@ -164,6 +225,12 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayout.insertObject(spriteObjectWithBehaviors, 0);
   testLayout.insertObject(spriteObjectWithoutBehaviors, 0);
   testLayout.insertObject(spriteObjectWithLongName, 14);
+  testLayout.insertNewObject(
+    project,
+    'FakeObjectWithUnsupportedCapability::FakeObjectWithUnsupportedCapability',
+    'MyFakeObjectWithUnsupportedCapability',
+    15
+  );
 
   const group1 = new gd.ObjectGroup();
   group1.setName('GroupOfSprites');
@@ -193,6 +260,30 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
 
+  const testSpriteObjectInstance = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testSpriteObjectInstance.setObjectName(spriteObject.getName());
+
+  {
+    const variablesContainer = testSpriteObjectInstance.getVariables();
+    variablesContainer
+      .insert('InstanceVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherInstanceVariable',
+      new gd.Variable(),
+      1
+    );
+    variable.castTo('structure');
+    variable.getChild('InstanceChild1').setValue(1995);
+    variable.getChild('InstanceChild2').setString('Hallo');
+    variable.getChild('InstanceChild3').setBool(false);
+    const arrayVariable = variable.getChild('InstanceChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.pushNew().setString('Bonjour');
+  }
+
   // Add layers
   testLayout.insertNewLayer('GUI', 0);
   testLayout.insertNewLayer('OtherLayer', 1);
@@ -209,10 +300,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   variable3.getChild('Child1').setString('Child1 str value');
   variable3.getChild('Child2').setString('7891011');
   variable3
-    .getChild('Child3')
+    .getChild('FoldedChild')
     .getChild('SubChild1')
     .setString('Hello\nMultiline\nWorld');
+  variable3.getChild('FoldedChild').setFolded(true);
   testLayoutVariables.insert('Variable3', variable3, 2);
+  const variable4 = new gd.Variable();
+  variable4.getAtIndex(0).setString('String value\nwith Multiline');
+  variable4.getAtIndex(1).setValue(4539.42);
+  variable4.getAtIndex(2).setBool(true);
+  variable4.setFolded(true);
+  testLayoutVariables.insert('FoldedArray', variable4, 3);
+  const variable5 = new gd.Variable();
+  variable5.getAtIndex(0).setString('PlayerName');
+  variable5.getAtIndex(1).setValue(25);
+  variable5.getAtIndex(2).setBool(false);
+  testLayoutVariables.insert('OtherArray', variable5, 4);
 
   //Create a few events
   //Add a new "standard" event to the scene:
@@ -426,6 +529,9 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
+  testEventsFunctionsExtension
+    .insertNewEventsFunction('MyPrivateTestFunction3', 2)
+    .setPrivate(true);
 
   // Create more dummy objects to test events with a lot of objects
   for (var i = 0; i < 6; ++i) {
@@ -598,6 +704,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     tiledSpriteObject,
     panelSpriteObject,
     spriteObject,
+    testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,

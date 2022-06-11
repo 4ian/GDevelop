@@ -76,33 +76,23 @@ export const TextFieldWithButtonLayout = ({
   );
 };
 
-type ResponsiveLineStackLayoutProps = {|
+type LineStackLayoutProps = {|
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
-  /** Prefer `noColumnMargin` if needed. */
   noMargin?: boolean,
-  /** Remove the margin on the left and right of the column, when the layout is shown as a single column. */
-  noColumnMargin?: boolean,
   children: React.Node,
 |};
 
-export const ResponsiveLineStackLayout = ({
+export const LineStackLayout = ({
   alignItems,
   justifyContent,
   expand,
   noMargin,
-  noColumnMargin,
   children,
-}: ResponsiveLineStackLayoutProps) => {
-  const windowWidth = useResponsiveWindowWidth();
+}: LineStackLayoutProps) => {
   let isFirstChild = true;
-
-  return windowWidth === 'small' ? (
-    <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
-      {children}
-    </ColumnStackLayout>
-  ) : (
+  return (
     <Line
       alignItems={alignItems}
       justifyContent={justifyContent}
@@ -126,12 +116,53 @@ export const ResponsiveLineStackLayout = ({
   );
 };
 
+type ResponsiveLineStackLayoutProps = {|
+  alignItems?: string,
+  justifyContent?: string,
+  expand?: boolean,
+  /** Prefer `noColumnMargin` if needed. */
+  noMargin?: boolean,
+  /** Remove the margin on the left and right of the column, when the layout is shown as a single column. */
+  noColumnMargin?: boolean,
+  /** Do not measure window width in case parent component is in smaller component */
+  width?: 'small',
+  children: React.Node,
+|};
+
+export const ResponsiveLineStackLayout = ({
+  alignItems,
+  justifyContent,
+  expand,
+  noMargin,
+  noColumnMargin,
+  width,
+  children,
+}: ResponsiveLineStackLayoutProps) => {
+  const windowWidth = useResponsiveWindowWidth();
+
+  return (width || windowWidth) === 'small' ? (
+    <ColumnStackLayout noMargin={noMargin || noColumnMargin} expand>
+      {children}
+    </ColumnStackLayout>
+  ) : (
+    <LineStackLayout
+      alignItems={alignItems}
+      justifyContent={justifyContent}
+      expand={expand}
+      noMargin={noMargin}
+    >
+      {children}
+    </LineStackLayout>
+  );
+};
+
 type ColumnStackLayoutProps = {|
   alignItems?: string,
   justifyContent?: string,
   expand?: boolean,
   noMargin?: boolean,
   children: React.Node,
+  noOverflowParent?: boolean,
 |};
 
 export const ColumnStackLayout = ({
@@ -140,6 +171,7 @@ export const ColumnStackLayout = ({
   expand,
   noMargin,
   children,
+  noOverflowParent,
 }: ColumnStackLayoutProps) => {
   let isFirstChild = true;
   return (
@@ -148,6 +180,7 @@ export const ColumnStackLayout = ({
       justifyContent={justifyContent}
       expand={expand}
       noMargin={noMargin}
+      noOverflowParent={noOverflowParent}
     >
       {React.Children.map(children, (child, index) => {
         if (!child) return null;

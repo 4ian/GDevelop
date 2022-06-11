@@ -8,7 +8,6 @@ import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for Electron powered IDE.
-import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
@@ -29,7 +28,10 @@ import ProjectStorageProviders from './ProjectsStorage/ProjectStorageProviders';
 import LocalFileStorageProvider from './ProjectsStorage/LocalFileStorageProvider';
 import { LocalGDJSDevelopmentWatcher } from './GameEngineFinder/LocalGDJSDevelopmentWatcher';
 import { LocalResourceFetcher } from './ProjectsStorage/ResourceFetcher/LocalResourceFetcher';
-import { onCreateFromExampleShortHeader, onCreateBlank } from './ProjectCreation/services/LocalCreation';
+import {
+  onCreateFromExampleShortHeader,
+  onCreateBlank,
+} from './ProjectCreation/services/LocalCreation';
 
 const gd: libGDevelop = global.gd;
 
@@ -72,6 +74,7 @@ export const create = (authentication: Authentication) => {
               renderExportDialog={props => (
                 <ExportDialog
                   project={props.project}
+                  onSaveProject={props.onSaveProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={localAutomatedExporters}
@@ -81,8 +84,11 @@ export const create = (authentication: Authentication) => {
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog
-                  {...props}
-                  examplesComponent={LocalExamples}
+                  open={props.open}
+                  onClose={props.onClose}
+                  onOpen={props.onOpen}
+                  initialTab={props.initialTab}
+                  onCreateBlank={onCreateBlank}
                   onCreateFromExampleShortHeader={
                     onCreateFromExampleShortHeader
                   }

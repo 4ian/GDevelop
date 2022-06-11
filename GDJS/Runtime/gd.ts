@@ -331,6 +331,36 @@ namespace gdjs {
   };
 
   /**
+   * Unregister a callback.
+   * This should not be used apart from the code generated from extensions
+   * events functions, to handle hot-reloading.
+   * In any other case, a callback should be registered once, and only once.
+   *
+   * @internal
+   */
+  export const _unregisterCallback = function (callback: unknown): void {
+    const filterArrayInPlace = (array: unknown[]) => {
+      for (let i = 0; i < array.length; ) {
+        if (array[i] === callback) {
+          array.splice(i, 1);
+        } else {
+          i++;
+        }
+      }
+    };
+
+    filterArrayInPlace(callbacksFirstRuntimeSceneLoaded);
+    filterArrayInPlace(callbacksRuntimeSceneLoaded);
+    filterArrayInPlace(callbacksRuntimeScenePreEvents);
+    filterArrayInPlace(callbacksRuntimeScenePostEvents);
+    filterArrayInPlace(callbacksRuntimeScenePaused);
+    filterArrayInPlace(callbacksRuntimeSceneResumed);
+    filterArrayInPlace(callbacksRuntimeSceneUnloading);
+    filterArrayInPlace(callbacksRuntimeSceneUnloaded);
+    filterArrayInPlace(callbacksObjectDeletedFromScene);
+  };
+
+  /**
    * Keep this function until we're sure now client is using it anymore.
    * @deprecated
    * @private
@@ -339,23 +369,6 @@ namespace gdjs {
     logger.warn(
       "You're calling gdjs.registerGlobalCallbacks. This method is now useless and you must not call it anymore."
     );
-  };
-
-  /**
-   * Remove all the global callbacks that were registered previously.
-   *
-   * Should only be used for testing - this should never be used at runtime.
-   */
-  export const clearGlobalCallbacks = function (): void {
-    gdjs.callbacksFirstRuntimeSceneLoaded.length = 0;
-    gdjs.callbacksRuntimeSceneLoaded.length = 0;
-    gdjs.callbacksRuntimeScenePreEvents.length = 0;
-    gdjs.callbacksRuntimeScenePostEvents.length = 0;
-    gdjs.callbacksRuntimeScenePaused.length = 0;
-    gdjs.callbacksRuntimeSceneResumed.length = 0;
-    gdjs.callbacksRuntimeSceneUnloading.length = 0;
-    gdjs.callbacksRuntimeSceneUnloaded.length = 0;
-    gdjs.callbacksObjectDeletedFromScene.length = 0;
   };
 
   /**

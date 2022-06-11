@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { makeStyles, createStyles } from '@material-ui/styles';
 import GridList from '@material-ui/core/GridList';
 import { GridListTile } from '@material-ui/core';
 import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIos from '@material-ui/icons/ArrowForwardIos';
+import ListOutlined from '@material-ui/icons/ListOutlined';
 import { Skeleton } from '@material-ui/lab';
 
 import Window from '../Utils/Window';
@@ -32,8 +32,10 @@ type SkeletonThumbnail = {
 type Props<ThumbnailType> = {|
   title: React.Node,
   items: ?Array<ThumbnailType>,
+  additionalAction?: React.Node,
   onBrowseAllClick?: () => void,
   browseAllLink?: string,
+  browseAllLabel: React.Node,
   displayItemTitles?: boolean,
   error?: React.Node,
 |};
@@ -121,8 +123,10 @@ const useStylesForLeftArrow = makeStyles({
 const Carousel = <ThumbnailType: Thumbnail>({
   title,
   items,
+  additionalAction,
   browseAllLink,
   onBrowseAllClick,
+  browseAllLabel,
   error,
   displayItemTitles = true,
 }: Props<ThumbnailType>) => {
@@ -367,15 +371,24 @@ const Carousel = <ThumbnailType: Thumbnail>({
           width: `calc(100% - ${2 * arrowWidth}px - ${rightArrowMargin}px)`,
         }}
       >
-        <Line noMargin justifyContent="space-between" alignItems="center">
+        <Line justifyContent="space-between" alignItems="center">
           <Text size="bold-title">{title}</Text>
-          <FlatButton
-            onClick={
-              onBrowseAllClick ||
-              (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
-            }
-            label={<Trans>Browse all</Trans>}
-          />
+          <Line>
+            {additionalAction && (
+              <>
+                {additionalAction}
+                <Spacer />
+              </>
+            )}
+            <FlatButton
+              onClick={
+                onBrowseAllClick ||
+                (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
+              }
+              label={browseAllLabel}
+              icon={<ListOutlined />}
+            />
+          </Line>
         </Line>
         {error ? (
           <div style={{ ...styles.error, height: cellHeight }}>

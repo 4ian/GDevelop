@@ -59,7 +59,7 @@ module.exports = {
         _('Light Obstacle Behavior'),
         'LightObstacleBehavior',
         _(
-          'This behavior makes the object an obstacle to the light. The light emitted by light objects will be stopped by the object.'
+          'Flag objects as being obstacles to light. The light emitted by light objects will be stopped by the object.'
         ),
         '',
         'CppPlatform/Extensions/lightObstacleIcon32.png',
@@ -132,6 +132,7 @@ module.exports = {
               'When activated, display the lines used to render the light - useful to understand how the light is rendered on screen.'
             )
           )
+          .setGroup(_('Advanced'))
       );
 
       objectProperties
@@ -193,7 +194,8 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Lighting/lightruntimeobject.js')
       .addIncludeFile('Extensions/Lighting/lightruntimeobject-pixi-renderer.js')
-      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js');
+      .addIncludeFile('Extensions/Lighting/lightobstacleruntimebehavior.js')
+      .setCategoryFullName(_('Lights'));
 
     object
       .addAction(
@@ -241,7 +243,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'Lighting::LightObject',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/light',
+        helpPagePath: '/all-features/lighting/reference',
       })
     );
   },

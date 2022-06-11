@@ -1159,9 +1159,9 @@ namespace gdjs {
     /**
      * Change the width of the object. This changes the scale on X axis of the object.
      *
-     * @param width The new width of the object, in pixels.
+     * @param newWidth The new width of the object, in pixels.
      */
-    setWidth(newWidth): void {
+    setWidth(newWidth: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
@@ -1174,9 +1174,9 @@ namespace gdjs {
     /**
      * Change the height of the object. This changes the scale on Y axis of the object.
      *
-     * @param height The new height of the object, in pixels.
+     * @param newHeight The new height of the object, in pixels.
      */
-    setHeight(newHeight): void {
+    setHeight(newHeight: float): void {
       if (this._animationFrameDirty) {
         this._updateAnimationFrame();
       }
@@ -1184,6 +1184,17 @@ namespace gdjs {
       if (unscaledHeight !== 0) {
         this.setScaleY(newHeight / unscaledHeight);
       }
+    }
+
+    /**
+     * Change the size of the object.
+     *
+     * @param newWidth The new width of the object, in pixels.
+     * @param newHeight The new height of the object, in pixels.
+     */
+    setSize(newWidth: float, newHeight: float): void {
+      this.setWidth(newWidth);
+      this.setHeight(newHeight);
     }
 
     /**

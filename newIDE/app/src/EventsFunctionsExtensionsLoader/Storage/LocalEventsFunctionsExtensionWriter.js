@@ -1,10 +1,10 @@
 // @flow
 import { serializeToJSObject } from '../../Utils/Serializer';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const fs = optionalRequire('fs-extra');
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+const remote = optionalRequire('@electron/remote');
+const dialog = remote ? remote.dialog : null;
 
 const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
   if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
@@ -29,9 +29,11 @@ const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
 };
 
 export default class LocalEventsFunctionsExtensionWriter {
-  static chooseEventsFunctionExtensionFile = (): Promise<?string> => {
+  static chooseEventsFunctionExtensionFile = (
+    extensionName?: string
+  ): Promise<?string> => {
     if (!dialog) return Promise.reject('Not supported');
-    const browserWindow = electron.remote.getCurrentWindow();
+    const browserWindow = remote.getCurrentWindow();
 
     return dialog
       .showSaveDialog(browserWindow, {
@@ -42,7 +44,7 @@ export default class LocalEventsFunctionsExtensionWriter {
             extensions: ['json'],
           },
         ],
-        defaultPath: 'Extension.json',
+        defaultPath: extensionName ? extensionName : 'Extension.json',
       })
       .then(({ filePath }) => {
         if (!filePath) return null;

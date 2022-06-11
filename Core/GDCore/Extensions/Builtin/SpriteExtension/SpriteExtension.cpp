@@ -23,11 +23,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/sprite");
 
-  gd::ObjectMetadata& obj = extension.AddObject<SpriteObject>(
-      "Sprite",
-      _("Sprite"),
-      _("Animated object which can be used for most elements of a game"),
-      "CppPlatform/Extensions/spriteicon.png");
+  gd::ObjectMetadata& obj =
+      extension
+          .AddObject<SpriteObject>("Sprite",
+                                   _("Sprite"),
+                                   _("Animated object which can be used for "
+                                     "most elements of a game"),
+                                   "CppPlatform/Extensions/spriteicon.png")
+          .SetCategoryFullName(_("General"));
 
   obj.AddAction("Opacity",
                 _("Change sprite opacity"),
@@ -78,7 +81,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Direction"),
          "res/actions/direction24.png",
          "res/actions/direction.png")
-      .SetHidden() // Hide as 8 direction is not supported officially in the interface.
+      .SetHidden()  // Hide as 8 direction is not supported officially in the
+                    // interface.
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
@@ -195,6 +199,18 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced();
 
+  obj.AddCondition("Width",
+                   _("Width"),
+                   _("Compare the width of a Sprite object."),
+                   _("the width"),
+                   _("Size"),
+                   "res/conditions/scaleWidth24.png",
+                   "res/conditions/scaleWidth.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
+
   obj.AddAction("ChangeHeight",
                 _("Height"),
                 _("Change the height of a Sprite object."),
@@ -205,6 +221,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddCondition("Height",
+                   _("Height"),
+                   _("Compare the height of a Sprite object."),
+                   _("the height"),
+                   _("Size"),
+                   "res/conditions/scaleHeight24.png",
+                   "res/conditions/scaleHeight.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
+      .UseStandardRelationalOperatorParameters("number")
+      .MarkAsAdvanced();
+
+  obj.AddAction("SetSize",
+                _("Size"),
+                _("Change the size of an object."),
+                _("Change the size of _PARAM0_: set to _PARAM1_x_PARAM2_"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"))
+      .AddParameter("expression", _("Width"))
+      .AddParameter("expression", _("Height"))
       .MarkAsAdvanced();
 
   obj.AddCondition(
@@ -242,7 +283,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
          _("Direction"),
          "res/conditions/direction24.png",
          "res/conditions/direction.png")
-      .SetHidden() // Hide as 8 direction is not supported officially in the interface.
+      .SetHidden()  // Hide as 8 direction is not supported officially in the
+                    // interface.
       .AddParameter("object", _("Object"), "Sprite")
       .UseStandardRelationalOperatorParameters("number");
 
@@ -361,7 +403,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("FlipX",
                 _("Flip the object horizontally"),
                 _("Flip the object horizontally"),
-                _("Flip horizontally _PARAM0_ : _PARAM1_"),
+                _("Flip horizontally _PARAM0_: _PARAM1_"),
                 _("Effects"),
                 "res/actions/flipX24.png",
                 "res/actions/flipX.png")
@@ -373,7 +415,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   obj.AddAction("FlipY",
                 _("Flip the object vertically"),
                 _("Flip the object vertically"),
-                _("Flip vertically _PARAM0_ : _PARAM1_"),
+                _("Flip vertically _PARAM0_: _PARAM1_"),
                 _("Effects"),
                 "res/actions/flipY24.png",
                 "res/actions/flipY.png")
@@ -464,7 +506,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     _("Direction of the object"),
                     _("Direction"),
                     "res/actions/direction.png")
-      .SetHidden() // Hide as 8 direction is not supported officially in the interface.
+      .SetHidden()  // Hide as 8 direction is not supported officially in the
+                    // interface.
       .AddParameter("object", _("Object"), "Sprite");
 
   obj.AddExpression("Anim",

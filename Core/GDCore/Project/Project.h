@@ -56,14 +56,34 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@{
 
   /**
-   * \brief Change project name
+   * \brief Change the project name
    */
   void SetName(const gd::String& name_) { name = name_; };
 
   /**
-   * \brief Get project name
+   * \brief Get the project name
    */
   const gd::String& GetName() const { return name; }
+
+  /**
+   * \brief Get the categories/genres of the project.
+   */
+  const std::vector<gd::String>& GetCategories() const { return categories; };
+
+  /**
+   * \brief Get the categories of the project, to modify them (non-const).
+   */
+  std::vector<gd::String>& GetCategories() { return categories; };
+
+  /**
+   * \brief Change the project description
+   */
+  void SetDescription(const gd::String& description_) { description = description_; };
+
+  /**
+   * \brief Get the project description
+   */
+  const gd::String& GetDescription() const { return description; }
 
   /**
    * \brief Change the version of the project.
@@ -73,7 +93,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetVersion(const gd::String& version_) { version = version_; };
 
   /**
-   * \brief Get project version.
+   * \brief Get the project version.
    */
   const gd::String& GetVersion() const { return version; }
 
@@ -83,7 +103,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void SetAuthor(const gd::String& author_) { author = author_; };
 
   /**
-   * \brief Get project author name.
+   * \brief Get the project author name.
    */
   const gd::String& GetAuthor() const { return author; }
 
@@ -98,16 +118,61 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::vector<gd::String>& GetAuthorIds() { return authorIds; };
 
   /**
-   * \brief Change project package name.
+   * Define the project as playable with a keyboard.
+   * \param enable True to define the project as playable with a keyboard.
+   */
+  void SetPlayableWithKeyboard(bool playable = true) { isPlayableWithKeyboard = playable; }
+
+  /**
+   * Check if the project is defined as playable with a keyboard.
+   */
+  bool IsPlayableWithKeyboard() const { return isPlayableWithKeyboard; }
+
+  /**
+   * Define the project as playable with a gamepad.
+   * \param enable True to define the project as playable with a gamepad.
+   */
+  void SetPlayableWithGamepad(bool playable = true) { isPlayableWithGamepad = playable; }
+
+  /**
+   * Check if the project is defined as playable with a gamepad.
+   */
+  bool IsPlayableWithGamepad() const { return isPlayableWithGamepad; }
+
+  /**
+   * Define the project as playable on a mobile.
+   * \param enable True to define the project as playable on a mobile.
+   */
+  void SetPlayableWithMobile(bool playable = true) { isPlayableWithMobile = playable; }
+
+  /**
+   * Check if the project is defined as playable on a mobile.
+   */
+  bool IsPlayableWithMobile() const { return isPlayableWithMobile; }
+
+  /**
+   * \brief Change the project package name.
    */
   void SetPackageName(const gd::String& packageName_) {
     packageName = packageName_;
   };
 
   /**
-   * \brief Get project package name.
+   * \brief Get the project package name.
    */
   const gd::String& GetPackageName() const { return packageName; }
+
+    /**
+   * \brief Change the slug of the template from which the project is created.
+   */
+  void SetTemplateSlug(const gd::String& templateSlug_) {
+    templateSlug = templateSlug_;
+  };
+
+  /**
+   * \brief Get the slug of the template from which the project is created.
+   */
+  const gd::String& GetTemplateSlug() const { return templateSlug; }
 
   /**
    * \brief Change the project orientation (in particular when exported with
@@ -119,7 +184,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   };
 
   /**
-   * \brief Get project orientation ("default", "landscape", "portrait").
+   * \brief Get the project orientation ("default", "landscape", "portrait").
    */
   const gd::String& GetOrientation() const { return orientation; }
 
@@ -884,6 +949,7 @@ class GD_CORE_API Project : public ObjectsContainer {
   void Init(const gd::Project& project);
 
   gd::String name;            ///< Game name
+  gd::String description;     ///< Game description
   gd::String version;         ///< Game version number (used for some exports)
   unsigned int windowWidth;   ///< Window default width
   unsigned int windowHeight;  ///< Window default height
@@ -923,7 +989,14 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::String author;        ///< Game author name, for publishing purpose.
   std::vector<gd::String>
       authorIds;           ///< Game author ids, from GDevelop users DB.
+  std::vector<gd::String>
+      categories;           ///< Game categories
+  bool isPlayableWithKeyboard; ///< The project is playable with a keyboard.
+  bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
+  bool isPlayableWithMobile;   ///< The project is playable on a mobile.
   gd::String packageName;  ///< Game package name
+  gd::String templateSlug; ///< The slug of the template from which the game is
+                           ///< created.
   gd::String orientation;  ///< Lock game orientation (on mobile devices).
                            ///< "default", "landscape" or "portrait".
   bool

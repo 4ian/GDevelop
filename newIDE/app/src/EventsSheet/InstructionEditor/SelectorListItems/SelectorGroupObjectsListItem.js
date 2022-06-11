@@ -7,12 +7,14 @@ import {
   getObjectGroupListItemKey,
   getObjectOrObjectGroupListItemValue,
 } from './Keys';
+import HighlightedText from '../../../UI/Search/HighlightedText';
 
 type Props = {|
   groupWithContext: GroupWithContext,
   iconSize: number,
   onClick: () => void,
   selectedValue: ?string,
+  matchesCoordinates: number[][],
 |};
 
 export const renderGroupObjectsListItem = ({
@@ -20,6 +22,7 @@ export const renderGroupObjectsListItem = ({
   iconSize,
   onClick,
   selectedValue,
+  matchesCoordinates,
 }: Props) => {
   const groupName: string = groupWithContext.group.getName();
   return (
@@ -28,7 +31,12 @@ export const renderGroupObjectsListItem = ({
       selected={
         selectedValue === getObjectOrObjectGroupListItemValue(groupName)
       }
-      primaryText={groupName}
+      primaryText={
+        <HighlightedText
+          text={groupName}
+          matchesCoordinates={matchesCoordinates}
+        />
+      }
       leftIcon={
         <ListIcon
           iconSize={iconSize}
@@ -36,6 +44,7 @@ export const renderGroupObjectsListItem = ({
         />
       }
       onClick={onClick}
+      disableAutoTranslate
     />
   );
 };

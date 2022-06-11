@@ -3,6 +3,7 @@ import {
   type Asset,
   type AssetShortHeader,
   getAsset,
+  isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { unserializeFromJSObject } from '../Utils/Serializer';
@@ -53,6 +54,7 @@ export const sanitizeObjectName = (objectName: string) => {
  */
 export const installResource = (
   project: gdProject,
+  asset: Asset,
   serializedResource: any,
   resourceNewNames: { [string]: string }
 ) => {
@@ -112,7 +114,9 @@ export const installResource = (
     resourcesManager.hasResource(name)
   );
   newResource.setName(newName);
-  newResource.setSmooth(project.getScaleMode() !== 'nearest');
+  newResource.setSmooth(
+    project.getScaleMode() !== 'nearest' && !isPixelArt(asset)
+  );
   newResource.setOrigin(resourceOriginName, resourceOriginIdentifier);
   resourcesManager.addResource(newResource);
   newResource.delete();
@@ -164,12 +168,13 @@ export const addAssetToProject = async ({
       project
     );
 
+    object.setAssetStoreId(asset.id);
     // The name was overwritten after unserialization.
     object.setName(newName);
 
     // Add resources used by the object
     objectAsset.resources.forEach(serializedResource => {
-      installResource(project, serializedResource, resourceNewNames);
+      installResource(project, asset, serializedResource, resourceNewNames);
     });
 
     // TODO: Check how multiple objects are handled
@@ -199,6 +204,7 @@ export const addAssetToProject = async ({
         const behavior = behaviorMetadata.get();
         // TODO: When this feature is exposed to users, we might want to use
         // gd.WholeProjectRefactorer.addBehaviorAndRequiredBehaviors instead.
+        // And add analytics for this.
         const behaviorContent = object.addNewBehavior(
           project,
           behaviorType,
@@ -243,9 +249,10 @@ export const addAssetToProject = async ({
             groupEvent.getSubEvents(),
             parameter.name,
             parameter.defaultValue,
-            true,
-            true,
-            true
+            /*matchCase=*/ true,
+            /*inConditions=*/ true,
+            /*inActions=*/ true,
+            /*inEventStrings=*/ false
           );
         });
 
@@ -400,7 +407,8 @@ export const downloadExtensions = async (
 export const addSerializedExtensionsToProject = (
   eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
   project: gdProject,
-  serializedExtensions: Array<SerializedExtension>
+  serializedExtensions: Array<SerializedExtension>,
+  fromExtensionStore: boolean = true
 ): Promise<void> => {
   serializedExtensions.forEach(serializedExtension => {
     const { name } = serializedExtension;
@@ -419,6 +427,10 @@ export const addSerializedExtensionsToProject = (
       'unserializeFrom',
       project
     );
+
+    if (fromExtensionStore) {
+      newEventsFunctionsExtension.setOrigin('gdevelop-extension-store', name);
+    }
   });
 
   return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(

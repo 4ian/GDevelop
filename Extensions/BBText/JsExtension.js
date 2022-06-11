@@ -67,19 +67,22 @@ module.exports = {
         .getOrCreate('color')
         .setValue(objectContent.color)
         .setType('color')
-        .setLabel(_('Base color'));
+        .setLabel(_('Base color'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('opacity')
         .setValue(objectContent.opacity.toString())
         .setType('number')
-        .setLabel(_('Opacity (0-255)'));
+        .setLabel(_('Opacity (0-255)'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('fontSize')
         .setValue(objectContent.fontSize.toString())
         .setType('number')
-        .setLabel(_('Base size'));
+        .setLabel(_('Base size'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('align')
@@ -88,33 +91,36 @@ module.exports = {
         .addExtraInfo('left')
         .addExtraInfo('center')
         .addExtraInfo('right')
-        .setLabel(_('Base alignment'));
+        .setLabel(_('Base alignment'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('fontFamily')
         .setValue(objectContent.fontFamily)
         .setType('resource')
         .addExtraInfo('font')
-        .setLabel(_('Base font family'));
+        .setLabel(_('Font'))
+        .setGroup(_('Font'));
 
       objectProperties
         .getOrCreate('wordWrap')
         .setValue(objectContent.wordWrap ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Word wrapping'));
+        .setLabel(_('Word wrapping'))
+        .setGroup(_('Appearance'));
 
       objectProperties
         .getOrCreate('visible')
         .setValue(objectContent.visible ? 'true' : 'false')
         .setType('boolean')
-        .setLabel(_('Visible on start'));
+        .setLabel(_('Visible on start'))
+        .setGroup(_('Appearance'));
 
       return objectProperties;
     };
     objectBBText.setRawJSONContent(
       JSON.stringify({
-        text:
-          '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
+        text: '[b]bold[/b] [i]italic[/i] [size=15]smaller[/size] [font=times]times[/font] font\n[spacing=12]spaced out[/spacing]\n[outline=yellow]outlined[/outline] [shadow=red]DropShadow[/shadow] ',
         opacity: 255,
         fontSize: 20,
         visible: true,
@@ -161,7 +167,8 @@ module.exports = {
       .addIncludeFile('Extensions/BBText/bbtextruntimeobject-pixi-renderer.js')
       .addIncludeFile(
         'Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd.js'
-      );
+      )
+      .setCategoryFullName(_('Texts'));
 
     /**
      * Utility function to add both a setter and a getter to a property from a list.
@@ -511,7 +518,8 @@ module.exports = {
       this._pixiObject.alpha = opacity / 255;
 
       const color = properties.get('color').getValue();
-      this._pixiObject.textStyles.default.fill = objectsRenderingService.rgbOrHexToHexNumber(color);
+      this._pixiObject.textStyles.default.fill =
+        objectsRenderingService.rgbOrHexToHexNumber(color);
 
       const fontSize = properties.get('fontSize').getValue();
       this._pixiObject.textStyles.default.fontSize = `${fontSize}px`;

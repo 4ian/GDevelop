@@ -1,8 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import EventsBasedBehaviorEditor from './index';
 import HelpButton from '../UI/HelpButton';
 
@@ -28,7 +27,6 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
 
     return (
       <Dialog
-        onApply={onApply}
         noMargin
         secondaryActions={[
           <HelpButton
@@ -37,17 +35,16 @@ export default class EventsBasedBehaviorEditorDialog extends React.Component<
           />,
         ]}
         actions={[
-          <FlatButton
+          <DialogPrimaryButton
             label={<Trans>Apply</Trans>}
             primary
-            keyboardFocused
             onClick={onApply}
             key={'Apply'}
           />,
         ]}
-        cannotBeDismissed={true}
         open
         onRequestClose={onApply}
+        onApply={onApply}
         title={<Trans>Edit the behavior</Trans>}
       >
         <EventsBasedBehaviorEditor

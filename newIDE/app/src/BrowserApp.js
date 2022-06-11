@@ -8,8 +8,6 @@ import Authentication from './Utils/GDevelopServices/Authentication';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
 
 // Import for browser only IDE
-import BrowserExamples from './ProjectCreation/BrowserExamples';
-import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
@@ -73,6 +71,7 @@ export const create = (authentication: Authentication) => {
               renderExportDialog={props => (
                 <ExportDialog
                   project={props.project}
+                  onSaveProject={props.onSaveProject}
                   onChangeSubscription={props.onChangeSubscription}
                   onClose={props.onClose}
                   automatedExporters={browserAutomatedExporters}
@@ -83,12 +82,14 @@ export const create = (authentication: Authentication) => {
               )}
               renderCreateDialog={props => (
                 <CreateProjectDialog
-                  {...props}
-                  examplesComponent={BrowserExamples}
+                  open={props.open}
+                  onClose={props.onClose}
+                  onOpen={props.onOpen}
+                  initialTab={props.initialTab}
+                  onCreateBlank={onCreateBlank}
                   onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
                 />
               )}
-              introDialog={<BrowserIntroDialog />}
               storageProviders={storageProviders}
               onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
               onCreateBlank={onCreateBlank}

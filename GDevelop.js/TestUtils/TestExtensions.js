@@ -70,5 +70,152 @@ module.exports = {
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
     }
+    {
+      const extension = new gd.PlatformExtension();
+      extension.setExtensionInformation(
+        'FakeObjectWithUnsupportedCapability',
+        'Fake object not supporting the "effect" capability',
+        'Fake object not supporting the "effect" capability',
+        '',
+        'MIT'
+      );
+      const fakeObject = new gd.ObjectJsImplementation();
+
+
+      fakeObject.updateProperty = function(
+        objectContent,
+        propertyName,
+        newValue
+      ) {
+        return false;
+      };
+
+      fakeObject.getProperties = function(objectContent) {
+        const objectProperties = new gd.MapStringPropertyDescriptor();
+
+        objectProperties
+          .getOrCreate('text')
+          .setValue(objectContent.text)
+          .setType('textarea')
+          .setLabel('Text');
+
+        return objectProperties;
+      };
+      fakeObject.setRawJSONContent(
+        JSON.stringify({
+          text: 'Some text.',
+        })
+      );
+
+
+      fakeObject.updateInitialInstanceProperty = function(
+        objectContent,
+        instance,
+        propertyName,
+        newValue,
+        project,
+        layout
+      ) {
+        return false;
+      };
+
+      fakeObject.getInitialInstanceProperties = function(
+        content,
+        instance,
+        project,
+        layout
+      ) {
+        var instanceProperties = new gd.MapStringPropertyDescriptor();
+        return instanceProperties;
+      };
+
+      const object = extension
+        .addObject(
+          'FakeObjectWithUnsupportedCapability',
+          'FakeObjectWithUnsupportedCapability',
+          'This is FakeObjectWithUnsupportedCapability',
+          '',
+          fakeObject
+        )
+        .addUnsupportedBaseObjectCapability('effect');
+
+      platform.addNewExtension(extension);
+      extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+    }
+    {
+      const extension = new gd.PlatformExtension();
+      extension.setExtensionInformation(
+        'FakeObjectWithAsyncAction',
+        'Fake object with an async action',
+        'Fake object with an async action',
+        '',
+        'MIT'
+      );
+      const fakeObject = new gd.ObjectJsImplementation();
+
+
+      fakeObject.updateProperty = function(
+        objectContent,
+        propertyName,
+        newValue
+      ) {
+        return false;
+      };
+
+      fakeObject.getProperties = function(objectContent) {
+        const objectProperties = new gd.MapStringPropertyDescriptor();
+        return objectProperties;
+      };
+      fakeObject.setRawJSONContent(
+        JSON.stringify({})
+      );
+
+      fakeObject.updateInitialInstanceProperty = function(
+        objectContent,
+        instance,
+        propertyName,
+        newValue,
+        project,
+        layout
+      ) {
+        return false;
+      };
+
+      fakeObject.getInitialInstanceProperties = function(
+        content,
+        instance,
+        project,
+        layout
+      ) {
+        var instanceProperties = new gd.MapStringPropertyDescriptor();
+        return instanceProperties;
+      };
+
+      const object = extension
+        .addObject(
+          'FakeObjectWithAsyncAction',
+          'FakeObjectWithAsyncAction',
+          'This is FakeObjectWithAsyncAction',
+          '',
+          fakeObject
+        );
+
+      object.addScopedAction(
+          'DoAsyncAction',
+          'Some async action',
+          'Some async action.',
+          'Do some async action with _PARAM0_',
+          '',
+          'res/icon.png',
+          'res/icon.png'
+        )
+        .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
+        .setAsync()
+        .getCodeExtraInformation()
+        .setFunctionName('doFakeAsyncAction')
+
+      platform.addNewExtension(extension);
+      extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+    }
   },
 };

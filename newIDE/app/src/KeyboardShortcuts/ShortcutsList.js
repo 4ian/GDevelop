@@ -5,7 +5,6 @@ import { type I18n } from '@lingui/core';
 import List from '@material-ui/core/List';
 import Text from '../UI/Text';
 import DetectShortcutDialog from './DetectShortcutDialog';
-import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { type ShortcutMap } from './DefaultShortcuts';
@@ -17,6 +16,20 @@ import commandsList, {
   type CommandName,
   commandAreas,
 } from '../CommandPalette/CommandsList';
+import { ColumnStackLayout } from '../UI/Layout';
+
+/**
+ * Get shortcut string to be displayed after patching the default
+ * shortcut with user-defined shortcut, if any.
+ */
+const getPatchedShortcutString = (
+  defaultShortcut: string,
+  userShortcut?: string
+) => {
+  // User shortcut can be empty string when user has removed a shortcut,
+  // so we check userShortcut against null/undefined.
+  return userShortcut == null ? defaultShortcut : userShortcut;
+};
 
 /**
  * Sorts all commands into an object keyed by area name, and also creates a
@@ -38,7 +51,10 @@ const sortCommandsIntoAreasAndGetReverseMap = (
       // Add to shortcut-command mapping
       const userShortcut = userShortcutMap[name];
       const defaultShortcut = defaultShortcuts[name] || '';
-      const shortcutString = userShortcut || defaultShortcut;
+      const shortcutString = getPatchedShortcutString(
+        defaultShortcut,
+        userShortcut
+      );
       if (shortcutString === '') return;
       shortcutStringToCommands[shortcutString] = (
         shortcutStringToCommands[shortcutString] || []
@@ -86,22 +102,20 @@ const ShortcutsList = (props: Props) => {
   );
 
   return (
-    <>
-      <Line>
-        <DismissableAlertMessage
-          kind="info"
-          identifier="command-palette-shortcut"
-        >
-          <Trans>You can open the command palette by pressing</Trans>{' '}
-          {commandPaletteShortcut}
-        </DismissableAlertMessage>
-      </Line>
-      <Line>
-        <RaisedButton
-          label={<Trans>Reset all shortcuts to default</Trans>}
-          onClick={resetAllShortcutsToDefault}
-        />
-      </Line>
+    <ColumnStackLayout noMargin>
+      <DismissableAlertMessage
+        kind="info"
+        identifier="command-palette-shortcut"
+      >
+        <Trans>
+          You can open the command palette by pressing {commandPaletteShortcut}.
+        </Trans>
+      </DismissableAlertMessage>
+      <RaisedButton
+        label={<Trans>Reset all shortcuts to default</Trans>}
+        onClick={resetAllShortcutsToDefault}
+        fullWidth
+      />
       <List>
         {Object.keys(areaWiseCommands).map(areaName => (
           <React.Fragment key={areaName}>
@@ -110,7 +124,10 @@ const ShortcutsList = (props: Props) => {
               // Get default and user-set shortcuts
               const userShortcut = props.userShortcutMap[commandName];
               const defaultShortcut = defaultShortcuts[commandName] || '';
-              const shortcutString = userShortcut || defaultShortcut;
+              const shortcutString = getPatchedShortcutString(
+                defaultShortcut,
+                userShortcut
+              );
               const shortcutDisplayName = getShortcutDisplayName(
                 shortcutString
               );
@@ -124,7 +141,7 @@ const ShortcutsList = (props: Props) => {
                   key={commandName}
                   shortcutString={shortcutDisplayName}
                   commandName={commandName}
-                  isDefault={!userShortcut}
+                  isDefault={shortcutString === defaultShortcut}
                   isClashing={hasClash}
                   onEditShortcut={() => setEditedShortcut(commandName)}
                   onResetShortcut={() => resetShortcut(commandName)}
@@ -143,7 +160,7 @@ const ShortcutsList = (props: Props) => {
           }}
         />
       )}
-    </>
+    </ColumnStackLayout>
   );
 };
 

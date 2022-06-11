@@ -1,5 +1,5 @@
 // @flow
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 const os = optionalRequire('os');
 
 export const getUID = () => {

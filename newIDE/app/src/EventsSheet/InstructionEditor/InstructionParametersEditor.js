@@ -48,7 +48,7 @@ const styles = {
     width: 24,
     height: 24,
     marginRight: 8,
-    paddingTop: 12,
+    paddingTop: 6,
     flexShrink: 0,
   },
   invertToggle: {
@@ -287,7 +287,11 @@ export default class InstructionParametersEditor extends React.Component<
                 </Line>
               ) : null}
               <Spacer />
-              <div key={instructionType} style={styles.parametersContainer}>
+              <div
+                key={instructionType}
+                style={styles.parametersContainer}
+                id="instruction-parameters-container"
+              >
                 <ColumnStackLayout noMargin>
                   {mapFor(0, instructionMetadata.getParametersCount(), i => {
                     const parameterMetadata = instructionMetadata.getParameter(
@@ -319,9 +323,12 @@ export default class InstructionParametersEditor extends React.Component<
                         instruction={instruction}
                         parameterMetadata={parameterMetadata}
                         parameterIndex={i}
-                        value={instruction.getParameter(i)}
+                        value={instruction.getParameter(i).getPlainString()}
                         onChange={value => {
-                          if (instruction.getParameter(i) !== value) {
+                          if (
+                            instruction.getParameter(i).getPlainString() !==
+                            value
+                          ) {
                             instruction.setParameter(i, value);
                             this.setState({
                               isDirty: true,

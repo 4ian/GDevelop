@@ -6,7 +6,13 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace input {
+      /**
+       * @deprecated
+       */
       export let lastTouchId = 0;
+      /**
+       * @deprecated
+       */
       export let lastEndedTouchId = 0;
 
       /**
@@ -68,18 +74,18 @@ namespace gdjs {
         RAlt: 2018,
         LSystem: 1091,
         RSystem: 2091,
-        /*"Menu": sf::Keyboard::Menu ,
-    "LBracket": sf::Keyboard::LBracket ,
-    "RBracket": sf::Keyboard::RBracket ,
-    "SemiColon": sf::Keyboard::SemiColon ,
-    "Comma": sf::Keyboard::Comma ,
-    "Period": sf::Keyboard::Period ,
-    "Quote": sf::Keyboard::Quote ,
-    "Slash": sf::Keyboard::Slash ,
-    "BackSlash": sf::Keyboard::BackSlash ,
-    "Tilde": sf::Keyboard::Tilde ,
-    "Equal": sf::Keyboard::Equal ,
-    "Dash": sf::Keyboard::Dash,*/
+        SemiColon: 186,
+        Comma: 188,
+        Period: 190,
+        Quote: 222,
+        Slash: 191,
+        BackSlash: 220,
+        Equal: 187,
+        Dash: 189,
+        Menu: 93,
+        LBracket: 219,
+        RBracket: 221,
+        Tilde: 192,
         Space: 32,
         Back: 8,
         Tab: 9,
@@ -266,6 +272,12 @@ namespace gdjs {
           )[1];
       };
 
+      export const isMouseInsideCanvas = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
+        return runtimeScene.getGame().getInputManager().isMouseInsideCanvas();
+      };
+
       export const _cursorIsOnObject = function (obj, runtimeScene) {
         return obj.cursorOnObject(runtimeScene);
       };
@@ -285,10 +297,10 @@ namespace gdjs {
       };
 
       export const getTouchX = function (
-        runtimeScene,
-        identifier,
-        layer,
-        camera
+        runtimeScene: gdjs.RuntimeScene,
+        identifier: integer,
+        layer: string,
+        camera: integer
       ) {
         return runtimeScene
           .getLayer(layer)
@@ -298,12 +310,12 @@ namespace gdjs {
           )[0];
       };
 
-      export const getTouchY = function (
-        runtimeScene,
-        identifier,
-        layer,
-        camera
-      ) {
+      export const getTouchY = (
+        runtimeScene: gdjs.RuntimeScene,
+        identifier: integer,
+        layer: string,
+        camera: integer
+      ) => {
         return runtimeScene
           .getLayer(layer)
           .convertCoords(
@@ -312,15 +324,64 @@ namespace gdjs {
           )[1];
       };
 
+      export const hasAnyTouchStarted = (
+        runtimeScene: gdjs.RuntimeScene
+      ): boolean => {
+        return (
+          runtimeScene.getGame().getInputManager().getStartedTouchIdentifiers()
+            .length > 0
+        );
+      };
+
+      export const getStartedTouchCount = (
+        runtimeScene: gdjs.RuntimeScene
+      ): integer => {
+        return runtimeScene
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers().length;
+      };
+
+      export const getStartedTouchIdentifier = (
+        runtimeScene: gdjs.RuntimeScene,
+        index: integer
+      ): integer => {
+        return runtimeScene
+          .getGame()
+          .getInputManager()
+          .getStartedTouchIdentifiers()[index];
+      };
+
+      export const hasTouchEnded = (
+        runtimeScene: gdjs.RuntimeScene,
+        identifier: integer
+      ): boolean => {
+        return runtimeScene
+          .getGame()
+          .getInputManager()
+          .hasTouchEnded(identifier);
+      };
+
+      /**
+       * @deprecated
+       */
       export const getLastTouchId = function () {
         return gdjs.evtTools.input.lastTouchId || 0;
       };
 
+      /**
+       * @deprecated
+       */
       export const getLastEndedTouchId = function () {
         return gdjs.evtTools.input.lastEndedTouchId || 0;
       };
 
-      export const popStartedTouch = function (runtimeScene) {
+      /**
+       * @deprecated
+       */
+      export const popStartedTouch = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         const startedTouchId = runtimeScene
           .getGame()
           .getInputManager()
@@ -332,7 +393,10 @@ namespace gdjs {
         return false;
       };
 
-      export const popEndedTouch = function (runtimeScene) {
+      /**
+       * @deprecated
+       */
+      export const popEndedTouch = function (runtimeScene: gdjs.RuntimeScene) {
         const endedTouchId = runtimeScene
           .getGame()
           .getInputManager()

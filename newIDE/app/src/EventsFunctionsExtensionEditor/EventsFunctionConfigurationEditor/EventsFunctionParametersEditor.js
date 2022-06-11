@@ -29,6 +29,7 @@ import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 import StringArrayEditor from '../../StringArrayEditor';
+import newNameGenerator from '../../Utils/NewNameGenerator';
 
 const gd: libGDevelop = global.gd;
 
@@ -112,9 +113,16 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
+    const existingParameterNames = mapVector(parameters, parameterMetadata =>
+      parameterMetadata.getName()
+    );
 
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
+    const newName = newNameGenerator('Parameter', name =>
+      existingParameterNames.includes(name)
+    );
+    newParameter.setName(newName);
     parameters.push_back(newParameter);
     newParameter.delete();
     this.forceUpdate();
@@ -359,6 +367,8 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 value={parameter.getType()}
                                 onChange={(e, i, value: string) => {
                                   parameter.setType(value);
+                                  parameter.setOptional(false);
+                                  parameter.setDefaultValue('');
                                   this.forceUpdate();
                                   this.props.onParametersUpdated();
                                 }}
@@ -452,6 +462,55 @@ export default class EventsFunctionParametersEditor extends React.Component<
                                 }}
                                 disabled={isParameterDisabled(i)}
                               />
+                            )}
+                            {parameter.getType() === 'yesorno' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={
+                                  parameter.getDefaultValue() === 'yes'
+                                    ? 'yes'
+                                    : 'no'
+                                }
+                                onChange={(e, i, value) => {
+                                  parameter.setOptional(true);
+                                  parameter.setDefaultValue(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="yes"
+                                  primaryText={t`Yes`}
+                                />
+                                <SelectOption value="no" primaryText={t`No`} />
+                              </SelectField>
+                            )}
+                            {parameter.getType() === 'trueorfalse' && (
+                              <SelectField
+                                floatingLabelText={<Trans>Default value</Trans>}
+                                value={
+                                  parameter.getDefaultValue() === 'True'
+                                    ? 'True'
+                                    : 'False'
+                                }
+                                onChange={(e, i, value) => {
+                                  parameter.setOptional(true);
+                                  parameter.setDefaultValue(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <SelectOption
+                                  value="True"
+                                  primaryText={t`True`}
+                                />
+                                <SelectOption
+                                  value="False"
+                                  primaryText={t`False`}
+                                />
+                              </SelectField>
                             )}
                           </ResponsiveLineStackLayout>
                           {parameter.getType() === 'stringWithSelector' && (

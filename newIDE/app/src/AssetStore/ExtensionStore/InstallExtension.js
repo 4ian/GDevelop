@@ -71,7 +71,8 @@ export const importExtension = async (
     await addSerializedExtensionsToProject(
       eventsFunctionsExtensionsState,
       project,
-      [serializedExtension]
+      [serializedExtension],
+      false
     );
     return true;
   } catch (rawError) {

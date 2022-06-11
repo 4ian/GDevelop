@@ -41,8 +41,12 @@ type ExportHomeProps = {|
   setChosenExporterSection: (section: ExporterSection) => void,
   cantExportBecauseOffline: boolean,
   project: gdProject,
+  onSaveProject: () => Promise<void>,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
+  isNavigationDisabled: boolean,
+  setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
+  onGameUpdated: () => void,
 |};
 
 const ExportHome = ({
@@ -51,8 +55,12 @@ const ExportHome = ({
   setChosenExporterSection,
   cantExportBecauseOffline,
   project,
+  onSaveProject,
   onChangeSubscription,
   authenticatedUser,
+  isNavigationDisabled,
+  setIsNavigationDisabled,
+  onGameUpdated,
 }: ExportHomeProps) => {
   return (
     <ResponsiveLineStackLayout>
@@ -60,7 +68,7 @@ const ExportHome = ({
         <div style={styles.titleContainer}>
           <Line>
             <Text size="title">
-              <Trans>Share with friends</Trans>
+              <Trans>Publish and share with friends on Liluo.io</Trans>
             </Text>
           </Line>
         </div>
@@ -71,8 +79,11 @@ const ExportHome = ({
           <ExportLauncher
             exportPipeline={onlineWebExporter.exportPipeline}
             project={project}
+            onSaveProject={onSaveProject}
             onChangeSubscription={onChangeSubscription}
             authenticatedUser={authenticatedUser}
+            setIsNavigationDisabled={setIsNavigationDisabled}
+            onGameUpdated={onGameUpdated}
           />
         </div>
       </ColumnStackLayout>
@@ -81,7 +92,7 @@ const ExportHome = ({
         <div style={styles.titleContainer}>
           <Line>
             <Text size="title">
-              <Trans>Publish your game</Trans>
+              <Trans>Export and publish on other platforms</Trans>
             </Text>
           </Line>
         </div>
@@ -102,12 +113,13 @@ const ExportHome = ({
               </Text>
             </Line>
             <RaisedButton
-              label={<Trans>Publish on stores</Trans>}
+              label={<Trans>Export to other platforms</Trans>}
               onClick={() => {
                 setChosenExporterSection('automated');
                 setChosenExporterKey('webexport');
               }}
               primary
+              disabled={isNavigationDisabled}
             />
             <Spacer />
             <FlatButton
@@ -117,6 +129,7 @@ const ExportHome = ({
                 setChosenExporterSection('manual');
                 setChosenExporterKey('webexport');
               }}
+              disabled={isNavigationDisabled}
             />
           </Column>
         </div>

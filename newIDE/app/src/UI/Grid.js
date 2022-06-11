@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-const marginsSize = 4;
+const marginsSize = 8;
 
 /**
  * A Line in the standard GDevelop grid to position components.
@@ -47,8 +47,8 @@ export const Column = (props: {|
   <div
     style={{
       display: 'flex',
-      marginLeft: props.noMargin ? 0 : marginsSize * 2,
-      marginRight: props.noMargin ? 0 : marginsSize * 2,
+      marginLeft: props.noMargin ? 0 : marginsSize,
+      marginRight: props.noMargin ? 0 : marginsSize,
       flexDirection: 'column',
       alignItems: props.alignItems || 'stretch',
       justifyContent: props.justifyContent,
@@ -78,6 +78,17 @@ export const Spacer = () => (
     style={{
       width: marginsSize,
       height: marginsSize,
+      flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
+    }}
+  />
+);
+
+/** A large spacer that is 24px width. */
+export const LargeSpacer = () => (
+  <span
+    style={{
+      width: 24,
+      height: 24,
       flexShrink: 0, // Ensure the spacer is not shrinked when in a flex container
     }}
   />

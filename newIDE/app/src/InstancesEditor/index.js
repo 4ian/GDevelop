@@ -56,7 +56,11 @@ export type InstancesEditorPropsWithoutSizeAndScroll = {|
   onInstancesResized: (instances: Array<gdInitialInstance>) => void,
   onInstancesRotated: (instances: Array<gdInitialInstance>) => void,
   selectedObjectNames: Array<string>,
-  onContextMenu: (x: number, y: number) => void,
+  onContextMenu: (
+    x: number,
+    y: number,
+    ignoreSelectedObjectNamesForContextMenu?: boolean
+  ) => void,
   onCopy: () => void,
   onCut: () => void,
   onPaste: () => void,
@@ -152,17 +156,6 @@ export default class InstancesEditor extends Component<Props> {
         this.props.onContextMenu(event.clientX, event.clientY),
     });
 
-    this.pixiRenderer.view.addEventListener('contextmenu', e => {
-      e.preventDefault();
-
-      this.lastContextMenuX = e.offsetX;
-      this.lastContextMenuY = e.offsetY;
-      if (this.props.onContextMenu)
-        this.props.onContextMenu(e.clientX, e.clientY);
-
-      return false;
-    });
-
     this.pixiRenderer.view.onwheel = (event: any) => {
       const zoomFactor = this.getZoomFactor();
       if (this.keyboardShortcuts.shouldZoom()) {
@@ -207,6 +200,23 @@ export default class InstancesEditor extends Component<Props> {
     gesture.panable(this.backgroundArea);
     this.backgroundArea.on('mousedown', event =>
       this._onBackgroundClicked(event.data.global.x, event.data.global.y)
+    );
+    this.backgroundArea.on(
+      'rightclick',
+      (interactionEvent: PIXI.InteractionEvent) => {
+        const {
+          data: { originalEvent: event },
+        } = interactionEvent;
+        this._onRightClicked({
+          offsetX: event.offsetX,
+          offsetY: event.offsetY,
+          x: event.clientX,
+          y: event.clientY,
+          ignoreSelectedObjectNamesForContextMenu: true,
+        });
+
+        return false;
+      }
     );
     this.backgroundArea.on('touchstart', event => {
       if (shouldBeHandledByPinch(event.data && event.data.originalEvent)) {
@@ -332,6 +342,7 @@ export default class InstancesEditor extends Component<Props> {
       onDownInstance: this._onDownInstance,
       onOutInstance: this._onOutInstance,
       onInstanceClicked: this._onInstanceClicked,
+      onInstanceRightClicked: this._onInstanceRightClicked,
       onInstanceDoubleClicked: this._onInstanceDoubleClicked,
     });
     this.selectionRectangle = new SelectionRectangle({
@@ -407,7 +418,8 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.destroy();
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (
       nextProps.width !== this.props.width ||
       nextProps.height !== this.props.height
@@ -598,6 +610,38 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.view.focus();
   };
 
+  _onInstanceRightClicked = (coordinates: {|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+  |}) => {
+    this._onRightClicked({
+      ...coordinates,
+      ignoreSelectedObjectNamesForContextMenu: false,
+    });
+  };
+
+  _onRightClicked = ({
+    offsetX,
+    offsetY,
+    x,
+    y,
+    ignoreSelectedObjectNamesForContextMenu,
+  }: {|
+    offsetX: number,
+    offsetY: number,
+    x: number,
+    y: number,
+    ignoreSelectedObjectNamesForContextMenu?: boolean,
+  |}) => {
+    this.lastContextMenuX = offsetX;
+    this.lastContextMenuY = offsetY;
+    if (this.props.onContextMenu) {
+      this.props.onContextMenu(x, y, !!ignoreSelectedObjectNamesForContextMenu);
+    }
+  };
+
   _onInstanceDoubleClicked = (instance: gdInitialInstance) => {
     this.props.onInstanceDoubleClicked(instance);
   };
@@ -745,11 +789,14 @@ export default class InstancesEditor extends Component<Props> {
 
   moveSelection = (x: number, y: number) => {
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
-    selectedInstances.forEach(instance => {
+    const unlockedSelectedInstances = selectedInstances.filter(
+      instance => !instance.isLocked()
+    );
+    unlockedSelectedInstances.forEach(instance => {
       instance.setX(instance.getX() + x);
       instance.setY(instance.getY() + y);
     });
-    this.props.onInstancesMoved(selectedInstances);
+    this.props.onInstancesMoved(unlockedSelectedInstances);
   };
 
   scrollTo(x: number, y: number) {

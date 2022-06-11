@@ -38,6 +38,7 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           canGrabPlatforms: true,
           ignoreDefaultControls: true,
           slopeMaxAngle: 60,
+          useLegacyTrajectory: false,
         },
       ],
       effects: [],
@@ -135,9 +136,6 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
     expect(result.isCollidingAnyPlatform).to.be(true);
     expect(characterBehavior.owner.getY()).to.be(oldY);
   };
-
-  const noCollision = gdjs.PlatformerObjectRuntimeBehavior._noCollision;
-  const floorIsTooHigh = gdjs.PlatformerObjectRuntimeBehavior._floorIsTooHigh;
 
   [false, true].forEach((swapVerticesOrder) => {
     describe(`(swapVertexOrder: ${swapVerticesOrder})`, function () {
@@ -304,6 +302,10 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           platform.setCustomWidthAndHeight(300, 300);
           platform.setPosition(position[0], position[1]);
           const platformBehavior = platform.getBehavior('Platform');
+          const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
+            runtimeScene
+          );
+          platformObstaclesManager.addPlatform(platformBehavior);
 
           it('can detect a platform away downward', function () {
             character.setPosition(300, -210.1);
@@ -372,6 +374,10 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
           platform.setCustomWidthAndHeight(300, 300);
           platform.setPosition(position[0], position[1]);
           const platformBehavior = platform.getBehavior('Platform');
+          const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
+            runtimeScene
+          );
+          platformObstaclesManager.addPlatform(platformBehavior);
 
           it('can detect an obstacle overlapping the top', function () {
             // -10 because the character can follow a platform downward.
@@ -398,6 +404,10 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
         platform.setCustomWidthAndHeight(200, 200);
         platform.setPosition(250, -250);
         const platformBehavior = platform.getBehavior('Platform');
+        const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
+          runtimeScene
+        );
+        platformObstaclesManager.addPlatform(platformBehavior);
 
         it('can detect a tunnel ceiling', function () {
           character.setPosition(300, -210.1);
@@ -443,12 +453,15 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
         const runtimeScene = makeTestRuntimeScene();
         const character = addCharacter(runtimeScene);
         const behavior = character.getBehavior('auto1');
-
         const platform = addPlatform(
           runtimeScene,
           collisionMasks.verticalTunnel
         );
         const platformBehavior = platform.getBehavior('Platform');
+        const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
+          runtimeScene
+        );
+        platformObstaclesManager.addPlatform(platformBehavior);
 
         it('can fell inside a vertical tunnel that fit the character', function () {
           platform.setCustomWidthAndHeight(200, 200);
@@ -482,6 +495,10 @@ describe(`gdjs.PlatformerObjectRuntimeBehavior.findHighestFloorAndMoveOnTop`, fu
 
         const platform = addPlatform(runtimeScene, collisionMasks.square);
         const platformBehavior = platform.getBehavior('Platform');
+        const platformObstaclesManager = gdjs.PlatformObjectsManager.getManager(
+          runtimeScene
+        );
+        platformObstaclesManager.addPlatform(platformBehavior);
 
         it('can detect a platform at its exact position', function () {
           platform.setCustomWidthAndHeight(100, 100);

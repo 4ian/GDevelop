@@ -1,68 +1,93 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
 import { Card, CardActions, CardHeader, Chip } from '@material-ui/core';
-import { format } from 'date-fns';
 import * as React from 'react';
-import FlatButton from '../UI/FlatButton';
-import { Line, Spacer } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import { type Game } from '../Utils/GDevelopServices/Game';
-import TimelineIcon from '@material-ui/icons/Timeline';
-import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+import Window from '../Utils/Window';
+import { GameThumbnail } from './GameThumbnail';
 
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
-  onOpenAnalytics: () => void,
-  onOpenDetails: () => void,
-  onOpenMonetization: () => void,
+  onOpenGameManager: () => void,
 |};
 
-export const GameCard = ({
-  game,
-  isCurrentGame,
-  onOpenDetails,
-  onOpenAnalytics,
-  onOpenMonetization,
-}: Props) => (
-  <Card key={game.id}>
-    <CardHeader
-      title={game.gameName}
-      subheader={
-        <Line alignItems="center" noMargin>
-          <Trans>
-            Registered on{' '}
-            {format(game.createdAt * 1000 /* TODO */, 'yyyy-MM-dd')}
-          </Trans>
-          {isCurrentGame && (
-            <React.Fragment>
-              <Spacer />
-              <Chip size="small" label={<Trans>Game currently edited</Trans>} />
-            </React.Fragment>
-          )}
-        </Line>
-      }
-    />
-    <CardActions>
-      <Line expand noMargin justifyContent="flex-end">
-        <FlatButton
-          label={<Trans>See details</Trans>}
-          onClick={onOpenDetails}
-        />
-        <RaisedButton
-          primary
-          icon={<TimelineIcon />}
-          label={<Trans>Analytics</Trans>}
-          onClick={onOpenAnalytics}
-        />
-        <Spacer />
-        <RaisedButton
-          primary
-          icon={<MonetizationOnIcon />}
-          label={<Trans>Monetization</Trans>}
-          onClick={onOpenMonetization}
-        />
-      </Line>
-    </CardActions>
-  </Card>
-);
+export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
+  const openGameUrl = () => {
+    const url = getGameUrl(game);
+    if (!url) return;
+    Window.openExternalURL(url);
+  };
+  return (
+    <I18n>
+      {({ i18n }) => (
+        <Card key={game.id}>
+          <ResponsiveLineStackLayout>
+            <GameThumbnail
+              gameName={game.gameName}
+              thumbnailUrl={game.thumbnailUrl}
+            />
+            <Column expand>
+              <CardHeader
+                title={game.gameName}
+                subheader={
+                  <Line alignItems="center" noMargin>
+                    <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
+                    {isCurrentGame && (
+                      <>
+                        <Spacer />
+                        <Chip
+                          size="small"
+                          label={<Trans>Currently edited</Trans>}
+                          color="primary"
+                        />
+                      </>
+                    )}
+                    {game.publicWebBuildId && (
+                      <>
+                        <Spacer />
+                        <Chip
+                          size="small"
+                          label={
+                            game.discoverable ? (
+                              <Trans>Discoverable on Liluo.io</Trans>
+                            ) : (
+                              <Trans>Published on Liluo.io</Trans>
+                            )
+                          }
+                        />
+                      </>
+                    )}
+                  </Line>
+                }
+              />
+              <CardActions>
+                <ResponsiveLineStackLayout
+                  expand
+                  noMargin
+                  justifyContent="flex-end"
+                >
+                  {game.publicWebBuildId && (
+                    <RaisedButton
+                      label={<Trans>Open in browser</Trans>}
+                      onClick={openGameUrl}
+                    />
+                  )}
+                  <RaisedButton
+                    label={<Trans>Manage game</Trans>}
+                    onClick={onOpenGameManager}
+                    primary
+                  />
+                </ResponsiveLineStackLayout>
+              </CardActions>
+            </Column>
+          </ResponsiveLineStackLayout>
+        </Card>
+      )}
+    </I18n>
+  );
+};

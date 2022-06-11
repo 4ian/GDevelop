@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
@@ -32,6 +32,7 @@ type Props = {|
 |};
 
 type State = {|
+  thumbnailResourceName: string,
   desktopIconResourceNames: Array<string>,
   androidIconResourceNames: Array<string>,
   iosIconResourceNames: Array<string>,
@@ -72,6 +73,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
   _loadFrom(project: gdProject): State {
     return {
+      thumbnailResourceName: project
+        .getPlatformSpecificAssets()
+        .get('liluo', `thumbnail`),
       desktopIconResourceNames: desktopSizes.map(size =>
         project.getPlatformSpecificAssets().get('desktop', `icon-${size}`)
       ),
@@ -84,7 +88,8 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     };
   }
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.project !== newProps.project)
@@ -202,10 +207,15 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   onApply = () => {
     const { project } = this.props;
     const {
+      thumbnailResourceName,
       desktopIconResourceNames,
       androidIconResourceNames,
       iosIconResourceNames,
     } = this.state;
+
+    project
+      .getPlatformSpecificAssets()
+      .set('liluo', `thumbnail`, thumbnailResourceName);
 
     desktopSizes.forEach((size, index) => {
       project
@@ -234,11 +244,10 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         primary={false}
         onClick={this.props.onClose}
       />,
-      <FlatButton
+      <DialogPrimaryButton
         key="apply"
         label={<Trans>Apply</Trans>}
         primary={true}
-        keyboardFocused={true}
         onClick={this.onApply}
       />,
     ];
@@ -249,6 +258,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       resourceExternalEditors,
     } = this.props;
     const {
+      thumbnailResourceName,
       desktopIconResourceNames,
       androidIconResourceNames,
       iosIconResourceNames,
@@ -256,14 +266,30 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
     return (
       <Dialog
-        onApply={this.onApply}
         title={<Trans>Project icons</Trans>}
         actions={actions}
         open={this.props.open}
-        cannotBeDismissed={true}
         onRequestClose={this.props.onClose}
+        onApply={this.onApply}
       >
         <ColumnStackLayout noMargin>
+          <Text>
+            <Trans>Liluo.io thumbnail:</Trans>
+          </Text>
+          <ResourceSelectorWithThumbnail
+            floatingLabelText={`Liluo.io thumbnail (1920x1080 px)`}
+            project={project}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+            resourceKind="image"
+            resourceName={thumbnailResourceName}
+            onChange={resourceName => {
+              this.setState({
+                thumbnailResourceName: resourceName,
+              });
+            }}
+          />
           <Line justifyContent="center">
             {isResizeSupported() ? (
               <RaisedButton

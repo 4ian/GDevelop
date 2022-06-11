@@ -164,8 +164,11 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["CollisionPoint"]
       .SetFunctionName("isCollidingWithPoint")
       .SetIncludeFile("runtimeobject.js");
-  objectConditions["ObjectTimer"]
+  objectConditions["ObjectTimer"] // deprecated
       .SetFunctionName("timerElapsedTime")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["CompareObjectTimer"]
+      .SetFunctionName("getTimerElapsedTimeInSecondsOrNaN")
       .SetIncludeFile("runtimeobject.js");
   objectConditions["ObjectTimerPaused"]
       .SetFunctionName("timerPaused")
@@ -249,10 +252,21 @@ BaseObjectExtension::BaseObjectExtension() {
       "gdjs.evtTools.object.createObjectOnScene");
   GetAllActions()["CreateByName"].SetFunctionName(
       "gdjs.evtTools.object.createObjectFromGroupOnScene");
+
   GetAllExpressions()["Count"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount");
+      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
   GetAllConditions()["NbObjet"].SetFunctionName(
-      "gdjs.evtTools.object.pickedObjectsCount");
+      "gdjs.evtTools.object.pickedObjectsCount"); // Deprecated
+
+  GetAllExpressions()["SceneInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getSceneInstancesCount");
+  GetAllConditions()["SceneInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getSceneInstancesCount");
+  GetAllExpressions()["PickedInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getPickedInstancesCount");
+  GetAllConditions()["PickedInstancesCount"].SetFunctionName(
+      "gdjs.evtTools.object.getPickedInstancesCount");
+
   GetAllConditions()["CollisionNP"].SetFunctionName(
       "gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(
@@ -353,14 +367,16 @@ BaseObjectExtension::BaseObjectExtension() {
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(2).GetPlainString());
+                  instruction.GetParameter(2).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String expression2Code =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(4).GetPlainString());
+                  instruction.GetParameter(4).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
           gd::String newX =
@@ -408,14 +424,16 @@ BaseObjectExtension::BaseObjectExtension() {
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(2).GetPlainString());
+                  instruction.GetParameter(2).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String expression2Code =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(4).GetPlainString());
+                  instruction.GetParameter(4).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
           gd::String newX = isNotAssignmentOperator(op1)

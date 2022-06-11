@@ -2,28 +2,39 @@
 import { Trans } from '@lingui/macro';
 import { t } from '@lingui/macro';
 import * as React from 'react';
+import Add from '@material-ui/icons/Add';
+import Fuse from 'fuse.js';
+
 import { List, type ListItemRefType } from '../../../UI/List';
-import SearchBar, { useShouldAutofocusSearchbar } from '../../../UI/SearchBar';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import SearchBar, {
+  useShouldAutofocusSearchbar,
+  type SearchBarInterface,
+} from '../../../UI/SearchBar';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
   findInTree,
 } from '../../../InstructionOrExpression/CreateTree';
-import { filterInstructionsList } from '../../../InstructionOrExpression/EnumerateInstructions';
 import ThemeConsumer from '../../../UI/Theme/ThemeConsumer';
 import { renderInstructionOrExpressionListItem } from '../SelectorListItems/SelectorInstructionOrExpressionListItem';
 import { renderInstructionOrExpressionTree } from '../SelectorListItems/SelectorInstructionsTreeListItem';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import ScrollView, { type ScrollViewInterface } from '../../../UI/ScrollView';
 import { Line } from '../../../UI/Grid';
+import RaisedButton from '../../../UI/RaisedButton';
 import { getInstructionListItemValue } from '../SelectorListItems/Keys';
+import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import {
+  tuneMatches,
+  type SearchResult,
+  sharedFuseConfiguration,
+} from '../../../UI/Search/UseSearchStructuredItem';
+const gd: libGDevelop = global.gd;
 
-const styles = {
-  searchBar: {
-    backgroundColor: 'transparent',
-    flexShrink: 0,
-    zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
-  },
+const getGroupIconSrc = (key: string) => {
+  return gd.JsPlatform.get()
+    .getInstructionOrExpressionGroupMetadata(key)
+    .getIcon();
 };
 
 type Props<T> = {|
@@ -38,6 +49,8 @@ type Props<T> = {|
   searchPlaceholderIsCondition?: ?boolean,
   helpPagePath?: ?string,
   style?: Object,
+  onClickMore?: () => void,
+  id?: ?string,
 |};
 type State<T> = {|
   searchText: string,
@@ -51,9 +64,10 @@ export default class InstructionOrExpressionSelector<
     searchText: '',
     searchResults: [],
   };
-  _searchBar: ?SearchBar;
+  _searchBar: ?SearchBarInterface;
   _scrollView = React.createRef<ScrollViewInterface>();
   _selectedItem = React.createRef<ListItemRefType>();
+  searchApi = null;
 
   initialInstructionTypePath = findInTree(
     this.props.instructionsInfoTree,
@@ -63,6 +77,7 @@ export default class InstructionOrExpressionSelector<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar
     ) {
@@ -71,6 +86,14 @@ export default class InstructionOrExpressionSelector<
     if (this._selectedItem.current && this._scrollView.current) {
       this._scrollView.current.scrollTo(this._selectedItem.current);
     }
+
+    this.searchApi = new Fuse(this.props.instructionsInfo, {
+      ...sharedFuseConfiguration,
+      keys: [
+        { name: 'displayedName', weight: 2 },
+        { name: 'fullGroupName', weight: 1 },
+      ],
+    });
   }
 
   focus = () => {
@@ -88,17 +111,26 @@ export default class InstructionOrExpressionSelector<
       useSubheaders,
       helpPagePath,
       style,
+      onClickMore,
+      id,
     } = this.props;
     const { searchText } = this.state;
-    const displayedInstructionsList: Array<T> = searchText
-      ? filterInstructionsList(this.props.instructionsInfo, { searchText })
-      : [];
+    const displayedInstructionsList: Array<SearchResult<T>> =
+      !!searchText && this.searchApi
+        ? this.searchApi.search(`'${searchText}`).map(result => ({
+            item: result.item,
+            matches: tuneMatches(result, searchText),
+          }))
+        : [];
     const hasResults = !searchText || !!displayedInstructionsList.length;
 
     const onSubmitSearch = () => {
       if (!displayedInstructionsList.length) return;
 
-      onChoose(displayedInstructionsList[0].type, displayedInstructionsList[0]);
+      onChoose(
+        displayedInstructionsList[0].item.type,
+        displayedInstructionsList[0].item
+      );
     };
 
     return (
@@ -109,6 +141,7 @@ export default class InstructionOrExpressionSelector<
               backgroundColor: muiTheme.list.itemsBackgroundColor,
               ...style,
             }}
+            id={id}
           >
             <SearchBar
               value={searchText}
@@ -118,7 +151,7 @@ export default class InstructionOrExpressionSelector<
                 })
               }
               onRequestSearch={onSubmitSearch}
-              style={styles.searchBar}
+              aspect="integrated-search-bar"
               placeholder={
                 searchPlaceholderObjectName
                   ? searchPlaceholderIsCondition
@@ -137,23 +170,29 @@ export default class InstructionOrExpressionSelector<
             >
               {hasResults && (
                 <List>
-                  {searchText
-                    ? displayedInstructionsList.map(
-                        enumeratedInstructionOrExpressionMetadata =>
-                          renderInstructionOrExpressionListItem({
-                            instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
-                            iconSize: iconSize,
-                            onClick: () =>
-                              onChoose(
-                                enumeratedInstructionOrExpressionMetadata.type,
-                                enumeratedInstructionOrExpressionMetadata
-                              ),
-                            selectedValue: getInstructionListItemValue(
-                              selectedType
+                  {searchText ? (
+                    displayedInstructionsList.map(
+                      ({
+                        item: enumeratedInstructionOrExpressionMetadata,
+                        matches,
+                      }) =>
+                        renderInstructionOrExpressionListItem({
+                          instructionOrExpressionMetadata: enumeratedInstructionOrExpressionMetadata,
+                          iconSize: iconSize,
+                          onClick: () =>
+                            onChoose(
+                              enumeratedInstructionOrExpressionMetadata.type,
+                              enumeratedInstructionOrExpressionMetadata
                             ),
-                          })
-                      )
-                    : renderInstructionOrExpressionTree({
+                          matches,
+                          selectedValue: getInstructionListItemValue(
+                            selectedType
+                          ),
+                        })
+                    )
+                  ) : (
+                    <>
+                      {renderInstructionOrExpressionTree({
                         instructionTreeNode: instructionsInfoTree,
                         iconSize,
                         onChoose,
@@ -163,7 +202,22 @@ export default class InstructionOrExpressionSelector<
                         ),
                         initiallyOpenedPath: this.initialInstructionTypePath,
                         selectedItemRef: this._selectedItem,
+                        getGroupIconSrc,
                       })}
+                      {onClickMore && (
+                        <ResponsiveLineStackLayout justifyContent="center">
+                          <RaisedButton
+                            primary
+                            icon={<Add />}
+                            onClick={onClickMore}
+                            label={
+                              <Trans>Add a new behavior to the object</Trans>
+                            }
+                          />
+                        </ResponsiveLineStackLayout>
+                      )}
+                    </>
+                  )}
                 </List>
               )}
               {!hasResults && (

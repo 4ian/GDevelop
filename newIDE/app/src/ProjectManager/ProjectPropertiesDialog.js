@@ -7,7 +7,7 @@ import FlatButton from '../UI/FlatButton';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import {
   getProjectPropertiesErrors,
@@ -36,7 +36,7 @@ import {
   type HotReloadPreviewButtonProps,
   NewPreviewIcon,
 } from '../HotReload/HotReloadPreviewButton';
-import { UsersAutocomplete } from '../Utils/UsersAutocomplete';
+import PublicGameProperties from '../GameDashboard/PublicGameProperties';
 
 type Props = {|
   project: gdProject,
@@ -58,8 +58,9 @@ type ProjectProperties = {|
   gameResolutionHeight: number,
   adaptGameResolutionAtRuntime: boolean,
   name: string,
+  description: string,
   author: string,
-  authorIds: gdVectorString,
+  authorIds: string[],
   version: string,
   packageName: string,
   orientation: string,
@@ -78,8 +79,9 @@ function loadPropertiesFromProject(project: gdProject): ProjectProperties {
     gameResolutionHeight: project.getGameResolutionHeight(),
     adaptGameResolutionAtRuntime: project.getAdaptGameResolutionAtRuntime(),
     name: project.getName(),
+    description: project.getDescription(),
     author: project.getAuthor(),
-    authorIds: project.getAuthorIds(),
+    authorIds: project.getAuthorIds().toJSArray(),
     version: project.getVersion(),
     packageName: project.getPackageName(),
     orientation: project.getOrientation(),
@@ -103,6 +105,8 @@ function applyPropertiesToProject(
     gameResolutionHeight,
     adaptGameResolutionAtRuntime,
     name,
+    description,
+    authorIds,
     author,
     version,
     packageName,
@@ -118,6 +122,10 @@ function applyPropertiesToProject(
   project.setGameResolutionSize(gameResolutionWidth, gameResolutionHeight);
   project.setAdaptGameResolutionAtRuntime(adaptGameResolutionAtRuntime);
   project.setName(name);
+  project.setDescription(description);
+  const projectAuthorIds = project.getAuthorIds();
+  projectAuthorIds.clear();
+  authorIds.forEach(authorId => projectAuthorIds.push_back(authorId));
   project.setAuthor(author);
   project.setVersion(version);
   project.setPackageName(packageName);
@@ -141,6 +149,10 @@ function ProjectPropertiesDialog(props: Props) {
     [project]
   );
   let [name, setName] = React.useState(initialProperties.name);
+  let [description, setDescription] = React.useState(
+    initialProperties.description
+  );
+  let [authorIds, setAuthorIds] = React.useState(initialProperties.authorIds);
   let [gameResolutionWidth, setGameResolutionWidth] = React.useState(
     initialProperties.gameResolutionWidth
   );
@@ -199,8 +211,9 @@ function ProjectPropertiesDialog(props: Props) {
         gameResolutionHeight,
         adaptGameResolutionAtRuntime,
         name,
+        description,
         author,
-        authorIds: project.getAuthorIds(),
+        authorIds,
         version,
         packageName,
         orientation,
@@ -221,7 +234,6 @@ function ProjectPropertiesDialog(props: Props) {
       {({ i18n }) => (
         <React.Fragment>
           <Dialog
-            onApply={onApply}
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}
@@ -229,7 +241,7 @@ function ProjectPropertiesDialog(props: Props) {
                 onClick={onCancelChanges}
                 key="cancel"
               />,
-              <FlatButton
+              <DialogPrimaryButton
                 label={<Trans>Apply</Trans>}
                 primary={true}
                 onClick={onApply}
@@ -252,9 +264,10 @@ function ProjectPropertiesDialog(props: Props) {
                 />
               ) : null,
             ]}
+            onRequestClose={onCancelChanges}
+            onApply={onApply}
             noTitleMargin
             open={props.open}
-            onRequestClose={onCancelChanges}
             fullHeight
             flexBody
             title={
@@ -276,22 +289,23 @@ function ProjectPropertiesDialog(props: Props) {
           >
             {currentTab === 'properties' && (
               <ColumnStackLayout expand noMargin>
-                <SemiControlledTextField
-                  floatingLabelText={<Trans>Game name</Trans>}
-                  fullWidth
-                  type="text"
-                  value={name}
-                  onChange={setName}
-                  autoFocus
+                <Text size="title">
+                  <Trans>Game Info</Trans>
+                </Text>
+                <PublicGameProperties
+                  name={name}
+                  setName={setName}
+                  description={description}
+                  setDescription={setDescription}
+                  project={project}
+                  authorIds={authorIds}
+                  setAuthorIds={setAuthorIds}
+                  orientation={orientation}
+                  setOrientation={setOrientation}
                 />
-                <SemiControlledTextField
-                  floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
-                  fullWidth
-                  hintText={defaultVersion}
-                  type="text"
-                  value={version}
-                  onChange={setVersion}
-                />
+                <Text size="title">
+                  <Trans>Packaging</Trans>
+                </Text>
                 <SemiControlledTextField
                   floatingLabelText={
                     <Trans>Package name (for iOS and Android)</Trans>
@@ -313,16 +327,24 @@ function ProjectPropertiesDialog(props: Props) {
                     )
                   }
                 />
-                <UsersAutocomplete
-                  userIds={project.getAuthorIds()}
-                  floatingLabelText={<Trans>Authors</Trans>}
-                  helperText={
-                    <Trans>
-                      Select the usernames of the authors of this project. They
-                      will be displayed in the selected order, if you publish
-                      this game as an example or in the community.
-                    </Trans>
-                  }
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
+                  fullWidth
+                  hintText={defaultVersion}
+                  type="text"
+                  value={version}
+                  onChange={setVersion}
+                />
+                <SemiControlledTextField
+                  floatingLabelText={<Trans>Publisher name</Trans>}
+                  fullWidth
+                  hintText={t`Your name`}
+                  helperMarkdownText={i18n._(
+                    t`This will be used when packaging and submitting your application to the stores.`
+                  )}
+                  type="text"
+                  value={author}
+                  onChange={setAuthor}
                 />
                 {useDeprecatedZeroAsDefaultZOrder ? (
                   <React.Fragment>
@@ -482,21 +504,6 @@ function ProjectPropertiesDialog(props: Props) {
                 <SelectField
                   fullWidth
                   floatingLabelText={
-                    <Trans>Device orientation (for iOS and Android)</Trans>
-                  }
-                  value={orientation}
-                  onChange={(e, i, value: string) => setOrientation(value)}
-                >
-                  <SelectOption
-                    value="default"
-                    primaryText={t`Platform default`}
-                  />
-                  <SelectOption value="landscape" primaryText={t`Landscape`} />
-                  <SelectOption value="portrait" primaryText={t`Portrait`} />
-                </SelectField>
-                <SelectField
-                  fullWidth
-                  floatingLabelText={
                     <Trans>Scale mode (also called "Sampling")</Trans>
                   }
                   value={scaleMode}
@@ -534,20 +541,18 @@ function ProjectPropertiesDialog(props: Props) {
                     </Trans>
                   </DismissableAlertMessage>
                 )}
-                <Text size="title">
-                  <Trans>Publishing</Trans>
-                </Text>
-                <SemiControlledTextField
-                  floatingLabelText={<Trans>Publisher name</Trans>}
-                  fullWidth
-                  hintText={t`Your name`}
-                  helperMarkdownText={i18n._(
-                    t`This will be used when packaging and submitting your application to the stores.`
-                  )}
-                  type="text"
-                  value={author}
-                  onChange={setAuthor}
-                />
+                {pixelsRounding && (
+                  <DismissableAlertMessage
+                    identifier="use-pixel-rounding"
+                    kind="info"
+                  >
+                    <Trans>
+                      To avoid flickering on objects followed by the camera, use
+                      sprites with even dimensions.
+                    </Trans>
+                  </DismissableAlertMessage>
+                )}
+
                 <Text size="title">
                   <Trans>Project files</Trans>
                 </Text>

@@ -10,7 +10,7 @@ import {
 } from 'react-virtualized';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
-import Chip from '@material-ui/core/Chip';
+import Chip from '../UI/Chip';
 
 import { Line, Column, Spacer } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
@@ -315,7 +315,6 @@ export const DebuggerConsole = ({
         <Dialog
           open
           title={<Trans>Select log groups to display</Trans>}
-          onRequestClose={() => setEditingHiddenGroups(false)}
           actions={[
             <FlatButton
               key="close"
@@ -324,6 +323,8 @@ export const DebuggerConsole = ({
               onClick={() => setEditingHiddenGroups(false)}
             />,
           ]}
+          onRequestClose={() => setEditingHiddenGroups(false)}
+          onApply={() => setEditingHiddenGroups(false)}
         >
           <Column>
             {(() => {

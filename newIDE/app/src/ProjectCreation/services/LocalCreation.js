@@ -3,12 +3,11 @@ import axios from 'axios';
 import { t } from '@lingui/macro';
 
 import LocalFileStorageProvider from '../../ProjectsStorage/LocalFileStorageProvider';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import { getExample } from '../../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { writeAndCheckFile } from '../../ProjectsStorage/LocalFileStorageProvider/LocalProjectWriter';
-import { showGameFileCreationError } from '../LocalExamples';
 import {
   type OnCreateBlankFunction,
   type OnCreateFromExampleShortHeaderFunction,
@@ -20,22 +19,28 @@ var fs = optionalRequire('fs-extra');
 
 export const onCreateBlank: OnCreateBlankFunction = async ({
   i18n,
-  outputPath,
-  projectName,
+  settings,
 }) => {
+  const { projectName, outputPath } = settings;
   if (!fs || !outputPath) return;
 
   try {
     fs.mkdirsSync(outputPath);
   } catch (error) {
-    showGameFileCreationError(i18n, outputPath, error);
+    showErrorBox({
+      message: i18n._(
+        t`Unable to create the game in the specified folder. Check that you have permissions to write in this folder: ${outputPath} or choose another folder.`
+      ),
+      rawError: error,
+      errorId: 'local-example-creation-error',
+    });
     return;
   }
 
   const project: gdProject = gd.ProjectHelper.createNewGDJSProject();
   const filePath = path.join(outputPath, 'game.json');
   project.setProjectFile(filePath);
-  sendNewGameCreated('');
+  sendNewGameCreated({ exampleUrl: '', exampleSlug: '' });
   return {
     project,
     storageProvider: LocalFileStorageProvider,
@@ -47,9 +52,9 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
 export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction = async ({
   i18n,
   exampleShortHeader,
-  outputPath,
-  projectName,
+  settings,
 }) => {
+  const { projectName, outputPath } = settings;
   if (!fs || !outputPath) return;
   try {
     const example = await getExample(exampleShortHeader);
@@ -68,7 +73,10 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
 
     await writeAndCheckFile(projectFileContent, localFilePath);
 
-    sendNewGameCreated(example.projectFileUrl);
+    sendNewGameCreated({
+      exampleUrl: example.projectFileUrl,
+      exampleSlug: exampleShortHeader.slug,
+    });
     return {
       storageProvider: LocalFileStorageProvider,
       fileMetadata: { fileIdentifier: localFilePath },

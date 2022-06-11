@@ -8,9 +8,7 @@ import Dialog from '../UI/Dialog';
 import { Column, Line } from '../UI/Grid';
 import CreateProfile from './CreateProfile';
 import AuthenticatedUserProfileDetails from './AuthenticatedUserProfileDetails';
-import EmptyMessage from '../UI/EmptyMessage';
 import HelpButton from '../UI/HelpButton';
-import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
 import ContributionsDetails from './ContributionsDetails';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
@@ -53,14 +51,14 @@ const ProfileDialog = ({
 
   return (
     <Dialog
-      actions={
+      actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
           key="close"
           primary={false}
           onClick={onClose}
-        />
-      }
+        />,
+      ]}
       secondaryActions={[
         <HelpButton
           key="help"
@@ -79,32 +77,33 @@ const ProfileDialog = ({
         ),
       ]}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       open={open}
       noMargin
+      fullHeight
       noTitleMargin
       title={
         <Tabs value={currentTab} onChange={_onChangeTab}>
           <Tab label={<Trans>My Profile</Trans>} value="profile" />
           <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
-          <Tab label={<Trans>Services Usage</Trans>} value="usage" />
         </Tabs>
       }
     >
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Column noMargin>
-            <AuthenticatedUserProfileDetails
-              authenticatedUser={authenticatedUser}
-              onEditProfile={authenticatedUser.onEdit}
-              onChangeEmail={authenticatedUser.onChangeEmail}
-            />
-            <SubscriptionDetails
-              subscription={authenticatedUser.subscription}
-              onChangeSubscription={onChangeSubscription}
-            />
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
-          </Column>
+          <Line>
+            <Column expand>
+              <AuthenticatedUserProfileDetails
+                authenticatedUser={authenticatedUser}
+                onEditProfile={authenticatedUser.onEdit}
+                onChangeEmail={authenticatedUser.onChangeEmail}
+              />
+              <SubscriptionDetails
+                subscription={authenticatedUser.subscription}
+                onChangeSubscription={onChangeSubscription}
+              />
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            </Column>
+          </Line>
         ) : (
           <Column>
             <CreateProfile
@@ -116,7 +115,7 @@ const ProfileDialog = ({
       {currentTab === 'games-dashboard' &&
         (authenticatedUser.authenticated ? (
           <Line>
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noOverflowParent>
               <GamesList project={currentProject} />
             </ColumnStackLayout>
           </Line>
@@ -134,18 +133,6 @@ const ProfileDialog = ({
               }
             />
           </Column>
-        ))}
-      {currentTab === 'usage' &&
-        (authenticatedUser.authenticated ? (
-          <Column noMargin>
-            <UsagesDetails usages={authenticatedUser.usages} />
-          </Column>
-        ) : (
-          <EmptyMessage>
-            <Trans>
-              Register to see the usage that you've made of the online services
-            </Trans>
-          </EmptyMessage>
         ))}
     </Dialog>
   );

@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
-import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow.js';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type Build } from '../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { type BuildStep } from './Builds/BuildStepsProgress';
 
 export type ExportPipelineContext<ExportState> = {|
   project: gdProject,
@@ -37,9 +38,21 @@ export type ExportPipeline<
 
   renderLaunchButtonLabel: () => React.Node,
 
-  canLaunchBuild: (exportState: ExportState) => boolean,
+  canLaunchBuild: (
+    exportState: ExportState,
+    errored: boolean,
+    exportStep: BuildStep
+  ) => boolean,
 
-  renderCustomStepsProgress?: (build: ?Build, loading: boolean) => React.Node,
+  isNavigationDisabled: (exportStep: BuildStep, errored: boolean) => boolean,
+
+  renderCustomStepsProgress?: ({
+    build: ?Build,
+    project: gdProject,
+    onSaveProject: () => Promise<void>,
+    errored: boolean,
+    exportStep: BuildStep,
+  }) => React.Node,
 
   prepareExporter: (
     context: ExportPipelineContext<ExportState>
@@ -78,7 +91,8 @@ export type ExportPipeline<
   launchOnlineBuild?: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string
   ) => Promise<Build>,
 
   /**

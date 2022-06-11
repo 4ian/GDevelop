@@ -3,8 +3,7 @@ import { Trans } from '@lingui/macro';
 
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../UI/Grid';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -39,7 +38,7 @@ export default function EmailVerificationPendingDialog({
     <Dialog
       actions={[
         isVerified ? (
-          <RaisedButton
+          <DialogPrimaryButton
             label={<Trans>Done!</Trans>}
             key="close"
             primary
@@ -55,9 +54,10 @@ export default function EmailVerificationPendingDialog({
         ),
       ]}
       maxWidth="sm"
-      cannotBeDismissed={true}
       open
       noMargin
+      onRequestClose={onClose}
+      onApply={onClose}
     >
       {!isVerified ? (
         <Column>

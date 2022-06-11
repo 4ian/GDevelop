@@ -33,6 +33,7 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _isLoaded: boolean = false;
+    private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     // True if loadFromScene was called and the scene is being played.
     _isJustResumed: boolean = false;
@@ -281,6 +282,14 @@ namespace gdjs {
      * for some time, until it's resumed or unloaded.
      */
     onPause() {
+      // Notify the objects that the scene is being paused. Objects should not
+      // do anything special, but some object renderers might want to know about this.
+      this._constructListOfAllInstances();
+      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
+        const object = this._allInstancesList[i];
+        object.onScenePaused(this);
+      }
+
       for (let i = 0; i < gdjs.callbacksRuntimeScenePaused.length; ++i) {
         gdjs.callbacksRuntimeScenePaused[i](this);
       }
@@ -292,6 +301,15 @@ namespace gdjs {
      */
     onResume() {
       this._isJustResumed = true;
+
+      // Notify the objects that the scene is being resumed. Objects should not
+      // do anything special, but some object renderers might want to know about this.
+      this._constructListOfAllInstances();
+      for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
+        const object = this._allInstancesList[i];
+        object.onSceneResumed(this);
+      }
+
       for (let i = 0; i < gdjs.callbacksRuntimeSceneResumed.length; ++i) {
         gdjs.callbacksRuntimeSceneResumed[i](this);
       }
@@ -473,6 +491,13 @@ namespace gdjs {
         this._runtimeGame.getMinimalFramerate()
       );
       if (this._profiler) {
+        this._profiler.begin('asynchronous actions (wait action, etc...)');
+      }
+      this._asyncTasksManager.processTasks(this);
+      if (this._profiler) {
+        this._profiler.end('asynchronous actions (wait action, etc...)');
+      }
+      if (this._profiler) {
         this._profiler.begin('objects (pre-events)');
       }
       this._updateObjectsPreEvents();
@@ -531,11 +556,9 @@ namespace gdjs {
 
       // Set to true to enable debug rendering (look for the implementation in the renderer
       // to see what is rendered).
-      if (this._debugDrawEnabled && this._layersCameraCoordinates) {
-        this._updateLayersCameraCoordinates(1);
+      if (this._debugDrawEnabled) {
         this.getRenderer().renderDebugDraw(
           this._allInstancesList,
-          this._layersCameraCoordinates,
           this._debugDrawShowHiddenInstances,
           this._debugDrawShowPointsNames,
           this._debugDrawShowCustomPoints
@@ -636,38 +659,46 @@ namespace gdjs {
         this._constructListOfAllInstances();
         for (let i = 0, len = this._allInstancesList.length; i < len; ++i) {
           const object = this._allInstancesList[i];
-          const cameraCoords = this._layersCameraCoordinates[object.getLayer()];
           const rendererObject = object.getRendererObject();
-          if (!cameraCoords || !rendererObject) {
-            continue;
-          }
-          if (object.isHidden()) {
-            rendererObject.visible = false;
-          } else {
-            const aabb = object.getVisibilityAABB();
-            if (
-              // If no AABB is returned, the object should always be visible
-              aabb &&
-              (aabb.min[0] > cameraCoords[2] ||
-                aabb.min[1] > cameraCoords[3] ||
-                aabb.max[0] < cameraCoords[0] ||
-                aabb.max[1] < cameraCoords[1])
-            ) {
+          if (rendererObject) {
+            if (object.isHidden()) {
               rendererObject.visible = false;
             } else {
-              rendererObject.visible = true;
+              const cameraCoords = this._layersCameraCoordinates[
+                object.getLayer()
+              ];
+              if (!cameraCoords) {
+                continue;
+              }
+              const aabb = object.getVisibilityAABB();
+              rendererObject.visible =
+                // If no AABB is returned, the object should always be visible
+                !aabb ||
+                // If an AABB is there, it must be at least partially inside
+                // the camera bounds.
+                !(
+                  aabb.min[0] > cameraCoords[2] ||
+                  aabb.min[1] > cameraCoords[3] ||
+                  aabb.max[0] < cameraCoords[0] ||
+                  aabb.max[1] < cameraCoords[1]
+                );
             }
-          }
 
-          // Update effects, only for visible objects.
-          if (rendererObject.visible) {
-            this._runtimeGame
-              .getEffectsManager()
-              .updatePreRender(object.getRendererEffects(), object);
-          }
+            // Update effects, only for visible objects.
+            if (rendererObject.visible) {
+              this._runtimeGame
+                .getEffectsManager()
+                .updatePreRender(object.getRendererEffects(), object);
 
-          // Perform pre-render update.
-          object.updatePreRender(this);
+              // Perform pre-render update only if the object is visible
+              // (including if there is no visibility AABB returned previously).
+              object.updatePreRender(this);
+            }
+          } else {
+            // Perform pre-render update, always for objects not having an
+            // associated renderer object (so it must handle visibility on its own).
+            object.updatePreRender(this);
+          }
         }
       }
     }
@@ -1045,6 +1076,13 @@ namespace gdjs {
     }
 
     /**
+     * @returns The scene's async tasks manager.
+     */
+    getAsyncTasksManager() {
+      return this._asyncTasksManager;
+    }
+
+    /**
      * Return the value of the scene change that is requested.
      */
     getRequestedChange(): SceneChangeRequest {
@@ -1125,6 +1163,19 @@ namespace gdjs {
     getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
       this._constructListOfAllInstances();
       return this._allInstancesList;
+    }
+
+    /**
+     * Return the number of instances of the specified object living on the scene.
+     * @param objectName The object name for which instances must be counted.
+     */
+    getInstancesCountOnScene(objectName: string): integer {
+      const instances = this._instances.get(objectName);
+      if (instances) {
+        return instances.length;
+      }
+
+      return 0;
     }
 
     /**

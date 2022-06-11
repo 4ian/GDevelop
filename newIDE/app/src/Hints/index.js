@@ -17,13 +17,6 @@ export const getDeprecatedBehaviorsInformation = (): {
   },
 });
 
-export const getExperimentalObjects = (): {
-  [string]: boolean,
-} => ({
-  'BitmapText::BitmapTextObject': true,
-  'TileMap::TileMap': true,
-});
-
 export const getExtraObjectsInformation = (): {
   [string]: Array<Hint>,
 } => ({
@@ -44,7 +37,7 @@ export const getExtraObjectsInformation = (): {
   'BitmapText::BitmapTextObject': [
     {
       kind: 'warning',
-      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button bellow.`,
+      message: t`This object is experimental and not yet complete. It might have bugs or incomplete support in GDevelop, be sure to read the wiki by clicking on help button below.`,
     },
     {
       kind: 'info',
@@ -59,6 +52,12 @@ export const getExtraObjectsInformation = (): {
     {
       kind: 'info',
       message: t`The tilemap must be designed in a separated program, Tiled, that can be downloaded on mapeditor.org. Save your map as a JSON file, then select here the Atlas image that you used and the Tile map JSON file.`,
+    },
+  ],
+  'TextInput::TextInputObject': [
+    {
+      kind: 'warning',
+      message: t`The text input will be always shown on top of all other objects in the game - this is a limitation that can't be changed. According to the platform/device or browser running the game, the appearance can also slightly change.`,
     },
   ],
 });
@@ -77,6 +76,30 @@ export const getExtraInstructionInformation = (type: string): ?Hint => {
     return {
       kind: 'info',
       message: t`The bounding box is an imaginary rectangle surrounding the object collision mask. Even if the object X and Y positions are not changed, this rectangle can change if the object is rotated or if an animation is being played. Usually you should use actions and conditions related to the object position or center, but the bounding box can be useful to deal with the area of the object.`,
+    };
+  }
+  if (type === 'PickedInstancesCount') {
+    return {
+      kind: 'info',
+      message: t`If no previous condition or action used the specified object(s), the picked instances count will be 0.`,
+    };
+  }
+  if (type === 'CompareTimer') {
+    return {
+      kind: 'info',
+      message: t`To start a timer, don't forget to use the action "Start (or reset) a scene timer" in another event.`,
+    };
+  }
+  if (type === 'CompareObjectTimer') {
+    return {
+      kind: 'info',
+      message: t`To start a timer, don't forget to use the action "Start (or reset) an object timer" in another event.`,
+    };
+  }
+  if (type === 'FixCamera') {
+    return {
+      kind: 'info',
+      message: t`Please prefer using the new action "Enforce camera boundaries" which is more flexible.`,
     };
   }
   if (type === 'BitmapText::Scale') {

@@ -30,14 +30,15 @@ const ShowcasedGameDialog = ({
     <Dialog
       maxWidth="xs"
       open={open}
-      actions={
+      actions={[
         <FlatButton
           label={<Trans>Close</Trans>}
           key="close"
           primary={false}
           onClick={onClose}
-        />
-      }
+        />,
+      ]}
+      onRequestClose={onClose}
     >
       <Column noMargin expand>
         <CorsAwareImage

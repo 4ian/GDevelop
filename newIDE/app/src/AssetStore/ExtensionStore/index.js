@@ -1,30 +1,25 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
-import Background from '../../UI/Background';
-import ScrollView from '../../UI/ScrollView';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
-import { FiltersChooser } from '../../UI/Search/FiltersChooser';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
 import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
-import Subheader from '../../UI/Subheader';
-
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
+import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import {
+  sendExtensionDetailsOpened,
+  sendExtensionAddedToProject,
+} from '../../Utils/Analytics/EventSender';
+import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
+import { t } from '@lingui/macro';
 
 type Props = {|
   isInstalling: boolean,
   project: gdProject,
-  onInstall: ExtensionShortHeader => Promise<void>,
+  onInstall: ExtensionShortHeader => Promise<boolean>,
   showOnlyWithBehaviors: boolean,
 |};
 
@@ -60,11 +55,34 @@ export const ExtensionStore = ({
 
   const filteredSearchResults = searchResults
     ? searchResults.filter(
-        extensionShortHeader =>
+        ({ item: extensionShortHeader }) =>
           !showOnlyWithBehaviors ||
           extensionShortHeader.eventsBasedBehaviorsCount > 0
       )
     : null;
+
+  const tagsHandler = React.useMemo(
+    () => ({
+      add: filtersState.addFilter,
+      remove: filtersState.removeFilter,
+      chosenTags: filtersState.chosenFilters,
+    }),
+    [filtersState]
+  );
+
+  const getExtensionsMatches = (
+    extensionShortHeader: ExtensionShortHeader
+  ): SearchMatch[] => {
+    if (!searchResults) return [];
+    const extensionMatches = searchResults.find(
+      result => result.item.name === extensionShortHeader.name
+    );
+    return extensionMatches ? extensionMatches.matches : [];
+  };
+
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-behaviors-and-functions'
+  );
 
   return (
     <React.Fragment>
@@ -75,60 +93,51 @@ export const ExtensionStore = ({
               value={searchText}
               onChange={setSearchText}
               onRequestSearch={() => {}}
-              style={styles.searchBar}
+              aspect="add-margins-only-if-modern-theme"
+              tagsHandler={tagsHandler}
+              tags={filters && filters.allTags}
+              placeholder={t`Search extensions`}
             />
-            <Line
-              expand
-              overflow={
-                'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
+            {DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
+            <ListSearchResults
+              disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
+              onRetry={fetchExtensionsAndFilters}
+              error={error}
+              searchItems={
+                filteredSearchResults &&
+                filteredSearchResults.map(({ item }) => item)
               }
-            >
-              <Background
-                noFullHeight
-                noExpand
-                width={windowWidth === 'small' ? 150 : 250}
-              >
-                <ScrollView>
-                  <Subheader>
-                    <Trans>Filters</Trans>
-                  </Subheader>
-                  <FiltersChooser
-                    allFilters={filters}
-                    filtersState={filtersState}
-                    error={error}
-                  />
-                </ScrollView>
-              </Background>
-              <ListSearchResults
-                onRetry={fetchExtensionsAndFilters}
-                error={error}
-                searchItems={filteredSearchResults}
-                getSearchItemUniqueId={getExtensionName}
-                renderSearchItem={(extensionShortHeader, onHeightComputed) => (
-                  <ExtensionListItem
-                    key={extensionShortHeader.name}
-                    project={project}
-                    onHeightComputed={onHeightComputed}
-                    extensionShortHeader={extensionShortHeader}
-                    onChoose={() => {
-                      setSelectedExtensionShortHeader(extensionShortHeader);
-                    }}
-                  />
-                )}
-              />
-            </Line>
+              getSearchItemUniqueId={getExtensionName}
+              renderSearchItem={(extensionShortHeader, onHeightComputed) => (
+                <ExtensionListItem
+                  key={extensionShortHeader.name}
+                  project={project}
+                  onHeightComputed={onHeightComputed}
+                  extensionShortHeader={extensionShortHeader}
+                  matches={getExtensionsMatches(extensionShortHeader)}
+                  onChoose={() => {
+                    sendExtensionDetailsOpened(extensionShortHeader.name);
+                    setSelectedExtensionShortHeader(extensionShortHeader);
+                  }}
+                />
+              )}
+            />
           </Column>
         )}
       </ResponsiveWindowMeasurer>
       {!!selectedExtensionShortHeader && (
         <ExtensionInstallDialog
+          project={project}
           isInstalling={isInstalling}
           extensionShortHeader={selectedExtensionShortHeader}
-          alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
-            selectedExtensionShortHeader.name
-          )}
-          onInstall={() => {
-            onInstall(selectedExtensionShortHeader);
+          onInstall={async () => {
+            sendExtensionAddedToProject(selectedExtensionShortHeader.name);
+            const wasInstalled = await onInstall(selectedExtensionShortHeader);
+            if (wasInstalled) setSelectedExtensionShortHeader(null);
           }}
           onClose={() => setSelectedExtensionShortHeader(null)}
         />

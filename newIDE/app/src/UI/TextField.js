@@ -47,7 +47,7 @@ type Props = {|
   }) => void,
 
   // Advanced DOM events, for exceptional usage:
-  onClick?: () => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
@@ -70,6 +70,9 @@ type Props = {|
 
   // Keyboard focus:
   autoFocus?: boolean,
+
+  // String text field:
+  maxLength?: number,
 
   // Number text field:
   precision?: number,
@@ -248,6 +251,8 @@ export default class TextField extends React.Component<Props, {||}> {
                 onKeyUp: props.onKeyUp,
                 onKeyDown: props.onKeyDown,
                 onClick: props.onClick,
+                // String field props:
+                maxLength: props.maxLength,
                 // Number field props:
                 max: props.max,
                 min: props.min,

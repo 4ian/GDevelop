@@ -23,7 +23,7 @@ void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
       "AnchorBehavior",
       _("Anchor"),
       "Anchor",
-      _("Behavior that anchors objects to the window's bounds."),
+      _("Anchor objects to the window's bounds."),
       "",
       "CppPlatform/Extensions/AnchorIcon.png",
       "AnchorBehavior",

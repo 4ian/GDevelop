@@ -34,8 +34,8 @@ export default class ObjectField extends React.Component<
       : undefined;
   }
 
-  focus() {
-    if (this._field) this._field.focus();
+  focus(selectAll: boolean = false) {
+    if (this._field) this._field.focus(selectAll);
   }
 
   render() {
@@ -48,10 +48,24 @@ export default class ObjectField extends React.Component<
         onRequestClose={this.props.onRequestClose}
         onApply={this.props.onApply}
         allowedObjectType={this._allowedObjectType}
+        requiredObjectCapability={
+          // Some instructions apply to all objects BUT not some objects
+          // lacking a specific capability usually offered by all objects.
+          this.props.instructionMetadata
+            ? this.props.instructionMetadata.getRequiredBaseObjectCapability()
+            : this.props.expressionMetadata
+            ? this.props.expressionMetadata.getRequiredBaseObjectCapability()
+            : undefined
+        }
         globalObjectsContainer={this.props.globalObjectsContainer}
         objectsContainer={this.props.objectsContainer}
         floatingLabelText={this._description}
         helperMarkdownText={this._longDescription}
+        id={
+          this.props.parameterIndex !== undefined
+            ? `parameter-${this.props.parameterIndex}-object-selector`
+            : undefined
+        }
         fullWidth
         errorTextIfInvalid={
           this._allowedObjectType ? (
@@ -74,6 +88,8 @@ export const renderInlineObjectWithThumbnail = ({
   value,
   parameterMetadata,
   renderObjectThumbnail,
+  expressionIsValid,
+  InvalidParameterValue,
   MissingParameterValue,
 }: ParameterInlineRendererProps) => {
   if (!value && !parameterMetadata.isOptional()) {
@@ -88,7 +104,11 @@ export const renderInlineObjectWithThumbnail = ({
       })}
     >
       {renderObjectThumbnail(value)}
-      {value}
+      {expressionIsValid ? (
+        value
+      ) : (
+        <InvalidParameterValue>{value}</InvalidParameterValue>
+      )}
     </span>
   );
 };

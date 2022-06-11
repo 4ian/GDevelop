@@ -11,7 +11,9 @@ import HelpButton from '../UI/HelpButton';
 import Create from '../UI/CustomSvgIcons/Behaviors/Create';
 import Step from '../UI/CustomSvgIcons/Behaviors/Step';
 import Destroy from '../UI/CustomSvgIcons/Behaviors/Destroy';
-import Function from '../UI/CustomSvgIcons/Behaviors/Function';
+import Action from '../UI/CustomSvgIcons/Behaviors/Action';
+import Condition from '../UI/CustomSvgIcons/Behaviors/Condition';
+import Expression from '../UI/CustomSvgIcons/Behaviors/Expression';
 import Activate from '../UI/CustomSvgIcons/Behaviors/Activate';
 import Deactivate from '../UI/CustomSvgIcons/Behaviors/Deactivate';
 import { Line } from '../UI/Grid';
@@ -85,7 +87,6 @@ export default function BehaviorMethodSelectorDialog({
           key={'close'}
         />,
       ]}
-      cannotBeDismissed={false}
       open
       noMargin
       title={<Trans>Choose a new behavior function ("method")</Trans>}
@@ -93,7 +94,7 @@ export default function BehaviorMethodSelectorDialog({
     >
       <List>
         <ListItem
-          leftIcon={<Function style={styles.icon} />}
+          leftIcon={<Action style={styles.icon} />}
           primaryText={<Trans>Action</Trans>}
           secondaryText={
             <Trans>
@@ -110,7 +111,7 @@ export default function BehaviorMethodSelectorDialog({
           }
         />
         <ListItem
-          leftIcon={<Function style={styles.icon} />}
+          leftIcon={<Condition style={styles.icon} />}
           primaryText={<Trans>Condition</Trans>}
           secondaryText={
             <Trans>
@@ -127,7 +128,7 @@ export default function BehaviorMethodSelectorDialog({
           }
         />
         <ListItem
-          leftIcon={<Function style={styles.icon} />}
+          leftIcon={<Expression style={styles.icon} />}
           primaryText={<Trans>Expression</Trans>}
           secondaryText={
             <Trans>

@@ -25,7 +25,7 @@ const exportExtension = (
     return Promise.reject(new Error('Not supported'));
 
   return eventsFunctionsExtensionWriter
-    .chooseEventsFunctionExtensionFile()
+    .chooseEventsFunctionExtensionFile(eventsFunctionsExtension.getName())
     .then(pathOrUrl => {
       if (!pathOrUrl) return;
 
@@ -107,12 +107,11 @@ export default function OptionsEditorDialog({
           label={<Trans>Close</Trans>}
           primary={true}
           keyboardFocused={true}
-          onClick={() => onClose()}
+          onClick={onClose}
           disabled={isLoading}
           key={'close'}
         />,
       ]}
-      cannotBeDismissed={true}
       open={open}
       noTitleMargin
       title={
@@ -121,6 +120,7 @@ export default function OptionsEditorDialog({
           <Tab label={<Trans>Dependencies</Trans>} value="dependencies" />
         </Tabs>
       }
+      cannotBeDismissed={isLoading}
       onRequestClose={isLoading ? () => {} : onClose}
     >
       {currentTab === 'options' && (
@@ -147,11 +147,10 @@ export default function OptionsEditorDialog({
               onClick={() => {
                 setExportDialogOpen(false);
               }}
-              key={'close'}
+              key="close"
             />,
           ]}
           open
-          cannotBeDismissed={false}
           onRequestClose={() => {
             setExportDialogOpen(false);
           }}

@@ -115,59 +115,76 @@ export default class KeyboardShortcuts {
 
     if (onMove) {
       if (evt.which === UP_KEY) {
+        evt.preventDefault();
         this._shiftPressed ? onMove(0, -5) : onMove(0, -1);
       } else if (evt.which === DOWN_KEY) {
+        evt.preventDefault();
         this._shiftPressed ? onMove(0, 5) : onMove(0, 1);
       } else if (evt.which === LEFT_KEY) {
+        evt.preventDefault();
         this._shiftPressed ? onMove(-5, 0) : onMove(-1, 0);
       } else if (evt.which === RIGHT_KEY) {
+        evt.preventDefault();
         this._shiftPressed ? onMove(5, 0) : onMove(1, 0);
       }
     }
     if (onDelete && (evt.which === BACKSPACE_KEY || evt.which === DELETE_KEY)) {
+      evt.preventDefault();
       onDelete();
     }
     if (onCopy && this._isControlOrCmdPressed() && evt.which === C_KEY) {
+      evt.preventDefault();
       onCopy();
     }
     if (onCut && this._isControlOrCmdPressed() && evt.which === X_KEY) {
+      evt.preventDefault();
       onCut();
     }
     if (onPaste && this._isControlOrCmdPressed() && evt.which === V_KEY) {
+      evt.preventDefault();
       onPaste();
     }
-    if (onUndo && this._isControlOrCmdPressed() && evt.which === Z_KEY) {
-      onUndo();
-    }
     if (
-      onRedo &&
+      (onUndo || onRedo) &&
       this._isControlOrCmdPressed() &&
-      evt.shiftKey &&
       evt.which === Z_KEY
     ) {
-      onRedo();
+      evt.preventDefault();
+      if (evt.shiftKey) {
+        if (onRedo) onRedo();
+      } else {
+        if (onUndo) onUndo();
+      }
     }
+
     if (onRedo && this._isControlOrCmdPressed() && evt.which === Y_KEY) {
+      evt.preventDefault();
       onRedo();
     }
     if (onSearch && this._isControlOrCmdPressed() && evt.which === F_KEY) {
+      evt.preventDefault();
       onSearch();
     }
     if (onEscape && evt.which === ESC_KEY) {
+      evt.preventDefault();
       onEscape();
     }
 
     if (onZoomOut && this._isControlOrCmdPressed() && evt.which === MINUS_KEY) {
+      evt.preventDefault();
       onZoomOut(evt);
     }
     if (onZoomOut && evt.which === NUMPAD_SUBTRACT) {
+      evt.preventDefault();
       onZoomOut(evt);
     }
 
     if (onZoomIn && this._isControlOrCmdPressed() && evt.which === EQUAL_KEY) {
+      evt.preventDefault();
       onZoomIn(evt);
     }
     if (onZoomIn && evt.which === NUMPAD_ADD) {
+      evt.preventDefault();
       onZoomIn(evt);
     }
   };

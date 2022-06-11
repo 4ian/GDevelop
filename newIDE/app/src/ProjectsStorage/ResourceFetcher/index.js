@@ -1,7 +1,7 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
@@ -14,7 +14,6 @@ import {
   TableRow,
   TableRowColumn,
 } from '../../UI/Table';
-import RaisedButton from '../../UI/RaisedButton';
 import { ColumnStackLayout } from '../../UI/Layout';
 
 export type FetchedResources = {|
@@ -67,7 +66,7 @@ export const ResourceFetcherDialog = ({
     <Dialog
       actions={[
         onRetry ? (
-          <RaisedButton
+          <DialogPrimaryButton
             label={<Trans>Retry</Trans>}
             primary
             onClick={onRetry}
@@ -83,7 +82,7 @@ export const ResourceFetcherDialog = ({
           key="close"
         />,
       ]}
-      cannotBeDismissed={true}
+      cannotBeDismissed={!hasErrors}
       noMargin
       open
       maxWidth="sm"

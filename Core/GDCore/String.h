@@ -13,11 +13,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <SFML/System/String.hpp>
 
 #include "GDCore/Utf8/utf8.h"
-
-namespace sf {class String;};
 
 namespace gd
 {
@@ -121,11 +118,6 @@ public:
      */
     String(const std::u32string &string);
 
-    /**
-     * Constructs a string from an sf::String.
-     */
-    String(const sf::String &string);
-
 /**
  * \}
  */
@@ -145,8 +137,6 @@ public:
      * \endcode
      */
     String& operator=(const char *characters);
-
-    String& operator=(const sf::String &string);
 
     String& operator=(const std::u32string &string);
 
@@ -229,7 +219,6 @@ public:
     static String From(T value)
     {
         static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::From with std::string.");
-        static_assert(!std::is_same<T, sf::String>::value, "Can't use gd::String::From with sf::String.");
 
         std::ostringstream oss;
         oss << value;
@@ -244,7 +233,6 @@ public:
     T To() const
     {
         static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::To with std::string.");
-        static_assert(!std::is_same<T, sf::String>::value, "Can't use gd::String::To with sf::String.");
 
         T value;
         std::istringstream oss(m_string);
@@ -273,13 +261,6 @@ public:
      * \return a String created from a std::u32string.
      */
     static String FromUTF32( const std::u32string &string );
-
-    /**
-     * \return a String created from a sf::String (UTF32).
-     *
-     * See \ref Conversions1 for more information.
-     */
-    static String FromSfString( const sf::String &sfString );
 
     /**
      * \return a String created an UTF8 encoded std::string.
@@ -311,20 +292,6 @@ public:
      * \return a std::u32string.
      */
     std::u32string ToUTF32() const;
-
-    /**
-     * \return a sf::String from the current string.
-     *
-     * See \ref Conversions1 for more information.
-     */
-    sf::String ToSfString() const;
-
-    /**
-     * Implicit conversion operator to sf::String.
-     *
-     * See \ref Conversions1 for more information.
-     */
-    operator sf::String() const;
 
     /**
      * \return a UTF8 encoded std::string from the current string.
@@ -885,7 +852,7 @@ namespace std
  * on the string size and so is the operator[]().
  *
  * \section Conversion Conversions from/to other string types
- * The String handles implicit conversion with sf::String (implicit constructor and implicit conversion
+ * The String handles implicit conversion with std::String (implicit constructor and implicit conversion
  * operator).
  *
  * **However, this is not the case with std::string** as this conversion is not often lossless (mostly on Windows).
@@ -893,16 +860,6 @@ namespace std
  * to convert a std::string to a String. However, if you want to get a String object from a string literal, you can
  * directly use the operator=() or the constructor as they are supporting const char* as argument (it assumes the string
  * literal is encoded in UTF8, so you'll need to put the u8 prefix).
- *
- * \subsection Conversions1 Implicit conversion from/to sf::String
- * \code
- * //Get a String from sf::String
- * sf::String sfmlStr("This is a test ! ");
- * gd::String str1(sfmlStr); //Now contains "This is a test ! " encoded in UTF8
- *
- * //Get a sf::String from String
- * sf::String anotherSfmlString = str; //anotherSfmlString now contains "Another test ! "
- * \endcode
  *
  * \subsection Conversions2 Conversion from/to std::string
  * \code

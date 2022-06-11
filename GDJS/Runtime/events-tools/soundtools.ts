@@ -6,20 +6,24 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace sound {
+      const logger = new gdjs.Logger('Audio events');
+
       export const getGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene
-      ) {
+      ): float {
         return runtimeScene.getSoundManager().getGlobalVolume();
       };
 
       export const setGlobalVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         globalVolume: float
-      ) {
+      ): void {
         runtimeScene.getSoundManager().setGlobalVolume(globalVolume);
       };
 
-      export const unloadAllAudio = function (runtimeScene: gdjs.RuntimeScene) {
+      export const unloadAllAudio = function (
+        runtimeScene: gdjs.RuntimeScene
+      ): void {
         runtimeScene.getSoundManager().unloadAll();
       };
 
@@ -30,7 +34,7 @@ namespace gdjs {
         loop: boolean,
         volume: float,
         pitch: float
-      ) {
+      ): void {
         runtimeScene
           .getSoundManager()
           .playSound(soundFile, loop, volume, pitch);
@@ -43,7 +47,7 @@ namespace gdjs {
         loop: boolean,
         volume: float,
         pitch: float
-      ) {
+      ): void {
         runtimeScene
           .getSoundManager()
           .playSoundOnChannel(soundFile, channel, loop, volume, pitch);
@@ -52,33 +56,45 @@ namespace gdjs {
       export const stopSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): void {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        sound && sound.stop();
+        if (sound) sound.stop();
+        else {
+          logger.error(`Cannot stop non-existing sound on channel ${channel}.`);
+        }
       };
 
       export const pauseSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): void {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        sound && sound.pause();
+        if (sound) sound.pause();
+        else {
+          logger.error(
+            `Cannot pause non-existing sound on channel ${channel}.`
+          );
+        }
       };
 
       export const continueSoundOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): void {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        if (sound && !sound.playing()) {
-          sound.play();
+        if (sound) {
+          if (!sound.playing()) sound.play();
+        } else {
+          logger.error(
+            `Cannot continue playing non-existing sound on channel ${channel}.`
+          );
         }
       };
 
       export const isSoundOnChannelPlaying = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): boolean {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
         return sound ? sound.playing() : false;
       };
@@ -86,68 +102,113 @@ namespace gdjs {
       export const isSoundOnChannelPaused = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): boolean {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        return sound ? sound.paused() : false;
+        if (sound) return sound.paused();
+        else {
+          logger.error(
+            `Cannot check if non-existing sound on channel ${channel} is paused.`
+          );
+          return false;
+        }
       };
 
       export const isSoundOnChannelStopped = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): boolean {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        return sound ? sound.stopped() : true;
+        if (sound) return sound.stopped();
+        else {
+          logger.error(
+            `Cannot check if non-existing sound on channel ${channel} is stopped.`
+          );
+          return true;
+        }
       };
 
       export const getSoundOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): float {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        return sound ? sound.getVolume() * 100 : 100;
+        if (sound) return sound.getVolume() * 100;
+        else {
+          logger.error(
+            `Cannot get the volume of a non-existing sound on channel ${channel}.`
+          );
+          return 100;
+        }
       };
 
       export const setSoundOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         volume: float
-      ) {
+      ): void {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        sound && sound.setVolume(volume / 100);
+        if (sound) sound.setVolume(volume / 100);
+        else {
+          logger.error(
+            `Cannot set the volume of a non-existing sound on channel ${channel}.`
+          );
+        }
       };
 
       export const getSoundOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): float {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        return sound ? sound.getSeek() : 0;
+        if (sound) return sound.getSeek();
+        else {
+          logger.error(
+            `Cannot get the playing offset of a non-existing sound on channel ${channel}.`
+          );
+          return 0;
+        }
       };
 
       export const setSoundOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         playingOffset: float
-      ) {
+      ): void {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        sound && sound.setSeek(playingOffset);
+        if (sound) sound.setSeek(playingOffset);
+        else {
+          logger.error(
+            `Cannot set the playing offset of a non-existing sound on channel ${channel}.`
+          );
+        }
       };
 
       export const getSoundOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): float {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        return sound ? sound.getRate() : 1;
+        if (sound) return sound.getRate();
+        else {
+          logger.error(
+            `Cannot get the pitch of a non-existing sound on channel ${channel}.`
+          );
+          return 1;
+        }
       };
 
       export const setSoundOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         pitch: float
-      ) {
+      ): void {
         const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-        sound && sound.setRate(pitch);
+        if (sound) sound.setRate(pitch);
+        else {
+          logger.error(
+            `Cannot get the pitch of a non-existing sound on channel ${channel}.`
+          );
+        }
       };
 
       export const preloadSound = (
@@ -173,7 +234,7 @@ namespace gdjs {
         loop: boolean,
         volume: float,
         pitch: float
-      ) {
+      ): void {
         runtimeScene
           .getSoundManager()
           .playMusic(soundFile, loop, volume, pitch);
@@ -186,7 +247,7 @@ namespace gdjs {
         loop: boolean,
         volume: float,
         pitch: float
-      ) {
+      ): void {
         runtimeScene
           .getSoundManager()
           .playMusicOnChannel(soundFile, channel, loop, volume, pitch);
@@ -195,33 +256,47 @@ namespace gdjs {
       export const stopMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): void {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        music && music.stop();
+        if (music) music.stop();
+        else {
+          logger.error(
+            `Cannot stop a non-existing music on channel ${channel}.`
+          );
+        }
       };
 
       export const pauseMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): void {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        music && music.pause();
+        if (music) music.pause();
+        else {
+          logger.error(
+            `Cannot pause a non-existing music on channel ${channel}.`
+          );
+        }
       };
 
       export const continueMusicOnChannel = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): void {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        if (music && !music.playing()) {
-          music.play();
+        if (music) {
+          if (!music.playing()) music.play();
+        } else {
+          logger.error(
+            `Cannot stop a non-existing music on channel ${channel}.`
+          );
         }
       };
 
       export const isMusicOnChannelPlaying = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): boolean {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
         return music ? music.playing() : false;
       };
@@ -229,68 +304,113 @@ namespace gdjs {
       export const isMusicOnChannelPaused = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): boolean {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        return music ? music.paused() : false;
+        if (music) return music.paused();
+        else {
+          logger.error(
+            `Cannot check if non-existing music on channel ${channel} is paused.`
+          );
+          return false;
+        }
       };
 
       export const isMusicOnChannelStopped = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): boolean {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        return music ? music.stopped() : true;
+        if (music) return music.stopped();
+        else {
+          logger.error(
+            `Cannot check if non-existing music on channel ${channel} is stopped.`
+          );
+          return true;
+        }
       };
 
       export const getMusicOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): float {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        return music ? music.getVolume() * 100 : 100;
+        if (music) return music.getVolume() * 100;
+        else {
+          logger.error(
+            `Cannot get the volume of a non-existing music on channel ${channel}.`
+          );
+          return 100;
+        }
       };
 
       export const setMusicOnChannelVolume = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         volume: float
-      ) {
+      ): void {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        music && music.setVolume(volume / 100);
+        if (music) music.setVolume(volume / 100);
+        else {
+          logger.error(
+            `Cannot set the volume of a non-existing music on channel ${channel}.`
+          );
+        }
       };
 
       export const getMusicOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): float {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        return music ? music.getSeek() : 0;
+        if (music) return music.getSeek();
+        else {
+          logger.error(
+            `Cannot get the playing offset of a non-existing music on channel ${channel}.`
+          );
+          return 0;
+        }
       };
 
       export const setMusicOnChannelPlayingOffset = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         playingOffset: float
-      ) {
+      ): void {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        music && music.setSeek(playingOffset);
+        if (music) music.setSeek(playingOffset);
+        else {
+          logger.error(
+            `Cannot set the playing offset of a non-existing music on channel ${channel}.`
+          );
+        }
       };
 
       export const getMusicOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer
-      ) {
+      ): float {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        return music ? music.getRate() : 1;
+        if (music) return music.getRate();
+        else {
+          logger.error(
+            `Cannot get the pitch of a non-existing music on channel ${channel}.`
+          );
+          return 1;
+        }
       };
 
       export const setMusicOnChannelPitch = function (
         runtimeScene: gdjs.RuntimeScene,
         channel: integer,
         pitch: float
-      ) {
+      ): void {
         const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-        music && music.setRate(pitch);
+        if (music) music.setRate(pitch);
+        else {
+          logger.error(
+            `Cannot get the pitch of a non-existing music on channel ${channel}.`
+          );
+        }
       };
 
       export const preloadMusic = (
@@ -308,6 +428,37 @@ namespace gdjs {
         runtimeScene
           .getSoundManager()
           .unloadAudio(soundFile, /* isMusic= */ true);
+
+      export const fadeSoundVolume = (
+        runtimeScene: gdjs.RuntimeScene,
+        channel: integer,
+        toVolume: float,
+        timeOfFade: float /* in seconds */
+      ) => {
+        const sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
+        if (sound) {
+          sound.fade(sound.getVolume(), toVolume / 100, timeOfFade * 1000);
+        } else {
+          logger.error(
+            `Cannot fade the volume of a non-existing sound on channel ${channel}.`
+          );
+        }
+      };
+      export const fadeMusicVolume = (
+        runtimeScene: gdjs.RuntimeScene,
+        channel: integer,
+        toVolume: float,
+        timeOfFade: float /* in seconds */
+      ) => {
+        const music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
+        if (music) {
+          music.fade(music.getVolume(), toVolume / 100, timeOfFade * 1000);
+        } else {
+          logger.error(
+            `Cannot fade the volume of a non-existing music on channel ${channel}.`
+          );
+        }
+      };
     }
   }
 }

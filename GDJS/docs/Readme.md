@@ -1,6 +1,6 @@
 # GDJS Documentation
 
-📚 Read the documentation online: **[GDJS Runtime (game engine) documentation](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/index.html)** or [GDJS Platform documentation for the IDE](https://docs.gdevelop-app.com/GDJS%20Documentation/index.html).
+📚 Read the documentation online: **[GDJS Runtime (game engine) documentation](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation/index.html)** or [GDJS Platform documentation for the IDE](https://docs.gdevelop.io/GDJS%20Documentation/index.html).
 
 ## How to generate the documentation
 
@@ -8,6 +8,7 @@
 
   ```bash
   cd <GDevelop repository>/GDJS
+  npm install
   npm run generate-doc
   ```
 

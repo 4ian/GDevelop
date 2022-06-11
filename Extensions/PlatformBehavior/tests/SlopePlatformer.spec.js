@@ -1,5 +1,5 @@
 describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
-  const epsilon = 1 / (2 << 8);
+  const epsilon = 1 / (2 << 16);
 
   describe('(walk on slopes)', function () {
     let runtimeScene;
@@ -26,6 +26,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
           },
         ],
         effects: [],
@@ -362,7 +363,13 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           walkRight(30);
           expect(object.getX()).to.be.above(platform.getX());
           // Gone downward following the 2nd platform.
-          expect(object.getY()).to.be(platform.getY() - object.getHeight());
+          // The floor detection can't round it to 30
+          // because the character bottom is 50 with rounding error
+          // 29.999999999999996 + 20 = 50
+          expect(object.getY()).to.be.within(
+            platform.getY() - object.getHeight() - epsilon,
+            platform.getY() - object.getHeight() + epsilon
+          );
         });
       });
 
@@ -430,6 +437,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               ignoreDefaultControls: true,
               slopeMaxAngle: 60,
               jumpSustainTime: 0.2,
+              useLegacyTrajectory: false,
             },
           ],
           effects: [],
@@ -521,6 +529,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               ignoreDefaultControls: true,
               slopeMaxAngle: slopeMaxAngle,
               jumpSustainTime: 0.2,
+              useLegacyTrajectory: false,
             },
           ],
           effects: [],

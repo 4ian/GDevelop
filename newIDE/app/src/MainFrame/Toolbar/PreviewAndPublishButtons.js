@@ -3,7 +3,7 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import ToolbarIcon from '../../UI/ToolbarIcon';
-import FlatButton from '../../UI/FlatButton';
+import TextButton from '../../UI/TextButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { type PreviewState } from '../PreviewState';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
@@ -119,6 +119,12 @@ export default function PreviewAndPublishButtons({
       previewState,
     ]
   );
+
+  const onClickPreview = event => {
+    if (event.target) event.target.blur();
+    onHotReloadPreview();
+  };
+
   return (
     <React.Fragment>
       <ElementWithMenu
@@ -133,8 +139,8 @@ export default function PreviewAndPublishButtons({
       />
       <ElementWithMenu
         element={
-          <FlatButton
-            onClick={onHotReloadPreview}
+          <TextButton
+            onClick={onClickPreview}
             disabled={!isPreviewEnabled}
             icon={
               <img
@@ -162,6 +168,7 @@ export default function PreviewAndPublishButtons({
                 <Trans>Preview</Trans>
               )
             }
+            id={'toolbar-preview-button'}
             exceptionalTooltipForToolbar={
               hasPreviewsRunning ? (
                 <Trans>
@@ -185,7 +192,7 @@ export default function PreviewAndPublishButtons({
         openMenuWithSecondaryClick
         buildMenuTemplate={previewBuildMenuTemplate}
       />
-      <FlatButton
+      <TextButton
         onClick={exportProject}
         disabled={!hasProject}
         icon={

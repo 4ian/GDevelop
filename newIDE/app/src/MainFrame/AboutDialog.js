@@ -244,7 +244,7 @@ export default class AboutDialog extends PureComponent<Props, State> {
   };
 
   _openContributePage = () => {
-    Window.openExternalURL('https://gdevelop-app.com/contribute/');
+    Window.openExternalURL('https://gdevelop.io/page/contribute/');
   };
 
   _openLink = (link: string) => {
@@ -272,7 +272,7 @@ export default class AboutDialog extends PureComponent<Props, State> {
             key="website"
             label={<Trans>GDevelop Website</Trans>}
             primary={false}
-            onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
+            onClick={() => Window.openExternalURL('https://gdevelop.io')}
           />,
           <FlatButton
             key="close"
@@ -282,7 +282,6 @@ export default class AboutDialog extends PureComponent<Props, State> {
           />,
         ]}
         onRequestClose={onClose}
-        cannotBeDismissed={false}
         open={open}
         maxWidth="sm"
         noMargin

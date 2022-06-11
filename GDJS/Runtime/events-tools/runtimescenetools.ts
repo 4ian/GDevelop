@@ -42,10 +42,20 @@ namespace gdjs {
         return runtimeScene.getTimeManager().getTimeScale();
       };
 
+      /**
+       * Test a timer elapsed time, if the timer doesn't exist it is created.
+       *
+       * @deprecated prefer using getTimerElapsedTimeInSecondsOrNaN
+       *
+       * @param runtimeScene The scene owning the timer
+       * @param timeInSeconds The time value to check in seconds
+       * @param timerName The timer name
+       * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
+       */
       export const timerElapsedTime = function (
-        runtimeScene,
-        timeInSeconds,
-        timerName
+        runtimeScene: gdjs.RuntimeScene,
+        timeInSeconds: float,
+        timerName: string
       ) {
         const timeManager = runtimeScene.getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
@@ -95,9 +105,39 @@ namespace gdjs {
         timeManager.removeTimer(timerName);
       };
 
+      export class WaitTask extends gdjs.AsyncTask {
+        private duration: float;
+        private timeElapsedOnScene = 0;
+
+        constructor(durationInMilliseconds: float) {
+          super();
+          this.duration = durationInMilliseconds;
+        }
+
+        update(runtimeScene: RuntimeScene): boolean {
+          this.timeElapsedOnScene += runtimeScene
+            .getTimeManager()
+            .getElapsedTime();
+          return this.timeElapsedOnScene >= this.duration;
+        }
+      }
+
+      export const wait = (durationInSeconds: float): AsyncTask =>
+        new WaitTask(
+          durationInSeconds * 1000 /* Convert from seconds to milliseconds */
+        );
+
+      /**
+       * This is used by expressions to return 0 when a timer doesn't exist,
+       * because numeric expressions must always return a number.
+       *
+       * @param runtimeScene The scene owning the timer.
+       * @param timerName The timer name.
+       * @returns The timer elapsed time in seconds or 0 if the timer doesn't exist.
+       */
       export const getTimerElapsedTimeInSeconds = function (
-        runtimeScene,
-        timerName
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
       ) {
         const timeManager = runtimeScene.getTimeManager();
         if (!timeManager.hasTimer(timerName)) {
@@ -106,11 +146,35 @@ namespace gdjs {
         return timeManager.getTimer(timerName).getTime() / 1000;
       };
 
-      export const getTimeFromStartInSeconds = function (runtimeScene) {
+      /**
+       * This is used by conditions to return false when a timer doesn't exist,
+       * no matter the relational operator.
+       *
+       * @param runtimeScene The scene owning the timer.
+       * @param timerName The timer name.
+       * @returns The timer elapsed time in seconds or NaN if the timer doesn't exist.
+       */
+      export const getTimerElapsedTimeInSecondsOrNaN = function (
+        runtimeScene: gdjs.RuntimeScene,
+        timerName: string
+      ) {
+        const timeManager = runtimeScene.getTimeManager();
+        if (!timeManager.hasTimer(timerName)) {
+          return Number.NaN;
+        }
+        return timeManager.getTimer(timerName).getTime() / 1000;
+      };
+
+      export const getTimeFromStartInSeconds = function (
+        runtimeScene: gdjs.RuntimeScene
+      ) {
         return runtimeScene.getTimeManager().getTimeFromStart() / 1000;
       };
 
-      export const getTime = function (runtimeScene, what) {
+      export const getTime = function (
+        runtimeScene: gdjs.RuntimeScene,
+        what: string
+      ) {
         if (what === 'timestamp') {
           return Date.now();
         }
@@ -140,9 +204,9 @@ namespace gdjs {
       };
 
       export const replaceScene = function (
-        runtimeScene,
-        newSceneName,
-        clearOthers
+        runtimeScene: gdjs.RuntimeScene,
+        newSceneName: string,
+        clearOthers: boolean
       ) {
         if (!runtimeScene.getGame().getSceneData(newSceneName)) {
           return;
@@ -174,10 +238,10 @@ namespace gdjs {
       };
 
       export const createObjectsFromExternalLayout = function (
-        scene,
-        externalLayout,
-        xPos,
-        yPos
+        scene: gdjs.RuntimeScene,
+        externalLayout: string,
+        xPos: float,
+        yPos: float
       ) {
         const externalLayoutData = scene
           .getGame()

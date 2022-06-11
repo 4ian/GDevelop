@@ -5,15 +5,10 @@ import { I18n } from '@lingui/react';
 import { t, Trans } from '@lingui/macro';
 import RaisedButton from '../../UI/RaisedButton';
 import { sendExportLaunched } from '../../Utils/Analytics/EventSender';
-import {
-  type Build,
-  type BuildArtifactKeyName,
-  getBuildArtifactUrl,
-} from '../../Utils/GDevelopServices/Build';
+import { type Build } from '../../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../../UI/Grid';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import Window from '../../Utils/Window';
 import CreateProfile from '../../Profile/CreateProfile';
 import LimitDisplayer from '../../Profile/LimitDisplayer';
 import {
@@ -28,13 +23,14 @@ import BuildStepsProgress, {
 import {
   registerGame,
   getGame,
-  updateGame,
+  type Game,
+  setGameUserAcls,
+  getAclsFromUserIds,
 } from '../../Utils/GDevelopServices/Game';
 import { type ExportPipeline } from '../ExportPipeline.flow';
 import { GameRegistration } from '../../GameDashboard/GameRegistration';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import {
-  ACHIEVEMENT_FEATURE_FLAG,
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_WEB_EXPORT,
 } from '../../Utils/GDevelopServices/Badge';
@@ -52,9 +48,12 @@ type State = {|
 
 type Props = {|
   project: gdProject,
+  onSaveProject: () => Promise<void>,
   onChangeSubscription: () => void,
   authenticatedUser: AuthenticatedUser,
   exportPipeline: ExportPipeline<any, any, any, any, any>,
+  setIsNavigationDisabled: (isNavigationDisabled: boolean) => void,
+  onGameUpdated: (game: Game) => void,
 |};
 
 /**
@@ -87,13 +86,21 @@ export default class ExportLauncher extends Component<Props, State> {
   }
   componentDidUpdate(prevProps: Props, prevState: State) {
     this._setupAchievementHook();
+    if (
+      prevState.exportStep !== this.state.exportStep ||
+      prevState.errored !== this.state.errored
+    ) {
+      this.props.setIsNavigationDisabled(
+        this.props.exportPipeline.isNavigationDisabled(
+          this.state.exportStep,
+          this.state.errored
+        )
+      );
+    }
   }
 
   _setupAchievementHook = () => {
-    if (
-      ACHIEVEMENT_FEATURE_FLAG &&
-      this.props.exportPipeline.name.includes('web')
-    ) {
+    if (this.props.exportPipeline.name.includes('web')) {
       this.launchWholeExport = addCreateBadgePreHookIfNotClaimed(
         this.props.authenticatedUser,
         TRIVIAL_FIRST_WEB_EXPORT,
@@ -121,36 +128,60 @@ export default class ExportLauncher extends Component<Props, State> {
       builds: [this.state.build],
       onBuildUpdated: (build: Build) => {
         this.setState({ build });
-        authenticatedUser.onRefreshUserProfile();
+        if (build.status !== 'pending') {
+          authenticatedUser.onRefreshUserProfile();
+        }
       },
     });
   };
 
-  registerAndUpdateGame = async () => {
+  tryUpdateAuthors = async () => {
+    const profile = this.props.authenticatedUser.profile;
+    if (profile) {
+      const authorAcls = getAclsFromUserIds(
+        this.props.project.getAuthorIds().toJSArray()
+      );
+
+      try {
+        await setGameUserAcls(
+          this.props.authenticatedUser.getAuthorizationHeader,
+          profile.id,
+          this.props.project.getProjectUuid(),
+          { author: authorAcls }
+        );
+      } catch (e) {
+        // Best effort call, do not prevent exporting the game.
+        console.error(e);
+      }
+    }
+  };
+
+  registerGameIfNot = async () => {
     const profile = this.props.authenticatedUser.profile;
     const getAuthorizationHeader = this.props.authenticatedUser
       .getAuthorizationHeader;
     const gameId = this.props.project.getProjectUuid();
-    const authorName = this.props.project.getAuthor() || 'Unspecified author';
-    const gameName = this.props.project.getName() || 'Untitled game';
     if (profile) {
       const userId = profile.id;
       try {
+        // Try to fetch the game to see if it's registered but do not do anything with it.
         await getGame(getAuthorizationHeader, userId, gameId);
-        // Update the game details to ensure that it is up to date in GDevelop services.
-        await updateGame(getAuthorizationHeader, userId, {
-          gameId,
-          authorName,
-          gameName,
-        });
       } catch (err) {
         if (err.response.status === 404) {
           // If the game is not registered, register it before launching the export.
-          await registerGame(getAuthorizationHeader, userId, {
+          const authorName =
+            this.props.project.getAuthor() || 'Unspecified publisher';
+          const templateSlug = this.props.project.getTemplateSlug();
+          const gameName = this.props.project.getName() || 'Untitled game';
+          const game = await registerGame(getAuthorizationHeader, userId, {
             gameId,
             authorName,
             gameName,
+            templateSlug,
           });
+          // We don't await for the authors update, as it is not required for publishing.
+          this.tryUpdateAuthors();
+          this.props.onGameUpdated(game);
         }
       }
     }
@@ -167,21 +198,25 @@ export default class ExportLauncher extends Component<Props, State> {
     const getErrorMessage = () => {
       switch (this.state.exportStep) {
         case 'export':
-          return t('Error while preparing the exporter.');
-        case 'resources-download':
           return t('Error while exporting the game.');
-        case 'compress':
+        case 'resources-download':
           return t(
             'Error while downloading the game resources. Check your internet connection and that all resources of the game are valid in the Resources editor.'
           );
-        case 'upload':
+        case 'compress':
           return t('Error while compressing the game.');
-        case 'waiting-for-build':
+        case 'upload':
           return t(
             'Error while uploading the game. Check your internet connection or try again later.'
           );
+        case 'waiting-for-build':
+          return t(
+            'Error while building the game. Check the logs of the build for more details.'
+          );
         case 'build':
-          return t('Error while lauching the build of the game.');
+          return t(
+            'Error while building of the game. Check the logs of the build for more details.'
+          );
         default:
           return t(
             'Error while building the game. Try again later. Your internet connection may be slow or one of your resources may be corrupted.'
@@ -196,8 +231,7 @@ export default class ExportLauncher extends Component<Props, State> {
         });
         showErrorBox({
           message:
-            getErrorMessage() +
-            (err.message ? `\n\nDetails of the error: ${err.message}` : ''),
+            getErrorMessage() + (err.message ? `\n\n${err.message}` : ''),
           rawError: {
             exportStep: this.state.exportStep,
             rawError: err,
@@ -210,10 +244,11 @@ export default class ExportLauncher extends Component<Props, State> {
     const setStep = (step: BuildStep) => this.setState({ exportStep: step });
 
     try {
-      // We do not await for this call, allowing to start building the game in parallel.
-      this.registerAndUpdateGame();
+      setStep('register');
+      // We await for this call, allowing to link the build to the game just registered.
+      await this.registerGameIfNot();
     } catch {
-      // Best effort call, we don't prevent building the game.
+      // But if it fails, we don't prevent building the game.
       console.warn('Error while registering the game - ignoring it.');
     }
 
@@ -258,7 +293,8 @@ export default class ExportLauncher extends Component<Props, State> {
         const build = await launchOnlineBuild(
           this.state.exportState,
           authenticatedUser,
-          uploadBucketKey
+          uploadBucketKey,
+          this.props.project.getProjectUuid()
         );
         setStep('build');
         this.setState({ build }, () => {
@@ -274,11 +310,6 @@ export default class ExportLauncher extends Component<Props, State> {
       console.error('An error happened during export:', error);
       handleError(error);
     }
-  };
-
-  _downloadBuild = (key: BuildArtifactKeyName) => {
-    const url = getBuildArtifactUrl(this.state.build, key);
-    if (url) Window.openExternalURL(url);
   };
 
   _closeDoneFooter = () =>
@@ -304,23 +335,23 @@ export default class ExportLauncher extends Component<Props, State> {
       doneFooterOpen,
       exportState,
     } = this.state;
-    const { project, authenticatedUser, exportPipeline } = this.props;
+    const {
+      project,
+      authenticatedUser,
+      exportPipeline,
+      onSaveProject,
+    } = this.props;
     if (!project) return null;
-
     const getBuildLimit = (authenticatedUser: AuthenticatedUser): ?Limit =>
       authenticatedUser.limits && exportPipeline.onlineBuildType
         ? authenticatedUser.limits[exportPipeline.onlineBuildType]
         : null;
-    const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
-      const buildPending =
-        !errored && exportStep !== '' && exportStep !== 'done';
-      const buildFinished = !errored && exportStep === 'done';
-      if (buildPending || buildFinished) return false;
 
+    const canLaunchBuild = (authenticatedUser: AuthenticatedUser) => {
       const limit: ?Limit = getBuildLimit(authenticatedUser);
       if (limit && limit.limitReached) return false;
 
-      return exportPipeline.canLaunchBuild(exportState);
+      return exportPipeline.canLaunchBuild(exportState, errored, exportStep);
     };
 
     return (
@@ -378,17 +409,19 @@ export default class ExportLauncher extends Component<Props, State> {
           )}
         {authenticatedUser.authenticated &&
           (exportPipeline.renderCustomStepsProgress ? (
-            exportPipeline.renderCustomStepsProgress(
+            exportPipeline.renderCustomStepsProgress({
               build,
-              !!this.state.exportStep && this.state.exportStep !== 'done'
-            )
+              project,
+              onSaveProject,
+              errored,
+              exportStep,
+            })
           ) : (
             <Line expand>
               <BuildStepsProgress
                 exportStep={exportStep}
                 hasBuildStep={!!exportPipeline.onlineBuildType}
                 build={build}
-                onDownload={this._downloadBuild}
                 stepMaxProgress={stepMaxProgress}
                 stepCurrentProgress={stepCurrentProgress}
                 errored={errored}

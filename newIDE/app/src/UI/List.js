@@ -74,6 +74,7 @@ type ListItemProps = {|
   onDoubleClick?: (event: DoubleClickMouseEvent) => void,
   primaryText: ?React.Node,
   secondaryText?: React.Node,
+  disableAutoTranslate?: boolean,
   selected?: boolean,
   autoGenerateNestedIndicator?: boolean, // TODO: Rename?
   renderNestedItems?: () => Array<React$Element<any> | null>,
@@ -96,6 +97,8 @@ type ListItemProps = {|
   ...ListItemRightButtonProps,
 
   secondaryTextLines?: 1 | 2,
+
+  id?: ?string,
 |};
 
 export type ListItemRefType = any; // Should be a material-ui ListIten
@@ -212,6 +215,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
           {...longTouchForContextMenuProps}
           alignItems={props.secondaryTextLines === 2 ? 'flex-start' : undefined}
           ref={ref}
+          id={props.id}
         >
           {props.leftIcon && (
             <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -220,6 +224,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             style={styles.listItemText}
             primary={props.primaryText}
             secondary={props.secondaryText}
+            className={props.disableAutoTranslate ? 'notranslate' : ''}
           />
           {renderListItemSecondaryAction()}
           {props.displayAddIcon && (
@@ -247,6 +252,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
             disabled={props.disabled}
             style={props.style}
             ref={ref}
+            id={props.id}
           >
             {props.leftIcon && (
               <MUIListItemIcon>{props.leftIcon}</MUIListItemIcon>
@@ -255,6 +261,7 @@ export const ListItem = React.forwardRef<ListItemProps, ListItemRefType>(
               style={styles.listItemText}
               primary={props.primaryText}
               secondary={props.secondaryText}
+              className={props.disableAutoTranslate ? 'notranslate' : ''}
             />
             {props.autoGenerateNestedIndicator ? (
               isItemOpen ? (

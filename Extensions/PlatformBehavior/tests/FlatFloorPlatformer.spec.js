@@ -1,4 +1,5 @@
 describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
+  const epsilon = 1 / (2 << 16);
   [0, 60].forEach((slopeMaxAngle) => {
     describe(`(walk on flat floors, slopeMaxAngle: ${slopeMaxAngle}°)`, function () {
       let runtimeScene;
@@ -25,6 +26,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               ignoreDefaultControls: true,
               slopeMaxAngle: slopeMaxAngle,
               jumpSustainTime: 0.2,
+              useLegacyTrajectory: false,
             },
           ],
           effects: [],
@@ -328,6 +330,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
               canGrabPlatforms: true,
               ignoreDefaultControls: true,
               slopeMaxAngle: 60,
+              useLegacyTrajectory: false,
             },
           ],
           effects: [],
@@ -383,7 +386,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       });
 
       it('can track object height changes', function () {
-        //Put the object near the right ledge of the platform.
+        // Put the character near the right ledge of the platform.
         object.setPosition(
           platform.getX() + 10,
           platform.getY() - object.getHeight() + 1
@@ -398,16 +401,19 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           false
         );
         expect(object.getX()).to.be(10);
-        expect(object.getY()).to.be.within(-31, -30); // -30 = -10 (platform y) + -20 (object height)
+        expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
 
+        // Make the platform under the character feet smaller.
         object.setCustomWidthAndHeight(object.getWidth(), 9);
         runtimeScene.renderAndStep(1000 / 60);
         expect(object.getBehavior('auto1').isFalling()).to.be(false);
         expect(object.getBehavior('auto1').isFallingWithoutJumping()).to.be(
           false
         );
+        // The character follows it.
         expect(object.getY()).to.be(-19); // -19 = -10 (platform y) + -9 (object height)
 
+        // The character walks on the platform.
         for (let i = 0; i < 10; ++i) {
           object.getBehavior('auto1').simulateRightKey();
           runtimeScene.renderAndStep(1000 / 60);
@@ -417,10 +423,12 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           );
         }
         expect(object.getY()).to.be(-19);
-        expect(object.getX()).to.be.within(17.638, 17.639);
+        expect(object.getX()).to.be.above(16);
 
+        // Make the platform under the character feet bigger.
         object.setCustomWidthAndHeight(object.getWidth(), 20);
         runtimeScene.renderAndStep(1000 / 60);
+        // The character follows it.
         expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
       });
 
@@ -480,6 +488,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 60,
             jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
           },
         ],
         effects: [],
@@ -612,6 +621,7 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
             ignoreDefaultControls: true,
             slopeMaxAngle: 0,
             jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
           },
         ],
         effects: [],
@@ -690,6 +700,88 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       expect(object.getY()).to.be.within(140.6297999, 140.6298001);
       expect(object.getX()).to.be(6);
+    });
+  });
+
+  [20, 30, 60, 120].forEach((framesPerSecond) => {
+    describe(`(FPS independent trajectory: ${framesPerSecond} fps)`, function () {
+      let runtimeScene;
+      let object;
+
+      beforeEach(function () {
+        runtimeScene = makePlatformerTestRuntimeScene(1000 / framesPerSecond);
+
+        // Put a platformer object on a platform
+        object = new gdjs.TestRuntimeObject(runtimeScene, {
+          name: 'obj1',
+          type: '',
+          behaviors: [
+            {
+              type: 'PlatformBehavior::PlatformerObjectBehavior',
+              name: 'auto1',
+              gravity: 1500,
+              maxFallingSpeed: 1500,
+              acceleration: 500,
+              deceleration: 1500,
+              maxSpeed: 500,
+              jumpSpeed: 900,
+              canGrabPlatforms: true,
+              ignoreDefaultControls: true,
+              slopeMaxAngle: 60,
+              jumpSustainTime: 0.2,
+              useLegacyTrajectory: false,
+            },
+          ],
+          effects: [],
+        });
+        object.setCustomWidthAndHeight(10, 20);
+        runtimeScene.addObject(object);
+      });
+
+      const fallOnPlatform = (maxFrameCount) => {
+        // Ensure the object falls on the platform
+        for (let i = 0; i < maxFrameCount; ++i) {
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+        //Check the object is on the platform
+        expect(object.getBehavior('auto1').isFalling()).to.be(false);
+        expect(object.getBehavior('auto1').isMoving()).to.be(false);
+      };
+
+      it('can walk', function () {
+        const platform = addPlatformObject(runtimeScene);
+        platform.setPosition(0, -10);
+        platform.setCustomWidthAndHeight(600, 32);
+
+        object.setPosition(0, -32);
+        // Ensure the object falls on the platform
+        fallOnPlatform(10);
+        expect(object.getY()).to.be(-30);
+
+        // Accelerate
+        for (let i = 0; i < framesPerSecond; ++i) {
+          object.getBehavior('auto1').simulateRightKey();
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // Reached the maximum speed
+        expect(object.getX()).to.be.within(250 - epsilon, 250 + epsilon);
+        expect(object.getY()).to.be(platform.getY() - object.getHeight());
+        expect(object.getBehavior('auto1').getCurrentSpeed()).to.be.within(
+          500 - epsilon,
+          500 + epsilon
+        );
+
+        // Decelerate
+        for (let i = 0; i < framesPerSecond / 3; ++i) {
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+
+        // Stopped
+        expect(object.getX()).to.be.within(333, 334);
+        expect(object.getY()).to.be(platform.getY() - object.getHeight());
+        expect(object.getBehavior('auto1').getCurrentSpeed()).to.be(0);
+      });
     });
   });
 });

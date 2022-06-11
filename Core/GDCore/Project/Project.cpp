@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SFML/System/Utf.hpp>
 #include <cctype>
 #include <fstream>
 #include <map>
@@ -52,6 +51,7 @@ Project::Project()
     : name(_("Project")),
       version("1.0.0"),
       packageName("com.example.gamename"),
+      templateSlug(""),
       orientation("landscape"),
       folderProject(false),
       windowWidth(800),
@@ -66,6 +66,9 @@ Project::Project()
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       useExternalSourceFiles(false),
+      isPlayableWithKeyboard(false),
+      isPlayableWithGamepad(false),
+      isPlayableWithMobile(false),
       currentPlatform(NULL),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
@@ -495,6 +498,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   const SerializerElement& propElement =
       element.GetChild("properties", 0, "Info");
   SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
+  SetDescription(propElement.GetChild("description", 0).GetValue().GetString());
   SetVersion(propElement.GetStringAttribute("version", "1.0.0"));
   SetGameResolutionSize(
       propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt(),
@@ -513,6 +517,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
+  SetTemplateSlug(propElement.GetStringAttribute("templateSlug"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
@@ -533,6 +538,27 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   authorIdsElement.ConsiderAsArray();
   for (std::size_t i = 0; i < authorIdsElement.GetChildrenCount(); ++i) {
     authorIds.push_back(authorIdsElement.GetChild(i).GetStringValue());
+  }
+
+  categories.clear();
+  auto& categoriesElement = propElement.GetChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < categoriesElement.GetChildrenCount(); ++i) {
+    categories.push_back(categoriesElement.GetChild(i).GetStringValue());
+  }
+
+  auto& playableDevicesElement = propElement.GetChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  for (std::size_t i = 0; i < playableDevicesElement.GetChildrenCount(); ++i) {
+    const auto& playableDevice =
+        playableDevicesElement.GetChild(i).GetStringValue();
+    if (playableDevice == "keyboard") {
+      isPlayableWithKeyboard = true;
+    } else if (playableDevice == "gamepad") {
+      isPlayableWithGamepad = true;
+    } else if (playableDevice == "mobile") {
+      isPlayableWithMobile = true;
+    }
   }
 
   // Compatibility with GD <= 5.0.0-beta101
@@ -634,6 +660,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         layoutElement.GetStringAttribute("name", "", "nom"), -1);
     layout.UnserializeFrom(*this, layoutElement);
   }
+  SetFirstLayout(element.GetChild("firstLayout").GetStringValue());
 
   externalEvents.clear();
   const SerializerElement& externalEventsElement =
@@ -703,6 +730,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   SerializerElement& propElement = element.AddChild("properties");
   propElement.AddChild("name").SetValue(GetName());
+  propElement.AddChild("description").SetValue(GetDescription());
   propElement.SetAttribute("version", GetVersion());
   propElement.AddChild("author").SetValue(GetAuthor());
   propElement.AddChild("windowWidth").SetValue(GetGameResolutionWidth());
@@ -721,6 +749,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
+  propElement.SetAttribute("templateSlug", templateSlug);
   propElement.SetAttribute("orientation", orientation);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
@@ -731,6 +760,24 @@ void Project::SerializeTo(SerializerElement& element) const {
   authorIdsElement.ConsiderAsArray();
   for (const auto& authorId : authorIds) {
     authorIdsElement.AddChild("").SetStringValue(authorId);
+  }
+
+  auto& categoriesElement = propElement.AddChild("categories");
+  categoriesElement.ConsiderAsArray();
+  for (const auto& category : categories) {
+    categoriesElement.AddChild("").SetStringValue(category);
+  }
+
+  auto& playableDevicesElement = propElement.AddChild("playableDevices");
+  playableDevicesElement.ConsiderAsArray();
+  if (isPlayableWithKeyboard) {
+    playableDevicesElement.AddChild("").SetStringValue("keyboard");
+  }
+  if (isPlayableWithGamepad) {
+    playableDevicesElement.AddChild("").SetStringValue("gamepad");
+  }
+  if (isPlayableWithMobile) {
+    playableDevicesElement.AddChild("").SetStringValue("mobile");
   }
 
   // Compatibility with GD <= 5.0.0-beta101
@@ -908,6 +955,9 @@ Project& Project::operator=(const Project& other) {
 
 void Project::Init(const gd::Project& game) {
   name = game.name;
+  categories = game.categories;
+  description = game.description;
+  firstLayout = game.firstLayout;
   version = game.version;
   windowWidth = game.windowWidth;
   windowHeight = game.windowHeight;
@@ -923,7 +973,11 @@ void Project::Init(const gd::Project& game) {
 
   author = game.author;
   authorIds = game.authorIds;
+  isPlayableWithKeyboard = game.isPlayableWithKeyboard;
+  isPlayableWithGamepad = game.isPlayableWithGamepad;
+  isPlayableWithMobile = game.isPlayableWithMobile;
   packageName = game.packageName;
+  templateSlug = game.templateSlug;
   orientation = game.orientation;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;

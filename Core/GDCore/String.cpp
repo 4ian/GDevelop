@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <string.h>
 
-#include <SFML/System/String.hpp>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8/utf8proc.h"
 
@@ -28,11 +27,6 @@ String::String(const char *characters) : m_string()
     *this = characters;
 }
 
-String::String(const sf::String &string) : m_string()
-{
-    *this = string;
-}
-
 String::String(const std::u32string &string) : m_string()
 {
     *this = string;
@@ -41,26 +35,6 @@ String::String(const std::u32string &string) : m_string()
 String& String::operator=(const char *characters)
 {
     m_string = std::string(characters);
-    return *this;
-}
-
-String& String::operator=(const sf::String &string)
-{
-    m_string.clear();
-
-    //In theory, an UTF8 character can be up to 6 bytes (even if in the current Unicode standard,
-    //the last character is 4 bytes long when encoded in UTF8).
-    //So, reserve the maximum possible size to avoid reallocations.
-    m_string.reserve( string.getSize() * 6 );
-
-    //Push_back all characters inside the string.
-    for( sf::String::ConstIterator it = string.begin(); it != string.end(); ++it )
-    {
-        push_back( *it );
-    }
-
-    m_string.shrink_to_fit();
-
     return *this;
 }
 
@@ -112,7 +86,7 @@ String::const_iterator String::end() const
 String String::FromLocale( const std::string &localizedString )
 {
 #if defined(WINDOWS)
-    return FromSfString(sf::String(localizedString)); //Don't need to use the current locale, on Windows, std::locale is always the C locale
+    return FromUTF8(localizedString); //Don't need to use the current locale, on Windows, std::locale is always the C locale
 #elif defined(MACOS)
     return FromUTF8(localizedString); //Assume UTF8 is the current locale
 #elif defined(EMSCRIPTEN)
@@ -124,7 +98,7 @@ String String::FromLocale( const std::string &localizedString )
        std::locale("").name().find("UTF8") != std::string::npos)
         return FromUTF8(localizedString); //UTF8 is already the current locale
     else
-        return FromSfString(sf::String(localizedString, std::locale(""))); //Use the current locale (std::locale("")) for conversion
+        return FromUTF8(localizedString); //Use the current locale (std::locale("")) for conversion
 #endif
 }
 
@@ -134,11 +108,6 @@ String String::FromUTF32( const std::u32string &string )
     str = string; //operator=(const std::u32string&)
 
     return str;
-}
-
-String String::FromSfString( const sf::String &sfString )
-{
-    return String(sfString);
 }
 
 String String::FromUTF8( const std::string &utf8Str )
@@ -164,7 +133,7 @@ String String::FromWide( const std::wstring &wstr )
 std::string String::ToLocale() const
 {
 #if defined(WINDOWS)
-    return ToSfString().toAnsiString();
+    return m_string;
 #elif defined(MACOS)
     return m_string;
 #elif defined(EMSCRIPTEN)
@@ -176,7 +145,7 @@ std::string String::ToLocale() const
        std::locale("").name().find("UTF8") != std::string::npos)
         return m_string; //UTF8 is already the current locale on Linux
     else
-        return ToSfString().toAnsiString(std::locale("")); //Use the current locale for conversion
+        return m_string; //Use the current locale for conversion
 #endif
 }
 
@@ -189,20 +158,6 @@ std::u32string String::ToUTF32() const
     }
 
     return u32str;
-}
-
-sf::String String::ToSfString() const
-{
-    sf::String str;
-    for(const_iterator it = begin(); it != end(); ++it)
-        str += sf::String(static_cast<sf::Uint32>(*it));
-
-    return str;
-}
-
-String::operator sf::String() const
-{
-    return ToSfString();
 }
 
 std::string String::ToUTF8() const
@@ -667,7 +622,7 @@ int String::compare( const String &other ) const
 namespace priv
 {
     /**
-     * As the the casefolded version of a string can have a different size, the positions
+     * As the casefolded version of a string can have a different size, the positions
      * in the two versions of the string are not the same.
      * \return where the **pos** position in the original string **str** is in the
      * casefolded version of **str**
@@ -681,7 +636,7 @@ namespace priv
     }
 
     /**
-     * As the the casefolded version of a string can have a different size, the positions
+     * As the casefolded version of a string can have a different size, the positions
      * in the two versions of the string are not the same.
      * \return where the **pos** position in the casefolded string of **str** is in the
      * original version **str**

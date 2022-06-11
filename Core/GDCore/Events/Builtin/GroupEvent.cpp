@@ -27,6 +27,13 @@ vector<gd::String> GroupEvent::GetAllSearchableStrings() const {
   return allSearchableStrings;
 }
 
+bool GroupEvent::ReplaceAllSearchableStrings(
+    std::vector<gd::String> newSearchableString) {
+  if (newSearchableString[0] == name) return false;
+  SetName(newSearchableString[0]);
+  return true;
+}
+
 void GroupEvent::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("source", source);
@@ -68,6 +75,5 @@ void GroupEvent::SetBackgroundColor(unsigned int colorR_,
   colorG = colorG_;
   colorB = colorB_;
 }
-
 
 }  // namespace gd

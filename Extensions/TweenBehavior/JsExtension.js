@@ -77,19 +77,22 @@ module.exports = {
 
     extension
       .addExpression(
-        'Interpolate',
-        _('Interpolate with easing'),
-        _('Interpolates a value using tweens'),
-        _('Scene Tweens'),
-        'JsPlatform/Extensions/tween_behavior24.png'
+        'Ease',
+        _('Ease'),
+        _('Tween between 2 values according to an easing function.'),
+        '',
+        'JsPlatform/Extensions/tween_behavior32.png'
       )
-      .addParameter('expression', 'Initial value', '', false)
-      .addParameter('expression', 'Final value', '', false)
-      .addParameter('expression', 'Interpolation position (from 0 to 1)', '', false)
-      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
+      .setDefaultValue('linear')
+      .addParameter('expression', _('From value'))
+      .addParameter('expression', _('To value'))
+      .addParameter('expression', _('Weighting'))
+      .setParameterLongDescription(_('From 0 to 1.'))
       .getCodeExtraInformation()
-      .setIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.interpolate');
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.ease');
 
     extension
       .addAction(
@@ -284,7 +287,7 @@ module.exports = {
         _('Tween'),
         'Tween',
         _(
-          'Smoothly animate position, angle, scale and other properties of the object.'
+          'Smoothly animate position, angle, scale and other properties of objects.'
         ),
         '',
         'JsPlatform/Extensions/tween_behavior32.png',

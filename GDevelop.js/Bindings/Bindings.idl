@@ -39,6 +39,11 @@ interface VectorDependencyMetadata {
     [Const, Ref] DependencyMetadata at(unsigned long index);
 };
 
+interface VectorInt {
+    unsigned long size();
+    long at(unsigned long index);
+};
+
 interface VectorVariable {
     unsigned long size();
     [Const] Variable WRAPPED_at(unsigned long index);
@@ -130,6 +135,13 @@ interface EventsVariablesFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface InstructionOrExpressionGroupMetadata {
+    void InstructionOrExpressionGroupMetadata();
+
+    [Ref] InstructionOrExpressionGroupMetadata SetIcon([Const] DOMString icon);
+    [Const, Ref] DOMString GetIcon();
+};
+
 interface VersionWrapper {
     long STATIC_Major();
     long STATIC_Minor();
@@ -148,6 +160,7 @@ interface Platform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -164,6 +177,7 @@ interface JsPlatform {
     [Const, Value] DOMString GetFullName();
     [Const, Value] DOMString GetSubtitle();
     [Const, Value] DOMString GetDescription();
+    [Const, Ref] InstructionOrExpressionGroupMetadata GetInstructionOrExpressionGroupMetadata([Const] DOMString name);
     boolean IsExtensionLoaded([Const] DOMString name);
     void RemoveExtension([Const] DOMString name);
     void ReloadBuiltinExtensions();
@@ -200,6 +214,8 @@ interface Variable {
     double GetValue();
     void SetBool([Const] boolean val);
     boolean GetBool();
+    void SetFolded(boolean val);
+    boolean IsFolded();
 
     unsigned long GetChildrenCount();
     boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
@@ -215,6 +231,9 @@ interface Variable {
     [Ref] Variable PushNew();
     void RemoveAtIndex([Const] unsigned long index);
     [Const, Ref] VectorVariable GetAllChildrenArray();
+    void MoveChildInArray([Const] unsigned long oldIndex, [Const] unsigned long newIndex);
+    boolean InsertAtIndex([Const, Ref] Variable variable, [Const] unsigned long index);
+    boolean InsertChild([Const] DOMString name, [Const, Ref] Variable variable);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -350,13 +369,24 @@ interface Project {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    [Ref] VectorString GetCategories();
+    void SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
     void SetVersion([Const] DOMString authorName);
     [Const, Ref] DOMString GetVersion();
     void SetAuthor([Const] DOMString authorName);
     [Const, Ref] DOMString GetAuthor();
     [Ref] VectorString GetAuthorIds();
+    boolean IsPlayableWithKeyboard();
+    void SetPlayableWithKeyboard(boolean playable);
+    boolean IsPlayableWithGamepad();
+    void SetPlayableWithGamepad(boolean playable);
+    boolean IsPlayableWithMobile();
+    void SetPlayableWithMobile(boolean playable);
     void SetPackageName([Const] DOMString packageName);
     [Const, Ref] DOMString GetPackageName();
+    void SetTemplateSlug([Const] DOMString templateSlug);
+    [Const, Ref] DOMString GetTemplateSlug();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
     void SetProjectUuid([Const] DOMString projectUuid);
@@ -524,6 +554,8 @@ interface gdObject {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetAssetStoreId([Const] DOMString assetStoreId);
+    [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
     void SetTags([Const] DOMString tags);
@@ -700,6 +732,7 @@ interface EffectsContainer {
   void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
   void RemoveEffect([Const] DOMString name);
   void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+  void MoveEffect(unsigned long oldIndex, unsigned long newIndex);
 
   void SerializeTo([Ref] SerializerElement element);
   void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -743,6 +776,8 @@ interface PropertyDescriptor {
     [Const, Ref] DOMString GetLabel();
     [Ref] PropertyDescriptor SetDescription([Const] DOMString label);
     [Const, Ref] DOMString GetDescription();
+    [Ref] PropertyDescriptor SetGroup([Const] DOMString label);
+    [Const, Ref] DOMString GetGroup();
     [Ref] PropertyDescriptor AddExtraInfo([Const] DOMString type);
     [Ref] PropertyDescriptor SetExtraInfo([Const, Ref] VectorString info);
     [Ref] VectorString GetExtraInfo();
@@ -1043,10 +1078,15 @@ interface Instruction {
     void SetInverted(boolean inverted);
     boolean IsInverted();
     void SetParameter(unsigned long id, [Const] DOMString value);
-    [Const, Ref] DOMString GetParameter(unsigned long id);
+    [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
     unsigned long GetParametersCount();
     [Ref] InstructionsList GetSubInstructions();
+};
+
+interface Expression {
+  [Const, Ref] DOMString GetPlainString();
+  ExpressionNode GetRootNode();
 };
 
 interface VectorPairStringTextFormatting {
@@ -1073,6 +1113,7 @@ interface ExtraInformation {
     [Ref] ExtraInformation SetMutators([Const, Ref] MapStringString mutators);
     [Ref] ExtraInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExtraInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionCodeGenerationInformation {
@@ -1080,6 +1121,7 @@ interface ExpressionCodeGenerationInformation {
     [Ref] ExpressionCodeGenerationInformation SetStatic();
     [Ref] ExpressionCodeGenerationInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExpressionCodeGenerationInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface InstructionMetadata {
@@ -1099,11 +1141,13 @@ interface InstructionMetadata {
     long GetUsageComplexity();
     boolean IsHidden();
     boolean IsPrivate();
+    boolean IsAsync();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
     [Ref] InstructionMetadata SetPrivate();
+    [Ref] InstructionMetadata SetAsync();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -1116,6 +1160,9 @@ interface InstructionMetadata {
 
     [Ref] InstructionMetadata UseStandardOperatorParameters([Const] DOMString type);
     [Ref] InstructionMetadata UseStandardRelationalOperatorParameters([Const] DOMString type);
+
+    [Ref] InstructionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] InstructionMetadata MarkAsSimple();
     [Ref] InstructionMetadata MarkAsAdvanced();
@@ -1156,6 +1203,9 @@ interface ExpressionMetadata {
         [Const] DOMString type, [Const] DOMString supplementaryInformation);
     [Ref] ExpressionMetadata SetDefaultValue([Const] DOMString defaultValue);
     [Ref] ExpressionMetadata SetParameterLongDescription([Const] DOMString longDescription);
+
+    [Ref] ExpressionMetadata SetRequiresBaseObjectCapability([Const] DOMString capability);
+    [Const, Ref] DOMString GetRequiredBaseObjectCapability();
 
     [Ref] ExpressionCodeGenerationInformation GetCodeExtraInformation();
 };
@@ -1226,6 +1276,7 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+    boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1259,6 +1310,9 @@ interface ObjectMetadata {
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetIconFilename();
     [Const, Ref] DOMString GetHelpPath();
+    [Const, Ref] DOMString GetCategoryFullName();
+
+    [Ref] ObjectMetadata SetCategoryFullName([Const] DOMString categoryFullName);
 
     [Const, Ref] InstructionMetadata AddScopedCondition([Const] DOMString name,
                                         [Const] DOMString fullname,
@@ -1324,8 +1378,17 @@ interface ObjectMetadata {
                                         [Const] DOMString group,
                                         [Const] DOMString icon);
 
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+
     [Ref] ObjectMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] ObjectMetadata AddIncludeFile([Const] DOMString includeFile);
+
+    [Const, Ref] SetString GetUnsupportedBaseObjectCapabilities();
+    [Ref] ObjectMetadata AddUnsupportedBaseObjectCapability([Const] DOMString capability);
+    boolean IsUnsupportedBaseObjectCapability([Const] DOMString capability);
 };
 
 interface BehaviorMetadata {
@@ -1414,6 +1477,11 @@ interface BehaviorMetadata {
         [Const] DOMString newExpressionName,
         [Const] DOMString copiedExpressionName);
 
+    [Ref] MapStringInstructionMetadata GetAllActions();
+    [Ref] MapStringInstructionMetadata GetAllConditions();
+    [Ref] MapStringExpressionMetadata GetAllExpressions();
+    [Ref] MapStringExpressionMetadata GetAllStrExpressions();
+
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
 
@@ -1456,6 +1524,8 @@ interface PlatformExtension {
                                 [Const] DOMString license);
     [Ref] PlatformExtension SetExtensionHelpPath([Const] DOMString helpPath);
     [Ref] PlatformExtension SetIconUrl([Const] DOMString iconUrl);
+    [Ref] PlatformExtension SetCategory([Const] DOMString category);
+    [Ref] InstructionOrExpressionGroupMetadata AddInstructionOrExpressionGroupMetadata([Const] DOMString name);
     void MarkAsDeprecated();
 
     [Value] MultipleInstructionMetadata AddExpressionAndCondition(
@@ -1528,6 +1598,7 @@ interface PlatformExtension {
 
     [Const, Ref] DOMString GetFullName();
     [Const, Ref] DOMString GetName();
+    [Const, Ref] DOMString GetCategory();
     [Const, Ref] DOMString GetDescription();
     [Const, Ref] DOMString GetAuthor();
     [Const, Ref] DOMString GetLicense();
@@ -1847,6 +1918,8 @@ interface EventsRemover {
 
 interface EventsListUnfolder {
     void STATIC_UnfoldWhenContaining([Ref] EventsList list, [Const, Ref] BaseEvent eventToContain);
+    void STATIC_FoldAll([Ref] EventsList list);
+    void STATIC_UnfoldToLevel([Ref] EventsList list, [Const] unsigned long maxLevel, [Const] optional unsigned long currentLevel = 0);
 };
 
 interface EventsSearchResult {
@@ -1872,7 +1945,7 @@ interface VectorEventsSearchResult {
 interface EventsRefactorer {
     void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
     void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString name);
-    void STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions);
+    [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
 
@@ -2020,7 +2093,7 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator();
+    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetErrors();
 
@@ -2054,7 +2127,7 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
@@ -2070,9 +2143,9 @@ interface UniquePtrExpressionNode {
 };
 
 interface ExpressionParser2 {
-    void ExpressionParser2([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer);
+    void ExpressionParser2();
 
-    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString type, [Const] DOMString expression);
+    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString expression);
 };
 
 enum EventsFunction_FunctionType {
@@ -2190,6 +2263,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsFunctionsExtension SetCategory([Const] DOMString category);
+    [Const, Ref] DOMString GetCategory();
     [Ref] VectorString GetTags();
     [Ref] VectorString GetAuthorIds();
     [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
@@ -2200,6 +2275,10 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetIconUrl();
     [Ref] EventsFunctionsExtension SetHelpPath([Const] DOMString helpPath);
     [Const, Ref] DOMString GetHelpPath();
+    void SetOrigin([Const] DOMString originName, [Const] DOMString originIdentifier);
+    [Const, Ref] DOMString GetOriginName();
+    [Const, Ref] DOMString GetOriginIdentifier();
+
 
     [Ref] DependencyMetadata AddDependency();
     void RemoveDependencyAt(unsigned long index);
@@ -2259,6 +2338,15 @@ interface ArbitraryEventsWorker {
 interface EventsParametersLister {
     void EventsParametersLister([Ref] Project project);
     [Const, Ref] MapStringString GetParametersAndTypes();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsPositionFinder {
+    void EventsPositionFinder();
+    [Value] VectorInt GetPositions();
+    void AddEventToSearch(BaseEvent event);
 
     //Inherited from ArbitraryEventsWorker
     void Launch([Ref] EventsList events);
@@ -2429,6 +2517,7 @@ interface Direction {
     boolean IsLooping();
     void SetLoop(boolean enable);
     float GetTimeBetweenFrames();
+    [Const, Ref] VectorString GetSpriteNames();
     void SetTimeBetweenFrames(float time);
     void SwapSprites(unsigned long first, unsigned long second);
     void MoveSprite(unsigned long oldIndex, unsigned long newIndex);
@@ -2470,7 +2559,6 @@ interface SpriteObject {
 };
 SpriteObject implements gdObject;
 
-[Prefix="sf::"]
 interface Vector2f {
     void Vector2f();
 
@@ -2486,6 +2574,7 @@ interface VectorVector2f {
     [Ref] Vector2f at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] Vector2f pt);
     void FREE_removeFromVectorVector2f(unsigned long index);
+    void FREE_moveVector2fInVector(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 
@@ -2719,6 +2808,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
+    [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
 };
 
 [Prefix="gdjs::"]

@@ -6,10 +6,11 @@ import { Trans, t } from '@lingui/macro';
 import Language from '@material-ui/icons/Language';
 import ForumIcon from '@material-ui/icons/Forum';
 import HelpIcon from '@material-ui/icons/Help';
+import AddCircleOutline from '@material-ui/icons/AddCircleOutline';
 
 import FlatButton from '../../../UI/FlatButton';
 import IconButton from '../../../UI/IconButton';
-import { Line, Spacer } from '../../../UI/Grid';
+import { LargeSpacer, Line, Column, Spacer } from '../../../UI/Grid';
 import RaisedButton from '../../../UI/RaisedButton';
 import Carousel from '../../../UI/Carousel';
 import { ResponsiveLineStackLayout } from '../../../UI/Layout';
@@ -28,23 +29,20 @@ import UserChip from '../../../UI/User/UserChip';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from '../../../AssetStore/ExampleStore/ExampleDialog';
-import optionalRequire from '../../../Utils/OptionalRequire';
-import { findEmptyPathInDefaultFolder } from '../../../ProjectCreation/LocalPathFinder';
 import ProjectPreCreationDialog from '../../../ProjectCreation/ProjectPreCreationDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
+  type ProjectCreationSettings,
 } from '../../../ProjectCreation/CreateProjectDialog';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
-import generateName from '../../../Utils/ProjectNameGenerator';
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
-
+import optionalRequire from '../../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
 
 const styles = {
   container: {
@@ -112,13 +110,6 @@ const prepareTutorials = (tutorials: Array<Tutorial>) =>
     };
   });
 
-const betweenCarouselSpacerCount = 6;
-
-const renderBetweenCarouselSpace = (offset: number = 0) =>
-  Array(betweenCarouselSpacerCount)
-    .fill(0)
-    .map((e, index) => <Spacer key={`spacer${index + offset}`} />);
-
 export const HomePage = React.memo<Props>(
   React.forwardRef<Props, HomePageEditorInterface>(
     (
@@ -161,7 +152,6 @@ export const HomePage = React.memo<Props>(
       }));
 
       const windowWidth = useResponsiveWindowWidth();
-      const [newProjectName, setNewProjectName] = React.useState<string>('');
       const authenticatedUser = React.useContext(AuthenticatedUserContext);
       const { getRecentProjectFiles } = React.useContext(PreferencesContext);
       const {
@@ -194,7 +184,6 @@ export const HomePage = React.memo<Props>(
         ]
       );
 
-      const [outputPath, setOutputPath] = React.useState<string>('');
       const [
         preCreationDialogOpen,
         setPreCreationDialogOpen,
@@ -261,15 +250,10 @@ export const HomePage = React.memo<Props>(
         []
       );
 
-      const openPreCreationDialog = React.useCallback((open: boolean) => {
-        if (open) {
-          setOutputPath(app ? findEmptyPathInDefaultFolder(app) : '');
-          setNewProjectName(generateName());
-        }
-        setPreCreationDialogOpen(open);
-      }, []);
-
-      const createProject = async (i18n: I18nType) => {
+      const createProject = async (
+        i18n: I18nType,
+        settings: ProjectCreationSettings
+      ) => {
         setIsOpening(true);
 
         try {
@@ -278,23 +262,24 @@ export const HomePage = React.memo<Props>(
           if (selectedExample) {
             projectMetadata = await onCreateFromExampleShortHeader({
               i18n,
-              outputPath,
-              projectName: newProjectName,
               exampleShortHeader: selectedExample,
+              settings,
             });
           } else {
             projectMetadata = await onCreateBlank({
               i18n,
-              outputPath,
-              projectName: newProjectName,
+              settings,
             });
           }
 
           if (!projectMetadata) return;
 
-          openPreCreationDialog(false);
+          setPreCreationDialogOpen(false);
           setSelectedExample(null);
-          onOpenProjectAfterCreation({ ...projectMetadata });
+          onOpenProjectAfterCreation({
+            ...projectMetadata,
+            templateSlug: selectedExample ? selectedExample.slug : undefined,
+          });
         } finally {
           setIsOpening(false);
         }
@@ -325,19 +310,20 @@ export const HomePage = React.memo<Props>(
                           noColumnMargin
                         >
                           {!project && (
-                            <FlatButton
+                            <RaisedButton
+                              primary
                               label={<Trans>Create a blank project</Trans>}
                               onClick={() => {
-                                openPreCreationDialog(true);
+                                setPreCreationDialogOpen(true);
                               }}
-                              primary
+                              icon={<AddCircleOutline />}
+                              id="home-create-blank-project-button"
                             />
                           )}
                           {!project && canOpen && (
                             <RaisedButtonWithSplitMenu
                               label={<Trans>Open a project</Trans>}
                               onClick={onOpen}
-                              primary
                               buildMenuTemplate={
                                 buildRecentProjectFilesMenuTemplate
                               }
@@ -356,6 +342,7 @@ export const HomePage = React.memo<Props>(
                                 onClick={() => {
                                   onCloseProject();
                                 }}
+                                id="home-close-project-button"
                               />
                             </>
                           )}
@@ -363,10 +350,11 @@ export const HomePage = React.memo<Props>(
                       </ResponsiveLineStackLayout>
                     </div>
                     <Carousel
-                      title={<Trans>Start from a template</Trans>}
+                      title={<Trans>Start from an example</Trans>}
                       items={examples ? prepareExamples(examples) : null}
                       displayItemTitles
                       onBrowseAllClick={onOpenExamples}
+                      browseAllLabel={<Trans>More examples</Trans>}
                       error={
                         exampleLoadingError && (
                           <>
@@ -381,12 +369,13 @@ export const HomePage = React.memo<Props>(
                         )
                       }
                     />
-                    {renderBetweenCarouselSpace()}
+                    <LargeSpacer />
                     <Carousel
-                      title={<Trans>Our latest tutorials</Trans>}
+                      title={<Trans>Learn game making</Trans>}
                       items={tutorials ? prepareTutorials(tutorials) : null}
                       displayItemTitles={false}
                       onBrowseAllClick={onOpenTutorials}
+                      browseAllLabel={<Trans>All tutorials</Trans>}
                       error={
                         tutorialLoadingError && (
                           <>
@@ -401,16 +390,25 @@ export const HomePage = React.memo<Props>(
                         )
                       }
                     />
-                    {renderBetweenCarouselSpace(betweenCarouselSpacerCount)}
+                    <LargeSpacer />
                     <Carousel
-                      title={<Trans>Games Showcase</Trans>}
+                      title={<Trans>Games made by the community</Trans>}
                       items={
                         showcasedGames
                           ? prepareShowcasedGames(showcasedGames)
                           : null
                       }
                       displayItemTitles
+                      additionalAction={
+                        <RaisedButton
+                          label={<Trans>Play on Liluo.io</Trans>}
+                          onClick={() =>
+                            Window.openExternalURL('https://liluo.io')
+                          }
+                        />
+                      }
                       onBrowseAllClick={onOpenGamesShowcase}
+                      browseAllLabel={<Trans>Browse all</Trans>}
                       error={
                         showcaseLoadingError && (
                           <>
@@ -426,89 +424,104 @@ export const HomePage = React.memo<Props>(
                       }
                     />
                   </div>
-                  <Line noMargin>
-                    <ResponsiveLineStackLayout
-                      alignItems="center"
-                      justifyContent="space-between"
-                      expand
-                    >
+                  <Column expand justifyContent="flex-end">
+                    <Line noMargin>
                       <ResponsiveLineStackLayout
                         noMargin
-                        justifyContent="center"
-                      >
-                        <FlatButton
-                          icon={<ForumIcon />}
-                          label={<Trans>Community Forums</Trans>}
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://forum.gdevelop-app.com'
-                            )
-                          }
-                        />
-                        <FlatButton
-                          icon={<HelpIcon />}
-                          label={<Trans>Help and documentation</Trans>}
-                          onClick={onOpenHelpFinder}
-                        />
-                      </ResponsiveLineStackLayout>
-                      <Line
-                        noMargin
                         alignItems="center"
-                        justifyContent="center"
+                        justifyContent="space-between"
+                        expand
                       >
-                        <IconButton
-                          className="icon-youtube"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://www.youtube.com/c/GDevelopApp'
-                            )
-                          }
-                          tooltip={t`Tutorials on YouTube`}
-                        />
-                        <IconButton
-                          className="icon-discord"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://discord.gg/gdevelop'
-                            )
-                          }
-                          tooltip={t`GDevelop on Discord`}
-                        />
-                        <IconButton
-                          className="icon-reddit"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://www.reddit.com/r/gdevelop'
-                            )
-                          }
-                          tooltip={t`GDevelop on Reddit`}
-                        />
-                        <IconButton
-                          className="icon-twitter"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://twitter.com/GDevelopApp'
-                            )
-                          }
-                          tooltip={t`GDevelop on Twitter`}
-                        />
-                        <IconButton
-                          className="icon-facebook"
-                          onClick={() =>
-                            Window.openExternalURL(
-                              'https://www.facebook.com/GDevelopApp'
-                            )
-                          }
-                          tooltip={t`GDevelop on Facebook`}
-                        />
-                        <FlatButton
-                          label={i18n.language}
-                          onClick={onOpenLanguageDialog}
-                          icon={<Language />}
-                        />
-                      </Line>
-                    </ResponsiveLineStackLayout>
-                  </Line>
+                        <ResponsiveLineStackLayout
+                          noMargin
+                          justifyContent="center"
+                        >
+                          <FlatButton
+                            icon={<ForumIcon />}
+                            label={<Trans>Community Forums</Trans>}
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://forum.gdevelop.io'
+                              )
+                            }
+                          />
+                          <FlatButton
+                            icon={<HelpIcon />}
+                            label={<Trans>Help and documentation</Trans>}
+                            onClick={onOpenHelpFinder}
+                          />
+                          {!electron && (
+                            <RaisedButton
+                              label={
+                                <Trans>Download the full desktop version</Trans>
+                              }
+                              onClick={() =>
+                                Window.openExternalURL(
+                                  'https://gdevelop.io/download'
+                                )
+                              }
+                            />
+                          )}
+                        </ResponsiveLineStackLayout>
+                        <Line
+                          noMargin
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <IconButton
+                            className="icon-youtube"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://www.youtube.com/c/GDevelopApp'
+                              )
+                            }
+                            tooltip={t`Tutorials on YouTube`}
+                          />
+                          <IconButton
+                            className="icon-discord"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://discord.gg/gdevelop'
+                              )
+                            }
+                            tooltip={t`GDevelop on Discord`}
+                          />
+                          <IconButton
+                            className="icon-reddit"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://www.reddit.com/r/gdevelop'
+                              )
+                            }
+                            tooltip={t`GDevelop on Reddit`}
+                          />
+                          <IconButton
+                            className="icon-twitter"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://twitter.com/GDevelopApp'
+                              )
+                            }
+                            tooltip={t`GDevelop on Twitter`}
+                          />
+                          <IconButton
+                            className="icon-facebook"
+                            onClick={() =>
+                              Window.openExternalURL(
+                                'https://www.facebook.com/GDevelopApp'
+                              )
+                            }
+                            tooltip={t`GDevelop on Facebook`}
+                          />
+                          <FlatButton
+                            label={i18n.language}
+                            onClick={onOpenLanguageDialog}
+                            icon={<Language />}
+                          />
+                        </Line>
+                      </ResponsiveLineStackLayout>
+                    </Line>
+                  </Column>
                 </div>
               </ScrollBackground>
               {selectedShowcasedGame && (
@@ -524,7 +537,7 @@ export const HomePage = React.memo<Props>(
                   onClose={() => setSelectedExample(null)}
                   exampleShortHeader={selectedExample}
                   onOpen={() => {
-                    openPreCreationDialog(true);
+                    setPreCreationDialogOpen(true);
                   }}
                 />
               )}
@@ -532,12 +545,8 @@ export const HomePage = React.memo<Props>(
                 <ProjectPreCreationDialog
                   open
                   isOpening={isOpening}
-                  onClose={() => openPreCreationDialog(false)}
-                  onCreate={() => createProject(i18n)}
-                  outputPath={electron ? outputPath : undefined}
-                  onChangeOutputPath={electron ? setOutputPath : undefined}
-                  projectName={newProjectName}
-                  onChangeProjectName={setNewProjectName}
+                  onClose={() => setPreCreationDialogOpen(false)}
+                  onCreate={options => createProject(i18n, options)}
                 />
               )}
             </>

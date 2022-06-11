@@ -31,6 +31,7 @@ const untransformedPaths = [
   'GDJS/Runtime/libs/rbush.js',
 
   // Extensions pre-built files:
+  'Extensions/Leaderboards/sha256.js',
   'Extensions/Firebase/A_firebasejs',
   'Extensions/BBText/pixi-multistyle-text/dist',
   'Extensions/DialogueTree/bondage.js/dist',

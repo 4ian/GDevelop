@@ -19,15 +19,20 @@ import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
+import LanguageSelector from './LanguageSelector';
+import Link from '@material-ui/core/Link';
 const electron = optionalRequire('electron');
 
 type Props = {|
   i18n: I18n,
-  onClose: Function,
+  onClose: (languageDidChange: boolean) => void,
 |};
 
 const PreferencesDialog = ({ i18n, onClose }: Props) => {
   const [currentTab, setCurrentTab] = React.useState('preferences');
+  const [languageDidChange, setLanguageDidChange] = React.useState<boolean>(
+    false
+  );
   const {
     values,
     setThemeName,
@@ -60,11 +65,10 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           key="close"
           label={<Trans>Close</Trans>}
           primary={false}
-          onClick={onClose}
+          onClick={() => onClose(languageDidChange)}
         />,
       ]}
-      onRequestClose={onClose}
-      cannotBeDismissed={true}
+      onRequestClose={() => onClose(languageDidChange)}
       open
       noTitleMargin
       maxWidth="sm"
@@ -78,6 +82,14 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     >
       {currentTab === 'preferences' && (
         <Column>
+          <Text size="title">
+            <Trans>Language</Trans>
+          </Text>
+          <LanguageSelector
+            onLanguageChanged={() => {
+              setLanguageDidChange(true);
+            }}
+          />
           <Text size="title">
             <Trans>Appearance</Trans>
           </Text>
@@ -113,16 +125,24 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           </ResponsiveLineStackLayout>
           <Line noMargin>
             <Text>
-              <Trans>You can contribute and create your own themes: </Trans>
+              <Trans>
+                You can contribute and{' '}
+                <Link
+                  href={
+                    'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
+                  }
+                  onClick={event => {
+                    Window.openExternalURL(
+                      'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
+                    );
+                    event.preventDefault();
+                  }}
+                >
+                  create your own themes
+                </Link>
+                .
+              </Trans>
             </Text>
-            <FlatButton
-              label={<Trans>Learn more</Trans>}
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://github.com/4ian/GDevelop/tree/master/newIDE#theming'
-                );
-              }}
-            />
           </Line>
           <Text size="title">
             <Trans>Layouts</Trans>
@@ -365,14 +385,16 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
         </Column>
       )}
       {currentTab === 'shortcuts' && (
-        <Column>
-          <ShortcutsList
-            i18n={i18n}
-            userShortcutMap={values.userShortcutMap}
-            onEdit={setShortcutForCommand}
-            onReset={resetShortcutsToDefault}
-          />
-        </Column>
+        <Line expand>
+          <Column expand>
+            <ShortcutsList
+              i18n={i18n}
+              userShortcutMap={values.userShortcutMap}
+              onEdit={setShortcutForCommand}
+              onReset={resetShortcutsToDefault}
+            />
+          </Column>
+        </Line>
       )}
     </Dialog>
   );

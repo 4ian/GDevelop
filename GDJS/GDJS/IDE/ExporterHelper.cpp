@@ -77,7 +77,10 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
 
+  // TODO Try to remove side effects to avoid the copy
+  // that destroys the AST in cache.
   gd::Project exportedProject = options.project;
+  const gd::Project &immutableProject = exportedProject;
 
   if (!options.fullLoadingScreen) {
     // Most of the time, we skip the logo and minimum duration so that
@@ -105,26 +108,26 @@ bool ExporterHelper::ExportProjectForPixiPreview(
                  !options.websocketDebuggerServerAddress.empty(),
                  /*includeWindowMessageDebuggerClient=*/
                  options.useWindowMessageDebuggerClient,
-                 exportedProject.GetLoadingScreen().GetGDevelopLogoStyle(),
+                 immutableProject.GetLoadingScreen().GetGDevelopLogoStyle(),
                  includesFiles);
 
   // Export files for object and behaviors
-  ExportObjectAndBehaviorsIncludes(exportedProject, includesFiles);
+  ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
-  ExportEffectIncludes(exportedProject, includesFiles);
+  ExportEffectIncludes(immutableProject, includesFiles);
 
   previousTime = LogTimeSpent("Include files export", previousTime);
 
   if (!options.projectDataOnlyExport) {
     // Generate events code
-    if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
+    if (!ExportEventsCode(immutableProject, codeOutputDir, includesFiles, true))
       return false;
 
     // Export source files
     if (!ExportExternalSourceFiles(
-            exportedProject, codeOutputDir, includesFiles)) {
+            immutableProject, codeOutputDir, includesFiles)) {
       gd::LogError(
           _("Error during exporting! Unable to export source files:\n") +
           lastError);
@@ -154,6 +157,8 @@ bool ExporterHelper::ExportProjectForPixiPreview(
       .SetStringValue(options.websocketDebuggerServerAddress);
   runtimeGameOptions.AddChild("websocketDebuggerServerPort")
       .SetStringValue(options.websocketDebuggerServerPort);
+  runtimeGameOptions.AddChild("electronRemoteRequirePath")
+      .SetStringValue(options.electronRemoteRequirePath);
 
   // Pass in the options the list of scripts files - useful for hot-reloading.
   auto &scriptFilesElement = runtimeGameOptions.AddChild("scriptFiles");
@@ -439,12 +444,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                   dependency.GetVersion() + "\",";
     }
 
-    if (!packages.empty()) {
-      // Remove the , at the end as last item cannot have , in JSON.
-      packages = packages.substr(0, packages.size() - 1);
-    }
-
-    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\"",
+    str = str.FindAndReplace("\"GDJS_EXTENSION_NPM_DEPENDENCY\": \"0\",",
                              packages);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
@@ -534,6 +534,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "logger.js");
   InsertUnique(includesFiles, "gd.js");
   InsertUnique(includesFiles, "libs/rbush.js");
+  InsertUnique(includesFiles, "AsyncTasksManager.js");
   InsertUnique(includesFiles, "inputmanager.js");
   InsertUnique(includesFiles, "jsonmanager.js");
   InsertUnique(includesFiles, "timemanager.js");
@@ -625,7 +626,7 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
 }
 
 bool ExporterHelper::ExportEffectIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    const gd::Project &project, std::vector<gd::String> &includesFiles) {
   std::set<gd::String> effectIncludes;
 
   gd::EffectsCodeGenerator::GenerateEffectsIncludeFiles(
@@ -636,7 +637,7 @@ bool ExporterHelper::ExportEffectIncludes(
   return true;
 }
 
-bool ExporterHelper::ExportEventsCode(gd::Project &project,
+bool ExporterHelper::ExportEventsCode(const gd::Project &project,
                                       gd::String outputDir,
                                       std::vector<gd::String> &includesFiles,
                                       bool exportForPreview) {
@@ -644,7 +645,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     std::set<gd::String> eventsIncludes;
-    gd::Layout &layout = project.GetLayout(i);
+    const gd::Layout &layout = project.GetLayout(i);
     LayoutCodeGenerator layoutCodeGenerator(project);
     gd::String eventsOutput = layoutCodeGenerator.GenerateLayoutCompleteCode(
         layout, eventsIncludes, !exportForPreview);
@@ -666,7 +667,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
 }
 
 bool ExporterHelper::ExportExternalSourceFiles(
-    gd::Project &project,
+    const gd::Project &project,
     gd::String outputDir,
     std::vector<gd::String> &includesFiles) {
   const auto &allFiles = project.GetAllSourceFiles();
@@ -767,7 +768,7 @@ bool ExporterHelper::ExportIncludesAndLibs(
 }
 
 void ExporterHelper::ExportObjectAndBehaviorsIncludes(
-    gd::Project &project, std::vector<gd::String> &includesFiles) {
+    const gd::Project &project, std::vector<gd::String> &includesFiles) {
   auto addIncludeFiles = [&](const std::vector<gd::String> &newIncludeFiles) {
     for (const auto &includeFile : newIncludeFiles) {
       InsertUnique(includesFiles, includeFile);
@@ -800,7 +801,7 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
 
   addObjectsIncludeFiles(project);
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
-    gd::Layout &layout = project.GetLayout(i);
+    const gd::Layout &layout = project.GetLayout(i);
     addObjectsIncludeFiles(layout);
   }
 }

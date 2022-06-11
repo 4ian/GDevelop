@@ -51,15 +51,17 @@ export const UrlChooser = ({
 }: ResourceStoreChooserProps) => {
   const [inputValue, setInputValue] = React.useState('');
   const [error, setError] = React.useState<?Error>(null);
-  const [erroredUrls, setErroredUrls] = React.useState<boolean[]>([]);
-  const hasErroredUrls = erroredUrls.filter(Boolean).length;
+  const [urlsErroredBooleanArray, setUrlsErroredBooleanArray] = React.useState<
+    boolean[]
+  >([]);
+  const hasErroredUrls = !!urlsErroredBooleanArray.filter(Boolean).length;
 
   const validateInputValue = useDebounce(async (inputValue: string) => {
     const urls = options.multiSelection
       ? inputValue.split('\n').filter(Boolean)
       : [inputValue];
     setError(null);
-    setErroredUrls([]);
+    setUrlsErroredBooleanArray([]);
 
     try {
       const responses = await Promise.all(
@@ -71,7 +73,7 @@ export const UrlChooser = ({
         })
       );
 
-      setErroredUrls(
+      setUrlsErroredBooleanArray(
         responses.map(
           response => !(response.status >= 200 && response.status < 400)
         )
@@ -113,6 +115,7 @@ export const UrlChooser = ({
               primary
               label={<Trans>Choose</Trans>}
               style={style}
+              disabled={!!error || hasErroredUrls}
             />
           )}
           renderTextField={() => (
@@ -139,7 +142,7 @@ export const UrlChooser = ({
                 ) : hasErroredUrls ? (
                   <Trans>
                     Unable to verify URLs{' '}
-                    {erroredUrls
+                    {urlsErroredBooleanArray
                       .map((isErrored, index) => {
                         if (isErrored) return '#' + (index + 1);
                         return null;
@@ -177,6 +180,7 @@ const browserResourceSources: Array<ResourceSource> = [
         createNewResource={createNewResource}
         onChooseResources={props.onChooseResources}
         options={props.options}
+        key={`resource-store-${kind}`}
       />
     ),
   })),
@@ -190,6 +194,7 @@ const browserResourceSources: Array<ResourceSource> = [
         createNewResource={createNewResource}
         onChooseResources={props.onChooseResources}
         options={props.options}
+        key={`url-chooser-${kind}`}
       />
     ),
   })),

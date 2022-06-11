@@ -1,5 +1,7 @@
 name: GDevelop Issues automatic workflow
-on: [issues]
+on:
+  issues:
+    types: [opened]
 jobs:
   autoclose:
     runs-on: ubuntu-latest
@@ -10,7 +12,7 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         type: "body"
         regex: ".*Scroll down to '\\.\\.\\.\\.'.*"
-        message: "Hi @${issue.user.login}! 👋 This issue was automatically closed because it seems that you have not included any steps to reproduce the bug.\n\nGitHub is a place for the technical development of GDevelop itself - you may want to go on the [forum](https://forum.gdevelop-app.com/), the Discord chat or [read the documentation](http://wiki.compilgames.net/doku.php/gdevelop5/start) to learn more about GDevelop. Thanks!"
+        message: "Hi @${issue.user.login}! 👋 This issue was automatically closed because it seems that you have not included any steps to reproduce the bug.\n\nGitHub is a place for the technical development of GDevelop itself - you may want to go on the [forum](https://forum.gdevelop.io/), the Discord chat or [read the documentation](https://wiki.gdevelop.io/gdevelop5/start) to learn more about GDevelop. Thanks!"
     - name: Autoclose known beta 105 web-app update bug
       uses: arkon/issue-closer-action@v1.1
       with:
@@ -25,4 +27,17 @@ jobs:
         type: "body"
         regex: ".*getAssociatedSettings is not a function.*"
         message: "Hi @${issue.user.login}! 👋 This issue was automatically closed as this seems to be a known bug. It can be solved by **closing entirely the web-app and opening it again**. This will allow the web-app to auto-update and the problem should be gone."
+  autocomment:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.body, 'The node to be removed is not a child of this node')
+    steps:
+    - name: Autocomment indications on bug if it looks like #3453
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        issue-number: ${{ github.event.issue.number }}
+        body: |
+          Hi @${{ github.actor }}!
+          Thank you for taking the time to open an issue.
 
+          The solved issue #3453 mentioned a similar error, maybe it could help fix this new issue.
+        token: ${{ secrets.GITHUB_TOKEN }}

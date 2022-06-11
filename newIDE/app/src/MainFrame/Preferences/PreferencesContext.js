@@ -14,6 +14,7 @@ export type AlertMessageIdentifier =
   | 'automatic-lighting-layer'
   | 'object-moved-in-lighting-layer'
   | 'use-non-smoothed-textures'
+  | 'use-pixel-rounding'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
   | 'minimum-fps-too-low'
@@ -52,6 +53,10 @@ export const allAlertMessages: Array<{
   {
     key: 'use-non-smoothed-textures',
     label: <Trans>Using non smoothed textures</Trans>,
+  },
+  {
+    key: 'use-pixel-rounding',
+    label: <Trans>Using pixel rounding</Trans>,
   },
   {
     key: 'use-nearest-scale-mode',
@@ -255,8 +260,9 @@ export const initialPreferences = {
     themeName:
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'Nord'
-        : 'GDevelop default',
+        ? 'GDevelop default Dark'
+        : // TODO: Use the light theme back when it's adapted to the modern theme.
+          'GDevelop default Dark',
     codeEditorThemeName: 'vs-dark',
     hiddenAlertMessages: {},
     hiddenTutorialHints: {},

@@ -1,19 +1,33 @@
 <!doctype html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://api.gdevelop-app.com https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js https://api.keen.io https://apis.google.com">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: https://api.gdevelop-app.com https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js https://api.keen.io https://apis.google.com https://js.userflow.com">
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon-256.png">
     <title>GDevelop 5</title>
+
+    <meta name="title" content="GDevelop game making app" />
+    <meta property="og:title" content="GDevelop game making app" />
+    <meta name="description"
+      content="Build your own game super fast and without programming. Publish on mobile, desktop and on the web." />
+    <meta property="og:description"
+      content="Build your own game super fast and without programming. Publish on mobile, desktop and on the web." />
+    <meta property="og:url" content="https://gdevelop.io" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="%PUBLIC_URL%/GDevelop-editor-thumbnail.png" />
+    <meta property="og:image:width" content="1920" />
+    <meta property="og:image:height" content="1080" />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <style>
       html, body {
         margin: 0;
         padding: 0;
         height: 100%;
-        background-color: #f0f0f0;
+        background-color: #000;
+        transition: background-color 0.5s linear;
       }
 
       body {
@@ -25,11 +39,14 @@
 
       @keyframes text-focus-in {
         0% {
-          -webkit-filter: blur(12px); filter: blur(12px);
+          -webkit-filter: blur(12px);
+          filter: blur(12px);
           opacity: 0;
         }
+
         100% {
-          -webkit-filter: blur(0px); filter: blur(0px);
+          -webkit-filter: blur(0px);
+          filter: blur(0px);
           opacity: 1;
         }
       }
@@ -57,7 +74,7 @@
         <p>
           To use GDevelop 5, you must <b>activate JavaScript</b> in your browser or
           download the desktop version for Windows, macOS or Linux on
-          <a href="https://gdevelop-app.com">https://gdevelop-app.com</a>.
+          <a href="https://gdevelop.io">https://gdevelop.io</a>.
         </p>
       </div>
     </noscript>

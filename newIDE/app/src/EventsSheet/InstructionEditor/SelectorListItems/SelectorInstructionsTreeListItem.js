@@ -3,7 +3,7 @@ import * as React from 'react';
 import { ListItem, type ListItemRefType } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
 import { type InstructionOrExpressionTreeNode } from '../../../InstructionOrExpression/CreateTree';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import Subheader from '../../../UI/Subheader';
 import flatten from 'lodash/flatten';
 import { getSubheaderListItemKey, getInstructionListItemValue } from './Keys';
@@ -15,6 +15,7 @@ type Props<T> = {|
   useSubheaders?: boolean,
   selectedValue: ?string,
   initiallyOpenedPath?: ?Array<string>,
+  getGroupIconSrc: string => string,
 
   // Optional ref that will be filled with the selected ListItem
   selectedItemRef?: { current: null | ListItemRefType },
@@ -30,6 +31,7 @@ export const renderInstructionOrExpressionTree = <
   selectedValue,
   selectedItemRef,
   initiallyOpenedPath,
+  getGroupIconSrc,
 }: Props<T>): Array<React$Element<any> | null> => {
   const [initiallyOpenedKey, ...restOfInitiallyOpenedPath] =
     initiallyOpenedPath || [];
@@ -54,6 +56,7 @@ export const renderInstructionOrExpressionTree = <
             key={value}
             primaryText={key}
             selected={selected}
+            id={'instruction-item-' + instructionInformation.type}
             leftIcon={
               <ListIcon
                 iconSize={iconSize}
@@ -81,16 +84,21 @@ export const renderInstructionOrExpressionTree = <
               selectedValue,
               selectedItemRef,
               initiallyOpenedPath: restOfInitiallyOpenedPath,
+              getGroupIconSrc,
             })
           );
         } else {
           const initiallyOpen = initiallyOpenedKey === key;
+          const iconSrc = getGroupIconSrc(key);
           return (
             <ListItem
               key={key}
               primaryText={key}
               autoGenerateNestedIndicator={true}
               initiallyOpen={initiallyOpen}
+              leftIcon={
+                iconSrc ? <ListIcon iconSize={iconSize} src={iconSrc} /> : null
+              }
               renderNestedItems={() =>
                 renderInstructionOrExpressionTree({
                   instructionTreeNode: groupOfInstructionInformation,
@@ -101,6 +109,7 @@ export const renderInstructionOrExpressionTree = <
                   initiallyOpenedPath: initiallyOpen
                     ? restOfInitiallyOpenedPath
                     : undefined,
+                  getGroupIconSrc,
                 })
               }
             />

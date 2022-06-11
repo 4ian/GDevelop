@@ -38,7 +38,7 @@
         "value": "#047AA6"
       },
       "color": {
-        "value": "white"
+        "value": "#FFFFFF"
       }
     },
     "text": {
@@ -60,6 +60,11 @@
       "contrast": {
         "color": {
           "value": "#fff"
+        }
+      },
+      "highlighted": {
+        "background-color": {
+          "value": "rgb(255, 255, 255, 0.3)"
         }
       }
     },
@@ -159,6 +164,23 @@
       },
       "frame-border-color": {
         "value": "#dcdcdc"
+      }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "#DCDCDC"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#BF616A"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
       }
     }
   },
@@ -299,6 +321,11 @@
         },
         "background-color": {
           "value": "rgba(238, 255, 0, 0.05)"
+        }
+      },
+      "warning": {
+        "color": {
+          "value": "#ffa500"
         }
       }
     },

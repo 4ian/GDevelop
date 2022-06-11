@@ -1,8 +1,9 @@
 // @ts-check
 describe('gdjs.TopDownMovementRuntimeBehavior', function () {
+  const epsilon = 1 / (2 << 8);
   const topDownName = 'auto1';
 
-  const createScene = () => {
+  const createScene = (timeDelta = 1000 / 60) => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
       // @ts-ignore - missing properties.
@@ -38,7 +39,7 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
       instances: [],
     });
     runtimeScene._timeManager.getElapsedTime = function () {
-      return (1 / 60) * 1000;
+      return timeDelta;
     };
     return runtimeScene;
   };
@@ -98,6 +99,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateDownKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(
+                player.getBehavior(topDownName).getXVelocity()
+              ).to.be.above(0);
+              expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
             }
 
             expect(player.getX()).to.be.above(200 + 20);
@@ -119,6 +124,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateUpKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(
+                player.getBehavior(topDownName).getXVelocity()
+              ).to.be.below(0);
+              expect(player.getBehavior(topDownName).getYVelocity()).to.be(0);
             }
 
             expect(player.getX()).to.be.below(200 - 20);
@@ -140,6 +149,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateLeftKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
+              expect(
+                player.getBehavior(topDownName).getYVelocity()
+              ).to.be.above(0);
             }
 
             expect(player.getX()).to.be(200);
@@ -161,6 +174,10 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
                 player.getBehavior(topDownName).simulateLeftKey();
               }
               runtimeScene.renderAndStep(1000 / 60);
+              expect(player.getBehavior(topDownName).getXVelocity()).to.be(0);
+              expect(
+                player.getBehavior(topDownName).getYVelocity()
+              ).to.be.below(0);
             }
 
             expect(player.getX()).to.be(200);
@@ -424,6 +441,30 @@ describe('gdjs.TopDownMovementRuntimeBehavior', function () {
           expect(player.getX()).to.be(200);
           expect(player.getY()).to.be.below(300 - 20);
         });
+      });
+    });
+  });
+
+  [20, 30, 60, 120].forEach((framesPerSecond) => {
+    describe(`(frames per second: ${framesPerSecond})`, function () {
+      let runtimeScene;
+      let player;
+      beforeEach(function () {
+        runtimeScene = createScene(1000 / framesPerSecond);
+        player = addPlayer(runtimeScene, true);
+      });
+
+      it('moves the same distance', function () {
+        player.setPosition(200, 300);
+        runtimeScene.renderAndStep(1000 / 60);
+
+        // It takes 0,5 second to reach the maximum speed because
+        // the acceleration is 400 and maxSpeed is 200.
+        for (let i = 0; i < framesPerSecond / 2; i++) {
+          player.getBehavior(topDownName).simulateRightKey();
+          runtimeScene.renderAndStep(1000 / framesPerSecond);
+        }
+        expect(player.getX()).to.be.within(250 - epsilon, 250 + epsilon);
       });
     });
   });

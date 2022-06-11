@@ -1,22 +1,27 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import Refresh from '@material-ui/icons/Refresh';
 import * as React from 'react';
-import Dialog from '../UI/Dialog';
+
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
 import { Column, Spacer } from '../UI/Grid';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import TextField from '../UI/TextField';
+
+import generateName from '../Utils/ProjectNameGenerator';
+import optionalRequire from '../Utils/OptionalRequire';
+import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
+import { type ProjectCreationSettings } from './CreateProjectDialog';
+
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 type Props = {|
   open: boolean,
   isOpening?: boolean,
   onClose: () => void,
-  onCreate: () => void | Promise<void>,
-  outputPath?: string,
-  onChangeOutputPath?: (outputPath: string) => void,
-  projectName: string,
-  onChangeProjectName: (name: string) => void,
+  onCreate: ProjectCreationSettings => void | Promise<void>,
 |};
 
 const ProjectPreCreationDialog = ({
@@ -24,17 +29,21 @@ const ProjectPreCreationDialog = ({
   isOpening,
   onClose,
   onCreate,
-  outputPath,
-  onChangeOutputPath,
-  projectName,
-  onChangeProjectName,
 }: Props): React.Node => {
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
+  const [projectName, setProjectName] = React.useState<string>(() =>
+    generateName()
+  );
+  const [outputPath, setOutputPath] = React.useState<string>(() =>
+    app ? findEmptyPathInDefaultFolder(app) : ''
+  );
 
   const onValidate = React.useCallback(
     () => {
+      if (isOpening) return;
+
       setProjectNameError(null);
       if (!projectName) {
         setProjectNameError(
@@ -42,22 +51,23 @@ const ProjectPreCreationDialog = ({
         );
         return;
       }
-      onCreate();
+      onCreate({ projectName, outputPath: app ? outputPath : undefined });
     },
-    [onCreate, projectName]
+    [onCreate, projectName, outputPath, isOpening]
   );
 
   const _onChangeProjectName = React.useCallback(
     (event, text) => {
       if (projectNameError) setProjectNameError(null);
-      onChangeProjectName(text);
+      setProjectName(text);
     },
-    [onChangeProjectName, projectNameError]
+    [setProjectName, projectNameError]
   );
 
   return (
     <Dialog
-      title={<Trans>Project settings</Trans>}
+      id="project-pre-creation-dialog"
+      title={<Trans>New Project</Trans>}
       maxWidth="sm"
       open={open}
       actions={[
@@ -67,16 +77,20 @@ const ProjectPreCreationDialog = ({
           label={<Trans>Cancel</Trans>}
           onClick={onClose}
         />,
-        <RaisedButton
+        <DialogPrimaryButton
           primary
           disabled={isOpening}
           key="create"
           label={<Trans>Create project</Trans>}
           onClick={onValidate}
+          id="create-project-button"
         />,
       ]}
+      cannotBeDismissed={isOpening}
+      onRequestClose={onClose}
+      onApply={onValidate}
     >
-      <Column>
+      <Column noMargin>
         <TextField
           type="text"
           errorText={projectNameError}
@@ -84,14 +98,17 @@ const ProjectPreCreationDialog = ({
           value={projectName}
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
+          endAdornment={
+            <Refresh onClick={() => setProjectName(generateName())} />
+          }
         />
-        {onChangeOutputPath && (
+        {app && (
           <>
             <Spacer />
             <LocalFolderPicker
               fullWidth
-              value={outputPath || ''}
-              onChange={onChangeOutputPath}
+              value={outputPath}
+              onChange={setOutputPath}
               type="create-game"
             />
           </>

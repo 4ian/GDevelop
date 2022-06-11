@@ -1,8 +1,9 @@
 // @flow
 import axios from 'axios';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
-import { GDevelopBuildApi } from './ApiConfigs';
+import { GDevelopBuildApi, GDevelopGamesPlatform } from './ApiConfigs';
 import { getSignedUrl } from './Usage';
+import { basename } from 'path';
 
 export type TargetName =
   | 'winExe'
@@ -15,6 +16,7 @@ export type TargetName =
 
 export type Build = {
   id: string,
+  gameId?: string, // not defined for old builds.
   userId: string,
   bucket?: string,
   logsKey?: string,
@@ -51,10 +53,38 @@ export const getBuildArtifactUrl = (
   }
 
   if (keyName === 's3Key') {
-    return `https://games.gdevelop-app.com/${build[keyName]}/index.html`;
+    // New builds have a gameId.
+    return build.gameId
+      ? GDevelopGamesPlatform.getInstantBuildUrl(build.id)
+      : `https://games.gdevelop-app.com/${build[keyName]}/index.html`;
   }
 
   return `https://builds.gdevelop-app.com/${build[keyName]}`;
+};
+
+export const getWebBuildThumbnailUrl = (
+  project: gdProject,
+  buildId: string
+): string => {
+  const resourceManager = project.getResourcesManager();
+  const resourceName = project
+    .getPlatformSpecificAssets()
+    .get('liluo', `thumbnail`);
+  if (!resourceManager.hasResource(resourceName)) {
+    return '';
+  }
+  const path = resourceManager.getResource(resourceName).getFile();
+  const fileName = basename(path);
+  if (!fileName) {
+    return '';
+  }
+  // The exporter put asset files directly in the build folder.
+  // It's not factorized with the exporter because it's a temporary solution.
+  // TODO: Upload the thumbnail separately, so that this URL is not defined by the frontend.
+  const uri = `https://games.gdevelop-app.com/game-${buildId}/${fileName}`;
+  // The backend services encode the file URLs when uploaded, so we need to do the same before saving the value.
+  const encodedUri = encodeURI(uri);
+  return encodedUri;
 };
 
 type UploadOptions = {|
@@ -84,26 +114,23 @@ export const buildElectron = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
   key: string,
-  targets: Array<TargetName>
+  targets: Array<TargetName>,
+  gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-          userId
-        )}&key=${encodeURIComponent(
-          key
-        )}&type=electron-build&targets=${encodeURIComponent(
-          targets.join(',')
-        )}`,
-        null,
-        {
-          params: {},
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
+      axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
+        params: {
+          userId,
+          key,
+          type: 'electron-build',
+          targets: targets.join(','),
+          gameId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
     )
     .then(response => response.data);
 };
@@ -111,22 +138,23 @@ export const buildElectron = (
 export const buildWeb = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  key: string
+  key: string,
+  gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
-      axios.post(
-        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-          userId
-        )}&key=${encodeURIComponent(key)}&type=web-build&targets=s3`,
-        null,
-        {
-          params: {},
-          headers: {
-            Authorization: authorizationHeader,
-          },
-        }
-      )
+      axios.post(`${GDevelopBuildApi.baseUrl}/build`, null, {
+        params: {
+          userId,
+          key,
+          type: 'web-build',
+          targets: 's3',
+          gameId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
     )
     .then(response => response.data);
 };
@@ -136,23 +164,26 @@ export const buildCordovaAndroid = (
   userId: string,
   key: string,
   targets: Array<TargetName>,
-  keystore: 'old' | 'new'
+  keystore: 'old' | 'new',
+  gameId: string
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
-        `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
-          userId
-        )}&key=${encodeURIComponent(
-          key
-        )}&type=cordova-build&targets=${encodeURIComponent(targets.join(','))}`,
+        `${GDevelopBuildApi.baseUrl}/build`,
         JSON.stringify({
           signing: {
             keystore,
           },
         }),
         {
-          params: {},
+          params: {
+            userId,
+            key,
+            type: 'cordova-build',
+            targets: targets.join(','),
+            gameId,
+          },
           headers: {
             Authorization: authorizationHeader,
           },
@@ -183,13 +214,15 @@ export const getBuild = (
 
 export const getBuilds = (
   getAuthorizationHeader: () => Promise<string>,
-  userId: string
+  userId: string,
+  gameId?: string
 ): Promise<Array<Build>> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build`, {
         params: {
           userId,
+          gameId,
         },
         headers: {
           Authorization: authorizationHeader,

@@ -26,7 +26,7 @@ export const allResourceKindsAndMetadata = [
   {
     kind: 'image',
     displayName: t`Image`,
-    fileExtensions: ['png', 'jpg'],
+    fileExtensions: ['png', 'jpg', 'jpeg', 'webp'],
     createNewResource: () => new gd.ImageResource(),
   },
   {
@@ -38,7 +38,7 @@ export const allResourceKindsAndMetadata = [
   {
     kind: 'video',
     displayName: t`Video`,
-    fileExtensions: ['mp4'],
+    fileExtensions: ['mp4', 'webm'],
     createNewResource: () => new gd.VideoResource(),
   },
   {

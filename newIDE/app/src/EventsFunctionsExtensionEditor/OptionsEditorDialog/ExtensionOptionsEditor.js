@@ -23,6 +23,7 @@ import axios from 'axios';
 import { useIsMounted } from '../../Utils/UseIsMounted';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { UsersAutocomplete } from '../../Utils/UsersAutocomplete';
+import SemiControlledAutoComplete from '../../UI/SemiControlledAutoComplete';
 
 const downloadSvgAsBase64 = async (url: string): Promise<string> => {
   try {
@@ -190,6 +191,49 @@ export const ExtensionOptionsEditor = ({
             }}
             fullWidth
           />
+          <SemiControlledAutoComplete
+            floatingLabelText={<Trans>Category (shown in the editor)</Trans>}
+            fullWidth
+            value={eventsFunctionsExtension.getCategory()}
+            onChange={category => {
+              eventsFunctionsExtension.setCategory(category);
+              forceUpdate();
+            }}
+            dataSource={[
+              {
+                text: '',
+                value: 'General',
+              },
+              {
+                text: 'Ads',
+                value: 'Ads',
+              },
+              {
+                text: 'Audio',
+                value: 'Audio',
+              },
+              {
+                text: 'Advanced',
+                value: 'Advanced',
+              },
+              {
+                text: 'Device',
+                value: 'Device',
+              },
+              {
+                text: 'Input',
+                value: 'Input',
+              },
+              {
+                text: 'Network',
+                value: 'Network',
+              },
+              {
+                text: 'Third-party',
+                value: 'Third-party',
+              },
+            ]}
+          />
           <SemiControlledTextField
             floatingLabelText={<Trans>Tags (comma separated)</Trans>}
             value={eventsFunctionsExtension
@@ -219,7 +263,12 @@ export const ExtensionOptionsEditor = ({
             }}
           />
           <UsersAutocomplete
-            userIds={eventsFunctionsExtension.getAuthorIds()}
+            userIds={eventsFunctionsExtension.getAuthorIds().toJSArray()}
+            onChange={userIds => {
+              const projectAuthorIds = eventsFunctionsExtension.getAuthorIds();
+              projectAuthorIds.clear();
+              userIds.forEach(userId => projectAuthorIds.push_back(userId));
+            }}
             floatingLabelText={<Trans>Authors</Trans>}
             helperText={
               <Trans>
@@ -242,9 +291,11 @@ export const ExtensionOptionsEditor = ({
                   }}
                 />,
               ]}
-              cannotBeDismissed={false}
               open
               noMargin
+              onRequestClose={() => {
+                setResourceStoreOpen(false);
+              }}
             >
               <ResourceStore
                 onChoose={resource => {

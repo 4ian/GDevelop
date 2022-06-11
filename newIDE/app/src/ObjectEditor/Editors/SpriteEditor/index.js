@@ -14,10 +14,11 @@ import { mapFor } from '../../../Utils/MapFor';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
 import HelpButton from '../../../UI/HelpButton';
-import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import DragHandle from '../../../UI/DragHandle';
-import ContextMenu from '../../../UI/Menu/ContextMenu';
+import ContextMenu, {
+  type ContextMenuInterface,
+} from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
@@ -38,6 +39,8 @@ import { ResponsiveLineStackLayout } from '../../../UI/Layout';
 import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
+import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
+import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -98,7 +101,7 @@ class Animation extends React.Component<AnimationProps, void> {
               fullWidth
             />
           </Column>
-          <IconButton onClick={onRemove}>
+          <IconButton size="small" onClick={onRemove}>
             <Delete />
           </IconButton>
         </MiniToolbar>
@@ -210,7 +213,7 @@ class AnimationsListContainer extends React.Component<
   state = {
     selectedSprites: {},
   };
-  spriteContextMenu: ?ContextMenu;
+  spriteContextMenu: ?ContextMenuInterface;
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.spriteObject.moveAnimation(oldIndex, newIndex);
@@ -309,63 +312,70 @@ class AnimationsListContainer extends React.Component<
     return (
       <Column noMargin expand useFullHeight>
         {this.props.spriteObject.getAnimationsCount() === 0 ? (
-          <EmptyMessage>
-            <Trans>
-              This object has no animations containing images. Start by adding
-              an animation.
-            </Trans>
-          </EmptyMessage>
-        ) : (
-          <SortableAnimationsList
-            spriteObject={this.props.spriteObject}
-            objectName={this.props.objectName}
-            helperClass="sortable-helper"
-            project={this.props.project}
-            onSortEnd={this.onSortEnd}
-            onChangeAnimationName={this.changeAnimationName}
-            onRemoveAnimation={this.removeAnimation}
-            onReplaceDirection={this.replaceDirection}
-            onSpriteContextMenu={this.openSpriteContextMenu}
-            selectedSprites={this.state.selectedSprites}
-            onSelectSprite={this.selectSprite}
-            resourcesLoader={this.props.resourcesLoader}
-            resourceSources={this.props.resourceSources}
-            resourceExternalEditors={this.props.resourceExternalEditors}
-            onChooseResource={this.props.onChooseResource}
-            useDragHandle
-            lockAxis="y"
-            axis="y"
-          />
-        )}
-        <Column>
-          <ResponsiveLineStackLayout
-            justifyContent="space-between"
-            noColumnMargin
-          >
-            {this.props.extraBottomTools}
-            <RaisedButton
-              label={<Trans>Add an animation</Trans>}
-              primary
-              onClick={this.addAnimation}
-              icon={<Add />}
+          <Column noMargin expand justifyContent="center">
+            <EmptyPlaceholder
+              title={<Trans>Add your first animation</Trans>}
+              description={<Trans>Animations are a sequence of images.</Trans>}
+              actionLabel={<Trans>Add an animation</Trans>}
+              helpPagePath="/objects/sprite"
+              tutorialId="intermediate-changing-animations"
+              onAction={this.addAnimation}
             />
-          </ResponsiveLineStackLayout>
-        </Column>
-        <ContextMenu
-          ref={spriteContextMenu =>
-            (this.spriteContextMenu = spriteContextMenu)
-          }
-          buildMenuTemplate={(i18n: I18nType) => [
-            {
-              label: i18n._(t`Delete selection`),
-              click: () => this.deleteSelection(),
-            },
-            {
-              label: i18n._(t`Duplicate selection`),
-              click: () => this.duplicateSelection(),
-            },
-          ]}
-        />
+          </Column>
+        ) : (
+          <React.Fragment>
+            <SpacedDismissableTutorialMessage />
+            <SortableAnimationsList
+              spriteObject={this.props.spriteObject}
+              objectName={this.props.objectName}
+              helperClass="sortable-helper"
+              project={this.props.project}
+              onSortEnd={this.onSortEnd}
+              onChangeAnimationName={this.changeAnimationName}
+              onRemoveAnimation={this.removeAnimation}
+              onReplaceDirection={this.replaceDirection}
+              onSpriteContextMenu={this.openSpriteContextMenu}
+              selectedSprites={this.state.selectedSprites}
+              onSelectSprite={this.selectSprite}
+              resourcesLoader={this.props.resourcesLoader}
+              resourceSources={this.props.resourceSources}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              onChooseResource={this.props.onChooseResource}
+              useDragHandle
+              lockAxis="y"
+              axis="y"
+            />
+            <Column>
+              <ResponsiveLineStackLayout
+                justifyContent="space-between"
+                noColumnMargin
+              >
+                {this.props.extraBottomTools}
+                <RaisedButton
+                  label={<Trans>Add an animation</Trans>}
+                  primary
+                  onClick={this.addAnimation}
+                  icon={<Add />}
+                />
+              </ResponsiveLineStackLayout>
+            </Column>
+            <ContextMenu
+              ref={spriteContextMenu =>
+                (this.spriteContextMenu = spriteContextMenu)
+              }
+              buildMenuTemplate={(i18n: I18nType) => [
+                {
+                  label: i18n._(t`Delete selection`),
+                  click: () => this.deleteSelection(),
+                },
+                {
+                  label: i18n._(t`Duplicate selection`),
+                  click: () => this.duplicateSelection(),
+                },
+              ]}
+            />
+          </React.Fragment>
+        )}
       </Column>
     );
   }
@@ -425,13 +435,14 @@ export default function SpriteEditor({
       />
       {advancedOptionsOpen && (
         <Dialog
-          actions={
+          actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setAdvancedOptionsOpen(false)}
-            />
-          }
+            />,
+          ]}
           maxWidth="sm"
           flexBody
           onRequestClose={() => setAdvancedOptionsOpen(false)}
@@ -457,25 +468,25 @@ export default function SpriteEditor({
       )}
       {pointsEditorOpen && (
         <Dialog
-          actions={
+          actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setPointsEditorOpen(false)}
-            />
-          }
+            />,
+          ]}
           secondaryActions={[
             <HelpButton
               helpPagePath="/objects/sprite/edit-points"
               key="help"
             />,
           ]}
-          cannotBeDismissed={true}
+          onRequestClose={() => setPointsEditorOpen(false)}
           noMargin
           maxWidth="lg"
           flexBody
           fullHeight
-          onRequestClose={() => setPointsEditorOpen(false)}
           open={pointsEditorOpen}
         >
           <PointsEditor
@@ -487,13 +498,14 @@ export default function SpriteEditor({
       )}
       {collisionMasksEditorOpen && (
         <Dialog
-          actions={
+          actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setCollisionMasksEditorOpen(false)}
-            />
-          }
+            />,
+          ]}
           secondaryActions={[
             <HelpButton
               helpPagePath="/objects/sprite/collision-mask"
@@ -504,7 +516,6 @@ export default function SpriteEditor({
           maxWidth="lg"
           flexBody
           fullHeight
-          cannotBeDismissed={true}
           onRequestClose={() => setCollisionMasksEditorOpen(false)}
           open={collisionMasksEditorOpen}
         >

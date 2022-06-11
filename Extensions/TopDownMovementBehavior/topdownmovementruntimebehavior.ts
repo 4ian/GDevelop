@@ -35,10 +35,11 @@ namespace gdjs {
     private _rightKey: boolean = false;
     private _upKey: boolean = false;
     private _downKey: boolean = false;
-    private _leftKeyPressedDuration: integer = -1;
-    private _rightKeyPressedDuration: integer = -1;
-    private _upKeyPressedDuration: integer = -1;
-    private _downKeyPressedDuration: integer = -1;
+    private _leftKeyPressedDuration: float = 0;
+    private _rightKeyPressedDuration: float = 0;
+    private _upKeyPressedDuration: float = 0;
+    private _downKeyPressedDuration: float = 0;
+    private _wasStickUsed: boolean = false;
     private _stickAngle: float = 0;
     private _stickForce: float = 0;
 
@@ -192,18 +193,26 @@ namespace gdjs {
       return this._xVelocity !== 0 || this._yVelocity !== 0;
     }
 
-    getSpeed() {
+    getSpeed(): float {
       return Math.sqrt(
         this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity
       );
     }
 
-    getXVelocity() {
+    getXVelocity(): float {
       return this._xVelocity;
     }
 
-    getYVelocity() {
+    setXVelocity(velocityX: float): void {
+      this._xVelocity = velocityX;
+    }
+
+    getYVelocity(): float {
       return this._yVelocity;
+    }
+
+    setYVelocity(velocityY: float): void {
+      this._yVelocity = velocityY;
     }
 
     getAngle(): float {
@@ -242,31 +251,31 @@ namespace gdjs {
         !this._ignoreDefaultControls &&
         runtimeScene.getGame().getInputManager().isKeyPressed(UPKEY);
 
+      const elapsedTime = this.owner.getElapsedTime(runtimeScene);
+
+      if (!this._leftKey) {
+        this._leftKeyPressedDuration = 0;
+      } else {
+        this._leftKeyPressedDuration += elapsedTime;
+      }
+      if (!this._rightKey) {
+        this._rightKeyPressedDuration = 0;
+      } else {
+        this._rightKeyPressedDuration += elapsedTime;
+      }
+      if (!this._downKey) {
+        this._downKeyPressedDuration = 0;
+      } else {
+        this._downKeyPressedDuration += elapsedTime;
+      }
+      if (!this._upKey) {
+        this._upKeyPressedDuration = 0;
+      } else {
+        this._upKeyPressedDuration += elapsedTime;
+      }
+
       let direction = -1;
       if (!this._allowDiagonals) {
-        const elapsedTime = this.owner.getElapsedTime(runtimeScene);
-
-        if (!this._leftKey) {
-          this._leftKeyPressedDuration = 0;
-        } else {
-          this._leftKeyPressedDuration += elapsedTime;
-        }
-        if (!this._rightKey) {
-          this._rightKeyPressedDuration = 0;
-        } else {
-          this._rightKeyPressedDuration += elapsedTime;
-        }
-        if (!this._downKey) {
-          this._downKeyPressedDuration = 0;
-        } else {
-          this._downKeyPressedDuration += elapsedTime;
-        }
-        if (!this._upKey) {
-          this._upKeyPressedDuration = 0;
-        } else {
-          this._upKeyPressedDuration += elapsedTime;
-        }
-
         if (this._upKey && !this._downKey) {
           direction = 6;
         } else if (!this._upKey && this._downKey) {
@@ -322,17 +331,34 @@ namespace gdjs {
 
       const object = this.owner;
       const timeDelta = this.owner.getElapsedTime(runtimeScene) / 1000;
+      const previousVelocityX = this._xVelocity;
+      const previousVelocityY = this._yVelocity;
+      this._wasStickUsed = false;
+
+      // These 4 values are not actually used.
+      // JavaScript doesn't allow to declare
+      // variables without assigning them a value.
       let directionInRad = 0;
       let directionInDeg = 0;
-      //Update the speed of the object
+      let cos = 1;
+      let sin = 0;
+
+      // Update the speed of the object:
       if (direction !== -1) {
         directionInRad =
           ((direction + this._movementAngleOffset / 45) * Math.PI) / 4.0;
         directionInDeg = direction * 45 + this._movementAngleOffset;
-        this._xVelocity +=
-          this._acceleration * timeDelta * Math.cos(directionInRad);
-        this._yVelocity +=
-          this._acceleration * timeDelta * Math.sin(directionInRad);
+        // This makes the trigo resilient to rounding errors on directionInRad.
+        cos = Math.cos(directionInRad);
+        sin = Math.sin(directionInRad);
+        if (cos === -1 || cos === 1) {
+          sin = 0;
+        }
+        if (sin === -1 || sin === 1) {
+          cos = 0;
+        }
+        this._xVelocity += this._acceleration * timeDelta * cos;
+        this._yVelocity += this._acceleration * timeDelta * sin;
       } else if (this._stickForce !== 0) {
         if (!this._allowDiagonals) {
           this._stickAngle = 90 * Math.floor((this._stickAngle + 45) / 90);
@@ -340,56 +366,78 @@ namespace gdjs {
         directionInDeg = this._stickAngle + this._movementAngleOffset;
         directionInRad = (directionInDeg * Math.PI) / 180;
         const norm = this._acceleration * timeDelta * this._stickForce;
-        this._xVelocity += norm * Math.cos(directionInRad);
-        this._yVelocity += norm * Math.sin(directionInRad);
+        // This makes the trigo resilient to rounding errors on directionInRad.
+        cos = Math.cos(directionInRad);
+        sin = Math.sin(directionInRad);
+        if (cos === -1 || cos === 1) {
+          sin = 0;
+        }
+        if (sin === -1 || sin === 1) {
+          cos = 0;
+        }
+        this._xVelocity += norm * cos;
+        this._yVelocity += norm * sin;
 
+        this._wasStickUsed = true;
         this._stickForce = 0;
-      } else {
+      } else if (this._yVelocity !== 0 || this._xVelocity !== 0) {
         directionInRad = Math.atan2(this._yVelocity, this._xVelocity);
-        directionInDeg =
-          (Math.atan2(this._yVelocity, this._xVelocity) * 180.0) / Math.PI;
+        directionInDeg = (directionInRad * 180.0) / Math.PI;
         const xVelocityWasPositive = this._xVelocity >= 0;
         const yVelocityWasPositive = this._yVelocity >= 0;
-        this._xVelocity -=
-          this._deceleration * timeDelta * Math.cos(directionInRad);
-        this._yVelocity -=
-          this._deceleration * timeDelta * Math.sin(directionInRad);
-        // @ts-ignore
-        if ((this._xVelocity > 0) ^ xVelocityWasPositive) {
+        // This makes the trigo resilient to rounding errors on directionInRad.
+        cos = Math.cos(directionInRad);
+        sin = Math.sin(directionInRad);
+        if (cos === -1 || cos === 1) {
+          sin = 0;
+        }
+        if (sin === -1 || sin === 1) {
+          cos = 0;
+        }
+        this._xVelocity -= this._deceleration * timeDelta * cos;
+        this._yVelocity -= this._deceleration * timeDelta * sin;
+        if (this._xVelocity > 0 !== xVelocityWasPositive) {
           this._xVelocity = 0;
         }
-        // @ts-ignore
-        if ((this._yVelocity > 0) ^ yVelocityWasPositive) {
+        if (this._yVelocity > 0 !== yVelocityWasPositive) {
           this._yVelocity = 0;
         }
       }
-      const speed = Math.sqrt(
-        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity
-      );
-      if (speed > this._maxSpeed) {
-        this._xVelocity = this._maxSpeed * Math.cos(directionInRad);
-        this._yVelocity = this._maxSpeed * Math.sin(directionInRad);
+      const squaredSpeed =
+        this._xVelocity * this._xVelocity + this._yVelocity * this._yVelocity;
+      if (squaredSpeed > this._maxSpeed * this._maxSpeed) {
+        this._xVelocity = this._maxSpeed * cos;
+        this._yVelocity = this._maxSpeed * sin;
       }
+
+      // No acceleration for angular speed for now.
       this._angularSpeed = this._angularMaxSpeed;
 
-      //No acceleration for angular speed for now
-
-      //Position object
+      // Position object.
+      // This is a Verlet integration considering the acceleration as constant.
+      // If you expand deltaX or deltaY, it gives, thanks to the usage of both
+      // the old and the new velocity:
+      // "velocity * timeDelta + acceleration * timeDelta^2 / 2".
+      //
+      // The acceleration is not actually always constant, particularly with a gamepad,
+      // but the error is multiplied by timDelta^3. So, it shouldn't matter much.
+      const deltaX = ((previousVelocityX + this._xVelocity) / 2) * timeDelta;
+      const deltaY = ((previousVelocityY + this._yVelocity) / 2) * timeDelta;
       if (this._basisTransformation === null) {
         // Top-down viewpoint
-        object.setX(object.getX() + this._xVelocity * timeDelta);
-        object.setY(object.getY() + this._yVelocity * timeDelta);
+        object.setX(object.getX() + deltaX);
+        object.setY(object.getY() + deltaY);
       } else {
         // Isometry viewpoint
         const point = this._temporaryPointForTransformations;
-        point[0] = this._xVelocity * timeDelta;
-        point[1] = this._yVelocity * timeDelta;
+        point[0] = deltaX;
+        point[1] = deltaY;
         this._basisTransformation.toScreen(point, point);
         object.setX(object.getX() + point[0]);
         object.setY(object.getY() + point[1]);
       }
 
-      //Also update angle if needed
+      // Also update angle if needed.
       if (this._xVelocity !== 0 || this._yVelocity !== 0) {
         this._angle = directionInDeg;
         if (this._rotateObject) {
@@ -442,6 +490,33 @@ namespace gdjs {
     simulateStick(stickAngle: float, stickForce: float) {
       this._stickAngle = stickAngle % 360;
       this._stickForce = Math.max(0, Math.min(1, stickForce));
+    }
+
+    /**.
+     * @param input The control to be tested [Left,Right,Up,Down,Stick].
+     * @returns true if the key was used since the last `doStepPreEvents` call.
+     */
+    isUsingControl(input: string): boolean {
+      if (input === 'Left') {
+        return this._leftKeyPressedDuration > 0;
+      }
+      if (input === 'Right') {
+        return this._rightKeyPressedDuration > 0;
+      }
+      if (input === 'Up') {
+        return this._upKeyPressedDuration > 0;
+      }
+      if (input === 'Down') {
+        return this._downKeyPressedDuration > 0;
+      }
+      if (input === 'Stick') {
+        return this._wasStickUsed;
+      }
+      return false;
+    }
+
+    getLastStickInputAngle() {
+      return this._stickAngle;
     }
   }
   export namespace TopDownMovementRuntimeBehavior {

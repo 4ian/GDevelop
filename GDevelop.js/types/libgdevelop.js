@@ -37,6 +37,7 @@ declare class libGDevelop {
   VectorString: Class<gdVectorString>;
   VectorPlatformExtension: Class<gdVectorPlatformExtension>;
   VectorDependencyMetadata: Class<gdVectorDependencyMetadata>;
+  VectorInt: Class<gdVectorInt>;
   VectorVariable: Class<gdVectorVariable>;
   MapStringString: Class<gdMapStringString>;
   MapStringBoolean: Class<gdMapStringBoolean>;
@@ -49,6 +50,7 @@ declare class libGDevelop {
   SetString: Class<gdSetString>;
   ProjectHelper: Class<gdProjectHelper>;
   EventsVariablesFinder: Class<gdEventsVariablesFinder>;
+  InstructionOrExpressionGroupMetadata: Class<gdInstructionOrExpressionGroupMetadata>;
   VersionWrapper: Class<gdVersionWrapper>;
   Platform: Class<gdPlatform>;
   JsPlatform: Class<gdJsPlatform>;
@@ -102,6 +104,7 @@ declare class libGDevelop {
   Serializer: Class<gdSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
+  Expression: Class<gdExpression>;
   VectorPairStringTextFormatting: Class<gdVectorPairStringTextFormatting>;
   TextFormatting: Class<gdTextFormatting>;
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;
@@ -168,6 +171,7 @@ declare class libGDevelop {
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
   EventsParametersLister: Class<gdEventsParametersLister>;
+  EventsPositionFinder: Class<gdEventsPositionFinder>;
   EventsTypesLister: Class<gdEventsTypesLister>;
   InstructionsTypeRenamer: Class<gdInstructionsTypeRenamer>;
   EventsContext: Class<gdEventsContext>;

@@ -10,6 +10,7 @@ declare class gdEffectsContainer {
   insertEffect(theEffect: gdEffect, position: number): void;
   removeEffect(name: string): void;
   swapEffects(firstEffectIndex: number, secondEffectIndex: number): void;
+  moveEffect(oldIndex: number, newIndex: number): void;
   serializeTo(element: gdSerializerElement): void;
   unserializeFrom(element: gdSerializerElement): void;
   delete(): void;

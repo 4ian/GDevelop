@@ -11,6 +11,7 @@ export type EnumeratedObjectMetadata = {|
   fullName: string,
   description: string,
   iconFilename: string,
+  categoryFullName: string,
 |};
 
 export type ObjectWithContext = {|
@@ -25,6 +26,17 @@ export type GroupWithContext = {|
 
 export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
+
+export const isSameGroupWithContext = (groupWithContext: ?GroupWithContext) => (
+  other: ?GroupWithContext
+) => {
+  return (
+    groupWithContext &&
+    other &&
+    groupWithContext.global === other.global &&
+    groupWithContext.group === other.group
+  );
+};
 
 export const isSameObjectWithContext = (
   objectWithContext: ?ObjectWithContext
@@ -102,6 +114,7 @@ export const enumerateObjectTypes = (
           fullName: objectMetadata.getFullName(),
           description: objectMetadata.getDescription(),
           iconFilename: objectMetadata.getIconFilename(),
+          categoryFullName: objectMetadata.getCategoryFullName(),
         }));
     })
   );
@@ -113,6 +126,16 @@ export type ObjectFilteringOptions = {|
   hideExactMatches?: boolean,
 |};
 
+export const filterObjectByTags = (
+  objectWithContext: ObjectWithContext,
+  selectedTags: SelectedTags
+): boolean => {
+  if (!selectedTags.length) return true;
+
+  const objectTags = objectWithContext.object.getTags();
+  return hasStringAllTags(objectTags, selectedTags);
+};
+
 export const filterObjectsList = (
   list: ObjectWithContextList,
   { searchText, selectedTags, hideExactMatches }: ObjectFilteringOptions
@@ -120,12 +143,9 @@ export const filterObjectsList = (
   if (!searchText && !selectedTags.length) return list;
 
   return list
-    .filter((objectWithContext: ObjectWithContext) => {
-      if (!selectedTags.length) return true;
-
-      const objectTags = objectWithContext.object.getTags();
-      return hasStringAllTags(objectTags, selectedTags);
-    })
+    .filter(objectWithContext =>
+      filterObjectByTags(objectWithContext, selectedTags)
+    )
     .filter((objectWithContext: ObjectWithContext) => {
       const objectName = objectWithContext.object.getName();
 

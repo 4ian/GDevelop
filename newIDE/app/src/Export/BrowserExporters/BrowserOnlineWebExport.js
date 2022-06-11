@@ -24,7 +24,7 @@ import {
 } from '../ExportPipeline.flow';
 import {
   ExplanationHeader,
-  WebProjectLink,
+  OnlineGameLink,
 } from '../GenericExporters/OnlineWebExport';
 const gd: libGDevelop = global.gd;
 
@@ -60,14 +60,32 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
 
   getInitialExportState: () => null,
 
-  canLaunchBuild: () => true,
+  // Build can be launched if just opened the dialog or build errored, re-enabled when done.
+  canLaunchBuild: (exportState, errored, exportStep) =>
+    errored || exportStep === '' || exportStep === 'done',
+
+  // Navigation is enabled when the build is errored or if the build is not done.
+  isNavigationDisabled: (exportStep, errored) =>
+    !errored && !['', 'done'].includes(exportStep),
 
   renderHeader: () => <ExplanationHeader />,
 
   renderLaunchButtonLabel: () => <Trans>Generate link</Trans>,
 
-  renderCustomStepsProgress: (build: ?Build, loading: boolean) => (
-    <WebProjectLink build={build} loading={loading} />
+  renderCustomStepsProgress: ({
+    build,
+    project,
+    onSaveProject,
+    errored,
+    exportStep,
+  }) => (
+    <OnlineGameLink
+      build={build}
+      project={project}
+      onSaveProject={onSaveProject}
+      errored={errored}
+      exportStep={exportStep}
+    />
   ),
 
   prepareExporter: (
@@ -133,6 +151,7 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
       textFiles,
       basePath: '/export/',
       onProgress: context.updateStepProgress,
+      sizeLimit: 250 * 1000 * 1000,
     });
   },
 
@@ -152,12 +171,18 @@ export const browserOnlineWebExportPipeline: ExportPipeline<
   launchOnlineBuild: (
     exportState: ExportState,
     authenticatedUser: AuthenticatedUser,
-    uploadBucketKey: string
+    uploadBucketKey: string,
+    gameId: string
   ): Promise<Build> => {
     const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
     if (!firebaseUser)
       return Promise.reject(new Error('User is not authenticated'));
 
-    return buildWeb(getAuthorizationHeader, firebaseUser.uid, uploadBucketKey);
+    return buildWeb(
+      getAuthorizationHeader,
+      firebaseUser.uid,
+      uploadBucketKey,
+      gameId
+    );
   },
 };

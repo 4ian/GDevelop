@@ -12,7 +12,7 @@ type Props = {|
   onBackgroundColorChanged: () => void,
 |};
 
-export default ({ layout, onBackgroundColorChanged }: Props) => (
+const BackgroundColorRow = ({ layout, onBackgroundColorChanged }: Props) => (
   <I18n>
     {({ i18n }) => (
       <TreeTableRow>
@@ -46,3 +46,5 @@ export default ({ layout, onBackgroundColorChanged }: Props) => (
     )}
   </I18n>
 );
+
+export default BackgroundColorRow;

@@ -5,7 +5,7 @@ import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import Checkbox from '../UI/Checkbox';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import {
   type InstancesEditorSettings,
@@ -46,7 +46,6 @@ export default function SetupGridDialog(props: Props) {
 
   return (
     <Dialog
-      onApply={props.onApply}
       title={<Trans>Edit Grid Options</Trans>}
       actions={[
         <FlatButton
@@ -55,17 +54,16 @@ export default function SetupGridDialog(props: Props) {
           primary={false}
           onClick={onCancel}
         />,
-        <FlatButton
+        <DialogPrimaryButton
           key="apply"
           label={<Trans>Apply</Trans>}
           primary={true}
-          keyboardFocused={true}
           onClick={props.onApply}
         />,
       ]}
-      cannotBeDismissed={true}
-      open
       onRequestClose={onCancel}
+      onApply={props.onApply}
+      open
       maxWidth="sm"
       noMargin
     >

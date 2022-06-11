@@ -11,7 +11,7 @@ const gd /* TODO: add flow in this file */ = global.gd;
 /**
  * A service returning editor components for each object type.
  */
-export default {
+const ObjectsEditorService = {
   getEditorConfiguration(objectType: string) {
     if (!this.editorConfigurations[objectType]) {
       console.warn(
@@ -48,9 +48,6 @@ export default {
       return;
     }
 
-    console.info(
-      `Properly registered editor configuration for object "${objectType}".`
-    );
     this.editorConfigurations[objectType] = editorConfiguration;
   },
   getDefaultObjectJsImplementationPropertiesEditor(options) {
@@ -110,3 +107,5 @@ export default {
     },
   },
 };
+
+export default ObjectsEditorService;

@@ -12,6 +12,10 @@ namespace gdjs {
     max: FloatPoint;
   };
 
+  type RendererObjectInterface = {
+    visible: boolean;
+  };
+
   /**
    * Return the squared bounding radius of an object given its width/height and its center of rotation
    * (relative to the top-left of the object). The radius is relative to the center of rotation.
@@ -152,6 +156,7 @@ namespace gdjs {
     protected _livingOnScene: boolean = true;
 
     readonly id: integer;
+    private destroyCallbacks = new Set<() => void>();
     _runtimeScene: gdjs.RuntimeScene;
 
     /**
@@ -236,14 +241,15 @@ namespace gdjs {
      * (`RuntimeObject.prototype.onCreated.call(this);`).
      */
     onCreated(): void {
-      for (const effectName in this._rendererEffects) {
-        this._runtimeScene
-          .getGame()
-          .getEffectsManager()
-          .applyEffect(
-            this.getRendererObject(),
-            this._rendererEffects[effectName]
-          );
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
+        for (const effectName in this._rendererEffects) {
+          this._runtimeScene
+            .getGame()
+            .getEffectsManager()
+            // @ts-expect-error - the effects manager is typed with the PIXI object.
+            .applyEffect(rendererObject, this._rendererEffects[effectName]);
+        }
       }
 
       for (let i = 0; i < this._behaviors.length; ++i) {
@@ -315,6 +321,8 @@ namespace gdjs {
 
       // Make sure to delete existing timers.
       this._timers.clear();
+
+      this.destroyCallbacks.clear();
     }
 
     static supportsReinitialization = false;
@@ -351,7 +359,6 @@ namespace gdjs {
      */
     updatePreRender(runtimeScene: gdjs.RuntimeScene): void {}
 
-    //Nothing to do.
     /**
      * Called when the object is created from an initial instance at the startup of the scene.<br>
      * Note that common properties (position, angle, z order...) have already been setup.
@@ -362,7 +369,6 @@ namespace gdjs {
       initialInstanceData: InstanceData
     ): void {}
 
-    //Nothing to do.
     /**
      * Called when the object must be updated using the specified objectData. This is the
      * case during hot-reload, and is only called if the object was modified.
@@ -392,6 +398,14 @@ namespace gdjs {
       }
     }
 
+    registerDestroyCallback(callback: () => void) {
+      this.destroyCallbacks.add(callback);
+    }
+
+    unregisterDestroyCallback(callback: () => void) {
+      this.destroyCallbacks.delete(callback);
+    }
+
     /**
      * Called when the object is destroyed (because it is removed from a scene or the scene
      * is being unloaded). If you redefine this function, **make sure to call the original method**
@@ -408,8 +422,25 @@ namespace gdjs {
       for (let j = 0, lenj = this._behaviors.length; j < lenj; ++j) {
         this._behaviors[j].onDestroy();
       }
+      this.destroyCallbacks.forEach((c) => c());
       this.clearEffects();
     }
+
+    /**
+     * Called whenever the scene owning the object is paused.
+     * This should *not* impact objects, but some may need to inform their renderer.
+     *
+     * @param runtimeScene The scene owning the object.
+     */
+    onScenePaused(runtimeScene: gdjs.RuntimeScene): void {}
+
+    /**
+     * Called whenever the scene owning the object is resumed after a pause.
+     * This should *not* impact objects, but some may need to inform their renderer.
+     *
+     * @param runtimeScene The scene owning the object.
+     */
+    onSceneResumed(runtimeScene: gdjs.RuntimeScene): void {}
 
     //Rendering:
     /**
@@ -418,7 +449,7 @@ namespace gdjs {
      *
      * @return The internal rendered object (PIXI.DisplayObject...)
      */
-    getRendererObject(): any {
+    getRendererObject(): RendererObjectInterface | null | undefined {
       return undefined;
     }
 
@@ -672,11 +703,10 @@ namespace gdjs {
         return;
       }
       this.zOrder = z;
-      if (this.getRendererObject()) {
+      const rendererObject = this.getRendererObject();
+      if (rendererObject) {
         const theLayer = this._runtimeScene.getLayer(this.layer);
-        theLayer
-          .getRenderer()
-          .changeRendererObjectZOrder(this.getRendererObject(), z);
+        theLayer.getRenderer().changeRendererObjectZOrder(rendererObject, z);
       }
     }
 
@@ -885,15 +915,16 @@ namespace gdjs {
      * @param effectData The data describing the effect to add.
      */
     addEffect(effectData: EffectData): boolean {
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .addEffect(
-          effectData,
-          this._rendererEffects,
-          this.getRendererObject(),
-          this
-        );
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .addEffect(effectData, this._rendererEffects, rendererObject, this)
+      );
     }
 
     /**
@@ -901,25 +932,33 @@ namespace gdjs {
      * @param effectName The name of the effect.
      */
     removeEffect(effectName: string): boolean {
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .removeEffect(
-          this._rendererEffects,
-          this.getRendererObject(),
-          effectName
-        );
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .removeEffect(this._rendererEffects, rendererObject, effectName)
+      );
     }
 
     /**
      * Remove all effects.
      */
     clearEffects(): boolean {
+      const rendererObject = this.getRendererObject();
+      if (!rendererObject) return false;
+
       this._rendererEffects = {};
-      return this._runtimeScene
-        .getGame()
-        .getEffectsManager()
-        .clearEffects(this.getRendererObject());
+      return (
+        this._runtimeScene
+          .getGame()
+          .getEffectsManager()
+          // @ts-expect-error - the effects manager is typed with the PIXI object.
+          .clearEffects(rendererObject)
+      );
     }
 
     /**
@@ -1700,10 +1739,13 @@ namespace gdjs {
     }
 
     /**
-     * Test a timer elapsed time, if the timer doesn't exist it is created
-     * @param timerName The timer name
-     * @param timeInSeconds The time value to check in seconds
-     * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise
+     * Compare a timer elapsed time. If the timer does not exist, it is created.
+     *
+     * @deprecated prefer using `getTimerElapsedTimeInSecondsOrNaN`.
+     *
+     * @param timerName The timer name.
+     * @param timeInSeconds The time value to check in seconds.
+     * @return True if the timer exists and its value is greater than or equal than the given time, false otherwise.
      */
     timerElapsedTime(timerName: string, timeInSeconds: float): boolean {
       if (!this._timers.containsKey(timerName)) {
@@ -1714,9 +1756,9 @@ namespace gdjs {
     }
 
     /**
-     * Test a if a timer is paused
-     * @param timerName The timer name
-     * @return True if the timer exists and is paused, false otherwise
+     * Test a if a timer is paused.
+     * @param timerName The timer name.
+     * @return True if the timer exists and is paused, false otherwise.
      */
     timerPaused(timerName: string): boolean {
       if (!this._timers.containsKey(timerName)) {
@@ -1726,8 +1768,8 @@ namespace gdjs {
     }
 
     /**
-     * Reset a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Reset a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     resetTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1737,8 +1779,8 @@ namespace gdjs {
     }
 
     /**
-     * Pause a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Pause a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     pauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1748,8 +1790,8 @@ namespace gdjs {
     }
 
     /**
-     * Unpause a timer, if the timer doesn't exist it is created
-     * @param timerName The timer name
+     * Unpause a timer. If the timer doesn't exist it is created.
+     * @param timerName The timer name.
      */
     unpauseTimer(timerName: string): void {
       if (!this._timers.containsKey(timerName)) {
@@ -1760,7 +1802,7 @@ namespace gdjs {
 
     /**
      * Remove a timer
-     * @param timerName The timer name
+     * @param timerName The timer name.
      */
     removeTimer(timerName: string): void {
       if (this._timers.containsKey(timerName)) {
@@ -1770,12 +1812,32 @@ namespace gdjs {
 
     /**
      * Get a timer elapsed time.
-     * @param timerName The timer name
-     * @return The timer elapsed time in seconds, 0 if the timer doesn't exist
+     *
+     * This is used by expressions to return 0 when a timer doesn't exist
+     * because numeric expressions must always return a number.
+     *
+     * @param timerName The timer name.
+     * @return The timer elapsed time in seconds, 0 if the timer doesn't exist.
      */
     getTimerElapsedTimeInSeconds(timerName: string): float {
       if (!this._timers.containsKey(timerName)) {
         return 0;
+      }
+      return this._timers.get(timerName).getTime() / 1000.0;
+    }
+
+    /**
+     * Get a timer elapsed time.
+     *
+     * This is used by conditions to return false when a timer doesn't exist,
+     * no matter the relational operator.
+     *
+     * @param timerName The timer name.
+     * @return The timer elapsed time in seconds, NaN if the timer doesn't exist.
+     */
+    getTimerElapsedTimeInSecondsOrNaN(timerName: string): float {
+      if (!this._timers.containsKey(timerName)) {
+        return Number.NaN;
       }
       return this._timers.get(timerName).getTime() / 1000.0;
     }
@@ -2289,6 +2351,7 @@ namespace gdjs {
      *
      * The position should be in "world" coordinates, i.e use gdjs.Layer.convertCoords
      * if you need to pass the mouse or a touch position that you get from gdjs.InputManager.
+     * To check if a point is inside the object collision mask, you can use `isCollidingWithPoint` instead.
      *
      */
     insideObject(x: float, y: float): boolean {

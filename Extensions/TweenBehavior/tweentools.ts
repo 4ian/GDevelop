@@ -1,12 +1,11 @@
 /// <reference path="shifty.d.ts" />
 namespace gdjs {
+  export interface RuntimeScene {
+    _tweens: Map<string, shifty.Tweenable>;
+  }
   export namespace evtTools {
     export namespace tween {
-      interface RuntimeScene {
-        _tweens: Map<string, shifty.Tweenable>;
-      }
-
-      const easingFunctions: { [key: string]: shifty.easingFunction } = {
+      const easingFunctions: Record<string, shifty.easingFunction> = {
         linear: shifty.Tweenable.formulas.linear,
         easeInQuad: shifty.Tweenable.formulas.easeInQuad,
         easeOutQuad: shifty.Tweenable.formulas.easeOutQuad,
@@ -65,21 +64,56 @@ namespace gdjs {
 
       const getTweensMap = (rs: RuntimeScene) =>
         rs._tweens || (rs._tweens = new Map());
+      const getShiftyScene = (rs: RuntimeScene) =>
+        rs.shiftyJsScene || (rs.shiftyJsScene = new shifty.Scene());
 
-      export const hasTween = (rs: RuntimeScene, id: string) =>
+      export const tweenExists = (rs: RuntimeScene, id: string) =>
         getTweensMap(rs).has(id);
 
-      export const isPlaying = (rs: RuntimeScene, id: string) => {
+      export const tweenIsPlaying = (rs: RuntimeScene, id: string) => {
         const map = getTweensMap(rs);
         return map.has(id) && map.get(id)!.isPlaying();
       };
 
-      export const hasFinished = (rs: RuntimeScene, id: string) => {
+      export const tweenHasFinished = (rs: RuntimeScene, id: string) => {
         const map = getTweensMap(rs);
-        return map.has(id) && map.get(id)!.hasFinished;
+        return map.has(id) && map.get(id)!.hasEnded();
       };
 
-      export const tweenVariable = (
+      export const resumeTween = (rs: RuntimeScene, id: string) => {
+        const map = getTweensMap(rs);
+        if (!map.has(id)) return;
+        const tween = map.get(id)!;
+        tween.resume();
+        getShiftyScene(rs).add(tween);
+      };
+
+      export const pauseTween = (rs: RuntimeScene, id: string) => {
+        const map = getTweensMap(rs);
+        if (!map.has(id)) return;
+        const tween = map.get(id)!;
+        tween.pause();
+        getShiftyScene(rs).remove(tween);
+      };
+
+      export const stopTween = (rs: RuntimeScene, id: string) => {
+        const map = getTweensMap(rs);
+        if (!map.has(id)) return;
+        const tween = map.get(id)!;
+        tween.stop();
+        getShiftyScene(rs).remove(tween);
+      };
+
+      export const removeTween = (rs: RuntimeScene, id: string) => {
+        const map = getTweensMap(rs);
+        if (!map.has(id)) return;
+        const tween = map.get(id)!;
+        map.delete(id);
+        getShiftyScene(rs).remove(tween);
+        tween.stop().dispose();
+      };
+
+      export const tweenNumber = (
         rs: RuntimeScene,
         identifier: string,
         variable: Variable,
@@ -88,16 +122,41 @@ namespace gdjs {
         duration: number,
         easing: shifty.easingFunction
       ) => {
-        getTweensMap(rs).set(
-          identifier,
-          shifty.tween({
-            from: { value: from },
-            to: { value: to },
-            easing,
-            duration,
-            render: ({ value }) => variable.setNumber(value),
-          })
-        );
+        const tween = shifty.tween({
+          from: { value: from },
+          to: { value: to },
+          easing,
+          duration,
+          render: ({ value }) => variable.setNumber(value),
+        });
+
+        getTweensMap(rs).set(identifier, tween);
+        getShiftyScene(rs).add(tween);
+      };
+
+      export const tweenCamera = (
+        rs: RuntimeScene,
+        identifier: string,
+        toX: number,
+        toY: number,
+        layerName: string,
+        duration: number,
+        easing: shifty.easingFunction
+      ) => {
+        const layer = rs.getLayer(layerName);
+        const tween = shifty.tween({
+          from: { x: layer.getCameraX(), y: layer.getCameraY() },
+          to: { x: toX, y: toY },
+          easing,
+          duration,
+          render: ({ x, y }) => {
+            layer.setCameraX(x);
+            layer.setCameraY(y);
+          },
+        });
+
+        getTweensMap(rs).set(identifier, tween);
+        getShiftyScene(rs).add(tween);
       };
     }
   }

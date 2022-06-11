@@ -904,6 +904,7 @@ const gd::String ExporterHelper::GenerateWebManifest(
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "black",
+  "categories": ["games", "entertainment"],
   "icons": {ICONS}
 })webmanifest")
       .FindAndReplace("{NAME}", project.GetName())

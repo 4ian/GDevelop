@@ -210,9 +210,8 @@ module.exports = {
           'res/icon.png'
         )
         .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
-        .setAsync()
         .getCodeExtraInformation()
-        .setFunctionName('doFakeAsyncAction')
+        .setAsyncFunctionName('doFakeAsyncAction')
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

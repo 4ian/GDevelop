@@ -1,9 +1,9 @@
 //@flow
-import { diff } from 'semver/functions/diff';
+import diff from 'semver/functions/diff';
 import { useMemo } from 'react';
 import type { ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 
-type UpdateType = 'patch' | 'minor' | 'major';
+type UpdateType = 'patch' | 'minor' | 'major' | 'unknown';
 type UpdateMetadata = {|
   type: UpdateType,
   currentVersion: string,
@@ -30,8 +30,7 @@ const getUpdateMetadataFromVersions = (
     // is only for local extensions that do not respect the best practices.
     if (currentVersion !== newestVersion) {
       return {
-        // Use minor as it is the most neutral option
-        type: 'minor',
+        type: 'unknown',
         currentVersion,
         newestVersion,
       };

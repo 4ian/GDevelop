@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -46,6 +47,7 @@ type Props = {|
   onInstall: () => Promise<void>,
   onEdit?: () => void,
   project: gdProject,
+  i18n: I18nType,
 |};
 
 const ExtensionInstallDialog = ({
@@ -55,6 +57,7 @@ const ExtensionInstallDialog = ({
   onInstall,
   onEdit,
   project,
+  i18n,
 }: Props) => {
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
@@ -93,18 +96,29 @@ const ExtensionInstallDialog = ({
   const onInstallExtension = React.useCallback(
     () => {
       if (canInstallExtension) {
-        if (alreadyInstalled) {
-          const answer = Window.showConfirmDialog(
-            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?'
-          );
-          if (!answer) return;
-          onInstall();
-        } else {
-          onInstall();
+        if (extensionUpdate) {
+          if (extensionUpdate.type === 'major') {
+            const answer = Window.showConfirmDialog(
+              i18n._(
+                t`This extension update contains a breaking change. You will have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+              )
+            );
+            if (!answer) return;
+          }
+
+          if (extensionUpdate.type === 'unknown') {
+            const answer = Window.showConfirmDialog(
+              i18n._(
+                t`The latest version will be installed, but it isn't indicated whether this update includes breaking changes. You may have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+              )
+            );
+            if (!answer) return;
+          }
         }
+        onInstall();
       }
     },
-    [onInstall, canInstallExtension, alreadyInstalled]
+    [onInstall, canInstallExtension, extensionUpdate, i18n]
   );
 
   return (
@@ -117,6 +131,7 @@ const ExtensionInstallDialog = ({
           onClick={onClose}
           disabled={isInstalling}
         />,
+
         <LeftLoader isLoading={isInstalling} key="install">
           <DialogPrimaryButton
             label={

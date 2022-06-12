@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 import SearchBar from '../../UI/SearchBar';
 import { Column, Line } from '../../UI/Grid';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
@@ -129,19 +130,26 @@ export const ExtensionStore = ({
           </Column>
         )}
       </ResponsiveWindowMeasurer>
-      {!!selectedExtensionShortHeader && (
-        <ExtensionInstallDialog
-          project={project}
-          isInstalling={isInstalling}
-          extensionShortHeader={selectedExtensionShortHeader}
-          onInstall={async () => {
-            sendExtensionAddedToProject(selectedExtensionShortHeader.name);
-            const wasInstalled = await onInstall(selectedExtensionShortHeader);
-            if (wasInstalled) setSelectedExtensionShortHeader(null);
-          }}
-          onClose={() => setSelectedExtensionShortHeader(null)}
-        />
-      )}
+      <I18n>
+        {({ i18n }) =>
+          !!selectedExtensionShortHeader && (
+            <ExtensionInstallDialog
+              project={project}
+              isInstalling={isInstalling}
+              extensionShortHeader={selectedExtensionShortHeader}
+              onInstall={async () => {
+                sendExtensionAddedToProject(selectedExtensionShortHeader.name);
+                const wasInstalled = await onInstall(
+                  selectedExtensionShortHeader
+                );
+                if (wasInstalled) setSelectedExtensionShortHeader(null);
+              }}
+              onClose={() => setSelectedExtensionShortHeader(null)}
+              i18n={i18n}
+            />
+          )
+        }
+      </I18n>
     </React.Fragment>
   );
 };

@@ -227,6 +227,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
+      const gd::String& functionCallName,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
@@ -236,6 +237,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& objectName,
       const gd::String& behaviorName,
       const gd::BehaviorMetadata& autoInfo,
+      const gd::String& functionCallName,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,

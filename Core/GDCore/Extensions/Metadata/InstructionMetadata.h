@@ -6,10 +6,10 @@
 
 #ifndef INSTRUCTIONMETADATA_H
 #define INSTRUCTIONMETADATA_H
+#include <algorithm>
 #include <functional>
 #include <map>
 #include <memory>
-#include <algorithm>
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
@@ -104,16 +104,17 @@ class GD_CORE_API InstructionMetadata {
    * background, executing the instructions following it before the frame after
    * it resolved.
    */
-  bool IsAsync() const { return isAsync; }
+  bool IsAsync() const {
+    return !codeExtraInformation.asyncFunctionCallName.empty();
+  }
 
   /**
-   * Set that the instruction is asynchronous - it will be running in the
-   * background, executing the instructions following it before the frame after
-   * it resolved.
+   * Check if the instruction's asynchronity is optional. If it is, it can be
+   * both used synchronously or asynchronously, with two different possible
+   * implementations.
    */
-  InstructionMetadata &SetAsync() {
-    isAsync = true;
-    return *this;
+  bool IsOptionallyAsync() const {
+    return IsAsync() && !codeExtraInformation.functionCallName.empty();
   }
 
   /**
@@ -328,6 +329,17 @@ class GD_CORE_API InstructionMetadata {
     }
 
     /**
+     * Set the function name which will be used when generating the code as an
+     * async instruction.
+     * \param functionName the name of the async version of the
+     * function to call
+     */
+    ExtraInformation &SetAsyncFunctionName(const gd::String &functionName_) {
+      asyncFunctionCallName = functionName_;
+      return *this;
+    }
+
+    /**
      * Declare if the instruction being declared is somewhat manipulating in a
      * standard way.
      */
@@ -422,6 +434,7 @@ class GD_CORE_API InstructionMetadata {
     bool HasCustomCodeGenerator() const { return hasCustomCodeGenerator; }
 
     gd::String functionCallName;
+    gd::String asyncFunctionCallName;
     gd::String type;
     AccessType accessType;
     gd::String optionalAssociatedInstruction;
@@ -463,6 +476,16 @@ class GD_CORE_API InstructionMetadata {
     return codeExtraInformation.SetFunctionName(functionName);
   }
 
+  /**
+   * \brief Set the function that should be called when generating the source
+   * code from events for the asynchronous version of the instruction.
+   * \param functionName the name of the function to call
+   * \note Shortcut for `codeExtraInformation.SetAsyncFunctionName`.
+   */
+  ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {
+    return codeExtraInformation.SetAsyncFunctionName(functionName);
+  }
+
   std::vector<ParameterMetadata> parameters;
 
  private:
@@ -479,7 +502,6 @@ class GD_CORE_API InstructionMetadata {
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
   bool isPrivate;
-  bool isAsync;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;

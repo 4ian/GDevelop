@@ -1,5 +1,6 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import React from 'react';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
@@ -46,6 +47,7 @@ type Props = {|
   onInstall: () => Promise<void>,
   onEdit?: () => void,
   project: gdProject,
+  i18n: I18nType,
 |};
 
 const ExtensionInstallDialog = ({
@@ -55,6 +57,7 @@ const ExtensionInstallDialog = ({
   onInstall,
   onEdit,
   project,
+  i18n,
 }: Props) => {
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
@@ -95,16 +98,24 @@ const ExtensionInstallDialog = ({
       if (canInstallExtension) {
         if (alreadyInstalled) {
           const answer = Window.showConfirmDialog(
-            'This extension is already in your project, this will install the latest version. You may have to do some adaptations to make sure your game still works. Do you want to continue?'
+            (extensionUpdate && extensionUpdate.type) === 'major'
+              ? i18n._(
+                  t`This extension update contains a breaking change. You will have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+                )
+              : (extensionUpdate && extensionUpdate.type) === 'unknown'
+              ? i18n._(
+                  t`The latest version will be installed, but it isn't indicated whether this update includes breaking changes. You may have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+                )
+              : i18n._(
+                  t`The latest version of the extension is about to be installed. While the extension notifies that there should be no breaking changes, be aware that any modifications you might have made to the extension since installing it will be discarded.  Do you want to continue?`
+                )
           );
           if (!answer) return;
-          onInstall();
-        } else {
-          onInstall();
         }
+        onInstall();
       }
     },
-    [onInstall, canInstallExtension, alreadyInstalled]
+    [onInstall, canInstallExtension, alreadyInstalled, extensionUpdate, i18n]
   );
 
   return (
@@ -117,6 +128,7 @@ const ExtensionInstallDialog = ({
           onClick={onClose}
           disabled={isInstalling}
         />,
+
         <LeftLoader isLoading={isInstalling} key="install">
           <DialogPrimaryButton
             label={

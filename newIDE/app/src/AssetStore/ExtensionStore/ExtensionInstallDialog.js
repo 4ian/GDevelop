@@ -96,29 +96,26 @@ const ExtensionInstallDialog = ({
   const onInstallExtension = React.useCallback(
     () => {
       if (canInstallExtension) {
-        if (extensionUpdate) {
-          if (extensionUpdate.type === 'major') {
-            const answer = Window.showConfirmDialog(
-              i18n._(
-                t`This extension update contains a breaking change. You will have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
-              )
-            );
-            if (!answer) return;
-          }
-
-          if (extensionUpdate.type === 'unknown') {
-            const answer = Window.showConfirmDialog(
-              i18n._(
-                t`The latest version will be installed, but it isn't indicated whether this update includes breaking changes. You may have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
-              )
-            );
-            if (!answer) return;
-          }
+        if (alreadyInstalled) {
+          const answer = Window.showConfirmDialog(
+            (extensionUpdate && extensionUpdate.type) === 'major'
+              ? i18n._(
+                  t`This extension update contains a breaking change. You will have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+                )
+              : (extensionUpdate && extensionUpdate.type) === 'unknown'
+              ? i18n._(
+                  t`The latest version will be installed, but it isn't indicated whether this update includes breaking changes. You may have to do some adaptations to make sure your game still works. We advise to back up your game before proceeding. Do you want to continue?`
+                )
+              : i18n._(
+                  t`The latest version of the extension is about to be installed. While the extension notifies that there should be no breaking changes, be aware that any modifications you might have made to the extension since installing it will be discarded.  Do you want to continue?`
+                )
+          );
+          if (!answer) return;
         }
         onInstall();
       }
     },
-    [onInstall, canInstallExtension, extensionUpdate, i18n]
+    [onInstall, canInstallExtension, alreadyInstalled, extensionUpdate, i18n]
   );
 
   return (

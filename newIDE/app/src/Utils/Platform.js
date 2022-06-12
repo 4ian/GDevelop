@@ -1,11 +1,11 @@
 // @flow
-import optionalRequire from './OptionalRequire.js';
-const electron = optionalRequire('electron');
+import optionalRequire from './OptionalRequire';
+const remote = optionalRequire('@electron/remote');
 const process = optionalRequire('process');
 
 let _isWindows = false;
-if (electron) {
-  _isWindows = electron.remote.require('electron-is').windows();
+if (remote) {
+  _isWindows = remote.require('electron-is').windows();
 }
 const _isMacLike =
   typeof navigator !== 'undefined' &&

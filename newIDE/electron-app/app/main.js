@@ -20,6 +20,14 @@ const throttle = require('lodash.throttle');
 const { findLocalIp } = require('./Utils/LocalNetworkIpFinder');
 const setUpDiscordRichPresence = require('./DiscordRichPresence');
 const { downloadLocalFile } = require('./LocalFileDownloader');
+const { openPreviewWindow } = require('./PreviewWindow');
+const {
+  setupLocalGDJSDevelopmentWatcher,
+  closeLocalGDJSDevelopmentWatcher,
+} = require('./LocalGDJSDevelopmentWatcher');
+
+// Initialize `@electron/remote` module
+require('@electron/remote/main').initialize();
 
 log.info('GDevelop Electron app starting...');
 
@@ -46,17 +54,10 @@ const args = parseArgs(process.argv.slice(isDev ? 2 : 1), {
 // See registerGdideProtocol (used for HTML modules support)
 protocol.registerSchemesAsPrivileged([{ scheme: 'gdide' }]);
 
-// Should be set to true, which will be the default value in future Electron
-// versions, but then causes an issue on Windows where the `fs` module stops
-// working in the renderer process.
-// See https://github.com/electron/electron/issues/22119
-// For now, disable this as we rely heavily on `fs` in the renderer process.
-app.allowRendererProcessReuse = false;
-
 // Notifications on Microsoft Windows platforms show the app user model id.
 // If not set, defaults to `electron.app.{app.name}`.
 if (process.platform === 'win32') {
-    app.setAppUserModelId('gdevelop.ide');
+  app.setAppUserModelId('gdevelop.ide');
 }
 
 // Quit when all windows are closed.
@@ -84,7 +85,10 @@ app.on('ready', function() {
     y: args.y,
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
+      // Allow Node.js API access in renderer process, as long
+      // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
+      contextIsolation: false,
     },
     enableLargerThanScreen: true,
     backgroundColor: '#000',
@@ -102,13 +106,16 @@ app.on('ready', function() {
     options.show = false;
   }
 
-  if (isDev)
-    BrowserWindow.addDevToolsExtension(
-      path.join(__dirname, 'extensions/ReactDeveloperTools/4.2.1_0/')
-    );
-
   mainWindow = new BrowserWindow(options);
   if (!isIntegrated) mainWindow.maximize();
+
+  // Enable `@electron/remote` module for renderer process
+  require('@electron/remote/main').enable(mainWindow.webContents);
+
+  if (isDev)
+    mainWindow.webContents.session.loadExtension(
+      path.join(__dirname, 'extensions/ReactDeveloperTools/4.24.3_0/')
+    );
 
   // Expose program arguments (to be accessed by mainWindow)
   global['args'] = args;
@@ -144,11 +151,21 @@ app.on('ready', function() {
     }
   });
 
-  //Prevent opening any website or url inside Electron.
-  mainWindow.webContents.on('new-window', (e, url) => {
-    console.info('Opening in browser (because of new-window): ', url);
-    e.preventDefault();
-    electron.shell.openExternal(url);
+  // Prevent opening any website or url inside Electron
+  mainWindow.webContents.setWindowOpenHandler(details => {
+    console.info('Opening in browser (because of new window): ', details.url);
+    electron.shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
+
+  ipcMain.handle('preview-open', async (event, options) => {
+    return openPreviewWindow({
+      parentWindow: mainWindow,
+      previewBrowserWindowOptions: options.previewBrowserWindowOptions,
+      previewGameIndexHtmlPath: options.previewGameIndexHtmlPath,
+      alwaysOnTop: options.alwaysOnTop,
+      hideMenuBar: options.hideMenuBar,
+    });
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, externalEditorData) => {
@@ -255,7 +272,7 @@ app.on('ready', function() {
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {
     const result = await downloadLocalFile(url, outputPath);
     return result;
-  })
+  });
 
   // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {
@@ -276,6 +293,15 @@ app.on('ready', function() {
 
   ipcMain.on('get-local-network-ip', event => {
     event.sender.send('local-network-ip', findLocalIp());
+  });
+
+  // LocalGDJSDevelopmentWatcher events:
+  ipcMain.on('setup-local-gdjs-development-watcher', event => {
+    setupLocalGDJSDevelopmentWatcher();
+  });
+
+  ipcMain.on('close-local-gdjs-development-watcher', event => {
+    closeLocalGDJSDevelopmentWatcher();
   });
 
   // DebuggerServer events:

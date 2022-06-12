@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import InstructionsList from '../InstructionsList.js';
+import InstructionsList from '../InstructionsList';
 import classNames from 'classnames';
 import {
   selectableArea,
@@ -17,7 +17,7 @@ import SceneVariableField from '../../ParameterFields/SceneVariableField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
 import { Trans } from '@lingui/macro';
-import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 const gd: libGDevelop = global.gd;
 
 const styles = {
@@ -299,6 +299,8 @@ export default class ForEachChildVariableEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
             />
           )}
           renderActionsList={({ className }) => (
@@ -327,6 +329,8 @@ export default class ForEachChildVariableEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
             />
           )}
         />

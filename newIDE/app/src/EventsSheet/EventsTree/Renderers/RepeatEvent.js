@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import InstructionsList from '../InstructionsList.js';
+import InstructionsList from '../InstructionsList';
 import classNames from 'classnames';
 import {
   largeSelectedArea,
@@ -13,7 +13,7 @@ import InlinePopover from '../../InlinePopover';
 import DefaultField from '../../ParameterFields/DefaultField';
 import { type EventRendererProps } from './EventRenderer';
 import ConditionsActionsColumns from '../ConditionsActionsColumns';
-import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys.js';
+import { shouldActivate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { Trans } from '@lingui/macro';
 const gd: libGDevelop = global.gd;
 
@@ -155,6 +155,8 @@ export default class RepeatEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
             />
           )}
           renderActionsList={({ className }) => (
@@ -183,6 +185,8 @@ export default class RepeatEvent extends React.Component<
               renderObjectThumbnail={this.props.renderObjectThumbnail}
               screenType={this.props.screenType}
               windowWidth={this.props.windowWidth}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
             />
           )}
         />

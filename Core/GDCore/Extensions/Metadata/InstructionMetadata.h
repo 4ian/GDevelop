@@ -9,6 +9,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <algorithm>
 
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
@@ -95,6 +96,23 @@ class GD_CORE_API InstructionMetadata {
    */
   InstructionMetadata &SetPrivate() {
     isPrivate = true;
+    return *this;
+  }
+
+  /**
+   * Check if the instruction is asynchronous - it will be running in the
+   * background, executing the instructions following it before the frame after
+   * it resolved.
+   */
+  bool IsAsync() const { return isAsync; }
+
+  /**
+   * Set that the instruction is asynchronous - it will be running in the
+   * background, executing the instructions following it before the frame after
+   * it resolved.
+   */
+  InstructionMetadata &SetAsync() {
+    isAsync = true;
     return *this;
   }
 
@@ -461,6 +479,7 @@ class GD_CORE_API InstructionMetadata {
   int usageComplexity;  ///< Evaluate the instruction from 0 (simple&easy to
                         ///< use) to 10 (complex to understand)
   bool isPrivate;
+  bool isAsync;
   bool isObjectInstruction;
   bool isBehaviorInstruction;
   gd::String requiredBaseObjectCapability;

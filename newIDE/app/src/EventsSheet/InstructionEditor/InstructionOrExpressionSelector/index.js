@@ -10,7 +10,7 @@ import SearchBar, {
   useShouldAutofocusSearchbar,
   type SearchBarInterface,
 } from '../../../UI/SearchBar';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import {
   type TreeNode,
   findInTree,
@@ -30,14 +30,6 @@ import {
   sharedFuseConfiguration,
 } from '../../../UI/Search/UseSearchStructuredItem';
 const gd: libGDevelop = global.gd;
-
-const styles = {
-  searchBar: {
-    backgroundColor: 'transparent',
-    flexShrink: 0,
-    zIndex: 1, // Put the SearchBar in front of the list, to display the shadow
-  },
-};
 
 const getGroupIconSrc = (key: string) => {
   return gd.JsPlatform.get()
@@ -85,6 +77,7 @@ export default class InstructionOrExpressionSelector<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar
     ) {
@@ -158,7 +151,7 @@ export default class InstructionOrExpressionSelector<
                 })
               }
               onRequestSearch={onSubmitSearch}
-              style={styles.searchBar}
+              aspect="integrated-search-bar"
               placeholder={
                 searchPlaceholderObjectName
                   ? searchPlaceholderIsCondition

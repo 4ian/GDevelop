@@ -257,7 +257,8 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (
       this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
@@ -403,6 +404,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   undo = () => {
+    // TODO: Do not clear selection so that the user can actually see
+    // the changes it is undoing (variable change, instance moved, etc.)
+    // or find a way to display a sumup of the change such as "Variable XXX
+    // in instance of Enemy changed to YYY"
     this.instancesSelection.clearSelection();
     this.setState(
       {
@@ -504,7 +509,11 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'ADD'
+        ),
       },
       () => this.updateToolbar()
     );
@@ -527,7 +536,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
@@ -536,7 +549,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesResized = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
@@ -545,7 +562,11 @@ export default class SceneEditor extends React.Component<Props, State> {
   _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'EDIT'
+        ),
       },
       () => this.forceUpdatePropertiesEditor()
     );
@@ -836,7 +857,11 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState(
       {
         selectedObjectNames: [],
-        history: saveToHistory(this.state.history, this.props.initialInstances),
+        history: saveToHistory(
+          this.state.history,
+          this.props.initialInstances,
+          'DELETE'
+        ),
       },
       () => {
         this.updateToolbar();
@@ -1135,6 +1160,13 @@ export default class SceneEditor extends React.Component<Props, State> {
       isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
+    const variablesEditedAssociatedObjectName = this.state
+      .variablesEditedInstance
+      ? this.state.variablesEditedInstance.getObjectName()
+      : null;
+    const variablesEditedAssociatedObject = variablesEditedAssociatedObjectName
+      ? getObjectByName(project, layout, variablesEditedAssociatedObjectName)
+      : null;
 
     const editors = {
       properties: {
@@ -1157,6 +1189,19 @@ export default class SceneEditor extends React.Component<Props, State> {
                   (this._propertiesEditor = propertiesEditor)
                 }
                 unsavedChanges={this.props.unsavedChanges}
+                historyHandler={{
+                  undo: this.undo,
+                  redo: this.redo,
+                  canUndo: () => canUndo(this.state.history),
+                  canRedo: () => canRedo(this.state.history),
+                  saveToHistory: () =>
+                    this.setState({
+                      history: saveToHistory(
+                        this.state.history,
+                        this.props.initialInstances
+                      ),
+                    }),
+                }}
               />
             )}
           </I18n>
@@ -1464,66 +1509,60 @@ export default class SceneEditor extends React.Component<Props, State> {
             onApply={() => this.openSetupGrid(false)}
           />
         )}
-        {!!this.state.variablesEditedInstance && (
-          <VariablesEditorDialog
-            open
-            variablesContainer={
-              this.state.variablesEditedInstance &&
-              this.state.variablesEditedInstance.getVariables()
-            }
-            onCancel={() => this.editInstanceVariables(null)}
-            onApply={() => this.editInstanceVariables(null)}
-            emptyPlaceholderTitle={
-              <Trans>Add your first instance variable</Trans>
-            }
-            emptyPlaceholderDescription={
-              <Trans>
-                Instance variables overwrite the default values of the variables
-                of the object.
-              </Trans>
-            }
-            helpPagePath={'/all-features/variables/instance-variables'}
-            title={<Trans>Instance Variables</Trans>}
-            onEditObjectVariables={() => {
-              if (!this.instancesSelection.hasSelectedInstances()) {
-                return;
+        {!!this.state.variablesEditedInstance &&
+          !!variablesEditedAssociatedObject && (
+            <VariablesEditorDialog
+              open
+              variablesContainer={this.state.variablesEditedInstance.getVariables()}
+              inheritedVariablesContainer={variablesEditedAssociatedObject.getVariables()}
+              onCancel={() => this.editInstanceVariables(null)}
+              onApply={() => this.editInstanceVariables(null)}
+              emptyPlaceholderTitle={
+                <Trans>Add your first instance variable</Trans>
               }
-              const associatedObjectName = this.instancesSelection
-                .getSelectedInstances()[0]
-                .getObjectName();
-              const object = getObjectByName(
-                project,
-                layout,
-                associatedObjectName
-              );
-              if (object) {
-                this.editObject(object, 'variables');
-                this.editInstanceVariables(null);
+              emptyPlaceholderDescription={
+                <Trans>
+                  Instance variables overwrite the default values of the
+                  variables of the object.
+                </Trans>
               }
-            }}
-            hotReloadPreviewButtonProps={this.props.hotReloadPreviewButtonProps}
-            onComputeAllVariableNames={() => {
-              const variablesEditedInstance = this.state
-                .variablesEditedInstance;
-              if (!variablesEditedInstance) {
-                return [];
+              helpPagePath={'/all-features/variables/instance-variables'}
+              title={<Trans>Instance Variables</Trans>}
+              onEditObjectVariables={
+                variablesEditedAssociatedObject
+                  ? () => {
+                      this.editObject(
+                        variablesEditedAssociatedObject,
+                        'variables'
+                      );
+                      this.editInstanceVariables(null);
+                    }
+                  : undefined
               }
-              const variablesEditedObject = getObjectByName(
-                project,
-                layout,
-                variablesEditedInstance.getObjectName()
-              );
-              return variablesEditedObject
-                ? EventsRootVariablesFinder.findAllObjectVariables(
-                    project.getCurrentPlatform(),
-                    project,
-                    layout,
-                    variablesEditedObject
-                  )
-                : [];
-            }}
-          />
-        )}
+              hotReloadPreviewButtonProps={
+                this.props.hotReloadPreviewButtonProps
+              }
+              onComputeAllVariableNames={() => {
+                const { variablesEditedInstance } = this.state;
+                if (!variablesEditedInstance) {
+                  return [];
+                }
+                const variablesEditedObject = getObjectByName(
+                  project,
+                  layout,
+                  variablesEditedInstance.getObjectName()
+                );
+                return variablesEditedObject
+                  ? EventsRootVariablesFinder.findAllObjectVariables(
+                      project.getCurrentPlatform(),
+                      project,
+                      layout,
+                      variablesEditedObject
+                    )
+                  : [];
+              }}
+            />
+          )}
         {!!this.state.layerRemoveDialogOpen && (
           <LayerRemoveDialog
             open

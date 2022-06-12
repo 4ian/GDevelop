@@ -82,6 +82,12 @@ export default class VariableField extends Component<Props, State> {
     this.updateAutocompletions();
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.variablesContainer !== this.props.variablesContainer) {
+      this.updateAutocompletions();
+    }
+  }
+
   /**
    * Can be called to set up or force updating the variables list.
    */
@@ -197,6 +203,8 @@ export const renderVariableWithIcon = (
   {
     value,
     parameterMetadata,
+    expressionIsValid,
+    InvalidParameterValue,
     MissingParameterValue,
   }: ParameterInlineRendererProps,
   iconPath: string,
@@ -223,7 +231,11 @@ export const renderVariableWithIcon = (
         src={iconPath}
         alt=""
       />
-      {value}
+      {expressionIsValid ? (
+        value
+      ) : (
+        <InvalidParameterValue>{value}</InvalidParameterValue>
+      )}
     </span>
   );
 };

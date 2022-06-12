@@ -77,9 +77,9 @@ const ProfileDialog = ({
         ),
       ]}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       open={open}
       noMargin
+      fullHeight
       noTitleMargin
       title={
         <Tabs value={currentTab} onChange={_onChangeTab}>
@@ -90,18 +90,20 @@ const ProfileDialog = ({
     >
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Column noMargin>
-            <AuthenticatedUserProfileDetails
-              authenticatedUser={authenticatedUser}
-              onEditProfile={authenticatedUser.onEdit}
-              onChangeEmail={authenticatedUser.onChangeEmail}
-            />
-            <SubscriptionDetails
-              subscription={authenticatedUser.subscription}
-              onChangeSubscription={onChangeSubscription}
-            />
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
-          </Column>
+          <Line>
+            <Column expand>
+              <AuthenticatedUserProfileDetails
+                authenticatedUser={authenticatedUser}
+                onEditProfile={authenticatedUser.onEdit}
+                onChangeEmail={authenticatedUser.onChangeEmail}
+              />
+              <SubscriptionDetails
+                subscription={authenticatedUser.subscription}
+                onChangeSubscription={onChangeSubscription}
+              />
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            </Column>
+          </Line>
         ) : (
           <Column>
             <CreateProfile
@@ -113,7 +115,7 @@ const ProfileDialog = ({
       {currentTab === 'games-dashboard' &&
         (authenticatedUser.authenticated ? (
           <Line>
-            <ColumnStackLayout expand>
+            <ColumnStackLayout expand noOverflowParent>
               <GamesList project={currentProject} />
             </ColumnStackLayout>
           </Line>

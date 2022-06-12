@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "GDevelop IDE running on browsers",
   "author": "Florian Rival",
-  "homepage": "http://gdevelop-app.com",
+  "homepage": "http://gdevelop.io",
   "private": true,
   "license": "MIT",
   "scripts": {

@@ -19,6 +19,7 @@ type Props = {|
   onChange: (Array<string>) => void,
   floatingLabelText?: React.Node,
   helperText: React.Node,
+  disabled?: boolean,
 |};
 
 const getErrorMessage = (error: ?Error) => {
@@ -30,6 +31,7 @@ export const UsersAutocomplete = ({
   onChange,
   floatingLabelText,
   helperText,
+  disabled,
 }: Props) => {
   const forceUpdate = useForceUpdate();
   const [users, setUsers] = React.useState<Array<AutocompleteOption>>([]);
@@ -84,14 +86,18 @@ export const UsersAutocomplete = ({
           userIds
         );
         setUsers(
-          userIds.map(userId => {
-            const userPublicProfile: UserPublicProfile =
-              userPublicProfilesByIds[userId];
-            return {
-              text: userPublicProfile.username || '(no username)',
-              value: userPublicProfile.id,
-            };
-          })
+          userIds
+            .map(userId => {
+              const userPublicProfile: UserPublicProfile =
+                userPublicProfilesByIds[userId];
+              return userPublicProfile
+                ? {
+                    text: userPublicProfile.username || '(no username)',
+                    value: userPublicProfile.id,
+                  }
+                : null;
+            })
+            .filter(Boolean)
         );
       } catch (err) {
         setError(err);
@@ -141,7 +147,7 @@ export const UsersAutocomplete = ({
           return null;
         })
         .filter(Boolean)}
-      loading={loading}
+      loading={loading || disabled}
       fullWidth
       error={getErrorMessage(error)}
     />

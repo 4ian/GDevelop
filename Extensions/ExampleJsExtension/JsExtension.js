@@ -68,7 +68,7 @@ module.exports = {
       .setFullName(_('Dummy effect example'))
       .setDescription(
         _(
-          'This is an example of an effect ("shader") with an [external link to the wiki](http://wiki.compilgames.net/doku.php/gdevelop5/) and **bold letters**.'
+          'This is an example of an effect ("shader") with an [external link to the wiki](https://wiki.gdevelop.io/gdevelop5/) and **bold letters**.'
         )
       )
       .addIncludeFile('Extensions/ExampleJsExtension/dummyeffect.js');

@@ -15,7 +15,7 @@ type Props = {
   justifyContent?: 'center',
 };
 
-export default ({
+const CreateProfile = ({
   message,
   onLogin,
   onCreateAccount,
@@ -40,10 +40,11 @@ export default ({
         primary
       />
       <Spacer />
-      <Spacer />
       <BackgroundText>or</BackgroundText>
       <Spacer />
       <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
     </Line>
   </Column>
 );
+
+export default CreateProfile;

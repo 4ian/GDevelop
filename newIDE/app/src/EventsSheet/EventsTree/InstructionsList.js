@@ -48,6 +48,9 @@ type Props = {
 
   screenType: ScreenType,
   windowWidth: WidthType,
+
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
 };
 
 const DropTarget = makeDropTarget<{
@@ -74,6 +77,8 @@ export default function InstructionsList({
   renderObjectThumbnail,
   screenType,
   windowWidth,
+  globalObjectsContainer,
+  objectsContainer,
 }: Props) {
   const [canPaste, setCanPaste] = React.useState(false);
 
@@ -143,10 +148,14 @@ export default function InstructionsList({
         renderObjectThumbnail={renderObjectThumbnail}
         screenType={screenType}
         windowWidth={windowWidth}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
       />
     );
   });
 
+  // Note: might be worth fixing this warning:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const instructionsListContext = {
     instrsList,
     isCondition: areConditions,
@@ -158,6 +167,7 @@ export default function InstructionsList({
   ) : (
     <Trans>Add action</Trans>
   );
+
   const longTouchForContextMenuProps = useLongTouch(
     React.useCallback(
       event => {

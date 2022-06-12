@@ -3,7 +3,13 @@ import * as React from 'react';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Tooltip from '@material-ui/core/Tooltip';
-import { FormGroup, FormHelperText } from '@material-ui/core';
+import { FormGroup, FormHelperText, makeStyles } from '@material-ui/core';
+
+const useLabelStyles = makeStyles({
+  root: {
+    cursor: 'default',
+  },
+});
 
 type Props = {|
   label?: ?React.Node,
@@ -19,7 +25,7 @@ type Props = {|
  * A checkbox based on Material-UI Checkbox, but that can be displayed
  * without having it taking the full width of its container.
  */
-export default ({
+const InlineCheckbox = ({
   onCheck,
   disabled,
   checked,
@@ -28,6 +34,7 @@ export default ({
   checkedIcon,
   tooltipOrHelperText,
 }: Props) => {
+  const labelClasses = useLabelStyles();
   const checkbox = (
     <Checkbox
       disabled={disabled}
@@ -42,7 +49,11 @@ export default ({
   );
   return label ? (
     <FormGroup>
-      <FormControlLabel control={checkbox} label={label} />
+      <FormControlLabel
+        control={checkbox}
+        label={label}
+        classes={labelClasses}
+      />
       {tooltipOrHelperText && (
         <FormHelperText>{tooltipOrHelperText}</FormHelperText>
       )}
@@ -53,3 +64,5 @@ export default ({
     checkbox
   );
 };
+
+export default InlineCheckbox;

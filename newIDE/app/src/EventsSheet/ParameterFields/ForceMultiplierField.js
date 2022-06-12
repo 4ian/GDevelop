@@ -3,6 +3,7 @@ import { Trans } from '@lingui/macro';
 import { type ParameterInlineRendererProps } from './ParameterInlineRenderer.flow';
 import React, { Component } from 'react';
 import RaisedButton from '../../UI/RaisedButton';
+import { type ButtonInterface } from '../../UI/Button';
 import { Line, Column } from '../../UI/Grid';
 import { type ParameterFieldProps } from './ParameterFieldCommons';
 import GenericExpressionField from './GenericExpressionField';
@@ -18,7 +19,7 @@ export default class ForceMultiplierField extends Component<
   ParameterFieldProps,
   State
 > {
-  _instantButton = React.createRef<RaisedButton>();
+  _instantButton = React.createRef<ButtonInterface>();
   state = {
     showDeprecatedNumericValue:
       this.props.value !== '' &&

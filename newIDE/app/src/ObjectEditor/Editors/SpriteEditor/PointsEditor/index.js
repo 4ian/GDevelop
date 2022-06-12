@@ -6,7 +6,9 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
 import PointsPreview from './PointsPreview';
-import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSamePointsAs,
@@ -50,6 +52,13 @@ const PointsEditor = (props: Props) => {
   const [animationIndex, setAnimationIndex] = React.useState(0);
   const [directionIndex, setDirectionIndex] = React.useState(0);
   const [spriteIndex, setSpriteIndex] = React.useState(0);
+  const [selectedPointName, setSelectedPointName] = React.useState<?string>(
+    null
+  );
+  const [
+    highlightedPointName,
+    setHighlightedPointName,
+  ] = React.useState<?string>(null);
 
   // Note: these two booleans are set to false to avoid erasing points of other
   // animations/frames (and they will be updated by updateSamePointsToggles). In
@@ -148,8 +157,11 @@ const PointsEditor = (props: Props) => {
     setSamePointsForSprites(enable);
   };
 
+  // Note: might be worth fixing these warnings:
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updateSamePointsToggles, [animationIndex]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   React.useEffect(updatePoints, [
     samePointsForAnimations,
     samePointsForSprites,
@@ -161,6 +173,7 @@ const PointsEditor = (props: Props) => {
     screenSize === 'small' ? verticalMosaicNodes : horizontalMosaicNodes;
 
   if (!props.object.getAnimationsCount()) return null;
+  const resourceName = hasValidSprite ? sprite.getImageName() : '';
 
   const editors: { [string]: Editor } = {
     preview: {
@@ -169,8 +182,16 @@ const PointsEditor = (props: Props) => {
       renderEditor: () => (
         <Background>
           <ImagePreview
-            resourceName={hasValidSprite ? sprite.getImageName() : ''}
-            resourcesLoader={props.resourcesLoader}
+            resourceName={resourceName}
+            imageResourceSource={props.resourcesLoader.getResourceFullUrl(
+              props.project,
+              resourceName,
+              {}
+            )}
+            isImageResourceSmooth={isProjectImageResourceSmooth(
+              props.project,
+              resourceName
+            )}
             project={props.project}
             renderOverlay={overlayProps =>
               hasValidSprite && (
@@ -178,6 +199,9 @@ const PointsEditor = (props: Props) => {
                   {...overlayProps}
                   pointsContainer={sprite}
                   onPointsUpdated={updatePoints}
+                  selectedPointName={selectedPointName}
+                  highlightedPointName={highlightedPointName}
+                  onClickPoint={setSelectedPointName}
                 />
               )
             }
@@ -220,6 +244,9 @@ const PointsEditor = (props: Props) => {
               <PointsList
                 pointsContainer={sprite}
                 onPointsUpdated={updatePoints}
+                selectedPointName={selectedPointName}
+                onHoverPoint={setHighlightedPointName}
+                onSelectPoint={setSelectedPointName}
               />
             )}
             {!sprite && (

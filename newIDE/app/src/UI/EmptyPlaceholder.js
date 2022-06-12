@@ -1,22 +1,31 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+import Container from '@material-ui/core/Container';
+import { CircularProgress } from '@material-ui/core';
+import Add from '@material-ui/icons/Add';
+import { ColumnStackLayout } from './Layout';
+import RaisedButton from '../UI/RaisedButton';
 import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
-import Add from '@material-ui/icons/Add';
-import RaisedButton from '../UI/RaisedButton';
-import Container from '@material-ui/core/Container';
-import { ColumnStackLayout } from './Layout';
+import TutorialButton from './TutorialButton';
 
 type Props = {|
   title: React.Node,
   description: React.Node,
   actionLabel: React.Node,
-  helpPagePath: string,
+  helpPagePath?: string,
+  tutorialId?: string,
   actionButtonId?: string,
-  onAdd: () => void,
+  onAction: () => void,
+  isLoading?: boolean,
+  actionIcon?: React.Node,
 |};
+
+const DefaultHelpButton = ({ helpPagePath }: { helpPagePath?: string }) => (
+  <HelpButton label={<Trans>Read the doc</Trans>} helpPagePath={helpPagePath} />
+);
 
 /**
  * A placeholder for when there is no content to display.
@@ -42,14 +51,30 @@ export const EmptyPlaceholder = (props: Props) => (
           <RaisedButton
             label={props.actionLabel}
             primary
-            onClick={props.onAdd}
-            icon={<Add />}
+            onClick={props.onAction}
+            disabled={!!props.isLoading}
+            icon={
+              props.isLoading ? (
+                <CircularProgress size={24} />
+              ) : props.actionIcon ? (
+                props.actionIcon
+              ) : (
+                <Add />
+              )
+            }
             id={props.actionButtonId}
           />
-          <HelpButton
-            label={<Trans>Read the doc</Trans>}
-            helpPagePath={props.helpPagePath}
-          />
+          {props.tutorialId ? (
+            <TutorialButton
+              tutorialId={props.tutorialId}
+              label="Watch tutorial"
+              renderIfNotFound={
+                <DefaultHelpButton helpPagePath={props.helpPagePath} />
+              }
+            />
+          ) : (
+            <DefaultHelpButton helpPagePath={props.helpPagePath} />
+          )}
         </ColumnStackLayout>
       </Column>
     </Container>

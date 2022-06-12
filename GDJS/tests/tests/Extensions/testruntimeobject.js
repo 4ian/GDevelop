@@ -48,7 +48,23 @@ gdjs.TestRuntimeObject = class TestRuntimeObject extends gdjs.RuntimeObject {
     return this._customWidth;
   }
 
+  setWidth(width) {
+    if (width !== this._customWidth) {
+      this._customWidth = width;
+      this.hitBoxesDirty = true;
+    }
+    return this._customWidth;
+  }
+
   getHeight() {
+    return this._customHeight;
+  }
+
+  setHeight(height) {
+    if (height !== this._customHeight) {
+      this._customHeight = height;
+      this.hitBoxesDirty = true;
+    }
     return this._customHeight;
   }
 

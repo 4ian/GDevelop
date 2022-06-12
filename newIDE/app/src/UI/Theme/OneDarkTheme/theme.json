@@ -175,6 +175,23 @@
       "frame-border-color": {
         "value": "#D6DEEC"
       }
+    },
+    "drop-indicator": {
+      "can-drop": {
+        "color": {
+          "value": "#D6DEEC"
+        }
+      },
+      "cannot-drop": {
+        "color": {
+          "value": "#E06C75"
+        }
+      },
+      "border": {
+        "color": {
+          "value": "#21252B"
+        }
+      }
     }
   },
   "input": {

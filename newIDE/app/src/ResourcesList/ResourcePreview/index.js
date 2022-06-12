@@ -2,7 +2,7 @@
 import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 import { type ResourceKind } from '../ResourceSource';
-import ImagePreview from './ImagePreview';
+import ImagePreview, { isProjectImageResourceSmooth } from './ImagePreview';
 import GenericIconPreview from './GenericIconPreview';
 import Audiotrack from '@material-ui/icons/Audiotrack';
 import InsertDriveFile from '@material-ui/icons/InsertDriveFile';
@@ -12,7 +12,6 @@ import FontDownload from '@material-ui/icons/FontDownload';
 type Props = {|
   project: gdProject,
   resourceName: string,
-  resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
   onSize?: (number, number) => void,
 |};
@@ -27,11 +26,11 @@ type State = {|
 export default class ResourcePreview extends React.PureComponent<Props, State> {
   state = this._loadFrom(this.props);
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       newProps.resourceName !== this.props.resourceName ||
-      newProps.project !== this.props.project ||
-      newProps.resourcePath !== this.props.resourcePath
+      newProps.project !== this.props.project
     ) {
       this.setState(this._loadFrom(newProps));
     }
@@ -58,9 +57,16 @@ export default class ResourcePreview extends React.PureComponent<Props, State> {
           <ImagePreview
             project={this.props.project}
             resourceName={this.props.resourceName}
-            resourcesLoader={this.props.resourcesLoader}
+            imageResourceSource={this.props.resourcesLoader.getResourceFullUrl(
+              this.props.project,
+              this.props.resourceName,
+              {}
+            )}
+            isImageResourceSmooth={isProjectImageResourceSmooth(
+              this.props.project,
+              this.props.resourceName
+            )}
             onSize={this.props.onSize}
-            resourcePath={this.props.resourcePath}
           />
         );
       case 'audio':

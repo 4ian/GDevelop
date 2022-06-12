@@ -2,22 +2,27 @@
 import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import { type Game } from '../../../Utils/GDevelopServices/Game';
+import { type Game, type GameSlug } from '../../../Utils/GDevelopServices/Game';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog from '../../../UI/Dialog';
-import PublicGameProperties from '../../../GameDashboard/PublicGameProperties';
+import {
+  cleanUpGameSlug,
+  PublicGameProperties,
+} from '../../../GameDashboard/PublicGameProperties';
 import {
   applyPublicPropertiesToProject,
   type PartialGameChange,
 } from '../../../GameDashboard/PublicGamePropertiesDialog';
 import { getWebBuildThumbnailUrl } from '../../../Utils/GDevelopServices/Build';
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: gdProject,
   onSaveProject: () => Promise<void>,
   buildId: string,
   game: Game,
+  slug: ?GameSlug,
   onClose: () => void,
   onApply: PartialGameChange => Promise<void>,
   isLoading: boolean,
@@ -28,10 +33,13 @@ export const OnlineGamePropertiesDialog = ({
   onSaveProject,
   buildId,
   game,
+  slug,
   onClose,
   onApply,
   isLoading,
 }: Props) => {
+  const { profile } = React.useContext(AuthenticatedUserContext);
+
   const [name, setName] = React.useState<string>(project.getName());
   const [categories, setCategories] = React.useState<string[]>(
     project.getCategories().toJSArray()
@@ -51,6 +59,12 @@ export const OnlineGamePropertiesDialog = ({
   const [playWithMobile, setPlayableWithMobile] = React.useState<boolean>(
     project.isPlayableWithMobile()
   );
+  const [userSlug, setUserSlug] = React.useState<string>(
+    (slug && slug.username) || (profile && profile.username) || ''
+  );
+  const [gameSlug, setGameSlug] = React.useState<string>(
+    (slug && slug.gameSlug) || cleanUpGameSlug(project.getName())
+  );
   const [orientation, setOrientation] = React.useState<string>(
     project.getOrientation()
   );
@@ -59,13 +73,8 @@ export const OnlineGamePropertiesDialog = ({
   );
   const thumbnailUrl = getWebBuildThumbnailUrl(project, buildId);
 
-  const saveProjectAndPublish = async () => {
-    await onSaveProject();
-    await onPublish();
-  };
-
-  const onPublish = async () => {
-    // Update the project with the new properties before updating the game.
+  const onPublish = async ({ saveProject }: { saveProject: boolean }) => {
+    // First update the project with the new properties.
     if (
       applyPublicPropertiesToProject(project, {
         name,
@@ -78,14 +87,18 @@ export const OnlineGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
-      await onApply({ discoverable });
+      // If the project has been modified, then save it.
+      if (saveProject) {
+        await onSaveProject();
+      }
+      // Then, call the top function with the partial game updates.
+      await onApply({ discoverable, userSlug, gameSlug });
     }
   };
 
   return (
     <Dialog
       title={<Trans>Verify your game info before publishing</Trans>}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           label={<Trans>Back</Trans>}
@@ -99,18 +112,22 @@ export const OnlineGamePropertiesDialog = ({
           key="publish"
           primary
           onClick={() => {
-            saveProjectAndPublish();
+            onPublish({ saveProject: true });
           }}
           disabled={isLoading}
           buildMenuTemplate={i18n => [
             {
               label: i18n._(t`Publish without saving project`),
-              click: onPublish,
+              click: () => onPublish({ saveProject: false }),
             },
           ]}
         />,
       ]}
       cannotBeDismissed={isLoading}
+      onRequestClose={onClose}
+      onApply={() => {
+        onPublish({ saveProject: true });
+      }}
       open
     >
       <PublicGameProperties
@@ -131,10 +148,15 @@ export const OnlineGamePropertiesDialog = ({
         playWithMobile={playWithMobile}
         setOrientation={setOrientation}
         orientation={orientation}
+        userSlug={userSlug}
+        setUserSlug={setUserSlug}
+        gameSlug={gameSlug}
+        setGameSlug={setGameSlug}
         discoverable={discoverable}
         setDiscoverable={setDiscoverable}
         displayThumbnail
         thumbnailUrl={thumbnailUrl}
+        disabled={isLoading}
       />
     </Dialog>
   );

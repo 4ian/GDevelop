@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import SearchBar from '../../UI/SearchBar';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
@@ -10,13 +10,12 @@ import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
+import {
+  sendExtensionDetailsOpened,
+  sendExtensionAddedToProject,
+} from '../../Utils/Analytics/EventSender';
+import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
+import { t } from '@lingui/macro';
 
 type Props = {|
   isInstalling: boolean,
@@ -82,6 +81,10 @@ export const ExtensionStore = ({
     return extensionMatches ? extensionMatches.matches : [];
   };
 
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-behaviors-and-functions'
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -91,10 +94,16 @@ export const ExtensionStore = ({
               value={searchText}
               onChange={setSearchText}
               onRequestSearch={() => {}}
-              style={styles.searchBar}
+              aspect="add-margins-only-if-modern-theme"
               tagsHandler={tagsHandler}
               tags={filters && filters.allTags}
+              placeholder={t`Search extensions`}
             />
+            {DismissableTutorialMessage && (
+              <Line>
+                <Column expand>{DismissableTutorialMessage}</Column>
+              </Line>
+            )}
             <ListSearchResults
               disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
               onRetry={fetchExtensionsAndFilters}
@@ -112,6 +121,7 @@ export const ExtensionStore = ({
                   extensionShortHeader={extensionShortHeader}
                   matches={getExtensionsMatches(extensionShortHeader)}
                   onChoose={() => {
+                    sendExtensionDetailsOpened(extensionShortHeader.name);
                     setSelectedExtensionShortHeader(extensionShortHeader);
                   }}
                 />
@@ -128,6 +138,7 @@ export const ExtensionStore = ({
               isInstalling={isInstalling}
               extensionShortHeader={selectedExtensionShortHeader}
               onInstall={async () => {
+                sendExtensionAddedToProject(selectedExtensionShortHeader.name);
                 const wasInstalled = await onInstall(
                   selectedExtensionShortHeader
                 );

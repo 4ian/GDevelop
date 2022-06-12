@@ -80,7 +80,11 @@ export const getWebBuildThumbnailUrl = (
   }
   // The exporter put asset files directly in the build folder.
   // It's not factorized with the exporter because it's a temporary solution.
-  return `https://games.gdevelop-app.com/game-${buildId}/${fileName}`;
+  // TODO: Upload the thumbnail separately, so that this URL is not defined by the frontend.
+  const uri = `https://games.gdevelop-app.com/game-${buildId}/${fileName}`;
+  // The backend services encode the file URLs when uploaded, so we need to do the same before saving the value.
+  const encodedUri = encodeURI(uri);
+  return encodedUri;
 };
 
 type UploadOptions = {|

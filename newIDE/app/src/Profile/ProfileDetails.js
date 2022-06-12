@@ -3,8 +3,9 @@ import { Trans, t } from '@lingui/macro';
 
 import * as React from 'react';
 import Avatar from '@material-ui/core/Avatar';
-import { Column, Line, Spacer } from '../UI/Grid';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import OpenInNew from '@material-ui/icons/OpenInNew';
+import { Line, Spacer } from '../UI/Grid';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { getGravatarUrl } from '../UI/GravatarUrl';
 import Text from '../UI/Text';
@@ -14,8 +15,11 @@ import PlaceholderError from '../UI/PlaceholderError';
 import RaisedButton from '../UI/RaisedButton';
 import UserAchievements from './Achievement/UserAchievements';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
+import Window from '../Utils/Window';
+import { GDevelopGamesPlatform } from '../Utils/GDevelopServices/ApiConfigs';
 
 type DisplayedProfile = {
+  id: string,
   +email?: string,
   description: ?string,
   username: ?string,
@@ -43,24 +47,44 @@ const ProfileDetails = ({
   return profile ? (
     <I18n>
       {({ i18n }) => (
-        <Column>
-          <Line alignItems="center">
-            <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
-            <Spacer />
-            <Text
-              size="title"
-              style={{
-                opacity: profile.username ? 1.0 : 0.5,
-              }}
-            >
-              {profile.username ||
-                (isAuthenticatedUserProfile
-                  ? i18n._(t`Edit your profile to pick a username!`)
-                  : i18n._(t`No username`))}
-            </Text>
-          </Line>
-          {isAuthenticatedUserProfile && profile.email && (
+        <ColumnStackLayout noMargin>
+          <ResponsiveLineStackLayout
+            alignItems="center"
+            justifyContent="space-between"
+            noMargin
+          >
             <Line>
+              <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
+              <Spacer />
+              <Text
+                size="title"
+                style={{
+                  opacity: profile.username ? 1.0 : 0.5,
+                }}
+              >
+                {profile.username ||
+                  (isAuthenticatedUserProfile
+                    ? i18n._(t`Edit your profile to pick a username!`)
+                    : i18n._(t`No username`))}
+              </Text>
+            </Line>
+            {profile.id && (
+              <RaisedButton
+                label={i18n._(t`Access public profile`)}
+                onClick={() =>
+                  Window.openExternalURL(
+                    GDevelopGamesPlatform.getUserPublicProfileUrl(
+                      profile.id,
+                      profile.username
+                    )
+                  )
+                }
+                icon={<OpenInNew />}
+              />
+            )}
+          </ResponsiveLineStackLayout>
+          {isAuthenticatedUserProfile && profile.email && (
+            <Line noMargin>
               <TextField
                 value={profile.email}
                 readOnly
@@ -70,7 +94,7 @@ const ProfileDetails = ({
               />
             </Line>
           )}
-          <Line>
+          <Line noMargin>
             <TextField
               value={profile.description || ''}
               readOnly
@@ -88,7 +112,7 @@ const ProfileDetails = ({
             />
           </Line>
           {isAuthenticatedUserProfile && (
-            <ResponsiveLineStackLayout justifyContent="flex-end" noColumnMargin>
+            <ResponsiveLineStackLayout justifyContent="flex-end" noMargin>
               <RaisedButton
                 label={<Trans>Change my email</Trans>}
                 onClick={onChangeEmail}
@@ -105,7 +129,7 @@ const ProfileDetails = ({
             displayUnclaimedAchievements={!!isAuthenticatedUserProfile}
             displayNotifications={!!isAuthenticatedUserProfile}
           />
-        </Column>
+        </ColumnStackLayout>
       )}
     </I18n>
   ) : error ? (

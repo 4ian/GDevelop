@@ -33,6 +33,7 @@ namespace gdjs {
     _gameStopRequested: boolean = false;
     _requestedScene: string = '';
     _isLoaded: boolean = false;
+    private _asyncTasksManager = new gdjs.AsyncTasksManager();
 
     // True if loadFromScene was called and the scene is being played.
     _isJustResumed: boolean = false;
@@ -489,6 +490,13 @@ namespace gdjs {
         elapsedTime,
         this._runtimeGame.getMinimalFramerate()
       );
+      if (this._profiler) {
+        this._profiler.begin('asynchronous actions (wait action, etc...)');
+      }
+      this._asyncTasksManager.processTasks(this);
+      if (this._profiler) {
+        this._profiler.end('asynchronous actions (wait action, etc...)');
+      }
       if (this._profiler) {
         this._profiler.begin('objects (pre-events)');
       }
@@ -1068,6 +1076,13 @@ namespace gdjs {
     }
 
     /**
+     * @returns The scene's async tasks manager.
+     */
+    getAsyncTasksManager() {
+      return this._asyncTasksManager;
+    }
+
+    /**
      * Return the value of the scene change that is requested.
      */
     getRequestedChange(): SceneChangeRequest {
@@ -1148,6 +1163,19 @@ namespace gdjs {
     getAdhocListOfAllInstances(): gdjs.RuntimeObject[] {
       this._constructListOfAllInstances();
       return this._allInstancesList;
+    }
+
+    /**
+     * Return the number of instances of the specified object living on the scene.
+     * @param objectName The object name for which instances must be counted.
+     */
+    getInstancesCountOnScene(objectName: string): integer {
+      const instances = this._instances.get(objectName);
+      if (instances) {
+        return instances.length;
+      }
+
+      return 0;
     }
 
     /**

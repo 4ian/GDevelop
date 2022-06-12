@@ -54,11 +54,8 @@ Layout::Layout()
       oglFOV(90.0f),
       oglZNear(1.0f),
       oglZFar(500.0f),
-      disableInputWhenNotFocused(true)
-#if defined(GD_IDE_ONLY)
-      ,
+      disableInputWhenNotFocused(true),
       profiler(NULL)
-#endif
 {
   gd::Layer layer;
   layer.SetCameraCount(1);
@@ -332,7 +329,6 @@ void Layout::UnserializeFrom(gd::Project& project,
   disableInputWhenNotFocused =
       element.GetBoolAttribute("disableInputWhenNotFocused");
 
-#if defined(GD_IDE_ONLY)
   editorSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
 
@@ -340,7 +336,6 @@ void Layout::UnserializeFrom(gd::Project& project,
       element.GetChild("objectsGroups", 0, "GroupesObjets"));
   gd::EventsListSerialization::UnserializeEventsFrom(
       project, GetEvents(), element.GetChild("events", 0, "Events"));
-#endif
 
   UnserializeObjectsFrom(project, element.GetChild("objects", 0, "Objets"));
   initialInstances.UnserializeFrom(
@@ -410,13 +405,11 @@ void Layout::Init(const Layout& other) {
         std::unique_ptr<gd::BehaviorContent>(it.second->Clone());
   }
 
-#if defined(GD_IDE_ONLY)
   events = other.events;
   editorSettings = other.editorSettings;
   objectGroups = other.objectGroups;
 
   profiler = other.profiler;
-#endif
 }
 
 std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
@@ -430,7 +423,6 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
   return hiddenLayers;
 }
 
-#if defined(GD_IDE_ONLY)
 gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
                                        const gd::ObjectsContainer& layout,
                                        gd::String name,
@@ -444,7 +436,7 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
     type = project.GetObject(name).GetType();
 
   // Search in groups
-  if (searchInGroups) {
+  else if (searchInGroups) {
     for (std::size_t i = 0; i < layout.GetObjectGroups().size(); ++i) {
       if (layout.GetObjectGroups()[i].GetName() == name) {
         // A group has the name searched
@@ -505,18 +497,16 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
                                          gd::String name,
                                          bool searchInGroups) {
   for (std::size_t i = 0; i < layout.GetObjectsCount(); ++i) {
-    vector<gd::String> behaviors = layout.GetObject(i).GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      if (layout.GetObject(i).GetBehavior(behaviors[j]).GetName() == name)
-        return layout.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
+    const auto &object = layout.GetObject(i);
+    if (object.HasBehaviorNamed(name)) {
+      return object.GetBehavior(name).GetTypeName();
     }
   }
 
   for (std::size_t i = 0; i < project.GetObjectsCount(); ++i) {
-    vector<gd::String> behaviors = project.GetObject(i).GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      if (project.GetObject(i).GetBehavior(behaviors[j]).GetName() == name)
-        return project.GetObject(i).GetBehavior(behaviors[j]).GetTypeName();
+    const auto &object = project.GetObject(i);
+    if (object.HasBehaviorNamed(name)) {
+      return object.GetBehavior(name).GetTypeName();
     }
   }
 
@@ -612,6 +602,5 @@ GetBehaviorsOfObject(const gd::ObjectsContainer& project,
 
   return behaviors;
 }
-#endif
 
 }  // namespace gd

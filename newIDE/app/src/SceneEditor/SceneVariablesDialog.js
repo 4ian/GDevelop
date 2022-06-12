@@ -14,7 +14,7 @@ type Props = {|
   hotReloadPreviewButtonProps: HotReloadPreviewButtonProps,
 |};
 
-export default (props: Props) => {
+const SceneVariablesDialog = (props: Props) => {
   return (
     <VariablesEditorDialog
       open={props.open}
@@ -38,3 +38,5 @@ export default (props: Props) => {
     />
   );
 };
+
+export default SceneVariablesDialog;

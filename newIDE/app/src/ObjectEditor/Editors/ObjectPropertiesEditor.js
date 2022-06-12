@@ -7,7 +7,7 @@ import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { type EditorProps } from './EditorProps.flow';
-import { Column, Line } from '../../UI/Grid';
+import { Line } from '../../UI/Grid';
 import { getExtraObjectsInformation } from '../../Hints';
 import { getObjectTutorialIds } from '../../Utils/GDevelopServices/Tutorial';
 import AlertMessage from '../../UI/AlertMessage';
@@ -62,13 +62,13 @@ const ObjectPropertiesEditor = (props: Props) => {
             <React.Fragment>
               {extraInformation ? (
                 <Line>
-                  <Column noMargin>
+                  <ColumnStackLayout noMargin>
                     {extraInformation.map(({ kind, message }, index) => (
                       <AlertMessage kind={kind} key={index}>
                         {i18n._(message)}
                       </AlertMessage>
                     ))}
-                  </Column>
+                  </ColumnStackLayout>
                 </Line>
               ) : null}
               <PropertiesEditor

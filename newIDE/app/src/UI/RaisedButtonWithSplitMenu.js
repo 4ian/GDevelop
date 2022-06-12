@@ -7,6 +7,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Spacer } from './Grid';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 type Props = {|
   label?: React.Node,
@@ -15,6 +16,14 @@ type Props = {|
   icon?: React.Node,
   onClick: ?() => void,
   buildMenuTemplate: (i18n: I18nType) => Array<MenuItemTemplate>,
+  style?: {|
+    marginTop?: number,
+    marginBottom?: number,
+    marginLeft?: number,
+    marginRight?: number,
+    margin?: number,
+    flexShrink?: 0,
+  |},
 |};
 
 const shouldNeverBeCalled = () => {
@@ -40,12 +49,24 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
   // always visible to be sure we're getting focusing right.
   const focusRipple = true;
 
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
   return (
     <ButtonGroup
-      variant="contained"
-      color={primary ? 'primary' : 'default'}
+      variant={primary ? 'contained' : 'outlined'}
+      disableElevation={gdevelopTheme.isModern}
+      color={
+        gdevelopTheme.isModern
+          ? primary
+            ? 'secondary'
+            : 'primary'
+          : primary
+          ? 'primary'
+          : 'default'
+      }
       disabled={disabled}
       size="small"
+      style={props.style}
     >
       <Button
         focusRipple={focusRipple}
@@ -53,7 +74,7 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
         style={styles.mainButton}
       >
         {icon}
-        {icon && <Spacer />}
+        {!!icon && !!label && <Spacer />}
         {label}
       </Button>
       <ElementWithMenu

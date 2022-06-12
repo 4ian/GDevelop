@@ -94,22 +94,8 @@ export const NewResourceDialog = ({
   return (
     <Dialog
       open
-      onRequestClose={onClose}
       fullHeight
       flexBody
-      secondaryActions={[
-        !electron && screenType !== 'touch' ? (
-          <FlatButton
-            key="download-gdevelop"
-            label={
-              <Trans>Download GDevelop to use images from your computer</Trans>
-            }
-            onClick={() =>
-              Window.openExternalURL('https://gdevelop-app.com/download')
-            }
-          />
-        ) : null,
-      ]}
       actions={[
         <FlatButton
           key="close"
@@ -118,14 +104,36 @@ export const NewResourceDialog = ({
           onClick={onClose}
         />,
       ]}
+      secondaryActions={[
+        !electron && screenType !== 'touch' ? (
+          <FlatButton
+            key="download-gdevelop"
+            label={
+              <Trans>Download GDevelop to use images from your computer</Trans>
+            }
+            onClick={() =>
+              Window.openExternalURL('https://gdevelop.io/download')
+            }
+          />
+        ) : null,
+      ]}
+      onRequestClose={onClose}
       noMargin
     >
       <Column expand noMargin>
         <Tabs value={currentTab} onChange={setCurrentTab}>
           {standaloneTabResourceSources.map(({ name, displayName }) => (
-            <Tab label={i18n._(displayName)} value={'standalone-' + name} />
+            <Tab
+              label={i18n._(displayName)}
+              value={'standalone-' + name}
+              key={name}
+            />
           ))}
-          <Tab label={<Trans>Choose a file</Trans>} value="import" />
+          <Tab
+            label={<Trans>Choose a file</Trans>}
+            value="import"
+            key="import"
+          />
         </Tabs>
         {standaloneTabResourceSources.map(source => {
           if (currentTab !== 'standalone-' + source.name) return null;
@@ -143,7 +151,7 @@ export const NewResourceDialog = ({
           <Line expand>
             <ColumnStackLayout expand>
               {importTabResourceSources.map(source => (
-                <>
+                <React.Fragment key={source.name}>
                   <Text size="title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({
                     i18n,
@@ -153,7 +161,7 @@ export const NewResourceDialog = ({
                     setLastUsedPath: preferences.setLastUsedPath,
                     onChooseResources,
                   })}
-                </>
+                </React.Fragment>
               ))}
             </ColumnStackLayout>
           </Line>

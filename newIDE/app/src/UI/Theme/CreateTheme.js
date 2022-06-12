@@ -17,17 +17,23 @@ export function getRootClassNames(theme: string) {
 }
 
 export function getMuiOverrides(
+  isModern: boolean,
   tabTextColor: string,
   tabBackgroundColor: string,
   inputBorderBottomColor: string,
   appBarBackgroundColor: string,
-  iconColor: string
+  iconColor: string,
+  outlinedButtonBorderColor: string
 ) {
   return {
     MuiTypography: {
+      h5: {
+        // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
+        fontWeight: isModern ? 600 : 400,
+      },
       h6: {
         // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: 400,
+        fontWeight: isModern ? 600 : 400,
       },
     },
     MuiInput: {
@@ -81,7 +87,18 @@ export function getMuiOverrides(
     },
     MuiTab: {
       textColorPrimary: {
-        color: tabTextColor + ' !important',
+        color:
+          (isModern ? darken(tabTextColor, 0.2) : tabTextColor) + ' !important',
+        textTransform: isModern ? 'none' : 'uppercase',
+        fontWeight: isModern ? 600 : 500,
+        letterSpacing: isModern ? '0.3px' : '',
+        ...(isModern
+          ? {
+              '&.Mui-selected': {
+                color: tabTextColor + ' !important',
+              },
+            }
+          : {}),
       },
       root: {
         // Reduce the height of tabs to 32px
@@ -131,12 +148,21 @@ export function getMuiOverrides(
         marginBottom: -9,
       },
     },
-    // Use non rounded buttons
+    MuiPaper: {
+      rounded: {
+        borderRadius: isModern ? 8 : 4,
+      },
+    },
     MuiButton: {
       root: {
-        borderRadius: 0,
-        fontWeight: 400, // Lower a bit the weight of buttons
+        borderRadius: isModern ? 8 : 0,
+        textTransform: isModern ? 'none' : 'uppercase',
+        fontWeight: isModern ? 600 : 400, // Lower a bit the weight of buttons
+        letterSpacing: isModern ? '0.3px' : '',
       },
+      ...(isModern
+        ? { outlined: { borderColor: outlinedButtonBorderColor } }
+        : {}),
     },
     // Make MuiAccordion much more compact than default.
     // Some (or all) of these styles can be removed on MUIv5,
@@ -194,14 +220,22 @@ export function getThemeMode(color: string, contrastText: string) {
   };
 }
 
-export function createGdevelopTheme(
+export function createGdevelopTheme({
+  styles,
+  isModern,
+  rootClassNameIdentifier,
+  paletteType,
+  gdevelopIconsCSSFilter,
+}: {
   styles: any,
+  isModern?: boolean,
   rootClassNameIdentifier: string,
   paletteType: string,
-  gdevelopIconsCSSFilter: string = ''
-) {
+  gdevelopIconsCSSFilter: ?string,
+}) {
   return {
     gdevelopTheme: {
+      isModern: !!isModern,
       palette: {
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
       },
@@ -218,6 +252,11 @@ export function createGdevelopTheme(
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
         },
+      },
+      dropIndicator: {
+        canDrop: styles['ThemeDropIndicatorCanDropColor'],
+        cannotDrop: styles['ThemeDropIndicatorCannotDropColor'],
+        border: styles['ThemeDropIndicatorBorderColor'],
       },
       closableTabs: {
         fontFamily: styles['GdevelopFontFamily'],
@@ -270,7 +309,9 @@ export function createGdevelopTheme(
     },
     muiThemeOptions: {
       typography: {
-        fontFamily: styles['GdevelopFontFamily'],
+        fontFamily: isModern
+          ? styles['GdevelopModernFontFamily']
+          : styles['GdevelopFontFamily'],
       },
       palette: {
         type: paletteType,
@@ -298,10 +339,12 @@ export function createGdevelopTheme(
         },
       },
       overrides: getMuiOverrides(
+        !!isModern,
         styles['ThemeTextContrastColor'],
         styles['TabsBackgroundColor'],
         styles['InputBorderBottomColor'],
         styles['MosaicToolbarBackgroundColor'],
+        styles['ThemeTextDefaultColor'],
         styles['ThemeTextDefaultColor']
       ),
     },

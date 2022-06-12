@@ -21,7 +21,7 @@ import {
 import {
   type EnumeratedInstructionMetadata,
   filterEnumeratedInstructionOrExpressionMetadataByScope,
-} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+} from '../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { List, type ListItemRefType, ListItem } from '../../UI/List';
 import SearchBar, {
   useShouldAutofocusSearchbar,
@@ -62,12 +62,6 @@ import {
 } from '../../UI/Search/UseSearchStructuredItem';
 
 const gd: libGDevelop = global.gd;
-
-const styles = {
-  searchBar: {
-    flexShrink: 0,
-  },
-};
 
 const DISPLAYED_INSTRUCTIONS_MAX_LENGTH = 20;
 
@@ -161,6 +155,7 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
   componentDidMount() {
     if (
       this.props.focusOnMount &&
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useShouldAutofocusSearchbar() &&
       this._searchBar.current
     ) {
@@ -388,8 +383,13 @@ export default class InstructionOrObjectSelector extends React.PureComponent<
                   buildMenuTemplate={() =>
                     this._buildObjectTagsMenuTemplate(i18n)
                   }
-                  style={styles.searchBar}
+                  aspect="integrated-search-bar"
                   ref={this._searchBar}
+                  placeholder={
+                    isCondition
+                      ? t`Search objects or conditions`
+                      : t`Search objects or actions`
+                  }
                 />
                 {!isSearching && (
                   <Tabs value={currentTab} onChange={onChangeTab}>

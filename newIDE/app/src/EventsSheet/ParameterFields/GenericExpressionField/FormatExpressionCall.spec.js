@@ -13,9 +13,12 @@ import {
 describe('FormatExpressionCall', () => {
   it('properly formats a free function, with one or more arguments', () => {
     const freeExpressions = enumerateFreeExpressions('number');
-    const countExpression = filterExpressions(freeExpressions, 'Count')[0];
+    const countExpression = filterExpressions(
+      freeExpressions,
+      'PickedInstancesCount'
+    )[0];
     expect(formatExpressionCall(countExpression, ['MyObject'])).toBe(
-      'Count(MyObject)'
+      'PickedInstancesCount(MyObject)'
     );
 
     const atan2Expression = filterExpressions(freeExpressions, 'atan2')[0];

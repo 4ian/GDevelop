@@ -230,6 +230,19 @@ describe('libGD.js', function () {
       expect(effects.getEffectPosition('MyEffect2')).toBe(0);
       expect(effects.getEffectPosition('MyEffect')).toBe(1);
 
+      const effect3 = new gd.Effect();
+      effect3.setName('MyEffect3');
+
+      effects.insertEffect(effect3, 2);
+      expect(effects.hasEffectNamed('MyEffect3')).toBe(true);
+      expect(effects.getEffectsCount()).toBe(3);
+
+      effects.moveEffect(2, 0);
+
+      expect(effects.getEffectPosition('MyEffect3')).toBe(0);
+      expect(effects.getEffectPosition('MyEffect2')).toBe(1);
+      expect(effects.getEffectPosition('MyEffect')).toBe(2);
+
       layer.delete();
     });
     it('can be serialized', function () {
@@ -747,7 +760,7 @@ describe('libGD.js', function () {
 
   describe('gd.Variable', function () {
     let variable = null;
-    beforeAll(() => (variable = new gd.Variable()));
+    beforeEach(() => (variable = new gd.Variable()));
 
     it('should have initial value', function () {
       expect(variable.getValue()).toBe(0);
@@ -782,6 +795,24 @@ describe('libGD.js', function () {
       variable.removeChild('SecondChild');
       expect(variable.getType()).toBe(gd.Variable.Structure);
     });
+    it('can insert a child in structure', function () {
+      variable.getChild('FirstChild').setValue(1);
+      variable.getChild('SecondChild').setString('two');
+      expect(variable.getType()).toBe(gd.Variable.Structure);
+      const variableToInsert = new gd.Variable();
+      variableToInsert.setString('strVariable');
+      {
+        const result = variable.insertChild('FirstChild', variableToInsert);
+        expect(result).toBe(false);
+      }
+      {
+        const result = variable.insertChild('ThirdChild', variableToInsert);
+        expect(result).toBe(true);
+      }
+      variableToInsert.delete();
+      expect(variable.hasChild('ThirdChild')).toBe(true);
+      expect(variable.getChild('ThirdChild').getString()).toBe('strVariable');
+    });
     it('can expose its children', function () {
       variable.getChild('FirstChild').setValue(1);
       variable.getChild('SecondChild').setValue(1);
@@ -810,6 +841,31 @@ describe('libGD.js', function () {
       variable.removeAtIndex(1);
       variable.removeAtIndex(0);
       expect(variable.getType()).toBe(gd.Variable.Array);
+    });
+    it('can move children inside array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(1).setValue(2);
+      variable.getAtIndex(2).setValue(3);
+      variable.getAtIndex(3).setValue(4);
+      variable.moveChildInArray(2, 0);
+      expect(variable.getAtIndex(2).getValue()).toBe(2);
+      expect(variable.getAtIndex(0).getValue()).toBe(3);
+    });
+    it('can insert child in array', function () {
+      variable.getAtIndex(0).setValue(1);
+      expect(variable.getType()).toBe(gd.Variable.Array);
+      variable.getAtIndex(1).setValue(2);
+      variable.getAtIndex(2).setValue(3);
+      variable.getAtIndex(3).setValue(4);
+      const variableToInsert = new gd.Variable();
+      variableToInsert.setString('strVariable');
+      const result = variable.insertAtIndex(variableToInsert, 2);
+      variableToInsert.delete();
+      expect(result).toBe(true);
+      expect(variable.getAtIndex(2).getString()).toBe('strVariable');
+      expect(variable.getAtIndex(3).getValue()).toBe(3);
+      expect(variable.getAtIndex(4).getValue()).toBe(4);
     });
     it('can search inside children and remove them recursively', function () {
       let parentVariable = new gd.Variable();
@@ -1898,9 +1954,9 @@ describe('libGD.js', function () {
       let instr = new gd.Instruction();
       instr.setParametersCount(3);
       expect(instr.getParametersCount()).toBe(3);
-      expect(instr.getParameter(1)).toBe('');
+      expect(instr.getParameter(1).getPlainString()).toBe('');
       instr.setParameter(2, 'MyValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
       instr.delete();
     });
     it('can be cloned', function () {
@@ -1910,14 +1966,14 @@ describe('libGD.js', function () {
 
       let newInstr = instr.clone();
       expect(newInstr.getParametersCount()).toBe(3);
-      expect(newInstr.getParameter(1)).toBe('');
-      expect(newInstr.getParameter(2)).toBe('MyValue');
+      expect(newInstr.getParameter(1).getPlainString()).toBe('');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyValue');
 
       newInstr.setParameter(2, 'MyChangedValue');
-      expect(instr.getParameter(2)).toBe('MyValue');
-      expect(newInstr.getParameter(2)).toBe('MyChangedValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
+      expect(newInstr.getParameter(2).getPlainString()).toBe('MyChangedValue');
       newInstr.delete();
-      expect(instr.getParameter(2)).toBe('MyValue');
+      expect(instr.getParameter(2).getPlainString()).toBe('MyValue');
 
       instr.delete();
     });
@@ -2009,9 +2065,9 @@ describe('libGD.js', function () {
       expect(list2.get(1).getType()).toBe('Type2');
       expect(list2.get(0).getParametersCount()).toBe(2);
       expect(list2.get(1).getParametersCount()).toBe(1);
-      expect(list2.get(0).getParameter(0)).toBe('Param1');
-      expect(list2.get(0).getParameter(1)).toBe('Param2');
-      expect(list2.get(1).getParameter(0)).toBe('Param3');
+      expect(list2.get(0).getParameter(0).getPlainString()).toBe('Param1');
+      expect(list2.get(0).getParameter(1).getPlainString()).toBe('Param2');
+      expect(list2.get(1).getParameter(0).getPlainString()).toBe('Param3');
 
       list2.delete();
       project.delete();
@@ -3233,18 +3289,36 @@ describe('libGD.js', function () {
       type,
       expression,
       expectedError,
-      expectedErrorPosition
+      expectedErrorPosition,
+      expectedError2,
+      expectedErrorPosition2
     ) {
-      const parser = new gd.ExpressionParser2(
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
+
+      const expressionValidator = new gd.ExpressionValidator(
         gd.JsPlatform.get(),
         project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
-
-      const expressionValidator = new gd.ExpressionValidator();
+        layout,
+        type);
       expressionNode.visit(expressionValidator);
-      if (expectedError) {
+      if (expectedError2) {
+        expect(expressionValidator.getErrors().size()).toBe(2);
+        expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
+          expectedError
+        );
+        if (expectedErrorPosition)
+          expect(expressionValidator.getErrors().at(0).getStartPosition()).toBe(
+            expectedErrorPosition
+          );
+        expect(expressionValidator.getErrors().at(1).getMessage()).toBe(
+          expectedError2
+        );
+        if (expectedErrorPosition2)
+          expect(expressionValidator.getErrors().at(1).getStartPosition()).toBe(
+            expectedErrorPosition2
+          );
+      } else if (expectedError) {
         expect(expressionValidator.getErrors().size()).toBe(1);
         expect(expressionValidator.getErrors().at(0).getMessage()).toBe(
           expectedError
@@ -3305,6 +3379,8 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         '3..14',
+        'More than one term was found. Verify that your expression is properly written.',
+        2,
         'No operator found. Did you forget to enter an operator (like +, -, * or /) between numbers or expressions?',
         2
       );
@@ -3354,12 +3430,12 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'abs(-5, 3)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
       testExpression(
         'number',
         'MouseX("", 0, 0) + 1',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be: 0-2"
       );
     });
 
@@ -3378,7 +3454,7 @@ describe('libGD.js', function () {
       testExpression(
         'number',
         'MySpriteObject.PointX("Point", 2)',
-        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name."
+        "This parameter was not expected by this expression. Remove it or verify that you've entered the proper expression name. The number of parameters must be exactly 1"
       );
     });
 
@@ -3409,14 +3485,14 @@ describe('libGD.js', function () {
       }
       const expression = expressionWithCaret.replace('|', '');
 
-      const parser = new gd.ExpressionParser2(
-        gd.JsPlatform.get(),
-        project,
-        layout
-      );
-      const expressionNode = parser.parseExpression(type, expression).get();
+      const parser = new gd.ExpressionParser2();
+      const expressionNode = parser.parseExpression(expression).get();
       const completionDescriptions =
         gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+          gd.JsPlatform.get(),
+          project,
+          layout,
+          type,
           expressionNode,
           // We're looking for completion for the character just before the caret.
           Math.max(0, caretPosition - 1)
@@ -3561,10 +3637,15 @@ describe('libGD.js', function () {
         expect(vectorVector2f.at(1).get_x()).toBe(2);
         expect(vectorVector2f.at(2).get_x()).toBe(3);
 
+        gd.moveVector2fInVector(vectorVector2f, 2, 0);
+        expect(vectorVector2f.at(0).get_x()).toBe(3);
+        expect(vectorVector2f.at(1).get_x()).toBe(1);
+        expect(vectorVector2f.at(2).get_x()).toBe(2);
+
         gd.removeFromVectorVector2f(vectorVector2f, 1);
         expect(vectorVector2f.size()).toBe(2);
-        expect(vectorVector2f.at(0).get_x()).toBe(1);
-        expect(vectorVector2f.at(1).get_x()).toBe(3);
+        expect(vectorVector2f.at(0).get_x()).toBe(3);
+        expect(vectorVector2f.at(1).get_x()).toBe(2);
 
         vectorVector2f.clear();
         expect(vectorVector2f.size()).toBe(0);

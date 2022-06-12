@@ -6,29 +6,17 @@ import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import { getGameUrl, type Game } from '../Utils/GDevelopServices/Game';
-import TimelineIcon from '@material-ui/icons/Timeline';
-import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
-import TuneIcon from '@material-ui/icons/Tune';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
-import FlatButton from '../UI/FlatButton';
 import { GameThumbnail } from './GameThumbnail';
 
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
-  onOpenDetails: () => void,
-  onOpenBuilds: () => void,
-  onOpenAnalytics: () => void,
+  onOpenGameManager: () => void,
 |};
 
-export const GameCard = ({
-  game,
-  isCurrentGame,
-  onOpenDetails,
-  onOpenBuilds,
-  onOpenAnalytics,
-}: Props) => {
+export const GameCard = ({ game, isCurrentGame, onOpenGameManager }: Props) => {
   const openGameUrl = () => {
     const url = getGameUrl(game);
     if (!url) return;
@@ -85,25 +73,14 @@ export const GameCard = ({
                 >
                   {game.publicWebBuildId && (
                     <RaisedButton
-                      label={<Trans>Open</Trans>}
+                      label={<Trans>Open in browser</Trans>}
                       onClick={openGameUrl}
-                      primary
                     />
                   )}
-                  <FlatButton
-                    icon={<TuneIcon />}
-                    label={<Trans>Details</Trans>}
-                    onClick={onOpenDetails}
-                  />
-                  <FlatButton
-                    icon={<PlaylistPlayIcon />}
-                    label={<Trans>Builds</Trans>}
-                    onClick={onOpenBuilds}
-                  />
-                  <FlatButton
-                    icon={<TimelineIcon />}
-                    label={<Trans>Analytics</Trans>}
-                    onClick={onOpenAnalytics}
+                  <RaisedButton
+                    label={<Trans>Manage game</Trans>}
+                    onClick={onOpenGameManager}
+                    primary
                   />
                 </ResponsiveLineStackLayout>
               </CardActions>

@@ -48,7 +48,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Construct a code generator for the specified
    * platform/project/layout.
    */
-  EventsCodeGenerator(gd::Project& project_,
+  EventsCodeGenerator(const gd::Project& project_,
                       const gd::Layout& layout,
                       const gd::Platform& platform_);
 
@@ -57,7 +57,7 @@ class GD_CORE_API EventsCodeGenerator {
    * objects/groups and platform
    */
   EventsCodeGenerator(const gd::Platform& platform,
-                      gd::ObjectsContainer& globalObjectsAndGroups_,
+                      const gd::ObjectsContainer& globalObjectsAndGroups_,
                       const gd::ObjectsContainer& objectsAndGroups_);
   virtual ~EventsCodeGenerator(){};
 
@@ -77,7 +77,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \return Code
    */
   virtual gd::String GenerateEventsListCode(
-      gd::EventsList& events, const EventsCodeGenerationContext& context);
+      gd::EventsList& events, EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for executing a condition list
@@ -155,7 +155,51 @@ class GD_CORE_API EventsCodeGenerator {
    * \return Code
    */
   gd::String GenerateActionCode(gd::Instruction& action,
-                                EventsCodeGenerationContext& context);
+                                EventsCodeGenerationContext& context,
+                                const gd::String& optionalAsyncCallbackName = "");
+
+  struct CallbackDescriptor {
+    CallbackDescriptor(const gd::String functionName_,
+                       const gd::String argumentsList_,
+                       const std::set<gd::String> requiredObjects_)
+        : functionName(functionName_),
+          argumentsList(argumentsList_),
+          requiredObjects(requiredObjects_){};
+    /**
+     * The name by which the function can be invoked.
+     */
+    const gd::String functionName;
+    /**
+     * The comma separated list of arguments that the function takes.
+     */
+    const gd::String argumentsList;
+    /**
+     * A set of all objects that need to be backed up to be passed to the callback code.
+     */
+    const std::set<gd::String> requiredObjects;
+  };
+
+  /**
+   * \brief Generates actions and events as a callback.
+   *
+   * This is used by asynchronous functions to run the code out of the normal
+   * events flow.
+   *
+   * \returns A set with all objects required by the callback code.
+   * The caller must take care of backing them up in a LongLivedObjectsList,
+   * and to pass it to the callback function as the last argument.
+   */
+  virtual const CallbackDescriptor GenerateCallback(
+      const gd::String& callbackFunctionName,
+      gd::EventsCodeGenerationContext& parentContext,
+      gd::InstructionsList& actions,
+      gd::EventsList* subEvents = nullptr);
+
+  /**
+   * \brief Generates the parameters list of an event's generated function.
+   */
+  const gd::String GenerateEventsParameters(
+      const gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Generate code for declaring objects lists.
@@ -283,7 +327,7 @@ class GD_CORE_API EventsCodeGenerator {
   /**
    * \brief Get the global objects/groups used for code generation.
    */
-  gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
+  const gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
     return globalObjectsAndGroups;
   }
 
@@ -304,7 +348,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Get the project the code is being generated for.
    * \warning This is only valid if HasProjectAndLayout() is true.
    */
-  gd::Project& GetProject() const { return *project; }
+  const gd::Project& GetProject() const { return *project; }
 
   /**
    * \brief Get the layout the code is being generated for.
@@ -462,17 +506,10 @@ class GD_CORE_API EventsCodeGenerator {
    * Other standard parameters type that should be implemented by platforms:
    * - currentScene: Reference to the current runtime scene.
    * - objectList : a map containing lists of objects which are specified by the
-  object name in another parameter. Example:
-   * \code
-      AddExpression("Count", _("Object count"), _("Count the number of picked
-  objects"), _("Objects"), "res/conditions/nbObjet.png")
-      .AddParameter("objectList", _("Object"))
-      .SetFunctionName("getPickedObjectsCount");
-
-   * \endcode
-   * - objectListWithoutPicking : Same as objectList but do not pick object if
+  object name in another parameter.
+   * - objectListOrEmptyIfJustDeclared : Same as `objectList` but do not pick object if
   they are not already picked.
-   * - objectPtr : Return a reference to the object specified by the object name in
+   * - objectPtr: Return a reference to the object specified by the object name in
   another parameter. Example:
    * \code
   .AddParameter("object", _("Object"))
@@ -480,7 +517,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \endcode
    */
   virtual gd::String GenerateParameterCodes(
-      const gd::String& parameter,
+      const gd::Expression& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,
@@ -665,14 +702,16 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateFreeAction(
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& optionalAsyncCallbackName = "");
 
   virtual gd::String GenerateBehaviorAction(
       const gd::String& objectName,
@@ -680,7 +719,8 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::BehaviorMetadata& autoInfo,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
-      gd::EventsCodeGenerationContext& context);
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& optionalAsyncCallbackName = "");
 
   gd::String GenerateRelationalOperatorCall(
       const gd::InstructionMetadata& instrInfos,
@@ -730,12 +770,12 @@ class GD_CORE_API EventsCodeGenerator {
 
   const gd::Platform& platform;  ///< The platform being used.
 
-  gd::ObjectsContainer& globalObjectsAndGroups;
+  const gd::ObjectsContainer& globalObjectsAndGroups;
   const gd::ObjectsContainer& objectsAndGroups;
 
   bool hasProjectAndLayout;  ///< true only if project and layout are valid
                              ///< references. If false, they should not be used.
-  gd::Project* project;      ///< The project being used.
+  const gd::Project* project;      ///< The project being used.
   const gd::Layout* scene;   ///< The scene being generated.
 
   bool errorOccurred;          ///< Must be set to true if an error occured.

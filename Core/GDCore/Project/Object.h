@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
-#include <SFML/System/Vector2.hpp>
+#include "GDCore/Vector2.h"
 #include <map>
 #include <memory>
 #include <vector>
@@ -83,6 +83,14 @@ class GD_CORE_API Object {
    */
   const gd::String& GetName() const { return name; };
 
+  /** \brief Change the asset store id of the object.
+   */
+  void SetAssetStoreId(const gd::String& assetStoreId_) { assetStoreId = assetStoreId_; };
+
+  /** \brief Return the asset store id of the object.
+   */
+  const gd::String& GetAssetStoreId() const { return assetStoreId; };
+
   /** \brief Change the type of the object.
    */
   void SetType(const gd::String& type_) { type = type_; }
@@ -100,7 +108,6 @@ class GD_CORE_API Object {
   const gd::String& GetTags() const { return tags; }
   ///@}
 
-#if defined(GD_IDE_ONLY)
   /** \name Resources management
    * Members functions related to managing resources used by the object
    */
@@ -186,7 +193,6 @@ class GD_CORE_API Object {
     return false;
   };
     ///@}
-#endif
 
   /** \name Behaviors management
    * Members functions related to behaviors management.
@@ -232,7 +238,6 @@ class GD_CORE_API Object {
    */
   gd::BehaviorContent& AddBehavior(const gd::BehaviorContent& behavior);
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Add the behavior of the specified \a type with the specified \a
    * name.
@@ -242,10 +247,9 @@ class GD_CORE_API Object {
    * \return A pointer to the newly added behavior content. NULL if the creation
    * failed.
    */
-  gd::BehaviorContent* AddNewBehavior(gd::Project& project,
+  gd::BehaviorContent* AddNewBehavior(const gd::Project& project,
                                       const gd::String& type,
                                       const gd::String& name);
-#endif
 
   /**
    * \brief Get a read-only access to the map containing the behaviors with
@@ -296,13 +300,11 @@ class GD_CORE_API Object {
  * Members functions related to serialization of the object
  */
 ///@{
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the object.
    * \see DoSerializeTo
    */
   void SerializeTo(SerializerElement& element) const;
-#endif
 
   /**
    * \brief Unserialize the object.
@@ -313,6 +315,7 @@ class GD_CORE_API Object {
 
  protected:
   gd::String name;  ///< The full name of the object
+  gd::String assetStoreId;  ///< The ID of the asset if the object comes from the store.
   gd::String type;  ///< Which type is the object. ( To test if we can do
                     ///< something reserved to some objects with it )
   std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
@@ -331,12 +334,10 @@ class GD_CORE_API Object {
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const SerializerElement& element){};
 
-#if defined(GD_IDE_ONLY)
   /**
    * \brief Derived objects can redefine this method to save custom attributes.
    */
   virtual void DoSerializeTo(SerializerElement& element) const {};
-#endif
 
   /**
    * Initialize object using another object. Used by copy-ctor and assign-op.

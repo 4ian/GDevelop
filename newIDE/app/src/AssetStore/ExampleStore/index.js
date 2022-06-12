@@ -12,13 +12,8 @@ import { ExampleListItem } from './ExampleListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { ExampleDialog } from './ExampleDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
-
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
+import { sendExampleDetailsOpened } from '../../Utils/Analytics/EventSender';
+import { t } from '@lingui/macro';
 
 type Props = {|
   isOpening: boolean,
@@ -90,16 +85,18 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
               value={searchText}
               onChange={setSearchText}
               onRequestSearch={() => {}}
-              style={styles.searchBar}
+              aspect="add-margins-only-if-modern-theme"
               tagsHandler={tagsHandler}
               tags={filters && filters.defaultTags}
               ref={searchBarRef}
+              placeholder={t`Search examples`}
             />
             <Line
               expand
               overflow={
                 'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
               }
+              noMargin
             >
               <ListSearchResults
                 disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
@@ -116,6 +113,7 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                     exampleShortHeader={exampleShortHeader}
                     matches={getExampleMatches(exampleShortHeader)}
                     onChoose={() => {
+                      sendExampleDetailsOpened(exampleShortHeader.slug);
                       setSelectedExampleShortHeader(exampleShortHeader);
                     }}
                     onOpen={() => {

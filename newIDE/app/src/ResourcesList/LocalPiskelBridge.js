@@ -1,10 +1,10 @@
 // @flow
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../Utils/OptionalRequire';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
 import {
   createOrUpdateResource,
   getLocalResourceFullPath,
-} from './ResourceUtils.js';
+} from './ResourceUtils';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;

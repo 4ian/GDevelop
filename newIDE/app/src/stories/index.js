@@ -39,7 +39,6 @@ import MouseField from '../EventsSheet/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
 import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/ParameterFields/KeyField';
-import AudioResourceField from '../EventsSheet/ParameterFields/AudioResourceField';
 import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/ParameterFields/StringField';
 import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
@@ -63,7 +62,6 @@ import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
-import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
@@ -103,7 +101,7 @@ import {
 import {
   GDevelopAnalyticsApi,
   GDevelopGameApi,
-} from '../Utils/GDevelopServices/ApiConfigs.js';
+} from '../Utils/GDevelopServices/ApiConfigs';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
@@ -142,7 +140,6 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
-import ExtensionsSearchDialog from '../AssetStore/ExtensionStore/ExtensionsSearchDialog';
 import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
@@ -153,16 +150,16 @@ import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 import NewInstructionEditorMenu from '../EventsSheet/InstructionEditor/NewInstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
-import EffectsList from '../EffectsList';
 import SubscriptionPendingDialog from '../Profile/SubscriptionPendingDialog';
 import EmailVerificationPendingDialog from '../Profile/EmailVerificationPendingDialog';
 import Dialog from '../UI/Dialog';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
-import NewObjectDialog from '../AssetStore/NewObjectDialog';
 import { Column, Line } from '../UI/Grid';
+import { LineStackLayout, ColumnStackLayout } from '../UI/Layout';
 import DragAndDropTestBed from './DragAndDropTestBed';
 import EditorMosaic from '../UI/EditorMosaic';
 import FlatButton from '../UI/FlatButton';
+import TextButton from '../UI/TextButton';
 import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
@@ -208,20 +205,11 @@ import HotReloadPreviewButton, {
   type HotReloadPreviewButtonProps,
 } from '../HotReload/HotReloadPreviewButton';
 import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
-import { AssetStore } from '../AssetStore';
-import { AssetStoreStateProvider } from '../AssetStore/AssetStoreContext';
 import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
-import { AssetCard } from '../AssetStore/AssetCard';
-import { AssetDetails } from '../AssetStore/AssetDetails';
-import { ResourceStoreStateProvider } from '../AssetStore/ResourceStore/ResourceStoreContext';
-import { ResourceStore } from '../AssetStore/ResourceStore';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
-import { ExampleStore } from '../AssetStore/ExampleStore';
-import { ExampleDialog } from '../AssetStore/ExampleStore/ExampleDialog';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
-import { ExtensionStore } from '../AssetStore/ExtensionStore';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
@@ -246,6 +234,8 @@ import {
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
+import { initialPreferences } from '../MainFrame/Preferences/PreferencesContext';
+import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
   depth: 2,
@@ -255,8 +245,6 @@ configureActions({
 addDecorator(GDevelopJsInitializerDecorator);
 
 // No i18n in this file
-
-const Placeholder = () => <div>Placeholder component</div>;
 
 const buildFakeMenuTemplate = () => [
   {
@@ -283,32 +271,74 @@ storiesOf('Welcome', module)
   .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/Buttons', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <Column>
-      <Line>
+    <ColumnStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton label="Raised button" onClick={action('onClick')} />
+        <RaisedButton
+          icon={<CloudDownload />}
+          label="Raised button"
+          onClick={action('onClick')}
+        />
         <RaisedButton
           label="Primary Raised button"
           primary
           onClick={action('onClick')}
         />
-      </Line>
-      <Line>
+        <RaisedButton
+          icon={<CloudDownload />}
+          label="Primary Raised button"
+          primary
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <FlatButton label="Flat button" onClick={action('onClick')} />
+        <FlatButton
+          icon={<CloudDownload />}
+          label="Flat button"
+          onClick={action('onClick')}
+        />
         <FlatButton
           label="Primary Flat button"
           primary
           onClick={action('onClick')}
         />
-      </Line>
-      <Line>
+        <FlatButton
+          icon={<CloudDownload />}
+          label="Primary Flat button"
+          primary
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
+        <TextButton label="Text button" onClick={action('onClick')} />
+        <TextButton
+          icon={<CloudDownload />}
+          label="Text button"
+          onClick={action('onClick')}
+        />
+        <TextButton
+          primary
+          label="Primary Text button"
+          onClick={action('onClick')}
+        />
+        <TextButton
+          icon={<CloudDownload />}
+          primary
+          label="Primary Text button"
+          onClick={action('onClick')}
+        />
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons with split menus:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton
           label="Traditional Raised button"
           onClick={action('onClick')}
@@ -337,11 +367,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           onClick={action('onClick')}
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Buttons with menus:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <RaisedButton
           label="Traditional Raised button"
           onClick={action('onClick')}
@@ -361,11 +391,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           disabled
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>Icons with menu:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <ElementWithMenu
           element={
             <ToolbarIcon
@@ -383,11 +413,11 @@ storiesOf('UI Building Blocks/Buttons', module)
           }
           buildMenuTemplate={buildFakeMenuTemplate}
         />
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <Text>In a mini toolbar:</Text>
-      </Line>
-      <Line>
+      </LineStackLayout>
+      <LineStackLayout noMargin>
         <MiniToolbar>
           <MiniToolbarText firstChild>Some text:</MiniToolbarText>
           <IconButton>
@@ -412,8 +442,8 @@ storiesOf('UI Building Blocks/Buttons', module)
             ]}
           />
         </MiniToolbar>
-      </Line>
-    </Column>
+      </LineStackLayout>
+    </ColumnStackLayout>
   ));
 
 storiesOf('UI Building Blocks/SelectField', module)
@@ -1765,25 +1795,6 @@ storiesOf('PropertiesEditor', module)
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('AudioResourceField', () => (
-    <ValueStateHolder
-      initialValue={''}
-      render={(value, onChange) => (
-        <AudioResourceField
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          value={value}
-          onChange={onChange}
-          parameterRenderingService={ParameterRenderingService}
-          resourceSources={[]}
-          onChooseResource={() => Promise.reject('unimplemented')}
-          resourceExternalEditors={fakeResourceExternalEditors}
-        />
-      )}
-    />
-  ))
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
@@ -2085,6 +2096,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ))
   .add('autocompletions (expression selected)', () => (
@@ -2097,6 +2109,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={6}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ))
   .add('empty autocompletions (because exact expression)', () => (
@@ -2109,6 +2122,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ))
   .add('empty autocompletions (nothing shown)', () => (
@@ -2121,6 +2135,7 @@ storiesOf('ExpressionAutcompletionsDisplayer', module)
       onChoose={action('chosen')}
       selectedCompletionIndex={0}
       parameterRenderingService={ParameterRenderingService}
+      onScroll={() => {}}
     />
   ));
 
@@ -2571,216 +2586,6 @@ storiesOf('ExternalPropertiesDialog', module)
         "And there's another one!",
       ]}
     />
-  ));
-
-storiesOf('EventsTree', module)
-  .addDecorator(muiDecorator)
-  .add('default, medium screen (scope: in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.testLayout.getEvents()}
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'medium'}
-            eventsSheetHeight={500}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ))
-  .add('default, small screen (scope: in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.testLayout.getEvents()}
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'small'}
-            eventsSheetHeight={500}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ))
-  .add('default, medium screen (scope: not in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.testLayout.getEvents()}
-            project={testProject.project}
-            scope={{}}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'medium'}
-            eventsSheetHeight={500}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ))
-  .add('empty, small screen (scope: in a layout)', () => (
-    <DragAndDropContextProvider>
-      <div className="gd-events-sheet">
-        <FixedHeightFlexContainer height={500}>
-          <EventsTree
-            events={testProject.emptyEventsList}
-            project={testProject.project}
-            scope={{ layout: testProject.testLayout }}
-            globalObjectsContainer={testProject.project}
-            objectsContainer={testProject.testLayout}
-            selection={getInitialSelection()}
-            onAddNewInstruction={action('add new instruction')}
-            onPasteInstructions={action('paste instructions')}
-            onMoveToInstruction={action('move to instruction')}
-            onMoveToInstructionsList={action('move instruction to list')}
-            onInstructionClick={action('instruction click')}
-            onInstructionDoubleClick={action('instruction double click')}
-            onInstructionContextMenu={action('instruction context menu')}
-            onAddInstructionContextMenu={action(
-              'instruction list context menu'
-            )}
-            onParameterClick={action('parameter click')}
-            onEventClick={action('event click')}
-            onEventContextMenu={action('event context menu')}
-            onAddNewEvent={action('add new event')}
-            onOpenExternalEvents={action('open external events')}
-            onOpenLayout={action('open layout')}
-            searchResults={null}
-            searchFocusOffset={null}
-            onEventMoved={() => {}}
-            showObjectThumbnails={true}
-            screenType={'normal'}
-            windowWidth={'small'}
-            eventsSheetHeight={500}
-          />
-        </FixedHeightFlexContainer>
-      </div>
-    </DragAndDropContextProvider>
-  ));
-
-storiesOf('EventsSheet', module)
-  .addDecorator(muiDecorator)
-  .add('default (no scope)', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={500}>
-        <EventsSheet
-          project={testProject.project}
-          scope={{ layout: testProject.testLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.testLayout}
-          events={testProject.testLayout.getEvents()}
-          onOpenExternalEvents={action('Open external events')}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenLayout={action('open layout')}
-          onOpenSettings={action('open settings')}
-          setToolbar={() => {}}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCreateEventsFunction={action('create events function')}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
-  ))
-  .add('empty (no events) (no scope)', () => (
-    <DragAndDropContextProvider>
-      <FixedHeightFlexContainer height={500}>
-        <EventsSheet
-          project={testProject.project}
-          scope={{ layout: testProject.emptyLayout }}
-          globalObjectsContainer={testProject.project}
-          objectsContainer={testProject.emptyLayout}
-          events={testProject.emptyLayout.getEvents()}
-          onOpenExternalEvents={action('Open external events')}
-          resourceSources={[]}
-          onChooseResource={source =>
-            action('Choose resource from source', source)
-          }
-          resourceExternalEditors={fakeResourceExternalEditors}
-          onOpenLayout={action('open layout')}
-          onOpenSettings={action('open settings')}
-          setToolbar={() => {}}
-          openInstructionOrExpression={action('open instruction or expression')}
-          onCreateEventsFunction={action('create events function')}
-        />
-      </FixedHeightFlexContainer>
-    </DragAndDropContextProvider>
   ));
 
 storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
@@ -3429,16 +3234,18 @@ storiesOf('ObjectGroupsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <div style={{ height: 250 }}>
-        <ObjectGroupsList
-          globalObjectGroups={testProject.project.getObjectGroups()}
-          objectGroups={testProject.testLayout.getObjectGroups()}
-          onEditGroup={() => {}}
-          canRenameGroup={() => true}
-        />
-      </div>
-    </SerializedObjectDisplay>
+    <DragAndDropContextProvider>
+      <SerializedObjectDisplay object={testProject.testLayout}>
+        <div style={{ height: 250 }}>
+          <ObjectGroupsList
+            globalObjectGroups={testProject.project.getObjectGroups()}
+            objectGroups={testProject.testLayout.getObjectGroups()}
+            onEditGroup={() => {}}
+            canRenameGroup={() => true}
+          />
+        </div>
+      </SerializedObjectDisplay>
+    </DragAndDropContextProvider>
   ));
 
 storiesOf('BehaviorsEditor', module)
@@ -3465,18 +3272,6 @@ storiesOf('BehaviorsEditor', module)
         onChooseResource={() => Promise.reject('Unimplemented')}
         resourceExternalEditors={fakeResourceExternalEditors}
         onUpdateBehaviorsSharedData={() => {}}
-      />
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('VariablesList', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay object={testProject.testLayout}>
-      <VariablesList
-        variablesContainer={testProject.testLayout.getVariables()}
-        onComputeAllVariableNames={() => []}
       />
     </SerializedObjectDisplay>
   ));
@@ -4483,102 +4278,6 @@ storiesOf('LayersList', module)
     </div>
   ));
 
-storiesOf('EffectsList', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('with some effects (for a layer)', () => (
-    <EffectsList
-      target="layer"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.layerWithEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('with some effects (for an object)', () => (
-    <EffectsList
-      target="object"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.spriteObjectWithEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('with an effect without effect type (for a layer)', () => (
-    <EffectsList
-      target="layer"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.layerWithEffectWithoutEffectType.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('without effects (for a layer)', () => (
-    <EffectsList
-      target="layer"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.layerWithoutEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ))
-  .add('without effects (for an object)', () => (
-    <EffectsList
-      target="object"
-      project={testProject.project}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-      effectsContainer={testProject.spriteObjectWithoutEffects.getEffects()}
-      onEffectsUpdated={action('effects updated')}
-    />
-  ));
-
-storiesOf('NewObjectDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AssetStoreStateProvider>
-      <NewObjectDialog
-        project={testProject.project}
-        layout={testProject.testLayout}
-        onClose={action('onClose')}
-        onCreateNewObject={action('onCreateNewObject')}
-        onObjectAddedFromAsset={action('onObjectAddedFromAsset')}
-        events={testProject.testLayout.getEvents()}
-        objectsContainer={testProject.testLayout}
-        resourceExternalEditors={fakeResourceExternalEditors}
-        onChooseResource={() => {
-          action('onChooseResource');
-          return Promise.reject();
-        }}
-        resourceSources={[]}
-      />
-    </AssetStoreStateProvider>
-  ));
-
 storiesOf('CommandPalette', module)
   .addDecorator(muiDecorator)
   .add('commands', () => (
@@ -4685,122 +4384,6 @@ storiesOf('HotReloadLogsDialog', module)
     />
   ));
 
-storiesOf('AssetStore', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <AssetStoreStateProvider>
-        <AssetStore
-          onOpenDetails={action('onOpenDetails')}
-          events={testProject.testLayout.getEvents()}
-          project={testProject.project}
-          objectsContainer={testProject.testLayout}
-        />
-      </AssetStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('AssetStore/ExampleStore', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExampleStoreStateProvider>
-        <ExampleStore onOpen={action('onOpen')} isOpening={false} />
-      </ExampleStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-storiesOf('AssetStore/ExampleStore/ExampleDialog', module)
-  .addDecorator(muiDecorator)
-  .add('non existing example, from a future version', () => (
-    <ExampleDialog
-      exampleShortHeader={exampleFromFutureVersion}
-      onOpen={action('onOpen')}
-      isOpening={false}
-      onClose={action('onClose')}
-    />
-  ));
-
-storiesOf('AssetStore/ResourceStore', module)
-  .addDecorator(muiDecorator)
-  .add('resourceKind: image', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="image" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('resourceKind: audio', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="audio" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('resourceKind: font', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="font" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('resourceKind: svg (for icons)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ResourceStoreStateProvider>
-        <ResourceStore onChoose={action('onChoose')} resourceKind="svg" />
-      </ResourceStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('AssetStore/AssetCard', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AssetCard
-      size={128}
-      onOpenDetails={action('onOpenDetails')}
-      assetShortHeader={fakeAssetShortHeader1}
-    />
-  ));
-
-storiesOf('AssetStore/AssetDetails', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <AssetDetails
-      canInstall={true}
-      isBeingInstalled={false}
-      onAdd={action('onAdd')}
-      onClose={action('onClose')}
-      assetShortHeader={fakeAssetShortHeader1}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout}
-      layout={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-    />
-  ))
-  .add('being installed', () => (
-    <AssetDetails
-      canInstall={false}
-      isBeingInstalled={true}
-      onAdd={action('onAdd')}
-      onClose={action('onClose')}
-      assetShortHeader={fakeAssetShortHeader1}
-      project={testProject.project}
-      objectsContainer={testProject.testLayout}
-      layout={testProject.testLayout}
-      resourceExternalEditors={fakeResourceExternalEditors}
-      onChooseResource={() => {
-        action('onChooseResource');
-        return Promise.reject();
-      }}
-      resourceSources={[]}
-    />
-  ));
-
 storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
   .addDecorator(muiDecorator)
   .add('in progress', () => (
@@ -4894,18 +4477,14 @@ storiesOf('GameDashboard/GameCard', module)
     <GameCard
       game={game1}
       isCurrentGame={false}
-      onOpenDetails={action('onOpenDetails')}
-      onOpenBuilds={action('onOpenBuilds')}
-      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenGameManager={action('onOpenGameManager')}
     />
   ))
   .add('current game', () => (
     <GameCard
       game={game1}
       isCurrentGame={true}
-      onOpenDetails={action('onOpenDetails')}
-      onOpenBuilds={action('onOpenBuilds')}
-      onOpenAnalytics={action('onOpenAnalytics')}
+      onOpenGameManager={action('onOpenGameManager')}
     />
   ));
 
@@ -5032,68 +4611,6 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
       </AuthenticatedUserContext.Provider>
     );
   });
-
-storiesOf('AssetStore/ExtensionStore', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExtensionStoreStateProvider>
-        <ExtensionStore
-          project={testProject.project}
-          isInstalling={false}
-          onInstall={action('onInstall')}
-          showOnlyWithBehaviors={false}
-        />
-      </ExtensionStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('is installing', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExtensionStoreStateProvider>
-        <ExtensionStore
-          project={testProject.project}
-          isInstalling={true}
-          onInstall={action('onInstall')}
-          showOnlyWithBehaviors={false}
-        />
-      </ExtensionStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ))
-  .add('showOnlyWithBehaviors', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExtensionStoreStateProvider>
-        <ExtensionStore
-          project={testProject.project}
-          isInstalling={false}
-          onInstall={action('onInstall')}
-          showOnlyWithBehaviors={true}
-        />
-      </ExtensionStoreStateProvider>
-    </FixedHeightFlexContainer>
-  ));
-
-storiesOf('AssetStore/ExtensionsSearchDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <I18n>
-      {({ i18n }) => (
-        <EventsFunctionsExtensionsProvider
-          i18n={i18n}
-          makeEventsFunctionCodeWriter={() => null}
-          eventsFunctionsExtensionWriter={null}
-          eventsFunctionsExtensionOpener={null}
-        >
-          <ExtensionStoreStateProvider>
-            <ExtensionsSearchDialog
-              project={testProject.project}
-              onClose={action('on close')}
-              onInstallExtension={action('onInstallExtension')}
-            />
-          </ExtensionStoreStateProvider>
-        </EventsFunctionsExtensionsProvider>
-      )}
-    </I18n>
-  ));
 
 storiesOf('GamesShowcase', module)
   .addDecorator(muiDecorator)

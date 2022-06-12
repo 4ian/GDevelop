@@ -1,5 +1,5 @@
 //@flow
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { type ParameterValues } from './ExpressionParametersEditorDialog';
 import { mapVector } from '../../../Utils/MapFor';
 

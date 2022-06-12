@@ -2,7 +2,7 @@
 import {
   type EnumeratedInstructionMetadata,
   type InstructionOrExpressionScope,
-} from './EnumeratedInstructionOrExpressionMetadata.js';
+} from './EnumeratedInstructionOrExpressionMetadata';
 
 const gd: libGDevelop = global.gd;
 
@@ -29,7 +29,8 @@ const freeConditionsToAddToObject: ExtensionsExtraInstructions = {
       'AjoutHasard',
       'AjoutObjConcern',
       'CollisionNP',
-      'NbObjet',
+      'SceneInstancesCount',
+      'PickedInstancesCount',
       'PickNearest',
       'Distance',
       'SeDirige',

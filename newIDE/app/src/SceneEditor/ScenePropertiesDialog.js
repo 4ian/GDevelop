@@ -2,10 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
-import FlatButton from '../UI/FlatButton';
 import TextField from '../UI/TextField';
 import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
@@ -56,7 +55,8 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.layout !== newProps.layout)
@@ -89,11 +89,10 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       //   primary={false}
       //   onClick={this.props.onClose}
       // />,
-      <FlatButton
+      <DialogPrimaryButton
         label={<Trans>Ok</Trans>}
         key="ok"
         primary={true}
-        keyboardFocused={true}
         onClick={this._onApply}
       />,
     ];
@@ -160,10 +159,9 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             }}
           />,
         ]}
-        open={this.props.open}
-        cannotBeDismissed={true}
-        onApply={this._onApply}
         onRequestClose={this.props.onClose}
+        onApply={this._onApply}
+        open={this.props.open}
         maxWidth="sm"
       >
         <ColumnStackLayout expand noMargin>

@@ -17,12 +17,14 @@ import {
   addCreateBadgePreHookIfNotClaimed,
   TRIVIAL_FIRST_EXTENSION,
 } from '../../Utils/GDevelopServices/Badge';
+import Add from '@material-ui/icons/Add';
 
 type Props = {|
   project: gdProject,
   onClose: () => void,
   onInstallExtension: ExtensionShortHeader => void,
   onExtensionInstalled?: (extensionShortHeader?: ExtensionShortHeader) => void,
+  onCreateNew?: () => void,
 |};
 
 /**
@@ -33,6 +35,7 @@ export default function ExtensionsSearchDialog({
   onClose,
   onInstallExtension,
   onExtensionInstalled,
+  onCreateNew,
 }: Props) {
   const [isInstalling, setIsInstalling] = React.useState(false);
   const [extensionWasInstalled, setExtensionWasInstalled] = React.useState(
@@ -114,11 +117,19 @@ export default function ExtensionsSearchDialog({
                 disabled={isInstalling}
               />
             ) : null,
+            onCreateNew ? (
+              <FlatButton
+                key="create-new"
+                onClick={onCreateNew}
+                label={<Trans>Create a new extension</Trans>}
+                icon={<Add />}
+              />
+            ) : null,
           ]}
-          cannotBeDismissed={true}
           flexBody
           open
           noMargin
+          cannotBeDismissed={isInstalling}
           onRequestClose={onClose}
         >
           <ExtensionStore

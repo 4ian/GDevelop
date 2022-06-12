@@ -40,6 +40,7 @@ import ScrollView from '../../../UI/ScrollView';
 import Checkbox from '../../../UI/Checkbox';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 import { EmptyPlaceholder } from '../../../UI/EmptyPlaceholder';
+import SpacedDismissableTutorialMessage from './SpacedDismissableTutorialMessage';
 
 const gd: libGDevelop = global.gd;
 
@@ -100,7 +101,7 @@ class Animation extends React.Component<AnimationProps, void> {
               fullWidth
             />
           </Column>
-          <IconButton onClick={onRemove}>
+          <IconButton size="small" onClick={onRemove}>
             <Delete />
           </IconButton>
         </MiniToolbar>
@@ -317,11 +318,13 @@ class AnimationsListContainer extends React.Component<
               description={<Trans>Animations are a sequence of images.</Trans>}
               actionLabel={<Trans>Add an animation</Trans>}
               helpPagePath="/objects/sprite"
-              onAdd={this.addAnimation}
+              tutorialId="intermediate-changing-animations"
+              onAction={this.addAnimation}
             />
           </Column>
         ) : (
           <React.Fragment>
+            <SpacedDismissableTutorialMessage />
             <SortableAnimationsList
               spriteObject={this.props.spriteObject}
               objectName={this.props.objectName}
@@ -434,6 +437,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setAdvancedOptionsOpen(false)}
@@ -466,6 +470,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setPointsEditorOpen(false)}
@@ -477,12 +482,11 @@ export default function SpriteEditor({
               key="help"
             />,
           ]}
-          cannotBeDismissed={true}
+          onRequestClose={() => setPointsEditorOpen(false)}
           noMargin
           maxWidth="lg"
           flexBody
           fullHeight
-          onRequestClose={() => setPointsEditorOpen(false)}
           open={pointsEditorOpen}
         >
           <PointsEditor
@@ -496,6 +500,7 @@ export default function SpriteEditor({
         <Dialog
           actions={[
             <FlatButton
+              key="close"
               label={<Trans>Close</Trans>}
               primary
               onClick={() => setCollisionMasksEditorOpen(false)}
@@ -511,7 +516,6 @@ export default function SpriteEditor({
           maxWidth="lg"
           flexBody
           fullHeight
-          cannotBeDismissed={true}
           onRequestClose={() => setCollisionMasksEditorOpen(false)}
           open={collisionMasksEditorOpen}
         >

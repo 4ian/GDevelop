@@ -12,7 +12,7 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         type: "body"
         regex: ".*Scroll down to '\\.\\.\\.\\.'.*"
-        message: "Hi @${issue.user.login}! 👋 This issue was automatically closed because it seems that you have not included any steps to reproduce the bug.\n\nGitHub is a place for the technical development of GDevelop itself - you may want to go on the [forum](https://forum.gdevelop-app.com/), the Discord chat or [read the documentation](http://wiki.compilgames.net/doku.php/gdevelop5/start) to learn more about GDevelop. Thanks!"
+        message: "Hi @${issue.user.login}! 👋 This issue was automatically closed because it seems that you have not included any steps to reproduce the bug.\n\nGitHub is a place for the technical development of GDevelop itself - you may want to go on the [forum](https://forum.gdevelop.io/), the Discord chat or [read the documentation](https://wiki.gdevelop.io/gdevelop5/start) to learn more about GDevelop. Thanks!"
     - name: Autoclose known beta 105 web-app update bug
       uses: arkon/issue-closer-action@v1.1
       with:

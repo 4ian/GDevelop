@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <SFML/System/Utf.hpp>
 #include <cctype>
 #include <fstream>
 #include <map>
@@ -52,6 +51,7 @@ Project::Project()
     : name(_("Project")),
       version("1.0.0"),
       packageName("com.example.gamename"),
+      templateSlug(""),
       orientation("landscape"),
       folderProject(false),
       windowWidth(800),
@@ -66,6 +66,9 @@ Project::Project()
       projectUuid(""),
       useDeprecatedZeroAsDefaultZOrder(false),
       useExternalSourceFiles(false),
+      isPlayableWithKeyboard(false),
+      isPlayableWithGamepad(false),
+      isPlayableWithMobile(false),
       currentPlatform(NULL),
       gdMajorVersion(gd::VersionWrapper::Major()),
       gdMinorVersion(gd::VersionWrapper::Minor()),
@@ -514,6 +517,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetProjectUuid(propElement.GetStringAttribute("projectUuid", ""));
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
+  SetTemplateSlug(propElement.GetStringAttribute("templateSlug"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetLastCompilationDirectory(propElement
@@ -745,6 +749,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("projectUuid", projectUuid);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
+  propElement.SetAttribute("templateSlug", templateSlug);
   propElement.SetAttribute("orientation", orientation);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
@@ -972,6 +977,7 @@ void Project::Init(const gd::Project& game) {
   isPlayableWithGamepad = game.isPlayableWithGamepad;
   isPlayableWithMobile = game.isPlayableWithMobile;
   packageName = game.packageName;
+  templateSlug = game.templateSlug;
   orientation = game.orientation;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;

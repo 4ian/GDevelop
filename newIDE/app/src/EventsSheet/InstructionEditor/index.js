@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react';
 import Paper from '@material-ui/core/Paper';
-import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector.js';
-import InstructionParametersEditor from './InstructionParametersEditor.js';
+import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector';
+import InstructionParametersEditor from './InstructionParametersEditor';
 import {
   type ResourceSource,
   type ChooseResourceFunction,

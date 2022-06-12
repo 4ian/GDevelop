@@ -8,10 +8,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
 import { type Release } from '../Utils/GDevelopServices/Release';
 import { type Build } from '../Utils/GDevelopServices/Build';
-import {
-  type ExtensionShortHeader,
-  type SerializedExtension,
-} from '../Utils/GDevelopServices/Extension';
+import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
@@ -19,6 +16,7 @@ import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
+  type AssetPacks,
 } from '../Utils/GDevelopServices/Asset';
 
 export const indieFirebaseUser: FirebaseUser = {
@@ -244,7 +242,7 @@ export const release: Release = {
   publishedAt: '2019-01-14T23:32:41Z',
   url: 'https://github.com/4ian/GDevelop/releases/tag/v5.0.0-beta62',
   description:
-    '> 💌Before listing the new features/improvements/bug fixes, a huge thanks to the contributors that allowed this new version to be what it is: @blurymind, @Bouh, @Lizard-13, @Wend1go, @zatsme 👏 GDevelop is growing thanks to you!\r\n\r\n## ✨New features\r\n\r\n* **Functions** are now "out of alpha testing" and always shown in the project manager. Functions are a powerful way to create new conditions, actions and expression using events. This allow to make your events and the logic of your game easier to understand and create. This also allow you to share common functions between games and create advanced features that are easy to use. [Learn more about functions on the wiki](http://wiki.compilgames.net/doku.php/gdevelop5/events/functions)\r\n* A brand new Physics engine: **Physics Engine 2.0**. (Thanks @Lizard-13 for creating it, testing it, improving it and creating examples and tests, and @zatsme for various update and examples!). While still based on the same internal physics engine, it is much more complete and powerful than the previous one:\r\n  * Support for a lot of joints (revolute, gear, mouse, prismatic, rope, pulley, wheel and more!)\r\n  * Support more options for bodies\r\n  * Support more shape and even custom polygons for objects.\r\n  * Look at the updated and **new examples** to learn how to use it and to see what\'s possible!\r\n\r\n  > Your existing games will continue to work with the old physics engine. You can still continue to use it. For new games, prefer to use the new Physics Engine 2.0. In your existing game, you can also replace *the behavior of all of your objects* by the new behavior, and replace *all the conditions and actions* by the conditions and actions from the new engine.\r\n* New **Screenshot** action, to take in-game screenshot for games running on Windows/macOS/Linux. (thanks @Wend1go!)\r\n  * This also come with new expressions to access to the **file system paths**, useful to save the screenshots in a folder of the user.\r\n\r\n## 💝 Improvements\r\n\r\n* Display missing files in resource editor as red (thanks @blurymind!)\r\n* Add option to set scale mode ("sampling") of the game to nearest (for "pixel perfect" or 8bit games) in the game properties.\r\n* Usability: autoclose project manager when opening an editor (thanks @blurymind!)\r\n* Add button to choose a new file for a resource in the resource editor (thanks @blurymind!)\r\n* New "Pixel perfect platform engine" example.\r\n* Usability: add shortcut to open Project Manager and focus search field when opening it.\r\n* Updated "Isometric Game" starter game to have better collision handling and mobile support.\r\n* Add GetAngle/GetXVelocity and GetYVelocity expressions to top-down movement behavior.\r\n* Extensions written in JavaScript can now be used to create new type of objects.\r\n* Usability: icons in the list of instructions or expressions are now displayed.\r\n\r\n## 🐛 Bug fixes \r\n\r\n* Update **Facebook Instant Games export** to have the now required bundle file (fbapp-config.json).\r\n* Fix the sentence in the events sheet of a Facebook Instant Games action. (thanks @Bouh!)\r\n* Fix descriptions of Storage actions to make clear that no "real" files are written.\r\n* Fix Left Shift key\r\n* Fix middle mouse button (thanks @Bouh!)\r\n* Fix visual artifacts when rendering rescaled games\r\n* Fix platform engine 1-pixel offset bug\r\n* Fix initial opacity undefined for text objects (thanks @Lizard-13)\r\n* Fix the condition checking if the cursor is on an object (thanks @Lizard-13)\r\n* Avoid crash of the debugger with Particle Emitters\r\n* Add explicit "OK" button in message box to fix issue on Linux\r\n* Usability: hide object drop-down list after an object is selected\r\n* Fix login dialog not showing on top of export dialog',
+    '> 💌Before listing the new features/improvements/bug fixes, a huge thanks to the contributors that allowed this new version to be what it is: @blurymind, @Bouh, @Lizard-13, @Wend1go, @zatsme 👏 GDevelop is growing thanks to you!\r\n\r\n## ✨New features\r\n\r\n* **Functions** are now "out of alpha testing" and always shown in the project manager. Functions are a powerful way to create new conditions, actions and expression using events. This allow to make your events and the logic of your game easier to understand and create. This also allow you to share common functions between games and create advanced features that are easy to use. [Learn more about functions on the wiki](https://wiki.gdevelop.io/gdevelop5/events/functions)\r\n* A brand new Physics engine: **Physics Engine 2.0**. (Thanks @Lizard-13 for creating it, testing it, improving it and creating examples and tests, and @zatsme for various update and examples!). While still based on the same internal physics engine, it is much more complete and powerful than the previous one:\r\n  * Support for a lot of joints (revolute, gear, mouse, prismatic, rope, pulley, wheel and more!)\r\n  * Support more options for bodies\r\n  * Support more shape and even custom polygons for objects.\r\n  * Look at the updated and **new examples** to learn how to use it and to see what\'s possible!\r\n\r\n  > Your existing games will continue to work with the old physics engine. You can still continue to use it. For new games, prefer to use the new Physics Engine 2.0. In your existing game, you can also replace *the behavior of all of your objects* by the new behavior, and replace *all the conditions and actions* by the conditions and actions from the new engine.\r\n* New **Screenshot** action, to take in-game screenshot for games running on Windows/macOS/Linux. (thanks @Wend1go!)\r\n  * This also come with new expressions to access to the **file system paths**, useful to save the screenshots in a folder of the user.\r\n\r\n## 💝 Improvements\r\n\r\n* Display missing files in resource editor as red (thanks @blurymind!)\r\n* Add option to set scale mode ("sampling") of the game to nearest (for "pixel perfect" or 8bit games) in the game properties.\r\n* Usability: autoclose project manager when opening an editor (thanks @blurymind!)\r\n* Add button to choose a new file for a resource in the resource editor (thanks @blurymind!)\r\n* New "Pixel perfect platform engine" example.\r\n* Usability: add shortcut to open Project Manager and focus search field when opening it.\r\n* Updated "Isometric Game" starter game to have better collision handling and mobile support.\r\n* Add GetAngle/GetXVelocity and GetYVelocity expressions to top-down movement behavior.\r\n* Extensions written in JavaScript can now be used to create new type of objects.\r\n* Usability: icons in the list of instructions or expressions are now displayed.\r\n\r\n## 🐛 Bug fixes \r\n\r\n* Update **Facebook Instant Games export** to have the now required bundle file (fbapp-config.json).\r\n* Fix the sentence in the events sheet of a Facebook Instant Games action. (thanks @Bouh!)\r\n* Fix descriptions of Storage actions to make clear that no "real" files are written.\r\n* Fix Left Shift key\r\n* Fix middle mouse button (thanks @Bouh!)\r\n* Fix visual artifacts when rendering rescaled games\r\n* Fix platform engine 1-pixel offset bug\r\n* Fix initial opacity undefined for text objects (thanks @Lizard-13)\r\n* Fix the condition checking if the cursor is on an object (thanks @Lizard-13)\r\n* Avoid crash of the debugger with Particle Emitters\r\n* Add explicit "OK" button in message box to fix issue on Linux\r\n* Usability: hide object drop-down list after an object is selected\r\n* Fix login dialog not showing on top of export dialog',
 };
 
 export const releaseWithBreakingChange: Release = {
@@ -252,7 +250,7 @@ export const releaseWithBreakingChange: Release = {
   publishedAt: '2019-01-07T23:32:41Z',
   url: 'https://github.com/4ian/GDevelop/releases/tag/v5.0.0-beta60',
   description:
-    '> ⚠️ Blabla, beware there is a breaking change!!!\r\n\r\n## ✨New features\r\n\r\n* **Functions** are now "out of alpha testing" and always shown in the project manager. Functions are a powerful way to create new conditions, actions and expression using events. This allow to make your events and the logic of your game easier to understand and create. This also allow you to share common functions between games and create advanced features that are easy to use. [Learn more about functions on the wiki](http://wiki.compilgames.net/doku.php/gdevelop5/events/functions)\r\n* A brand new Physics engine: **Physics Engine 2.0**. (Thanks @Lizard-13 for creating it, testing it, improving it and creating examples and tests, and @zatsme for various update and examples!). While still based on the same internal physics engine, it is much more complete and powerful than the previous one:\r\n  * Support for a lot of joints (revolute, gear, mouse, prismatic, rope, pulley, wheel and more!)\r\n  * Support more options for bodies\r\n  * Support more shape and even custom polygons for objects.\r\n  * Look at the updated and **new examples** to learn how to use it and to see what\'s possible!\r\n\r\n  > Your existing games will continue to work with the old physics engine. You can still continue to use it. For new games, prefer to use the new Physics Engine 2.0. In your existing game, you can also replace *the behavior of all of your objects* by the new behavior, and replace *all the conditions and actions* by the conditions and actions from the new engine.\r\n* New **Screenshot** action, to take in-game screenshot for games running on Windows/macOS/Linux. (thanks @Wend1go!)\r\n  * This also come with new expressions to access to the **file system paths**, useful to save the screenshots in a folder of the user.\r\n\r\n## 💝 Improvements\r\n\r\n* Display missing files in resource editor as red (thanks @blurymind!)\r\n* Add option to set scale mode ("sampling") of the game to nearest (for "pixel perfect" or 8bit games) in the game properties.\r\n* Usability: autoclose project manager when opening an editor (thanks @blurymind!)\r\n* Add button to choose a new file for a resource in the resource editor (thanks @blurymind!)\r\n* New "Pixel perfect platform engine" example.\r\n* Usability: add shortcut to open Project Manager and focus search field when opening it.\r\n* Updated "Isometric Game" starter game to have better collision handling and mobile support.\r\n* Add GetAngle/GetXVelocity and GetYVelocity expressions to top-down movement behavior.\r\n* Extensions written in JavaScript can now be used to create new type of objects.\r\n* Usability: icons in the list of instructions or expressions are now displayed.\r\n\r\n## 🐛 Bug fixes \r\n\r\n* Update **Facebook Instant Games export** to have the now required bundle file (fbapp-config.json).\r\n* Fix the sentence in the events sheet of a Facebook Instant Games action. (thanks @Bouh!)\r\n* Fix descriptions of Storage actions to make clear that no "real" files are written.\r\n* Fix Left Shift key\r\n* Fix middle mouse button (thanks @Bouh!)\r\n* Fix visual artifacts when rendering rescaled games\r\n* Fix platform engine 1-pixel offset bug\r\n* Fix initial opacity undefined for text objects (thanks @Lizard-13)\r\n* Fix the condition checking if the cursor is on an object (thanks @Lizard-13)\r\n* Avoid crash of the debugger with Particle Emitters\r\n* Add explicit "OK" button in message box to fix issue on Linux\r\n* Usability: hide object drop-down list after an object is selected\r\n* Fix login dialog not showing on top of export dialog',
+    '> ⚠️ Blabla, beware there is a breaking change!!!\r\n\r\n## ✨New features\r\n\r\n* **Functions** are now "out of alpha testing" and always shown in the project manager. Functions are a powerful way to create new conditions, actions and expression using events. This allow to make your events and the logic of your game easier to understand and create. This also allow you to share common functions between games and create advanced features that are easy to use. [Learn more about functions on the wiki](https://wiki.gdevelop.io/gdevelop5/events/functions)\r\n* A brand new Physics engine: **Physics Engine 2.0**. (Thanks @Lizard-13 for creating it, testing it, improving it and creating examples and tests, and @zatsme for various update and examples!). While still based on the same internal physics engine, it is much more complete and powerful than the previous one:\r\n  * Support for a lot of joints (revolute, gear, mouse, prismatic, rope, pulley, wheel and more!)\r\n  * Support more options for bodies\r\n  * Support more shape and even custom polygons for objects.\r\n  * Look at the updated and **new examples** to learn how to use it and to see what\'s possible!\r\n\r\n  > Your existing games will continue to work with the old physics engine. You can still continue to use it. For new games, prefer to use the new Physics Engine 2.0. In your existing game, you can also replace *the behavior of all of your objects* by the new behavior, and replace *all the conditions and actions* by the conditions and actions from the new engine.\r\n* New **Screenshot** action, to take in-game screenshot for games running on Windows/macOS/Linux. (thanks @Wend1go!)\r\n  * This also come with new expressions to access to the **file system paths**, useful to save the screenshots in a folder of the user.\r\n\r\n## 💝 Improvements\r\n\r\n* Display missing files in resource editor as red (thanks @blurymind!)\r\n* Add option to set scale mode ("sampling") of the game to nearest (for "pixel perfect" or 8bit games) in the game properties.\r\n* Usability: autoclose project manager when opening an editor (thanks @blurymind!)\r\n* Add button to choose a new file for a resource in the resource editor (thanks @blurymind!)\r\n* New "Pixel perfect platform engine" example.\r\n* Usability: add shortcut to open Project Manager and focus search field when opening it.\r\n* Updated "Isometric Game" starter game to have better collision handling and mobile support.\r\n* Add GetAngle/GetXVelocity and GetYVelocity expressions to top-down movement behavior.\r\n* Extensions written in JavaScript can now be used to create new type of objects.\r\n* Usability: icons in the list of instructions or expressions are now displayed.\r\n\r\n## 🐛 Bug fixes \r\n\r\n* Update **Facebook Instant Games export** to have the now required bundle file (fbapp-config.json).\r\n* Fix the sentence in the events sheet of a Facebook Instant Games action. (thanks @Bouh!)\r\n* Fix descriptions of Storage actions to make clear that no "real" files are written.\r\n* Fix Left Shift key\r\n* Fix middle mouse button (thanks @Bouh!)\r\n* Fix visual artifacts when rendering rescaled games\r\n* Fix platform engine 1-pixel offset bug\r\n* Fix initial opacity undefined for text objects (thanks @Lizard-13)\r\n* Fix the condition checking if the cursor is on an object (thanks @Lizard-13)\r\n* Avoid crash of the debugger with Particle Emitters\r\n* Add explicit "OK" button in message box to fix issue on Linux\r\n* Usability: hide object drop-down list after an object is selected\r\n* Fix login dialog not showing on top of export dialog',
 };
 
 export const releaseWithoutDescription: Release = {
@@ -430,11 +428,17 @@ export const fakeAsset1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -444,6 +448,11 @@ export const fakeAsset1: Asset = {
   ],
 };
 
+export const fakePixelArtAsset1: Asset = {
+  ...fakeAsset1,
+  tags: ['space shooter', 'tag2', 'pixel art'],
+};
+
 export const fakeAssetWithBehaviorCustomizations1: Asset = {
   id: '123',
   name: 'My spaceship',
@@ -451,11 +460,17 @@ export const fakeAssetWithBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -492,11 +507,17 @@ export const fakeAssetWithUnknownBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -522,11 +543,17 @@ export const fakeAssetWithFlashBehaviorCustomizations1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   version: '1.0.0',
   authors: ['test author'],
   license: 'MIT',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -552,11 +579,17 @@ export const fakeAssetWithEventCustomizationsAndFlashExtension1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -625,11 +658,17 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
     'A spaceship that can be moved with the keyboard or by touching the screen',
   description: "A very nice way to start a shoot'em up.",
   previewImageUrls: ['res/GD-logo.png'],
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  objectType: 'sprite',
   gdevelopVersion: '5.0.0-beta100',
   authors: ['test author'],
   license: 'MIT',
   version: '1.0.0',
   tags: ['space shooter', 'tag2'],
+  dominantColors: [255],
   objectAssets: [
     {
       object: spaceshipSerializedObject,
@@ -672,28 +711,28 @@ export const fakeAssetWithEventCustomizationsAndUnknownExtension1: Asset = {
 };
 
 export const fakeAssetShortHeader1: AssetShortHeader = {
-  id: '123',
-  name: 'My spaceship',
-  shortDescription:
-    'A spaceship that can be moved with the keyboard or by touching the screen',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['space shooter', 'tag2'],
-};
-
-export const fakeAssetShortHeader2: AssetShortHeader = {
-  id: '456',
-  name: 'Zombie',
-  shortDescription: 'A zombie attacking the player and wandering around.',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['survival', 'tag2'],
-};
-
-export const fakeAssetShortHeader3: AssetShortHeader = {
-  id: '789',
-  name: 'Sword',
-  shortDescription: 'A small sword.',
-  previewImageUrls: ['res/GD-logo.png'],
-  tags: ['medieval', 'tag2'],
+  id: 'a4eb5460ffc062ece1f3ff45d24b07e40e9d4247d21602de70973049eb4f6ee5',
+  license:
+    'CC-BY 4.0 (Attribution to the artist is required, click for details)',
+  animationsCount: 6,
+  maxFramesCount: 6,
+  height: 36,
+  width: 36,
+  name: 'Dino Doux',
+  objectType: 'sprite',
+  previewImageUrls: [
+    'https://resources.gdevelop-app.com/assets/24x24 Dino Characters/Dino Doux_Crouch.png',
+  ],
+  shortDescription: 'with 6 animations',
+  tags: [
+    '24x24 dino characters',
+    'side view',
+    'pixel art',
+    'character',
+    'player',
+    'enemy',
+  ],
+  dominantColors: [255],
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
@@ -731,6 +770,7 @@ export const game1: Game = {
   authorName: 'My company',
   gameName: 'My Great Game',
   createdAt: 1606065498,
+  publicWebBuildId: 'fake-publicwebbuild-id',
 };
 
 export const game2: Game = {
@@ -861,4 +901,102 @@ export const geometryMonsterExampleShortHeader: ExampleShortHeader = {
     'Health (life points and damages for objects)',
   ],
   gdevelopVersion: '',
+};
+
+export const fakeAssetPacks: AssetPacks = {
+  starterPacks: [
+    {
+      name: 'GDevelop Platformer',
+      tag: 'platformer',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/platformer.png',
+      assetsCount: 16,
+    },
+    {
+      name: 'Space Shooter',
+      tag: 'space shooter',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/space shooter.png',
+      assetsCount: 140,
+    },
+    {
+      name: 'Tanks',
+      tag: 'tank pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/tank pack.png',
+      assetsCount: 32,
+    },
+    {
+      name: 'Pixel Adventure',
+      tag: 'pixel adventure pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pixel adventure pack.png',
+      assetsCount: 80,
+    },
+    {
+      name: 'Fake Paid External',
+      tag: 'pirate bomb pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pirate bomb pack.png',
+      assetsCount: 48,
+      externalWebLink: 'https://example.com',
+      userFriendlyPrice: '$4.99',
+    },
+    {
+      name: 'Particles',
+      tag: 'pixel effects pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/pixel effects pack.png',
+      assetsCount: 20,
+    },
+    {
+      name: 'Emotes',
+      tag: 'emote',
+      thumbnailUrl: 'https://resources.gdevelop-app.com/assets/Packs/emote.png',
+      assetsCount: 176,
+    },
+    {
+      name: 'Dinosaurus Characters',
+      tag: '24x24 dino characters',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/24x24 dino characters.png',
+      assetsCount: 5,
+    },
+    {
+      name: 'Fake Paid Spinning Items',
+      tag: '16x16 pixel art spinning items',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art spinning items.png',
+      assetsCount: 30,
+      userFriendlyPrice: '$4.99',
+    },
+    {
+      name: 'RPG Items #2',
+      tag: '16x16 pixel art rpg items',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 pixel art rpg items.png',
+      assetsCount: 64,
+    },
+    {
+      name: 'RPG Items',
+      tag: '16x16 rpg item pack',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/16x16 rpg item pack.png',
+      assetsCount: 144,
+    },
+    {
+      name: 'Fantasy Icons',
+      tag: '32x32 fantasy icons pack v2',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/32x32 fantasy icons pack v2.png',
+      assetsCount: 285,
+    },
+    {
+      name: 'On-Screen Controls',
+      tag: 'on-screen controls',
+      thumbnailUrl:
+        'https://resources.gdevelop-app.com/assets/Packs/on-screen controls.png',
+      assetsCount: 287,
+    },
+  ],
 };

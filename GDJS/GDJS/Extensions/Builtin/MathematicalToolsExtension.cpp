@@ -37,7 +37,9 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["atanh"].SetFunctionName("gdjs.evtTools.common.atanh");
   GetAllExpressions()["cbrt"].SetFunctionName("gdjs.evtTools.common.cbrt");
   GetAllExpressions()["ceil"].SetFunctionName("Math.ceil");
+  GetAllExpressions()["ceilTo"].SetFunctionName("gdjs.evtTools.common.ceilTo");
   GetAllExpressions()["floor"].SetFunctionName("Math.floor");
+  GetAllExpressions()["floorTo"].SetFunctionName("gdjs.evtTools.common.floorTo");
   GetAllExpressions()["cosh"].SetFunctionName("gdjs.evtTools.common.cosh");
   GetAllExpressions()["sinh"].SetFunctionName("gdjs.evtTools.common.sinh");
   GetAllExpressions()["tanh"].SetFunctionName("gdjs.evtTools.common.tanh");
@@ -63,6 +65,7 @@ MathematicalToolsExtension::MathematicalToolsExtension() {
   GetAllExpressions()["int"].SetFunctionName("Math.round");
   GetAllExpressions()["rint"].SetFunctionName("Math.round");
   GetAllExpressions()["round"].SetFunctionName("Math.round");
+  GetAllExpressions()["roundTo"].SetFunctionName("gdjs.evtTools.common.roundTo");
   GetAllExpressions()["trunc"].SetFunctionName("gdjs.evtTools.common.trunc");
   GetAllExpressions()["lerp"].SetFunctionName("gdjs.evtTools.common.lerp");
   GetAllExpressions()["XFromAngleAndDistance"].SetFunctionName("gdjs.evtTools.common.getXFromAngleAndDistance");

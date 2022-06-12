@@ -60,7 +60,7 @@ class GD_CORE_API Resource {
    * \see gd::Resource::GetFile
    * \see gd::Resource::SetFile
    */
-  virtual bool UseFile() { return false; }
+  virtual bool UseFile() const { return false; }
 
   /**
    * \brief Return, if applicable, the String containing the file used by the
@@ -184,7 +184,7 @@ class GD_CORE_API ImageResource : public Resource {
    */
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -234,7 +234,7 @@ class GD_CORE_API AudioResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -286,7 +286,7 @@ class GD_CORE_API FontResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(const SerializerElement& element) override;
@@ -312,7 +312,7 @@ class GD_CORE_API VideoResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(const SerializerElement& element) override;
@@ -338,7 +338,7 @@ class GD_CORE_API JsonResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -379,7 +379,7 @@ class GD_CORE_API BitmapFontResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(const SerializerElement& element) override;

@@ -8,48 +8,47 @@ style.registerAction({
     let path = config.files[0].destination;
     fs.writeFileSync(
       path,
-      fs.readFileSync(path).toString().replace(':root', '.' + config.theme),
+      fs
+        .readFileSync(path)
+        .toString()
+        .replace(':root', '.' + config.theme)
     );
   },
-  undo() {
-  },
+  undo() {},
 });
-
 
 const registry = readThemeRegistry();
 
 for (let registration of registry) {
   const theme = registration.id;
-  style.extend({
-    source: [
-      './src/UI/Theme/Global/styles.json',  // Global styles
-      `./src/UI/Theme/${theme}/theme.json`, // Theme specific overrides
-    ],
-    platforms: {
-      'css': {
-        theme,
-        'transformGroup': 'css',
-        'files': [
-          {
-            'format': 'css/variables',
-            'destination': `./src/UI/Theme/${theme}/${theme}Variables.css`,
-          },
-        ],
-        'actions': [
-          'set_theme_class',
-        ],
+  style
+    .extend({
+      source: [
+        `${__dirname}/../src/UI/Theme/Global/styles.json`, // Global styles
+        `${__dirname}/../src/UI/Theme/${theme}/theme.json`, // Theme specific overrides
+      ],
+      platforms: {
+        css: {
+          theme,
+          transformGroup: 'css',
+          files: [
+            {
+              format: 'css/variables',
+              destination: `${__dirname}/../src/UI/Theme/${theme}/${theme}Variables.css`,
+            },
+          ],
+          actions: ['set_theme_class'],
+        },
+        js: {
+          transformGroup: 'js',
+          files: [
+            {
+              format: 'json/flat',
+              destination: `${__dirname}/../src/UI/Theme/${theme}/${theme}Variables.json`,
+            },
+          ],
+        },
       },
-      'js': {
-        'transformGroup': 'js',
-        'files': [
-          {
-            'format': 'json/flat',
-            'destination': `./src/UI/Theme/${theme}/${theme}Variables.json`,
-          },
-        ],
-      },
-    },
-  })
+    })
     .buildAllPlatforms();
 }
-

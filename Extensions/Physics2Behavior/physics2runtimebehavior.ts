@@ -56,21 +56,8 @@ namespace gdjs {
           return;
         }
 
-        // There might be contacts that end during the frame and
-        // start again right away. It is considered a glitch
-        // and should not be detected.
-        let i = behaviorA.contactsEndedThisFrame.indexOf(behaviorB);
-        if (i !== -1) {
-          behaviorA.contactsEndedThisFrame.splice(i, 1);
-        } else {
-          behaviorA.contactsStartedThisFrame.push(behaviorB);
-        }
-        i = behaviorB.contactsStartedThisFrame.indexOf(behaviorA);
-        if (i !== -1) {
-          behaviorB.contactsStartedThisFrame.splice(i, 1);
-        } else {
-          behaviorB.contactsStartedThisFrame.push(behaviorA);
-        }
+        behaviorA.onContactBegin(behaviorB);
+        behaviorB.onContactBegin(behaviorA);
       };
       this.contactListener.EndContact = function (contactPtr) {
         // Get the contact
@@ -94,8 +81,8 @@ namespace gdjs {
           return;
         }
 
-        behaviorA.contactsEndedThisFrame.push(behaviorB);
-        behaviorB.contactsEndedThisFrame.push(behaviorA);
+        behaviorA.onContactEnd(behaviorB);
+        behaviorB.onContactEnd(behaviorA);
       };
       this.contactListener.PreSolve = function () {};
       this.contactListener.PostSolve = function () {};
@@ -254,9 +241,9 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
-    contactsStartedThisFrame: Array<any>;
-    contactsEndedThisFrame: Array<any>;
-    currentContacts: any;
+    contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
+    contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
+    currentContacts: Array<Physics2RuntimeBehavior>;
     _body: any = null;
     _sharedData: any;
     _tempb2Vec2: any;
@@ -3824,6 +3811,22 @@ namespace gdjs {
       // Awake the bodies
       joint.GetBodyA().SetAwake(true);
       joint.GetBodyB().SetAwake(true);
+    }
+
+    onContactBegin(otherBehavior: Physics2RuntimeBehavior) {
+      // There might be contacts that end during the frame and
+      // start again right away. It is considered a glitch
+      // and should not be detected.
+      let i = this.contactsEndedThisFrame.indexOf(otherBehavior);
+      if (i !== -1) {
+        this.contactsEndedThisFrame.splice(i, 1);
+      } else {
+        this.contactsStartedThisFrame.push(otherBehavior);
+      }
+    }
+
+    onContactEnd(otherBehavior: Physics2RuntimeBehavior) {
+      this.contactsEndedThisFrame.push(otherBehavior);
     }
 
     /**

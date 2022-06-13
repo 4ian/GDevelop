@@ -786,7 +786,7 @@ describe('ExpressionAutocompletion', () => {
       ).toMatchObject({ expression: 'ToString(World())' });
     });
     it('Check ToString conversion wraps the whole expresssion.', () => {
-      // Check that the begininning of the expression is wrapped in ToString.
+      // Check that the beginning of the expression is wrapped in ToString.
       expect(
         insertAutocompletionInExpression(
           { expression: 'Object::w', caretLocation: 9 },

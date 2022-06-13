@@ -108,7 +108,7 @@ describe.skip('Physics2RuntimeBehavior', () => {
           expect(movingObject.getY() < staticObject.getY()).to.be(true);
           expect(movingObjectBehavior.getLinearVelocityY() < 0).to.be(true);
           expect(
-            gdjs.Physics2RuntimeBehavior.collisionTest(
+            gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(
               movingObject,
               staticObject,
               'Physics2'

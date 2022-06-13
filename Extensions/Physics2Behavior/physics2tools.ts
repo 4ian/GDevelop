@@ -7,7 +7,7 @@ namespace gdjs {
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
-        gdjs.Physics2RuntimeBehavior.collisionTest,
+        gdjs.Physics2RuntimeBehavior.areObjectsColliding,
         objectsLists1,
         objectsLists2,
         inverted,
@@ -22,7 +22,7 @@ namespace gdjs {
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
-        gdjs.Physics2RuntimeBehavior.startedCollisionTest,
+        gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween,
         objectsLists1,
         objectsLists2,
         inverted,
@@ -37,7 +37,7 @@ namespace gdjs {
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
-        gdjs.Physics2RuntimeBehavior.stoppedCollisionTest,
+        gdjs.Physics2RuntimeBehavior.hasCollisionStoppedBetween,
         objectsLists1,
         objectsLists2,
         inverted,

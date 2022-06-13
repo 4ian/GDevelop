@@ -48,24 +48,28 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
+
+        if (!behaviorA || !behaviorB) {
+          return;
+        }
 
         // There might be contacts that end during the frame and
         // start again right away. It is considered a glitch
         // and should not be detected.
-        let i = behaviorA.contactsEndedBetweenFrames.indexOf(behaviorB);
+        let i = behaviorA.contactsEndedThisFrame.indexOf(behaviorB);
         if (i !== -1) {
-          behaviorA.contactsEndedBetweenFrames.splice(i, 1);
+          behaviorA.contactsEndedThisFrame.splice(i, 1);
         } else {
-          behaviorA.contactsStartedBetweenFrames.push(behaviorB);
+          behaviorA.contactsStartedThisFrame.push(behaviorB);
         }
-        i = behaviorB.contactsStartedBetweenFrames.indexOf(behaviorA);
+        i = behaviorB.contactsStartedThisFrame.indexOf(behaviorA);
         if (i !== -1) {
-          behaviorB.contactsStartedBetweenFrames.splice(i, 1);
+          behaviorB.contactsStartedThisFrame.splice(i, 1);
         } else {
-          behaviorB.contactsStartedBetweenFrames.push(behaviorA);
+          behaviorB.contactsStartedThisFrame.push(behaviorA);
         }
       };
       this.contactListener.EndContact = function (contactPtr) {
@@ -82,12 +86,16 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior as Physics2RuntimeBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
 
-        behaviorA.contactsEndedBetweenFrames.push(behaviorB);
-        behaviorB.contactsEndedBetweenFrames.push(behaviorA);
+        if (!behaviorA || !behaviorB) {
+          return;
+        }
+
+        behaviorA.contactsEndedThisFrame.push(behaviorB);
+        behaviorB.contactsEndedThisFrame.push(behaviorA);
       };
       this.contactListener.PreSolve = function () {};
       this.contactListener.PostSolve = function () {};
@@ -246,8 +254,8 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
-    contactsStartedBetweenFrames: Array<any>;
-    contactsEndedBetweenFrames: Array<any>;
+    contactsStartedThisFrame: Array<any>;
+    contactsEndedThisFrame: Array<any>;
     currentContacts: any;
     _body: any = null;
     _sharedData: any;
@@ -288,10 +296,10 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
-      this.contactsStartedBetweenFrames = [];
-      this.contactsStartedBetweenFrames.length = 0;
-      this.contactsEndedBetweenFrames = [];
-      this.contactsEndedBetweenFrames.length = 0;
+      this.contactsStartedThisFrame = [];
+      this.contactsStartedThisFrame.length = 0;
+      this.contactsEndedThisFrame = [];
+      this.contactsEndedThisFrame.length = 0;
       this.currentContacts = [];
       this.currentContacts.length = 0;
       this._sharedData = Physics2SharedData.getSharedData(
@@ -755,8 +763,8 @@ namespace gdjs {
 
       gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
         this.currentContacts,
-        this.contactsStartedBetweenFrames,
-        this.contactsEndedBetweenFrames
+        this.contactsStartedThisFrame,
+        this.contactsEndedThisFrame
       );
     }
 
@@ -764,8 +772,8 @@ namespace gdjs {
       this._updateBodyFromObject();
 
       // Reset contacts that happened this frame
-      this.contactsStartedBetweenFrames.length = 0
-      this.contactsEndedBetweenFrames.length = 0
+      this.contactsStartedThisFrame.length = 0;
+      this.contactsEndedThisFrame.length = 0;
 
       // Reset world step to update next frame
       this._sharedData.stepped = false;
@@ -3818,8 +3826,12 @@ namespace gdjs {
       joint.GetBodyB().SetAwake(true);
     }
 
-    // Collision
-    static collisionTest(
+    /**
+     * @deprecated Prefer using `Physics2RuntimeBehavior.areObjectsColliding`.
+     */
+    static collisionTest = Physics2RuntimeBehavior.areObjectsColliding;
+
+    static areObjectsColliding(
       object1: gdjs.RuntimeObject,
       object2: gdjs.RuntimeObject,
       behaviorName: string
@@ -3827,22 +3839,22 @@ namespace gdjs {
       // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
-      ) as Physics2RuntimeBehavior;
+      ) as Physics2RuntimeBehavior | null;
       if (!!behavior1) {
         for (let i = 0, len = behavior1.currentContacts.length; i < len; ++i) {
           if (behavior1.currentContacts[i].owner === object2) {
             return true;
           }
         }
-        // If a contact has started between frames and ended right away, it
+        // If a contact has started at this frame and ended right away, it
         // won't appear in current contacts but the condition should return
         // true anyway.
         for (
-          let i = 0, len = behavior1.contactsStartedBetweenFrames.length;
+          let i = 0, len = behavior1.contactsStartedThisFrame.length;
           i < len;
           ++i
         ) {
-          if (behavior1.contactsStartedBetweenFrames[i].owner === object2) {
+          if (behavior1.contactsStartedThisFrame[i].owner === object2) {
             return true;
           }
         }
@@ -3852,8 +3864,7 @@ namespace gdjs {
       return false;
     }
 
-    // Collision
-    static startedCollisionTest(
+    static hasCollisionStartedBetween(
       object1: gdjs.RuntimeObject,
       object2: gdjs.RuntimeObject,
       behaviorName: string
@@ -3861,14 +3872,14 @@ namespace gdjs {
       // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
-      ) as Physics2RuntimeBehavior;
+      ) as Physics2RuntimeBehavior | null;
       if (!!behavior1) {
         for (
-          let i = 0, len = behavior1.contactsStartedBetweenFrames.length;
+          let i = 0, len = behavior1.contactsStartedThisFrame.length;
           i < len;
           ++i
         ) {
-          if (behavior1.contactsStartedBetweenFrames[i].owner === object2) {
+          if (behavior1.contactsStartedThisFrame[i].owner === object2) {
             return true;
           }
         }
@@ -3878,8 +3889,7 @@ namespace gdjs {
       return false;
     }
 
-    // Collision
-    static stoppedCollisionTest(
+    static hasCollisionStoppedBetween(
       object1: gdjs.RuntimeObject,
       object2: gdjs.RuntimeObject,
       behaviorName: string
@@ -3887,14 +3897,14 @@ namespace gdjs {
       // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
-      ) as Physics2RuntimeBehavior;
+      ) as Physics2RuntimeBehavior | null;
       if (!!behavior1) {
         for (
-          let i = 0, len = behavior1.contactsEndedBetweenFrames.length;
+          let i = 0, len = behavior1.contactsEndedThisFrame.length;
           i < len;
           ++i
         ) {
-          if (behavior1.contactsEndedBetweenFrames[i].owner === object2) {
+          if (behavior1.contactsEndedThisFrame[i].owner === object2) {
             return true;
           }
         }

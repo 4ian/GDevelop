@@ -288,13 +288,11 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
-      this.contactsStartedBetweenFrames =
-        behaviorData.contactsStartedBetweenFrames || [];
+      this.contactsStartedBetweenFrames = [];
       this.contactsStartedBetweenFrames.length = 0;
-      this.contactsEndedBetweenFrames =
-        behaviorData.contactsEndedBetweenFrames || [];
+      this.contactsEndedBetweenFrames = [];
       this.contactsEndedBetweenFrames.length = 0;
-      this.currentContacts = behaviorData.currentContacts || [];
+      this.currentContacts = [];
       this.currentContacts.length = 0;
       this._sharedData = Physics2SharedData.getSharedData(
         runtimeScene,

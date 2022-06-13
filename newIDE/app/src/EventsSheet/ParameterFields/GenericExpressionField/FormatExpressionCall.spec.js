@@ -17,14 +17,18 @@ describe('FormatExpressionCall', () => {
       freeExpressions,
       'PickedInstancesCount'
     )[0];
-    expect(formatExpressionCall(countExpression, ['MyObject'], false)).toBe(
-      'PickedInstancesCount(MyObject)'
-    );
+    expect(
+      formatExpressionCall(countExpression, ['MyObject'], {
+        shouldConvertToString: false,
+      })
+    ).toBe('PickedInstancesCount(MyObject)');
 
     const atan2Expression = filterExpressions(freeExpressions, 'atan2')[0];
-    expect(formatExpressionCall(atan2Expression, ['1', '2'], false)).toBe(
-      'atan2(1, 2)'
-    );
+    expect(
+      formatExpressionCall(atan2Expression, ['1', '2'], {
+        shouldConvertToString: false,
+      })
+    ).toBe('atan2(1, 2)');
   });
 
   it('properly formats a free function, with "code-only" parameters', () => {
@@ -34,28 +38,34 @@ describe('FormatExpressionCall', () => {
       'CameraHeight'
     )[0];
     expect(
-      formatExpressionCall(
-        cameraHeightExpression,
-        ['', '"My layer"', '0'],
-        false
-      )
+      formatExpressionCall(cameraHeightExpression, ['', '"My layer"', '0'], {
+        shouldConvertToString: false,
+      })
     ).toBe('CameraHeight("My layer", 0)');
   });
 
   it('properly formats a free function, with "code-only" and optional parameters', () => {
     const freeExpressions = enumerateFreeExpressions();
     const touchExpression = filterExpressions(freeExpressions, 'TouchX')[0];
-    expect(formatExpressionCall(touchExpression, ['', '1'], false)).toBe(
-      'TouchX(1)'
-    );
     expect(
-      formatExpressionCall(touchExpression, ['', '1', '"My layer"'], false)
-    ).toBe('TouchX(1, "My layer")');
-    expect(
-      formatExpressionCall(touchExpression, ['', '1', '', ''], false)
+      formatExpressionCall(touchExpression, ['', '1'], {
+        shouldConvertToString: false,
+      })
     ).toBe('TouchX(1)');
     expect(
-      formatExpressionCall(touchExpression, ['', '1', '', '2'], false)
+      formatExpressionCall(touchExpression, ['', '1', '"My layer"'], {
+        shouldConvertToString: false,
+      })
+    ).toBe('TouchX(1, "My layer")');
+    expect(
+      formatExpressionCall(touchExpression, ['', '1', '', ''], {
+        shouldConvertToString: false,
+      })
+    ).toBe('TouchX(1)');
+    expect(
+      formatExpressionCall(touchExpression, ['', '1', '', '2'], {
+        shouldConvertToString: false,
+      })
     ).toBe('TouchX(1, "", 2)');
   });
 
@@ -70,7 +80,7 @@ describe('FormatExpressionCall', () => {
       formatExpressionCall(
         variableStringExpression,
         ['MyObject', 'Variable1'],
-        false
+        { shouldConvertToString: false }
       )
     ).toBe('MyObject.Variable(Variable1)');
   });
@@ -80,7 +90,9 @@ describe('FormatExpressionCall', () => {
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
     expect(pointXExpression).not.toBeUndefined();
     expect(
-      formatExpressionCall(pointXExpression, ['MyObject', '"MyPoint"'], false)
+      formatExpressionCall(pointXExpression, ['MyObject', '"MyPoint"'], {
+        shouldConvertToString: false,
+      })
     ).toBe('MyObject.PointX("MyPoint")');
   });
 
@@ -97,7 +109,7 @@ describe('FormatExpressionCall', () => {
       formatExpressionCall(
         jumpSpeedExpression,
         ['MyObject', 'PlatformerObject'],
-        false
+        { shouldConvertToString: false }
       )
     ).toBe('MyObject.PlatformerObject::JumpSpeed()');
   });
@@ -115,7 +127,7 @@ describe('FormatExpressionCall', () => {
       formatExpressionCall(
         jumpSpeedExpression,
         ['MyObject', 'PlatformerObject'],
-        true
+        { shouldConvertToString: true }
       )
     ).toBe('ToString(MyObject.PlatformerObject::JumpSpeed())');
   });

@@ -303,11 +303,9 @@ export default class ExpressionField extends React.Component<Props, State> {
         }
       });
     }
-    const functionCall = formatExpressionCall(
-      expressionInfo,
-      parameterValues,
-      shouldConvertToString
-    );
+    const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
+      shouldConvertToString,
+    });
 
     // Generate the expression with the function call
     const newValue =

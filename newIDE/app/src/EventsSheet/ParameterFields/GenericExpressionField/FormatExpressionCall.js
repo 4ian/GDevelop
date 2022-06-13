@@ -86,7 +86,7 @@ export const getVisibleParameterTypes = (
 export const formatExpressionCall = (
   expressionInfo: EnumeratedInstructionOrExpressionMetadata,
   parameterValues: ParameterValues,
-  shouldConvertToString: boolean
+  options: {| shouldConvertToString: boolean |}
 ): string => {
   const functionName = expressionInfo.name || '';
   let functionCall = '';
@@ -118,5 +118,7 @@ export const formatExpressionCall = (
     ).join(', ');
     functionCall = `${functionName}(${functionArgs})`;
   }
-  return shouldConvertToString ? `ToString(${functionCall})` : functionCall;
+  return options.shouldConvertToString
+    ? `ToString(${functionCall})`
+    : functionCall;
 };

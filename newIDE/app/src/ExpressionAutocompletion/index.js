@@ -529,6 +529,12 @@ type ExpressionAndCaretLocation = {|
   caretLocation: number,
 |};
 
+/**
+ * Returns the position where the last expression call starts,
+ * so that we know where to insert the ToString call.
+ * For example:
+ * '"HelloWorld" + Object.Behavior::' should return 15.
+ */
 const findCompletedExpressionStartPosition = (expression: string) => {
   let match;
   let indexes = [];
@@ -537,7 +543,7 @@ const findCompletedExpressionStartPosition = (expression: string) => {
   while ((match = expressionSeparatorRegex.exec(expression))) {
     indexes.push(match.index);
   }
-  return Math.max.apply(null, indexes);
+  return Math.max(...indexes);
 };
 
 const getNewExpressionWithToStringConversion = ({

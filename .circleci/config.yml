@@ -147,7 +147,7 @@ jobs:
 
       - run:
           name: Clean dist folder to keep only installers/binaries.
-          command: rm -rf newIDE/electron-app/dist/linux-unpacked
+          command: rm -rf newIDE/electron-app/dist/linux-unpacked && rm -rf newIDE/electron-app/dist/linux-arm64-unpacked
 
       # Upload artifacts (CircleCI)
       - store_artifacts:

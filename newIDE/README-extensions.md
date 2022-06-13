@@ -102,8 +102,11 @@ Use [`extension.setExtensionInformation`](https://docs.gdevelop.io/GDCore%20Docu
 Use [`addAction`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
 
 -   Chain calls to [`addParameter`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
--   If your function is asynchronous, call `setAsync` to tell GDevelop to wait for your task to resolve before executing subevents.
 -   Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
+  -   If your function is asynchronous, call `setAsyncFunctionName` instead to tell GDevelop to wait for the returned `Task` to resolve before executing subsequent actions and subevents. 
+	-   If you want to be able to toggle the awaiting on and off, make one implementation of the function that returns a `Task` and one that doesn't, and use both `setFunctionName` and `setAsyncFunctionName` respectively to declare both to GDevelop, making the action optionally async.
+	-   If you just want to return a promise to be awaited, you do not need to create your own task. Simply return `new gd.PromiseTask(yourPromise)`.
+	-   Note that, as of now, *only actions can be asynchronous*. Giving other functions an async function name will not have any effect.
 
 > You can call these functions on the `extension` object, or on the objects returned by `extension.addObject` (for objects) or `extension.addBehavior` (for behaviors). See below.
 

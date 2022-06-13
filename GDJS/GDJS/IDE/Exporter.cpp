@@ -124,7 +124,7 @@ bool Exporter::ExportWholePixiProject(
     // Export a WebManifest with project metadata
     if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
                         helper.GenerateWebManifest(exportedProject)))
-      gd::LogError("Unable to export WebManifest!");
+      gd::LogError("Unable to export WebManifest.");
 
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
 

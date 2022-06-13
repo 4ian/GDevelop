@@ -3843,24 +3843,22 @@ namespace gdjs {
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as Physics2RuntimeBehavior | null;
-      if (!!behavior1) {
-        for (let i = 0, len = behavior1.currentContacts.length; i < len; ++i) {
-          if (behavior1.currentContacts[i].owner === object2) {
-            return true;
-          }
-        }
-        // If a contact has started at this frame and ended right away, it
-        // won't appear in current contacts but the condition should return
-        // true anyway.
-        for (
-          let i = 0, len = behavior1.contactsStartedThisFrame.length;
-          i < len;
-          ++i
-        ) {
-          if (behavior1.contactsStartedThisFrame[i].owner === object2) {
-            return true;
-          }
-        }
+      if (!behavior1) return false;
+
+      if (
+        behavior1.currentContacts.some((behavior) => behavior.owner === object2)
+      ) {
+        return true;
+      }
+      // If a contact has started at this frame and ended right away, it
+      // won't appear in current contacts but the condition should return
+      // true anyway.
+      if (
+        behavior1.contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object2
+        )
+      ) {
+        return true;
       }
 
       // No contact found
@@ -3876,20 +3874,11 @@ namespace gdjs {
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as Physics2RuntimeBehavior | null;
-      if (!!behavior1) {
-        for (
-          let i = 0, len = behavior1.contactsStartedThisFrame.length;
-          i < len;
-          ++i
-        ) {
-          if (behavior1.contactsStartedThisFrame[i].owner === object2) {
-            return true;
-          }
-        }
-      }
+      if (!behavior1) return false;
 
-      // No contact found
-      return false;
+      return behavior1.contactsStartedThisFrame.some(
+        (behavior) => behavior.owner === object2
+      );
     }
 
     static hasCollisionStoppedBetween(
@@ -3901,20 +3890,11 @@ namespace gdjs {
       const behavior1 = object1.getBehavior(
         behaviorName
       ) as Physics2RuntimeBehavior | null;
-      if (!!behavior1) {
-        for (
-          let i = 0, len = behavior1.contactsEndedThisFrame.length;
-          i < len;
-          ++i
-        ) {
-          if (behavior1.contactsEndedThisFrame[i].owner === object2) {
-            return true;
-          }
-        }
-      }
+      if (!behavior1) return false;
 
-      // No contact found
-      return false;
+      return behavior1.contactsEndedThisFrame.some(
+        (behavior) => behavior.owner === object2
+      );
     }
   }
   gdjs.registerBehavior(

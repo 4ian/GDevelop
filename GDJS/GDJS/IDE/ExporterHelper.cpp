@@ -858,28 +858,28 @@ const gd::String ExporterHelper::GenerateWebManifest(
 
   {
     std::map<int, gd::String> resourcesForSizes;
-    const auto FileNameForIcon = [&project](const gd::String &platform,
-                                            const int size) {
-      return project.GetPlatformSpecificAssets().Has(
-                 platform, "icon-" + gd::String::From(size))
+    const auto getFileNameForIcon = [&project](const gd::String &platform,
+                                               const int size) {
+      const gd::String iconName = "icon-" + gd::String::From(size);
+      return project.GetPlatformSpecificAssets().Has(platform, iconName)
                  ? project.GetResourcesManager()
                        .GetResource(project.GetPlatformSpecificAssets().Get(
-                           platform, "icon-" + gd::String::From(size)))
+                           platform, iconName))
                        .GetFile()
                  : "";
     };
 
     for (const int size : IOS_ICONS_SIZES) {
-      const auto iconFile = FileNameForIcon("ios", size);
+      const auto iconFile = getFileNameForIcon("ios", size);
       if (!iconFile.empty()) resourcesForSizes[size] = iconFile;
     };
 
     for (const int size : ANDROID_ICONS_SIZES) {
-      const auto iconFile = FileNameForIcon("android", size);
+      const auto iconFile = getFileNameForIcon("android", size);
       if (!iconFile.empty()) resourcesForSizes[size] = iconFile;
     };
 
-    const auto desktopIconFile = FileNameForIcon("desktop", 512);
+    const auto desktopIconFile = getFileNameForIcon("desktop", 512);
     if (!desktopIconFile.empty()) resourcesForSizes[512] = desktopIconFile;
 
     for (const auto &sizeAndFile : resourcesForSizes) {

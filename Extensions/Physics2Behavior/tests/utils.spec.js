@@ -1,7 +1,7 @@
 // @ts-check
 
 describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
-  it('It returns same current items is nothing happened', () => {
+  it('returns same current items is nothing happened', () => {
     const items = ['A', 'B', 'C'];
     const startedItems = [];
     const endedItems = [];
@@ -16,7 +16,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     }
   });
 
-  it('It returns current items with started items added', () => {
+  it('returns current items with started items added', () => {
     const items = ['A', 'B', 'C'];
     const startedItems = ['Z', 'Q'];
     const endedItems = [];
@@ -31,7 +31,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     }
   });
 
-  it('It returns current items with ended items removed', () => {
+  it('returns current items with ended items removed', () => {
     const items = ['A', 'B', 'C', 'Z'];
     const startedItems = [];
     const endedItems = ['Z', 'B', 'R'];

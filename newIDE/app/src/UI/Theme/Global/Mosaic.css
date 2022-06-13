@@ -14,6 +14,7 @@
 }
 
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
+  padding-left: 8px; /* Follow same spacing as in the rest of the app. */
   color: var(--mosaic-title-color) !important;
   font-weight: 400 !important;
   font-family: var(--gdevelop-modern-font-family);

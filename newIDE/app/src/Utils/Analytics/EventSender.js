@@ -86,6 +86,7 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       appLanguage,
       browserLanguage,
       programOpeningCount: getProgramOpeningCount(),
+      themeName: userPreferences ? userPreferences.themeName : 'Unknown',
       ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     };
 

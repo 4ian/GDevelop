@@ -763,15 +763,9 @@ namespace gdjs {
     doStepPostEvents(runtimeScene) {
       this._updateBodyFromObject();
 
-      // Reset contacts that happened in-between frames
-      this.contactsStartedBetweenFrames.splice(
-        0,
-        this.contactsStartedBetweenFrames.length
-      );
-      this.contactsEndedBetweenFrames.splice(
-        0,
-        this.contactsEndedBetweenFrames.length
-      );
+      // Reset contacts that happened this frame
+      this.contactsStartedBetweenFrames.length = 0
+      this.contactsEndedBetweenFrames.length = 0
 
       // Reset world step to update next frame
       this._sharedData.stepped = false;

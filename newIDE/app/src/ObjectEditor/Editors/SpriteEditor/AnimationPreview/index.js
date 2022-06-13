@@ -36,6 +36,7 @@ type Props = {|
   hideControls?: boolean,
   initialZoom?: number,
   fixedHeight?: number,
+  fixedWidth?: number,
 |};
 
 const AnimationPreview = ({
@@ -50,6 +51,7 @@ const AnimationPreview = ({
   hideControls,
   initialZoom,
   fixedHeight,
+  fixedWidth,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -171,6 +173,7 @@ const AnimationPreview = ({
         hideCheckeredBackground={hideCheckeredBackground}
         hideControls={hideControls}
         fixedHeight={fixedHeight}
+        fixedWidth={fixedWidth}
       />
       {!hideControls && (
         <LineStackLayout noMargin alignItems="center">

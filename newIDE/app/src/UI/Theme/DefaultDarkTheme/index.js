@@ -5,7 +5,7 @@ import './DefaultDarkThemeVariables.css';
 
 export default createGdevelopTheme({
   styles,
-  isModern: true,
+
   rootClassNameIdentifier: 'DefaultDarkTheme',
   paletteType: 'dark',
 });

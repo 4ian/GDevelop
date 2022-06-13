@@ -269,7 +269,8 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
         instrElement.GetChild("type", 0, "Type")
             .GetBoolAttribute("inverted", false, "Contraire"));
 
-    instruction.SetAwaited(instrElement.GetBoolAttribute("await"));
+    instruction.SetAwaited(
+        instrElement.GetChild("type", 0, "Type").GetBoolAttribute("await"));
 
     // Read parameters
     vector<gd::Expression> parameters;

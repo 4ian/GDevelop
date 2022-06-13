@@ -41,8 +41,8 @@ type Props = {|
   onChange?: string => void,
   /** Fired when the search icon is clicked. */
   onRequestSearch: string => void,
-  /** Set if margins should be added or not. */
-  aspect?: 'integrated-search-bar' | 'add-margins-only-if-modern-theme',
+  /** Set if rounding should be applied or not. */
+  aspect?: 'integrated-search-bar',
   /** The value of the text field. */
   value: string,
   /** The functions needed to interact with the list of tags displayed below search bar. */
@@ -167,10 +167,6 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     };
 
     const gdevelopTheme = React.useContext(GDevelopThemeContext);
-    const noMargin =
-      aspect === 'add-margins-only-if-modern-theme' && gdevelopTheme.isModern
-        ? false
-        : true;
 
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
@@ -288,17 +284,15 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     return (
       <I18n>
         {({ i18n }) => (
-          <Column noMargin={noMargin}>
-            <Line noMargin={noMargin}>
+          <Column noMargin>
+            <Line noMargin>
               <Paper
                 style={{
                   backgroundColor: gdevelopTheme.searchBar.backgroundColor,
                   ...styles.root,
                 }}
-                square={
-                  aspect === 'integrated-search-bar' || !gdevelopTheme.isModern
-                }
-                elevation={gdevelopTheme.isModern ? 0 : 1}
+                square={aspect === 'integrated-search-bar'}
+                elevation={0}
               >
                 <div style={styles.searchContainer}>
                   {tags ? (

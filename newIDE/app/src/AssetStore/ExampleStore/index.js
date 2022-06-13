@@ -81,16 +81,19 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <Column expand noMargin useFullHeight>
-            <SearchBar
-              value={searchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              aspect="add-margins-only-if-modern-theme"
-              tagsHandler={tagsHandler}
-              tags={filters && filters.defaultTags}
-              ref={searchBarRef}
-              placeholder={t`Search examples`}
-            />
+            <Line>
+              <Column expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={setSearchText}
+                  onRequestSearch={() => {}}
+                  tagsHandler={tagsHandler}
+                  tags={filters && filters.defaultTags}
+                  ref={searchBarRef}
+                  placeholder={t`Search examples`}
+                />
+              </Column>
+            </Line>
             <Line
               expand
               overflow={

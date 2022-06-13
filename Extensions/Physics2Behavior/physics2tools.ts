@@ -15,7 +15,7 @@ namespace gdjs {
       );
     };
 
-    export const objectsStartedColliding = function (
+    export const haveObjectsStartedColliding = function (
       objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
       behaviorName: string,
       objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
@@ -30,7 +30,7 @@ namespace gdjs {
       );
     };
 
-    export const objectsStoppedColliding = function (
+    export const haveObjectsStoppedColliding = function (
       objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
       behaviorName: string,
       objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,

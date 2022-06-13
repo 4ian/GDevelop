@@ -3763,7 +3763,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
-      .setFunctionName('gdjs.physics2.objectsStartedColliding');
+      .setFunctionName('gdjs.physics2.haveObjectsStartedColliding');
 
     extension
       .addCondition(
@@ -3781,7 +3781,7 @@ module.exports = {
       .addCodeOnlyParameter('conditionInverted', '')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
-      .setFunctionName('gdjs.physics2.objectsStoppedColliding');
+      .setFunctionName('gdjs.physics2.haveObjectsStoppedColliding');
 
     return extension;
   },

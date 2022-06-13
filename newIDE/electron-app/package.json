@@ -38,7 +38,14 @@
     "mac": {
       "category": "public.app-category.developer-tools",
       "hardenedRuntime": true,
-      "entitlements": "./build/entitlements.mac.inherit.plist"
+      "entitlements": "./build/entitlements.mac.inherit.plist",
+      "target": {
+        "target": "default",
+        "arch": [
+          "x64",
+          "arm64"
+        ]
+      }
     },
     "win": {
       "executableName": "GDevelop"

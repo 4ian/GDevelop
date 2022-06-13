@@ -43,6 +43,7 @@ export type ExpressionAutocompletion =
       ...BaseExpressionAutocompletion,
       kind: 'Expression',
       enumeratedExpressionMetadata: EnumeratedExpressionMetadata,
+      shouldConvertToString: boolean,
     |}
   | {|
       ...BaseExpressionAutocompletion,
@@ -88,7 +89,8 @@ const getAutocompletionsForExpressions = (
   prefix: string,
   replacementStartPosition: number,
   replacementEndPosition: number,
-  isExact: boolean
+  isExact: boolean,
+  completionType: string
 ): Array<ExpressionAutocompletion> => {
   return expressionMetadatas
     .filter(
@@ -113,6 +115,9 @@ const getAutocompletionsForExpressions = (
         hasVisibleParameters:
           getVisibleParameterTypes(enumeratedExpressionMetadata).length !== 0,
         isExact,
+        shouldConvertToString:
+          completionType === 'string' &&
+          enumeratedExpressionMetadata.metadata.getReturnType() === 'number',
       };
     })
     .filter(Boolean);
@@ -126,7 +131,7 @@ const getAutocompletionsForFreeExpressions = function(
   const type: string = completionDescription.getType();
   const isExact: boolean = completionDescription.isExact();
 
-  const freeExpressions = enumerateFreeExpressions(type);
+  const freeExpressions = enumerateFreeExpressions();
 
   const filteredFreeExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(freeExpressions, prefix),
@@ -137,7 +142,8 @@ const getAutocompletionsForFreeExpressions = function(
     prefix,
     completionDescription.getReplacementStartPosition(),
     completionDescription.getReplacementEndPosition(),
-    isExact
+    isExact,
+    type
   );
 };
 
@@ -161,7 +167,7 @@ const getAutocompletionsForObjectExpressions = function(
     objectName,
     /* searchInGroups= */ true
   );
-  const objectExpressions = enumerateObjectExpressions(type, objectType);
+  const objectExpressions = enumerateObjectExpressions(objectType);
   const filteredObjectExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(objectExpressions, prefix),
     expressionAutocompletionContext.scope
@@ -172,7 +178,8 @@ const getAutocompletionsForObjectExpressions = function(
     prefix,
     completionDescription.getReplacementStartPosition(),
     completionDescription.getReplacementEndPosition(),
-    isExact
+    isExact,
+    type
   );
 };
 
@@ -198,7 +205,7 @@ const getAutocompletionsForBehaviorExpressions = function(
     /* searchInGroups= */ true
   );
 
-  const behaviorExpressions = enumerateBehaviorExpressions(type, behaviorType);
+  const behaviorExpressions = enumerateBehaviorExpressions(behaviorType);
 
   const filteredBehaviorExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(behaviorExpressions, prefix),
@@ -210,7 +217,8 @@ const getAutocompletionsForBehaviorExpressions = function(
     prefix,
     completionDescription.getReplacementStartPosition(),
     completionDescription.getReplacementEndPosition(),
-    isExact
+    isExact,
+    type
   );
 };
 
@@ -513,6 +521,7 @@ type InsertedAutocompletion = {|
   addDot?: ?boolean,
   addParameterSeparator?: ?boolean,
   addNamespaceSeparator?: ?boolean,
+  shouldConvertToString?: ?boolean,
 |};
 
 type ExpressionAndCaretLocation = {|
@@ -520,25 +529,110 @@ type ExpressionAndCaretLocation = {|
   caretLocation: number,
 |};
 
+const findCompletedExpressionStartPosition = (expression: string) => {
+  let match;
+  let indexes = [];
+  // We consider that expressions are composed of letters, digits, dot or colons
+  const expressionSeparatorRegex = new RegExp(/[^\w\d.:]/g);
+  while ((match = expressionSeparatorRegex.exec(expression))) {
+    indexes.push(match.index);
+  }
+  return Math.max.apply(null, indexes);
+};
+
+const getNewExpressionWithToStringConversion = ({
+  expression,
+  wordStartPosition,
+  wordEndPosition,
+  insertedWord,
+}: {
+  expression: string,
+  wordStartPosition: number,
+  wordEndPosition: number,
+  insertedWord: string,
+}) => {
+  const expressionStart = expression.substring(0, wordStartPosition);
+  const completedExpressionStartPosition: number = findCompletedExpressionStartPosition(
+    expressionStart
+  );
+
+  const newExpressionStart = expression.substring(
+    0,
+    completedExpressionStartPosition + 1
+  );
+  const completedExpressionStart = expression.substring(
+    completedExpressionStartPosition + 1,
+    wordStartPosition
+  );
+
+  const newExpressionEnd = expression.substring(wordEndPosition);
+  return {
+    expression:
+      newExpressionStart +
+      'ToString(' +
+      completedExpressionStart +
+      insertedWord +
+      ')' +
+      newExpressionEnd,
+    // We place the caret before the closing parenthesis of ToString()
+    // so that the user's typing flow is not interrupted.
+    caretLocation:
+      newExpressionStart.length +
+      completedExpressionStart.length +
+      insertedWord.length +
+      'ToString('.length,
+  };
+};
+
+const getNewExpression = ({
+  expression,
+  wordStartPosition,
+  wordEndPosition,
+  insertedWord,
+}: {
+  expression: string,
+  wordStartPosition: number,
+  wordEndPosition: number,
+  insertedWord: string,
+}) => {
+  const newExpressionStart = expression.substring(0, wordStartPosition);
+  const newExpressionEnd = expression.substring(wordEndPosition);
+  return {
+    expression: newExpressionStart + insertedWord + newExpressionEnd,
+    caretLocation: newExpressionStart.length + insertedWord.length,
+  };
+};
+
 export const insertAutocompletionInExpression = (
   { expression, caretLocation }: ExpressionAndCaretLocation,
   insertedAutocompletion: InsertedAutocompletion
 ): ExpressionAndCaretLocation => {
+  const {
+    addDot,
+    addParameterSeparator,
+    addNamespaceSeparator,
+    addParenthesis,
+    completion,
+    shouldConvertToString,
+    replacementStartPosition,
+    replacementEndPosition,
+    hasVisibleParameters,
+  } = insertedAutocompletion;
   const formatCompletion = (nextCharacter: ?string) => {
-    const suffix = insertedAutocompletion.addDot
+    const suffix = addDot
       ? '.'
-      : insertedAutocompletion.addParameterSeparator
+      : addParameterSeparator
       ? ', '
-      : insertedAutocompletion.addNamespaceSeparator
+      : addNamespaceSeparator
       ? '::'
-      : insertedAutocompletion.addParenthesis
+      : addParenthesis
       ? '()'
       : '';
 
     const addSuffix =
       !nextCharacter || !suffix || nextCharacter[0] !== suffix[0];
 
-    return insertedAutocompletion.completion + (addSuffix ? suffix : '');
+    return completion + (addSuffix ? suffix : '');
   };
 
   if (caretLocation > expression.length) {
@@ -549,35 +643,42 @@ export const insertAutocompletionInExpression = (
     const newExpression = formatCompletion(undefined) + expression;
     return {
       caretLocation: newExpression.length,
-      expression: newExpression,
+      expression: shouldConvertToString
+        ? `ToString(${newExpression})`
+        : newExpression,
     };
   }
 
-  const wordStartPosition: number = insertedAutocompletion.replacementStartPosition
-    ? insertedAutocompletion.replacementStartPosition
+  const wordStartPosition: number = replacementStartPosition
+    ? replacementStartPosition
     : 0;
-  const wordEndPosition: number = insertedAutocompletion.replacementEndPosition
-    ? insertedAutocompletion.replacementEndPosition
+  const wordEndPosition: number = replacementEndPosition
+    ? replacementEndPosition
     : expression.length;
 
   // The next character, if any, will be useful to format the completion
   // (to avoid repeating an existing character).
   const maybeNextCharacter: ?string = expression[wordEndPosition];
-
-  const newExpressionStart = expression.substring(0, wordStartPosition);
   const insertedWord = formatCompletion(maybeNextCharacter);
-  const newExpressionEnd = expression.substring(wordEndPosition);
-  const newExpression = newExpressionStart + insertedWord + newExpressionEnd;
-  let newCaretLocation = newExpressionStart.length + insertedWord.length;
-  if (
-    insertedAutocompletion.addParenthesis &&
-    insertedAutocompletion.hasVisibleParameters
-  ) {
-    newCaretLocation = newCaretLocation - 1;
+
+  const newAutocompletedExpression = shouldConvertToString
+    ? getNewExpressionWithToStringConversion({
+        expression,
+        insertedWord,
+        wordEndPosition,
+        wordStartPosition,
+      })
+    : getNewExpression({
+        expression,
+        insertedWord,
+        wordEndPosition,
+        wordStartPosition,
+      });
+
+  if (addParenthesis && hasVisibleParameters) {
+    newAutocompletedExpression.caretLocation =
+      newAutocompletedExpression.caretLocation - 1;
   }
 
-  return {
-    caretLocation: newCaretLocation,
-    expression: newExpression,
-  };
+  return newAutocompletedExpression;
 };

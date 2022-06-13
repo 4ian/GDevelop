@@ -131,7 +131,7 @@ const getAutocompletionsForFreeExpressions = function(
   const type: string = completionDescription.getType();
   const isExact: boolean = completionDescription.isExact();
 
-  const freeExpressions = enumerateFreeExpressions();
+  const freeExpressions = enumerateFreeExpressions(type);
 
   const filteredFreeExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(freeExpressions, prefix),
@@ -167,7 +167,7 @@ const getAutocompletionsForObjectExpressions = function(
     objectName,
     /* searchInGroups= */ true
   );
-  const objectExpressions = enumerateObjectExpressions(objectType);
+  const objectExpressions = enumerateObjectExpressions(type, objectType);
   const filteredObjectExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(objectExpressions, prefix),
     expressionAutocompletionContext.scope
@@ -205,7 +205,7 @@ const getAutocompletionsForBehaviorExpressions = function(
     /* searchInGroups= */ true
   );
 
-  const behaviorExpressions = enumerateBehaviorExpressions(behaviorType);
+  const behaviorExpressions = enumerateBehaviorExpressions(type, behaviorType);
 
   const filteredBehaviorExpressions = filterEnumeratedInstructionOrExpressionMetadataByScope(
     filterExpressions(behaviorExpressions, prefix),

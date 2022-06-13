@@ -12,7 +12,7 @@ import {
 
 describe('FormatExpressionCall', () => {
   it('properly formats a free function, with one or more arguments', () => {
-    const freeExpressions = enumerateFreeExpressions();
+    const freeExpressions = enumerateFreeExpressions('number|string');
     const countExpression = filterExpressions(
       freeExpressions,
       'PickedInstancesCount'
@@ -32,7 +32,7 @@ describe('FormatExpressionCall', () => {
   });
 
   it('properly formats a free function, with "code-only" parameters', () => {
-    const freeExpressions = enumerateFreeExpressions();
+    const freeExpressions = enumerateFreeExpressions('number|string');
     const cameraHeightExpression = filterExpressions(
       freeExpressions,
       'CameraHeight'
@@ -45,7 +45,7 @@ describe('FormatExpressionCall', () => {
   });
 
   it('properly formats a free function, with "code-only" and optional parameters', () => {
-    const freeExpressions = enumerateFreeExpressions();
+    const freeExpressions = enumerateFreeExpressions('number|string');
     const touchExpression = filterExpressions(freeExpressions, 'TouchX')[0];
     expect(
       formatExpressionCall(touchExpression, ['', '1'], {
@@ -70,7 +70,10 @@ describe('FormatExpressionCall', () => {
   });
 
   it('properly formats an object function', () => {
-    const objectsExpressions = enumerateObjectExpressions('Sprite');
+    const objectsExpressions = enumerateObjectExpressions(
+      'number|string',
+      'Sprite'
+    );
     const variableStringExpression = filterExpressions(
       objectsExpressions,
       'Variable'
@@ -86,7 +89,10 @@ describe('FormatExpressionCall', () => {
   });
 
   it('properly formats an object function with an argument', () => {
-    const objectsExpressions = enumerateObjectExpressions('Sprite');
+    const objectsExpressions = enumerateObjectExpressions(
+      'number|string',
+      'Sprite'
+    );
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
     expect(pointXExpression).not.toBeUndefined();
     expect(
@@ -98,6 +104,7 @@ describe('FormatExpressionCall', () => {
 
   it('properly formats an object behavior function', () => {
     const behaviorsExpressions = enumerateBehaviorExpressions(
+      'number|string',
       'PlatformBehavior::PlatformerObjectBehavior'
     );
     const jumpSpeedExpression = filterExpressions(
@@ -116,6 +123,7 @@ describe('FormatExpressionCall', () => {
 
   it('properly formats an object behavior function and converts to string', () => {
     const behaviorsExpressions = enumerateBehaviorExpressions(
+      'number|string',
       'PlatformBehavior::PlatformerObjectBehavior'
     );
     const jumpSpeedExpression = filterExpressions(
@@ -133,7 +141,10 @@ describe('FormatExpressionCall', () => {
   });
 
   it('can return the visible parameters of a function', () => {
-    const objectsExpressions = enumerateObjectExpressions('Sprite');
+    const objectsExpressions = enumerateObjectExpressions(
+      'number|string',
+      'Sprite'
+    );
     const pointXExpression = filterExpressions(objectsExpressions, 'PointX')[0];
     expect(pointXExpression).not.toBeUndefined();
 

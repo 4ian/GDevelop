@@ -14,9 +14,22 @@ export default {
   decorators: [muiDecorator, paperDecorator],
 };
 
-export const DefaultNoScope = () => (
+export const DefaultStringNoScope = () => (
   <FixedHeightFlexContainer height={400}>
     <ExpressionSelector
+      expressionType="string"
+      selectedType=""
+      onChoose={action('Expression chosen')}
+      focusOnMount
+      scope={{}}
+    />
+  </FixedHeightFlexContainer>
+);
+
+export const DefaultNumberNoScope = () => (
+  <FixedHeightFlexContainer height={400}>
+    <ExpressionSelector
+      expressionType="number"
       selectedType=""
       onChoose={action('Expression chosen')}
       focusOnMount

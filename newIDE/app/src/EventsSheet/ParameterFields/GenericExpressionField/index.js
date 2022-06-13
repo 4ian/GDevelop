@@ -606,6 +606,7 @@ export default class ExpressionField extends React.Component<Props, State> {
                             onChoose={(type, expression) => {
                               this._handleExpressionChosen(expression);
                             }}
+                            expressionType={expressionType}
                             focusOnMount
                             scope={scope}
                           />

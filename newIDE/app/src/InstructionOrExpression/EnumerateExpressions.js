@@ -10,6 +10,8 @@ const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
+const shouldOnlyBeNumberType = (type: string) => type === 'number';
+
 const enumerateExpressionMetadataMap = (
   prefix: string,
   expressions: gdMapStringExpressionMetadata,
@@ -55,7 +57,9 @@ const enumerateExpressionMetadataMap = (
 };
 
 /** Enumerate all the free expressions available. */
-export const enumerateFreeExpressions = (): Array<EnumeratedExpressionMetadata> => {
+export const enumerateFreeExpressions = (
+  type: string
+): Array<EnumeratedExpressionMetadata> => {
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
@@ -70,11 +74,13 @@ export const enumerateFreeExpressions = (): Array<EnumeratedExpressionMetadata> 
       };
 
       return [
-        ...enumerateExpressionMetadataMap(
-          prefix,
-          extension.getAllStrExpressions(),
-          scope
-        ),
+        ...(!shouldOnlyBeNumberType(type)
+          ? enumerateExpressionMetadataMap(
+              prefix,
+              extension.getAllStrExpressions(),
+              scope
+            )
+          : []),
         ...enumerateExpressionMetadataMap(
           prefix,
           extension.getAllExpressions(),
@@ -87,6 +93,7 @@ export const enumerateFreeExpressions = (): Array<EnumeratedExpressionMetadata> 
 
 /** Enumerate the expressions available for the given object type. */
 export const enumerateObjectExpressions = (
+  type: string,
   objectType: string
 ): Array<EnumeratedExpressionMetadata> => {
   const extensionAndObjectMetadata = gd.MetadataProvider.getExtensionAndObjectMetadata(
@@ -98,11 +105,13 @@ export const enumerateObjectExpressions = (
   const scope = { extension, objectMetadata };
 
   let objectsExpressions = [
-    ...enumerateExpressionMetadataMap(
-      '',
-      extension.getAllStrExpressionsForObject(objectType),
-      scope
-    ),
+    ...(!shouldOnlyBeNumberType(type)
+      ? enumerateExpressionMetadataMap(
+          '',
+          extension.getAllStrExpressionsForObject(objectType),
+          scope
+        )
+      : []),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForObject(objectType),
@@ -120,11 +129,13 @@ export const enumerateObjectExpressions = (
 
     objectsExpressions = [
       ...objectsExpressions,
-      ...enumerateExpressionMetadataMap(
-        '',
-        extension.getAllStrExpressionsForObject(baseObjectType),
-        scope
-      ),
+      ...(!shouldOnlyBeNumberType(type)
+        ? enumerateExpressionMetadataMap(
+            '',
+            extension.getAllStrExpressionsForObject(baseObjectType),
+            scope
+          )
+        : []),
       ...enumerateExpressionMetadataMap(
         '',
         extension.getAllExpressionsForObject(baseObjectType),
@@ -138,6 +149,7 @@ export const enumerateObjectExpressions = (
 
 /** Enumerate the expressions available for the given behavior type. */
 export const enumerateBehaviorExpressions = (
+  type: string,
   behaviorType: string
 ): Array<EnumeratedExpressionMetadata> => {
   const extensionAndBehaviorMetadata = gd.MetadataProvider.getExtensionAndBehaviorMetadata(
@@ -149,11 +161,13 @@ export const enumerateBehaviorExpressions = (
   const scope = { extension, behaviorMetadata };
 
   return [
-    ...enumerateExpressionMetadataMap(
-      '',
-      extension.getAllStrExpressionsForBehavior(behaviorType),
-      scope
-    ),
+    ...(!shouldOnlyBeNumberType(type)
+      ? enumerateExpressionMetadataMap(
+          '',
+          extension.getAllStrExpressionsForBehavior(behaviorType),
+          scope
+        )
+      : []),
     ...enumerateExpressionMetadataMap(
       '',
       extension.getAllExpressionsForBehavior(behaviorType),
@@ -163,10 +177,12 @@ export const enumerateBehaviorExpressions = (
 };
 
 /** Enumerate all the expressions available. */
-export const enumerateAllExpressions = (): Array<EnumeratedExpressionMetadata> => {
+export const enumerateAllExpressions = (
+  type: string
+): Array<EnumeratedExpressionMetadata> => {
   const objectsExpressions = [];
   const behaviorsExpressions = [];
-  const freeExpressions = enumerateFreeExpressions();
+  const freeExpressions = enumerateFreeExpressions(type);
 
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
@@ -179,14 +195,15 @@ export const enumerateAllExpressions = (): Array<EnumeratedExpressionMetadata> =
       const objectMetadata = extension.getObjectMetadata(objectType);
       const scope = { extension, objectMetadata };
 
-      objectsExpressions.push.apply(
-        objectsExpressions,
-        enumerateExpressionMetadataMap(
-          prefix,
-          extension.getAllStrExpressionsForObject(objectType),
-          scope
-        )
-      );
+      if (!shouldOnlyBeNumberType(type))
+        objectsExpressions.push.apply(
+          objectsExpressions,
+          enumerateExpressionMetadataMap(
+            prefix,
+            extension.getAllStrExpressionsForObject(objectType),
+            scope
+          )
+        );
       objectsExpressions.push.apply(
         objectsExpressions,
         enumerateExpressionMetadataMap(
@@ -202,14 +219,15 @@ export const enumerateAllExpressions = (): Array<EnumeratedExpressionMetadata> =
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 
-      behaviorsExpressions.push.apply(
-        behaviorsExpressions,
-        enumerateExpressionMetadataMap(
-          prefix,
-          extension.getAllStrExpressionsForBehavior(behaviorType),
-          scope
-        )
-      );
+      if (!shouldOnlyBeNumberType(type))
+        behaviorsExpressions.push.apply(
+          behaviorsExpressions,
+          enumerateExpressionMetadataMap(
+            prefix,
+            extension.getAllStrExpressionsForBehavior(behaviorType),
+            scope
+          )
+        );
       behaviorsExpressions.push.apply(
         behaviorsExpressions,
         enumerateExpressionMetadataMap(

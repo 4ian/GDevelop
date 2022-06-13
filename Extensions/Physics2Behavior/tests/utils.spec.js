@@ -11,9 +11,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 
   it('returns current items with started items added', () => {
@@ -26,9 +24,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 
   it('returns current items with ended items removed', () => {
@@ -41,9 +37,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 
   it('It returns same current items if all started items also ended', () => {
@@ -56,9 +50,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 
   it('It returns current items without started items that also ended', () => {
@@ -71,9 +63,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 
   it('It returns current items with item started twice', () => {
@@ -86,9 +76,7 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 
   it('It returns current items without item ended twice', () => {
@@ -101,8 +89,6 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
       startedItems,
       endedItems
     );
-    for (let i = 0; i < items.length; i++) {
-      expect(items[i]).to.be(expectedResolvedItems[i]);
-    }
+    expect(items).to.eql(expectedResolvedItems);
   });
 });

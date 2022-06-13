@@ -3735,7 +3735,7 @@ module.exports = {
         _('Collision'),
         _('Test if two objects collide.'),
         _('_PARAM0_ is colliding with _PARAM2_'),
-        _('Collisions'),
+       '',
         'res/physics32.png',
         'res/physics32.png'
       )
@@ -3753,7 +3753,7 @@ module.exports = {
         _('Collision start'),
         _('Test if two objects started colliding.'),
         _('_PARAM0_ started colliding with _PARAM2_'),
-        _('Collisions'),
+        _('Collision'),
         'res/physics32.png',
         'res/physics32.png'
       )
@@ -3771,7 +3771,7 @@ module.exports = {
         _('Collision stop'),
         _('Test if two objects stopped colliding.'),
         _('_PARAM0_ stopped colliding with _PARAM2_'),
-        _('Collisions'),
+        _('Collision'),
         'res/physics32.png',
         'res/physics32.png'
       )

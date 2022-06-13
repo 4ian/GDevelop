@@ -17,11 +17,11 @@ export function getRootClassNames(theme: string) {
 }
 
 export function getMuiOverrides(
-  isModern: boolean,
   tabTextColor: string,
   tabBackgroundColor: string,
   inputBorderBottomColor: string,
   appBarBackgroundColor: string,
+  appBarTextColor: string,
   iconColor: string,
   outlinedButtonBorderColor: string
 ) {
@@ -29,11 +29,11 @@ export function getMuiOverrides(
     MuiTypography: {
       h5: {
         // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: isModern ? 600 : 400,
+        fontWeight: 600,
       },
       h6: {
         // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: isModern ? 600 : 400,
+        fontWeight: 600,
       },
     },
     MuiInput: {
@@ -49,7 +49,9 @@ export function getMuiOverrides(
     },
     MuiAppBar: {
       colorPrimary: {
+        // Use some colors as mosaic titles:
         backgroundColor: appBarBackgroundColor,
+        color: appBarTextColor,
       },
     },
     MuiIconButton: {
@@ -87,18 +89,13 @@ export function getMuiOverrides(
     },
     MuiTab: {
       textColorPrimary: {
-        color:
-          (isModern ? darken(tabTextColor, 0.2) : tabTextColor) + ' !important',
-        textTransform: isModern ? 'none' : 'uppercase',
-        fontWeight: isModern ? 600 : 500,
-        letterSpacing: isModern ? '0.3px' : '',
-        ...(isModern
-          ? {
-              '&.Mui-selected': {
-                color: tabTextColor + ' !important',
-              },
-            }
-          : {}),
+        color: darken(tabTextColor, 0.2) + ' !important',
+        textTransform: 'none',
+        fontWeight: 600,
+        letterSpacing: '0.3px',
+        '&.Mui-selected': {
+          color: tabTextColor + ' !important',
+        },
       },
       root: {
         // Reduce the height of tabs to 32px
@@ -150,19 +147,17 @@ export function getMuiOverrides(
     },
     MuiPaper: {
       rounded: {
-        borderRadius: isModern ? 8 : 4,
+        borderRadius: 8,
       },
     },
     MuiButton: {
       root: {
-        borderRadius: isModern ? 8 : 0,
-        textTransform: isModern ? 'none' : 'uppercase',
-        fontWeight: isModern ? 600 : 400, // Lower a bit the weight of buttons
-        letterSpacing: isModern ? '0.3px' : '',
+        borderRadius: 8,
+        textTransform: 'none',
+        fontWeight: 600,
+        letterSpacing: '0.3px',
       },
-      ...(isModern
-        ? { outlined: { borderColor: outlinedButtonBorderColor } }
-        : {}),
+      outlined: { borderColor: outlinedButtonBorderColor },
     },
     // Make MuiAccordion much more compact than default.
     // Some (or all) of these styles can be removed on MUIv5,
@@ -222,21 +217,20 @@ export function getThemeMode(color: string, contrastText: string) {
 
 export function createGdevelopTheme({
   styles,
-  isModern,
   rootClassNameIdentifier,
   paletteType,
   gdevelopIconsCSSFilter,
 }: {
   styles: any,
-  isModern?: boolean,
   rootClassNameIdentifier: string,
   paletteType: string,
   gdevelopIconsCSSFilter: ?string,
 }) {
   return {
     gdevelopTheme: {
-      isModern: !!isModern,
+      isModern: true,
       palette: {
+        type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
       },
       message: {
@@ -259,7 +253,7 @@ export function createGdevelopTheme({
         border: styles['ThemeDropIndicatorBorderColor'],
       },
       closableTabs: {
-        fontFamily: styles['GdevelopFontFamily'],
+        fontFamily: styles['GdevelopModernFontFamily'],
         containerBackgroundColor: styles['ThemeSurfaceWindowBackgroundColor'],
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],
         textColor: styles['ThemeClosableTabsDefaultColor'],
@@ -309,9 +303,7 @@ export function createGdevelopTheme({
     },
     muiThemeOptions: {
       typography: {
-        fontFamily: isModern
-          ? styles['GdevelopModernFontFamily']
-          : styles['GdevelopFontFamily'],
+        fontFamily: styles['GdevelopModernFontFamily'],
       },
       palette: {
         type: paletteType,
@@ -339,11 +331,11 @@ export function createGdevelopTheme({
         },
       },
       overrides: getMuiOverrides(
-        !!isModern,
         styles['ThemeTextContrastColor'],
         styles['TabsBackgroundColor'],
         styles['InputBorderBottomColor'],
         styles['MosaicToolbarBackgroundColor'],
+        styles['MosaicTitleColor'],
         styles['ThemeTextDefaultColor'],
         styles['ThemeTextDefaultColor']
       ),

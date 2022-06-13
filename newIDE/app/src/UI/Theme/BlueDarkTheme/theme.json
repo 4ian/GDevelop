@@ -2,18 +2,20 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "{gdevelop.color.blue.value}"
+        "value": "#6BAFFF",
+        "comment": "Palette/Blue/40"
       },
       "text-contrast-color": {
-        "value": "#fff"
+        "value": "#FFFFFF"
       }
     },
     "secondary": {
       "color": {
-        "value": "#EEE"
+        "value": "#006DEE",
+        "comment": "Palette/Blue/60"
       },
       "text-contrast-color": {
-        "value": "#000"
+        "value": "#FFFFFF"
       }
     },
     "surface": {
@@ -193,7 +195,7 @@
   },
   "tabs": {
     "background-color": {
-      "value": "#3c4698"
+      "value": "#4C5361"
     }
   },
   "event-sheet": {

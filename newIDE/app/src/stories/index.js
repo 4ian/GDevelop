@@ -49,10 +49,8 @@ import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
-import EventsTree from '../EventsSheet/EventsTree';
 import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
-import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
 import ObjectGroupEditor from '../ObjectGroupEditor';
 import ObjectGroupsList from '../ObjectGroupsList';
@@ -62,7 +60,6 @@ import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
-import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
@@ -76,9 +73,6 @@ import {
   limitsForIndieUser,
   limitsReached,
   noSubscription,
-  usagesForIndieUser,
-  indieFirebaseUser,
-  indieUserProfile,
   fakeNoSubscriptionAuthenticatedUser,
   fakeIndieAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
@@ -87,13 +81,11 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
-  fakeAssetShortHeader1,
   game1,
   game2,
   gameRollingMetrics1,
   gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
-  exampleFromFutureVersion,
   geometryMonsterExampleShortHeader,
   fireBulletExtensionShortHeader,
   flashExtensionShortHeader,
@@ -123,8 +115,6 @@ import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import ObjectField from '../EventsSheet/ParameterFields/ObjectField';
-import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
@@ -146,7 +136,6 @@ import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
-import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 import NewInstructionEditorMenu from '../EventsSheet/InstructionEditor/NewInstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
@@ -188,7 +177,6 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import TextField from '../UI/TextField';
 import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
 import {
   getFakePopperJsAnchorElement,
@@ -214,7 +202,6 @@ import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GameCard } from '../GameDashboard/GameCard';
 import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
 import { GamesList } from '../GameDashboard/GamesList';
-import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
@@ -228,13 +215,11 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
-import { initialPreferences } from '../MainFrame/Preferences/PreferencesContext';
 import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
@@ -2660,32 +2645,6 @@ storiesOf('SearchPanel', module)
       onCloseSearchPanel={() => {}}
       searchFocusOffset={1}
     />
-  ));
-
-storiesOf('ExpressionSelector', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('number (with focusOnMount) (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExpressionSelector
-        selectedType=""
-        expressionType="number"
-        onChoose={action('Expression chosen')}
-        focusOnMount
-        scope={{}}
-      />
-    </FixedHeightFlexContainer>
-  ))
-  .add('string (with focusOnMount) (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExpressionSelector
-        selectedType=""
-        expressionType="string"
-        onChoose={action('(String) Expression chosen')}
-        focusOnMount
-        scope={{}}
-      />
-    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionSelector', module)

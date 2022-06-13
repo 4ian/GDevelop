@@ -228,7 +228,6 @@ export function createGdevelopTheme({
 }) {
   return {
     gdevelopTheme: {
-      isModern: true,
       palette: {
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],

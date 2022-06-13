@@ -12,6 +12,7 @@ import { ResourceCard } from './ResourceCard';
 import Subheader from '../../UI/Subheader';
 import { CategoryChooser } from '../../UI/Search/CategoryChooser';
 import { t, Trans } from '@lingui/macro';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 type Props = {
   onChoose: Resource => void,
@@ -41,19 +42,23 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
     : null;
 
   return (
-    <Column expand noMargin useFullHeight>
-      <SearchBar
-        value={searchText}
-        onChange={setSearchText}
-        onRequestSearch={() => {}}
-        aspect="add-margins-only-if-modern-theme"
-        placeholder={t`Search resources`}
-      />
+    <ColumnStackLayout expand noMargin useFullHeight>
+      <Line>
+        <Column expand>
+          <SearchBar
+            value={searchText}
+            onChange={setSearchText}
+            onRequestSearch={() => {}}
+            placeholder={t`Search resources`}
+          />
+        </Column>
+      </Line>
       <Line
         expand
         overflow={
           'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
         }
+        noMargin
       >
         <Background noFullHeight noExpand width={250}>
           <ScrollView>
@@ -90,6 +95,6 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
           )}
         />
       </Line>
-    </Column>
+    </ColumnStackLayout>
   );
 };

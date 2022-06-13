@@ -5,7 +5,7 @@ import './BlueDarkThemeVariables.css';
 
 export default createGdevelopTheme({
   styles,
-  isModern: true,
+
   rootClassNameIdentifier: 'BlueDarkTheme',
   paletteType: 'dark',
 });

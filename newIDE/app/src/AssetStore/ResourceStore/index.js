@@ -42,18 +42,22 @@ export const ResourceStore = ({ onChoose, resourceKind }: Props) => {
 
   return (
     <Column expand noMargin useFullHeight>
-      <SearchBar
-        value={searchText}
-        onChange={setSearchText}
-        onRequestSearch={() => {}}
-        aspect="add-margins-only-if-modern-theme"
-        placeholder={t`Search resources`}
-      />
+      <Line>
+        <Column expand>
+          <SearchBar
+            value={searchText}
+            onChange={setSearchText}
+            onRequestSearch={() => {}}
+            placeholder={t`Search resources`}
+          />
+        </Column>
+      </Line>
       <Line
         expand
         overflow={
           'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
         }
+        noMargin
       >
         <Background noFullHeight noExpand width={250}>
           <ScrollView>

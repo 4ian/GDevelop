@@ -10,10 +10,10 @@
     },
     "secondary": {
       "color": {
-        "value": "#EEE"
+        "value": "#5E81AC"
       },
       "text-contrast-color": {
-        "value": "#000"
+        "value": "#fff"
       }
     },
     "surface": {
@@ -193,7 +193,7 @@
   },
   "tabs": {
     "background-color": {
-      "value": "#81A1C1"
+      "value": "#4C566A"
     }
   },
   "event-sheet": {

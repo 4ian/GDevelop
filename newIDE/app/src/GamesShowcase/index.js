@@ -40,13 +40,16 @@ export const GamesShowcase = (props: Props) => {
     <ResponsiveWindowMeasurer>
       {windowWidth => (
         <Column expand noMargin useFullHeight>
-          <SearchBar
-            value={searchText}
-            onChange={setSearchText}
-            onRequestSearch={() => {}}
-            aspect="add-margins-only-if-modern-theme"
-            placeholder={t`Search games`}
-          />
+          <Line>
+            <Column expand>
+              <SearchBar
+                value={searchText}
+                onChange={setSearchText}
+                onRequestSearch={() => {}}
+                placeholder={t`Search games`}
+              />
+            </Column>
+          </Line>
           <Line
             expand
             overflow={

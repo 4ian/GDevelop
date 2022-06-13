@@ -2,7 +2,7 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#047AA6"
+        "value": "#2799b9"
       },
       "text-contrast-color": {
         "value": "#fff"
@@ -10,10 +10,10 @@
     },
     "secondary": {
       "color": {
-        "value": "#EEE"
+        "value": "#047AA6"
       },
       "text-contrast-color": {
-        "value": "#000"
+        "value": "#fff"
       }
     },
     "surface": {
@@ -193,7 +193,7 @@
   },
   "tabs": {
     "background-color": {
-      "value": "#047AA6"
+      "value": "#586e75"
     }
   },
   "event-sheet": {

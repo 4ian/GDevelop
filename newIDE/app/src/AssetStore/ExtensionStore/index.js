@@ -15,6 +15,7 @@ import {
 } from '../../Utils/Analytics/EventSender';
 import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
 import { t } from '@lingui/macro';
+import { ColumnStackLayout } from '../../UI/Layout';
 
 type Props = {|
   isInstalling: boolean,
@@ -89,20 +90,19 @@ export const ExtensionStore = ({
       <ResponsiveWindowMeasurer>
         {windowWidth => (
           <Column expand noMargin useFullHeight>
-            <SearchBar
-              value={searchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              aspect="add-margins-only-if-modern-theme"
-              tagsHandler={tagsHandler}
-              tags={filters && filters.allTags}
-              placeholder={t`Search extensions`}
-            />
-            {DismissableTutorialMessage && (
-              <Line>
-                <Column expand>{DismissableTutorialMessage}</Column>
-              </Line>
-            )}
+            <Line>
+              <ColumnStackLayout expand>
+                <SearchBar
+                  value={searchText}
+                  onChange={setSearchText}
+                  onRequestSearch={() => {}}
+                  tagsHandler={tagsHandler}
+                  tags={filters && filters.allTags}
+                  placeholder={t`Search extensions`}
+                />
+                {DismissableTutorialMessage}
+              </ColumnStackLayout>
+            </Line>
             <ListSearchResults
               disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
               onRetry={fetchExtensionsAndFilters}

@@ -163,6 +163,7 @@ type ColumnStackLayoutProps = {|
   noMargin?: boolean,
   children: React.Node,
   noOverflowParent?: boolean,
+  useFullHeight?: boolean,
 |};
 
 export const ColumnStackLayout = ({
@@ -172,6 +173,7 @@ export const ColumnStackLayout = ({
   noMargin,
   children,
   noOverflowParent,
+  useFullHeight,
 }: ColumnStackLayoutProps) => {
   let isFirstChild = true;
   return (
@@ -181,6 +183,7 @@ export const ColumnStackLayout = ({
       expand={expand}
       noMargin={noMargin}
       noOverflowParent={noOverflowParent}
+      useFullHeight={useFullHeight}
     >
       {React.Children.map(children, (child, index) => {
         if (!child) return null;

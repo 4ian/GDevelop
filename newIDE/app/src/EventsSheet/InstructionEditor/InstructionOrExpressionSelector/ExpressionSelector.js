@@ -13,7 +13,6 @@ import {
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
 
 type Props = {|
-  expressionType: string,
   focusOnMount?: boolean,
   selectedType: string,
   onChoose: (type: string, EnumeratedExpressionMetadata) => void,
@@ -28,13 +27,13 @@ const style = {
 
 export default class ExpressionSelector extends Component<Props, {||}> {
   instructionsInfo: Array<EnumeratedExpressionMetadata> = filterEnumeratedInstructionOrExpressionMetadataByScope(
-    enumerateAllExpressions(this.props.expressionType),
+    enumerateAllExpressions(),
     this.props.scope
   );
   instructionsInfoTree: ExpressionTreeNode = createTree(this.instructionsInfo);
 
   render() {
-    const { expressionType, scope, ...otherProps } = this.props;
+    const { scope, ...otherProps } = this.props;
     return (
       <InstructionOrExpressionSelector
         style={style}

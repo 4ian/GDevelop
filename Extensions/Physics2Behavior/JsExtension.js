@@ -419,7 +419,8 @@ module.exports = {
         sharedData
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
-      .addIncludeFile('Extensions/Physics2Behavior/box2d.js');
+      .addIncludeFile('Extensions/Physics2Behavior/box2d.js')
+      .addIncludeFile('Extensions/Physics2Behavior/utils.js');
 
     // Global
     aut
@@ -3732,9 +3733,9 @@ module.exports = {
       .addCondition(
         'Collision',
         _('Collision'),
-        _('Test if two objects collide.'),
+        _('Check if two objects collide.'),
         _('_PARAM0_ is colliding with _PARAM2_'),
-        '',
+       '',
         'res/physics32.png',
         'res/physics32.png'
       )
@@ -3745,6 +3746,42 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
       .setFunctionName('gdjs.physics2.objectsCollide');
+
+    extension
+      .addCondition(
+        'CollisionStarted',
+        _('Collision started'),
+        _('Check if two objects started colliding.'),
+        _('_PARAM0_ started colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .setFunctionName('gdjs.physics2.haveObjectsStartedColliding');
+
+    extension
+      .addCondition(
+        'CollisionStopped',
+        _('Collision stopped'),
+        _('Check if two objects stopped colliding.'),
+        _('_PARAM0_ stopped colliding with _PARAM2_'),
+        _('Collision'),
+        'res/physics32.png',
+        'res/physics32.png'
+      )
+      .addParameter('objectList', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'Physics2Behavior')
+      .addParameter('objectList', _('Object'), '', false)
+      .addCodeOnlyParameter('conditionInverted', '')
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/Physics2Behavior/physics2tools.js')
+      .setFunctionName('gdjs.physics2.haveObjectsStoppedColliding');
 
     return extension;
   },

@@ -277,32 +277,34 @@ export default class ExpressionField extends React.Component<Props, State> {
     const cursorPosition = this._inputElement.selectionStart;
     const parser = new gd.ExpressionParser2();
 
-    // We add a character so that getCompletionDescriptionsFor will always return the type of the node
-    // like it would do for an automatic completion.
+    // We want to know what type the expression should be so as to convert to string
+    // when necessary.
+    // We add a fake identifier so that getNodeAtPosition will return the type of
+    // its parent. Particularly, this is needed to get the type of a parameter in
+    // a function call. We could create a worker ExpectedTypeFinder that would get
+    // the type wanted by the parent instead.
     const expressionNode = parser
       .parseExpression(
-        value.substring(0, cursorPosition) +
-          'a' +
-          value.substring(cursorPosition)
+        value.substr(0, cursorPosition) +
+          'fakeIdentifier' +
+          value.substr(cursorPosition)
       )
       .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+    const currentNode = gd.ExpressionNodeLocationFinder.getNodeAtPosition(
+      expressionNode,
+      cursorPosition + 'fakeIdentifier'.length - 1
+    );
+    const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
       globalObjectsContainer,
       objectsContainer,
       expressionType,
-      expressionNode,
-      cursorPosition
+      currentNode
     );
 
-    let shouldConvertToString = false;
-    if (expressionInfo.metadata.getReturnType() === 'number') {
-      mapVector(completionDescriptions, completionDescription => {
-        if (!shouldConvertToString) {
-          shouldConvertToString = completionDescription.getType() === 'string';
-        }
-      });
-    }
+    let shouldConvertToString =
+      expressionInfo.metadata.getReturnType() === 'number' && type === 'string';
+
     const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
       shouldConvertToString,
     });
@@ -330,9 +332,7 @@ export default class ExpressionField extends React.Component<Props, State> {
         if (this._inputElement) {
           this._inputElement.setSelectionRange(
             cursorPosition,
-            shouldConvertToString
-              ? cursorPosition + functionCall.length + 'ToString()'.length
-              : cursorPosition + functionCall.length
+            cursorPosition + functionCall.length
           );
         }
       }, 5);

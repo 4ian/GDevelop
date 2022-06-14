@@ -558,6 +558,8 @@ const getNewExpressionWithToStringConversion = ({
   insertedWord: string,
 }) => {
   const expressionStart = expression.substring(0, wordStartPosition);
+  // If the grammar is becoming more complex, you'll need to implement a
+  // NodeParenthesesBoundsFinder worker to specify the proper bounds for each node.
   const completedExpressionStartPosition: number = findCompletedExpressionStartPosition(
     expressionStart
   );

@@ -275,34 +275,33 @@ export default class ExpressionField extends React.Component<Props, State> {
       value,
     } = this.props;
     const cursorPosition = this._inputElement.selectionStart;
+    console.log(cursorPosition);
     const parser = new gd.ExpressionParser2();
-
     // We add a character so that getCompletionDescriptionsFor will always return the type of the node
     // like it would do for an automatic completion.
-    const expressionNode = parser
-      .parseExpression(
-        value.substring(0, cursorPosition) +
-          'a' +
-          value.substring(cursorPosition)
-      )
-      .get();
-    const completionDescriptions = gd.ExpressionCompletionFinder.getCompletionDescriptionsFor(
+    const expressionNode = parser.parseExpression(value).get();
+    const currentNode = gd.ExpressionNodeLocationFinder.getNodeAtPosition(
+      expressionNode,
+      cursorPosition
+    );
+    console.log(expressionNode);
+    const type = gd.ExpressionTypeFinder.getType(
       gd.JsPlatform.get(),
       globalObjectsContainer,
       objectsContainer,
       expressionType,
-      expressionNode,
-      cursorPosition
+      currentNode
     );
-
-    let shouldConvertToString = false;
-    if (expressionInfo.metadata.getReturnType() === 'number') {
-      mapVector(completionDescriptions, completionDescription => {
-        if (!shouldConvertToString) {
-          shouldConvertToString = completionDescription.getType() === 'string';
-        }
-      });
-    }
+    console.log(type);
+    let shouldConvertToString =
+      expressionInfo.metadata.getReturnType() === 'number' && type === 'string';
+    // if (expressionInfo.metadata.getReturnType() === 'number') {
+    //   mapVector(completionDescriptions, completionDescription => {
+    //     if (!shouldConvertToString) {
+    //       shouldConvertToString = completionDescription.getType() === 'string';
+    //     }
+    //   });
+    // }
     const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
       shouldConvertToString,
     });

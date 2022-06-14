@@ -54,9 +54,12 @@ class GD_CORE_API ExpressionTypeFinder : public ExpressionParser2NodeWorker {
                       const gd::ObjectsContainer &objectsContainer,
                       const gd::String &rootType,
                       gd::ExpressionNode& node) {
+    std::cout << "initializingTypeFinder" << std::endl;
     gd::ExpressionTypeFinder typeFinder(
         platform, globalObjectsContainer, objectsContainer, rootType);
+    std::cout << "previsit" << std::endl;
     node.Visit(typeFinder);
+    std::cout << "salut" << typeFinder.GetType() << std::endl;
     return typeFinder.GetType();
   }
 

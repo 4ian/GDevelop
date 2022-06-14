@@ -721,6 +721,10 @@ namespace gdjs {
         this.createBody();
       }
 
+      // Reset contacts that happened this frame
+      this.contactsStartedThisFrame.length = 0;
+      this.contactsEndedThisFrame.length = 0;
+
       // Step the world if not done this frame yet
       if (!this._sharedData.stepped) {
         this._sharedData.step(
@@ -757,10 +761,6 @@ namespace gdjs {
 
     doStepPostEvents(runtimeScene) {
       this._updateBodyFromObject();
-
-      // Reset contacts that happened this frame
-      this.contactsStartedThisFrame.length = 0;
-      this.contactsEndedThisFrame.length = 0;
 
       // Reset world step to update next frame
       this._sharedData.stepped = false;

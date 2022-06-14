@@ -268,12 +268,45 @@ export default class ExpressionField extends React.Component<Props, State> {
     parameterValues: ParameterValues
   ) => {
     if (!this._inputElement) return;
+    const {
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+      value,
+    } = this.props;
     const cursorPosition = this._inputElement.selectionStart;
-
-    const functionCall = formatExpressionCall(expressionInfo, parameterValues);
+    console.log(cursorPosition);
+    const parser = new gd.ExpressionParser2();
+    // We add a character so that getCompletionDescriptionsFor will always return the type of the node
+    // like it would do for an automatic completion.
+    const expressionNode = parser.parseExpression(value).get();
+    const currentNode = gd.ExpressionNodeLocationFinder.getNodeAtPosition(
+      expressionNode,
+      cursorPosition
+    );
+    console.log(expressionNode);
+    const type = gd.ExpressionTypeFinder.getType(
+      gd.JsPlatform.get(),
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+      currentNode
+    );
+    console.log(type);
+    let shouldConvertToString =
+      expressionInfo.metadata.getReturnType() === 'number' && type === 'string';
+    // if (expressionInfo.metadata.getReturnType() === 'number') {
+    //   mapVector(completionDescriptions, completionDescription => {
+    //     if (!shouldConvertToString) {
+    //       shouldConvertToString = completionDescription.getType() === 'string';
+    //     }
+    //   });
+    // }
+    const functionCall = formatExpressionCall(expressionInfo, parameterValues, {
+      shouldConvertToString,
+    });
 
     // Generate the expression with the function call
-    const { value } = this.props;
     const newValue =
       value.substr(0, cursorPosition) +
       functionCall +
@@ -296,7 +329,9 @@ export default class ExpressionField extends React.Component<Props, State> {
         if (this._inputElement) {
           this._inputElement.setSelectionRange(
             cursorPosition,
-            cursorPosition + functionCall.length
+            shouldConvertToString
+              ? cursorPosition + functionCall.length + 'ToString()'.length
+              : cursorPosition + functionCall.length
           );
         }
       }, 5);
@@ -338,6 +373,10 @@ export default class ExpressionField extends React.Component<Props, State> {
         addParameterSeparator: expressionAutocompletion.addParameterSeparator,
         addNamespaceSeparator: expressionAutocompletion.addNamespaceSeparator,
         hasVisibleParameters: expressionAutocompletion.hasVisibleParameters,
+        shouldConvertToString:
+          expressionAutocompletion.kind === 'Expression'
+            ? expressionAutocompletion.shouldConvertToString
+            : null,
       }
     );
 

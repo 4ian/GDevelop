@@ -3751,7 +3751,7 @@ module.exports = {
       .addCondition(
         'CollisionStarted',
         _('Collision started'),
-        _('Check if two objects started colliding.'),
+        _('Check if two objects just started colliding during this frame.'),
         _('_PARAM0_ started colliding with _PARAM2_'),
         _('Collision'),
         'res/physics32.png',
@@ -3769,7 +3769,7 @@ module.exports = {
       .addCondition(
         'CollisionStopped',
         _('Collision stopped'),
-        _('Check if two objects stopped colliding.'),
+        _('Check if two objects just stopped colliding at this frame.'),
         _('_PARAM0_ stopped colliding with _PARAM2_'),
         _('Collision'),
         'res/physics32.png',

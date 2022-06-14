@@ -284,9 +284,7 @@ namespace gdjs {
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
       this.contactsStartedThisFrame = [];
-      this.contactsStartedThisFrame.length = 0;
       this.contactsEndedThisFrame = [];
-      this.contactsEndedThisFrame.length = 0;
       this.currentContacts = [];
       this.currentContacts.length = 0;
       this._sharedData = Physics2SharedData.getSharedData(

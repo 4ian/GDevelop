@@ -5,6 +5,7 @@ import findIndex from 'lodash/findIndex';
 import {
   SortableTreeWithoutDndContext,
   getFlatDataFromTree,
+  getNodeAtPath,
 } from 'react-sortable-tree';
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
@@ -588,17 +589,20 @@ export default class ThemableEventsTree extends Component<
   };
 
   _onDrop = (
-    moveFunction: MoveFunctionArguments => number,
+    moveFunction: MoveFunctionArguments => void,
     currentNode: SortableTreeNode
   ) => {
     const draggedNode = this.state.draggedNode;
     if (draggedNode) {
-      const nextRowIndex = moveFunction({
+      moveFunction({
         node: draggedNode,
         targetNode: currentNode,
       });
-      const { nodePath } = draggedNode;
-      this.props.onEventMoved(nodePath[nodePath.length - 1], nextRowIndex);
+      const { nodePath, event } = draggedNode;
+      this._onEndDrag();
+      // $FlowFixMe - We are confident event is defined because of canDrag.
+      const newRowIndex = this.getEventRow(event);
+      this.props.onEventMoved(nodePath[nodePath.length - 1], newRowIndex);
     }
   };
 
@@ -669,9 +673,11 @@ export default class ThemableEventsTree extends Component<
   };
 
   _onEndDrag = () => {
-    this.setState({ draggedNode: null });
-    this._restoreFoldedNodes();
-    this.forceEventsUpdate();
+    if (this.state.draggedNode) {
+      this.setState({ draggedNode: null });
+      this._restoreFoldedNodes();
+      this.forceEventsUpdate();
+    }
   };
 
   _renderEvent = ({ node }: { node: SortableTreeNode }) => {
@@ -779,6 +785,13 @@ export default class ThemableEventsTree extends Component<
                   onDrop={this._onDrop}
                   activateTargets={!isDragged && !!this.state.draggedNode}
                   windowWidth={this.props.windowWidth}
+                  getNodeAtPath={path =>
+                    getNodeAtPath({
+                      path,
+                      treeData: this.state.treeData,
+                      getNodeKey,
+                    }).node
+                  }
                 />
               )}
             </div>

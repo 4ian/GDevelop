@@ -5,6 +5,7 @@ import findIndex from 'lodash/findIndex';
 import {
   SortableTreeWithoutDndContext,
   getFlatDataFromTree,
+  getNodeAtPath,
 } from 'react-sortable-tree';
 import { type ConnectDragSource } from 'react-dnd';
 import { mapFor } from '../../Utils/MapFor';
@@ -779,6 +780,13 @@ export default class ThemableEventsTree extends Component<
                   onDrop={this._onDrop}
                   activateTargets={!isDragged && !!this.state.draggedNode}
                   windowWidth={this.props.windowWidth}
+                  getNodeAtPath={path =>
+                    getNodeAtPath({
+                      path,
+                      treeData: this.state.treeData,
+                      getNodeKey,
+                    }).node
+                  }
                 />
               )}
             </div>

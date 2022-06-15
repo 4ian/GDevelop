@@ -92,16 +92,35 @@ export const isDescendant = (
   return parentPath.every((pathValue, index) => pathValue === childPath[index]);
 };
 
-export const isSameDepthAndJustBelow = (
+export const isSibling = (nodeA: SortableTreeNode, nodeB: SortableTreeNode) => {
+  if (nodeA.depth !== nodeB.depth) return false;
+  const nodeAPath = nodeA.nodePath;
+  const nodeBPath = nodeB.nodePath;
+  return nodeAPath
+    .slice(0, -1)
+    .every((pathValue, index) => pathValue === nodeBPath[index]);
+};
+
+export const isJustBelow = (
   aboveNode: SortableTreeNode,
   belowNode: SortableTreeNode
 ) => {
-  if (aboveNode.depth !== belowNode.depth) return false;
   const belowNodePath = belowNode.nodePath;
   const aboveNodePath = aboveNode.nodePath;
   if (belowNodePath[belowNodePath.length - 1] === 0) return false;
   return (
     belowNodePath[belowNodePath.length - 1] - 1 ===
     aboveNodePath[aboveNodePath.length - 1]
+  );
+};
+
+export const getNodeAtPath = (
+  path: Array<number>,
+  treeData: Array<SortableTreeNode>
+) => {
+  if (path.length === 1) return treeData[path[0]];
+  return getNodeAtPath(
+    path.slice(0, -1),
+    treeData[path[path.length - 1]].children
   );
 };

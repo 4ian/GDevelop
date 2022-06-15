@@ -530,12 +530,12 @@ type ExpressionAndCaretLocation = {|
 |};
 
 /**
- * Returns the position where the last expression call starts,
+ * Returns the position where the last expression call (node) starts,
  * so that we know where to insert the ToString call.
  * For example:
  * '"HelloWorld" + Object.Behavior::' should return 15.
  */
-const findCompletedExpressionStartPosition = (expression: string) => {
+const findLastNodeStartPosition = (expression: string) => {
   let match;
   let indexes = [];
   // We consider that expressions are composed of letters, digits, dot or colons
@@ -546,7 +546,7 @@ const findCompletedExpressionStartPosition = (expression: string) => {
   return Math.max(...indexes);
 };
 
-const getNewExpressionWithToStringConversion = ({
+const insertWordInExpressionWithToString = ({
   expression,
   wordStartPosition,
   wordEndPosition,
@@ -559,17 +559,18 @@ const getNewExpressionWithToStringConversion = ({
 }) => {
   const expressionStart = expression.substring(0, wordStartPosition);
   // If the grammar is becoming more complex, you'll need to implement a
-  // NodeParenthesesBoundsFinder worker to specify the proper bounds for each node.
-  const completedExpressionStartPosition: number = findCompletedExpressionStartPosition(
+  // NodeParenthesesBoundsFinder worker to specify the proper bounds for each node
+  // or give this responsibility to `ExpressionCompletionDescription`/`ExpressionCompletionFinder`.
+  const completedNodeStartPosition: number = findLastNodeStartPosition(
     expressionStart
   );
 
   const newExpressionStart = expression.substring(
     0,
-    completedExpressionStartPosition + 1
+    completedNodeStartPosition + 1
   );
-  const completedExpressionStart = expression.substring(
-    completedExpressionStartPosition + 1,
+  const completedNodeStart = expression.substring(
+    completedNodeStartPosition + 1,
     wordStartPosition
   );
 
@@ -578,7 +579,7 @@ const getNewExpressionWithToStringConversion = ({
     expression:
       newExpressionStart +
       'ToString(' +
-      completedExpressionStart +
+      completedNodeStart +
       insertedWord +
       ')' +
       newExpressionEnd,
@@ -586,13 +587,13 @@ const getNewExpressionWithToStringConversion = ({
     // so that the user's typing flow is not interrupted.
     caretLocation:
       newExpressionStart.length +
-      completedExpressionStart.length +
+      completedNodeStart.length +
       insertedWord.length +
       'ToString('.length,
   };
 };
 
-const getNewExpression = ({
+const insertWordInExpression = ({
   expression,
   wordStartPosition,
   wordEndPosition,
@@ -670,13 +671,13 @@ export const insertAutocompletionInExpression = (
   const insertedWord = formatCompletion(maybeNextCharacter);
 
   const newAutocompletedExpression = shouldConvertToString
-    ? getNewExpressionWithToStringConversion({
+    ? insertWordInExpressionWithToString({
         expression,
         insertedWord,
         wordEndPosition,
         wordStartPosition,
       })
-    : getNewExpression({
+    : insertWordInExpression({
         expression,
         insertedWord,
         wordEndPosition,

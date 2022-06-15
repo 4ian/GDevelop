@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { formatISO } from 'date-fns';
 import { Line, Spacer } from '../UI/Grid';
+import { type Game } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
@@ -27,10 +28,11 @@ const styles = {
 };
 
 type Props = {|
-  publicGame: PublicGame,
+  game: Game,
+  publicGame: ?PublicGame,
 |};
 
-export const GameAnalyticsPanel = ({ publicGame }: Props) => {
+export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -59,7 +61,7 @@ export const GameAnalyticsPanel = ({ publicGame }: Props) => {
         const gameRollingMetrics = await getGameMetrics(
           getAuthorizationHeader,
           id,
-          publicGame.id,
+          game.id,
           analyticsDate
         );
         setGameMetrics(gameRollingMetrics);
@@ -69,7 +71,7 @@ export const GameAnalyticsPanel = ({ publicGame }: Props) => {
       }
       setIsGameMetricsLoading(false);
     },
-    [getAuthorizationHeader, profile, publicGame, analyticsDate]
+    [getAuthorizationHeader, profile, game, analyticsDate]
   );
 
   React.useEffect(

@@ -538,7 +538,7 @@ export const GameDetailsDialog = ({
               />
             ) : null}
             {currentTab === 'analytics' ? (
-              <GameAnalyticsPanel publicGame={publicGame} />
+              <GameAnalyticsPanel game={game} publicGame={publicGame} />
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

@@ -85,9 +85,11 @@ export const getVisibleParameterTypes = (
 
 export const formatExpressionCall = (
   expressionInfo: EnumeratedInstructionOrExpressionMetadata,
-  parameterValues: ParameterValues
+  parameterValues: ParameterValues,
+  options: {| shouldConvertToString: boolean |}
 ): string => {
   const functionName = expressionInfo.name || '';
+  let functionCall = '';
 
   if (expressionInfo.scope.objectMetadata) {
     const objectName = parameterValues[0];
@@ -97,7 +99,7 @@ export const formatExpressionCall = (
       expressionInfo.metadata,
       1
     ).join(', ');
-    return `${objectName}.${functionName}(${functionArgs})`;
+    functionCall = `${objectName}.${functionName}(${functionArgs})`;
   } else if (expressionInfo.scope.behaviorMetadata) {
     const objectName = parameterValues[0];
     const behaviorName = parameterValues[1];
@@ -107,13 +109,16 @@ export const formatExpressionCall = (
       expressionInfo.metadata,
       2
     ).join(', ');
-    return `${objectName}.${behaviorName}::${functionName}(${functionArgs})`;
+    functionCall = `${objectName}.${behaviorName}::${functionName}(${functionArgs})`;
   } else {
     const functionArgs = filterVisibleParameters(
       parameterValues,
       expressionInfo.metadata,
       0
     ).join(', ');
-    return `${functionName}(${functionArgs})`;
+    functionCall = `${functionName}(${functionArgs})`;
   }
+  return options.shouldConvertToString
+    ? `ToString(${functionCall})`
+    : functionCall;
 };

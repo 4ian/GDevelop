@@ -2134,6 +2134,14 @@ interface ExpressionCompletionFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface ExpressionNodeLocationFinder {
+    ExpressionNode STATIC_GetNodeAtPosition([Ref] ExpressionNode node, unsigned long searchedPosition);
+};
+
+interface ExpressionTypeFinder {
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node);
+};
+
 interface ExpressionNode {
     void Visit([Ref] ExpressionParser2NodeWorker worker);
 };

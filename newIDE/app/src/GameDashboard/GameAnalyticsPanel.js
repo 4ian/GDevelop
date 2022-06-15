@@ -30,7 +30,7 @@ type Props = {|
   publicGame: PublicGame,
 |};
 
-export const GameDashboard = ({ publicGame }: Props) => {
+export const GameAnalyticsPanel = ({ publicGame }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );

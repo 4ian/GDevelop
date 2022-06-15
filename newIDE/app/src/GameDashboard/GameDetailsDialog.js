@@ -42,7 +42,7 @@ import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
 import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
-import { GameDashboard } from './GameDashboard';
+import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 
 export type GamesDetailsTab =
   | 'details'
@@ -538,7 +538,7 @@ export const GameDetailsDialog = ({
               />
             ) : null}
             {currentTab === 'analytics' ? (
-              <GameDashboard publicGame={publicGame} />
+              <GameAnalyticsPanel publicGame={publicGame} />
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

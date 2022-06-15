@@ -1,7 +1,7 @@
 // @ts-check
 
 describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
-  it('returns same current items is nothing happened', () => {
+  it('returns same current items if nothing happened', () => {
     const items = ['A', 'B', 'C'];
     const startedItems = [];
     const endedItems = [];

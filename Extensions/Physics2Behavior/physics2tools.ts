@@ -7,7 +7,37 @@ namespace gdjs {
       inverted: boolean
     ) {
       return gdjs.evtTools.object.twoListsTest(
-        gdjs.Physics2RuntimeBehavior.collisionTest,
+        gdjs.Physics2RuntimeBehavior.areObjectsColliding,
+        objectsLists1,
+        objectsLists2,
+        inverted,
+        behaviorName
+      );
+    };
+
+    export const haveObjectsStartedColliding = function (
+      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      behaviorName: string,
+      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      inverted: boolean
+    ) {
+      return gdjs.evtTools.object.twoListsTest(
+        gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween,
+        objectsLists1,
+        objectsLists2,
+        inverted,
+        behaviorName
+      );
+    };
+
+    export const haveObjectsStoppedColliding = function (
+      objectsLists1: Hashtable<Array<gdjs.RuntimeObject>>,
+      behaviorName: string,
+      objectsLists2: Hashtable<Array<gdjs.RuntimeObject>>,
+      inverted: boolean
+    ) {
+      return gdjs.evtTools.object.twoListsTest(
+        gdjs.Physics2RuntimeBehavior.hasCollisionStoppedBetween,
         objectsLists1,
         objectsLists2,
         inverted,

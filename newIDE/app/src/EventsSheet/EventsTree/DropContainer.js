@@ -132,7 +132,7 @@ type DropContainerProps = {|
     moveFunction: ({
       targetNode: SortableTreeNode,
       node: SortableTreeNode,
-    }) => number,
+    }) => void,
     node: SortableTreeNode
   ) => void,
   activateTargets: boolean,
@@ -153,7 +153,7 @@ type HorizontalDraggedNodeDropContainerProps = {|
     moveFunction: ({
       targetNode: SortableTreeNode,
       node: SortableTreeNode,
-    }) => number,
+    }) => void,
     node: SortableTreeNode
   ) => void,
   activateTargets: boolean,

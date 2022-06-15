@@ -1,94 +1,104 @@
 // @ts-check
 
 describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
-  it('returns same current items if nothing happened', () => {
-    const items = ['A', 'B', 'C'];
-    const startedItems = [];
-    const endedItems = [];
-    const expectedResolvedItems = [...items];
+  it('returns same current contacts if nothing happened', () => {
+    const contacts = ['A', 'B', 'C'];
+    const startedContacts = [];
+    const endedContacts = [];
+    const expectedResolvedContacts = [...contacts];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 
-  it('returns current items with started items added', () => {
-    const items = ['A', 'B', 'C'];
-    const startedItems = ['Z', 'Q'];
-    const endedItems = [];
-    const expectedResolvedItems = [...items, ...startedItems];
+  it('returns current contacts with started contacts added', () => {
+    const contacts = ['A', 'B', 'C'];
+    const startedContacts = ['Z', 'Q'];
+    const endedContacts = [];
+    const expectedResolvedContacts = [...contacts, ...startedContacts];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 
-  it('returns current items with ended items removed', () => {
-    const items = ['A', 'B', 'C', 'Z'];
-    const startedItems = [];
-    const endedItems = ['Z', 'B', 'R'];
-    const expectedResolvedItems = ['A', 'C'];
+  it('returns current contacts with ended contacts removed', () => {
+    const contacts = ['A', 'B', 'C', 'Z'];
+    const startedContacts = [];
+    const endedContacts = ['Z', 'B', 'R'];
+    const expectedResolvedContacts = ['A', 'C'];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 
-  it('It returns same current items if all started items also ended', () => {
-    const items = ['A', 'B', 'C'];
-    const startedItems = ['Z', 'X'];
-    const endedItems = ['Z', 'X'];
-    const expectedResolvedItems = [...items];
+  it('returns same current contacts if all started contacts also ended', () => {
+    const contacts = ['A', 'B', 'C'];
+    const startedContacts = ['Z', 'X'];
+    const endedContacts = ['Z', 'X'];
+    const expectedResolvedContacts = [...contacts];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 
-  it('It returns current items without started items that also ended', () => {
-    const items = ['A', 'B', 'C'];
-    const startedItems = ['Z', 'X', 'W'];
-    const endedItems = ['Z', 'A', 'X'];
-    const expectedResolvedItems = ['B', 'C', 'W'];
+  it('returns current contacts without started contacts that also ended', () => {
+    const contacts = ['A', 'B', 'C'];
+    const startedContacts = ['Z', 'X', 'W'];
+    const endedContacts = ['Z', 'A', 'X'];
+    const expectedResolvedContacts = ['B', 'C', 'W'];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 
-  it('It returns current items with item started twice', () => {
-    const items = ['A', 'B', 'C'];
-    const startedItems = ['Z', 'Z'];
-    const endedItems = ['Z'];
-    const expectedResolvedItems = [...items, 'Z'];
+  it('returns current contacts with a contact that started and also jittered', () => {
+    // Should handle cases when this happens during the frame:
+    // - contact Z starts
+    // - contact Z ends
+    // - contact Z starts
+    // Contact Z should appear in the current contacts
+    const contacts = ['A', 'B', 'C'];
+    const startedContacts = ['Z', 'Z'];
+    const endedContacts = ['Z'];
+    const expectedResolvedContacts = [...contacts, 'Z'];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 
-  it('It returns current items without item ended twice', () => {
-    const items = ['A', 'B', 'C'];
-    const startedItems = ['C'];
-    const endedItems = ['C', 'C'];
-    const expectedResolvedItems = ['A', 'B'];
+  it('returns current contacts without a contact that ended and also jittered', () => {
+    // Should handle cases where contact C was here and, during the frame:
+    // - contact C ends
+    // - contact C starts
+    // - contact C ends
+    // Contact C should not appear in the current contacts
+    const contacts = ['A', 'B', 'C'];
+    const startedContacts = ['C'];
+    const endedContacts = ['C', 'C'];
+    const expectedResolvedContacts = ['A', 'B'];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-      items,
-      startedItems,
-      endedItems
+      contacts,
+      startedContacts,
+      endedContacts
     );
-    expect(items).to.eql(expectedResolvedItems);
+    expect(contacts).to.eql(expectedResolvedContacts);
   });
 });

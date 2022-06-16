@@ -241,7 +241,40 @@ describe('Physics2RuntimeBehavior', () => {
       expect(behavior.contactsStartedThisFrame[0]).to.be(otherBehavior);
     });
 
+    it('should add behavior to list of started contacts and ended contacts', () => {
+      // From the user point of view the objects are colliding but it could be
+      // quick enough for it to happen between 2 game frames (the physics model
+      // uses modelling sub-steps). So contact beginning and end should be detected.
+      const fps = 50;
+      runtimeGame.setGameResolutionSize(1000, 1000);
+
+      const object = createObject(runtimeScene);
+      const otherObject = createObject(runtimeScene);
+
+      const behavior = object.getBehavior('Physics2');
+      const otherBehavior = otherObject.getBehavior('Physics2');
+      if (!behavior || !otherBehavior) {
+        throw new Error('Behavior not found, test cannot be run.');
+      }
+
+      behavior.onContactBegin(otherBehavior);
+
+      expect(behavior.contactsStartedThisFrame.length).to.be(1);
+      expect(behavior.contactsStartedThisFrame[0]).to.be(otherBehavior);
+      expect(behavior.contactsEndedThisFrame.length).to.be(0);
+
+      behavior.onContactEnd(otherBehavior);
+
+      expect(behavior.contactsStartedThisFrame.length).to.be(1);
+      expect(behavior.contactsStartedThisFrame[0]).to.be(otherBehavior);
+      expect(behavior.contactsEndedThisFrame.length).to.be(1);
+      expect(behavior.contactsEndedThisFrame[0]).to.be(otherBehavior);
+    });
+
     it('should not add behavior to list of started contacts if the behavior is also present in the list of ended contacts', () => {
+      // From the user point of view the objects are staying in contact with each other.
+      // They would be surprised if the conditions for a contact beginning and
+      // end were true.
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
 

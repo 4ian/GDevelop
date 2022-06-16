@@ -28,10 +28,10 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
   });
 
   it('returns current contacts with ended contacts removed', () => {
-    const contacts = ['A', 'B', 'C', 'Z'];
+    const contacts = ['A', 'B', 'C'];
     const startedContacts = [];
-    const endedContacts = ['Z', 'B', 'R'];
-    const expectedResolvedContacts = ['A', 'C'];
+    const endedContacts = ['A', 'C'];
+    const expectedResolvedContacts = ['B'];
     gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
       contacts,
       startedContacts,
@@ -71,7 +71,9 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     // - contact Z starts
     // - contact Z ends
     // - contact Z starts
-    // Contact Z should appear in the current contacts
+    // Contact Z should appear in the current contacts.
+    // We consider a contact shouldn't be able to do that but it should be handled
+    // in case it happens.
     const contacts = ['A', 'B', 'C'];
     const startedContacts = ['Z', 'Z'];
     const endedContacts = ['Z'];
@@ -90,6 +92,8 @@ describe('computeCurrentContactsFromStartedAndEndedContacts', () => {
     // - contact C starts
     // - contact C ends
     // Contact C should not appear in the current contacts
+    // We consider a contact shouldn't be able to do that but it should be handled
+    // in case it happens.
     const contacts = ['A', 'B', 'C'];
     const startedContacts = ['C'];
     const endedContacts = ['C', 'C'];

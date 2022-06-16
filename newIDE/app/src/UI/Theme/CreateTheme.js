@@ -3,7 +3,7 @@ import { darken, lighten } from '@material-ui/core/styles';
 
 export const closeableTabSizeOverrides = {
   width: 200,
-  height: 32,
+  height: 29,
   closeButtonWidth: 24,
 };
 
@@ -378,8 +378,11 @@ export function createGdevelopTheme({
         error: styles['ThemeMessageErrorColor'],
         valid: styles['ThemeMessageValidColor'],
       },
+      titlebar: {
+        backgroundColor: styles['ThemeSurfaceTitlebarBackgroundColor'],
+      },
       toolbar: {
-        backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        backgroundColor: styles['ThemeSurfaceToolbarBackgroundColor'],
         separatorColor: styles['ThemeToolbarSeparatorColor'],
       },
       text: {
@@ -442,7 +445,7 @@ export function createGdevelopTheme({
       },
       closableTabs: {
         fontFamily: styles['GdevelopModernFontFamily'],
-        containerBackgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        containerBackgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'], // TODO?
         backgroundColor: styles['ThemeClosableTabsDefaultBackgroundColor'],
         textColor: styles['ThemeClosableTabsDefaultColor'],
         selectedBackgroundColor:

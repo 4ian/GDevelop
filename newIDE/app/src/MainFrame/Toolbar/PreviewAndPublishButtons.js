@@ -2,11 +2,14 @@
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
-import ToolbarIcon from '../../UI/ToolbarIcon';
+import IconButton from '../../UI/IconButton';
 import TextButton from '../../UI/TextButton';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import { type PreviewState } from '../PreviewState';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import PreviewIcon from '../../UI/CustomSvgIcons/Preview';
+import PublishIcon from '../../UI/CustomSvgIcons/Publish';
+import DebugIcon from '../../UI/CustomSvgIcons/Debug';
 
 export type PreviewAndPublishButtonsProps = {|
   onPreviewWithoutHotReload: () => void,
@@ -39,7 +42,6 @@ export default function PreviewAndPublishButtons({
   exportProject,
   hasProject,
 }: PreviewAndPublishButtonsProps) {
-  const theme = React.useContext(GDevelopThemeContext);
   const debugBuildMenuTemplate = React.useCallback(
     (i18n: I18nType) => [
       {
@@ -129,11 +131,14 @@ export default function PreviewAndPublishButtons({
     <React.Fragment>
       <ElementWithMenu
         element={
-          <ToolbarIcon
+          <IconButton
+            size="small"
             disabled={!isPreviewEnabled}
-            src="res/ribbon_default/bug32.png"
             tooltip={t`Advanced preview options (debugger, network preview...)`}
-          />
+            color="default"
+          >
+            <DebugIcon />
+          </IconButton>
         }
         buildMenuTemplate={debugBuildMenuTemplate}
       />
@@ -142,25 +147,7 @@ export default function PreviewAndPublishButtons({
           <TextButton
             onClick={onClickPreview}
             disabled={!isPreviewEnabled}
-            icon={
-              <img
-                alt="Preview"
-                src={
-                  hasPreviewsRunning
-                    ? 'res/ribbon_default/hotReload64.png'
-                    : previewState.isPreviewOverriden
-                    ? 'res/ribbon_default/previewOverride32.png'
-                    : 'res/ribbon_default/preview64.png'
-                }
-                width={32}
-                height={32}
-                style={{
-                  filter: !isPreviewEnabled
-                    ? 'grayscale(100%)'
-                    : theme.gdevelopIconsCSSFilter,
-                }}
-              />
-            }
+            icon={<PreviewIcon />}
             label={
               hasPreviewsRunning ? (
                 <Trans>Update</Trans>
@@ -195,19 +182,7 @@ export default function PreviewAndPublishButtons({
       <TextButton
         onClick={exportProject}
         disabled={!hasProject}
-        icon={
-          <img
-            alt="Publish"
-            src={'res/ribbon_default/networkicon32.png'}
-            width={32}
-            height={32}
-            style={{
-              filter: !hasProject
-                ? 'grayscale(100%)'
-                : theme.gdevelopIconsCSSFilter,
-            }}
-          />
-        }
+        icon={<PublishIcon />}
         label={<Trans>Publish</Trans>}
         id={'toolbar-publish-button'}
         exceptionalTooltipForToolbar={

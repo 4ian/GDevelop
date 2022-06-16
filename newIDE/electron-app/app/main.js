@@ -83,6 +83,12 @@ app.on('ready', function() {
     height: args.height || 600,
     x: args.x,
     y: args.y,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#000000',
+      symbolColor: '#ffffff',
+    },
+    trafficLightPosition: { x: 12, y: 12 },
     webPreferences: {
       webSecurity: false, // Allow to access to local files,
       // Allow Node.js API access in renderer process, as long
@@ -267,6 +273,18 @@ app.on('ready', function() {
       }
     );
   });
+
+  // Titlebar handling:
+  ipcMain.handle(
+    'titlebar-set-overlay-options',
+    async (event, overlayOptions) => {
+      if (!mainWindow) return;
+
+      // setTitleBarOverlay seems not defined on macOS.
+      if (mainWindow.setTitleBarOverlay)
+        mainWindow.setTitleBarOverlay(overlayOptions);
+    }
+  );
 
   // LocalFileDownloader events:
   ipcMain.handle('local-file-download', async (event, url, outputPath) => {

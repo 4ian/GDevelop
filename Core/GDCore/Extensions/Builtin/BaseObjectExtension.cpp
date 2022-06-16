@@ -407,9 +407,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .UseStandardOperatorParameters("number");
 
   obj.AddAction("ModVarObjetTxt",
-                _("Text of an object variable"),
-                _("Change the text of an object variable."),
-                _("the text of variable _PARAM1_"),
+                _("String of an object variable"),
+                _("Change the string of an object variable."),
+                _("the string of variable _PARAM1_"),
                 _("Variables"),
                 "res/actions/var24.png",
                 "res/actions/var.png")
@@ -613,9 +613,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .UseStandardRelationalOperatorParameters("number");
 
   obj.AddCondition("VarObjetTxt",
-                   _("Text of an object variable"),
-                   _("Compare the text of an object variable."),
-                   _("the text of variable _PARAM1_"),
+                   _("String of an object variable"),
+                   _("Compare the string of an object variable."),
+                   _("the string of variable _PARAM1_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
@@ -1110,7 +1110,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddStrExpression("VariableString",
                        _("Object variable"),
-                       _("Text of an object variable"),
+                       _("String of an object variable"),
                        _("Variables"),
                        "res/actions/var.png")
       .AddParameter("object", _("Object"))

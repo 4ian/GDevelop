@@ -38,9 +38,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarSceneTxt",
-                    _("Text of a scene variable"),
-                    _("Compare the text of a scene variable."),
-                    _("the text of scene variable _PARAM0_"),
+                    _("String of a scene variable"),
+                    _("Compare the string of a scene variable."),
+                    _("the string of scene variable _PARAM0_"),
                     _("Scene variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -112,8 +112,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarGlobalTxt",
-                    _("Text of a global variable"),
-                    _("Compare the text of a global variable."),
+                    _("String of a global variable"),
+                    _("Compare the string of a global variable."),
                     _("the text of the global variable _PARAM0_"),
                     _("Global variables"),
                     "res/conditions/var24.png",
@@ -162,7 +162,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("ModVarSceneTxt",
                  _("String of a scene variable"),
-                 _("Modify the text of a scene variable."),
+                 _("Modify the string of a scene variable."),
                  _("the text of scene variable _PARAM0_"),
                  _("Scene variables"),
                  "res/actions/var24.png",
@@ -209,7 +209,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("ModVarGlobalTxt",
                  _("String of a global variable"),
-                 _("Modify the text of a global variable."),
+                 _("Modify the string of a global variable."),
                  _("the text of global variable _PARAM0_"),
                  _("Global variables"),
                  "res/actions/var24.png",
@@ -438,8 +438,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddStrExpression("VariableString",
-                        _("Text of a scene variable"),
-                        _("Text of a scene variable"),
+                        _("String of a scene variable"),
+                        _("String of a scene variable"),
                         _("Scene variables"),
                         "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"));
@@ -454,8 +454,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddStrExpression("GlobalVariableString",
-                        _("Text of a global variable"),
-                        _("Text of a global variable"),
+                        _("String of a global variable"),
+                        _("String of a global variable"),
                         _("Global variables"),
                         "res/actions/var.png")
       .AddParameter("globalvar", _("Variable"));

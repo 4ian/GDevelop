@@ -174,11 +174,6 @@ function HorizontalDraggedNodeDropContainer({
   draggedNodeHeight,
 }: HorizontalDraggedNodeDropContainerProps) {
   const { depth } = node;
-  // The component should not exist if draggedNode.depth is 0.
-  const depthArray = new Array(depth).fill(0);
-  const parentNodes = depthArray.map((_, depthStep) =>
-    getNodeAtPath(node.nodePath.slice(0, depthStep + 1))
-  );
   return (
     <>
       {new Array(depth).fill(0).map((_, depthStep) => {
@@ -189,7 +184,12 @@ function HorizontalDraggedNodeDropContainer({
           <DropTargetContainer
             key={depthStep}
             DnDComponent={DnDComponent}
-            onDrop={() => onDrop(moveNodeBelow, parentNodes[depthStep])}
+            onDrop={() =>
+              onDrop(
+                moveNodeBelow,
+                getNodeAtPath(node.nodePath.slice(0, depthStep + 1))
+              )
+            }
             canDrop={() => true}
             style={{
               dropArea: {
@@ -201,6 +201,7 @@ function HorizontalDraggedNodeDropContainer({
               dropIndicator: {
                 left: `-${indentWidth * (depth - depthStep)}px`,
                 right: '0px',
+                // The bottom is set so that the indicator is centered between the events.
                 bottom: '-2px',
               },
             }}

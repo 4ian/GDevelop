@@ -600,7 +600,10 @@ export default class ThemableEventsTree extends Component<
       });
       const { nodePath, event } = draggedNode;
       this._onEndDrag();
-      // $FlowFixMe - We are confident event is defined because of canDrag.
+      if (!event) {
+        console.warn('EventsSheet: No event found in dragged node.');
+        return;
+      }
       const newRowIndex = this.getEventRow(event);
       this.props.onEventMoved(nodePath[nodePath.length - 1], newRowIndex);
     }
@@ -673,6 +676,10 @@ export default class ThemableEventsTree extends Component<
   };
 
   _onEndDrag = () => {
+    // This method is always called at the end of the drag, regardless of whether
+    // an event was actually dropped. It is also already called in `_onDrop` to update
+    // the event list and compute history. So if draggedNode is null, we want to avoid
+    // recomputing the event list.
     if (this.state.draggedNode) {
       this.setState({ draggedNode: null });
       this._restoreFoldedNodes();

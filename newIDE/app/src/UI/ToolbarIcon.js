@@ -41,8 +41,8 @@ const ToolbarIcon = React.forwardRef<Props, IconButton>(
         <img
           alt={tooltip}
           src={src}
-          width={32}
-          height={32}
+          width={24}
+          height={24}
           style={{
             filter: disabled
               ? 'grayscale(100%)'

@@ -7,6 +7,7 @@ const electron = optionalRequire('electron');
 const remote = optionalRequire('@electron/remote');
 const shell = electron ? electron.shell : null;
 const dialog = remote ? remote.dialog : null;
+const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 export type AppArguments = { [string]: any };
 type YesNoCancelDialogChoice = 'yes' | 'no' | 'cancel';
@@ -42,14 +43,17 @@ export default class Window {
   }
 
   static setTitleBarColor(newColor: string) {
-    if (electron) {
-      // Nothing to do, the title bar is using the system window management.
-      return;
-    }
-
     if (currentTitleBarColor === newColor) {
       // Avoid potentially expensive DOM query/modification if no changes needed.
       return;
+    }
+
+    if (ipcRenderer) {
+      ipcRenderer.invoke('titlebar-set-overlay-options', {
+        color: newColor,
+        symbolColor: '#ffffff',
+      });
+      currentTitleBarColor = newColor;
     }
 
     const metaElement = document.querySelector('meta[name="theme-color"]');

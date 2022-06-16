@@ -156,6 +156,7 @@ import { useOpenInitialDialog } from '../Utils/UseOpenInitialDialog';
 import { type InAppTutorialOrchestratorInterface } from '../InAppTutorial/InAppTutorialOrchestrator';
 import useInAppTutorialOrchestrator from '../InAppTutorial/useInAppTutorialOrchestrator';
 import { FLING_GAME_IN_APP_TUTORIAL_ID } from '../InAppTutorial/InAppTutorialProvider';
+import TabsTitlebar from './TabsTitlebar';
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -608,7 +609,7 @@ const MainFrame = (props: Props) => {
     (newEditorTabs = state.editorTabs) => {
       const editorTab = getCurrentTab(newEditorTabs);
       if (!editorTab || !editorTab.editorRef) {
-        setEditorToolbar(null);
+        setEditorToolbar(null, { showProjectButtons: false });
         return;
       }
 
@@ -956,10 +957,14 @@ const MainFrame = (props: Props) => {
     [openProjectManager]
   );
 
-  const setEditorToolbar = (editorToolbar: any, isCurrentTab = true) => {
+  const setEditorToolbar = (
+    editorToolbar: any,
+    options: {| showProjectButtons: boolean |},
+    isCurrentTab = true
+  ) => {
     if (!toolbar.current || !isCurrentTab) return;
 
-    toolbar.current.setEditorToolbar(editorToolbar);
+    toolbar.current.setEditorToolbar(editorToolbar, options);
   };
 
   const onInstallExtension = (extensionShortHeader: ExtensionShortHeader) => {
@@ -2711,7 +2716,6 @@ const MainFrame = (props: Props) => {
           title={
             state.currentProject ? state.currentProject.getName() : 'No project'
           }
-          displayRightCloseButton
           onClose={toggleProjectManager}
         />
         {currentProject && (
@@ -2769,9 +2773,24 @@ const MainFrame = (props: Props) => {
           </EmptyMessage>
         )}
       </Drawer>
+      <TabsTitlebar>
+        <DraggableEditorTabs
+          hideLabels={false}
+          editorTabs={state.editorTabs}
+          onClickTab={(id: number) => _onChangeEditorTab(id)}
+          onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
+          onCloseOtherTabs={(editorTab: EditorTab) =>
+            _onCloseOtherEditorTabs(editorTab)
+          }
+          onCloseAll={_onCloseAllEditorTabs}
+          onTabActivated={(editorTab: EditorTab) =>
+            _onEditorTabActivated(editorTab)
+          }
+          onDropTab={onDropEditorTab}
+        />
+      </TabsTitlebar>
       <Toolbar
         ref={toolbar}
-        showProjectIcons
         hasProject={!!currentProject}
         toggleProjectManager={toggleProjectManager}
         exportProject={() => openExportDialog(true)}
@@ -2793,20 +2812,6 @@ const MainFrame = (props: Props) => {
         }
         previewState={previewState}
       />
-      <DraggableEditorTabs
-        hideLabels={false}
-        editorTabs={state.editorTabs}
-        onClickTab={(id: number) => _onChangeEditorTab(id)}
-        onCloseTab={(editorTab: EditorTab) => _onCloseEditorTab(editorTab)}
-        onCloseOtherTabs={(editorTab: EditorTab) =>
-          _onCloseOtherEditorTabs(editorTab)
-        }
-        onCloseAll={_onCloseAllEditorTabs}
-        onTabActivated={(editorTab: EditorTab) =>
-          _onEditorTabActivated(editorTab)
-        }
-        onDropTab={onDropEditorTab}
-      />
       <LeaderboardProvider
         gameId={
           state.currentProject ? state.currentProject.getProjectUuid() : ''
@@ -2824,7 +2829,11 @@ const MainFrame = (props: Props) => {
                     project: currentProject,
                     ref: editorRef => (editorTab.editorRef = editorRef),
                     setToolbar: editorToolbar =>
-                      setEditorToolbar(editorToolbar, isCurrentTab),
+                      setEditorToolbar(
+                        editorToolbar,
+                        { showProjectButtons: id !== 0 /* TODO */ },
+                        isCurrentTab
+                      ),
                     projectItemName: editorTab.projectItemName,
                     setPreviewedLayout,
                     onOpenExternalEvents: openExternalEvents,

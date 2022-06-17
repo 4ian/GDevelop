@@ -62,59 +62,82 @@ namespace gdjs {
         return fromValue + (toValue - fromValue) * easingFunction(weighting);
       };
 
-      const getTweensMap = (rs: RuntimeScene) =>
-        rs._tweens || (rs._tweens = new Map());
-      const getShiftyScene = (rs: RuntimeScene) =>
-        rs.shiftyJsScene || (rs.shiftyJsScene = new shifty.Scene());
+      const getTweensMap = (runtimeScene: RuntimeScene) =>
+        runtimeScene._tweens || (runtimeScene._tweens = new Map());
+      const getShiftyScene = (runtimeScene: RuntimeScene) =>
+        runtimeScene.shiftyJsScene ||
+        (runtimeScene.shiftyJsScene = new shifty.Scene());
 
-      export const tweenExists = (rs: RuntimeScene, id: string) =>
-        getTweensMap(rs).has(id);
+      export const sceneTweenExists = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => getTweensMap(runtimeScene).has(id);
 
-      export const tweenIsPlaying = (rs: RuntimeScene, id: string) => {
-        const map = getTweensMap(rs);
-        return map.has(id) && map.get(id)!.isPlaying();
+      export const sceneTweenIsPlaying = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => {
+        const tweenMap = getTweensMap(runtimeScene);
+        const tween = tweenMap.get(id);
+        return tween && tween.isPlaying();
       };
 
-      export const tweenHasFinished = (rs: RuntimeScene, id: string) => {
-        const map = getTweensMap(rs);
-        return map.has(id) && map.get(id)!.hasEnded();
+      export const sceneTweenHasFinished = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => {
+        const tweenMap = getTweensMap(runtimeScene);
+        const tween = tweenMap.get(id);
+        return tween && tween.hasEnded();
       };
 
-      export const resumeTween = (rs: RuntimeScene, id: string) => {
-        const map = getTweensMap(rs);
-        if (!map.has(id)) return;
-        const tween = map.get(id)!;
+      export const resumeSceneTween = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => {
+        const tweenMap = getTweensMap(runtimeScene);
+        const tween = tweenMap.get(id);
+        if (!tween) return;
         tween.resume();
-        getShiftyScene(rs).add(tween);
+        getShiftyScene(runtimeScene).add(tween);
       };
 
-      export const pauseTween = (rs: RuntimeScene, id: string) => {
-        const map = getTweensMap(rs);
-        if (!map.has(id)) return;
-        const tween = map.get(id)!;
+      export const pauseSceneTween = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => {
+        const tweenMap = getTweensMap(runtimeScene);
+        const tween = tweenMap.get(id);
+        if (!tween) return;
         tween.pause();
-        getShiftyScene(rs).remove(tween);
+        getShiftyScene(runtimeScene).remove(tween);
       };
 
-      export const stopTween = (rs: RuntimeScene, id: string) => {
-        const map = getTweensMap(rs);
-        if (!map.has(id)) return;
-        const tween = map.get(id)!;
+      export const stopSceneTween = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => {
+        const tweenMap = getTweensMap(runtimeScene);
+        const tween = tweenMap.get(id);
+        if (!tween) return;
         tween.stop();
-        getShiftyScene(rs).remove(tween);
+        getShiftyScene(runtimeScene).remove(tween);
       };
 
-      export const removeTween = (rs: RuntimeScene, id: string) => {
-        const map = getTweensMap(rs);
-        if (!map.has(id)) return;
-        const tween = map.get(id)!;
-        map.delete(id);
-        getShiftyScene(rs).remove(tween);
+      export const removeSceneTween = (
+        runtimeScene: RuntimeScene,
+        id: string
+      ) => {
+        const tweenMap = getTweensMap(runtimeScene);
+        const tween = tweenMap.get(id);
+        if (!tween) return;
+        tweenMap.delete(id);
+        getShiftyScene(runtimeScene).remove(tween);
         tween.stop().dispose();
       };
 
-      export const tweenNumber = (
-        rs: RuntimeScene,
+      export const tweenVariableNumber = (
+        runtimeScene: RuntimeScene,
         identifier: string,
         variable: Variable,
         from: number,
@@ -130,12 +153,12 @@ namespace gdjs {
           render: ({ value }) => variable.setNumber(value),
         });
 
-        getTweensMap(rs).set(identifier, tween);
-        getShiftyScene(rs).add(tween);
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
       };
 
       export const tweenCamera = (
-        rs: RuntimeScene,
+        runtimeScene: RuntimeScene,
         identifier: string,
         toX: number,
         toY: number,
@@ -143,7 +166,7 @@ namespace gdjs {
         duration: number,
         easing: shifty.easingFunction
       ) => {
-        const layer = rs.getLayer(layerName);
+        const layer = runtimeScene.getLayer(layerName);
         const tween = shifty.tween({
           from: { x: layer.getCameraX(), y: layer.getCameraY() },
           to: { x: toX, y: toY },
@@ -155,8 +178,8 @@ namespace gdjs {
           },
         });
 
-        getTweensMap(rs).set(identifier, tween);
-        getShiftyScene(rs).add(tween);
+        getTweensMap(runtimeScene).set(identifier, tween);
+        getShiftyScene(runtimeScene).add(tween);
       };
     }
   }

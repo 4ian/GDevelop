@@ -96,7 +96,7 @@ module.exports = {
 
     extension
       .addAction(
-        'TweenNumber',
+        'TweenSceneVariableNumber',
         _('Tween a number in a scene variable'),
         _(
           "Tweens a scene variable's numeric value from one number to another."
@@ -123,7 +123,7 @@ module.exports = {
 
     extension
       .addAction(
-        'TweenCamera',
+        'TweenCameraPosition',
         _('Tween the camera position'),
         _(
           'Tweens tweens the camera position from the current one to a new one.'
@@ -150,7 +150,7 @@ module.exports = {
 
     extension
       .addCondition(
-        'TweenExists',
+        'SceneTweenExists',
         _('Scene tween exists'),
         _('Check if the scene tween exists.'),
         _('Scene tween _PARAM1_ exists'),
@@ -164,11 +164,11 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.tweenExists');
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenExists');
 
     extension
       .addCondition(
-        'TweenIsPlaying',
+        'SceneTweenIsPlaying',
         _('Scene tween is playing'),
         _('Check if the scene tween is currently playing.'),
         _('Scene tween _PARAM1_ is playing'),
@@ -182,11 +182,11 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.tweenIsPlaying');
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenIsPlaying');
 
     extension
       .addCondition(
-        'TweenHasFinished',
+        'SceneTweenHasFinished',
         _('Scene tween finished playing'),
         _('Check if the scene tween has finished playing.'),
         _('Scene tween _PARAM1_ has finished playing'),
@@ -200,11 +200,11 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.tweenHasFinished');
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenHasFinished');
 
     extension
       .addAction(
-        'PauseTween',
+        'PauseSceneTween',
         _('Pause a scene tween'),
         _('Pause the running scene tween.'),
         _('Pause the scene tween _PARAM1_'),
@@ -218,11 +218,11 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.pauseTween');
+      .setFunctionName('gdjs.evtTools.tween.pauseSceneTween');
 
     extension
       .addAction(
-        'StopTween',
+        'StopSceneTween',
         _('Stop a scene tween'),
         _('Stop the running scene tween.'),
         _('Stop the scene tween _PARAM1_ (jump to the end: _PARAM2_)'),
@@ -237,11 +237,11 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.stopTween');
+      .setFunctionName('gdjs.evtTools.tween.stopSceneTween');
 
     extension
       .addAction(
-        'ResumeTween',
+        'ResumeSceneTween',
         _('Resume a scene tween'),
         _('Resume the scene tween.'),
         _('Resume the scene tween _PARAM1_'),
@@ -255,11 +255,11 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.resumeTween');
+      .setFunctionName('gdjs.evtTools.tween.resumeSceneTween');
 
     extension
       .addAction(
-        'RemoveTween',
+        'RemoveSceneTween',
         _('Remove a scene tween'),
         _('Remove the scene tween.'),
         _('Remove the scene tween _PARAM1_'),
@@ -273,7 +273,7 @@ module.exports = {
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
-      .setFunctionName('gdjs.evtTools.tween.removeTween');
+      .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
 
     const tweenBehavior = new gd.BehaviorJsImplementation();
 

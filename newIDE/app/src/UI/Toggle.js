@@ -17,10 +17,11 @@ type Props = {|
   toggled: boolean,
   onToggle: (e: {||}, toggled: boolean) => void,
   disabled?: boolean,
-  labelPosition: 'right',
+  labelPosition: 'right' | 'left',
 
   style?: {|
     marginTop?: number,
+    marginLeft?: number,
   |},
 |};
 
@@ -38,6 +39,7 @@ const Toggle = (props: Props) => {
           color="primary"
         />
       }
+      labelPlacement={props.labelPosition === 'right' ? 'end' : 'start'}
       label={props.label}
       disabled={props.disabled}
       classes={classes}

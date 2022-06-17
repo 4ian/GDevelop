@@ -37,6 +37,8 @@ const ShareDialog = ({ game, onClose }: Props) => {
           game.id
         );
         setGameSlug(gameSlugs[0]);
+      } catch (error) {
+        console.log(error);
       } finally {
         setIsFetchingGameSlug(false);
       }
@@ -50,7 +52,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
     },
     [fetchGameSlug]
   );
-
+  console.log(gameSlug);
   const gameUrl = getGameUrl(game, gameSlug);
   const onCopyLinkToClipboard = () => {
     if (!profile) return;
@@ -82,7 +84,13 @@ const ShareDialog = ({ game, onClose }: Props) => {
   return (
     <Dialog
       open
-      actions={[<FlatButton label={<Trans>Close</Trans>} onClick={onClose} />]}
+      actions={[
+        <FlatButton
+          key="close"
+          label={<Trans>Close</Trans>}
+          onClick={onClose}
+        />,
+      ]}
       title={<Trans>Share your game</Trans>}
       onRequestClose={onClose}
     >

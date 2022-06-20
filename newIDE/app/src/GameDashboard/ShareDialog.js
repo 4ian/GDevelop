@@ -20,6 +20,7 @@ import {
   getGameUrl,
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
+import AlertMessage from '../UI/AlertMessage';
 
 type Props = {| game: Game, onClose: () => void |};
 
@@ -27,6 +28,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
   const [isFetchingGameSlug, setIsFetchingGameSlug] = React.useState(true);
   const [gameSlug, setGameSlug] = React.useState<?GameSlug>(null);
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
+  const [showAlertMessage, setShowAlertMessage] = React.useState(false);
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -42,6 +44,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
         setGameSlug(gameSlugs[0]);
       } catch (error) {
         console.log(error);
+        setShowAlertMessage(true);
       } finally {
         setIsFetchingGameSlug(false);
       }
@@ -130,6 +133,14 @@ const ShareDialog = ({ game, onClose }: Props) => {
         visible={showCopiedInfoBar}
         hide={() => setShowCopiedInfoBar(false)}
       />
+      {showAlertMessage && (
+        <AlertMessage kind="error" onHide={() => setShowAlertMessage(false)}>
+          <Trans>
+            An error occured while generating the game url with the currently
+            set game slug.
+          </Trans>
+        </AlertMessage>
+      )}
     </Dialog>
   );
 };

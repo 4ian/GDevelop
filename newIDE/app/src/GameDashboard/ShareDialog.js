@@ -1,15 +1,18 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { CircularProgress } from '@material-ui/core';
-import Share from '@material-ui/icons/Share';
 import * as React from 'react';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { Trans } from '@lingui/macro';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Share from '@material-ui/icons/Share';
+
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Column, Line } from '../UI/Grid';
 import InfoBar from '../UI/Messages/InfoBar';
 import ShareButtons from '../UI/ShareDialog/ShareButtons';
 import ShareLink from '../UI/ShareDialog/ShareLink';
+
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import {
   type GameSlug,
   type Game,
@@ -52,15 +55,17 @@ const ShareDialog = ({ game, onClose }: Props) => {
     },
     [fetchGameSlug]
   );
-  console.log(gameSlug);
+
   const gameUrl = getGameUrl(game, gameSlug);
+  if (!gameUrl) return null;
+
   const onCopyLinkToClipboard = () => {
     if (!profile) return;
-    gameUrl && navigator.clipboard.writeText(gameUrl);
+    navigator.clipboard.writeText(gameUrl);
     setShowCopiedInfoBar(true);
   };
   const onOpen = () => {
-    gameUrl && Window.openExternalURL(gameUrl);
+    Window.openExternalURL(gameUrl);
   };
 
   const onShare = async () => {
@@ -80,7 +85,6 @@ const ShareDialog = ({ game, onClose }: Props) => {
     }
   };
 
-  if (!gameUrl) return null;
   return (
     <Dialog
       open

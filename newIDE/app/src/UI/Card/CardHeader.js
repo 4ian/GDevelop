@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { CardHeader as MUICardHeader, makeStyles } from '@material-ui/core';
+import MUICardHeader from '@material-ui/core/CardHeader';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   root: {

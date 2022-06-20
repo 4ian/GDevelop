@@ -1,38 +1,48 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
-import { Card, Chip } from '@material-ui/core';
 import * as React from 'react';
+import { type I18n as I18nType } from '@lingui/core';
+
+import { Card, Chip } from '@material-ui/core';
+import ShareIcon from '@material-ui/icons/Share';
+import MoreVert from '@material-ui/icons/MoreVert';
+
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+import FlatButton from '../UI/FlatButton';
+import IconButton from '../UI/IconButton';
+import Text from '../UI/Text';
+import Toggle from '../UI/Toggle';
+import CardContent from '../UI/Card/CardContent';
+import CardHeader from '../UI/Card/CardHeader';
+import ElementWithMenu from '../UI/Menu/ElementWithMenu';
+
+import { GameThumbnail } from './GameThumbnail';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import ShareDialog from './ShareDialog';
+
 import {
   getGameUrl,
   updateGame,
   type Game,
 } from '../Utils/GDevelopServices/Game';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
 import Window from '../Utils/Window';
-import { GameThumbnail } from './GameThumbnail';
-import FlatButton from '../UI/FlatButton';
-import ShareIcon from '@material-ui/icons/Share';
-import IconButton from '../UI/IconButton';
-import Text from '../UI/Text';
-import Toggle from '../UI/Toggle';
-import MoreVert from '@material-ui/icons/MoreVert';
-import CardContent from '../UI/Card/CardContent';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
-import CardHeader from '../UI/Card/CardHeader';
-import ElementWithMenu from '../UI/Menu/ElementWithMenu';
-import { type I18n as I18nType } from '@lingui/core';
 import { type GamesDetailsTab } from './GameDetailsDialog';
 import { useDebounce } from '../Utils/UseDebounce';
-import ShareDialog from './ShareDialog';
 
 type Props = {|
   game: Game,
   isCurrentGame: boolean,
   onOpenGameManager: (tab: GamesDetailsTab) => void,
   onUpdateGame: () => Promise<void>,
+|};
+
+type UpdateProperties = {|
+  discoverable?: boolean,
+  acceptsBuildComments?: boolean,
+  acceptsGameComments?: boolean,
 |};
 
 const getCurrentState = (gameProperty: ?boolean, pendingState: ?boolean) => {
@@ -66,16 +76,21 @@ export const GameCard = ({
     AuthenticatedUserContext
   );
 
-  const updateGameProperties = useDebounce(async parameters => {
-    if (!profile) return;
-    await updateGame(getAuthorizationHeader, profile.id, game.id, parameters);
-    await onUpdateGame();
-    typeof parameters.isDiscoverable === 'boolean' && setIsDiscoverable(null);
-    typeof parameters.acceptsBuildComments === 'boolean' &&
-      setAcceptsBuildComments(null);
-    typeof parameters.acceptsGameComments === 'boolean' &&
-      setAcceptsGameComments(null);
-  }, 500);
+  const updateGameProperties = useDebounce(
+    async (parameters: UpdateProperties) => {
+      if (!profile) return;
+      await updateGame(getAuthorizationHeader, profile.id, game.id, {
+        ...parameters,
+      });
+      await onUpdateGame();
+      typeof parameters.discoverable === 'boolean' && setIsDiscoverable(null);
+      typeof parameters.acceptsBuildComments === 'boolean' &&
+        setAcceptsBuildComments(null);
+      typeof parameters.acceptsGameComments === 'boolean' &&
+        setAcceptsGameComments(null);
+    },
+    500
+  );
 
   const onToggleDiscoverable = () => {
     const currentDiscoverableState = getCurrentState(
@@ -132,7 +147,7 @@ export const GameCard = ({
                   )}
 
                   <Text size="body2" noMargin displayInlineAsSpan>
-                    <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>{' '}
+                    <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
                   </Text>
                 </Line>
                 <ElementWithMenu
@@ -147,7 +162,7 @@ export const GameCard = ({
                       click: () => onOpenGameManager('details'),
                     },
                     {
-                      label: i18n._(t`Open builds`),
+                      label: i18n._(t`See builds`),
                       click: () => onOpenGameManager('builds'),
                     },
                     {
@@ -155,7 +170,7 @@ export const GameCard = ({
                       click: () => onOpenGameManager('analytics'),
                     },
                     {
-                      label: i18n._(t`Open leaderboards`),
+                      label: i18n._(t`Manage leaderboards`),
                       click: () => onOpenGameManager('leaderboards'),
                     },
                   ]}
@@ -221,7 +236,6 @@ export const GameCard = ({
                           isDiscoverable
                         )}
                         label={<Trans>Make discoverable on Liluo</Trans>}
-                        style={{ marginLeft: 0 }}
                       />
                       <Toggle
                         labelPosition="left"
@@ -231,7 +245,6 @@ export const GameCard = ({
                           acceptsGameComments
                         )}
                         label={<Trans>Open for feedback on Liluo</Trans>}
-                        style={{ marginLeft: 0 }}
                       />
                     </Column>
                     <Column expand alignItems="flex-start" noMargin>
@@ -243,7 +256,6 @@ export const GameCard = ({
                           acceptsBuildComments
                         )}
                         label={<Trans>Open feedback on all Builds</Trans>}
-                        style={{ marginLeft: 0 }}
                       />
                     </Column>
                   </ResponsiveLineStackLayout>

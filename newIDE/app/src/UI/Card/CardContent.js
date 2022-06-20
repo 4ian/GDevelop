@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react';
-import { CardContent as MUICardContent, makeStyles } from '@material-ui/core';
+import MUICardContent from '@material-ui/core/CardContent';
+import { makeStyles } from '@material-ui/core/styles';
+import { marginsSize } from '../Grid';
 
 const useStyles = makeStyles({
   root: {
-    padding: 24,
-    paddingTop: 8,
+    padding: marginsSize * 4,
+    paddingTop: marginsSize,
   },
 });
 

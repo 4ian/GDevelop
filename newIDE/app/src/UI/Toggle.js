@@ -8,6 +8,7 @@ const useStyles = makeStyles({
   root: {
     cursor: 'default',
   },
+  labelPlacementStart: { marginLeft: 0 },
 });
 
 // We support a subset of the props supported by Material-UI v0.x Toggle
@@ -21,7 +22,6 @@ type Props = {|
 
   style?: {|
     marginTop?: number,
-    marginLeft?: number,
   |},
 |};
 
@@ -43,7 +43,9 @@ const Toggle = (props: Props) => {
       label={props.label}
       disabled={props.disabled}
       classes={classes}
-      style={props.style}
+      style={{
+        ...props.style,
+      }}
     />
   );
 };

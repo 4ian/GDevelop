@@ -664,7 +664,14 @@ namespace gdjs {
       }
       const baseUrl = 'https://api.gdevelop-app.com/analytics';
       this._playerId = this._makePlayerUuid();
-      let lastSessionHitTime = Date.now();
+      let sendedDuration = 0;
+      /** The duration that is not yet sent to the service to avoid flooding */
+      let notYetSentDuration = 0;
+      /**
+       * The last time when duration has been counted
+       * either in sendedDuration or notYetSentDuration.
+       **/
+      let lastSessionResumeTime = Date.now();
       fetch(baseUrl + '/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -715,24 +722,37 @@ namespace gdjs {
           return;
         }
 
+        const now = Date.now();
+        notYetSentDuration += now - lastSessionResumeTime;
+        lastSessionResumeTime = now;
+
         // Group repeated calls to sendSessionHit - which could
         // happen because of multiple event listeners being fired.
-        if (Date.now() - lastSessionHitTime < 3 * 1000) {
+        if (notYetSentDuration < 5 * 1000) {
           return;
         }
-        lastSessionHitTime = Date.now();
+        const onlySeconds = Math.floor(notYetSentDuration / 1000) * 1000;
+        sendedDuration += onlySeconds;
+        notYetSentDuration -= onlySeconds;
+
         navigator.sendBeacon(
           baseUrl + '/session-hit',
           JSON.stringify({
             gameId: this._data.properties.projectUuid,
             playerId: this._playerId,
             sessionId: this._sessionId,
+            duration: Math.floor(sendedDuration / 1000),
           })
         );
       };
       if (typeof navigator !== 'undefined' && typeof document !== 'undefined') {
         document.addEventListener('visibilitychange', () => {
-          sendSessionHit();
+          if (document.visibilityState === 'visible') {
+            // Skip the duration the game was hidden.
+            lastSessionResumeTime = Date.now();
+          } else {
+            sendSessionHit();
+          }
         });
         window.addEventListener(
           'pagehide',

@@ -227,7 +227,7 @@ export const GameCard = ({
                     noMargin
                     justifyContent="flex-start"
                   >
-                    <Column expand alignItems="flex-start" noMargin>
+                    <Column expand noMargin>
                       <Toggle
                         labelPosition="left"
                         onToggle={onToggleDiscoverable}
@@ -247,7 +247,7 @@ export const GameCard = ({
                         label={<Trans>Open for feedback on Liluo.io</Trans>}
                       />
                     </Column>
-                    <Column expand alignItems="flex-start" noMargin>
+                    <Column expand noMargin>
                       <Toggle
                         labelPosition="left"
                         onToggle={onToggleAcceptsBuildComments}

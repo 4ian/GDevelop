@@ -9,6 +9,7 @@ const useStyles = makeStyles({
     cursor: 'default',
   },
   labelPlacementStart: { marginLeft: 0 },
+  label: { flex: 1 },
 });
 
 // We support a subset of the props supported by Material-UI v0.x Toggle

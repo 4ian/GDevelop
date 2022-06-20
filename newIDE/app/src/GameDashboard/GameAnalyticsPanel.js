@@ -76,17 +76,25 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
       : 0;
   });
 
+  const dateFormatOptions = { month: 'short', day: 'numeric' };
+
   return {
     byDay: metrics
       .map(metric => ({
         timestamp: parseISO(metric.date).getTime(),
-        date: metric.date,
+        date: parseISO(metric.date).toLocaleDateString(
+          undefined,
+          dateFormatOptions
+        ),
         playersCount: metric.players
           ? metric.players.d0Players - metric.players.d0PlayersBelow60s
           : 0,
         viewersCount: metric.players ? metric.players.d0Players : 0,
         meanPlayedTime: metric.sessions
-          ? metric.sessions.d0SessionsDurationTotal / metric.sessions.d0Sessions
+          ? Math.round(
+              metric.sessions.d0SessionsDurationTotal /
+                metric.sessions.d0Sessions
+            )
           : 0,
       }))
       .sort((a, b) => a.timestamp - b.timestamp),
@@ -237,6 +245,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
                   >
                     <Area
+                      name={i18n._(t`Viewers`)}
                       type="monotone"
                       dataKey="viewersCount"
                       stroke="#777777"
@@ -245,6 +254,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       yAxisId={0}
                     />
                     <Area
+                      name={i18n._(t`Players`)}
                       type="monotone"
                       dataKey="playersCount"
                       stroke="#ff7300"
@@ -273,6 +283,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
                   >
                     <RechartsLine
+                      name={i18n._(t`Mean played time`)}
                       type="monotone"
                       dataKey="meanPlayedTime"
                       stroke="#ff7300"
@@ -297,12 +308,14 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
                   >
                     <RechartsLine
+                      name={i18n._(t`Players`)}
                       type="monotone"
                       dataKey="playersCount"
                       stroke="#ff7300"
                       yAxisId={0}
                     />
                     <XAxis
+                      name={i18n._(t`Played time`)}
                       dataKey="duration"
                       type="number"
                       domain={[0, 15]}

@@ -235,7 +235,7 @@ export const GameCard = ({
                           game.discoverable,
                           isDiscoverable
                         )}
-                        label={<Trans>Make discoverable on Liluo</Trans>}
+                        label={<Trans>Make discoverable on Liluo.io</Trans>}
                       />
                       <Toggle
                         labelPosition="left"
@@ -244,7 +244,7 @@ export const GameCard = ({
                           game.acceptsGameComments,
                           acceptsGameComments
                         )}
-                        label={<Trans>Open for feedback on Liluo</Trans>}
+                        label={<Trans>Open for feedback on Liluo.io</Trans>}
                       />
                     </Column>
                     <Column expand alignItems="flex-start" noMargin>

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-const marginsSize = 8;
+export const marginsSize = 8;
 
 /**
  * A Line in the standard GDevelop grid to position components.

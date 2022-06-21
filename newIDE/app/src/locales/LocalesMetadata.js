@@ -41,7 +41,7 @@ module.exports = [
     "languageCode": "cs_CZ",
     "languageName": "Czech",
     "languageNativeName": "čeština",
-    "translationRatio": 0.14570195818121479
+    "translationRatio": 0.1495187520743445
   },
   {
     "languageCode": "da_DK",
@@ -77,7 +77,7 @@ module.exports = [
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.985894457351477
+    "translationRatio": 0.9878858280783273
   },
   {
     "languageCode": "fa_IR",
@@ -131,7 +131,7 @@ module.exports = [
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Bahasa Indonesia",
-    "translationRatio": 0.5386657816130103
+    "translationRatio": 0.5393295718552937
   },
   {
     "languageCode": "ig_NG",
@@ -149,7 +149,7 @@ module.exports = [
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.9774311317623631
+    "translationRatio": 0.9797543976103551
   },
   {
     "languageCode": "ka_GE",
@@ -227,7 +227,7 @@ module.exports = [
     "languageCode": "pt_BR",
     "languageName": "Brazilian Portuguese",
     "languageNativeName": "Português brasileiro",
-    "translationRatio": 0.9535346830401593
+    "translationRatio": 0.9624958513109857
   },
   {
     "languageCode": "pt_PT",
@@ -263,7 +263,7 @@ module.exports = [
     "languageCode": "sl_SI",
     "languageName": "Slovene",
     "languageNativeName": "slovenski jezik",
-    "translationRatio": 0.9910388317291736
+    "translationRatio": 0.9933620975771656
   },
   {
     "languageCode": "sq_AL",
@@ -305,7 +305,7 @@ module.exports = [
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.8647527381347494
+    "translationRatio": 0.868901427149021
   },
   {
     "languageCode": "ur_PK",
@@ -323,7 +323,7 @@ module.exports = [
     "languageCode": "vi_VN",
     "languageName": "Vietnamese",
     "languageNativeName": "Tiếng Việt",
-    "translationRatio": 0.05426485230667111
+    "translationRatio": 0.05741785595751747
   },
   {
     "languageCode": "yo_NG",
@@ -335,7 +335,7 @@ module.exports = [
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.9918685695320278
+    "translationRatio": 0.9925323597743113
   },
   {
     "languageCode": "zh_TW",

@@ -131,8 +131,8 @@ describe('Physics2RuntimeBehavior', () => {
 
       let hasBounced = false;
       let stepIndex = 0;
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
         if (movingObjectBehavior.getLinearVelocityY() > 0) {
           // If the moving object has a positive velocity, it hasn't bounced
           // on the static object
@@ -150,9 +150,12 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: true,
           });
         }
-
+      });
+      while (stepIndex < 10 && !hasBounced) {
+        runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
+
       if (!hasBounced) {
         throw new Error('Contact did not happen, nothing was tested.');
       }
@@ -178,8 +181,8 @@ describe('Physics2RuntimeBehavior', () => {
 
       let hasBounced = false;
       let stepIndex = 0;
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
         if (movingObjectBehavior.getLinearVelocityY() > 0) {
           // If the moving object has a positive velocity, it hasn't bounced
           // on the static object
@@ -190,6 +193,7 @@ describe('Physics2RuntimeBehavior', () => {
           });
         } else {
           hasBounced = true;
+          // At first frame, collision should have only started
           expect(movingObject.getY() < staticObject.getY()).to.be(true);
           assertCollision(movingObject, staticObject, {
             started: true,
@@ -197,21 +201,27 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: false,
           });
         }
+      });
 
+      while (stepIndex < 10 && !hasBounced) {
+        runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
+
       if (!hasBounced) {
         throw new Error('Contact did not happen, nothing was tested.');
       }
 
-      runtimeScene.renderAndStep(1000 / fps);
-
       // At next frame, end of collision should be detected
-      assertCollision(movingObject, staticObject, {
-        started: false,
-        collision: false,
-        stopped: true,
+      runtimeScene.setEventsFunction(() => {
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: false,
+          stopped: true,
+        });
       });
+
+      runtimeScene.renderAndStep(1000 / fps);
     });
   });
 

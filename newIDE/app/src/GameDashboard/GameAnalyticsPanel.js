@@ -1,15 +1,15 @@
 // @flow
-import { Trans, t } from '@lingui/macro';
+import { Trans, t, number } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
-import { formatISO } from 'date-fns';
-import { Line, Spacer } from '../UI/Grid';
+import { formatISO, parseISO } from 'date-fns';
+import { Column, Line, Spacer } from '../UI/Grid';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
 import {
   type GameMetrics,
-  getGameMetrics,
+  getGameMetricsFrom,
 } from '../Utils/GDevelopServices/Analytics';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -20,11 +20,93 @@ import { Table, TableBody, TableRow, TableRowColumn } from '../UI/Table';
 import AlertMessage from '../UI/AlertMessage';
 import subDays from 'date-fns/subDays';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line as RechartsLine,
+  XAxis,
+  YAxis,
+  ReferenceLine,
+  ReferenceArea,
+  ReferenceDot,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  Brush,
+  ErrorBar,
+  AreaChart,
+  Area,
+  Label,
+  LabelList,
+} from 'recharts';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
-const styles = {
-  tableRowStatColumn: {
-    width: 100,
-  },
+type ChartData = {|
+  byDay: {
+    timestamp: number,
+    date: string,
+    playersCount: number,
+    viewersCount: number,
+    meanPlayedTime: number,
+  }[],
+  byPlayedTime: { duration: number, playersCount: number }[],
+|};
+
+const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
+  let playersBelow60sSum = 0;
+  let playersBelow180sSum = 0;
+  let playersBelow300sSum = 0;
+  let playersBelow600sSum = 0;
+  let playersBelow900sSum = 0;
+
+  metrics.forEach(metric => {
+    playersBelow60sSum += metric.players ? metric.players.d0PlayersBelow60s : 0;
+    playersBelow180sSum += metric.players
+      ? metric.players.d0PlayersBelow180s
+      : 0;
+    playersBelow300sSum += metric.players
+      ? metric.players.d0PlayersBelow300s
+      : 0;
+    playersBelow600sSum += metric.players
+      ? metric.players.d0PlayersBelow600s
+      : 0;
+    playersBelow900sSum += metric.players
+      ? metric.players.d0PlayersBelow900s
+      : 0;
+  });
+
+  const dateFormatOptions = { month: 'short', day: 'numeric' };
+
+  return {
+    byDay: metrics
+      .map(metric => ({
+        timestamp: parseISO(metric.date).getTime(),
+        date: parseISO(metric.date).toLocaleDateString(
+          undefined,
+          dateFormatOptions
+        ),
+        playersCount: metric.players
+          ? metric.players.d0Players - metric.players.d0PlayersBelow60s
+          : 0,
+        viewersCount: metric.players ? metric.players.d0Players : 0,
+        meanPlayedTime: metric.sessions
+          ? Math.round(
+              metric.sessions.d0SessionsDurationTotal /
+                metric.sessions.d0Sessions
+            )
+          : 0,
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp),
+    byPlayedTime: [
+      { duration: 1, playersCount: playersBelow60sSum },
+      { duration: 3, playersCount: playersBelow180sSum },
+      { duration: 5, playersCount: playersBelow300sSum },
+      { duration: 10, playersCount: playersBelow600sSum },
+      { duration: 15, playersCount: playersBelow900sSum },
+    ],
+  };
 };
 
 type Props = {|
@@ -36,18 +118,42 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
-  const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
+
+  const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
+  const chartData = React.useMemo(
+    () =>
+      gameRollingMetrics
+        ? evaluateChartData(gameRollingMetrics)
+        : { byDay: [], byPlayedTime: [] },
+    [gameRollingMetrics]
+  );
+
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
 
-  const yesterdayIsoDate = formatISO(subDays(new Date(), 1), {
+  const lastMonthIsoDate = formatISO(subDays(new Date(), 30), {
     representation: 'date',
   });
-  const [analyticsDate, setAnalyticsDate] = React.useState(yesterdayIsoDate);
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  const styles = {
+    tableRowStatColumn: {
+      width: 100,
+    },
+    tooltipContent: {
+      backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
+      border: 0,
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+    tickLabel: {
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+  };
 
   const loadGameMetrics = React.useCallback(
     async () => {
@@ -58,11 +164,11 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
       setIsGameMetricsLoading(true);
       setGameMetricsError(null);
       try {
-        const gameRollingMetrics = await getGameMetrics(
+        const gameRollingMetrics = await getGameMetricsFrom(
           getAuthorizationHeader,
           id,
           game.id,
-          analyticsDate
+          lastMonthIsoDate
         );
         setGameMetrics(gameRollingMetrics);
       } catch (err) {
@@ -71,7 +177,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
       }
       setIsGameMetricsLoading(false);
     },
-    [getAuthorizationHeader, profile, game, analyticsDate]
+    [getAuthorizationHeader, profile, game, lastMonthIsoDate]
   );
 
   React.useEffect(
@@ -80,6 +186,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
     },
     [loadGameMetrics]
   );
+
+  const windowWidth = useResponsiveWindowWidth();
+  const chartWidth = windowWidth === 'small' ? '100%' : '50%';
 
   return (
     <I18n>
@@ -126,121 +235,141 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                 </TableRow>
               </TableBody>
             </Table>
-            <Line noMargin alignItems="center">
-              <Text size="title">
-                <Trans>Daily metrics</Trans>
-              </Text>
-              <Spacer />
-              {isGameMetricsLoading && <CircularProgress size={20} />}
-            </Line>
-            <Line noMargin>
-              <SelectField
-                fullWidth
-                floatingLabelText={<Trans>Day</Trans>}
-                value={analyticsDate}
-                onChange={(_, _index, newIsoDate) => {
-                  setAnalyticsDate(newIsoDate);
-                }}
-              >
-                {Array(5)
-                  .fill('')
-                  .map((_, index) => {
-                    const isoDate = formatISO(subDays(new Date(), index + 2), {
-                      representation: 'date',
-                    });
-                    return (
-                      <SelectOption
-                        key={isoDate}
-                        value={isoDate}
-                        primaryText={isoDate}
-                      />
-                    );
-                  })
-                  .reverse()}
-                <SelectOption
-                  value={yesterdayIsoDate}
-                  primaryText={t`Yesterday`}
-                />
-                <SelectOption
-                  value={formatISO(new Date(), {
-                    representation: 'date',
-                  })}
-                  primaryText={t`Today (so far, in real time)`}
-                />
-              </SelectField>
-            </Line>
-            {!isGameMetricsLoading && !gameRollingMetrics ? (
-              <AlertMessage kind="warning">
-                <Trans>
-                  There were no players or stored metrics for this day. Be sure
-                  to publish your game and get players to try it to see the
-                  collected anonymous analytics.
-                </Trans>
-              </AlertMessage>
-            ) : null}
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableRowColumn>
-                    <Trans>Players count</Trans>
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.tableRowStatColumn}>
-                    {gameRollingMetrics && gameRollingMetrics.players
-                      ? gameRollingMetrics.players.d0Players
-                      : '-'}
-                  </TableRowColumn>
-                </TableRow>
-                <TableRow>
-                  <TableRowColumn>
-                    <Trans>Sessions count</Trans>
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.tableRowStatColumn}>
-                    {gameRollingMetrics && gameRollingMetrics.sessions
-                      ? gameRollingMetrics.sessions.d0Sessions
-                      : '-'}
-                  </TableRowColumn>
-                </TableRow>
-                <TableRow>
-                  <TableRowColumn>
-                    <Trans>New players count</Trans>
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.tableRowStatColumn}>
-                    {gameRollingMetrics && gameRollingMetrics.players
-                      ? gameRollingMetrics.players.d0NewPlayers
-                      : '-'}
-                  </TableRowColumn>
-                </TableRow>
-              </TableBody>
-            </Table>
             {gameRollingMetrics &&
-            (!gameRollingMetrics.retention || !gameRollingMetrics.players) ? (
+            (!gameRollingMetrics[0].retention ||
+              !gameRollingMetrics[0].players) ? (
               <AlertMessage kind="info">
                 Upgrade your account with a subscription to unlock all the
                 metrics for your game.
               </AlertMessage>
             ) : null}
-            <Table>
-              <TableBody>
-                {[1, 2, 3, 4, 5, 6, 7].map(dayIndex => (
-                  <TableRow key={dayIndex}>
-                    <TableRowColumn>
-                      <Trans>Day {dayIndex} retained players</Trans>
-                    </TableRowColumn>
-                    <TableRowColumn style={styles.tableRowStatColumn}>
-                      {gameRollingMetrics &&
-                      gameRollingMetrics.retention &&
-                      gameRollingMetrics.retention[
-                        `d${dayIndex}RetainedPlayers`
-                      ] != null
-                        ? gameRollingMetrics.retention[
-                            `d${dayIndex}RetainedPlayers`
-                          ]
-                        : '-'}
-                    </TableRowColumn>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <ResponsiveLineStackLayout expand noMargin>
+              <Column expand noMargin alignItems="center">
+                <Line noMargin>
+                  <Text size="title" align="center">
+                    <Trans>Players</Trans>
+                  </Text>
+                </Line>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart
+                    data={chartData.byDay}
+                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  >
+                    <Area
+                      name={i18n._(t`Viewers`)}
+                      type="monotone"
+                      dataKey="viewersCount"
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      fill={gdevelopTheme.chart.dataColor1}
+                      fillOpacity={0.125}
+                      yAxisId={0}
+                    />
+                    <Area
+                      name={i18n._(t`Players`)}
+                      type="monotone"
+                      dataKey="playersCount"
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      fill={gdevelopTheme.chart.dataColor1}
+                      fillOpacity={0.25}
+                      yAxisId={0}
+                    />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <YAxis
+                      dataKey="viewersCount"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Column>
+            </ResponsiveLineStackLayout>
+            <ResponsiveLineStackLayout expand noMargin>
+              <Column expand noMargin alignItems="center">
+                <Line noMargin>
+                  <Text size="title" align="center">
+                    <Trans>Mean played time</Trans>
+                  </Text>
+                </Line>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={chartData.byDay}
+                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  >
+                    <RechartsLine
+                      name={i18n._(t`Mean played time`)}
+                      type="monotone"
+                      dataKey="meanPlayedTime"
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      yAxisId={0}
+                    />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <YAxis
+                      dataKey="meanPlayedTime"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Column>
+              <Column expand noMargin alignItems="center">
+                <Line noMargin>
+                  <Text size="title" align="center">
+                    <Trans>Players per played time</Trans>
+                  </Text>
+                </Line>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={chartData.byPlayedTime}
+                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  >
+                    <RechartsLine
+                      name={i18n._(t`Players`)}
+                      type="monotone"
+                      dataKey="playersCount"
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      yAxisId={0}
+                    />
+                    <XAxis
+                      name={i18n._(t`Played time`)}
+                      dataKey="duration"
+                      type="number"
+                      domain={[0, 15]}
+                      ticks={[1, 3, 5, 10, 15]}
+                      stroke={gdevelopTheme.chart.textColor}
+                      contentStyle={styles.tickLabel}
+                    />
+                    <YAxis
+                      dataKey="playersCount"
+                      stroke="#f5f5f5"
+                      style={styles.tickLabel}
+                    />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Column>
+            </ResponsiveLineStackLayout>
           </ColumnStackLayout>
         )
       }

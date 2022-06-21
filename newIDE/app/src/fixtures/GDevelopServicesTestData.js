@@ -18,6 +18,7 @@ import {
   type Asset,
   type AssetPacks,
 } from '../Utils/GDevelopServices/Asset';
+import { formatISO, subDays } from 'date-fns';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -780,31 +781,59 @@ export const game2: Game = {
   createdAt: 1607065498,
 };
 
-export const gameRollingMetrics1: GameMetrics = {
-  date: '2020-10-01',
+const interpolateWithNoise = (
+  leftValue: number,
+  rightValue: number,
+  ratio: number
+) =>
+  Math.round(
+    (1 - ratio) * leftValue +
+      ratio * rightValue +
+      (Math.random() * Math.max(leftValue, rightValue)) / 10
+  );
 
-  sessions: {
-    d0Sessions: 350,
-  },
-  players: {
-    d0Players: 200,
-    d0NewPlayers: 220,
-  },
-  retention: {
-    d1RetainedPlayers: 193,
-    d2RetainedPlayers: 153,
-    d3RetainedPlayers: 121,
-    d4RetainedPlayers: 83,
-    d5RetainedPlayers: 74,
-    d6RetainedPlayers: 73,
-    d7RetainedPlayers: 67,
-  },
+const generateGameRollingMetrics1 = () => {
+  const metrics = [];
+  const count = 30;
+  for (let index = 0; index < count; index++) {
+    const ratio = 1 - index / count;
+    metrics.push({
+      date: formatISO(subDays(new Date(), index)),
+
+      sessions: {
+        d0Sessions: interpolateWithNoise(250, 350, ratio),
+        d0SessionsDurationTotal: interpolateWithNoise(75000, 175000, ratio),
+      },
+      players: {
+        d0Players: interpolateWithNoise(150, 250, ratio),
+        d0NewPlayers: interpolateWithNoise(80, 120, ratio),
+        d0PlayersBelow60s: interpolateWithNoise(72, 95, ratio),
+        d0PlayersBelow180s: interpolateWithNoise(11, 22, ratio),
+        d0PlayersBelow300s: interpolateWithNoise(31, 63, ratio),
+        d0PlayersBelow600s: interpolateWithNoise(28, 56, ratio),
+        d0PlayersBelow900s: interpolateWithNoise(7, 14, ratio),
+      },
+      retention: {
+        d1RetainedPlayers: 193,
+        d2RetainedPlayers: 153,
+        d3RetainedPlayers: 121,
+        d4RetainedPlayers: 83,
+        d5RetainedPlayers: 74,
+        d6RetainedPlayers: 73,
+        d7RetainedPlayers: 67,
+      },
+    });
+  }
+  return metrics;
 };
+
+export const gameRollingMetrics1: GameMetrics[] = generateGameRollingMetrics1();
 export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
   date: '2020-10-01',
 
   sessions: {
     d0Sessions: 350,
+    d0SessionsDurationTotal: 175000,
   },
   players: null,
   retention: null,

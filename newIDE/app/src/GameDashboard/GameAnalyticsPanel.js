@@ -41,6 +41,7 @@ import {
   Label,
   LabelList,
 } from 'recharts';
+import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type ChartData = {|
   byDay: {
@@ -108,12 +109,6 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
   };
 };
 
-const styles = {
-  tableRowStatColumn: {
-    width: 100,
-  },
-};
-
 type Props = {|
   game: Game,
   publicGame: ?PublicGame,
@@ -143,6 +138,22 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
   const lastMonthIsoDate = formatISO(subDays(new Date(), 30), {
     representation: 'date',
   });
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  const styles = {
+    tableRowStatColumn: {
+      width: 100,
+    },
+    tooltipContent: {
+      backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
+      border: 0,
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+    tickLabel: {
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+  };
 
   const loadGameMetrics = React.useCallback(
     async () => {
@@ -248,24 +259,35 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       name={i18n._(t`Viewers`)}
                       type="monotone"
                       dataKey="viewersCount"
-                      stroke="#777777"
-                      fill="#777777"
-                      fillOpacity={1}
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      fill={gdevelopTheme.chart.dataColor1}
+                      fillOpacity={0.125}
                       yAxisId={0}
                     />
                     <Area
                       name={i18n._(t`Players`)}
                       type="monotone"
                       dataKey="playersCount"
-                      stroke="#ff7300"
-                      fill="#ff7300"
-                      fillOpacity={1}
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      fill={gdevelopTheme.chart.dataColor1}
+                      fillOpacity={0.25}
                       yAxisId={0}
                     />
-                    <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
-                    <XAxis dataKey="date" stroke="#f5f5f5" />
-                    <YAxis dataKey="viewersCount" stroke="#f5f5f5" />
-                    <Tooltip />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <YAxis
+                      dataKey="viewersCount"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
                   </AreaChart>
                 </ResponsiveContainer>
               </Column>
@@ -286,13 +308,24 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       name={i18n._(t`Mean played time`)}
                       type="monotone"
                       dataKey="meanPlayedTime"
-                      stroke="#ff7300"
+                      stroke={gdevelopTheme.chart.dataColor1}
                       yAxisId={0}
                     />
-                    <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
-                    <XAxis dataKey="date" stroke="#f5f5f5" />
-                    <YAxis dataKey="meanPlayedTime" stroke="#f5f5f5" />
-                    <Tooltip />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <YAxis
+                      dataKey="meanPlayedTime"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
                   </LineChart>
                 </ResponsiveContainer>
               </Column>
@@ -311,7 +344,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       name={i18n._(t`Players`)}
                       type="monotone"
                       dataKey="playersCount"
-                      stroke="#ff7300"
+                      stroke={gdevelopTheme.chart.dataColor1}
                       yAxisId={0}
                     />
                     <XAxis
@@ -320,11 +353,19 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       type="number"
                       domain={[0, 15]}
                       ticks={[1, 3, 5, 10, 15]}
-                      stroke="#f5f5f5"
+                      stroke={gdevelopTheme.chart.textColor}
+                      contentStyle={styles.tickLabel}
                     />
-                    <YAxis dataKey="playersCount" stroke="#f5f5f5" />
-                    <CartesianGrid stroke="#f5f5f5" strokeDasharray="3 3" />
-                    <Tooltip />
+                    <YAxis
+                      dataKey="playersCount"
+                      stroke="#f5f5f5"
+                      style={styles.tickLabel}
+                    />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
                   </LineChart>
                 </ResponsiveContainer>
               </Column>

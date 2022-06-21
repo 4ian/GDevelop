@@ -664,8 +664,15 @@ namespace gdjs {
       }
       const baseUrl = 'https://api.gdevelop-app.com/analytics';
       this._playerId = this._makePlayerUuid();
+      /**
+       * The duration that is already sent to the service
+       * (in milliseconds).
+       **/
       let sendedDuration = 0;
-      /** The duration that is not yet sent to the service to avoid flooding */
+      /**
+       * The duration that is not yet sent to the service to avoid flooding
+       * (in milliseconds).
+       **/
       let notYetSentDuration = 0;
       /**
        * The last time when duration has been counted

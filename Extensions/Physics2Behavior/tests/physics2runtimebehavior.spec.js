@@ -131,8 +131,8 @@ describe('Physics2RuntimeBehavior', () => {
 
       let hasBounced = false;
       let stepIndex = 0;
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
         if (movingObjectBehavior.getLinearVelocityY() > 0) {
           // If the moving object has a positive velocity, it hasn't bounced
           // on the static object
@@ -150,9 +150,12 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: true,
           });
         }
-
+      });
+      while (stepIndex < 10 && !hasBounced) {
+        runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
+
       if (!hasBounced) {
         throw new Error('Contact did not happen, nothing was tested.');
       }
@@ -176,10 +179,10 @@ describe('Physics2RuntimeBehavior', () => {
       }
       movingObjectBehavior.setLinearVelocityY(40000);
 
-      let hasBounced = false;
+      let hasBegunBouncing = false;
       let stepIndex = 0;
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
         if (movingObjectBehavior.getLinearVelocityY() > 0) {
           // If the moving object has a positive velocity, it hasn't bounced
           // on the static object
@@ -189,7 +192,8 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: false,
           });
         } else {
-          hasBounced = true;
+          hasBegunBouncing = true;
+          // At first frame, collision should have only started
           expect(movingObject.getY() < staticObject.getY()).to.be(true);
           assertCollision(movingObject, staticObject, {
             started: true,
@@ -197,21 +201,36 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: false,
           });
         }
+      });
 
+      while (stepIndex < 10 && !hasBegunBouncing) {
+        runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
-      if (!hasBounced) {
-        throw new Error('Contact did not happen, nothing was tested.');
+
+      if (!hasBegunBouncing) {
+        throw new Error(
+          'Start of contact was not detected, nothing was tested.'
+        );
       }
+
+      // At next frame, end of collision should be detected
+      let hasFinishedBouncing = false;
+
+      runtimeScene.setEventsFunction(() => {
+        hasFinishedBouncing = true;
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: false,
+          stopped: true,
+        });
+      });
 
       runtimeScene.renderAndStep(1000 / fps);
 
-      // At next frame, end of collision should be detected
-      assertCollision(movingObject, staticObject, {
-        started: false,
-        collision: false,
-        stopped: true,
-      });
+      if (!hasFinishedBouncing) {
+        throw new Error('End of contact was not detected, nothing was tested.');
+      }
     });
   });
 

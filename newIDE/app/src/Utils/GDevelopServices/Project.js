@@ -1,41 +1,110 @@
 // @flow
 import axios from 'axios';
-import { GDevelopProjectApi } from './ApiConfigs';
-import optionalRequire from '../OptionalRequire';
-const remote = optionalRequire('@electron/remote');
+import {
+  GDevelopProjectApi,
+  GDevelopProjectResourcesStorage,
+} from './ApiConfigs';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
-const client = axios.create({
+type CloudProject = {|
+  id: string,
+  name: string,
+  createdAt: string,
+  currentVersion?: string,
+  deletedAt?: string,
+|};
+
+const projectResourcesClient = axios.create({
   withCredentials: true,
 });
 
-export const getToken = async (projectId: string): Promise<void> => {
-  const response = await client.get(
-    `${GDevelopProjectApi.baseUrl}/project/${projectId}/action/authorize`,
+export const getCredentialsForProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<boolean> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return false;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/authorize`,
     {
-      params: { userId: '45' },
-      withCredentials: true,
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+      validateStatus: status => true,
+    }
+  );
+  return response.status >= 200 && response.status < 400;
+};
+
+export const createCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectCreationPayload: { name: string }
+) => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return false;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopProjectApi.baseUrl}/project`,
+    cloudProjectCreationPayload,
+    {
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
     }
   );
   return response.data;
 };
 
-export const getFile = async (): Promise<void> => {
-  let cookie = null;
-  if (remote) {
-    const cookies = await remote.session.defaultSession.cookies.get({
-      domain: 'gdevelop.io',
-    });
-    cookies.forEach(cookie => {
-      console.log(cookie.domain);
-      console.log(cookie.value);
-    });
-  }
-  const response = await axios.get(
-    'https://project-resources-dev.gdevelop.io/project4/hello.txt',
+const commitVersion = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProject: CloudProject,
+  zippedProject: any
+) => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return false;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${GDevelopProjectApi.baseUrl}/project`,
+    zippedProject,
     {
-      withCredentials: true,
-      headers: {},
+      headers: { Authorization: authorizationHeader },
+      params: { userId },
+      validateStatus: status => true,
     }
   );
-  console.log(response.data);
+  return response.data;
+};
+
+export const listUserCloudProject = async (
+  authenticatedUser: AuthenticatedUser
+): Promise<?Array<CloudProject>> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(`${GDevelopProjectApi.baseUrl}/project`, {
+    headers: { Authorization: authorizationHeader },
+    params: { userId },
+  });
+  return response.data;
+};
+
+export const getProjectFileAsJson = async (
+  cloudProject: CloudProject
+): Promise<?Array<CloudProject>> => {
+  if (!cloudProject.currentVersion) {
+    throw new Error('Opening of project without current version not handled');
+  }
+  const response = await projectResourcesClient.get(
+    `${GDevelopProjectResourcesStorage.baseUrl}/${cloudProject.id}/versions/${
+      cloudProject.currentVersion
+    }`
+  );
+  return response.data;
 };

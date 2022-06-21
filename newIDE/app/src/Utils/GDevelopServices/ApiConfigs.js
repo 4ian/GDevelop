@@ -88,3 +88,9 @@ export const GDevelopProjectApi = {
     ? 'https://api-dev.gdevelop.io/project'
     : 'https://api.gdevelop.io/project',
 };
+
+export const GDevelopProjectResourcesStorage = {
+  baseUrl: isDev
+    ? 'https://project-resources-dev.gdevelop.io'
+    : 'https://project-resources.gdevelop.io',
+};

@@ -179,7 +179,7 @@ describe('Physics2RuntimeBehavior', () => {
       }
       movingObjectBehavior.setLinearVelocityY(40000);
 
-      let hasBounced = false;
+      let hasBegunBouncing = false;
       let stepIndex = 0;
 
       runtimeScene.setEventsFunction(() => {
@@ -192,7 +192,7 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: false,
           });
         } else {
-          hasBounced = true;
+          hasBegunBouncing = true;
           // At first frame, collision should have only started
           expect(movingObject.getY() < staticObject.getY()).to.be(true);
           assertCollision(movingObject, staticObject, {
@@ -203,17 +203,22 @@ describe('Physics2RuntimeBehavior', () => {
         }
       });
 
-      while (stepIndex < 10 && !hasBounced) {
+      while (stepIndex < 10 && !hasBegunBouncing) {
         runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
 
-      if (!hasBounced) {
-        throw new Error('Contact did not happen, nothing was tested.');
+      if (!hasBegunBouncing) {
+        throw new Error(
+          'Start of contact was not detected, nothing was tested.'
+        );
       }
 
       // At next frame, end of collision should be detected
+      let hasFinishedBouncing = false;
+
       runtimeScene.setEventsFunction(() => {
+        hasFinishedBouncing = true;
         assertCollision(movingObject, staticObject, {
           started: false,
           collision: false,
@@ -222,6 +227,10 @@ describe('Physics2RuntimeBehavior', () => {
       });
 
       runtimeScene.renderAndStep(1000 / fps);
+
+      if (!hasFinishedBouncing) {
+        throw new Error('End of contact was not detected, nothing was tested.');
+      }
     });
   });
 

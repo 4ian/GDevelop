@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -25,7 +26,8 @@ export type StorageProviderOperations = {|
   // Project opening:
   onOpenWithPicker?: () => Promise<?FileMetadata>,
   onOpen?: (
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    options?: { authenticatedUser?: AuthenticatedUser }
   ) => Promise<{|
     content: Object,
   |}>,

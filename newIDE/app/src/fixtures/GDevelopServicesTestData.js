@@ -786,32 +786,43 @@ const interpolateWithNoise = (
   rightValue: number,
   ratio: number
 ) =>
-  Math.round(
-    (1 - ratio) * leftValue +
-      ratio * rightValue +
-      (Math.random() * Math.max(leftValue, rightValue)) / 10
-  );
+  (1 - ratio) * leftValue +
+  ratio * rightValue +
+  (Math.random() * Math.max(leftValue, rightValue)) / 10;
 
 const generateGameRollingMetrics1 = () => {
   const metrics = [];
   const count = 30;
   for (let index = 0; index < count; index++) {
     const ratio = 1 - index / count;
+    const playersCount = Math.round(interpolateWithNoise(150, 250, ratio));
     metrics.push({
       date: formatISO(subDays(new Date(), index)),
 
       sessions: {
-        d0Sessions: interpolateWithNoise(250, 350, ratio),
-        d0SessionsDurationTotal: interpolateWithNoise(75000, 175000, ratio),
+        d0Sessions: Math.round(interpolateWithNoise(250, 350, ratio)),
+        d0SessionsDurationTotal: Math.round(
+          interpolateWithNoise(75000, 175000, ratio)
+        ),
       },
       players: {
-        d0Players: interpolateWithNoise(150, 250, ratio),
-        d0NewPlayers: interpolateWithNoise(80, 120, ratio),
-        d0PlayersBelow60s: interpolateWithNoise(72, 95, ratio),
-        d0PlayersBelow180s: interpolateWithNoise(11, 22, ratio),
-        d0PlayersBelow300s: interpolateWithNoise(31, 63, ratio),
-        d0PlayersBelow600s: interpolateWithNoise(28, 56, ratio),
-        d0PlayersBelow900s: interpolateWithNoise(7, 14, ratio),
+        d0Players: playersCount,
+        d0NewPlayers: Math.round(interpolateWithNoise(80, 120, ratio)),
+        d0PlayersBelow60s: Math.round(
+          playersCount * interpolateWithNoise(0.5, 0.4, ratio)
+        ),
+        d0PlayersBelow180s: Math.round(
+          playersCount * interpolateWithNoise(0.65, 0.55, ratio)
+        ),
+        d0PlayersBelow300s: Math.round(
+          playersCount * interpolateWithNoise(0.7, 0.6, ratio)
+        ),
+        d0PlayersBelow600s: Math.round(
+          playersCount * interpolateWithNoise(0.8, 0.7, ratio)
+        ),
+        d0PlayersBelow900s: Math.round(
+          playersCount * Math.min(1, interpolateWithNoise(1, 0.9, ratio))
+        ),
       },
       retention: {
         d1RetainedPlayers: 193,

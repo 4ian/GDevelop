@@ -131,8 +131,8 @@ describe('Physics2RuntimeBehavior', () => {
 
       let hasBounced = false;
       let stepIndex = 0;
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
         if (movingObjectBehavior.getLinearVelocityY() > 0) {
           // If the moving object has a positive velocity, it hasn't bounced
           // on the static object
@@ -150,9 +150,12 @@ describe('Physics2RuntimeBehavior', () => {
             stopped: true,
           });
         }
-
+      });
+      while (stepIndex < 10 && !hasBounced) {
+        runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
+
       if (!hasBounced) {
         throw new Error('Contact did not happen, nothing was tested.');
       }
@@ -178,8 +181,12 @@ describe('Physics2RuntimeBehavior', () => {
 
       let hasBounced = false;
       let stepIndex = 0;
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
+      // Seems like the events function is called even if hasBounce is true.
+      // So logic is added to handle such a case to test that collision ends.
+      let subStepIndex = 0;
+      let hasCollisionEndedBeenTested = false;
+
+      runtimeScene.setEventsFunction(() => {
         if (movingObjectBehavior.getLinearVelocityY() > 0) {
           // If the moving object has a positive velocity, it hasn't bounced
           // on the static object
@@ -190,28 +197,39 @@ describe('Physics2RuntimeBehavior', () => {
           });
         } else {
           hasBounced = true;
-          expect(movingObject.getY() < staticObject.getY()).to.be(true);
-          assertCollision(movingObject, staticObject, {
-            started: true,
-            collision: true,
-            stopped: false,
-          });
+          subStepIndex += 1;
+          if (subStepIndex === 1) {
+            // At first frame, collision should have only started
+            expect(movingObject.getY() < staticObject.getY()).to.be(true);
+            assertCollision(movingObject, staticObject, {
+              started: true,
+              collision: true,
+              stopped: false,
+            });
+          } else if (subStepIndex === 3) {
+            // At next frame, end of collision should be detected
+            assertCollision(movingObject, staticObject, {
+              started: false,
+              collision: false,
+              stopped: true,
+            });
+            hasCollisionEndedBeenTested = true;
+          }
         }
+      });
 
+      while (stepIndex < 10 && !hasBounced) {
+        runtimeScene.renderAndStep(1000 / fps);
         stepIndex++;
       }
+
       if (!hasBounced) {
         throw new Error('Contact did not happen, nothing was tested.');
       }
 
-      runtimeScene.renderAndStep(1000 / fps);
-
-      // At next frame, end of collision should be detected
-      assertCollision(movingObject, staticObject, {
-        started: false,
-        collision: false,
-        stopped: true,
-      });
+      if (!hasCollisionEndedBeenTested) {
+        runtimeScene.renderAndStep(1000 / fps);
+      }
     });
   });
 

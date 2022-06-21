@@ -668,7 +668,7 @@ namespace gdjs {
        * The duration that is already sent to the service
        * (in milliseconds).
        **/
-      let sendedDuration = 0;
+      let sentDuration = 0;
       /**
        * The duration that is not yet sent to the service to avoid flooding
        * (in milliseconds).
@@ -738,9 +738,11 @@ namespace gdjs {
         if (notYetSentDuration < 5 * 1000) {
           return;
         }
-        const onlySeconds = Math.floor(notYetSentDuration / 1000) * 1000;
-        sendedDuration += onlySeconds;
-        notYetSentDuration -= onlySeconds;
+        // The backend use seconds for duration.
+        // The milliseconds will stay in notYetSentDuration.
+        const toBeSentDuration = Math.floor(notYetSentDuration / 1000) * 1000;
+        sentDuration += toBeSentDuration;
+        notYetSentDuration -= toBeSentDuration;
 
         navigator.sendBeacon(
           baseUrl + '/session-hit',
@@ -748,7 +750,7 @@ namespace gdjs {
             gameId: this._data.properties.projectUuid,
             playerId: this._playerId,
             sessionId: this._sessionId,
-            duration: Math.floor(sendedDuration / 1000),
+            duration: Math.floor(sentDuration / 1000),
           })
         );
       };

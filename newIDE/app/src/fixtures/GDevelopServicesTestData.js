@@ -839,16 +839,18 @@ const generateGameRollingMetrics1 = () => {
 };
 
 export const gameRollingMetrics1: GameMetrics[] = generateGameRollingMetrics1();
-export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
-  date: '2020-10-01',
+export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = [
+  {
+    date: '2020-10-01',
 
-  sessions: {
-    d0Sessions: 350,
-    d0SessionsDurationTotal: 175000,
+    sessions: {
+      d0Sessions: 350,
+      d0SessionsDurationTotal: 175000,
+    },
+    players: null,
+    retention: null,
   },
-  players: null,
-  retention: null,
-};
+];
 
 export const showcasedGame1: ShowcasedGame = {
   title: "Lil BUB's HELLO EARTH",

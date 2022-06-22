@@ -46,44 +46,118 @@ import {
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 type ChartData = {|
-  byDay: {
+  overview: {|
+    viewersCount: number,
+    playersCount: number,
+    bounceRatio: number,
+    meanPlayedTimeInMinutes: number,
+    nearestToMedianDurationPlayersCount: number,
+    nearestToMedianDurationPlayersRatio: number,
+    nearestToMedianDurationInMinutes: number,
+  |},
+  byDay: {|
     timestamp: number,
     date: string,
     playersCount: number,
     viewersCount: number,
     meanPlayedTime: number,
-  }[],
-  byPlayedTime: { duration: number, playersCount: number }[],
+
+    over60sPlayersCount: number,
+    over180sPlayersCount: number,
+    over300sPlayersCount: number,
+    over600sPlayersCount: number,
+    over900sPlayersCount: number,
+
+    below60sPlayersCount: number,
+    from60sTo180sPlayersCount: number,
+    from180sTo300sPlayersCount: number,
+    from300sTo600sPlayersCount: number,
+    from600sTo900sPlayersCount: number,
+    from900sToInfinityPlayersCount: number,
+
+    over0sPlayersRatio: number,
+    over60sPlayersRatio: number,
+    over180sPlayersRatio: number,
+    over300sPlayersRatio: number,
+    over600sPlayersRatio: number,
+    over900sPlayersRatio: number,
+
+    below60sPlayersRatio: number,
+    from60sTo180sPlayersRatio: number,
+    from180sTo300sPlayersRatio: number,
+    from300sTo600sPlayersRatio: number,
+    from600sTo900sPlayersRatio: number,
+    from900sToInfinityPlayersRatio: number,
+  |}[],
+  byPlayedTime: {| duration: number, playersCount: number |}[],
 |};
 
+const durationIndexes: { [string]: number } = {
+  for1Minute: 0,
+  for3Minutes: 1,
+  for5Minutes: 2,
+  for10Minutes: 3,
+  for15Minutes: 4,
+};
+const durationValues = [1, 3, 5, 10, 15];
+
 const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
-  let playersBelow60sSum = 0;
-  let playersBelow180sSum = 0;
-  let playersBelow300sSum = 0;
-  let playersBelow600sSum = 0;
-  let playersBelow900sSum = 0;
+  let playersBelowSum = [0, 0, 0, 0, 0];
   let playersSum = 0;
+  let playedDurationSumInMinutes = 0;
 
   metrics.forEach(metric => {
-    playersBelow60sSum += metric.players ? metric.players.d0PlayersBelow60s : 0;
-    playersBelow180sSum += metric.players
+    playersBelowSum[durationIndexes.for1Minute] += metric.players
+      ? metric.players.d0PlayersBelow60s
+      : 0;
+    playersBelowSum[durationIndexes.for3Minutes] += metric.players
       ? metric.players.d0PlayersBelow180s
       : 0;
-    playersBelow300sSum += metric.players
+    playersBelowSum[durationIndexes.for5Minutes] += metric.players
       ? metric.players.d0PlayersBelow300s
       : 0;
-    playersBelow600sSum += metric.players
+    playersBelowSum[durationIndexes.for10Minutes] += metric.players
       ? metric.players.d0PlayersBelow600s
       : 0;
-    playersBelow900sSum += metric.players
+    playersBelowSum[durationIndexes.for15Minutes] += metric.players
       ? metric.players.d0PlayersBelow900s
       : 0;
     playersSum += metric.players ? metric.players.d0Players : 0;
+    playedDurationSumInMinutes += metric.sessions
+      ? metric.sessions.d0SessionsDurationTotal / 60
+      : 0;
   });
+
+  const viewersCount = playersSum;
+  const playersCount = playersSum - playersBelowSum[durationIndexes.for1Minute];
+
+  const overMedianDurationIndex = playersBelowSum.findIndex(
+    (value, index) => index > 0 && value > playersCount / 2
+  );
+  const overMedianDuration = playersBelowSum[overMedianDurationIndex];
+  const underMedianDuration = playersBelowSum[overMedianDurationIndex + 1];
+  const nearestToMedianDurationIndex =
+    underMedianDuration &&
+    Math.abs(overMedianDuration - playersSum / 2) <
+      Math.abs(underMedianDuration - playersSum / 2)
+      ? overMedianDurationIndex
+      : overMedianDurationIndex + 1;
 
   const dateFormatOptions = { month: 'short', day: 'numeric' };
 
   return {
+    overview: {
+      viewersCount: viewersCount,
+      playersCount: playersCount,
+      bounceRatio: playersCount / viewersCount,
+      meanPlayedTimeInMinutes: playedDurationSumInMinutes / playersSum,
+      nearestToMedianDurationPlayersCount:
+        playersBelowSum[nearestToMedianDurationIndex],
+      nearestToMedianDurationPlayersRatio:
+        playersBelowSum[nearestToMedianDurationIndex] / playersSum,
+      nearestToMedianDurationInMinutes:
+        durationValues[nearestToMedianDurationIndex],
+    },
     byDay: metrics
       .map(metric => ({
         timestamp: parseISO(metric.date).getTime(),
@@ -91,12 +165,12 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
           undefined,
           dateFormatOptions
         ),
-        meanPlayedTime: metric.sessions
-          ? Math.round(
-              metric.sessions.d0SessionsDurationTotal /
-                metric.sessions.d0Sessions
-            )
-          : 0,
+        meanPlayedTimeInMinutes:
+          metric.sessions && metric.players
+            ? metric.sessions.d0SessionsDurationTotal /
+              60 /
+              metric.players.d0Players
+            : 0,
         viewersCount: metric.players ? metric.players.d0Players : 0,
         playersCount: metric.players
           ? metric.players.d0Players - metric.players.d0PlayersBelow60s
@@ -190,13 +264,14 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
           : 0,
       }))
       .sort((a, b) => a.timestamp - b.timestamp),
-    byPlayedTime: [
-      { duration: 1, playersCount: playersBelow60sSum },
-      { duration: 3, playersCount: playersBelow180sSum - playersBelow60sSum },
-      { duration: 5, playersCount: playersBelow300sSum - playersBelow180sSum },
-      { duration: 10, playersCount: playersBelow600sSum - playersBelow300sSum },
-      { duration: 15, playersCount: playersBelow900sSum - playersBelow600sSum },
-    ],
+    byPlayedTime: Object.values(durationIndexes).map(
+      (durationIndex: number) => ({
+        duration: durationValues[durationIndex],
+        playersCount:
+          playersBelowSum[durationIndex] -
+          (durationIndex > 0 ? playersBelowSum[durationIndex - 1] : 0),
+      })
+    ),
   };
 };
 
@@ -217,7 +292,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
     () =>
       gameRollingMetrics
         ? evaluateChartData(gameRollingMetrics)
-        : { byDay: [], byPlayedTime: [] },
+        : { overview: {}, byDay: [], byPlayedTime: [] },
     [gameRollingMetrics]
   );
 
@@ -295,37 +370,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
           </PlaceholderError>
         ) : (
           <ColumnStackLayout expand>
-            <Line noMargin alignItems="center">
-              <Text size="title">
-                <Trans>Consolidated metrics</Trans>
-              </Text>
-              <Spacer />
+            <Column expand noMargin alignItems="center">
               {!publicGame && <CircularProgress size={20} />}
-            </Line>
-            <Table>
-              <TableBody>
-                <TableRow>
-                  <TableRowColumn>
-                    <Trans>Last week sessions count</Trans>
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.tableRowStatColumn}>
-                    {publicGame && publicGame.cachedLastWeekSessionsCount
-                      ? publicGame.cachedLastWeekSessionsCount
-                      : '-'}
-                  </TableRowColumn>
-                </TableRow>
-                <TableRow>
-                  <TableRowColumn>
-                    <Trans>Last year sessions count</Trans>
-                  </TableRowColumn>
-                  <TableRowColumn style={styles.tableRowStatColumn}>
-                    {publicGame && publicGame.cachedLastYearSessionsCount
-                      ? publicGame.cachedLastYearSessionsCount
-                      : '-'}
-                  </TableRowColumn>
-                </TableRow>
-              </TableBody>
-            </Table>
+            </Column>
             {gameRollingMetrics &&
             (!gameRollingMetrics[0].retention ||
               !gameRollingMetrics[0].players) ? (
@@ -338,7 +385,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
               <Column expand noMargin alignItems="center">
                 <Line noMargin>
                   <Text size="title" align="center">
-                    <Trans>Players</Trans>
+                    <Trans>
+                      {chartData.overview.playersCount} players this month
+                    </Trans>
                   </Text>
                 </Line>
                 <ResponsiveContainer width="100%" height={300}>
@@ -387,7 +436,10 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
               <Column expand noMargin alignItems="center">
                 <Line noMargin>
                   <Text size="title" align="center">
-                    <Trans>Mean played time</Trans>
+                    <Trans>
+                      {Math.round(chartData.overview.meanPlayedTimeInMinutes)}{' '}
+                      minutes per player
+                    </Trans>
                   </Text>
                 </Line>
                 <ResponsiveContainer width="100%" height={300}>
@@ -398,7 +450,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <RechartsLine
                       name={i18n._(t`Mean played time`)}
                       type="monotone"
-                      dataKey="meanPlayedTime"
+                      dataKey="meanPlayedTimeInMinutes"
                       stroke={gdevelopTheme.chart.dataColor1}
                       yAxisId={0}
                     />
@@ -412,7 +464,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       style={styles.tickLabel}
                     />
                     <YAxis
-                      dataKey="meanPlayedTime"
+                      dataKey="meanPlayedTimeInMinutes"
                       stroke={gdevelopTheme.chart.textColor}
                       style={styles.tickLabel}
                     />
@@ -465,7 +517,12 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
               <Column expand noMargin alignItems="center">
                 <Line noMargin>
                   <Text size="title" align="center">
-                    <Trans>Players by played time</Trans>
+                    <Trans>
+                      {chartData.overview.nearestToMedianDurationPlayersCount}{' '}
+                      players >{' '}
+                      {chartData.overview.nearestToMedianDurationInMinutes}{' '}
+                      minutes
+                    </Trans>
                   </Text>
                 </Line>
                 <ResponsiveContainer width="100%" height={300}>
@@ -548,7 +605,15 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
               <Column expand noMargin alignItems="center">
                 <Line noMargin>
                   <Text size="title" align="center">
-                    <Trans>Players by played time</Trans>
+                    <Trans>
+                      {Math.round(
+                        chartData.overview.nearestToMedianDurationPlayersRatio *
+                          100
+                      )}
+                      % of players >{' '}
+                      {chartData.overview.nearestToMedianDurationInMinutes}{' '}
+                      minutes
+                    </Trans>
                   </Text>
                 </Line>
                 <ResponsiveContainer width="100%" height={300}>

@@ -44,13 +44,7 @@ type InitialStorageProviderAndFileMetadata = {|
   initialFileMetadataToOpen: ?FileMetadata,
 |};
 
-type State = {|
-  ...InitialStorageProviderAndFileMetadata,
-  storageProviderOperations: ?StorageProviderOperations,
-  renderDialog: ?() => React.Node,
-|};
-
-const computeInitialFileMetadataToOpen = (
+const computeDefaultConfiguration = (
   defaultStorageProvider: ?StorageProvider,
   storageProviders: Array<StorageProvider>,
   appArguments: AppArguments
@@ -81,86 +75,74 @@ const computeInitialFileMetadataToOpen = (
   return candidates[0];
 };
 
-export default class ProjectStorageProviders extends React.Component<
-  Props,
-  State
-> {
-  state = {
-    ...computeInitialFileMetadataToOpen(
-      this.props.defaultStorageProvider,
-      this.props.storageProviders,
-      this.props.appArguments
-    ),
-    storageProviderOperations: null,
-    renderDialog: null,
+const ProjectStorageProviders = (props: Props) => {
+  const [
+    storageProviderOperations,
+    setStorageProviderOperations,
+  ] = React.useState<?StorageProviderOperations>(null);
+  const [renderDialog, setRenderDialog] = React.useState<?() => React.Node>(
+    null
+  );
+  const defaultConfiguration = computeDefaultConfiguration(
+    props.defaultStorageProvider,
+    props.storageProviders,
+    props.appArguments
+  );
+  const [
+    currentStorageProvider,
+    setCurrentStorageProvider,
+  ] = React.useState<?StorageProvider>(
+    defaultConfiguration.currentStorageProvider
+  );
+
+  const setDialog = (_renderDialog: () => React.Node) => {
+    setRenderDialog(_renderDialog);
   };
 
-  _setDialog = (renderDialog: () => React.Node) => {
-    this.setState({
-      renderDialog,
-    });
+  const closeDialog = () => {
+    setRenderDialog(null);
   };
 
-  _closeDialog = () => {
-    this.setState({
-      renderDialog: null,
-    });
-  };
-
-  _getStorageProviderOperations = (
-    storageProvider: ?StorageProvider
+  const getStorageProviderOperations = async (
+    newStorageProvider: ?StorageProvider
   ): Promise<StorageProviderOperations> => {
     // Avoid creating a new storageProviderOperations
     // if we're not changing the storage provider.
-    if (
-      !storageProvider ||
-      storageProvider === this.state.currentStorageProvider
-    ) {
-      if (this.state.storageProviderOperations) {
-        return Promise.resolve(this.state.storageProviderOperations);
+    if (!newStorageProvider || newStorageProvider === currentStorageProvider) {
+      if (storageProviderOperations) {
+        return storageProviderOperations;
       }
     }
 
-    const newStorageProvider: StorageProvider =
-      storageProvider ||
-      this.state.currentStorageProvider ||
-      emptyStorageProvider;
-    const storageProviderOperations = newStorageProvider.createOperations({
-      setDialog: this._setDialog,
-      closeDialog: this._closeDialog,
+    const storageProviderToUse: StorageProvider =
+      newStorageProvider || currentStorageProvider || emptyStorageProvider;
+    const storageProviderOperationsToUse = storageProviderToUse.createOperations({
+      setDialog,
+      closeDialog,
     });
 
-    return new Promise(resolve => {
-      this.setState(
-        {
-          currentStorageProvider: newStorageProvider,
-          storageProviderOperations,
-        },
-        () => {
-          resolve(storageProviderOperations);
-        }
-      );
-    });
+    setCurrentStorageProvider(storageProviderToUse);
+    setStorageProviderOperations(storageProviderOperationsToUse);
+
+    return storageProviderOperationsToUse;
   };
 
-  _getStorageProvider = () => {
-    return this.state.currentStorageProvider || emptyStorageProvider;
+  const getStorageProvider = () => {
+    return currentStorageProvider || emptyStorageProvider;
   };
 
-  render() {
-    const { children, storageProviders } = this.props;
-    const { renderDialog, initialFileMetadataToOpen } = this.state;
+  return (
+    <React.Fragment>
+      {props.children({
+        storageProviders: props.storageProviders,
+        getStorageProviderOperations,
+        initialFileMetadataToOpen:
+          defaultConfiguration.initialFileMetadataToOpen,
+        getStorageProvider,
+      })}
+      {renderDialog && renderDialog()}
+    </React.Fragment>
+  );
+};
 
-    return (
-      <React.Fragment>
-        {children({
-          storageProviders,
-          getStorageProviderOperations: this._getStorageProviderOperations,
-          initialFileMetadataToOpen,
-          getStorageProvider: this._getStorageProvider,
-        })}
-        {renderDialog && renderDialog()}
-      </React.Fragment>
-    );
-  }
-}
+export default ProjectStorageProviders;

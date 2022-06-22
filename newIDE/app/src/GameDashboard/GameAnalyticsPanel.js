@@ -52,7 +52,7 @@ type ChartData = {|
     bounceRatio: number,
     meanPlayedTimeInMinutes: number,
     nearestToMedianDurationPlayersCount: number,
-    nearestToMedianDurationPlayersRatio: number,
+    nearestToMedianDurationPlayersPercent: number,
     nearestToMedianDurationInMinutes: number,
   |},
   byDay: {|
@@ -75,19 +75,19 @@ type ChartData = {|
     from600sTo900sPlayersCount: number,
     from900sToInfinityPlayersCount: number,
 
-    over0sPlayersRatio: number,
-    over60sPlayersRatio: number,
-    over180sPlayersRatio: number,
-    over300sPlayersRatio: number,
-    over600sPlayersRatio: number,
-    over900sPlayersRatio: number,
+    over0sPlayersPercent: number,
+    over60sPlayersPercent: number,
+    over180sPlayersPercent: number,
+    over300sPlayersPercent: number,
+    over600sPlayersPercent: number,
+    over900sPlayersPercent: number,
 
-    below60sPlayersRatio: number,
-    from60sTo180sPlayersRatio: number,
-    from180sTo300sPlayersRatio: number,
-    from300sTo600sPlayersRatio: number,
-    from600sTo900sPlayersRatio: number,
-    from900sToInfinityPlayersRatio: number,
+    below60sPlayersPercent: number,
+    from60sTo180sPlayersPercent: number,
+    from180sTo300sPlayersPercent: number,
+    from300sTo600sPlayersPercent: number,
+    from600sTo900sPlayersPercent: number,
+    from900sToInfinityPlayersPercent: number,
   |}[],
   byPlayedTime: {| duration: number, playersCount: number |}[],
 |};
@@ -153,8 +153,8 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
       meanPlayedTimeInMinutes: playedDurationSumInMinutes / playersSum,
       nearestToMedianDurationPlayersCount:
         playersBelowSum[nearestToMedianDurationIndex],
-      nearestToMedianDurationPlayersRatio:
-        playersBelowSum[nearestToMedianDurationIndex] / playersSum,
+      nearestToMedianDurationPlayersPercent:
+        (100 * playersBelowSum[nearestToMedianDurationIndex]) / playersSum,
       nearestToMedianDurationInMinutes:
         durationValues[nearestToMedianDurationIndex],
     },
@@ -213,53 +213,63 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
           ? metric.players.d0Players - metric.players.d0PlayersBelow900s
           : 0,
 
-        over0sPlayersRatio: metric.players ? 1 : 0,
-        over60sPlayersRatio: metric.players
-          ? (metric.players.d0Players - metric.players.d0PlayersBelow60s) /
+        over0sPlayersPercent: metric.players ? 100 : 0,
+        over60sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0Players - metric.players.d0PlayersBelow60s)) /
             metric.players.d0Players
           : 0,
-        over180sPlayersRatio: metric.players
-          ? (metric.players.d0Players - metric.players.d0PlayersBelow180s) /
+        over180sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0Players - metric.players.d0PlayersBelow180s)) /
             metric.players.d0Players
           : 0,
-        over300sPlayersRatio: metric.players
-          ? (metric.players.d0Players - metric.players.d0PlayersBelow300s) /
+        over300sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0Players - metric.players.d0PlayersBelow300s)) /
             metric.players.d0Players
           : 0,
-        over600sPlayersRatio: metric.players
-          ? (metric.players.d0Players - metric.players.d0PlayersBelow600s) /
+        over600sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0Players - metric.players.d0PlayersBelow600s)) /
             metric.players.d0Players
           : 0,
-        over900sPlayersRatio: metric.players
-          ? (metric.players.d0Players - metric.players.d0PlayersBelow900s) /
+        over900sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0Players - metric.players.d0PlayersBelow900s)) /
             metric.players.d0Players
           : 0,
 
-        below60sPlayersRatio: metric.players
-          ? metric.players.d0PlayersBelow60s / metric.players.d0Players
+        below60sPlayersPercent: metric.players
+          ? (100 * metric.players.d0PlayersBelow60s) / metric.players.d0Players
           : 0,
-        from60sTo180sPlayersRatio: metric.players
-          ? (metric.players.d0PlayersBelow180s -
-              metric.players.d0PlayersBelow60s) /
+        from60sTo180sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0PlayersBelow180s -
+                metric.players.d0PlayersBelow60s)) /
             metric.players.d0Players
           : 0,
-        from180sTo300sPlayersRatio: metric.players
-          ? (metric.players.d0PlayersBelow300s -
-              metric.players.d0PlayersBelow180s) /
+        from180sTo300sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0PlayersBelow300s -
+                metric.players.d0PlayersBelow180s)) /
             metric.players.d0Players
           : 0,
-        from300sTo600sPlayersRatio: metric.players
-          ? (metric.players.d0PlayersBelow600s -
-              metric.players.d0PlayersBelow300s) /
+        from300sTo600sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0PlayersBelow600s -
+                metric.players.d0PlayersBelow300s)) /
             metric.players.d0Players
           : 0,
-        from600sTo900sPlayersRatio: metric.players
-          ? (metric.players.d0PlayersBelow900s -
-              metric.players.d0PlayersBelow600s) /
+        from600sTo900sPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0PlayersBelow900s -
+                metric.players.d0PlayersBelow600s)) /
             metric.players.d0Players
           : 0,
-        from900sToInfinityPlayersRatio: metric.players
-          ? (metric.players.d0Players - metric.players.d0PlayersBelow900s) /
+        from900sToInfinityPlayersPercent: metric.players
+          ? (100 *
+              (metric.players.d0Players - metric.players.d0PlayersBelow900s)) /
             metric.players.d0Players
           : 0,
       }))
@@ -273,6 +283,14 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
       })
     ),
   };
+};
+
+const minutesFormatter = value => {
+  return value.toFixed(2);
+};
+
+const percentFormatter = value => {
+  return value.toFixed(2);
 };
 
 type Props = {|
@@ -449,6 +467,8 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                   >
                     <RechartsLine
                       name={i18n._(t`Mean played time`)}
+                      unit={' ' + i18n._(t`minutes`)}
+                      formatter={minutesFormatter}
                       type="monotone"
                       dataKey="meanPlayedTimeInMinutes"
                       stroke={gdevelopTheme.chart.dataColor1}
@@ -607,8 +627,8 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                   <Text size="title" align="center">
                     <Trans>
                       {Math.round(
-                        chartData.overview.nearestToMedianDurationPlayersRatio *
-                          100
+                        chartData.overview
+                          .nearestToMedianDurationPlayersPercent * 100
                       )}
                       % of players >{' '}
                       {chartData.overview.nearestToMedianDurationInMinutes}{' '}
@@ -624,7 +644,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Area
                       name={i18n._(t`Viewers`)}
                       type="monotone"
-                      dataKey="over0sPlayersRatio"
+                      dataKey="over0sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       stroke={gdevelopTheme.chart.dataColor1}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.125}
@@ -633,7 +655,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Area
                       name={i18n._(t`Players`)}
                       type="monotone"
-                      dataKey="over60sPlayersRatio"
+                      dataKey="over60sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       stroke={gdevelopTheme.chart.dataColor1}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.125}
@@ -642,7 +666,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Area
                       name={i18n._(t`Played > 3 minutes`)}
                       type="monotone"
-                      dataKey="over180sPlayersRatio"
+                      dataKey="over180sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       stroke={gdevelopTheme.chart.dataColor1}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.125}
@@ -651,7 +677,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Area
                       name={i18n._(t`Played > 5 minutes`)}
                       type="monotone"
-                      dataKey="over300sPlayersRatio"
+                      dataKey="over300sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       stroke={gdevelopTheme.chart.dataColor1}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.125}
@@ -660,7 +688,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Area
                       name={i18n._(t`Played > 10 minutes`)}
                       type="monotone"
-                      dataKey="over600sPlayersRatio"
+                      dataKey="over600sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       stroke={gdevelopTheme.chart.dataColor1}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.125}
@@ -669,7 +699,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Area
                       name={i18n._(t`Played > 15 minutes`)}
                       type="monotone"
-                      dataKey="over900sPlayersRatio"
+                      dataKey="over900sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       stroke={gdevelopTheme.chart.dataColor1}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.125}
@@ -685,9 +717,10 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       style={styles.tickLabel}
                     />
                     <YAxis
-                      dataKey="over0sPlayersRatio"
+                      dataKey="over0sPlayersPercent"
                       stroke={gdevelopTheme.chart.textColor}
                       style={styles.tickLabel}
+                      unit={' %'}
                     />
                     <Tooltip contentStyle={styles.tooltipContent} />
                   </AreaChart>
@@ -787,7 +820,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Bar
                       name={i18n._(t`More than 15 minutes`)}
                       stackId="a"
-                      dataKey="from900sToInfinityPlayersRatio"
+                      dataKey="from900sToInfinityPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={1}
                       yAxisId={0}
@@ -795,7 +830,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Bar
                       name={i18n._(t`From 10 to 15 minutes`)}
                       stackId="a"
-                      dataKey="from600sTo900sPlayersRatio"
+                      dataKey="from600sTo900sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.75}
                       yAxisId={0}
@@ -803,7 +840,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Bar
                       name={i18n._(t`From 5 to 10 minutes`)}
                       stackId="a"
-                      dataKey="from300sTo600sPlayersRatio"
+                      dataKey="from300sTo600sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.75 ** 2}
                       yAxisId={0}
@@ -811,7 +850,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Bar
                       name={i18n._(t`From 3 to 5 minutes`)}
                       stackId="a"
-                      dataKey="from180sTo300sPlayersRatio"
+                      dataKey="from180sTo300sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.75 ** 3}
                       yAxisId={0}
@@ -819,7 +860,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Bar
                       name={i18n._(t`From 1 to 3 minutes`)}
                       stackId="a"
-                      dataKey="from60sTo180sPlayersRatio"
+                      dataKey="from60sTo180sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.75 ** 4}
                       yAxisId={0}
@@ -827,7 +870,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                     <Bar
                       name={i18n._(t`Less than 1 minute`)}
                       stackId="a"
-                      dataKey="below60sPlayersRatio"
+                      dataKey="below60sPlayersPercent"
+                      formatter={percentFormatter}
+                      unit={' %'}
                       fill={gdevelopTheme.chart.dataColor1}
                       fillOpacity={0.75 ** 6}
                       yAxisId={0}
@@ -843,9 +888,10 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       style={styles.tickLabel}
                     />
                     <YAxis
-                      dataKey="over0sPlayersRatio"
+                      dataKey="over0sPlayersPercent"
                       stroke={gdevelopTheme.chart.textColor}
                       style={styles.tickLabel}
+                      unit={' %'}
                     />
                     <Tooltip contentStyle={styles.tooltipContent} />
                   </BarChart>

@@ -274,13 +274,11 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
           : 0,
       }))
       .sort((a, b) => a.timestamp - b.timestamp),
-    byPlayedTime: Object.values(durationIndexes).map(
-      (durationIndex: number) => ({
+    byPlayedTime: [{ duration: 0, playersCount: viewersCount }].concat(
+      Object.values(durationIndexes).map((durationIndex: number) => ({
         duration: durationValues[durationIndex],
-        playersCount:
-          playersBelowSum[durationIndex] -
-          (durationIndex > 0 ? playersBelowSum[durationIndex - 1] : 0),
-      })
+        playersCount: viewersCount - playersBelowSum[durationIndex],
+      }))
     ),
   };
 };
@@ -499,15 +497,17 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                   </Text>
                 </Line>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart
+                  <AreaChart
                     data={chartData.byPlayedTime}
                     margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
                   >
-                    <RechartsLine
+                    <Area
                       name={i18n._(t`Players`)}
                       type="monotone"
                       dataKey="playersCount"
                       stroke={gdevelopTheme.chart.dataColor1}
+                      fill={gdevelopTheme.chart.dataColor1}
+                      fillOpacity={0.25}
                       yAxisId={0}
                     />
                     <XAxis
@@ -529,7 +529,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       strokeDasharray="3 3"
                     />
                     <Tooltip contentStyle={styles.tooltipContent} />
-                  </LineChart>
+                  </AreaChart>
                 </ResponsiveContainer>
               </Column>
             </ResponsiveLineStackLayout>

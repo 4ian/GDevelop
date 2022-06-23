@@ -5,6 +5,7 @@ import {
   type StorageProviderOperations,
   type FileMetadata,
 } from '.';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import { type AppArguments } from '../Utils/Window';
 
 /**
@@ -94,6 +95,7 @@ const ProjectStorageProviders = (props: Props) => {
   ] = React.useState<?StorageProvider>(
     defaultConfiguration.currentStorageProvider
   );
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const setDialog = (_renderDialog: () => React.Node) => {
     setRenderDialog(_renderDialog);
@@ -119,6 +121,7 @@ const ProjectStorageProviders = (props: Props) => {
     const storageProviderOperationsToUse = storageProviderToUse.createOperations({
       setDialog,
       closeDialog,
+      authenticatedUser
     });
 
     setCurrentStorageProvider(storageProviderToUse);

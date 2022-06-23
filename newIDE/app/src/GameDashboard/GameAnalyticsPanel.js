@@ -45,6 +45,59 @@ import {
 } from 'recharts';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
+export type MergedGameMetrics = GameMetrics & {
+  endDate: string,
+};
+
+const mergeGameMetrics = (
+  a: GameMetrics,
+  b: GameMetrics
+): MergedGameMetrics => {
+  return {
+    gameId: a.gameId,
+
+    date: a.date,
+    endDate: b.date,
+
+    sessions: {
+      d0Sessions: a.sessions.d0Sessions + b.sessions.d0Sessions,
+      d0SessionsDurationTotal:
+        a.sessions.d0SessionsDurationTotal + b.sessions.d0SessionsDurationTotal,
+    },
+
+    players: {
+      d0Players: a.players.d0Players + b.players.d0Players,
+      d0NewPlayers: a.players.d0NewPlayers + b.players.d0NewPlayers,
+      d0PlayersBelow60s:
+        a.players.d0PlayersBelow60s + b.players.d0PlayersBelow60s,
+      d0PlayersBelow180s:
+        a.players.d0PlayersBelow180s + b.players.d0PlayersBelow180s,
+      d0PlayersBelow300s:
+        a.players.d0PlayersBelow300s + b.players.d0PlayersBelow300s,
+      d0PlayersBelow600s:
+        a.players.d0PlayersBelow600s + b.players.d0PlayersBelow600s,
+      d0PlayersBelow900s:
+        a.players.d0PlayersBelow900s + b.players.d0PlayersBelow900s,
+    },
+
+    retention: null,
+  };
+};
+
+const mergeGameMetricsByWeek = (
+  gameMetrics: GameMetrics[]
+): MergedGameMetrics[] => {
+  const mergedGameMetrics: Array<MergedGameMetrics> = [];
+  for (let weekIndex = 7; weekIndex < gameMetrics.length; weekIndex += 7) {
+    let mergedGameMetric = gameMetrics[weekIndex];
+    for (let index = weekIndex + 1; index < weekIndex + 7; index++) {
+      mergedGameMetric = mergeGameMetrics(mergedGameMetric, gameMetrics[index]);
+    }
+    mergedGameMetrics.push(((mergedGameMetric: any): MergedGameMetrics));
+  }
+  return mergedGameMetrics;
+};
+
 type ChartData = {|
   overview: {|
     viewersCount: number,
@@ -157,7 +210,9 @@ const findGreaterDurationPlayerIndex = (
   return greaterDurationPlayerIndex;
 };
 
-const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
+const evaluateChartData = (
+  metrics: GameMetrics[] | MergedGameMetrics[]
+): ChartData => {
   let playersBelowSums = [0, 0, 0, 0, 0];
   let playersSum = 0;
   let playedDurationSumInMinutes = 0;
@@ -203,24 +258,31 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
     overview: {
       viewersCount: viewersCount,
       playersCount: playersCount,
-      bounceRatePercent: (100 * playersCount) / viewersCount,
-      meanPlayedDurationInMinutes: playedDurationSumInMinutes / playersSum,
+      bounceRatePercent:
+        viewersCount > 0 ? (100 * playersCount) / viewersCount : 0,
+      meanPlayedDurationInMinutes:
+        playersSum > 0 ? playedDurationSumInMinutes / playersSum : 0,
       nearestToMedianDuration: {
         playersCount:
           viewersCount - playersBelowSums[nearestToMedianDurationIndex],
         playersPercent:
-          (100 *
-            (viewersCount - playersBelowSums[nearestToMedianDurationIndex])) /
-          playersSum,
+          playersSum > 0
+            ? (100 *
+                (viewersCount -
+                  playersBelowSums[nearestToMedianDurationIndex])) /
+              playersSum
+            : 0,
         durationInMinutes: durationValues[nearestToMedianDurationIndex],
       },
       greaterDurationPlayerSurface: {
         playersCount:
           viewersCount - playersBelowSums[greaterDurationPlayerIndex],
         playersPercent:
-          (100 *
-            (viewersCount - playersBelowSums[greaterDurationPlayerIndex])) /
-          playersSum,
+          playersSum > 0
+            ? (100 *
+                (viewersCount - playersBelowSums[greaterDurationPlayerIndex])) /
+              playersSum
+            : 0,
         durationInMinutes: durationValues[greaterDurationPlayerIndex],
       },
     },
@@ -373,10 +435,17 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
-  const chartData = React.useMemo(
+  const yearChartData = React.useMemo(
     () =>
       gameRollingMetrics
-        ? evaluateChartData(gameRollingMetrics)
+        ? evaluateChartData(mergeGameMetricsByWeek(gameRollingMetrics))
+        : emptyChartData,
+    [gameRollingMetrics]
+  );
+  const monthChartData = React.useMemo(
+    () =>
+      gameRollingMetrics
+        ? evaluateChartData(gameRollingMetrics.slice(0, 30))
         : emptyChartData,
     [gameRollingMetrics]
   );
@@ -385,8 +454,11 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
     null
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
+  const [dataPeriod, setDataPeriod] = React.useState('month');
+  const chartData = dataPeriod === 'year' ? yearChartData : monthChartData;
 
-  const lastMonthIsoDate = formatISO(subDays(new Date(), 30), {
+  // It's divisible by 7.
+  const lastYearIsoDate = formatISO(subDays(new Date(), 364), {
     representation: 'date',
   });
 
@@ -419,7 +491,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
           getAuthorizationHeader,
           id,
           game.id,
-          lastMonthIsoDate
+          lastYearIsoDate
         );
         setGameMetrics(gameRollingMetrics);
       } catch (err) {
@@ -428,7 +500,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
       }
       setIsGameMetricsLoading(false);
     },
-    [getAuthorizationHeader, profile, game, lastMonthIsoDate]
+    [getAuthorizationHeader, profile, game, lastYearIsoDate]
   );
 
   React.useEffect(
@@ -458,7 +530,26 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
             <Column expand noMargin alignItems="center">
               {!publicGame && <CircularProgress size={20} />}
             </Column>
+            <SelectField
+              value={dataPeriod}
+              onChange={(e, i, period: string) => {
+                setDataPeriod(period);
+              }}
+              disableUnderline
+            >
+              <SelectOption
+                key="month"
+                value="month"
+                primaryText={i18n._(t`Month`)}
+              />
+              <SelectOption
+                key="year"
+                value="year"
+                primaryText={i18n._(t`Year`)}
+              />
+            </SelectField>
             {gameRollingMetrics &&
+            gameRollingMetrics.length > 0 &&
             (!gameRollingMetrics[0].retention ||
               !gameRollingMetrics[0].players) ? (
               <AlertMessage kind="info">

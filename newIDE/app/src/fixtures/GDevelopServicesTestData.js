@@ -786,39 +786,37 @@ const interpolateWithNoise = (
   rightValue: number,
   ratio: number
 ) =>
-  (1 - ratio) * leftValue +
-  ratio * rightValue +
-  (Math.random() * Math.max(leftValue, rightValue)) / 10;
+  ((1 - ratio) * leftValue + ratio * rightValue) * (0.95 + 0.1 * Math.random());
 
 const generateGameRollingMetrics1 = () => {
   const metrics = [];
-  const count = 30;
+  const count = 364;
   for (let index = 0; index < count; index++) {
     const ratio = 1 - index / count;
-    const playersCount = Math.round(interpolateWithNoise(150, 250, ratio));
+    const playersCount = Math.round(interpolateWithNoise(50, 250, ratio));
     metrics.push({
       date: formatISO(subDays(new Date(), index)),
 
       sessions: {
-        d0Sessions: Math.round(interpolateWithNoise(250, 350, ratio)),
+        d0Sessions: Math.round(interpolateWithNoise(80, 350, ratio)),
         d0SessionsDurationTotal: Math.round(
-          interpolateWithNoise(75000, 175000, ratio)
+          interpolateWithNoise(15000, 175000, ratio)
         ),
       },
       players: {
         d0Players: playersCount,
         d0NewPlayers: Math.round(interpolateWithNoise(80, 120, ratio)),
         d0PlayersBelow60s: Math.round(
-          playersCount * interpolateWithNoise(0.5, 0.4, ratio)
+          playersCount * interpolateWithNoise(0.8, 0.4, ratio)
         ),
         d0PlayersBelow180s: Math.round(
-          playersCount * interpolateWithNoise(0.65, 0.55, ratio)
+          playersCount * interpolateWithNoise(0.9, 0.55, ratio)
         ),
         d0PlayersBelow300s: Math.round(
-          playersCount * interpolateWithNoise(0.7, 0.6, ratio)
+          playersCount * interpolateWithNoise(0.95, 0.6, ratio)
         ),
         d0PlayersBelow600s: Math.round(
-          playersCount * interpolateWithNoise(0.8, 0.7, ratio)
+          playersCount * interpolateWithNoise(0.98, 0.7, ratio)
         ),
         d0PlayersBelow900s: Math.round(
           playersCount * Math.min(1, interpolateWithNoise(1, 0.9, ratio))

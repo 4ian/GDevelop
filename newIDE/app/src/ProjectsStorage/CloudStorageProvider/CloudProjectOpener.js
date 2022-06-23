@@ -8,7 +8,7 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 import { type FileMetadata } from '../index';
 
-const onOpenWithPicker = () => {};
+export const onOpenWithPicker = () => {};
 
 export const onOpen = async (
   fileMetadata: FileMetadata,
@@ -25,5 +25,5 @@ export const onOpen = async (
   };
 };
 
-const hasAutoSave = () => {};
-const onGetAutoSave = () => {};
+export const hasAutoSave = () => {};
+export const onGetAutoSave = () => {};

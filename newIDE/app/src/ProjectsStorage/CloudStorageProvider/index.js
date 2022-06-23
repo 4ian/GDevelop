@@ -1,17 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import { type StorageProvider } from '../index';
-// import {
-//   onOpenWithPicker,
-//   onOpen,
-//   hasAutoSave,
-//   onGetAutoSave,
-// } from './LocalProjectOpener';
-// import {
-//   onSaveProject,
-//   onSaveProjectAs,
-//   onAutoSaveProject,
-// } from './LocalProjectWriter';
+import { generateOnSaveProject, generateOnSaveProjectAs } from './CloudProjectWriter';
 import {
   type AppArguments,
   POSITIONAL_ARGUMENTS_KEY,
@@ -29,14 +19,14 @@ export default ({
       fileIdentifier: appArguments[POSITIONAL_ARGUMENTS_KEY][0],
     };
   },
-  createOperations: () => ({
-    onOpenWithPicker,
-    onOpen,
-    hasAutoSave,
-    onSaveProject,
-    onSaveProjectAs,
-    onAutoSaveProject,
-    onGetAutoSave,
+  createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
+    // onOpenWithPicker,
+    // onOpen,
+    // hasAutoSave,
+    onSaveProject: generateOnSaveProject(authenticatedUser),
+    onSaveProjectAs: generateOnSaveProjectAs(authenticatedUser),
+    // onAutoSaveProject,
+    // onGetAutoSave,
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorizations to open it.`;
     },

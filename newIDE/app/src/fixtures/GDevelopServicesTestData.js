@@ -839,7 +839,7 @@ const generateGameRollingMetrics1 = () => {
 };
 
 export const gameRollingMetrics1: GameMetrics[] = generateGameRollingMetrics1();
-export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = [
+export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
   {
     date: '2020-10-01',
 

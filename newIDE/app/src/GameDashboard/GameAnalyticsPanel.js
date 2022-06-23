@@ -49,18 +49,26 @@ type ChartData = {|
   overview: {|
     viewersCount: number,
     playersCount: number,
-    bounceRatio: number,
-    meanPlayedTimeInMinutes: number,
-    nearestToMedianDurationPlayersCount: number,
-    nearestToMedianDurationPlayersPercent: number,
-    nearestToMedianDurationInMinutes: number,
+    bounceRatePercent: number,
+    meanPlayedDurationInMinutes: number,
+    nearestToMedianDuration: {|
+      playersCount: number,
+      playersPercent: number,
+      durationInMinutes: number,
+    |},
+    greaterDurationPlayerSurface: {|
+      playersCount: number,
+      playersPercent: number,
+      durationInMinutes: number,
+    |},
   |},
   byDay: {|
     timestamp: number,
     date: string,
     playersCount: number,
     viewersCount: number,
-    meanPlayedTime: number,
+    meanPlayedDurationInMinutes: number,
+    bounceRatePercent: number,
 
     over60sPlayersCount: number,
     over180sPlayersCount: number,
@@ -92,6 +100,19 @@ type ChartData = {|
   byPlayedTime: {| duration: number, playersCount: number |}[],
 |};
 
+const emptyChartData = {
+  overview: {
+    viewersCount: 0,
+    playersCount: 0,
+    bounceRatePercent: 0,
+    meanPlayedDurationInMinutes: 0,
+    nearestToMedianDuration: {},
+    greaterDurationPlayerSurface: {},
+  },
+  byDay: [],
+  byPlayedTime: [],
+};
+
 const durationIndexes: { [string]: number } = {
   for1Minute: 0,
   for3Minutes: 1,
@@ -101,25 +122,60 @@ const durationIndexes: { [string]: number } = {
 };
 const durationValues = [1, 3, 5, 10, 15];
 
+const findNearestToMedianDurationIndex = (
+  playersBelowSums: Array<number>,
+  playersCount: number
+): number => {
+  const overMedianDurationIndex = playersBelowSums.findIndex(
+    (value, index) => index > 0 && value > playersCount / 2
+  );
+  const overMedianDuration = playersBelowSums[overMedianDurationIndex];
+  const underMedianDuration = playersBelowSums[overMedianDurationIndex + 1];
+  return underMedianDuration &&
+    Math.abs(overMedianDuration - playersCount / 2) <
+      Math.abs(underMedianDuration - playersCount / 2)
+    ? overMedianDurationIndex
+    : overMedianDurationIndex + 1;
+};
+
+const findGreaterDurationPlayerIndex = (
+  playersBelowSums: Array<number>,
+  viewersCount: number
+): number => {
+  let durationPlayerMax = 0;
+  let greaterDurationPlayerIndex = 0;
+  for (let index = 0; index < playersBelowSums.length; index++) {
+    const playersOverSum = viewersCount - playersBelowSums[index];
+    const duration = durationValues[index];
+
+    const durationPlayer = playersOverSum * duration;
+    if (durationPlayer >= durationPlayerMax) {
+      durationPlayerMax = durationPlayer;
+      greaterDurationPlayerIndex = index;
+    }
+  }
+  return greaterDurationPlayerIndex;
+};
+
 const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
-  let playersBelowSum = [0, 0, 0, 0, 0];
+  let playersBelowSums = [0, 0, 0, 0, 0];
   let playersSum = 0;
   let playedDurationSumInMinutes = 0;
 
   metrics.forEach(metric => {
-    playersBelowSum[durationIndexes.for1Minute] += metric.players
+    playersBelowSums[durationIndexes.for1Minute] += metric.players
       ? metric.players.d0PlayersBelow60s
       : 0;
-    playersBelowSum[durationIndexes.for3Minutes] += metric.players
+    playersBelowSums[durationIndexes.for3Minutes] += metric.players
       ? metric.players.d0PlayersBelow180s
       : 0;
-    playersBelowSum[durationIndexes.for5Minutes] += metric.players
+    playersBelowSums[durationIndexes.for5Minutes] += metric.players
       ? metric.players.d0PlayersBelow300s
       : 0;
-    playersBelowSum[durationIndexes.for10Minutes] += metric.players
+    playersBelowSums[durationIndexes.for10Minutes] += metric.players
       ? metric.players.d0PlayersBelow600s
       : 0;
-    playersBelowSum[durationIndexes.for15Minutes] += metric.players
+    playersBelowSums[durationIndexes.for15Minutes] += metric.players
       ? metric.players.d0PlayersBelow900s
       : 0;
     playersSum += metric.players ? metric.players.d0Players : 0;
@@ -129,19 +185,17 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
   });
 
   const viewersCount = playersSum;
-  const playersCount = playersSum - playersBelowSum[durationIndexes.for1Minute];
+  const playersCount =
+    playersSum - playersBelowSums[durationIndexes.for1Minute];
 
-  const overMedianDurationIndex = playersBelowSum.findIndex(
-    (value, index) => index > 0 && value > playersCount / 2
+  const nearestToMedianDurationIndex = findNearestToMedianDurationIndex(
+    playersBelowSums,
+    playersCount
   );
-  const overMedianDuration = playersBelowSum[overMedianDurationIndex];
-  const underMedianDuration = playersBelowSum[overMedianDurationIndex + 1];
-  const nearestToMedianDurationIndex =
-    underMedianDuration &&
-    Math.abs(overMedianDuration - playersSum / 2) <
-      Math.abs(underMedianDuration - playersSum / 2)
-      ? overMedianDurationIndex
-      : overMedianDurationIndex + 1;
+  const greaterDurationPlayerIndex = findGreaterDurationPlayerIndex(
+    playersBelowSums,
+    viewersCount
+  );
 
   const dateFormatOptions = { month: 'short', day: 'numeric' };
 
@@ -149,14 +203,26 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
     overview: {
       viewersCount: viewersCount,
       playersCount: playersCount,
-      bounceRatio: playersCount / viewersCount,
-      meanPlayedTimeInMinutes: playedDurationSumInMinutes / playersSum,
-      nearestToMedianDurationPlayersCount:
-        playersBelowSum[nearestToMedianDurationIndex],
-      nearestToMedianDurationPlayersPercent:
-        (100 * playersBelowSum[nearestToMedianDurationIndex]) / playersSum,
-      nearestToMedianDurationInMinutes:
-        durationValues[nearestToMedianDurationIndex],
+      bounceRatePercent: (100 * playersCount) / viewersCount,
+      meanPlayedDurationInMinutes: playedDurationSumInMinutes / playersSum,
+      nearestToMedianDuration: {
+        playersCount:
+          viewersCount - playersBelowSums[nearestToMedianDurationIndex],
+        playersPercent:
+          (100 *
+            (viewersCount - playersBelowSums[nearestToMedianDurationIndex])) /
+          playersSum,
+        durationInMinutes: durationValues[nearestToMedianDurationIndex],
+      },
+      greaterDurationPlayerSurface: {
+        playersCount:
+          viewersCount - playersBelowSums[greaterDurationPlayerIndex],
+        playersPercent:
+          (100 *
+            (viewersCount - playersBelowSums[greaterDurationPlayerIndex])) /
+          playersSum,
+        durationInMinutes: durationValues[greaterDurationPlayerIndex],
+      },
     },
     byDay: metrics
       .map(metric => ({
@@ -165,12 +231,15 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
           undefined,
           dateFormatOptions
         ),
-        meanPlayedTimeInMinutes:
+        meanPlayedDurationInMinutes:
           metric.sessions && metric.players
             ? metric.sessions.d0SessionsDurationTotal /
               60 /
               metric.players.d0Players
             : 0,
+        bounceRatePercent: metric.players
+          ? (100 * metric.players.d0PlayersBelow60s) / metric.players.d0Players
+          : 0,
         viewersCount: metric.players ? metric.players.d0Players : 0,
         playersCount: metric.players
           ? metric.players.d0Players - metric.players.d0PlayersBelow60s
@@ -277,7 +346,7 @@ const evaluateChartData = (metrics: GameMetrics[]): ChartData => {
     byPlayedTime: [{ duration: 0, playersCount: viewersCount }].concat(
       Object.values(durationIndexes).map((durationIndex: number) => ({
         duration: durationValues[durationIndex],
-        playersCount: viewersCount - playersBelowSum[durationIndex],
+        playersCount: viewersCount - playersBelowSums[durationIndex],
       }))
     ),
   };
@@ -308,7 +377,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
     () =>
       gameRollingMetrics
         ? evaluateChartData(gameRollingMetrics)
-        : { overview: {}, byDay: [], byPlayedTime: [] },
+        : emptyChartData,
     [gameRollingMetrics]
   );
 
@@ -402,7 +471,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                 <Line noMargin>
                   <Text size="title" align="center">
                     <Trans>
-                      {chartData.overview.playersCount} players this month
+                      {chartData.overview.playersCount} sessions this month
                     </Trans>
                   </Text>
                 </Line>
@@ -447,13 +516,56 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                   </AreaChart>
                 </ResponsiveContainer>
               </Column>
+              <Column expand noMargin alignItems="center">
+                <Line noMargin>
+                  <Text size="title" align="center">
+                    <Trans>
+                      {Math.round(chartData.overview.bounceRatePercent)}% bounce
+                      rate
+                    </Trans>
+                  </Text>
+                </Line>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={chartData.byDay}
+                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  >
+                    <RechartsLine
+                      name={i18n._(t`Bounce rate`)}
+                      unit="%"
+                      formatter={minutesFormatter}
+                      type="monotone"
+                      dataKey="bounceRatePercent"
+                      stroke={gdevelopTheme.chart.dataColor1}
+                      yAxisId={0}
+                    />
+                    <CartesianGrid
+                      stroke={gdevelopTheme.chart.gridColor}
+                      strokeDasharray="3 3"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <YAxis
+                      dataKey="bounceRatePercent"
+                      stroke={gdevelopTheme.chart.textColor}
+                      style={styles.tickLabel}
+                    />
+                    <Tooltip contentStyle={styles.tooltipContent} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Column>
             </ResponsiveLineStackLayout>
             <ResponsiveLineStackLayout expand noMargin>
               <Column expand noMargin alignItems="center">
                 <Line noMargin>
                   <Text size="title" align="center">
                     <Trans>
-                      {Math.round(chartData.overview.meanPlayedTimeInMinutes)}{' '}
+                      {Math.round(
+                        chartData.overview.meanPlayedDurationInMinutes
+                      )}{' '}
                       minutes per player
                     </Trans>
                   </Text>
@@ -468,7 +580,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       unit={' ' + i18n._(t`minutes`)}
                       formatter={minutesFormatter}
                       type="monotone"
-                      dataKey="meanPlayedTimeInMinutes"
+                      dataKey="meanPlayedDurationInMinutes"
                       stroke={gdevelopTheme.chart.dataColor1}
                       yAxisId={0}
                     />
@@ -482,7 +594,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       style={styles.tickLabel}
                     />
                     <YAxis
-                      dataKey="meanPlayedTimeInMinutes"
+                      dataKey="meanPlayedDurationInMinutes"
                       stroke={gdevelopTheme.chart.textColor}
                       style={styles.tickLabel}
                     />
@@ -493,7 +605,18 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
               <Column expand noMargin alignItems="center">
                 <Line noMargin>
                   <Text size="title" align="center">
-                    <Trans>Players per played time</Trans>
+                    <Trans>
+                      {
+                        chartData.overview.greaterDurationPlayerSurface
+                          .playersCount
+                      }{' '}
+                      players >{' '}
+                      {
+                        chartData.overview.greaterDurationPlayerSurface
+                          .durationInMinutes
+                      }{' '}
+                      minutes
+                    </Trans>
                   </Text>
                 </Line>
                 <ResponsiveContainer width="100%" height={300}>
@@ -517,7 +640,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       domain={[0, 15]}
                       ticks={[1, 3, 5, 10, 15]}
                       stroke={gdevelopTheme.chart.textColor}
-                      contentStyle={styles.tickLabel}
+                      style={styles.tickLabel}
                     />
                     <YAxis
                       dataKey="playersCount"
@@ -538,9 +661,12 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                 <Line noMargin>
                   <Text size="title" align="center">
                     <Trans>
-                      {chartData.overview.nearestToMedianDurationPlayersCount}{' '}
+                      {chartData.overview.nearestToMedianDuration.playersCount}{' '}
                       players >{' '}
-                      {chartData.overview.nearestToMedianDurationInMinutes}{' '}
+                      {
+                        chartData.overview.nearestToMedianDuration
+                          .durationInMinutes
+                      }{' '}
                       minutes
                     </Trans>
                   </Text>
@@ -627,11 +753,14 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                   <Text size="title" align="center">
                     <Trans>
                       {Math.round(
-                        chartData.overview
-                          .nearestToMedianDurationPlayersPercent * 100
+                        chartData.overview.nearestToMedianDuration
+                          .playersPercent
                       )}
                       % of players >{' '}
-                      {chartData.overview.nearestToMedianDurationInMinutes}{' '}
+                      {
+                        chartData.overview.nearestToMedianDuration
+                          .durationInMinutes
+                      }{' '}
                       minutes
                     </Trans>
                   </Text>
@@ -647,9 +776,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       dataKey="over0sPlayersPercent"
                       formatter={percentFormatter}
                       unit={' %'}
-                      stroke={gdevelopTheme.chart.dataColor1}
+                      stroke="none"
                       fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
+                      fillOpacity={0.7 ** 6}
                       yAxisId={0}
                     />
                     <Area
@@ -658,9 +787,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       dataKey="over60sPlayersPercent"
                       formatter={percentFormatter}
                       unit={' %'}
-                      stroke={gdevelopTheme.chart.dataColor1}
+                      stroke="none"
                       fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
+                      fillOpacity={0.7 ** 5}
                       yAxisId={0}
                     />
                     <Area
@@ -669,9 +798,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       dataKey="over180sPlayersPercent"
                       formatter={percentFormatter}
                       unit={' %'}
-                      stroke={gdevelopTheme.chart.dataColor1}
+                      stroke="none"
                       fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
+                      fillOpacity={0.7 ** 4}
                       yAxisId={0}
                     />
                     <Area
@@ -680,9 +809,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       dataKey="over300sPlayersPercent"
                       formatter={percentFormatter}
                       unit={' %'}
-                      stroke={gdevelopTheme.chart.dataColor1}
+                      stroke="none"
                       fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
+                      fillOpacity={0.7 ** 3}
                       yAxisId={0}
                     />
                     <Area
@@ -691,9 +820,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       dataKey="over600sPlayersPercent"
                       formatter={percentFormatter}
                       unit={' %'}
-                      stroke={gdevelopTheme.chart.dataColor1}
+                      stroke="none"
                       fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
+                      fillOpacity={0.7 ** 2}
                       yAxisId={0}
                     />
                     <Area
@@ -702,9 +831,9 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                       dataKey="over900sPlayersPercent"
                       formatter={percentFormatter}
                       unit={' %'}
-                      stroke={gdevelopTheme.chart.dataColor1}
+                      stroke="none"
                       fill={gdevelopTheme.chart.dataColor1}
-                      fillOpacity={0.125}
+                      fillOpacity={0.7}
                       yAxisId={0}
                     />
                     <CartesianGrid

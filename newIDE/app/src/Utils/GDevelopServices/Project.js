@@ -41,9 +41,9 @@ export const getCredentialsForProject = async (
 export const createCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectCreationPayload: { name: string }
-) => {
+): Promise<?CloudProject> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return false;
+  if (!firebaseUser) return null;
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
@@ -58,23 +58,52 @@ export const createCloudProject = async (
   return response.data;
 };
 
-const commitVersion = async (
+const generateUUID = (a): string => {
+  return a
+    ? // eslint-disable-next-line
+      (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
+    : // $FlowFixMe
+      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
+};
+
+export const commitVersion = async (
   authenticatedUser: AuthenticatedUser,
-  cloudProject: CloudProject,
+  cloudProjectId: string,
   zippedProject: any
-) => {
+): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return false;
+  if (!firebaseUser) return;
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
+  // generate uuid
+  const uuid = generateUUID();
+  // fetch pre signed url TODO
+  // upload zipped project
+  {
+    const response = await projectResourcesClient.post(
+      `${
+        GDevelopProjectResourcesStorage.baseUrl
+      }/${cloudProjectId}/versions/${uuid}`,
+      zippedProject,
+      {
+        headers: {
+          'content-type': 'application/zip',
+        },
+        withCredentials: true
+      }
+    );
+  }
+  // inform backend new version uploaded
   const response = await axios.post(
-    `${GDevelopProjectApi.baseUrl}/project`,
+    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/commit`,
     zippedProject,
     {
-      headers: { Authorization: authorizationHeader },
+      headers: {
+        Authorization: authorizationHeader,
+        'content-type': 'application/zip',
+      },
       params: { userId },
-      validateStatus: status => true,
     }
   );
   return response.data;

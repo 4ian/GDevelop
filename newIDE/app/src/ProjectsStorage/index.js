@@ -27,7 +27,6 @@ export type StorageProviderOperations = {|
   onOpenWithPicker?: () => Promise<?FileMetadata>,
   onOpen?: (
     fileMetadata: FileMetadata,
-    options?: { authenticatedUser?: AuthenticatedUser }
   ) => Promise<{|
     content: Object,
   |}>,
@@ -81,5 +80,6 @@ export type StorageProvider = {|
     setDialog: (() => React.Node) => void,
     /** Close the dialog */
     closeDialog: () => void,
+    authenticatedUser: AuthenticatedUser
   }) => StorageProviderOperations,
 |};

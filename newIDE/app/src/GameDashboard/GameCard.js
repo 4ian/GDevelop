@@ -223,42 +223,39 @@ export const GameCard = ({
                       </ResponsiveLineStackLayout>
                     </Column>
                   </ResponsiveLineStackLayout>
-                  <ResponsiveLineStackLayout
-                    noMargin
-                    justifyContent="flex-start"
-                  >
-                    <Column expand noMargin>
-                      <Toggle
-                        labelPosition="left"
-                        onToggle={onToggleDiscoverable}
-                        toggled={getCurrentState(
-                          game.discoverable,
-                          isDiscoverable
-                        )}
-                        label={<Trans>Make discoverable on Liluo.io</Trans>}
-                      />
-                      <Toggle
-                        labelPosition="left"
-                        onToggle={onToggleAcceptsGameComments}
-                        toggled={getCurrentState(
-                          game.acceptsGameComments,
-                          acceptsGameComments
-                        )}
-                        label={<Trans>Open for feedback on Liluo.io</Trans>}
-                      />
-                    </Column>
-                    <Column expand noMargin>
-                      <Toggle
-                        labelPosition="left"
-                        onToggle={onToggleAcceptsBuildComments}
-                        toggled={getCurrentState(
-                          game.acceptsBuildComments,
-                          acceptsBuildComments
-                        )}
-                        label={<Trans>Open feedback on all Builds</Trans>}
-                      />
-                    </Column>
-                  </ResponsiveLineStackLayout>
+                  <Column noMargin justifyContent="flex-start">
+                    <Toggle
+                      labelPosition="left"
+                      onToggle={onToggleDiscoverable}
+                      toggled={getCurrentState(
+                        game.discoverable,
+                        isDiscoverable
+                      )}
+                      label={<Trans>Make discoverable on Liluo.io</Trans>}
+                    />
+                    <Toggle
+                      labelPosition="left"
+                      onToggle={onToggleAcceptsGameComments}
+                      toggled={getCurrentState(
+                        game.acceptsGameComments,
+                        acceptsGameComments
+                      )}
+                      label={
+                        <Trans>
+                          Show feedback banner on Liluo.io game page
+                        </Trans>
+                      }
+                    />
+                    <Toggle
+                      labelPosition="left"
+                      onToggle={onToggleAcceptsBuildComments}
+                      toggled={getCurrentState(
+                        game.acceptsBuildComments,
+                        acceptsBuildComments
+                      )}
+                      label={<Trans>Ask for feedback on all build pages</Trans>}
+                    />
+                  </Column>
                 </Column>
               </ResponsiveLineStackLayout>
             </CardContent>

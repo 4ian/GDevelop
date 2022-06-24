@@ -294,3 +294,83 @@ export const deleteLeaderboardEntry = async (
   );
   return response.data;
 };
+
+// 2 types of comments. Feedback is private, Review is public.
+export type CommentType = 'FEEDBACK' | 'REVIEW';
+
+export type GameRatings = {
+  version: number,
+  visuals: number,
+  sound: number,
+  fun: number,
+  easeOfUse: number,
+};
+
+export type Comment = {
+  id: string,
+  type: CommentType,
+  gameId: string,
+  buildId?: string,
+  text: string,
+  ratings?: GameRatings,
+  playerId?: string,
+  playerName?: string,
+  contact?: string,
+  createdAt: number,
+  processedAt?: number,
+};
+
+export const listComments = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    type,
+  }: {|
+    gameId: string,
+    type: 'FEEDBACK' | 'REVIEW',
+  |}
+): Promise<Array<Comment>> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/comment`, {
+        params: {
+          userId,
+          type,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
+    .then(response => response.data);
+};
+
+export const updateComment = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    commentId,
+    processed,
+  }: {|
+    gameId: string,
+    commentId: string,
+    processed: boolean,
+  |}
+) => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.patch(
+        `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
+        { processed },
+        {
+          params: { userId },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};

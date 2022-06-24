@@ -43,10 +43,12 @@ import Crown from '../UI/CustomSvgIcons/Crown';
 import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
+import GameFeedback from './Feedbacks/GameFeedback';
 
 export type GamesDetailsTab =
   | 'details'
   | 'builds'
+  | 'feedback'
   | 'analytics'
   | 'leaderboards';
 
@@ -334,6 +336,7 @@ export const GameDetailsDialog = ({
           <Tabs value={currentTab} onChange={setCurrentTab}>
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
+            <Tab label={<Trans>Feedback</Trans>} value="feedback" />
             <Tab label={<Trans>Analytics</Trans>} value="analytics" />
             <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
@@ -539,6 +542,9 @@ export const GameDetailsDialog = ({
             ) : null}
             {currentTab === 'analytics' ? (
               <GameAnalyticsPanel game={game} publicGame={publicGame} />
+            ) : null}
+            {currentTab === 'feedback' ? (
+              <GameFeedback authenticatedUser={authenticatedUser} game={game} />
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

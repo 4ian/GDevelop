@@ -39,7 +39,10 @@ import {
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
-import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
+import {
+  sendOnboardingManuallyOpened,
+  sendTutorialOpened,
+} from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import TextButton from '../../../UI/TextButton';
@@ -320,7 +323,10 @@ export const HomePage = React.memo<Props>(
                             <TextButton
                               label={<Trans>Start tour</Trans>}
                               primary
-                              onClick={onOpenOnboardingDialog}
+                              onClick={() => {
+                                sendOnboardingManuallyOpened();
+                                onOpenOnboardingDialog();
+                              }}
                             />
                           )}
                         </ResponsiveLineStackLayout>

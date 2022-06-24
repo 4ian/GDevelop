@@ -196,7 +196,7 @@ const mergeGameMetricsByWeek = (
   for (let weekIndex = 0; weekIndex < gameMetrics.length; weekIndex += 7) {
     let mergedGameMetric = gameMetrics[weekIndex];
     for (
-      let index = weekIndex;
+      let index = weekIndex + 1;
       index < weekIndex + 7 && index < gameMetrics.length;
       index++
     ) {
@@ -477,7 +477,7 @@ const evaluateChartData = (
 };
 
 export const evaluateGameMetrics = (
-  gameMetrics: GameMetrics
+  gameMetrics: Array<GameMetrics>
 ): { yearChartData: ChartData, monthChartData: ChartData } => {
   if (!gameMetrics) {
     return {

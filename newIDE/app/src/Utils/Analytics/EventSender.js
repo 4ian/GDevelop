@@ -274,6 +274,10 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
+export const sendOnboardingManuallyOpened = () => {
+  recordEvent('onboarding_manually_opened');
+};
+
 export const sendAssetPackOpened = (assetPackTag: string) => {
   recordEvent('asset_pack_opened', {
     assetPackTag,

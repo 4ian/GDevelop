@@ -7,19 +7,21 @@ import { I18n } from '@lingui/react';
 import { Card } from '@material-ui/core';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons//CheckCircle';
+
+import { ResponsiveLineStackLayout } from '../../UI/Layout';
 import CardContent from '../../UI/Card/CardContent';
 import Text from '../../UI/Text';
+import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
+import IconButton from '../../UI/IconButton';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+
+import Rating from './Rating';
 
 import {
   updateComment,
   type Comment,
   type GameRatings,
 } from '../../Utils/GDevelopServices/Play';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import Rating from './Rating';
-import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
-import IconButton from '../../UI/IconButton';
-import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import { useDebounce } from '../../Utils/UseDebounce';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 

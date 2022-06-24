@@ -1,18 +1,20 @@
 // @flow
+import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import * as React from 'react';
-import { listComments, type Comment } from '../../Utils/GDevelopServices/Play';
-import { type Game } from '../../Utils/GDevelopServices/Game';
 import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Text from '../../UI/Text';
 import { ColumnStackLayout } from '../../UI/Layout';
 import PlaceholderError from '../../UI/PlaceholderError';
-import FeedbackCard from './FeedbackCard';
 import Checkbox from '../../UI/Checkbox';
+
+import FeedbackCard from './FeedbackCard';
+
+import { listComments, type Comment } from '../../Utils/GDevelopServices/Play';
+import { type Game } from '../../Utils/GDevelopServices/Game';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 type Props = {|
   authenticatedUser: AuthenticatedUser,

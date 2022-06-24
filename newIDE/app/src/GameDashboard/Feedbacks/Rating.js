@@ -3,14 +3,9 @@
 import * as React from 'react';
 
 import LinearProgress from '@material-ui/core/LinearProgress';
+
 import Text from '../../UI/Text';
-
 import { Column } from '../../UI/Grid';
-import { makeStyles } from '@material-ui/styles';
-
-const useStyles = makeStyles({
-  root: { height: 8, borderRadius: 8 },
-});
 
 type Props = {
   value: number,

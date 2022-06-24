@@ -21,7 +21,6 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import AlertMessage from '../UI/AlertMessage';
-import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import {
   ResponsiveContainer,
@@ -492,10 +491,9 @@ const percentFormatter = value => {
 
 type Props = {|
   game: Game,
-  publicGame: ?PublicGame,
 |};
 
-export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
+export const GameAnalyticsPanel = ({ game }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
@@ -567,11 +565,13 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
           game.id,
           lastYearIsoDate
         );
+        console.log('setGameMetrics');
         setGameMetrics(gameRollingMetrics);
       } catch (err) {
         console.error(`Unable to load game rolling metrics:`, err);
         setGameMetricsError(err);
       }
+      console.log('stop loading');
       setIsGameMetricsLoading(false);
     },
     [getAuthorizationHeader, profile, game, lastYearIsoDate]
@@ -618,598 +618,593 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
                 metrics for your game.
               </AlertMessage>
             ) : null}
-            {(!publicGame || isGameMetricsLoading) && <PlaceholderLoader />}
-            {publicGame && (
-              <>
-                <Line noMargin justifyContent="flex-end">
-                  <SelectField
-                    value={dataPeriod}
-                    onChange={(e, i, period: string) => {
-                      setDataPeriod(period);
-                    }}
-                    disableUnderline
+            {isGameMetricsLoading && <PlaceholderLoader />}
+            <>
+              <Line noMargin justifyContent="flex-end">
+                <SelectField
+                  value={dataPeriod}
+                  onChange={(e, i, period: string) => {
+                    setDataPeriod(period);
+                  }}
+                  disableUnderline
+                >
+                  <SelectOption
+                    key="month"
+                    value="month"
+                    primaryText={i18n._(t`Month`)}
+                  />
+                  <SelectOption
+                    key="year"
+                    value="year"
+                    primaryText={i18n._(t`Year`)}
+                  />
+                </SelectField>
+              </Line>
+              <ResponsiveLineStackLayout
+                expand
+                noMargin
+                justifyContent="center"
+              >
+                <Column noMargin alignItems="center" expand>
+                  <Text size="title" align="center">
+                    <Trans>
+                      {chartData.overview.playersCount} sessions this month
+                    </Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
                   >
-                    <SelectOption
-                      key="month"
-                      value="month"
-                      primaryText={i18n._(t`Month`)}
-                    />
-                    <SelectOption
-                      key="year"
-                      value="year"
-                      primaryText={i18n._(t`Year`)}
-                    />
-                  </SelectField>
-                </Line>
-                <ResponsiveLineStackLayout
-                  expand
-                  noMargin
-                  justifyContent="center"
-                >
-                  <Column noMargin alignItems="center" expand>
-                    <Text size="title" align="center">
-                      <Trans>
-                        {chartData.overview.playersCount} sessions this month
-                      </Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
+                    <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <Area
+                        name={i18n._(t`Viewers`)}
+                        type="monotone"
+                        dataKey="viewersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Players`)}
+                        type="monotone"
+                        dataKey="playersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.25}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="viewersCount"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </Column>
+                <Column noMargin alignItems="center" expand>
+                  <Text size="title" align="center">
+                    <Trans>
+                      {Math.round(chartData.overview.bounceRatePercent)}% bounce
+                      rate
+                    </Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <LineChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <RechartsLine
+                        name={i18n._(t`Bounce rate`)}
+                        unit="%"
+                        formatter={minutesFormatter}
+                        type="monotone"
+                        dataKey="bounceRatePercent"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="bounceRatePercent"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Column>
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout
+                expand
+                noMargin
+                justifyContent="center"
+              >
+                <Column expand noMargin alignItems="center">
+                  <Text size="title" align="center">
+                    <Trans>
+                      {Math.round(
+                        chartData.overview.meanPlayedDurationInMinutes
+                      )}{' '}
+                      minutes per player
+                    </Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <LineChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <RechartsLine
+                        name={i18n._(t`Mean played time`)}
+                        unit={' ' + i18n._(t`minutes`)}
+                        formatter={minutesFormatter}
+                        type="monotone"
+                        dataKey="meanPlayedDurationInMinutes"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="meanPlayedDurationInMinutes"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Column>
+                <Column expand noMargin alignItems="center">
+                  <Text size="title" align="center">
+                    <Trans>
+                      {
+                        chartData.overview.greaterDurationPlayerSurface
+                          .playersCount
+                      }{' '}
+                      players >{' '}
+                      {
+                        chartData.overview.greaterDurationPlayerSurface
+                          .durationInMinutes
+                      }{' '}
+                      minutes
+                    </Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <AreaChart
+                      data={chartData.byPlayedTime}
+                      margin={CHART_MARGINS}
                     >
-                      <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <Area
-                          name={i18n._(t`Viewers`)}
-                          type="monotone"
-                          dataKey="viewersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Players`)}
-                          type="monotone"
-                          dataKey="playersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.25}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="viewersCount"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </Column>
-                  <Column noMargin alignItems="center" expand>
-                    <Text size="title" align="center">
-                      <Trans>
-                        {Math.round(chartData.overview.bounceRatePercent)}%
-                        bounce rate
-                      </Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <LineChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <RechartsLine
-                          name={i18n._(t`Bounce rate`)}
-                          unit="%"
-                          formatter={minutesFormatter}
-                          type="monotone"
-                          dataKey="bounceRatePercent"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="bounceRatePercent"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </Column>
-                </ResponsiveLineStackLayout>
-                <ResponsiveLineStackLayout
-                  expand
-                  noMargin
-                  justifyContent="center"
-                >
-                  <Column expand noMargin alignItems="center">
-                    <Text size="title" align="center">
-                      <Trans>
-                        {Math.round(
-                          chartData.overview.meanPlayedDurationInMinutes
-                        )}{' '}
-                        minutes per player
-                      </Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <LineChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <RechartsLine
-                          name={i18n._(t`Mean played time`)}
-                          unit={' ' + i18n._(t`minutes`)}
-                          formatter={minutesFormatter}
-                          type="monotone"
-                          dataKey="meanPlayedDurationInMinutes"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="meanPlayedDurationInMinutes"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </Column>
-                  <Column expand noMargin alignItems="center">
-                    <Text size="title" align="center">
-                      <Trans>
-                        {
-                          chartData.overview.greaterDurationPlayerSurface
-                            .playersCount
-                        }{' '}
-                        players >{' '}
-                        {
-                          chartData.overview.greaterDurationPlayerSurface
-                            .durationInMinutes
-                        }{' '}
-                        minutes
-                      </Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <AreaChart
-                        data={chartData.byPlayedTime}
-                        margin={CHART_MARGINS}
-                      >
-                        <Area
-                          name={i18n._(t`Players`)}
-                          type="monotone"
-                          dataKey="playersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.25}
-                          yAxisId={0}
-                        />
-                        <XAxis
-                          name={i18n._(t`Played time`)}
-                          dataKey="duration"
-                          type="number"
-                          domain={[0, 15]}
-                          ticks={[1, 3, 5, 10, 15]}
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="playersCount"
-                          stroke="#f5f5f5"
-                          style={styles.tickLabel}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </Column>
-                </ResponsiveLineStackLayout>
-                <ResponsiveLineStackLayout
-                  expand
-                  noMargin
-                  justifyContent="center"
-                >
-                  <Column expand noMargin alignItems="center">
-                    <Text size="title" align="center">
-                      <Trans>
-                        {
-                          chartData.overview.nearestToMedianDuration
-                            .playersCount
-                        }{' '}
-                        players >{' '}
-                        {
-                          chartData.overview.nearestToMedianDuration
-                            .durationInMinutes
-                        }{' '}
-                        minutes
-                      </Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <Area
-                          name={i18n._(t`Viewers`)}
-                          type="monotone"
-                          dataKey="viewersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Players`)}
-                          type="monotone"
-                          dataKey="over60sPlayersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 3 minutes`)}
-                          type="monotone"
-                          dataKey="over180sPlayersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 5 minutes`)}
-                          type="monotone"
-                          dataKey="over300sPlayersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 10 minutes`)}
-                          type="monotone"
-                          dataKey="over600sPlayersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 15 minutes`)}
-                          type="monotone"
-                          dataKey="over900sPlayersCount"
-                          stroke={gdevelopTheme.chart.dataColor1}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.125}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="viewersCount"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </Column>
-                  <Column expand noMargin alignItems="center">
-                    <Text size="title" align="center">
-                      <Trans>
-                        {Math.round(
-                          chartData.overview.nearestToMedianDuration
-                            .playersPercent
-                        )}
-                        % of players >{' '}
-                        {
-                          chartData.overview.nearestToMedianDuration
-                            .durationInMinutes
-                        }{' '}
-                        minutes
-                      </Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <Area
-                          name={i18n._(t`Viewers`)}
-                          type="monotone"
-                          dataKey="over0sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          stroke="none"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.7 ** 6}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Players`)}
-                          type="monotone"
-                          dataKey="over60sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          stroke="none"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.7 ** 5}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 3 minutes`)}
-                          type="monotone"
-                          dataKey="over180sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          stroke="none"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.7 ** 4}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 5 minutes`)}
-                          type="monotone"
-                          dataKey="over300sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          stroke="none"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.7 ** 3}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 10 minutes`)}
-                          type="monotone"
-                          dataKey="over600sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          stroke="none"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.7 ** 2}
-                          yAxisId={0}
-                        />
-                        <Area
-                          name={i18n._(t`Played > 15 minutes`)}
-                          type="monotone"
-                          dataKey="over900sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          stroke="none"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.7}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="over0sPlayersPercent"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                          unit={' %'}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </Column>
-                </ResponsiveLineStackLayout>
-                <ResponsiveLineStackLayout
-                  expand
-                  noMargin
-                  justifyContent="center"
-                >
-                  <Column expand noMargin alignItems="center">
-                    <Text size="title" align="center">
-                      <Trans>Players by played time</Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <BarChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <Bar
-                          name={i18n._(t`More than 15 minutes`)}
-                          stackId="a"
-                          dataKey="from900sToInfinityPlayersCount"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={1}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 10 to 15 minutes`)}
-                          stackId="a"
-                          dataKey="from600sTo900sPlayersCount"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 5 to 10 minutes`)}
-                          stackId="a"
-                          dataKey="from300sTo600sPlayersCount"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 2}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 3 to 5 minutes`)}
-                          stackId="a"
-                          dataKey="from180sTo300sPlayersCount"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 3}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 1 to 3 minutes`)}
-                          stackId="a"
-                          dataKey="from60sTo180sPlayersCount"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 4}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`Less than 1 minute`)}
-                          stackId="a"
-                          dataKey="below60sPlayersCount"
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 6}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                          vertical={false}
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="viewersCount"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </Column>
-                  <Column expand noMargin alignItems="center">
-                    <Text size="title" align="center">
-                      <Trans>Players by played time</Trans>
-                    </Text>
-                    <ResponsiveContainer
-                      width={CHART_WIDTH}
-                      height={CHART_HEIGHT}
-                    >
-                      <BarChart data={chartData.byDay} margin={CHART_MARGINS}>
-                        <Bar
-                          name={i18n._(t`More than 15 minutes`)}
-                          stackId="a"
-                          dataKey="from900sToInfinityPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={1}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 10 to 15 minutes`)}
-                          stackId="a"
-                          dataKey="from600sTo900sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 5 to 10 minutes`)}
-                          stackId="a"
-                          dataKey="from300sTo600sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 2}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 3 to 5 minutes`)}
-                          stackId="a"
-                          dataKey="from180sTo300sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 3}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`From 1 to 3 minutes`)}
-                          stackId="a"
-                          dataKey="from60sTo180sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 4}
-                          yAxisId={0}
-                        />
-                        <Bar
-                          name={i18n._(t`Less than 1 minute`)}
-                          stackId="a"
-                          dataKey="below60sPlayersPercent"
-                          formatter={percentFormatter}
-                          unit={' %'}
-                          fill={gdevelopTheme.chart.dataColor1}
-                          fillOpacity={0.75 ** 6}
-                          yAxisId={0}
-                        />
-                        <CartesianGrid
-                          stroke={gdevelopTheme.chart.gridColor}
-                          strokeDasharray="3 3"
-                          vertical={false}
-                        />
-                        <XAxis
-                          dataKey="date"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                        />
-                        <YAxis
-                          dataKey="over0sPlayersPercent"
-                          stroke={gdevelopTheme.chart.textColor}
-                          style={styles.tickLabel}
-                          unit={' %'}
-                        />
-                        <Tooltip contentStyle={styles.tooltipContent} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </Column>
-                </ResponsiveLineStackLayout>
-              </>
-            )}
+                      <Area
+                        name={i18n._(t`Players`)}
+                        type="monotone"
+                        dataKey="playersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.25}
+                        yAxisId={0}
+                      />
+                      <XAxis
+                        name={i18n._(t`Played time`)}
+                        dataKey="duration"
+                        type="number"
+                        domain={[0, 15]}
+                        ticks={[1, 3, 5, 10, 15]}
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="playersCount"
+                        stroke="#f5f5f5"
+                        style={styles.tickLabel}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </Column>
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout
+                expand
+                noMargin
+                justifyContent="center"
+              >
+                <Column expand noMargin alignItems="center">
+                  <Text size="title" align="center">
+                    <Trans>
+                      {chartData.overview.nearestToMedianDuration.playersCount}{' '}
+                      players >{' '}
+                      {
+                        chartData.overview.nearestToMedianDuration
+                          .durationInMinutes
+                      }{' '}
+                      minutes
+                    </Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <Area
+                        name={i18n._(t`Viewers`)}
+                        type="monotone"
+                        dataKey="viewersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Players`)}
+                        type="monotone"
+                        dataKey="over60sPlayersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 3 minutes`)}
+                        type="monotone"
+                        dataKey="over180sPlayersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 5 minutes`)}
+                        type="monotone"
+                        dataKey="over300sPlayersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 10 minutes`)}
+                        type="monotone"
+                        dataKey="over600sPlayersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 15 minutes`)}
+                        type="monotone"
+                        dataKey="over900sPlayersCount"
+                        stroke={gdevelopTheme.chart.dataColor1}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.125}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="viewersCount"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </Column>
+                <Column expand noMargin alignItems="center">
+                  <Text size="title" align="center">
+                    <Trans>
+                      {Math.round(
+                        chartData.overview.nearestToMedianDuration
+                          .playersPercent
+                      )}
+                      % of players >{' '}
+                      {
+                        chartData.overview.nearestToMedianDuration
+                          .durationInMinutes
+                      }{' '}
+                      minutes
+                    </Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <Area
+                        name={i18n._(t`Viewers`)}
+                        type="monotone"
+                        dataKey="over0sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        stroke="none"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.7 ** 6}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Players`)}
+                        type="monotone"
+                        dataKey="over60sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        stroke="none"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.7 ** 5}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 3 minutes`)}
+                        type="monotone"
+                        dataKey="over180sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        stroke="none"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.7 ** 4}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 5 minutes`)}
+                        type="monotone"
+                        dataKey="over300sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        stroke="none"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.7 ** 3}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 10 minutes`)}
+                        type="monotone"
+                        dataKey="over600sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        stroke="none"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.7 ** 2}
+                        yAxisId={0}
+                      />
+                      <Area
+                        name={i18n._(t`Played > 15 minutes`)}
+                        type="monotone"
+                        dataKey="over900sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        stroke="none"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.7}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="over0sPlayersPercent"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                        unit={' %'}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </Column>
+              </ResponsiveLineStackLayout>
+              <ResponsiveLineStackLayout
+                expand
+                noMargin
+                justifyContent="center"
+              >
+                <Column expand noMargin alignItems="center">
+                  <Text size="title" align="center">
+                    <Trans>Players by played time</Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <BarChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <Bar
+                        name={i18n._(t`More than 15 minutes`)}
+                        stackId="a"
+                        dataKey="from900sToInfinityPlayersCount"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={1}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 10 to 15 minutes`)}
+                        stackId="a"
+                        dataKey="from600sTo900sPlayersCount"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 5 to 10 minutes`)}
+                        stackId="a"
+                        dataKey="from300sTo600sPlayersCount"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 2}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 3 to 5 minutes`)}
+                        stackId="a"
+                        dataKey="from180sTo300sPlayersCount"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 3}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 1 to 3 minutes`)}
+                        stackId="a"
+                        dataKey="from60sTo180sPlayersCount"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 4}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`Less than 1 minute`)}
+                        stackId="a"
+                        dataKey="below60sPlayersCount"
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 6}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="viewersCount"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Column>
+                <Column expand noMargin alignItems="center">
+                  <Text size="title" align="center">
+                    <Trans>Players by played time</Trans>
+                  </Text>
+                  <ResponsiveContainer
+                    width={CHART_WIDTH}
+                    height={CHART_HEIGHT}
+                  >
+                    <BarChart data={chartData.byDay} margin={CHART_MARGINS}>
+                      <Bar
+                        name={i18n._(t`More than 15 minutes`)}
+                        stackId="a"
+                        dataKey="from900sToInfinityPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={1}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 10 to 15 minutes`)}
+                        stackId="a"
+                        dataKey="from600sTo900sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 5 to 10 minutes`)}
+                        stackId="a"
+                        dataKey="from300sTo600sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 2}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 3 to 5 minutes`)}
+                        stackId="a"
+                        dataKey="from180sTo300sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 3}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`From 1 to 3 minutes`)}
+                        stackId="a"
+                        dataKey="from60sTo180sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 4}
+                        yAxisId={0}
+                      />
+                      <Bar
+                        name={i18n._(t`Less than 1 minute`)}
+                        stackId="a"
+                        dataKey="below60sPlayersPercent"
+                        formatter={percentFormatter}
+                        unit={' %'}
+                        fill={gdevelopTheme.chart.dataColor1}
+                        fillOpacity={0.75 ** 6}
+                        yAxisId={0}
+                      />
+                      <CartesianGrid
+                        stroke={gdevelopTheme.chart.gridColor}
+                        strokeDasharray="3 3"
+                        vertical={false}
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                      />
+                      <YAxis
+                        dataKey="over0sPlayersPercent"
+                        stroke={gdevelopTheme.chart.textColor}
+                        style={styles.tickLabel}
+                        unit={' %'}
+                      />
+                      <Tooltip contentStyle={styles.tooltipContent} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Column>
+              </ResponsiveLineStackLayout>
+            </>
           </ColumnStackLayout>
         )
       }

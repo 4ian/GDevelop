@@ -297,7 +297,10 @@ export const HomePage = React.memo<Props>(
                         margin: `0px ${windowWidth === 'small' ? 15 : 35}px`,
                       }}
                     >
-                      <ResponsiveLineStackLayout justifyContent="space-between">
+                      <ResponsiveLineStackLayout
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
                         <UserChip
                           profile={authenticatedUser.profile}
                           onClick={onOpenProfile}

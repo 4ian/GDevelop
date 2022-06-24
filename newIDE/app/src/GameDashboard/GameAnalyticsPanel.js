@@ -42,6 +42,8 @@ export type MergedGameMetrics = GameMetrics & {
   startDate: string,
 };
 
+const daysShownForYear = 364;
+
 const fillMissingDays = (
   gameMetrics: Array<GameMetrics>
 ): Array<GameMetrics> => {
@@ -77,6 +79,29 @@ const fillMissingDays = (
     }
     filledGameMetrics.push(metric);
     previousMetricDate = metricDate;
+  }
+  while (filledGameMetrics.length < daysShownForYear) {
+    const addedMetricDate = subDays(previousMetricDate, 1);
+    const zeroMetric: GameMetrics = {
+      date: formatISO(addedMetricDate),
+
+      sessions: {
+        d0Sessions: 0,
+        d0SessionsDurationTotal: 0,
+      },
+      players: {
+        d0Players: 0,
+        d0NewPlayers: 0,
+        d0PlayersBelow60s: 0,
+        d0PlayersBelow180s: 0,
+        d0PlayersBelow300s: 0,
+        d0PlayersBelow600s: 0,
+        d0PlayersBelow900s: 0,
+      },
+      retention: null,
+    };
+    filledGameMetrics.push(zeroMetric);
+    previousMetricDate = addedMetricDate;
   }
   return filledGameMetrics;
 };
@@ -534,7 +559,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
   const chartData = dataPeriod === 'year' ? yearChartData : monthChartData;
 
   // It's divisible by 7.
-  const lastYearIsoDate = formatISO(subDays(new Date(), 364), {
+  const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
     representation: 'date',
   });
 

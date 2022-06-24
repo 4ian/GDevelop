@@ -12,6 +12,18 @@ type Props = {|
   onLoad?: (e: any) => void,
 |};
 
+function fixedEncodeURIComponent(str: string) {
+  return str.replace(/[#*]/g, function(c) {
+    return (
+      '%' +
+      c
+        .charCodeAt(0)
+        .toString(16)
+        .toUpperCase()
+    );
+  });
+}
+
 const addSearchParameterToUrl = (
   url: string,
   urlEncodedParameterName: string,
@@ -23,7 +35,13 @@ const addSearchParameterToUrl = (
   }
 
   const separator = url.indexOf('?') === -1 ? '?' : '&';
-  return url + separator + urlEncodedParameterName + '=' + urlEncodedValue;
+  return (
+    fixedEncodeURIComponent(url) +
+    separator +
+    urlEncodedParameterName +
+    '=' +
+    urlEncodedValue
+  );
 };
 
 /**

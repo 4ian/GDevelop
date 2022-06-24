@@ -166,6 +166,10 @@ export const GameCard = ({
                       click: () => onOpenGameManager('builds'),
                     },
                     {
+                      label: i18n._(t`See feedbacks`),
+                      click: () => onOpenGameManager('feedback'),
+                    },
+                    {
                       label: i18n._(t`Open analytics`),
                       click: () => onOpenGameManager('analytics'),
                     },
@@ -203,7 +207,7 @@ export const GameCard = ({
                       >
                         <FlatButton
                           label={<Trans>Access feedback</Trans>}
-                          onClick={() => {}}
+                          onClick={() => onOpenGameManager('feedback')}
                           disabled={!game.publicWebBuildId}
                         />
                         <RaisedButton

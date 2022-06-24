@@ -584,7 +584,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
     [loadGameMetrics]
   );
 
-  const CHART_MARGINS = {
+  const chartMargins = {
     top: 5,
     bottom: 5,
     right: 25,
@@ -592,8 +592,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
   };
   // There is a known bug with recharts that causes the chart to not render if the width is 100%
   // in a flexbox component. check https://github.com/recharts/recharts/issues/172
-  const CHART_WIDTH = '99%';
-  const CHART_HEIGHT = 300;
+  const chartWidth = '99%';
+  const chartHeight = 300;
 
   return (
     <I18n>
@@ -651,11 +651,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                       {chartData.overview.playersCount} sessions this month
                     </Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <AreaChart data={chartData.byDay} margin={chartMargins}>
                       <Area
                         name={i18n._(t`Viewers`)}
                         type="monotone"
@@ -699,11 +696,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                       rate
                     </Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <LineChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <LineChart data={chartData.byDay} margin={chartMargins}>
                       <RechartsLine
                         name={i18n._(t`Bounce rate`)}
                         unit="%"
@@ -746,11 +740,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                       minutes per player
                     </Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <LineChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <LineChart data={chartData.byDay} margin={chartMargins}>
                       <RechartsLine
                         name={i18n._(t`Mean played time`)}
                         unit={' ' + i18n._(t`minutes`)}
@@ -793,13 +784,10 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                       minutes
                     </Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
                     <AreaChart
                       data={chartData.byPlayedTime}
-                      margin={CHART_MARGINS}
+                      margin={chartMargins}
                     >
                       <Area
                         name={i18n._(t`Players`)}
@@ -850,11 +838,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                       minutes
                     </Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <AreaChart data={chartData.byDay} margin={chartMargins}>
                       <Area
                         name={i18n._(t`Viewers`)}
                         type="monotone"
@@ -942,11 +927,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                       minutes
                     </Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <AreaChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <AreaChart data={chartData.byDay} margin={chartMargins}>
                       <Area
                         name={i18n._(t`Viewers`)}
                         type="monotone"
@@ -1042,11 +1024,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   <Text size="title" align="center">
                     <Trans>Players by played time</Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <BarChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <BarChart data={chartData.byDay} margin={chartMargins}>
                       <Bar
                         name={i18n._(t`More than 15 minutes`)}
                         stackId="a"
@@ -1118,11 +1097,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   <Text size="title" align="center">
                     <Trans>Players by played time</Trans>
                   </Text>
-                  <ResponsiveContainer
-                    width={CHART_WIDTH}
-                    height={CHART_HEIGHT}
-                  >
-                    <BarChart data={chartData.byDay} margin={CHART_MARGINS}>
+                  <ResponsiveContainer width={chartWidth} height={chartHeight}>
+                    <BarChart data={chartData.byDay} margin={chartMargins}>
                       <Bar
                         name={i18n._(t`More than 15 minutes`)}
                         stackId="a"

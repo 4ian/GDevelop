@@ -89,7 +89,7 @@ const FeedbackCard = ({ comment, authenticatedUser }: Props) => {
         });
         setProcessed(newProcessedValue);
       } catch (error) {
-        console.error(`Unable to update comment: ${error}`);
+        console.error(`Unable to update comment: `, error);
         showErrorBox({
           message: i18n._(t`Unable to change resolved status of feedback.`),
           rawError: error,

@@ -527,27 +527,37 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
           </PlaceholderError>
         ) : (
           <ColumnStackLayout expand>
-            <Column expand noMargin alignItems="center">
-              {!publicGame && <CircularProgress size={20} />}
-            </Column>
-            <SelectField
-              value={dataPeriod}
-              onChange={(e, i, period: string) => {
-                setDataPeriod(period);
-              }}
-              disableUnderline
-            >
-              <SelectOption
-                key="month"
-                value="month"
-                primaryText={i18n._(t`Month`)}
-              />
-              <SelectOption
-                key="year"
-                value="year"
-                primaryText={i18n._(t`Year`)}
-              />
-            </SelectField>
+            <Line noMargin>
+              <Column expand noMargin alignItems="left" />
+              <Column expand noMargin alignItems="center">
+                {!publicGame && <CircularProgress size={20} />}
+              </Column>
+              <Column expand noMargin alignItems="right">
+                <Line noMargin>
+                  <Column expand noMargin />
+                  <Column noMargin alignItems="right">
+                    <SelectField
+                      value={dataPeriod}
+                      onChange={(e, i, period: string) => {
+                        setDataPeriod(period);
+                      }}
+                      disableUnderline
+                    >
+                      <SelectOption
+                        key="month"
+                        value="month"
+                        primaryText={i18n._(t`Month`)}
+                      />
+                      <SelectOption
+                        key="year"
+                        value="year"
+                        primaryText={i18n._(t`Year`)}
+                      />
+                    </SelectField>
+                  </Column>
+                </Line>
+              </Column>
+            </Line>
             {gameRollingMetrics &&
             gameRollingMetrics.length > 0 &&
             (!gameRollingMetrics[0].retention ||

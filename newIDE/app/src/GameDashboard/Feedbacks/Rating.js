@@ -9,19 +9,18 @@ import { Column } from '../../UI/Grid';
 
 type Props = {
   value: number,
-  label: string,
+  label: React.Node,
 };
 
 /* Display a rating between 1 and 10. */
 const Rating = ({ value, label }: Props) => {
-  const classes = useStyles();
   return (
     <Column expand noMargin>
       <Text size="body2">{label}</Text>
       <LinearProgress
         variant="determinate"
         value={value * 10}
-        classes={classes}
+        style={{ height: 8, borderRadius: 8 }}
       />
     </Column>
   );

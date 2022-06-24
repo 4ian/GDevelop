@@ -74,7 +74,7 @@ const GameFeedback = ({ authenticatedUser, game }: Props) => {
       <Line>
         {!authenticatedUser.authenticated && (
           <EmptyMessage>
-            <Trans>You need to login first to see your builds.</Trans>
+            <Trans>You need to login first to see your game feedbacks.</Trans>
           </EmptyMessage>
         )}
         {authenticatedUser.authenticated &&

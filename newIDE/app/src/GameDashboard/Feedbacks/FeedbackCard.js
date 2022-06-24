@@ -37,10 +37,22 @@ const getRatings = (ratings: ?GameRatings) => {
   if (!ratings) return null;
   if (ratings.version === 1) {
     return [
-      { label: 'Sound', value: ratings.sound },
-      { label: 'Visuals', value: ratings.visuals },
-      { label: 'Fun', value: ratings.fun },
-      { label: 'Ease of use', value: ratings.easeOfUse },
+      {
+        key: 'rating-sound',
+        label: <Trans>Sound</Trans>,
+        value: ratings.sound,
+      },
+      {
+        key: 'rating-visuals',
+        label: <Trans>Visuals</Trans>,
+        value: ratings.visuals,
+      },
+      { key: 'rating-fun', label: <Trans>Fun</Trans>, value: ratings.fun },
+      {
+        key: 'rating-ease-of-use',
+        label: <Trans>Ease of use</Trans>,
+        value: ratings.easeOfUse,
+      },
     ];
   }
 };
@@ -112,7 +124,7 @@ const FeedbackCard = ({
                   {ratings && (
                     <ResponsiveLineStackLayout noColumnMargin expand>
                       {ratings.map(rating => (
-                        <Line expand noMargin key={rating.label}>
+                        <Line expand noMargin key={rating.key}>
                           <Rating label={rating.label} value={rating.value} />
                           <Spacer />
                         </Line>

@@ -21,6 +21,5 @@ export const DefaultFeedbackCard = () => (
   <FeedbackCard
     comment={commentUnsolved}
     authenticatedUser={fakeIndieAuthenticatedUser}
-    onUpdateComment={action('onUpdateComment')}
   />
 );

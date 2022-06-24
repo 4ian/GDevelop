@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import { Card } from '@material-ui/core';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
@@ -24,14 +25,14 @@ import {
 } from '../../Utils/GDevelopServices/Play';
 import { useDebounce } from '../../Utils/UseDebounce';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 const styles = { textComment: { whiteSpace: 'pre-wrap' } };
 
-type Props = {
+type Props = {|
   comment: Comment,
   authenticatedUser: AuthenticatedUser,
-  onUpdateComment: () => ?Promise<void>,
-};
+|};
 
 const getRatings = (ratings: ?GameRatings) => {
   if (!ratings) return null;
@@ -57,44 +58,57 @@ const getRatings = (ratings: ?GameRatings) => {
   }
 };
 
-const FeedbackCard = ({
-  comment,
-  authenticatedUser,
-  onUpdateComment,
-}: Props) => {
+const getCurrentState = (pendingState: ?boolean, state: boolean) => {
+  return pendingState === null ? state : pendingState;
+};
+
+const FeedbackCard = ({ comment, authenticatedUser }: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
 
-  const [processed, setProcessed] = React.useState<?boolean>(null);
-
-  const isProcessed = processed === null ? !!comment.processedAt : processed;
+  const [processed, setProcessed] = React.useState<boolean>(
+    !!comment.processedAt
+  );
+  const [
+    pendingProcessedState,
+    setPendingProcessedState,
+  ] = React.useState<?boolean>(null);
 
   const setProcessedAt = useDebounce(
-    async ({ processed }: { processed: boolean }) => {
+    async (
+      i18n: I18nType,
+      { processed: newProcessedValue }: { processed: boolean }
+    ) => {
       if (!profile) return;
       try {
         await updateComment(getAuthorizationHeader, profile.id, {
           gameId: comment.gameId,
           commentId: comment.id,
-          processed: processed,
+          processed: newProcessedValue,
         });
+        setProcessed(newProcessedValue);
       } catch (error) {
-        console.warn(`Unable to update comment: ${error}`);
+        console.error(`Unable to update comment: ${error}`);
+        showErrorBox({
+          message: i18n._(t`Unable to change resolved status of feedback.`),
+          rawError: error,
+          errorId: 'feedback-card-set-processed-error',
+        });
       } finally {
-        await onUpdateComment();
-        setProcessed(null);
+        setPendingProcessedState(null);
       }
     },
     500
   );
 
-  const onSetProcessed = () => {
-    const newProcessedValue = !(processed === null
-      ? !!comment.processedAt
-      : processed);
-    setProcessed(newProcessedValue);
-    setProcessedAt({
+  const onSetProcessed = (i18n: I18nType) => {
+    const newProcessedValue = !getCurrentState(
+      pendingProcessedState,
+      processed
+    );
+    setPendingProcessedState(newProcessedValue);
+    setProcessedAt(i18n, {
       processed: newProcessedValue,
     });
   };
@@ -102,7 +116,7 @@ const FeedbackCard = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Card variant="outlined" style={{ opacity: isProcessed ? '0.5' : '1' }}>
+        <Card variant="outlined" style={{ opacity: processed ? '0.5' : '1' }}>
           <Line noMargin alignItems="start">
             <Column expand>
               <CardContent>
@@ -137,10 +151,10 @@ const FeedbackCard = ({
               </CardContent>
             </Column>
             <IconButton
-              tooltip={isProcessed ? t`Unresolve` : t`Resolve`}
-              onClick={onSetProcessed}
+              tooltip={processed ? t`Unresolve` : t`Resolve`}
+              onClick={() => onSetProcessed(i18n)}
             >
-              {isProcessed ? (
+              {getCurrentState(pendingProcessedState, processed) ? (
                 <CheckCircleIcon htmlColor={theme.message.valid} />
               ) : (
                 <CheckCircleOutlineIcon />

@@ -120,7 +120,6 @@ const GameFeedback = ({ authenticatedUser, game }: Props) => {
                     key={comment.id}
                     comment={comment}
                     authenticatedUser={authenticatedUser}
-                    onUpdateComment={loadFeedbacks}
                   />
                 ))}
               </ColumnStackLayout>

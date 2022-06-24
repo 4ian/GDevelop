@@ -32,6 +32,7 @@ import Window from '../Utils/Window';
 import { type GamesDetailsTab } from './GameDetailsDialog';
 import Dialog from '../UI/Dialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 type Props = {|
   game: Game,
@@ -45,61 +46,39 @@ type TogglableProperties =
   | 'acceptsBuildComments'
   | 'acceptsGameComments';
 
-const getConfirmationMessage = (newProperty: {
-  [key: TogglableProperties]: boolean,
-}) => {
-  console.log(newProperty);
-  const {
-    discoverable,
-    acceptsBuildComments,
-    acceptsGameComments,
-  } = newProperty;
-  if (discoverable !== undefined) {
-    if (discoverable) {
-      return (
-        <Trans>Are you sure you want to make this game discoverable?</Trans>
-      );
-    }
-    if (!discoverable) {
-      return (
-        <Trans>
-          Are you sure you don't want to make this game discoverable anymore?
-        </Trans>
-      );
-    }
-  }
-  if (acceptsBuildComments !== undefined) {
-    if (acceptsBuildComments) {
-      return (
-        <Trans>
-          Are you sure you want to ask for feedbacks on all build pages?
-        </Trans>
-      );
-    }
-    if (!acceptsBuildComments) {
-      return (
-        <Trans>
-          Are you sure you want to stop asking for feedbacks on all build pages?
-        </Trans>
-      );
-    }
-  }
-  if (acceptsGameComments !== undefined) {
-    if (acceptsGameComments) {
-      return (
-        <Trans>
-          Are you sure you want to show a feedback banner on Liluo.io?
-        </Trans>
-      );
-    }
-    if (!acceptsGameComments) {
-      return (
-        <Trans>
-          Are you sure you want to remove the feedback banner on Liluo.io?
-        </Trans>
-      );
-    }
-  }
+const confirmationMessage = {
+  discoverable: {
+    true: <Trans>Are you sure you want to make this game discoverable?</Trans>,
+    false: (
+      <Trans>
+        Are you sure you don't want to make this game discoverable anymore?
+      </Trans>
+    ),
+  },
+  acceptsBuildComments: {
+    true: (
+      <Trans>
+        Are you sure you want to ask for feedbacks on all build pages?
+      </Trans>
+    ),
+    false: (
+      <Trans>
+        Are you sure you want to stop asking for feedbacks on all build pages?
+      </Trans>
+    ),
+  },
+  acceptsGameComments: {
+    true: (
+      <Trans>
+        Are you sure you want to show a feedback banner on Liluo.io?
+      </Trans>
+    ),
+    false: (
+      <Trans>
+        Are you sure you want to remove the feedback banner on Liluo.io?
+      </Trans>
+    ),
+  },
 };
 
 export const GameCard = ({
@@ -138,7 +117,7 @@ export const GameCard = ({
   };
   const newProperty = getNewProperty(showConfirmationDialog);
 
-  const onConfirmToggleChanges = async () => {
+  const onConfirmToggleChanges = async (i18n: I18nType) => {
     if (!profile || !showConfirmationDialog) return;
     if (!newProperty) return;
     setIsEditingProperty(true);
@@ -152,10 +131,15 @@ export const GameCard = ({
       await onUpdateGame();
       setShowConfirmationDialog(null);
     } catch (error) {
-      console.warn(
+      console.error(
         `Unable to update property ${showConfirmationDialog}`,
         error
       );
+      showErrorBox({
+        message: i18n._(t`Unable to update game.`),
+        rawError: error,
+        errorId: 'game-dashboard-update-game-error',
+      });
     } finally {
       setIsEditingProperty(false);
     }
@@ -317,11 +301,11 @@ export const GameCard = ({
                 <RaisedButton
                   key="confirm-toggle-change"
                   label={<Trans>Confirm</Trans>}
-                  onClick={onConfirmToggleChanges}
+                  onClick={() => onConfirmToggleChanges(i18n)}
                   disabled={isEditingProperty}
                 />,
               ]}
-              onApply={onConfirmToggleChanges}
+              onApply={() => onConfirmToggleChanges(i18n)}
               cannotBeDismissed={isEditingProperty}
             >
               <Column>
@@ -329,7 +313,13 @@ export const GameCard = ({
                   {isEditingProperty ? (
                     <PlaceholderLoader />
                   ) : (
-                    <Text>{getConfirmationMessage(newProperty)}</Text>
+                    <Text>
+                      {
+                        confirmationMessage[showConfirmationDialog][
+                          (!!newProperty[showConfirmationDialog]).toString()
+                        ]
+                      }
+                    </Text>
                   )}
                 </Line>
               </Column>

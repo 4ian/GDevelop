@@ -298,7 +298,7 @@ export const deleteLeaderboardEntry = async (
 // 2 types of comments. Feedback is private, Review is public.
 export type CommentType = 'FEEDBACK' | 'REVIEW';
 
-export type GameRatingsV1 = {
+export type GameRatings = {
   version: number,
   visuals: number,
   sound: number,
@@ -306,22 +306,18 @@ export type GameRatingsV1 = {
   easeOfUse: number,
 };
 
-export type GameRatings = GameRatingsV1; // Handle future versions of the schema with "| GameRatingsV2"
-
 export type Comment = {
   id: string,
   type: CommentType,
-  gameId: string, // We are always able to link a comment to a game, even if made on a build.
-  buildId?: string, // If defined, the comment is made on a specific build.
+  gameId: string,
+  buildId?: string,
   text: string,
   ratings?: GameRatings,
-  playerId?: string, // Useful in the future, to link a comment to a user.
-  playerName?: string, // For non-authenticated comments.
-  contact?: string, // In order to be able to contact the user.
+  playerId?: string,
+  playerName?: string,
+  contact?: string,
   createdAt: number,
-  updatedAt: number,
-  deletedAt?: number, // For soft delete.
-  processedAt?: number, // For marking comments as resolved/processed.
+  processedAt?: number,
 };
 
 export const listComments = async (

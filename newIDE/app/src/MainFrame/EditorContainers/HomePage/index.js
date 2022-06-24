@@ -42,6 +42,8 @@ import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorag
 import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
 import optionalRequire from '../../../Utils/OptionalRequire';
+import TextButton from '../../../UI/TextButton';
+import { isMobile } from '../../../Utils/Platform';
 const electron = optionalRequire('electron');
 
 const styles = {
@@ -85,6 +87,7 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
+  onOpenOnboardingDialog: () => void,
 
   // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -130,6 +133,7 @@ export const HomePage = React.memo<Props>(
         onOpenLanguageDialog,
         onOpenProfile,
         setToolbar,
+        onOpenOnboardingDialog,
       }: Props,
       ref
     ) => {
@@ -301,13 +305,25 @@ export const HomePage = React.memo<Props>(
                         justifyContent="space-between"
                         alignItems="center"
                       >
-                        <UserChip
-                          profile={authenticatedUser.profile}
-                          onClick={onOpenProfile}
-                          displayNotificationBadge={hasPendingNotifications(
-                            authenticatedUser
+                        <ResponsiveLineStackLayout
+                          justifyContent="flex-start"
+                          noColumnMargin
+                        >
+                          <UserChip
+                            profile={authenticatedUser.profile}
+                            onClick={onOpenProfile}
+                            displayNotificationBadge={hasPendingNotifications(
+                              authenticatedUser
+                            )}
+                          />
+                          {!electron && !isMobile() && (
+                            <TextButton
+                              label={<Trans>Start in-app onboarding</Trans>}
+                              primary
+                              onClick={onOpenOnboardingDialog}
+                            />
                           )}
-                        />
+                        </ResponsiveLineStackLayout>
                         <ResponsiveLineStackLayout
                           justifyContent="flex-end"
                           noColumnMargin
@@ -586,5 +602,6 @@ export const renderHomePageContainer = (
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
+    onOpenOnboardingDialog={props.onOpenOnboardingDialog}
   />
 );

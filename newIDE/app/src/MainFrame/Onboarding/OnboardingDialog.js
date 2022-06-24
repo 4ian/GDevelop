@@ -5,9 +5,6 @@ import * as React from 'react';
 import userflow from 'userflow.js';
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import optionalRequire from '../../Utils/OptionalRequire';
-import { getProgramOpeningCount } from '../../Utils/Analytics/LocalStats';
-import { isMobile } from '../../Utils/Platform';
 import Window from '../../Utils/Window';
 import { getUserUUID } from '../../Utils/Analytics/UserUUID';
 import { Line } from '../../UI/Grid';
@@ -15,9 +12,8 @@ import { MarkdownText } from '../../UI/MarkdownText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { ColumnStackLayout } from '../../UI/Layout';
 import PreferencesContext from '../Preferences/PreferencesContext';
-
-const electron = optionalRequire('electron');
 const isDev = Window.isDev();
+
 let isUserflowInitialized = false;
 export let isUserflowRunning = false;
 
@@ -51,8 +47,12 @@ The tour is only available in 4 languages
 We highly recommend it!
 `;
 
-const OnboardingDialog = () => {
-  const [open, setOpen] = React.useState(false);
+type Props = {|
+  open: boolean,
+  onClose: () => void,
+|};
+
+const OnboardingDialog = ({ open, onClose }: Props) => {
   const [loading, setLoading] = React.useState(false);
   const { values } = React.useContext(PreferencesContext);
 
@@ -85,7 +85,7 @@ const OnboardingDialog = () => {
         await userflow.identify(getUserUUID(), { language: appLanguage });
         const flowId = userFlowIds[appLanguage || 'en'] || userFlowIds.en;
         await userflow.start(flowId);
-        setOpen(false);
+        onClose();
       } catch (e) {
         // Something wrong happened, allow the user to retry.
         console.error(
@@ -101,28 +101,14 @@ const OnboardingDialog = () => {
         setLoading(false);
       }
     },
-    [initializeUserflow, values.language]
+    [initializeUserflow, values.language, onClose]
   );
-
-  // Open modal if this is the first time the user opens the web app.
-  React.useEffect(() => {
-    setTimeout(() => {
-      if (
-        !electron &&
-        getProgramOpeningCount() <= 1 &&
-        !isMobile() &&
-        !isDev // Uncomment this condition to see the onboarding in dev, as we are not tracking the opening count, we disable it.
-      ) {
-        setOpen(true);
-      }
-    }, 3000); // Timeout to avoid showing the dialog while the app is still loading.
-  }, []);
 
   const actions = [
     <FlatButton
       key="close"
       label={<Trans>No thanks, I'm good</Trans>}
-      onClick={() => setOpen(false)}
+      onClick={onClose}
     />,
     <DialogPrimaryButton
       key="start"
@@ -138,7 +124,7 @@ const OnboardingDialog = () => {
       title={<Trans>Take a quick tour?</Trans>}
       actions={actions}
       open={open}
-      onRequestClose={() => setOpen(false)}
+      onRequestClose={onClose}
       onApply={startUserflow}
       maxWidth="xs"
     >

@@ -18,6 +18,7 @@ import {
   type Asset,
   type AssetPacks,
 } from '../Utils/GDevelopServices/Asset';
+import { formatISO, subDays } from 'date-fns';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -780,35 +781,94 @@ export const game2: Game = {
   createdAt: 1607065498,
 };
 
-export const gameRollingMetrics1: GameMetrics = {
-  date: '2020-10-01',
+const interpolateWithNoise = (
+  leftValue: number,
+  rightValue: number,
+  ratio: number
+) =>
+  ((1 - ratio) * leftValue + ratio * rightValue) * (0.95 + 0.1 * Math.random());
 
-  sessions: {
-    d0Sessions: 350,
-  },
-  players: {
-    d0Players: 200,
-    d0NewPlayers: 220,
-  },
-  retention: {
-    d1RetainedPlayers: 193,
-    d2RetainedPlayers: 153,
-    d3RetainedPlayers: 121,
-    d4RetainedPlayers: 83,
-    d5RetainedPlayers: 74,
-    d6RetainedPlayers: 73,
-    d7RetainedPlayers: 67,
-  },
-};
-export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
-  date: '2020-10-01',
+const generateGameRollingMetrics1 = () => {
+  const metrics = [];
+  const count = 364;
+  for (let index = 0; index < count; index++) {
+    const ratio = 1 - index / count;
+    const playersCount = Math.round(interpolateWithNoise(50, 250, ratio));
+    metrics.push({
+      date: formatISO(subDays(new Date(), index)),
 
-  sessions: {
-    d0Sessions: 350,
-  },
-  players: null,
-  retention: null,
+      sessions: {
+        d0Sessions: Math.round(interpolateWithNoise(80, 350, ratio)),
+        d0SessionsDurationTotal: Math.round(
+          interpolateWithNoise(15000, 175000, ratio)
+        ),
+      },
+      players: {
+        d0Players: playersCount,
+        d0NewPlayers: Math.round(interpolateWithNoise(80, 120, ratio)),
+        d0PlayersBelow60s: Math.round(
+          playersCount * interpolateWithNoise(0.8, 0.4, ratio)
+        ),
+        d0PlayersBelow180s: Math.round(
+          playersCount * interpolateWithNoise(0.9, 0.55, ratio)
+        ),
+        d0PlayersBelow300s: Math.round(
+          playersCount * interpolateWithNoise(0.95, 0.6, ratio)
+        ),
+        d0PlayersBelow600s: Math.round(
+          playersCount * interpolateWithNoise(0.98, 0.7, ratio)
+        ),
+        d0PlayersBelow900s: Math.round(
+          playersCount * Math.min(1, interpolateWithNoise(1, 0.9, ratio))
+        ),
+      },
+      retention: {
+        d1RetainedPlayers: 193,
+        d2RetainedPlayers: 153,
+        d3RetainedPlayers: 121,
+        d4RetainedPlayers: 83,
+        d5RetainedPlayers: 74,
+        d6RetainedPlayers: 73,
+        d7RetainedPlayers: 67,
+      },
+    });
+  }
+  return metrics;
 };
+
+export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetrics1();
+export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  19
+);
+export const gameRollingMetricsWithOnly1Day: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  1
+);
+export const gameRollingMetricsWithHoles: GameMetrics[] = [
+  4,
+  12,
+  13,
+  25,
+  33,
+  107,
+  108,
+  109,
+  110,
+  230,
+].map(index => gameRollingMetricsFor364Days[index]);
+export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
+  {
+    date: '2020-10-01',
+
+    sessions: {
+      d0Sessions: 350,
+      d0SessionsDurationTotal: 175000,
+    },
+    players: null,
+    retention: null,
+  },
+];
 
 export const showcasedGame1: ShowcasedGame = {
   title: "Lil BUB's HELLO EARTH",

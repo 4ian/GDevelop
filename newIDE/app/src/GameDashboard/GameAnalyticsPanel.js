@@ -7,6 +7,7 @@ import {
   parseISO,
   differenceInCalendarDays,
   subDays,
+  addDays,
 } from 'date-fns';
 import { Column, Line } from '../UI/Grid';
 import { type Game } from '../Utils/GDevelopServices/Game';
@@ -20,7 +21,6 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import AlertMessage from '../UI/AlertMessage';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import {
   ResponsiveContainer,
@@ -48,7 +48,8 @@ const fillMissingDays = (
   gameMetrics: Array<GameMetrics>
 ): Array<GameMetrics> => {
   const filledGameMetrics = [];
-  let previousMetricDate = new Date();
+  // TODO In some timezones, it might start the wrong day.
+  let previousMetricDate = addDays(new Date(), 1);
   for (const metric of gameMetrics) {
     const metricDate = parseISO(metric.date);
     while (

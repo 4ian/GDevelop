@@ -83,7 +83,10 @@ import {
   releaseWithoutDescription,
   game1,
   game2,
-  gameRollingMetrics1,
+  gameRollingMetricsFor364Days,
+  gameRollingMetricsWithOnly19Days,
+  gameRollingMetricsWithOnly1Day,
+  gameRollingMetricsWithHoles,
   gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
   geometryMonsterExampleShortHeader,
@@ -4526,7 +4529,79 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
     const mock = new MockAdapter(axios);
     mock
       .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetrics1)
+      .reply(200, gameRollingMetricsFor364Days)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </AuthenticatedUserContext.Provider>
+    );
+  })
+  .add('With analytics only for 19 days', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetricsWithOnly19Days)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </AuthenticatedUserContext.Provider>
+    );
+  })
+  .add('With analytics only for 1 day', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetricsWithOnly1Day)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </AuthenticatedUserContext.Provider>
+    );
+  })
+  .add('With analytics with holes', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetricsWithHoles)
       .onAny()
       .reply(config => {
         console.error(`Unexpected call to ${config.url} (${config.method})`);
@@ -4550,7 +4625,7 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
     const mock = new MockAdapter(axios, { delayResponse: 2000 });
     mock
       .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetrics1)
+      .reply(200, gameRollingMetricsFor364Days)
       .onAny()
       .reply(config => {
         console.error(`Unexpected call to ${config.url} (${config.method})`);

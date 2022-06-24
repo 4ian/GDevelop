@@ -48,11 +48,10 @@ const fillMissingDays = (
   gameMetrics: Array<GameMetrics>
 ): Array<GameMetrics> => {
   const filledGameMetrics = [];
-  let previousMetricDate = null;
+  let previousMetricDate = new Date();
   for (const metric of gameMetrics) {
     const metricDate = parseISO(metric.date);
     while (
-      previousMetricDate &&
       differenceInCalendarDays(parseISO(metric.date), previousMetricDate) < -1
     ) {
       const addedMetricDate = subDays(previousMetricDate, 1);

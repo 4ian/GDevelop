@@ -135,6 +135,11 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import OnboardingDialog from './Onboarding/OnboardingDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import optionalRequire from '../Utils/OptionalRequire';
+import { isMobile } from '../Utils/Platform';
+import { getProgramOpeningCount } from '../Utils/Analytics/LocalStats';
+const electron = optionalRequire('electron');
+const isDev = Window.isDev();
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -274,6 +279,9 @@ const MainFrame = (props: Props) => {
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
+  const [onboardingDialogOpen, openOnboardingDialog] = React.useState<boolean>(
+    false
+  );
   const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
     false
   );
@@ -357,6 +365,20 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
+
+  // Open onboarding modal if this is the first time the user opens the web app.
+  React.useEffect(() => {
+    setTimeout(() => {
+      if (
+        !electron &&
+        getProgramOpeningCount() <= 1 &&
+        !isMobile() &&
+        !isDev // Uncomment this condition to see the onboarding in dev, as we are not tracking the opening count, we disable it.
+      ) {
+        openOnboardingDialog(true);
+      }
+    }, 3000); // Timeout to avoid showing the dialog while the app is still loading.
+  }, []);
 
   React.useEffect(
     () => {
@@ -2267,6 +2289,7 @@ const MainFrame = (props: Props) => {
                     onOpenProfile: () => openProfileDialogWithTab('profile'),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onOpenOnboardingDialog: () => openOnboardingDialog(true),
                     onLoadEventsFunctionsExtensions: () =>
                       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                         currentProject
@@ -2453,7 +2476,14 @@ const MainFrame = (props: Props) => {
         hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
-      <OnboardingDialog />
+      {onboardingDialogOpen && (
+        <OnboardingDialog
+          open
+          onClose={() => {
+            openOnboardingDialog(false);
+          }}
+        />
+      )}
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
         renderGDJSDevelopmentWatcher()}

@@ -836,7 +836,27 @@ const generateGameRollingMetrics1 = () => {
   return metrics;
 };
 
-export const gameRollingMetrics1: GameMetrics[] = generateGameRollingMetrics1();
+export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetrics1();
+export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  19
+);
+export const gameRollingMetricsWithOnly1Day: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  1
+);
+export const gameRollingMetricsWithHoles: GameMetrics[] = [
+  4,
+  12,
+  13,
+  25,
+  33,
+  107,
+  108,
+  109,
+  110,
+  230,
+].map(index => gameRollingMetricsFor364Days[index]);
 export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
   {
     date: '2020-10-01',

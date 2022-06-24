@@ -45,7 +45,7 @@ import {
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
 export type MergedGameMetrics = GameMetrics & {
-  endDate: string,
+  startDate: string,
 };
 
 const mergeGameMetrics = (
@@ -54,7 +54,7 @@ const mergeGameMetrics = (
 ): MergedGameMetrics => {
   return {
     date: a.date,
-    endDate: b.date,
+    startDate: b.date,
 
     sessions: a.sessions &&
       b.sessions && {
@@ -88,9 +88,13 @@ const mergeGameMetricsByWeek = (
   gameMetrics: GameMetrics[]
 ): MergedGameMetrics[] => {
   const mergedGameMetrics: Array<MergedGameMetrics> = [];
-  for (let weekIndex = 7; weekIndex < gameMetrics.length; weekIndex += 7) {
+  for (let weekIndex = 0; weekIndex < gameMetrics.length; weekIndex += 7) {
     let mergedGameMetric = gameMetrics[weekIndex];
-    for (let index = weekIndex + 1; index < weekIndex + 7; index++) {
+    for (
+      let index = weekIndex;
+      index < weekIndex + 7 && index < gameMetrics.length;
+      index++
+    ) {
       mergedGameMetric = mergeGameMetrics(mergedGameMetric, gameMetrics[index]);
     }
     mergedGameMetrics.push(((mergedGameMetric: any): MergedGameMetrics));
@@ -253,6 +257,7 @@ const evaluateChartData = (
   );
 
   const dateFormatOptions = { month: 'short', day: 'numeric' };
+  const noMonthDateFormatOptions = { day: 'numeric' };
 
   return {
     overview: {
@@ -289,10 +294,20 @@ const evaluateChartData = (
     byDay: metrics
       .map(metric => ({
         timestamp: parseISO(metric.date).getTime(),
-        date: parseISO(metric.date).toLocaleDateString(
-          undefined,
-          dateFormatOptions
-        ),
+        date:
+          (metric.startDate
+            ? parseISO(metric.startDate).toLocaleDateString(
+                undefined,
+                parseISO(metric.date).getMonth() ===
+                  parseISO(metric.startDate).getMonth()
+                  ? noMonthDateFormatOptions
+                  : dateFormatOptions
+              ) + ' - '
+            : '') +
+          parseISO(metric.date).toLocaleDateString(
+            undefined,
+            dateFormatOptions
+          ),
         meanPlayedDurationInMinutes:
           metric.sessions && metric.players
             ? metric.sessions.d0SessionsDurationTotal /
@@ -435,6 +450,7 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
+  // TODO fill the holes with zeroes.
   const yearChartData = React.useMemo(
     () =>
       gameRollingMetrics

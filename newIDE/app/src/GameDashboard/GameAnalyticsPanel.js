@@ -609,15 +609,6 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
           </PlaceholderError>
         ) : (
           <ColumnStackLayout expand>
-            {gameRollingMetrics &&
-            gameRollingMetrics.length > 0 &&
-            (!gameRollingMetrics[0].retention ||
-              !gameRollingMetrics[0].players) ? (
-              <AlertMessage kind="info">
-                Upgrade your account with a subscription to unlock all the
-                metrics for your game.
-              </AlertMessage>
-            ) : null}
             {isGameMetricsLoading && <PlaceholderLoader />}
             <>
               <Line noMargin justifyContent="flex-end">
@@ -802,8 +793,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         name={i18n._(t`Played time`)}
                         dataKey="duration"
                         type="number"
-                        domain={[0, 15]}
-                        ticks={[1, 3, 5, 10, 15]}
+                        domain={[0, durationValues[durationValues.length - 1]]}
+                        ticks={durationValues}
                         stroke={gdevelopTheme.chart.textColor}
                         style={styles.tickLabel}
                       />

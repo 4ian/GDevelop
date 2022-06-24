@@ -2,7 +2,12 @@
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
-import { formatISO, parseISO } from 'date-fns';
+import {
+  formatISO,
+  parseISO,
+  differenceInCalendarDays,
+  subDays,
+} from 'date-fns';
 import { Column, Line } from '../UI/Grid';
 import { type Game } from '../Utils/GDevelopServices/Game';
 import { ColumnStackLayout } from '../UI/Layout';
@@ -16,7 +21,6 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import AlertMessage from '../UI/AlertMessage';
-import subDays from 'date-fns/subDays';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import {
@@ -37,6 +41,45 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 export type MergedGameMetrics = GameMetrics & {
   startDate: string,
+};
+
+const fillMissingDays = (
+  gameMetrics: Array<GameMetrics>
+): Array<GameMetrics> => {
+  const filledGameMetrics = [];
+  let previousMetricDate = null;
+  for (const metric of gameMetrics) {
+    const metricDate = parseISO(metric.date);
+    while (
+      previousMetricDate &&
+      differenceInCalendarDays(parseISO(metric.date), previousMetricDate) < -1
+    ) {
+      const addedMetricDate = subDays(previousMetricDate, 1);
+      const zeroMetric: GameMetrics = {
+        date: formatISO(addedMetricDate),
+
+        sessions: {
+          d0Sessions: 0,
+          d0SessionsDurationTotal: 0,
+        },
+        players: {
+          d0Players: 0,
+          d0NewPlayers: 0,
+          d0PlayersBelow60s: 0,
+          d0PlayersBelow180s: 0,
+          d0PlayersBelow300s: 0,
+          d0PlayersBelow600s: 0,
+          d0PlayersBelow900s: 0,
+        },
+        retention: null,
+      };
+      filledGameMetrics.push(zeroMetric);
+      previousMetricDate = addedMetricDate;
+    }
+    filledGameMetrics.push(metric);
+    previousMetricDate = metricDate;
+  }
+  return filledGameMetrics;
 };
 
 const mergeGameMetrics = (
@@ -255,7 +298,9 @@ const evaluateChartData = (
       viewersCount: viewersCount,
       playersCount: playersCount,
       bounceRatePercent:
-        viewersCount > 0 ? (100 * playersCount) / viewersCount : 0,
+        viewersCount > 0
+          ? (100 * playersBelowSums[durationIndexes.for1Minute]) / viewersCount
+          : 0,
       meanPlayedDurationInMinutes:
         playersSum > 0 ? playedDurationSumInMinutes / playersSum : 0,
       nearestToMedianDuration: {
@@ -351,64 +396,81 @@ const evaluateChartData = (
           : 0,
 
         over0sPlayersPercent: metric.players ? 100 : 0,
-        over60sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0Players - metric.players.d0PlayersBelow60s)) /
-            metric.players.d0Players
-          : 0,
-        over180sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0Players - metric.players.d0PlayersBelow180s)) /
-            metric.players.d0Players
-          : 0,
-        over300sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0Players - metric.players.d0PlayersBelow300s)) /
-            metric.players.d0Players
-          : 0,
-        over600sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0Players - metric.players.d0PlayersBelow600s)) /
-            metric.players.d0Players
-          : 0,
-        over900sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0Players - metric.players.d0PlayersBelow900s)) /
-            metric.players.d0Players
-          : 0,
+        over60sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0Players - metric.players.d0PlayersBelow60s)) /
+              metric.players.d0Players
+            : 0,
+        over180sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0Players -
+                  metric.players.d0PlayersBelow180s)) /
+              metric.players.d0Players
+            : 0,
+        over300sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0Players -
+                  metric.players.d0PlayersBelow300s)) /
+              metric.players.d0Players
+            : 0,
+        over600sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0Players -
+                  metric.players.d0PlayersBelow600s)) /
+              metric.players.d0Players
+            : 0,
+        over900sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0Players -
+                  metric.players.d0PlayersBelow900s)) /
+              metric.players.d0Players
+            : 0,
 
-        below60sPlayersPercent: metric.players
-          ? (100 * metric.players.d0PlayersBelow60s) / metric.players.d0Players
-          : 0,
-        from60sTo180sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0PlayersBelow180s -
-                metric.players.d0PlayersBelow60s)) /
-            metric.players.d0Players
-          : 0,
-        from180sTo300sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0PlayersBelow300s -
-                metric.players.d0PlayersBelow180s)) /
-            metric.players.d0Players
-          : 0,
-        from300sTo600sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0PlayersBelow600s -
-                metric.players.d0PlayersBelow300s)) /
-            metric.players.d0Players
-          : 0,
-        from600sTo900sPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0PlayersBelow900s -
-                metric.players.d0PlayersBelow600s)) /
-            metric.players.d0Players
-          : 0,
-        from900sToInfinityPlayersPercent: metric.players
-          ? (100 *
-              (metric.players.d0Players - metric.players.d0PlayersBelow900s)) /
-            metric.players.d0Players
-          : 0,
+        below60sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 * metric.players.d0PlayersBelow60s) /
+              metric.players.d0Players
+            : 0,
+        from60sTo180sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0PlayersBelow180s -
+                  metric.players.d0PlayersBelow60s)) /
+              metric.players.d0Players
+            : 0,
+        from180sTo300sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0PlayersBelow300s -
+                  metric.players.d0PlayersBelow180s)) /
+              metric.players.d0Players
+            : 0,
+        from300sTo600sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0PlayersBelow600s -
+                  metric.players.d0PlayersBelow300s)) /
+              metric.players.d0Players
+            : 0,
+        from600sTo900sPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0PlayersBelow900s -
+                  metric.players.d0PlayersBelow600s)) /
+              metric.players.d0Players
+            : 0,
+        from900sToInfinityPlayersPercent:
+          metric.players && metric.players.d0Players > 0
+            ? (100 *
+                (metric.players.d0Players -
+                  metric.players.d0PlayersBelow900s)) /
+              metric.players.d0Players
+            : 0,
       }))
       .sort((a, b) => a.timestamp - b.timestamp),
     byPlayedTime: [{ duration: 0, playersCount: viewersCount }].concat(
@@ -441,19 +503,24 @@ export const GameAnalyticsPanel = ({ game, publicGame }: Props) => {
   const [gameRollingMetrics, setGameMetrics] = React.useState<?(GameMetrics[])>(
     null
   );
-  // TODO fill the holes with zeroes.
-  const yearChartData = React.useMemo(
-    () =>
-      gameRollingMetrics
-        ? evaluateChartData(mergeGameMetricsByWeek(gameRollingMetrics))
-        : emptyChartData,
-    [gameRollingMetrics]
-  );
-  const monthChartData = React.useMemo(
-    () =>
-      gameRollingMetrics
-        ? evaluateChartData(gameRollingMetrics.slice(0, 30))
-        : emptyChartData,
+  const { yearChartData, monthChartData } = React.useMemo(
+    () => {
+      if (!gameRollingMetrics) {
+        return {
+          yearChartData: emptyChartData,
+          monthChartData: emptyChartData,
+        };
+      }
+      const filledGameRollingMetrics = fillMissingDays(gameRollingMetrics);
+      return {
+        yearChartData: evaluateChartData(
+          mergeGameMetricsByWeek(filledGameRollingMetrics)
+        ),
+        monthChartData: evaluateChartData(
+          filledGameRollingMetrics.slice(0, 30)
+        ),
+      };
+    },
     [gameRollingMetrics]
   );
 

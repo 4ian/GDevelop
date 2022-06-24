@@ -368,16 +368,12 @@ const MainFrame = (props: Props) => {
 
   // Open onboarding modal if this is the first time the user opens the web app.
   React.useEffect(() => {
-    setTimeout(() => {
-      if (
-        !electron &&
-        getProgramOpeningCount() <= 1 &&
-        !isMobile() &&
-        !isDev // Uncomment this condition to see the onboarding in dev, as we are not tracking the opening count, we disable it.
-      ) {
+    const timeoutId = setTimeout(() => {
+      if (!electron && getProgramOpeningCount() <= 1 && !isMobile() && !isDev) {
         openOnboardingDialog(true);
       }
     }, 3000); // Timeout to avoid showing the dialog while the app is still loading.
+    return () => clearTimeout(timeoutId);
   }, []);
 
   React.useEffect(

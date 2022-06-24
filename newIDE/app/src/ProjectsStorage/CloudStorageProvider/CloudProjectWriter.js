@@ -13,15 +13,12 @@ import { initializeZipJs } from '../../Utils/Zip.js';
 const zipProject = async (project: gdProject) => {
   const zipJs: ZipJs = await initializeZipJs();
   const projectJson = serializeToJSON(project);
-  console.log(projectJson);
   const textReader = new zipJs.TextReader(projectJson);
 
   return new Promise((resolve, reject) => {
     zipJs.createWriter(new zipJs.BlobWriter('application/zip'), zipWriter => {
       zipWriter.add('game.json', textReader, () => {
         zipWriter.close(blob => {
-          console.log('blob');
-          console.log(blob);
           resolve(blob);
         });
       });

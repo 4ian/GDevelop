@@ -33,6 +33,7 @@ export const getCredentialsForProject = async (
       headers: { Authorization: authorizationHeader },
       params: { userId },
       validateStatus: status => true,
+      withCredentials: true, // Necessary to save cookie returned by the server.
     }
   );
   return response.status >= 200 && response.status < 400;
@@ -84,24 +85,21 @@ export const commitVersion = async (
     const response = await projectResourcesClient.post(
       `${
         GDevelopProjectResourcesStorage.baseUrl
-      }/${cloudProjectId}/versions/${uuid}`,
+      }/${cloudProjectId}/versions/${uuid}.zip`,
       zippedProject,
       {
-        headers: {
-          'content-type': 'application/zip',
-        },
-        withCredentials: true
+        headers: { 'content-type': 'application/zip' },
+        withCredentials: true,
       }
     );
   }
   // inform backend new version uploaded
   const response = await axios.post(
     `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/commit`,
-    zippedProject,
+    { newVersion: uuid },
     {
       headers: {
         Authorization: authorizationHeader,
-        'content-type': 'application/zip',
       },
       params: { userId },
     }

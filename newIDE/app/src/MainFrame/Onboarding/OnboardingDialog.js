@@ -34,8 +34,6 @@ const userFlowIds = {
   en: 'b1611206-2fae-41ac-b08c-0f8ad72d8c39',
 };
 
-// Note that this text is in markdown, and contains spaces at the end of lines
-// to create new lines.
 const onboardingText = `
 In 5 minutes, you will have:
   - Created a game

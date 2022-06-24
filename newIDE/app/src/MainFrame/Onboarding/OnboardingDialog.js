@@ -9,12 +9,12 @@ import optionalRequire from '../../Utils/OptionalRequire';
 import { getProgramOpeningCount } from '../../Utils/Analytics/LocalStats';
 import { isMobile } from '../../Utils/Platform';
 import Window from '../../Utils/Window';
-import { loadPreferencesFromLocalStorage } from '../Preferences/PreferencesProvider';
 import { getUserUUID } from '../../Utils/Analytics/UserUUID';
 import { Line } from '../../UI/Grid';
 import { MarkdownText } from '../../UI/MarkdownText';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { ColumnStackLayout } from '../../UI/Layout';
+import PreferencesContext from '../Preferences/PreferencesContext';
 
 const electron = optionalRequire('electron');
 const isDev = Window.isDev();
@@ -27,25 +27,41 @@ const styles = {
   },
 };
 
+const USERFLOW_DEV_ID = 'ct_y5qogyfo6zbahjejcbo3dybnta';
+const USERFLOW_PROD_ID = 'ct_paaz6o2t2bhlrlyi7a3toojn7e';
+
+const userFlowIds = {
+  fr_FR: '761ac722-d74e-45e3-a870-cd0f60f3299f',
+  pt_BR: 'a31fa85f-df42-40b5-aa80-3c6a59ad9666',
+  es_ES: '146d656b-900a-4294-86a5-70f90f12c1eb',
+  en: 'b1611206-2fae-41ac-b08c-0f8ad72d8c39',
+};
+
 const onboardingText = `
 In 5 minutes, you will have:
   - Created a game
   - Learned the fundamentals of GDevelop
 
-(🇬🇧 The tour is only available in English)
+The tour is only available in 4 languages 
+  - 🇬🇧/🇺🇸 English
+  - 🇫🇷 French
+  - 🇪🇸 Spanish
+  - 🇵🇹 Portuguese
+
 We highly recommend it!
 `;
 
 const OnboardingDialog = () => {
   const [open, setOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const { values } = React.useContext(PreferencesContext);
 
   const initializeUserflow = React.useCallback(() => {
     if (isUserflowInitialized) return;
     if (isDev) {
-      userflow.init('ct_y5qogyfo6zbahjejcbo3dybnta');
+      userflow.init(USERFLOW_DEV_ID);
     } else {
-      userflow.init('ct_paaz6o2t2bhlrlyi7a3toojn7e');
+      userflow.init(USERFLOW_PROD_ID);
     }
     userflow.on(
       // Undocumented legacy userflow event that is fired
@@ -65,12 +81,10 @@ const OnboardingDialog = () => {
       try {
         setLoading(true);
         initializeUserflow();
-        const userPreferences = loadPreferencesFromLocalStorage();
-        const appLanguage = userPreferences
-          ? userPreferences.language
-          : undefined;
+        const appLanguage = values.language;
         await userflow.identify(getUserUUID(), { language: appLanguage });
-        await userflow.start('b1611206-2fae-41ac-b08c-0f8ad72d8c39');
+        const flowId = userFlowIds[appLanguage || 'en'] || userFlowIds.en;
+        await userflow.start(flowId);
         setOpen(false);
       } catch (e) {
         // Something wrong happened, allow the user to retry.
@@ -87,7 +101,7 @@ const OnboardingDialog = () => {
         setLoading(false);
       }
     },
-    [initializeUserflow]
+    [initializeUserflow, values.language]
   );
 
   // Open modal if this is the first time the user opens the web app.

@@ -509,7 +509,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
           monthChartData: emptyChartData,
         };
       }
-      const filledGameRollingMetrics = fillMissingDays(gameRollingMetrics);
+      const filledGameRollingMetrics = fillMissingDays(
+        gameRollingMetrics.sort(
+          (a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime()
+        )
+      );
       return {
         yearChartData: evaluateChartData(
           mergeGameMetricsByWeek(filledGameRollingMetrics)
@@ -565,13 +569,11 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
           game.id,
           lastYearIsoDate
         );
-        console.log('setGameMetrics');
         setGameMetrics(gameRollingMetrics);
       } catch (err) {
         console.error(`Unable to load game rolling metrics:`, err);
         setGameMetricsError(err);
       }
-      console.log('stop loading');
       setIsGameMetricsLoading(false);
     },
     [getAuthorizationHeader, profile, game, lastYearIsoDate]

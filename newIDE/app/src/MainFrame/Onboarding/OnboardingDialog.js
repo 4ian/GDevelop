@@ -33,16 +33,14 @@ const userFlowIds = {
   en: 'b1611206-2fae-41ac-b08c-0f8ad72d8c39',
 };
 
+// Note that this text is in markdown, and contains spaces at the end of lines
+// to create new lines.
 const onboardingText = `
 In 5 minutes, you will have:
   - Created a game
   - Learned the fundamentals of GDevelop
 
-The tour is only available in 4 languages 
-  - 🇬🇧/🇺🇸 English
-  - 🇫🇷 French
-  - 🇪🇸 Spanish
-  - 🇵🇹 Portuguese
+(The tour is only available in 4 languages: 🇬🇧/🇺🇸 English, 🇫🇷 French, 🇪🇸 Spanish, 🇵🇹 Portuguese)
 
 We highly recommend it!
 `;
@@ -135,7 +133,7 @@ const OnboardingDialog = ({ open, onClose }: Props) => {
           </div>
         </Line>
         <Line noMargin>
-          <MarkdownText source={onboardingText} />
+          <MarkdownText source={onboardingText} allowParagraphs />
         </Line>
       </ColumnStackLayout>
     </Dialog>

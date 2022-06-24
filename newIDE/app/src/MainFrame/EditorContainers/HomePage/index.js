@@ -318,7 +318,7 @@ export const HomePage = React.memo<Props>(
                           />
                           {!electron && !isMobile() && (
                             <TextButton
-                              label={<Trans>Start in-app onboarding</Trans>}
+                              label={<Trans>Start tour</Trans>}
                               primary
                               onClick={onOpenOnboardingDialog}
                             />

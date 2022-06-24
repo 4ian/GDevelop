@@ -30,7 +30,8 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
 import { type GamesDetailsTab } from './GameDetailsDialog';
-import { useDebounce } from '../Utils/UseDebounce';
+import Dialog from '../UI/Dialog';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 type Props = {|
   game: Game,
@@ -39,14 +40,66 @@ type Props = {|
   onUpdateGame: () => Promise<void>,
 |};
 
-type UpdateProperties = {|
-  discoverable?: boolean,
-  acceptsBuildComments?: boolean,
-  acceptsGameComments?: boolean,
-|};
+type TogglableProperties =
+  | 'discoverable'
+  | 'acceptsBuildComments'
+  | 'acceptsGameComments';
 
-const getCurrentState = (gameProperty: ?boolean, pendingState: ?boolean) => {
-  return !!(pendingState === null ? gameProperty : pendingState);
+const getConfirmationMessage = (newProperty: {
+  [key: TogglableProperties]: boolean,
+}) => {
+  console.log(newProperty);
+  const {
+    discoverable,
+    acceptsBuildComments,
+    acceptsGameComments,
+  } = newProperty;
+  if (discoverable !== undefined) {
+    if (discoverable) {
+      return (
+        <Trans>Are you sure you want to make this game discoverable?</Trans>
+      );
+    }
+    if (!discoverable) {
+      return (
+        <Trans>
+          Are you sure you don't want to make this game discoverable anymore?
+        </Trans>
+      );
+    }
+  }
+  if (acceptsBuildComments !== undefined) {
+    if (acceptsBuildComments) {
+      return (
+        <Trans>
+          Are you sure you want to ask for feedbacks on all build pages?
+        </Trans>
+      );
+    }
+    if (!acceptsBuildComments) {
+      return (
+        <Trans>
+          Are you sure you want to stop asking for feedbacks on all build pages?
+        </Trans>
+      );
+    }
+  }
+  if (acceptsGameComments !== undefined) {
+    if (acceptsGameComments) {
+      return (
+        <Trans>
+          Are you sure you want to show a feedback banner on Liluo.io?
+        </Trans>
+      );
+    }
+    if (!acceptsGameComments) {
+      return (
+        <Trans>
+          Are you sure you want to remove the feedback banner on Liluo.io?
+        </Trans>
+      );
+    }
+  }
 };
 
 export const GameCard = ({
@@ -61,66 +114,51 @@ export const GameCard = ({
     Window.openExternalURL(url);
   };
   const [showShareDialog, setShowShareDialog] = React.useState(false);
-  // Those are pending states that are used to limit the number of requests on toggle.
-  const [isDiscoverable, setIsDiscoverable] = React.useState<?boolean>(null);
   const [
-    acceptsBuildComments,
-    setAcceptsBuildComments,
-  ] = React.useState<?boolean>(null);
-  const [
-    acceptsGameComments,
-    setAcceptsGameComments,
-  ] = React.useState<?boolean>(null);
+    showConfirmationDialog,
+    setShowConfirmationDialog,
+  ] = React.useState<?TogglableProperties>(null);
+  const [isEditingProperty, setIsEditingProperty] = React.useState(false);
 
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
 
-  const updateGameProperties = useDebounce(
-    async (parameters: UpdateProperties) => {
-      if (!profile) return;
-      await updateGame(getAuthorizationHeader, profile.id, game.id, {
-        ...parameters,
-      });
-      await onUpdateGame();
-      typeof parameters.discoverable === 'boolean' && setIsDiscoverable(null);
-      typeof parameters.acceptsBuildComments === 'boolean' &&
-        setAcceptsBuildComments(null);
-      typeof parameters.acceptsGameComments === 'boolean' &&
-        setAcceptsGameComments(null);
-    },
-    500
-  );
+  const getNewProperty = (property: ?TogglableProperties) => {
+    switch (property) {
+      case 'discoverable':
+        return { discoverable: !game.discoverable };
+      case 'acceptsBuildComments':
+        return { acceptsBuildComments: !game.acceptsBuildComments };
+      case 'acceptsGameComments':
+        return { acceptsGameComments: !game.acceptsGameComments };
+      default:
+        return null;
+    }
+  };
+  const newProperty = getNewProperty(showConfirmationDialog);
 
-  const onToggleDiscoverable = () => {
-    const currentDiscoverableState = getCurrentState(
-      game.discoverable,
-      isDiscoverable
-    );
-    setIsDiscoverable(!currentDiscoverableState);
-    updateGameProperties({
-      discoverable: !currentDiscoverableState,
-    });
-  };
-  const onToggleAcceptsBuildComments = () => {
-    const currentAcceptsBuildCommentsState = getCurrentState(
-      game.acceptsBuildComments,
-      acceptsBuildComments
-    );
-    setAcceptsBuildComments(!currentAcceptsBuildCommentsState);
-    updateGameProperties({
-      acceptsBuildComments: !currentAcceptsBuildCommentsState,
-    });
-  };
-  const onToggleAcceptsGameComments = () => {
-    const currentAcceptsGameCommentsState = getCurrentState(
-      game.acceptsGameComments,
-      acceptsGameComments
-    );
-    setAcceptsGameComments(!currentAcceptsGameCommentsState);
-    updateGameProperties({
-      acceptsGameComments: !currentAcceptsGameCommentsState,
-    });
+  const onConfirmToggleChanges = async () => {
+    if (!profile || !showConfirmationDialog) return;
+    if (!newProperty) return;
+    setIsEditingProperty(true);
+    try {
+      await updateGame(
+        getAuthorizationHeader,
+        profile.id,
+        game.id,
+        newProperty
+      );
+      await onUpdateGame();
+      setShowConfirmationDialog(null);
+    } catch (error) {
+      console.warn(
+        `Unable to update property ${showConfirmationDialog}`,
+        error
+      );
+    } finally {
+      setIsEditingProperty(false);
+    }
   };
 
   return (
@@ -166,6 +204,10 @@ export const GameCard = ({
                       click: () => onOpenGameManager('builds'),
                     },
                     {
+                      label: i18n._(t`See feedbacks`),
+                      click: () => onOpenGameManager('feedback'),
+                    },
+                    {
                       label: i18n._(t`Open analytics`),
                       click: () => onOpenGameManager('analytics'),
                     },
@@ -203,7 +245,7 @@ export const GameCard = ({
                       >
                         <FlatButton
                           label={<Trans>Access feedback</Trans>}
-                          onClick={() => {}}
+                          onClick={() => onOpenGameManager('feedback')}
                           disabled={!game.publicWebBuildId}
                         />
                         <RaisedButton
@@ -226,20 +268,16 @@ export const GameCard = ({
                   <Column noMargin justifyContent="flex-start">
                     <Toggle
                       labelPosition="left"
-                      onToggle={onToggleDiscoverable}
-                      toggled={getCurrentState(
-                        game.discoverable,
-                        isDiscoverable
-                      )}
+                      onToggle={() => setShowConfirmationDialog('discoverable')}
+                      toggled={!!game.discoverable}
                       label={<Trans>Make discoverable on Liluo.io</Trans>}
                     />
                     <Toggle
                       labelPosition="left"
-                      onToggle={onToggleAcceptsGameComments}
-                      toggled={getCurrentState(
-                        game.acceptsGameComments,
-                        acceptsGameComments
-                      )}
+                      onToggle={() =>
+                        setShowConfirmationDialog('acceptsGameComments')
+                      }
+                      toggled={!!game.acceptsGameComments}
                       label={
                         <Trans>
                           Show feedback banner on Liluo.io game page
@@ -248,11 +286,10 @@ export const GameCard = ({
                     />
                     <Toggle
                       labelPosition="left"
-                      onToggle={onToggleAcceptsBuildComments}
-                      toggled={getCurrentState(
-                        game.acceptsBuildComments,
-                        acceptsBuildComments
-                      )}
+                      onToggle={() =>
+                        setShowConfirmationDialog('acceptsBuildComments')
+                      }
+                      toggled={!!game.acceptsBuildComments}
                       label={<Trans>Ask for feedback on all build pages</Trans>}
                     />
                   </Column>
@@ -265,6 +302,38 @@ export const GameCard = ({
               game={game}
               onClose={() => setShowShareDialog(false)}
             />
+          )}
+          {showConfirmationDialog && newProperty && (
+            <Dialog
+              open
+              maxWidth="xs"
+              actions={[
+                <FlatButton
+                  key="cancel-toggle-change"
+                  label={<Trans>Cancel</Trans>}
+                  onClick={() => setShowConfirmationDialog(null)}
+                  disabled={isEditingProperty}
+                />,
+                <RaisedButton
+                  key="confirm-toggle-change"
+                  label={<Trans>Confirm</Trans>}
+                  onClick={onConfirmToggleChanges}
+                  disabled={isEditingProperty}
+                />,
+              ]}
+              onApply={onConfirmToggleChanges}
+              cannotBeDismissed={isEditingProperty}
+            >
+              <Column>
+                <Line>
+                  {isEditingProperty ? (
+                    <PlaceholderLoader />
+                  ) : (
+                    <Text>{getConfirmationMessage(newProperty)}</Text>
+                  )}
+                </Line>
+              </Column>
+            </Dialog>
           )}
         </>
       )}

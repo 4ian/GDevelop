@@ -294,3 +294,87 @@ export const deleteLeaderboardEntry = async (
   );
   return response.data;
 };
+
+// 2 types of comments. Feedback is private, Review is public.
+export type CommentType = 'FEEDBACK' | 'REVIEW';
+
+export type GameRatingsV1 = {
+  version: number,
+  visuals: number,
+  sound: number,
+  fun: number,
+  easeOfUse: number,
+};
+
+export type GameRatings = GameRatingsV1; // Handle future versions of the schema with "| GameRatingsV2"
+
+export type Comment = {
+  id: string,
+  type: CommentType,
+  gameId: string, // We are always able to link a comment to a game, even if made on a build.
+  buildId?: string, // If defined, the comment is made on a specific build.
+  text: string,
+  ratings?: GameRatings,
+  playerId?: string, // Useful in the future, to link a comment to a user.
+  playerName?: string, // For non-authenticated comments.
+  contact?: string, // In order to be able to contact the user.
+  createdAt: number,
+  updatedAt: number,
+  deletedAt?: number, // For soft delete.
+  processedAt?: number, // For marking comments as resolved/processed.
+};
+
+export const listComments = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    type,
+  }: {|
+    gameId: string,
+    type: 'FEEDBACK' | 'REVIEW',
+  |}
+): Promise<Array<Comment>> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopPlayApi.baseUrl}/game/${gameId}/comment`, {
+        params: {
+          userId,
+          type,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
+    .then(response => response.data);
+};
+
+export const updateComment = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  {
+    gameId,
+    commentId,
+    processed,
+  }: {|
+    gameId: string,
+    commentId: string,
+    processed: boolean,
+  |}
+) => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.patch(
+        `${GDevelopPlayApi.baseUrl}/game/${gameId}/comment/${commentId}`,
+        { processed },
+        {
+          params: { userId },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};

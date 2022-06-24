@@ -1,5 +1,5 @@
 // @flow
-import { Trans, t, number } from '@lingui/macro';
+import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { formatISO, parseISO } from 'date-fns';
@@ -16,7 +16,6 @@ import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
 import { CircularProgress } from '@material-ui/core';
-import { Table, TableBody, TableRow, TableRowColumn } from '../UI/Table';
 import AlertMessage from '../UI/AlertMessage';
 import subDays from 'date-fns/subDays';
 import { type PublicGame } from '../Utils/GDevelopServices/Game';
@@ -54,31 +53,32 @@ const mergeGameMetrics = (
   b: GameMetrics
 ): MergedGameMetrics => {
   return {
-    gameId: a.gameId,
-
     date: a.date,
     endDate: b.date,
 
-    sessions: {
-      d0Sessions: a.sessions.d0Sessions + b.sessions.d0Sessions,
-      d0SessionsDurationTotal:
-        a.sessions.d0SessionsDurationTotal + b.sessions.d0SessionsDurationTotal,
-    },
+    sessions: a.sessions &&
+      b.sessions && {
+        d0Sessions: a.sessions.d0Sessions + b.sessions.d0Sessions,
+        d0SessionsDurationTotal:
+          a.sessions.d0SessionsDurationTotal +
+          b.sessions.d0SessionsDurationTotal,
+      },
 
-    players: {
-      d0Players: a.players.d0Players + b.players.d0Players,
-      d0NewPlayers: a.players.d0NewPlayers + b.players.d0NewPlayers,
-      d0PlayersBelow60s:
-        a.players.d0PlayersBelow60s + b.players.d0PlayersBelow60s,
-      d0PlayersBelow180s:
-        a.players.d0PlayersBelow180s + b.players.d0PlayersBelow180s,
-      d0PlayersBelow300s:
-        a.players.d0PlayersBelow300s + b.players.d0PlayersBelow300s,
-      d0PlayersBelow600s:
-        a.players.d0PlayersBelow600s + b.players.d0PlayersBelow600s,
-      d0PlayersBelow900s:
-        a.players.d0PlayersBelow900s + b.players.d0PlayersBelow900s,
-    },
+    players: a.players &&
+      b.players && {
+        d0Players: a.players.d0Players + b.players.d0Players,
+        d0NewPlayers: a.players.d0NewPlayers + b.players.d0NewPlayers,
+        d0PlayersBelow60s:
+          a.players.d0PlayersBelow60s + b.players.d0PlayersBelow60s,
+        d0PlayersBelow180s:
+          a.players.d0PlayersBelow180s + b.players.d0PlayersBelow180s,
+        d0PlayersBelow300s:
+          a.players.d0PlayersBelow300s + b.players.d0PlayersBelow300s,
+        d0PlayersBelow600s:
+          a.players.d0PlayersBelow600s + b.players.d0PlayersBelow600s,
+        d0PlayersBelow900s:
+          a.players.d0PlayersBelow900s + b.players.d0PlayersBelow900s,
+      },
 
     retention: null,
   };

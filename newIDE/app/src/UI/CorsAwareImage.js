@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import ResourcesLoader from '../ResourcesLoader';
 
 type Props = {|
   src: ?string,
@@ -11,18 +12,6 @@ type Props = {|
   onError?: (?Error) => void,
   onLoad?: (e: any) => void,
 |};
-
-function fixedEncodeURIComponent(str: string) {
-  return str.replace(/[#*]/g, function(c) {
-    return (
-      '%' +
-      c
-        .charCodeAt(0)
-        .toString(16)
-        .toUpperCase()
-    );
-  });
-}
 
 const addSearchParameterToUrl = (
   url: string,
@@ -36,7 +25,7 @@ const addSearchParameterToUrl = (
 
   const separator = url.indexOf('?') === -1 ? '?' : '&';
   return (
-    fixedEncodeURIComponent(url) +
+    ResourcesLoader.fixedEncodeURIComponent(url) +
     separator +
     urlEncodedParameterName +
     '=' +

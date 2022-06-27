@@ -79,6 +79,7 @@ export type RenderEditorContainerProps = {|
   onOpenExamples: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
+  onOpenOnboardingDialog: () => void,
   onChangeSubscription: () => void,
   onOpenProfile: () => void,
 

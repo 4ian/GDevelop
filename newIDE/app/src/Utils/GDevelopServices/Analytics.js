@@ -8,12 +8,24 @@ export type GameMetrics = {
   sessions: ?{
     /** Number of sessions for this day. */
     d0Sessions: number,
+    /** Total duration of sessions for this day. */
+    d0SessionsDurationTotal: ?number,
   },
   players: ?{
     /** Number of players for this day. */
     d0Players: number,
     /** Number of new players for this day. */
     d0NewPlayers: number,
+    /** Number of players that play the game less than 1 minute for this day. */
+    d0PlayersBelow60s: ?number,
+    /** Number of players that play the game less than 3 minutes for this day. */
+    d0PlayersBelow180s: ?number,
+    /** Number of players that play the game less than 5 minutes for this day. */
+    d0PlayersBelow300s: ?number,
+    /** Number of players that play the game less than 10 minutes for this day. */
+    d0PlayersBelow600s: ?number,
+    /** Number of players that play the game less than 15 minutes for this day. */
+    d0PlayersBelow900s: ?number,
   },
   retention: ?{
     /** Day 1 retained players (number of players that played this day, and were new players 1 days earlier). */
@@ -48,6 +60,34 @@ export const getGameMetrics = async (
         userId,
         gameId,
         dayIsoDate,
+      },
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      validateStatus: status =>
+        (status >= 200 && status < 300) || status === 404,
+    }
+  );
+
+  if (response.status === 404) return null;
+  return response.data;
+};
+
+export const getGameMetricsFrom = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  gameId: string,
+  firstDayIsoDate: string
+): Promise<?(GameMetrics[])> => {
+  const authorizationHeader = await getAuthorizationHeader();
+
+  const response = await axios.get(
+    `${GDevelopAnalyticsApi.baseUrl}/game-metrics`,
+    {
+      params: {
+        userId,
+        gameId,
+        firstDayIsoDate,
       },
       headers: {
         Authorization: authorizationHeader,

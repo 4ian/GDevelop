@@ -27,6 +27,9 @@ type Props = {|
 
   noGroups?: boolean,
 
+  /** A list of object names to exclude from the autocomplete list (for exasmple if they have already been selected). */
+  excludedObjects?: Array<string>,
+
   onChoose?: string => void,
   onChange: string => void,
   onRequestClose?: () => void,
@@ -52,12 +55,14 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
+  excludedObjects,
 }: {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
+  excludedObjects: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     globalObjectsContainer,
@@ -87,7 +92,10 @@ const getObjectsAndGroupsDataSource = ({
         };
       });
 
-  return [...objects, { type: 'separator' }, ...groups];
+  const fullList = [...objects, { type: 'separator' }, ...groups];
+  return excludedObjects
+    ? fullList.filter(({ value }) => !excludedObjects.includes(value))
+    : fullList;
 };
 
 const checkHasRequiredCapability = ({
@@ -153,6 +161,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       onRequestClose,
       onApply,
       id,
+      excludedObjects,
       ...rest
     } = this.props;
 
@@ -162,6 +171,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       objectsContainer,
       noGroups,
       allowedObjectType,
+      excludedObjects,
     });
     const hasValidChoice =
       objectAndGroups.filter(

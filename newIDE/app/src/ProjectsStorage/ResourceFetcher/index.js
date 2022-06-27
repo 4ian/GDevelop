@@ -92,10 +92,12 @@ export const ResourceFetcherDialog = ({
           <Text>
             {hasErrors ? (
               <Trans>
-                There were errors when fetching resources for the project.
+                There were errors when fetching resources for the project. You
+                can retry (recommended) or continue despite the errors. In this
+                case, the project will be missing some resources.
               </Trans>
             ) : (
-              <Trans>Resources needed for the project are downloaded...</Trans>
+              <Trans>Resources needed for the project are fetched...</Trans>
             )}
           </Text>
           <LinearProgress variant="determinate" value={progress} />

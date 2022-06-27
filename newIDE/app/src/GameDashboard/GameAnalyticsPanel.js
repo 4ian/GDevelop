@@ -32,7 +32,7 @@ import {
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import {
-  evaluateGameMetrics,
+  buildChartData,
   daysShownForYear,
   durationValues,
 } from './GameAnalyticsEvaluator';
@@ -58,7 +58,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
     null
   );
   const { yearChartData, monthChartData } = React.useMemo(
-    () => evaluateGameMetrics(gameRollingMetrics),
+    () => buildChartData(gameRollingMetrics),
     [gameRollingMetrics]
   );
 

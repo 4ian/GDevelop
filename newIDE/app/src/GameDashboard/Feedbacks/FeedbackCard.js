@@ -5,12 +5,12 @@ import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import { Card } from '@material-ui/core';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons//CheckCircle';
 
 import { ResponsiveLineStackLayout } from '../../UI/Layout';
-import CardContent from '../../UI/Card/CardContent';
 import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
@@ -23,9 +23,9 @@ import {
   type Comment,
   type GameRatings,
 } from '../../Utils/GDevelopServices/Play';
-import { useDebounce } from '../../Utils/UseDebounce';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { useOptimisticState } from '../../Utils/UseOptimisticState';
 
 const styles = { textComment: { whiteSpace: 'pre-wrap' } };
 
@@ -58,60 +58,34 @@ const getRatings = (ratings: ?GameRatings) => {
   }
 };
 
-const getCurrentState = (pendingState: ?boolean, state: boolean) => {
-  return pendingState === null ? state : pendingState;
-};
-
 const FeedbackCard = ({ comment, authenticatedUser }: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
 
-  const [processed, setProcessed] = React.useState<boolean>(
-    !!comment.processedAt
-  );
-  const [
-    pendingProcessedState,
-    setPendingProcessedState,
-  ] = React.useState<?boolean>(null);
-
-  const setProcessedAt = useDebounce(
-    async (
-      i18n: I18nType,
-      { processed: newProcessedValue }: { processed: boolean }
-    ) => {
-      if (!profile) return;
-      try {
-        await updateComment(getAuthorizationHeader, profile.id, {
-          gameId: comment.gameId,
-          commentId: comment.id,
-          processed: newProcessedValue,
-        });
-        setProcessed(newProcessedValue);
-      } catch (error) {
-        console.error(`Unable to update comment: `, error);
-        showErrorBox({
-          message: i18n._(t`Unable to change resolved status of feedback.`),
-          rawError: error,
-          errorId: 'feedback-card-set-processed-error',
-        });
-      } finally {
-        setPendingProcessedState(null);
-      }
-    },
-    500
-  );
-
-  const onSetProcessed = (i18n: I18nType) => {
-    const newProcessedValue = !getCurrentState(
-      pendingProcessedState,
-      processed
-    );
-    setPendingProcessedState(newProcessedValue);
-    setProcessedAt(i18n, {
-      processed: newProcessedValue,
-    });
+  const processComment = async (processed: boolean, i18n: I18nType) => {
+    if (!profile) return;
+    try {
+      await updateComment(getAuthorizationHeader, profile.id, {
+        gameId: comment.gameId,
+        commentId: comment.id,
+        processed,
+      });
+    } catch (error) {
+      console.error(`Unable to update comment: `, error);
+      showErrorBox({
+        message: i18n._(t`Unable to change resolved status of feedback.`),
+        rawError: error,
+        errorId: 'feedback-card-set-processed-error',
+      });
+      throw new Error();
+    }
   };
+
+  const [processed, setProcessed] = useOptimisticState(
+    !!comment.processedAt,
+    processComment
+  );
 
   return (
     <I18n>
@@ -152,9 +126,9 @@ const FeedbackCard = ({ comment, authenticatedUser }: Props) => {
             </Column>
             <IconButton
               tooltip={processed ? t`Unresolve` : t`Resolve`}
-              onClick={() => onSetProcessed(i18n)}
+              onClick={() => setProcessed(!processed, i18n)}
             >
-              {getCurrentState(pendingProcessedState, processed) ? (
+              {processed ? (
                 <CheckCircleIcon htmlColor={theme.message.valid} />
               ) : (
                 <CheckCircleOutlineIcon />

@@ -9,7 +9,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Column, Line } from '../UI/Grid';
 import InfoBar from '../UI/Messages/InfoBar';
-import ShareButtons from '../UI/ShareDialog/ShareButtons';
+import SocialShareButtons from '../UI/ShareDialog/SocialShareButtons';
 import ShareLink from '../UI/ShareDialog/ShareLink';
 
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
@@ -19,8 +19,8 @@ import {
   getGameSlugs,
   getGameUrl,
 } from '../Utils/GDevelopServices/Game';
-import Window from '../Utils/Window';
 import AlertMessage from '../UI/AlertMessage';
+import ShareButton from '../UI/ShareDialog/ShareButton';
 
 type Props = {| game: Game, onClose: () => void |};
 
@@ -60,34 +60,8 @@ const ShareDialog = ({ game, onClose }: Props) => {
   );
 
   const gameUrl = getGameUrl(game, gameSlug);
+
   if (!gameUrl) return null;
-
-  const onCopyLinkToClipboard = () => {
-    if (!profile) return;
-    navigator.clipboard.writeText(gameUrl);
-    setShowCopiedInfoBar(true);
-  };
-  const onOpen = () => {
-    Window.openExternalURL(gameUrl);
-  };
-
-  const onShare = async () => {
-    if (!gameUrl || !navigator.share) return;
-
-    // We are on mobile (or on browsers supporting sharing using the system dialog).
-    const shareData = {
-      title: 'My GDevelop game',
-      text: 'Try the game I just created with #gdevelop',
-      url: gameUrl,
-    };
-
-    try {
-      await navigator.share(shareData);
-    } catch (err) {
-      console.error("Couldn't share the game", err);
-    }
-  };
-
   return (
     <Dialog
       open
@@ -103,21 +77,11 @@ const ShareDialog = ({ game, onClose }: Props) => {
     >
       {!isFetchingGameSlug ? (
         <Column>
-          <ShareLink
-            onCopy={onCopyLinkToClipboard}
-            onOpen={onOpen}
-            buildUrl={gameUrl}
-          />
+          <ShareLink url={gameUrl} />
           {navigator.share ? (
-            <Line justifyContent="flex-end">
-              <FlatButton
-                label={<Trans>Share</Trans>}
-                onClick={onShare}
-                icon={<Share />}
-              />
-            </Line>
+            <ShareButton url={gameUrl} />
           ) : (
-            <ShareButtons url={gameUrl} />
+            <SocialShareButtons url={gameUrl} />
           )}
         </Column>
       ) : (

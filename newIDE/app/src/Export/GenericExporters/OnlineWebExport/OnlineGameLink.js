@@ -11,8 +11,6 @@ import {
   type Build,
 } from '../../../Utils/GDevelopServices/Build';
 import { type BuildStep } from '../../Builds/BuildStepsProgress';
-import Window from '../../../Utils/Window';
-import Share from '@material-ui/icons/Share';
 import InfoBar from '../../../UI/Messages/InfoBar';
 import { CircularProgress, LinearProgress } from '@material-ui/core';
 import FlatButton from '../../../UI/FlatButton';
@@ -34,7 +32,8 @@ import OnlineGamePropertiesDialog from './OnlineGamePropertiesDialog';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropertiesDialog';
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
-import ShareButtons from '../../../UI/ShareDialog/ShareButtons';
+import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
+import ShareButton from '../../../UI/ShareDialog/ShareButton';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -190,35 +189,6 @@ const OnlineGameLink = ({
     [game, loadGame, isBuildComplete]
   );
 
-  const onOpen = () => {
-    if (!buildUrl) return;
-    Window.openExternalURL(buildUrl);
-  };
-
-  const onCopy = () => {
-    if (!buildUrl) return;
-    // TODO: use Clipboard.js, after it's been reworked to use this API and handle text.
-    navigator.clipboard.writeText(buildUrl);
-    setShowCopiedInfoBar(true);
-  };
-
-  const onShare = async () => {
-    if (!buildUrl || !navigator.share) return;
-
-    // We are on mobile (or on browsers supporting sharing using the system dialog).
-    const shareData = {
-      title: 'My GDevelop game',
-      text: 'Try the game I just created with #gdevelop',
-      url: buildUrl,
-    };
-
-    try {
-      await navigator.share(shareData);
-    } catch (err) {
-      console.error("Couldn't share the game", err);
-    }
-  };
-
   React.useEffect(
     () => {
       if (exportStep === 'done') {
@@ -337,19 +307,9 @@ const OnlineGameLink = ({
             >
               {buildUrl && !isGameLoading ? (
                 <Column noMargin>
-                  <ShareLink
-                    buildUrl={buildUrl}
-                    onCopy={onCopy}
-                    onOpen={onOpen}
-                  />
+                  <ShareLink url={buildUrl} />
                   {isBuildPublished && navigator.share && (
-                    <Line justifyContent="flex-end">
-                      <FlatButton
-                        label={<Trans>Share</Trans>}
-                        onClick={onShare}
-                        icon={<Share />}
-                      />
-                    </Line>
+                    <ShareButton url={buildUrl} />
                   )}
                   {isBuildPublished && !navigator.share && (
                     <Line justifyContent="space-between">
@@ -361,7 +321,7 @@ const OnlineGameLink = ({
                         </AlertMessage>
                       </Column>
                       <Column justifyContent="flex-end">
-                        <ShareButtons url={buildUrl} />
+                        <SocialShareButtons url={buildUrl} />
                       </Column>
                     </Line>
                   )}

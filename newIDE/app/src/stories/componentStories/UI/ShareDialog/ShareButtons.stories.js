@@ -4,14 +4,14 @@ import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
-import ShareButtons from '../../../../UI/ShareDialog/ShareButtons';
+import SocialShareButtons from '../../../../UI/ShareDialog/SocialShareButtons';
 
 export default {
-  title: 'UI/ShareDialog/ShareButtons',
-  component: ShareButtons,
+  title: 'UI/ShareDialog/SocialShareButtons',
+  component: SocialShareButtons,
   decorators: [muiDecorator, paperDecorator],
 };
 
-export const DefaultShareButtons = () => (
-  <ShareButtons url={'https://liluo.io/username/game-slug'} />
+export const DefaultSocialShareButtons = () => (
+  <SocialShareButtons url={'https://liluo.io/username/game-slug'} />
 );

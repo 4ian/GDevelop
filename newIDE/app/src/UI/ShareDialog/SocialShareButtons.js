@@ -25,7 +25,7 @@ const styles = {
   },
 };
 
-const ShareButtons = ({ url }: Props) => {
+const SocialShareButtons = ({ url }: Props) => {
   return (
     <Line>
       <FacebookShareButton
@@ -70,4 +70,4 @@ const ShareButtons = ({ url }: Props) => {
   );
 };
 
-export default ShareButtons;
+export default SocialShareButtons;

@@ -318,6 +318,7 @@ export type Comment = {
   contact?: string,
   createdAt: number,
   processedAt?: number,
+  updatedAt: number,
 };
 
 export const listComments = async (

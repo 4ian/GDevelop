@@ -5,6 +5,8 @@ import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import { Card, Chip } from '@material-ui/core';
+import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
 import ShareIcon from '@material-ui/icons/Share';
 import MoreVert from '@material-ui/icons/MoreVert';
 
@@ -15,8 +17,6 @@ import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import Text from '../UI/Text';
 import Toggle from '../UI/Toggle';
-import CardContent from '../UI/Card/CardContent';
-import CardHeader from '../UI/Card/CardHeader';
 import ElementWithMenu from '../UI/Menu/ElementWithMenu';
 
 import { GameThumbnail } from './GameThumbnail';
@@ -48,34 +48,44 @@ type TogglableProperties =
 
 const confirmationMessage = {
   discoverable: {
-    true: <Trans>Are you sure you want to make this game discoverable?</Trans>,
+    true: (
+      <Trans>
+        You are about to make this game discoverable on categories pages on
+        Liluo.io. Continue?
+      </Trans>
+    ),
     false: (
       <Trans>
-        Are you sure you don't want to make this game discoverable anymore?
+        You are about to hide this game from categories pages on Liluo.io.
+        Continue?
       </Trans>
     ),
   },
   acceptsBuildComments: {
     true: (
       <Trans>
-        Are you sure you want to ask for feedbacks on all build pages?
+        You are about to activate a feedback banner on all your build pages on
+        Liluo.io, asking for feedback on your game. Continue?
       </Trans>
     ),
     false: (
       <Trans>
-        Are you sure you want to stop asking for feedbacks on all build pages?
+        You are about to de-activate the feedback banner on all your build pages
+        on Liluo.io. Continue ?
       </Trans>
     ),
   },
   acceptsGameComments: {
     true: (
       <Trans>
-        Are you sure you want to show a feedback banner on Liluo.io?
+        You are about to activate a feedback banner on your game page on
+        Liluo.io, to let any user give you feedback. Continue?
       </Trans>
     ),
     false: (
       <Trans>
-        Are you sure you want to remove the feedback banner on Liluo.io?
+        You're about to de-activate the feedback banner on your game page on
+        Liluo.io. Continue ?
       </Trans>
     ),
   },
@@ -94,8 +104,8 @@ export const GameCard = ({
   };
   const [showShareDialog, setShowShareDialog] = React.useState(false);
   const [
-    showConfirmationDialog,
-    setShowConfirmationDialog,
+    confirmationDialogName,
+    setConfirmationDialogName,
   ] = React.useState<?TogglableProperties>(null);
   const [isEditingProperty, setIsEditingProperty] = React.useState(false);
 
@@ -115,10 +125,10 @@ export const GameCard = ({
         return null;
     }
   };
-  const newProperty = getNewProperty(showConfirmationDialog);
+  const newProperty = getNewProperty(confirmationDialogName);
 
   const onConfirmToggleChanges = async (i18n: I18nType) => {
-    if (!profile || !showConfirmationDialog) return;
+    if (!profile || !confirmationDialogName) return;
     if (!newProperty) return;
     setIsEditingProperty(true);
     try {
@@ -129,10 +139,10 @@ export const GameCard = ({
         newProperty
       );
       await onUpdateGame();
-      setShowConfirmationDialog(null);
+      setConfirmationDialogName(null);
     } catch (error) {
       console.error(
-        `Unable to update property ${showConfirmationDialog}`,
+        `Unable to update property ${confirmationDialogName}`,
         error
       );
       showErrorBox({
@@ -252,14 +262,14 @@ export const GameCard = ({
                   <Column noMargin justifyContent="flex-start">
                     <Toggle
                       labelPosition="left"
-                      onToggle={() => setShowConfirmationDialog('discoverable')}
+                      onToggle={() => setConfirmationDialogName('discoverable')}
                       toggled={!!game.discoverable}
                       label={<Trans>Make discoverable on Liluo.io</Trans>}
                     />
                     <Toggle
                       labelPosition="left"
                       onToggle={() =>
-                        setShowConfirmationDialog('acceptsGameComments')
+                        setConfirmationDialogName('acceptsGameComments')
                       }
                       toggled={!!game.acceptsGameComments}
                       label={
@@ -271,7 +281,7 @@ export const GameCard = ({
                     <Toggle
                       labelPosition="left"
                       onToggle={() =>
-                        setShowConfirmationDialog('acceptsBuildComments')
+                        setConfirmationDialogName('acceptsBuildComments')
                       }
                       toggled={!!game.acceptsBuildComments}
                       label={<Trans>Ask for feedback on all build pages</Trans>}
@@ -287,7 +297,7 @@ export const GameCard = ({
               onClose={() => setShowShareDialog(false)}
             />
           )}
-          {showConfirmationDialog && newProperty && (
+          {confirmationDialogName && newProperty && (
             <Dialog
               open
               maxWidth="xs"
@@ -295,7 +305,7 @@ export const GameCard = ({
                 <FlatButton
                   key="cancel-toggle-change"
                   label={<Trans>Cancel</Trans>}
-                  onClick={() => setShowConfirmationDialog(null)}
+                  onClick={() => setConfirmationDialogName(null)}
                   disabled={isEditingProperty}
                 />,
                 <RaisedButton
@@ -315,8 +325,8 @@ export const GameCard = ({
                   ) : (
                     <Text>
                       {
-                        confirmationMessage[showConfirmationDialog][
-                          (!!newProperty[showConfirmationDialog]).toString()
+                        confirmationMessage[confirmationDialogName][
+                          (!!newProperty[confirmationDialogName]).toString()
                         ]
                       }
                     </Text>

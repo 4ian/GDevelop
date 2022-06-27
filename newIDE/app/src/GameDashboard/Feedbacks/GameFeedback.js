@@ -81,7 +81,7 @@ const GameFeedback = ({ authenticatedUser, game }: Props) => {
           !displayedFeedbacks &&
           !isErrored && <PlaceholderLoader />}
         {authenticatedUser.authenticated && isErrored && (
-          <PlaceholderError onRetry={() => {}}>
+          <PlaceholderError onRetry={() => loadFeedbacks()}>
             <Text>
               <Trans>
                 An error occured while retrieving feedbacks for this game.

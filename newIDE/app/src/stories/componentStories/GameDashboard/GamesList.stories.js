@@ -5,7 +5,6 @@ import * as React from 'react';
 import muiDecorator from '../../ThemeDecorator';
 
 import paperDecorator from '../../PaperDecorator';
-import { GameCard } from '../../../GameDashboard/GameCard';
 import {
   fakeIndieAuthenticatedUser,
   game1,
@@ -18,8 +17,8 @@ import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext'
 import { GamesList } from '../../../GameDashboard/GamesList';
 
 export default {
-  title: 'GameDashboard/GameCard',
-  component: GameCard,
+  title: 'GameDashboard/GamesList',
+  component: GamesList,
   decorators: [muiDecorator, paperDecorator],
 };
 

@@ -1,6 +1,7 @@
 // @flow
 
 import {
+  getCloudProject,
   getCredentialsForProject,
   getProjectFileAsJson,
 } from '../../Utils/GDevelopServices/Project';
@@ -10,15 +11,17 @@ import { type FileMetadata } from '../index';
 
 export const onOpenWithPicker = () => {};
 
-export const onOpen = async (
-  fileMetadata: FileMetadata,
-  options: { authenticatedUser: AuthenticatedUser }
+export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
+  fileMetadata: FileMetadata
 ): Promise<{|
   content: Object,
 |}> => {
-  const cloudProject = JSON.parse(fileMetadata.fileIdentifier);
+  const cloudProjectId = fileMetadata.fileIdentifier;
 
-  await getCredentialsForProject(options.authenticatedUser, cloudProject.id);
+  const cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
+  if (!cloudProject) throw new Error("Cloud project couldn't be fetched.");
+
+  await getCredentialsForProject(authenticatedUser, cloudProjectId);
   const projectFileContent = getProjectFileAsJson(cloudProject);
   return {
     content: projectFileContent,

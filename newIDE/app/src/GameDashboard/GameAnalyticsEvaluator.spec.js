@@ -14,7 +14,7 @@ describe('GameAnalyticsEvaluator', () => {
 
         sessions: {
           d0Sessions: 1,
-          d0SessionsDurationTotal: 1,
+          d0SessionsDurationTotal: 60,
         },
         players: {
           d0Players: 1,
@@ -53,6 +53,8 @@ describe('GameAnalyticsEvaluator', () => {
       const { yearChartData, monthChartData } = buildChartData(
         generateGameRollingMetrics1(19)
       );
+      console.log(yearChartData.overview);
+      console.log(monthChartData.overview);
       expect(yearChartData.overview).toStrictEqual(monthChartData.overview);
     }
     // Randomized data to be sure to spot everything

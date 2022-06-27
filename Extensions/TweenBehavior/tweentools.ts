@@ -115,12 +115,13 @@ namespace gdjs {
 
       export const stopSceneTween = (
         runtimeScene: RuntimeScene,
-        id: string
+        id: string,
+        shouldGoToEnd: boolean
       ) => {
         const tweenMap = getTweensMap(runtimeScene);
         const tween = tweenMap.get(id);
         if (!tween) return;
-        tween.stop();
+        tween.stop(shouldGoToEnd);
         getShiftyScene(runtimeScene).remove(tween);
       };
 

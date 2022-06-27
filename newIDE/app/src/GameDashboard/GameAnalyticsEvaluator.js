@@ -346,37 +346,31 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
       viewersCount: playersSum,
       playersCount: playersCount,
       bounceRatePercent:
-        onlyFullyDefinedPlayersSum > 0
-          ? (100 * playersBelowSums[durationIndexes.for1Minute]) /
-            onlyFullyDefinedPlayersSum
+        viewersCount > 0
+          ? (100 * playersBelowSums[durationIndexes.for1Minute]) / viewersCount
           : 0,
       meanPlayedDurationInMinutes:
-        onlyFullyDefinedPlayersSum > 0
-          ? playedDurationSumInMinutes / onlyFullyDefinedPlayersSum
-          : 0,
+        viewersCount > 0 ? playedDurationSumInMinutes / viewersCount : 0,
       nearestToMedianDuration: {
         playersCount:
-          onlyFullyDefinedPlayersSum -
-          playersBelowSums[nearestToMedianDurationIndex],
+          viewersCount - playersBelowSums[nearestToMedianDurationIndex],
         playersPercent:
-          onlyFullyDefinedPlayersSum > 0
+          viewersCount > 0
             ? (100 *
-                (onlyFullyDefinedPlayersSum -
+                (viewersCount -
                   playersBelowSums[nearestToMedianDurationIndex])) /
-              onlyFullyDefinedPlayersSum
+              viewersCount
             : 0,
         durationInMinutes: durationValues[nearestToMedianDurationIndex],
       },
       greaterDurationPlayerSurface: {
         playersCount:
-          onlyFullyDefinedPlayersSum -
-          playersBelowSums[greaterDurationPlayerIndex],
+          viewersCount - playersBelowSums[greaterDurationPlayerIndex],
         playersPercent:
-          onlyFullyDefinedPlayersSum > 0
+          viewersCount > 0
             ? (100 *
-                (onlyFullyDefinedPlayersSum -
-                  playersBelowSums[greaterDurationPlayerIndex])) /
-              onlyFullyDefinedPlayersSum
+                (viewersCount - playersBelowSums[greaterDurationPlayerIndex])) /
+              viewersCount
             : 0,
         durationInMinutes: durationValues[greaterDurationPlayerIndex],
       },

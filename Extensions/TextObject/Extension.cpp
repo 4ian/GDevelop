@@ -33,9 +33,6 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                                  "CppPlatform/Extensions/texticon.png")
           .SetCategoryFullName(_("Texts"));
 
-#if defined(GD_IDE_ONLY)
-  obj.SetIncludeFile("TextObject/TextObject.h");
-
   obj.AddAction("String",
                 _("Modify the text"),
                 _("Modify the text of a Text object."),
@@ -47,8 +44,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .UseStandardOperatorParameters("string")
       .SetFunctionName("SetString")
-      .SetGetter("GetString")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetGetter("GetString");
 
   obj.AddCondition("String",
                    _("Compare the text"),
@@ -60,8 +56,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardRelationalOperatorParameters("string")
-      .SetFunctionName("GetString")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetString");
 
   obj.AddAction("Font",
                 _("Font"),
@@ -73,8 +68,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("police", _("Font"))
-      .SetFunctionName("ChangeFont")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("ChangeFont");
 
   obj.AddCondition("ScaleX",
                    _("Scale on X axis"),
@@ -86,8 +80,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetScaleX")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetScaleX");
 
   obj.AddAction(
          "ScaleX",
@@ -100,8 +93,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardOperatorParameters("number")
-      .SetFunctionName("SetScaleX")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetScaleX");
 
   obj.AddCondition("ScaleY",
                    _("Scale on Y axis"),
@@ -113,8 +105,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetScaleY")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetScaleY");
 
   obj.AddAction(
          "ScaleY",
@@ -127,8 +118,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardOperatorParameters("number")
-      .SetFunctionName("SetScaleY")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetScaleY");
 
   obj.AddAction(
          "Scale",
@@ -141,8 +131,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardOperatorParameters("number")
-      .SetFunctionName("SetScale")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetScale");
 
   obj.AddAction(
          "ChangeColor",
@@ -155,8 +144,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("color", _("Color"))
-      .SetFunctionName("SetColor")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetColor");
 
   obj.AddAction("SetGradient",
                 _("Gradient"),
@@ -229,8 +217,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetOpacity")
-      .SetGetter("GetOpacity")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetGetter("GetOpacity");
 
   obj.AddCondition("Opacity",
                    _("Opacity"),
@@ -243,8 +230,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetOpacity")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetOpacity");
 
   obj.AddAction("SetSmooth",
                 _("Smoothing"),
@@ -256,8 +242,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Smooth the text"))
-      .SetFunctionName("SetSmooth")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetSmooth");
 
   obj.AddCondition("Smoothed",
                    _("Smoothing"),
@@ -268,8 +253,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/opacity.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("IsSmoothed")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("IsSmoothed");
 
   obj.AddAction("SetBold",
                 _("Bold"),
@@ -281,8 +265,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Set bold style"))
-      .SetFunctionName("SetBold")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetBold");
 
   obj.AddCondition("IsBold",
                    _("Bold"),
@@ -293,8 +276,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/bold16.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("IsBold")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("IsBold");
 
   obj.AddAction("SetItalic",
                 _("Italic"),
@@ -306,8 +288,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Set italic"))
-      .SetFunctionName("SetItalic")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetItalic");
 
   obj.AddCondition("IsItalic",
                    _("Italic"),
@@ -318,8 +299,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/italic16.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("IsItalic")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("IsItalic");
 
   obj.AddAction("SetUnderlined",
                 _("Underlined"),
@@ -331,8 +311,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Underline"))
-      .SetFunctionName("SetUnderlined")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetUnderlined");
 
   obj.AddCondition("IsUnderlined",
                    _("Underlined"),
@@ -343,8 +322,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    "res/conditions/underline16.png")
 
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("IsUnderlined")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("IsUnderlined");
 
   obj.AddAction("Angle",
                 _("Angle"),
@@ -357,8 +335,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "Text")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetAngle")
-      .SetGetter("GetAngle")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetGetter("GetAngle");
 
   obj.AddCondition("Angle",
                    _("Angle"),
@@ -370,8 +347,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "Text")
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("GetAngle")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetAngle");
 
   obj.AddCondition("Padding",
                    _("Padding"),
@@ -413,8 +389,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Alignment"),
                     "[\"left\", \"center\", \"right\"]",
                     false)
-      .SetFunctionName("SetTextAlignment")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("SetTextAlignment");
 
   obj.AddCondition("TextAlignment",
                    _("Alignment"),
@@ -485,8 +460,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Scale"),
                     "res/actions/scaleWidth.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetScaleX")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetScaleX");
 
   obj.AddExpression("ScaleY",
                     _("Y Scale of a Text object"),
@@ -494,8 +468,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Scale"),
                     "res/actions/scaleHeight.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetScaleY")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetScaleY");
 
   obj.AddExpression("Opacity",
                     _("Opacity of a Text object"),
@@ -503,8 +476,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Opacity"),
                     "res/actions/opacity.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetOpacity")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetOpacity");
 
   obj.AddExpression("Angle",
                     _("Angle"),
@@ -512,8 +484,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                     _("Rotation"),
                     "res/actions/rotate.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetAngle")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("GetAngle");
 
   obj.AddExpressionAndConditionAndAction("number",
                                          "FontSize",
@@ -532,7 +503,5 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
   obj.AddStrExpression(
          "String", _("Text"), _("Text"), _("Text"), "res/texteicon.png")
       .AddParameter("object", _("Object"), "Text")
-      .SetFunctionName("GetString")
-      .SetIncludeFile("TextObject/TextObject.h");
-#endif
+      .SetFunctionName("GetString");
 }

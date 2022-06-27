@@ -5,35 +5,18 @@ import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
 import Text from '../../../UI/Text';
 import { Column, Line } from '../../../UI/Grid';
-import TextField from '../../../UI/TextField';
 import {
   getBuildArtifactUrl,
   getWebBuildThumbnailUrl,
   type Build,
 } from '../../../Utils/GDevelopServices/Build';
 import { type BuildStep } from '../../Builds/BuildStepsProgress';
-import RaisedButton from '../../../UI/RaisedButton';
 import Window from '../../../Utils/Window';
-import Copy from '../../../UI/CustomSvgIcons/Copy';
 import Share from '@material-ui/icons/Share';
 import InfoBar from '../../../UI/Messages/InfoBar';
-import IconButton from '../../../UI/IconButton';
 import { CircularProgress, LinearProgress } from '@material-ui/core';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
-import {
-  EmailShareButton,
-  FacebookShareButton,
-  RedditShareButton,
-  TwitterShareButton,
-  WhatsappShareButton,
-  EmailIcon,
-  FacebookIcon,
-  RedditIcon,
-  TwitterIcon,
-  WhatsappIcon,
-} from 'react-share';
-import { TextFieldWithButtonLayout } from '../../../UI/Layout';
 import {
   getGame,
   getGameUrl,
@@ -50,12 +33,8 @@ import AlertMessage from '../../../UI/AlertMessage';
 import OnlineGamePropertiesDialog from './OnlineGamePropertiesDialog';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropertiesDialog';
-
-const styles = {
-  icon: {
-    padding: 5,
-  },
-};
+import ShareLink from '../../../UI/ShareDialog/ShareLink';
+import ShareButtons from '../../../UI/ShareDialog/ShareButtons';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -358,32 +337,10 @@ const OnlineGameLink = ({
             >
               {buildUrl && !isGameLoading ? (
                 <Column noMargin>
-                  <TextFieldWithButtonLayout
-                    noFloatingLabelText
-                    renderTextField={() => (
-                      <TextField
-                        value={buildUrl}
-                        readOnly
-                        fullWidth
-                        endAdornment={
-                          <IconButton
-                            onClick={onCopy}
-                            tooltip={t`Copy`}
-                            edge="end"
-                          >
-                            <Copy />
-                          </IconButton>
-                        }
-                      />
-                    )}
-                    renderButton={style => (
-                      <RaisedButton
-                        primary
-                        label={<Trans>Open</Trans>}
-                        onClick={onOpen}
-                        style={style}
-                      />
-                    )}
+                  <ShareLink
+                    buildUrl={buildUrl}
+                    onCopy={onCopy}
+                    onOpen={onOpen}
                   />
                   {isBuildPublished && navigator.share && (
                     <Line justifyContent="flex-end">
@@ -404,46 +361,7 @@ const OnlineGameLink = ({
                         </AlertMessage>
                       </Column>
                       <Column justifyContent="flex-end">
-                        <Line>
-                          <FacebookShareButton
-                            url={buildUrl}
-                            style={styles.icon}
-                            quote={`Try the game I just created with GDevelop.io`}
-                            hashtag="#gdevelop"
-                          >
-                            <FacebookIcon size={32} round />
-                          </FacebookShareButton>
-                          <RedditShareButton
-                            url={buildUrl}
-                            title={`Try the game I just created with r/gdevelop`}
-                            style={styles.icon}
-                          >
-                            <RedditIcon size={32} round />
-                          </RedditShareButton>
-                          <TwitterShareButton
-                            title={`Try the game I just created with GDevelop.io`}
-                            hashtags={['gdevelop']}
-                            url={buildUrl}
-                            style={styles.icon}
-                          >
-                            <TwitterIcon size={32} round />
-                          </TwitterShareButton>
-                          <WhatsappShareButton
-                            title={`Try the game I just created with GDevelop.io`}
-                            url={buildUrl}
-                            style={styles.icon}
-                          >
-                            <WhatsappIcon size={32} round />
-                          </WhatsappShareButton>
-                          <EmailShareButton
-                            subject="My GDevelop game"
-                            body="Try the game I just created with GDevelop.io"
-                            url={buildUrl}
-                            style={styles.icon}
-                          >
-                            <EmailIcon size={32} round />
-                          </EmailShareButton>
-                        </Line>
+                        <ShareButtons url={buildUrl} />
                       </Column>
                     </Line>
                   )}
@@ -461,7 +379,9 @@ const OnlineGameLink = ({
                 </Column>
               ) : (
                 <Column alignItems="center">
-                  <CircularProgress />
+                  <Line>
+                    <CircularProgress />
+                  </Line>
                 </Column>
               )}
               <InfoBar

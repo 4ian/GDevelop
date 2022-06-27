@@ -28,7 +28,7 @@ type Props = {|
   noGroups?: boolean,
 
   /** A list of object names to exclude from the autocomplete list (for exasmple if they have already been selected). */
-  excludedObjects?: Array<string>,
+  excludedObjectOrGroupNames?: Array<string>,
 
   onChoose?: string => void,
   onChange: string => void,
@@ -55,14 +55,14 @@ const getObjectsAndGroupsDataSource = ({
   objectsContainer,
   noGroups,
   allowedObjectType,
-  excludedObjects,
+  excludedObjectOrGroupNames,
 }: {|
   project: ?gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   noGroups: ?boolean,
   allowedObjectType: ?string,
-  excludedObjects: ?Array<string>,
+  excludedObjectOrGroupNames: ?Array<string>,
 |}): DataSource => {
   const list = enumerateObjectsAndGroups(
     globalObjectsContainer,
@@ -93,8 +93,10 @@ const getObjectsAndGroupsDataSource = ({
       });
 
   const fullList = [...objects, { type: 'separator' }, ...groups];
-  return excludedObjects
-    ? fullList.filter(({ value }) => !excludedObjects.includes(value))
+  return excludedObjectOrGroupNames
+    ? fullList.filter(
+        ({ value }) => !excludedObjectOrGroupNames.includes(value)
+      )
     : fullList;
 };
 
@@ -161,7 +163,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       onRequestClose,
       onApply,
       id,
-      excludedObjects,
+      excludedObjectOrGroupNames,
       ...rest
     } = this.props;
 
@@ -171,7 +173,7 @@ export default class ObjectSelector extends React.Component<Props, {||}> {
       objectsContainer,
       noGroups,
       allowedObjectType,
-      excludedObjects,
+      excludedObjectOrGroupNames,
     });
     const hasValidChoice =
       objectAndGroups.filter(

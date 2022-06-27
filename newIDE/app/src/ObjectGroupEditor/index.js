@@ -96,7 +96,7 @@ const ObjectGroupEditor = ({
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             value={newObjectName}
-            excludedObjects={objectsInGroup}
+            excludedObjectOrGroupNames={objectsInGroup}
             onChange={setNewObjectName}
             onChoose={addObject}
             openOnFocus

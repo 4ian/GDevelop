@@ -84,6 +84,7 @@ import {
   game1,
   game2,
   gameRollingMetricsFor364Days,
+  gameRollingMetricsWithUndefinedDurationMetrics,
   gameRollingMetricsWithOnly19Days,
   gameRollingMetricsWithOnly1Day,
   gameRollingMetricsWithHoles,
@@ -4530,6 +4531,30 @@ storiesOf('GameDashboard/GameDetailsDialog', module)
     mock
       .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
       .reply(200, gameRollingMetricsFor364Days)
+      .onAny()
+      .reply(config => {
+        console.error(`Unexpected call to ${config.url} (${config.method})`);
+        return [504, null];
+      });
+
+    return (
+      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
+        <GameDetailsDialog
+          game={game1}
+          project={null}
+          initialTab="analytics"
+          onClose={action('onClose')}
+          onGameUpdated={action('onGameUpdated')}
+          onGameDeleted={action('onGameDeleted')}
+        />
+      </AuthenticatedUserContext.Provider>
+    );
+  })
+  .add('With analytics with missing new metrics', () => {
+    const mock = new MockAdapter(axios);
+    mock
+      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
+      .reply(200, gameRollingMetricsWithUndefinedDurationMetrics)
       .onAny()
       .reply(config => {
         console.error(`Unexpected call to ${config.url} (${config.method})`);

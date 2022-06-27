@@ -836,7 +836,33 @@ const generateGameRollingMetrics1 = () => {
   return metrics;
 };
 
+const deleteDurationMetrics = (
+  gameMetrics: GameMetrics[],
+  startDays: number
+): GameMetrics[] => {
+  for (let index = startDays; index < gameMetrics.length; index++) {
+    const gameMetric = gameMetrics[index];
+    const sessions = gameMetric.sessions;
+    const players = gameMetric.players;
+    if (sessions) {
+      sessions.d0SessionsDurationTotal = undefined;
+    }
+    if (players) {
+      players.d0PlayersBelow60s = undefined;
+      players.d0PlayersBelow180s = undefined;
+      players.d0PlayersBelow300s = undefined;
+      players.d0PlayersBelow600s = undefined;
+      players.d0PlayersBelow900s = undefined;
+    }
+  }
+  return gameMetrics;
+};
+
 export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetrics1();
+export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
+  generateGameRollingMetrics1(),
+  15
+);
 export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(
   0,
   19

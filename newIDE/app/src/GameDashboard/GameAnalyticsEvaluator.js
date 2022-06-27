@@ -75,8 +75,16 @@ const emptyChartData = {
     playersCount: 0,
     bounceRatePercent: 0,
     meanPlayedDurationInMinutes: 0,
-    nearestToMedianDuration: {},
-    greaterDurationPlayerSurface: {},
+    nearestToMedianDuration: {
+      playersCount: 0,
+      playersPercent: 0,
+      durationInMinutes: 0,
+    },
+    greaterDurationPlayerSurface: {
+      playersCount: 0,
+      playersPercent: 0,
+      durationInMinutes: 0,
+    },
   },
   byDay: [],
   byPlayedTime: [],
@@ -165,8 +173,8 @@ const mergeGameMetrics = (
       b.sessions && {
         d0Sessions: a.sessions.d0Sessions + b.sessions.d0Sessions,
         d0SessionsDurationTotal:
-          a.sessions.d0SessionsDurationTotal +
-          b.sessions.d0SessionsDurationTotal,
+          (a.sessions.d0SessionsDurationTotal || 0) +
+          (b.sessions.d0SessionsDurationTotal || 0),
       },
 
     players: a.players &&
@@ -174,15 +182,20 @@ const mergeGameMetrics = (
         d0Players: a.players.d0Players + b.players.d0Players,
         d0NewPlayers: a.players.d0NewPlayers + b.players.d0NewPlayers,
         d0PlayersBelow60s:
-          a.players.d0PlayersBelow60s + b.players.d0PlayersBelow60s,
+          (a.players.d0PlayersBelow60s || 0) +
+          (b.players.d0PlayersBelow60s || 0),
         d0PlayersBelow180s:
-          a.players.d0PlayersBelow180s + b.players.d0PlayersBelow180s,
+          (a.players.d0PlayersBelow180s || 0) +
+          (b.players.d0PlayersBelow180s || 0),
         d0PlayersBelow300s:
-          a.players.d0PlayersBelow300s + b.players.d0PlayersBelow300s,
+          (a.players.d0PlayersBelow300s || 0) +
+          (b.players.d0PlayersBelow300s || 0),
         d0PlayersBelow600s:
-          a.players.d0PlayersBelow600s + b.players.d0PlayersBelow600s,
+          (a.players.d0PlayersBelow600s || 0) +
+          (b.players.d0PlayersBelow600s || 0),
         d0PlayersBelow900s:
-          a.players.d0PlayersBelow900s + b.players.d0PlayersBelow900s,
+          (a.players.d0PlayersBelow900s || 0) +
+          (b.players.d0PlayersBelow900s || 0),
       },
 
     retention: null,
@@ -247,33 +260,44 @@ const evaluateChartData = (
 ): ChartData => {
   let playersBelowSums = [0, 0, 0, 0, 0];
   let playersSum = 0;
+  let onlyFullyDefinedPlayersSum = 0;
   let playedDurationSumInMinutes = 0;
 
   metrics.forEach(metric => {
-    playersBelowSums[durationIndexes.for1Minute] += metric.players
-      ? metric.players.d0PlayersBelow60s
-      : 0;
-    playersBelowSums[durationIndexes.for3Minutes] += metric.players
-      ? metric.players.d0PlayersBelow180s
-      : 0;
-    playersBelowSums[durationIndexes.for5Minutes] += metric.players
-      ? metric.players.d0PlayersBelow300s
-      : 0;
-    playersBelowSums[durationIndexes.for10Minutes] += metric.players
-      ? metric.players.d0PlayersBelow600s
-      : 0;
-    playersBelowSums[durationIndexes.for15Minutes] += metric.players
-      ? metric.players.d0PlayersBelow900s
-      : 0;
+    playersBelowSums[durationIndexes.for1Minute] +=
+      metric.players && metric.players.d0PlayersBelow60s
+        ? metric.players.d0PlayersBelow60s
+        : 0;
+    playersBelowSums[durationIndexes.for3Minutes] +=
+      metric.players && metric.players.d0PlayersBelow180s
+        ? metric.players.d0PlayersBelow180s
+        : 0;
+    playersBelowSums[durationIndexes.for5Minutes] +=
+      metric.players && metric.players.d0PlayersBelow300s
+        ? metric.players.d0PlayersBelow300s
+        : 0;
+    playersBelowSums[durationIndexes.for10Minutes] +=
+      metric.players && metric.players.d0PlayersBelow600s
+        ? metric.players.d0PlayersBelow600s
+        : 0;
+    playersBelowSums[durationIndexes.for15Minutes] +=
+      metric.players && metric.players.d0PlayersBelow900s
+        ? metric.players.d0PlayersBelow900s
+        : 0;
     playersSum += metric.players ? metric.players.d0Players : 0;
-    playedDurationSumInMinutes += metric.sessions
-      ? metric.sessions.d0SessionsDurationTotal / 60
-      : 0;
+    onlyFullyDefinedPlayersSum +=
+      metric.players && metric.players.d0PlayersBelow60s
+        ? metric.players.d0Players
+        : 0;
+    playedDurationSumInMinutes +=
+      metric.sessions && metric.sessions.d0SessionsDurationTotal
+        ? metric.sessions.d0SessionsDurationTotal / 60
+        : 0;
   });
 
-  const viewersCount = playersSum;
+  const viewersCount = onlyFullyDefinedPlayersSum;
   const playersCount =
-    playersSum - playersBelowSums[durationIndexes.for1Minute];
+    onlyFullyDefinedPlayersSum - playersBelowSums[durationIndexes.for1Minute];
 
   const nearestToMedianDurationIndex = findNearestToMedianDurationIndex(
     playersBelowSums,
@@ -289,34 +313,42 @@ const evaluateChartData = (
 
   return {
     overview: {
-      viewersCount: viewersCount,
+      // Players from before the migration are shown as viewers
+      // because it's not possible to make them apart from real players.
+      viewersCount: playersSum,
       playersCount: playersCount,
       bounceRatePercent:
-        viewersCount > 0
-          ? (100 * playersBelowSums[durationIndexes.for1Minute]) / viewersCount
+        onlyFullyDefinedPlayersSum > 0
+          ? (100 * playersBelowSums[durationIndexes.for1Minute]) /
+            onlyFullyDefinedPlayersSum
           : 0,
       meanPlayedDurationInMinutes:
-        playersSum > 0 ? playedDurationSumInMinutes / playersSum : 0,
+        onlyFullyDefinedPlayersSum > 0
+          ? playedDurationSumInMinutes / onlyFullyDefinedPlayersSum
+          : 0,
       nearestToMedianDuration: {
         playersCount:
-          viewersCount - playersBelowSums[nearestToMedianDurationIndex],
+          onlyFullyDefinedPlayersSum -
+          playersBelowSums[nearestToMedianDurationIndex],
         playersPercent:
-          playersSum > 0
+          onlyFullyDefinedPlayersSum > 0
             ? (100 *
-                (viewersCount -
+                (onlyFullyDefinedPlayersSum -
                   playersBelowSums[nearestToMedianDurationIndex])) /
-              playersSum
+              onlyFullyDefinedPlayersSum
             : 0,
         durationInMinutes: durationValues[nearestToMedianDurationIndex],
       },
       greaterDurationPlayerSurface: {
         playersCount:
-          viewersCount - playersBelowSums[greaterDurationPlayerIndex],
+          onlyFullyDefinedPlayersSum -
+          playersBelowSums[greaterDurationPlayerIndex],
         playersPercent:
-          playersSum > 0
+          onlyFullyDefinedPlayersSum > 0
             ? (100 *
-                (viewersCount - playersBelowSums[greaterDurationPlayerIndex])) /
-              playersSum
+                (onlyFullyDefinedPlayersSum -
+                  playersBelowSums[greaterDurationPlayerIndex])) /
+              onlyFullyDefinedPlayersSum
             : 0,
         durationInMinutes: durationValues[greaterDurationPlayerIndex],
       },
@@ -339,86 +371,121 @@ const evaluateChartData = (
             dateFormatOptions
           ),
         meanPlayedDurationInMinutes:
-          metric.sessions && metric.players
+          metric.sessions &&
+          metric.players &&
+          metric.sessions.d0SessionsDurationTotal
             ? metric.sessions.d0SessionsDurationTotal /
               60 /
               metric.players.d0Players
             : 0,
-        bounceRatePercent: metric.players
-          ? (100 * metric.players.d0PlayersBelow60s) / metric.players.d0Players
-          : 0,
+        bounceRatePercent:
+          metric.players && metric.players.d0PlayersBelow60s
+            ? (100 * metric.players.d0PlayersBelow60s) /
+              metric.players.d0Players
+            : 0,
         viewersCount: metric.players ? metric.players.d0Players : 0,
-        playersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow60s
-          : 0,
-        over60sPlayersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow60s
-          : 0,
-        over180sPlayersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow180s
-          : 0,
-        over300sPlayersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow300s
-          : 0,
-        over600sPlayersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow600s
-          : 0,
-        over900sPlayersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow900s
-          : 0,
+        playersCount:
+          metric.players && metric.players.d0PlayersBelow60s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow60s
+            : 0,
+        over60sPlayersCount:
+          metric.players && metric.players.d0PlayersBelow60s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow60s
+            : 0,
+        over180sPlayersCount:
+          metric.players && metric.players.d0PlayersBelow180s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow180s
+            : 0,
+        over300sPlayersCount:
+          metric.players && metric.players.d0PlayersBelow300s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow300s
+            : 0,
+        over600sPlayersCount:
+          metric.players && metric.players.d0PlayersBelow600s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow600s
+            : 0,
+        over900sPlayersCount:
+          metric.players && metric.players.d0PlayersBelow900s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow900s
+            : 0,
 
-        below60sPlayersCount: metric.players
-          ? metric.players.d0PlayersBelow60s
-          : 0,
-        from60sTo180sPlayersCount: metric.players
-          ? metric.players.d0PlayersBelow180s - metric.players.d0PlayersBelow60s
-          : 0,
-        from180sTo300sPlayersCount: metric.players
-          ? metric.players.d0PlayersBelow300s -
-            metric.players.d0PlayersBelow180s
-          : 0,
-        from300sTo600sPlayersCount: metric.players
-          ? metric.players.d0PlayersBelow600s -
-            metric.players.d0PlayersBelow300s
-          : 0,
-        from600sTo900sPlayersCount: metric.players
-          ? metric.players.d0PlayersBelow900s -
-            metric.players.d0PlayersBelow600s
-          : 0,
-        from900sToInfinityPlayersCount: metric.players
-          ? metric.players.d0Players - metric.players.d0PlayersBelow900s
-          : 0,
+        below60sPlayersCount:
+          metric.players && metric.players.d0PlayersBelow60s
+            ? metric.players.d0PlayersBelow60s
+            : 0,
+        from60sTo180sPlayersCount:
+          metric.players &&
+          metric.players.d0PlayersBelow180s &&
+          metric.players.d0PlayersBelow60s
+            ? metric.players.d0PlayersBelow180s -
+              metric.players.d0PlayersBelow60s
+            : 0,
+        from180sTo300sPlayersCount:
+          metric.players &&
+          metric.players.d0PlayersBelow300s &&
+          metric.players.d0PlayersBelow180s
+            ? metric.players.d0PlayersBelow300s -
+              metric.players.d0PlayersBelow180s
+            : 0,
+        from300sTo600sPlayersCount:
+          metric.players &&
+          metric.players.d0PlayersBelow600s &&
+          metric.players.d0PlayersBelow300s
+            ? metric.players.d0PlayersBelow600s -
+              metric.players.d0PlayersBelow300s
+            : 0,
+        from600sTo900sPlayersCount:
+          metric.players &&
+          metric.players.d0PlayersBelow900s &&
+          metric.players.d0PlayersBelow600s
+            ? metric.players.d0PlayersBelow900s -
+              metric.players.d0PlayersBelow600s
+            : 0,
+        from900sToInfinityPlayersCount:
+          metric.players && metric.players.d0PlayersBelow900s
+            ? metric.players.d0Players - metric.players.d0PlayersBelow900s
+            : 0,
 
         over0sPlayersPercent: metric.players ? 100 : 0,
         over60sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow60s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0Players - metric.players.d0PlayersBelow60s)) /
               metric.players.d0Players
             : 0,
         over180sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow180s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0Players -
                   metric.players.d0PlayersBelow180s)) /
               metric.players.d0Players
             : 0,
         over300sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow300s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0Players -
                   metric.players.d0PlayersBelow300s)) /
               metric.players.d0Players
             : 0,
         over600sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow600s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0Players -
                   metric.players.d0PlayersBelow600s)) /
               metric.players.d0Players
             : 0,
         over900sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow900s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0Players -
                   metric.players.d0PlayersBelow900s)) /
@@ -426,40 +493,56 @@ const evaluateChartData = (
             : 0,
 
         below60sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow60s &&
+          metric.players.d0Players > 0
             ? (100 * metric.players.d0PlayersBelow60s) /
               metric.players.d0Players
             : 0,
         from60sTo180sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow180s &&
+          metric.players.d0PlayersBelow60s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0PlayersBelow180s -
                   metric.players.d0PlayersBelow60s)) /
               metric.players.d0Players
             : 0,
         from180sTo300sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow300s &&
+          metric.players.d0PlayersBelow180s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0PlayersBelow300s -
                   metric.players.d0PlayersBelow180s)) /
               metric.players.d0Players
             : 0,
         from300sTo600sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow600s &&
+          metric.players.d0PlayersBelow300s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0PlayersBelow600s -
                   metric.players.d0PlayersBelow300s)) /
               metric.players.d0Players
             : 0,
         from600sTo900sPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow900s &&
+          metric.players.d0PlayersBelow600s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0PlayersBelow900s -
                   metric.players.d0PlayersBelow600s)) /
               metric.players.d0Players
             : 0,
         from900sToInfinityPlayersPercent:
-          metric.players && metric.players.d0Players > 0
+          metric.players &&
+          metric.players.d0PlayersBelow900s &&
+          metric.players.d0Players > 0
             ? (100 *
                 (metric.players.d0Players -
                   metric.players.d0PlayersBelow900s)) /
@@ -467,17 +550,20 @@ const evaluateChartData = (
             : 0,
       }))
       .sort((a, b) => a.timestamp - b.timestamp),
-    byPlayedTime: [{ duration: 0, playersCount: viewersCount }].concat(
+    byPlayedTime: [
+      { duration: 0, playersCount: onlyFullyDefinedPlayersSum },
+    ].concat(
       Object.values(durationIndexes).map((durationIndex: number) => ({
         duration: durationValues[durationIndex],
-        playersCount: viewersCount - playersBelowSums[durationIndex],
+        playersCount:
+          onlyFullyDefinedPlayersSum - playersBelowSums[durationIndex],
       }))
     ),
   };
 };
 
 export const evaluateGameMetrics = (
-  gameMetrics: Array<GameMetrics>
+  gameMetrics: ?Array<GameMetrics>
 ): { yearChartData: ChartData, monthChartData: ChartData } => {
   if (!gameMetrics) {
     return {

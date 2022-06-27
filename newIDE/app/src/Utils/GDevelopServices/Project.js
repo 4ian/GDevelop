@@ -122,9 +122,30 @@ export const listUserCloudProject = async (
   return response.data;
 };
 
+export const getCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.get(
+    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const getProjectFileAsJson = async (
   cloudProject: CloudProject
-): Promise<?Array<CloudProject>> => {
+): Promise<any> => {
   if (!cloudProject.currentVersion) {
     throw new Error('Opening of project without current version not handled');
   }

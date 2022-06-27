@@ -56,7 +56,7 @@ const OnboardingDialog = ({
   onUserflowRunningUpdate,
 }: Props) => {
   const [loading, setLoading] = React.useState(false);
-  const { values } = React.useContext(PreferencesContext);
+  const { values: userPreferences } = React.useContext(PreferencesContext);
 
   const initializeUserflow = React.useCallback(
     () => {
@@ -87,7 +87,7 @@ const OnboardingDialog = ({
       try {
         setLoading(true);
         initializeUserflow();
-        const appLanguage = values.language;
+        const appLanguage = userPreferences.language;
         await userflow.identify(getUserUUID(), { language: appLanguage });
         const flowId = userFlowIds[appLanguage || 'en'] || userFlowIds.en;
         await userflow.start(flowId);
@@ -107,7 +107,7 @@ const OnboardingDialog = ({
         setLoading(false);
       }
     },
-    [initializeUserflow, values.language, onClose]
+    [initializeUserflow, userPreferences.language, onClose]
   );
 
   const actions = [

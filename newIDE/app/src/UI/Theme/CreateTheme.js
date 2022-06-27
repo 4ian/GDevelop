@@ -299,6 +299,14 @@ export function createGdevelopTheme({
         src: 'res/GD-logo-big.png',
       },
       gdevelopIconsCSSFilter,
+      chart: {
+        fontFamily: styles['GdevelopModernFontFamily'],
+        tooltipBackgroundColor:
+          styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
+        dataColor1: styles['ThemePrimaryColor'],
+        textColor: styles['ThemeTextDefaultColor'],
+        gridColor: styles['ThemeTextDisabledColor'],
+      },
     },
     muiThemeOptions: {
       typography: {

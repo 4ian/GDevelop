@@ -61,6 +61,7 @@ const WrappedHomePage = ({ project }: {| project: ?gdProject |}) => (
           onOpenGamesShowcase={() => action('onOpenGamesShowcase')()}
           onOpenHelpFinder={() => action('onOpenHelpFinder')()}
           onOpenLanguageDialog={() => action('open language dialog')()}
+          onOpenOnboardingDialog={() => action('open onboarding dialog')()}
           onCreateFromExampleShortHeader={() => action('create from example')()}
           onOpenProjectAfterCreation={() =>
             action('call callback after project creation')()

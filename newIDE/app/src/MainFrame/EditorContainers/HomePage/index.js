@@ -39,9 +39,14 @@ import {
 import RaisedButtonWithSplitMenu from '../../../UI/RaisedButtonWithSplitMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
-import { sendTutorialOpened } from '../../../Utils/Analytics/EventSender';
+import {
+  sendOnboardingManuallyOpened,
+  sendTutorialOpened,
+} from '../../../Utils/Analytics/EventSender';
 import { hasPendingNotifications } from '../../../Utils/Notification';
 import optionalRequire from '../../../Utils/OptionalRequire';
+import TextButton from '../../../UI/TextButton';
+import { isMobile } from '../../../Utils/Platform';
 const electron = optionalRequire('electron');
 
 const styles = {
@@ -85,6 +90,7 @@ type Props = {|
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,
   onOpenProfile: () => void,
+  onOpenOnboardingDialog: () => void,
 
   // Project creation
   onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunction,
@@ -130,6 +136,7 @@ export const HomePage = React.memo<Props>(
         onOpenLanguageDialog,
         onOpenProfile,
         setToolbar,
+        onOpenOnboardingDialog,
       }: Props,
       ref
     ) => {
@@ -297,14 +304,32 @@ export const HomePage = React.memo<Props>(
                         margin: `0px ${windowWidth === 'small' ? 15 : 35}px`,
                       }}
                     >
-                      <ResponsiveLineStackLayout justifyContent="space-between">
-                        <UserChip
-                          profile={authenticatedUser.profile}
-                          onClick={onOpenProfile}
-                          displayNotificationBadge={hasPendingNotifications(
-                            authenticatedUser
+                      <ResponsiveLineStackLayout
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <ResponsiveLineStackLayout
+                          justifyContent="flex-start"
+                          noColumnMargin
+                        >
+                          <UserChip
+                            profile={authenticatedUser.profile}
+                            onClick={onOpenProfile}
+                            displayNotificationBadge={hasPendingNotifications(
+                              authenticatedUser
+                            )}
+                          />
+                          {!electron && !isMobile() && (
+                            <TextButton
+                              label={<Trans>Start tour</Trans>}
+                              primary
+                              onClick={() => {
+                                sendOnboardingManuallyOpened();
+                                onOpenOnboardingDialog();
+                              }}
+                            />
                           )}
-                        />
+                        </ResponsiveLineStackLayout>
                         <ResponsiveLineStackLayout
                           justifyContent="flex-end"
                           noColumnMargin
@@ -583,5 +608,6 @@ export const renderHomePageContainer = (
     onOpenHelpFinder={props.onOpenHelpFinder}
     onOpenLanguageDialog={props.onOpenLanguageDialog}
     onOpenProfile={props.onOpenProfile}
+    onOpenOnboardingDialog={props.onOpenOnboardingDialog}
   />
 );

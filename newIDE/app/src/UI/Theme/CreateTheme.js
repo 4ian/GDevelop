@@ -203,6 +203,18 @@ export function getMuiOverrides(
         padding: 8,
       },
     },
+    MuiCardHeader: {
+      root: {
+        padding: 0,
+        flexGrow: 0,
+      },
+    },
+    MuiCardContent: {
+      root: {
+        padding: 32,
+        paddingTop: 8,
+      },
+    },
   };
 }
 

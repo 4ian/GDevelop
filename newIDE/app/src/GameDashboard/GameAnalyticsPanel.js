@@ -15,6 +15,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
+import AlertMessage from '../UI/AlertMessage';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import {
   ResponsiveContainer,
@@ -24,8 +25,6 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  BarChart,
-  Bar,
   AreaChart,
   Area,
 } from 'recharts';
@@ -169,6 +168,16 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   />
                 </SelectField>
               </Line>
+              {!isGameMetricsLoading &&
+              (!gameRollingMetrics || gameRollingMetrics.length === 0) ? (
+                <AlertMessage kind="warning">
+                  <Trans>
+                    There were no players or stored metrics for this period. Be
+                    sure to publish your game and get players to try it to see
+                    the collected anonymous analytics.
+                  </Trans>
+                </AlertMessage>
+              ) : null}
               <ResponsiveLineStackLayout
                 expand
                 noMargin

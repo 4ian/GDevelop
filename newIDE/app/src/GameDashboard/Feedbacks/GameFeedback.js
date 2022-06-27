@@ -64,13 +64,16 @@ const GameFeedback = ({ authenticatedUser, game }: Props) => {
 
   const onCommentUpdated = (updatedComment: Comment) => {
     if (!feedbacks) return;
-    const newFeedbacks = [...feedbacks];
-    const updatedFeedbackIndex = newFeedbacks.findIndex(
-      feedback => feedback.id === updatedComment.id
-    );
-    if (updatedFeedbackIndex === -1) return;
-    newFeedbacks[updatedFeedbackIndex] = updatedComment;
-    setFeedbacks(newFeedbacks);
+    setFeedbacks((previousFeedbacks: ?Array<Comment>) => {
+      if (!previousFeedbacks) return previousFeedbacks;
+      const newFeedbacks = [...previousFeedbacks];
+      const updatedFeedbackIndex = newFeedbacks.findIndex(
+        feedback => feedback.id === updatedComment.id
+      );
+      if (updatedFeedbackIndex === -1) return;
+      newFeedbacks[updatedFeedbackIndex] = updatedComment;
+      return newFeedbacks;
+    });
   };
 
   React.useEffect(

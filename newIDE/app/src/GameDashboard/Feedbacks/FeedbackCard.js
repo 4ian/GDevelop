@@ -25,7 +25,6 @@ import {
 } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import { useDebounce } from '../../Utils/UseDebounce';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 
 const styles = { textComment: { whiteSpace: 'pre-wrap' } };

@@ -7,6 +7,7 @@ import {
   POSITIONAL_ARGUMENTS_KEY,
 } from '../../Utils/Window';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { generateOnOpen } from './CloudProjectOpener';
 
 export default ({
   internalName: 'Cloud',
@@ -21,7 +22,7 @@ export default ({
   },
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     // onOpenWithPicker,
-    // onOpen,
+    onOpen: generateOnOpen(authenticatedUser),
     // hasAutoSave,
     onSaveProject: generateOnSaveProject(authenticatedUser),
     onSaveProjectAs: generateOnSaveProjectAs(authenticatedUser),

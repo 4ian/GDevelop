@@ -47,31 +47,41 @@ We highly recommend it!
 type Props = {|
   open: boolean,
   onClose: () => void,
+  onUserflowRunningUpdate: () => void,
 |};
 
-const OnboardingDialog = ({ open, onClose }: Props) => {
+const OnboardingDialog = ({
+  open,
+  onClose,
+  onUserflowRunningUpdate,
+}: Props) => {
   const [loading, setLoading] = React.useState(false);
   const { values } = React.useContext(PreferencesContext);
 
-  const initializeUserflow = React.useCallback(() => {
-    if (isUserflowInitialized) return;
-    if (isDev) {
-      userflow.init(USERFLOW_DEV_ID);
-    } else {
-      userflow.init(USERFLOW_PROD_ID);
-    }
-    userflow.on(
-      // Undocumented legacy userflow event that is fired
-      // "when a flow either becomes active or removed"
-      // (tip given by a tech member of Userflow - it shouldn't be removed
-      // in the near future given the fact that some of their users still use it).
-      'flowvisibilitychange',
-      isRunning => {
-        isUserflowRunning = isRunning;
+  const initializeUserflow = React.useCallback(
+    () => {
+      if (isUserflowInitialized) return;
+      if (isDev) {
+        userflow.init(USERFLOW_DEV_ID);
+      } else {
+        userflow.init(USERFLOW_PROD_ID);
       }
-    );
-    isUserflowInitialized = true;
-  }, []);
+      userflow.on(
+        // Undocumented legacy userflow event that is fired
+        // "when a flow either becomes active or removed"
+        // (tip given by a tech member of Userflow - it shouldn't be removed
+        // in the near future given the fact that some of their users still use it).
+        'flowvisibilitychange',
+        isRunning => {
+          isUserflowRunning = isRunning;
+          console.log('updating', isRunning);
+          onUserflowRunningUpdate();
+        }
+      );
+      isUserflowInitialized = true;
+    },
+    [onUserflowRunningUpdate]
+  );
 
   const startUserflow = React.useCallback(
     async () => {

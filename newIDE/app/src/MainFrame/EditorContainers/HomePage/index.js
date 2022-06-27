@@ -47,6 +47,7 @@ import { hasPendingNotifications } from '../../../Utils/Notification';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import TextButton from '../../../UI/TextButton';
 import { isMobile } from '../../../Utils/Platform';
+import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 const electron = optionalRequire('electron');
 
 const styles = {
@@ -319,7 +320,7 @@ export const HomePage = React.memo<Props>(
                               authenticatedUser
                             )}
                           />
-                          {!electron && !isMobile() && (
+                          {!electron && !isMobile() && !isUserflowRunning && (
                             <TextButton
                               label={<Trans>Start tour</Trans>}
                               primary

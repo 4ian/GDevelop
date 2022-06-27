@@ -261,7 +261,7 @@ module.exports = {
       .addAction(
         'RemoveSceneTween',
         _('Remove a scene tween'),
-        _('Remove the scene tween.'),
+        _('Remove the scene tween. Call this when the tween is no longer needed to free memory.'),
         _('Remove the scene tween _PARAM1_'),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',

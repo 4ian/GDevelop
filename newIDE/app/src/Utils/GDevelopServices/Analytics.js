@@ -9,7 +9,7 @@ export type GameMetrics = {
     /** Number of sessions for this day. */
     d0Sessions: number,
     /** Total duration of sessions for this day. */
-    d0SessionsDurationTotal: number,
+    d0SessionsDurationTotal: ?number,
   },
   players: ?{
     /** Number of players for this day. */
@@ -17,15 +17,15 @@ export type GameMetrics = {
     /** Number of new players for this day. */
     d0NewPlayers: number,
     /** Number of players that play the game less than 1 minute for this day. */
-    d0PlayersBelow60s: number,
+    d0PlayersBelow60s: ?number,
     /** Number of players that play the game less than 3 minutes for this day. */
-    d0PlayersBelow180s: number,
+    d0PlayersBelow180s: ?number,
     /** Number of players that play the game less than 5 minutes for this day. */
-    d0PlayersBelow300s: number,
+    d0PlayersBelow300s: ?number,
     /** Number of players that play the game less than 10 minutes for this day. */
-    d0PlayersBelow600s: number,
+    d0PlayersBelow600s: ?number,
     /** Number of players that play the game less than 15 minutes for this day. */
-    d0PlayersBelow900s: number,
+    d0PlayersBelow900s: ?number,
   },
   retention: ?{
     /** Day 1 retained players (number of players that played this day, and were new players 1 days earlier). */

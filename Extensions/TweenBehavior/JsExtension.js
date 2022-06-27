@@ -19,6 +19,44 @@
 import { type ObjectsRenderingService, type ObjectsEditorService } from '../JsExtensionTypes.flow.js'
 */
 
+const easingChoices = JSON.stringify([
+  'linear',
+  'easeInQuad',
+  'easeOutQuad',
+  'easeInOutQuad',
+  'easeInCubic',
+  'easeOutCubic',
+  'easeInOutCubic',
+  'easeInQuart',
+  'easeOutQuart',
+  'easeInOutQuart',
+  'easeInQuint',
+  'easeOutQuint',
+  'easeInOutQuint',
+  'easeInSine',
+  'easeOutSine',
+  'easeInOutSine',
+  'easeInExpo',
+  'easeOutExpo',
+  'easeInOutExpo',
+  'easeInCirc',
+  'easeOutCirc',
+  'easeInOutCirc',
+  'easeOutBounce',
+  'easeInBack',
+  'easeOutBack',
+  'easeInOutBack',
+  'elastic',
+  'swingFromTo',
+  'swingFrom',
+  'swingTo',
+  'bounce',
+  'bouncePast',
+  'easeFromTo',
+  'easeFrom',
+  'easeTo',
+]);
+
 module.exports = {
   createExtension: function (
     _ /*: (string) => string */,
@@ -37,45 +75,7 @@ module.exports = {
       )
       .setExtensionHelpPath('/behaviors/tween');
 
-      const easingChoices = JSON.stringify([
-        'linear',
-        'easeInQuad',
-        'easeOutQuad',
-        'easeInOutQuad',
-        'easeInCubic',
-        'easeOutCubic',
-        'easeInOutCubic',
-        'easeInQuart',
-        'easeOutQuart',
-        'easeInOutQuart',
-        'easeInQuint',
-        'easeOutQuint',
-        'easeInOutQuint',
-        'easeInSine',
-        'easeOutSine',
-        'easeInOutSine',
-        'easeInExpo',
-        'easeOutExpo',
-        'easeInOutExpo',
-        'easeInCirc',
-        'easeOutCirc',
-        'easeInOutCirc',
-        'easeOutBounce',
-        'easeInBack',
-        'easeOutBack',
-        'easeInOutBack',
-        'elastic',
-        'swingFromTo',
-        'swingFrom',
-        'swingTo',
-        'bounce',
-        'bouncePast',
-        'easeFromTo',
-        'easeFrom',
-        'easeTo',
-      ]);
-  
-      extension
+    extension
       .addExpression(
         'Ease',
         _('Ease'),
@@ -88,15 +88,194 @@ module.exports = {
       .addParameter('expression', _('From value'))
       .addParameter('expression', _('To value'))
       .addParameter('expression', _('Weighting'))
-      .setParameterLongDescription(
-        _('From 0 to 1.')
-      )
+      .setParameterLongDescription(_('From 0 to 1.'))
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
       .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
       .setFunctionName('gdjs.evtTools.tween.ease');
 
-    var tweenBehavior = new gd.BehaviorJsImplementation();
+    extension
+      .addAction(
+        'TweenSceneVariableNumber',
+        _('Tween a number in a scene variable'),
+        _(
+          "Tweens a scene variable's numeric value from one number to another."
+        ),
+        _(
+          'Tween variable _PARAM2_ from _PARAM3_ to _PARAM4_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', 'Tween identifier', '', false)
+      .addParameter('scenevar', 'The variable to tween', '', false)
+      .addParameter('expression', 'Initial value', '', false)
+      .addParameter('expression', 'Final value', '', false)
+      .addParameter('expression', 'Duration', '', false)
+      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenNumber');
+
+    extension
+      .addAction(
+        'TweenCameraPosition',
+        _('Tween the camera position'),
+        _(
+          'Tweens tweens the camera position from the current one to a new one.'
+        ),
+        _(
+          'Tween camera on layer _PARAM4_ to _PARAM2_;_PARAM3_ for _PARAM5_ms with easing _PARAM6_ as _PARAM1_'
+        ),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', 'Tween identifier', '', false)
+      .addParameter('expression', 'Target X position', '', false)
+      .addParameter('expression', 'Target Y position', '', false)
+      .addParameter('layer', 'Layer', '', true)
+      .addParameter('expression', 'Duration', '', false)
+      .addParameter('stringWithSelector', 'Easing', easingChoices, false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.tweenCamera');
+
+    extension
+      .addCondition(
+        'SceneTweenExists',
+        _('Scene tween exists'),
+        _('Check if the scene tween exists.'),
+        _('Scene tween _PARAM1_ exists'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenExists');
+
+    extension
+      .addCondition(
+        'SceneTweenIsPlaying',
+        _('Scene tween is playing'),
+        _('Check if the scene tween is currently playing.'),
+        _('Scene tween _PARAM1_ is playing'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenIsPlaying');
+
+    extension
+      .addCondition(
+        'SceneTweenHasFinished',
+        _('Scene tween finished playing'),
+        _('Check if the scene tween has finished playing.'),
+        _('Scene tween _PARAM1_ has finished playing'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.sceneTweenHasFinished');
+
+    extension
+      .addAction(
+        'PauseSceneTween',
+        _('Pause a scene tween'),
+        _('Pause the running scene tween.'),
+        _('Pause the scene tween _PARAM1_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.pauseSceneTween');
+
+    extension
+      .addAction(
+        'StopSceneTween',
+        _('Stop a scene tween'),
+        _('Stop the running scene tween.'),
+        _('Stop the scene tween _PARAM1_ (jump to the end: _PARAM2_)'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .addParameter('yesorno', _('Jump to the end'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.stopSceneTween');
+
+    extension
+      .addAction(
+        'ResumeSceneTween',
+        _('Resume a scene tween'),
+        _('Resume the scene tween.'),
+        _('Resume the scene tween _PARAM1_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.resumeSceneTween');
+
+    extension
+      .addAction(
+        'RemoveSceneTween',
+        _('Remove a scene tween'),
+        _('Remove the scene tween. Call this when the tween is no longer needed to free memory.'),
+        _('Remove the scene tween _PARAM1_'),
+        _('Scene Tweens'),
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
+      .addIncludeFile('Extensions/TweenBehavior/tweentools.js')
+      .setFunctionName('gdjs.evtTools.tween.removeSceneTween');
+
+    const tweenBehavior = new gd.BehaviorJsImplementation();
 
     // $FlowExpectedError - ignore Flow warning as we're creating a behavior
     tweenBehavior.updateProperty = function (
@@ -131,6 +310,7 @@ module.exports = {
         new gd.BehaviorsSharedData()
       )
       .setIncludeFile('Extensions/TweenBehavior/shifty.js')
+      .addIncludeFile('Extensions/TweenBehavior/shifty_setup.js')
       .addIncludeFile('Extensions/TweenBehavior/tweenruntimebehavior.js');
 
     // Behavior related

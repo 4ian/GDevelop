@@ -303,7 +303,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         chartData.overview.greaterDurationPlayerSurface
                           .playersCount
                       }{' '}
-                      players >{' '}
+                      players with more than{' '}
                       {
                         chartData.overview.greaterDurationPlayerSurface
                           .durationInMinutes
@@ -361,7 +361,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         chartData.overview.nearestToMedianDuration
                           .playersPercent
                       )}
-                      % of players >{' '}
+                      % of players with more than{' '}
                       {
                         chartData.overview.nearestToMedianDuration
                           .durationInMinutes
@@ -371,17 +371,6 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
                     <AreaChart data={chartData.byDay} margin={chartMargins}>
-                      <Area
-                        name={i18n._(t`Viewers`)}
-                        type="monotone"
-                        dataKey="over0sPlayersPercent"
-                        formatter={percentFormatter}
-                        unit={' %'}
-                        stroke={gdevelopTheme.chart.dataColor1}
-                        fill={gdevelopTheme.chart.dataColor1}
-                        fillOpacity={0.125}
-                        yAxisId={0}
-                      />
                       <Area
                         name={i18n._(t`Players`)}
                         type="monotone"
@@ -447,7 +436,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         style={styles.tickLabel}
                       />
                       <YAxis
-                        dataKey="over0sPlayersPercent"
+                        dataKey="over60sPlayersPercent"
                         stroke={gdevelopTheme.chart.textColor}
                         style={styles.tickLabel}
                         unit={' %'}

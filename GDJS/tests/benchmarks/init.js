@@ -37,9 +37,11 @@ let makeBenchmarkSuite = (options = {}) => {
 
     const results = {};
     for (let benchmarkName in benchmarkTimings) {
-      results[benchmarkName] =
-        benchmarkTimings[benchmarkName].reduce((sum, value) => sum + value, 0) /
-        benchmarksCount;
+      const mean = benchmarkTimings[benchmarkName].reduce((sum, value) => sum + value, 0) /
+      benchmarksCount;
+      const standardDeviation = Math.sqrt(benchmarkTimings[benchmarkName].reduce((sum, value) => sum + (value - mean) * (value - mean), 0) /
+      benchmarksCount);
+      results[benchmarkName] = (mean + " standardDeviation: " + standardDeviation);
     }
     return results;
   };

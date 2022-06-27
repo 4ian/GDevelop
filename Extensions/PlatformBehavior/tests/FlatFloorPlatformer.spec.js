@@ -583,7 +583,9 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       object.setPosition(30, -32);
       // Ensure the object falls on the platform
       fallOnPlatform(10);
-      expect(object.getY()).to.be(-30); // -30 = -10 (platform y) + -20 (object height)
+      // The Y scaling of the object is 0.4 which is not a rational number in base 2.
+      // -30 = -10 (platform y) + -20 (object height)
+      expect(object.getY()).to.be.within(-30 - epsilon, -30 + epsilon);
 
       // walk right
       for (let i = 0; i < 25; ++i) {
@@ -592,8 +594,18 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
         expect(object.getBehavior('auto1').isOnFloor()).to.be(true);
       }
       // is blocked by the wall
-      expect(object.getX()).to.be(wall.getX() - objectWidth);
-      expect(object.getY()).to.be(platform.getY() - objectHeight);
+      // The X scaling of the object is 0.2 which is not a rational number in base 2.
+      // The search is done pixel by pixel on X which doesn't allow to find the right position to stop.
+      // This result to the object being stopped at its position before moving.
+      // It then converge a bit thanks to a lower speed.
+      expect(object.getX()).to.be.within(
+        wall.getX() - objectWidth - 0.3,
+        wall.getX() - objectWidth
+      );
+      expect(object.getY()).to.be.within(
+        platform.getY() - objectHeight - epsilon,
+        platform.getY() - objectHeight + epsilon
+      );
     });
   });
 

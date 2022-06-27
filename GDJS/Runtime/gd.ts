@@ -524,6 +524,33 @@ namespace gdjs {
       hex[r[15]]
     );
   };
+
+  /**
+   * See https://floating-point-gui.de/errors/comparison/
+   * @param a
+   * @param b
+   * @param epsilon the relative margin error
+   * @returns true when a and b are within a relative margin error.
+   */
+  export const nearlyEqual = (a: float, b: float, epsilon: float): boolean => {
+    if (a === b) {
+      // also handles infinities
+      return true;
+    }
+
+    const absA = Math.abs(a);
+    const absB = Math.abs(b);
+    const absDiff = Math.abs(a - b);
+
+    if (a === 0 || b === 0 || absA + absB < Number.EPSILON) {
+      // a or b is zero or both are extremely close to it
+      // relative error is less meaningful here
+      return absDiff < epsilon * Number.EPSILON;
+    }
+
+    // use relative error
+    return absDiff / Math.min(absA + absB, Number.MAX_VALUE) < epsilon;
+  };
 }
 
 //Make sure console.warn and console.error are available.

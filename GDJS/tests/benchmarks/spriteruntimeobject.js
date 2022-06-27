@@ -93,6 +93,14 @@ describe('gdjs.SpriteRuntimeObject', function () {
           object.setX(i);
           object.getAABB();
         }
+      )
+      .add(
+        'getAABB of a rotating sprite, with custom hitboxes, origin and center',
+        (i) => {
+          object.setAngle(1.1 * i);
+          object.setX(i);
+          object.getAABB();
+        }
       );
 
     console.log(benchmarkSuite.run());

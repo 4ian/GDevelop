@@ -315,6 +315,8 @@ namespace gdjs {
     _renderer: gdjs.SpriteRuntimeObjectRenderer;
     hitBoxesDirty: any;
     _animationFrameDirty: any;
+    _affineTransformation: gdjs.AffineTransformation | null = null;
+    _affineTransformationDirty: boolean = true;
 
     constructor(runtimeScene, spriteObjectData) {
       super(runtimeScene, spriteObjectData);
@@ -408,6 +410,7 @@ namespace gdjs {
         this.setAnimation(0);
       }
       this.hitBoxesDirty = true;
+      this._affineTransformationDirty = true;
       return true;
     }
 
@@ -494,6 +497,7 @@ namespace gdjs {
       }
       if (oldFrame !== this._currentFrame) {
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
       }
       this._renderer.ensureUpToDate();
     }
@@ -614,6 +618,7 @@ namespace gdjs {
         this._renderer.update();
         this._animationFrameDirty = true;
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
       }
     }
 
@@ -670,6 +675,7 @@ namespace gdjs {
         }
         this.angle = newValue;
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
         this._renderer.updateAngle();
       } else {
         newValue = newValue | 0;
@@ -689,6 +695,7 @@ namespace gdjs {
         this._renderer.update();
         this._animationFrameDirty = true;
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
       }
     }
 
@@ -726,6 +733,7 @@ namespace gdjs {
         this._currentFrame = newFrame;
         this._animationFrameDirty = true;
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
       }
     }
 
@@ -845,41 +853,69 @@ namespace gdjs {
      * (x and y position of the point in global coordinates).
      */
     private _transformToGlobal(x: float, y: float, result: number[]) {
+      result.length = 2;
+      const onlyNeedTranslation =
+        this.angle === 0 && this._scaleX === 1 && this._scaleY === 1;
+      if (onlyNeedTranslation) {
+        // It's faster than applying a whole affine transformation.
+        // And it avoid to instantiate this._affineTransformation
+        // if it's never needed.
+        const animationFrame = this._animationFrame as SpriteAnimationFrame;
+        result[0] = x + this.x - animationFrame.origin.x;
+        result[1] = y + this.y - animationFrame.origin.y;
+      } else {
+        result[0] = x;
+        result[1] = y;
+        // @ts-ignore It's a FloatPoint at this point.
+        this.getAffineTransformation().transform(result, result);
+      }
+    }
+
+    /**
+     * Return the affine transformation that represents
+     * flipping, scale, rotation and translation of the object.
+     * @returns the affine transformation.
+     */
+    getAffineTransformation(): gdjs.AffineTransformation {
+      if (!this._affineTransformation) {
+        this._affineTransformation = new gdjs.AffineTransformation();
+      }
+      if (!this._affineTransformationDirty) {
+        return this._affineTransformation;
+      }
       const animationFrame = this._animationFrame as SpriteAnimationFrame;
-      let cx = animationFrame.center.x;
-      let cy = animationFrame.center.y;
-
-      //Flipping
-      if (this._flippedX) {
-        x = x + (cx - x) * 2;
-      }
-      if (this._flippedY) {
-        y = y + (cy - y) * 2;
-      }
-
-      //Scale
+      const centerX = animationFrame.center.x;
+      const centerY = animationFrame.center.y;
+      const originX = animationFrame.origin.x;
+      const originY = animationFrame.origin.y;
       const absScaleX = Math.abs(this._scaleX);
       const absScaleY = Math.abs(this._scaleY);
-      x *= absScaleX;
-      y *= absScaleY;
-      cx *= absScaleX;
-      cy *= absScaleY;
 
-      //Rotation
-      const oldX = x;
-      const angleInRadians = (this.angle / 180) * Math.PI;
-      const cosValue = Math.cos(
-        // Only compute cos and sin once (10% faster than doing it twice)
-        angleInRadians
+      // Translation
+      this._affineTransformation.setToTranslation(this.x, this.y);
+
+      // Rotation
+      const angleInRadians = (this.angle * Math.PI) / 180;
+      this._affineTransformation.rotateAround(
+        angleInRadians,
+        (centerX - originX) * absScaleX,
+        (centerY - originY) * absScaleY
       );
-      const sinValue = Math.sin(angleInRadians);
-      const xToCenterXDelta = x - cx;
-      const yToCenterYDelta = y - cy;
-      x = cx + cosValue * xToCenterXDelta - sinValue * yToCenterYDelta;
-      y = cy + sinValue * xToCenterXDelta + cosValue * yToCenterYDelta;
-      result.length = 2;
-      result[0] = x + (this.x - animationFrame.origin.x * absScaleX);
-      result[1] = y + (this.y - animationFrame.origin.y * absScaleY);
+
+      // Scale
+      this._affineTransformation.scale(absScaleX, absScaleY);
+      this._affineTransformation.translate(-originX, -originY);
+
+      // Flipping
+      if (this._flippedX) {
+        this._affineTransformation.flipX(centerX);
+      }
+      if (this._flippedY) {
+        this._affineTransformation.flipY(centerY);
+      }
+      this._affineTransformationDirty = false;
+
+      return this._affineTransformation;
     }
 
     /**
@@ -981,6 +1017,7 @@ namespace gdjs {
       this.x = x;
       if (this._animationFrame !== null) {
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
         this._renderer.updateX();
       }
     }
@@ -996,6 +1033,7 @@ namespace gdjs {
       this.y = y;
       if (this._animationFrame !== null) {
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
         this._renderer.updateY();
       }
     }
@@ -1015,6 +1053,7 @@ namespace gdjs {
         this.angle = angle;
         this._renderer.updateAngle();
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
       } else {
         angle = angle % 360;
         if (angle < 0) {
@@ -1110,6 +1149,7 @@ namespace gdjs {
         this._scaleX *= -1;
         this._flippedX = enable;
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
         this._renderer.update();
       }
     }
@@ -1119,6 +1159,7 @@ namespace gdjs {
         this._scaleY *= -1;
         this._flippedY = enable;
         this.hitBoxesDirty = true;
+        this._affineTransformationDirty = true;
         this._renderer.update();
       }
     }
@@ -1216,6 +1257,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.update();
       this.hitBoxesDirty = true;
+      this._affineTransformationDirty = true;
     }
 
     /**
@@ -1233,6 +1275,7 @@ namespace gdjs {
       this._scaleX = newScale * (this._flippedX ? -1 : 1);
       this._renderer.update();
       this.hitBoxesDirty = true;
+      this._affineTransformationDirty = true;
     }
 
     /**
@@ -1250,6 +1293,7 @@ namespace gdjs {
       this._scaleY = newScale * (this._flippedY ? -1 : 1);
       this._renderer.update();
       this.hitBoxesDirty = true;
+      this._affineTransformationDirty = true;
     }
 
     /**

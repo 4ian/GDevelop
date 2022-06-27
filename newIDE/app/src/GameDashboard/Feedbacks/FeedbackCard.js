@@ -25,6 +25,7 @@ import {
 } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
+import { useDebounce } from '../../Utils/UseDebounce';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 
 const styles = { textComment: { whiteSpace: 'pre-wrap' } };
@@ -32,6 +33,7 @@ const styles = { textComment: { whiteSpace: 'pre-wrap' } };
 type Props = {|
   comment: Comment,
   authenticatedUser: AuthenticatedUser,
+  onCommentUpdated: (comment: Comment) => void,
 |};
 
 const getRatings = (ratings: ?GameRatings) => {
@@ -58,19 +60,28 @@ const getRatings = (ratings: ?GameRatings) => {
   }
 };
 
-const FeedbackCard = ({ comment, authenticatedUser }: Props) => {
+const FeedbackCard = ({
+  comment,
+  authenticatedUser,
+  onCommentUpdated,
+}: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
   const ratings = getRatings(comment.ratings);
   const theme = React.useContext(GDevelopThemeContext);
 
-  const processComment = async (processed: boolean, i18n: I18nType) => {
+  const processComment = async (newProcessed: boolean, i18n: I18nType) => {
     if (!profile) return;
     try {
-      await updateComment(getAuthorizationHeader, profile.id, {
-        gameId: comment.gameId,
-        commentId: comment.id,
-        processed,
-      });
+      const updatedComment: Comment = await updateComment(
+        getAuthorizationHeader,
+        profile.id,
+        {
+          gameId: comment.gameId,
+          commentId: comment.id,
+          processed: newProcessed,
+        }
+      );
+      onCommentUpdated(updatedComment);
     } catch (error) {
       console.error(`Unable to update comment: `, error);
       showErrorBox({

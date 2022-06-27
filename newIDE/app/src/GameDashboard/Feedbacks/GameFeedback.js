@@ -62,6 +62,17 @@ const GameFeedback = ({ authenticatedUser, game }: Props) => {
     [authenticatedUser, game]
   );
 
+  const onCommentUpdated = (updatedComment: Comment) => {
+    if (!feedbacks) return;
+    const newFeedbacks = [...feedbacks];
+    const updatedFeedbackIndex = newFeedbacks.findIndex(
+      feedback => feedback.id === updatedComment.id
+    );
+    if (updatedFeedbackIndex === -1) return;
+    newFeedbacks[updatedFeedbackIndex] = updatedComment;
+    setFeedbacks(newFeedbacks);
+  };
+
   React.useEffect(
     () => {
       loadFeedbacks();
@@ -115,11 +126,12 @@ const GameFeedback = ({ authenticatedUser, game }: Props) => {
             )}
             {displayedFeedbacks.length !== 0 && (
               <ColumnStackLayout expand>
-                {displayedFeedbacks.map((comment: Comment) => (
+                {displayedFeedbacks.map((comment: Comment, index: number) => (
                   <FeedbackCard
                     key={comment.id}
                     comment={comment}
                     authenticatedUser={authenticatedUser}
+                    onCommentUpdated={onCommentUpdated}
                   />
                 ))}
               </ColumnStackLayout>

@@ -84,7 +84,7 @@ const confirmationMessage = {
     ),
     false: (
       <Trans>
-        You're about to de-activate the feedback banner on your game page on
+        You are about to de-activate the feedback banner on your game page on
         Liluo.io. Continue ?
       </Trans>
     ),

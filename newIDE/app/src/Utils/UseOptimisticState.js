@@ -11,12 +11,10 @@ export const useOptimisticState = (
   initialState: any,
   functionToDebounce: (newState: any, args: any) => Promise<void>
 ) => {
-  const [current, setCurrent] = React.useState(initialState);
   const [pending, setPending] = React.useState<?any>(null);
   const debouncedFunction = useDebounce(async (newState, ...args) => {
     try {
       await functionToDebounce(newState, ...args);
-      setCurrent(newState);
     } catch (error) {
       console.error(`Error while updating optimistic state: `, error);
     } finally {
@@ -27,5 +25,5 @@ export const useOptimisticState = (
     setPending(newState);
     debouncedFunction(newState, args);
   };
-  return [pending !== null ? pending : current, setNewState];
+  return [pending !== null ? pending : initialState, setNewState];
 };

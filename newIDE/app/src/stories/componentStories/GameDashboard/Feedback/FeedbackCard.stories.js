@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -20,5 +21,6 @@ export const DefaultFeedbackCard = () => (
   <FeedbackCard
     comment={commentUnsolved}
     authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
   />
 );

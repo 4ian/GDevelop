@@ -79,7 +79,7 @@ namespace gdjs {
       ) => {
         const tweenMap = getTweensMap(runtimeScene);
         const tween = tweenMap.get(id);
-        return tween && tween.isPlaying();
+        return !!tween && tween.isPlaying();
       };
 
       export const sceneTweenHasFinished = (
@@ -88,7 +88,7 @@ namespace gdjs {
       ) => {
         const tweenMap = getTweensMap(runtimeScene);
         const tween = tweenMap.get(id);
-        return tween && tween.hasEnded();
+        return !!tween && tween.hasEnded();
       };
 
       export const resumeSceneTween = (

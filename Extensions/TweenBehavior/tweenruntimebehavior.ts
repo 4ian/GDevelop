@@ -147,16 +147,13 @@ namespace gdjs {
       // Start the tween and set the needed callbacks
       tweenable
         .tween(tweenConfig)
-        .then(
-          () => {
-            if (this._tweens[identifier])
-              this._tweens[identifier].hasFinished = true;
+        .then(() => {
+          if (this._tweens[identifier])
+            this._tweens[identifier].hasFinished = true;
 
-            if (destroyObjectWhenFinished)
-              this.owner.deleteFromScene(this._runtimeScene);
-          },
-          () => {}
-        )
+          if (destroyObjectWhenFinished)
+            this.owner.deleteFromScene(this._runtimeScene);
+        })
         .catch((e) => {});
     }
 

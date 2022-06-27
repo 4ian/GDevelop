@@ -713,7 +713,7 @@ declare namespace shifty {
      * @return {Promise<Object>}
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
      */
-    then(onFulfilled: Function, onRejected: Function): Promise<any>;
+    then(onFulfilled: Function, onRejected?: Function): Promise<any>;
     /** @private */
     private _promise;
     /**

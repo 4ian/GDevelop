@@ -173,8 +173,10 @@ const mergeGameMetrics = (
       b.sessions && {
         d0Sessions: a.sessions.d0Sessions + b.sessions.d0Sessions,
         d0SessionsDurationTotal:
-          (a.sessions.d0SessionsDurationTotal || 0) +
-          (b.sessions.d0SessionsDurationTotal || 0),
+          a.sessions.d0SessionsDurationTotal &&
+          b.sessions.d0SessionsDurationTotal &&
+          a.sessions.d0SessionsDurationTotal +
+            b.sessions.d0SessionsDurationTotal,
       },
 
     players: a.players &&
@@ -182,20 +184,25 @@ const mergeGameMetrics = (
         d0Players: a.players.d0Players + b.players.d0Players,
         d0NewPlayers: a.players.d0NewPlayers + b.players.d0NewPlayers,
         d0PlayersBelow60s:
-          (a.players.d0PlayersBelow60s || 0) +
-          (b.players.d0PlayersBelow60s || 0),
+          a.players.d0PlayersBelow60s &&
+          b.players.d0PlayersBelow60s &&
+          a.players.d0PlayersBelow60s + b.players.d0PlayersBelow60s,
         d0PlayersBelow180s:
-          (a.players.d0PlayersBelow180s || 0) +
-          (b.players.d0PlayersBelow180s || 0),
+          a.players.d0PlayersBelow180s &&
+          b.players.d0PlayersBelow180s &&
+          a.players.d0PlayersBelow180s + b.players.d0PlayersBelow180s,
         d0PlayersBelow300s:
-          (a.players.d0PlayersBelow300s || 0) +
-          (b.players.d0PlayersBelow300s || 0),
+          a.players.d0PlayersBelow300s &&
+          b.players.d0PlayersBelow300s &&
+          a.players.d0PlayersBelow300s + b.players.d0PlayersBelow300s,
         d0PlayersBelow600s:
-          (a.players.d0PlayersBelow600s || 0) +
-          (b.players.d0PlayersBelow600s || 0),
+          a.players.d0PlayersBelow600s &&
+          b.players.d0PlayersBelow600s &&
+          a.players.d0PlayersBelow600s + b.players.d0PlayersBelow600s,
         d0PlayersBelow900s:
-          (a.players.d0PlayersBelow900s || 0) +
-          (b.players.d0PlayersBelow900s || 0),
+          a.players.d0PlayersBelow900s &&
+          b.players.d0PlayersBelow900s &&
+          a.players.d0PlayersBelow900s + b.players.d0PlayersBelow900s,
       },
 
     retention: null,

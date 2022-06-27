@@ -861,7 +861,7 @@ const deleteDurationMetrics = (
 export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetrics1();
 export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
   generateGameRollingMetrics1(),
-  15
+  17
 );
 export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(
   0,

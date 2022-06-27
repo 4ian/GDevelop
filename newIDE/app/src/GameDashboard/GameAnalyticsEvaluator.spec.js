@@ -1,4 +1,4 @@
-import { evaluateGameMetrics } from './GameAnalyticsEvaluator';
+import { buildChartData } from './GameAnalyticsEvaluator';
 import {
   gameRollingMetricsWithHoles,
   gameRollingMetricsWithOnly19Days,
@@ -32,14 +32,14 @@ describe('GameAnalyticsEvaluator', () => {
   };
 
   it('fill empty metrics', () => {
-    const { yearChartData, monthChartData } = evaluateGameMetrics([]);
+    const { yearChartData, monthChartData } = buildChartData([]);
 
     expect(yearChartData.byDay.length).toBe(52);
     expect(monthChartData.byDay.length).toBe(30);
   });
 
   it('fill metrics missing days', () => {
-    const { yearChartData, monthChartData } = evaluateGameMetrics(
+    const { yearChartData, monthChartData } = buildChartData(
       gameRollingMetricsWithHoles
     );
 
@@ -50,14 +50,14 @@ describe('GameAnalyticsEvaluator', () => {
   it('give the same overview statistics on year and month', () => {
     // Easy to understand data for debugging
     {
-      const { yearChartData, monthChartData } = evaluateGameMetrics(
+      const { yearChartData, monthChartData } = buildChartData(
         generateGameRollingMetrics1(19)
       );
       expect(yearChartData.overview).toStrictEqual(monthChartData.overview);
     }
     // Randomized data to be sure to spot everything
     {
-      const { yearChartData, monthChartData } = evaluateGameMetrics(
+      const { yearChartData, monthChartData } = buildChartData(
         gameRollingMetricsWithOnly19Days
       );
       expect(yearChartData.overview).toStrictEqual(monthChartData.overview);

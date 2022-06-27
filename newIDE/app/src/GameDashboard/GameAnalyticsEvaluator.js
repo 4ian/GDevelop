@@ -9,7 +9,7 @@ import {
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 
 export type MergedGameMetrics = GameMetrics & {
-  startDate: string,
+  startDate: string | null,
 };
 
 export const daysShownForYear = 364;
@@ -262,9 +262,7 @@ const findGreaterDurationPlayerIndex = (
   return greaterDurationPlayerIndex;
 };
 
-const evaluateChartData = (
-  metrics: GameMetrics[] | MergedGameMetrics[]
-): ChartData => {
+const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
   let playersBelowSums = [0, 0, 0, 0, 0];
   let playersSum = 0;
   let onlyFullyDefinedPlayersSum = 0;
@@ -318,6 +316,29 @@ const evaluateChartData = (
   const dateFormatOptions = { month: 'short', day: 'numeric' };
   const noMonthDateFormatOptions = { day: 'numeric' };
 
+  const formatDate = (metric: MergedGameMetrics) => {
+    const startIsoDate = metric.startDate;
+    const endDate = parseISO(metric.date);
+    const formattedDate = endDate.toLocaleDateString(
+      undefined,
+      dateFormatOptions
+    );
+    if (!startIsoDate) {
+      return formattedDate;
+    }
+    const startDate = parseISO(startIsoDate);
+    return (
+      startDate.toLocaleDateString(
+        undefined,
+        endDate.getMonth() === startDate.getMonth()
+          ? noMonthDateFormatOptions
+          : dateFormatOptions
+      ) +
+      ' - ' +
+      formattedDate
+    );
+  };
+
   return {
     overview: {
       // Players from before the migration are shown as viewers
@@ -363,20 +384,7 @@ const evaluateChartData = (
     byDay: metrics
       .map(metric => ({
         timestamp: parseISO(metric.date).getTime(),
-        date:
-          (metric.startDate
-            ? parseISO(metric.startDate).toLocaleDateString(
-                undefined,
-                parseISO(metric.date).getMonth() ===
-                  parseISO(metric.startDate).getMonth()
-                  ? noMonthDateFormatOptions
-                  : dateFormatOptions
-              ) + ' - '
-            : '') +
-          parseISO(metric.date).toLocaleDateString(
-            undefined,
-            dateFormatOptions
-          ),
+        date: formatDate(metric),
         meanPlayedDurationInMinutes:
           metric.sessions &&
           metric.players &&
@@ -560,6 +568,7 @@ const evaluateChartData = (
     byPlayedTime: [
       { duration: 0, playersCount: onlyFullyDefinedPlayersSum },
     ].concat(
+      // $FlowFixMe durationIndex can only be a number.
       Object.values(durationIndexes).map((durationIndex: number) => ({
         duration: durationValues[durationIndex],
         playersCount:
@@ -569,7 +578,7 @@ const evaluateChartData = (
   };
 };
 
-export const evaluateGameMetrics = (
+export const buildChartData = (
   gameMetrics: ?Array<GameMetrics>
 ): { yearChartData: ChartData, monthChartData: ChartData } => {
   if (!gameMetrics) {
@@ -587,6 +596,10 @@ export const evaluateGameMetrics = (
     yearChartData: evaluateChartData(
       mergeGameMetricsByWeek(filledGameRollingMetrics)
     ),
-    monthChartData: evaluateChartData(filledGameRollingMetrics.slice(0, 30)),
+    monthChartData: evaluateChartData(
+      filledGameRollingMetrics
+        .slice(0, 30)
+        .map(metric => ({ ...metric, startDate: null }: MergedGameMetrics))
+    ),
   };
 };

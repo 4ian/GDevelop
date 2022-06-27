@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
-import Share from '@material-ui/icons/Share';
 
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';

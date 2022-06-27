@@ -95,6 +95,7 @@ const getObjectsAndGroupsDataSource = ({
   const fullList = [...objects, { type: 'separator' }, ...groups];
   return excludedObjectOrGroupNames
     ? fullList.filter(
+        //$FlowFixMe
         ({ value }) => !excludedObjectOrGroupNames.includes(value)
       )
     : fullList;

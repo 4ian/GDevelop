@@ -198,8 +198,8 @@ const fillMissingDays = (
  * the value. It will sightly change the overview sums, but they are less
  * important.
  * This should only happen on the migration week when new metrics were added.
- * @param {*} a
- * @param {*} b
+ * @param a
+ * @param b
  * @returns the sum for each metric or `undefined` when one side is `undefined`
  */
 const mergeGameMetrics = (

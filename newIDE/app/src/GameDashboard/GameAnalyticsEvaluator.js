@@ -12,26 +12,45 @@ export type MergedGameMetrics = GameMetrics & {
   startDate: string | null,
 };
 
+/**
+ * It's divisible by 7.
+ */
 export const daysShownForYear = 364;
 
+/**
+ * Enriched game metrics that are ready to be used in a chart.
+ */
 type ChartData = {|
   overview: {|
     viewersCount: number,
     playersCount: number,
     bounceRatePercent: number,
     meanPlayedDurationInMinutes: number,
+    /**
+     * @see findNearestToMedianDurationIndex
+     */
     nearestToMedianDuration: {|
       playersCount: number,
       playersPercent: number,
       durationInMinutes: number,
     |},
+
+    /**
+     * @see findGreaterDurationPlayerIndex
+     */
     greaterDurationPlayerSurface: {|
       playersCount: number,
       playersPercent: number,
       durationInMinutes: number,
     |},
   |},
-  byDay: {|
+  /**
+   * Metrics for each day of a month or each week of a year.
+   */
+  overTime: {|
+    /**
+     * It's used to sort the data.
+     */
     timestamp: number,
     date: string,
     playersCount: number,
@@ -66,7 +85,10 @@ type ChartData = {|
     from600sTo900sPlayersPercent: number,
     from900sToInfinityPlayersPercent: number,
   |}[],
-  byPlayedTime: {| duration: number, playersCount: number |}[],
+  /**
+   * A funnel of the remaining players after a given played duration.
+   */
+  overPlayedDuration: {| duration: number, playersCount: number |}[],
 |};
 
 const emptyChartData = {
@@ -86,8 +108,8 @@ const emptyChartData = {
       durationInMinutes: 0,
     },
   },
-  byDay: [],
-  byPlayedTime: [],
+  overTime: [],
+  overPlayedDuration: [],
 };
 
 const durationIndexes: { [string]: number } = {
@@ -99,6 +121,11 @@ const durationIndexes: { [string]: number } = {
 };
 export const durationValues = [1, 3, 5, 10, 15];
 
+/**
+ * Fill the void left by the backend for days without any players.
+ * @param gameMetrics
+ * @returns game metrics with a metric for each 364 past days.
+ */
 const fillMissingDays = (
   gameMetrics: Array<GameMetrics>
 ): Array<GameMetrics> => {
@@ -161,6 +188,18 @@ const fillMissingDays = (
   return filledGameMetrics;
 };
 
+/**
+ * Sum each metric or `undefined` when one side is `undefined`.
+ * When one metric is `undefined`, the value of the other is not used because
+ * it would act as if the other metric is `0` which is probably far from the
+ * truce and would mess the metric overview like means. It's better to ignore
+ * the value. It will sightly change the overview sums, but they are less
+ * important.
+ * This should only happen on the migration week when new metrics were added.
+ * @param {*} a
+ * @param {*} b
+ * @returns the sum for each metric or `undefined` when one side is `undefined`
+ */
 const mergeGameMetrics = (
   a: GameMetrics,
   b: GameMetrics
@@ -215,6 +254,11 @@ const mergeGameMetrics = (
   };
 };
 
+/**
+ * @param gameMetrics
+ * @returns metrics summed by weeks
+ * @see mergeGameMetrics
+ */
 const mergeGameMetricsByWeek = (
   gameMetrics: GameMetrics[]
 ): MergedGameMetrics[] => {
@@ -233,6 +277,13 @@ const mergeGameMetricsByWeek = (
   return mergedGameMetrics;
 };
 
+/**
+ * @param {*} playersBelowSums
+ * @param {*} playersCount
+ * @returns the duration limit that split the players the most evenly.
+ * The real median would hard to process for the backend,
+ * so we rely on this.
+ */
 const findNearestToMedianDurationIndex = (
   playersBelowSums: Array<number>,
   playersCount: number
@@ -249,6 +300,12 @@ const findNearestToMedianDurationIndex = (
     : overMedianDurationIndex + 1;
 };
 
+/**
+ * @param playersBelowSums
+ * @param viewersCount
+ * @returns the duration limit which maximize: duration * players.
+ * It allows to give the most impressive point from `overPlayedDuration`.
+ */
 const findGreaterDurationPlayerIndex = (
   playersBelowSums: Array<number>,
   viewersCount: number
@@ -268,6 +325,10 @@ const findGreaterDurationPlayerIndex = (
   return greaterDurationPlayerIndex;
 };
 
+/**
+ * @param metrics
+ * @returns enriched game metrics that are ready to be used in a chart.
+ */
 const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
   let playersBelowSums = [0, 0, 0, 0, 0];
   let playersSum = 0;
@@ -395,7 +456,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
         durationInMinutes: durationValues[greaterDurationPlayerIndex],
       },
     },
-    byDay: metrics
+    overTime: metrics
       .map(metric => {
         const d0SessionsDurationTotal =
           metric.sessions && metric.sessions.d0SessionsDurationTotal !== null
@@ -535,7 +596,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
         };
       })
       .sort((a, b) => a.timestamp - b.timestamp),
-    byPlayedTime: [
+    overPlayedDuration: [
       { duration: 0, playersCount: onlyFullyDefinedPlayersSum },
     ].concat(
       // $FlowFixMe durationIndex can only be a number.
@@ -548,6 +609,10 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
   };
 };
 
+/**
+ * @param {*} gameMetrics
+ * @returns enriched game metrics that are ready to be used in a chart.
+ */
 export const buildChartData = (
   gameMetrics: ?Array<GameMetrics>
 ): { yearChartData: ChartData, monthChartData: ChartData } => {

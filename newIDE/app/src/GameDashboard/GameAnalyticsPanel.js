@@ -36,6 +36,17 @@ import {
   durationValues,
 } from './GameAnalyticsEvaluator';
 
+const chartMargins = {
+  top: 5,
+  bottom: 5,
+  right: 25,
+  left: 0,
+};
+// There is a known bug with recharts that causes the chart to not render if the width is 100%
+// in a flexbox component. check https://github.com/recharts/recharts/issues/172
+const chartWidth = '99%';
+const chartHeight = 300;
+
 const minutesFormatter = value => {
   return value.toFixed(2);
 };
@@ -60,35 +71,17 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
     () => buildChartData(gameRollingMetrics),
     [gameRollingMetrics]
   );
+  const [dataPeriod, setDataPeriod] = React.useState('month');
+  const chartData = dataPeriod === 'year' ? yearChartData : monthChartData;
 
   const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
     null
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
-  const [dataPeriod, setDataPeriod] = React.useState('month');
-  const chartData = dataPeriod === 'year' ? yearChartData : monthChartData;
 
-  // It's divisible by 7.
   const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
     representation: 'date',
   });
-
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
-  const styles = {
-    tableRowStatColumn: {
-      width: 100,
-    },
-    tooltipContent: {
-      backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
-      border: 0,
-      fontFamily: gdevelopTheme.chart.fontFamily,
-    },
-    tickLabel: {
-      fontFamily: gdevelopTheme.chart.fontFamily,
-    },
-  };
-
   const loadGameMetrics = React.useCallback(
     async () => {
       if (!profile) return;
@@ -121,16 +114,25 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
     [loadGameMetrics]
   );
 
-  const chartMargins = {
-    top: 5,
-    bottom: 5,
-    right: 25,
-    left: 0,
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+
+  const styles = {
+    tableRowStatColumn: {
+      width: 100,
+    },
+    tooltipContent: {
+      backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
+      border: 0,
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+    tickLabel: {
+      fontFamily: gdevelopTheme.chart.fontFamily,
+    },
+    chartLineDot: {
+      fill: gdevelopTheme.chart.dataColor1,
+      strokeWidth: 0,
+    },
   };
-  // There is a known bug with recharts that causes the chart to not render if the width is 100%
-  // in a flexbox component. check https://github.com/recharts/recharts/issues/172
-  const chartWidth = '99%';
-  const chartHeight = 300;
 
   return (
     <I18n>
@@ -188,7 +190,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     <Trans>{chartData.overview.playersCount} sessions</Trans>
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
-                    <AreaChart data={chartData.byDay} margin={chartMargins}>
+                    <AreaChart data={chartData.overTime} margin={chartMargins}>
                       <Area
                         name={i18n._(t`Viewers`)}
                         type="monotone"
@@ -233,7 +235,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     </Trans>
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
-                    <LineChart data={chartData.byDay} margin={chartMargins}>
+                    <LineChart data={chartData.overTime} margin={chartMargins}>
                       <RechartsLine
                         name={i18n._(t`Bounce rate`)}
                         unit="%"
@@ -241,10 +243,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         type="monotone"
                         dataKey="bounceRatePercent"
                         stroke={gdevelopTheme.chart.dataColor1}
-                        dot={{
-                          stroke: gdevelopTheme.chart.dataColor1,
-                          strokeWidth: 1,
-                        }}
+                        dot={styles.chartLineDot}
                         yAxisId={0}
                       />
                       <CartesianGrid
@@ -281,7 +280,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     </Trans>
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
-                    <LineChart data={chartData.byDay} margin={chartMargins}>
+                    <LineChart data={chartData.overTime} margin={chartMargins}>
                       <RechartsLine
                         name={i18n._(t`Mean played time`)}
                         unit={' ' + i18n._(t`minutes`)}
@@ -289,10 +288,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         type="monotone"
                         dataKey="meanPlayedDurationInMinutes"
                         stroke={gdevelopTheme.chart.dataColor1}
-                        dot={{
-                          stroke: gdevelopTheme.chart.dataColor1,
-                          strokeWidth: 1,
-                        }}
+                        dot={styles.chartLineDot}
                         yAxisId={0}
                       />
                       <CartesianGrid
@@ -330,7 +326,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
                     <AreaChart
-                      data={chartData.byPlayedTime}
+                      data={chartData.overPlayedDuration}
                       margin={chartMargins}
                     >
                       <Area
@@ -387,7 +383,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                     </Trans>
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
-                    <AreaChart data={chartData.byDay} margin={chartMargins}>
+                    <AreaChart data={chartData.overTime} margin={chartMargins}>
                       <Area
                         name={i18n._(t`Players`)}
                         type="monotone"

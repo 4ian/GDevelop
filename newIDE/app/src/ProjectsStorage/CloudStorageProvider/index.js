@@ -25,13 +25,9 @@ export default ({
     };
   },
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
-    // onOpenWithPicker,
     onOpen: generateOnOpen(authenticatedUser),
-    // hasAutoSave,
     onSaveProject: generateOnSaveProject(authenticatedUser),
     onSaveProjectAs: generateOnSaveProjectAs(authenticatedUser),
-    // onAutoSaveProject,
-    // onGetAutoSave,
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorizations to open it.`;
     },

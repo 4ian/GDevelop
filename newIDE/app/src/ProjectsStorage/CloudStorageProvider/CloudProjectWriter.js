@@ -63,26 +63,21 @@ export const generateOnSaveProject = (
 export const generateOnSaveProjectAs = (
   authenticatedUser: AuthenticatedUser
 ) => async (project: gdProject, fileMetadata: ?FileMetadata) => {
-  // TODO: sometimes, at first save as, nothing happens. To investigate.
   if (!authenticatedUser) return { wasSaved: false, fileMetadata };
-  if (!fileMetadata) {
-    const cloudProject = await createCloudProject(authenticatedUser, {
-      name: project.getName(),
-    });
-    if (!cloudProject) return { wasSaved: false, fileMetadata };
-    await getCredentialsForProject(authenticatedUser, cloudProject.id);
-    const newVersion = await zipProjectAndCommitVersion({
-      authenticatedUser,
-      project,
-      cloudProjectId: cloudProject.id,
-    });
-    if (!newVersion) return { wasSaved: false, fileMetadata };
+  const cloudProject = await createCloudProject(authenticatedUser, {
+    name: project.getName(),
+  });
+  if (!cloudProject) return { wasSaved: false, fileMetadata };
+  await getCredentialsForProject(authenticatedUser, cloudProject.id);
+  const newVersion = await zipProjectAndCommitVersion({
+    authenticatedUser,
+    project,
+    cloudProjectId: cloudProject.id,
+  });
+  if (!newVersion) return { wasSaved: false, fileMetadata };
 
-    return {
-      wasSaved: true,
-      fileMetadata: { fileIdentifier: cloudProject.id },
-    };
-  }
-
-  return { wasSaved: false, fileMetadata };
+  return {
+    wasSaved: true,
+    fileMetadata: { fileIdentifier: cloudProject.id },
+  };
 };

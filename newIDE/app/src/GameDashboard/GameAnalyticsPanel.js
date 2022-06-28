@@ -241,6 +241,10 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         type="monotone"
                         dataKey="bounceRatePercent"
                         stroke={gdevelopTheme.chart.dataColor1}
+                        dot={{
+                          stroke: gdevelopTheme.chart.dataColor1,
+                          strokeWidth: 1,
+                        }}
                         yAxisId={0}
                       />
                       <CartesianGrid
@@ -285,6 +289,10 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         type="monotone"
                         dataKey="meanPlayedDurationInMinutes"
                         stroke={gdevelopTheme.chart.dataColor1}
+                        dot={{
+                          stroke: gdevelopTheme.chart.dataColor1,
+                          strokeWidth: 1,
+                        }}
                         yAxisId={0}
                       />
                       <CartesianGrid

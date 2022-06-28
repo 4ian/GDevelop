@@ -327,7 +327,7 @@ const findGreaterDurationPlayerIndex = (
   return greaterDurationPlayerIndex;
 };
 
-const playersOverDurationPercent = (
+const evaluatePlayersOverDurationPercent = (
   playersBelowDuration: ?number,
   playersCount: number
 ): number => {
@@ -336,7 +336,7 @@ const playersOverDurationPercent = (
     : 0;
 };
 
-const playersBetweenDurationPercent = (
+const evaluatePlayersBetweenDurationPercent = (
   playersBelowUpperDuration: ?number,
   playersBelowLowerDuration: ?number,
   playersCount: number
@@ -349,7 +349,7 @@ const playersBetweenDurationPercent = (
     : 0;
 };
 
-const difference = (a: ?number, b: ?number): number => {
+const subtract = (a: ?number, b: ?number): number => {
   return a != null && b != null ? a - b : 0;
 };
 
@@ -514,90 +514,90 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
           meanPlayedDurationInMinutes: d0SessionsDurationTotal
             ? d0SessionsDurationTotal / 60 / d0Players
             : 0,
-          bounceRatePercent: playersBetweenDurationPercent(
+          bounceRatePercent: evaluatePlayersBetweenDurationPercent(
             d0PlayersBelow60s,
             0,
             d0Players
           ),
           viewersCount: d0Players,
-          playersCount: difference(d0Players, d0PlayersBelow60s),
+          playersCount: subtract(d0Players, d0PlayersBelow60s),
 
-          over60sPlayersCount: difference(d0Players, d0PlayersBelow60s),
-          over180sPlayersCount: difference(d0Players, d0PlayersBelow180s),
-          over300sPlayersCount: difference(d0Players, d0PlayersBelow300s),
-          over600sPlayersCount: difference(d0Players, d0PlayersBelow600s),
-          over900sPlayersCount: difference(d0Players, d0PlayersBelow900s),
+          over60sPlayersCount: subtract(d0Players, d0PlayersBelow60s),
+          over180sPlayersCount: subtract(d0Players, d0PlayersBelow180s),
+          over300sPlayersCount: subtract(d0Players, d0PlayersBelow300s),
+          over600sPlayersCount: subtract(d0Players, d0PlayersBelow600s),
+          over900sPlayersCount: subtract(d0Players, d0PlayersBelow900s),
 
-          below60sPlayersCount: difference(d0PlayersBelow60s, 0),
-          from60sTo180sPlayersCount: difference(
+          below60sPlayersCount: subtract(d0PlayersBelow60s, 0),
+          from60sTo180sPlayersCount: subtract(
             d0PlayersBelow180s,
             d0PlayersBelow60s
           ),
-          from180sTo300sPlayersCount: difference(
+          from180sTo300sPlayersCount: subtract(
             d0PlayersBelow300s,
             d0PlayersBelow180s
           ),
-          from300sTo600sPlayersCount: difference(
+          from300sTo600sPlayersCount: subtract(
             d0PlayersBelow600s,
             d0PlayersBelow300s
           ),
-          from600sTo900sPlayersCount: difference(
+          from600sTo900sPlayersCount: subtract(
             d0PlayersBelow900s,
             d0PlayersBelow600s
           ),
-          from900sToInfinityPlayersCount: difference(
+          from900sToInfinityPlayersCount: subtract(
             d0Players,
             d0PlayersBelow900s
           ),
 
           over0sPlayersPercent: 100,
-          over60sPlayersPercent: playersOverDurationPercent(
+          over60sPlayersPercent: evaluatePlayersOverDurationPercent(
             d0PlayersBelow60s,
             d0Players
           ),
-          over180sPlayersPercent: playersOverDurationPercent(
+          over180sPlayersPercent: evaluatePlayersOverDurationPercent(
             d0PlayersBelow180s,
             d0Players
           ),
-          over300sPlayersPercent: playersOverDurationPercent(
+          over300sPlayersPercent: evaluatePlayersOverDurationPercent(
             d0PlayersBelow300s,
             d0Players
           ),
-          over600sPlayersPercent: playersOverDurationPercent(
+          over600sPlayersPercent: evaluatePlayersOverDurationPercent(
             d0PlayersBelow600s,
             d0Players
           ),
-          over900sPlayersPercent: playersOverDurationPercent(
+          over900sPlayersPercent: evaluatePlayersOverDurationPercent(
             d0PlayersBelow900s,
             d0Players
           ),
 
-          below60sPlayersPercent: playersBetweenDurationPercent(
+          below60sPlayersPercent: evaluatePlayersBetweenDurationPercent(
             d0PlayersBelow60s,
             0,
             d0Players
           ),
-          from60sTo180sPlayersPercent: playersBetweenDurationPercent(
+          from60sTo180sPlayersPercent: evaluatePlayersBetweenDurationPercent(
             d0PlayersBelow180s,
             d0PlayersBelow60s,
             d0Players
           ),
-          from180sTo300sPlayersPercent: playersBetweenDurationPercent(
+          from180sTo300sPlayersPercent: evaluatePlayersBetweenDurationPercent(
             d0PlayersBelow300s,
             d0PlayersBelow180s,
             d0Players
           ),
-          from300sTo600sPlayersPercent: playersBetweenDurationPercent(
+          from300sTo600sPlayersPercent: evaluatePlayersBetweenDurationPercent(
             d0PlayersBelow600s,
             d0PlayersBelow300s,
             d0Players
           ),
-          from600sTo900sPlayersPercent: playersBetweenDurationPercent(
+          from600sTo900sPlayersPercent: evaluatePlayersBetweenDurationPercent(
             d0PlayersBelow900s,
             d0PlayersBelow600s,
             d0Players
           ),
-          from900sToInfinityPlayersPercent: playersBetweenDurationPercent(
+          from900sToInfinityPlayersPercent: evaluatePlayersBetweenDurationPercent(
             d0Players,
             d0PlayersBelow900s,
             d0Players

@@ -789,7 +789,7 @@ const interpolateWithNoise = (
 ) =>
   ((1 - ratio) * leftValue + ratio * rightValue) * (0.95 + 0.1 * Math.random());
 
-const generateGameRollingMetrics1 = () => {
+const generateGameRollingMetricsFor364Days = () => {
   const metrics = [];
   const count = 364;
   for (let index = 0; index < count; index++) {
@@ -859,9 +859,9 @@ const deleteDurationMetrics = (
   return gameMetrics;
 };
 
-export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetrics1();
+export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetricsFor364Days();
 export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
-  generateGameRollingMetrics1(),
+  generateGameRollingMetricsFor364Days(),
   17
 );
 export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(

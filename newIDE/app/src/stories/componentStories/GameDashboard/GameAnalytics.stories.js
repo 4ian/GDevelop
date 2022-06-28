@@ -25,7 +25,7 @@ import MockAdapter from 'axios-mock-adapter';
 export default {
   title: 'GameDashboard/GameAnalytics',
   component: GameAnalyticsPanel,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const ErrorLoadingAnalytics = () => {

@@ -123,7 +123,7 @@ export const durationValues = [1, 3, 5, 10, 15];
 
 /**
  * Fill the void left by the backend for days without any players.
- * @param gameMetrics
+ * @param gameMetrics today first
  * @returns game metrics with a metric for each 364 past days.
  */
 const fillMissingDays = (
@@ -134,6 +134,7 @@ const fillMissingDays = (
   let previousMetricDate = addDays(new Date(), 1);
   for (const metric of gameMetrics) {
     const metricDate = parseISO(metric.date);
+    // Fill holes
     while (
       differenceInCalendarDays(parseISO(metric.date), previousMetricDate) < -1
     ) {
@@ -162,6 +163,7 @@ const fillMissingDays = (
     filledGameMetrics.push(metric);
     previousMetricDate = metricDate;
   }
+  // Fill to one year
   while (filledGameMetrics.length < daysShownForYear) {
     const addedMetricDate = subDays(previousMetricDate, 1);
     const zeroMetric: GameMetrics = {
@@ -255,7 +257,7 @@ const mergeGameMetrics = (
 };
 
 /**
- * @param gameMetrics
+ * @param gameMetrics today first
  * @returns metrics summed by weeks
  * @see mergeGameMetrics
  */
@@ -325,9 +327,36 @@ const findGreaterDurationPlayerIndex = (
   return greaterDurationPlayerIndex;
 };
 
+const playersOverDurationPercent = (
+  playersBelowDuration: ?number,
+  playersCount: number
+): number => {
+  return playersBelowDuration != null && playersCount > 0
+    ? (100 * (playersCount - playersBelowDuration)) / playersCount
+    : 0;
+};
+
+const playersBetweenDurationPercent = (
+  playersBelowUpperDuration: ?number,
+  playersBelowLowerDuration: ?number,
+  playersCount: number
+): number => {
+  return playersBelowUpperDuration != null &&
+    playersBelowLowerDuration != null &&
+    playersCount > 0
+    ? (100 * (playersBelowUpperDuration - playersBelowLowerDuration)) /
+        playersCount
+    : 0;
+};
+
+const difference = (a: ?number, b: ?number): number => {
+  return a != null && b != null ? a - b : 0;
+};
+
 /**
  * @param metrics
- * @returns enriched game metrics that are ready to be used in a chart.
+ * @returns enriched game metrics that are ready to be used in a chart
+ * (today first).
  */
 const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
   let playersBelowSums = [0, 0, 0, 0, 0];
@@ -363,21 +392,15 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
         ? metric.players.d0PlayersBelow900s
         : undefined;
 
-    playersBelowSums[durationIndexes.for1Minute] +=
-      d0PlayersBelow60s !== undefined ? d0PlayersBelow60s : 0;
-    playersBelowSums[durationIndexes.for3Minutes] +=
-      d0PlayersBelow180s !== undefined ? d0PlayersBelow180s : 0;
-    playersBelowSums[durationIndexes.for5Minutes] +=
-      d0PlayersBelow300s !== undefined ? d0PlayersBelow300s : 0;
-    playersBelowSums[durationIndexes.for10Minutes] +=
-      d0PlayersBelow600s !== undefined ? d0PlayersBelow600s : 0;
-    playersBelowSums[durationIndexes.for15Minutes] +=
-      d0PlayersBelow900s !== undefined ? d0PlayersBelow900s : 0;
-    playersSum += metric.players ? d0Players : 0;
+    playersBelowSums[durationIndexes.for1Minute] += d0PlayersBelow60s || 0;
+    playersBelowSums[durationIndexes.for3Minutes] += d0PlayersBelow180s || 0;
+    playersBelowSums[durationIndexes.for5Minutes] += d0PlayersBelow300s || 0;
+    playersBelowSums[durationIndexes.for10Minutes] += d0PlayersBelow600s || 0;
+    playersBelowSums[durationIndexes.for15Minutes] += d0PlayersBelow900s || 0;
+    playedDurationSumInMinutes += d0SessionsDurationTotal || 0;
+    playersSum += d0Players;
     onlyFullyDefinedPlayersSum +=
       d0PlayersBelow60s !== undefined ? d0Players : 0;
-    playedDurationSumInMinutes +=
-      d0SessionsDurationTotal !== undefined ? d0SessionsDurationTotal : 0;
   });
   playedDurationSumInMinutes /= 60;
 
@@ -491,108 +514,94 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
           meanPlayedDurationInMinutes: d0SessionsDurationTotal
             ? d0SessionsDurationTotal / 60 / d0Players
             : 0,
-          bounceRatePercent:
-            d0PlayersBelow60s !== undefined
-              ? (100 * d0PlayersBelow60s) / d0Players
-              : 0,
+          bounceRatePercent: playersBetweenDurationPercent(
+            d0PlayersBelow60s,
+            0,
+            d0Players
+          ),
           viewersCount: d0Players,
-          playersCount:
-            d0PlayersBelow60s !== undefined ? d0Players - d0PlayersBelow60s : 0,
-          over60sPlayersCount:
-            d0PlayersBelow60s !== undefined ? d0Players - d0PlayersBelow60s : 0,
-          over180sPlayersCount:
-            d0PlayersBelow180s !== undefined
-              ? d0Players - d0PlayersBelow180s
-              : 0,
-          over300sPlayersCount:
-            d0PlayersBelow300s !== undefined
-              ? d0Players - d0PlayersBelow300s
-              : 0,
-          over600sPlayersCount:
-            d0PlayersBelow600s !== undefined
-              ? d0Players - d0PlayersBelow600s
-              : 0,
-          over900sPlayersCount:
-            d0PlayersBelow900s !== undefined
-              ? d0Players - d0PlayersBelow900s
-              : 0,
+          playersCount: difference(d0Players, d0PlayersBelow60s),
 
-          below60sPlayersCount:
-            d0PlayersBelow60s !== undefined ? d0PlayersBelow60s : 0,
-          from60sTo180sPlayersCount:
-            d0PlayersBelow180s !== undefined && d0PlayersBelow60s !== undefined
-              ? d0PlayersBelow180s - d0PlayersBelow60s
-              : 0,
-          from180sTo300sPlayersCount:
-            d0PlayersBelow300s !== undefined && d0PlayersBelow180s !== undefined
-              ? d0PlayersBelow300s - d0PlayersBelow180s
-              : 0,
-          from300sTo600sPlayersCount:
-            d0PlayersBelow600s !== undefined && d0PlayersBelow300s !== undefined
-              ? d0PlayersBelow600s - d0PlayersBelow300s
-              : 0,
-          from600sTo900sPlayersCount:
-            d0PlayersBelow900s !== undefined && d0PlayersBelow600s !== undefined
-              ? d0PlayersBelow900s - d0PlayersBelow600s
-              : 0,
-          from900sToInfinityPlayersCount:
-            d0PlayersBelow900s !== undefined
-              ? d0Players - d0PlayersBelow900s
-              : 0,
+          over60sPlayersCount: difference(d0Players, d0PlayersBelow60s),
+          over180sPlayersCount: difference(d0Players, d0PlayersBelow180s),
+          over300sPlayersCount: difference(d0Players, d0PlayersBelow300s),
+          over600sPlayersCount: difference(d0Players, d0PlayersBelow600s),
+          over900sPlayersCount: difference(d0Players, d0PlayersBelow900s),
+
+          below60sPlayersCount: difference(d0PlayersBelow60s, 0),
+          from60sTo180sPlayersCount: difference(
+            d0PlayersBelow180s,
+            d0PlayersBelow60s
+          ),
+          from180sTo300sPlayersCount: difference(
+            d0PlayersBelow300s,
+            d0PlayersBelow180s
+          ),
+          from300sTo600sPlayersCount: difference(
+            d0PlayersBelow600s,
+            d0PlayersBelow300s
+          ),
+          from600sTo900sPlayersCount: difference(
+            d0PlayersBelow900s,
+            d0PlayersBelow600s
+          ),
+          from900sToInfinityPlayersCount: difference(
+            d0Players,
+            d0PlayersBelow900s
+          ),
 
           over0sPlayersPercent: 100,
-          over60sPlayersPercent:
-            d0PlayersBelow60s !== undefined && d0Players > 0
-              ? (100 * (d0Players - d0PlayersBelow60s)) / d0Players
-              : 0,
-          over180sPlayersPercent:
-            d0PlayersBelow180s !== undefined && d0Players > 0
-              ? (100 * (d0Players - d0PlayersBelow180s)) / d0Players
-              : 0,
-          over300sPlayersPercent:
-            d0PlayersBelow300s !== undefined && d0Players > 0
-              ? (100 * (d0Players - d0PlayersBelow300s)) / d0Players
-              : 0,
-          over600sPlayersPercent:
-            d0PlayersBelow600s !== undefined && d0Players > 0
-              ? (100 * (d0Players - d0PlayersBelow600s)) / d0Players
-              : 0,
-          over900sPlayersPercent:
-            d0PlayersBelow900s !== undefined && d0Players > 0
-              ? (100 * (d0Players - d0PlayersBelow900s)) / d0Players
-              : 0,
-          below60sPlayersPercent:
-            d0PlayersBelow60s !== undefined && d0Players > 0
-              ? (100 * d0PlayersBelow60s) / d0Players
-              : 0,
-          from60sTo180sPlayersPercent:
-            d0PlayersBelow180s !== undefined &&
-            d0PlayersBelow60s !== undefined &&
-            d0Players > 0
-              ? (100 * (d0PlayersBelow180s - d0PlayersBelow60s)) / d0Players
-              : 0,
-          from180sTo300sPlayersPercent:
-            d0PlayersBelow300s !== undefined &&
-            d0PlayersBelow180s !== undefined &&
-            d0Players > 0
-              ? (100 * (d0PlayersBelow300s - d0PlayersBelow180s)) / d0Players
-              : 0,
-          from300sTo600sPlayersPercent:
-            d0PlayersBelow600s !== undefined &&
-            d0PlayersBelow300s !== undefined &&
-            d0Players > 0
-              ? (100 * (d0PlayersBelow600s - d0PlayersBelow300s)) / d0Players
-              : 0,
-          from600sTo900sPlayersPercent:
-            d0PlayersBelow900s !== undefined &&
-            d0PlayersBelow600s !== undefined &&
-            d0Players > 0
-              ? (100 * (d0PlayersBelow900s - d0PlayersBelow600s)) / d0Players
-              : 0,
-          from900sToInfinityPlayersPercent:
-            d0PlayersBelow900s !== undefined && d0Players > 0
-              ? (100 * (d0Players - d0PlayersBelow900s)) / d0Players
-              : 0,
+          over60sPlayersPercent: playersOverDurationPercent(
+            d0PlayersBelow60s,
+            d0Players
+          ),
+          over180sPlayersPercent: playersOverDurationPercent(
+            d0PlayersBelow180s,
+            d0Players
+          ),
+          over300sPlayersPercent: playersOverDurationPercent(
+            d0PlayersBelow300s,
+            d0Players
+          ),
+          over600sPlayersPercent: playersOverDurationPercent(
+            d0PlayersBelow600s,
+            d0Players
+          ),
+          over900sPlayersPercent: playersOverDurationPercent(
+            d0PlayersBelow900s,
+            d0Players
+          ),
+
+          below60sPlayersPercent: playersBetweenDurationPercent(
+            d0PlayersBelow60s,
+            0,
+            d0Players
+          ),
+          from60sTo180sPlayersPercent: playersBetweenDurationPercent(
+            d0PlayersBelow180s,
+            d0PlayersBelow60s,
+            d0Players
+          ),
+          from180sTo300sPlayersPercent: playersBetweenDurationPercent(
+            d0PlayersBelow300s,
+            d0PlayersBelow180s,
+            d0Players
+          ),
+          from300sTo600sPlayersPercent: playersBetweenDurationPercent(
+            d0PlayersBelow600s,
+            d0PlayersBelow300s,
+            d0Players
+          ),
+          from600sTo900sPlayersPercent: playersBetweenDurationPercent(
+            d0PlayersBelow900s,
+            d0PlayersBelow600s,
+            d0Players
+          ),
+          from900sToInfinityPlayersPercent: playersBetweenDurationPercent(
+            d0Players,
+            d0PlayersBelow900s,
+            d0Players
+          ),
         };
       })
       .sort((a, b) => a.timestamp - b.timestamp),
@@ -610,8 +619,9 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
 };
 
 /**
- * @param {*} gameMetrics
- * @returns enriched game metrics that are ready to be used in a chart.
+ * @param gameMetrics today first
+ * @returns enriched game metrics that are ready to be used in a chart
+ * (today at last).
  */
 export const buildChartData = (
   gameMetrics: ?Array<GameMetrics>

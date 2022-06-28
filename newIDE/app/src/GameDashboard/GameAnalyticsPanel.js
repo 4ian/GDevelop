@@ -79,6 +79,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
   );
   const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
 
+  // TODO In some timezones, it might ask one less or extra day.
   const lastYearIsoDate = formatISO(subDays(new Date(), daysShownForYear), {
     representation: 'date',
   });

@@ -9,7 +9,6 @@ import {
   type OnCreateBlankFunction,
   type OnCreateFromExampleShortHeaderFunction,
 } from '../CreateProjectDialog';
-import CloudStorageProvider from '../../ProjectsStorage/CloudStorageProvider';
 
 const gd: libGDevelop = global.gd;
 
@@ -25,7 +24,7 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   return {
     project,
     projectName,
-    storageProvider: CloudStorageProvider,
+    storageProvider: null,
     fileMetadata: null,
   };
 };

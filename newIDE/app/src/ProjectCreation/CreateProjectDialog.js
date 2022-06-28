@@ -42,8 +42,6 @@ export type CreateProjectDialogWithComponentsProps = {|
 export type ProjectCreationSettings = {|
   projectName: string,
   outputPath?: string,
-  // TODO: Added for tests - TBD if this is the right way
-  authenticatedUser?: AuthenticatedUser,
 |};
 
 export type OnCreateBlankFunction = ({|

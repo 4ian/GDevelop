@@ -18,7 +18,8 @@ import {
   type Asset,
   type AssetPacks,
 } from '../Utils/GDevelopServices/Asset';
-import { formatISO, subDays, type Comment } from '../Utils/GDevelopServices/Play';
+import { formatISO, subDays } from 'date-fns';
+import { type Comment } from '../Utils/GDevelopServices/Play';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',

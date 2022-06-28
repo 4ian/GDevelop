@@ -608,7 +608,7 @@ const MainFrame = (props: Props) => {
         // is able to save. Otherwise, it means nothing to consider this as
         // a recent file: we must wait for the user to save in a "real" storage
         // (like locally or on Google Drive).
-        if (onSaveProject && fileMetadata) {
+        if (onSaveProject) {
           preferences.insertRecentProjectFile({
             fileMetadata,
             storageProviderName: storageProvider.internalName,
@@ -1995,24 +1995,10 @@ const MainFrame = (props: Props) => {
   |}) => {
     if (shouldCloseDialog)
       await setState(state => ({ ...state, createDialogOpen: false }));
-    let fileMetadataToUse;
-    if (project && !fileMetadata && storageProvider.internalName === 'Cloud') {
-      const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
-        storageProvider
-      );
-      if (!storageProviderOperations.onSaveProjectAs) return;
-      const saveData = await storageProviderOperations.onSaveProjectAs(
-        project,
-        null
-      );
-      fileMetadataToUse = saveData.fileMetadata;
-    }
-    if (!fileMetadataToUse) fileMetadataToUse = fileMetadata;
 
     let state: ?State;
-    if (project) state = await loadFromProject(project, fileMetadataToUse);
-    else if (!!fileMetadataToUse)
-      state = await openFromFileMetadata(fileMetadataToUse);
+    if (project) state = await loadFromProject(project, fileMetadata);
+    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
 
     if (!state) return;
     const { currentProject, editorTabs } = state;
@@ -2038,12 +2024,9 @@ const MainFrame = (props: Props) => {
 
     const { onSaveProject } = storageProviderOperations;
 
-    if (onSaveProject && fileMetadataToUse) {
+    if (onSaveProject && fileMetadata) {
       try {
-        const { wasSaved } = await onSaveProject(
-          currentProject,
-          fileMetadataToUse
-        );
+        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
 
         if (wasSaved) {
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();

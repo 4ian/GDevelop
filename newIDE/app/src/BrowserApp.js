@@ -53,8 +53,8 @@ export const create = (authentication: Authentication) => {
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
-            CloudStorageProvider,
             UrlStorageProvider,
+            CloudStorageProvider,
             GoogleDriveStorageProvider,
             DropboxStorageProvider,
             OneDriveStorageProvider,

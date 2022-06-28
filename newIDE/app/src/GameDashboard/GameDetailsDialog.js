@@ -541,7 +541,7 @@ export const GameDetailsDialog = ({
               />
             ) : null}
             {currentTab === 'analytics' ? (
-              <GameAnalyticsPanel game={game} publicGame={publicGame} />
+              <GameAnalyticsPanel game={game} />
             ) : null}
             {currentTab === 'feedback' ? (
               <GameFeedback authenticatedUser={authenticatedUser} game={game} />

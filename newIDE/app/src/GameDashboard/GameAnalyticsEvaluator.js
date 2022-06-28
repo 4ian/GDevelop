@@ -123,8 +123,8 @@ export const durationValues = [1, 3, 5, 10, 15];
 
 /**
  * Fill the void left by the backend for days without any players.
- * @param gameMetrics today first
- * @returns game metrics with a metric for each 364 past days.
+ * @param gameMetrics concise game metrics from the backend (today first)
+ * @returns game metrics with a metric for each 364 past days (today first).
  */
 const fillMissingDays = (
   gameMetrics: Array<GameMetrics>
@@ -194,7 +194,7 @@ const fillMissingDays = (
  * Sum each metric or `undefined` when one side is `undefined`.
  * When one metric is `undefined`, the value of the other is not used because
  * it would act as if the other metric is `0` which is probably far from the
- * truce and would mess the metric overview like means. It's better to ignore
+ * truth and would mess the metric overview like means. It's better to ignore
  * the value. It will sightly change the overview sums, but they are less
  * important.
  * This should only happen on the migration week when new metrics were added.
@@ -257,7 +257,8 @@ const mergeGameMetrics = (
 };
 
 /**
- * @param gameMetrics today first
+ * @param gameMetrics concise game metrics from the backend filled with zeroes
+ * metrics (today first)
  * @returns metrics summed by weeks
  * @see mergeGameMetrics
  */
@@ -306,7 +307,8 @@ const findNearestToMedianDurationIndex = (
  * @param playersBelowSums
  * @param viewersCount
  * @returns the duration limit which maximize: duration * players.
- * It allows to give the most impressive point from `overPlayedDuration`.
+ * It allows to know which point of the curve from
+ * `ChartData.overPlayedDuration` is the most impressive one.
  */
 const findGreaterDurationPlayerIndex = (
   playersBelowSums: Array<number>,
@@ -354,7 +356,8 @@ const subtract = (a: ?number, b: ?number): number => {
 };
 
 /**
- * @param metrics
+ * @param metrics concise game metrics from the backend filled with zeroes
+ * metrics (today first)
  * @returns enriched game metrics that are ready to be used in a chart
  * (today first).
  */
@@ -619,7 +622,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
 };
 
 /**
- * @param gameMetrics today first
+ * @param gameMetrics concise game metrics from the backend (today first)
  * @returns enriched game metrics that are ready to be used in a chart
  * (today at last).
  */

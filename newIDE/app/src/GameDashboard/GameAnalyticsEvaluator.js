@@ -280,8 +280,8 @@ const mergeGameMetricsByWeek = (
 };
 
 /**
- * @param {*} playersBelowSums
- * @param {*} playersCount
+ * @param playersBelowSums
+ * @param playersCount
  * @returns the duration limit that split the players the most evenly.
  * The real median would hard to process for the backend,
  * so we rely on this.
@@ -438,7 +438,7 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
           ? noMonthDateFormatOptions
           : dateFormatOptions
       ) +
-      ' - ' +
+      '-' +
       formattedDate
     );
   };

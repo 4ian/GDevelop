@@ -1993,7 +1993,8 @@ const MainFrame = (props: Props) => {
 
     let state: ?State;
     if (project) state = await loadFromProject(project, fileMetadata);
-    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+    else if (!!fileMetadata)
+      state = await openFromFileMetadata(fileMetadata);
 
     if (!state) return;
     const { currentProject, editorTabs } = state;
@@ -2014,11 +2015,15 @@ const MainFrame = (props: Props) => {
     const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
       storageProvider
     );
+
     const { onSaveProject } = storageProviderOperations;
 
     if (onSaveProject && fileMetadata) {
       try {
-        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
+        const { wasSaved } = await onSaveProject(
+          currentProject,
+          fileMetadata
+        );
 
         if (wasSaved) {
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();

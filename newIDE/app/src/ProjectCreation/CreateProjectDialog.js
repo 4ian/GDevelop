@@ -16,6 +16,7 @@ import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import ProjectPreCreationDialog from './ProjectPreCreationDialog';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 export type CreateProjectDialogTabs =
   | 'examples'

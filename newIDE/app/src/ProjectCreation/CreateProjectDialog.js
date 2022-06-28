@@ -10,7 +10,6 @@ import { Column } from '../UI/Grid';
 import { type StorageProvider, type FileMetadata } from '../ProjectsStorage';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import ProjectPreCreationDialog from './ProjectPreCreationDialog';
-import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 export type OnOpenProjectAfterCreationFunction = ({|
   project?: gdProject,
@@ -30,8 +29,6 @@ export type CreateProjectDialogWithComponentsProps = {|
 export type ProjectCreationSettings = {|
   projectName: string,
   outputPath?: string,
-  // TODO: Added for tests - TBD if this is the right way
-  authenticatedUser?: AuthenticatedUser,
 |};
 
 export type OnCreateBlankFunction = ({|

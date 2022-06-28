@@ -2014,6 +2014,7 @@ const MainFrame = (props: Props) => {
     const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
       storageProvider
     );
+
     const { onSaveProject } = storageProviderOperations;
 
     if (onSaveProject && fileMetadata) {

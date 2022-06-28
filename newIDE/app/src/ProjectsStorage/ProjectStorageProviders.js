@@ -34,7 +34,7 @@ type Props = {|
     storageProviders: Array<StorageProvider>,
     getStorageProviderOperations: (
       newStorageProvider: ?StorageProvider
-    ) => Promise<StorageProviderOperations>,
+    ) => StorageProviderOperations,
     initialFileMetadataToOpen: ?FileMetadata,
     getStorageProvider: () => StorageProvider,
   }) => React.Node,
@@ -77,10 +77,9 @@ const computeDefaultConfiguration = (
 };
 
 const ProjectStorageProviders = (props: Props) => {
-  const [
-    storageProviderOperations,
-    setStorageProviderOperations,
-  ] = React.useState<?StorageProviderOperations>(null);
+  const storageProviderOperations = React.useRef<?StorageProviderOperations>(
+    null
+  );
   const [renderDialog, setRenderDialog] = React.useState<?() => React.Node>(
     null
   );
@@ -89,10 +88,7 @@ const ProjectStorageProviders = (props: Props) => {
     props.storageProviders,
     props.appArguments
   );
-  const [
-    currentStorageProvider,
-    setCurrentStorageProvider,
-  ] = React.useState<?StorageProvider>(
+  const currentStorageProvider = React.useRef<?StorageProvider>(
     defaultConfiguration.currentStorageProvider
   );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
@@ -105,33 +101,39 @@ const ProjectStorageProviders = (props: Props) => {
     setRenderDialog(null);
   };
 
-  const getStorageProviderOperations = async (
+  const getStorageProviderOperations = (
     newStorageProvider: ?StorageProvider
-  ): Promise<StorageProviderOperations> => {
+  ): StorageProviderOperations => {
     // Avoid creating a new storageProviderOperations
     // if we're not changing the storage provider.
-    if (!newStorageProvider || newStorageProvider === currentStorageProvider) {
-      if (storageProviderOperations) {
-        return storageProviderOperations;
+    if (
+      !newStorageProvider ||
+      newStorageProvider === currentStorageProvider.current
+    ) {
+      if (storageProviderOperations.current) {
+        return storageProviderOperations.current;
       }
     }
 
     const storageProviderToUse: StorageProvider =
-      newStorageProvider || currentStorageProvider || emptyStorageProvider;
-    const storageProviderOperationsToUse = storageProviderToUse.createOperations({
-      setDialog,
-      closeDialog,
-      authenticatedUser
-    });
-
-    setCurrentStorageProvider(storageProviderToUse);
-    setStorageProviderOperations(storageProviderOperationsToUse);
+      newStorageProvider ||
+      currentStorageProvider.current ||
+      emptyStorageProvider;
+    const storageProviderOperationsToUse = storageProviderToUse.createOperations(
+      {
+        setDialog,
+        closeDialog,
+        authenticatedUser,
+      }
+    );
+    currentStorageProvider.current = storageProviderToUse;
+    storageProviderOperations.current = storageProviderOperationsToUse;
 
     return storageProviderOperationsToUse;
   };
 
   const getStorageProvider = () => {
-    return currentStorageProvider || emptyStorageProvider;
+    return currentStorageProvider.current || emptyStorageProvider;
   };
 
   return (

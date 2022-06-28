@@ -70,6 +70,7 @@ export type StorageProviderOperations = {|
 export type StorageProvider = {|
   internalName: string,
   name: MessageDescriptor,
+  needUserAuthentication?: boolean,
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,

@@ -254,6 +254,7 @@ const MainFrame = (props: Props) => {
   );
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
+  const { loginState } = authenticatedUser;
 
   const [
     chooseResourceOptions,
@@ -331,6 +332,7 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
+  const isInitialProjectLoadingDone = React.useRef<boolean>(false);
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -394,50 +396,6 @@ const MainFrame = (props: Props) => {
           ]);
 
           console.info('Startup times:', getStartupTimesSummary());
-
-          const {
-            getAutoOpenMostRecentProject,
-            getRecentProjectFiles,
-            hadProjectOpenedDuringLastSession,
-          } = preferences;
-
-          if (initialFileMetadataToOpen) {
-            // Open the initial file metadata (i.e: the file that was passed
-            // as argument and recognized by a storage provider). Note that the storage
-            // provider is assumed to be already set to the proper one.
-            const storageProviderOperations = getStorageProviderOperations();
-            const proceed = await ensureInteractionHappened(
-              storageProviderOperations
-            );
-            if (proceed) openInitialFileMetadata();
-          } else if (
-            getAutoOpenMostRecentProject() &&
-            hadProjectOpenedDuringLastSession() &&
-            getRecentProjectFiles()[0]
-          ) {
-            // Re-open the last opened project, if any and if asked to.
-            const fileMetadataAndStorageProviderName = getRecentProjectFiles()[0];
-            const storageProvider = findStorageProviderFor(
-              i18n,
-              props.storageProviders,
-              fileMetadataAndStorageProviderName
-            );
-            if (!storageProvider) return;
-
-            const storageProviderOperations = getStorageProviderOperations(
-              storageProvider
-            );
-            const proceed = await ensureInteractionHappened(
-              storageProviderOperations
-            );
-            if (proceed)
-              openFromFileMetadataWithStorageProvider(
-                fileMetadataAndStorageProviderName
-              );
-          } else {
-            // Open the intro dialog if not opening any project.
-            if (introDialog) openIntroDialog(true);
-          }
         })
         .catch(() => {
           /* Ignore errors */
@@ -445,6 +403,64 @@ const MainFrame = (props: Props) => {
     },
     // eslint-disable-next-line
     []
+  );
+
+  React.useEffect(
+    () => {
+      if (isInitialProjectLoadingDone.current) return;
+      const autoLoadProject = async () => {
+        const {
+          getAutoOpenMostRecentProject,
+          getRecentProjectFiles,
+          hadProjectOpenedDuringLastSession,
+        } = preferences;
+
+        if (initialFileMetadataToOpen) {
+          // Open the initial file metadata (i.e: the file that was passed
+          // as argument and recognized by a storage provider). Note that the storage
+          // provider is assumed to be already set to the proper one.
+          const storageProviderOperations = getStorageProviderOperations();
+          const proceed = await ensureInteractionHappened(
+            storageProviderOperations
+          );
+          if (proceed) openInitialFileMetadata();
+        } else if (
+          getAutoOpenMostRecentProject() &&
+          hadProjectOpenedDuringLastSession() &&
+          getRecentProjectFiles()[0]
+        ) {
+          // Re-open the last opened project, if any and if asked to.
+          const fileMetadataAndStorageProviderName = getRecentProjectFiles()[0];
+          const storageProvider = findStorageProviderFor(
+            i18n,
+            props.storageProviders,
+            fileMetadataAndStorageProviderName
+          );
+          if (!storageProvider) return;
+          if (storageProvider.needUserAuthentication && loginState !== 'done')
+            return;
+          console.log('LOGIN STATE OK');
+
+          const storageProviderOperations = getStorageProviderOperations(
+            storageProvider
+          );
+          const proceed = await ensureInteractionHappened(
+            storageProviderOperations
+          );
+          if (proceed)
+            openFromFileMetadataWithStorageProvider(
+              fileMetadataAndStorageProviderName
+            );
+        } else {
+          // Open the intro dialog if not opening any project.
+          if (introDialog) openIntroDialog(true);
+        }
+        isInitialProjectLoadingDone.current = true;
+      };
+      autoLoadProject();
+    },
+    // eslint-disable-next-line
+    [loginState]
   );
 
   const openProfileDialogWithTab = (

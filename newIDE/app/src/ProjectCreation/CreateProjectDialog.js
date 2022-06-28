@@ -16,7 +16,6 @@ import { GamesShowcase } from '../GamesShowcase';
 import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
 import Window from '../Utils/Window';
 import ProjectPreCreationDialog from './ProjectPreCreationDialog';
-import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 export type CreateProjectDialogTabs =
   | 'examples'
@@ -42,8 +41,6 @@ export type CreateProjectDialogWithComponentsProps = {|
 export type ProjectCreationSettings = {|
   projectName: string,
   outputPath?: string,
-  // TODO: Added for tests - TBD if this is the right way
-  authenticatedUser?: AuthenticatedUser,
 |};
 
 export type OnCreateBlankFunction = ({|

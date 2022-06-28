@@ -25,8 +25,6 @@ const unzipProject = async (zippedProject: any) => {
   });
 };
 
-export const onOpenWithPicker = () => {};
-
 export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   fileMetadata: FileMetadata
 ): Promise<{|
@@ -45,6 +43,3 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
     content: JSON.parse(serializedProject),
   };
 };
-
-export const hasAutoSave = () => {};
-export const onGetAutoSave = () => {};

@@ -28,8 +28,6 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
   extension.AddInstructionOrExpressionGroupMetadata(_("Linked objects"))
       .SetIcon("CppPlatform/Extensions/LinkedObjectsicon24.png");
 
-#if defined(GD_IDE_ONLY)
-
   extension
       .AddAction("LinkObjects",
                  _("Link two objects"),
@@ -44,8 +42,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddParameter("objectPtr", _("Object 1"))
       .AddParameter("objectPtr", _("Object 2"))
 
-      .SetFunctionName("GDpriv::LinkedObjects::LinkObjects")
-      .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+      .SetFunctionName("GDpriv::LinkedObjects::LinkObjects");
 
   extension
       .AddAction("RemoveLinkBetween",
@@ -60,8 +57,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddParameter("objectPtr", _("Object 1"))
       .AddParameter("objectPtr", _("Object 2"))
 
-      .SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween")
-      .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+      .SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween");
 
   extension
       .AddAction("RemoveAllLinksOf",
@@ -75,8 +71,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectPtr", _("Object"))
 
-      .SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf")
-      .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+      .SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf");
 
   extension
       .AddCondition("PickObjectsLinkedTo",
@@ -94,8 +89,7 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddParameter("objectPtr", _("...if they are linked to this object"))
       .AddCodeOnlyParameter("eventsFunctionContext", "")
 
-      .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
-      .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
+      .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo");
 
   extension
       .AddAction(
@@ -112,8 +106,5 @@ void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
       .AddParameter("objectPtr", _("...if they are linked to this object"))
       .AddCodeOnlyParameter("eventsFunctionContext", "")
 
-      .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo")
-      .SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
-
-#endif
+      .SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo");
 }

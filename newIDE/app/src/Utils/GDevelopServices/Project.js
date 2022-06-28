@@ -141,16 +141,17 @@ export const getCloudProject = async (
   return response.data;
 };
 
-export const getProjectFileAsJson = async (
+export const getProjectFileAsZipBlob = async (
   cloudProject: CloudProject
-): Promise<any> => {
+): Promise<Blob> => {
   if (!cloudProject.currentVersion) {
     throw new Error('Opening of project without current version not handled');
   }
   const response = await projectResourcesClient.get(
     `${GDevelopProjectResourcesStorage.baseUrl}/${cloudProject.id}/versions/${
       cloudProject.currentVersion
-    }`
+    }.zip`,
+    { responseType: 'blob' }
   );
   return response.data;
 };

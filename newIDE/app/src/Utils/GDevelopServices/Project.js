@@ -81,18 +81,16 @@ export const commitVersion = async (
   const uuid = generateUUID();
   // fetch pre signed url TODO
   // upload zipped project
-  {
-    const response = await projectResourcesClient.post(
-      `${
-        GDevelopProjectResourcesStorage.baseUrl
-      }/${cloudProjectId}/versions/${uuid}.zip`,
-      zippedProject,
-      {
-        headers: { 'content-type': 'application/zip' },
-        withCredentials: true,
-      }
-    );
-  }
+  await projectResourcesClient.post(
+    `${
+      GDevelopProjectResourcesStorage.baseUrl
+    }/${cloudProjectId}/versions/${uuid}.zip`,
+    zippedProject,
+    {
+      headers: { 'content-type': 'application/zip' },
+      withCredentials: true,
+    }
+  );
   // inform backend new version uploaded
   const response = await axios.post(
     `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/commit`,

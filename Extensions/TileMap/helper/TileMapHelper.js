@@ -24,22 +24,22 @@
 
     var PIXI__namespace = /*#__PURE__*/_interopNamespace(PIXI);
 
-    var __extends = (undefined && undefined.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            if (typeof b !== "function" && b !== null)
-                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var __values$3 = (undefined && undefined.__values) || function(o) {
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    function __values(o) {
         var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
         if (m) return m.call(o);
         if (o && typeof o.length === "number") return {
@@ -49,7 +49,8 @@
             }
         };
         throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-    };
+    }
+
     /**
      * A tile map model.
      *
@@ -167,7 +168,7 @@
             var indexX = Math.floor(x / this.tileWidth);
             var indexY = Math.floor(y / this.tileHeight);
             try {
-                for (var _b = __values$3(this._layers), _c = _b.next(); !_c.done; _c = _b.next()) {
+                for (var _b = __values(this._layers), _c = _b.next(); !_c.done; _c = _b.next()) {
                     var layer = _c.value;
                     var tileLayer = layer;
                     if (!tileLayer) {
@@ -529,17 +530,6 @@
         return TileDefinition;
     }());
 
-    var __values$2 = (undefined && undefined.__values) || function(o) {
-        var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-        if (m) return m.call(o);
-        if (o && typeof o.length === "number") return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-        throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-    };
     var ResourceCache = /** @class */ (function () {
         /**
          *
@@ -577,7 +567,7 @@
                 var callbacks = _this._callbacks.get(key);
                 _this._callbacks.delete(key);
                 try {
-                    for (var callbacks_1 = __values$2(callbacks), callbacks_1_1 = callbacks_1.next(); !callbacks_1_1.done; callbacks_1_1 = callbacks_1.next()) {
+                    for (var callbacks_1 = __values(callbacks), callbacks_1_1 = callbacks_1.next(); !callbacks_1_1.done; callbacks_1_1 = callbacks_1.next()) {
                         var callback_1 = callbacks_1_1.value;
                         callback_1(value);
                     }
@@ -673,17 +663,6 @@
         };
     };
 
-    var __values$1 = (undefined && undefined.__values) || function(o) {
-        var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-        if (m) return m.call(o);
-        if (o && typeof o.length === "number") return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-        throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-    };
     /**
      * It creates a {@link EditableTileMap} from a Tiled JSON.
      */
@@ -698,12 +677,12 @@
             }
             var definitions = new Map();
             try {
-                for (var _e = __values$1(tiledMap.tilesets[0].tiles), _f = _e.next(); !_f.done; _f = _e.next()) {
+                for (var _e = __values(tiledMap.tilesets[0].tiles), _f = _e.next(); !_f.done; _f = _e.next()) {
                     var tile = _f.value;
                     var polygons = [];
                     if (tile.objectgroup) {
                         try {
-                            for (var _g = (e_2 = void 0, __values$1(tile.objectgroup.objects)), _h = _g.next(); !_h.done; _h = _g.next()) {
+                            for (var _g = (e_2 = void 0, __values(tile.objectgroup.objects)), _h = _g.next(); !_h.done; _h = _g.next()) {
                                 var object = _h.value;
                                 var polygon = null;
                                 if (object.polygon) {
@@ -751,13 +730,13 @@
             //console.log(definitions.size + " tiles definition");
             var collisionTileMap = new EditableTileMap(tiledMap.tilewidth, tiledMap.tileheight, tiledMap.width, tiledMap.height, definitions);
             try {
-                for (var _j = __values$1(tiledMap.layers), _k = _j.next(); !_k.done; _k = _j.next()) {
+                for (var _j = __values(tiledMap.layers), _k = _j.next(); !_k.done; _k = _j.next()) {
                     var tiledLayer = _k.value;
                     if (tiledLayer.type === "objectgroup") {
                         var objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
                         objectLayer.setVisible(tiledLayer.visible);
                         try {
-                            for (var _l = (e_4 = void 0, __values$1(tiledLayer.objects)), _m = _l.next(); !_m.done; _m = _l.next()) {
+                            for (var _l = (e_4 = void 0, __values(tiledLayer.objects)), _m = _l.next(); !_m.done; _m = _l.next()) {
                                 var tiledObject = _m.value;
                                 if (!tiledObject.visible) {
                                     // Objects layer are nice to put decorations but dynamic objects
@@ -929,17 +908,6 @@
         return TileTextureCache;
     }());
 
-    var __values = (undefined && undefined.__values) || function(o) {
-        var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-        if (m) return m.call(o);
-        if (o && typeof o.length === "number") return {
-            next: function () {
-                if (o && i >= o.length) o = void 0;
-                return { value: o && o[i++], done: !o };
-            }
-        };
-        throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-    };
     var PixiTileMapHelper = /** @class */ (function () {
         function PixiTileMapHelper() {
         }

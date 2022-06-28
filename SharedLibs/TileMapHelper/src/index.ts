@@ -13,7 +13,7 @@ import {
 // These use PIXI and make errors on rollup.
 import { TileMapManager } from "./TileMapManager";
 import { TileTextureCache } from "./TileTextureCache";
-import { PixiTileMapHelper } from "./PixiTileMapHelper";
+import { PixiTileMapHelper } from "./TilemapPixiHelper";
 
 export * from "./CommonTypes";
 

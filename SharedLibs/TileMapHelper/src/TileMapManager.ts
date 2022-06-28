@@ -3,7 +3,7 @@ import { TiledMap } from "./tiled/Tiled";
 import { TiledTileMapLoader } from "./tiled/TiledTileMapLoader";
 import { EditableTileMap } from "./TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
-import { PixiTileMapHelper } from "./PixiTileMapHelper";
+import { PixiTileMapHelper } from "./TilemapPixiHelper";
 
 import * as PIXI from "pixi.js";
 

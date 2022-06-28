@@ -45,8 +45,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .AddParameter("object", _("Object"), "ParticleEmitter")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetAngle")
-      .SetGetter("GetAngle")
-      .SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+      .SetGetter("GetAngle");
 
   obj.AddCondition("EmitterAngle",
                    _("Emission angle"),

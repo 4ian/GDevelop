@@ -34,7 +34,6 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                             std::make_shared<DestroyOutsideBehavior>(),
                             std::shared_ptr<gd::BehaviorsSharedData>());
 
-#if defined(GD_IDE_ONLY)
   aut.AddCondition("ExtraBorder",
                    _("Additional border"),
                    _("Compare the additional border that the object must cross "
@@ -47,8 +46,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "DestroyOutside")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
-      .SetFunctionName("GetExtraBorder")
-      .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
+      .SetFunctionName("GetExtraBorder");
 
   aut.AddAction("ExtraBorder",
                 _("Additional border"),
@@ -63,7 +61,5 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetExtraBorder")
-      .SetGetter("GetExtraBorder")
-      .SetIncludeFile("DestroyOutsideBehavior/DestroyOutsideRuntimeBehavior.h");
-#endif
+      .SetGetter("GetExtraBorder");
 }

@@ -136,6 +136,20 @@ const ProjectStorageProviders = (props: Props) => {
     return currentStorageProvider.current || emptyStorageProvider;
   };
 
+  React.useEffect(
+    () => {
+      const { current: storageProvider } = currentStorageProvider;
+      if (!storageProvider) return;
+      console.log('recreating operations');
+      storageProviderOperations.current = storageProvider.createOperations({
+        setDialog,
+        closeDialog,
+        authenticatedUser,
+      });
+    },
+    [authenticatedUser]
+  );
+
   return (
     <React.Fragment>
       {props.children({

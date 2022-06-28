@@ -53,14 +53,14 @@ export const create = (authentication: Authentication) => {
         <ProjectStorageProviders
           appArguments={appArguments}
           storageProviders={[
+            CloudStorageProvider,
             UrlStorageProvider,
             GoogleDriveStorageProvider,
             DropboxStorageProvider,
             OneDriveStorageProvider,
             DownloadFileStorageProvider,
-            CloudStorageProvider,
           ]}
-          defaultStorageProvider={UrlStorageProvider} // TODO: Use CloudStorageProvider as default
+          defaultStorageProvider={UrlStorageProvider}
         >
           {({
             getStorageProviderOperations,

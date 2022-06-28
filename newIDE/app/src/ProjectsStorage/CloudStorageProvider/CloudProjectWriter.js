@@ -26,16 +26,33 @@ const zipProject = async (project: gdProject) => {
   });
 };
 
+const zipProjectAndCommitVersion = async ({
+  authenticatedUser,
+  project,
+  cloudProjectId,
+}: {
+  authenticatedUser: AuthenticatedUser,
+  project: gdProject,
+  cloudProjectId: string,
+}): Promise<?string> => {
+  const archive = await zipProject(project);
+  const newVersion = await commitVersion(
+    authenticatedUser,
+    cloudProjectId,
+    archive
+  );
+  return newVersion;
+};
+
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
 ) => async (project: gdProject, fileMetadata: FileMetadata) => {
   if (!authenticatedUser) return { wasSaved: false, fileMetadata };
-  const archive = await zipProject(project);
-  const newVersion = await commitVersion(
+  const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
-    fileMetadata.fileIdentifier,
-    archive
-  );
+    project,
+    cloudProjectId: fileMetadata.fileIdentifier,
+  });
   if (!newVersion) return { wasSaved: false, fileMetadata };
   return {
     wasSaved: true,
@@ -46,6 +63,7 @@ export const generateOnSaveProject = (
 export const generateOnSaveProjectAs = (
   authenticatedUser: AuthenticatedUser
 ) => async (project: gdProject, fileMetadata: ?FileMetadata) => {
+  // TODO: sometimes, at first save as, nothing happens. To investigate.
   if (!authenticatedUser) return { wasSaved: false, fileMetadata };
   if (!fileMetadata) {
     const cloudProject = await createCloudProject(authenticatedUser, {
@@ -53,6 +71,13 @@ export const generateOnSaveProjectAs = (
     });
     if (!cloudProject) return { wasSaved: false, fileMetadata };
     await getCredentialsForProject(authenticatedUser, cloudProject.id);
+    const newVersion = await zipProjectAndCommitVersion({
+      authenticatedUser,
+      project,
+      cloudProjectId: cloudProject.id,
+    });
+    if (!newVersion) return { wasSaved: false, fileMetadata };
+
     return {
       wasSaved: true,
       fileMetadata: { fileIdentifier: cloudProject.id },

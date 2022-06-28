@@ -1,5 +1,7 @@
 // @flow
+import * as React from 'react';
 import { t } from '@lingui/macro';
+import Cloud from '@material-ui/icons/Cloud';
 import { type StorageProvider } from '../index';
 import { generateOnSaveProject, generateOnSaveProjectAs } from './CloudProjectWriter';
 import {
@@ -12,6 +14,7 @@ import { generateOnOpen } from './CloudProjectOpener';
 export default ({
   internalName: 'Cloud',
   name: t`GDevelop cloud storage`,
+  renderIcon: () => <Cloud />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;

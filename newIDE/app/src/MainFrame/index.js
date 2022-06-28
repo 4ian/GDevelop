@@ -610,7 +610,7 @@ const MainFrame = (props: Props) => {
         // is able to save. Otherwise, it means nothing to consider this as
         // a recent file: we must wait for the user to save in a "real" storage
         // (like locally or on Google Drive).
-        if (onSaveProject) {
+        if (onSaveProject && fileMetadata) {
           preferences.insertRecentProjectFile({
             fileMetadata,
             storageProviderName: storageProvider.internalName,
@@ -1990,10 +1990,24 @@ const MainFrame = (props: Props) => {
   |}) => {
     if (shouldCloseDialog)
       await setState(state => ({ ...state, createDialogOpen: false }));
+    let fileMetadataToUse;
+    if (project && !fileMetadata && storageProvider.internalName === 'Cloud') {
+      const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
+        storageProvider
+      );
+      if (!storageProviderOperations.onSaveProjectAs) return;
+      const saveData = await storageProviderOperations.onSaveProjectAs(
+        project,
+        null
+      );
+      fileMetadataToUse = saveData.fileMetadata;
+    }
+    if (!fileMetadataToUse) fileMetadataToUse = fileMetadata;
 
     let state: ?State;
-    if (project) state = await loadFromProject(project, fileMetadata);
-    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+    if (project) state = await loadFromProject(project, fileMetadataToUse);
+    else if (!!fileMetadataToUse)
+      state = await openFromFileMetadata(fileMetadataToUse);
 
     if (!state) return;
     const { currentProject, editorTabs } = state;
@@ -2014,11 +2028,15 @@ const MainFrame = (props: Props) => {
     const storageProviderOperations: StorageProviderOperations = await getStorageProviderOperations(
       storageProvider
     );
+
     const { onSaveProject } = storageProviderOperations;
 
-    if (onSaveProject && fileMetadata) {
+    if (onSaveProject && fileMetadataToUse) {
       try {
-        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
+        const { wasSaved } = await onSaveProject(
+          currentProject,
+          fileMetadataToUse
+        );
 
         if (wasSaved) {
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();

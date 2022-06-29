@@ -193,27 +193,29 @@ export const GameCard = ({
                 ]}
               />
             }
-          >
-            <Line>
-              {game.publicWebBuildId && (
-                <>
-                  <Text size="body2" noMargin displayInlineAsSpan>
-                    {game.discoverable ? (
-                      <Trans>Public on Liluo.io</Trans>
-                    ) : (
-                      <Trans>
-                        Build version only (non visible on Liluo.io)
-                      </Trans>
-                    )}
-                  </Text>
-                  <Spacer />
-                </>
-              )}
+            header={
+              <Line>
+                {game.publicWebBuildId && (
+                  <>
+                    <Text size="body2" noMargin displayInlineAsSpan>
+                      {game.discoverable ? (
+                        <Trans>Public on Liluo.io</Trans>
+                      ) : (
+                        <Trans>
+                          Build version only (non visible on Liluo.io)
+                        </Trans>
+                      )}
+                    </Text>
+                    <Spacer />
+                  </>
+                )}
 
-              <BackgroundText>
-                <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
-              </BackgroundText>
-            </Line>
+                <BackgroundText>
+                  <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
+                </BackgroundText>
+              </Line>
+            }
+          >
             <ResponsiveLineStackLayout noMargin>
               <GameThumbnail
                 gameName={game.gameName}

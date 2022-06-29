@@ -289,6 +289,7 @@ export const BuildCard = ({
                             if (shouldValidate(event) && nameInput.current)
                               nameInput.current.blur();
                           }}
+                          maxLength={50}
                         />
                         {gameUpdating && (
                           <>

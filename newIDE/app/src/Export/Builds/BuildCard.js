@@ -267,7 +267,9 @@ export const BuildCard = ({
                 }
               >
                 <Column expand noMargin>
-                  <BuildAndCreatedAt build={build} />
+                  {windowWidth === 'small' && (
+                    <BuildAndCreatedAt build={build} />
+                  )}
                   <Spacer />
                   <Line noMargin>
                     {isEditingName ? (

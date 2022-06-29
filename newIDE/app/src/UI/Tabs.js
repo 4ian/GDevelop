@@ -11,7 +11,6 @@ type TabsProps<TabName> = {|
   children: React.Node, // Should be Tab
 
   variant?: 'scrollable',
-  'aria-label'?: string,
 |};
 
 /**
@@ -21,18 +20,17 @@ export function Tabs<TabName>({
   value,
   onChange,
   children,
-  ...MUITabProps
+  variant,
 }: TabsProps<TabName>) {
   return (
     <MUITabs
-      variant="fullWidth"
+      variant={variant || 'fullWidth'}
       textColor="primary"
       indicatorColor={'primary'}
       value={value}
       onChange={(e, newValue) => onChange(newValue)}
-      allowScrollButtonsMobile={!!MUITabProps.variant}
-      scrollButtons={MUITabProps.variant ? 'on' : 'off'}
-      {...MUITabProps}
+      allowScrollButtonsMobile={!!variant}
+      scrollButtons={variant ? 'on' : 'off'}
     >
       {children}
     </MUITabs>

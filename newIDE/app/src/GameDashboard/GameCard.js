@@ -11,7 +11,7 @@ import MoreVert from '@material-ui/icons/MoreVert';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import Text from '../UI/Text';
@@ -217,10 +217,12 @@ export const GameCard = ({
             }
           >
             <ResponsiveLineStackLayout noMargin>
-              <GameThumbnail
-                gameName={game.gameName}
-                thumbnailUrl={game.thumbnailUrl}
-              />
+              <Column noMargin alignItems="center">
+                <GameThumbnail
+                  gameName={game.gameName}
+                  thumbnailUrl={game.thumbnailUrl}
+                />
+              </Column>
               <Spacer />
               <Column expand justifyContent="space-between">
                 <ResponsiveLineStackLayout noMargin alignItems="flex-start">
@@ -246,20 +248,24 @@ export const GameCard = ({
                         onClick={() => onOpenGameManager('feedback')}
                         disabled={!game.publicWebBuildId}
                       />
-                      <RaisedButton
-                        label={<Trans>Open in browser</Trans>}
-                        onClick={openGameUrl}
-                        primary
-                        disabled={!game.publicWebBuildId}
-                      />
-                      <IconButton
-                        size="small"
-                        disabled={!game.publicWebBuildId}
-                        onClick={() => setShowShareDialog(true)}
-                        tooltip={t`Share`}
-                      >
-                        <ShareIcon />
-                      </IconButton>
+                      <LineStackLayout noMargin>
+                        <Column noMargin expand>
+                          <RaisedButton
+                            label={<Trans>Open in browser</Trans>}
+                            onClick={openGameUrl}
+                            primary
+                            disabled={!game.publicWebBuildId}
+                          />
+                        </Column>
+                        <IconButton
+                          size="small"
+                          disabled={!game.publicWebBuildId}
+                          onClick={() => setShowShareDialog(true)}
+                          tooltip={t`Share`}
+                        >
+                          <ShareIcon />
+                        </IconButton>
+                      </LineStackLayout>
                     </ResponsiveLineStackLayout>
                   </Column>
                 </ResponsiveLineStackLayout>

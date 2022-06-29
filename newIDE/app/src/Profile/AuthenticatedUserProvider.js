@@ -114,7 +114,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           ...authenticatedUser,
           loginState: 'justOpened',
         },
-      }))
+      }));
       this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
@@ -197,7 +197,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...authenticatedUser,
         loginState: 'loading',
       },
-    }))
+    }));
 
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
@@ -208,7 +208,7 @@ export default class AuthenticatedUserProvider extends React.Component<
           ...authenticatedUser,
           loginState: 'done',
         },
-      }))
+      }));
       return;
     }
 

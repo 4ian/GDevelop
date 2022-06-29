@@ -209,12 +209,6 @@ export function getMuiOverrides(
         flexGrow: 0,
       },
     },
-    MuiCardContent: {
-      root: {
-        padding: 32,
-        paddingTop: 8,
-      },
-    },
   };
 }
 

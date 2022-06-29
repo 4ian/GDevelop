@@ -5,8 +5,6 @@ import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons//CheckCircle';
 
@@ -26,6 +24,7 @@ import {
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
+import Card from '../../UI/Card';
 
 const styles = { textComment: { whiteSpace: 'pre-wrap' } };
 
@@ -100,41 +99,11 @@ const FeedbackCard = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Card variant="outlined" style={{ opacity: processed ? '0.5' : '1' }}>
-          <Line noMargin alignItems="start">
-            <Column expand>
-              <CardContent>
-                <Column noMargin>
-                  <Line
-                    noMargin
-                    justifyContent="space-between"
-                    alignItems="start"
-                  >
-                    <Column noMargin>
-                      <Text size="body2">
-                        <Trans>{i18n.date(comment.createdAt)}</Trans>
-                      </Text>
-                      <Text size="body2" noMargin>
-                        {comment.playerName}
-                      </Text>
-                    </Column>
-                  </Line>
-                  {ratings && (
-                    <ResponsiveLineStackLayout noColumnMargin expand>
-                      {ratings.map(rating => (
-                        <Line expand noMargin key={rating.key}>
-                          <Rating label={rating.label} value={rating.value} />
-                          <Spacer />
-                        </Line>
-                      ))}
-                    </ResponsiveLineStackLayout>
-                  )}
-                  <LargeSpacer />
-                  <Text style={styles.textComment}>{comment.text}</Text>
-                </Column>
-              </CardContent>
-            </Column>
+        <Card
+          style={{ opacity: processed ? 0.5 : 1 }}
+          cardCornerAction={
             <IconButton
+              size="small"
               tooltip={processed ? t`Unresolve` : t`Resolve`}
               onClick={() => setProcessed(!processed, i18n)}
             >
@@ -144,7 +113,32 @@ const FeedbackCard = ({
                 <CheckCircleOutlineIcon />
               )}
             </IconButton>
-          </Line>
+          }
+        >
+          <Column noMargin>
+            <Line noMargin justifyContent="space-between" alignItems="start">
+              <Column noMargin>
+                <Text size="body2">
+                  <Trans>{i18n.date(comment.createdAt)}</Trans>
+                </Text>
+                <Text size="body2" noMargin>
+                  {comment.playerName}
+                </Text>
+              </Column>
+            </Line>
+            {ratings && (
+              <ResponsiveLineStackLayout noColumnMargin expand>
+                {ratings.map(rating => (
+                  <Line expand noMargin key={rating.key}>
+                    <Rating label={rating.label} value={rating.value} />
+                    <Spacer />
+                  </Line>
+                ))}
+              </ResponsiveLineStackLayout>
+            )}
+            <LargeSpacer />
+            <Text style={styles.textComment}>{comment.text}</Text>
+          </Column>
         </Card>
       )}
     </I18n>

@@ -243,6 +243,7 @@ export function createGdevelopTheme({
       palette: {
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        primary: styles['ThemePrimaryColor'],
       },
       message: {
         warning: styles['ThemeMessageWarningColor'],

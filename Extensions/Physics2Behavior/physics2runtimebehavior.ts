@@ -244,6 +244,7 @@ namespace gdjs {
     contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
     contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
     currentContacts: Array<Physics2RuntimeBehavior>;
+    destroyedDuringFrameLogic: boolean;
     _body: any = null;
     _sharedData: any;
     _tempb2Vec2: any;
@@ -287,6 +288,7 @@ namespace gdjs {
       this.contactsEndedThisFrame = [];
       this.currentContacts = [];
       this.currentContacts.length = 0;
+      this.destroyedDuringFrameLogic = false;
       this._sharedData = Physics2SharedData.getSharedData(
         runtimeScene,
         behaviorData.name
@@ -398,6 +400,7 @@ namespace gdjs {
     }
 
     onDestroy() {
+      this.destroyedDuringFrameLogic = true;
       this.onDeActivate();
     }
 
@@ -677,7 +680,7 @@ namespace gdjs {
     }
 
     createBody(): boolean {
-      if (!this.activated()) return false;
+      if (!this.activated() || this.destroyedDuringFrameLogic) return false;
       // Generate the body definition
       const bodyDef = new Box2D.b2BodyDef();
 

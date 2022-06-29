@@ -267,7 +267,7 @@ export const erroredCordovaBuild: Build = {
   status: 'error',
   logsKey: '/fake-error.log',
   createdAt: 1515084391000,
-  updatedAt: 1515084399000,
+  updatedAt: Date.now(),
   userId: 'fake-user-id',
   type: 'cordova-build',
 };
@@ -277,7 +277,7 @@ export const pendingCordovaBuild: Build = {
   gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
-  updatedAt: 1515084399000,
+  updatedAt: Date.now(),
   userId: 'fake-user-id',
   type: 'cordova-build',
 };
@@ -287,7 +287,7 @@ export const pendingElectronBuild: Build = {
   gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
-  updatedAt: 1515084399000,
+  updatedAt: Date.now(),
   userId: 'fake-user-id',
   type: 'electron-build',
 };

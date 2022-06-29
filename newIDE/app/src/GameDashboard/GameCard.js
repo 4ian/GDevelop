@@ -4,15 +4,14 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import { Card, Chip } from '@material-ui/core';
+import { Chip } from '@material-ui/core';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
 import ShareIcon from '@material-ui/icons/Share';
 import MoreVert from '@material-ui/icons/MoreVert';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import Text from '../UI/Text';
@@ -33,6 +32,8 @@ import { type GamesDetailsTab } from './GameDetailsDialog';
 import Dialog from '../UI/Dialog';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import BackgroundText from '../UI/BackgroundText';
+import Card from '../UI/Card';
 
 type Props = {|
   game: Game,
@@ -159,95 +160,103 @@ export const GameCard = ({
     <I18n>
       {({ i18n }) => (
         <>
-          <Card key={game.id} variant="outlined">
-            <CardContent>
-              <Line noMargin justifyContent="space-between" alignItems="center">
-                <Line>
-                  {game.publicWebBuildId && (
-                    <>
-                      <Text size="body2" noMargin displayInlineAsSpan>
-                        {game.discoverable ? (
-                          <Trans>Public on Liluo.io</Trans>
-                        ) : (
-                          <Trans>
-                            Build version only (non visible on Liluo.io)
-                          </Trans>
-                        )}
-                      </Text>
-                      <Spacer />
-                    </>
-                  )}
+          <Card
+            key={game.id}
+            cardCornerAction={
+              <ElementWithMenu
+                element={
+                  <IconButton size="small">
+                    <MoreVert />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Open details`),
+                    click: () => onOpenGameManager('details'),
+                  },
+                  {
+                    label: i18n._(t`See builds`),
+                    click: () => onOpenGameManager('builds'),
+                  },
+                  {
+                    label: i18n._(t`See feedbacks`),
+                    click: () => onOpenGameManager('feedback'),
+                  },
+                  {
+                    label: i18n._(t`Open analytics`),
+                    click: () => onOpenGameManager('analytics'),
+                  },
+                  {
+                    label: i18n._(t`Manage leaderboards`),
+                    click: () => onOpenGameManager('leaderboards'),
+                  },
+                ]}
+              />
+            }
+            header={
+              <Line>
+                {game.publicWebBuildId && (
+                  <>
+                    <Text size="body2" noMargin displayInlineAsSpan>
+                      {game.discoverable ? (
+                        <Trans>Public on Liluo.io</Trans>
+                      ) : (
+                        <Trans>
+                          Build version only (non visible on Liluo.io)
+                        </Trans>
+                      )}
+                    </Text>
+                    <Spacer />
+                  </>
+                )}
 
-                  <Text size="body2" noMargin displayInlineAsSpan>
-                    <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
-                  </Text>
-                </Line>
-                <ElementWithMenu
-                  element={
-                    <IconButton size="small" style={{ padding: 0 }}>
-                      <MoreVert />
-                    </IconButton>
-                  }
-                  buildMenuTemplate={(i18n: I18nType) => [
-                    {
-                      label: i18n._(t`Open details`),
-                      click: () => onOpenGameManager('details'),
-                    },
-                    {
-                      label: i18n._(t`See builds`),
-                      click: () => onOpenGameManager('builds'),
-                    },
-                    {
-                      label: i18n._(t`See feedbacks`),
-                      click: () => onOpenGameManager('feedback'),
-                    },
-                    {
-                      label: i18n._(t`Open analytics`),
-                      click: () => onOpenGameManager('analytics'),
-                    },
-                    {
-                      label: i18n._(t`Manage leaderboards`),
-                      click: () => onOpenGameManager('leaderboards'),
-                    },
-                  ]}
-                />
+                <BackgroundText>
+                  <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
+                </BackgroundText>
               </Line>
-              <ResponsiveLineStackLayout noMargin>
+            }
+          >
+            <ResponsiveLineStackLayout noMargin>
+              <Column noMargin alignItems="center">
                 <GameThumbnail
                   gameName={game.gameName}
                   thumbnailUrl={game.thumbnailUrl}
                 />
-                <Spacer />
-                <Column expand justifyContent="space-between">
-                  <ResponsiveLineStackLayout noMargin alignItems="flex-start">
-                    <CardHeader
-                      title={game.gameName}
-                      subheader={
-                        isCurrentGame && (
-                          <Chip
-                            size="small"
-                            label={<Trans>Currently edited</Trans>}
-                            color="primary"
+              </Column>
+              <Spacer />
+              <Column expand justifyContent="space-between">
+                <ResponsiveLineStackLayout noMargin alignItems="flex-start">
+                  <CardHeader
+                    title={game.gameName}
+                    subheader={
+                      isCurrentGame && (
+                        <Chip
+                          size="small"
+                          label={<Trans>Currently edited</Trans>}
+                          color="primary"
+                        />
+                      )
+                    }
+                  />
+                  <Column expand noMargin>
+                    <ResponsiveLineStackLayout
+                      justifyContent="flex-end"
+                      noColumnMargin
+                    >
+                      <FlatButton
+                        label={<Trans>Access feedback</Trans>}
+                        onClick={() => onOpenGameManager('feedback')}
+                        disabled={!game.publicWebBuildId}
+                      />
+                      <LineStackLayout noMargin>
+                        <Column noMargin expand>
+                          <RaisedButton
+                            label={<Trans>Open in browser</Trans>}
+                            onClick={openGameUrl}
+                            primary
+                            disabled={!game.publicWebBuildId}
                           />
-                        )
-                      }
-                    />
-                    <Column expand noMargin>
-                      <ResponsiveLineStackLayout
-                        justifyContent="flex-end"
-                        noColumnMargin
-                      >
-                        <FlatButton
-                          label={<Trans>Access feedback</Trans>}
-                          onClick={() => onOpenGameManager('feedback')}
-                          disabled={!game.publicWebBuildId}
-                        />
-                        <RaisedButton
-                          label={<Trans>Open in browser</Trans>}
-                          onClick={openGameUrl}
-                          primary
-                          disabled={!game.publicWebBuildId}
-                        />
+                        </Column>
                         <IconButton
                           size="small"
                           disabled={!game.publicWebBuildId}
@@ -256,40 +265,38 @@ export const GameCard = ({
                         >
                           <ShareIcon />
                         </IconButton>
-                      </ResponsiveLineStackLayout>
-                    </Column>
-                  </ResponsiveLineStackLayout>
-                  <Column noMargin justifyContent="flex-start">
-                    <Toggle
-                      labelPosition="left"
-                      onToggle={() => setConfirmationDialogName('discoverable')}
-                      toggled={!!game.discoverable}
-                      label={<Trans>Make discoverable on Liluo.io</Trans>}
-                    />
-                    <Toggle
-                      labelPosition="left"
-                      onToggle={() =>
-                        setConfirmationDialogName('acceptsGameComments')
-                      }
-                      toggled={!!game.acceptsGameComments}
-                      label={
-                        <Trans>
-                          Show feedback banner on Liluo.io game page
-                        </Trans>
-                      }
-                    />
-                    <Toggle
-                      labelPosition="left"
-                      onToggle={() =>
-                        setConfirmationDialogName('acceptsBuildComments')
-                      }
-                      toggled={!!game.acceptsBuildComments}
-                      label={<Trans>Ask for feedback on all build pages</Trans>}
-                    />
+                      </LineStackLayout>
+                    </ResponsiveLineStackLayout>
                   </Column>
+                </ResponsiveLineStackLayout>
+                <Column noMargin justifyContent="flex-start">
+                  <Toggle
+                    labelPosition="left"
+                    onToggle={() => setConfirmationDialogName('discoverable')}
+                    toggled={!!game.discoverable}
+                    label={<Trans>Make discoverable on Liluo.io</Trans>}
+                  />
+                  <Toggle
+                    labelPosition="left"
+                    onToggle={() =>
+                      setConfirmationDialogName('acceptsGameComments')
+                    }
+                    toggled={!!game.acceptsGameComments}
+                    label={
+                      <Trans>Show feedback banner on Liluo.io game page</Trans>
+                    }
+                  />
+                  <Toggle
+                    labelPosition="left"
+                    onToggle={() =>
+                      setConfirmationDialogName('acceptsBuildComments')
+                    }
+                    toggled={!!game.acceptsBuildComments}
+                    label={<Trans>Ask for feedback on all build pages</Trans>}
+                  />
                 </Column>
-              </ResponsiveLineStackLayout>
-            </CardContent>
+              </Column>
+            </ResponsiveLineStackLayout>
           </Card>
           {showShareDialog && (
             <ShareDialog

@@ -6,6 +6,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { type StorageProvider } from '.';
 import { List, ListItem } from '../UI/List';
+import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
@@ -18,6 +19,7 @@ const SaveToStorageProviderDialog = ({
   storageProviders,
   onChooseProvider,
 }: Props) => {
+  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   return (
     <I18n>
       {({ i18n }) => (
@@ -42,7 +44,11 @@ const SaveToStorageProviderDialog = ({
               .map(storageProvider => (
                 <ListItem
                   key={storageProvider.internalName}
-                  disabled={!!storageProvider.disabled}
+                  disabled={
+                    !!storageProvider.disabled ||
+                    (storageProvider.needUserAuthentication &&
+                      !authenticatedUser.authenticated)
+                  }
                   primaryText={i18n._(storageProvider.name)}
                   leftIcon={
                     storageProvider.renderIcon

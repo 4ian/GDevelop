@@ -81,19 +81,11 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
-  game1,
-  game2,
-  gameRollingMetrics1,
-  gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
   geometryMonsterExampleShortHeader,
   fireBulletExtensionShortHeader,
   flashExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
-import {
-  GDevelopAnalyticsApi,
-  GDevelopGameApi,
-} from '../Utils/GDevelopServices/ApiConfigs';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
@@ -199,11 +191,6 @@ import '../UI/Theme/Global/Animation.css';
 import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
-import { GameCard } from '../GameDashboard/GameCard';
-import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
-import { GamesList } from '../GameDashboard/GamesList';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
@@ -4373,130 +4360,6 @@ storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
       onRetry={action('retry')}
     />
   ));
-
-storiesOf('GameDashboard/GameDetailsDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('Error loading analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(500)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('Missing analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(404)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('With partial analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetricsWithoutPlayersAndRetention1)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('With analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetrics1)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('With analytics, long loading', () => {
-    const mock = new MockAdapter(axios, { delayResponse: 2000 });
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetrics1)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  });
 
 storiesOf('GamesShowcase', module)
   .addDecorator(muiDecorator)

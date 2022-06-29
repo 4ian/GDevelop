@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import { type Build } from '../../Utils/GDevelopServices/Build';
@@ -32,22 +32,30 @@ type BuildFilter = BuildType | 'all-build';
 const selectOptionsArray: Array<{
   key: BuildFilter,
   value: BuildFilter,
-  primaryText: string,
+  primaryText: React.Node,
 }> = [
-  { key: 'all-build', value: 'all-build', primaryText: 'All builds' },
+  {
+    key: 'all-build',
+    value: 'all-build',
+    primaryText: t`All builds`,
+  },
 
-  { key: 'web-build', value: 'web-build', primaryText: 'Web builds' },
+  {
+    key: 'web-build',
+    value: 'web-build',
+    primaryText: t`Web builds`,
+  },
 
   {
     key: 'cordova-build',
     value: 'cordova-build',
-    primaryText: 'Mobile builds',
+    primaryText: t`Mobile builds`,
   },
 
   {
     key: 'electron-build',
     value: 'electron-build',
-    primaryText: 'Desktop builds',
+    primaryText: t`Desktop builds`,
   },
 ];
 
@@ -105,19 +113,25 @@ const BuildsList = ({
           </EmptyMessage>
         </Column>
         <Column>
-          <SelectField
-            style={{ width: 'auto' }}
-            floatingLabelText={<Trans>Show</Trans>}
-            value={buildFilter}
-            onChange={(e, i, value) => {
-              // $FlowFixMe - We are confident that the selected option's value is of type BuildFilter.
-              setBuildFilter(value);
-            }}
-          >
-            {selectOptionsArray.map(({ key, value, primaryText }) => (
-              <SelectOption key={key} value={value} primaryText={primaryText} />
-            ))}
-          </SelectField>
+          <div style={{ maxWidth: '350' }}>
+            <SelectField
+              fullWidth
+              floatingLabelText={<Trans>Show</Trans>}
+              value={buildFilter}
+              onChange={(e, i, value) => {
+                // $FlowFixMe - We are confident that the selected option's value is of type BuildFilter.
+                setBuildFilter(value);
+              }}
+            >
+              {selectOptionsArray.map(({ key, value, primaryText }) => (
+                <SelectOption
+                  key={key}
+                  value={value}
+                  primaryText={primaryText}
+                />
+              ))}
+            </SelectField>
+          </div>
         </Column>
       </ResponsiveLineStackLayout>
       <Line>

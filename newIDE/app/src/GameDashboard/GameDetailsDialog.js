@@ -333,7 +333,12 @@ export const GameDetailsDialog = ({
           onRequestClose={onClose}
           cannotBeDismissed={isLoading}
         >
-          <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            variant="scrollable"
+            aria-label="scrollable auto tabs example"
+          >
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
             <Tab label={<Trans>Feedback</Trans>} value="feedback" />
@@ -544,7 +549,11 @@ export const GameDetailsDialog = ({
               <GameAnalyticsPanel game={game} publicGame={publicGame} />
             ) : null}
             {currentTab === 'feedback' ? (
-              <GameFeedback authenticatedUser={authenticatedUser} game={game} />
+              <GameFeedback
+                i18n={i18n}
+                authenticatedUser={authenticatedUser}
+                game={game}
+              />
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

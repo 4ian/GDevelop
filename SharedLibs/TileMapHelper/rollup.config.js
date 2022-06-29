@@ -1,7 +1,7 @@
 //import pkg from "./package.json";
 import typescript from "@rollup/plugin-typescript";
-import dts from "rollup-plugin-dts";
 import resolve from '@rollup/plugin-node-resolve';
+import { terser } from 'rollup-plugin-terser';
 
 export default [
   {
@@ -12,6 +12,11 @@ export default [
         format: 'umd',
         file: '../../Extensions/TileMap/helper/TileMapHelper.js',
         sourcemap: true,
+        plugins: [terser({
+              format: {
+                comments: false
+              },
+            })]
       },
     ],
   	external: ['pixi.js'],
@@ -22,13 +27,4 @@ export default [
       typescript({ tsconfig: './tsconfig.json' }),
     ],
   },
-  {
-    input: '../../Extensions/TileMap/helper/dts/index.d.ts',
-    output:{
-      name: 'TileMapHelper',
-      format: 'umd',
-      file: "../../Extensions/TileMap/helper/TileMapHelper.d.ts",
-    },
-    plugins: [dts()],
-  }
 ];

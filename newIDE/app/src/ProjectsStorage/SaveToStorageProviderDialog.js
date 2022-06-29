@@ -1,12 +1,13 @@
 // @flow
-import { Trans } from '@lingui/macro';
-import { I18n } from '@lingui/react';
 import * as React from 'react';
+import { Trans } from '@lingui/macro';
+
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
+import { List } from '../UI/List';
+
+import StorageProviderListItem from './StorageProviderListItem';
 import { type StorageProvider } from '.';
-import { List, ListItem } from '../UI/List';
-import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 
 type Props = {|
   storageProviders: Array<StorageProvider>,
@@ -19,49 +20,33 @@ const SaveToStorageProviderDialog = ({
   storageProviders,
   onChooseProvider,
 }: Props) => {
-  const authenticatedUser = React.useContext(AuthenticatedUserContext);
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={<Trans>Choose where to save the project to</Trans>}
-          actions={[
-            <FlatButton
-              label={<Trans>Cancel</Trans>}
-              key="close"
-              primary={false}
-              onClick={onClose}
-            />,
-          ]}
-          onRequestClose={onClose}
-          open
-          noMargin
-          maxWidth="sm"
-        >
-          <List>
-            {storageProviders
-              .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
-              .map(storageProvider => (
-                <ListItem
-                  key={storageProvider.internalName}
-                  disabled={
-                    !!storageProvider.disabled ||
-                    (storageProvider.needUserAuthentication &&
-                      !authenticatedUser.authenticated)
-                  }
-                  primaryText={i18n._(storageProvider.name)}
-                  leftIcon={
-                    storageProvider.renderIcon
-                      ? storageProvider.renderIcon()
-                      : undefined
-                  }
-                  onClick={() => onChooseProvider(storageProvider)}
-                />
-              ))}
-          </List>
-        </Dialog>
-      )}
-    </I18n>
+    <Dialog
+      title={<Trans>Choose where to save the project to</Trans>}
+      actions={[
+        <FlatButton
+          label={<Trans>Cancel</Trans>}
+          key="close"
+          primary={false}
+          onClick={onClose}
+        />,
+      ]}
+      onRequestClose={onClose}
+      open
+      noMargin
+      maxWidth="sm"
+    >
+      <List style={{ padding: 20 }} useGap>
+        {storageProviders
+          .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
+          .map(storageProvider => (
+            <StorageProviderListItem
+              onChooseProvider={onChooseProvider}
+              storageProvider={storageProvider}
+            />
+          ))}
+      </List>
+    </Dialog>
   );
 };
 

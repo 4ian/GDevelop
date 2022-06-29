@@ -13,18 +13,22 @@ export default [
         file: '../../Extensions/TileMap/helper/TileMapHelper.js',
         sourcemap: true,
       },
-      {
-        format: "umd",
-        file: "../../Extensions/TileMap/helper/TileMapHelper.d.ts",
-        plugins: [dts()],
-      }
     ],
   	external: ['pixi.js'],
     plugins: [
       resolve({
           extensions: ['.js'],
       }),
-      typescript(),
+      typescript({ tsconfig: './tsconfig.json' }),
     ],
   },
+  {
+    input: '../../Extensions/TileMap/helper/dts/index.d.ts',
+    output:{
+      name: 'TileMapHelper',
+      format: 'umd',
+      file: "../../Extensions/TileMap/helper/TileMapHelper.d.ts",
+    },
+    plugins: [dts()],
+  }
 ];

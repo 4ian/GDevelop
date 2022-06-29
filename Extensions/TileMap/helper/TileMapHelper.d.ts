@@ -1,31 +1,309 @@
-import * as PIXI from 'pixi.js';
+declare namespace TileMapHelper {
 
-var extendStatics = function(d, b) {
-    extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-    return extendStatics(d, b);
+    import PIXI = GlobalPIXIModule.PIXI;
+
+type integer = number;
+type float = number;
+type FloatPoint = [float, float];
+type PolygonVertices = FloatPoint[];
+
+/**
+ * Tiled JSON format.
+ */
+type TiledMap = {
+    /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
+    backgroundcolor?: string;
+    /** The compression level to use for tile layer data (defaults to -1, which means to use the algorithm default) */
+    compressionlevel: integer;
+    /** Number of tile rows */
+    height: integer;
+    /** Length of the side of a hex tile in pixels (hexagonal maps only) */
+    hexsidelength: integer;
+    /** Whether the map has infinite dimensions */
+    infinite: boolean;
+    /** Array of {@link TiledLayer} */
+    layers: Array<TiledLayer>;
+    /** Auto-increments for each layer */
+    nextlayerid: integer;
+    /** Auto-increments for each placed object */
+    nextobjectid: integer;
+    /** `orthogonal`, `isometric`, `staggered` or `hexagonal` */
+    orientation: string;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** `right-down` (the default), `right-up`, `left-down` or `left-up` (currently only supported for orthogonal maps) */
+    renderorder: string;
+    /** `x` or `y` (staggered / hexagonal maps only) */
+    staggeraxis: string;
+    /** `odd` or `even` (staggered / hexagonal maps only) */
+    staggerindex: string;
+    /** The Tiled version used to save the file */
+    tiledversion: string;
+    /** Map grid height */
+    tileheight: integer;
+    /** Array of {@link TiledTileset} */
+    tilesets: Array<TiledTileset>;
+    /** Map grid width */
+    tilewidth: integer;
+    /** `map` (since 1.0) */
+    type: string;
+    /** The JSON format version (previously a number, saved as string since 1.6) */
+    version: string;
+    /** Number of tile columns */
+    width: integer;
 };
-
-function __extends(d, b) {
-    if (typeof b !== "function" && b !== null)
-        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-    extendStatics(d, b);
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-}
-
-function __values(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) return m.call(o);
-    if (o && typeof o.length === "number") return {
-        next: function () {
-            if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
-        }
-    };
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-}
+type TiledLayer = {
+    /** Array of {@link TiledChunk} (optional). `tilelayer` only. */
+    chunks?: Array<TiledChunk>;
+    /** `zlib`, `gzip`, `zstd` (since Tiled 1.3) or empty (default). `tilelayer` only. */
+    compression: string;
+    /** Array of `unsigned`, `integer` (GIDs) or base64-encoded data. `tilelayer` only.*/
+    data: Array<integer> | string;
+    /** `topdown` (default) or `index`. `objectgroup` only. */
+    draworder: string;
+    /** `csv` (default) or `base64`. `tilelayer` only. */
+    encoding: string;
+    /** Row count. Same as map height for fixed-size maps. */
+    height: integer;
+    /** Incremental ID - unique across all layers */
+    id: integer;
+    /** Image used by this layer. `imagelayer` only. */
+    image: string;
+    /** Array of {@link TiledLayer}. `group` only. */
+    layers: Array<TiledLayer>;
+    /** Name assigned to this layer */
+    name: string;
+    /** Array of {@link TiledObject}. `objectgroup` only. */
+    objects: Array<TiledObject>;
+    /** Horizontal layer offset in pixels (default: 0) */
+    offsetx: float;
+    /** Vertical layer offset in pixels (default: 0) */
+    offsety: float;
+    /** Value between 0 and 1 */
+    opacity: float;
+    /** Horizontal {@link parallax factor} for this layer (default: 1). (since Tiled 1.5) */
+    parallaxx: float;
+    /** Vertical {@link parallax factor} for this layer (default: 1). (since Tiled 1.5) */
+    parallaxy: float;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** X coordinate where layer content starts (for infinite maps) */
+    startx: integer;
+    /** Y coordinate where layer content starts (for infinite maps) */
+    starty: integer;
+    /** Hex-formatted {@link tint color} (#RRGGBB or #AARRGGBB) that is multiplied with any graphics drawn by this layer or any child layers (optional). */
+    tintcolor?: string;
+    /** Hex-formatted color (#RRGGBB) (optional). `imagelayer` only. */
+    transparentcolor?: string;
+    /** `tilelayer`, `objectgroup`, `imagelayer` or `group` */
+    type: string;
+    /** Whether layer is shown or hidden in editor */
+    visible: boolean;
+    /** Column count. Same as map width for fixed-size maps. */
+    width: integer;
+    /** Horizontal layer offset in tiles. Always 0. */
+    x: integer;
+    /** Vertical layer offset in tiles. Always 0. */
+    y: integer;
+};
+type TiledChunk = {
+    /** Array of `unsigned` `integer` (GIDs) or base64-encoded data */
+    data: Array<integer> | string;
+    /** Height in tiles */
+    height: integer;
+    /** Width in tiles */
+    width: integer;
+    /** X coordinate in tiles */
+    x: integer;
+    /** Y coordinate in tiles */
+    y: integer;
+};
+type TiledObject = {
+    /** Used to mark an object as an ellipse */
+    ellipse: boolean;
+    /** Global tile ID, only if object represents a tile */
+    gid: integer;
+    /** Height in pixels. */
+    height: float;
+    /** Incremental ID, unique across all objects */
+    id: integer;
+    /** String assigned to name field in editor */
+    name: string;
+    /** Used to mark an object as a point */
+    point: boolean;
+    /** Array of {@link TiledPoint}, in case the object is a polygon */
+    polygon: Array<TiledPoint>;
+    /** Array of {@link TiledPoint}, in case the object is a polyline */
+    polyline: Array<TiledPoint>;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** Angle in degrees clockwise */
+    rotation: float;
+    /** Reference to a template file, in case object is a {@link template instance} */
+    template: string;
+    /** Only used for text objects */
+    text: Text;
+    /** String assigned to type Tiledfield in editor */
+    type: string;
+    /** Whether object is shown in editor. */
+    visible: boolean;
+    /** Width in pixels. */
+    width: float;
+    /** X coordinate in pixels */
+    x: float;
+    /** Y coordinate in pixels */
+    y: float;
+};
+type TiledTileset = {
+    /** Hex-formatted color (#RRGGBB or #AARRGGBB) (optional) */
+    backgroundcolor?: string;
+    /** The number of tile columns in the tileset */
+    columns: integer;
+    /** GID corresponding to the first tile in the set */
+    firstgid: integer;
+    /** (optional) */
+    grid?: TiledGrid;
+    /** Image used for tiles in this set */
+    image: string;
+    /** Height of source image in pixels */
+    imageheight: integer;
+    /** Width of source image in pixels */
+    imagewidth: integer;
+    /** Buffer between image edge and first tile (pixels) */
+    margin: integer;
+    /** Name given to this tileset */
+    name: string;
+    /** Alignment to use for tile objects (`unspecified` (default), `topleft`, `top`, `topright`, `left`, `center`, `right`, `bottomleft`, `bottom` or `bottomright`) (since 1.4) */
+    objectalignment: string;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** The external file that contains this tilesets data */
+    source: string;
+    /** Spacing between adjacent tiles in image (pixels) */
+    spacing: integer;
+    /** Array of {@link TiledTerrain} (optional) */
+    terrains?: Array<TiledTerrain>;
+    /** The number of tiles in this tileset */
+    tilecount: integer;
+    /** The Tiled version used to save the file */
+    tiledversion: string;
+    /** Maximum height of tiles in this set */
+    tileheight: integer;
+    /** (optional) */
+    tileoffset?: TileOffset;
+    /** Array of {@link TiledTileDefinition} (optional) */
+    tiles?: Array<TiledTileDefinition>;
+    /** Maximum width of tiles in this set */
+    tilewidth: integer;
+    /** Allowed transformations (optional) */
+    transformations?: TiledTransformations;
+    /** Hex-formatted color (#RRGGBB) (optional) */
+    transparentcolor?: string;
+    /** `tileset` (for tileset files, since 1.0) */
+    type: string;
+    /** The JSON format version (previously a number, saved as string since 1.6) */
+    version: string;
+    /** Array of {@link TiledWangSet} (since 1.1.5) */
+    wangsets: Array<TiledWangSet>;
+};
+type TiledGrid = {
+    /** Cell height of tile grid */
+    height: integer;
+    /** `orthogonal` (default) or `isometric` */
+    orientation: string;
+    /** Cell width of tile grid */
+    width: integer;
+};
+type TileOffset = {
+    /** Horizontal offset in pixels */
+    x: integer;
+    /** Vertical offset in pixels (positive is down) */
+    y: integer;
+};
+type TiledTransformations = {
+    /** Tiles can be flipped horizontally */
+    hflip: boolean;
+    /** Tiles can be flipped vertically */
+    vflip: boolean;
+    /** Tiles can be rotated in 90-degree increments */
+    rotate: boolean;
+    /** Whether untransformed tiles remain preferred, otherwise transformed tiles are used to produce more variations */
+    preferuntransformed: boolean;
+};
+type TiledTileDefinition = {
+    /** Array of {@link TiledTiles} */
+    animation: Array<TiledTileDefinition>;
+    /** Local ID of the tile */
+    id: integer;
+    /** Image representing this tile (optional) */
+    image?: string;
+    /** Height of the tile image in pixels */
+    imageheight: integer;
+    /** Width of the tile image in pixels */
+    imagewidth: integer;
+    /** Layer with type Tiled`objectgroup`, when collision shapes are specified (optional) */
+    objectgroup?: TiledLayer;
+    /** Percentage chance this tile is chosen when competing with others in the editor (optional) */
+    probability?: float;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** Index of terrain for each corner of tile (optional) */
+    terrain?: Array<integer>;
+    /** The type of the tile (optional) */
+    type?: string;
+};
+type TiledTerrain = {
+    /** Name of terrain */
+    name: string;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** Local ID of tile representing terrain */
+    tile: integer;
+};
+type TiledWangSet = {
+    /** Array of {@link TiledWangColor} */
+    colors: Array<TiledWangColor>;
+    /** Name of the Wang set */
+    name: string;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** Local ID of tile representing the Wang set */
+    tile: integer;
+    /** Array of {@link TiledWangTile} */
+    wangtiles: Array<TiledWangTile>;
+};
+type TiledWangColor = {
+    /** Hex-formatted color (#RRGGBB or #AARRGGBB) */
+    color: string;
+    /** Name of the Wang color */
+    name: string;
+    /** Probability used when randomizing */
+    probability: float;
+    /** Array of {@link TiledProperty} */
+    properties: Array<TiledProperty>;
+    /** Local ID of tile representing the Wang color */
+    tile: integer;
+};
+type TiledWangTile = {
+    /** Local ID of tile */
+    tileid: integer;
+    /** Array of Wang color indexes (`uchar[8]`) */
+    wangid: Array<integer>;
+};
+type TiledProperty = {
+    /** Name of the property */
+    name: string;
+    /** type of the property (`string` (default), `integer`, `float`, `boolean`, `color` or `file` (since 0.16, with `color` and `file` added in 0.17)) */
+    type: string;
+    /** Value of the property */
+    value: string | number;
+};
+type TiledPoint = {
+    /** X coordinate in pixels */
+    x: float;
+    /** Y coordinate in pixels */
+    y: float;
+};
 
 /**
  * A tile map model.
@@ -35,7 +313,25 @@ function __values(o) {
  * and hitboxes handling ({@link TransformedCollisionTileMap}).
  * This allows to support new file format with only a new parser.
  */
-var EditableTileMap = /** @class */ (function () {
+class EditableTileMap {
+    private _tileSet;
+    private _layers;
+    /**
+     * The width of a tile.
+     */
+    private readonly tileWidth;
+    /**
+     * The height of a tile.
+     */
+    private readonly tileHeight;
+    /**
+     * The number of tile columns in the map.
+     */
+    private readonly dimX;
+    /**
+     * The number of tile rows in the map.
+     */
+    private readonly dimY;
     /**
      * @param tileWidth The width of a tile.
      * @param tileHeight The height of a tile.
@@ -43,91 +339,54 @@ var EditableTileMap = /** @class */ (function () {
      * @param dimY The number of tile rows in the map.
      * @param tileSet The tile set.
      */
-    function EditableTileMap(tileWidth, tileHeight, dimX, dimY, 
-    // TODO should the tile set be built internally?
-    // It's not meant to change and it avoid to do a copy.
-    tileSet) {
-        console.log("tile dimension: " + tileWidth + " " + tileHeight);
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
-        this.dimX = dimX;
-        this.dimY = dimY;
-        this._tileSet = tileSet;
-        this._layers = [];
-    }
+    constructor(tileWidth: integer, tileHeight: integer, dimX: integer, dimY: integer, tileSet: Map<integer, TileDefinition>);
     /**
      * @returns The tile map width in pixels.
      */
-    EditableTileMap.prototype.getWidth = function () {
-        return this.tileWidth * this.dimX;
-    };
+    getWidth(): number;
     /**
      * @returns The tile map height in pixels.
      */
-    EditableTileMap.prototype.getHeight = function () {
-        return this.tileHeight * this.dimY;
-    };
+    getHeight(): number;
     /**
      * @returns The tile width in pixels.
      */
-    EditableTileMap.prototype.getTileHeight = function () {
-        return this.tileWidth;
-    };
+    getTileHeight(): number;
     /**
      * @returns The tile height in pixels.
      */
-    EditableTileMap.prototype.getTileWidth = function () {
-        return this.tileHeight;
-    };
+    getTileWidth(): number;
     /**
      * @returns The number of tile columns in the map.
      */
-    EditableTileMap.prototype.getDimensionX = function () {
-        return this.dimX;
-    };
+    getDimensionX(): number;
     /**
      * @returns The number of tile rows in the map.
      */
-    EditableTileMap.prototype.getDimensionY = function () {
-        return this.dimY;
-    };
+    getDimensionY(): number;
     /**
      * @param tileId The tile identifier
      * @returns The tile definition form the tile set.
      */
-    EditableTileMap.prototype.getTileDefinition = function (tileId) {
-        return this._tileSet.get(tileId);
-    };
+    getTileDefinition(tileId: integer): TileDefinition | undefined;
     /**
      * @returns All the tile definitions form the tile set.
      */
-    EditableTileMap.prototype.getTileDefinitions = function () {
-        return this._tileSet.values();
-    };
+    getTileDefinitions(): Iterable<TileDefinition>;
     /**
      * @param id The identifier of the new layer.
      * @returns The new layer.
      */
-    EditableTileMap.prototype.addTileLayer = function (id) {
-        var layer = new EditableTileMapLayer(this, id);
-        this._layers.push(layer);
-        return layer;
-    };
+    addTileLayer(id: integer): EditableTileMapLayer;
     /**
      * @param id The identifier of the new layer.
      * @returns The new layer.
      */
-    EditableTileMap.prototype.addObjectLayer = function (id) {
-        var layer = new EditableObjectLayer(this, id);
-        this._layers.push(layer);
-        return layer;
-    };
+    addObjectLayer(id: integer): EditableObjectLayer;
     /**
      * @returns All the layers of the tile map.
      */
-    EditableTileMap.prototype.getLayers = function () {
-        return this._layers;
-    };
+    getLayers(): Iterable<AbstractEditableLayer>;
     /**
      * Check if a point is inside a tile with a given tag.
      *
@@ -139,652 +398,213 @@ var EditableTileMap = /** @class */ (function () {
      * @param tag The tile tag
      * @returns true when the point is inside a tile with a given tag.
      */
-    EditableTileMap.prototype.pointIsInsideTile = function (x, y, tag) {
-        var e_1, _a;
-        var indexX = Math.floor(x / this.tileWidth);
-        var indexY = Math.floor(y / this.tileHeight);
-        try {
-            for (var _b = __values(this._layers), _c = _b.next(); !_c.done; _c = _b.next()) {
-                var layer = _c.value;
-                var tileLayer = layer;
-                if (!tileLayer) {
-                    continue;
-                }
-                var tileId = tileLayer.get(indexX, indexY);
-                if (!tileId) {
-                    return false;
-                }
-                var tileDefinition = this._tileSet.get(tileId);
-                if (tileDefinition.getTag() === tag) {
-                    return true;
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        return false;
-    };
-    return EditableTileMap;
-}());
+    pointIsInsideTile(x: float, y: float, tag: string): boolean;
+}
 /**
  * A tile map layer.
  */
-var AbstractEditableLayer = /** @class */ (function () {
+abstract class AbstractEditableLayer {
+    /**
+     * The layer tile map.
+     */
+    readonly tileMap: EditableTileMap;
+    /**
+     * The layer identifier.
+     */
+    readonly id: integer;
+    private visible;
     /**
      * @param tileMap The layer tile map.
      * @param id The layer identifier.
      */
-    function AbstractEditableLayer(tileMap, id) {
-        this.visible = true;
-        this.tileMap = tileMap;
-        this.id = id;
-    }
+    constructor(tileMap: EditableTileMap, id: integer);
     /**
      * @param visible
      */
-    AbstractEditableLayer.prototype.setVisible = function (visible) {
-        this.visible = visible;
-    };
+    setVisible(visible: boolean): void;
     /**
      * @returns true if the layer is visible.
      */
-    AbstractEditableLayer.prototype.isVisible = function () {
-        return this.visible;
-    };
-    return AbstractEditableLayer;
-}());
+    isVisible(): boolean;
+}
 /**
  * A layer where tiles are placed with pixel coordinates.
  */
-var EditableObjectLayer = /** @class */ (function (_super) {
-    __extends(EditableObjectLayer, _super);
+class EditableObjectLayer extends AbstractEditableLayer {
+    readonly objects: TileObject[];
     /**
      * @param tileMap  The layer tile map.
      * @param id The layer identifier.
      */
-    function EditableObjectLayer(tileMap, id) {
-        var _this = _super.call(this, tileMap, id) || this;
-        _this.objects = [];
-        return _this;
-    }
+    constructor(tileMap: EditableTileMap, id: integer);
     /**
      * @param object
      */
-    EditableObjectLayer.prototype.add = function (object) {
-        this.objects.push(object);
-    };
-    return EditableObjectLayer;
-}(AbstractEditableLayer));
+    add(object: TileObject): void;
+}
 /**
  * A tile that is placed with pixel coordinates.
  */
-var TileObject = /** @class */ (function () {
+class TileObject {
+    /**
+     * The tile identifier in the tile set.
+     */
+    private tileId;
+    /**
+     * The coordinate of the tile left side.
+     */
+    readonly x: float;
+    /**
+     * The coordinate of the tile top side.
+     */
+    readonly y: float;
     /**
      * @param x The coordinate of the tile left side.
      * @param y The coordinate of the tile top side.
      * @param tileId The tile identifier in the tile set.
      */
-    function TileObject(x, y, tileId) {
-        this.tileId = tileId;
-        this.x = x;
-        this.y = y;
-    }
+    constructor(x: float, y: float, tileId: integer);
     /**
      * @return The tile identifier in the tile set.
      */
-    TileObject.prototype.getTileId = function () {
-        return FlippingHelper.getTileId(this.tileId);
-    };
+    getTileId(): integer;
     /**
      * @param flippedHorizontally
      */
-    TileObject.prototype.setFlippedHorizontally = function (flippedHorizontally) {
-        this.tileId = FlippingHelper.setFlippedHorizontally(this.tileId, flippedHorizontally);
-    };
+    setFlippedHorizontally(flippedHorizontally: boolean): void;
     /**
      * @param flippedVertically
      */
-    TileObject.prototype.setFlippedVertically = function (flippedVertically) {
-        this.tileId = FlippingHelper.setFlippedVertically(this.tileId, flippedVertically);
-    };
+    setFlippedVertically(flippedVertically: boolean): void;
     /**
      * @param flippedDiagonally
      */
-    TileObject.prototype.setFlippedDiagonally = function (flippedDiagonally) {
-        this.tileId = FlippingHelper.setFlippedDiagonally(this.tileId, flippedDiagonally);
-    };
+    setFlippedDiagonally(flippedDiagonally: boolean): void;
     /**
      * @returns true if the tile is flipped horizontally.
      */
-    TileObject.prototype.isFlippedHorizontally = function () {
-        return FlippingHelper.isFlippedHorizontally(this.tileId);
-    };
+    isFlippedHorizontally(): boolean;
     /**
      * @returns true if the tile is flipped vertically.
      */
-    TileObject.prototype.isFlippedVertically = function () {
-        return FlippingHelper.isFlippedVertically(this.tileId);
-    };
+    isFlippedVertically(): boolean;
     /**
      * @returns true if the tile is flipped diagonally.
      */
-    TileObject.prototype.isFlippedDiagonally = function () {
-        return FlippingHelper.isFlippedDiagonally(this.tileId);
-    };
-    return TileObject;
-}());
-/**
- * Tile identifiers making to access flipping flags.
- */
-var FlippingHelper = /** @class */ (function () {
-    function FlippingHelper() {
-    }
-    FlippingHelper.getTileId = function (tileId) {
-        return tileId & FlippingHelper.tileIdMask;
-    };
-    FlippingHelper.setFlippedHorizontally = function (tileId, flippedHorizontally) {
-        tileId &= ~FlippingHelper.flippedHorizontallyFlag;
-        if (flippedHorizontally) {
-            tileId |= FlippingHelper.flippedHorizontallyFlag;
-        }
-        return tileId;
-    };
-    FlippingHelper.setFlippedVertically = function (tileId, flippedVertically) {
-        tileId &= ~FlippingHelper.flippedVerticallyFlag;
-        if (flippedVertically) {
-            tileId |= FlippingHelper.flippedVerticallyFlag;
-        }
-        return tileId;
-    };
-    FlippingHelper.setFlippedDiagonally = function (tileId, flippedDiagonally) {
-        tileId &= ~FlippingHelper.flippedDiagonallyFlag;
-        if (flippedDiagonally) {
-            tileId |= FlippingHelper.flippedDiagonallyFlag;
-        }
-        return tileId;
-    };
-    FlippingHelper.isFlippedHorizontally = function (tileId) {
-        return (tileId & FlippingHelper.flippedHorizontallyFlag) !== 0;
-    };
-    FlippingHelper.isFlippedVertically = function (tileId) {
-        return (tileId & FlippingHelper.flippedVerticallyFlag) !== 0;
-    };
-    FlippingHelper.isFlippedDiagonally = function (tileId) {
-        return (tileId & FlippingHelper.flippedDiagonallyFlag) !== 0;
-    };
-    FlippingHelper.flippedHorizontallyFlag = 0x80000000;
-    FlippingHelper.flippedVerticallyFlag = 0x40000000;
-    FlippingHelper.flippedDiagonallyFlag = 0x20000000;
-    FlippingHelper.tileIdMask = ~(FlippingHelper.flippedHorizontallyFlag |
-        FlippingHelper.flippedVerticallyFlag |
-        FlippingHelper.flippedDiagonallyFlag);
-    return FlippingHelper;
-}());
+    isFlippedDiagonally(): boolean;
+}
 /**
  * A tile map layer with tile organized in grid.
  */
-var EditableTileMapLayer = /** @class */ (function (_super) {
-    __extends(EditableTileMapLayer, _super);
+class EditableTileMapLayer extends AbstractEditableLayer {
+    private readonly _tiles;
     /**
      * @param tileMap The layer tile map.
      * @param id The layer identifier.
      */
-    function EditableTileMapLayer(tileMap, id) {
-        var _this = _super.call(this, tileMap, id) || this;
-        _this._tiles = [];
-        _this._tiles.length = _this.tileMap.getDimensionY();
-        for (var index = 0; index < _this._tiles.length; index++) {
-            _this._tiles[index] = new Int32Array(_this.tileMap.getDimensionX());
-        }
-        return _this;
-    }
+    constructor(tileMap: EditableTileMap, id: integer);
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @param tileId The tile identifier in the tile set.
      */
-    EditableTileMapLayer.prototype.setTile = function (x, y, tileId) {
-        var definition = this.tileMap.getTileDefinition(tileId);
-        if (!definition) {
-            throw new Error("Invalid tile definition index: ".concat(tileId));
-        }
-        //console.log(x + " " + y + " set: " + definitionIndex);
-        // +1 because 0 mean null
-        this._tiles[y][x] = tileId + 1;
-    };
+    setTile(x: integer, y: integer, tileId: integer): void;
     /**
      * @param x The layer column.
      * @param y The layer row.
      */
-    EditableTileMapLayer.prototype.removeTile = function (x, y) {
-        // 0 mean null
-        this._tiles[y][x] = 0;
-    };
+    removeTile(x: integer, y: integer): void;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @param flippedHorizontally
      */
-    EditableTileMapLayer.prototype.setFlippedHorizontally = function (x, y, flippedHorizontally) {
-        var tileId = this._tiles[y][x];
-        if (tileId === 0) {
-            return;
-        }
-        this._tiles[y][x] = FlippingHelper.setFlippedHorizontally(tileId, flippedHorizontally);
-    };
+    setFlippedHorizontally(x: integer, y: integer, flippedHorizontally: boolean): void;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @param flippedVertically
      */
-    EditableTileMapLayer.prototype.setFlippedVertically = function (x, y, flippedVertically) {
-        var tileId = this._tiles[y][x];
-        if (tileId === 0) {
-            return;
-        }
-        this._tiles[y][x] = FlippingHelper.setFlippedVertically(tileId, flippedVertically);
-    };
+    setFlippedVertically(x: integer, y: integer, flippedVertically: boolean): void;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @param flippedDiagonally
      */
-    EditableTileMapLayer.prototype.setFlippedDiagonally = function (x, y, flippedDiagonally) {
-        var tileId = this._tiles[y][x];
-        if (tileId === 0) {
-            return;
-        }
-        this._tiles[y][x] = FlippingHelper.setFlippedDiagonally(tileId, flippedDiagonally);
-    };
+    setFlippedDiagonally(x: integer, y: integer, flippedDiagonally: boolean): void;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @returns true if the tile is flipped horizontally.
      */
-    EditableTileMapLayer.prototype.isFlippedHorizontally = function (x, y) {
-        return FlippingHelper.isFlippedHorizontally(this._tiles[y][x]);
-    };
+    isFlippedHorizontally(x: integer, y: integer): boolean;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @returns true if the tile is flipped vertically.
      */
-    EditableTileMapLayer.prototype.isFlippedVertically = function (x, y) {
-        return FlippingHelper.isFlippedVertically(this._tiles[y][x]);
-    };
+    isFlippedVertically(x: integer, y: integer): boolean;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @returns true if the tile is flipped diagonally.
      */
-    EditableTileMapLayer.prototype.isFlippedDiagonally = function (x, y) {
-        return FlippingHelper.isFlippedDiagonally(this._tiles[y][x]);
-    };
+    isFlippedDiagonally(x: integer, y: integer): boolean;
     /**
      * @param x The layer column.
      * @param y The layer row.
      * @returns The tile identifier from the tile set.
      */
-    EditableTileMapLayer.prototype.get = function (x, y) {
-        var row = this._tiles[y];
-        if (!row || row[x] === 0) {
-            return undefined;
-        }
-        // -1 because 0 is keep for null.
-        var tileId = FlippingHelper.getTileId(row[x] - 1);
-        return tileId;
-    };
+    get(x: integer, y: integer): integer | undefined;
     /**
      * The number of tile columns in the layer.
      */
-    EditableTileMapLayer.prototype.getDimensionX = function () {
-        return this._tiles.length === 0 ? 0 : this._tiles[0].length;
-    };
+    getDimensionX(): number;
     /**
      * The number of tile rows in the layer.
      */
-    EditableTileMapLayer.prototype.getDimensionY = function () {
-        return this._tiles.length;
-    };
+    getDimensionY(): number;
     /**
      * @returns The layer width in pixels.
      */
-    EditableTileMapLayer.prototype.getWidth = function () {
-        return this.tileMap.getWidth();
-    };
+    getWidth(): number;
     /**
      * @returns The layer height in pixels.
      */
-    EditableTileMapLayer.prototype.getHeight = function () {
-        return this.tileMap.getHeight();
-    };
-    return EditableTileMapLayer;
-}(AbstractEditableLayer));
+    getHeight(): number;
+}
 /**
  * A tile definition from the tile set.
  */
-var TileDefinition = /** @class */ (function () {
+class TileDefinition {
+    private readonly hitBoxes;
+    private readonly tag;
+    private readonly animationLength;
     /**
      * @param hitBoxes The hit boxes for this tile.
      * @param tag The tag of this tile.
      * @param animationLength The number of frame in the tile animation.
      */
-    function TileDefinition(hitBoxes, tag, animationLength) {
-        this.hitBoxes = hitBoxes;
-        this.tag = tag;
-        this.animationLength = animationLength;
-    }
+    constructor(hitBoxes: PolygonVertices[], tag: string, animationLength: integer);
     /**
      * This property is used by {@link TransformedCollisionTileMap}
      * to make collision classes.
      * @returns The tag that is used to filter tiles.
      */
-    TileDefinition.prototype.getTag = function () {
-        return this.tag;
-    };
+    getTag(): string;
     /**
      * The hitboxes positioning is done by {@link TransformedCollisionTileMap}.
      * @returns The hit boxes for this tile.
      */
-    TileDefinition.prototype.getHiBoxes = function () {
-        return this.hitBoxes;
-    };
+    getHiBoxes(): PolygonVertices[];
     /**
      * Animated tiles have a limitation:
      * they are only able to use frames arranged horizontally one next
      * to each other on the atlas.
      * @returns The number of frame in the tile animation.
      */
-    TileDefinition.prototype.getAnimationLength = function () {
-        return this.animationLength;
-    };
-    return TileDefinition;
-}());
-
-var ResourceCache = /** @class */ (function () {
-    /**
-     *
-     */
-    function ResourceCache() {
-        this._cachedValues = new Map();
-        this._callbacks = new Map();
-    }
-    ResourceCache.prototype.getOrLoad = function (key, load, callback) {
-        var _this = this;
-        // Check if the value is in the cache.
-        {
-            var value = this._cachedValues.get(key);
-            if (value) {
-                callback(value);
-                return;
-            }
-        }
-        // Check if the value is being loading.
-        {
-            var callbacks = this._callbacks.get(key);
-            if (callbacks) {
-                callbacks.push(callback);
-                return;
-            }
-            else {
-                this._callbacks.set(key, [callback]);
-            }
-        }
-        load(function (value) {
-            var e_1, _a;
-            if (value) {
-                _this._cachedValues.set(key, value);
-            }
-            var callbacks = _this._callbacks.get(key);
-            _this._callbacks.delete(key);
-            try {
-                for (var callbacks_1 = __values(callbacks), callbacks_1_1 = callbacks_1.next(); !callbacks_1_1.done; callbacks_1_1 = callbacks_1.next()) {
-                    var callback_1 = callbacks_1_1.value;
-                    callback_1(value);
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (callbacks_1_1 && !callbacks_1_1.done && (_a = callbacks_1.return)) _a.call(callbacks_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-        });
-    };
-    return ResourceCache;
-}());
-
-/**
- * Decodes a layer data, which can sometimes be store as a compressed base64 string
- * by Tiled.
- * See https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#data.
- * @param pako The zlib library.
- * @param layer The layer data from a Tiled JSON.
- * @returns The decoded layer data.
- */
-var decodeBase64LayerData = function (pako, layer) {
-    var data = layer.data, compression = layer.compression;
-    var dataBase64 = data;
-    if (!dataBase64) {
-        // The layer data is not encoded.
-        return data;
-    }
-    var index = 4;
-    var decodedData = [];
-    var step1 = atob(dataBase64)
-        .split("")
-        .map(function (x) {
-        return x.charCodeAt(0);
-    });
-    try {
-        var decodeArray = function (arr, index) {
-            return (arr[index] +
-                (arr[index + 1] << 8) +
-                (arr[index + 2] << 16) +
-                (arr[index + 3] << 24)) >>>
-                0;
-        };
-        if (compression === "zlib") {
-            var binData = new Uint8Array(step1);
-            var decompressedData = pako.inflate(binData);
-            while (index <= decompressedData.length) {
-                decodedData.push(decodeArray(decompressedData, index - 4));
-                index += 4;
-            }
-        }
-        else if (compression === "zstd") {
-            console.error("Zstandard compression is not supported for layers in a Tilemap. Use instead zlib compression or no compression.");
-            return null;
-        }
-        else {
-            while (index <= step1.length) {
-                decodedData.push(decodeArray(step1, index - 4));
-                index += 4;
-            }
-        }
-        return decodedData;
-    }
-    catch (error) {
-        console.error("Failed to decompress and unzip base64 layer.data string", error);
-        return null;
-    }
-};
-/**
- * Extract information about the rotation of a tile from the tile id.
- * @param globalTileUid
- * @returns The tile identifier and orientation.
- */
-var extractTileUidFlippedStates = function (globalTileUid) {
-    var FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
-    var FLIPPED_VERTICALLY_FLAG = 0x40000000;
-    var FLIPPED_DIAGONALLY_FLAG = 0x20000000;
-    var flippedHorizontally = globalTileUid & FLIPPED_HORIZONTALLY_FLAG;
-    var flippedVertically = globalTileUid & FLIPPED_VERTICALLY_FLAG;
-    var flippedDiagonally = globalTileUid & FLIPPED_DIAGONALLY_FLAG;
-    var tileUid = globalTileUid &
-        ~(FLIPPED_HORIZONTALLY_FLAG |
-            FLIPPED_VERTICALLY_FLAG |
-            FLIPPED_DIAGONALLY_FLAG);
-    return {
-        id: tileUid,
-        flippedHorizontally: !!flippedHorizontally,
-        flippedVertically: !!flippedVertically,
-        flippedDiagonally: !!flippedDiagonally,
-    };
-};
-
-/**
- * It creates a {@link EditableTileMap} from a Tiled JSON.
- */
-var TiledTileMapLoader = /** @class */ (function () {
-    function TiledTileMapLoader() {
-    }
-    TiledTileMapLoader.load = function (pako, tiledMap) {
-        var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
-        if (!tiledMap.tiledversion) {
-            console.warn("The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?");
-            return null;
-        }
-        var definitions = new Map();
-        try {
-            for (var _e = __values(tiledMap.tilesets[0].tiles), _f = _e.next(); !_f.done; _f = _e.next()) {
-                var tile = _f.value;
-                var polygons = [];
-                if (tile.objectgroup) {
-                    try {
-                        for (var _g = (e_2 = void 0, __values(tile.objectgroup.objects)), _h = _g.next(); !_h.done; _h = _g.next()) {
-                            var object = _h.value;
-                            var polygon = null;
-                            if (object.polygon) {
-                                polygon = object.polygon.map(function (point) { return [point.x, point.y]; });
-                                //TODO check that polygons are convex or split them?
-                            }
-                            // TODO handle ellipses by creating a polygon?
-                            // Make an object property for the number of vertices or always create 8 ones?
-                            // Will the user need the same vertices number for every ellipse?
-                            else {
-                                polygon = [
-                                    [object.x, object.y],
-                                    [object.x, object.y + object.height],
-                                    [object.x + object.width, object.y + object.height],
-                                    [object.x + object.width, object.y],
-                                ];
-                            }
-                            polygons.push(polygon);
-                        }
-                    }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (_h && !_h.done && (_b = _g.return)) _b.call(_g);
-                        }
-                        finally { if (e_2) throw e_2.error; }
-                    }
-                }
-                //console.log("Definition: " + tile.id);
-                definitions.set(tile.id, new TileDefinition(polygons, tile.type ? tile.type : "", tile.animation ? tile.animation.length : 0));
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_f && !_f.done && (_a = _e.return)) _a.call(_e);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        for (var tileId = 0; tileId < tiledMap.tilesets[0].tilecount; tileId++) {
-            if (!definitions.has(tileId)) {
-                definitions.set(tileId, new TileDefinition([], "", 0));
-            }
-        }
-        //console.log(definitions.size + " tiles definition");
-        var collisionTileMap = new EditableTileMap(tiledMap.tilewidth, tiledMap.tileheight, tiledMap.width, tiledMap.height, definitions);
-        try {
-            for (var _j = __values(tiledMap.layers), _k = _j.next(); !_k.done; _k = _j.next()) {
-                var tiledLayer = _k.value;
-                if (tiledLayer.type === "objectgroup") {
-                    var objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
-                    objectLayer.setVisible(tiledLayer.visible);
-                    try {
-                        for (var _l = (e_4 = void 0, __values(tiledLayer.objects)), _m = _l.next(); !_m.done; _m = _l.next()) {
-                            var tiledObject = _m.value;
-                            if (!tiledObject.visible) {
-                                // Objects layer are nice to put decorations but dynamic objects
-                                // must be done with GDevelop objects.
-                                // So, there is no point to load it as there won't be any action to
-                                // make objects visible individually.
-                                continue;
-                            }
-                            var tileGid = extractTileUidFlippedStates(tiledObject.gid);
-                            var object = new TileObject(tiledObject.x, tiledObject.y, tileGid.id);
-                            objectLayer.add(object);
-                            object.setFlippedHorizontally(tileGid.flippedHorizontally);
-                            object.setFlippedVertically(tileGid.flippedVertically);
-                            object.setFlippedDiagonally(tileGid.flippedDiagonally);
-                        }
-                    }
-                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
-                    finally {
-                        try {
-                            if (_m && !_m.done && (_d = _l.return)) _d.call(_l);
-                        }
-                        finally { if (e_4) throw e_4.error; }
-                    }
-                }
-                else if (tiledLayer.type === "tilelayer") {
-                    var tileSlotIndex = 0;
-                    var layerData = null;
-                    if (tiledLayer.encoding === "base64") {
-                        layerData = decodeBase64LayerData(pako, tiledLayer);
-                        if (!layerData) {
-                            console.warn("Failed to uncompress layer.data");
-                        }
-                    }
-                    else {
-                        layerData = tiledLayer.data;
-                    }
-                    if (layerData) {
-                        var collisionTileLayer = collisionTileMap.addTileLayer(tiledLayer.id);
-                        collisionTileLayer.setVisible(tiledLayer.visible);
-                        // TODO handle layer offset
-                        for (var y = 0; y < tiledLayer.height; y++) {
-                            for (var x = 0; x < tiledLayer.width; x++) {
-                                // The "globalTileUid" is the tile UID with encoded
-                                // bits about the flipping/rotation of the tile.
-                                var globalTileUid = layerData[tileSlotIndex];
-                                // Extract the tile UID and the texture.
-                                var tileUid = extractTileUidFlippedStates(globalTileUid);
-                                //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
-                                if (tileUid.id > 0) {
-                                    collisionTileLayer.setTile(x, y, tileUid.id - 1);
-                                    collisionTileLayer.setFlippedHorizontally(x, y, tileUid.flippedHorizontally);
-                                    collisionTileLayer.setFlippedVertically(x, y, tileUid.flippedVertically);
-                                    collisionTileLayer.setFlippedDiagonally(x, y, tileUid.flippedDiagonally);
-                                }
-                                tileSlotIndex += 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (_k && !_k.done && (_c = _j.return)) _c.call(_j);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-        return collisionTileMap;
-    };
-    return TiledTileMapLoader;
-}());
+    getAnimationLength(): integer;
+}
 
 /**
  * A cache to access the tile images.
@@ -792,14 +612,13 @@ var TiledTileMapLoader = /** @class */ (function () {
  * It's created by {@link PixiTileMapHelper.parseAtlas}
  * and used by {@link PixiTileMapHelper.updatePixiTileMap}.
  */
-var TileTextureCache = /** @class */ (function () {
-    function TileTextureCache() {
-        this._textures = new Map();
-    }
-    TileTextureCache.prototype.setTexture = function (tileId, flippedHorizontally, flippedVertically, flippedDiagonally, texture) {
-        var globalTileUid = this._getGlobalId(tileId, flippedHorizontally, flippedVertically, flippedDiagonally);
-        this._textures.set(globalTileUid, texture);
-    };
+class TileTextureCache {
+    private static readonly flippedHorizontallyFlag;
+    private static readonly flippedVerticallyFlag;
+    private static readonly flippedDiagonallyFlag;
+    private readonly _textures;
+    constructor();
+    setTexture(tileId: integer, flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean, texture: PIXI.Texture): void;
     /**
      * Return the texture to use for the tile with the specified uid, which can contains
      * information about rotation in bits 32, 31 and 30
@@ -811,82 +630,50 @@ var TileTextureCache = /** @class */ (function () {
      * @param flippedDiagonally
      * @returns The texture for the given tile identifier and orientation.
      */
-    TileTextureCache.prototype.findTileTexture = function (tileId, flippedHorizontally, flippedVertically, flippedDiagonally) {
-        var globalTileUid = this._getGlobalId(tileId, flippedHorizontally, flippedVertically, flippedDiagonally);
-        if (globalTileUid === 0)
-            return undefined;
-        if (this._textures.has(globalTileUid)) {
-            return this._textures.get(globalTileUid);
-        }
-        // If the texture is not in the cache, it's potentially because its ID
-        // is a flipped/rotated version of another ID.
-        var unflippedTexture = this._textures.get(tileId);
-        // If the tile still can't be found in the cache, it means the ID we got
-        // is invalid.
-        if (!unflippedTexture)
-            return undefined;
-        // Clone the unflipped texture and save it in the cache
-        var frame = unflippedTexture.frame.clone();
-        var orig = unflippedTexture.orig.clone();
-        if (flippedDiagonally) {
-            var width = orig.width;
-            orig.width = orig.height;
-            orig.height = width;
-        }
-        var trim = orig.clone();
-        // Get the rotation "D8" number.
-        // See https://pixijs.io/examples/#/textures/texture-rotate.js
-        var rotate = 0;
-        if (flippedDiagonally) {
-            rotate = 10;
-            if (!flippedHorizontally && flippedVertically) {
-                rotate = 2;
-            }
-            else if (flippedHorizontally && !flippedVertically) {
-                rotate = 6;
-            }
-            else if (flippedHorizontally && flippedVertically) {
-                rotate = 14;
-            }
-        }
-        else {
-            rotate = 0;
-            if (!flippedHorizontally && flippedVertically) {
-                rotate = 8;
-            }
-            else if (flippedHorizontally && !flippedVertically) {
-                rotate = 12;
-            }
-            else if (flippedHorizontally && flippedVertically) {
-                rotate = 4;
-            }
-        }
-        var flippedTexture = new PIXI.Texture(unflippedTexture.baseTexture, frame, orig, trim, rotate);
-        this._textures.set(globalTileUid, flippedTexture);
-        return flippedTexture;
-    };
-    TileTextureCache.prototype._getGlobalId = function (tileId, flippedHorizontally, flippedVertically, flippedDiagonally) {
-        var globalTileUid = tileId;
-        if (flippedHorizontally) {
-            globalTileUid |= TileTextureCache.flippedHorizontallyFlag;
-        }
-        if (flippedVertically) {
-            globalTileUid |= TileTextureCache.flippedVerticallyFlag;
-        }
-        if (flippedDiagonally) {
-            globalTileUid |= TileTextureCache.flippedDiagonallyFlag;
-        }
-        return globalTileUid;
-    };
-    TileTextureCache.flippedHorizontallyFlag = 0x80000000;
-    TileTextureCache.flippedVerticallyFlag = 0x40000000;
-    TileTextureCache.flippedDiagonallyFlag = 0x20000000;
-    return TileTextureCache;
-}());
+    findTileTexture(tileId: integer, flippedHorizontally: boolean, flippedVertically: boolean, flippedDiagonally: boolean): PIXI.Texture | undefined;
+    private _getGlobalId;
+}
 
-var PixiTileMapHelper = /** @class */ (function () {
-    function PixiTileMapHelper() {
-    }
+/**
+ * An holder to share tile maps across the 2 extension objects.
+ *
+ * Every instance with the same files path in properties will
+ * share the same {@link EditableTileMap} and {@link TileTextureCache}.
+ *
+ * @see {@link TileMapRuntimeManager}
+ */
+class TileMapManager {
+    private _tileMapCache;
+    private _textureCacheCaches;
+    /**
+     *
+     */
+    constructor();
+    /**
+     * @param instanceHolder Where to set the manager instance.
+     * @returns The shared manager.
+     */
+    static getManager(instanceHolder: Object): any;
+    /**
+     * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+     * @param tilemapJsonFile
+     * @param tilesetJsonFile
+     * @param pako The zlib library.
+     * @param callback
+     */
+    getOrLoadTileMap(loadTiledMap: (tilemapJsonFile: string, tilesetJsonFile: string, callback: (tiledMap: TiledMap | null) => void) => void, tilemapJsonFile: string, tilesetJsonFile: string, pako: any, callback: (tileMap: EditableTileMap | null) => void): void;
+    /**
+     * @param loadTiledMap The method that loads the Tiled JSON file in memory.
+     * @param getTexture The method that loads the atlas image file in memory.
+     * @param atlasImageResourceName
+     * @param tilemapJsonFile
+     * @param tilesetJsonFile
+     * @param callback
+     */
+    getOrLoadTextureCache(loadTiledMap: (tilemapJsonFile: string, tilesetJsonFile: string, callback: (tiledMap: TiledMap | null) => void) => void, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>, atlasImageResourceName: string, tilemapJsonFile: string, tilesetJsonFile: string, callback: (textureCache: TileTextureCache | null) => void): void;
+}
+
+class PixiTileMapHelper {
     /**
      * Parse a Tiled map JSON file,
      * exported from Tiled (https://www.mapeditor.org/)
@@ -897,54 +684,7 @@ var PixiTileMapHelper = /** @class */ (function () {
      * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
      * @returns A textures cache.
      */
-    PixiTileMapHelper.parseAtlas = function (tiledData, atlasTexture, getTexture) {
-        if (!tiledData.tiledversion) {
-            console.warn("The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?");
-            return null;
-        }
-        // We only handle tileset embedded in the tilemap. Warn if it's not the case.
-        if (!tiledData.tilesets.length || "source" in tiledData.tilesets[0]) {
-            console.warn("The loaded Tiled map seems not to contain any tileset data (nothing in 'tilesets' key).");
-            return null;
-        }
-        var _a = tiledData.tilesets[0], tilewidth = _a.tilewidth, tileheight = _a.tileheight, tilecount = _a.tilecount; _a.tiles; var image = _a.image, columns = _a.columns, spacing = _a.spacing, margin = _a.margin;
-        if (!atlasTexture)
-            atlasTexture = getTexture(image);
-        // We try to detect what size Tiled is expecting.
-        var rows = tilecount / columns;
-        var expectedAtlasWidth = tilewidth * columns + spacing * (columns - 1) + margin * 2;
-        var expectedAtlasHeight = tileheight * rows + spacing * (rows - 1) + margin * 2;
-        if ((atlasTexture.width !== 1 && expectedAtlasWidth !== atlasTexture.width) ||
-            (atlasTexture.height !== 1 && expectedAtlasHeight !== atlasTexture.height)) {
-            var expectedSize = expectedAtlasWidth + "x" + expectedAtlasHeight;
-            var actualSize = atlasTexture.width + "x" + atlasTexture.height;
-            console.warn("It seems the atlas file was resized, which is not supported. It should be " +
-                expectedSize +
-                "px, but it's " +
-                actualSize +
-                " px.");
-            return null;
-        }
-        // Prepare the textures pointing to the base "Atlas" Texture for each tile.
-        // Note that this cache can be augmented later with rotated/flipped
-        // versions of the tile textures.
-        var textureCache = new TileTextureCache();
-        for (var frame = 0; frame < tilecount; frame++) {
-            var columnMultiplier = Math.floor(frame % columns);
-            var rowMultiplier = Math.floor(frame / columns);
-            var x = margin + columnMultiplier * (tilewidth + spacing);
-            var y = margin + rowMultiplier * (tileheight + spacing);
-            try {
-                var rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
-                var texture = new PIXI.Texture(atlasTexture, rect);
-                textureCache.setTexture(frame, false, false, false, texture);
-            }
-            catch (error) {
-                console.error("An error occurred while creating a PIXI.Texture to be used in a TileMap:", error);
-            }
-        }
-        return textureCache;
-    };
+    static parseAtlas(tiledData: TiledMap, atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null, getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>): TileTextureCache | null;
     /**
      * Re-renders the tilemap whenever its rendering settings have been changed
      *
@@ -954,69 +694,7 @@ var PixiTileMapHelper = /** @class */ (function () {
      * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
      * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
      */
-    PixiTileMapHelper.updatePixiTileMap = function (pixiTileMap, tileMap, textureCache, displayMode, layerIndex) {
-        var e_1, _a, e_2, _b;
-        if (!pixiTileMap)
-            return;
-        pixiTileMap.clear();
-        try {
-            for (var _c = __values(tileMap.getLayers()), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var layer = _d.value;
-                if ((displayMode === "index" && layerIndex !== layer.id) ||
-                    (displayMode === "visible" && !layer.isVisible())) {
-                    return;
-                }
-                if (layer instanceof EditableObjectLayer) {
-                    var objectLayer = layer;
-                    try {
-                        for (var _e = (e_2 = void 0, __values(objectLayer.objects)), _f = _e.next(); !_f.done; _f = _e.next()) {
-                            var object = _f.value;
-                            var texture = textureCache.findTileTexture(object.getTileId(), object.isFlippedHorizontally(), object.isFlippedVertically(), object.isFlippedDiagonally());
-                            if (texture) {
-                                pixiTileMap.addFrame(texture, object.x, object.y - objectLayer.tileMap.getTileHeight());
-                            }
-                        }
-                    }
-                    catch (e_2_1) { e_2 = { error: e_2_1 }; }
-                    finally {
-                        try {
-                            if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
-                        }
-                        finally { if (e_2) throw e_2.error; }
-                    }
-                }
-                else if (layer instanceof EditableTileMapLayer) {
-                    var tileLayer = layer;
-                    for (var y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
-                        for (var x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
-                            var tileWidth = tileLayer.tileMap.getTileWidth();
-                            var xPos = tileWidth * x;
-                            var yPos = tileLayer.tileMap.getTileHeight() * y;
-                            var tileId = tileLayer.get(x, y);
-                            var tileTexture = textureCache.findTileTexture(tileId, tileLayer.isFlippedHorizontally(x, y), tileLayer.isFlippedVertically(x, y), tileLayer.isFlippedDiagonally(x, y));
-                            if (tileTexture) {
-                                var pixiTilemapFrame = pixiTileMap.addFrame(tileTexture, xPos, yPos);
-                                var tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
-                                // Animated tiles have a limitation:
-                                // they are only able to use frames arranged horizontally one next
-                                // to each other on the atlas.
-                                if (tileDefinition && tileDefinition.getAnimationLength() > 0) {
-                                    pixiTilemapFrame.tileAnimX(tileWidth, tileDefinition.getAnimationLength());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-    };
+    static updatePixiTileMap(pixiTileMap: any, tileMap: EditableTileMap, textureCache: TileTextureCache, displayMode: "index" | "visible" | "all", layerIndex: number): void;
     /**
      * Re-renders the collision mask
      *
@@ -1026,165 +704,6 @@ var PixiTileMapHelper = /** @class */ (function () {
      * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
      * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
      */
-    PixiTileMapHelper.updatePixiCollisionMask = function (pixiGraphics, tileMap, displayMode, layerIndex, typeFilter, outlineSize, outlineColor, outlineOpacity, fillColor, fillOpacity) {
-        var e_3, _a, e_4, _b;
-        if (!pixiGraphics)
-            return;
-        pixiGraphics.clear();
-        try {
-            for (var _c = __values(tileMap.getLayers()), _d = _c.next(); !_d.done; _d = _c.next()) {
-                var layer = _d.value;
-                if (displayMode === "index" && layerIndex !== layer.id)
-                    return;
-                // invisible doesn't mean no collision.
-                // TODO add a "Enable" flag next to "Visible" or rename "Visible" to "Enable"?
-                var tileWidth = tileMap.getTileWidth();
-                var tileHeight = tileMap.getTileHeight();
-                if (layer instanceof EditableTileMapLayer) {
-                    var tileLayer = layer;
-                    for (var y = 0; y < tileLayer.tileMap.getDimensionY(); y++) {
-                        for (var x = 0; x < tileLayer.tileMap.getDimensionX(); x++) {
-                            var xPos = tileWidth * x;
-                            var yPos = tileHeight * y;
-                            var tileId = tileLayer.get(x, y);
-                            var isFlippedHorizontally = tileLayer.isFlippedHorizontally(x, y);
-                            var isFlippedVertically = tileLayer.isFlippedVertically(x, y);
-                            var isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
-                            var tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
-                            if (!tileDefinition || tileDefinition.getTag() !== typeFilter) {
-                                continue;
-                            }
-                            pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
-                            try {
-                                for (var _e = (e_4 = void 0, __values(tileDefinition.getHiBoxes())), _f = _e.next(); !_f.done; _f = _e.next()) {
-                                    var vertices = _f.value;
-                                    if (vertices.length === 0)
-                                        continue;
-                                    pixiGraphics.beginFill(fillColor, fillOpacity);
-                                    for (var index = 0; index < vertices.length; index++) {
-                                        var vertexX = vertices[index][0];
-                                        var vertexY = vertices[index][1];
-                                        if (isFlippedHorizontally) {
-                                            vertexX = tileWidth - vertexX;
-                                        }
-                                        if (isFlippedVertically) {
-                                            vertexY = tileHeight - vertexY;
-                                        }
-                                        if (isFlippedDiagonally) {
-                                            var swap = vertexX;
-                                            vertexX = vertexY;
-                                            vertexY = swap;
-                                        }
-                                        if (index === 0) {
-                                            pixiGraphics.moveTo(xPos + vertexX, yPos + vertexY);
-                                        }
-                                        else {
-                                            pixiGraphics.lineTo(xPos + vertexX, yPos + vertexY);
-                                        }
-                                    }
-                                    pixiGraphics.closePath();
-                                    pixiGraphics.endFill();
-                                }
-                            }
-                            catch (e_4_1) { e_4 = { error: e_4_1 }; }
-                            finally {
-                                try {
-                                    if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
-                                }
-                                finally { if (e_4) throw e_4.error; }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-    };
-    return PixiTileMapHelper;
-}());
-
-/**
- * An holder to share tile maps across the 2 extension objects.
- *
- * Every instance with the same files path in properties will
- * share the same {@link EditableTileMap} and {@link TileTextureCache}.
- *
- * @see {@link TileMapRuntimeManager}
- */
-var TileMapManager = /** @class */ (function () {
-    /**
-     *
-     */
-    function TileMapManager() {
-        this._tileMapCache = new ResourceCache();
-        this._textureCacheCaches = new ResourceCache();
-    }
-    /**
-     * @param instanceHolder Where to set the manager instance.
-     * @returns The shared manager.
-     */
-    TileMapManager.getManager = function (instanceHolder) {
-        // @ts-ignore
-        if (!instanceHolder.tileMapCollisionMaskManager) {
-            //Create the shared manager if necessary.
-            // @ts-ignore
-            instanceHolder.tileMapCollisionMaskManager = new TileMapManager();
-        }
-        // @ts-ignore
-        return instanceHolder.tileMapCollisionMaskManager;
-    };
-    /**
-     * @param loadTiledMap The method that loads the Tiled JSON file in memory.
-     * @param tilemapJsonFile
-     * @param tilesetJsonFile
-     * @param pako The zlib library.
-     * @param callback
-     */
-    TileMapManager.prototype.getOrLoadTileMap = function (loadTiledMap, tilemapJsonFile, tilesetJsonFile, pako, callback) {
-        var key = tilemapJsonFile + "|" + tilesetJsonFile;
-        this._tileMapCache.getOrLoad(key, function (callback) {
-            loadTiledMap(tilemapJsonFile, tilesetJsonFile, function (tiledMap) {
-                if (!tiledMap) {
-                    callback(null);
-                    return;
-                }
-                var collisionTileMap = TiledTileMapLoader.load(pako, tiledMap);
-                callback(collisionTileMap);
-            });
-        }, callback);
-    };
-    /**
-     * @param loadTiledMap The method that loads the Tiled JSON file in memory.
-     * @param getTexture The method that loads the atlas image file in memory.
-     * @param atlasImageResourceName
-     * @param tilemapJsonFile
-     * @param tilesetJsonFile
-     * @param callback
-     */
-    TileMapManager.prototype.getOrLoadTextureCache = function (loadTiledMap, getTexture, atlasImageResourceName, tilemapJsonFile, tilesetJsonFile, callback) {
-        var key = tilemapJsonFile + "|" + tilesetJsonFile + "|" + atlasImageResourceName;
-        this._textureCacheCaches.getOrLoad(key, function (callback) {
-            loadTiledMap(tilemapJsonFile, tilesetJsonFile, function (tiledMap) {
-                if (!tiledMap) {
-                    // loadTiledMap already log errors.
-                    callback(null);
-                    return;
-                }
-                var atlasTexture = atlasImageResourceName
-                    ? getTexture(atlasImageResourceName)
-                    : null;
-                var textureCache = PixiTileMapHelper.parseAtlas(tiledMap, atlasTexture, getTexture);
-                callback(textureCache);
-            });
-        }, callback);
-    };
-    return TileMapManager;
-}());
-
-export { EditableTileMap, EditableTileMapLayer, PixiTileMapHelper, TileDefinition, TileMapManager, TileTextureCache };
+    static updatePixiCollisionMask(pixiGraphics: PIXI.Graphics, tileMap: EditableTileMap, displayMode: "index" | "visible" | "all", layerIndex: integer, typeFilter: string, outlineSize: integer, outlineColor: integer, outlineOpacity: float, fillColor: integer, fillOpacity: float): void;
+}
+}

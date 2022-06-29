@@ -393,6 +393,10 @@ namespace gdjs {
       }
     }
 
+    onActivate() {
+      this._updateBodyFromObject();
+    }
+
     onDestroy() {
       this.onDeActivate();
     }

@@ -17,19 +17,26 @@ import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import Rating from './Rating';
 
 import {
+  breakUuid,
   updateComment,
   type Comment,
   type GameRatings,
 } from '../../Utils/GDevelopServices/Play';
+import { type Build } from '../../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 import Card from '../../UI/Card';
+import BackgroundText from '../../UI/BackgroundText';
 
-const styles = { textComment: { whiteSpace: 'pre-wrap' } };
+const styles = {
+  textComment: { whiteSpace: 'pre-wrap' },
+  backgroundText: { padding: 0, textAlign: 'left' },
+};
 
 type Props = {|
   comment: Comment,
+  build?: Build,
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};
@@ -60,6 +67,7 @@ const getRatings = (ratings: ?GameRatings) => {
 
 const FeedbackCard = ({
   comment,
+  build,
   authenticatedUser,
   onCommentUpdated,
 }: Props) => {
@@ -114,18 +122,26 @@ const FeedbackCard = ({
               )}
             </IconButton>
           }
+          header={
+            <BackgroundText style={styles.backgroundText}>
+              <Trans>{i18n.date(comment.createdAt)}</Trans>
+            </BackgroundText>
+          }
         >
           <Column noMargin>
             <Line noMargin justifyContent="space-between" alignItems="start">
               <Column noMargin>
-                <Text size="body2">
-                  <Trans>{i18n.date(comment.createdAt)}</Trans>
-                </Text>
-                <Text size="body2" noMargin>
+                {build && (
+                  <Text color="primary">
+                    {build.name || breakUuid(build.id)}
+                  </Text>
+                )}
+                <BackgroundText style={styles.backgroundText}>
                   {comment.playerName}
-                </Text>
+                </BackgroundText>
               </Column>
             </Line>
+            <Spacer />
             {ratings && (
               <ResponsiveLineStackLayout noColumnMargin expand>
                 {ratings.map(rating => (

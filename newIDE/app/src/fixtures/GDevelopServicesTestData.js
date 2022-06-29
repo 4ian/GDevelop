@@ -782,45 +782,70 @@ export const game2: Game = {
   createdAt: 1607065498,
 };
 
+/**
+ * It uses the ANSI C one because Number.MAX_SAFE_INTEGER is 2^53
+ * and this one multiply a seed of 2^15 with a multiplier of 2^32.
+ * https://en.wikipedia.org/wiki/Linear_congruential_generator
+ * The randomization is poor, but ok for placeholder values.
+ */
+class NumberGenerator {
+   	x: number;
+
+    constructor(x = 1) {
+      this.x = x % (2 ** 15);
+    }
+
+    /**
+     * @returns a number inside [0 ; 1[.
+     */
+    getNextRandomNumber(): number {
+      // Masks would more efficient but less readable.
+      this.x = ((1103515245 * this.x + 12345) % (2 ** 31)) >> 16;
+      return this.x / (2 ** 15);
+    }
+}
+
 const interpolateWithNoise = (
   leftValue: number,
   rightValue: number,
-  ratio: number
+  ratio: number,
+  numberGenerator: NumberGenerator
 ) =>
-  ((1 - ratio) * leftValue + ratio * rightValue) * (0.95 + 0.1 * Math.random());
+  ((1 - ratio) * leftValue + ratio * rightValue) * (0.95 + 0.1 * numberGenerator.getNextRandomNumber());
 
 const generateGameRollingMetricsFor364Days = () => {
+  const numberGenerator = new NumberGenerator();
   const metrics = [];
   const count = 364;
   for (let index = 0; index < count; index++) {
     const ratio = 1 - index / count;
-    const playersCount = Math.round(interpolateWithNoise(50, 250, ratio));
+    const playersCount = Math.round(interpolateWithNoise(50, 250, ratio, numberGenerator));
     metrics.push({
       date: formatISO(subDays(new Date(), index)),
 
       sessions: {
-        d0Sessions: Math.round(interpolateWithNoise(80, 350, ratio)),
+        d0Sessions: Math.round(interpolateWithNoise(80, 350, ratio, numberGenerator)),
         d0SessionsDurationTotal: Math.round(
-          interpolateWithNoise(15000, 175000, ratio)
+          interpolateWithNoise(15000, 175000, ratio, numberGenerator)
         ),
       },
       players: {
         d0Players: playersCount,
-        d0NewPlayers: Math.round(interpolateWithNoise(80, 120, ratio)),
+        d0NewPlayers: Math.round(interpolateWithNoise(80, 120, ratio, numberGenerator)),
         d0PlayersBelow60s: Math.round(
-          playersCount * interpolateWithNoise(0.8, 0.4, ratio)
+          playersCount * interpolateWithNoise(0.8, 0.4, ratio, numberGenerator)
         ),
         d0PlayersBelow180s: Math.round(
-          playersCount * interpolateWithNoise(0.9, 0.55, ratio)
+          playersCount * interpolateWithNoise(0.9, 0.55, ratio, numberGenerator)
         ),
         d0PlayersBelow300s: Math.round(
-          playersCount * interpolateWithNoise(0.95, 0.6, ratio)
+          playersCount * interpolateWithNoise(0.95, 0.6, ratio, numberGenerator)
         ),
         d0PlayersBelow600s: Math.round(
-          playersCount * interpolateWithNoise(0.98, 0.7, ratio)
+          playersCount * interpolateWithNoise(0.98, 0.7, ratio, numberGenerator)
         ),
         d0PlayersBelow900s: Math.round(
-          playersCount * Math.min(1, interpolateWithNoise(1, 0.9, ratio))
+          playersCount * Math.min(1, interpolateWithNoise(1, 0.9, ratio, numberGenerator))
         ),
       },
       retention: {

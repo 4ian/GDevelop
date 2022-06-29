@@ -1,23 +1,56 @@
 // @flow
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { I18n } from '@lingui/react';
+import { t, Trans } from '@lingui/macro';
+import { type I18n as I18nType } from '@lingui/core';
 import { differenceInCalendarDays, format } from 'date-fns';
-import { Line } from '../../UI/Grid';
-import { type Build } from '../../Utils/GDevelopServices/Build';
-import { type Game } from '../../Utils/GDevelopServices/Game';
-import { Card, CardActions, CardHeader } from '@material-ui/core';
-import BuildProgressAndActions from './BuildProgressAndActions';
-import EmptyMessage from '../../UI/EmptyMessage';
-import Chrome from '../../UI/CustomSvgIcons/Chrome';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
+import MoreVert from '@material-ui/icons/MoreVert';
+
+import { Line, LargeSpacer, Spacer, Column } from '../../UI/Grid';
+import EmptyMessage from '../../UI/EmptyMessage';
+import Chrome from '../../UI/CustomSvgIcons/Chrome';
+import Text from '../../UI/Text';
+import InfoBar from '../../UI/Messages/InfoBar';
+import IconButton from '../../UI/IconButton';
+import Copy from '../../UI/CustomSvgIcons/Copy';
+import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
+import TextField from '../../UI/TextField';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
+import Dialog from '../../UI/Dialog';
+import FlatButton from '../../UI/FlatButton';
+import RaisedButton from '../../UI/RaisedButton';
+
+import BuildProgressAndActions from './BuildProgressAndActions';
+
+import {
+  deleteBuild,
+  updateBuild,
+  type Build,
+} from '../../Utils/GDevelopServices/Build';
+import { type Game } from '../../Utils/GDevelopServices/Game';
+import { breakUuid } from '../../Utils/GDevelopServices/Play';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import BackgroundText from '../../UI/BackgroundText';
+import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../../UI/Layout';
+import Card from '../../UI/Card';
 
 const styles = {
   icon: {
-    height: 30,
-    width: 30,
-    marginRight: 5,
+    height: 16,
+    width: 16,
+    marginRight: 4,
   },
+  buildButtonIcon: { height: 16, width: 16, opacity: 0.6 },
+  openForFeedbackChip: { height: 4, width: 4, borderRadius: 4 },
+  cardContent: { flex: 1 },
+  textField: { width: '60%' },
+  circularProgress: { height: 20, width: 20 },
 };
 
 const formatBuildText = (
@@ -56,6 +89,9 @@ type Props = {|
   onGameUpdated?: Game => void,
   gameUpdating: boolean,
   setGameUpdating: boolean => void,
+  onBuildUpdated: Build => void,
+  onBuildDeleted: Build => void,
+  authenticatedUser: AuthenticatedUser,
 |};
 
 export const BuildCard = ({
@@ -64,46 +100,256 @@ export const BuildCard = ({
   onGameUpdated,
   gameUpdating,
   setGameUpdating,
+  onBuildUpdated,
+  onBuildDeleted,
+  authenticatedUser,
 }: Props) => {
+  const { getAuthorizationHeader, profile } = authenticatedUser;
+  const buildName = build.name ? build.name : breakUuid(build.id);
+  const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
     build &&
     build.type !== 'web-build' &&
     differenceInCalendarDays(Date.now(), build.updatedAt) > 6;
+
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
+  const nameInput = React.useRef<?TextField>(null);
+
+  console.log(game);
+  const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
+  const [showConfirmationDialog, setShowConfirmationDialog] = React.useState(
+    false
+  );
+  const [isEditingName, setIsEditingName] = React.useState(false);
+  const [name, setName] = React.useState(build.name || '');
+
+  const onCopyUuid = () => {
+    navigator.clipboard.writeText(build.id);
+    setShowCopiedInfoBar(true);
+  };
+
+  const onEditName = () => {
+    setIsEditingName(true);
+    nameInput.current && nameInput.current.focus();
+  };
+  const onBlurEditName = async (i18n: I18nType) => {
+    if (!profile) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setName(build.name || '');
+    } else if (trimmedName === buildName) {
+      setName(name.trim());
+    } else {
+      try {
+        setGameUpdating(true);
+        const updatedBuild = await updateBuild(
+          getAuthorizationHeader,
+          profile.id,
+          build.id,
+          {
+            name: name,
+          }
+        );
+        onBuildUpdated({
+          ...build,
+          name: updatedBuild.name,
+        });
+      } catch (error) {
+        setName(build.name || '');
+        showErrorBox({
+          message: i18n._(t`Could not update build name`),
+          rawError: error,
+          errorId: 'build-name-update-error',
+        });
+      } finally {
+        setGameUpdating(false);
+      }
+    }
+    setIsEditingName(false);
+  };
+
+  const onDeleteBuild = async (i18n: I18nType) => {
+    if (!profile) return;
+    try {
+      setGameUpdating(true);
+      await deleteBuild(getAuthorizationHeader, profile.id, build.id);
+      setGameUpdating(false);
+      setShowConfirmationDialog(false);
+      onBuildDeleted(build);
+    } catch (error) {
+      showErrorBox({
+        message: i18n._(t`Could not delete build`),
+        rawError: error,
+        errorId: 'build-delete-error',
+      });
+      setGameUpdating(false);
+      setShowConfirmationDialog(false);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader
-        title={build.id}
-        subheader={
-          <Line alignItems="center" noMargin>
-            {getIcon(build.type)}
-            <Trans>
-              {formatBuildText(build.type)} -{' '}
-              {format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}
-            </Trans>
-          </Line>
-        }
-      />
-      <CardActions>
-        <Line expand noMargin justifyContent="flex-end">
-          {!isOld && (
-            <BuildProgressAndActions
-              build={build}
-              game={game}
-              onGameUpdated={onGameUpdated}
-              gameUpdating={gameUpdating}
-              setGameUpdating={setGameUpdating}
-            />
+    <I18n>
+      {({ i18n }) => (
+        <>
+          <Card
+            isHighlighted={isOnlineBuild}
+            cardCornerAction={
+              <ElementWithMenu
+                element={
+                  <IconButton size="small" disabled={gameUpdating}>
+                    <MoreVert />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Edit build name`),
+                    click: onEditName,
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Delete build`),
+                    click: () => setShowConfirmationDialog(true),
+                  },
+                ]}
+              />
+            }
+          >
+            <Column expand noMargin>
+              <Line noMargin alignItems="start" justifyContent="space-between">
+                <Line alignItems="end">
+                  <Line noMargin alignItems="center">
+                    {getIcon(build.type)}
+                    <Text noMargin>
+                      <Trans>{formatBuildText(build.type)}</Trans>
+                    </Text>
+                  </Line>
+                  <Spacer />
+                  <BackgroundText>
+                    <Trans>
+                      {format(build.updatedAt, 'yyyy-MM-dd HH:mm:ss')}
+                    </Trans>
+                  </BackgroundText>
+                </Line>
+                {isOnlineBuild ? (
+                  <Text size="body2">
+                    <Trans>Current build online</Trans>
+                  </Text>
+                ) : (
+                  game.acceptsBuildComments &&
+                  build.type === 'web-build' && (
+                    <LineStackLayout alignItems="center" noMargin>
+                      <div
+                        style={{
+                          ...styles.openForFeedbackChip,
+                          backgroundColor: gdevelopTheme.message.valid,
+                        }}
+                      />
+                      <Text size="body2">
+                        <Trans>Build open for feedbacks</Trans>
+                      </Text>
+                    </LineStackLayout>
+                  )
+                )}
+              </Line>
+              <Spacer />
+              <Line noMargin>
+                {isEditingName ? (
+                  <Line noMargin expand>
+                    <TextField
+                      ref={nameInput}
+                      style={styles.textField}
+                      value={name}
+                      margin="none"
+                      onChange={(_, value) => setName(value)}
+                      onBlur={() => {
+                        onBlurEditName(i18n);
+                      }}
+                      hintText={buildName}
+                      disabled={gameUpdating}
+                      onKeyPress={event => {
+                        if (shouldValidate(event) && nameInput.current)
+                          nameInput.current.blur();
+                      }}
+                    />
+                    {gameUpdating && (
+                      <>
+                        <Spacer />
+                        <CircularProgress style={styles.circularProgress} />
+                      </>
+                    )}
+                  </Line>
+                ) : (
+                  <Line noMargin alignItems="baseline">
+                    <Text noMargin>{buildName}</Text>
+                  </Line>
+                )}
+              </Line>
+              <Line noMargin alignItems="center">
+                <BackgroundText>{build.id}</BackgroundText>
+                <Spacer />
+                <IconButton size="small" onClick={onCopyUuid}>
+                  <Copy style={styles.buildButtonIcon} />
+                </IconButton>
+              </Line>
+              <LargeSpacer />
+              <Line expand noMargin justifyContent="space-between">
+                {!isOld && (
+                  <BuildProgressAndActions
+                    build={build}
+                    game={game}
+                    onGameUpdated={onGameUpdated}
+                    gameUpdating={gameUpdating}
+                    setGameUpdating={setGameUpdating}
+                    onCopyToClipboard={() => setShowCopiedInfoBar(true)}
+                  />
+                )}
+                {isOld && (
+                  <EmptyMessage>
+                    <Trans>
+                      This build is old and the generated games can't be
+                      downloaded anymore.
+                    </Trans>
+                  </EmptyMessage>
+                )}
+              </Line>
+            </Column>
+          </Card>
+          <InfoBar
+            visible={showCopiedInfoBar}
+            hide={() => setShowCopiedInfoBar(false)}
+            message={<Trans>Copied to clipboard!</Trans>}
+          />
+          {showConfirmationDialog && (
+            <Dialog
+              open
+              onRequestClose={() => setShowConfirmationDialog(false)}
+              actions={[
+                <FlatButton
+                  key={'cancel-delete-build'}
+                  label={<Trans>Cancel</Trans>}
+                  onClick={() => setShowConfirmationDialog(false)}
+                  disabled={gameUpdating}
+                />,
+                <RaisedButton
+                  key={'confirm-delete-build'}
+                  label={<Trans>Confirm</Trans>}
+                  onClick={() => onDeleteBuild(i18n)}
+                  disabled={gameUpdating}
+                />,
+              ]}
+              maxWidth="xs"
+            >
+              <Column>
+                <Line>
+                  <Text>
+                    <Trans>You are about to delete this build. Continue?</Trans>
+                  </Text>
+                </Line>
+              </Column>
+            </Dialog>
           )}
-          {isOld && (
-            <EmptyMessage>
-              <Trans>
-                This build is old and the generated games can't be downloaded
-                anymore.
-              </Trans>
-            </EmptyMessage>
-          )}
-        </Line>
-      </CardActions>
-    </Card>
+        </>
+      )}
+    </I18n>
   );
 };

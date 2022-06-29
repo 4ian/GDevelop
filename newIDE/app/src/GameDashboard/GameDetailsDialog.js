@@ -44,6 +44,7 @@ import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
+import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type GamesDetailsTab =
   | 'details'
@@ -297,275 +298,303 @@ export const GameDetailsDialog = ({
     !!project && project.getProjectUuid() === game.id;
 
   return (
-    <I18n>
-      {({ i18n }) => (
-        <Dialog
-          title={
-            <span>
-              {game.gameName}
-              {' - '}
-              <Trans>Dashboard</Trans>
-            </span>
-          }
-          open
-          noMargin
-          flexColumnBody
-          fullHeight={currentTab === 'leaderboards'}
-          maxWidth="md"
-          actions={[
-            <FlatButton
-              label={<Trans>Close</Trans>}
-              disabled={isLoading}
-              onClick={onClose}
-              key="close"
-            />,
-          ]}
-          secondaryActions={[
-            <HelpButton
-              key="help"
-              helpPagePath={
-                currentTab === 'leaderboards'
-                  ? '/interface/games-dashboard/leaderboard-administration'
-                  : '/interface/games-dashboard'
+    <ResponsiveWindowMeasurer>
+      {windowWidth => (
+        <I18n>
+          {({ i18n }) => (
+            <Dialog
+              title={
+                <span>
+                  {game.gameName}
+                  {' - '}
+                  <Trans>Dashboard</Trans>
+                </span>
               }
-            />,
-          ]}
-          onRequestClose={onClose}
-          cannotBeDismissed={isLoading}
-        >
-          <Tabs value={currentTab} onChange={setCurrentTab}>
-            <Tab label={<Trans>Details</Trans>} value="details" />
-            <Tab label={<Trans>Builds</Trans>} value="builds" />
-            <Tab label={<Trans>Feedback</Trans>} value="feedback" />
-            <Tab label={<Trans>Analytics</Trans>} value="analytics" />
-            <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
-          </Tabs>
-          <Line expand>
-            {currentTab === 'leaderboards' ? (
-              <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
-            ) : null}
-            {currentTab === 'details' ? (
-              publicGameError ? (
-                <PlaceholderError onRetry={loadPublicGame}>
-                  <Trans>There was an issue getting the game details.</Trans>{' '}
-                  <Trans>
-                    Verify your internet connection or try again later.
-                  </Trans>
-                </PlaceholderError>
-              ) : !publicGame ? (
-                <PlaceholderLoader />
-              ) : (
-                <ColumnStackLayout expand>
-                  {!isGameOpenedAsProject && (
-                    <AlertMessage kind="info">
+              open
+              noMargin
+              flexColumnBody
+              fullHeight={currentTab === 'leaderboards'}
+              maxWidth="md"
+              actions={[
+                <FlatButton
+                  label={<Trans>Close</Trans>}
+                  disabled={isLoading}
+                  onClick={onClose}
+                  key="close"
+                />,
+              ]}
+              secondaryActions={[
+                <HelpButton
+                  key="help"
+                  helpPagePath={
+                    currentTab === 'leaderboards'
+                      ? '/interface/games-dashboard/leaderboard-administration'
+                      : '/interface/games-dashboard'
+                  }
+                />,
+              ]}
+              onRequestClose={onClose}
+              cannotBeDismissed={isLoading}
+            >
+              <Tabs
+                value={currentTab}
+                onChange={setCurrentTab}
+                variant={windowWidth === 'medium' ? 'scrollable' : undefined}
+              >
+                <Tab label={<Trans>Details</Trans>} value="details" />
+                <Tab label={<Trans>Builds</Trans>} value="builds" />
+                <Tab label={<Trans>Feedback</Trans>} value="feedback" />
+                <Tab label={<Trans>Analytics</Trans>} value="analytics" />
+                <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
+              </Tabs>
+              <Line expand>
+                {currentTab === 'leaderboards' ? (
+                  <LeaderboardAdmin gameId={game.id} onLoading={setIsLoading} />
+                ) : null}
+                {currentTab === 'details' ? (
+                  publicGameError ? (
+                    <PlaceholderError onRetry={loadPublicGame}>
                       <Trans>
-                        In order to update these details you have to open the
-                        game's project.
+                        There was an issue getting the game details.
                       </Trans>
-                    </AlertMessage>
-                  )}
-                  <Line alignItems="center" noMargin>
-                    <Line
-                      expand
-                      justifyContent="flex-start"
-                      alignItems="center"
-                      noMargin
-                    >
-                      {authorUsernames && (
-                        <>
-                          <Text>
-                            <Trans>Authors:</Trans>
-                          </Text>
-                          <Line noMargin>
-                            {authorUsernames.map((username, index) => (
-                              <React.Fragment key={username}>
-                                <Spacer />
-                                <Chip
-                                  size="small"
-                                  icon={
-                                    ownerUsernames &&
-                                    ownerUsernames.includes(username) ? (
-                                      <Crown />
-                                    ) : (
-                                      undefined
-                                    )
-                                  }
-                                  label={username}
-                                  color={index === 0 ? 'primary' : 'default'}
-                                />
-                              </React.Fragment>
-                            ))}
-                          </Line>
-                        </>
+                      <Trans>
+                        Verify your internet connection or try again later.
+                      </Trans>
+                    </PlaceholderError>
+                  ) : !publicGame ? (
+                    <PlaceholderLoader />
+                  ) : (
+                    <ColumnStackLayout expand>
+                      {!isGameOpenedAsProject && (
+                        <AlertMessage kind="info">
+                          <Trans>
+                            In order to update these details you have to open
+                            the game's project.
+                          </Trans>
+                        </AlertMessage>
                       )}
-                    </Line>
-                    <Line expand justifyContent="flex-end" noMargin>
-                      <Text>
-                        <Trans>
-                          Created on {i18n.date(game.createdAt * 1000)}
-                        </Trans>
-                      </Text>
-                    </Line>
-                  </Line>
-                  {(publicGame.playWithKeyboard ||
-                    publicGame.playWithGamepad ||
-                    publicGame.playWithMobile ||
-                    publicGame.categories) && (
-                    <Line alignItems="center" noMargin>
-                      <Line
-                        expand
-                        justifyContent="flex-start"
-                        alignItems="center"
-                        noMargin
-                      >
-                        {publicGame.categories &&
-                          !!publicGame.categories.length && (
+                      <Line alignItems="center" noMargin>
+                        <Line
+                          expand
+                          justifyContent="flex-start"
+                          alignItems="center"
+                          noMargin
+                        >
+                          {authorUsernames && (
                             <>
                               <Text>
-                                <Trans>Genres:</Trans>
+                                <Trans>Authors:</Trans>
                               </Text>
                               <Line noMargin>
-                                {publicGame.categories.map(
-                                  (category, index) => (
-                                    <React.Fragment key={category}>
-                                      <Spacer />
-                                      <Chip
-                                        size="small"
-                                        label={getCategoryName(category, i18n)}
-                                        color={
-                                          index === 0 ? 'primary' : 'default'
-                                        }
-                                      />
-                                    </React.Fragment>
-                                  )
-                                )}
+                                {authorUsernames.map((username, index) => (
+                                  <React.Fragment key={username}>
+                                    <Spacer />
+                                    <Chip
+                                      size="small"
+                                      icon={
+                                        ownerUsernames &&
+                                        ownerUsernames.includes(username) ? (
+                                          <Crown />
+                                        ) : (
+                                          undefined
+                                        )
+                                      }
+                                      label={username}
+                                      color={
+                                        index === 0 ? 'primary' : 'default'
+                                      }
+                                    />
+                                  </React.Fragment>
+                                ))}
                               </Line>
                             </>
                           )}
+                        </Line>
+                        <Line expand justifyContent="flex-end" noMargin>
+                          <Text>
+                            <Trans>
+                              Created on {i18n.date(game.createdAt * 1000)}
+                            </Trans>
+                          </Text>
+                        </Line>
                       </Line>
-                      <Line expand justifyContent="flex-end" noMargin>
-                        {publicGame.playWithKeyboard && <KeyboardIcon />}
-                        {publicGame.playWithGamepad && <SportsEsportsIcon />}
-                        {publicGame.playWithMobile && <SmartphoneIcon />}
-                      </Line>
-                    </Line>
-                  )}
-                  <TextField
-                    value={publicGame.gameName}
-                    readOnly
-                    fullWidth
-                    floatingLabelText={<Trans>Game name</Trans>}
-                    floatingLabelFixed={true}
-                  />
-                  <TextField
-                    value={publicGame.description || ''}
-                    readOnly
-                    fullWidth
-                    floatingLabelText={<Trans>Game description</Trans>}
-                    floatingLabelFixed={true}
-                    hintText={t`No description set.`}
-                    multiline
-                    rows={5}
-                  />
-                  <SelectField
-                    disabled
-                    fullWidth
-                    floatingLabelText={
-                      <Trans>Device orientation (for mobile)</Trans>
-                    }
-                    value={publicGame.orientation}
-                  >
-                    <SelectOption
-                      value="default"
-                      primaryText={t`Platform default`}
-                    />
-                    <SelectOption
-                      value="landscape"
-                      primaryText={t`Landscape`}
-                    />
-                    <SelectOption value="portrait" primaryText={t`Portrait`} />
-                  </SelectField>
-                  <Line noMargin justifyContent="flex-end">
-                    <FlatButton
-                      onClick={() => {
-                        const answer = Window.showConfirmDialog(
-                          "Are you sure you want to unregister this game? \n\nIt will disappear from your games dashboard and you won't get access to analytics, unless you register it again."
-                        );
-
-                        if (!answer) return;
-
-                        unregisterGame(i18n);
-                      }}
-                      label={<Trans>Unregister this game</Trans>}
-                      disabled={isGameUpdating}
-                    />
-                    <Spacer />
-                    {publicGame.publicWebBuildId && (
-                      <>
-                        <RaisedButton
+                      {(publicGame.playWithKeyboard ||
+                        publicGame.playWithGamepad ||
+                        publicGame.playWithMobile ||
+                        publicGame.categories) && (
+                        <Line alignItems="center" noMargin>
+                          <Line
+                            expand
+                            justifyContent="flex-start"
+                            alignItems="center"
+                            noMargin
+                          >
+                            {publicGame.categories &&
+                              !!publicGame.categories.length && (
+                                <>
+                                  <Text>
+                                    <Trans>Genres:</Trans>
+                                  </Text>
+                                  <Line noMargin>
+                                    {publicGame.categories.map(
+                                      (category, index) => (
+                                        <React.Fragment key={category}>
+                                          <Spacer />
+                                          <Chip
+                                            size="small"
+                                            label={getCategoryName(
+                                              category,
+                                              i18n
+                                            )}
+                                            color={
+                                              index === 0
+                                                ? 'primary'
+                                                : 'default'
+                                            }
+                                          />
+                                        </React.Fragment>
+                                      )
+                                    )}
+                                  </Line>
+                                </>
+                              )}
+                          </Line>
+                          <Line expand justifyContent="flex-end" noMargin>
+                            {publicGame.playWithKeyboard && <KeyboardIcon />}
+                            {publicGame.playWithGamepad && (
+                              <SportsEsportsIcon />
+                            )}
+                            {publicGame.playWithMobile && <SmartphoneIcon />}
+                          </Line>
+                        </Line>
+                      )}
+                      <TextField
+                        value={publicGame.gameName}
+                        readOnly
+                        fullWidth
+                        floatingLabelText={<Trans>Game name</Trans>}
+                        floatingLabelFixed={true}
+                      />
+                      <TextField
+                        value={publicGame.description || ''}
+                        readOnly
+                        fullWidth
+                        floatingLabelText={<Trans>Game description</Trans>}
+                        floatingLabelFixed={true}
+                        hintText={t`No description set.`}
+                        multiline
+                        rows={5}
+                      />
+                      <SelectField
+                        disabled
+                        fullWidth
+                        floatingLabelText={
+                          <Trans>Device orientation (for mobile)</Trans>
+                        }
+                        value={publicGame.orientation}
+                      >
+                        <SelectOption
+                          value="default"
+                          primaryText={t`Platform default`}
+                        />
+                        <SelectOption
+                          value="landscape"
+                          primaryText={t`Landscape`}
+                        />
+                        <SelectOption
+                          value="portrait"
+                          primaryText={t`Portrait`}
+                        />
+                      </SelectField>
+                      <Line noMargin justifyContent="flex-end">
+                        <FlatButton
                           onClick={() => {
                             const answer = Window.showConfirmDialog(
-                              'Are you sure you want to unpublish this game? \n\nThis will make your Liluo.io unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
+                              "Are you sure you want to unregister this game? \n\nIt will disappear from your games dashboard and you won't get access to analytics, unless you register it again."
                             );
 
                             if (!answer) return;
 
-                            unpublishGame();
+                            unregisterGame(i18n);
                           }}
-                          label={<Trans>Unpublish from Liluo.io</Trans>}
+                          label={<Trans>Unregister this game</Trans>}
                           disabled={isGameUpdating}
                         />
                         <Spacer />
-                      </>
-                    )}
-                    <RaisedButton
-                      primary
-                      onClick={() => setIsPublicGamePropertiesDialogOpen(true)}
-                      label={<Trans>Edit game details</Trans>}
-                      disabled={!isGameOpenedAsProject || isGameUpdating}
-                    />
-                  </Line>
-                  {gameUnregisterErrorText ? (
-                    <PlaceholderError kind="error">
-                      {gameUnregisterErrorText}
-                    </PlaceholderError>
-                  ) : null}
-                </ColumnStackLayout>
-              )
-            ) : null}
-            {currentTab === 'builds' ? (
-              <Builds
-                game={game}
-                authenticatedUser={authenticatedUser}
-                onGameUpdated={onGameUpdated}
-              />
-            ) : null}
-            {currentTab === 'analytics' ? (
-              <GameAnalyticsPanel game={game} publicGame={publicGame} />
-            ) : null}
-            {currentTab === 'feedback' ? (
-              <GameFeedback authenticatedUser={authenticatedUser} game={game} />
-            ) : null}
-          </Line>
-          {publicGame && project && isPublicGamePropertiesDialogOpen && (
-            <PublicGamePropertiesDialog
-              project={project}
-              publicGame={publicGame}
-              onApply={async partialGameChange => {
-                const isGameUpdated = await updateGameFromProject(
-                  partialGameChange,
-                  i18n
-                );
-                if (isGameUpdated) {
-                  setIsPublicGamePropertiesDialogOpen(false);
-                }
-              }}
-              onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
-              isLoading={isGameUpdating}
-            />
+                        {publicGame.publicWebBuildId && (
+                          <>
+                            <RaisedButton
+                              onClick={() => {
+                                const answer = Window.showConfirmDialog(
+                                  'Are you sure you want to unpublish this game? \n\nThis will make your Liluo.io unique game URL not accessible anymore. \n\nYou can decide at any time to publish it again.'
+                                );
+
+                                if (!answer) return;
+
+                                unpublishGame();
+                              }}
+                              label={<Trans>Unpublish from Liluo.io</Trans>}
+                              disabled={isGameUpdating}
+                            />
+                            <Spacer />
+                          </>
+                        )}
+                        <RaisedButton
+                          primary
+                          onClick={() =>
+                            setIsPublicGamePropertiesDialogOpen(true)
+                          }
+                          label={<Trans>Edit game details</Trans>}
+                          disabled={!isGameOpenedAsProject || isGameUpdating}
+                        />
+                      </Line>
+                      {gameUnregisterErrorText ? (
+                        <PlaceholderError kind="error">
+                          {gameUnregisterErrorText}
+                        </PlaceholderError>
+                      ) : null}
+                    </ColumnStackLayout>
+                  )
+                ) : null}
+                {currentTab === 'builds' ? (
+                  <Builds
+                    game={game}
+                    authenticatedUser={authenticatedUser}
+                    onGameUpdated={onGameUpdated}
+                  />
+                ) : null}
+                {currentTab === 'analytics' ? (
+                  <GameAnalyticsPanel game={game} publicGame={publicGame} />
+                ) : null}
+                {currentTab === 'feedback' ? (
+                  <GameFeedback
+                    i18n={i18n}
+                    authenticatedUser={authenticatedUser}
+                    game={game}
+                  />
+                ) : null}
+              </Line>
+              {publicGame && project && isPublicGamePropertiesDialogOpen && (
+                <PublicGamePropertiesDialog
+                  project={project}
+                  publicGame={publicGame}
+                  onApply={async partialGameChange => {
+                    const isGameUpdated = await updateGameFromProject(
+                      partialGameChange,
+                      i18n
+                    );
+                    if (isGameUpdated) {
+                      setIsPublicGamePropertiesDialogOpen(false);
+                    }
+                  }}
+                  onClose={() => setIsPublicGamePropertiesDialogOpen(false)}
+                  isLoading={isGameUpdating}
+                />
+              )}
+            </Dialog>
           )}
-        </Dialog>
+        </I18n>
       )}
-    </I18n>
+    </ResponsiveWindowMeasurer>
   );
 };

@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { I18n } from '@lingui/react';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -34,7 +35,15 @@ export const DefaultGameFeedback = () => {
       return [504, null];
     });
   return (
-    <GameFeedback authenticatedUser={fakeIndieAuthenticatedUser} game={game1} />
+    <I18n>
+      {({ i18n }) => (
+        <GameFeedback
+          i18n={i18n}
+          authenticatedUser={fakeIndieAuthenticatedUser}
+          game={game1}
+        />
+      )}
+    </I18n>
   );
 };
 
@@ -49,7 +58,15 @@ export const GameFeedbackOneSolvedComment = () => {
       return [504, null];
     });
   return (
-    <GameFeedback authenticatedUser={fakeIndieAuthenticatedUser} game={game1} />
+    <I18n>
+      {({ i18n }) => (
+        <GameFeedback
+          i18n={i18n}
+          authenticatedUser={fakeIndieAuthenticatedUser}
+          game={game1}
+        />
+      )}
+    </I18n>
   );
 };
 
@@ -64,7 +81,15 @@ export const GameFeedbackWithError = () => {
       return [504, null];
     });
   return (
-    <GameFeedback authenticatedUser={fakeIndieAuthenticatedUser} game={game1} />
+    <I18n>
+      {({ i18n }) => (
+        <GameFeedback
+          i18n={i18n}
+          authenticatedUser={fakeIndieAuthenticatedUser}
+          game={game1}
+        />
+      )}
+    </I18n>
   );
 };
 
@@ -79,6 +104,14 @@ export const GameFeedbackEmpty = () => {
       return [504, null];
     });
   return (
-    <GameFeedback authenticatedUser={fakeIndieAuthenticatedUser} game={game1} />
+    <I18n>
+      {({ i18n }) => (
+        <GameFeedback
+          i18n={i18n}
+          authenticatedUser={fakeIndieAuthenticatedUser}
+          game={game1}
+        />
+      )}
+    </I18n>
   );
 };

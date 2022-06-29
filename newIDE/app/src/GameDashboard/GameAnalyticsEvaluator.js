@@ -599,12 +599,14 @@ const evaluateChartData = (metrics: MergedGameMetrics[]): ChartData => {
     overPlayedDuration: [
       { duration: 0, playersCount: onlyFullyDefinedPlayersSum },
     ].concat(
-      // $FlowFixMe durationIndex can only be a number.
-      Object.values(durationIndexes).map((durationIndex: number) => ({
-        duration: durationValues[durationIndex],
-        playersCount:
-          onlyFullyDefinedPlayersSum - playersBelowSums[durationIndex],
-      }))
+      Object.keys(durationIndexes).map(name => {
+        const durationIndex = durationIndexes[name];
+        return {
+          duration: durationValues[durationIndex],
+          playersCount:
+            onlyFullyDefinedPlayersSum - playersBelowSums[durationIndex],
+        };
+      })
     ),
   };
 };

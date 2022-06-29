@@ -305,12 +305,10 @@ type ListProps = {|
 /**
  * List based on Material-UI List.
  */
-export class List extends React.Component<ListProps, {||}> {
-  render() {
-    return (
-      <MUIList style={this.props.style} dense={useDenseLists}>
-        {this.props.children}
-      </MUIList>
-    );
-  }
-}
+export const List = (props: ListProps) => {
+  return (
+    <MUIList style={props.style} dense={useDenseLists}>
+      {props.children}
+    </MUIList>
+  );
+};

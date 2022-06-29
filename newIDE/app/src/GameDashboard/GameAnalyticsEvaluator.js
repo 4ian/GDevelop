@@ -9,6 +9,9 @@ import {
 import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
 
 export type MergedGameMetrics = GameMetrics & {
+  /**
+   * The start date is not defined when only one day is merged.
+   */
   startDate: string | null,
 };
 
@@ -91,7 +94,7 @@ type ChartData = {|
   overPlayedDuration: {| duration: number, playersCount: number |}[],
 |};
 
-const emptyChartData = {
+const emptyChartData: ChartData = {
   overview: {
     viewersCount: 0,
     playersCount: 0,
@@ -121,6 +124,27 @@ const durationIndexes: { [string]: number } = {
 };
 export const durationValues = [1, 3, 5, 10, 15];
 
+const createZeroesMetric = (date: Date): GameMetrics => {
+  return {
+    date: formatISO(date),
+
+    sessions: {
+      d0Sessions: 0,
+      d0SessionsDurationTotal: 0,
+    },
+    players: {
+      d0Players: 0,
+      d0NewPlayers: 0,
+      d0PlayersBelow60s: 0,
+      d0PlayersBelow180s: 0,
+      d0PlayersBelow300s: 0,
+      d0PlayersBelow600s: 0,
+      d0PlayersBelow900s: 0,
+    },
+    retention: null,
+  };
+};
+
 /**
  * Fill the void left by the backend for days without any players.
  * @param gameMetrics concise game metrics from the backend (today first)
@@ -139,25 +163,7 @@ const fillMissingDays = (
       differenceInCalendarDays(parseISO(metric.date), previousMetricDate) < -1
     ) {
       const addedMetricDate = subDays(previousMetricDate, 1);
-      const zeroMetric: GameMetrics = {
-        date: formatISO(addedMetricDate),
-
-        sessions: {
-          d0Sessions: 0,
-          d0SessionsDurationTotal: 0,
-        },
-        players: {
-          d0Players: 0,
-          d0NewPlayers: 0,
-          d0PlayersBelow60s: 0,
-          d0PlayersBelow180s: 0,
-          d0PlayersBelow300s: 0,
-          d0PlayersBelow600s: 0,
-          d0PlayersBelow900s: 0,
-        },
-        retention: null,
-      };
-      filledGameMetrics.push(zeroMetric);
+      filledGameMetrics.push(createZeroesMetric(addedMetricDate));
       previousMetricDate = addedMetricDate;
     }
     filledGameMetrics.push(metric);
@@ -166,25 +172,7 @@ const fillMissingDays = (
   // Fill to one year
   while (filledGameMetrics.length < daysShownForYear) {
     const addedMetricDate = subDays(previousMetricDate, 1);
-    const zeroMetric: GameMetrics = {
-      date: formatISO(addedMetricDate),
-
-      sessions: {
-        d0Sessions: 0,
-        d0SessionsDurationTotal: 0,
-      },
-      players: {
-        d0Players: 0,
-        d0NewPlayers: 0,
-        d0PlayersBelow60s: 0,
-        d0PlayersBelow180s: 0,
-        d0PlayersBelow300s: 0,
-        d0PlayersBelow600s: 0,
-        d0PlayersBelow900s: 0,
-      },
-      retention: null,
-    };
-    filledGameMetrics.push(zeroMetric);
+    filledGameMetrics.push(createZeroesMetric(addedMetricDate));
     previousMetricDate = addedMetricDate;
   }
   return filledGameMetrics;
@@ -284,7 +272,7 @@ const mergeGameMetricsByWeek = (
  * @param playersBelowSums
  * @param playersCount
  * @returns the duration limit that split the players the most evenly.
- * The real median would hard to process for the backend,
+ * The real median would be hard to process for the backend,
  * so we rely on this.
  */
 const findNearestToMedianDurationIndex = (

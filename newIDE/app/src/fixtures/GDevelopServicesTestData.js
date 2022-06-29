@@ -789,20 +789,20 @@ export const game2: Game = {
  * The randomization is poor, but ok for placeholder values.
  */
 class NumberGenerator {
-   	x: number;
+  x: number;
 
-    constructor(x = 1) {
-      this.x = x % (2 ** 15);
-    }
+  constructor(x = 1) {
+    this.x = x % 2 ** 15;
+  }
 
-    /**
-     * @returns a number inside [0 ; 1[.
-     */
-    getNextRandomNumber(): number {
-      // Masks would more efficient but less readable.
-      this.x = ((1103515245 * this.x + 12345) % (2 ** 31)) >> 16;
-      return this.x / (2 ** 15);
-    }
+  /**
+   * @returns a number inside [0 ; 1[.
+   */
+  getNextRandomNumber(): number {
+    // Masks would more efficient but less readable.
+    this.x = (1103515245 * this.x + 12345) % 2 ** 31 >> 16;
+    return this.x / 2 ** 15;
+  }
 }
 
 const interpolateWithNoise = (
@@ -811,7 +811,8 @@ const interpolateWithNoise = (
   ratio: number,
   numberGenerator: NumberGenerator
 ) =>
-  ((1 - ratio) * leftValue + ratio * rightValue) * (0.95 + 0.1 * numberGenerator.getNextRandomNumber());
+  ((1 - ratio) * leftValue + ratio * rightValue) *
+  (0.95 + 0.1 * numberGenerator.getNextRandomNumber());
 
 const generateGameRollingMetricsFor364Days = () => {
   const numberGenerator = new NumberGenerator();
@@ -819,19 +820,25 @@ const generateGameRollingMetricsFor364Days = () => {
   const count = 364;
   for (let index = 0; index < count; index++) {
     const ratio = 1 - index / count;
-    const playersCount = Math.round(interpolateWithNoise(50, 250, ratio, numberGenerator));
+    const playersCount = Math.round(
+      interpolateWithNoise(50, 250, ratio, numberGenerator)
+    );
     metrics.push({
       date: formatISO(subDays(new Date(), index)),
 
       sessions: {
-        d0Sessions: Math.round(interpolateWithNoise(80, 350, ratio, numberGenerator)),
+        d0Sessions: Math.round(
+          interpolateWithNoise(80, 350, ratio, numberGenerator)
+        ),
         d0SessionsDurationTotal: Math.round(
           interpolateWithNoise(15000, 175000, ratio, numberGenerator)
         ),
       },
       players: {
         d0Players: playersCount,
-        d0NewPlayers: Math.round(interpolateWithNoise(80, 120, ratio, numberGenerator)),
+        d0NewPlayers: Math.round(
+          interpolateWithNoise(80, 120, ratio, numberGenerator)
+        ),
         d0PlayersBelow60s: Math.round(
           playersCount * interpolateWithNoise(0.8, 0.4, ratio, numberGenerator)
         ),
@@ -845,7 +852,8 @@ const generateGameRollingMetricsFor364Days = () => {
           playersCount * interpolateWithNoise(0.98, 0.7, ratio, numberGenerator)
         ),
         d0PlayersBelow900s: Math.round(
-          playersCount * Math.min(1, interpolateWithNoise(1, 0.9, ratio, numberGenerator))
+          playersCount *
+            Math.min(1, interpolateWithNoise(1, 0.9, ratio, numberGenerator))
         ),
       },
       retention: {

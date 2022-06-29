@@ -5,7 +5,7 @@ import { EditableTileMap } from "./TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 import { PixiTileMapHelper } from "./TilemapPixiHelper";
 
-import * as PIXI from "pixi.js";
+import PIXI = GlobalPIXIModule.PIXI;
 
 /**
  * An holder to share tile maps across the 2 extension objects.

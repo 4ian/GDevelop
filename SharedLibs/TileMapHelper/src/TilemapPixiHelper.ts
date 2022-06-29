@@ -7,7 +7,7 @@ import {
 } from "./TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 
-import * as PIXI from "pixi.js";
+import PIXI = GlobalPIXIModule.PIXI;
 
 export class PixiTileMapHelper {
   /**

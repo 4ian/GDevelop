@@ -1,6 +1,6 @@
 import { integer } from "./CommonTypes";
 
-import * as PIXI from "pixi.js";
+import PIXI = GlobalPIXIModule.PIXI;
 
 /**
  * A cache to access the tile images.

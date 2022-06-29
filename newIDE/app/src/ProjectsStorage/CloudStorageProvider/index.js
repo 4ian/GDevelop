@@ -3,7 +3,10 @@ import * as React from 'react';
 import { t } from '@lingui/macro';
 import Cloud from '@material-ui/icons/Cloud';
 import { type StorageProvider } from '../index';
-import { generateOnSaveProject, generateOnSaveProjectAs } from './CloudProjectWriter';
+import {
+  generateOnSaveProject,
+  generateOnSaveProjectAs,
+} from './CloudProjectWriter';
 import {
   type AppArguments,
   POSITIONAL_ARGUMENTS_KEY,

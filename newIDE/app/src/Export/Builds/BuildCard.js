@@ -46,7 +46,7 @@ const styles = {
     marginRight: 4,
   },
   buildButtonIcon: { height: 16, width: 16, opacity: 0.6 },
-  openForFeedbackChip: { height: 4, width: 4, borderRadius: 4 },
+  openForFeedbackIndicator: { height: 4, width: 4, borderRadius: 4 },
   cardContent: { flex: 1 },
   textField: { width: '60%' },
   circularProgress: { height: 20, width: 20 },
@@ -253,7 +253,7 @@ export const BuildCard = ({
                             <LineStackLayout alignItems="center" noMargin>
                               <div
                                 style={{
-                                  ...styles.openForFeedbackChip,
+                                  ...styles.openForFeedbackIndicator,
                                   backgroundColor: gdevelopTheme.message.valid,
                                 }}
                               />

@@ -3789,6 +3789,7 @@ storiesOf('ProjectManager', module)
   .add('default', () => (
     <ProjectManager
       project={testProject.project}
+      onChangeProjectName={action('onChangeProjectName')}
       onOpenExternalEvents={action('onOpenExternalEvents')}
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
@@ -3830,6 +3831,7 @@ storiesOf('ProjectManager', module)
   .add('Error in functions', () => (
     <ProjectManager
       project={testProject.project}
+      onChangeProjectName={action('onChangeProjectName')}
       onOpenExternalEvents={action('onOpenExternalEvents')}
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}

@@ -294,9 +294,11 @@ function ProjectPropertiesDialog(props: Props) {
                 </Text>
                 <PublicGameProperties
                   name={name}
-                  setName={setName}
+                  setName={newName => setName(newName.trim())}
                   description={description}
-                  setDescription={setDescription}
+                  setDescription={newDescription =>
+                    setDescription(newDescription.trim())
+                  }
                   project={project}
                   authorIds={authorIds}
                   setAuthorIds={setAuthorIds}

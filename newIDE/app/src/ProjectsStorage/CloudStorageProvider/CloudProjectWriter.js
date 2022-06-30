@@ -6,6 +6,7 @@ import {
   commitVersion,
   createCloudProject,
   getCredentialsForProject,
+  updateCloudProject,
 } from '../../Utils/GDevelopServices/Project';
 import { serializeToJSON } from '../../Utils/Serializer';
 import { initializeZipJs } from '../../Utils/Zip.js';
@@ -58,6 +59,29 @@ export const generateOnSaveProject = (
     wasSaved: true,
     fileMetadata,
   };
+};
+
+export const generateOnChangeProjectProperty = (
+  authenticatedUser: AuthenticatedUser
+) => async (
+  project: gdProject,
+  fileMetadata: FileMetadata,
+  properties: { name: string }
+) => {
+  if (!authenticatedUser) return;
+  try {
+    await updateCloudProject(
+      authenticatedUser,
+      fileMetadata.fileIdentifier,
+      properties
+    );
+  } catch (error) {
+    // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
+    console.warn(
+      'An error occurred while changing cloud project name. Ignoring.',
+      error
+    );
+  }
 };
 
 export const generateOnSaveProjectAs = (

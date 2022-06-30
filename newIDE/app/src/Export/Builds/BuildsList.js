@@ -1,19 +1,21 @@
 // @flow
 import { t, Trans } from '@lingui/macro';
-
 import * as React from 'react';
-import { type Build } from '../../Utils/GDevelopServices/Build';
-import { type Game } from '../../Utils/GDevelopServices/Game';
+
 import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Text from '../../UI/Text';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
-import { BuildCard } from './BuildCard';
 import PlaceholderError from '../../UI/PlaceholderError';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+
+import { BuildCard } from './BuildCard';
+
+import { type Build } from '../../Utils/GDevelopServices/Build';
+import { type Game } from '../../Utils/GDevelopServices/Game';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type BuildType } from '../../Utils/GDevelopServices/Build';
 
 const styles = {

@@ -73,7 +73,7 @@ export type TiledLayer = {
   compression?: string;
 
   /** Array of `unsigned`, `integer` (GIDs) or base64-encoded data. `tilelayer` only.*/
-  data: Array<integer> | string;
+  data?: Array<integer> | string;
 
   /** `topdown` (default) or `index`. `objectgroup` only. */
   draworder?: string;
@@ -82,10 +82,10 @@ export type TiledLayer = {
   encoding?: string;
 
   /** Row count. Same as map height for fixed-size maps. */
-  height: integer;
+  height?: integer;
 
   /** Incremental ID - unique across all layers */
-  id: integer;
+  id?: integer;
 
   /** Image used by this layer. `imagelayer` only. */
   image?: string;
@@ -136,7 +136,7 @@ export type TiledLayer = {
   visible: boolean;
 
   /** Column count. Same as map width for fixed-size maps. */
-  width: integer;
+  width?: integer;
 
   /** Horizontal layer offset in tiles. Always 0. */
   x: integer;
@@ -164,10 +164,10 @@ export type TiledChunk = {
 
 export type TiledObject = {
   /** Used to mark an object as an ellipse */
-  ellipse: boolean;
+  ellipse?: boolean;
 
   /** Global tile ID, only if object represents a tile */
-  gid: integer;
+  gid?: integer;
 
   /** Height in pixels. */
   height: float;
@@ -179,25 +179,25 @@ export type TiledObject = {
   name: string;
 
   /** Used to mark an object as a point */
-  point: boolean;
+  point?: boolean;
 
   /** Array of {@link TiledPoint}, in case the object is a polygon */
-  polygon: Array<TiledPoint>;
+  polygon?: Array<TiledPoint>;
 
   /** Array of {@link TiledPoint}, in case the object is a polyline */
-  polyline: Array<TiledPoint>;
+  polyline?: Array<TiledPoint>;
 
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
 
   /** Angle in degrees clockwise */
   rotation: float;
 
   /** Reference to a template file, in case object is a {@link template instance} */
-  template: string;
+  template?: string;
 
   /** Only used for text objects */
-  text: Text;
+  text?: Text;
 
   /** String assigned to type Tiledfield in editor */
   type: string;
@@ -365,7 +365,7 @@ export type TiledTransformations = {
 
 export type TiledTileDefinition = {
   /** Array of {@link TiledTiles} */
-  animation: Array<TiledTileDefinition>;
+  animation?: Array<TiledTileDefinition>;
 
   /** Local ID of the tile */
   id: integer;
@@ -374,10 +374,10 @@ export type TiledTileDefinition = {
   image?: string;
 
   /** Height of the tile image in pixels */
-  imageheight: integer;
+  imageheight?: integer;
 
   /** Width of the tile image in pixels */
-  imagewidth: integer;
+  imagewidth?: integer;
 
   /** Layer with type Tiled`objectgroup`, when collision shapes are specified (optional) */
   objectgroup?: TiledLayer;
@@ -386,7 +386,7 @@ export type TiledTileDefinition = {
   probability?: float;
 
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
 
   /** Index of terrain for each corner of tile (optional) */
   terrain?: Array<integer>;

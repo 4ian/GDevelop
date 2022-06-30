@@ -34,8 +34,8 @@ describe('GameAnalyticsEvaluator', () => {
   it('fill empty metrics', () => {
     const { yearChartData, monthChartData } = buildChartData([]);
 
-    expect(yearChartData.byDay.length).toBe(52);
-    expect(monthChartData.byDay.length).toBe(30);
+    expect(yearChartData.overTime.length).toBe(52);
+    expect(monthChartData.overTime.length).toBe(30);
   });
 
   it('fill metrics missing days', () => {
@@ -43,8 +43,8 @@ describe('GameAnalyticsEvaluator', () => {
       gameRollingMetricsWithHoles
     );
 
-    expect(yearChartData.byDay.length).toBe(52);
-    expect(monthChartData.byDay.length).toBe(30);
+    expect(yearChartData.overTime.length).toBe(52);
+    expect(monthChartData.overTime.length).toBe(30);
   });
 
   it('give the same overview statistics on year and month', () => {

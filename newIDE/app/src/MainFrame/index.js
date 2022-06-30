@@ -2062,7 +2062,10 @@ const MainFrame = (props: Props) => {
 
     let state: ?State;
     if (project) state = await loadFromProject(project, fileMetadata);
-    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+    else if (!!fileMetadata) {
+      if (storageProvider) getStorageProviderOperations(storageProvider);
+      state = await openFromFileMetadata(fileMetadata);
+    }
 
     if (!state) return;
     const { currentProject, editorTabs } = state;

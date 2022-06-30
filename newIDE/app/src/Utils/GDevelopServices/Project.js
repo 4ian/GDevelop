@@ -6,6 +6,8 @@ import {
 } from './ApiConfigs';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
+export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
+
 type CloudProject = {|
   id: string,
   name: string,
@@ -149,11 +151,15 @@ export const updateCloudProject = async (
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 
+  const cleanedAttributes = {
+    name: attributes.name.slice(0, CLOUD_PROJECT_NAME_MAX_LENGTH),
+  };
+
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.patch(
     `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
-    attributes,
+    cleanedAttributes,
     {
       headers: {
         Authorization: authorizationHeader,

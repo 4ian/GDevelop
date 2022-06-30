@@ -1,14 +1,15 @@
 // @flow
 
+import { t } from '@lingui/macro';
 import {
   getCloudProject,
   getCredentialsForProject,
   getProjectFileAsZipBlob,
 } from '../../Utils/GDevelopServices/Project';
-import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-
-import { type FileMetadata } from '../index';
 import { initializeZipJs } from '../../Utils/Zip.js';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
+import { type FileMetadata } from '..';
 
 const unzipProject = async (zippedProject: any) => {
   const zipJs: ZipJs = await initializeZipJs();
@@ -26,17 +27,22 @@ const unzipProject = async (zippedProject: any) => {
 };
 
 export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
-  fileMetadata: FileMetadata
+  fileMetadata: FileMetadata,
+  onProgress?: (progress: number, message: MessageDescriptor) => void
 ): Promise<{|
   content: Object,
 |}> => {
   const cloudProjectId = fileMetadata.fileIdentifier;
 
+  onProgress && onProgress((1 / 4) * 100, t`Fetching project metadata`);
   const cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
   if (!cloudProject) throw new Error("Cloud project couldn't be fetched.");
 
+  onProgress && onProgress((2 / 4) * 100, t`Getting cookie`);
   await getCredentialsForProject(authenticatedUser, cloudProjectId);
+  onProgress && onProgress((3 / 4) * 100, t`Downloading project`);
   const zippedSerializedProject = await getProjectFileAsZipBlob(cloudProject);
+  onProgress && onProgress((4 / 4) * 100, t`Unzipping project`);
   const serializedProject = await unzipProject(zippedSerializedProject);
 
   return {

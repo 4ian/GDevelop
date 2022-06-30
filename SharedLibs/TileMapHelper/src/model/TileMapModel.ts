@@ -44,7 +44,6 @@ export class EditableTileMap {
     // It's not meant to change and it avoid to do a copy.
     tileSet: Map<integer, TileDefinition>
   ) {
-    console.log("tile dimension: " + tileWidth + " " + tileHeight);
     this.tileWidth = tileWidth;
     this.tileHeight = tileHeight;
     this.dimX = dimX;

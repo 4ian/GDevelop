@@ -1,5 +1,5 @@
-import { integer, PolygonVertices } from "../CommonTypes";
-import { EditableTileMap, TileDefinition, TileObject } from "../TileMapModel";
+import { integer, PolygonVertices } from "../model/CommonTypes";
+import { EditableTileMap, TileDefinition, TileObject } from "../model/TileMapModel";
 import { TiledMap } from "./Tiled";
 import {
   extractTileUidFlippedStates,
@@ -20,45 +20,50 @@ export class TiledTileMapLoader {
     }
 
     const definitions = new Map<integer, TileDefinition>();
-    for (const tile of tiledMap.tilesets[0].tiles!) {
-      const polygons: PolygonVertices[] = [];
-      if (tile.objectgroup) {
-        for (const object of tile.objectgroup.objects) {
-          let polygon: PolygonVertices | null = null;
-          if (object.polygon) {
-            polygon = object.polygon.map((point) => [point.x, point.y]);
-            //TODO check that polygons are convex or split them?
+    const tiledSet = tiledMap.tilesets[0];
+    if (tiledSet.tiles) {
+      for (const tile of tiledSet.tiles) {
+        const polygons: PolygonVertices[] = [];
+        if (tile.objectgroup) {
+          for (const object of tile.objectgroup.objects) {
+            let polygon: PolygonVertices | null = null;
+            if (object.polygon) {
+              polygon = object.polygon.map((point) => [point.x, point.y]);
+              //TODO check that polygons are convex or split them?
+            }
+            // TODO handle ellipses by creating a polygon?
+            // Make an object property for the number of vertices or always create 8 ones?
+            // Will the user need the same vertices number for every ellipse?
+            else {
+              polygon = [
+                [object.x, object.y],
+                [object.x, object.y + object.height],
+                [object.x + object.width, object.y + object.height],
+                [object.x + object.width, object.y],
+              ];
+            }
+            polygons.push(polygon);
           }
-          // TODO handle ellipses by creating a polygon?
-          // Make an object property for the number of vertices or always create 8 ones?
-          // Will the user need the same vertices number for every ellipse?
-          else {
-            polygon = [
-              [object.x, object.y],
-              [object.x, object.y + object.height],
-              [object.x + object.width, object.y + object.height],
-              [object.x + object.width, object.y],
-            ];
-          }
-          polygons.push(polygon);
         }
+        definitions.set(
+          tile.id,
+          new TileDefinition(
+            polygons,
+            tile.type ? tile.type : "",
+            tile.animation ? tile.animation.length : 0
+          )
+        );
       }
-      //console.log("Definition: " + tile.id);
-      definitions.set(
-        tile.id,
-        new TileDefinition(
-          polygons,
-          tile.type ? tile.type : "",
-          tile.animation ? tile.animation.length : 0
-        )
-      );
     }
-    for (let tileId = 0; tileId < tiledMap.tilesets[0].tilecount; tileId++) {
+    for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
+      const tileId = tiledSet.firstgid + tileIndex;
       if (!definitions.has(tileId)) {
         definitions.set(tileId, new TileDefinition([], "", 0));
       }
     }
-    //console.log(definitions.size + " tiles definition");
+    if (!definitions.has(0)) {
+      definitions.set(0, new TileDefinition([], "", 0));
+    }
     const collisionTileMap = new EditableTileMap(
       tiledMap.tilewidth,
       tiledMap.tileheight,
@@ -116,7 +121,6 @@ export class TiledTileMapLoader {
               const globalTileUid = layerData[tileSlotIndex];
               // Extract the tile UID and the texture.
               const tileUid = extractTileUidFlippedStates(globalTileUid);
-              //console.log("globalTileUid: " + tileUid.id + " " + tileUid.flippedHorizontally + " " + tileUid.flippedVertically + " " + tileUid.flippedDiagonally);
               if (tileUid.id > 0) {
                 collisionTileLayer.setTile(x, y, tileUid.id - 1);
                 collisionTileLayer.setFlippedHorizontally(

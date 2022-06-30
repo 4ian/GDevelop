@@ -1,4 +1,4 @@
-import { integer } from "./CommonTypes";
+import { integer } from "../model/CommonTypes";
 
 import PIXI = GlobalPIXIModule.PIXI;
 

@@ -10,7 +10,8 @@ module.exports = function (config) {
     },
     files: [
             { pattern: "node_modules/expect.js/index.js" },
-            { pattern: "./src/**/*.ts" }
+            { pattern: "./src/tiled/**/*.ts" },
+            { pattern: "./src/model/**/*.ts" }
     ],
 	preprocessors: {
 		"**/*.ts": 'karma-typescript'
@@ -26,9 +27,14 @@ module.exports = function (config) {
 			sourceMap: true,
 			types : [
 				"mocha",
-				"expect.js"
+				"expect.js",
+				"offscreencanvas"
 			],
-			lib: ["DOM", "ES5", "ES2015"],
+			lib: ["DOM", "ES5", "ES6"],
+			"esModuleInterop": false, 
+			"downlevelIteration": true,
+			"moduleResolution": "node",
+			"allowSyntheticDefaultImports": true,
 		},
 		exclude: ["node_modules"]
 	}

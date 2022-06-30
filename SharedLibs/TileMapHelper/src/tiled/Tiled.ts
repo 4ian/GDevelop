@@ -1,4 +1,4 @@
-import { float, integer } from "../CommonTypes";
+import { float, integer } from "../model/CommonTypes";
 
 /**
  * Tiled JSON format.
@@ -14,7 +14,7 @@ export type TiledMap = {
   height: integer;
 
   /** Length of the side of a hex tile in pixels (hexagonal maps only) */
-  hexsidelength: integer;
+  hexsidelength?: integer;
 
   /** Whether the map has infinite dimensions */
   infinite: boolean;
@@ -32,16 +32,16 @@ export type TiledMap = {
   orientation: string;
 
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
 
   /** `right-down` (the default), `right-up`, `left-down` or `left-up` (currently only supported for orthogonal maps) */
   renderorder: string;
 
   /** `x` or `y` (staggered / hexagonal maps only) */
-  staggeraxis: string;
+  staggeraxis?: string;
 
   /** `odd` or `even` (staggered / hexagonal maps only) */
-  staggerindex: string;
+  staggerindex?: string;
 
   /** The Tiled version used to save the file */
   tiledversion: string;
@@ -70,16 +70,16 @@ export type TiledLayer = {
   chunks?: Array<TiledChunk>;
 
   /** `zlib`, `gzip`, `zstd` (since Tiled 1.3) or empty (default). `tilelayer` only. */
-  compression: string;
+  compression?: string;
 
   /** Array of `unsigned`, `integer` (GIDs) or base64-encoded data. `tilelayer` only.*/
   data: Array<integer> | string;
 
   /** `topdown` (default) or `index`. `objectgroup` only. */
-  draworder: string;
+  draworder?: string;
 
   /** `csv` (default) or `base64`. `tilelayer` only. */
-  encoding: string;
+  encoding?: string;
 
   /** Row count. Same as map height for fixed-size maps. */
   height: integer;
@@ -88,40 +88,40 @@ export type TiledLayer = {
   id: integer;
 
   /** Image used by this layer. `imagelayer` only. */
-  image: string;
+  image?: string;
 
   /** Array of {@link TiledLayer}. `group` only. */
-  layers: Array<TiledLayer>;
+  layers?: Array<TiledLayer>;
 
   /** Name assigned to this layer */
   name: string;
 
   /** Array of {@link TiledObject}. `objectgroup` only. */
-  objects: Array<TiledObject>;
+  objects?: Array<TiledObject>;
 
   /** Horizontal layer offset in pixels (default: 0) */
-  offsetx: float;
+  offsetx?: float;
 
   /** Vertical layer offset in pixels (default: 0) */
-  offsety: float;
+  offsety?: float;
 
   /** Value between 0 and 1 */
   opacity: float;
 
   /** Horizontal {@link parallax factor} for this layer (default: 1). (since Tiled 1.5) */
-  parallaxx: float;
+  parallaxx?: float;
 
   /** Vertical {@link parallax factor} for this layer (default: 1). (since Tiled 1.5) */
-  parallaxy: float;
+  parallaxy?: float;
 
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
 
   /** X coordinate where layer content starts (for infinite maps) */
-  startx: integer;
+  startx?: integer;
 
   /** Y coordinate where layer content starts (for infinite maps) */
-  starty: integer;
+  starty?: integer;
 
   /** Hex-formatted {@link tint color} (#RRGGBB or #AARRGGBB) that is multiplied with any graphics drawn by this layer or any child layers (optional). */
   tintcolor?: string;
@@ -282,13 +282,13 @@ export type TiledTileset = {
   name: string;
 
   /** Alignment to use for tile objects (`unspecified` (default), `topleft`, `top`, `topright`, `left`, `center`, `right`, `bottomleft`, `bottom` or `bottomright`) (since 1.4) */
-  objectalignment: string;
+  objectalignment?: string;
 
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
 
   /** The external file that contains this tilesets data */
-  source: string;
+  source?: string;
 
   /** Spacing between adjacent tiles in image (pixels) */
   spacing: integer;
@@ -327,7 +327,7 @@ export type TiledTileset = {
   version: string;
 
   /** Array of {@link TiledWangSet} (since 1.1.5) */
-  wangsets: Array<TiledWangSet>;
+  wangsets?: Array<TiledWangSet>;
 };
 
 export type TiledGrid = {

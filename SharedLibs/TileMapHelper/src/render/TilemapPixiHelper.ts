@@ -1,10 +1,10 @@
-import { integer, float } from "./CommonTypes";
-import { TiledMap } from "./tiled/Tiled";
+import { integer, float } from "../model/CommonTypes";
+import { TiledMap } from "../tiled/Tiled";
 import {
   EditableObjectLayer,
   EditableTileMap,
   EditableTileMapLayer,
-} from "./TileMapModel";
+} from "../model/TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";
 
 import PIXI = GlobalPIXIModule.PIXI;

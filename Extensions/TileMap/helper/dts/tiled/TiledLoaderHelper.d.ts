@@ -1,4 +1,4 @@
-import { integer } from '../CommonTypes';
+import { integer } from '../model/CommonTypes';
 import { TiledLayer } from './Tiled';
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string

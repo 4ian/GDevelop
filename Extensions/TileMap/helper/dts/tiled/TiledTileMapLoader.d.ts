@@ -1,4 +1,4 @@
-import { EditableTileMap } from '../TileMapModel';
+import { EditableTileMap } from '../model/TileMapModel';
 import { TiledMap } from './Tiled';
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.

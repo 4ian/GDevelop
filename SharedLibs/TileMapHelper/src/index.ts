@@ -8,13 +8,13 @@ import {
   EditableTileMap,
   EditableTileMapLayer,
   TileDefinition,
-} from "./TileMapModel";
+} from "./model/TileMapModel";
 
-import { TileMapManager } from "./TileMapManager";
-import { TileTextureCache } from "./TileTextureCache";
-import { PixiTileMapHelper } from "./TilemapPixiHelper";
+import { TileMapManager } from "./render/TileMapManager";
+import { TileTextureCache } from "./render/TileTextureCache";
+import { PixiTileMapHelper } from "./render/TilemapPixiHelper";
 
-export * from "./CommonTypes";
+export * from "./model/CommonTypes";
 
 export { EditableTileMap };
 export { EditableTileMapLayer };

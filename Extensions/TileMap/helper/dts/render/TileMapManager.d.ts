@@ -1,5 +1,5 @@
-import { TiledMap } from './tiled/Tiled';
-import { EditableTileMap } from './TileMapModel';
+import { TiledMap } from '../tiled/Tiled';
+import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
 import PIXI = GlobalPIXIModule.PIXI;
 /**

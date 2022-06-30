@@ -1,6 +1,6 @@
-import { integer, float } from './CommonTypes';
-import { TiledMap } from './tiled/Tiled';
-import { EditableTileMap } from './TileMapModel';
+import { integer, float } from '../model/CommonTypes';
+import { TiledMap } from '../tiled/Tiled';
+import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
 import PIXI = GlobalPIXIModule.PIXI;
 export declare class PixiTileMapHelper {

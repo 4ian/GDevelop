@@ -1,6 +1,7 @@
 // @flow
 import { t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import RaisedButton from '../../UI/RaisedButton';
@@ -23,6 +24,7 @@ import TextButton from '../../UI/TextButton';
 import Download from '../../UI/CustomSvgIcons/Download';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import OpenInNew from '@material-ui/icons/OpenInNew';
+import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -126,10 +128,26 @@ const BuildProgressAndActions = ({
   };
 
   const onUpdatePublicBuild = React.useCallback(
-    async (buildId: ?string) => {
+    async (buildId: ?string, i18n: I18nType) => {
       if (!profile || !game || !onGameUpdated || !setGameUpdating) return;
 
       const { id } = profile;
+      const answer = Window.showConfirmDialog(
+        buildId
+          ? i18n._(
+              t`"${build.name ||
+                shortenUuidForDisplay(
+                  build.id
+                )}" will be the new build of this game published on Liluo.io. Continue?`
+            )
+          : i18n._(
+              t`"${build.name ||
+                shortenUuidForDisplay(
+                  build.id
+                )}" will be unpublished on Liluo.io. Continue?`
+            )
+      );
+      if (!answer) return;
       try {
         setGameUpdating(true);
         const updatedGame = await updateGame(
@@ -147,7 +165,15 @@ const BuildProgressAndActions = ({
         setGameUpdating(false);
       }
     },
-    [game, getAuthorizationHeader, profile, onGameUpdated, setGameUpdating]
+    [
+      profile,
+      game,
+      onGameUpdated,
+      setGameUpdating,
+      build.name,
+      build.id,
+      getAuthorizationHeader,
+    ]
   );
 
   const isBuildPublished = !!game && game.publicWebBuildId === build.id;
@@ -250,7 +276,10 @@ const BuildProgressAndActions = ({
                       labelPosition="left"
                       toggled={isBuildPublished}
                       onToggle={() => {
-                        onUpdatePublicBuild(isBuildPublished ? null : build.id);
+                        onUpdatePublicBuild(
+                          isBuildPublished ? null : build.id,
+                          i18n
+                        );
                       }}
                       disabled={gameUpdating}
                     />

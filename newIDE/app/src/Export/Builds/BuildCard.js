@@ -21,9 +21,11 @@ import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import ElementWithMenu from '../../UI/Menu/ElementWithMenu';
 import TextField from '../../UI/TextField';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
-import Dialog from '../../UI/Dialog';
-import FlatButton from '../../UI/FlatButton';
-import RaisedButton from '../../UI/RaisedButton';
+import BackgroundText from '../../UI/BackgroundText';
+import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../../UI/Layout';
+import Card from '../../UI/Card';
+import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 import BuildProgressAndActions from './BuildProgressAndActions';
 
@@ -35,11 +37,7 @@ import {
 import { type Game } from '../../Utils/GDevelopServices/Game';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import BackgroundText from '../../UI/BackgroundText';
-import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
-import { LineStackLayout } from '../../UI/Layout';
-import Card from '../../UI/Card';
-import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import Window from '../../Utils/Window';
 
 const styles = {
   icon: {
@@ -132,9 +130,7 @@ export const BuildCard = ({
   const nameInput = React.useRef<?TextField>(null);
 
   const [showCopiedInfoBar, setShowCopiedInfoBar] = React.useState(false);
-  const [showConfirmationDialog, setShowConfirmationDialog] = React.useState(
-    false
-  );
+
   const [isEditingName, setIsEditingName] = React.useState(false);
   const [name, setName] = React.useState(build.name || '');
 
@@ -172,7 +168,9 @@ export const BuildCard = ({
       } catch (error) {
         setName(build.name || '');
         showErrorBox({
-          message: i18n._(t`Could not update build name`),
+          message: i18n._(
+            t`Could not update the build name. Verify your internet connection or try again later.`
+          ),
           rawError: error,
           errorId: 'build-name-update-error',
         });
@@ -185,20 +183,24 @@ export const BuildCard = ({
 
   const onDeleteBuild = async (i18n: I18nType) => {
     if (!profile) return;
+    const answer = Window.showConfirmDialog(
+      'You are about to delete this build. Continue?'
+    );
+    if (!answer) return;
     try {
       setGameUpdating(true);
       await deleteBuild(getAuthorizationHeader, profile.id, build.id);
       setGameUpdating(false);
-      setShowConfirmationDialog(false);
       onBuildDeleted(build);
     } catch (error) {
       showErrorBox({
-        message: i18n._(t`Could not delete build`),
+        message: i18n._(
+          t`Could not delete the build. Verify your internet connection or try again later.`
+        ),
         rawError: error,
         errorId: 'build-delete-error',
       });
       setGameUpdating(false);
-      setShowConfirmationDialog(false);
     }
   };
 
@@ -225,7 +227,7 @@ export const BuildCard = ({
                       { type: 'separator' },
                       {
                         label: i18n._(t`Delete build`),
-                        click: () => setShowConfirmationDialog(true),
+                        click: () => onDeleteBuild(i18n),
                       },
                     ]}
                   />
@@ -341,37 +343,6 @@ export const BuildCard = ({
                 hide={() => setShowCopiedInfoBar(false)}
                 message={<Trans>Copied to clipboard!</Trans>}
               />
-              {showConfirmationDialog && (
-                <Dialog
-                  open
-                  onRequestClose={() => setShowConfirmationDialog(false)}
-                  actions={[
-                    <FlatButton
-                      key={'cancel-delete-build'}
-                      label={<Trans>Cancel</Trans>}
-                      onClick={() => setShowConfirmationDialog(false)}
-                      disabled={gameUpdating}
-                    />,
-                    <RaisedButton
-                      key={'confirm-delete-build'}
-                      label={<Trans>Confirm</Trans>}
-                      onClick={() => onDeleteBuild(i18n)}
-                      disabled={gameUpdating}
-                    />,
-                  ]}
-                  maxWidth="xs"
-                >
-                  <Column>
-                    <Line>
-                      <Text>
-                        <Trans>
-                          You are about to delete this build. Continue?
-                        </Trans>
-                      </Text>
-                    </Line>
-                  </Column>
-                </Dialog>
-              )}
             </>
           )}
         </I18n>

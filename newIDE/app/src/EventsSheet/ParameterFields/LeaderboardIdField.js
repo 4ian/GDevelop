@@ -16,7 +16,7 @@ import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
-import { breakUuid } from '../../Utils/GDevelopServices/Play';
+import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 
 const getInlineParameterDisplayValue = (
@@ -99,7 +99,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 key={leaderboard.id}
                 value={`"${leaderboard.id}"`}
                 primaryText={`${leaderboard.name} ${
-                  leaderboard.id ? `(${breakUuid(leaderboard.id)})` : ''
+                  leaderboard.id
+                    ? `(${shortenUuidForDisplay(leaderboard.id)})`
+                    : ''
                 }`}
               />
             ))

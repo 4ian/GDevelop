@@ -24,3 +24,34 @@ export const DefaultFeedbackCard = () => (
     onCommentUpdated={action('onCommentUpdated')}
   />
 );
+
+export const FeedbackCardWithNamedBuild = () => (
+  <FeedbackCard
+    comment={commentUnsolved}
+    buildProperties={{
+      id: 'build-id',
+      name: 'My magnificient build',
+      isDeleted: false,
+    }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const FeedbackCardWithUnnamedBuild = () => (
+  <FeedbackCard
+    comment={commentUnsolved}
+    buildProperties={{ id: 'build-id', isDeleted: false }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);
+
+export const FeedbackCardWithDeletedBuild = () => (
+  <FeedbackCard
+    comment={commentUnsolved}
+    buildProperties={{ id: 'build-id', isDeleted: true }}
+    authenticatedUser={fakeIndieAuthenticatedUser}
+    onCommentUpdated={action('onCommentUpdated')}
+  />
+);

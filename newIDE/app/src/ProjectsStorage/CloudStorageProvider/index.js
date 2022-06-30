@@ -4,6 +4,7 @@ import { t } from '@lingui/macro';
 import Cloud from '@material-ui/icons/Cloud';
 import { type StorageProvider } from '../index';
 import {
+  generateOnChangeProjectProperty,
   generateOnSaveProject,
   generateOnSaveProjectAs,
 } from './CloudProjectWriter';
@@ -31,6 +32,7 @@ export default ({
     onOpen: generateOnOpen(authenticatedUser),
     onSaveProject: generateOnSaveProject(authenticatedUser),
     onSaveProjectAs: generateOnSaveProjectAs(authenticatedUser),
+    onChangeProjectProperty: generateOnChangeProjectProperty(authenticatedUser),
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorizations to open it.`;
     },

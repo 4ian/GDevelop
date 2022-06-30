@@ -48,7 +48,6 @@ const zipProjectAndCommitVersion = async ({
 export const generateOnSaveProject = (
   authenticatedUser: AuthenticatedUser
 ) => async (project: gdProject, fileMetadata: FileMetadata) => {
-  if (!authenticatedUser) return { wasSaved: false, fileMetadata };
   const newVersion = await zipProjectAndCommitVersion({
     authenticatedUser,
     project,
@@ -75,6 +74,13 @@ export const generateOnChangeProjectProperty = (
       fileMetadata.fileIdentifier,
       properties
     );
+    const newVersion = await zipProjectAndCommitVersion({
+      authenticatedUser,
+      project,
+      cloudProjectId: fileMetadata.fileIdentifier,
+    });
+    if (!newVersion)
+      throw new Error("Couldn't save project following property update.");
   } catch (error) {
     // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
     console.warn(

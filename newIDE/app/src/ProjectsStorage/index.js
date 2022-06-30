@@ -56,7 +56,7 @@ export type StorageProviderOperations = {|
   onChangeProjectProperty?: (
     project: gdProject,
     fileMetadata: FileMetadata,
-    properties: { name: string }, // In order to synchronize project and cloud project names.
+    properties: { name: string } // In order to synchronize project and cloud project names.
   ) => Promise<void>,
 
   // Project auto saving:

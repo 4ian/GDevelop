@@ -83,7 +83,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
-  onChangeProjectName: (string) => Promise<void>,
+  onChangeProjectName: string => Promise<void>,
   onDeleteLayout: gdLayout => void,
   onDeleteExternalEvents: gdExternalEvents => void,
   onDeleteExternalLayout: gdExternalLayout => void,
@@ -570,7 +570,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     }
 
     if (options.newName) {
-      this.props.onChangeProjectName(options.newName)
+      this.props.onChangeProjectName(options.newName);
     }
 
     this.setState({ projectPropertiesDialogOpen: false });

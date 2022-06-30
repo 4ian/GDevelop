@@ -289,7 +289,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
       .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"));
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0");
 
   obj.AddAction("AddForceAL",
                 _("Add a force (angle)"),
@@ -305,7 +306,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -323,7 +325,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -756,7 +759,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Target Object"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -776,7 +780,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectPtr", _("Rotate around this object"))
       .AddParameter("expression", _("Speed (in degrees per second)"))
       .AddParameter("expression", _("Distance (in pixels)"))
-      .AddParameter("forceMultiplier", _("Force multiplier"))
+      .AddParameter("forceMultiplier", _("Force multiplier"), "", true)
+      .SetDefaultValue("0")
       .MarkAsAdvanced();
 
   obj.AddAction("MettreAutour",

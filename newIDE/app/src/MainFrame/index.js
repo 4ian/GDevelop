@@ -1751,6 +1751,7 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
+      _showSnackMessage(i18n._(t`Saving...`));
 
       const storageProviderOperations = getStorageProviderOperations();
 

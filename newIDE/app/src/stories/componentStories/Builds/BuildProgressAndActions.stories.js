@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-import paperDecorator from '../PaperDecorator';
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
 
-import BuildProgressAndActions from '../../Export/Builds/BuildProgressAndActions';
+import BuildProgressAndActions from '../../../Export/Builds/BuildProgressAndActions';
 import {
   erroredCordovaBuild,
   pendingCordovaBuild,
@@ -14,12 +13,12 @@ import {
   completeElectronBuild,
   completeWebBuild,
   game1,
-} from '../../fixtures/GDevelopServicesTestData';
+} from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
-  title: 'Export/BuildProgressAndActions',
+  title: 'Builds/BuildProgressAndActions',
   component: BuildProgressAndActions,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Errored = () => (

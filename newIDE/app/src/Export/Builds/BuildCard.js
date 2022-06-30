@@ -33,7 +33,7 @@ import {
   type Build,
 } from '../../Utils/GDevelopServices/Build';
 import { type Game } from '../../Utils/GDevelopServices/Game';
-import { breakUuid } from '../../Utils/GDevelopServices/Play';
+import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import BackgroundText from '../../UI/BackgroundText';
 import { shouldValidate } from '../../UI/KeyboardShortcuts/InteractionKeys';
@@ -121,7 +121,7 @@ export const BuildCard = ({
   authenticatedUser,
 }: Props) => {
   const { getAuthorizationHeader, profile } = authenticatedUser;
-  const buildName = build.name ? build.name : breakUuid(build.id);
+  const buildName = build.name ? build.name : shortenUuidForDisplay(build.id);
   const isOnlineBuild = game.publicWebBuildId === build.id;
   const isOld =
     build &&

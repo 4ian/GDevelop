@@ -17,7 +17,7 @@ import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
 import Rating from './Rating';
 
 import {
-  breakUuid,
+  shortenUuidForDisplay,
   updateComment,
   type Comment,
   type GameRatings,
@@ -133,7 +133,7 @@ const FeedbackCard = ({
               <Column noMargin>
                 {build && (
                   <Text color="primary">
-                    {build.name || breakUuid(build.id)}
+                    {build.name || shortenUuidForDisplay(build.id)}
                   </Text>
                 )}
                 <BackgroundText style={styles.backgroundText}>

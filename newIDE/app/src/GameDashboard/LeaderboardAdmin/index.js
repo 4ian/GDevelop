@@ -50,7 +50,7 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
-  breakUuid,
+  shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
@@ -615,7 +615,9 @@ export const LeaderboardAdmin = ({
       avatar: <Fingerprint />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
-          <Text size="body2">{breakUuid(currentLeaderboard.id)}</Text>
+          <Text size="body2">
+            {shortenUuidForDisplay(currentLeaderboard.id)}
+          </Text>
         </Tooltip>
       ),
       secondaryText: null,

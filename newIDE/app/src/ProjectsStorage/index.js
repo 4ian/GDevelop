@@ -25,7 +25,8 @@ export type StorageProviderOperations = {|
   // Project opening:
   onOpenWithPicker?: () => Promise<?FileMetadata>,
   onOpen?: (
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    onProgress?: (progress: number, message: MessageDescriptor) => void
   ) => Promise<{|
     content: Object,
   |}>,

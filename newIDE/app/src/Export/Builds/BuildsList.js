@@ -32,7 +32,7 @@ type Props = {|
 
 type BuildFilter = BuildType | 'all-build';
 
-const selectOptionsArray: Array<{
+const buildFilterOptions: Array<{
   key: BuildFilter,
   value: BuildFilter,
   primaryText: React.Node,
@@ -124,7 +124,7 @@ const BuildsList = ({
               setBuildFilter(value);
             }}
           >
-            {selectOptionsArray.map(({ key, value, primaryText }) => (
+            {buildFilterOptions.map(({ key, value, primaryText }) => (
               <SelectOption key={key} value={value} primaryText={primaryText} />
             ))}
           </SelectField>

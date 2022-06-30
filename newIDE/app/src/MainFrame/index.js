@@ -529,6 +529,18 @@ const MainFrame = (props: Props) => {
     [state.editorTabs]
   );
 
+  const updateWindowTitle = React.useCallback(
+    () => {
+      const storageProvider = getStorageProvider();
+      if (storageProvider.internalName === 'Cloud' && !!currentProject) {
+        setCustomWindowTitle(currentProject.getName());
+      } else {
+        setCustomWindowTitle(null);
+      }
+    },
+    [currentProject, getStorageProvider]
+  );
+
   React.useEffect(
     () => {
       updateToolbar();
@@ -538,14 +550,9 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      const storageProvider = getStorageProvider();
-      if (storageProvider.internalName === 'Cloud' && !!currentProject) {
-        setCustomWindowTitle(currentProject.getName());
-      } else {
-        setCustomWindowTitle(null);
-      }
+      updateWindowTitle();
     },
-    [currentFileMetadata, getStorageProvider, currentProject]
+    [updateWindowTitle]
   );
 
   const _languageDidChange = () => {
@@ -2006,11 +2013,12 @@ const MainFrame = (props: Props) => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
     if (storageProviderOperations.onChangeProjectProperty) {
-      return storageProviderOperations.onChangeProjectProperty(
+      await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
+      updateWindowTitle();
     }
   };
 

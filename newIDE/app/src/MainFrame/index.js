@@ -249,6 +249,9 @@ const MainFrame = (props: Props) => {
       gdjsDevelopmentWatcherEnabled: false,
     }: State)
   );
+  const [customWindowTitle, setCustomWindowTitle] = React.useState<?string>(
+    null
+  );
   const toolbar = React.useRef<?ToolbarInterface>(null);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const { loginState } = authenticatedUser;
@@ -506,6 +509,18 @@ const MainFrame = (props: Props) => {
       updateToolbar();
     },
     [updateToolbar]
+  );
+
+  React.useEffect(
+    () => {
+      const storageProvider = getStorageProvider();
+      if (storageProvider.internalName === 'Cloud' && !!currentProject) {
+        setCustomWindowTitle(currentProject.getName());
+      } else {
+        setCustomWindowTitle(null);
+      }
+    },
+    [currentFileMetadata, getStorageProvider, currentProject]
   );
 
   const _languageDidChange = () => {
@@ -2125,7 +2140,10 @@ const MainFrame = (props: Props) => {
           setUpdateStatus: setUpdateStatus,
           recentProjectFiles: preferences.getRecentProjectFiles(),
         })}
-      <ProjectTitlebar fileMetadata={currentFileMetadata} />
+      <ProjectTitlebar
+        fileMetadata={currentFileMetadata}
+        customTitle={customWindowTitle}
+      />
       <Drawer
         open={projectManagerOpen}
         PaperProps={{

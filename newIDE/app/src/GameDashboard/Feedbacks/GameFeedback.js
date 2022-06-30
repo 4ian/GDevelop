@@ -284,13 +284,12 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
             {Object.keys(displayedFeedbacks).length !== 0 && (
               <ColumnStackLayout expand noMargin>
                 {Object.keys(displayedFeedbacks).map(key => (
-                  <ColumnStackLayout>
+                  <ColumnStackLayout key={key}>
                     <Spacer />
                     <Text>{sortByDate ? key : getBuildName(key)}</Text>
                     {displayedFeedbacks[key].map(
                       (comment: Comment, index: number) => (
                         <FeedbackCard
-                          key={comment.id}
                           comment={comment}
                           build={
                             buildsByIds && comment.buildId

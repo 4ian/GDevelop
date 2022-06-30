@@ -5,8 +5,6 @@ import { t, Trans } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckCircleIcon from '@material-ui/icons//CheckCircle';
 
@@ -15,22 +13,34 @@ import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import Card from '../../UI/Card';
+import BackgroundText from '../../UI/BackgroundText';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 import Rating from './Rating';
 
 import {
+  shortenUuidForDisplay,
   updateComment,
   type Comment,
   type GameRatings,
 } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
 
-const styles = { textComment: { whiteSpace: 'pre-wrap' } };
+const styles = {
+  textComment: { whiteSpace: 'pre-wrap' },
+  backgroundText: { padding: 0, textAlign: 'left' },
+};
 
+export type BuildProperties = {
+  id: string,
+  name?: string,
+  isDeleted?: boolean,
+};
 type Props = {|
   comment: Comment,
+  buildProperties?: BuildProperties,
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};
@@ -61,6 +71,7 @@ const getRatings = (ratings: ?GameRatings) => {
 
 const FeedbackCard = ({
   comment,
+  buildProperties,
   authenticatedUser,
   onCommentUpdated,
 }: Props) => {
@@ -100,41 +111,11 @@ const FeedbackCard = ({
   return (
     <I18n>
       {({ i18n }) => (
-        <Card variant="outlined" style={{ opacity: processed ? '0.5' : '1' }}>
-          <Line noMargin alignItems="start">
-            <Column expand>
-              <CardContent>
-                <Column noMargin>
-                  <Line
-                    noMargin
-                    justifyContent="space-between"
-                    alignItems="start"
-                  >
-                    <Column noMargin>
-                      <Text size="body2">
-                        <Trans>{i18n.date(comment.createdAt)}</Trans>
-                      </Text>
-                      <Text size="body2" noMargin>
-                        {comment.playerName}
-                      </Text>
-                    </Column>
-                  </Line>
-                  {ratings && (
-                    <ResponsiveLineStackLayout noColumnMargin expand>
-                      {ratings.map(rating => (
-                        <Line expand noMargin key={rating.key}>
-                          <Rating label={rating.label} value={rating.value} />
-                          <Spacer />
-                        </Line>
-                      ))}
-                    </ResponsiveLineStackLayout>
-                  )}
-                  <LargeSpacer />
-                  <Text style={styles.textComment}>{comment.text}</Text>
-                </Column>
-              </CardContent>
-            </Column>
+        <Card
+          style={{ opacity: processed ? 0.5 : 1 }}
+          cardCornerAction={
             <IconButton
+              size="small"
               tooltip={processed ? t`Unresolve` : t`Resolve`}
               onClick={() => setProcessed(!processed, i18n)}
             >
@@ -144,7 +125,47 @@ const FeedbackCard = ({
                 <CheckCircleOutlineIcon />
               )}
             </IconButton>
-          </Line>
+          }
+          header={
+            <BackgroundText style={styles.backgroundText}>
+              <Trans>{i18n.date(comment.createdAt)}</Trans>
+            </BackgroundText>
+          }
+        >
+          <Column noMargin>
+            <Line noMargin justifyContent="space-between" alignItems="start">
+              <Column noMargin>
+                {buildProperties && (
+                  <Text color="primary">
+                    {buildProperties.name ||
+                      shortenUuidForDisplay(buildProperties.id)}
+                    {buildProperties.isDeleted && (
+                      <>
+                        {' '}
+                        <Trans>(deleted)</Trans>
+                      </>
+                    )}
+                  </Text>
+                )}
+                <BackgroundText style={styles.backgroundText}>
+                  {comment.playerName}
+                </BackgroundText>
+              </Column>
+            </Line>
+            <Spacer />
+            {ratings && (
+              <ResponsiveLineStackLayout noColumnMargin expand>
+                {ratings.map(rating => (
+                  <Line expand noMargin key={rating.key}>
+                    <Rating label={rating.label} value={rating.value} />
+                    <Spacer />
+                  </Line>
+                ))}
+              </ResponsiveLineStackLayout>
+            )}
+            <LargeSpacer />
+            <Text style={styles.textComment}>{comment.text}</Text>
+          </Column>
         </Card>
       )}
     </I18n>

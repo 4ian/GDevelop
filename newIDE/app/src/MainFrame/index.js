@@ -1965,6 +1965,18 @@ const MainFrame = (props: Props) => {
     });
   };
 
+  const onChangeProjectName = async (newName: string): Promise<void> => {
+    if (!currentProject || !currentFileMetadata) return;
+    const storageProviderOperations = getStorageProviderOperations();
+    if (storageProviderOperations.onChangeProjectProperty) {
+      return storageProviderOperations.onChangeProjectProperty(
+        currentProject,
+        currentFileMetadata,
+        { name: newName }
+      );
+    }
+  };
+
   const onChooseResource: ChooseResourceFunction = (
     options: ChooseResourceOptions
   ) => {
@@ -2168,6 +2180,7 @@ const MainFrame = (props: Props) => {
         {currentProject && (
           <ProjectManager
             project={currentProject}
+            onChangeProjectName={onChangeProjectName}
             onOpenExternalEvents={openExternalEvents}
             onOpenLayout={openLayout}
             onOpenExternalLayout={openExternalLayout}

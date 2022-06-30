@@ -76,6 +76,7 @@ import {
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
@@ -336,6 +337,14 @@ const MainFrame = (props: Props) => {
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const isInitialProjectLoadingDone = React.useRef<boolean>(false);
+  const [
+    fileMetadataOpeningProgress,
+    setFileMetadataOpeningProgress,
+  ] = React.useState<?number>(null);
+  const [
+    fileMetadataOpeningMessage,
+    setFileMetadataOpeningMessage,
+  ] = React.useState<?MessageDescriptor>(null);
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -713,6 +722,14 @@ const MainFrame = (props: Props) => {
     [loadFromProject]
   );
 
+  const onFileOpeningProgress = (
+    progress: ?number,
+    message: ?MessageDescriptor
+  ) => {
+    setFileMetadataOpeningProgress(progress);
+    setFileMetadataOpeningMessage(message);
+  };
+
   const openFromFileMetadata = React.useCallback(
     (fileMetadata: FileMetadata): Promise<?State> => {
       const storageProviderOperations = getStorageProviderOperations();
@@ -776,7 +793,7 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       return delay(150)
         .then(() => checkForAutosave())
-        .then(fileMetadata => onOpen(fileMetadata))
+        .then(fileMetadata => onOpen(fileMetadata, onFileOpeningProgress))
         .catch(err => {
           // onOpen failed, tried to find again an autosave
           return checkForAutosaveAfterFailure().then(fileMetadata => {
@@ -791,6 +808,7 @@ const MainFrame = (props: Props) => {
           if (!verifyProjectContent(i18n, content)) {
             // The content is not recognized and the user was warned. Abort the opening.
             setIsLoadingProject(false);
+            onFileOpeningProgress(null, null);
             return;
           }
 
@@ -825,6 +843,7 @@ const MainFrame = (props: Props) => {
             rawError: error,
           });
           setIsLoadingProject(false);
+          onFileOpeningProgress(null, null);
           return Promise.reject(error);
         });
     },
@@ -1360,6 +1379,7 @@ const MainFrame = (props: Props) => {
         editorTabs: tabsWithSceneAndEventsEditors,
       }));
       setIsLoadingProject(false);
+      onFileOpeningProgress(null, null);
       openProjectManager(false);
     },
     [i18n, setState, state.editorTabs]
@@ -1614,6 +1634,7 @@ const MainFrame = (props: Props) => {
           editorTabs,
         })).then(() => {
           setIsLoadingProject(false);
+          onFileOpeningProgress(null, null);
           openProjectManager(true);
         });
       }
@@ -2378,7 +2399,11 @@ const MainFrame = (props: Props) => {
         })}
       </LeaderboardProvider>
       <CommandPalette ref={commandPaletteRef} />
-      <LoaderModal show={showLoader} />
+      <LoaderModal
+        show={showLoader}
+        progress={fileMetadataOpeningProgress}
+        message={fileMetadataOpeningMessage}
+      />
       <HelpFinder
         open={helpFinderDialogOpen}
         onClose={() => openHelpFinderDialog(false)}

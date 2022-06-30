@@ -11,7 +11,7 @@ import muiDecorator from '../../ThemeDecorator';
 
 export default {
   title: 'Storage Providers/Openers',
-  component: OpenFromStorageProviderDialog,
+  component: OpenFromStorageProviderDialogComponent,
   decorators: [muiDecorator],
 };
 

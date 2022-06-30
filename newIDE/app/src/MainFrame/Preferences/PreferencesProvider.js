@@ -503,6 +503,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    // Do not store recent project in preferences as they will be accessible only from user account.
+    if (newRecentFile.storageProviderName === 'Cloud') return;
+
     let recentProjectFiles = this._getRecentProjectFiles();
     const isNotNewRecentFile = recentFile =>
       JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);

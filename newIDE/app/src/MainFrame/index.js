@@ -1766,6 +1766,8 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
+      // TODO: Add condition on when to display the snack message
+      _showSnackMessage(i18n._(t`Saving...`));
 
       const storageProviderOperations = getStorageProviderOperations();
 

@@ -102,7 +102,6 @@ import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
@@ -1061,11 +1060,6 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
 storiesOf('UI Building Blocks/Background', module)
   .addDecorator(muiDecorator)
   .add('default', () => <Background>Hello world</Background>);
-
-storiesOf('UI Building Blocks/LoaderModal', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <LoaderModal show />);
 
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)

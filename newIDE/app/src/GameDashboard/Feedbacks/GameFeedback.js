@@ -18,7 +18,7 @@ import Checkbox from '../../UI/Checkbox';
 import FeedbackCard from './FeedbackCard';
 
 import {
-  breakUuid,
+  shortenUuidForDisplay,
   listComments,
   type Comment,
 } from '../../Utils/GDevelopServices/Play';
@@ -27,6 +27,11 @@ import { getBuilds, type Build } from '../../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
+
+const styles = {
+  // Make select field width not dependent on build names (name is truncated).
+  selectFieldContainer: { minWidth: 300 },
+};
 
 type Props = {|
   authenticatedUser: AuthenticatedUser,
@@ -43,7 +48,7 @@ const pushOrCreateKey = (
   key: string,
   value: Comment,
   object: { [key: string]: Array<Comment> }
-) => {
+): { [key: string]: Array<Comment> } => {
   if (!object[key]) {
     object[key] = [value];
   } else {
@@ -56,7 +61,7 @@ const groupFeedbacks = (
   i18n: I18nType,
   feedbacks: Array<Comment>,
   { build, date }: { build: boolean, date: boolean }
-) => {
+): { [buildIdOrDate: string]: Array<Comment> } => {
   const feedbacksByBuild = feedbacks.reduce((acc, feedback) => {
     if (build) {
       if (!feedback.buildId) {
@@ -80,15 +85,15 @@ const getDisplayedFeedbacks = (
   feedbacks: ?Array<Comment>,
   showUnsolved: boolean,
   sortByDate: boolean,
-  selectedBuildId: string
-) => {
+  filter: string
+): ?{ [buildIdOrDate: string]: Array<Comment> } => {
   if (!feedbacks) return null;
   let filteredFeedbacksByBuild = feedbacks;
-  if (selectedBuildId === 'game-only') {
+  if (filter === 'game-only') {
     filteredFeedbacksByBuild = feedbacks.filter(feedback => !feedback.buildId);
-  } else if (selectedBuildId) {
+  } else if (filter) {
     filteredFeedbacksByBuild = feedbacks.filter(
-      feedback => feedback.buildId === selectedBuildId
+      feedback => feedback.buildId === filter
     );
   }
 
@@ -114,7 +119,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   const [buildsByIds, setBuildsByIds] = React.useState<?{
     [id: string]: Build,
   }>(null);
-  const [selectedBuildId, setSelectedBuildId] = React.useState<string>('');
+  const [filter, setFilter] = React.useState<string>('');
   const [isErrored, setIsErrored] = React.useState(false);
 
   const displayedFeedbacks = getDisplayedFeedbacks(
@@ -122,13 +127,22 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     feedbacks,
     showUnsolved,
     sortByDate,
-    selectedBuildId
+    filter
   );
 
-  const getBuildName = (buildId: string) => {
+  const getBuildName = (buildId: string, options?: { shorten: boolean }) => {
     if (!buildsByIds) return '';
     const build = buildsByIds[buildId];
-    return build ? build.name : '';
+    const shortenedUuid = shortenUuidForDisplay(build.id);
+    if (options && options.shorten) {
+      const name = build.name;
+      return `(${shortenedUuid})${
+        name
+          ? ' ' + name.substring(0, 15) + (name.length >= 15 ? '...' : '')
+          : ''
+      }`;
+    }
+    return `(${shortenedUuid}) ${build.name || ''}`;
   };
 
   const loadFeedbacksAndBuilds = React.useCallback(
@@ -225,13 +239,13 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
               </Column>
               {buildsByIds && (
                 <Column>
-                  <div style={{ maxWidth: 350 }}>
+                  <div style={styles.selectFieldContainer}>
                     <SelectField
                       fullWidth
                       floatingLabelText={<Trans>Show</Trans>}
-                      value={selectedBuildId}
+                      value={filter}
                       onChange={(e, i, value) => {
-                        setSelectedBuildId(value);
+                        setFilter(value);
                       }}
                     >
                       <SelectOption
@@ -244,18 +258,11 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                         value={'game-only'}
                         primaryText={t`On game page only`}
                       />
-                      <SelectOption
-                        key={'game-only'}
-                        value={'game-only'}
-                        primaryText={t`verryyyyyyyyyyy long naaaaaaame`}
-                      />
                       {Object.keys(buildsByIds).map(buildId => (
                         <SelectOption
                           key={buildId}
                           value={buildId}
-                          primaryText={
-                            buildsByIds[buildId].name || breakUuid(buildId)
-                          }
+                          primaryText={getBuildName(buildId, { shorten: true })}
                         />
                       ))}
                     </SelectField>

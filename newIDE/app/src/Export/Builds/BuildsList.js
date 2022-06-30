@@ -16,6 +16,9 @@ import SelectField from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { type BuildType } from '../../Utils/GDevelopServices/Build';
 
+const styles = {
+  emptyMessageStyle: { textAlign: 'left' },
+};
 type Props = {|
   builds: ?Array<Build>,
   authenticatedUser: AuthenticatedUser,
@@ -104,7 +107,7 @@ const BuildsList = ({
     <Column noMargin expand>
       <ResponsiveLineStackLayout justifyContent="space-between">
         <Column>
-          <EmptyMessage messageStyle={{ textAlign: 'left' }}>
+          <EmptyMessage messageStyle={styles.emptyMessageStyle}>
             <Trans>
               This is the list of builds that you've done for this game. <br />
               Note that builds for mobile and desktop are available for 7 days,
@@ -113,25 +116,18 @@ const BuildsList = ({
           </EmptyMessage>
         </Column>
         <Column>
-          <div style={{ maxWidth: '350' }}>
-            <SelectField
-              fullWidth
-              floatingLabelText={<Trans>Show</Trans>}
-              value={buildFilter}
-              onChange={(e, i, value) => {
-                // $FlowFixMe - We are confident that the selected option's value is of type BuildFilter.
-                setBuildFilter(value);
-              }}
-            >
-              {selectOptionsArray.map(({ key, value, primaryText }) => (
-                <SelectOption
-                  key={key}
-                  value={value}
-                  primaryText={primaryText}
-                />
-              ))}
-            </SelectField>
-          </div>
+          <SelectField
+            floatingLabelText={<Trans>Show</Trans>}
+            value={buildFilter}
+            onChange={(e, i, value) => {
+              // $FlowFixMe - We are confident that the selected option's value is of type BuildFilter.
+              setBuildFilter(value);
+            }}
+          >
+            {selectOptionsArray.map(({ key, value, primaryText }) => (
+              <SelectOption key={key} value={value} primaryText={primaryText} />
+            ))}
+          </SelectField>
         </Column>
       </ResponsiveLineStackLayout>
       <Line>

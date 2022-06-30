@@ -522,15 +522,19 @@ const MainFrame = (props: Props) => {
 
   React.useEffect(
     () => {
-      const storageProvider = getStorageProvider();
-      if (storageProvider.internalName === 'Cloud' && !!currentProject) {
-        setCustomWindowTitle(currentProject.getName());
-      } else {
-        setCustomWindowTitle(null);
-      }
+      updateWindowTitle();
     },
     [currentFileMetadata, getStorageProvider, currentProject]
   );
+
+  const updateWindowTitle = () => {
+    const storageProvider = getStorageProvider();
+    if (storageProvider.internalName === 'Cloud' && !!currentProject) {
+      setCustomWindowTitle(currentProject.getName());
+    } else {
+      setCustomWindowTitle(null);
+    }
+  };
 
   const _languageDidChange = () => {
     // A change in the language will automatically be applied
@@ -1983,11 +1987,12 @@ const MainFrame = (props: Props) => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
     if (storageProviderOperations.onChangeProjectProperty) {
-      return storageProviderOperations.onChangeProjectProperty(
+      await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
+      updateWindowTitle();
     }
   };
 

@@ -19,7 +19,7 @@ import {
 } from '../../../fixtures/GDevelopServicesTestData';
 
 export default {
-  title: 'Storage Providers/Writers',
+  title: 'Storage Providers/Writers/SaveToStorageProviderDialog',
   component: SaveToStorageProviderDialog,
   decorators: [muiDecorator],
 };

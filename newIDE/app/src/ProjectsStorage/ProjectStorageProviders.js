@@ -140,7 +140,6 @@ const ProjectStorageProviders = (props: Props) => {
     () => {
       const { current: storageProvider } = currentStorageProvider;
       if (!storageProvider) return;
-      console.log('recreating operations');
       storageProviderOperations.current = storageProvider.createOperations({
         setDialog,
         closeDialog,

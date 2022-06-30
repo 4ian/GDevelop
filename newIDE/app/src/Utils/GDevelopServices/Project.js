@@ -141,6 +141,29 @@ export const getCloudProject = async (
   return response.data;
 };
 
+export const updateCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  attributes: { name: string }
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.patch(
+    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
+    attributes,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const getProjectFileAsZipBlob = async (
   cloudProject: CloudProject
 ): Promise<Blob> => {

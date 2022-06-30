@@ -33,7 +33,7 @@ const styles = {
   backgroundText: { padding: 0, textAlign: 'left' },
 };
 
-export type BuildProperties = {
+type BuildProperties = {
   id: string,
   name?: string,
   isDeleted?: boolean,

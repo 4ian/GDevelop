@@ -15,7 +15,7 @@ import {
 import PlaceholderError from '../../UI/PlaceholderError';
 import Checkbox from '../../UI/Checkbox';
 
-import FeedbackCard, { type BuildProperties } from './FeedbackCard';
+import FeedbackCard from './FeedbackCard';
 
 import {
   shortenUuidForDisplay,
@@ -203,9 +203,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     });
   };
 
-  const getBuildPropertiesForComment = (
-    comment: Comment
-  ): BuildProperties | undefined => {
+  const getBuildPropertiesForComment = (comment: Comment) => {
     if (!comment.buildId) return undefined;
     if (!buildsByIds) return { id: comment.buildId };
     const build = buildsByIds[comment.buildId];

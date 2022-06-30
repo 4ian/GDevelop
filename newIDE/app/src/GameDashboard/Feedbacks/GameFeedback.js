@@ -15,7 +15,7 @@ import {
 import PlaceholderError from '../../UI/PlaceholderError';
 import Checkbox from '../../UI/Checkbox';
 
-import FeedbackCard from './FeedbackCard';
+import FeedbackCard, { type BuildProperties } from './FeedbackCard';
 
 import {
   shortenUuidForDisplay,
@@ -130,19 +130,34 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
     filter
   );
 
-  const getBuildName = (buildId: string, options?: { shorten: boolean }) => {
-    if (!buildsByIds) return '';
+  const getBuildNameOption = (buildId: string) => {
+    const shortenedUuid = shortenUuidForDisplay(buildId);
+    if (!buildsByIds) return shortenedUuid;
+
     const build = buildsByIds[buildId];
-    const shortenedUuid = shortenUuidForDisplay(build.id);
-    if (options && options.shorten) {
-      const name = build.name;
-      return `(${shortenedUuid})${
-        name
-          ? ' ' + name.substring(0, 15) + (name.length >= 15 ? '...' : '')
-          : ''
-      }`;
-    }
-    return `(${shortenedUuid}) ${build.name || ''}`;
+
+    const name = build.name;
+    return name
+      ? `${name.substring(0, 15)}${
+          name.length >= 15 ? '...' : ''
+        } (${shortenedUuid})`
+      : shortenedUuid;
+  };
+
+  const getBuildNameTitle = (groupKey: string) => {
+    if (groupKey === 'game-only') return '';
+    const shortenedUuid = shortenUuidForDisplay(groupKey);
+    if (!buildsByIds) return shortenedUuid;
+
+    const build = buildsByIds[groupKey];
+    if (!build)
+      return (
+        <>
+          {`${shortenedUuid} `}
+          <Trans>(deleted)</Trans>
+        </>
+      );
+    return build.name ? `${build.name} (${shortenedUuid})` : shortenedUuid;
   };
 
   const loadFeedbacksAndBuilds = React.useCallback(
@@ -186,6 +201,20 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
       newFeedbacks[updatedFeedbackIndex] = updatedComment;
       return newFeedbacks;
     });
+  };
+
+  const getBuildPropertiesForComment = (
+    comment: Comment
+  ): BuildProperties | undefined => {
+    if (!comment.buildId) return undefined;
+    if (!buildsByIds) return { id: comment.buildId };
+    const build = buildsByIds[comment.buildId];
+    if (!build) return { id: comment.buildId, isDeleted: true };
+    return {
+      id: build.id,
+      name: build.name,
+      isDeleted: false,
+    };
   };
 
   React.useEffect(
@@ -258,13 +287,15 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                         value={'game-only'}
                         primaryText={t`On game page only`}
                       />
-                      {Object.keys(buildsByIds).map(buildId => (
-                        <SelectOption
-                          key={buildId}
-                          value={buildId}
-                          primaryText={getBuildName(buildId, { shorten: true })}
-                        />
-                      ))}
+                      {Object.keys(buildsByIds).map(buildId => {
+                        return (
+                          <SelectOption
+                            key={buildId}
+                            value={buildId}
+                            primaryText={getBuildNameOption(buildId)}
+                          />
+                        );
+                      })}
                     </SelectField>
                   </div>
                 </Column>
@@ -286,16 +317,15 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                 {Object.keys(displayedFeedbacks).map(key => (
                   <ColumnStackLayout key={key}>
                     <Spacer />
-                    <Text>{sortByDate ? key : getBuildName(key)}</Text>
+                    <Text>{sortByDate ? key : getBuildNameTitle(key)}</Text>
                     {displayedFeedbacks[key].map(
                       (comment: Comment, index: number) => (
                         <FeedbackCard
+                          key={comment.id}
                           comment={comment}
-                          build={
-                            buildsByIds && comment.buildId
-                              ? buildsByIds[comment.buildId]
-                              : undefined
-                          }
+                          buildProperties={getBuildPropertiesForComment(
+                            comment
+                          )}
                           authenticatedUser={authenticatedUser}
                           onCommentUpdated={onCommentUpdated}
                         />

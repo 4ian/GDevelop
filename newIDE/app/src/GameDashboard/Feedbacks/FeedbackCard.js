@@ -13,6 +13,9 @@ import Text from '../../UI/Text';
 import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
 import GDevelopThemeContext from '../../UI/Theme/ThemeContext';
+import Card from '../../UI/Card';
+import BackgroundText from '../../UI/BackgroundText';
+import { showErrorBox } from '../../UI/Messages/MessageBox';
 
 import Rating from './Rating';
 
@@ -22,21 +25,22 @@ import {
   type Comment,
   type GameRatings,
 } from '../../Utils/GDevelopServices/Play';
-import { type Build } from '../../Utils/GDevelopServices/Build';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
-import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { useOptimisticState } from '../../Utils/UseOptimisticState';
-import Card from '../../UI/Card';
-import BackgroundText from '../../UI/BackgroundText';
 
 const styles = {
   textComment: { whiteSpace: 'pre-wrap' },
   backgroundText: { padding: 0, textAlign: 'left' },
 };
 
+export type BuildProperties = {
+  id: string,
+  name?: string,
+  isDeleted?: boolean,
+};
 type Props = {|
   comment: Comment,
-  build?: Build,
+  buildProperties?: BuildProperties,
   authenticatedUser: AuthenticatedUser,
   onCommentUpdated: (comment: Comment) => void,
 |};
@@ -67,7 +71,7 @@ const getRatings = (ratings: ?GameRatings) => {
 
 const FeedbackCard = ({
   comment,
-  build,
+  buildProperties,
   authenticatedUser,
   onCommentUpdated,
 }: Props) => {
@@ -131,9 +135,16 @@ const FeedbackCard = ({
           <Column noMargin>
             <Line noMargin justifyContent="space-between" alignItems="start">
               <Column noMargin>
-                {build && (
+                {buildProperties && (
                   <Text color="primary">
-                    {build.name || shortenUuidForDisplay(build.id)}
+                    {buildProperties.name ||
+                      shortenUuidForDisplay(buildProperties.id)}
+                    {buildProperties.isDeleted && (
+                      <>
+                        {' '}
+                        <Trans>(deleted)</Trans>
+                      </>
+                    )}
                   </Text>
                 )}
                 <BackgroundText style={styles.backgroundText}>

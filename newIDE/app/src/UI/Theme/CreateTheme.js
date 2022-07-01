@@ -27,9 +27,8 @@ export function getMuiOverrides(
 ) {
   return {
     MuiTypography: {
-      h5: {
-        // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: 600,
+      h4: {
+        fontWeight: 800,
       },
       h6: {
         // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
@@ -238,6 +237,7 @@ export function createGdevelopTheme({
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
         primary: styles['ThemePrimaryColor'],
+        secondary: styles['ThemeSecondaryColor'],
       },
       message: {
         warning: styles['ThemeMessageWarningColor'],
@@ -251,6 +251,14 @@ export function createGdevelopTheme({
       text: {
         highlighted: {
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
+        },
+      },
+      home: {
+        header: {
+          backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        },
+        separator: {
+          color: styles['ThemeHomeSeparatorColor'],
         },
       },
       dropIndicator: {

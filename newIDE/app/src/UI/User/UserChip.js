@@ -2,18 +2,13 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { makeStyles } from '@material-ui/core';
-import Chip from '../../UI/Chip';
-import FaceIcon from '@material-ui/icons/Face';
+import Person from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { getGravatarUrl } from '../GravatarUrl';
 import DotBadge from '../DotBadge';
-
-type Props = {|
-  profile: ?Profile,
-  onClick: () => void,
-  displayNotificationBadge: boolean,
-|};
+import RaisedButton from '../RaisedButton';
+import { shortenString } from '../../Utils/StringHelpers';
 
 const useStyles = makeStyles({
   root: { flexDirection: 'column' },
@@ -23,36 +18,49 @@ const useStyles = makeStyles({
   },
 });
 
+const styles = {
+  avatar: {
+    width: 25,
+    height: 25,
+  },
+};
+
+type Props = {|
+  profile: ?Profile,
+  onClick: () => void,
+  displayNotificationBadge: boolean,
+|};
+
 const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
   const classes = useStyles();
+  const label = profile ? profile.username || profile.email : undefined;
+  const shortenedLabel = label ? shortenString(label, 20) : undefined;
   return (
     <DotBadge
       overlap="circle"
       invisible={!displayNotificationBadge}
       classes={classes}
     >
-      <Chip
-        variant="outlined"
-        avatar={
-          profile ? (
-            <Avatar
-              src={getGravatarUrl(profile.email || '', { size: 30 })}
-              sx={{ width: 30, height: 30 }}
-            />
-          ) : (
-            <FaceIcon />
-          )
-        }
+      <RaisedButton
         label={
-          profile ? (
-            profile.username || profile.email
-          ) : (
+          shortenedLabel || (
             <span>
-              <Trans>Click to connect</Trans>
+              <Trans>Create account - Sign in</Trans>
             </span>
           )
         }
         onClick={onClick}
+        primary
+        icon={
+          profile ? (
+            <Avatar
+              src={getGravatarUrl(profile.email || '', { size: 50 })}
+              style={styles.avatar}
+            />
+          ) : (
+            <Person style={styles.avatar} />
+          )
+        }
       />
     </DotBadge>
   );

@@ -192,6 +192,13 @@
           "value": "#21252B"
         }
       }
+    },
+    "home": {
+      "separator": {
+        "color": {
+          "value": "#494952"
+        }
+      }
     }
   },
   "input": {

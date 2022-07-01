@@ -6,7 +6,7 @@ type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: 'body' | 'body2' | 'title' | 'bold-title',
+  size?: 'body' | 'body2' | 'title' | 'bold-title' | 'main-title',
   /** Color of the text */
   color?: 'error' | 'primary' | 'secondary',
   /** The text alignment. */
@@ -63,7 +63,7 @@ const Text = React.forwardRef<Props, Interface>(
     <Typography
       variant={
         size === 'bold-title'
-          ? 'h5'
+          ? 'h4'
           : size === 'title'
           ? 'h6'
           : size === 'body2'

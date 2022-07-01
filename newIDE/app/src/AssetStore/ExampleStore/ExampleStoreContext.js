@@ -131,7 +131,8 @@ export const ExampleStoreStateProvider = ({
     exampleShortHeadersById,
     searchText,
     chosenCategory,
-    chosenFilters
+    chosenFilters,
+    { withoutShuffling: true }
   );
 
   const exampleStoreState = React.useMemo(

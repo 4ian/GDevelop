@@ -4,7 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
-import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
+import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
@@ -361,7 +361,7 @@ export const AssetStore = ({
                           <IconButton
                             onClick={() => setIsFiltersPanelOpen(false)}
                           >
-                            <DoubleChevronArrow />
+                            <DoubleChevronArrowLeft />
                           </IconButton>
                         </Line>
                         <Line

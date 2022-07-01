@@ -44,6 +44,7 @@ import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
 import { GameAnalyticsPanel } from './GameAnalyticsPanel';
 import GameFeedback from './Feedbacks/GameFeedback';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type GamesDetailsTab =
   | 'details'
@@ -87,6 +88,8 @@ export const GameDetailsDialog = ({
     isPublicGamePropertiesDialogOpen,
     setIsPublicGamePropertiesDialogOpen,
   ] = React.useState(false);
+
+  const windowWidth = useResponsiveWindowWidth();
 
   const loadPublicGame = React.useCallback(
     async () => {
@@ -333,7 +336,11 @@ export const GameDetailsDialog = ({
           onRequestClose={onClose}
           cannotBeDismissed={isLoading}
         >
-          <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            variant={windowWidth !== 'large' ? 'scrollable' : undefined}
+          >
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
             <Tab label={<Trans>Feedback</Trans>} value="feedback" />
@@ -544,7 +551,11 @@ export const GameDetailsDialog = ({
               <GameAnalyticsPanel game={game} />
             ) : null}
             {currentTab === 'feedback' ? (
-              <GameFeedback authenticatedUser={authenticatedUser} game={game} />
+              <GameFeedback
+                i18n={i18n}
+                authenticatedUser={authenticatedUser}
+                game={game}
+              />
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

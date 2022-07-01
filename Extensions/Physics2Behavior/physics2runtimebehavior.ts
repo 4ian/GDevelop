@@ -399,6 +399,9 @@ namespace gdjs {
     }
 
     onActivate() {
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
       this._updateBodyFromObject();
     }
 

@@ -31,7 +31,11 @@ export default ({
   createOperations: ({ setDialog, closeDialog, authenticatedUser }) => ({
     onOpen: generateOnOpen(authenticatedUser),
     onSaveProject: generateOnSaveProject(authenticatedUser),
-    onSaveProjectAs: generateOnSaveProjectAs(authenticatedUser),
+    onSaveProjectAs: generateOnSaveProjectAs(
+      authenticatedUser,
+      setDialog,
+      closeDialog
+    ),
     onChangeProjectProperty: generateOnChangeProjectProperty(authenticatedUser),
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorizations to open it.`;

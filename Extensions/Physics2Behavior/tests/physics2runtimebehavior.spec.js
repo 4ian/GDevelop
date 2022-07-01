@@ -106,7 +106,7 @@ function createObject(runtimeScene, behaviorProperties) {
 }
 
 describe('Physics2RuntimeBehavior', () => {
-  describe.only('Behavior activation and reactivation', () => {
+  describe('Behavior activation and reactivation', () => {
     let runtimeGame;
     let runtimeScene;
     beforeEach(() => {

@@ -41,6 +41,7 @@ const SaveToStorageProviderDialog = ({
           .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
           .map(storageProvider => (
             <StorageProviderListItem
+              key={storageProvider.internalName}
               onChooseProvider={onChooseProvider}
               storageProvider={storageProvider}
             />

@@ -1764,7 +1764,7 @@ const MainFrame = (props: Props) => {
   );
 
   const saveProjectAsWithStorageProvider = React.useCallback(
-    () => {
+    (isSameStorageProvider?: boolean) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
@@ -1786,7 +1786,9 @@ const MainFrame = (props: Props) => {
       }
       setIsSavingProject(true);
 
-      onSaveProjectAs(currentProject, currentFileMetadata)
+      onSaveProjectAs(currentProject, currentFileMetadata, {
+        isSameStorageProvider,
+      })
         .then(
           ({ wasSaved, fileMetadata }) => {
             if (wasSaved) {
@@ -2549,9 +2551,13 @@ const MainFrame = (props: Props) => {
           onClose={() => openSaveToStorageProviderDialog(false)}
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
+            const currentStorageProvider = getStorageProvider();
             openSaveToStorageProviderDialog(false);
             props.getStorageProviderOperations(storageProvider);
-            saveProjectAsWithStorageProvider();
+            saveProjectAsWithStorageProvider(
+              storageProvider.internalName ===
+                currentStorageProvider.internalName
+            );
           }}
         />
       )}

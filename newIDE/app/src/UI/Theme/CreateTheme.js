@@ -209,12 +209,6 @@ export function getMuiOverrides(
         flexGrow: 0,
       },
     },
-    MuiCardContent: {
-      root: {
-        padding: 32,
-        paddingTop: 8,
-      },
-    },
   };
 }
 
@@ -243,6 +237,7 @@ export function createGdevelopTheme({
       palette: {
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        primary: styles['ThemePrimaryColor'],
       },
       message: {
         warning: styles['ThemeMessageWarningColor'],

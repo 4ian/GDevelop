@@ -4,15 +4,14 @@ import { I18n } from '@lingui/react';
 import * as React from 'react';
 import { type I18n as I18nType } from '@lingui/core';
 
-import { Card, Chip } from '@material-ui/core';
+import { Chip } from '@material-ui/core';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
 import ShareIcon from '@material-ui/icons/Share';
 import MoreVert from '@material-ui/icons/MoreVert';
 
 import { Column, Line, Spacer } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
-import { ResponsiveLineStackLayout } from '../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../UI/Layout';
 import FlatButton from '../UI/FlatButton';
 import IconButton from '../UI/IconButton';
 import Text from '../UI/Text';
@@ -30,9 +29,9 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import Window from '../Utils/Window';
 import { type GamesDetailsTab } from './GameDetailsDialog';
-import Dialog from '../UI/Dialog';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import BackgroundText from '../UI/BackgroundText';
+import Card from '../UI/Card';
 
 type Props = {|
   game: Game,
@@ -48,46 +47,34 @@ type TogglableProperties =
 
 const confirmationMessage = {
   discoverable: {
-    true: (
-      <Trans>
+    true: t`
         You are about to make this game discoverable on categories pages on
         Liluo.io. Continue?
-      </Trans>
-    ),
-    false: (
-      <Trans>
+      `,
+    false: t`
         You are about to hide this game from categories pages on Liluo.io.
         Continue?
-      </Trans>
-    ),
+      `,
   },
   acceptsBuildComments: {
-    true: (
-      <Trans>
+    true: t`
         You are about to activate a feedback banner on all your build pages on
         Liluo.io, asking for feedback on your game. Continue?
-      </Trans>
-    ),
-    false: (
-      <Trans>
+      `,
+    false: t`
         You are about to de-activate the feedback banner on all your build pages
         on Liluo.io. Continue ?
-      </Trans>
-    ),
+      `,
   },
   acceptsGameComments: {
-    true: (
-      <Trans>
+    true: t`
         You are about to activate a feedback banner on your game page on
         Liluo.io, to let any user give you feedback. Continue?
-      </Trans>
-    ),
-    false: (
-      <Trans>
+      `,
+    false: t`
         You are about to de-activate the feedback banner on your game page on
         Liluo.io. Continue ?
-      </Trans>
-    ),
+      `,
   },
 };
 
@@ -104,150 +91,143 @@ export const GameCard = ({
   };
   const [showShareDialog, setShowShareDialog] = React.useState(false);
   const [
-    confirmationDialogName,
-    setConfirmationDialogName,
+    editedProperty,
+    setEditedProperty,
   ] = React.useState<?TogglableProperties>(null);
-  const [isEditingProperty, setIsEditingProperty] = React.useState(false);
 
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
   );
 
-  const getNewProperty = (property: ?TogglableProperties) => {
-    switch (property) {
-      case 'discoverable':
-        return { discoverable: !game.discoverable };
-      case 'acceptsBuildComments':
-        return { acceptsBuildComments: !game.acceptsBuildComments };
-      case 'acceptsGameComments':
-        return { acceptsGameComments: !game.acceptsGameComments };
-      default:
-        return null;
-    }
-  };
-  const newProperty = getNewProperty(confirmationDialogName);
-
-  const onConfirmToggleChanges = async (i18n: I18nType) => {
-    if (!profile || !confirmationDialogName) return;
-    if (!newProperty) return;
-    setIsEditingProperty(true);
+  const onToggle = async (
+    i18n: I18nType,
+    property: TogglableProperties,
+    newValue: boolean
+  ) => {
+    if (!profile) return;
+    const answer = Window.showConfirmDialog(
+      i18n._(confirmationMessage[property][newValue.toString()])
+    );
+    if (!answer) return;
+    setEditedProperty(property);
     try {
-      await updateGame(
-        getAuthorizationHeader,
-        profile.id,
-        game.id,
-        newProperty
-      );
+      await updateGame(getAuthorizationHeader, profile.id, game.id, {
+        // $FlowFixMe - We know that the property is a game property.
+        [property]: newValue,
+      });
       await onUpdateGame();
-      setConfirmationDialogName(null);
     } catch (error) {
-      console.error(
-        `Unable to update property ${confirmationDialogName}`,
-        error
-      );
+      console.error(`Unable to update property ${property}`, error);
       showErrorBox({
         message: i18n._(t`Unable to update game.`),
         rawError: error,
         errorId: 'game-dashboard-update-game-error',
       });
-    } finally {
-      setIsEditingProperty(false);
     }
+    setEditedProperty(null);
   };
 
   return (
     <I18n>
       {({ i18n }) => (
         <>
-          <Card key={game.id} variant="outlined">
-            <CardContent>
-              <Line noMargin justifyContent="space-between" alignItems="center">
-                <Line>
-                  {game.publicWebBuildId && (
-                    <>
-                      <Text size="body2" noMargin displayInlineAsSpan>
-                        {game.discoverable ? (
-                          <Trans>Public on Liluo.io</Trans>
-                        ) : (
-                          <Trans>
-                            Build version only (non visible on Liluo.io)
-                          </Trans>
-                        )}
-                      </Text>
-                      <Spacer />
-                    </>
-                  )}
+          <Card
+            key={game.id}
+            cardCornerAction={
+              <ElementWithMenu
+                element={
+                  <IconButton size="small">
+                    <MoreVert />
+                  </IconButton>
+                }
+                buildMenuTemplate={(i18n: I18nType) => [
+                  {
+                    label: i18n._(t`Open details`),
+                    click: () => onOpenGameManager('details'),
+                  },
+                  {
+                    label: i18n._(t`See builds`),
+                    click: () => onOpenGameManager('builds'),
+                  },
+                  {
+                    label: i18n._(t`See feedbacks`),
+                    click: () => onOpenGameManager('feedback'),
+                  },
+                  {
+                    label: i18n._(t`Open analytics`),
+                    click: () => onOpenGameManager('analytics'),
+                  },
+                  {
+                    label: i18n._(t`Manage leaderboards`),
+                    click: () => onOpenGameManager('leaderboards'),
+                  },
+                ]}
+              />
+            }
+            header={
+              <Line>
+                {game.publicWebBuildId && (
+                  <>
+                    <Text size="body2" noMargin displayInlineAsSpan>
+                      {game.discoverable ? (
+                        <Trans>Public on Liluo.io</Trans>
+                      ) : (
+                        <Trans>
+                          Build version only (non visible on Liluo.io)
+                        </Trans>
+                      )}
+                    </Text>
+                    <Spacer />
+                  </>
+                )}
 
-                  <Text size="body2" noMargin displayInlineAsSpan>
-                    <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
-                  </Text>
-                </Line>
-                <ElementWithMenu
-                  element={
-                    <IconButton size="small" style={{ padding: 0 }}>
-                      <MoreVert />
-                    </IconButton>
-                  }
-                  buildMenuTemplate={(i18n: I18nType) => [
-                    {
-                      label: i18n._(t`Open details`),
-                      click: () => onOpenGameManager('details'),
-                    },
-                    {
-                      label: i18n._(t`See builds`),
-                      click: () => onOpenGameManager('builds'),
-                    },
-                    {
-                      label: i18n._(t`See feedbacks`),
-                      click: () => onOpenGameManager('feedback'),
-                    },
-                    {
-                      label: i18n._(t`Open analytics`),
-                      click: () => onOpenGameManager('analytics'),
-                    },
-                    {
-                      label: i18n._(t`Manage leaderboards`),
-                      click: () => onOpenGameManager('leaderboards'),
-                    },
-                  ]}
-                />
+                <BackgroundText>
+                  <Trans>Created on {i18n.date(game.createdAt * 1000)}</Trans>
+                </BackgroundText>
               </Line>
-              <ResponsiveLineStackLayout noMargin>
+            }
+          >
+            <ResponsiveLineStackLayout noMargin>
+              <Column noMargin alignItems="center">
                 <GameThumbnail
                   gameName={game.gameName}
                   thumbnailUrl={game.thumbnailUrl}
                 />
-                <Spacer />
-                <Column expand justifyContent="space-between">
-                  <ResponsiveLineStackLayout noMargin alignItems="flex-start">
-                    <CardHeader
-                      title={game.gameName}
-                      subheader={
-                        isCurrentGame && (
-                          <Chip
-                            size="small"
-                            label={<Trans>Currently edited</Trans>}
-                            color="primary"
+              </Column>
+              <Spacer />
+              <Column expand justifyContent="space-between">
+                <ResponsiveLineStackLayout noMargin alignItems="flex-start">
+                  <CardHeader
+                    title={game.gameName}
+                    subheader={
+                      isCurrentGame && (
+                        <Chip
+                          size="small"
+                          label={<Trans>Currently edited</Trans>}
+                          color="primary"
+                        />
+                      )
+                    }
+                  />
+                  <Column expand noMargin>
+                    <ResponsiveLineStackLayout
+                      justifyContent="flex-end"
+                      noColumnMargin
+                    >
+                      <FlatButton
+                        label={<Trans>Access feedback</Trans>}
+                        onClick={() => onOpenGameManager('feedback')}
+                        disabled={!game.publicWebBuildId}
+                      />
+                      <LineStackLayout noMargin>
+                        <Column noMargin expand>
+                          <RaisedButton
+                            label={<Trans>Open in browser</Trans>}
+                            onClick={openGameUrl}
+                            primary
+                            disabled={!game.publicWebBuildId}
                           />
-                        )
-                      }
-                    />
-                    <Column expand noMargin>
-                      <ResponsiveLineStackLayout
-                        justifyContent="flex-end"
-                        noColumnMargin
-                      >
-                        <FlatButton
-                          label={<Trans>Access feedback</Trans>}
-                          onClick={() => onOpenGameManager('feedback')}
-                          disabled={!game.publicWebBuildId}
-                        />
-                        <RaisedButton
-                          label={<Trans>Open in browser</Trans>}
-                          onClick={openGameUrl}
-                          primary
-                          disabled={!game.publicWebBuildId}
-                        />
+                        </Column>
                         <IconButton
                           size="small"
                           disabled={!game.publicWebBuildId}
@@ -256,84 +236,57 @@ export const GameCard = ({
                         >
                           <ShareIcon />
                         </IconButton>
-                      </ResponsiveLineStackLayout>
-                    </Column>
-                  </ResponsiveLineStackLayout>
-                  <Column noMargin justifyContent="flex-start">
-                    <Toggle
-                      labelPosition="left"
-                      onToggle={() => setConfirmationDialogName('discoverable')}
-                      toggled={!!game.discoverable}
-                      label={<Trans>Make discoverable on Liluo.io</Trans>}
-                    />
-                    <Toggle
-                      labelPosition="left"
-                      onToggle={() =>
-                        setConfirmationDialogName('acceptsGameComments')
-                      }
-                      toggled={!!game.acceptsGameComments}
-                      label={
-                        <Trans>
-                          Show feedback banner on Liluo.io game page
-                        </Trans>
-                      }
-                    />
-                    <Toggle
-                      labelPosition="left"
-                      onToggle={() =>
-                        setConfirmationDialogName('acceptsBuildComments')
-                      }
-                      toggled={!!game.acceptsBuildComments}
-                      label={<Trans>Ask for feedback on all build pages</Trans>}
-                    />
+                      </LineStackLayout>
+                    </ResponsiveLineStackLayout>
                   </Column>
+                </ResponsiveLineStackLayout>
+                <Column noMargin justifyContent="flex-start">
+                  <Toggle
+                    labelPosition="left"
+                    onToggle={() => {
+                      onToggle(i18n, 'discoverable', !game.discoverable);
+                    }}
+                    toggled={!!game.discoverable}
+                    label={<Trans>Make discoverable on Liluo.io</Trans>}
+                    disabled={editedProperty === 'discoverable'}
+                  />
+                  <Toggle
+                    labelPosition="left"
+                    onToggle={() => {
+                      onToggle(
+                        i18n,
+                        'acceptsGameComments',
+                        !game.acceptsGameComments
+                      );
+                    }}
+                    toggled={!!game.acceptsGameComments}
+                    label={
+                      <Trans>Show feedback banner on Liluo.io game page</Trans>
+                    }
+                    disabled={editedProperty === 'acceptsGameComments'}
+                  />
+                  <Toggle
+                    labelPosition="left"
+                    onToggle={() => {
+                      onToggle(
+                        i18n,
+                        'acceptsBuildComments',
+                        !game.acceptsBuildComments
+                      );
+                    }}
+                    toggled={!!game.acceptsBuildComments}
+                    label={<Trans>Ask for feedback on all build pages</Trans>}
+                    disabled={editedProperty === 'acceptsBuildComments'}
+                  />
                 </Column>
-              </ResponsiveLineStackLayout>
-            </CardContent>
+              </Column>
+            </ResponsiveLineStackLayout>
           </Card>
           {showShareDialog && (
             <ShareDialog
               game={game}
               onClose={() => setShowShareDialog(false)}
             />
-          )}
-          {confirmationDialogName && newProperty && (
-            <Dialog
-              open
-              maxWidth="xs"
-              actions={[
-                <FlatButton
-                  key="cancel-toggle-change"
-                  label={<Trans>Cancel</Trans>}
-                  onClick={() => setConfirmationDialogName(null)}
-                  disabled={isEditingProperty}
-                />,
-                <RaisedButton
-                  key="confirm-toggle-change"
-                  label={<Trans>Confirm</Trans>}
-                  onClick={() => onConfirmToggleChanges(i18n)}
-                  disabled={isEditingProperty}
-                />,
-              ]}
-              onApply={() => onConfirmToggleChanges(i18n)}
-              cannotBeDismissed={isEditingProperty}
-            >
-              <Column>
-                <Line>
-                  {isEditingProperty ? (
-                    <PlaceholderLoader />
-                  ) : (
-                    <Text>
-                      {
-                        confirmationMessage[confirmationDialogName][
-                          (!!newProperty[confirmationDialogName]).toString()
-                        ]
-                      }
-                    </Text>
-                  )}
-                </Line>
-              </Column>
-            </Dialog>
           )}
         </>
       )}

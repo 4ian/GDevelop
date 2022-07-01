@@ -84,6 +84,31 @@ export default class Builds extends Component<Props, State> {
     );
   };
 
+  _onBuildUpdated = (build: Build) => {
+    this.setState((previousState: State) => {
+      if (!previousState.builds) return;
+      return {
+        ...previousState,
+        builds: previousState.builds.map((oldBuild: Build) => {
+          if (build.id === oldBuild.id) return build;
+          return oldBuild;
+        }),
+      };
+    });
+  };
+
+  _onBuildDeleted = (build: Build) => {
+    this.setState((previousState: State) => {
+      if (!previousState.builds) return;
+      return {
+        ...previousState,
+        builds: previousState.builds.filter(
+          (oldBuild: Build) => build.id !== oldBuild.id
+        ),
+      };
+    });
+  };
+
   render() {
     return (
       <BuildsList
@@ -93,6 +118,8 @@ export default class Builds extends Component<Props, State> {
         loadBuilds={this._refreshBuilds}
         game={this.props.game}
         onGameUpdated={this.props.onGameUpdated}
+        onBuildUpdated={this._onBuildUpdated}
+        onBuildDeleted={this._onBuildDeleted}
       />
     );
   }

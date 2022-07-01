@@ -253,6 +253,15 @@ export function createGdevelopTheme({
           backgroundColor: styles['ThemeTextHighlightedBackgroundColor'],
         },
       },
+      home: {
+        header: {
+          backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+        },
+        tabs: {
+          selectedBackgroundColor:
+            styles['ThemeHomeTabsSelectedBackgroundColor'],
+        },
+      },
       dropIndicator: {
         canDrop: styles['ThemeDropIndicatorCanDropColor'],
         cannotDrop: styles['ThemeDropIndicatorCannotDropColor'],

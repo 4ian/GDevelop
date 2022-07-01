@@ -33,6 +33,9 @@ const styles = {
     textAlign: 'left',
     overflow: 'hidden',
     width: '100%',
+    animation: 'fadein 0.5s',
+    paddingTop: 8,
+    paddingBottom: 8,
   },
 };
 
@@ -54,13 +57,7 @@ export const TutorialListItem = ({ tutorial }: Props) => {
       }}
       focusRipple
     >
-      <div
-        style={{
-          ...styles.container,
-          animation: 'fadein 0.5s',
-        }}
-        ref={containerRef}
-      >
+      <div style={styles.container} ref={containerRef}>
         <Card style={styles.card}>
           <ResponsiveLineStackLayout noMargin>
             <CorsAwareImage

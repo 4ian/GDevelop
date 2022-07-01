@@ -20,7 +20,6 @@ const electron = optionalRequire('electron');
 
 const componentStyles = {
   paper: {
-    margin: 4,
     padding: 10,
     maxWidth: 200,
     textAlign: 'center',
@@ -88,12 +87,11 @@ export const LearnSection = ({
   ].filter(Boolean);
 
   return (
-    <SectionContainer>
+    <SectionContainer title="Help and guides">
       <Line>
-        <Text size="main-title">Help and guides</Text>
-      </Line>
-      <Line>
-        <Text size="body">Shortcuts</Text>
+        <Text size="body">
+          <Trans>Shortcuts</Trans>
+        </Text>
       </Line>
       <div style={componentStyles.helpItemsContainer}>
         <ResponsiveLineStackLayout noMargin>
@@ -122,10 +120,14 @@ export const LearnSection = ({
         </ResponsiveLineStackLayout>
       </div>
       <Line>
-        <Text size="title">Guides and tutorials</Text>
+        <Text size="title">
+          <Trans>Guides and tutorials</Trans>
+        </Text>
       </Line>
       <Line noMargin>
-        <Text size="body">Learn by doing</Text>
+        <Text size="body">
+          <Trans>Learn by doing</Trans>
+        </Text>
       </Line>
       <ResponsiveLineStackLayout expand noMargin>
         <TutorialsList />

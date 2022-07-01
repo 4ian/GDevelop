@@ -16,10 +16,6 @@ import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 const electron = optionalRequire('electron');
 
-const styles = {
-  borderBottom: `1px solid lightgrey`,
-};
-
 type Props = {|
   project: ?gdProject,
   onOpenProjectManager: () => void,
@@ -42,7 +38,7 @@ export const HomePageHeader = ({
       {({ i18n }) => (
         <div
           style={{
-            ...styles,
+            borderBottom: `1px solid ${GDevelopTheme.home.separator.color}`,
             backgroundColor: GDevelopTheme.home.header.backgroundColor,
           }}
         >
@@ -68,7 +64,7 @@ export const HomePageHeader = ({
                 <LineStackLayout noMargin alignItems="center">
                   {!electron && windowWidth !== 'small' && (
                     <FlatButton
-                      label={<Trans>Download desktop version</Trans>}
+                      label={<Trans>Download desktop app</Trans>}
                       onClick={() =>
                         Window.openExternalURL('https://gdevelop.io/download')
                       }

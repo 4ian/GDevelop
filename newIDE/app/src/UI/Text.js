@@ -62,10 +62,8 @@ const Text = React.forwardRef<Props, Interface>(
   ) => (
     <Typography
       variant={
-        size === 'main-title'
+        size === 'bold-title'
           ? 'h4'
-          : size === 'bold-title'
-          ? 'h5'
           : size === 'title'
           ? 'h6'
           : size === 'body2'

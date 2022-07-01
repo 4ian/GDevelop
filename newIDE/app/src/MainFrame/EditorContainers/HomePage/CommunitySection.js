@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Line } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
 import { Trans } from '@lingui/macro';
 import TextButton from '../../../UI/TextButton';
@@ -17,12 +16,7 @@ import { SectionContainer } from './SectionContainer';
 
 export const CommunitySection = () => {
   return (
-    <SectionContainer>
-      <Line>
-        <Text size="main-title">
-          <Trans>Community</Trans>
-        </Text>
-      </Line>
+    <SectionContainer title="Community">
       <ColumnStackLayout alignItems="start" noMargin>
         <Text size="title">
           <Trans>Join the conversation</Trans>

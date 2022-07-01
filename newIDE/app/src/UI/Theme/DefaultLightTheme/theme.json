@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#42229B",
-        "comment": "Palette/Purple/70"
+        "value": "#6A3BEB",
+        "comment": "Palette/Purple/60"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -191,9 +191,9 @@
       }
     },
     "home": {
-      "tabs": {
-        "selected-background-color": {
-          "value": "#EAE6FD"
+      "separator": {
+        "color": {
+          "value": "#D9D9DE"
         }
       }
     }

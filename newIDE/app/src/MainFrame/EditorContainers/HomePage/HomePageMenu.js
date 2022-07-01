@@ -1,20 +1,17 @@
 // @flow
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
-import { Column, Line, Spacer } from '../../../UI/Grid';
+import { Column, Line } from '../../../UI/Grid';
 import SchoolIcon from '@material-ui/icons/School';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
 import LanguageIcon from '@material-ui/icons/Language';
-import BuildIcon from '@material-ui/icons/Build';
 import { Drawer, Paper } from '@material-ui/core';
-import {
-  useResponsiveWindowWidth,
-  type WidthType,
-} from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import IconButton from '../../../UI/IconButton';
 import DoubleChevronArrowRight from '../../../UI/CustomSvgIcons/DoubleChevronArrowRight';
 import VerticalTabButton from '../../../UI/VerticalTabButton';
 import DoubleChevronArrowLeft from '../../../UI/CustomSvgIcons/DoubleChevronArrowLeft';
+import PickAxeIcon from '../../../UI/CustomSvgIcons/PickAxe';
 
 export const styles = {
   drawerContent: {
@@ -31,31 +28,29 @@ export type HomeTab = 'Build' | 'Learn' | 'Play' | 'Community';
 const tabs: {
   label: React.Node,
   tab: HomeTab,
-  icon: React.Node,
+  getIcon: (color: string) => React.Node,
 }[] = [
   {
     label: <Trans>Build</Trans>,
     tab: 'Build',
-    icon: <BuildIcon fontSize="small" color="primary" />,
+    getIcon: color => <PickAxeIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Learn</Trans>,
     tab: 'Learn',
-    icon: <SchoolIcon fontSize="small" color="primary" />,
+    getIcon: color => <SchoolIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Play</Trans>,
     tab: 'Play',
-    icon: <SportsEsportsIcon fontSize="small" color="primary" />,
+    getIcon: color => <SportsEsportsIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Community</Trans>,
     tab: 'Community',
-    icon: <LanguageIcon fontSize="small" color="primary" />,
+    getIcon: color => <LanguageIcon fontSize="small" color={color} />,
   },
 ];
-
-const largeMenuWidthType: WidthType = 'large';
 
 type Props = {|
   setActiveTab: HomeTab => void,
@@ -73,13 +68,13 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
     <>
       <Paper
         style={{
-          paddingTop: windowWidth === largeMenuWidthType ? 30 : 10,
-          minWidth: windowWidth === largeMenuWidthType && 200,
+          paddingTop: windowWidth === 'large' ? 40 : 10,
+          minWidth: windowWidth === 'large' && 200,
         }}
         square
       >
         <Column alignItems="start" expand>
-          {windowWidth !== largeMenuWidthType && (
+          {windowWidth !== 'large' && (
             <IconButton
               onClick={() => setIsHomePageMenuDrawerOpen(true)}
               size="small"
@@ -87,15 +82,14 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
               <DoubleChevronArrowRight />
             </IconButton>
           )}
-          {tabs.map(({ label, tab, icon }) => (
+          {tabs.map(({ label, tab, getIcon }) => (
             <>
-              <Spacer />
               <VerticalTabButton
                 label={label}
                 onClick={() => setActiveTab(tab)}
-                icon={icon}
+                getIcon={getIcon}
                 isActive={activeTab === tab}
-                hideLabel={windowWidth !== largeMenuWidthType}
+                hideLabel={windowWidth !== 'large'}
               />
             </>
           ))}
@@ -122,14 +116,14 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
               <DoubleChevronArrowLeft />
             </IconButton>
           </Line>
-          {tabs.map(({ label, tab, icon }) => (
+          {tabs.map(({ label, tab, getIcon }) => (
             <VerticalTabButton
               label={label}
               onClick={() => {
                 setActiveTab(tab);
                 setIsHomePageMenuDrawerOpen(false);
               }}
-              icon={icon}
+              getIcon={getIcon}
               isActive={activeTab === tab}
             />
           ))}

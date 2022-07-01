@@ -34,36 +34,35 @@ export const BuildSection = ({
   const recentProjectFiles = getRecentProjectFiles();
 
   return (
-    <SectionContainer>
-      <Line>
-        <Text size="main-title">My Projects</Text>
+    <SectionContainer title="My projects">
+      <Line noMargin>
+        <ResponsiveLineStackLayout justifyContent="start" alignItems="center">
+          <RaisedButton
+            primary
+            label={<Trans>Create a project</Trans>}
+            onClick={onOpenExamples}
+            icon={<AddIcon />}
+            id="home-create-blank-project-button"
+          />
+          {canOpen && (
+            <>
+              {windowWidth !== 'small' && (
+                <>
+                  <Text>
+                    <Trans>or</Trans>
+                  </Text>
+                  <Spacer />
+                </>
+              )}
+              <TextButton
+                primary
+                label={<Trans>Open an existing project</Trans>}
+                onClick={onOpen}
+              />
+            </>
+          )}
+        </ResponsiveLineStackLayout>
       </Line>
-      <ResponsiveLineStackLayout justifyContent="start" alignItems="center">
-        <RaisedButton
-          primary
-          label={<Trans>Create a project</Trans>}
-          onClick={onOpenExamples}
-          icon={<AddIcon />}
-          id="home-create-blank-project-button"
-        />
-        {canOpen && (
-          <>
-            {windowWidth !== 'small' && (
-              <>
-                <Text>
-                  <Trans>or</Trans>
-                </Text>
-                <Spacer />
-              </>
-            )}
-            <TextButton
-              primary
-              label={<Trans>Open an existing project</Trans>}
-              onClick={onOpen}
-            />
-          </>
-        )}
-      </ResponsiveLineStackLayout>
       {recentProjectFiles && recentProjectFiles.length > 0 && (
         <Line>
           <Column noMargin>

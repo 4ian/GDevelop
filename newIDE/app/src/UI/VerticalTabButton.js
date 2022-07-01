@@ -2,46 +2,51 @@
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import { Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
 
 const styles = {
-  justifyContent: 'start',
-  minWidth: 0, // Ensure we can use the button with just an icon.
-  minHeight: 30, // Ensure it stays the same size with and without label.
+  button: {
+    justifyContent: 'start',
+    minWidth: 0, // Ensure we can use the button with just an icon.
+    minHeight: 30, // Ensure it stays the same size with and without label.
+    padding: '4px 10px', // Ensure same padding applied no matter the button variant.
+    fontWeight: 50,
+  },
+  iconWrapper: {
+    padding: '3px 8px',
+    justifyContent: 'center',
+    display: 'flex',
+  },
 };
 
 type Props = {|
   label: React.Node,
   onClick: ?(ev: any) => void | Promise<void>,
-  icon: React.Node,
+  getIcon: (color: string) => React.Node,
   isActive: boolean,
   hideLabel?: boolean,
 |};
 
 const VerticalTabButton = ({
   label,
-  icon,
+  getIcon,
   onClick,
   isActive,
   hideLabel,
 }: Props) => {
-  const GDevelopTheme = React.useContext(GDevelopThemeContext);
-
   return (
     <Button
-      variant="text"
+      variant={isActive ? 'contained' : 'text'}
       size="small"
       style={{
-        ...styles,
-        backgroundColor: isActive
-          ? GDevelopTheme.home.tabs.selectedBackgroundColor
-          : undefined,
+        ...styles.button,
       }}
       fullWidth
       onClick={onClick}
       color={isActive ? 'primary' : 'default'}
     >
-      {icon}
+      <div style={styles.iconWrapper}>
+        {getIcon(isActive ? 'default' : 'primary')}
+      </div>
       {!hideLabel && (
         <>
           <Spacer />

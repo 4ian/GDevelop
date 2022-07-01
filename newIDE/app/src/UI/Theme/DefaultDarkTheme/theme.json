@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#B094FF",
-        "comment": "Palette/Purple/40"
+        "value": "#6A3BEB",
+        "comment": "Palette/Purple/60"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -36,7 +36,7 @@
           }
         },
         "background-color": {
-          "value": "#282C34"
+          "value": "#1D1D26"
         }
       },
       "alternate-canvas": {
@@ -199,6 +199,11 @@
       "tabs": {
         "selected-background-color": {
           "value": "#403C53"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#494952"
         }
       }
     }

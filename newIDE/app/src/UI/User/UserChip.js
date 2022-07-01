@@ -45,7 +45,7 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
         label={
           shortenedLabel || (
             <span>
-              <Trans>Sign in</Trans>
+              <Trans>Create account - Sign in</Trans>
             </span>
           )
         }

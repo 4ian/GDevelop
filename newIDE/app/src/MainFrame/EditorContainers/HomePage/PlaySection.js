@@ -1,13 +1,11 @@
 // @flow
 import * as React from 'react';
-import { Line } from '../../../UI/Grid';
-import Text from '../../../UI/Text';
 import { GamesShowcase } from '../../../GamesShowcase';
 import PublishIcon from '@material-ui/icons/Publish';
 import FlatButton from '../../../UI/FlatButton';
 import Window from '../../../Utils/Window';
 import { Trans } from '@lingui/macro';
-import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { LineStackLayout } from '../../../UI/Layout';
 import RaisedButton from '../../../UI/RaisedButton';
 import { SectionContainer } from './SectionContainer';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -15,13 +13,8 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 export const PlaySection = () => {
   const windowWidth = useResponsiveWindowWidth();
   return (
-    <SectionContainer>
-      <Line>
-        <Text size="main-title">Showcased Games</Text>
-      </Line>
-      <ResponsiveLineStackLayout expand noMargin>
-        <GamesShowcase />
-      </ResponsiveLineStackLayout>
+    <SectionContainer title="Showcased Games">
+      <GamesShowcase />
       <LineStackLayout>
         {windowWidth !== 'small' && (
           <FlatButton

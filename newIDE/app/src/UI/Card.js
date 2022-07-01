@@ -26,8 +26,6 @@ type Props = {|
 
   disabled?: boolean,
   isHighlighted?: boolean,
-
-  style?: {| opacity?: number |},
 |};
 
 const Card = ({
@@ -36,7 +34,6 @@ const Card = ({
   cardCornerAction,
   isHighlighted,
   disabled,
-  style,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const gdevelopTheme = React.useContext(GDevelopThemeContext);

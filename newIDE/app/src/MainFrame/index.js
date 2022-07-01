@@ -2018,11 +2018,12 @@ const MainFrame = (props: Props) => {
     if (!currentProject || !currentFileMetadata) return;
     const storageProviderOperations = getStorageProviderOperations();
     if (storageProviderOperations.onChangeProjectProperty) {
-      await storageProviderOperations.onChangeProjectProperty(
+      const wasSaved = await storageProviderOperations.onChangeProjectProperty(
         currentProject,
         currentFileMetadata,
         { name: newName }
       );
+      if (wasSaved && unsavedChanges) unsavedChanges.sealUnsavedChanges();
       updateWindowTitle();
     }
   };

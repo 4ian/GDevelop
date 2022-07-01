@@ -26,12 +26,6 @@ export const GDevelopGamesPlatform = {
       : `https://liluo.io/user/${userId}${isDev ? '?dev=true' : ''}`,
 };
 
-export const GDevelopBuildApi = {
-  baseUrl: isDev
-    ? 'https://69p4m07edd.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/build',
-};
-
 export const GDevelopFirebaseConfig = {
   apiKey: 'AIzaSyAnX9QMacrIl3yo4zkVFEVhDppGVDDewBc',
   authDomain: 'gdevelop-services.firebaseapp.com',
@@ -41,44 +35,62 @@ export const GDevelopFirebaseConfig = {
   messagingSenderId: '44882707384',
 };
 
+export const GDevelopBuildApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/build'
+    : 'https://api.gdevelop.io/build',
+};
+
 export const GDevelopUsageApi = {
   baseUrl: isDev
-    ? 'https://dwjjhr5k76.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/usage',
+    ? 'https://api-dev.gdevelop.io/usage'
+    : 'https://api.gdevelop.io/usage',
 };
 
 export const GDevelopReleaseApi = {
   baseUrl: isDev
-    ? 'https://c8cldf4iqh.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/release',
+    ? 'https://api-dev.gdevelop.io/release'
+    : 'https://api.gdevelop.io/release',
 };
 
 export const GDevelopAssetApi = {
   baseUrl: isDev
-    ? 'https://57l4cj31aj.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/asset',
+    ? 'https://api-dev.gdevelop.io/asset'
+    : 'https://api.gdevelop.io/asset',
 };
 
 export const GDevelopAnalyticsApi = {
   baseUrl: isDev
-    ? 'https://fixpe96o0h.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/analytics',
+    ? 'https://api-dev.gdevelop.io/analytics'
+    : 'https://api.gdevelop.io/analytics',
 };
 
 export const GDevelopGameApi = {
   baseUrl: isDev
-    ? 'https://we7eqjifc2.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/game',
+    ? 'https://api-dev.gdevelop.io/game'
+    : 'https://api.gdevelop.io/game',
 };
 
 export const GDevelopUserApi = {
   baseUrl: isDev
-    ? 'https://yrun9q6udj.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/user',
+    ? 'https://api-dev.gdevelop.io/user'
+    : 'https://api.gdevelop.io/user',
 };
 
 export const GDevelopPlayApi = {
   baseUrl: isDev
-    ? 'https://n9dsp0xfw6.execute-api.us-east-1.amazonaws.com/dev'
-    : 'https://api.gdevelop-app.com/play',
+    ? 'https://api-dev.gdevelop.io/play'
+    : 'https://api.gdevelop.io/play',
+};
+
+export const GDevelopProjectApi = {
+  baseUrl: isDev
+    ? 'https://api-dev.gdevelop.io/project'
+    : 'https://api.gdevelop.io/project',
+};
+
+export const GDevelopProjectResourcesStorage = {
+  baseUrl: isDev
+    ? 'https://project-resources-dev.gdevelop.io'
+    : 'https://project-resources.gdevelop.io',
 };

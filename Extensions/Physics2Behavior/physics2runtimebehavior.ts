@@ -244,6 +244,7 @@ namespace gdjs {
     contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
     contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
     currentContacts: Array<Physics2RuntimeBehavior>;
+    destroyedDuringFrameLogic: boolean;
     _body: any = null;
     _sharedData: any;
     _tempb2Vec2: any;
@@ -287,6 +288,7 @@ namespace gdjs {
       this.contactsEndedThisFrame = [];
       this.currentContacts = [];
       this.currentContacts.length = 0;
+      this.destroyedDuringFrameLogic = false;
       this._sharedData = Physics2SharedData.getSharedData(
         runtimeScene,
         behaviorData.name
@@ -377,6 +379,9 @@ namespace gdjs {
     }
 
     onDeActivate() {
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
       if (this._body !== null) {
         // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
         this._sharedData.clearBodyJoints(this._body);
@@ -393,7 +398,15 @@ namespace gdjs {
       }
     }
 
+    onActivate() {
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
+      this._updateBodyFromObject();
+    }
+
     onDestroy() {
+      this.destroyedDuringFrameLogic = true;
       this.onDeActivate();
     }
 
@@ -641,8 +654,7 @@ namespace gdjs {
     recreateShape() {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Destroy the old shape
@@ -673,7 +685,8 @@ namespace gdjs {
       return this._body;
     }
 
-    createBody() {
+    createBody(): boolean {
+      if (!this.activated() || this.destroyedDuringFrameLogic) return false;
       // Generate the body definition
       const bodyDef = new Box2D.b2BodyDef();
 
@@ -711,12 +724,13 @@ namespace gdjs {
       // Update cached size
       this._objectOldWidth = this.owner.getWidth();
       this._objectOldHeight = this.owner.getHeight();
+      return true;
     }
 
     doStepPreEvents(runtimeScene) {
       // Create a body if there is not one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Step the world if not done this frame yet
@@ -771,7 +785,7 @@ namespace gdjs {
     _updateBodyFromObject() {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // The object size has changed, recreate the shape.
@@ -868,8 +882,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body type
@@ -892,8 +905,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body type
@@ -916,8 +928,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body type
@@ -940,8 +951,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body bullet flag
@@ -955,8 +965,7 @@ namespace gdjs {
     setFixedRotation(enable): void {
       this.fixedRotation = enable;
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
       this._body.SetFixedRotation(this.fixedRotation);
     }
@@ -968,8 +977,7 @@ namespace gdjs {
     setSleepingAllowed(enable): void {
       this.canSleep = enable;
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
       this._body.SetSleepingAllowed(this.canSleep);
     }
@@ -977,7 +985,7 @@ namespace gdjs {
     isSleeping(): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return true;
       }
 
       // Get the body sleeping state
@@ -1004,8 +1012,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body density
@@ -1033,8 +1040,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body friction
@@ -1068,8 +1074,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body restitution
@@ -1098,8 +1103,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body linear damping
@@ -1121,8 +1125,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body angular damping
@@ -1144,8 +1147,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body gravity scale
@@ -1181,8 +1183,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body layers
@@ -1220,8 +1221,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body masks
@@ -1233,8 +1233,7 @@ namespace gdjs {
     getLinearVelocityX(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return 0;
+        if (!this.createBody()) return 0;
       }
 
       // Get the linear velocity on X
@@ -1244,7 +1243,7 @@ namespace gdjs {
     setLinearVelocityX(linearVelocityX): void {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set the linear velocity on X
@@ -1259,8 +1258,7 @@ namespace gdjs {
     getLinearVelocityY(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return 0;
+        if (!this.createBody()) return 0;
       }
 
       // Get the linear velocity on Y
@@ -1270,7 +1268,7 @@ namespace gdjs {
     setLinearVelocityY(linearVelocityY): void {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set the linear velocity on Y
@@ -1282,11 +1280,10 @@ namespace gdjs {
       );
     }
 
-    getLinearVelocityLength() {
+    getLinearVelocityLength(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return 0;
+        if (!this.createBody()) return 0;
       }
 
       // Get the linear velocity length
@@ -1296,10 +1293,10 @@ namespace gdjs {
       ).Length();
     }
 
-    getAngularVelocity() {
+    getAngularVelocity(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Get the angular velocity
@@ -1309,7 +1306,7 @@ namespace gdjs {
     setAngularVelocity(angularVelocity): void {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set the angular velocity
@@ -1319,7 +1316,7 @@ namespace gdjs {
     applyForce(forceX, forceY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1338,7 +1335,7 @@ namespace gdjs {
     applyPolarForce(angle, length, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1358,7 +1355,7 @@ namespace gdjs {
     applyForceTowardPosition(length, towardX, towardY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1381,7 +1378,7 @@ namespace gdjs {
     applyImpulse(impulseX, impulseY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1400,7 +1397,7 @@ namespace gdjs {
     applyPolarImpulse(angle, length, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1420,7 +1417,7 @@ namespace gdjs {
     applyImpulseTowardPosition(length, towardX, towardY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1443,7 +1440,7 @@ namespace gdjs {
     applyTorque(torque) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1456,7 +1453,7 @@ namespace gdjs {
     applyAngularImpulse(angularImpulse) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1469,7 +1466,7 @@ namespace gdjs {
     getMass(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Wake up the object
@@ -1481,7 +1478,7 @@ namespace gdjs {
     getInertia(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Wake up the object
@@ -1493,7 +1490,7 @@ namespace gdjs {
     getMassCenterX(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Get the mass center on X
@@ -1503,7 +1500,7 @@ namespace gdjs {
     getMassCenterY(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Get the mass center on Y
@@ -1514,8 +1511,7 @@ namespace gdjs {
     isJointFirstObject(jointId): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return false;
+        if (!this.createBody()) return false;
       }
 
       // Get the joint
@@ -1533,8 +1529,7 @@ namespace gdjs {
     isJointSecondObject(jointId): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return false;
+        if (!this.createBody()) return false;
       }
 
       // Get the joint
@@ -1647,7 +1642,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -1818,7 +1813,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set joint settings
@@ -1887,7 +1882,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -2178,7 +2173,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -2503,7 +2498,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -2677,7 +2672,7 @@ namespace gdjs {
     addGearJoint(jointId1, jointId2, ratio, collideConnected, variable) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Get the first joint
@@ -2798,7 +2793,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set joint settings
@@ -2973,7 +2968,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3249,7 +3244,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3383,7 +3378,7 @@ namespace gdjs {
     addRopeJoint(x1, y1, other, x2, y2, maxLength, collideConnected, variable) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3490,7 +3485,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3618,7 +3613,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return

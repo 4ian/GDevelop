@@ -156,7 +156,7 @@ export class EditableTileMap {
         continue;
       }
       const tileId = tileLayer.get(indexX, indexY);
-      if (!tileId) {
+      if (tileId === undefined) {
         return false;
       }
       const tileDefinition = this._tileSet.get(tileId);

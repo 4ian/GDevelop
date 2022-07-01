@@ -95,7 +95,15 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/B_firebasetools/*.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/kawase-blur-pixi-filter.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
-
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapcollisionmaskruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/TileMapRuntimeManager.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TileMapCollisionMaskRender.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
+      
       // Test extensions:
       './tests/Extensions/**.js',
 
@@ -109,6 +117,13 @@ module.exports = function (config) {
       // Assets
       {
         pattern: './tests-utils/assets/*.jpg',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern: './tests-utils/simple-tiled-map/*.json',
         watched: false,
         included: false,
         served: true,

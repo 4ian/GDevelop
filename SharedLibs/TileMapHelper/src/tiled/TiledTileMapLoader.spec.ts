@@ -153,6 +153,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
+              type: "obstacle",
             },
 
             // The tile with id == 1 is missing
@@ -197,6 +198,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
+              type: "obstacle",
             },
             // 2 polygons
             {
@@ -262,6 +264,7 @@ describe("TiledTileMapLoader", function () {
                 x: 0,
                 y: 0,
               },
+              type: "obstacle",
             },
           ],
           tilewidth: 8,
@@ -284,6 +287,7 @@ describe("TiledTileMapLoader", function () {
     expect(tileMap.getHeight()).to.be(16);
 
     expect(tileMap.getTileDefinition(0)).to.be.ok();
+    expect(tileMap.getTileDefinition(0).getTag()).to.be("obstacle");
     expect(tileMap.getTileDefinition(0).getHiBoxes()).to.be.eql([
       [
         [0, 0],
@@ -293,8 +297,11 @@ describe("TiledTileMapLoader", function () {
       ],
     ]);
     expect(tileMap.getTileDefinition(1)).to.be.ok();
+    expect(tileMap.getTileDefinition(1).getTag()).to.be("");
     expect(tileMap.getTileDefinition(1).getHiBoxes()).to.be.eql([]);
+
     expect(tileMap.getTileDefinition(2)).to.be.ok();
+    expect(tileMap.getTileDefinition(2).getTag()).to.be("obstacle");
     expect(tileMap.getTileDefinition(2).getHiBoxes()).to.be.eql([
       [
         [0, 0],
@@ -303,6 +310,7 @@ describe("TiledTileMapLoader", function () {
       ],
     ]);
     expect(tileMap.getTileDefinition(3)).to.be.ok();
+    expect(tileMap.getTileDefinition(3).getTag()).to.be("obstacle");
     expect(tileMap.getTileDefinition(3).getHiBoxes()).to.be.eql([
       [
         [0, 0],
@@ -315,9 +323,8 @@ describe("TiledTileMapLoader", function () {
         [8, 0],
       ],
     ]);
-    expect(tileMap.getTileDefinition(4)).to.be.ok();
-
     // TODO the tile 0 is defined here, but undefined is use in the map.
+    expect(tileMap.getTileDefinition(4)).to.be.ok();
     expect(tileMap.getTileDefinition(4).getHiBoxes()).to.be.eql([]);
     expect(tileMap.getTileDefinition(5)).not.to.be.ok();
 
@@ -339,5 +346,7 @@ describe("TiledTileMapLoader", function () {
     expect(layer.get(1, 1)).to.be(2);
     expect(layer.get(2, 1)).to.be(undefined);
     expect(layer.get(3, 1)).to.be(1);
+
+    expect(tileMap.pointIsInsideTile(4, 4, "obstacle")).to.be(true);
   });
 });

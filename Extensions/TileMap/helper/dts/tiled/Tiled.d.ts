@@ -50,15 +50,15 @@ export declare type TiledLayer = {
   /** `zlib`, `gzip`, `zstd` (since Tiled 1.3) or empty (default). `tilelayer` only. */
   compression?: string;
   /** Array of `unsigned`, `integer` (GIDs) or base64-encoded data. `tilelayer` only.*/
-  data: Array<integer> | string;
+  data?: Array<integer> | string;
   /** `topdown` (default) or `index`. `objectgroup` only. */
   draworder?: string;
   /** `csv` (default) or `base64`. `tilelayer` only. */
   encoding?: string;
   /** Row count. Same as map height for fixed-size maps. */
-  height: integer;
+  height?: integer;
   /** Incremental ID - unique across all layers */
-  id: integer;
+  id?: integer;
   /** Image used by this layer. `imagelayer` only. */
   image?: string;
   /** Array of {@link TiledLayer}. `group` only. */
@@ -92,7 +92,7 @@ export declare type TiledLayer = {
   /** Whether layer is shown or hidden in editor */
   visible: boolean;
   /** Column count. Same as map width for fixed-size maps. */
-  width: integer;
+  width?: integer;
   /** Horizontal layer offset in tiles. Always 0. */
   x: integer;
   /** Vertical layer offset in tiles. Always 0. */
@@ -112,9 +112,9 @@ export declare type TiledChunk = {
 };
 export declare type TiledObject = {
   /** Used to mark an object as an ellipse */
-  ellipse: boolean;
+  ellipse?: boolean;
   /** Global tile ID, only if object represents a tile */
-  gid: integer;
+  gid?: integer;
   /** Height in pixels. */
   height: float;
   /** Incremental ID, unique across all objects */
@@ -122,19 +122,19 @@ export declare type TiledObject = {
   /** String assigned to name field in editor */
   name: string;
   /** Used to mark an object as a point */
-  point: boolean;
+  point?: boolean;
   /** Array of {@link TiledPoint}, in case the object is a polygon */
-  polygon: Array<TiledPoint>;
+  polygon?: Array<TiledPoint>;
   /** Array of {@link TiledPoint}, in case the object is a polyline */
-  polyline: Array<TiledPoint>;
+  polyline?: Array<TiledPoint>;
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
   /** Angle in degrees clockwise */
   rotation: float;
   /** Reference to a template file, in case object is a {@link template instance} */
-  template: string;
+  template?: string;
   /** Only used for text objects */
-  text: Text;
+  text?: Text;
   /** String assigned to type Tiledfield in editor */
   type: string;
   /** Whether object is shown in editor. */
@@ -250,21 +250,21 @@ export declare type TiledTransformations = {
 };
 export declare type TiledTileDefinition = {
   /** Array of {@link TiledTiles} */
-  animation: Array<TiledTileDefinition>;
+  animation?: Array<TiledTileDefinition>;
   /** Local ID of the tile */
   id: integer;
   /** Image representing this tile (optional) */
   image?: string;
   /** Height of the tile image in pixels */
-  imageheight: integer;
+  imageheight?: integer;
   /** Width of the tile image in pixels */
-  imagewidth: integer;
+  imagewidth?: integer;
   /** Layer with type Tiled`objectgroup`, when collision shapes are specified (optional) */
   objectgroup?: TiledLayer;
   /** Percentage chance this tile is chosen when competing with others in the editor (optional) */
   probability?: float;
   /** Array of {@link TiledProperty} */
-  properties: Array<TiledProperty>;
+  properties?: Array<TiledProperty>;
   /** Index of terrain for each corner of tile (optional) */
   terrain?: Array<integer>;
   /** The type of the tile (optional) */

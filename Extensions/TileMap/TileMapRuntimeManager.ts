@@ -119,6 +119,7 @@ namespace gdjs {
                     return;
                   }
                   const tileSet = tilesetJsonData as TileMapHelper.TiledTileset;
+                  tileSet.firstgid = tiledMap.tilesets[0].firstgid;
                   tiledMap.tilesets = [tileSet];
                   callback(tiledMap);
                 });

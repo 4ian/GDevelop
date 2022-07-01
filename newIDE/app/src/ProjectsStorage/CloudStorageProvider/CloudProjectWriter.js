@@ -66,8 +66,8 @@ export const generateOnChangeProjectProperty = (
   project: gdProject,
   fileMetadata: FileMetadata,
   properties: { name: string }
-) => {
-  if (!authenticatedUser) return;
+): Promise<boolean> => {
+  if (!authenticatedUser) return false;
   try {
     await updateCloudProject(
       authenticatedUser,
@@ -79,14 +79,18 @@ export const generateOnChangeProjectProperty = (
       project,
       cloudProjectId: fileMetadata.fileIdentifier,
     });
-    if (!newVersion)
+    if (!newVersion) {
       throw new Error("Couldn't save project following property update.");
+    }
+
+    return true;
   } catch (error) {
     // TODO: Determine if a feedback should be given to user so that they can try again if necessary.
     console.warn(
       'An error occurred while changing cloud project name. Ignoring.',
       error
     );
+    return false;
   }
 };
 

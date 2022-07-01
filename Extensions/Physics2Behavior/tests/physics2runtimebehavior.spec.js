@@ -1,5 +1,3 @@
-// @ts-check
-
 function assertCollision(object1, object2, options) {
   expect(
     gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(

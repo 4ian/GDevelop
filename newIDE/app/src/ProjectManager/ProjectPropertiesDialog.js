@@ -42,8 +42,8 @@ type Props = {|
   project: gdProject,
   open: boolean,
   initialTab: 'properties' | 'loading-screen',
-  onClose: Function,
-  onApply: Function,
+  onClose: () => void,
+  onApply: (options: { newName?: string }) => void,
   onChangeSubscription: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
@@ -205,28 +205,28 @@ function ProjectPropertiesDialog(props: Props) {
   });
 
   const onApply = () => {
-    if (
-      applyPropertiesToProject(project, {
-        gameResolutionWidth,
-        gameResolutionHeight,
-        adaptGameResolutionAtRuntime,
-        name,
-        description,
-        author,
-        authorIds,
-        version,
-        packageName,
-        orientation,
-        scaleMode,
-        pixelsRounding,
-        sizeOnStartupMode,
-        minFPS,
-        maxFPS,
-        isFolderProject,
-        useDeprecatedZeroAsDefaultZOrder,
-      })
-    )
-      props.onApply();
+    const wasProjectPropertiesApplied = applyPropertiesToProject(project, {
+      gameResolutionWidth,
+      gameResolutionHeight,
+      adaptGameResolutionAtRuntime,
+      name,
+      description,
+      author,
+      authorIds,
+      version,
+      packageName,
+      orientation,
+      scaleMode,
+      pixelsRounding,
+      sizeOnStartupMode,
+      minFPS,
+      maxFPS,
+      isFolderProject,
+      useDeprecatedZeroAsDefaultZOrder,
+    });
+    if (wasProjectPropertiesApplied) {
+      props.onApply(name !== initialProperties.name ? { newName: name } : {});
+    }
   };
 
   return (
@@ -294,9 +294,11 @@ function ProjectPropertiesDialog(props: Props) {
                 </Text>
                 <PublicGameProperties
                   name={name}
-                  setName={setName}
+                  setName={newName => setName(newName.trim())}
                   description={description}
-                  setDescription={setDescription}
+                  setDescription={newDescription =>
+                    setDescription(newDescription.trim())
+                  }
                   project={project}
                   authorIds={authorIds}
                   setAuthorIds={setAuthorIds}

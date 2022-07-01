@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { type AppArguments } from '../Utils/Window';
+import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
 
 /**
  * The data containing the file/url/file identifier to be loaded
@@ -24,7 +25,8 @@ export type StorageProviderOperations = {|
   // Project opening:
   onOpenWithPicker?: () => Promise<?FileMetadata>,
   onOpen?: (
-    fileMetadata: FileMetadata
+    fileMetadata: FileMetadata,
+    onProgress?: (progress: number, message: MessageDescriptor) => void
   ) => Promise<{|
     content: Object,
   |}>,
@@ -50,6 +52,13 @@ export type StorageProviderOperations = {|
     fileMetadata: ?FileMetadata,
   |}>,
 
+  // Project properties saving:
+  onChangeProjectProperty?: (
+    project: gdProject,
+    fileMetadata: FileMetadata,
+    properties: { name: string } // In order to synchronize project and cloud project names.
+  ) => Promise<void>,
+
   // Project auto saving:
   onAutoSaveProject?: (
     project: gdProject,
@@ -68,6 +77,7 @@ export type StorageProviderOperations = {|
 export type StorageProvider = {|
   internalName: string,
   name: MessageDescriptor,
+  needUserAuthentication?: boolean,
   hiddenInOpenDialog?: boolean,
   hiddenInSaveDialog?: boolean,
   disabled?: boolean,
@@ -78,5 +88,6 @@ export type StorageProvider = {|
     setDialog: (() => React.Node) => void,
     /** Close the dialog */
     closeDialog: () => void,
+    authenticatedUser: AuthenticatedUser,
   }) => StorageProviderOperations,
 |};

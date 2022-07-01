@@ -136,7 +136,10 @@ export function ExampleDialog({
         )}
         <Line alignItems="center" noMargin>
           {hasIcon ? (
-            <ExampleIcon exampleShortHeader={exampleShortHeader} size={40} />
+            <ExampleIcon
+              exampleShortHeader={exampleShortHeader}
+              type="thumbnail"
+            />
           ) : null}
           <Column expand noMargin={!hasIcon}>
             <Text noMargin size="title">

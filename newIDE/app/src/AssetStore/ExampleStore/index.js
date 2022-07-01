@@ -76,6 +76,21 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
     return exampleMatches ? exampleMatches.matches : [];
   };
 
+  // When showing examples, always put the starters first.
+  const prepareExamples = React.useCallback(
+    (examples: Array<ExampleShortHeader>) => {
+      const starters = examples.filter(example =>
+        example.tags.includes('Starter')
+      );
+      const others = examples.filter(
+        example => !example.tags.includes('Starter')
+      );
+
+      return [...starters, ...others];
+    },
+    []
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
@@ -106,7 +121,8 @@ export const ExampleStore = ({ isOpening, onOpen, focusOnMount }: Props) => {
                 onRetry={fetchExamplesAndFilters}
                 error={error}
                 searchItems={
-                  searchResults && searchResults.map(({ item }) => item)
+                  searchResults &&
+                  prepareExamples(searchResults.map(({ item }) => item))
                 }
                 getSearchItemUniqueId={getExampleName}
                 renderSearchItem={(exampleShortHeader, onHeightComputed) => (

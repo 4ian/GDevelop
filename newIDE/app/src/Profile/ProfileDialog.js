@@ -87,6 +87,7 @@ const ProfileDialog = ({
           <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
         </Tabs>
       }
+      maxWidth={!authenticatedUser.profile ? 'xs' : undefined}
     >
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (

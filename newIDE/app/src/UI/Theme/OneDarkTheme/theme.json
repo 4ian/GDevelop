@@ -192,6 +192,13 @@
           "value": "#21252B"
         }
       }
+    },
+    "home": {
+      "tabs": {
+        "selected-background-color": {
+          "value": "#4B525F"
+        }
+      }
     }
   },
   "input": {

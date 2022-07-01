@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-import paperDecorator from '../PaperDecorator';
-import ProjectPreCreationDialog from '../../ProjectCreation/ProjectPreCreationDialog';
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
+import ProjectPreCreationDialog from '../../../ProjectCreation/ProjectPreCreationDialog';
 
 export default {
   title: 'Project Creation/ProjectPreCreationDialog',
@@ -14,7 +13,6 @@ export default {
 };
 
 export const Open = () => {
-  const [projectName, setProjectName] = React.useState('Project Name');
   return (
     <ProjectPreCreationDialog
       open
@@ -25,7 +23,6 @@ export const Open = () => {
 };
 
 export const Disabled = () => {
-  const [projectName, setProjectName] = React.useState('Project Name');
   return (
     <ProjectPreCreationDialog
       open

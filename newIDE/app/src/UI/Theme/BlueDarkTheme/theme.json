@@ -184,6 +184,13 @@
           "value": "{theme.surface.canvas.background-color.value}"
         }
       }
+    },
+    "home": {
+      "tabs": {
+        "selected-background-color": {
+          "value": "#03356A"
+        }
+      }
     }
   },
   "input": {

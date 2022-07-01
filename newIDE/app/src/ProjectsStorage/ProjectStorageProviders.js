@@ -94,7 +94,7 @@ const ProjectStorageProviders = (props: Props) => {
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
   const setDialog = (_renderDialog: () => React.Node) => {
-    setRenderDialog(_renderDialog);
+    setRenderDialog((): (() => React.Node) => _renderDialog);
   };
 
   const closeDialog = () => {

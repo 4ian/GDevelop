@@ -108,13 +108,15 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
   searchItemsById: ?{ [string]: SearchItem },
   searchText: string,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
+  chosenFilters: Set<string>,
+  options?: { withoutShuffling?: boolean }
 ): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<{|
     item: SearchItem,
     matches: SearchMatch[],
   |}>>(null);
+  const withoutShuffling = options && options.withoutShuffling;
 
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
@@ -122,14 +124,15 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
     () => {
       if (!searchItemsById || !Object.keys(searchItemsById).length) return null;
 
-      return shuffle(
-        Object.keys(searchItemsById).map(id => ({
-          item: searchItemsById[id],
-          matches: [],
-        }))
-      );
+      const orderedSearchResults = Object.keys(searchItemsById).map(id => ({
+        item: searchItemsById[id],
+        matches: [],
+      }));
+      return withoutShuffling
+        ? orderedSearchResults
+        : shuffle(orderedSearchResults);
     },
-    [searchItemsById]
+    [searchItemsById, withoutShuffling]
   );
 
   // Index items that have been loaded.

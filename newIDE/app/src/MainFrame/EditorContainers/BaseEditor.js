@@ -74,8 +74,6 @@ export type RenderEditorContainerProps = {|
   onCloseProject: () => Promise<void>,
 
   // Other dialogs opening:
-  onOpenTutorials: () => void,
-  onOpenGamesShowcase: () => void,
   onOpenExamples: () => void,
   onOpenHelpFinder: () => void,
   onOpenLanguageDialog: () => void,

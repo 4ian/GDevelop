@@ -254,17 +254,17 @@ describe('Physics2RuntimeBehavior', () => {
       });
       runtimeScene.renderAndStep(1000 / fps);
       // object should have 0 contacts in memory
-      expect(object1Behavior.currentContacts.length).to.be(0)
+      expect(object1Behavior.currentContacts.length).to.be(0);
       // TODO: Once a frame has been run, there should be no contact ended. Known limitation to fix
       // expect(object1Behavior.contactsEndedThisFrame.length).to.be(0)
-      expect(object1Behavior.contactsStartedThisFrame.length).to.be(0)
+      expect(object1Behavior.contactsStartedThisFrame.length).to.be(0);
 
       // Reactivate physics behavior and test contact
       // is not immediately back on but after the first render.
       object1.activateBehavior('Physics2', true);
-      expect(object1Behavior.currentContacts.length).to.be(0)
-      expect(object1Behavior.contactsEndedThisFrame.length).to.be(0)
-      expect(object1Behavior.contactsStartedThisFrame.length).to.be(0)
+      expect(object1Behavior.currentContacts.length).to.be(0);
+      expect(object1Behavior.contactsEndedThisFrame.length).to.be(0);
+      expect(object1Behavior.contactsStartedThisFrame.length).to.be(0);
       runtimeScene.setEventsFunction(() => {
         assertCollision(object1, object2, {
           started: true,
@@ -279,7 +279,6 @@ describe('Physics2RuntimeBehavior', () => {
         collision: true,
         stopped: false,
       });
-
     });
   });
 

@@ -249,16 +249,16 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                 <LineStackLayout noMargin alignItems="center">
                   <Checkbox
                     checked={sortByDate}
-                    onCheck={() => {
-                      setSortByDate(!sortByDate);
+                    onCheck={(_event, checked) => {
+                      setSortByDate(checked);
                     }}
                     label={<Trans>Sort by most recent</Trans>}
                   />
                   <Spacer />
                   <Checkbox
                     checked={showUnsolved}
-                    onCheck={() => {
-                      setShowUnsolved(!showUnsolved);
+                    onCheck={(_event, checked) => {
+                      setShowUnsolved(checked);
                     }}
                     label={<Trans>Show unsolved feedbacks only</Trans>}
                   />

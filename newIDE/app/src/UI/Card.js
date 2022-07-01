@@ -21,17 +21,21 @@ const styles = {
 
 type Props = {|
   children: React.Node,
-  isHighlighted?: boolean,
   cardCornerAction?: React.Node,
-  style?: {| opacity?: number |},
   header?: React.Node,
+
+  disabled?: boolean,
+  isHighlighted?: boolean,
+
+  style?: {| opacity?: number |},
 |};
 
 const Card = ({
   children,
   header,
-  isHighlighted,
   cardCornerAction,
+  isHighlighted,
+  disabled,
   style,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
@@ -39,7 +43,7 @@ const Card = ({
   return (
     <MUICard
       style={{
-        opacity: style && style.opacity ? style.opacity : 1,
+        opacity: disabled ? 0.5 : 1,
         ...(isHighlighted
           ? {
               borderLeftWidth: 4,

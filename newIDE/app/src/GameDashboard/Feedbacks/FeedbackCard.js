@@ -112,7 +112,7 @@ const FeedbackCard = ({
     <I18n>
       {({ i18n }) => (
         <Card
-          style={{ opacity: processed ? 0.5 : 1 }}
+          disabled={processed}
           cardCornerAction={
             <IconButton
               size="small"

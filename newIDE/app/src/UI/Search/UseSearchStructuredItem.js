@@ -4,8 +4,15 @@ import { type ChosenCategory } from './FiltersChooser';
 import shuffle from 'lodash/shuffle';
 import Fuse from 'fuse.js';
 
-export type SearchMatch = {| key: string, indices: number[][], value: string |};
-export type SearchResult<T> = {| item: T, matches: SearchMatch[] |};
+export type SearchMatch = {|
+  key: string,
+  indices: number[][],
+  value: string,
+|};
+export type SearchResult<T> = {|
+  item: T,
+  matches: SearchMatch[],
+|};
 
 export const sharedFuseConfiguration = {
   minMatchCharLength: 1,
@@ -53,10 +60,18 @@ export const tuneMatches = <T>(result: SearchResult<T>, searchText: string) =>
  * Filter a list of items according to the chosen category
  * and the chosen filters.
  */
-export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
+export const filterSearchResults = <
+  SearchItem: {
+    // All search items have tags:
+    tags: Array<string>,
+    // Some search items can have tiers:
+    +tier?: string,
+  }
+>(
   searchResults: ?Array<{| item: SearchItem, matches: SearchMatch[] |}>,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
+  chosenFilters: Set<string>,
+  excludedTiers: Set<string>
 ): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   if (!searchResults) return null;
 
@@ -84,15 +99,17 @@ export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
 
       return true;
     })
-    .filter(({ item: { tags } }) => {
-      return (
-        chosenFilters.size === 0 || tags.some(tag => chosenFilters.has(tag))
-      );
+    .filter(({ item: { tags, tier } }) => {
+      const passTier = !tier || !excludedTiers.has(tier);
+      const passChosenFilters =
+        chosenFilters.size === 0 || tags.some(tag => chosenFilters.has(tag));
+
+      return passTier && passChosenFilters;
     });
 
   const totalTime = performance.now() - startTime;
   console.info(
-    `Filtered items by category/filters in ${totalTime.toFixed(3)}ms.`
+    `Filtered items by category/filters/tier in ${totalTime.toFixed(3)}ms.`
   );
   return filteredSearchResults;
 };
@@ -104,11 +121,19 @@ export const filterSearchResults = <SearchItem: { tags: Array<string> }>(
  * then returns the results of the search (according to the
  * search text and the chosen category/filters).
  */
-export const useSearchItem = <SearchItem: { tags: Array<string> }>(
+export const useSearchItem = <
+  SearchItem: {
+    // All search items have tags:
+    tags: Array<string>,
+    // Some search items can have tiers:
+    +tier?: string,
+  }
+>(
   searchItemsById: ?{ [string]: SearchItem },
   searchText: string,
   chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>
+  chosenFilters: Set<string>,
+  excludedTiers: Set<string>
 ): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<{|
@@ -183,7 +208,8 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
           filterSearchResults(
             shuffledSearchResults,
             chosenCategory,
-            chosenFilters
+            chosenFilters,
+            excludedTiers
           )
         );
       } else {
@@ -213,7 +239,8 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
               matches: tuneMatches(result, searchText),
             })),
             chosenCategory,
-            chosenFilters
+            chosenFilters,
+            excludedTiers
           )
         );
       }
@@ -231,6 +258,7 @@ export const useSearchItem = <SearchItem: { tags: Array<string> }>(
       chosenCategory,
       chosenFilters,
       searchApi,
+      excludedTiers,
     ]
   );
 

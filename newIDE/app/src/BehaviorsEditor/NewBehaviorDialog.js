@@ -346,14 +346,18 @@ export default function NewBehaviorDialog({
               </React.Fragment>
             )}
             {currentTab === 'search' && (
-              <ExtensionStore
-                project={project}
-                isInstalling={isInstalling}
-                onInstall={async extensionShortHeader =>
-                  onInstallExtension(i18n, extensionShortHeader)
-                }
-                showOnlyWithBehaviors
-              />
+              <Line expand>
+                <Column expand noMargin>
+                  <ExtensionStore
+                    project={project}
+                    isInstalling={isInstalling}
+                    onInstall={async extensionShortHeader =>
+                      onInstallExtension(i18n, extensionShortHeader)
+                    }
+                    showOnlyWithBehaviors
+                  />
+                </Column>
+              </Line>
             )}
           </Column>
           <DismissableInfoBar

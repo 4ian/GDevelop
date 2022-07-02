@@ -11,8 +11,12 @@ import {
   useSearchItem,
   type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
-const defaultSearchText = '';
+const emptySearchText = '';
+
+const noExcludedTiers = new Set();
+const excludedCommunityTiers = new Set(['community']);
 
 type ExtensionStoreState = {|
   filters: ?Filters,
@@ -47,10 +51,12 @@ export const ExtensionStoreContext = React.createContext<ExtensionStoreState>({
 
 type ExtensionStoreStateProviderProps = {|
   children: React.Node,
+  defaultSearchText?: string,
 |};
 
 export const ExtensionStoreStateProvider = ({
   children,
+  defaultSearchText,
 }: ExtensionStoreStateProviderProps) => {
   const [
     extensionShortHeadersByName,
@@ -58,11 +64,15 @@ export const ExtensionStoreStateProvider = ({
   ] = React.useState<{
     [string]: ExtensionShortHeader,
   }>({});
+  const preferences = React.useContext(PreferencesContext);
+  const { showCommunityExtensions } = preferences.values;
   const [filters, setFilters] = React.useState<?Filters>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
-  const [searchText, setSearchText] = React.useState(defaultSearchText);
+  const [searchText, setSearchText] = React.useState(
+    defaultSearchText || emptySearchText
+  );
   const filtersState = useFilters();
 
   const fetchExtensionsAndFilters = React.useCallback(
@@ -140,7 +150,8 @@ export const ExtensionStoreStateProvider = ({
     extensionShortHeadersByName,
     searchText,
     chosenCategory,
-    chosenFilters
+    chosenFilters,
+    showCommunityExtensions ? noExcludedTiers : excludedCommunityTiers
   );
 
   const extensionStoreState = React.useMemo(

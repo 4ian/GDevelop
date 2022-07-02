@@ -9,11 +9,11 @@ import RosePineTheme from './RosePineTheme';
 
 /*eslint no-useless-computed-key: "off"*/
 export const themes = {
-    ['GDevelop default Dark']: DefaultDarkTheme,
-    ['GDevelop default Light']: DefaultLightTheme,
-    ['Blue Dark']: BlueDarkTheme,
-    ['Nord']: NordTheme,
-    ['Solarized Dark']: SolarizedDarkTheme,
-    ['One Dark']: OneDarkTheme,
-    ['Rosé Pine']: RosePineTheme,
+  ['GDevelop default Dark']: DefaultDarkTheme,
+  ['GDevelop default Light']: DefaultLightTheme,
+  ['Blue Dark']: BlueDarkTheme,
+  ['Nord']: NordTheme,
+  ['Solarized Dark']: SolarizedDarkTheme,
+  ['One Dark']: OneDarkTheme,
+  ['Rosé Pine']: RosePineTheme,
 };

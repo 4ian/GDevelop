@@ -15,7 +15,7 @@ import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
 import PreferencesContext from './PreferencesContext';
 import Text from '../../UI/Text';
-import { ResponsiveLineStackLayout } from '../../UI/Layout';
+import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
@@ -56,6 +56,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     setBackdropClickBehavior,
     setIsAlwaysOnTopInPreview,
     setEventsSheetCancelInlineParameter,
+    setShowCommunityExtensions,
   } = React.useContext(PreferencesContext);
 
   return (
@@ -81,7 +82,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
       }
     >
       {currentTab === 'preferences' && (
-        <Column>
+        <ColumnStackLayout>
           <Text size="title">
             <Trans>Language</Trans>
           </Text>
@@ -147,213 +148,189 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
           <Text size="title">
             <Trans>Layouts</Trans>
           </Text>
-          <Line>
-            <Column>
-              <RaisedButton
-                label={<Trans>Reset Scene Editor layout</Trans>}
-                onClick={() => setDefaultEditorMosaicNode('scene-editor', null)}
-                disabled={!getDefaultEditorMosaicNode('scene-editor')}
-              />
-              <Spacer />
-              <RaisedButton
-                label={<Trans>Reset Scene Editor (small window) layout</Trans>}
-                onClick={() =>
-                  setDefaultEditorMosaicNode('scene-editor-small', null)
-                }
-                disabled={!getDefaultEditorMosaicNode('scene-editor-small')}
-              />
-              <Spacer />
-              <RaisedButton
-                label={<Trans>Reset Debugger layout</Trans>}
-                onClick={() => setDefaultEditorMosaicNode('debugger', null)}
-                disabled={!getDefaultEditorMosaicNode('debugger')}
-              />
-              <Spacer />
-              <RaisedButton
-                label={<Trans>Reset Resource Editor layout</Trans>}
-                onClick={() =>
-                  setDefaultEditorMosaicNode('resources-editor', null)
-                }
-                disabled={!getDefaultEditorMosaicNode('resources-editor')}
-              />
-              <Spacer />
-              <RaisedButton
-                label={<Trans>Reset Extension Editor layout</Trans>}
-                onClick={() =>
-                  setDefaultEditorMosaicNode(
-                    'events-functions-extension-editor',
-                    null
-                  )
-                }
-                disabled={
-                  !getDefaultEditorMosaicNode(
-                    'events-functions-extension-editor'
-                  )
-                }
-              />
-            </Column>
-          </Line>
+          <Column noMargin>
+            <RaisedButton
+              label={<Trans>Reset Scene Editor layout</Trans>}
+              onClick={() => setDefaultEditorMosaicNode('scene-editor', null)}
+              disabled={!getDefaultEditorMosaicNode('scene-editor')}
+            />
+            <Spacer />
+            <RaisedButton
+              label={<Trans>Reset Scene Editor (small window) layout</Trans>}
+              onClick={() =>
+                setDefaultEditorMosaicNode('scene-editor-small', null)
+              }
+              disabled={!getDefaultEditorMosaicNode('scene-editor-small')}
+            />
+            <Spacer />
+            <RaisedButton
+              label={<Trans>Reset Debugger layout</Trans>}
+              onClick={() => setDefaultEditorMosaicNode('debugger', null)}
+              disabled={!getDefaultEditorMosaicNode('debugger')}
+            />
+            <Spacer />
+            <RaisedButton
+              label={<Trans>Reset Resource Editor layout</Trans>}
+              onClick={() =>
+                setDefaultEditorMosaicNode('resources-editor', null)
+              }
+              disabled={!getDefaultEditorMosaicNode('resources-editor')}
+            />
+            <Spacer />
+            <RaisedButton
+              label={<Trans>Reset Extension Editor layout</Trans>}
+              onClick={() =>
+                setDefaultEditorMosaicNode(
+                  'events-functions-extension-editor',
+                  null
+                )
+              }
+              disabled={
+                !getDefaultEditorMosaicNode('events-functions-extension-editor')
+              }
+            />
+          </Column>
           <Text size="title">
             <Trans>Dialogs</Trans>
           </Text>
-          <Line>
-            <SelectField
-              floatingLabelText={<Trans>Dialog backdrop click behavior</Trans>}
-              value={values.backdropClickBehavior}
-              onChange={(e, i, value: string) =>
-                setBackdropClickBehavior(value)
-              }
-              fullWidth
-            >
-              <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-              <SelectOption value="apply" primaryText={t`Apply changes`} />
-              <SelectOption value="nothing" primaryText={t`Do nothing`} />
-            </SelectField>
-          </Line>
+          <SelectField
+            floatingLabelText={<Trans>Dialog backdrop click behavior</Trans>}
+            value={values.backdropClickBehavior}
+            onChange={(e, i, value: string) => setBackdropClickBehavior(value)}
+            fullWidth
+          >
+            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
+            <SelectOption value="apply" primaryText={t`Apply changes`} />
+            <SelectOption value="nothing" primaryText={t`Do nothing`} />
+          </SelectField>
           <Text size="title">
             <Trans>Updates</Trans>
           </Text>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setAutoDownloadUpdates(check)}
-              toggled={values.autoDownloadUpdates}
-              labelPosition="right"
-              label={
-                <Trans>Auto download and install updates (recommended)</Trans>
-              }
-            />
-          </Line>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setAutoDisplayChangelog(check)}
-              toggled={values.autoDisplayChangelog}
-              labelPosition="right"
-              label={
-                <Trans>
-                  Display What's New when a new version is launched
-                  (recommended)
-                </Trans>
-              }
-            />
-          </Line>
+          <Toggle
+            onToggle={(e, check) => setAutoDownloadUpdates(check)}
+            toggled={values.autoDownloadUpdates}
+            labelPosition="right"
+            label={
+              <Trans>Auto download and install updates (recommended)</Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setAutoDisplayChangelog(check)}
+            toggled={values.autoDisplayChangelog}
+            labelPosition="right"
+            label={
+              <Trans>
+                Display What's New when a new version is launched (recommended)
+              </Trans>
+            }
+          />
           <Text size="title">
             <Trans>Events Sheet</Trans>
           </Text>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setEventsSheetShowObjectThumbnails(check)}
-              toggled={values.eventsSheetShowObjectThumbnails}
-              labelPosition="right"
-              label={<Trans>Display object thumbnails in Events Sheets</Trans>}
-            />
-          </Line>
-          <Line>
-            <Toggle
-              onToggle={(e, check) =>
-                setEventsSheetUseAssignmentOperators(check)
-              }
-              toggled={values.eventsSheetUseAssignmentOperators}
-              labelPosition="right"
-              label={
-                <Trans>Display assignment operators in Events Sheets</Trans>
-              }
-            />
-          </Line>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setUseNewInstructionEditorDialog(check)}
-              toggled={values.useNewInstructionEditorDialog}
-              labelPosition="right"
-              label={<Trans>Use the new action/condition editor</Trans>}
-            />
-          </Line>
-          <Line>
-            <Toggle
-              onToggle={(e, check) =>
-                setUseUndefinedVariablesInAutocompletion(check)
-              }
-              toggled={values.useUndefinedVariablesInAutocompletion}
-              labelPosition="right"
-              label={
-                <Trans>
-                  Suggest names of variables used in events but not declared in
-                  the list of variables
-                </Trans>
-              }
-            />
-          </Line>
-          <Line>
-            <SelectField
-              floatingLabelText={
-                <Trans>
-                  Escape key behavior when editing an parameter inline
-                </Trans>
-              }
-              value={values.eventsSheetCancelInlineParameter}
-              onChange={(e, i, value: string) => {
-                setEventsSheetCancelInlineParameter(value);
-              }}
-              fullWidth
-            >
-              <SelectOption value="cancel" primaryText={t`Cancel changes`} />
-              <SelectOption value="apply" primaryText={t`Apply changes`} />
-            </SelectField>
-          </Line>
+          <Toggle
+            onToggle={(e, check) => setEventsSheetShowObjectThumbnails(check)}
+            toggled={values.eventsSheetShowObjectThumbnails}
+            labelPosition="right"
+            label={<Trans>Display object thumbnails in Events Sheets</Trans>}
+          />
+          <Toggle
+            onToggle={(e, check) => setEventsSheetUseAssignmentOperators(check)}
+            toggled={values.eventsSheetUseAssignmentOperators}
+            labelPosition="right"
+            label={<Trans>Display assignment operators in Events Sheets</Trans>}
+          />
+          <Toggle
+            onToggle={(e, check) => setUseNewInstructionEditorDialog(check)}
+            toggled={values.useNewInstructionEditorDialog}
+            labelPosition="right"
+            label={<Trans>Use the new action/condition editor</Trans>}
+          />
+          <Toggle
+            onToggle={(e, check) =>
+              setUseUndefinedVariablesInAutocompletion(check)
+            }
+            toggled={values.useUndefinedVariablesInAutocompletion}
+            labelPosition="right"
+            label={
+              <Trans>
+                Suggest names of variables used in events but not declared in
+                the list of variables
+              </Trans>
+            }
+          />
+          <SelectField
+            floatingLabelText={
+              <Trans>
+                Escape key behavior when editing an parameter inline
+              </Trans>
+            }
+            value={values.eventsSheetCancelInlineParameter}
+            onChange={(e, i, value: string) => {
+              setEventsSheetCancelInlineParameter(value);
+            }}
+            fullWidth
+          >
+            <SelectOption value="cancel" primaryText={t`Cancel changes`} />
+            <SelectOption value="apply" primaryText={t`Apply changes`} />
+          </SelectField>
           <Text size="title">
             <Trans>Embedded help and tutorials</Trans>
           </Text>
-          <Line>
-            <Column noMargin>
-              <Line>
-                <RaisedButton
-                  label={<Trans>Reset hidden embedded explanations</Trans>}
-                  onClick={() => showAllAlertMessages()}
-                  disabled={!Object.keys(values.hiddenAlertMessages).length}
-                />
-              </Line>
-              <Line>
-                <RaisedButton
-                  label={<Trans>Reset hidden embedded tutorials</Trans>}
-                  onClick={() => showAllTutorialHints()}
-                  disabled={!Object.keys(values.hiddenTutorialHints).length}
-                />
-              </Line>
-            </Column>
-          </Line>
+          <Column noMargin>
+            <Line>
+              <RaisedButton
+                label={<Trans>Reset hidden embedded explanations</Trans>}
+                onClick={() => showAllAlertMessages()}
+                disabled={!Object.keys(values.hiddenAlertMessages).length}
+              />
+            </Line>
+            <Line>
+              <RaisedButton
+                label={<Trans>Reset hidden embedded tutorials</Trans>}
+                onClick={() => showAllTutorialHints()}
+                disabled={!Object.keys(values.hiddenTutorialHints).length}
+              />
+            </Line>
+          </Column>
           <Text size="title">
             <Trans>Advanced</Trans>
           </Text>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setAutosaveOnPreview(check)}
-              toggled={values.autosaveOnPreview}
-              labelPosition="right"
-              label={<Trans>Auto-save project on Preview</Trans>}
-            />
-          </Line>
-          <Line>
-            <Toggle
-              onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
-              toggled={values.autoOpenMostRecentProject}
-              labelPosition="right"
-              label={
-                <Trans>
-                  Automatically re-open the project edited during last session
-                </Trans>
-              }
-            />
-          </Line>
+          <Toggle
+            onToggle={(e, check) => setAutosaveOnPreview(check)}
+            toggled={values.autosaveOnPreview}
+            labelPosition="right"
+            label={<Trans>Auto-save project on Preview</Trans>}
+          />
+          <Toggle
+            onToggle={(e, check) => setAutoOpenMostRecentProject(check)}
+            toggled={values.autoOpenMostRecentProject}
+            labelPosition="right"
+            label={
+              <Trans>
+                Automatically re-open the project edited during last session
+              </Trans>
+            }
+          />
+          <Toggle
+            onToggle={(e, check) => setShowCommunityExtensions(check)}
+            toggled={values.showCommunityExtensions}
+            labelPosition="right"
+            label={
+              <Trans>
+                Show community (non reviewed) extensions in the list of
+                extensions
+              </Trans>
+            }
+          />
           {electron && (
             <>
-              <Line>
+              <ColumnStackLayout expand noMargin>
                 <Toggle
                   onToggle={(e, check) => setIsMenuBarHiddenInPreview(check)}
                   toggled={values.isMenuBarHiddenInPreview}
                   labelPosition="right"
                   label={<Trans>Hide the menu bar in the preview window</Trans>}
                 />
-              </Line>
-              <Line>
                 <Toggle
                   onToggle={(e, check) => setIsAlwaysOnTopInPreview(check)}
                   toggled={values.isAlwaysOnTopInPreview}
@@ -364,25 +341,23 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                     </Trans>
                   }
                 />
-              </Line>
+              </ColumnStackLayout>
             </>
           )}
           {Window.isDev() && (
-            <Line>
-              <Toggle
-                onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
-                toggled={values.useGDJSDevelopmentWatcher}
-                labelPosition="right"
-                label={
-                  <Trans>
-                    Watch changes in game engine (GDJS) sources and auto import
-                    them (dev only)
-                  </Trans>
-                }
-              />
-            </Line>
+            <Toggle
+              onToggle={(e, check) => setUseGDJSDevelopmentWatcher(check)}
+              toggled={values.useGDJSDevelopmentWatcher}
+              labelPosition="right"
+              label={
+                <Trans>
+                  Watch changes in game engine (GDJS) sources and auto import
+                  them (dev only)
+                </Trans>
+              }
+            />
           )}
-        </Column>
+        </ColumnStackLayout>
       )}
       {currentTab === 'shortcuts' && (
         <Line expand>

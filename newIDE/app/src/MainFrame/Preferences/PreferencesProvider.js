@@ -141,6 +141,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetCancelInlineParameter: this._setEventsSheetCancelInlineParameter.bind(
       this
     ),
+    setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
   };
 
   componentDidMount() {
@@ -318,6 +319,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetCancelInlineParameter,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowCommunityExtensions(showCommunityExtensions: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showCommunityExtensions,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

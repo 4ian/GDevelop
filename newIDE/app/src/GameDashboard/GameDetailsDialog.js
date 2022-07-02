@@ -533,7 +533,7 @@ export const GameDetailsDialog = ({
                     />
                   </Line>
                   {gameUnregisterErrorText ? (
-                    <PlaceholderError kind="error">
+                    <PlaceholderError>
                       {gameUnregisterErrorText}
                     </PlaceholderError>
                   ) : null}

@@ -84,8 +84,8 @@ export const WithCommunityExtensions = () => {
     </PreferencesContext.Provider>
   );
 };
-Default.decorators = [withMock];
-Default.parameters = apiDataFakeExtensions;
+WithCommunityExtensions.decorators = [withMock];
+WithCommunityExtensions.parameters = apiDataFakeExtensions;
 
 export const WithServerSideErrors = () => (
   <FixedHeightFlexContainer height={400}>
@@ -129,8 +129,8 @@ export const ExtensionBeingInstalled = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-Default.decorators = [withMock];
-Default.parameters = apiDataFakeExtensions;
+ExtensionBeingInstalled.decorators = [withMock];
+ExtensionBeingInstalled.parameters = apiDataFakeExtensions;
 
 export const OnlyWithBehaviors = () => (
   <FixedHeightFlexContainer height={400}>
@@ -144,5 +144,5 @@ export const OnlyWithBehaviors = () => (
     </ExtensionStoreStateProvider>
   </FixedHeightFlexContainer>
 );
-Default.decorators = [withMock];
-Default.parameters = apiDataFakeExtensions;
+OnlyWithBehaviors.decorators = [withMock];
+OnlyWithBehaviors.parameters = apiDataFakeExtensions;

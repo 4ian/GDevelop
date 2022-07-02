@@ -4,7 +4,10 @@ import { GDevelopAssetApi } from './ApiConfigs';
 import semverSatisfies from 'semver/functions/satisfies';
 import { type UserPublicProfileSearch } from './User';
 
+type ExtensionTier = 'community' | 'reviewed';
+
 export type ExtensionShortHeader = {|
+  tier: ExtensionTier,
   shortDescription: string,
   authors?: Array<UserPublicProfileSearch>,
   extensionNamespace: string,

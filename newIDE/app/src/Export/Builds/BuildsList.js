@@ -5,7 +5,6 @@ import * as React from 'react';
 import { Column, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
-import Text from '../../UI/Text';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import PlaceholderError from '../../UI/PlaceholderError';
 import SelectField from '../../UI/SelectField';
@@ -143,7 +142,7 @@ const BuildsList = ({
         )}
         {authenticatedUser.authenticated && error && (
           <PlaceholderError onRetry={loadBuilds}>
-            <Text>{error.message}</Text>
+            {error.message}
           </PlaceholderError>
         )}
         {authenticatedUser.authenticated &&

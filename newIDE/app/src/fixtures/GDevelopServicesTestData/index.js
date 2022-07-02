@@ -3,23 +3,29 @@ import {
   type Usages,
   type Subscription,
   type Limits,
-} from '../Utils/GDevelopServices/Usage';
+} from '../../Utils/GDevelopServices/Usage';
 import { User as FirebaseUser } from 'firebase/auth';
-import { type Profile } from '../Utils/GDevelopServices/Authentication';
-import { type Release } from '../Utils/GDevelopServices/Release';
-import { type Build } from '../Utils/GDevelopServices/Build';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
-import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
-import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { type Profile } from '../../Utils/GDevelopServices/Authentication';
+import { type Release } from '../../Utils/GDevelopServices/Release';
+import { type Build } from '../../Utils/GDevelopServices/Build';
+import {
+  type ExtensionShortHeader,
+  type ExtensionHeader,
+} from '../../Utils/GDevelopServices/Extension';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import {
+  type Game,
+  type ShowcasedGame,
+} from '../../Utils/GDevelopServices/Game';
+import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
   type AssetPacks,
-} from '../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Asset';
 import { formatISO, subDays } from 'date-fns';
-import { type Comment } from '../Utils/GDevelopServices/Play';
+import { type Comment } from '../../Utils/GDevelopServices/Play';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -738,21 +744,48 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'reviewed',
   shortDescription:
     'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
   extensionNamespace: '',
   fullName: 'Fire bullets',
   name: 'FireBullet',
   version: '0.0.2',
-  url: 'Extensions/FireBullet.json',
-  headerUrl: 'Extensions/FireBullet-header.json',
+  url: 'https://resources.gdevelop-app.com/extensions/FireBullet.json',
+  headerUrl:
+    'https://resources.gdevelop-app.com/extensions/FireBullet-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
-  previewIconUrl: 'http://example.com/icon.svg',
+  previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
 };
 
+export const fireBulletExtensionHeader: ExtensionHeader = {
+  ...fireBulletExtensionShortHeader,
+  description:
+    'This is a longer description explaining:\n* How to\n* Use the extension\n\nWith *some* **markdown** :)',
+  helpPath: 'https://example.com',
+  iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
+};
+
+export const uncompatibleFireBulletExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  gdevelopVersion: '2000.0.0',
+};
+
+export const alreadyInstalledExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  name: 'SomeAlreadyInstalledExtension',
+};
+
+export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  tier: 'community',
+  name: 'SomeAlreadyInstalledExtension',
+};
+
 export const flashExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'reviewed',
   shortDescription:
     'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
   extensionNamespace: '',
@@ -762,9 +795,35 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: ['flash', 'blink', 'visible', 'invisible', 'hit', 'damage'],
-  previewIconUrl: 'http://example.com/icon.svg',
+  previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+};
+
+export const communityTierExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'community',
+  shortDescription:
+    'This is an example of an extension that is a community extension (not reviewed).',
+  extensionNamespace: '',
+  fullName: 'Fake Community extension',
+  name: 'FakeCommunityExtension',
+  version: '0.0.2',
+  url:
+    'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension.json',
+  headerUrl:
+    'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json',
+  tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
+  eventsBasedBehaviorsCount: 1,
+  eventsFunctionsCount: 0,
+};
+
+export const communityTierExtensionHeader: ExtensionHeader = {
+  ...communityTierExtensionShortHeader,
+  description:
+    'This is a longer description explaining:\n* How to\n* Use the extension\n\nWith *some* **markdown** :)',
+  helpPath: 'https://example.com',
+  iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
 };
 
 export const game1: Game = {

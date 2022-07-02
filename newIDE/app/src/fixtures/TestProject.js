@@ -486,6 +486,17 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   const emptyEventsList = new gd.EventsList();
 
   // Events functions extension
+  const someAlreadyInstalledExtension = project.insertNewEventsFunctionsExtension(
+    'SomeAlreadyInstalledExtension',
+    0
+  );
+  someAlreadyInstalledExtension.setNamespace('SomeAlreadyInstalledExtension');
+  someAlreadyInstalledExtension.setName('SomeAlreadyInstalledExtension');
+  someAlreadyInstalledExtension.setFullName(
+    'Some fake already installed extension'
+  );
+
+  // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
     'TestExt',
     0

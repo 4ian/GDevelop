@@ -496,7 +496,7 @@ export const LeaderboardAdmin = ({
   if (apiError && apiError.action === 'leaderboardsFetching') {
     return (
       <CenteredError>
-        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards}>
           {apiError.message}
         </PlaceholderError>
       </CenteredError>
@@ -507,7 +507,7 @@ export const LeaderboardAdmin = ({
 
     return (
       <CenteredError>
-        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards}>
           <Trans>
             An error occurred when retrieving leaderboards, please try again
             later.
@@ -932,9 +932,7 @@ export const LeaderboardAdmin = ({
                       {apiError &&
                       (apiError.action === 'leaderboardDeletion' ||
                         apiError.action === 'leaderboardPrimaryUpdate') ? (
-                        <PlaceholderError kind="error">
-                          {apiError.message}
-                        </PlaceholderError>
+                        <PlaceholderError>{apiError.message}</PlaceholderError>
                       ) : null}
                     </>
                   ) : null}
@@ -976,10 +974,7 @@ export const LeaderboardAdmin = ({
               </Line>
               {apiError && apiError.action === 'entriesFetching' ? (
                 <CenteredError>
-                  <PlaceholderError
-                    onRetry={onFetchLeaderboardEntries}
-                    kind="error"
-                  >
+                  <PlaceholderError onRetry={onFetchLeaderboardEntries}>
                     {apiError.message}
                   </PlaceholderError>
                 </CenteredError>

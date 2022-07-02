@@ -13,6 +13,7 @@ import {
 } from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
+const excludedTiers = new Set(); // No tiers for examples.
 
 type ExampleStoreState = {|
   filters: ?Filters,
@@ -131,7 +132,8 @@ export const ExampleStoreStateProvider = ({
     exampleShortHeadersById,
     searchText,
     chosenCategory,
-    chosenFilters
+    chosenFilters,
+    excludedTiers
   );
 
   const exampleStoreState = React.useMemo(

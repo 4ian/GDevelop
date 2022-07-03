@@ -374,7 +374,7 @@
   "mosaic": {
     "title": {
       "color": {
-        "value": "#191724"
+        "value": "#ebbcba"
       }
     },
     "layout": {
@@ -387,7 +387,7 @@
     },
     "toolbar": {
       "background-color": {
-        "value": "#ebbcba"
+        "value": "#26233a"
       },
       "border-color-hover": {
         "value": "{theme.primary.color.value}"

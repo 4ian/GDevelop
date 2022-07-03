@@ -8,7 +8,7 @@ import {
 } from '../../Utils/GDevelopServices/Extension';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
-  useSearchItem,
+  useSearchStructuredItem,
   type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
 import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
@@ -67,6 +67,9 @@ export const ExtensionStoreStateProvider = ({
   const preferences = React.useContext(PreferencesContext);
   const { showCommunityExtensions } = preferences.values;
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [firstExtensionIds, setFirstExtensionIds] = React.useState<
+    Array<string>
+  >([]);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
@@ -112,6 +115,11 @@ export const ExtensionStoreStateProvider = ({
             defaultTags: sortedTags,
             tagsTree: [],
           });
+          setFirstExtensionIds(
+            extensionRegistry.views
+              ? extensionRegistry.views.default.firstExtensionIds
+              : []
+          );
         } catch (error) {
           console.error(
             `Unable to load the extensions from the extension store:`,
@@ -146,13 +154,15 @@ export const ExtensionStoreStateProvider = ({
   const searchResults: ?Array<{|
     item: ExtensionShortHeader,
     matches: SearchMatch[],
-  |}> = useSearchItem(
-    extensionShortHeadersByName,
+  |}> = useSearchStructuredItem(extensionShortHeadersByName, {
     searchText,
     chosenCategory,
     chosenFilters,
-    showCommunityExtensions ? noExcludedTiers : excludedCommunityTiers
-  );
+    excludedTiers: showCommunityExtensions
+      ? noExcludedTiers
+      : excludedCommunityTiers,
+    defaultFirstSearchItemIds: firstExtensionIds,
+  });
 
   const extensionStoreState = React.useMemo(
     () => ({

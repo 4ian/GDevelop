@@ -14,6 +14,14 @@ export type SearchResult<T> = {|
   matches: SearchMatch[],
 |};
 
+type SearchOptions = {|
+  searchText: string,
+  chosenCategory: ?ChosenCategory,
+  chosenFilters: Set<string>,
+  excludedTiers: Set<string>,
+  defaultFirstSearchItemIds: Array<string>,
+|};
+
 export const sharedFuseConfiguration = {
   minMatchCharLength: 1,
   threshold: 0.35,
@@ -68,11 +76,11 @@ export const filterSearchResults = <
     +tier?: string,
   }
 >(
-  searchResults: ?Array<{| item: SearchItem, matches: SearchMatch[] |}>,
+  searchResults: ?Array<SearchResult<SearchItem>>,
   chosenCategory: ?ChosenCategory,
   chosenFilters: Set<string>,
   excludedTiers: Set<string>
-): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
+): ?Array<SearchResult<SearchItem>> => {
   if (!searchResults) return null;
 
   const startTime = performance.now();
@@ -121,7 +129,7 @@ export const filterSearchResults = <
  * then returns the results of the search (according to the
  * search text and the chosen category/filters).
  */
-export const useSearchItem = <
+export const useSearchStructuredItem = <
   SearchItem: {
     // All search items have tags:
     tags: Array<string>,
@@ -130,10 +138,13 @@ export const useSearchItem = <
   }
 >(
   searchItemsById: ?{ [string]: SearchItem },
-  searchText: string,
-  chosenCategory: ?ChosenCategory,
-  chosenFilters: Set<string>,
-  excludedTiers: Set<string>
+  {
+    searchText,
+    chosenCategory,
+    chosenFilters,
+    excludedTiers,
+    defaultFirstSearchItemIds,
+  }: SearchOptions
 ): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   const searchApiRef = React.useRef<?any>(null);
   const [searchResults, setSearchResults] = React.useState<?Array<{|
@@ -143,18 +154,26 @@ export const useSearchItem = <
 
   // Keep in memory a list of all the items, shuffled for
   // easing random discovery of items when no search is done.
-  const shuffledSearchResults = React.useMemo(
+  const orderedSearchResults: Array<
+    SearchResult<SearchItem>
+  > | null = React.useMemo(
     () => {
       if (!searchItemsById || !Object.keys(searchItemsById).length) return null;
 
-      return shuffle(
-        Object.keys(searchItemsById).map(id => ({
+      const alreadyOrderedIds = new Set<string>(defaultFirstSearchItemIds);
+      const nonOrderedIds = Object.keys(searchItemsById).filter(
+        id => !alreadyOrderedIds.has(id)
+      );
+
+      // Return the ordered results first, and shuffle the rest.
+      return [...defaultFirstSearchItemIds, ...shuffle(nonOrderedIds)].map(
+        id => ({
           item: searchItemsById[id],
           matches: [],
-        }))
+        })
       );
     },
-    [searchItemsById]
+    [searchItemsById, defaultFirstSearchItemIds]
   );
 
   // Index items that have been loaded.
@@ -206,7 +225,7 @@ export const useSearchItem = <
       if (!searchText) {
         setSearchResults(
           filterSearchResults(
-            shuffledSearchResults,
+            orderedSearchResults,
             chosenCategory,
             chosenFilters,
             excludedTiers
@@ -252,7 +271,7 @@ export const useSearchItem = <
       };
     },
     [
-      shuffledSearchResults,
+      orderedSearchResults,
       searchItemsById,
       searchText,
       chosenCategory,

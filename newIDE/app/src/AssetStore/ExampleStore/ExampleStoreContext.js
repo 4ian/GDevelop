@@ -8,12 +8,13 @@ import {
 } from '../../Utils/GDevelopServices/Example';
 import { type Filters } from '../../Utils/GDevelopServices/Filters';
 import {
-  useSearchItem,
+  useSearchStructuredItem,
   type SearchMatch,
 } from '../../UI/Search/UseSearchStructuredItem';
 
 const defaultSearchText = '';
 const excludedTiers = new Set(); // No tiers for examples.
+const firstExampleIds = [];
 
 type ExampleStoreState = {|
   filters: ?Filters,
@@ -128,13 +129,13 @@ export const ExampleStoreStateProvider = ({
   const searchResults: ?Array<{|
     item: ExampleShortHeader,
     matches: SearchMatch[],
-  |}> = useSearchItem(
-    exampleShortHeadersById,
+  |}> = useSearchStructuredItem(exampleShortHeadersById, {
     searchText,
     chosenCategory,
     chosenFilters,
-    excludedTiers
-  );
+    excludedTiers,
+    defaultFirstSearchItemIds: firstExampleIds,
+  });
 
   const exampleStoreState = React.useMemo(
     () => ({

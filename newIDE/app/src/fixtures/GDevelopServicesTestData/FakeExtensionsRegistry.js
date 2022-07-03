@@ -424,6 +424,15 @@ export const fakeExtensionsRegistry: ExtensionsRegistry = {
     'sdk',
     'ads',
   ],
+  views: {
+    default: {
+      firstExtensionIds: [
+        'SomeAlreadyInstalledExtension',
+        'Bounce',
+        'BoidsMovement',
+      ],
+    },
+  },
   extensionShortHeaders: [
     {
       tier: 'reviewed',

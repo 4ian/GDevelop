@@ -6,6 +6,8 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace network {
+      const logger = new gdjs.Logger('Network requests');
+
       /**
        * Send an asynchronous request to the specified URL, with the specified (text)
        * body, method and contentType (defaults to `application/x-www-form-urlencoded`).
@@ -35,8 +37,10 @@ namespace gdjs {
             err.currentTarget.status === 0
           ) {
             errorVar.setString('REQUEST_NOT_SENT');
+            logger.error('The request could not be sent!');
           } else {
             errorVar.setString('' + err);
+            logger.error('An error happened while sending the request! ' + err);
           }
         };
         try {
@@ -64,6 +68,43 @@ namespace gdjs {
         } catch (err) {
           onError(err);
         }
+      };
+
+      export const sendAwaitableAsyncRequest = (
+        url: string,
+        body: string,
+        method: string,
+        contentType: string,
+        responseVar: gdjs.Variable,
+        errorVar: gdjs.Variable
+      ) => {
+        return new gdjs.PromiseTask(
+          fetch(url, {
+            body: method !== 'GET' ? body : undefined,
+            method,
+            headers: {
+              'Content-Type':
+                contentType || 'application/x-www-form-urlencoded',
+            },
+          })
+            .then(async (response) => {
+              const result = await response.text();
+              if (response.status >= 400) {
+                errorVar.setString('' + response.status);
+                logger.error(
+                  'An error code was sent back while making the request! HTTP Status code: ' +
+                    response.status
+                );
+              }
+              responseVar.setString(result);
+            })
+            .catch((error) => {
+              errorVar.setString('' + error);
+              logger.error(
+                'An error happened while sending the request! ' + error
+              );
+            })
+        );
       };
 
       /**

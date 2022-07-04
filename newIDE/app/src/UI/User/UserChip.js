@@ -9,6 +9,7 @@ import { getGravatarUrl } from '../GravatarUrl';
 import DotBadge from '../DotBadge';
 import RaisedButton from '../RaisedButton';
 import { shortenString } from '../../Utils/StringHelpers';
+import TextButton from '../TextButton';
 
 const useStyles = makeStyles({
   root: { flexDirection: 'column' },
@@ -20,8 +21,8 @@ const useStyles = makeStyles({
 
 const styles = {
   avatar: {
-    width: 25,
-    height: 25,
+    width: 20,
+    height: 20,
   },
 };
 
@@ -33,35 +34,35 @@ type Props = {|
 
 const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
   const classes = useStyles();
-  const label = profile ? profile.username || profile.email : undefined;
-  const shortenedLabel = label ? shortenString(label, 20) : undefined;
   return (
     <DotBadge
       overlap="circle"
       invisible={!displayNotificationBadge}
       classes={classes}
     >
-      <RaisedButton
-        label={
-          shortenedLabel || (
-            <span>
-              <Trans>Sign in</Trans>
-            </span>
-          )
-        }
-        onClick={onClick}
-        primary
-        icon={
-          profile ? (
+      {profile ? (
+        <TextButton
+          label={shortenString(profile.username || profile.email, 20)}
+          onClick={onClick}
+          icon={
             <Avatar
               src={getGravatarUrl(profile.email || '', { size: 50 })}
               style={styles.avatar}
             />
-          ) : (
-            <Person style={styles.avatar} />
-          )
-        }
-      />
+          }
+        />
+      ) : (
+        <RaisedButton
+          label={
+            <span>
+              <Trans>Create account - Sign in</Trans>
+            </span>
+          }
+          onClick={onClick}
+          primary
+          icon={<Person fontSize="small" />}
+        />
+      )}
     </DotBadge>
   );
 };

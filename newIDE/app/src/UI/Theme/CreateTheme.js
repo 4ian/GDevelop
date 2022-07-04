@@ -27,13 +27,43 @@ export function getMuiOverrides(
 ) {
   return {
     MuiTypography: {
+      h1: {
+        fontSize: '44px',
+        lineHeight: '56px',
+        fontWeight: 900,
+        letterSpacing: '0.01em',
+      },
+      h2: {
+        fontSize: '33px',
+        lineHeight: '40px',
+        fontWeight: 700,
+      },
+      h3: {
+        fontSize: '25px',
+        lineHeight: '32px',
+        fontWeight: 700,
+      },
+      h4: {
+        fontSize: '19px',
+        lineHeight: '24px',
+        fontWeight: 700,
+        letterSpacing: '0.01em',
+      },
       h5: {
-        // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
-        fontWeight: 600,
+        fontSize: '14px',
+        lineHeight: '20px',
+        fontWeight: 700,
+        letterSpacing: '0.02em',
       },
       h6: {
         // Make h6, used in Drawer title bars, use the same weight as tabs and mosaic windows
         fontWeight: 600,
+      },
+      body1: {
+        fontSize: '14px',
+        lineHeight: '20px',
+        fontWeight: 400,
+        letterSpacing: '0.01em',
       },
     },
     MuiInput: {
@@ -158,6 +188,23 @@ export function getMuiOverrides(
         letterSpacing: '0.3px',
       },
       outlined: { borderColor: outlinedButtonBorderColor },
+      outlinedSizeSmall: {
+        fontSize: '12px',
+        fontWeight: 700,
+      },
+      containedSizeSmall: {
+        fontSize: '12px',
+        fontWeight: 700,
+      },
+      textSizeSmall: {
+        fontSize: '12px',
+        fontWeight: 700,
+      },
+    },
+    MuiSvgIcon: {
+      fontSizeSmall: {
+        fontSize: '15px',
+      },
     },
     // Make MuiAccordion much more compact than default.
     // Some (or all) of these styles can be removed on MUIv5,
@@ -238,6 +285,7 @@ export function createGdevelopTheme({
         type: paletteType,
         canvasColor: styles['ThemeSurfaceCanvasBackgroundColor'],
         primary: styles['ThemePrimaryColor'],
+        secondary: styles['ThemeSecondaryColor'],
       },
       message: {
         warning: styles['ThemeMessageWarningColor'],
@@ -257,9 +305,8 @@ export function createGdevelopTheme({
         header: {
           backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
         },
-        tabs: {
-          selectedBackgroundColor:
-            styles['ThemeHomeTabsSelectedBackgroundColor'],
+        separator: {
+          color: styles['ThemeHomeSeparatorColor'],
         },
       },
       dropIndicator: {

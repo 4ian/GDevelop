@@ -10,6 +10,7 @@ import { type AppArguments } from '../Utils/Window';
 export type FileMetadata = {|
   /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
+  lastModifiedDate?: number,
 |};
 
 export type FileMetadataAndStorageProviderName = {

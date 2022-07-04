@@ -18,6 +18,8 @@ import { GamesShowcaseContext } from '../../../GamesShowcase/GamesShowcaseContex
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
+import PreferencesContext from '../../Preferences/PreferencesContext';
+import { GetStartedSection } from './GetStartedSection';
 
 type Props = {|
   project: ?gdProject,
@@ -78,6 +80,10 @@ export const HomePage = React.memo<Props>(
         GamesShowcaseContext
       );
       const { fetchExamplesAndFilters } = React.useContext(ExampleStoreContext);
+      const {
+        values: { showGetStartedSection },
+        setShowGetStartedSection,
+      } = React.useContext(PreferencesContext);
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
@@ -107,7 +113,9 @@ export const HomePage = React.memo<Props>(
         forceUpdateEditor,
       }));
 
-      const [activeTab, setActiveTab] = React.useState<HomeTab>('Build');
+      const initialTab = showGetStartedSection ? 'get-started' : 'build';
+
+      const [activeTab, setActiveTab] = React.useState<HomeTab>(initialTab);
 
       return (
         <I18n>
@@ -125,7 +133,16 @@ export const HomePage = React.memo<Props>(
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
                   />
-                  {activeTab === 'Build' && (
+                  {activeTab === 'get-started' && (
+                    <GetStartedSection
+                      onTabChange={setActiveTab}
+                      onOpenExamples={onOpenExamples}
+                      onOpenOnboardingDialog={onOpenOnboardingDialog}
+                      showGetStartedSection={showGetStartedSection}
+                      setShowGetStartedSection={setShowGetStartedSection}
+                    />
+                  )}
+                  {activeTab === 'build' && (
                     <BuildSection
                       project={project}
                       canOpen={canOpen}
@@ -134,7 +151,7 @@ export const HomePage = React.memo<Props>(
                       onOpenRecentFile={onOpenRecentFile}
                     />
                   )}
-                  {activeTab === 'Learn' && (
+                  {activeTab === 'learn' && (
                     <LearnSection
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
                       onOpenExamples={onOpenExamples}
@@ -142,8 +159,8 @@ export const HomePage = React.memo<Props>(
                       onOpenHelpFinder={onOpenHelpFinder}
                     />
                   )}
-                  {activeTab === 'Play' && <PlaySection />}
-                  {activeTab === 'Community' && <CommunitySection />}
+                  {activeTab === 'play' && <PlaySection />}
+                  {activeTab === 'community' && <CommunitySection />}
                 </Line>
               </Column>
             </>

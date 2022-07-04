@@ -124,15 +124,22 @@ export const onSaveProject = (
   fileMetadata: FileMetadata,
 |}> => {
   const filePath = fileMetadata.fileIdentifier;
+  const now = Date.now();
   if (!filePath) {
     return Promise.reject(
       'Project file is empty, "Save as" should have been called?'
     );
   }
+  const newFileMetadata = {
+    ...fileMetadata,
+    lastModifiedDate: now,
+  };
+
+  console.log('SAVING');
 
   const projectPath = path.dirname(filePath);
   return writeProjectFiles(project, filePath, projectPath).then(() => {
-    return { wasSaved: true, fileMetadata }; // Save was properly done
+    return { wasSaved: true, fileMetadata: newFileMetadata }; // Save was properly done
   });
 };
 
@@ -173,12 +180,15 @@ export const onSaveProjectAs = (
   // Update the project with the new file path (resources have already been updated)
   project.setProjectFile(filePath);
 
+  console.log('SAVING');
+
   return writeProjectFiles(project, filePath, projectPath).then(() => {
     return {
       wasSaved: true,
       fileMetadata: {
         ...fileMetadata,
         fileIdentifier: filePath,
+        lastModifiedDate: Date.now(),
       },
     }; // Save was properly done
   });

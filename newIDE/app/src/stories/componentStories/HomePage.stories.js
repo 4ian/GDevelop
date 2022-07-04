@@ -27,6 +27,19 @@ const getRecentProjectFiles = (count: number) =>
   new Array(count).fill(0).map((_, index) => ({
     fileMetadata: {
       fileIdentifier: `Users/Gdevelop/project ${index}`,
+      lastModifiedDate: Math.floor(Math.random() * 1656942410477) + 1,
+    },
+    storageProviderName: 'test',
+  }));
+
+const getPartiallySavedRecentProjectFiles = (count: number) =>
+  new Array(count).fill(0).map((_, index) => ({
+    fileMetadata: {
+      fileIdentifier: `Users/Gdevelop/project ${index}`,
+      lastModifiedDate:
+        index % 3 === 0
+          ? Math.floor(Math.random() * 1656942410477) + 1
+          : undefined,
     },
     storageProviderName: 'test',
   }));
@@ -114,6 +127,13 @@ export const LotOfRecentFiles = () => (
   <WrappedHomePage
     project={testProject.project}
     recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+  />
+);
+export const SomeRecentFilesNotSavedYet = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getPartiallySavedRecentProjectFiles(20)}
     user={fakeIndieAuthenticatedUser}
   />
 );

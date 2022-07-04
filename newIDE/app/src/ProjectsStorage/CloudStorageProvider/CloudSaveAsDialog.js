@@ -1,7 +1,10 @@
 // @flow
 
-import { Trans } from '@lingui/macro';
 import * as React from 'react';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+import { Trans, t } from '@lingui/macro';
+
 import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import TextField from '../../UI/TextField';
@@ -13,42 +16,59 @@ type Props = {|
   onSave: (newCloudProjectName: string) => void,
 |};
 
-const CloudSaveAsDialog = ({ onCancel, onSave, nameSuggestion }: Props) => {
-  const [name, setName] = React.useState<string>(nameSuggestion);
+const CloudSaveAsDialog = (props: Props) => {
+  const [name, setName] = React.useState<string>(props.nameSuggestion);
+  const [error, setError] = React.useState<?string>(null);
+
+  const onSave = (i18n: I18nType) => {
+    setError(null);
+    if (!name) {
+      setError(i18n._(t`Project name cannot be empty.`));
+      return;
+    }
+    props.onSave(name);
+  };
+
   return (
-    <Dialog
-      onApply={() => onSave(name)}
-      actions={[
-        <FlatButton
-          key="cancel"
-          label={<Trans>Cancel</Trans>}
-          primary={false}
-          onClick={onCancel}
-        />,
-        <DialogPrimaryButton
-          key="save"
-          label={<Trans>Save</Trans>}
-          primary
-          onClick={() => onSave(name)}
-        />,
-      ]}
-      open
-      onRequestClose={onCancel}
-      maxWidth="sm"
-      title={<Trans>Choose a name for your new project</Trans>}
-      flexBody
-    >
-      <TextField
-        autoFocus
-        fullWidth
-        maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
-        type="text"
-        value={name}
-        onChange={(e, newName) => {
-          setName(newName);
-        }}
-      />
-    </Dialog>
+    <I18n>
+      {({ i18n }) => (
+        <Dialog
+          onApply={() => onSave(i18n)}
+          actions={[
+            <FlatButton
+              key="cancel"
+              label={<Trans>Cancel</Trans>}
+              primary={false}
+              onClick={props.onCancel}
+            />,
+            <DialogPrimaryButton
+              key="save"
+              label={<Trans>Save</Trans>}
+              primary
+              onClick={() => onSave(i18n)}
+            />,
+          ]}
+          open
+          onRequestClose={props.onCancel}
+          maxWidth="sm"
+          title={<Trans>Choose a name for your new project</Trans>}
+          flexBody
+        >
+          <TextField
+            autoFocus
+            fullWidth
+            maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
+            errorText={error}
+            hintText={t`Project name`}
+            type="text"
+            value={name}
+            onChange={(e, newName) => {
+              setName(newName);
+            }}
+          />
+        </Dialog>
+      )}
+    </I18n>
   );
 };
 

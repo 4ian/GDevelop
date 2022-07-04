@@ -93,9 +93,8 @@ namespace gdjs {
     static getSharedData(runtimeScene, behaviorName) {
       // Create one if needed
       if (!runtimeScene.physics2SharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics2SharedData = new gdjs.Physics2SharedData(
           runtimeScene,
           initialData
@@ -379,9 +378,6 @@ namespace gdjs {
     }
 
     onDeActivate() {
-      this.contactsEndedThisFrame.length = 0;
-      this.contactsStartedThisFrame.length = 0;
-      this.currentContacts.length = 0;
       if (this._body !== null) {
         // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
         this._sharedData.clearBodyJoints(this._body);
@@ -396,6 +392,9 @@ namespace gdjs {
         this._sharedData.world.DestroyBody(this._body);
         this._body = null;
       }
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
     }
 
     onActivate() {
@@ -755,24 +754,25 @@ namespace gdjs {
       );
       this.owner.setAngle(gdjs.toDegrees(this._body.GetAngle()));
 
-      // Update cached transform
+      // Update cached transform.
       this._objectOldX = this.owner.getX();
       this._objectOldY = this.owner.getY();
       this._objectOldAngle = this.owner.getAngle();
-
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        this.currentContacts,
-        this.contactsStartedThisFrame,
-        this.contactsEndedThisFrame
-      );
     }
 
     doStepPostEvents(runtimeScene) {
-      this._updateBodyFromObject();
-
-      // Reset contacts that happened this frame
+      // Reset contacts that happened this frame. The collision started and ended
+      // contact arrays should be reset just after the event played out in
+      // respect to this diagram:
+      // <------------- frame 0 --------------> | <------------- frame 1 --------------> | <----...
+      // <preEvents> | <events> | <postEvents>  |  <preEvents> | <events> | <postEvents>
+      // ...ring frame 0 events ]
+      //                        [ contacts detected during frame 1 events ]
+      //                                                                  [ to be detected during...
       this.contactsStartedThisFrame.length = 0;
       this.contactsEndedThisFrame.length = 0;
+
+      this._updateBodyFromObject();
 
       // Reset world step to update next frame
       this._sharedData.stepped = false;
@@ -3835,6 +3835,7 @@ namespace gdjs {
       // start again right away. It is considered a glitch
       // and should not be detected.
       let i = this.contactsEndedThisFrame.indexOf(otherBehavior);
+      this.currentContacts.push(otherBehavior);
       if (i !== -1) {
         this.contactsEndedThisFrame.splice(i, 1);
       } else {
@@ -3844,6 +3845,10 @@ namespace gdjs {
 
     onContactEnd(otherBehavior: Physics2RuntimeBehavior) {
       this.contactsEndedThisFrame.push(otherBehavior);
+      const index = this.currentContacts.indexOf(otherBehavior);
+      if (index !== -1) {
+        this.currentContacts.splice(index, 1);
+      }
     }
 
     /**

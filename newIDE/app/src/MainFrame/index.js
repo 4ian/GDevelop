@@ -1773,8 +1773,6 @@ const MainFrame = (props: Props) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
-      // TODO: Add condition on when to display the snack message
-      _showSnackMessage(i18n._(t`Saving...`));
 
       const storageProviderOperations = getStorageProviderOperations();
 
@@ -1793,6 +1791,7 @@ const MainFrame = (props: Props) => {
 
       onSaveProjectAs(currentProject, currentFileMetadata, {
         context,
+        onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
       })
         .then(
           ({ wasSaved, fileMetadata }) => {

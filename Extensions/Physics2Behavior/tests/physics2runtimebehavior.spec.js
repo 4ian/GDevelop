@@ -22,6 +22,33 @@ function assertCollision(object1, object2, options) {
   ).to.be(options.stopped);
 }
 
+function logCollision(object1, object2, options) {
+  console.log(
+    'started',
+    gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(
+      object1,
+      object2,
+      'Physics2'
+    )
+  );
+  console.log(
+    'current',
+    gdjs.Physics2RuntimeBehavior.areObjectsColliding(
+      object1,
+      object2,
+      'Physics2'
+    )
+  );
+  console.log(
+    'ended',
+    gdjs.Physics2RuntimeBehavior.hasCollisionStoppedBetween(
+      object1,
+      object2,
+      'Physics2'
+    )
+  );
+}
+
 function createGameWithSceneWithPhysics2SharedData() {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
@@ -243,18 +270,20 @@ describe('Physics2RuntimeBehavior', () => {
       // Reset scene events
       runtimeScene.setEventsFunction(() => {});
 
-      // Deactivate physics behavior and test contact is immediately lost
+      // Deactivate physics behavior and test that collisions are cleared.
       object1.activateBehavior('Physics2', false);
       assertCollision(object1, object2, {
         started: false,
         collision: false,
-        stopped: true,
+        // It should be false because the condition does not have sense anymore
+        // since the behavior is deactivated.
+        stopped: false,
       });
+
       runtimeScene.renderAndStep(1000 / fps);
-      // object should have 0 contacts in memory
+      // Objects should have 0 contacts in memory.
       expect(object1Behavior.currentContacts.length).to.be(0);
-      // TODO: Once a frame has been run, there should be no contact ended. Known limitation to fix
-      // expect(object1Behavior.contactsEndedThisFrame.length).to.be(0)
+      expect(object1Behavior.contactsEndedThisFrame.length).to.be(0);
       expect(object1Behavior.contactsStartedThisFrame.length).to.be(0);
 
       // Reactivate physics behavior and test contact
@@ -334,6 +363,12 @@ describe('Physics2RuntimeBehavior', () => {
         stepIndex++;
       }
 
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: false,
+        stopped: false,
+      });
+
       if (!hasBounced) {
         throw new Error('Contact did not happen, nothing was tested.');
       }
@@ -411,6 +446,181 @@ describe('Physics2RuntimeBehavior', () => {
       if (!hasFinishedBouncing) {
         throw new Error('End of contact was not detected, nothing was tested.');
       }
+    });
+
+    it('should not detect a new contact while already in contact as a new contact.', () => {
+      const fps = 50;
+      runtimeGame.setGameResolutionSize(1000, 1000);
+      runtimeScene._timeManager.getElapsedTime = function () {
+        return (1 / fps) * 1000;
+      };
+
+      const movingObject = createObject(runtimeScene);
+      const staticObject = createObject(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
+      staticObject.setPosition(0, 9);
+      movingObject.setPosition(0, 0);
+      /** @type {gdjs.Physics2RuntimeBehavior | null} */
+      const staticObjectBehavior = staticObject.getBehavior('Physics2');
+      /** @type {gdjs.Physics2RuntimeBehavior | null} */
+      const movingObjectBehavior = movingObject.getBehavior('Physics2');
+      if (!staticObjectBehavior || !movingObjectBehavior) {
+        throw new Error('Behaviors not found, test cannot be run.');
+      }
+      runtimeScene.renderAndStep(1000 / fps);
+      runtimeScene.renderAndStep(1000 / fps);
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: true,
+        stopped: false,
+      });
+      console.log('passed');
+
+      runtimeScene.setEventsFunction(() => {
+        movingObject.setY(-10);
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: false,
+          stopped: true,
+        });
+        movingObject.setY(0);
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: true,
+          stopped: false,
+        });
+      });
+    });
+
+    it('it should end collision on resize (loss of contact begins in post event).', () => {
+      const fps = 50;
+      runtimeGame.setGameResolutionSize(1000, 1000);
+      runtimeScene._timeManager.getElapsedTime = function () {
+        return (1 / fps) * 1000;
+      };
+
+      const movingObject = createObject(runtimeScene);
+      const staticObject = createObject(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
+      staticObject.setPosition(0, 9);
+      movingObject.setPosition(0, 0);
+      const staticObjectBehavior = staticObject.getBehavior('Physics2');
+      const movingObjectBehavior = movingObject.getBehavior('Physics2');
+      if (!staticObjectBehavior || !movingObjectBehavior) {
+        throw new Error('Behaviors not found, test cannot be run.');
+      }
+      runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
+        assertCollision(movingObject, staticObject, {
+          started: true,
+          collision: true,
+          stopped: false,
+        });
+      });
+      runtimeScene.renderAndStep(1000 / fps);
+      // Check that contactsStartedThisFrame array is reset in postEvent.
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: true,
+        stopped: false,
+      });
+
+      // Resize (postEvent operation).
+      runtimeScene.setEventsFunction(() => {
+        movingObject.setCustomWidthAndHeight(5, 5);
+        // Collision should still be true because the contact is lost during postEvent operations.
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: true,
+          stopped: false,
+        });
+      });
+
+      runtimeScene.renderAndStep(1000 / fps);
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: false,
+        stopped: true,
+      });
+      runtimeScene.setEventsFunction(() => {});
+      runtimeScene.renderAndStep(1000 / fps);
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: false,
+        stopped: false,
+      });
+    });
+
+    it('it should end collision on object destruction (loss of contact begins during event).', () => {
+      const fps = 50;
+      runtimeGame.setGameResolutionSize(1000, 1000);
+      runtimeScene._timeManager.getElapsedTime = function () {
+        return (1 / fps) * 1000;
+      };
+
+      const movingObject = createObject(runtimeScene);
+      const staticObject = createObject(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
+      staticObject.setPosition(0, 9);
+      movingObject.setPosition(0, 0);
+      const staticObjectBehavior = staticObject.getBehavior('Physics2');
+      const movingObjectBehavior = movingObject.getBehavior('Physics2');
+      if (!staticObjectBehavior || !movingObjectBehavior) {
+        throw new Error('Behaviors not found, test cannot be run.');
+      }
+      runtimeScene.renderAndStep(1000 / fps);
+
+      runtimeScene.setEventsFunction(() => {
+        assertCollision(movingObject, staticObject, {
+          started: true,
+          collision: true,
+          stopped: false,
+        });
+      });
+      runtimeScene.renderAndStep(1000 / fps);
+      // Check that contactsStartedThisFrame array is reset in postEvent.
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: true,
+        stopped: false,
+      });
+
+      // Destroy (postEvent operation).
+      runtimeScene.setEventsFunction(() => {
+        movingObject.deleteFromScene(runtimeScene);
+
+        // Collision should be reset on destroyed object and
+        // added to contactsStoppedThisFrame array of the other object.
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: false,
+          stopped: false,
+        });
+        assertCollision(staticObject, movingObject, {
+          started: false,
+          collision: false,
+          stopped: true,
+        });
+      });
+
+      runtimeScene.renderAndStep(1000 / fps);
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: false,
+        stopped: false,
+      });
+      assertCollision(staticObject, movingObject, {
+        started: false,
+        collision: false,
+        stopped: false,
+      });
     });
   });
 

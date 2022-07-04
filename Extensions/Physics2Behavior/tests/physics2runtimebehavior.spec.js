@@ -190,7 +190,7 @@ describe('Physics2RuntimeBehavior', () => {
       object.activateBehavior('Physics2', true);
       expect(behavior.getBody()).not.to.be(null);
 
-      // Behavior should have recorded the above setter called.
+      // Behavior should have recorded what was called with its setters while it was de-activated.
       expect(behavior.getDensity()).to.be(123);
       expect(behavior.getRestitution()).to.be(0.5);
     });
@@ -252,12 +252,12 @@ describe('Physics2RuntimeBehavior', () => {
         // since the behavior is deactivated.
         stopped: false,
       });
-
-      runtimeScene.renderAndStep(1000 / fps);
       // Objects should have 0 contacts in memory.
       expect(object1Behavior.currentContacts.length).to.be(0);
       expect(object1Behavior.contactsEndedThisFrame.length).to.be(0);
       expect(object1Behavior.contactsStartedThisFrame.length).to.be(0);
+
+      runtimeScene.renderAndStep(1000 / fps);
 
       // Reactivate physics behavior and test contact
       // is not immediately back on but after the first render.
@@ -451,6 +451,8 @@ describe('Physics2RuntimeBehavior', () => {
       });
 
       runtimeScene.setEventsFunction(() => {
+        // Manually call onContactEnd and onContactBegin methods to simulate
+        // a loss of contact followed by a contact beginning during the event.
         movingObject
           .getBehavior('Physics2')
           .onContactEnd(staticObject.getBehavior('Physics2'));
@@ -505,6 +507,9 @@ describe('Physics2RuntimeBehavior', () => {
       });
 
       runtimeScene.setEventsFunction(() => {
+        // Manually call onContactEnd and onContactBegin methods to simulate
+        // a loss of contact followed by a contact beginning and another loss
+        // of contact during the event.
         movingObject
           .getBehavior('Physics2')
           .onContactEnd(staticObject.getBehavior('Physics2'));

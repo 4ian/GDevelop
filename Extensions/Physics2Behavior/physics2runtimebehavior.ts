@@ -241,8 +241,28 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
+    // Array containing the contacts started from the beginning of the post-event
+    // of the previous frame to the beginning of the current one. Each contact
+    // should be unique to avoid recording glitches where the object loses and regain
+    // contact between two frames. The array is updated each time the method
+    // onContactBegin is called by the listener. It should be reset at the begining
+    // of the post-event of the current frame.
+    //
+    // <------------- frame 0 --------------> | <------------- frame 1 --------------> | <----...
+    // <preEvents> | <events> | <postEvents>  |  <preEvents> | <events> | <postEvents>
+    // ...ring frame 0 events ]
+    //                        [ contacts detected during frame 1 events ]
+    //                                                                  [ to be detected during...
     contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
+    // Array containing the contacts ended from the beginning of the post-event
+    // of the previous frame to the beginning of the current one. It is updated each
+    // time the method onContactEnd is called by the listener (to add new ended contacts) or
+    // when onContactBegin is called (to remove a glitched contact) by the listener. It should be
+    // reset at the begining of the post-event of the current frame.
     contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
+    // Array containing the exact current contacts with the objects. It is updated
+    // each time the methods onContactBegin and onContactEnd are called by the contact
+    // listener.
     currentContacts: Array<Physics2RuntimeBehavior>;
     destroyedDuringFrameLogic: boolean;
     _body: any = null;
@@ -763,13 +783,7 @@ namespace gdjs {
 
     doStepPostEvents(runtimeScene) {
       // Reset contacts that happened this frame. The collision started and ended
-      // contact arrays should be reset just after the event played out in
-      // respect to this diagram:
-      // <------------- frame 0 --------------> | <------------- frame 1 --------------> | <----...
-      // <preEvents> | <events> | <postEvents>  |  <preEvents> | <events> | <postEvents>
-      // ...ring frame 0 events ]
-      //                        [ contacts detected during frame 1 events ]
-      //                                                                  [ to be detected during...
+      // contact arrays should be reset just after the event played out.
       this.contactsStartedThisFrame.length = 0;
       this.contactsEndedThisFrame.length = 0;
 

@@ -8,6 +8,10 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 
+const projectResourcesClient = axios.create({
+  withCredentials: true,
+});
+
 type CloudProject = {|
   id: string,
   name: string,
@@ -16,9 +20,31 @@ type CloudProject = {|
   deletedAt?: string,
 |};
 
-const projectResourcesClient = axios.create({
-  withCredentials: true,
-});
+const reAuthenticateAndRetryIfFailed = async <T>(
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+  apiCall: () => Promise<T>
+): Promise<T> => {
+  try {
+    const response = await apiCall();
+    return response;
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      await getCredentialsForProject(authenticatedUser, cloudProjectId);
+      const response = await apiCall();
+      return response;
+    }
+    throw error;
+  }
+};
+
+const generateUUID = (a): string => {
+  return a
+    ? // eslint-disable-next-line
+      (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
+    : // $FlowFixMe
+      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
+};
 
 export const getCredentialsForProject = async (
   authenticatedUser: AuthenticatedUser,
@@ -61,14 +87,6 @@ export const createCloudProject = async (
   return response.data;
 };
 
-const generateUUID = (a): string => {
-  return a
-    ? // eslint-disable-next-line
-      (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
-    : // $FlowFixMe
-      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
-};
-
 export const commitVersion = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
@@ -83,15 +101,17 @@ export const commitVersion = async (
   const uuid = generateUUID();
   // fetch pre signed url TODO
   // upload zipped project
-  await projectResourcesClient.post(
-    `${
-      GDevelopProjectResourcesStorage.baseUrl
-    }/${cloudProjectId}/versions/${uuid}.zip`,
-    zippedProject,
-    {
-      headers: { 'content-type': 'application/zip' },
-      withCredentials: true,
-    }
+  await reAuthenticateAndRetryIfFailed(authenticatedUser, cloudProjectId, () =>
+    projectResourcesClient.post(
+      `${
+        GDevelopProjectResourcesStorage.baseUrl
+      }/${cloudProjectId}/versions/${uuid}.zip`,
+      zippedProject,
+      {
+        headers: { 'content-type': 'application/zip' },
+        withCredentials: true,
+      }
+    )
   );
   // inform backend new version uploaded
   const response = await axios.post(

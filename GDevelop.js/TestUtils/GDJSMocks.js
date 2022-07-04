@@ -498,6 +498,7 @@ function makeMinimalGDJSMock() {
         object: { createObjectOnScene, getSceneInstancesCount, getPickedInstancesCount },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
+          noop: () => {},
         },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {

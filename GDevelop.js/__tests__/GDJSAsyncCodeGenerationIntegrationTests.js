@@ -58,6 +58,84 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       ).toBe(1);
     });
 
+    it('generates a working function with an optionally asynchronous action, that is not set as async', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: {
+                  value: 'FakeOptionallyAsyncAction::DoOptionallyAsyncAction',
+                },
+                parameters: ['1.5'],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SuccessVariable', '+', '1'],
+              },
+            ],
+          },
+        ])
+      );
+
+      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+        gd,
+        eventsSerializerElement
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      runCompiledEvents(gdjs, runtimeScene, []);
+
+      // Nothing is async, the actions are all executed.
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+    });
+
+    it('generates a working function with an optionally asynchronous action, that is set as async', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: {
+                  value: 'FakeOptionallyAsyncAction::DoOptionallyAsyncAction',
+                  await: true,
+                },
+                parameters: ['1.5'],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SuccessVariable', '+', '1'],
+              },
+            ],
+          },
+        ])
+      );
+
+      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+        gd,
+        eventsSerializerElement
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      runCompiledEvents(gdjs, runtimeScene, []);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Process the tasks (but the task is not finished yet).
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(
+        runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+      ).toBe(1);
+    });
+
     it('generates a working function with two asynchronous actions', function () {
       // Create events using the Trigger Once condition.
       const eventsSerializerElement = gd.Serializer.fromJSON(
@@ -2490,7 +2568,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
       expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
-
 
       // Mark tasks as done.
       myObjectA1.markFakeAsyncActionAsFinished();

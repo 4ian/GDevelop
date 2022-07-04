@@ -32,7 +32,10 @@ export class TiledTileMapLoader {
           for (const object of tile.objectgroup.objects) {
             let polygon: PolygonVertices | null = null;
             if (object.polygon) {
-              polygon = object.polygon.map((point) => [point.x, point.y]);
+              polygon = object.polygon.map((point) => [
+                object.x + point.x,
+                object.y + point.y,
+              ]);
               //TODO check that polygons are convex or split them?
             }
             // TODO handle ellipses by creating a polygon?

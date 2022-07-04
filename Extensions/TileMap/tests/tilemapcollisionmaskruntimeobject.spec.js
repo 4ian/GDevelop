@@ -84,14 +84,20 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
         outlineSize: 1,
       },
     });
-    // tileMap.getWidth = function () {
-    //   return 90;
-    // };
-    // tileMap.getHeight = function () {
-    //   return 90;
-    // };
     runtimeScene.addObject(tileMap);
     return tileMap;
+  };
+
+  const addObject = (runtimeScene) => {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      behaviors: [],
+      effects: [],
+    });
+    object.setCustomWidthAndHeight(8, 8);
+    runtimeScene.addObject(object);
+    return object;
   };
 
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -105,10 +111,35 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     await delay(10);
   });
 
-  it('can find a point inside the collision mask', function () {
+  it('can detect a point inside the collision mask', function () {
     tileMap.setPosition(100, 200);
     runtimeScene.renderAndStep(1000 / 60);
 
     expect(tileMap.insideObject(104, 204)).to.be(true);
+    expect(tileMap.insideObject(112, 204)).to.be(false);
+  });
+
+  it('can detect collision with an object', function () {
+    tileMap.setPosition(100, 200);
+
+    const object = addObject(runtimeScene);
+    object.setPosition(96, 196);
+
+    runtimeScene.renderAndStep(1000 / 60);
+
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
+
+    object.setPosition(90, 190);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
+      false
+    );
+
+    object.setPosition(115, 207);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
+
+    object.setPosition(116, 208);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
+      false
+    );
   });
 });

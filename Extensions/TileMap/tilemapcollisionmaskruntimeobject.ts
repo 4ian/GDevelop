@@ -227,6 +227,11 @@ namespace gdjs {
     // This implementation doesn't use updateHitBoxes.
     // It's important for good performances.
     getHitBoxesAround(left: float, top: float, right: float, bottom: float) {
+      if (this.hitBoxesDirty) {
+        this.updateHitBoxes();
+        this.updateAABB();
+        this.hitBoxesDirty = false;
+      }
       return this._collisionTileMap.getHitboxesAround(
         this._typeFilter,
         left,

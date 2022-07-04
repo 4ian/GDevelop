@@ -152,6 +152,7 @@ export const generateOnSaveProjectAs = (
       ));
     });
     if (!name) return { wasSaved: false, fileMetadata };
+    project.setName(name);
   } else {
     name = project.getName();
   }

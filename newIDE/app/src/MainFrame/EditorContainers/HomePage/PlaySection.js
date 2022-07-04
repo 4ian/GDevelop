@@ -1,13 +1,11 @@
 // @flow
 import * as React from 'react';
-import { Line } from '../../../UI/Grid';
-import Text from '../../../UI/Text';
 import { GamesShowcase } from '../../../GamesShowcase';
 import PublishIcon from '@material-ui/icons/Publish';
 import FlatButton from '../../../UI/FlatButton';
 import Window from '../../../Utils/Window';
 import { Trans } from '@lingui/macro';
-import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { LineStackLayout } from '../../../UI/Layout';
 import RaisedButton from '../../../UI/RaisedButton';
 import { SectionContainer } from './SectionContainer';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
@@ -15,15 +13,9 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 export const PlaySection = () => {
   const windowWidth = useResponsiveWindowWidth();
   return (
-    <SectionContainer>
-      <Line>
-        <Text size="main-title">Showcased Games</Text>
-      </Line>
-      <ResponsiveLineStackLayout expand noMargin>
-        <GamesShowcase />
-      </ResponsiveLineStackLayout>
-      <LineStackLayout>
-        {windowWidth !== 'small' && (
+    <SectionContainer title={<Trans>Showcased games</Trans>}>
+      {windowWidth === 'large' && (
+        <LineStackLayout noMargin justifyContent="flex-end">
           <FlatButton
             key="submit-game-showcase"
             onClick={() => {
@@ -35,13 +27,14 @@ export const PlaySection = () => {
             icon={<PublishIcon />}
             label={<Trans>Submit your game to the showcase</Trans>}
           />
-        )}
-        <RaisedButton
-          primary
-          label={<Trans>Play on Liluo.io</Trans>}
-          onClick={() => Window.openExternalURL('https://liluo.io')}
-        />
-      </LineStackLayout>
+          <RaisedButton
+            primary
+            label={<Trans>Play on Liluo.io</Trans>}
+            onClick={() => Window.openExternalURL('https://liluo.io')}
+          />
+        </LineStackLayout>
+      )}
+      <GamesShowcase />
     </SectionContainer>
   );
 };

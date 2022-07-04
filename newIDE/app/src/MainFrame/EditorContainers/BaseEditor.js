@@ -1,7 +1,5 @@
 // @flow
 import * as React from 'react';
-import { type I18n as I18nType } from '@lingui/core';
-import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 import { type UnsavedChanges } from '../UnsavedChangesContext';
 import {
   type ResourceSource,
@@ -10,17 +8,17 @@ import {
 import { type PreviewDebuggerServer } from '../../Export/PreviewLauncher.flow';
 import { type HotReloadPreviewButtonProps } from '../../HotReload/HotReloadPreviewButton';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
-import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
   type OnOpenProjectAfterCreationFunction,
 } from '../../ProjectCreation/CreateProjectDialog';
-import {
-  type StorageProvider,
-  type FileMetadata,
-  type FileMetadataAndStorageProviderName,
-} from '../../ProjectsStorage';
+import { type FileMetadataAndStorageProviderName } from '../../ProjectsStorage';
+
+export type EditorContainerExtraProps = {|
+  initiallyFocusedFunctionName?: ?string,
+  initiallyFocusedBehaviorName?: ?string,
+|};
 
 export type RenderEditorContainerProps = {|
   isActive: boolean,
@@ -98,9 +96,4 @@ export type RenderEditorContainerProps = {|
 export type RenderEditorContainerPropsWithRef = {|
   ref: any => any, // TODO - improve the typing of this ref.
   ...RenderEditorContainerProps,
-|};
-
-export type EditorContainerExtraProps = {|
-  initiallyFocusedFunctionName?: ?string,
-  initiallyFocusedBehaviorName?: ?string,
 |};

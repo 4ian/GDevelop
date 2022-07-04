@@ -2,44 +2,31 @@
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
-import { createStyles, makeStyles, Paper } from '@material-ui/core';
 import { TutorialsList } from '../../../Tutorial/TutorialsList';
-import FlatButton from '../../../UI/FlatButton';
 import Window from '../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import PublishIcon from '@material-ui/icons/Publish';
-import { ResponsiveLineStackLayout } from '../../../UI/Layout';
+import { LineStackLayout, ResponsiveLineStackLayout } from '../../../UI/Layout';
 import { type HomeTab } from './HomePageMenu';
-import { shouldValidate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
 import { SectionContainer } from './SectionContainer';
+import FlatButton from '../../../UI/FlatButton';
+import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { CardWidget } from './CardWidget';
 const electron = optionalRequire('electron');
 
-const componentStyles = {
-  paper: {
-    margin: 4,
-    padding: 10,
-    maxWidth: 200,
+const styles = {
+  helpItemsContainer: {
+    marginBottom: 50,
     textAlign: 'center',
   },
-  helpItemsContainer: {
-    marginBottom: 20,
+  tutorialsContainer: {
+    marginTop: 30,
   },
 };
-
-// Styles to give the impression of pressing an element.
-const useStylesForHelpItem = makeStyles(theme =>
-  createStyles({
-    root: {
-      '&:focus': {
-        outline: `2px solid ${theme.palette.primary.main}`,
-      },
-    },
-  })
-);
 
 type Props = {|
   onOpenOnboardingDialog: () => void,
@@ -54,7 +41,7 @@ export const LearnSection = ({
   onTabChange,
   onOpenHelpFinder,
 }: Props) => {
-  const classes = useStylesForHelpItem();
+  const windowWidth = useResponsiveWindowWidth();
   const helpItems = [
     !electron && !isMobile() && !isUserflowRunning
       ? {
@@ -83,66 +70,68 @@ export const LearnSection = ({
     {
       title: <Trans>Community</Trans>,
       description: <Trans>Ask your questions to the community</Trans>,
-      action: () => onTabChange('Community'),
+      action: () => onTabChange('community'),
     },
   ].filter(Boolean);
 
   return (
-    <SectionContainer>
-      <Line>
-        <Text size="main-title">Help and guides</Text>
+    <SectionContainer title={<Trans>Help and guides</Trans>}>
+      <Line noMargin>
+        <Text size="sub-title">
+          <Trans>Shortcuts</Trans>
+        </Text>
       </Line>
-      <Line>
-        <Text size="body">Shortcuts</Text>
-      </Line>
-      <div style={componentStyles.helpItemsContainer}>
+      <div style={styles.helpItemsContainer}>
         <ResponsiveLineStackLayout noMargin>
           {helpItems.map((helpItem, index) => (
-            <Paper
-              elevation={10}
-              style={componentStyles.paper}
-              onClick={helpItem.action}
-              classes={classes}
-              key={index}
-              tabIndex={0}
-              onKeyPress={(
-                event: SyntheticKeyboardEvent<HTMLLIElement>
-              ): void => {
-                if (shouldValidate(event)) {
-                  helpItem.action();
-                }
-              }}
-            >
+            <CardWidget onClick={helpItem.action} key={index}>
               <Column alignItems="center">
-                <Text size="title">{helpItem.title}</Text>
-                <Text size="body2">{helpItem.description}</Text>
+                <Text size="block-title">{helpItem.title}</Text>
+                <Text size="body" color="secondary">
+                  {helpItem.description}
+                </Text>
               </Column>
-            </Paper>
+            </CardWidget>
           ))}
         </ResponsiveLineStackLayout>
       </div>
-      <Line>
-        <Text size="title">Guides and tutorials</Text>
-      </Line>
+      <LineStackLayout
+        justifyContent="space-between"
+        alignItems="center"
+        noMargin
+        expand
+      >
+        <Column noMargin>
+          <Text size="title">
+            <Trans>Guides and tutorials</Trans>
+          </Text>
+        </Column>
+        <Column noMargin>
+          {windowWidth === 'large' && (
+            <FlatButton
+              key="submit-example"
+              onClick={() => {
+                Window.openExternalURL(
+                  'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+                );
+              }}
+              primary
+              icon={<PublishIcon />}
+              label={<Trans>Submit your project as an example</Trans>}
+            />
+          )}
+        </Column>
+      </LineStackLayout>
       <Line noMargin>
-        <Text size="body">Learn by doing</Text>
+        <Text size="sub-title" noMargin>
+          <Trans>Learn by doing</Trans>
+        </Text>
       </Line>
-      <ResponsiveLineStackLayout expand noMargin>
-        <TutorialsList />
-      </ResponsiveLineStackLayout>
-      <Line justifyContent="start">
-        <FlatButton
-          key="submit-example"
-          onClick={() => {
-            Window.openExternalURL(
-              'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-            );
-          }}
-          primary
-          icon={<PublishIcon />}
-          label={<Trans>Submit your project as an example</Trans>}
-        />
-      </Line>
+      <div style={styles.tutorialsContainer}>
+        <ResponsiveLineStackLayout expand noMargin>
+          <TutorialsList />
+        </ResponsiveLineStackLayout>
+      </div>
     </SectionContainer>
   );
 };

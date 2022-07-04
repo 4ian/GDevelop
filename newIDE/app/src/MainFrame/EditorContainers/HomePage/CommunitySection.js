@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Line } from '../../../UI/Grid';
 import Text from '../../../UI/Text';
 import { Trans } from '@lingui/macro';
 import TextButton from '../../../UI/TextButton';
@@ -17,60 +16,83 @@ import { SectionContainer } from './SectionContainer';
 
 export const CommunitySection = () => {
   return (
-    <SectionContainer>
-      <Line>
-        <Text size="main-title">
-          <Trans>Community</Trans>
-        </Text>
-      </Line>
+    <SectionContainer title={<Trans>Community</Trans>}>
       <ColumnStackLayout alignItems="start" noMargin>
         <Text size="title">
           <Trans>Join the conversation</Trans>
         </Text>
         <TextButton
           onClick={() => Window.openExternalURL('https://forum.gdevelop.io')}
-          icon={<Messages />}
-          label={<Trans>GDevelop Forums</Trans>}
+          icon={<Messages fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>GDevelop Forums</Trans>
+            </Text>
+          }
         />
         <TextButton
           onClick={() =>
             Window.openExternalURL('https://www.youtube.com/c/GDevelopApp')
           }
-          icon={<YouTube />}
-          label={<Trans>YouTube</Trans>}
+          icon={<YouTube fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>YouTube</Trans>
+            </Text>
+          }
         />
         <TextButton
           onClick={() => Window.openExternalURL('https://discord.gg/gdevelop')}
-          icon={<Discord />}
-          label={<Trans>Discord</Trans>}
+          icon={<Discord fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>Discord</Trans>
+            </Text>
+          }
         />
         <TextButton
           onClick={() =>
             Window.openExternalURL('https://www.reddit.com/r/gdevelop')
           }
-          icon={<Reddit />}
-          label={<Trans>Reddit</Trans>}
+          icon={<Reddit fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>Reddit</Trans>
+            </Text>
+          }
         />
         <TextButton
           onClick={() =>
             Window.openExternalURL('https://twitter.com/GDevelopApp')
           }
-          icon={<Twitter />}
-          label={<Trans>Twitter</Trans>}
+          icon={<Twitter fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>Twitter</Trans>
+            </Text>
+          }
         />
         <TextButton
           onClick={() =>
             Window.openExternalURL('https://www.facebook.com/GDevelopApp')
           }
-          icon={<Facebook />}
-          label={<Trans>Facebook</Trans>}
+          icon={<Facebook fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>Facebook</Trans>
+            </Text>
+          }
         />
         <TextButton
           onClick={() =>
             Window.openExternalURL('https://www.tiktok.com/@gdevelop')
           }
-          icon={<TikTok />}
-          label={<Trans>TikTok</Trans>}
+          icon={<TikTok fontSize="small" />}
+          label={
+            <Text noMargin size="body">
+              <Trans>TikTok</Trans>
+            </Text>
+          }
         />
       </ColumnStackLayout>
     </SectionContainer>

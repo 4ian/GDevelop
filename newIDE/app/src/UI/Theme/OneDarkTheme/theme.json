@@ -194,9 +194,9 @@
       }
     },
     "home": {
-      "tabs": {
-        "selected-background-color": {
-          "value": "#4B525F"
+      "separator": {
+        "color": {
+          "value": "#32323B"
         }
       }
     }

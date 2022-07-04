@@ -1831,7 +1831,7 @@ const MainFrame = (props: Props) => {
 
       try {
         const saveStartTime = performance.now();
-        const { wasSaved } = await onSaveProject(
+        const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata
         );
@@ -1840,6 +1840,15 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          preferences.insertRecentProjectFile({
+            fileMetadata,
+            storageProviderName: getStorageProvider().internalName,
+          });
+
+          setState(state => ({
+            ...state,
+            currentFileMetadata: fileMetadata,
+          }));
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
           _showSnackMessage(i18n._(t`Project properly saved`));
         }
@@ -1865,6 +1874,9 @@ const MainFrame = (props: Props) => {
       unsavedChanges,
       saveProjectAs,
       state.editorTabs,
+      getStorageProvider,
+      preferences,
+      setState,
     ]
   );
 

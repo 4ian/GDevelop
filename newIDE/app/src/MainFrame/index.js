@@ -1823,7 +1823,10 @@ const MainFrame = (props: Props) => {
           }
         )
         .catch(() => {})
-        .then(() => setIsSavingProject(false));
+        .then(() => {
+          setIsSavingProject(false);
+          updateWindowTitle();
+        });
     },
     [
       i18n,
@@ -1837,6 +1840,7 @@ const MainFrame = (props: Props) => {
       _showSnackMessage,
       getStorageProvider,
       preferences,
+      updateWindowTitle,
     ]
   );
 

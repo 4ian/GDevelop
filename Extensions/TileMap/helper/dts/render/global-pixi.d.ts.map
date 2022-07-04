@@ -1,0 +1,1 @@
+{"version":3,"file":"global-pixi.d.ts","sourceRoot":"","sources":["../../src/render/global-pixi.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,UAAU,MAAM,SAAS,CAAC;AAEtC,OAAO,CAAC,MAAM,CAAC;IACb;;;;;;;;;;;;;;OAcG;IACH,UAAU,gBAAgB,CAAC;QACzB,MAAM,QAAQ,IAAI,GAAG,UAAU,CAAC;KACjC;CACF"}

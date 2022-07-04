@@ -22,33 +22,6 @@ function assertCollision(object1, object2, options) {
   ).to.be(options.stopped);
 }
 
-function logCollision(object1, object2, options) {
-  console.log(
-    'started',
-    gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(
-      object1,
-      object2,
-      'Physics2'
-    )
-  );
-  console.log(
-    'current',
-    gdjs.Physics2RuntimeBehavior.areObjectsColliding(
-      object1,
-      object2,
-      'Physics2'
-    )
-  );
-  console.log(
-    'ended',
-    gdjs.Physics2RuntimeBehavior.hasCollisionStoppedBetween(
-      object1,
-      object2,
-      'Physics2'
-    )
-  );
-}
-
 function createGameWithSceneWithPhysics2SharedData() {
   const runtimeGame = new gdjs.RuntimeGame({
     variables: [],
@@ -130,7 +103,7 @@ function createObject(runtimeScene, behaviorProperties) {
   return object;
 }
 
-describe('Physics2RuntimeBehavior', () => {
+describe.only('Physics2RuntimeBehavior', () => {
   describe('Behavior activation and reactivation', () => {
     let runtimeGame;
     let runtimeScene;
@@ -448,7 +421,7 @@ describe('Physics2RuntimeBehavior', () => {
       }
     });
 
-    it('should not detect a new contact while already in contact as a new contact.', () => {
+    it('should not detect a contact while already in contact as a new one (the contact jittered).', () => {
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
       runtimeScene._timeManager.getElapsedTime = function () {
@@ -476,22 +449,92 @@ describe('Physics2RuntimeBehavior', () => {
         collision: true,
         stopped: false,
       });
-      console.log('passed');
 
       runtimeScene.setEventsFunction(() => {
-        movingObject.setY(-10);
+        movingObject
+          .getBehavior('Physics2')
+          .onContactEnd(staticObject.getBehavior('Physics2'));
+
         assertCollision(movingObject, staticObject, {
           started: false,
           collision: false,
           stopped: true,
         });
-        movingObject.setY(0);
+
+        movingObject
+          .getBehavior('Physics2')
+          .onContactBegin(staticObject.getBehavior('Physics2'));
+
         assertCollision(movingObject, staticObject, {
           started: false,
           collision: true,
           stopped: false,
         });
       });
+      runtimeScene.renderAndStep(1000 / fps);
+    });
+
+    it('should not detect a new contact if the contact ended and jittered.', () => {
+      const fps = 50;
+      runtimeGame.setGameResolutionSize(1000, 1000);
+      runtimeScene._timeManager.getElapsedTime = function () {
+        return (1 / fps) * 1000;
+      };
+
+      const movingObject = createObject(runtimeScene);
+      const staticObject = createObject(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
+      staticObject.setPosition(0, 4);
+      movingObject.setPosition(0, 0);
+      /** @type {gdjs.Physics2RuntimeBehavior | null} */
+      const staticObjectBehavior = staticObject.getBehavior('Physics2');
+      /** @type {gdjs.Physics2RuntimeBehavior | null} */
+      const movingObjectBehavior = movingObject.getBehavior('Physics2');
+      if (!staticObjectBehavior || !movingObjectBehavior) {
+        throw new Error('Behaviors not found, test cannot be run.');
+      }
+      runtimeScene.renderAndStep(1000 / fps);
+      runtimeScene.renderAndStep(1000 / fps);
+
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: true,
+        stopped: false,
+      });
+
+      runtimeScene.setEventsFunction(() => {
+        movingObject
+          .getBehavior('Physics2')
+          .onContactEnd(staticObject.getBehavior('Physics2'));
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: false,
+          stopped: true,
+        });
+
+        movingObject
+          .getBehavior('Physics2')
+          .onContactBegin(staticObject.getBehavior('Physics2'));
+
+        // Started is false because it is like the jittered contact case.
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: true,
+          stopped: false,
+        });
+
+        movingObject
+          .getBehavior('Physics2')
+          .onContactEnd(staticObject.getBehavior('Physics2'));
+        assertCollision(movingObject, staticObject, {
+          started: false,
+          collision: false,
+          stopped: true,
+        });
+      });
+      runtimeScene.renderAndStep(1000 / fps);
     });
 
     it('it should end collision on resize (loss of contact begins in post event).', () => {

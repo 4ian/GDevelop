@@ -93,8 +93,9 @@ namespace gdjs {
     static getSharedData(runtimeScene, behaviorName) {
       // Create one if needed
       if (!runtimeScene.physics2SharedData) {
-        const initialData =
-          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
+        const initialData = runtimeScene.getInitialSharedDataForBehavior(
+          behaviorName
+        );
         runtimeScene.physics2SharedData = new gdjs.Physics2SharedData(
           runtimeScene,
           initialData

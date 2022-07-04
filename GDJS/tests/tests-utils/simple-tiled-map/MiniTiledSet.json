@@ -1,11 +1,11 @@
 { "columns":2,
  "image":"MiniTiledSet.png",
- "imageheight":16,
+ "imageheight":24,
  "imagewidth":16,
  "margin":0,
  "name":"new tileset",
  "spacing":0,
- "tilecount":4,
+ "tilecount":6,
  "tiledversion":"1.7.2",
  "tileheight":8,
  "tiles":[
@@ -79,6 +79,7 @@
          "objectgroup":
             {
              "draworder":"index",
+             "id":2,
              "name":"",
              "objects":[
                     {
@@ -107,7 +108,7 @@
                     }, 
                     {
                      "height":0,
-                     "id":2,
+                     "id":3,
                      "name":"",
                      "polygon":[
                             {
@@ -116,17 +117,17 @@
                             }, 
                             {
                              "x":4,
-                             "y":-4
+                             "y":4
                             }, 
                             {
                              "x":8,
                              "y":0
                             }],
-                     "rotation":0,
+                     "rotation":180,
                      "type":"",
                      "visible":true,
                      "width":0,
-                     "x":0,
+                     "x":8,
                      "y":8
                     }],
              "opacity":1,
@@ -136,6 +137,96 @@
              "y":0
             },
          "type":"obstacle"
+        }, 
+        {
+         "id":4,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":0,
+                     "id":1,
+                     "name":"",
+                     "polygon":[
+                            {
+                             "x":0,
+                             "y":0
+                            }, 
+                            {
+                             "x":0,
+                             "y":8
+                            }, 
+                            {
+                             "x":8,
+                             "y":0
+                            }],
+                     "rotation":0,
+                     "type":"obstacle",
+                     "visible":true,
+                     "width":0,
+                     "x":0,
+                     "y":0
+                    }, 
+                    {
+                     "height":0,
+                     "id":2,
+                     "name":"",
+                     "polygon":[
+                            {
+                             "x":0,
+                             "y":0
+                            }, 
+                            {
+                             "x":0,
+                             "y":8
+                            }, 
+                            {
+                             "x":8,
+                             "y":0
+                            }],
+                     "rotation":180,
+                     "type":"lava",
+                     "visible":true,
+                     "width":0,
+                     "x":8,
+                     "y":8
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            }
+        }, 
+        {
+         "id":5,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "id":2,
+             "name":"",
+             "objects":[
+                    {
+                     "height":8,
+                     "id":1,
+                     "name":"",
+                     "rotation":0,
+                     "type":"lava",
+                     "visible":true,
+                     "width":8,
+                     "x":0,
+                     "y":0
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "type":"lava"
         }],
  "tilewidth":8,
  "type":"tileset",

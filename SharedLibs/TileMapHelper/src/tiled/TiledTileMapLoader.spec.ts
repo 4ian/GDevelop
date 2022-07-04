@@ -128,7 +128,7 @@ describe("TiledTileMapLoader", function () {
           tiledversion: "1.7.2",
           tileheight: 8,
           tiles: [
-            // A rectangle
+            // Contains a rectangle
             {
               id: 0,
               objectgroup: {
@@ -159,7 +159,7 @@ describe("TiledTileMapLoader", function () {
             // The tile with id == 1 is missing
             // because it doesn't have any collision mask.
 
-            // A polygon
+            // Contains a polygon.
             {
               id: 2,
               objectgroup: {
@@ -200,72 +200,163 @@ describe("TiledTileMapLoader", function () {
               },
               type: "obstacle",
             },
-            // 2 polygons
-            {
-              id: 3,
-              objectgroup: {
-                draworder: "index",
-                name: "",
-                objects: [
-                  {
-                    height: 0,
-                    id: 1,
-                    name: "",
-                    polygon: [
-                      {
-                        x: 0,
-                        y: 0,
-                      },
-                      {
-                        x: 4,
-                        y: 4,
-                      },
-                      {
-                        x: 8,
-                        y: 0,
-                      },
-                    ],
-                    rotation: 0,
-                    type: "",
-                    visible: true,
-                    width: 0,
-                    x: 0,
-                    y: 0,
-                  },
-                  {
-                    height: 0,
-                    id: 2,
-                    name: "",
-                    polygon: [
-                      {
-                        x: 0,
-                        y: 0,
-                      },
-                      {
-                        x: 4,
-                        y: -4,
-                      },
-                      {
-                        x: 8,
-                        y: 0,
-                      },
-                    ],
-                    rotation: 0,
-                    type: "",
-                    visible: true,
-                    width: 0,
-                    x: 0,
-                    y: 8,
-                  },
-                ],
-                opacity: 1,
-                type: "objectgroup",
-                visible: true,
-                x: 0,
-                y: 0,
-              },
-              type: "obstacle",
-            },
+            // Contains 2 polygons, one is a rotated.
+        {
+          id:3,
+          objectgroup:
+             {
+              draworder:"index",
+              id:2,
+              name:"",
+              objects:[
+                     {
+                      height:0,
+                      id:1,
+                      name:"",
+                      polygon:[
+                             {
+                              x:0,
+                              y:0
+                             }, 
+                             {
+                              x:4,
+                              y:4
+                             }, 
+                             {
+                              x:8,
+                              y:0
+                             }],
+                      rotation:0,
+                      type:"",
+                      visible:true,
+                      width:0,
+                      x:0,
+                      y:0
+                     }, 
+                     {
+                      height:0,
+                      id:3,
+                      name:"",
+                      polygon:[
+                             {
+                              x:0,
+                              y:0
+                             }, 
+                             {
+                              x:4,
+                              y:4
+                             }, 
+                             {
+                              x:8,
+                              y:0
+                             }],
+                      rotation:180,
+                      type:"",
+                      visible:true,
+                      width:0,
+                      x:8,
+                      y:8
+                     }],
+              opacity:1,
+              type:"objectgroup",
+              visible:true,
+              x:0,
+              y:0
+             },
+          type:"obstacle"
+         },
+         // Contains hitboxes for obstacle and lava.
+         {
+          id:4,
+          objectgroup:
+             {
+              draworder:"index",
+              id:2,
+              name:"",
+              objects:[
+                     {
+                      height:0,
+                      id:1,
+                      name:"",
+                      polygon:[
+                             {
+                              x:0,
+                              y:0
+                             }, 
+                             {
+                              x:0,
+                              y:8
+                             }, 
+                             {
+                              x:8,
+                              y:0
+                             }],
+                      rotation:0,
+                      type:"obstacle",
+                      visible:true,
+                      width:0,
+                      x:0,
+                      y:0
+                     }, 
+                     {
+                      height:0,
+                      id:2,
+                      name:"",
+                      polygon:[
+                             {
+                              x:0,
+                              y:0
+                             }, 
+                             {
+                              x:0,
+                              y:8
+                             }, 
+                             {
+                              x:8,
+                              y:0
+                             }],
+                      rotation:180,
+                      type:"lava",
+                      visible:true,
+                      width:0,
+                      x:8,
+                      y:8
+                     }],
+              opacity:1,
+              type:"objectgroup",
+              visible:true,
+              x:0,
+              y:0
+             }
+         },
+         // Contains hitboxes for lava only
+         {
+          id:5,
+          objectgroup:
+             {
+              draworder:"index",
+              id:2,
+              name:"",
+              objects:[
+                     {
+                      height:8,
+                      id:1,
+                      name:"",
+                      rotation:0,
+                      type:"lava",
+                      visible:true,
+                      width:8,
+                      x:0,
+                      y:0
+                     }],
+              opacity:1,
+              type:"objectgroup",
+              visible:true,
+              x:0,
+              y:0
+             },
+          type:"lava"
+         }
           ],
           tilewidth: 8,
           type: "tileset",
@@ -304,9 +395,9 @@ describe("TiledTileMapLoader", function () {
     expect(tileMap.getTileDefinition(2).getTag()).to.be("obstacle");
     expect(tileMap.getTileDefinition(2).getHiBoxes()).to.be.eql([
       [
+        [0, 8],
+        [8, 0],
         [0, 0],
-        [8, -8],
-        [0, -8],
       ],
     ]);
     expect(tileMap.getTileDefinition(3)).to.be.ok();
@@ -318,15 +409,29 @@ describe("TiledTileMapLoader", function () {
         [8, 0],
       ],
       [
+        [8, 8],
+        [4, 4],
+        [0, 8],
+      ],
+    ]);
+    expect(tileMap.getTileDefinition(4)).to.be.ok();
+    // TODO Handle tile with hitboxes of different tags
+    expect(tileMap.getTileDefinition(4).getTag()).to.be("");
+    expect(tileMap.getTileDefinition(4).getHiBoxes()).to.be.eql([
+      [ [ 0, 0 ], [ 0, 8 ], [ 8, 0 ] ],
+      [[ 8, 8 ], [ 8, 0 ], [ 0, 8 ] ],
+    ]);
+    expect(tileMap.getTileDefinition(5)).to.be.ok();
+    expect(tileMap.getTileDefinition(5).getTag()).to.be("lava");
+    expect(tileMap.getTileDefinition(5).getHiBoxes()).to.be.eql([
+      [
         [0, 0],
-        [4, -4],
+        [0, 8],
+        [8, 8],
         [8, 0],
       ],
     ]);
-    // TODO the tile 0 is defined here, but undefined is use in the map.
-    expect(tileMap.getTileDefinition(4)).to.be.ok();
-    expect(tileMap.getTileDefinition(4).getHiBoxes()).to.be.eql([]);
-    expect(tileMap.getTileDefinition(5)).not.to.be.ok();
+    expect(tileMap.getTileDefinition(6)).not.to.be.ok();
 
     const layers = new Array(...tileMap.getLayers());
     expect(layers.length).to.be(1);

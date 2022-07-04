@@ -110,7 +110,7 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
   beforeEach(async function () {
     runtimeScene = createScene();
     tileMap = addTileMapCollisionMask(runtimeScene);
-    // TODO find a clean way to wait that the json is read.
+    // TODO find a clean way to wait for the json to be read.
     await delay(10);
   });
 
@@ -136,16 +136,16 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     expect(tileMap.isCollidingWithPoint(104, 204)).to.be(true);
 
     // The point is in wite square without any hitbox.
-    expect(tileMap.insideObject(112, 204)).to.be(false);
-    expect(tileMap.isCollidingWithPoint(112, 204)).to.be(false);
+    expect(tileMap.insideObject(112, 212)).to.be(false);
+    expect(tileMap.isCollidingWithPoint(112, 212)).to.be(false);
 
     // The point is in black triangle part of the square that has an hitbox.
-    expect(tileMap.insideObject(110, 210)).to.be(true);
-    expect(tileMap.isCollidingWithPoint(110, 210)).to.be(true);
+    expect(tileMap.insideObject(102, 210)).to.be(true);
+    expect(tileMap.isCollidingWithPoint(102, 210)).to.be(true);
 
     // The point is in white triangle part of the square that has no hitbox.
-    expect(tileMap.insideObject(114, 214)).to.be(true);
-    expect(tileMap.isCollidingWithPoint(114, 214)).to.be(false);
+    expect(tileMap.insideObject(106, 214)).to.be(true);
+    expect(tileMap.isCollidingWithPoint(106, 214)).to.be(false);
   });
 
   it('can detect collision with an object', function () {
@@ -165,6 +165,21 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
 
     object.setPosition(116, 208);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
+      false
+    );
+  });
+
+  it("can detect collision with an object when it's rotated", function () {
+    tileMap.setPosition(100, 200);
+    tileMap.setAngle(90);
+
+    const object = addObject(runtimeScene);
+
+    object.setPosition(123, 185);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
+
+    object.setPosition(124, 184);
     expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
       false
     );

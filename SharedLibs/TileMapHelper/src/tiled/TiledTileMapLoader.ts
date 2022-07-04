@@ -32,9 +32,19 @@ export class TiledTileMapLoader {
           for (const object of tile.objectgroup.objects) {
             let polygon: PolygonVertices | null = null;
             if (object.polygon) {
+              const angle = object.rotation * Math.PI / 180;
+              let cos = Math.cos(angle);
+              let sin = Math.sin(angle);
+              // Avoid rounding errors around 0.
+              if (cos === -1 || cos === 1) {
+                sin = 0;
+              }
+              if (sin === -1 || sin === 1) {
+                cos = 0;
+              }
               polygon = object.polygon.map((point) => [
-                object.x + point.x,
-                object.y + point.y,
+                object.x + point.x * cos - point.y * sin,
+                object.y + point.x * sin + point.y * cos,
               ]);
               //TODO check that polygons are convex or split them?
             }

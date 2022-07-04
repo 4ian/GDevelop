@@ -103,7 +103,7 @@ function createObject(runtimeScene, behaviorProperties) {
   return object;
 }
 
-describe.only('Physics2RuntimeBehavior', () => {
+describe('Physics2RuntimeBehavior', () => {
   describe('Behavior activation and reactivation', () => {
     let runtimeGame;
     let runtimeScene;

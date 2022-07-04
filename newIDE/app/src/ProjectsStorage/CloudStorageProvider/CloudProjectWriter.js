@@ -126,7 +126,7 @@ export const generateOnSaveProjectAs = (
 ) => async (
   project: gdProject,
   fileMetadata: ?FileMetadata,
-  options?: { isSameStorageProvider?: boolean }
+  options?: { context?: 'duplicateCurrentProject' }
 ) => {
   if (!authenticatedUser.authenticated) {
     return { wasSaved: false, fileMetadata };
@@ -135,7 +135,7 @@ export const generateOnSaveProjectAs = (
 
   const isBlankProject = !fileMetadata;
   const shouldDuplicateCurrentCloudProject =
-    fileMetadata && options && options.isSameStorageProvider;
+    fileMetadata && options && options.context === 'duplicateCurrentProject';
   if (!isBlankProject && shouldDuplicateCurrentCloudProject) {
     name = await new Promise(resolve => {
       setDialog(() => (

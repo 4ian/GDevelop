@@ -156,6 +156,8 @@ declare class libGDevelop {
   ExpressionCompletionDescription: Class<gdExpressionCompletionDescription>;
   VectorExpressionCompletionDescription: Class<gdVectorExpressionCompletionDescription>;
   ExpressionCompletionFinder: Class<gdExpressionCompletionFinder>;
+  ExpressionNodeLocationFinder: Class<gdExpressionNodeLocationFinder>;
+  ExpressionTypeFinder: Class<gdExpressionTypeFinder>;
   ExpressionNode: Class<gdExpressionNode>;
   UniquePtrExpressionNode: Class<gdUniquePtrExpressionNode>;
   ExpressionParser2: Class<gdExpressionParser2>;

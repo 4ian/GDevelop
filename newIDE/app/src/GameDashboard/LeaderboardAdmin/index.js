@@ -50,7 +50,7 @@ import {
   type Leaderboard,
   type LeaderboardCustomizationSettings,
   type LeaderboardUpdatePayload,
-  breakUuid,
+  shortenUuidForDisplay,
 } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardProvider from '../../Leaderboard/LeaderboardProvider';
@@ -496,7 +496,7 @@ export const LeaderboardAdmin = ({
   if (apiError && apiError.action === 'leaderboardsFetching') {
     return (
       <CenteredError>
-        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards}>
           {apiError.message}
         </PlaceholderError>
       </CenteredError>
@@ -507,7 +507,7 @@ export const LeaderboardAdmin = ({
 
     return (
       <CenteredError>
-        <PlaceholderError onRetry={onListLeaderboards} kind="error">
+        <PlaceholderError onRetry={onListLeaderboards}>
           <Trans>
             An error occurred when retrieving leaderboards, please try again
             later.
@@ -615,7 +615,9 @@ export const LeaderboardAdmin = ({
       avatar: <Fingerprint />,
       text: (
         <Tooltip title={currentLeaderboard.id}>
-          <Text size="body2">{breakUuid(currentLeaderboard.id)}</Text>
+          <Text size="body2">
+            {shortenUuidForDisplay(currentLeaderboard.id)}
+          </Text>
         </Tooltip>
       ),
       secondaryText: null,
@@ -930,9 +932,7 @@ export const LeaderboardAdmin = ({
                       {apiError &&
                       (apiError.action === 'leaderboardDeletion' ||
                         apiError.action === 'leaderboardPrimaryUpdate') ? (
-                        <PlaceholderError kind="error">
-                          {apiError.message}
-                        </PlaceholderError>
+                        <PlaceholderError>{apiError.message}</PlaceholderError>
                       ) : null}
                     </>
                   ) : null}
@@ -974,10 +974,7 @@ export const LeaderboardAdmin = ({
               </Line>
               {apiError && apiError.action === 'entriesFetching' ? (
                 <CenteredError>
-                  <PlaceholderError
-                    onRetry={onFetchLeaderboardEntries}
-                    kind="error"
-                  >
+                  <PlaceholderError onRetry={onFetchLeaderboardEntries}>
                     {apiError.message}
                   </PlaceholderError>
                 </CenteredError>

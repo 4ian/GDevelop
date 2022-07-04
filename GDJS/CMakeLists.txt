@@ -45,8 +45,6 @@ set(source_files ${source_files} ${f3})
 ENDIF()
 
 file(GLOB_RECURSE formatted_source_files GDJS/Events/* GDJS/Extensions/* GDJS/IDE/*)
-list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Dialogs/GDJSDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Dialogs/GDJSDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Dialogs/GDJSDialogsBitmaps.cpp")
-list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/mongoose/mongoose.c" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/mongoose/mongoose.h")
 gd_add_clang_utils(GDJS "${formatted_source_files}")
 
 

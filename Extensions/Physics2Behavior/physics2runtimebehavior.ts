@@ -48,13 +48,16 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
 
-        // Let each behavior know about the contact against the other
-        behaviorA.currentContacts.push(behaviorB);
-        behaviorB.currentContacts.push(behaviorA);
+        if (!behaviorA || !behaviorB) {
+          return;
+        }
+
+        behaviorA.onContactBegin(behaviorB);
+        behaviorB.onContactBegin(behaviorA);
       };
       this.contactListener.EndContact = function (contactPtr) {
         // Get the contact
@@ -70,19 +73,16 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior;
+          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
 
-        // Remove each other contact
-        let i = behaviorA.currentContacts.indexOf(behaviorB);
-        if (i !== -1) {
-          behaviorA.currentContacts.splice(i, 1);
+        if (!behaviorA || !behaviorB) {
+          return;
         }
-        i = behaviorB.currentContacts.indexOf(behaviorA);
-        if (i !== -1) {
-          behaviorB.currentContacts.splice(i, 1);
-        }
+
+        behaviorA.onContactEnd(behaviorB);
+        behaviorB.onContactEnd(behaviorA);
       };
       this.contactListener.PreSolve = function () {};
       this.contactListener.PostSolve = function () {};
@@ -241,7 +241,9 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
-    currentContacts: any;
+    contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
+    contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
+    currentContacts: Array<Physics2RuntimeBehavior>;
     _body: any = null;
     _sharedData: any;
     _tempb2Vec2: any;
@@ -281,7 +283,9 @@ namespace gdjs {
       this.gravityScale = behaviorData.gravityScale;
       this.layers = behaviorData.layers;
       this.masks = behaviorData.masks;
-      this.currentContacts = this.currentContacts || [];
+      this.contactsStartedThisFrame = [];
+      this.contactsEndedThisFrame = [];
+      this.currentContacts = [];
       this.currentContacts.length = 0;
       this._sharedData = Physics2SharedData.getSharedData(
         runtimeScene,
@@ -741,10 +745,20 @@ namespace gdjs {
       this._objectOldX = this.owner.getX();
       this._objectOldY = this.owner.getY();
       this._objectOldAngle = this.owner.getAngle();
+
+      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
+        this.currentContacts,
+        this.contactsStartedThisFrame,
+        this.contactsEndedThisFrame
+      );
     }
 
     doStepPostEvents(runtimeScene) {
       this._updateBodyFromObject();
+
+      // Reset contacts that happened this frame
+      this.contactsStartedThisFrame.length = 0;
+      this.contactsEndedThisFrame.length = 0;
 
       // Reset world step to update next frame
       this._sharedData.stepped = false;
@@ -1450,6 +1464,30 @@ namespace gdjs {
 
       // Apply the angular impulse
       this._body.ApplyAngularImpulse(angularImpulse);
+    }
+
+    getMass(): float {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        this.createBody();
+      }
+
+      // Wake up the object
+      this._body.SetAwake(true);
+
+      return this._body.GetMass();
+    }
+
+    getInertia(): float {
+      // If there is no body, set a new one
+      if (this._body === null) {
+        this.createBody();
+      }
+
+      // Wake up the object
+      this._body.SetAwake(true);
+
+      return this._body.GetInertia();
     }
 
     getMassCenterX(): float {
@@ -3797,8 +3835,28 @@ namespace gdjs {
       joint.GetBodyB().SetAwake(true);
     }
 
-    // Collision
-    static collisionTest(
+    onContactBegin(otherBehavior: Physics2RuntimeBehavior) {
+      // There might be contacts that end during the frame and
+      // start again right away. It is considered a glitch
+      // and should not be detected.
+      let i = this.contactsEndedThisFrame.indexOf(otherBehavior);
+      if (i !== -1) {
+        this.contactsEndedThisFrame.splice(i, 1);
+      } else {
+        this.contactsStartedThisFrame.push(otherBehavior);
+      }
+    }
+
+    onContactEnd(otherBehavior: Physics2RuntimeBehavior) {
+      this.contactsEndedThisFrame.push(otherBehavior);
+    }
+
+    /**
+     * @deprecated Prefer using `Physics2RuntimeBehavior.areObjectsColliding`.
+     */
+    static collisionTest = Physics2RuntimeBehavior.areObjectsColliding;
+
+    static areObjectsColliding(
       object1: gdjs.RuntimeObject,
       object2: gdjs.RuntimeObject,
       behaviorName: string
@@ -3806,17 +3864,59 @@ namespace gdjs {
       // Test if the second object is in the list of contacts of the first one
       const behavior1 = object1.getBehavior(
         behaviorName
-      ) as Physics2RuntimeBehavior;
-      if (!!behavior1) {
-        for (let i = 0, len = behavior1.currentContacts.length; i < len; ++i) {
-          if (behavior1.currentContacts[i].owner === object2) {
-            return true;
-          }
-        }
+      ) as Physics2RuntimeBehavior | null;
+      if (!behavior1) return false;
+
+      if (
+        behavior1.currentContacts.some((behavior) => behavior.owner === object2)
+      ) {
+        return true;
+      }
+      // If a contact has started at this frame and ended right away, it
+      // won't appear in current contacts but the condition should return
+      // true anyway.
+      if (
+        behavior1.contactsStartedThisFrame.some(
+          (behavior) => behavior.owner === object2
+        )
+      ) {
+        return true;
       }
 
       // No contact found
       return false;
+    }
+
+    static hasCollisionStartedBetween(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics2RuntimeBehavior | null;
+      if (!behavior1) return false;
+
+      return behavior1.contactsStartedThisFrame.some(
+        (behavior) => behavior.owner === object2
+      );
+    }
+
+    static hasCollisionStoppedBetween(
+      object1: gdjs.RuntimeObject,
+      object2: gdjs.RuntimeObject,
+      behaviorName: string
+    ): boolean {
+      // Test if the second object is in the list of contacts of the first one
+      const behavior1 = object1.getBehavior(
+        behaviorName
+      ) as Physics2RuntimeBehavior | null;
+      if (!behavior1) return false;
+
+      return behavior1.contactsEndedThisFrame.some(
+        (behavior) => behavior.owner === object2
+      );
     }
   }
   gdjs.registerBehavior(

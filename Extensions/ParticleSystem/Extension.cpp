@@ -39,8 +39,6 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
                 "CppPlatform/Extensions/particleSystemicon.png")
             .SetCategoryFullName(_("General"));
 
-    obj.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
-
     // Declaration is too big to be compiled by GCC in one file, unless you have
     // 4GB+ ram. :/
     ExtensionSubDeclaration1(obj);

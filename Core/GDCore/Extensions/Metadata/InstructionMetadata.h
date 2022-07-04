@@ -366,7 +366,7 @@ class GD_CORE_API InstructionMetadata {
      *      .AddParameter("object", _("Object"), "Text", false)
      *      .AddParameter("operator", _("Modification operator"), "string")
      *      .AddParameter("string", _("String"))
-     *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+     *      .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString");
      *
      *  DECLARE_END_OBJECT_ACTION()
      * \endcode

@@ -6,6 +6,7 @@
 /* Mosaic window and tile */
 .mosaic-gd-theme .mosaic-window-toolbar {
   background: var(--mosaic-toolbar-background-color) !important;
+  box-shadow: none !important;
 }
 
 .mosaic-gd-theme .mosaic-window-body {
@@ -13,9 +14,10 @@
 }
 
 .mosaic-gd-theme .mosaic-window .mosaic-window-title {
-  color: white !important;
+  padding-left: 8px; /* Follow same spacing as in the rest of the app. */
+  color: var(--mosaic-title-color) !important;
   font-weight: 400 !important;
-  font-family: var(--gdevelop-classic-font-family);
+  font-family: var(--gdevelop-modern-font-family);
   font-size: 15px; /* Same as ClosableTabs font size */
 }
 

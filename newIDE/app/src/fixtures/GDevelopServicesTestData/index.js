@@ -3,21 +3,29 @@ import {
   type Usages,
   type Subscription,
   type Limits,
-} from '../Utils/GDevelopServices/Usage';
+} from '../../Utils/GDevelopServices/Usage';
 import { User as FirebaseUser } from 'firebase/auth';
-import { type Profile } from '../Utils/GDevelopServices/Authentication';
-import { type Release } from '../Utils/GDevelopServices/Release';
-import { type Build } from '../Utils/GDevelopServices/Build';
-import { type ExtensionShortHeader } from '../Utils/GDevelopServices/Extension';
-import { type ExampleShortHeader } from '../Utils/GDevelopServices/Example';
-import { type Game, type ShowcasedGame } from '../Utils/GDevelopServices/Game';
-import { type GameMetrics } from '../Utils/GDevelopServices/Analytics';
-import { type AuthenticatedUser } from '../Profile/AuthenticatedUserContext';
+import { type Profile } from '../../Utils/GDevelopServices/Authentication';
+import { type Release } from '../../Utils/GDevelopServices/Release';
+import { type Build } from '../../Utils/GDevelopServices/Build';
+import {
+  type ExtensionShortHeader,
+  type ExtensionHeader,
+} from '../../Utils/GDevelopServices/Extension';
+import { type ExampleShortHeader } from '../../Utils/GDevelopServices/Example';
+import {
+  type Game,
+  type ShowcasedGame,
+} from '../../Utils/GDevelopServices/Game';
+import { type GameMetrics } from '../../Utils/GDevelopServices/Analytics';
+import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import {
   type AssetShortHeader,
   type Asset,
   type AssetPacks,
-} from '../Utils/GDevelopServices/Asset';
+} from '../../Utils/GDevelopServices/Asset';
+import { formatISO, subDays } from 'date-fns';
+import { type Comment } from '../../Utils/GDevelopServices/Play';
 
 export const indieFirebaseUser: FirebaseUser = {
   uid: 'indie-user',
@@ -266,7 +274,7 @@ export const erroredCordovaBuild: Build = {
   status: 'error',
   logsKey: '/fake-error.log',
   createdAt: 1515084391000,
-  updatedAt: 1515084399000,
+  updatedAt: Date.now(),
   userId: 'fake-user-id',
   type: 'cordova-build',
 };
@@ -276,7 +284,7 @@ export const pendingCordovaBuild: Build = {
   gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
-  updatedAt: 1515084399000,
+  updatedAt: Date.now(),
   userId: 'fake-user-id',
   type: 'cordova-build',
 };
@@ -286,7 +294,7 @@ export const pendingElectronBuild: Build = {
   gameId: 'pending-game-id',
   status: 'pending',
   createdAt: 1515084391000,
-  updatedAt: 1515084399000,
+  updatedAt: Date.now(),
   userId: 'fake-user-id',
   type: 'electron-build',
 };
@@ -736,21 +744,48 @@ export const fakeAssetShortHeader1: AssetShortHeader = {
 };
 
 export const fireBulletExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'reviewed',
   shortDescription:
     'Allow the object to fire bullets, with customizable speed, angle and fire rate.',
   extensionNamespace: '',
   fullName: 'Fire bullets',
   name: 'FireBullet',
   version: '0.0.2',
-  url: 'Extensions/FireBullet.json',
-  headerUrl: 'Extensions/FireBullet-header.json',
+  url: 'https://resources.gdevelop-app.com/extensions/FireBullet.json',
+  headerUrl:
+    'https://resources.gdevelop-app.com/extensions/FireBullet-header.json',
   tags: ['fire', 'bullets', 'spawn', 'firerate'],
-  previewIconUrl: 'http://example.com/icon.svg',
+  previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
 };
 
+export const fireBulletExtensionHeader: ExtensionHeader = {
+  ...fireBulletExtensionShortHeader,
+  description:
+    'This is a longer description explaining:\n* How to\n* Use the extension\n\nWith *some* **markdown** :)',
+  helpPath: 'https://example.com',
+  iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
+};
+
+export const uncompatibleFireBulletExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  gdevelopVersion: '2000.0.0',
+};
+
+export const alreadyInstalledExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  name: 'SomeAlreadyInstalledExtension',
+};
+
+export const alreadyInstalledCommunityExtensionShortHeader: ExtensionShortHeader = {
+  ...fireBulletExtensionShortHeader,
+  tier: 'community',
+  name: 'SomeAlreadyInstalledExtension',
+};
+
 export const flashExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'reviewed',
   shortDescription:
     'Make the object flash (blink) for a period of time, so that it is alternately visible and invisible.\nTrigger the effect by using the Flash action.',
   extensionNamespace: '',
@@ -760,9 +795,35 @@ export const flashExtensionShortHeader: ExtensionShortHeader = {
   url: 'Extensions/Flash.json',
   headerUrl: 'Extensions/Flash-header.json',
   tags: ['flash', 'blink', 'visible', 'invisible', 'hit', 'damage'],
-  previewIconUrl: 'http://example.com/icon.svg',
+  previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
   eventsBasedBehaviorsCount: 1,
   eventsFunctionsCount: 0,
+};
+
+export const communityTierExtensionShortHeader: ExtensionShortHeader = {
+  tier: 'community',
+  shortDescription:
+    'This is an example of an extension that is a community extension (not reviewed).',
+  extensionNamespace: '',
+  fullName: 'Fake Community extension',
+  name: 'FakeCommunityExtension',
+  version: '0.0.2',
+  url:
+    'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension.json',
+  headerUrl:
+    'https://resources.gdevelop-app.com/extensions/FakeCommunityExtension-header.json',
+  tags: ['fire', 'bullets', 'spawn', 'firerate'],
+  previewIconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
+  eventsBasedBehaviorsCount: 1,
+  eventsFunctionsCount: 0,
+};
+
+export const communityTierExtensionHeader: ExtensionHeader = {
+  ...communityTierExtensionShortHeader,
+  description:
+    'This is a longer description explaining:\n* How to\n* Use the extension\n\nWith *some* **markdown** :)',
+  helpPath: 'https://example.com',
+  iconUrl: 'https://resources.gdevelop-app.com/assets/Icons/repeat.svg',
 };
 
 export const game1: Game = {
@@ -780,35 +841,153 @@ export const game2: Game = {
   createdAt: 1607065498,
 };
 
-export const gameRollingMetrics1: GameMetrics = {
-  date: '2020-10-01',
+/**
+ * It uses the ANSI C one because Number.MAX_SAFE_INTEGER is 2^53
+ * and this one multiply a seed of 2^15 with a multiplier of 2^32.
+ * https://en.wikipedia.org/wiki/Linear_congruential_generator
+ * The randomization is poor, but ok for placeholder values.
+ */
+class NumberGenerator {
+  x: number;
 
-  sessions: {
-    d0Sessions: 350,
-  },
-  players: {
-    d0Players: 200,
-    d0NewPlayers: 220,
-  },
-  retention: {
-    d1RetainedPlayers: 193,
-    d2RetainedPlayers: 153,
-    d3RetainedPlayers: 121,
-    d4RetainedPlayers: 83,
-    d5RetainedPlayers: 74,
-    d6RetainedPlayers: 73,
-    d7RetainedPlayers: 67,
-  },
-};
-export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics = {
-  date: '2020-10-01',
+  constructor(x = 1) {
+    this.x = x % 2 ** 15;
+  }
 
-  sessions: {
-    d0Sessions: 350,
-  },
-  players: null,
-  retention: null,
+  /**
+   * @returns a number inside [0 ; 1[.
+   */
+  getNextRandomNumber(): number {
+    // Masks would more efficient but less readable.
+    this.x = (1103515245 * this.x + 12345) % 2 ** 31 >> 16;
+    return this.x / 2 ** 15;
+  }
+}
+
+const interpolateWithNoise = (
+  leftValue: number,
+  rightValue: number,
+  ratio: number,
+  numberGenerator: NumberGenerator
+) =>
+  ((1 - ratio) * leftValue + ratio * rightValue) *
+  (0.95 + 0.1 * numberGenerator.getNextRandomNumber());
+
+const generateGameRollingMetricsFor364Days = () => {
+  const numberGenerator = new NumberGenerator();
+  const metrics = [];
+  const count = 364;
+  for (let index = 0; index < count; index++) {
+    const ratio = 1 - index / count;
+    const playersCount = Math.round(
+      interpolateWithNoise(50, 250, ratio, numberGenerator)
+    );
+    metrics.push({
+      date: formatISO(subDays(new Date(), index)),
+
+      sessions: {
+        d0Sessions: Math.round(
+          interpolateWithNoise(80, 350, ratio, numberGenerator)
+        ),
+        d0SessionsDurationTotal: Math.round(
+          interpolateWithNoise(15000, 175000, ratio, numberGenerator)
+        ),
+      },
+      players: {
+        d0Players: playersCount,
+        d0NewPlayers: Math.round(
+          interpolateWithNoise(80, 120, ratio, numberGenerator)
+        ),
+        d0PlayersBelow60s: Math.round(
+          playersCount * interpolateWithNoise(0.8, 0.4, ratio, numberGenerator)
+        ),
+        d0PlayersBelow180s: Math.round(
+          playersCount * interpolateWithNoise(0.9, 0.55, ratio, numberGenerator)
+        ),
+        d0PlayersBelow300s: Math.round(
+          playersCount * interpolateWithNoise(0.95, 0.6, ratio, numberGenerator)
+        ),
+        d0PlayersBelow600s: Math.round(
+          playersCount * interpolateWithNoise(0.98, 0.7, ratio, numberGenerator)
+        ),
+        d0PlayersBelow900s: Math.round(
+          playersCount *
+            Math.min(1, interpolateWithNoise(1, 0.9, ratio, numberGenerator))
+        ),
+      },
+      retention: {
+        d1RetainedPlayers: 193,
+        d2RetainedPlayers: 153,
+        d3RetainedPlayers: 121,
+        d4RetainedPlayers: 83,
+        d5RetainedPlayers: 74,
+        d6RetainedPlayers: 73,
+        d7RetainedPlayers: 67,
+      },
+    });
+  }
+  return metrics;
 };
+
+const deleteDurationMetrics = (
+  gameMetrics: GameMetrics[],
+  startDays: number
+): GameMetrics[] => {
+  for (let index = startDays; index < gameMetrics.length; index++) {
+    const gameMetric = gameMetrics[index];
+    const sessions = gameMetric.sessions;
+    const players = gameMetric.players;
+    if (sessions) {
+      sessions.d0SessionsDurationTotal = undefined;
+    }
+    if (players) {
+      players.d0PlayersBelow60s = undefined;
+      players.d0PlayersBelow180s = undefined;
+      players.d0PlayersBelow300s = undefined;
+      players.d0PlayersBelow600s = undefined;
+      players.d0PlayersBelow900s = undefined;
+    }
+  }
+  return gameMetrics;
+};
+
+export const gameRollingMetricsFor364Days: GameMetrics[] = generateGameRollingMetricsFor364Days();
+export const gameRollingMetricsWithUndefinedDurationMetrics: GameMetrics[] = deleteDurationMetrics(
+  generateGameRollingMetricsFor364Days(),
+  17
+);
+export const gameRollingMetricsWithOnly19Days: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  19
+);
+export const gameRollingMetricsWithOnly1Day: GameMetrics[] = gameRollingMetricsFor364Days.slice(
+  0,
+  1
+);
+export const gameRollingMetricsWithHoles: GameMetrics[] = [
+  4,
+  12,
+  13,
+  25,
+  33,
+  107,
+  108,
+  109,
+  110,
+  230,
+].map(index => gameRollingMetricsFor364Days[index]);
+export const gameRollingMetricsWithoutPlayersAndRetention1: GameMetrics[] = [
+  {
+    date: '2020-10-01',
+
+    sessions: {
+      d0Sessions: 350,
+      d0SessionsDurationTotal: 175000,
+    },
+    players: null,
+    retention: null,
+  },
+];
 
 export const showcasedGame1: ShowcasedGame = {
   title: "Lil BUB's HELLO EARTH",
@@ -999,4 +1178,43 @@ export const fakeAssetPacks: AssetPacks = {
       assetsCount: 287,
     },
   ],
+};
+
+export const commentUnsolved: Comment = {
+  id: 'comment-unsolved-id',
+  type: 'FEEDBACK',
+  gameId: 'game-id',
+  buildId: 'build-id',
+  text:
+    "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
+  ratings: {
+    version: 1,
+    visuals: 2,
+    sound: 4,
+    fun: 6,
+    easeOfUse: 8,
+  },
+  playerName: 'playerName', // For non-authenticated comments.
+  createdAt: 1515084391000,
+  updatedAt: 1515084393000,
+};
+
+export const commentSolved: Comment = {
+  id: 'comment-solved-id',
+  type: 'FEEDBACK',
+  gameId: 'game-id',
+  buildId: 'build-id',
+  text:
+    "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
+  ratings: {
+    version: 1,
+    visuals: 2,
+    sound: 4,
+    fun: 6,
+    easeOfUse: 8,
+  },
+  playerName: 'playerName', // For non-authenticated comments.
+  createdAt: 1515084391000,
+  updatedAt: 1515084393000,
+  processedAt: 1515084393000,
 };

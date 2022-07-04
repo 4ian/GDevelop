@@ -246,20 +246,26 @@ export default function NewBehaviorDialog({
             </Tabs>
             {currentTab === 'installed' && (
               <React.Fragment>
-                <SearchBar
-                  value={searchText}
-                  onRequestSearch={() => {
-                    if (behaviors.length) {
-                      chooseBehavior(i18n, behaviors[0]);
-                    } else if (showDeprecated && deprecatedBehaviors.length) {
-                      chooseBehavior(i18n, deprecatedBehaviors[0]);
-                    }
-                  }}
-                  aspect="add-margins-only-if-modern-theme"
-                  onChange={setSearchText}
-                  ref={searchBar}
-                  placeholder={t`Search installed behaviors`}
-                />
+                <Line>
+                  <Column expand>
+                    <SearchBar
+                      value={searchText}
+                      onRequestSearch={() => {
+                        if (behaviors.length) {
+                          chooseBehavior(i18n, behaviors[0]);
+                        } else if (
+                          showDeprecated &&
+                          deprecatedBehaviors.length
+                        ) {
+                          chooseBehavior(i18n, deprecatedBehaviors[0]);
+                        }
+                      }}
+                      onChange={setSearchText}
+                      ref={searchBar}
+                      placeholder={t`Search installed behaviors`}
+                    />
+                  </Column>
+                </Line>
                 {hasSearchNoResult && (
                   <EmptyMessage>
                     <Trans>
@@ -340,14 +346,18 @@ export default function NewBehaviorDialog({
               </React.Fragment>
             )}
             {currentTab === 'search' && (
-              <ExtensionStore
-                project={project}
-                isInstalling={isInstalling}
-                onInstall={async extensionShortHeader =>
-                  onInstallExtension(i18n, extensionShortHeader)
-                }
-                showOnlyWithBehaviors
-              />
+              <Line expand>
+                <Column expand noMargin>
+                  <ExtensionStore
+                    project={project}
+                    isInstalling={isInstalling}
+                    onInstall={async extensionShortHeader =>
+                      onInstallExtension(i18n, extensionShortHeader)
+                    }
+                    showOnlyWithBehaviors
+                  />
+                </Column>
+              </Line>
             )}
           </Column>
           <DismissableInfoBar

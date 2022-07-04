@@ -86,6 +86,7 @@ export const installAnalyticsEvents = (authentication: Authentication) => {
       appLanguage,
       browserLanguage,
       programOpeningCount: getProgramOpeningCount(),
+      themeName: userPreferences ? userPreferences.themeName : 'Unknown',
       ...(isElectronApp ? { usedDesktopApp: true } : { usedWebApp: true }),
     };
 
@@ -271,6 +272,10 @@ export const sendTutorialOpened = (tutorialName: string) => {
   recordEvent('tutorial_opened', {
     tutorialName,
   });
+};
+
+export const sendOnboardingManuallyOpened = () => {
+  recordEvent('onboarding_manually_opened');
 };
 
 export const sendAssetPackOpened = (assetPackTag: string) => {

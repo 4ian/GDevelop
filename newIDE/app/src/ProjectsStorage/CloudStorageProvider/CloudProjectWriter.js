@@ -126,7 +126,7 @@ export const generateOnSaveProjectAs = (
 ) => async (
   project: gdProject,
   fileMetadata: ?FileMetadata,
-  options?: { context?: 'duplicateCurrentProject' }
+  options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
 ) => {
   if (!authenticatedUser.authenticated) {
     return { wasSaved: false, fileMetadata };
@@ -156,6 +156,9 @@ export const generateOnSaveProjectAs = (
     name = project.getName();
   }
 
+  if (options && options.onStartSaving) options.onStartSaving();
+  closeDialog();
+
   const cloudProjectId = await createCloudProjectAndInitCommit(
     project,
     authenticatedUser,
@@ -164,7 +167,6 @@ export const generateOnSaveProjectAs = (
 
   if (!cloudProjectId) return { wasSaved: false, fileMetadata };
 
-  closeDialog();
   return {
     wasSaved: true,
     fileMetadata: { fileIdentifier: cloudProjectId },

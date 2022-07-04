@@ -241,8 +241,11 @@ namespace gdjs {
       );
     }
 
-    // This implementation doesn't use updateHitBoxes.
-    // It's important for good performances.
+    /**
+     * insideObject usually use the AABB of the object.
+     * But, in case of a tile map, it makes more sense to look each tile individually.
+     * It returns true when there is an hitbox in the tile.
+     */
     insideObject(x: float, y: float): boolean {
       this.updateTransformation();
       // This is more precise than the default implementation.

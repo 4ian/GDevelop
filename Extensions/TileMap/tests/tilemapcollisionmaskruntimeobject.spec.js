@@ -103,6 +103,9 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
   let runtimeScene;
+  /**
+   * @type {gdjs.TileMapCollisionMaskRuntimeObject}
+   */
   let tileMap;
   beforeEach(async function () {
     runtimeScene = createScene();
@@ -111,22 +114,46 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     await delay(10);
   });
 
+  it('can be measured', function () {
+    tileMap.setPosition(100, 200);
+
+    expect(tileMap.getWidth()).to.be(32);
+    expect(tileMap.getHeight()).to.be(16);
+    expect(tileMap.getCenterX()).to.be(16);
+    expect(tileMap.getCenterY()).to.be(8);
+  });
+
+  /**
+   * insideObject usually use the AABB of the object.
+   * But, in case of a tile map, it makes more sense to look each tile individually.
+   * It returns true when there is an hitbox in the tile.
+   */
   it('can detect a point inside the collision mask', function () {
     tileMap.setPosition(100, 200);
-    runtimeScene.renderAndStep(1000 / 60);
 
+    // The point is in the black square with an hitbox.
     expect(tileMap.insideObject(104, 204)).to.be(true);
+    expect(tileMap.isCollidingWithPoint(104, 204)).to.be(true);
+
+    // The point is in wite square without any hitbox.
     expect(tileMap.insideObject(112, 204)).to.be(false);
+    expect(tileMap.isCollidingWithPoint(112, 204)).to.be(false);
+
+    // The point is in black triangle part of the square that has an hitbox.
+    expect(tileMap.insideObject(110, 210)).to.be(true);
+    expect(tileMap.isCollidingWithPoint(110, 210)).to.be(true);
+
+    // The point is in white triangle part of the square that has no hitbox.
+    expect(tileMap.insideObject(114, 214)).to.be(true);
+    expect(tileMap.isCollidingWithPoint(114, 214)).to.be(false);
   });
 
   it('can detect collision with an object', function () {
     tileMap.setPosition(100, 200);
 
     const object = addObject(runtimeScene);
+
     object.setPosition(96, 196);
-
-    runtimeScene.renderAndStep(1000 / 60);
-
     expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
 
     object.setPosition(90, 190);

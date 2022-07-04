@@ -160,7 +160,7 @@ export class EditableTileMap {
         return false;
       }
       const tileDefinition = this._tileSet.get(tileId);
-      if (tileDefinition!.getTag() === tag) {
+      if (tileDefinition!.hasTag(tag)) {
         return true;
       }
     }
@@ -557,40 +557,56 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
  * A tile definition from the tile set.
  */
 export class TileDefinition {
-  private readonly hitBoxes: PolygonVertices[];
-  private readonly tag: string;
+  /**
+   * There will probably be at most 4 tags on a tile.
+   * An array lookup should take less time than using a Map.
+   */
+  private readonly taggedHitBoxes: {
+    tag: string;
+    polygons: PolygonVertices[];
+  }[];
   private readonly animationLength: integer;
 
   /**
-   * @param hitBoxes The hit boxes for this tile.
-   * @param tag The tag of this tile.
    * @param animationLength The number of frame in the tile animation.
    */
-  constructor(
-    hitBoxes: PolygonVertices[],
-    tag: string,
-    animationLength: integer
-  ) {
-    this.hitBoxes = hitBoxes;
-    this.tag = tag;
+  constructor(animationLength: integer) {
+    this.taggedHitBoxes = [];
     this.animationLength = animationLength;
+  }
+
+  /**
+   * Add a polygon
+   * @param tag
+   * @param polygon
+   */
+  add(tag: string, polygon: PolygonVertices): void {
+    let taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
+    if (!taggedHitBox) {
+      taggedHitBox = { tag, polygons: [] };
+      this.taggedHitBoxes.push(taggedHitBox);
+    }
+    taggedHitBox.polygons.push(polygon);
   }
 
   /**
    * This property is used by {@link TransformedCollisionTileMap}
    * to make collision classes.
+   * @param tag
    * @returns The tag that is used to filter tiles.
    */
-  getTag() {
-    return this.tag;
+  hasTag(tag: string): boolean {
+    return this.taggedHitBoxes.some((hitbox) => hitbox.tag === tag);
   }
 
   /**
    * The hitboxes positioning is done by {@link TransformedCollisionTileMap}.
+   * @param tag
    * @returns The hit boxes for this tile.
    */
-  getHiBoxes() {
-    return this.hitBoxes;
+  getHiBoxes(tag: string): PolygonVertices[] | undefined {
+    const taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
+    return taggedHitBox && taggedHitBox.polygons;
   }
 
   /**

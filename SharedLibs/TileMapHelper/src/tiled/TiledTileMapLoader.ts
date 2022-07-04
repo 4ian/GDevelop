@@ -27,12 +27,14 @@ export class TiledTileMapLoader {
     const tiledSet = tiledMap.tilesets[0];
     if (tiledSet.tiles) {
       for (const tile of tiledSet.tiles) {
-        const polygons: PolygonVertices[] = [];
+        const tileDefinition = new TileDefinition(
+          tile.animation ? tile.animation.length : 0
+        );
         if (tile.objectgroup) {
           for (const object of tile.objectgroup.objects) {
             let polygon: PolygonVertices | null = null;
             if (object.polygon) {
-              const angle = object.rotation * Math.PI / 180;
+              const angle = (object.rotation * Math.PI) / 180;
               let cos = Math.cos(angle);
               let sin = Math.sin(angle);
               // Avoid rounding errors around 0.
@@ -59,27 +61,20 @@ export class TiledTileMapLoader {
                 [object.x + object.width, object.y],
               ];
             }
-            polygons.push(polygon);
+            tileDefinition.add(object.type || tile.type, polygon);
           }
         }
-        definitions.set(
-          tile.id,
-          new TileDefinition(
-            polygons,
-            tile.type ? tile.type : "",
-            tile.animation ? tile.animation.length : 0
-          )
-        );
+        definitions.set(tile.id, tileDefinition);
       }
     }
     for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
       const tileId = tiledSet.firstgid + tileIndex;
       if (!definitions.has(tileId)) {
-        definitions.set(tileId, new TileDefinition([], "", 0));
+        definitions.set(tileId, new TileDefinition(0));
       }
     }
     if (!definitions.has(0)) {
-      definitions.set(0, new TileDefinition([], "", 0));
+      definitions.set(0, new TileDefinition(0));
     }
     const collisionTileMap = new EditableTileMap(
       tiledMap.tilewidth,

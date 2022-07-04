@@ -65,7 +65,8 @@ namespace gdjs {
         new Map()
       );
       this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-        collisionTileMap
+        collisionTileMap,
+        this._typeFilter
       );
       this._renderer = new gdjs.TileMap.TileMapCollisionMaskRender(
         this,
@@ -160,7 +161,8 @@ namespace gdjs {
           }
 
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-            tileMap
+            tileMap,
+            this._typeFilter
           );
           // The tile map polygons always keep the same references.
           // TODO Update them if an action modify the tile map.

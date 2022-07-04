@@ -11,6 +11,7 @@ namespace gdjs {
        * The model that describes the tile map.
        */
       private _source: TileMapHelper.EditableTileMap;
+      tag: string;
       private _layers: Map<integer, TransformedCollisionTileMapLayer>;
       // TODO Tiled allows to offset the layers
       /**
@@ -36,8 +37,9 @@ namespace gdjs {
       /**
        * @param source The model that describes the tile map.
        */
-      constructor(source: TileMapHelper.EditableTileMap) {
+      constructor(source: TileMapHelper.EditableTileMap, tag: string) {
         this._source = source;
+        this.tag = tag;
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
         for (const sourceLayer of source.getLayers()) {
           const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
@@ -583,10 +585,16 @@ namespace gdjs {
                 return listNext;
               }
               const tile = this.layer.get(x, y);
-              const definition = tile?.getDefinition();
+              if (!tile) {
+                continue;
+              }
+              const definition = tile.getDefinition();
               //console.log("Check: " + x + " " + y + " tile: " + (tile ? tile.getTag(): tile));
-              if (definition && definition.getTag() === this.tag) {
-                polygonItr = tile!.getHitboxes()[Symbol.iterator]();
+              if (!definition) {
+                continue;
+              }
+              if (definition.hasTag(this.tag)) {
+                polygonItr = tile.getHitboxes()[Symbol.iterator]();
                 listNext = polygonItr.next();
               }
             }
@@ -638,23 +646,25 @@ namespace gdjs {
         this.hitBoxes = [];
         // TODO only for the right tag?
         if (definition) {
-          this.hitBoxes.length = definition.getHiBoxes().length;
-          for (
-            let polygonIndex = 0;
-            polygonIndex < this.hitBoxes.length;
-            polygonIndex++
-          ) {
-            const polygon = new gdjs.Polygon();
-            this.hitBoxes[polygonIndex] = polygon;
-            polygon.vertices.length = definition.getHiBoxes()[
-              polygonIndex
-            ].length;
+          const tag = this.layer.tileMap.tag;
+          const definitionHitboxes = definition.getHiBoxes(tag);
+          if (definitionHitboxes) {
+            this.hitBoxes.length = definitionHitboxes.length;
             for (
-              let vertexIndex = 0;
-              vertexIndex < polygon.vertices.length;
-              vertexIndex++
+              let polygonIndex = 0;
+              polygonIndex < this.hitBoxes.length;
+              polygonIndex++
             ) {
-              polygon.vertices[vertexIndex] = [0, 0];
+              const polygon = new gdjs.Polygon();
+              this.hitBoxes[polygonIndex] = polygon;
+              polygon.vertices.length = definitionHitboxes[polygonIndex].length;
+              for (
+                let vertexIndex = 0;
+                vertexIndex < polygon.vertices.length;
+                vertexIndex++
+              ) {
+                polygon.vertices[vertexIndex] = [0, 0];
+              }
             }
           }
         }
@@ -691,6 +701,15 @@ namespace gdjs {
 
         const definition = this.getDefinition();
         if (!definition) {
+          this._setHitboxesUpToDate();
+          // It should already be []
+          this.hitBoxes.length = 0;
+          return this.hitBoxes;
+        }
+        const tag = this.layer.tileMap.tag;
+        const definitionHitboxes = definition.getHiBoxes(tag);
+        if (!definitionHitboxes) {
+          this._setHitboxesUpToDate();
           // It should already be []
           this.hitBoxes.length = 0;
           return this.hitBoxes;
@@ -720,7 +739,7 @@ namespace gdjs {
           polygonIndex < this.hitBoxes.length;
           polygonIndex++
         ) {
-          const defPolygon = definition.getHiBoxes()[polygonIndex];
+          const defPolygon = definitionHitboxes[polygonIndex];
           const polygon = this.hitBoxes[polygonIndex];
 
           for (

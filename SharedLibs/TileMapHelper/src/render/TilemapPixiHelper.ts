@@ -233,12 +233,15 @@ export class PixiTileMapHelper {
             const isFlippedVertically = tileLayer.isFlippedVertically(x, y);
             const isFlippedDiagonally = tileLayer.isFlippedDiagonally(x, y);
             const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
-            if (!tileDefinition || tileDefinition.getTag() !== typeFilter) {
+            if (!tileDefinition) {
               continue;
             }
-
+            const hitboxes = tileDefinition.getHiBoxes(typeFilter);
+            if (!hitboxes) {
+              continue;
+            }
             pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
-            for (const vertices of tileDefinition.getHiBoxes()) {
+            for (const vertices of hitboxes) {
               if (vertices.length === 0) continue;
 
               pixiGraphics.beginFill(fillColor, fillOpacity);

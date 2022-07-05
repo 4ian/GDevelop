@@ -17,6 +17,9 @@ import { List, ListItem, ListItemText } from '@material-ui/core';
 const styles = {
   listItem: {
     padding: 0,
+    marginTop: 2,
+    marginBottom: 2,
+    borderRadius: 8,
     overflowWrap: 'anywhere', // Ensure everything is wrapped on small devices.
   },
 };

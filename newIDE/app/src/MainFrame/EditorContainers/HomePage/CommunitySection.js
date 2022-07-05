@@ -87,7 +87,7 @@ export const CommunitySection = () => {
           onClick={() =>
             Window.openExternalURL('https://www.tiktok.com/@gdevelop')
           }
-          icon={<TikTok fontSize="small" />}
+          icon={<TikTok fontSize="small" color="inherit" />}
           label={
             <Text noMargin size="body">
               <Trans>TikTok</Trans>

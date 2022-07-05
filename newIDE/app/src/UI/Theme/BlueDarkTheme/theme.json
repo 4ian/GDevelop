@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#6BAFFF",
-        "comment": "Palette/Blue/40"
+        "value": "#006DEE",
+        "comment": "Palette/Blue/60"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -11,8 +11,8 @@
     },
     "secondary": {
       "color": {
-        "value": "#006DEE",
-        "comment": "Palette/Blue/60"
+        "value": "#6BAFFF",
+        "comment": "Palette/Blue/40"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -182,6 +182,13 @@
       "border": {
         "color": {
           "value": "{theme.surface.canvas.background-color.value}"
+        }
+      }
+    },
+    "home": {
+      "separator": {
+        "color": {
+          "value": "#32323B"
         }
       }
     }

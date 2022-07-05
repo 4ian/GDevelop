@@ -217,7 +217,7 @@ export const AssetDetails = ({
         <Line justifyContent="space-between" noMargin>
           <Column>
             <Line alignItems="baseline" noMargin>
-              <Text size="title" displayInlineAsSpan>
+              <Text size="block-title" displayInlineAsSpan>
                 {assetShortHeader.name}
               </Text>
               <Spacer />
@@ -234,6 +234,7 @@ export const AssetDetails = ({
                             Window.openExternalURL(author.website);
                             event.preventDefault();
                           }}
+                          color="secondary"
                         >
                           {author.name}
                         </Link>
@@ -426,6 +427,7 @@ export const AssetDetails = ({
                             Window.openExternalURL(assetLicense.website);
                             event.preventDefault();
                           }}
+                          color="secondary"
                         >
                           {assetLicense.name}
                         </Link>
@@ -450,7 +452,7 @@ export const AssetDetails = ({
         {asset && (
           <Column expand>
             <Line noMargin>
-              <Text size="title" displayInlineAsSpan>
+              <Text size="block-title" displayInlineAsSpan>
                 <Trans>You might like</Trans>
               </Text>
             </Line>

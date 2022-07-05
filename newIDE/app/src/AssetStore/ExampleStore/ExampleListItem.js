@@ -103,7 +103,10 @@ export const ExampleListItem = ({
       <Line noMargin expand>
         <ButtonBase style={styles.button} onClick={onChoose} focusRipple>
           {!!exampleShortHeader.previewImageUrls.length && (
-            <ExampleIcon exampleShortHeader={exampleShortHeader} size={64} />
+            <ExampleIcon
+              exampleShortHeader={exampleShortHeader}
+              type="preview"
+            />
           )}
           <Column expand>
             <Text noMargin>{renderExampleField('name')} </Text>

@@ -2,18 +2,14 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import { makeStyles } from '@material-ui/core';
-import Chip from '../../UI/Chip';
-import FaceIcon from '@material-ui/icons/Face';
+import Person from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { getGravatarUrl } from '../GravatarUrl';
 import DotBadge from '../DotBadge';
-
-type Props = {|
-  profile: ?Profile,
-  onClick: () => void,
-  displayNotificationBadge: boolean,
-|};
+import RaisedButton from '../RaisedButton';
+import { shortenString } from '../../Utils/StringHelpers';
+import TextButton from '../TextButton';
 
 const useStyles = makeStyles({
   root: { flexDirection: 'column' },
@@ -23,6 +19,19 @@ const useStyles = makeStyles({
   },
 });
 
+const styles = {
+  avatar: {
+    width: 20,
+    height: 20,
+  },
+};
+
+type Props = {|
+  profile: ?Profile,
+  onClick: () => void,
+  displayNotificationBadge: boolean,
+|};
+
 const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
   const classes = useStyles();
   return (
@@ -31,29 +40,29 @@ const UserChip = ({ profile, onClick, displayNotificationBadge }: Props) => {
       invisible={!displayNotificationBadge}
       classes={classes}
     >
-      <Chip
-        variant="outlined"
-        avatar={
-          profile ? (
+      {profile ? (
+        <TextButton
+          label={shortenString(profile.username || profile.email, 20)}
+          onClick={onClick}
+          icon={
             <Avatar
-              src={getGravatarUrl(profile.email || '', { size: 30 })}
-              sx={{ width: 30, height: 30 }}
+              src={getGravatarUrl(profile.email || '', { size: 50 })}
+              style={styles.avatar}
             />
-          ) : (
-            <FaceIcon />
-          )
-        }
-        label={
-          profile ? (
-            profile.username || profile.email
-          ) : (
+          }
+        />
+      ) : (
+        <RaisedButton
+          label={
             <span>
-              <Trans>Click to connect</Trans>
+              <Trans>Create account - Sign in</Trans>
             </span>
-          )
-        }
-        onClick={onClick}
-      />
+          }
+          onClick={onClick}
+          primary
+          icon={<Person fontSize="small" />}
+        />
+      )}
     </DotBadge>
   );
 };

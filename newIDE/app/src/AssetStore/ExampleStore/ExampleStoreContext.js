@@ -135,7 +135,7 @@ export const ExampleStoreStateProvider = ({
     chosenFilters,
     excludedTiers,
     defaultFirstSearchItemIds: firstExampleIds,
-    withoutShuffling: true
+    withoutShuffling: true,
   });
 
   const exampleStoreState = React.useMemo(

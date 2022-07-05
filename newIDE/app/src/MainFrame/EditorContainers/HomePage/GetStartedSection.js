@@ -13,7 +13,7 @@ import {
   useResponsiveWindowWidth,
   type WidthType,
 } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { CardWidget } from './CardWidget';
+import { CardWidget, LARGE_WIDGET_SIZE } from './CardWidget';
 import Checkbox from '../../../UI/Checkbox';
 import { GridList, GridListTile } from '@material-ui/core';
 const electron = optionalRequire('electron');
@@ -22,12 +22,20 @@ const styles = {
   grid: {
     marginTop: 30,
     textAlign: 'center',
-    maxWidth: 850, // Avoid tiles taking too much space on large screens.
+    maxWidth: LARGE_WIDGET_SIZE * 4, // Avoid tiles taking too much space on large screens.
+    overflow: 'hidden',
   },
   tutorialsContainer: {
     marginTop: 30,
   },
   gridListTile: { display: 'flex', justifyContent: 'center' },
+  cardTextContainer: {
+    textAlign: 'left',
+    padding: 10,
+  },
+  imageStyle: {
+    borderRadius: 8,
+  },
 };
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -61,6 +69,7 @@ export const GetStartedSection = ({
   const items = [
     !electron && !isMobile() && !isUserflowRunning
       ? {
+          key: 'tour',
           title: <Trans>Take the tour</Trans>,
           timeText: <Trans>5 minutes</Trans>,
           description: <Trans>Learn the fundamentals of the editor</Trans>,
@@ -68,23 +77,30 @@ export const GetStartedSection = ({
             sendOnboardingManuallyOpened();
             onOpenOnboardingDialog();
           },
+          imagePath: 'res/homepage/take-the-tour.png',
         }
       : undefined,
     {
+      key: 'tutorial',
       title: <Trans>Follow a tutorial</Trans>,
       timeText: <Trans>30 min to 1h</Trans>,
-      description: <Trans>Find the complete documentation on everything</Trans>,
+      description: <Trans>A complete game step by step</Trans>,
       action: () => onTabChange('learn'),
+      imagePath: 'res/homepage/follow-tutorial.png',
     },
     {
+      key: 'build',
       title: <Trans>Start building directly</Trans>,
       description: <Trans>For people who like to try on their own</Trans>,
       action: onOpenExamples,
+      imagePath: 'res/homepage/start-building.png',
     },
     {
+      key: 'games',
       title: <Trans>Explore games made by others</Trans>,
       description: <Trans>Get inspired and have fun</Trans>,
       action: () => onTabChange('play'),
+      imagePath: 'res/homepage/explore-games.png',
     },
   ].filter(Boolean);
 
@@ -100,25 +116,37 @@ export const GetStartedSection = ({
           onCheck={(e, checked) => setShowGetStartedSection(!checked)}
         />
       </Line>
-      <GridList
-        cols={getColumnsFromWidth(windowWidth)}
-        style={styles.grid}
-        cellHeight="auto"
-        spacing={10}
-      >
-        {items.map((Item, index) => (
-          <GridListTile key={index} style={styles.gridListTile}>
-            <CardWidget onClick={Item.action} key={index} size="large">
-              <Column alignItems="center">
-                <Text size="block-title">{Item.title}</Text>
-                <Text size="body" color="secondary">
-                  {Item.description}
-                </Text>
-              </Column>
-            </CardWidget>
-          </GridListTile>
-        ))}
-      </GridList>
+      <Line noMargin>
+        <GridList
+          cols={getColumnsFromWidth(windowWidth)}
+          style={styles.grid}
+          cellHeight="auto"
+          spacing={10}
+        >
+          {items.map((item, index) => (
+            <GridListTile key={index} style={styles.gridListTile}>
+              <CardWidget onClick={item.action} key={index} size="large">
+                <Column noMargin>
+                  <img
+                    alt={item.key}
+                    src={item.imagePath}
+                    style={styles.imageStyle}
+                  />
+                  <div style={styles.cardTextContainer}>
+                    <Text size="block-title">{item.title}</Text>
+                    {item.timeText && (
+                      <Text size="body" color="secondary">
+                        {item.timeText}
+                      </Text>
+                    )}
+                    <Text size="body">{item.description}</Text>
+                  </div>
+                </Column>
+              </CardWidget>
+            </GridListTile>
+          ))}
+        </GridList>
+      </Line>
     </SectionContainer>
   );
 };

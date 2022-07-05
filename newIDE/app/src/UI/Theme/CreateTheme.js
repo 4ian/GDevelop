@@ -303,7 +303,7 @@ export function createGdevelopTheme({
       },
       home: {
         header: {
-          backgroundColor: styles['ThemeSurfaceCanvasBackgroundColor'],
+          backgroundColor: styles['ThemeHomeHeaderBackgroundColor'],
         },
         separator: {
           color: styles['ThemeHomeSeparatorColor'],

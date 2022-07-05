@@ -198,6 +198,12 @@
       }
     },
     "home": {
+      "header": {
+        "background-color": {
+          "value": "#25252E",
+          "comment": "Palette/Grey/90"
+        }
+      },
       "separator": {
         "color": {
           "value": "#32323B"

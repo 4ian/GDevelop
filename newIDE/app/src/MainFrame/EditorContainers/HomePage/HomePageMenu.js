@@ -13,6 +13,7 @@ import SchoolIcon from '../../../UI/CustomSvgIcons/School';
 import GoogleControllerIcon from '../../../UI/CustomSvgIcons/GoogleController';
 import WebIcon from '../../../UI/CustomSvgIcons/Web';
 import Sun from '../../../UI/CustomSvgIcons/Sun';
+import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 
 export const styles = {
   desktopMenu: {
@@ -72,6 +73,7 @@ type Props = {|
 
 export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const GDevelopTheme = React.useContext(GDevelopThemeContext);
   const [
     isHomePageMenuDrawerOpen,
     setIsHomePageMenuDrawerOpen,
@@ -108,7 +110,10 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
       <Drawer
         open={isHomePageMenuDrawerOpen}
         PaperProps={{
-          style: styles.drawerContent,
+          style: {
+            ...styles.drawerContent,
+            backgroundColor: GDevelopTheme.home.header.backgroundColor,
+          },
           className: 'safe-area-aware-left-container',
         }}
         ModalProps={{

@@ -14,18 +14,39 @@ import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
 import { SectionContainer } from './SectionContainer';
 import FlatButton from '../../../UI/FlatButton';
-import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { CardWidget } from './CardWidget';
+import {
+  useResponsiveWindowWidth,
+  type WidthType,
+} from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
+import { CardWidget, SMALL_WIDGET_SIZE } from './CardWidget';
+import { GridList, GridListTile } from '@material-ui/core';
 const electron = optionalRequire('electron');
 
 const styles = {
-  helpItemsContainer: {
+  grid: {
     marginBottom: 50,
     textAlign: 'center',
+    maxWidth: SMALL_WIDGET_SIZE * 4 + 100, // Avoid tiles taking too much space on large screens.
+  },
+  gridListTile: { display: 'flex', justifyContent: 'center' },
+  helpItem: {
+    padding: 10,
   },
   tutorialsContainer: {
     marginTop: 30,
   },
+};
+
+const getColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 3;
+    case 'large':
+    default:
+      return 4;
+  }
 };
 
 type Props = {|
@@ -81,20 +102,29 @@ export const LearnSection = ({
           <Trans>Shortcuts</Trans>
         </Text>
       </Line>
-      <div style={styles.helpItemsContainer}>
-        <ResponsiveLineStackLayout noMargin>
+      <Line noMargin>
+        <GridList
+          cols={getColumnsFromWidth(windowWidth)}
+          style={styles.grid}
+          cellHeight="auto"
+          spacing={10}
+        >
           {helpItems.map((helpItem, index) => (
-            <CardWidget onClick={helpItem.action} key={index}>
-              <Column alignItems="center">
-                <Text size="block-title">{helpItem.title}</Text>
-                <Text size="body" color="secondary">
-                  {helpItem.description}
-                </Text>
-              </Column>
-            </CardWidget>
+            <GridListTile key={index} style={styles.gridListTile}>
+              <CardWidget onClick={helpItem.action} key={index}>
+                <div style={styles.helpItem}>
+                  <Column alignItems="center">
+                    <Text size="block-title">{helpItem.title}</Text>
+                    <Text size="body" color="secondary">
+                      {helpItem.description}
+                    </Text>
+                  </Column>
+                </div>
+              </CardWidget>
+            </GridListTile>
           ))}
-        </ResponsiveLineStackLayout>
-      </div>
+        </GridList>
+      </Line>
       <LineStackLayout
         justifyContent="space-between"
         alignItems="center"

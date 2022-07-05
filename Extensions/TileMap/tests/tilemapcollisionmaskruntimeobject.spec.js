@@ -92,6 +92,7 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
       type: '',
       behaviors: [],
       effects: [],
+      variables: [],
     });
     object.setCustomWidthAndHeight(8, 8);
     runtimeScene.addObject(object);

@@ -33,9 +33,6 @@ const styles = {
     textAlign: 'left',
     padding: 10,
   },
-  imageStyle: {
-    borderRadius: 8,
-  },
 };
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -71,7 +68,7 @@ export const GetStartedSection = ({
       ? {
           key: 'tour',
           title: <Trans>Take the tour</Trans>,
-          timeText: <Trans>5 minutes</Trans>,
+          subText: <Trans>🕐 5 minutes</Trans>,
           description: <Trans>Learn the fundamentals of the editor</Trans>,
           action: () => {
             sendOnboardingManuallyOpened();
@@ -83,7 +80,7 @@ export const GetStartedSection = ({
     {
       key: 'tutorial',
       title: <Trans>Follow a tutorial</Trans>,
-      timeText: <Trans>30 min to 1h</Trans>,
+      subText: <Trans>🕐 30 min to 1h</Trans>,
       description: <Trans>A complete game step by step</Trans>,
       action: () => onTabChange('learn'),
       imagePath: 'res/homepage/follow-tutorial.png',
@@ -91,6 +88,7 @@ export const GetStartedSection = ({
     {
       key: 'build',
       title: <Trans>Start building directly</Trans>,
+      subText: '🌶🌶🌶',
       description: <Trans>For people who like to try on their own</Trans>,
       action: onOpenExamples,
       imagePath: 'res/homepage/start-building.png',
@@ -126,17 +124,13 @@ export const GetStartedSection = ({
           {items.map((item, index) => (
             <GridListTile key={index} style={styles.gridListTile}>
               <CardWidget onClick={item.action} key={index} size="large">
-                <Column noMargin>
-                  <img
-                    alt={item.key}
-                    src={item.imagePath}
-                    style={styles.imageStyle}
-                  />
+                <Column noMargin expand>
+                  <img alt={item.key} src={item.imagePath} />
                   <div style={styles.cardTextContainer}>
                     <Text size="block-title">{item.title}</Text>
-                    {item.timeText && (
+                    {item.subText && (
                       <Text size="body" color="secondary">
-                        {item.timeText}
+                        {item.subText}
                       </Text>
                     )}
                     <Text size="body">{item.description}</Text>

@@ -173,6 +173,8 @@ class RuntimeObject {
     return this._task;
   }
 
+  noop() {}
+
   markFakeAsyncActionAsFinished() {
     if (this._task) this._task.markAsFinished();
   }

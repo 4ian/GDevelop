@@ -220,8 +220,8 @@ module.exports = {
         )
         .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
         .getCodeExtraInformation()
-        .setFunctionName('doFakeNonAsyncAction')
-        .setAsyncFunctionName('doFakeOptionallyAsyncAction');
+        .setFunctionName('noop')
+        .setAsyncFunctionName('doFakeAsyncAction');
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

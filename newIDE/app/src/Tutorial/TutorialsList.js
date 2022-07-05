@@ -1,5 +1,6 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { List } from '@material-ui/core';
 import * as React from 'react';
 import { Column } from '../UI/Grid';
 import PlaceholderError from '../UI/PlaceholderError';
@@ -37,10 +38,12 @@ export const TutorialsList = (props: Props) => {
 
   return (
     <Column expand noMargin>
-      {tutorials &&
-        tutorials.map(tutorial => (
-          <TutorialListItem key={tutorial.id} tutorial={tutorial} />
-        ))}
+      <List>
+        {tutorials &&
+          tutorials.map(tutorial => (
+            <TutorialListItem key={tutorial.id} tutorial={tutorial} />
+          ))}
+      </List>
     </Column>
   );
 };

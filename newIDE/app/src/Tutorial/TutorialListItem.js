@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type Tutorial } from '../Utils/GDevelopServices/Tutorial';
-import { Card } from '@material-ui/core';
-import ButtonBase from '@material-ui/core/ButtonBase';
+import { ListItem } from '@material-ui/core';
 import Text from '../UI/Text';
 import { Column, Line, Spacer } from '../UI/Grid';
 import { MarkdownText } from '../UI/MarkdownText';
@@ -25,9 +24,6 @@ const styles = {
     backgroundColor: 'black',
     width: '100%',
   },
-  card: {
-    flex: 1,
-  },
   container: {
     display: 'flex',
     textAlign: 'left',
@@ -36,6 +32,10 @@ const styles = {
     animation: 'fadein 0.5s',
     paddingTop: 8,
     paddingBottom: 8,
+    flex: 1,
+  },
+  listItem: {
+    padding: 0,
   },
 };
 
@@ -50,51 +50,47 @@ export const TutorialListItem = ({ tutorial }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
 
   return (
-    <ButtonBase
+    <ListItem
+      button
+      key={tutorial.id}
       onClick={() => {
         sendTutorialOpened(tutorial.id);
         Window.openExternalURL(tutorial.link);
       }}
-      focusRipple
+      style={styles.listItem}
     >
       <div style={styles.container} ref={containerRef}>
-        <Card style={styles.card}>
-          <ResponsiveLineStackLayout noMargin>
-            <CorsAwareImage
-              style={
-                windowWidth === 'small'
-                  ? styles.smallScreenThumbnailImage
-                  : styles.thumbnailImageWithDescription
-              }
-              src={tutorial.thumbnailUrl}
-              alt={tutorial.title}
-              onError={() => {
-                isImageLoadingRef.current = false;
-              }}
-              onLoad={() => {
-                isImageLoadingRef.current = false;
-              }}
-            />
-            <Line expand>
-              <Column expand>
-                <ResponsiveLineStackLayout
-                  noMargin
-                  alignItems="baseline"
-                  expand
-                >
-                  <Text noMargin displayInlineAsSpan>
-                    {tutorial.title}
-                  </Text>
-                </ResponsiveLineStackLayout>
-                <Text size="body2" displayInlineAsSpan>
-                  <MarkdownText source={tutorial.description} allowParagraphs />
+        <ResponsiveLineStackLayout noMargin>
+          <CorsAwareImage
+            style={
+              windowWidth === 'small'
+                ? styles.smallScreenThumbnailImage
+                : styles.thumbnailImageWithDescription
+            }
+            src={tutorial.thumbnailUrl}
+            alt={tutorial.title}
+            onError={() => {
+              isImageLoadingRef.current = false;
+            }}
+            onLoad={() => {
+              isImageLoadingRef.current = false;
+            }}
+          />
+          <Line expand>
+            <Column expand>
+              <ResponsiveLineStackLayout noMargin alignItems="baseline" expand>
+                <Text noMargin displayInlineAsSpan>
+                  {tutorial.title}
                 </Text>
-                <Spacer />
-              </Column>
-            </Line>
-          </ResponsiveLineStackLayout>
-        </Card>
+              </ResponsiveLineStackLayout>
+              <Text size="body2" displayInlineAsSpan>
+                <MarkdownText source={tutorial.description} allowParagraphs />
+              </Text>
+              <Spacer />
+            </Column>
+          </Line>
+        </ResponsiveLineStackLayout>
       </div>
-    </ButtonBase>
+    </ListItem>
   );
 };

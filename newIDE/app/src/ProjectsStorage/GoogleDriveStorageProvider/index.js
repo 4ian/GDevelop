@@ -375,13 +375,17 @@ export default ({
       },
       onSaveProject: (project: gdProject, fileMetadata: FileMetadata) => {
         const fileId = fileMetadata.fileIdentifier;
+        const newFileMetadata = {
+          ...fileMetadata,
+          lastModifiedDate: Date.now(),
+        };
 
         const content = serializeToJSON(project);
         return authenticate()
           .then(googleUser => patchJsonFile(fileId, googleUser, content))
           .then(() => ({
             wasSaved: true,
-            fileMetadata,
+            fileMetadata: newFileMetadata,
           }));
       },
       onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
@@ -408,6 +412,7 @@ export default ({
                           wasSaved: true,
                           fileMetadata: {
                             fileIdentifier: newFileId,
+                            lastModifiedDate: Date.now(),
                           },
                         });
                       })
@@ -428,6 +433,7 @@ export default ({
                         wasSaved: true,
                         fileMetadata: {
                           fileIdentifier: selectedFileOrFolder.id,
+                          lastModifiedDate: Date.now(),
                         },
                       });
                     });

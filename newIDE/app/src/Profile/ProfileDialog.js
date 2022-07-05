@@ -87,53 +87,56 @@ const ProfileDialog = ({
           <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
         </Tabs>
       }
+      flexBody
     >
-      {currentTab === 'profile' &&
-        (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Line>
-            <Column expand>
-              <AuthenticatedUserProfileDetails
-                authenticatedUser={authenticatedUser}
-                onEditProfile={authenticatedUser.onEdit}
-                onChangeEmail={authenticatedUser.onChangeEmail}
+      <Column noMargin expand useFullHeight>
+        {currentTab === 'profile' &&
+          (authenticatedUser.authenticated && authenticatedUser.profile ? (
+            <Line>
+              <Column expand>
+                <AuthenticatedUserProfileDetails
+                  authenticatedUser={authenticatedUser}
+                  onEditProfile={authenticatedUser.onEdit}
+                  onChangeEmail={authenticatedUser.onChangeEmail}
+                />
+                <SubscriptionDetails
+                  subscription={authenticatedUser.subscription}
+                  onChangeSubscription={onChangeSubscription}
+                />
+                <ContributionsDetails userId={authenticatedUser.profile.id} />
+              </Column>
+            </Line>
+          ) : (
+            <Column noMargin expand justifyContent="center">
+              <CreateProfile
+                onLogin={authenticatedUser.onLogin}
+                onCreateAccount={authenticatedUser.onCreateAccount}
               />
-              <SubscriptionDetails
-                subscription={authenticatedUser.subscription}
-                onChangeSubscription={onChangeSubscription}
-              />
-              <ContributionsDetails userId={authenticatedUser.profile.id} />
             </Column>
-          </Line>
-        ) : (
-          <Column>
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-            />
-          </Column>
-        ))}
-      {currentTab === 'games-dashboard' &&
-        (authenticatedUser.authenticated ? (
-          <Line>
-            <ColumnStackLayout expand noOverflowParent>
-              <GamesList project={currentProject} />
-            </ColumnStackLayout>
-          </Line>
-        ) : (
-          <Column>
-            <CreateProfile
-              onLogin={authenticatedUser.onLogin}
-              onCreateAccount={authenticatedUser.onCreateAccount}
-              message={
-                <Trans>
-                  Create an account to register your games and to get access to
-                  metrics collected anonymously, like the number of daily
-                  players and retention of the players after a few days.
-                </Trans>
-              }
-            />
-          </Column>
-        ))}
+          ))}
+        {currentTab === 'games-dashboard' &&
+          (authenticatedUser.authenticated ? (
+            <Line>
+              <ColumnStackLayout expand noOverflowParent>
+                <GamesList project={currentProject} />
+              </ColumnStackLayout>
+            </Line>
+          ) : (
+            <Column noMargin expand justifyContent="center">
+              <CreateProfile
+                onLogin={authenticatedUser.onLogin}
+                onCreateAccount={authenticatedUser.onCreateAccount}
+                message={
+                  <Trans>
+                    Create an account to register your games and to get access
+                    to metrics collected anonymously, like the number of daily
+                    players and retention of the players after a few days.
+                  </Trans>
+                }
+              />
+            </Column>
+          ))}
+      </Column>
     </Dialog>
   );
 };

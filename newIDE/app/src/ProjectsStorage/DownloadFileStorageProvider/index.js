@@ -16,12 +16,18 @@ export default ({
   hiddenInOpenDialog: true,
   createOperations: ({ setDialog, closeDialog }) => ({
     onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+      const newFileMetadata = fileMetadata
+        ? {
+            ...fileMetadata,
+            lastModifiedDate: Date.now(),
+          }
+        : fileMetadata;
       return new Promise(resolve => {
         setDialog(() => (
           <DownloadSaveAsDialog
             onDone={() => {
               closeDialog();
-              resolve({ wasSaved: false, fileMetadata });
+              resolve({ wasSaved: false, fileMetadata: newFileMetadata });
             }}
             project={project}
           />

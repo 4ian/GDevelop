@@ -44,7 +44,7 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   return {
     project,
     storageProvider: LocalFileStorageProvider,
-    fileMetadata: { fileIdentifier: filePath },
+    fileMetadata: { fileIdentifier: filePath, lastModifiedDate: Date.now() },
     projectName,
   };
 };
@@ -79,7 +79,10 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
     });
     return {
       storageProvider: LocalFileStorageProvider,
-      fileMetadata: { fileIdentifier: localFilePath },
+      fileMetadata: {
+        fileIdentifier: localFilePath,
+        lastModifiedDate: Date.now(),
+      },
       projectName,
     };
   } catch (error) {

@@ -39,7 +39,8 @@ const styles = {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
-    padding: 8,
+    paddingBottom: 8,
+    paddingTop: 8,
   },
 };
 

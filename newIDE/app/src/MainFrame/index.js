@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import HomeIcon from '@material-ui/icons/Home';
+import HomeIcon from '../UI/CustomSvgIcons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -83,10 +83,7 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import {
-  type CreateProjectDialogWithComponentsProps,
-  type CreateProjectDialogTabs,
-} from '../ProjectCreation/CreateProjectDialog';
+import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
@@ -331,10 +328,6 @@ const MainFrame = (props: Props) => {
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const [
-    createDialogInitialTab,
-    setCreateDialogInitialTab,
-  ] = React.useState<CreateProjectDialogTabs>('examples');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -1412,7 +1405,8 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          icon: <HomeIcon role="img" titleAccess="Home" />,
+          icon: <HomeIcon titleAccess="Home" fontSize="small" />,
+          label: i18n._(t`Home`),
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,
           key: 'start page',
@@ -1420,7 +1414,7 @@ const MainFrame = (props: Props) => {
         }),
       }));
     },
-    [setState]
+    [setState, i18n]
   );
 
   const _openDebugger = React.useCallback(
@@ -1540,8 +1534,7 @@ const MainFrame = (props: Props) => {
   };
 
   const openCreateProjectDialog = React.useCallback(
-    (tab: CreateProjectDialogTabs) => (open: boolean = true) => {
-      setCreateDialogInitialTab(tab);
+    (open: boolean = true) => {
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
@@ -1549,18 +1542,6 @@ const MainFrame = (props: Props) => {
   const closeCreateDialog = () => {
     setState(state => ({ ...state, createDialogOpen: false }));
   };
-  const onOpenTutorials = React.useMemo(
-    () => openCreateProjectDialog('tutorials'),
-    [openCreateProjectDialog]
-  );
-  const onOpenExamples = React.useMemo(
-    () => openCreateProjectDialog('examples'),
-    [openCreateProjectDialog]
-  );
-  const onOpenGamesShowcase = React.useMemo(
-    () => openCreateProjectDialog('games-showcase'),
-    [openCreateProjectDialog]
-  );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -1671,6 +1652,16 @@ const MainFrame = (props: Props) => {
     (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
     ) => {
+      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Open a new project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+        unsavedChanges.sealUnsavedChanges();
+      }
+
       const { fileMetadata } = fileMetadataAndStorageProviderName;
       const storageProvider = findStorageProviderFor(
         i18n,
@@ -1700,6 +1691,7 @@ const MainFrame = (props: Props) => {
       openSceneOrProjectManager,
       props.storageProviders,
       getStorageProviderOperations,
+      unsavedChanges,
     ]
   );
 
@@ -1836,7 +1828,7 @@ const MainFrame = (props: Props) => {
 
       try {
         const saveStartTime = performance.now();
-        const { wasSaved } = await onSaveProject(
+        const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata
         );
@@ -1845,6 +1837,15 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          preferences.insertRecentProjectFile({
+            fileMetadata,
+            storageProviderName: getStorageProvider().internalName,
+          });
+
+          setState(state => ({
+            ...state,
+            currentFileMetadata: fileMetadata,
+          }));
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
           _showSnackMessage(i18n._(t`Project properly saved`));
         }
@@ -1870,6 +1871,9 @@ const MainFrame = (props: Props) => {
       unsavedChanges,
       saveProjectAs,
       state.editorTabs,
+      getStorageProvider,
+      preferences,
+      setState,
     ]
   );
 
@@ -2074,7 +2078,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateProject: onOpenExamples,
+    onCreateProject: openCreateProjectDialog,
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2113,7 +2117,7 @@ const MainFrame = (props: Props) => {
           onCloseProject: askToCloseProject,
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
-          onCreateProject: onOpenExamples,
+          onCreateProject: openCreateProjectDialog,
           onOpenProjectManager: () => openProjectManager(true),
           onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
@@ -2287,9 +2291,7 @@ const MainFrame = (props: Props) => {
                     onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenTutorials: () => onOpenTutorials(),
-                    onOpenGamesShowcase: () => onOpenGamesShowcase(),
-                    onOpenExamples: () => onOpenExamples(),
+                    onCreateProject: () => openCreateProjectDialog(true),
                     onOpenProfile: () => openProfileDialogWithTab('profile'),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
@@ -2354,7 +2356,6 @@ const MainFrame = (props: Props) => {
         state.createDialogOpen &&
         renderCreateDialog({
           open: state.createDialogOpen,
-          initialTab: createDialogInitialTab,
           onClose: closeCreateDialog,
           onOpen: onOpenProjectAfterCreation,
         })}

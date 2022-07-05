@@ -173,6 +173,8 @@ class RuntimeObject {
     return this._task;
   }
 
+  noop() {}
+
   markFakeAsyncActionAsFinished() {
     if (this._task) this._task.markAsFinished();
   }
@@ -498,6 +500,7 @@ function makeMinimalGDJSMock() {
         object: { createObjectOnScene, getSceneInstancesCount, getPickedInstancesCount },
         runtimeScene: {
           wait: () => new FakeAsyncTask(),
+          noop: () => {},
         },
       },
       registerBehavior: (behaviorTypeName, Ctor) => {

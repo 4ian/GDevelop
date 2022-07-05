@@ -22,7 +22,6 @@ InstructionMetadata::InstructionMetadata()
       canHaveSubInstructions(false),
       hidden(true),
       usageComplexity(5),
-      isAsync(false),
       isPrivate(false),
       isObjectInstruction(false),
       isBehaviorInstruction(false) {}
@@ -46,7 +45,6 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       extensionNamespace(extensionNamespace_),
       hidden(false),
       usageComplexity(5),
-      isAsync(false),
       isPrivate(false),
       isObjectInstruction(false),
       isBehaviorInstruction(false) {}

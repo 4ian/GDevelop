@@ -6,6 +6,8 @@
 namespace gdjs {
   export namespace evtTools {
     export namespace network {
+      const logger = new gdjs.Logger('Network requests');
+
       /**
        * Send an asynchronous request to the specified URL, with the specified (text)
        * body, method and contentType (defaults to `application/x-www-form-urlencoded`).
@@ -64,6 +66,37 @@ namespace gdjs {
         } catch (err) {
           onError(err);
         }
+      };
+
+      export const sendAwaitableAsyncRequest = (
+        url: string,
+        body: string,
+        method: string,
+        contentType: string,
+        responseVar: gdjs.Variable,
+        errorVar: gdjs.Variable
+      ) => {
+        return new gdjs.PromiseTask(
+          fetch(url, {
+            body: method !== 'GET' ? body : undefined,
+            method,
+            headers: {
+              'Content-Type':
+                contentType || 'application/x-www-form-urlencoded',
+            },
+          }).then(
+            async (response) => {
+              const result = await response.text();
+              if (response.status >= 400) {
+                errorVar.setString('' + response.status);
+              }
+              responseVar.setString(result);
+            },
+            (error) => {
+              errorVar.setString('' + error);
+            }
+          )
+        );
       };
 
       /**

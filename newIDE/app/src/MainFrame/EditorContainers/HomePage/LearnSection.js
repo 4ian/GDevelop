@@ -28,7 +28,7 @@ const styles = {
     textAlign: 'center',
     maxWidth: SMALL_WIDGET_SIZE * 4 + 100, // Avoid tiles taking too much space on large screens.
   },
-  gridListTile: { display: 'flex', justifyContent: 'center' },
+  gridListTile: { display: 'flex', justifyContent: 'flex-start' },
   helpItem: {
     padding: 10,
   },

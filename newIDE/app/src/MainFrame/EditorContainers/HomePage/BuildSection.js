@@ -81,20 +81,20 @@ export const BuildSection = ({
           {recentProjectFiles && recentProjectFiles.length > 0 && (
             <Line>
               <Column noMargin expand>
-                <LineStackLayout justifyContent="space-between">
-                  <Column expand noMargin>
-                    <Text color="secondary">
-                      <Trans>File name</Trans>
-                    </Text>
-                  </Column>
-                  {windowWidth !== 'small' && (
+                {windowWidth !== 'small' && (
+                  <LineStackLayout justifyContent="space-between">
+                    <Column expand noMargin>
+                      <Text color="secondary">
+                        <Trans>File name</Trans>
+                      </Text>
+                    </Column>
                     <Column expand noMargin>
                       <Text color="secondary">
                         <Trans>Last edited</Trans>
                       </Text>
                     </Column>
-                  )}
-                </LineStackLayout>
+                  </LineStackLayout>
+                )}
                 <List>
                   {recentProjectFiles.map(file => (
                     <ListItem

@@ -20,7 +20,13 @@ namespace gdjs {
     // Start with 1 so the user is safe from default variables value (0)
     joints: any = {};
 
+    // List of physics behavior in the runtimeScene. It should be updated
+    // when a new physics object is created (constructor), on destruction (onDestroy),
+    // on behavior activation (onActivate) and on behavior deactivation (onDeActivate).
+    _registeredBehaviors: Set<Physics2RuntimeBehavior>;
+
     constructor(runtimeScene, sharedData) {
+      this._registeredBehaviors = new Set();
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
       this.scaleX = sharedData.scaleX === 0 ? 100 : sharedData.scaleX;
@@ -93,15 +99,48 @@ namespace gdjs {
     static getSharedData(runtimeScene, behaviorName) {
       // Create one if needed
       if (!runtimeScene.physics2SharedData) {
-        const initialData = runtimeScene.getInitialSharedDataForBehavior(
-          behaviorName
-        );
+        const initialData =
+          runtimeScene.getInitialSharedDataForBehavior(behaviorName);
         runtimeScene.physics2SharedData = new gdjs.Physics2SharedData(
           runtimeScene,
           initialData
         );
       }
       return runtimeScene.physics2SharedData;
+    }
+
+    /**
+     * Add a physics object to the list of existing object.
+     */
+    addToBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior) {
+      this._registeredBehaviors.add(physicsBehavior);
+    }
+
+    /**
+     * Remove a physics object to the list of existing object.
+     */
+    removeFromBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior) {
+      this._registeredBehaviors.delete(physicsBehavior);
+    }
+
+    /**
+     * Reset all contactsStartedThisFrame and contactsEndedThisFrame of all
+     * registered physics behavior.
+     */
+    resetStartedAndEndedCollisions() {
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.contactsStartedThisFrame.length = 0;
+        physicsBehavior.contactsEndedThisFrame.length = 0;
+      }
+    }
+
+    /**
+     * Update all registered body.
+     */
+    updateBodiesFromObjects() {
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.updateBodyFromObject();
+      }
     }
 
     step(deltaTime) {
@@ -241,24 +280,16 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
-    // Array containing the contacts started from the beginning of the post-event
-    // of the previous frame to the beginning of the current one. Each contact
+    // Array containing the beginning of contacts reported by onContactBegin. Each contact
     // should be unique to avoid recording glitches where the object loses and regain
     // contact between two frames. The array is updated each time the method
-    // onContactBegin is called by the listener. It should be reset at the begining
-    // of the post-event of the current frame.
-    //
-    // <------------- frame 0 --------------> | <------------- frame 1 --------------> | <----...
-    // <preEvents> | <events> | <postEvents>  |  <preEvents> | <events> | <postEvents>
-    // ...ring frame 0 events ]
-    //                        [ contacts detected during frame 1 events ]
-    //                                                                  [ to be detected during...
+    // onContactBegin is called by the listener, which is only called when stepping
+    // the world i.e. in the first preEvent called by a physics behavior. This array is
+    // cleared just before stepping the world.
     contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
-    // Array containing the contacts ended from the beginning of the post-event
-    // of the previous frame to the beginning of the current one. It is updated each
-    // time the method onContactEnd is called by the listener (to add new ended contacts) or
-    // when onContactBegin is called (to remove a glitched contact) by the listener. It should be
-    // reset at the begining of the post-event of the current frame.
+    // Array containing the end of contacts reported by onContactEnd. The array is updated
+    // each time the method onContactEnd is called by the listener, which can be called at
+    // any time. This array is cleared just before stepping the world.
     contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
     // Array containing the exact current contacts with the objects. It is updated
     // each time the methods onContactBegin and onContactEnd are called by the contact
@@ -266,9 +297,12 @@ namespace gdjs {
     currentContacts: Array<Physics2RuntimeBehavior>;
     destroyedDuringFrameLogic: boolean;
     _body: any = null;
-    _sharedData: any;
     _tempb2Vec2: any;
 
+    // sharedData is a reference to the shared data of the scene, that registers
+    // every physics behavior that is created so that collisions can be cleared
+    // before stepping the world.
+    _sharedData: Physics2SharedData;
     // Avoid creating new vectors all the time
     _tempb2Vec2Sec: any;
 
@@ -315,6 +349,7 @@ namespace gdjs {
       );
       this._tempb2Vec2 = new Box2D.b2Vec2();
       this._tempb2Vec2Sec = new Box2D.b2Vec2();
+      this._sharedData.addToBehaviorsList(this);
     }
 
     // Stores a Box2D pointer of created vertices
@@ -399,6 +434,7 @@ namespace gdjs {
     }
 
     onDeActivate() {
+      this._sharedData.removeFromBehaviorsList(this);
       if (this._body !== null) {
         // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
         this._sharedData.clearBodyJoints(this._body);
@@ -419,10 +455,12 @@ namespace gdjs {
     }
 
     onActivate() {
+      this._sharedData.addToBehaviorsList(this);
+
       this.contactsEndedThisFrame.length = 0;
       this.contactsStartedThisFrame.length = 0;
       this.currentContacts.length = 0;
-      this._updateBodyFromObject();
+      this.updateBodyFromObject();
     }
 
     onDestroy() {
@@ -748,13 +786,11 @@ namespace gdjs {
     }
 
     doStepPreEvents(runtimeScene) {
-      // Create a body if there is not one
-      if (this._body === null) {
-        if (!this.createBody()) return;
-      }
-
       // Step the world if not done this frame yet
       if (!this._sharedData.stepped) {
+        // Reset started and ended contacts array for all physics instances.
+        this._sharedData.resetStartedAndEndedCollisions();
+        this._sharedData.updateBodiesFromObjects();
         this._sharedData.step(
           runtimeScene.getTimeManager().getElapsedTime() / 1000.0
         );
@@ -782,22 +818,15 @@ namespace gdjs {
     }
 
     doStepPostEvents(runtimeScene) {
-      // Reset contacts that happened this frame. The collision started and ended
-      // contact arrays should be reset just after the event played out.
-      this.contactsStartedThisFrame.length = 0;
-      this.contactsEndedThisFrame.length = 0;
-
-      this._updateBodyFromObject();
-
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }
 
     onObjectHotReloaded() {
-      this._updateBodyFromObject();
+      this.updateBodyFromObject();
     }
 
-    _updateBodyFromObject() {
+    updateBodyFromObject() {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;

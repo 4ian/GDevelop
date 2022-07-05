@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#42229B",
-        "comment": "Palette/Purple/70"
+        "value": "#6A3BEB",
+        "comment": "Palette/Purple/60"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -54,8 +54,8 @@
       },
       "secondary": {
         "color": {
-          "value": "#1D1D26",
-          "comment": "Text/Primary"
+          "value": "#494952",
+          "comment": "Text/Secondary"
         }
       },
       "disabled": {
@@ -187,6 +187,19 @@
       "border": {
         "color": {
           "value": "{theme.surface.canvas.background-color.value}"
+        }
+      }
+    },
+    "home": {
+      "header": {
+        "background-color": {
+          "value": "#EBEBED",
+          "comment": "Palette/Grey/10"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#D9D9DE"
         }
       }
     }

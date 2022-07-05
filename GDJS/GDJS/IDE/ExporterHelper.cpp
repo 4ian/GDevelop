@@ -553,6 +553,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "oncetriggers.js");
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
+  InsertUnique(includesFiles, "affinetransformation.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");

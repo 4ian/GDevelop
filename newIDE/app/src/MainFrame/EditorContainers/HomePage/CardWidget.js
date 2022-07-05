@@ -6,9 +6,9 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 
 const styles = {
   paper: {
-    borderRadius: 4,
-    padding: '10px',
+    borderRadius: 8,
     cursor: 'default',
+    height: '95%', // Take as much space as possible, without hiding the bottom border.
   },
 };
 
@@ -30,8 +30,8 @@ const useStylesForWidget = makeStyles(theme =>
   })
 );
 
-const LARGE_WIDGET_SIZE = 240;
-const SMALL_WIDGET_SIZE = 180;
+export const LARGE_WIDGET_SIZE = 275;
+export const SMALL_WIDGET_SIZE = 180;
 
 type Props = {|
   children: React.Node,
@@ -43,15 +43,17 @@ export const CardWidget = ({ children, onClick, size }: Props) => {
   const classes = useStylesForWidget();
   const windowWidth = useResponsiveWindowWidth();
 
+  const widgetWidth =
+    size === 'large' && windowWidth !== 'small'
+      ? LARGE_WIDGET_SIZE
+      : SMALL_WIDGET_SIZE;
+
   return (
     <Paper
       elevation={2}
       style={{
         ...styles.paper,
-        width:
-          size === 'large' && windowWidth !== 'small'
-            ? LARGE_WIDGET_SIZE
-            : SMALL_WIDGET_SIZE,
+        width: widgetWidth,
       }}
       onClick={onClick}
       classes={classes}

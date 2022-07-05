@@ -33,6 +33,9 @@ const styles = {
     textAlign: 'left',
     padding: 10,
   },
+  image: {
+    width: '100%',
+  },
 };
 
 const getColumnsFromWidth = (width: WidthType) => {
@@ -125,7 +128,11 @@ export const GetStartedSection = ({
             <GridListTile key={index} style={styles.gridListTile}>
               <CardWidget onClick={item.action} key={index} size="large">
                 <Column noMargin expand>
-                  <img alt={item.key} src={item.imagePath} />
+                  <img
+                    alt={item.key}
+                    src={item.imagePath}
+                    style={styles.image}
+                  />
                   <div style={styles.cardTextContainer}>
                     <Text size="block-title">{item.title}</Text>
                     {item.subText && (

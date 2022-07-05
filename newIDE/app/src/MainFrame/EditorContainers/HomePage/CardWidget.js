@@ -36,23 +36,25 @@ const useStylesForWidget = makeStyles(theme =>
   })
 );
 
-export const LARGE_WIDGET_SIZE = 322;
+export const LARGE_WIDGET_SIZE = 320;
 export const SMALL_WIDGET_SIZE = 200;
 
 type Props = {|
   children: React.Node,
   onClick: () => void,
-  size?: 'small' | 'large',
+  size: 'small' | 'large',
 |};
 
 export const CardWidget = ({ children, onClick, size }: Props) => {
   const classes = useStylesForWidget();
   const windowWidth = useResponsiveWindowWidth();
 
-  const widgetWidth =
-    size === 'large' && windowWidth !== 'small'
+  const widgetMaxWidth =
+    size === 'small'
+      ? SMALL_WIDGET_SIZE
+      : windowWidth !== 'small'
       ? LARGE_WIDGET_SIZE
-      : SMALL_WIDGET_SIZE;
+      : undefined;
 
   return (
     <ButtonBase
@@ -61,7 +63,7 @@ export const CardWidget = ({ children, onClick, size }: Props) => {
       elevation={2}
       style={{
         ...styles.buttonBase,
-        maxWidth: widgetWidth,
+        maxWidth: widgetMaxWidth,
       }}
       classes={classes}
       tabIndex={0}

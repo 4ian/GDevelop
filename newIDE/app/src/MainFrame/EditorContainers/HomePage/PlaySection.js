@@ -7,10 +7,10 @@ import Window from '../../../Utils/Window';
 import { Trans } from '@lingui/macro';
 import { LineStackLayout } from '../../../UI/Layout';
 import RaisedButton from '../../../UI/RaisedButton';
-import { SectionContainer } from './SectionContainer';
+import SectionContainer from './SectionContainer';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
-export const PlaySection = () => {
+const PlaySection = () => {
   const windowWidth = useResponsiveWindowWidth();
   return (
     <SectionContainer title={<Trans>Showcased games</Trans>}>
@@ -38,3 +38,5 @@ export const PlaySection = () => {
     </SectionContainer>
   );
 };
+
+export default PlaySection;

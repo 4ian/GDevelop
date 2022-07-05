@@ -72,7 +72,7 @@ const WrappedHomePage = ({
                 canOpen={true}
                 onOpen={() => action('onOpen')()}
                 onOpenRecentFile={() => action('onOpenRecentFile')()}
-                onOpenExamples={() => action('onOpenExamples')()}
+                onCreateProject={() => action('onCreateProject')()}
                 onOpenProjectManager={() => action('onOpenProjectManager')()}
                 onOpenHelpFinder={() => action('onOpenHelpFinder')()}
                 onOpenLanguageDialog={() => action('open language dialog')()}

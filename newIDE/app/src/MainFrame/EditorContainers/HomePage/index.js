@@ -9,17 +9,17 @@ import {
   type OnOpenProjectAfterCreationFunction,
 } from '../../../ProjectCreation/CreateProjectDialog';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
-import { BuildSection } from './BuildSection';
-import { LearnSection } from './LearnSection';
-import { PlaySection } from './PlaySection';
-import { CommunitySection } from './CommunitySection';
+import GetStartedSection from './GetStartedSection';
+import BuildSection from './BuildSection';
+import LearnSection from './LearnSection';
+import PlaySection from './PlaySection';
+import CommunitySection from './CommunitySection';
 import { TutorialContext } from '../../../Tutorial/TutorialContext';
 import { GamesShowcaseContext } from '../../../GamesShowcase/GamesShowcaseContext';
 import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleStoreContext';
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
-import { GetStartedSection } from './GetStartedSection';
 
 type Props = {|
   project: ?gdProject,
@@ -33,7 +33,7 @@ type Props = {|
   canOpen: boolean,
   onOpen: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenExamples: () => void,
+  onCreateProject: () => void,
   onOpenProjectManager: () => void,
 
   // Other dialogs opening:
@@ -65,7 +65,7 @@ export const HomePage = React.memo<Props>(
         onCreateFromExampleShortHeader,
         onCreateBlank,
         onOpenProjectAfterCreation,
-        onOpenExamples,
+        onCreateProject,
         onOpenProjectManager,
         onOpenHelpFinder,
         onOpenLanguageDialog,
@@ -136,7 +136,7 @@ export const HomePage = React.memo<Props>(
                   {activeTab === 'get-started' && (
                     <GetStartedSection
                       onTabChange={setActiveTab}
-                      onOpenExamples={onOpenExamples}
+                      onCreateProject={onCreateProject}
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
                       showGetStartedSection={showGetStartedSection}
                       setShowGetStartedSection={setShowGetStartedSection}
@@ -147,14 +147,14 @@ export const HomePage = React.memo<Props>(
                       project={project}
                       canOpen={canOpen}
                       onOpen={onOpen}
-                      onOpenExamples={onOpenExamples}
+                      onCreateProject={onCreateProject}
                       onOpenRecentFile={onOpenRecentFile}
                     />
                   )}
                   {activeTab === 'learn' && (
                     <LearnSection
                       onOpenOnboardingDialog={onOpenOnboardingDialog}
-                      onOpenExamples={onOpenExamples}
+                      onCreateProject={onCreateProject}
                       onTabChange={setActiveTab}
                       onOpenHelpFinder={onOpenHelpFinder}
                     />
@@ -186,7 +186,7 @@ export const renderHomePageContainer = (
     canOpen={props.canOpen}
     onOpen={props.onOpen}
     onOpenRecentFile={props.onOpenRecentFile}
-    onOpenExamples={props.onOpenExamples}
+    onCreateProject={props.onCreateProject}
     onCreateFromExampleShortHeader={props.onCreateFromExampleShortHeader}
     onCreateBlank={props.onCreateBlank}
     onOpenProjectAfterCreation={props.onOpenProjectAfterCreation}

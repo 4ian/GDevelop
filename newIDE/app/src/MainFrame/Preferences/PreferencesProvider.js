@@ -529,13 +529,11 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
-    console.log('inserting');
     let recentProjectFiles = this._getRecentProjectFiles();
     const isNotNewRecentFile = recentFile =>
       recentFile.fileMetadata.fileIdentifier !==
       newRecentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
-      // improve ?
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
         MAX_RECENT_FILES_COUNT
@@ -544,12 +542,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
-    console.log('removing');
     const isNotRemovedRecentFile = recentFileItem =>
       recentFileItem.fileMetadata.fileIdentifier !==
       recentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
-      // improve
       [...this._getRecentProjectFiles().filter(isNotRemovedRecentFile)].slice(
         0,
         MAX_RECENT_FILES_COUNT

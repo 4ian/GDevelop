@@ -1534,7 +1534,7 @@ const MainFrame = (props: Props) => {
   };
 
   const openCreateProjectDialog = React.useCallback(
-    () => (open: boolean = true) => {
+    (open: boolean = true) => {
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
@@ -1542,9 +1542,6 @@ const MainFrame = (props: Props) => {
   const closeCreateDialog = () => {
     setState(state => ({ ...state, createDialogOpen: false }));
   };
-  const onOpenExamples = React.useMemo(() => openCreateProjectDialog(), [
-    openCreateProjectDialog,
-  ]);
 
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -2081,7 +2078,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateProject: onOpenExamples,
+    onCreateProject: openCreateProjectDialog,
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2120,7 +2117,7 @@ const MainFrame = (props: Props) => {
           onCloseProject: askToCloseProject,
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
-          onCreateProject: onOpenExamples,
+          onCreateProject: openCreateProjectDialog,
           onOpenProjectManager: () => openProjectManager(true),
           onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
@@ -2294,7 +2291,7 @@ const MainFrame = (props: Props) => {
                     onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenExamples: () => onOpenExamples(),
+                    onCreateProject: () => openCreateProjectDialog(true),
                     onOpenProfile: () => openProfileDialogWithTab('profile'),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),

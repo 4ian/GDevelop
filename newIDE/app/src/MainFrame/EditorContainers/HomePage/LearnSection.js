@@ -12,7 +12,7 @@ import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
-import { SectionContainer } from './SectionContainer';
+import SectionContainer from './SectionContainer';
 import FlatButton from '../../../UI/FlatButton';
 import {
   useResponsiveWindowWidth,
@@ -51,14 +51,14 @@ const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
 
 type Props = {|
   onOpenOnboardingDialog: () => void,
-  onOpenExamples: () => void,
+  onCreateProject: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenHelpFinder: () => void,
 |};
 
-export const LearnSection = ({
+const LearnSection = ({
   onOpenOnboardingDialog,
-  onOpenExamples,
+  onCreateProject,
   onTabChange,
   onOpenHelpFinder,
 }: Props) => {
@@ -84,10 +84,8 @@ export const LearnSection = ({
     },
     {
       title: <Trans>Examples</Trans>,
-      description: (
-        <Trans>Have a look from the inside at existing projects</Trans>
-      ),
-      action: onOpenExamples,
+      description: <Trans>Have look at existing games from the inside</Trans>,
+      action: onCreateProject,
     },
     {
       title: <Trans>Community</Trans>,
@@ -166,3 +164,5 @@ export const LearnSection = ({
     </SectionContainer>
   );
 };
+
+export default LearnSection;

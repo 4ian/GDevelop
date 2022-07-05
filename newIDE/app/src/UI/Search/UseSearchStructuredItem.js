@@ -20,7 +20,7 @@ type SearchOptions = {|
   chosenFilters: Set<string>,
   excludedTiers: Set<string>,
   defaultFirstSearchItemIds: Array<string>,
-  withoutShuffling?: boolean,
+  shuffleResults?: boolean,
 |};
 
 export const sharedFuseConfiguration = {
@@ -145,7 +145,7 @@ export const useSearchStructuredItem = <
     chosenFilters,
     excludedTiers,
     defaultFirstSearchItemIds,
-    withoutShuffling,
+    shuffleResults = true,
   }: SearchOptions
 ): ?Array<{| item: SearchItem, matches: SearchMatch[] |}> => {
   const searchApiRef = React.useRef<?any>(null);
@@ -169,13 +169,13 @@ export const useSearchStructuredItem = <
       // Return the ordered results first, and shuffle the rest.
       return [
         ...defaultFirstSearchItemIds,
-        ...(withoutShuffling ? nonOrderedIds : shuffle(nonOrderedIds)),
+        ...(shuffleResults ? shuffle(nonOrderedIds) : nonOrderedIds),
       ].map(id => ({
         item: searchItemsById[id],
         matches: [],
       }));
     },
-    [searchItemsById, defaultFirstSearchItemIds, withoutShuffling]
+    [searchItemsById, defaultFirstSearchItemIds, shuffleResults]
   );
 
   // Index items that have been loaded.

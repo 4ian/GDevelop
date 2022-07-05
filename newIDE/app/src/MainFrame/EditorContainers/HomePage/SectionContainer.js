@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import { Column, Line } from '../../../UI/Grid';
-import { Paper } from '@material-ui/core';
+import Paper from '@material-ui/core/Paper';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
@@ -32,7 +32,7 @@ type Props = {|
   subtitle?: React.Node,
 |};
 
-export const SectionContainer = ({ children, title, subtitle }: Props) => {
+const SectionContainer = ({ children, title, subtitle }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -66,3 +66,5 @@ export const SectionContainer = ({ children, title, subtitle }: Props) => {
     </Column>
   );
 };
+
+export default SectionContainer;

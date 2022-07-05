@@ -16,13 +16,18 @@ const styles = {
   },
 };
 
+const ICON_SIZES = {
+  preview: 120,
+  thumbnail: 40,
+};
+
 type Props = {|
   exampleShortHeader: ExampleShortHeader,
   type: 'thumbnail' | 'preview',
 |};
 
 export const ExampleIcon = ({ exampleShortHeader, type }: Props) => {
-  const size = type === 'thumbnail' ? 40 : 120;
+  const size = type === 'thumbnail' ? ICON_SIZES.thumbnail : ICON_SIZES.preview;
   let iconUrl = exampleShortHeader.previewImageUrls[0];
   if (type === 'thumbnail') {
     const thumbnailUrl = exampleShortHeader.previewImageUrls.find(url =>

@@ -43,7 +43,7 @@ export const ErrorFallbackComponent = ({
     <Line>
       <BugReport fontSize="large" />
       <Spacer />
-      <Text size="title">This editor encountered a problem.</Text>
+      <Text size="block-title">This editor encountered a problem.</Text>
     </Line>
     <Divider />
     <Text>

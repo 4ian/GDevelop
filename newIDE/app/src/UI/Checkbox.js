@@ -54,7 +54,7 @@ const Checkbox = (props: Props) => {
       }
       icon={props.uncheckedIcon}
       checkedIcon={props.checkedIcon}
-      color="primary"
+      color="secondary"
       style={props.label ? undefined : props.style}
     />
   );
@@ -63,7 +63,10 @@ const Checkbox = (props: Props) => {
       <FormControlLabel
         control={checkbox}
         label={props.label}
-        style={props.style}
+        style={{
+          ...props.style,
+          cursor: 'default',
+        }}
       />
     </FormGroup>
   ) : (

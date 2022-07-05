@@ -187,7 +187,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                 justifyContent="center"
               >
                 <Column noMargin alignItems="center" expand>
-                  <Text size="title" align="center">
+                  <Text size="block-title" align="center">
                     <Trans>{chartData.overview.playersCount} sessions</Trans>
                   </Text>
                   <ResponsiveContainer width={chartWidth} height={chartHeight}>
@@ -229,7 +229,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   </ResponsiveContainer>
                 </Column>
                 <Column noMargin alignItems="center" expand>
-                  <Text size="title" align="center">
+                  <Text size="block-title" align="center">
                     <Trans>
                       {Math.round(chartData.overview.bounceRatePercent)}% bounce
                       rate
@@ -272,7 +272,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                 justifyContent="center"
               >
                 <Column expand noMargin alignItems="center">
-                  <Text size="title" align="center">
+                  <Text size="block-title" align="center">
                     <Trans>
                       {Math.round(
                         chartData.overview.meanPlayedDurationInMinutes
@@ -311,7 +311,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                   </ResponsiveContainer>
                 </Column>
                 <Column expand noMargin alignItems="center">
-                  <Text size="title" align="center">
+                  <Text size="block-title" align="center">
                     <Trans>
                       {
                         chartData.overview.greaterDurationPlayerSurface
@@ -369,7 +369,7 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                 justifyContent="center"
               >
                 <Column expand noMargin alignItems="center">
-                  <Text size="title" align="center">
+                  <Text size="block-title" align="center">
                     <Trans>
                       {Math.round(
                         chartData.overview.nearestToMedianDuration

@@ -85,7 +85,7 @@ const UserAchievements = ({
               }}
             >
               <Trophy color="primary" fontSize="large" />
-              <Text size="title">
+              <Text size="block-title">
                 <Trans>
                   {badges.length}/{achievements.length} achievements
                 </Trans>

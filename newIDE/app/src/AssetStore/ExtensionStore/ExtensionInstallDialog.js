@@ -166,7 +166,7 @@ const ExtensionInstallDialog = ({
             size={64}
           />
           <Column expand>
-            <Text noMargin size="title">
+            <Text noMargin size="block-title">
               {extensionShortHeader.fullName}
             </Text>
             <Text noMargin size="body2">

@@ -52,6 +52,8 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="outlined"
         size="small"
+        // Flat buttons look better with secondary color,
+        // so primary button = secondary color.
         color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}

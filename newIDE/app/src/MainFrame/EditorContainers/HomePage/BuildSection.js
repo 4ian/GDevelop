@@ -11,8 +11,10 @@ import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorag
 import TextButton from '../../../UI/TextButton';
 import Text from '../../../UI/Text';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
-import { SectionContainer } from './SectionContainer';
-import { List, ListItem, ListItemText } from '@material-ui/core';
+import SectionContainer from './SectionContainer';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
 
 const styles = {
   listItem: {
@@ -29,14 +31,14 @@ type Props = {|
   canOpen: boolean,
   onOpen: () => void,
   onOpenRecentFile: (file: FileMetadataAndStorageProviderName) => void,
-  onOpenExamples: () => void,
+  onCreateProject: () => void,
 |};
 
-export const BuildSection = ({
+const BuildSection = ({
   project,
   canOpen,
   onOpen,
-  onOpenExamples,
+  onCreateProject,
   onOpenRecentFile,
 }: Props) => {
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
@@ -58,7 +60,7 @@ export const BuildSection = ({
               <RaisedButton
                 primary
                 label={<Trans>Create a project</Trans>}
-                onClick={onOpenExamples}
+                onClick={onCreateProject}
                 icon={<AddIcon />}
                 id="home-create-blank-project-button"
               />
@@ -144,3 +146,5 @@ export const BuildSection = ({
     </I18n>
   );
 };
+
+export default BuildSection;

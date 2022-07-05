@@ -22,18 +22,19 @@ export const TutorialsList = (props: Props) => {
     [fetchTutorials]
   );
 
+  if (error) {
+    return (
+      <PlaceholderError onRetry={fetchTutorials}>
+        <Trans>
+          Can't load the tutorials. Verify your internet connection or retry
+          later.
+        </Trans>
+      </PlaceholderError>
+    );
+  }
+
   if (!tutorials) {
-    if (!error) return <PlaceholderLoader />;
-    else {
-      return (
-        <PlaceholderError onRetry={fetchTutorials}>
-          <Trans>
-            Can't load the tutorials. Verify your internet connection or retry
-            later.
-          </Trans>
-        </PlaceholderError>
-      );
-    }
+    return <PlaceholderLoader />;
   }
 
   return (

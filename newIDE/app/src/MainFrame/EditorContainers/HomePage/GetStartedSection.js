@@ -8,7 +8,7 @@ import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
-import { SectionContainer } from './SectionContainer';
+import SectionContainer from './SectionContainer';
 import {
   useResponsiveWindowWidth,
   type WidthType,
@@ -28,7 +28,7 @@ const styles = {
   tutorialsContainer: {
     marginTop: 30,
   },
-  gridListTile: { display: 'flex', justifyContent: 'center' },
+  gridListTile: { display: 'flex', justifyContent: 'flex-start' },
   cardTextContainer: {
     textAlign: 'left',
     padding: 10,
@@ -51,15 +51,15 @@ const getColumnsFromWidth = (width: WidthType) => {
 };
 
 type Props = {|
-  onOpenExamples: () => void,
+  onCreateProject: () => void,
   onTabChange: (tab: HomeTab) => void,
   onOpenOnboardingDialog: () => void,
   showGetStartedSection: boolean,
   setShowGetStartedSection: (enabled: boolean) => void,
 |};
 
-export const GetStartedSection = ({
-  onOpenExamples,
+const GetStartedSection = ({
+  onCreateProject,
   onTabChange,
   onOpenOnboardingDialog,
   showGetStartedSection,
@@ -93,7 +93,7 @@ export const GetStartedSection = ({
       title: <Trans>Start building directly</Trans>,
       subText: '🌶🌶🌶',
       description: <Trans>For people who like to try on their own</Trans>,
-      action: onOpenExamples,
+      action: onCreateProject,
       imagePath: 'res/homepage/start-building.png',
     },
     {
@@ -151,3 +151,5 @@ export const GetStartedSection = ({
     </SectionContainer>
   );
 };
+
+export default GetStartedSection;

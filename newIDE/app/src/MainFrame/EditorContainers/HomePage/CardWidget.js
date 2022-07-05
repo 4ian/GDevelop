@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { ButtonBase, createStyles, makeStyles } from '@material-ui/core';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import { makeStyles, createStyles } from '@material-ui/styles';
 import { shouldValidate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
@@ -25,12 +26,10 @@ const useStylesForWidget = makeStyles(theme =>
       border: `1px solid ${theme.palette.text.primary}`,
       borderBottom: `6px solid ${theme.palette.text.primary}`,
       '&:focus': {
-        border: `1px solid ${theme.palette.secondary.main}`,
-        borderBottom: `6px solid ${theme.palette.secondary.main}`,
+        backgroundColor: theme.palette.action.hover,
       },
       '&:hover': {
-        border: `1px solid ${theme.palette.secondary.main}`,
-        borderBottom: `6px solid ${theme.palette.secondary.main}`,
+        backgroundColor: theme.palette.action.hover,
       },
     },
   })

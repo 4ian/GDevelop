@@ -37,7 +37,7 @@ const styles = {
   },
 };
 
-const getColumnsFromWidth = (width: WidthType) => {
+const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
   switch (width) {
     case 'small':
       return 1;
@@ -45,7 +45,7 @@ const getColumnsFromWidth = (width: WidthType) => {
       return 3;
     case 'large':
     default:
-      return 4;
+      return showTourHelpItem ? 4 : 3;
   }
 };
 
@@ -63,8 +63,9 @@ export const LearnSection = ({
   onOpenHelpFinder,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
+  const showTourHelpItem = !electron && !isMobile() && !isUserflowRunning;
   const helpItems = [
-    !electron && !isMobile() && !isUserflowRunning
+    showTourHelpItem
       ? {
           title: <Trans>Guided Tour</Trans>,
           description: (
@@ -104,7 +105,7 @@ export const LearnSection = ({
       </Line>
       <Line noMargin>
         <GridList
-          cols={getColumnsFromWidth(windowWidth)}
+          cols={getColumnsFromWidth(windowWidth, showTourHelpItem)}
           style={styles.grid}
           cellHeight="auto"
           spacing={10}

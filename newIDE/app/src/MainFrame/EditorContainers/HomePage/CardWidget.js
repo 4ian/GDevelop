@@ -1,14 +1,20 @@
 // @flow
 import * as React from 'react';
-import { createStyles, makeStyles, Paper } from '@material-ui/core';
+import { ButtonBase, createStyles, makeStyles } from '@material-ui/core';
 import { shouldValidate } from '../../../UI/KeyboardShortcuts/InteractionKeys';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 
 const styles = {
-  paper: {
+  buttonBase: {
+    height: '100%',
+    width: '100%',
     borderRadius: 8,
     cursor: 'default',
-    height: '95%', // Take as much space as possible, without hiding the bottom border.
+    overflow: 'hidden',
+  },
+  contentWrapper: {
+    height: '100%',
+    width: '100%',
   },
 };
 
@@ -30,8 +36,8 @@ const useStylesForWidget = makeStyles(theme =>
   })
 );
 
-export const LARGE_WIDGET_SIZE = 275;
-export const SMALL_WIDGET_SIZE = 180;
+export const LARGE_WIDGET_SIZE = 322;
+export const SMALL_WIDGET_SIZE = 200;
 
 type Props = {|
   children: React.Node,
@@ -49,13 +55,14 @@ export const CardWidget = ({ children, onClick, size }: Props) => {
       : SMALL_WIDGET_SIZE;
 
   return (
-    <Paper
+    <ButtonBase
+      onClick={onClick}
+      focusRipple
       elevation={2}
       style={{
-        ...styles.paper,
-        width: widgetWidth,
+        ...styles.buttonBase,
+        maxWidth: widgetWidth,
       }}
-      onClick={onClick}
       classes={classes}
       tabIndex={0}
       onKeyPress={(event: SyntheticKeyboardEvent<HTMLLIElement>): void => {
@@ -64,7 +71,7 @@ export const CardWidget = ({ children, onClick, size }: Props) => {
         }
       }}
     >
-      {children}
-    </Paper>
+      <div style={styles.contentWrapper}>{children}</div>
+    </ButtonBase>
   );
 };

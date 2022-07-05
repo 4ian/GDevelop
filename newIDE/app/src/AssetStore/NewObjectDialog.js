@@ -134,6 +134,7 @@ export default function NewObjectDialog({
       noMargin
       fullHeight
       id="new-object-dialog"
+      maxWidth="lg"
     >
       <Column noMargin expand>
         <Tabs value={currentTab} onChange={setCurrentTab}>

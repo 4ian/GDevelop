@@ -42,7 +42,7 @@ const ShareDialog = ({ game, onClose }: Props) => {
         );
         setGameSlug(gameSlugs[0]);
       } catch (error) {
-        console.log(error);
+        console.error(error);
         setShowAlertMessage(true);
       } finally {
         setIsFetchingGameSlug(false);

@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#B094FF",
-        "comment": "Palette/Purple/40"
+        "value": "#6A3BEB",
+        "comment": "Palette/Purple/60"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -11,8 +11,8 @@
     },
     "secondary": {
       "color": {
-        "value": "#6A3BEB",
-        "comment": "Palette/Purple/60"
+        "value": "#B094FF",
+        "comment": "Palette/Purple/40"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -36,7 +36,7 @@
           }
         },
         "background-color": {
-          "value": "#282C34"
+          "value": "#1D1D26"
         }
       },
       "alternate-canvas": {
@@ -56,12 +56,14 @@
     "text": {
       "default": {
         "color": {
-          "value": "#EAEAEA"
+          "value": "#FAFAFA",
+          "comment": "Palette/Grey/00 - Text/Primary"
         }
       },
       "secondary": {
         "color": {
-          "value": "#ABB2BF"
+          "value": "#C5C5C9",
+          "comment": "Palette/Grey/30 - Text/Secondary"
         }
       },
       "disabled": {
@@ -192,6 +194,13 @@
       "border": {
         "color": {
           "value": "#21252B"
+        }
+      }
+    },
+    "home": {
+      "separator": {
+        "color": {
+          "value": "#32323B"
         }
       }
     }

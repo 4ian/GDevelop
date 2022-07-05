@@ -15,7 +15,6 @@ import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
 import AboutDialog from '../MainFrame/AboutDialog';
-import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
@@ -188,7 +187,6 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
-import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcase } from '../GamesShowcase';
@@ -2433,33 +2431,6 @@ storiesOf('AboutDialog', module)
       onClose={action('close')}
       updateStatus={{ message: '', status: 'unknown' }}
     />
-  ));
-
-storiesOf('Project Creation/CreateProjectDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ExampleStoreStateProvider>
-      <CreateProjectDialog
-        open
-        onClose={action('onClose')}
-        onOpen={action('On open project after it is created')}
-        initialTab="examples"
-        onCreateBlank={() => action('create blank project')}
-        onCreateFromExampleShortHeader={() => action('create from example')}
-      />
-    </ExampleStoreStateProvider>
-  ))
-  .add('Games showcase as initial tab', () => (
-    <ExampleStoreStateProvider>
-      <CreateProjectDialog
-        open
-        onClose={action('onClose')}
-        onOpen={action('On open project after it is created')}
-        initialTab="games-showcase"
-        onCreateBlank={() => action('create blank project')}
-        onCreateFromExampleShortHeader={() => action('create from example')}
-      />
-    </ExampleStoreStateProvider>
   ));
 
 storiesOf('OpenFromStorageProviderDialog', module)

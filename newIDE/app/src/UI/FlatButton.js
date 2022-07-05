@@ -52,7 +52,7 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="outlined"
         size="small"
-        color={primary ? 'primary' : 'default'}
+        color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}

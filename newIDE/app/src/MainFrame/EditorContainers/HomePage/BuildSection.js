@@ -38,7 +38,9 @@ export const BuildSection = ({
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const windowWidth = useResponsiveWindowWidth();
 
-  const recentProjectFiles = getRecentProjectFiles();
+  const recentProjectFiles = getRecentProjectFiles().filter(
+    file => file.fileMetadata
+  );
 
   return (
     <I18n>

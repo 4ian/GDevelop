@@ -112,7 +112,7 @@ export const LearnSection = ({
         >
           {helpItems.map((helpItem, index) => (
             <GridListTile key={index} style={styles.gridListTile}>
-              <CardWidget onClick={helpItem.action} key={index}>
+              <CardWidget onClick={helpItem.action} key={index} size="small">
                 <div style={styles.helpItem}>
                   <Column alignItems="center">
                     <Text size="block-title">{helpItem.title}</Text>

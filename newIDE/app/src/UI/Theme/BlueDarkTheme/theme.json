@@ -2,7 +2,7 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#6BAFFF",
+        "value": "#006DEE",
         "comment": "Palette/Blue/40"
       },
       "text-contrast-color": {
@@ -11,7 +11,7 @@
     },
     "secondary": {
       "color": {
-        "value": "#006DEE",
+        "value": "#6BAFFF",
         "comment": "Palette/Blue/60"
       },
       "text-contrast-color": {

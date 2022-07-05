@@ -49,7 +49,7 @@ export const LoadingScreenEditor = ({
     <I18n>
       {({ i18n }) => (
         <ColumnStackLayout expand noMargin>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Background</Trans>
           </Text>
           <Line noMargin>
@@ -94,7 +94,7 @@ export const LoadingScreenEditor = ({
               }}
             />
           </ResponsiveLineStackLayout>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Logo</Trans>
           </Text>
           <Checkbox
@@ -166,7 +166,7 @@ export const LoadingScreenEditor = ({
               }}
             />
           </ResponsiveLineStackLayout>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Progress bar</Trans>
           </Text>
           <Checkbox
@@ -240,7 +240,7 @@ export const LoadingScreenEditor = ({
               forceUpdate();
             }}
           />
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Duration</Trans>
           </Text>
           <SemiControlledTextField

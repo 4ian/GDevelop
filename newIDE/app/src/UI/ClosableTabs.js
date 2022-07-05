@@ -186,13 +186,21 @@ export function ClosableTab({
             style={{
               ...styles.tabLabelAndIcon,
               height: gdevelopTheme.closableTabs.height,
-              color: textColor,
               fontFamily: gdevelopTheme.closableTabs.fontFamily,
             }}
           >
             {icon}
             {icon && label ? <Spacer /> : null}
-            {label && <span style={styles.tabLabel}>{label}</span>}
+            {label && (
+              <span
+                style={{
+                  ...styles.tabLabel,
+                  color: textColor,
+                }}
+              >
+                {label}
+              </span>
+            )}
           </span>
         </ButtonBase>
         {closable && (

@@ -621,6 +621,7 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map32.png',
       collisionMaskObject
     )
+    .setCategoryFullName(_('Advanced'))
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
     .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')

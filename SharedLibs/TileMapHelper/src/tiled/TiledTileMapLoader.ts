@@ -68,13 +68,12 @@ export class TiledTileMapLoader {
       }
     }
     for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
-      const tileId = tiledSet.firstgid + tileIndex;
+      // Tiled use 0 as null, we do too but it's black boxed.
+      // This is why -1 is used here.
+      const tileId = tiledSet.firstgid - 1 + tileIndex;
       if (!definitions.has(tileId)) {
         definitions.set(tileId, new TileDefinition(0));
       }
-    }
-    if (!definitions.has(0)) {
-      definitions.set(0, new TileDefinition(0));
     }
     const collisionTileMap = new EditableTileMap(
       tiledMap.tilewidth,

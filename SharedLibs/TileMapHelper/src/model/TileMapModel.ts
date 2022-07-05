@@ -408,7 +408,6 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
     if (!definition) {
       throw new Error(`Invalid tile definition index: ${tileId}`);
     }
-    //console.log(x + " " + y + " set: " + definitionIndex);
     // +1 because 0 mean null
     this._tiles[y][x] = tileId + 1;
   }

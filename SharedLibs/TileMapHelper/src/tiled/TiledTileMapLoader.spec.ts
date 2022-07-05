@@ -68,9 +68,7 @@ describe("TiledTileMapLoader", function () {
       expect(tileMap.getTileDefinition(0)).to.be.ok();
       expect(tileMap.getTileDefinition(1)).to.be.ok();
 
-      // TODO the tile 0 is defined here, but undefined is use in the map.
-      expect(tileMap.getTileDefinition(2)).to.be.ok();
-      expect(tileMap.getTileDefinition(3)).not.to.be.ok();
+      expect(tileMap.getTileDefinition(2)).not.to.be.ok();
     });
 
     it("can load a tile map content", function () {

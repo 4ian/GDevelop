@@ -357,6 +357,8 @@ namespace gdjs {
 
     setLayerIndex(layerIndex: integer): void {
       this._layerIndex = layerIndex;
+      // TODO actually filter on a layer?
+      // It's probably easier too use without it.
       this._updateTileMap();
     }
 

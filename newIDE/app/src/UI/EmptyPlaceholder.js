@@ -40,7 +40,7 @@ export const EmptyPlaceholder = (props: Props) => (
       }}
     >
       <Column>
-        <Text size="title" align="center">
+        <Text size="block-title" align="center">
           {props.title}
         </Text>
         <Text align="center" noMargin>

@@ -263,7 +263,7 @@ export const AssetStore = ({
                   alignItems="center"
                 >
                   {isOnHomePage ? (
-                    <Text size="title">
+                    <Text size="block-title">
                       <Trans>Discover</Trans>
                     </Text>
                   ) : (
@@ -285,7 +285,7 @@ export const AssetStore = ({
                       {!openedAssetPack && filtersState.chosenCategory && (
                         <>
                           <Column expand alignItems="center">
-                            <Text size="title" noMargin>
+                            <Text size="block-title" noMargin>
                               {capitalize(
                                 filtersState.chosenCategory.node.name
                               )}
@@ -298,7 +298,7 @@ export const AssetStore = ({
                       {openedAssetPack && (
                         <>
                           <Column expand alignItems="center">
-                            <Text size="title" noMargin>
+                            <Text size="block-title" noMargin>
                               {openedAssetPack.name}
                             </Text>
                           </Column>

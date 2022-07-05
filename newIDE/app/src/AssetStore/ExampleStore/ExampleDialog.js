@@ -142,7 +142,7 @@ export function ExampleDialog({
             />
           ) : null}
           <Column expand noMargin={!hasIcon}>
-            <Text noMargin size="title">
+            <Text noMargin size="block-title">
               {exampleShortHeader.name}
             </Text>
           </Column>

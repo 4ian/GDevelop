@@ -83,7 +83,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
     >
       {currentTab === 'preferences' && (
         <ColumnStackLayout>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Language</Trans>
           </Text>
           <LanguageSelector
@@ -91,7 +91,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               setLanguageDidChange(true);
             }}
           />
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Appearance</Trans>
           </Text>
           <ResponsiveLineStackLayout noMargin>
@@ -146,7 +146,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             </Text>
           </Line>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Layouts</Trans>
           </Text>
           <Column noMargin>
@@ -191,7 +191,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               }
             />
           </Column>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Dialogs</Trans>
           </Text>
           <SelectField
@@ -204,7 +204,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             <SelectOption value="apply" primaryText={t`Apply changes`} />
             <SelectOption value="nothing" primaryText={t`Do nothing`} />
           </SelectField>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Updates</Trans>
           </Text>
           <Toggle
@@ -225,7 +225,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               </Trans>
             }
           />
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Events Sheet</Trans>
           </Text>
           <Toggle
@@ -274,7 +274,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
             <SelectOption value="cancel" primaryText={t`Cancel changes`} />
             <SelectOption value="apply" primaryText={t`Apply changes`} />
           </SelectField>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Embedded help and tutorials</Trans>
           </Text>
           <Column noMargin>
@@ -293,7 +293,7 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
               />
             </Line>
           </Column>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Advanced</Trans>
           </Text>
           <Toggle

@@ -9,7 +9,6 @@ namespace gdjs {
   export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
     _tilemapJsonFile: string;
     _tilesetJsonFile: string;
-    _layerIndex: integer;
     _renderer: gdjs.TileMap.TileMapCollisionMaskRender;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
     /**
@@ -102,11 +101,6 @@ namespace gdjs {
         newObjectData.content.tilesetJsonFile
       ) {
         this.setTilesetJsonFile(newObjectData.content.tilesetJsonFile);
-      }
-      if (
-        oldObjectData.content.layerIndex !== newObjectData.content.layerIndex
-      ) {
-        this.setLayerIndex(newObjectData.content.layerIndex);
       }
       if (oldObjectData.content.debugMode !== newObjectData.content.debugMode) {
         this.setDebugMode(newObjectData.content.debugMode);
@@ -353,17 +347,6 @@ namespace gdjs {
 
     isTilesetJsonFile(selectedTilesetJsonFile: string) {
       return this._tilesetJsonFile === selectedTilesetJsonFile;
-    }
-
-    setLayerIndex(layerIndex: integer): void {
-      this._layerIndex = layerIndex;
-      // TODO actually filter on a layer?
-      // It's probably easier too use without it.
-      this._updateTileMap();
-    }
-
-    getLayerIndex() {
-      return this._layerIndex;
     }
 
     /**

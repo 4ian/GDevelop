@@ -447,10 +447,6 @@ const defineCollisionMask = function (
       objectContent.tilesetJsonFile = newValue;
       return true;
     }
-    if (propertyName === 'layerIndex') {
-      objectContent.layerIndex = parseFloat(newValue);
-      return true;
-    }
     if (propertyName === 'typeFilter') {
       objectContent.typeFilter = newValue;
       return true;
@@ -505,17 +501,6 @@ const defineCollisionMask = function (
         .setDescription(
           _(
             "Optional, don't specify it if you've not saved the tileset in a different file."
-          )
-        )
-    );
-    objectProperties.set(
-      'layerIndex',
-      new gd.PropertyDescriptor(objectContent.layerIndex.toString())
-        .setType('number')
-        .setLabel(_('Layer index to display'))
-        .setDescription(
-          _(
-            'If "index" is selected as the display mode, this is the index of the layer to display.'
           )
         )
     );
@@ -578,7 +563,6 @@ const defineCollisionMask = function (
     JSON.stringify({
       tilemapJsonFile: '',
       tilesetJsonFile: '',
-      layerIndex: 0,
       typeFilter: '',
       debugMode: false,
       fillColor: '255;255;255',
@@ -694,49 +678,6 @@ const defineCollisionMask = function (
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
-
-  object
-    .addCondition(
-      'LayerIndex',
-      _('Layer index'),
-      _('Compare the value of the layer index.'),
-      _('the layer index'),
-      '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
-    )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardRelationalOperatorParameters('number')
-    .getCodeExtraInformation()
-    .setFunctionName('getLayerIndex');
-
-  object
-    .addAction(
-      'SetLayerIndex',
-      _('Layer index'),
-      _('Set the layer index of the Tilemap.'),
-      _('the layer index'),
-      '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
-    )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .useStandardOperatorParameters('number')
-    .getCodeExtraInformation()
-    .setFunctionName('setLayerIndex')
-    .setGetter('getLayerIndex');
-
-  object
-    .addExpression(
-      'LayerIndex',
-      _('Layer index'),
-      _('Get the layer index being displayed'),
-      '',
-      'JsPlatform/Extensions/tile_map32.png'
-    )
-    .addParameter('object', 'TileMap', 'TileMap', false)
-    .getCodeExtraInformation()
-    .setFunctionName('getLayerIndex');
 };
 
 module.exports = {

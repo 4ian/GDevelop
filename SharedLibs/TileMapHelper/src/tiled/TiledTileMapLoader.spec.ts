@@ -3,7 +3,7 @@ import { TiledMap } from "./Tiled";
 import { TiledTileMapLoader } from "./TiledTileMapLoader";
 
 describe("TiledTileMapLoader", function () {
-  it("can load a tile map without any collision mask", function () {
+  describe("without a collision mask", function () {
     // Built from an actual json file exported by Tiled.
     const tiledMap: TiledMap = {
       compressionlevel: -1,
@@ -54,41 +54,48 @@ describe("TiledTileMapLoader", function () {
     };
 
     const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
-    expect(tileMap.getDimensionX()).to.be(4);
-    expect(tileMap.getDimensionY()).to.be(2);
-    expect(tileMap.getTileHeight()).to.be(8);
-    expect(tileMap.getTileWidth()).to.be(8);
-    expect(tileMap.getWidth()).to.be(32);
-    expect(tileMap.getHeight()).to.be(16);
 
-    expect(tileMap.getTileDefinition(0)).to.be.ok();
-    expect(tileMap.getTileDefinition(1)).to.be.ok();
+    it("can load map dimensions", function () {
+      expect(tileMap.getDimensionX()).to.be(4);
+      expect(tileMap.getDimensionY()).to.be(2);
+      expect(tileMap.getTileHeight()).to.be(8);
+      expect(tileMap.getTileWidth()).to.be(8);
+      expect(tileMap.getWidth()).to.be(32);
+      expect(tileMap.getHeight()).to.be(16);
+    });
 
-    // TODO the tile 0 is defined here, but undefined is use in the map.
-    expect(tileMap.getTileDefinition(2)).to.be.ok();
-    expect(tileMap.getTileDefinition(3)).not.to.be.ok();
+    it("can load a tile set", function () {
+      expect(tileMap.getTileDefinition(0)).to.be.ok();
+      expect(tileMap.getTileDefinition(1)).to.be.ok();
 
-    const layers = new Array(...tileMap.getLayers());
-    expect(layers.length).to.be(1);
-    // TODO Change the model to avoid casts.
-    // TODO objects layers might not be necessary
-    const layer = layers[0] as EditableTileMapLayer;
-    // TODO Add the layer name as it will be useful for events
-    expect(layer.id).to.be(1);
-    expect(layer.isVisible()).to.be(true);
+      // TODO the tile 0 is defined here, but undefined is use in the map.
+      expect(tileMap.getTileDefinition(2)).to.be.ok();
+      expect(tileMap.getTileDefinition(3)).not.to.be.ok();
+    });
 
-    expect(layer.get(0, 0)).to.be(0);
-    expect(layer.get(1, 0)).to.be(undefined);
-    expect(layer.get(2, 0)).to.be(1);
-    expect(layer.get(3, 0)).to.be(undefined);
+    it("can load a tile map content", function () {
+      const layers = new Array(...tileMap.getLayers());
+      expect(layers.length).to.be(1);
+      // TODO Change the model to avoid casts.
+      // TODO objects layers might not be necessary
+      const layer = layers[0] as EditableTileMapLayer;
+      // TODO Add the layer name as it will be useful for events
+      expect(layer.id).to.be(1);
+      expect(layer.isVisible()).to.be(true);
 
-    expect(layer.get(0, 1)).to.be(undefined);
-    expect(layer.get(1, 1)).to.be(0);
-    expect(layer.get(2, 1)).to.be(undefined);
-    expect(layer.get(3, 1)).to.be(1);
+      expect(layer.get(0, 0)).to.be(0);
+      expect(layer.get(1, 0)).to.be(undefined);
+      expect(layer.get(2, 0)).to.be(1);
+      expect(layer.get(3, 0)).to.be(undefined);
+
+      expect(layer.get(0, 1)).to.be(undefined);
+      expect(layer.get(1, 1)).to.be(0);
+      expect(layer.get(2, 1)).to.be(undefined);
+      expect(layer.get(3, 1)).to.be(1);
+    });
   });
 
-  it("can load a tile map with a collision mask", function () {
+  describe("with a collision mask", function () {
     // Built from an actual json file exported by Tiled.
     const tiledMap: TiledMap = {
       compressionlevel: -1,
@@ -96,7 +103,7 @@ describe("TiledTileMapLoader", function () {
       infinite: false,
       layers: [
         {
-          data: [1, 0, 3, 0, 0, 3, 0, 2],
+          data: [1, 3, 4, 5, 3, 2, 0, 1073741829],
           height: 2,
           id: 1,
           name: "Tile Layer 1",
@@ -374,14 +381,17 @@ describe("TiledTileMapLoader", function () {
     };
 
     const tileMap: EditableTileMap = TiledTileMapLoader.load(null, tiledMap);
-    expect(tileMap.getDimensionX()).to.be(4);
-    expect(tileMap.getDimensionY()).to.be(2);
-    expect(tileMap.getTileHeight()).to.be(8);
-    expect(tileMap.getTileWidth()).to.be(8);
-    expect(tileMap.getWidth()).to.be(32);
-    expect(tileMap.getHeight()).to.be(16);
 
-    {
+    it("can load map dimensions", function () {
+      expect(tileMap.getDimensionX()).to.be(4);
+      expect(tileMap.getDimensionY()).to.be(2);
+      expect(tileMap.getTileHeight()).to.be(8);
+      expect(tileMap.getTileWidth()).to.be(8);
+      expect(tileMap.getWidth()).to.be(32);
+      expect(tileMap.getHeight()).to.be(16);
+    });
+
+    it("can load a tile set with a rectangle collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(0);
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(true);
@@ -394,27 +404,32 @@ describe("TiledTileMapLoader", function () {
           [8, 0],
         ],
       ]);
-    }
-    {
+    });
+
+    it("can load a tile set with an empty collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(1);
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(false);
       expect(tileDefinition.hasTag("lava")).to.be(false);
-    }
-    {
-      const tileDefinition = tileMap.getTileDefinition(2);
-      expect(tileDefinition).to.be.ok();
-      expect(tileDefinition.hasTag("obstacle")).to.be(true);
-      expect(tileDefinition.hasTag("lava")).to.be(false);
-      expect(tileDefinition.getHiBoxes("obstacle")).to.be.eql([
-        [
-          [0, 8],
-          [8, 0],
-          [0, 0],
-        ],
-      ]);
-    }
-    {
+    });
+
+    it("can load a tile set with a polygon collision mask", function () {
+      {
+        const tileDefinition = tileMap.getTileDefinition(2);
+        expect(tileDefinition).to.be.ok();
+        expect(tileDefinition.hasTag("obstacle")).to.be(true);
+        expect(tileDefinition.hasTag("lava")).to.be(false);
+        expect(tileDefinition.getHiBoxes("obstacle")).to.be.eql([
+          [
+            [0, 8],
+            [8, 0],
+            [0, 0],
+          ],
+        ]);
+      }
+    });
+
+    it("can load a tile set with a 2 polygons collision mask", function () {
       const tileDefinition = tileMap.getTileDefinition(3);
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(true);
@@ -431,8 +446,9 @@ describe("TiledTileMapLoader", function () {
           [0, 8],
         ],
       ]);
-    }
-    {
+    });
+
+    it("can load a tile set with several collision mask filter tags", function () {
       const tileDefinition = tileMap.getTileDefinition(4);
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(true);
@@ -451,8 +467,9 @@ describe("TiledTileMapLoader", function () {
           [0, 8],
         ],
       ]);
-    }
-    {
+    });
+
+    it("can load a tile set with only the other filter tag", function () {
       const tileDefinition = tileMap.getTileDefinition(5);
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(false);
@@ -465,28 +482,39 @@ describe("TiledTileMapLoader", function () {
           [8, 0],
         ],
       ]);
-    }
-    expect(tileMap.getTileDefinition(6)).not.to.be.ok();
+    });
 
-    const layers = new Array(...tileMap.getLayers());
-    expect(layers.length).to.be(1);
-    // TODO Change the model to avoid casts.
-    // TODO objects layers might not be necessary
-    const layer = layers[0] as EditableTileMapLayer;
-    // TODO Add the layer name as it will be useful for events
-    expect(layer.id).to.be(1);
-    expect(layer.isVisible()).to.be(true);
+    it("can load a tile set", function () {
+      expect(tileMap.getTileDefinition(6)).not.to.be.ok();
+    });
 
-    expect(layer.get(0, 0)).to.be(0);
-    expect(layer.get(1, 0)).to.be(undefined);
-    expect(layer.get(2, 0)).to.be(2);
-    expect(layer.get(3, 0)).to.be(undefined);
+    it("can load a tile map content", function () {
+      const layers = new Array(...tileMap.getLayers());
+      expect(layers.length).to.be(1);
+      // TODO Change the model to avoid casts.
+      // TODO objects layers might not be necessary
+      const layer = layers[0] as EditableTileMapLayer;
+      // TODO Add the layer name as it will be useful for events
+      expect(layer.id).to.be(1);
+      expect(layer.isVisible()).to.be(true);
 
-    expect(layer.get(0, 1)).to.be(undefined);
-    expect(layer.get(1, 1)).to.be(2);
-    expect(layer.get(2, 1)).to.be(undefined);
-    expect(layer.get(3, 1)).to.be(1);
+      expect(layer.get(0, 0)).to.be(0);
+      expect(layer.get(1, 0)).to.be(2);
+      expect(layer.get(2, 0)).to.be(3);
+      expect(layer.get(3, 0)).to.be(4);
 
-    expect(tileMap.pointIsInsideTile(4, 4, "obstacle")).to.be(true);
+      expect(layer.get(0, 1)).to.be(2);
+      expect(layer.get(1, 1)).to.be(1);
+      expect(layer.get(2, 1)).to.be(undefined);
+      expect(layer.get(3, 1)).to.be(4);
+      expect(layer.isFlippedVertically(3, 1)).to.be(true);
+    });
+
+    it("can detect that a point is in a tile that contains a mask with a given tag", function () {
+      // The point is in the black square with an hitbox.
+      expect(tileMap.pointIsInsideTile(4, 4, "obstacle")).to.be(true);
+      // The point is in wite square without any hitbox.
+      expect(tileMap.pointIsInsideTile(12, 12, "obstacle")).to.be(false);
+    });
   });
 });

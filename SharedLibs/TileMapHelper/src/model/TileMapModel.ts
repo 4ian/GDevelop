@@ -605,7 +605,9 @@ export class TileDefinition {
    * @returns The hit boxes for this tile.
    */
   getHiBoxes(tag: string): PolygonVertices[] | undefined {
-    const taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
+    const taggedHitBox = this.taggedHitBoxes.find(
+      (hitbox) => hitbox.tag === tag
+    );
     return taggedHitBox && taggedHitBox.polygons;
   }
 

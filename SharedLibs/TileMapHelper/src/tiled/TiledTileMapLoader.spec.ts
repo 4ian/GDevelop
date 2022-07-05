@@ -74,10 +74,9 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile map content", function () {
       const layers = new Array(...tileMap.getLayers());
       expect(layers.length).to.be(1);
-      // TODO Change the model to avoid casts.
-      // TODO objects layers might not be necessary
+      // TODO Change the model to avoid casts?
       const layer = layers[0] as EditableTileMapLayer;
-      // TODO Add the layer name as it will be useful for events
+      // TODO Add the layer name as it can be useful for events?
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 
@@ -489,10 +488,7 @@ describe("TiledTileMapLoader", function () {
     it("can load a tile map content", function () {
       const layers = new Array(...tileMap.getLayers());
       expect(layers.length).to.be(1);
-      // TODO Change the model to avoid casts.
-      // TODO objects layers might not be necessary
       const layer = layers[0] as EditableTileMapLayer;
-      // TODO Add the layer name as it will be useful for events
       expect(layer.id).to.be(1);
       expect(layer.isVisible()).to.be(true);
 

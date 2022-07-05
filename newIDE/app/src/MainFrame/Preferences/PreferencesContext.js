@@ -194,6 +194,7 @@ export type PreferencesValues = {|
   backdropClickBehavior: 'nothing' | 'apply' | 'cancel',
   eventsSheetCancelInlineParameter: 'cancel' | 'apply',
   showCommunityExtensions: boolean,
+  showGetStartedSection: boolean,
 |};
 
 /**
@@ -253,6 +254,7 @@ export type Preferences = {|
   setIsAlwaysOnTopInPreview: (enabled: boolean) => void,
   setEventsSheetCancelInlineParameter: (value: string) => void,
   setShowCommunityExtensions: (enabled: boolean) => void,
+  setShowGetStartedSection: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -290,6 +292,7 @@ export const initialPreferences = {
     backdropClickBehavior: 'nothing',
     eventsSheetCancelInlineParameter: 'apply',
     showCommunityExtensions: false,
+    showGetStartedSection: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -339,6 +342,7 @@ export const initialPreferences = {
   setIsAlwaysOnTopInPreview: () => {},
   setEventsSheetCancelInlineParameter: () => {},
   setShowCommunityExtensions: () => {},
+  setShowGetStartedSection: (enabled: boolean) => {},
 };
 
 const PreferencesContext = React.createContext<Preferences>(initialPreferences);

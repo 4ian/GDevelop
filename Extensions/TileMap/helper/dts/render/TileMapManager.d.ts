@@ -21,7 +21,7 @@ export declare class TileMapManager {
    * @param instanceHolder Where to set the manager instance.
    * @returns The shared manager.
    */
-  static getManager(instanceHolder: Object): any;
+  static getManager(instanceHolder: Object): TileMapManager;
   /**
    * @param loadTiledMap The method that loads the Tiled JSON file in memory.
    * @param tilemapJsonFile

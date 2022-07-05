@@ -55,42 +55,42 @@ export class EditableTileMap {
   /**
    * @returns The tile map width in pixels.
    */
-  getWidth() {
+  getWidth(): integer {
     return this.tileWidth * this.dimX;
   }
 
   /**
    * @returns The tile map height in pixels.
    */
-  getHeight() {
+  getHeight(): integer {
     return this.tileHeight * this.dimY;
   }
 
   /**
    * @returns The tile width in pixels.
    */
-  getTileHeight() {
+  getTileHeight(): integer {
     return this.tileWidth;
   }
 
   /**
    * @returns The tile height in pixels.
    */
-  getTileWidth() {
+  getTileWidth(): integer {
     return this.tileHeight;
   }
 
   /**
    * @returns The number of tile columns in the map.
    */
-  getDimensionX() {
+  getDimensionX(): integer {
     return this.dimX;
   }
 
   /**
    * @returns The number of tile rows in the map.
    */
-  getDimensionY() {
+  getDimensionY(): integer {
     return this.dimY;
   }
 
@@ -224,7 +224,7 @@ export class EditableObjectLayer extends AbstractEditableLayer {
   /**
    * @param object
    */
-  add(object: TileObject) {
+  add(object: TileObject): void {
     this.objects.push(object);
   }
 }
@@ -267,7 +267,7 @@ export class TileObject {
   /**
    * @param flippedHorizontally
    */
-  setFlippedHorizontally(flippedHorizontally: boolean) {
+  setFlippedHorizontally(flippedHorizontally: boolean): void {
     this.tileId = FlippingHelper.setFlippedHorizontally(
       this.tileId,
       flippedHorizontally
@@ -277,7 +277,7 @@ export class TileObject {
   /**
    * @param flippedVertically
    */
-  setFlippedVertically(flippedVertically: boolean) {
+  setFlippedVertically(flippedVertically: boolean): void {
     this.tileId = FlippingHelper.setFlippedVertically(
       this.tileId,
       flippedVertically
@@ -287,7 +287,7 @@ export class TileObject {
   /**
    * @param flippedDiagonally
    */
-  setFlippedDiagonally(flippedDiagonally: boolean) {
+  setFlippedDiagonally(flippedDiagonally: boolean): void {
     this.tileId = FlippingHelper.setFlippedDiagonally(
       this.tileId,
       flippedDiagonally
@@ -526,28 +526,28 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * The number of tile columns in the layer.
    */
-  getDimensionX() {
+  getDimensionX(): integer {
     return this._tiles.length === 0 ? 0 : this._tiles[0].length;
   }
 
   /**
    * The number of tile rows in the layer.
    */
-  getDimensionY() {
+  getDimensionY(): integer {
     return this._tiles.length;
   }
 
   /**
    * @returns The layer width in pixels.
    */
-  getWidth() {
+  getWidth(): integer {
     return this.tileMap.getWidth();
   }
 
   /**
    * @returns The layer height in pixels.
    */
-  getHeight() {
+  getHeight(): integer {
     return this.tileMap.getHeight();
   }
 }

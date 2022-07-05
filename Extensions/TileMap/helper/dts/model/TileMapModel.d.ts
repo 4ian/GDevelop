@@ -43,27 +43,27 @@ export declare class EditableTileMap {
   /**
    * @returns The tile map width in pixels.
    */
-  getWidth(): number;
+  getWidth(): integer;
   /**
    * @returns The tile map height in pixels.
    */
-  getHeight(): number;
+  getHeight(): integer;
   /**
    * @returns The tile width in pixels.
    */
-  getTileHeight(): number;
+  getTileHeight(): integer;
   /**
    * @returns The tile height in pixels.
    */
-  getTileWidth(): number;
+  getTileWidth(): integer;
   /**
    * @returns The number of tile columns in the map.
    */
-  getDimensionX(): number;
+  getDimensionX(): integer;
   /**
    * @returns The number of tile rows in the map.
    */
-  getDimensionY(): number;
+  getDimensionY(): integer;
   /**
    * @param tileId The tile identifier
    * @returns The tile definition form the tile set.
@@ -271,19 +271,19 @@ export declare class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * The number of tile columns in the layer.
    */
-  getDimensionX(): number;
+  getDimensionX(): integer;
   /**
    * The number of tile rows in the layer.
    */
-  getDimensionY(): number;
+  getDimensionY(): integer;
   /**
    * @returns The layer width in pixels.
    */
-  getWidth(): number;
+  getWidth(): integer;
   /**
    * @returns The layer height in pixels.
    */
-  getHeight(): number;
+  getHeight(): integer;
 }
 /**
  * A tile definition from the tile set.

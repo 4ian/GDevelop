@@ -38,17 +38,18 @@ export declare class PixiTileMapHelper {
   /**
    * Re-renders the collision mask
    *
-   * @param pixiTileMap
+   * @param pixiGraphics
    * @param tileMap
-   * @param textureCache
-   * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
-   * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
+   * @param typeFilter
+   * @param outlineSize
+   * @param outlineColor
+   * @param outlineOpacity
+   * @param fillColor
+   * @param fillOpacity
    */
   static updatePixiCollisionMask(
     pixiGraphics: PIXI.Graphics,
     tileMap: EditableTileMap,
-    displayMode: 'index' | 'visible' | 'all',
-    layerIndex: integer,
     typeFilter: string,
     outlineSize: integer,
     outlineColor: integer,

@@ -31,7 +31,7 @@ export class TileMapManager {
    * @param instanceHolder Where to set the manager instance.
    * @returns The shared manager.
    */
-  static getManager(instanceHolder: Object) {
+  static getManager(instanceHolder: Object): TileMapManager {
     // @ts-ignore
     if (!instanceHolder.tileMapCollisionMaskManager) {
       //Create the shared manager if necessary.

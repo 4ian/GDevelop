@@ -25,7 +25,7 @@ export class TileTextureCache {
     flippedVertically: boolean,
     flippedDiagonally: boolean,
     texture: PIXI.Texture
-  ) {
+  ): void {
     let globalTileUid = this._getGlobalId(
       tileId,
       flippedHorizontally,
@@ -119,7 +119,7 @@ export class TileTextureCache {
     flippedHorizontally: boolean,
     flippedVertically: boolean,
     flippedDiagonally: boolean
-  ) {
+  ): integer {
     let globalTileUid = tileId;
     if (flippedHorizontally) {
       globalTileUid |= TileTextureCache.flippedHorizontallyFlag;

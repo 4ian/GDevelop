@@ -1,7 +1,5 @@
 // @ts-check
 describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
-  const epsilon = 1 / (2 << 16);
-
   const createScene = (framePerSecond = 60) => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],
@@ -148,7 +146,7 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     expect(tileMap.isCollidingWithPoint(106, 214)).to.be(false);
   });
 
-  it('can detect collision with an object', function () {
+  it('can detect collisions with an object', function () {
     tileMap.setPosition(100, 200);
 
     const object = addObject(runtimeScene);
@@ -170,7 +168,34 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     );
   });
 
-  it("can detect collision with an object when it's rotated", function () {
+  it('can check collisions an object on empty tiles without any issue', function () {
+    tileMap.setPosition(100, 200);
+
+    const object = addObject(runtimeScene);
+
+    object.setPosition(116, 208);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
+      false
+    );
+  });
+
+  it('can detect collisions with an object on flipped tiles', function () {
+    tileMap.setPosition(100, 200);
+
+    const object = addObject(runtimeScene);
+
+    // The object is over the black triangle.
+    object.setPosition(118, 214);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
+
+    // The object is over the red triangle without touching a black polygon.
+    object.setPosition(130, 204);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
+      false
+    );
+  });
+
+  it("can detect collisions with an object when it's rotated", function () {
     tileMap.setPosition(100, 200);
     tileMap.setAngle(90);
 
@@ -180,6 +205,22 @@ describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
 
     object.setPosition(124, 184);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
+      false
+    );
+  });
+
+  it('can detect collisions with an object when it has a custom size', function () {
+    tileMap.setPosition(100, 200);
+    tileMap.setWidth(2 * tileMap.getWidth());
+    tileMap.setHeight(2 * tileMap.getHeight());
+
+    const object = addObject(runtimeScene);
+
+    object.setPosition(163, 231);
+    expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(true);
+
+    object.setPosition(164, 232);
     expect(gdjs.RuntimeObject.collisionTest(object, tileMap, true)).to.be(
       false
     );

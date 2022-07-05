@@ -413,13 +413,15 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  getInstancesCountOnScene: function(objectName) {\n"
          "    const objectsList = "
          "eventsFunctionContext._objectsMap[objectName];\n" +
-         "    let count = 0;\n" + "    if (objectsList) {\n" +
+         "    let count = 0;\n" +
+         "    if (objectsList) {\n" +
          "      for(const objectName in objectsList.items)\n" +
          "        count += parentEventsFunctionContext ?\n" +
          "parentEventsFunctionContext.getInstancesCountOnScene(objectName) "
          ":\n" +
          "        runtimeScene.getInstancesCountOnScene(objectName);\n" +
-         "    }\n" + "    return count;\n" +
+         "    }\n" +
+         "    return count;\n" +
          "  },\n"
          // Allow to get a layer directly from the context for convenience:
          "  getLayer: function(layerName) {\n"

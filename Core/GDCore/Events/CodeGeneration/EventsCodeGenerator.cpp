@@ -469,7 +469,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   }
 
   // Get the correct function name depending on whether it should be async or
-  // not
+  // not.
   const gd::String& functionCallName =
       instrInfos.IsAsync() &&
               (!instrInfos.IsOptionallyAsync() || action.IsAwaited())

@@ -109,9 +109,8 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * Check if the instruction's asynchronity is optional. If it is, it can be
-   * both used synchronously or asynchronously, with two different possible
-   * implementations.
+   * Check if the instruction asynchronicity is optional. If it is, it can either
+   * be used synchronously or asynchronously, with one function for each.
    */
   bool IsOptionallyAsync() const {
     return IsAsync() && !codeExtraInformation.functionCallName.empty();
@@ -320,8 +319,8 @@ class GD_CORE_API InstructionMetadata {
     virtual ~ExtraInformation(){};
 
     /**
-     * Set the function name which will be used when generating the code.
-     * \param functionName the name of the function to call
+     * Set the name of the function which will be called in the generated code.
+     * \param functionName the name of the function to call.
      */
     ExtraInformation &SetFunctionName(const gd::String &functionName_) {
       functionCallName = functionName_;
@@ -329,10 +328,11 @@ class GD_CORE_API InstructionMetadata {
     }
 
     /**
-     * Set the function name which will be used when generating the code as an
-     * async instruction.
-     * \param functionName the name of the async version of the
-     * function to call
+     * Set the name of the function, doing asynchronous work, which will be called in
+     * the generated code. This function should return an asynchronous task
+     * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+     *
+     * \param functionName the name of the function doing asynchronous work to call.
      */
     ExtraInformation &SetAsyncFunctionName(const gd::String &functionName_) {
       asyncFunctionCallName = functionName_;
@@ -467,9 +467,8 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Set the function that should be called when generating the source
-   * code from events.
-   * \param functionName the name of the function to call
+   * Set the name of the function which will be called in the generated code.
+   * \param functionName the name of the function to call.
    * \note Shortcut for `codeExtraInformation.SetFunctionName`.
    */
   ExtraInformation &SetFunctionName(const gd::String &functionName) {
@@ -477,9 +476,11 @@ class GD_CORE_API InstructionMetadata {
   }
 
   /**
-   * \brief Set the function that should be called when generating the source
-   * code from events for the asynchronous version of the instruction.
-   * \param functionName the name of the function to call
+   * Set the name of the function, doing asynchronous work, which will be called in
+   * the generated code. This function should return an asynchronous task
+   * (i.e: `gdjs.AsyncTask` in the JavaScript runtime).
+   *
+   * \param functionName the name of the function doing asynchronous work to call.
    * \note Shortcut for `codeExtraInformation.SetAsyncFunctionName`.
    */
   ExtraInformation &SetAsyncFunctionName(const gd::String &functionName) {

@@ -222,7 +222,7 @@ const ContributionDetails = ({ userId }: Props) => {
     <>
       <Column>
         <Line alignItems="center">
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Contributions</Trans>
           </Text>
         </Line>

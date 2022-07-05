@@ -56,7 +56,7 @@ const TextButton = React.forwardRef<Props, ButtonInterface>(
       <Button
         variant="text"
         size="small"
-        color={primary ? 'primary' : 'default'}
+        color={primary ? 'secondary' : 'default'}
         autoFocus={keyboardFocused}
         focusRipple={focusRipple}
         disabled={disabled}

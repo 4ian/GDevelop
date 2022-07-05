@@ -152,7 +152,7 @@ export const NewResourceDialog = ({
             <ColumnStackLayout expand>
               {importTabResourceSources.map(source => (
                 <React.Fragment key={source.name}>
-                  <Text size="title">{i18n._(source.displayName)}</Text>
+                  <Text size="block-title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({
                     i18n,
                     options,

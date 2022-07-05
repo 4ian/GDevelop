@@ -142,6 +142,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
       this
     ),
     setShowCommunityExtensions: this._setShowCommunityExtensions.bind(this),
+    setShowGetStartedSection: this._setShowGetStartedSection.bind(this),
   };
 
   componentDidMount() {
@@ -257,6 +258,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           showEffectParameterNames,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setShowGetStartedSection(showGetStartedSection: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          showGetStartedSection,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)
@@ -516,10 +529,13 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _insertRecentProjectFile(newRecentFile: FileMetadataAndStorageProviderName) {
+    console.log('inserting');
     let recentProjectFiles = this._getRecentProjectFiles();
     const isNotNewRecentFile = recentFile =>
-      JSON.stringify(recentFile) !== JSON.stringify(newRecentFile);
+      recentFile.fileMetadata.fileIdentifier !==
+      newRecentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
+      // improve ?
       [newRecentFile, ...recentProjectFiles.filter(isNotNewRecentFile)].slice(
         0,
         MAX_RECENT_FILES_COUNT
@@ -528,10 +544,13 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   }
 
   _removeRecentProjectFile(recentFile: FileMetadataAndStorageProviderName) {
-    const isNotSadPathRecentFile = recentFileItem =>
-      JSON.stringify(recentFileItem) !== JSON.stringify(recentFile);
+    console.log('removing');
+    const isNotRemovedRecentFile = recentFileItem =>
+      recentFileItem.fileMetadata.fileIdentifier !==
+      recentFile.fileMetadata.fileIdentifier;
     this._setRecentProjectFiles(
-      [...this._getRecentProjectFiles().filter(isNotSadPathRecentFile)].slice(
+      // improve
+      [...this._getRecentProjectFiles().filter(isNotRemovedRecentFile)].slice(
         0,
         MAX_RECENT_FILES_COUNT
       )

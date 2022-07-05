@@ -80,6 +80,7 @@ const LanguageSelector = ({ onLanguageChanged }: Props) => {
               Window.openExternalURL('https://crowdin.com/project/gdevelop');
               event.preventDefault();
             }}
+            color="secondary"
           >
             help to translate GDevelop in your language
           </Link>

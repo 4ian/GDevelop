@@ -23,7 +23,7 @@ const styles = {
     objectFit: 'contain',
     verticalAlign: 'middle',
     backgroundColor: 'black',
-    maxHeight: 150,
+    width: '100%',
   },
   card: {
     flex: 1,
@@ -32,34 +32,20 @@ const styles = {
     display: 'flex',
     textAlign: 'left',
     overflow: 'hidden',
-    padding: 8,
+    width: '100%',
+    animation: 'fadein 0.5s',
+    paddingTop: 8,
+    paddingBottom: 8,
   },
 };
 
 type Props = {|
   tutorial: Tutorial,
-  onHeightComputed: number => void,
 |};
 
-export const TutorialListItem = ({ tutorial, onHeightComputed }: Props) => {
-  // Report the height of the item once it's known.
-  const [isLoaded, setIsLoaded] = React.useState(false);
+export const TutorialListItem = ({ tutorial }: Props) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const isImageLoadingRef = React.useRef(true);
-  const notifyHeightChanged = React.useCallback(
-    () => {
-      if (!isLoaded && !isImageLoadingRef.current) {
-        setIsLoaded(true);
-      }
-
-      // But don't report the height while the image is loading, as it could
-      // make some "jumps" in the scroll when scrolling up.
-      if (containerRef.current && !isImageLoadingRef.current)
-        onHeightComputed(containerRef.current.getBoundingClientRect().height);
-    },
-    [onHeightComputed, isLoaded]
-  );
-  React.useLayoutEffect(notifyHeightChanged);
 
   const windowWidth = useResponsiveWindowWidth();
 
@@ -71,14 +57,7 @@ export const TutorialListItem = ({ tutorial, onHeightComputed }: Props) => {
       }}
       focusRipple
     >
-      <div
-        style={{
-          ...styles.container,
-          visibility: isLoaded ? undefined : 'hidden',
-          animation: isLoaded ? 'fadein 0.5s' : undefined,
-        }}
-        ref={containerRef}
-      >
+      <div style={styles.container} ref={containerRef}>
         <Card style={styles.card}>
           <ResponsiveLineStackLayout noMargin>
             <CorsAwareImage
@@ -91,11 +70,9 @@ export const TutorialListItem = ({ tutorial, onHeightComputed }: Props) => {
               alt={tutorial.title}
               onError={() => {
                 isImageLoadingRef.current = false;
-                notifyHeightChanged();
               }}
               onLoad={() => {
                 isImageLoadingRef.current = false;
-                notifyHeightChanged();
               }}
             />
             <Line expand>

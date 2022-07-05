@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
-import { Dialog as DialogMaterialUI } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import MuiDialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
@@ -41,6 +42,20 @@ const styles = {
   },
 };
 
+const useDangerousStyles = makeStyles(theme => ({
+  paper: {
+    '&:before': {
+      content: '""',
+      height: 60,
+      background: `repeating-linear-gradient(110deg, ${
+        theme.palette.error.main
+      }, ${theme.palette.error.main} 25px, ${theme.palette.error.light} 25px, ${
+        theme.palette.error.light
+      } 40px)`,
+    },
+  },
+}));
+
 // We support a subset of the props supported by Material-UI v0.x Dialog
 // They should be self descriptive - refer to Material UI docs otherwise.
 type Props = {|
@@ -48,6 +63,7 @@ type Props = {|
   title?: React.Node,
   actions?: Array<?React.Node>,
   secondaryActions?: Array<?React.Node>,
+  isDangerous?: boolean,
 
   /**
    * Callback called when the dialog is asking to be closed
@@ -106,28 +122,29 @@ export const DialogPrimaryButton = RaisedButton;
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-const Dialog = (props: Props) => {
-  const {
-    onApply,
-    secondaryActions,
-    actions,
-    open,
-    onRequestClose,
-    maxWidth,
-    noMargin,
-    title,
-    children,
-    flexColumnBody,
-    flexBody,
-    fullHeight,
-    noTitleMargin,
-    id,
-    cannotBeDismissed,
-  } = props;
-
+const Dialog = ({
+  onApply,
+  secondaryActions,
+  isDangerous,
+  actions,
+  open,
+  onRequestClose,
+  maxWidth,
+  noMargin,
+  title,
+  children,
+  flexColumnBody,
+  flexBody,
+  fullHeight,
+  noTitleMargin,
+  id,
+  cannotBeDismissed,
+}: Props) => {
   const preferences = React.useContext(PreferencesContext);
   const backdropClickBehavior = preferences.values.backdropClickBehavior;
   const size = useResponsiveWindowWidth();
+
+  const classesForDangerousDialog = useDangerousStyles();
 
   const dialogActions = React.useMemo(
     () => (
@@ -194,7 +211,8 @@ const Dialog = (props: Props) => {
   );
 
   return (
-    <DialogMaterialUI
+    <MuiDialog
+      classes={isDangerous ? classesForDangerousDialog : undefined}
       open={open}
       onClose={onCloseDialog}
       fullWidth
@@ -222,7 +240,7 @@ const Dialog = (props: Props) => {
       >
         {dialogActions}
       </DialogActions>
-    </DialogMaterialUI>
+    </MuiDialog>
   );
 };
 

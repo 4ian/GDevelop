@@ -1068,18 +1068,6 @@ module.exports = {
       .getProperties(this.project)
       .get('tilemapJsonFile')
       .getValue();
-    const layerIndex = parseInt(
-      this._associatedObject
-        .getProperties(this.project)
-        .get('layerIndex')
-        .getValue(),
-      10
-    );
-    const displayMode = 'visible';
-    // this._associatedObject
-    //   .getProperties(this.project)
-    //   .get('displayMode')
-    //   .getValue();
     const tilesetJsonFile = this._associatedObject
       .getProperties(this.project)
       .get('tilesetJsonFile')
@@ -1129,8 +1117,6 @@ module.exports = {
           TilemapHelper.PixiTileMapHelper.updatePixiCollisionMask(
             this._pixiObject,
             tileMap,
-            displayMode,
-            layerIndex,
             typeFilter,
             outlineSize,
             outlineColor,

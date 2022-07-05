@@ -116,7 +116,7 @@ export class PixiTileMapHelper {
     textureCache: TileTextureCache,
     displayMode: "index" | "visible" | "all",
     layerIndex: number
-  ) {
+  ): void {
     if (!pixiTileMap) return;
     pixiTileMap.clear();
 
@@ -192,31 +192,29 @@ export class PixiTileMapHelper {
   /**
    * Re-renders the collision mask
    *
-   * @param pixiTileMap
+   * @param pixiGraphics
    * @param tileMap
-   * @param textureCache
-   * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
-   * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
+   * @param typeFilter
+   * @param outlineSize
+   * @param outlineColor
+   * @param outlineOpacity
+   * @param fillColor
+   * @param fillOpacity
    */
   static updatePixiCollisionMask(
     pixiGraphics: PIXI.Graphics,
     tileMap: EditableTileMap,
-    displayMode: "index" | "visible" | "all",
-    layerIndex: integer,
     typeFilter: string,
     outlineSize: integer,
     outlineColor: integer,
     outlineOpacity: float,
     fillColor: integer,
     fillOpacity: float
-  ) {
+  ): void {
     if (!pixiGraphics) return;
     pixiGraphics.clear();
 
     for (const layer of tileMap.getLayers()) {
-      if (displayMode === "index" && layerIndex !== layer.id) return;
-      // invisible doesn't mean no collision.
-      // TODO add a "Enable" flag next to "Visible" or rename "Visible" to "Enable"?
       const tileWidth = tileMap.getTileWidth();
       const tileHeight = tileMap.getTileHeight();
 

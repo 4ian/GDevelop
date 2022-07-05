@@ -81,8 +81,7 @@ module.exports = {
       );
       const fakeObject = new gd.ObjectJsImplementation();
 
-
-      fakeObject.updateProperty = function(
+      fakeObject.updateProperty = function (
         objectContent,
         propertyName,
         newValue
@@ -90,7 +89,7 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getProperties = function(objectContent) {
+      fakeObject.getProperties = function (objectContent) {
         const objectProperties = new gd.MapStringPropertyDescriptor();
 
         objectProperties
@@ -107,8 +106,7 @@ module.exports = {
         })
       );
 
-
-      fakeObject.updateInitialInstanceProperty = function(
+      fakeObject.updateInitialInstanceProperty = function (
         objectContent,
         instance,
         propertyName,
@@ -119,7 +117,7 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getInitialInstanceProperties = function(
+      fakeObject.getInitialInstanceProperties = function (
         content,
         instance,
         project,
@@ -153,8 +151,7 @@ module.exports = {
       );
       const fakeObject = new gd.ObjectJsImplementation();
 
-
-      fakeObject.updateProperty = function(
+      fakeObject.updateProperty = function (
         objectContent,
         propertyName,
         newValue
@@ -162,15 +159,13 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getProperties = function(objectContent) {
+      fakeObject.getProperties = function (objectContent) {
         const objectProperties = new gd.MapStringPropertyDescriptor();
         return objectProperties;
       };
-      fakeObject.setRawJSONContent(
-        JSON.stringify({})
-      );
+      fakeObject.setRawJSONContent(JSON.stringify({}));
 
-      fakeObject.updateInitialInstanceProperty = function(
+      fakeObject.updateInitialInstanceProperty = function (
         objectContent,
         instance,
         propertyName,
@@ -181,7 +176,7 @@ module.exports = {
         return false;
       };
 
-      fakeObject.getInitialInstanceProperties = function(
+      fakeObject.getInitialInstanceProperties = function (
         content,
         instance,
         project,
@@ -191,16 +186,16 @@ module.exports = {
         return instanceProperties;
       };
 
-      const object = extension
-        .addObject(
-          'FakeObjectWithAsyncAction',
-          'FakeObjectWithAsyncAction',
-          'This is FakeObjectWithAsyncAction',
-          '',
-          fakeObject
-        );
+      const object = extension.addObject(
+        'FakeObjectWithAsyncAction',
+        'FakeObjectWithAsyncAction',
+        'This is FakeObjectWithAsyncAction',
+        '',
+        fakeObject
+      );
 
-      object.addScopedAction(
+      object
+        .addScopedAction(
           'DoAsyncAction',
           'Some async action',
           'Some async action.',
@@ -210,9 +205,51 @@ module.exports = {
           'res/icon.png'
         )
         .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
-        .setAsync()
         .getCodeExtraInformation()
-        .setFunctionName('doFakeAsyncAction')
+        .setAsyncFunctionName('doFakeAsyncAction');
+
+      object
+        .addScopedAction(
+          'DoOptionallyAsyncAction',
+          'Some optionally async action',
+          'Some optionally async action.',
+          'Do some optionally async action with _PARAM0_',
+          '',
+          'res/icon.png',
+          'res/icon.png'
+        )
+        .addParameter('object', 'Object', 'FakeObjectWithAsyncAction', false)
+        .getCodeExtraInformation()
+        .setFunctionName('noop')
+        .setAsyncFunctionName('doFakeAsyncAction');
+
+      platform.addNewExtension(extension);
+      extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
+    }
+    {
+      const extension = new gd.PlatformExtension();
+      extension.setExtensionInformation(
+        'FakeOptionallyAsyncAction',
+        'Fake optionally async action',
+        'Fake optionally async action',
+        '',
+        'MIT'
+      );
+
+      extension
+        .addAction(
+          'DoOptionallyAsyncAction',
+          'Some optionally async action',
+          'Some optionally async action.',
+          'Optionally async action with _PARAM0_',
+          '',
+          'res/icon.png',
+          'res/icon.png'
+        )
+        .addParameter('expression', 'Wait time', '', false)
+        .getCodeExtraInformation()
+        .setFunctionName('gdjs.evtTools.runtimeScene.noop')
+        .setAsyncFunctionName('gdjs.evtTools.runtimeScene.wait');
 
       platform.addNewExtension(extension);
       extension.delete(); // Release the extension as it was copied inside gd.JsPlatform

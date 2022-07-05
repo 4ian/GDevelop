@@ -58,6 +58,84 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       ).toBe(1);
     });
 
+    it('generates a working function with an optionally asynchronous action, that is not set as async', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: {
+                  value: 'FakeOptionallyAsyncAction::DoOptionallyAsyncAction',
+                },
+                parameters: ['1.5'],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SuccessVariable', '+', '1'],
+              },
+            ],
+          },
+        ])
+      );
+
+      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+        gd,
+        eventsSerializerElement
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      runCompiledEvents(gdjs, runtimeScene, []);
+
+      // Nothing is async, the actions are all executed.
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+    });
+
+    it('generates a working function with an optionally asynchronous action, that is set as async', function () {
+      const eventsSerializerElement = gd.Serializer.fromJSON(
+        JSON.stringify([
+          {
+            type: 'BuiltinCommonInstructions::Standard',
+            conditions: [],
+            actions: [
+              {
+                type: {
+                  value: 'FakeOptionallyAsyncAction::DoOptionallyAsyncAction',
+                  await: true,
+                },
+                parameters: ['1.5'],
+              },
+              {
+                type: { value: 'ModVarScene' },
+                parameters: ['SuccessVariable', '+', '1'],
+              },
+            ],
+          },
+        ])
+      );
+
+      var runCompiledEvents = generateCompiledEventsFromSerializedEvents(
+        gd,
+        eventsSerializerElement
+      );
+
+      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+      runCompiledEvents(gdjs, runtimeScene, []);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Process the tasks (but the task is not finished yet).
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+      // Process the tasks (after faking it's finished).
+      runtimeScene.getAsyncTasksManager().markAllFakeAsyncTasksAsFinished();
+      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+      expect(
+        runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+      ).toBe(1);
+    });
+
     it('generates a working function with two asynchronous actions', function () {
       // Create events using the Trigger Once condition.
       const eventsSerializerElement = gd.Serializer.fromJSON(
@@ -2236,119 +2314,286 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
       );
     });
 
-    test('async object actions, waiting for all objects to be finished', function () {
-      const eventsSerializerElement = gd.Serializer.fromJSON(
-        JSON.stringify([
-          {
-            type: 'BuiltinCommonInstructions::Standard',
-            conditions: [],
-            actions: [
-              {
-                type: {
-                  value:
-                    'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction',
+    describe('async object actions, waiting for all objects to be finished', () => {
+      const expectProgressivelyResolvedTasksForObjects = (runCompiledEvents) => {
+        const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+        const myObjectA1 = runtimeScene.createObject('MyObjectA');
+        const myObjectA2 = runtimeScene.createObject('MyObjectA');
+        const myObjectA3 = runtimeScene.createObject('MyObjectA');
+        const myObjectB1 = runtimeScene.createObject('MyObjectB');
+        const myObjectB2 = runtimeScene.createObject('MyObjectB');
+        const myObjectsLists = gdjs.Hashtable.newFrom({
+          MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+          MyObjectB: [myObjectB1, myObjectB2],
+        });
+
+        runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+        expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+        // Process the tasks again (but none is finished).
+        runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+        expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+        // Mark some tasks as done.
+        myObjectA1.markFakeAsyncActionAsFinished();
+        myObjectA2.markFakeAsyncActionAsFinished();
+        myObjectB1.markFakeAsyncActionAsFinished();
+
+        // Process the tasks again (but not everything is finished).
+        runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+        expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+
+        // Mark the rest of tasks as done.
+        myObjectA3.markFakeAsyncActionAsFinished();
+        myObjectB2.markFakeAsyncActionAsFinished();
+
+        // Process the tasks again (everything is finished this time).
+        runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
+        expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+        expect(
+          runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+        ).toBe(1);
+
+        expect(
+          myObjectA1.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectA2.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectA3.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectB1.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectB2.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+      };
+
+      test('async object actions, waiting for all objects to be finished', function () {
+        const eventsSerializerElement = gd.Serializer.fromJSON(
+          JSON.stringify([
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                {
+                  type: {
+                    value:
+                      'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoAsyncAction',
+                  },
+                  parameters: ['MyParamObject'],
                 },
-                parameters: ['MyParamObject'],
-              },
-              {
-                type: { value: 'ModVarObjet' },
-                parameters: [
-                  'MyParamObject',
-                  'TestVariable',
-                  '+',
-                  'GetArgumentAsNumber("IncreaseValue")',
-                ],
-              },
-              {
-                type: { value: 'ModVarScene' },
-                parameters: ['SuccessVariable', '+', '1'],
-              },
-            ],
-          },
-        ])
-      );
+                {
+                  type: { value: 'ModVarObjet' },
+                  parameters: [
+                    'MyParamObject',
+                    'TestVariable',
+                    '+',
+                    'GetArgumentAsNumber("IncreaseValue")',
+                  ],
+                },
+                {
+                  type: { value: 'ModVarScene' },
+                  parameters: ['SuccessVariable', '+', '1'],
+                },
+              ],
+            },
+          ])
+        );
 
-      const project = new gd.ProjectHelper.createNewGDJSProject();
-      const eventsFunction = new gd.EventsFunction();
+        const project = new gd.ProjectHelper.createNewGDJSProject();
+        const eventsFunction = new gd.EventsFunction();
 
-      eventsFunction
-        .getEvents()
-        .unserializeFrom(project, eventsSerializerElement);
-
-      const parameter = new gd.ParameterMetadata();
-      parameter.setType('number');
-      parameter.setName('IncreaseValue');
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.setType('object');
-      parameter.setName('MyParamObject');
-      parameter.setExtraInfo(
-        'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
-      );
-      eventsFunction.getParameters().push_back(parameter);
-      parameter.delete();
-
-      const runCompiledEvents = generateCompiledEventsForEventsFunction(
-        gd,
-        project,
         eventsFunction
-      );
+          .getEvents()
+          .unserializeFrom(project, eventsSerializerElement);
 
-      eventsFunction.delete();
-      project.delete();
+        const parameter = new gd.ParameterMetadata();
+        parameter.setType('number');
+        parameter.setName('IncreaseValue');
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.setType('object');
+        parameter.setName('MyParamObject');
+        parameter.setExtraInfo(
+          'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+        );
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.delete();
 
-      const { gdjs, runtimeScene } = makeMinimalGDJSMock();
-      const myObjectA1 = runtimeScene.createObject('MyObjectA');
-      const myObjectA2 = runtimeScene.createObject('MyObjectA');
-      const myObjectA3 = runtimeScene.createObject('MyObjectA');
-      const myObjectB1 = runtimeScene.createObject('MyObjectB');
-      const myObjectB2 = runtimeScene.createObject('MyObjectB');
-      const myObjectsLists = gdjs.Hashtable.newFrom({
-        MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
-        MyObjectB: [myObjectB1, myObjectB2],
+        const runCompiledEvents = generateCompiledEventsForEventsFunction(
+          gd,
+          project,
+          eventsFunction
+        );
+
+        eventsFunction.delete();
+        project.delete();
+
+        expectProgressivelyResolvedTasksForObjects(runCompiledEvents);
       });
 
-      runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
-      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+      test('optionally async object action, set as async', function () {
+        const eventsSerializerElement = gd.Serializer.fromJSON(
+          JSON.stringify([
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                {
+                  type: {
+                    value:
+                      'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoOptionallyAsyncAction',
+                    await: true,
+                  },
+                  parameters: ['MyParamObject'],
+                },
+                {
+                  type: { value: 'ModVarObjet' },
+                  parameters: [
+                    'MyParamObject',
+                    'TestVariable',
+                    '+',
+                    'GetArgumentAsNumber("IncreaseValue")',
+                  ],
+                },
+                {
+                  type: { value: 'ModVarScene' },
+                  parameters: ['SuccessVariable', '+', '1'],
+                },
+              ],
+            },
+          ])
+        );
 
-      // Process the tasks again (but none is finished).
-      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+        const project = new gd.ProjectHelper.createNewGDJSProject();
+        const eventsFunction = new gd.EventsFunction();
 
-      // Mark some tasks as done.
-      myObjectA1.markFakeAsyncActionAsFinished();
-      myObjectA2.markFakeAsyncActionAsFinished();
-      myObjectB1.markFakeAsyncActionAsFinished();
+        eventsFunction
+          .getEvents()
+          .unserializeFrom(project, eventsSerializerElement);
 
-      // Process the tasks again (but not everything is finished).
-      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
+        const parameter = new gd.ParameterMetadata();
+        parameter.setType('number');
+        parameter.setName('IncreaseValue');
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.setType('object');
+        parameter.setName('MyParamObject');
+        parameter.setExtraInfo(
+          'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+        );
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.delete();
 
-      // Mark the rest of tasks as done.
-      myObjectA3.markFakeAsyncActionAsFinished();
-      myObjectB2.markFakeAsyncActionAsFinished();
+        const runCompiledEvents = generateCompiledEventsForEventsFunction(
+          gd,
+          project,
+          eventsFunction
+        );
 
-      // Process the tasks again (but not everything is finished).
-      runtimeScene.getAsyncTasksManager().processTasks(runtimeScene);
-      expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
-      expect(
-        runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
-      ).toBe(1);
+        eventsFunction.delete();
+        project.delete();
 
-      expect(myObjectA1.getVariables().get('TestVariable').getAsNumber()).toBe(
-        5
-      );
-      expect(myObjectA2.getVariables().get('TestVariable').getAsNumber()).toBe(
-        5
-      );
-      expect(myObjectA3.getVariables().get('TestVariable').getAsNumber()).toBe(
-        5
-      );
-      expect(myObjectB1.getVariables().get('TestVariable').getAsNumber()).toBe(
-        5
-      );
-      expect(myObjectB2.getVariables().get('TestVariable').getAsNumber()).toBe(
-        5
-      );
+        expectProgressivelyResolvedTasksForObjects(runCompiledEvents);
+      });
+
+      test('optionally async object action, not set as async', function () {
+        const eventsSerializerElement = gd.Serializer.fromJSON(
+          JSON.stringify([
+            {
+              type: 'BuiltinCommonInstructions::Standard',
+              conditions: [],
+              actions: [
+                {
+                  type: {
+                    value:
+                      'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction::DoOptionallyAsyncAction',
+                    await: false,
+                  },
+                  parameters: ['MyParamObject'],
+                },
+                {
+                  type: { value: 'ModVarObjet' },
+                  parameters: [
+                    'MyParamObject',
+                    'TestVariable',
+                    '+',
+                    'GetArgumentAsNumber("IncreaseValue")',
+                  ],
+                },
+                {
+                  type: { value: 'ModVarScene' },
+                  parameters: ['SuccessVariable', '+', '1'],
+                },
+              ],
+            },
+          ])
+        );
+
+        const project = new gd.ProjectHelper.createNewGDJSProject();
+        const eventsFunction = new gd.EventsFunction();
+
+        eventsFunction
+          .getEvents()
+          .unserializeFrom(project, eventsSerializerElement);
+
+        const parameter = new gd.ParameterMetadata();
+        parameter.setType('number');
+        parameter.setName('IncreaseValue');
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.setType('object');
+        parameter.setName('MyParamObject');
+        parameter.setExtraInfo(
+          'FakeObjectWithAsyncAction::FakeObjectWithAsyncAction'
+        );
+        eventsFunction.getParameters().push_back(parameter);
+        parameter.delete();
+
+        const runCompiledEvents = generateCompiledEventsForEventsFunction(
+          gd,
+          project,
+          eventsFunction
+        );
+
+        eventsFunction.delete();
+        project.delete();
+
+        const { gdjs, runtimeScene } = makeMinimalGDJSMock();
+        const myObjectA1 = runtimeScene.createObject('MyObjectA');
+        const myObjectA2 = runtimeScene.createObject('MyObjectA');
+        const myObjectA3 = runtimeScene.createObject('MyObjectA');
+        const myObjectB1 = runtimeScene.createObject('MyObjectB');
+        const myObjectB2 = runtimeScene.createObject('MyObjectB');
+        const myObjectsLists = gdjs.Hashtable.newFrom({
+          MyObjectA: [myObjectA1, myObjectA2, myObjectA3],
+          MyObjectB: [myObjectB1, myObjectB2],
+        });
+
+        runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
+
+        // Nothing is async, everything is done in a single run.
+        expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(true);
+        expect(
+          runtimeScene.getVariables().get('SuccessVariable').getAsNumber()
+        ).toBe(1);
+
+        expect(
+          myObjectA1.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectA2.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectA3.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectB1.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+        expect(
+          myObjectB2.getVariables().get('TestVariable').getAsNumber()
+        ).toBe(5);
+      });
     });
   });
 
@@ -2490,7 +2735,6 @@ describe('libGD.js - GDJS Async Code Generation integration tests', function () 
 
       runCompiledEvents(gdjs, runtimeScene, [5, myObjectsLists]);
       expect(runtimeScene.getVariables().has('SuccessVariable')).toBe(false);
-
 
       // Mark tasks as done.
       myObjectA1.markFakeAsyncActionAsFinished();

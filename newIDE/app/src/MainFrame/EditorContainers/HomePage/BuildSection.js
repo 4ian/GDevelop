@@ -84,6 +84,7 @@ const BuildSection = ({
         <SectionContainer title={<Trans>My projects</Trans>}>
           <Line noMargin>
             <ResponsiveLineStackLayout
+              noColumnMargin
               justifyContent="start"
               alignItems="center"
             >
@@ -133,12 +134,12 @@ const BuildSection = ({
                 <Column noMargin expand>
                   {windowWidth !== 'small' && (
                     <LineStackLayout justifyContent="space-between">
-                      <Column expand noMargin>
+                      <Column expand>
                         <Text color="secondary">
                           <Trans>File name</Trans>
                         </Text>
                       </Column>
-                      <Column expand noMargin>
+                      <Column expand>
                         <Text color="secondary">
                           <Trans>Last edited</Trans>
                         </Text>
@@ -157,14 +158,13 @@ const BuildSection = ({
                       >
                         {windowWidth !== 'small' ? (
                           <LineStackLayout justifyContent="flex-start" expand>
-                            <Column expand noMargin>
+                            <Column expand>
                               <Text noMargin>
-                                {file.fileMetadata.name
-                                  ? file.fileMetadata.name
-                                  : file.fileMetadata.fileIdentifier}
+                                {file.fileMetadata.name ||
+                                  file.fileMetadata.fileIdentifier}
                               </Text>
                             </Column>
-                            <Column expand noMargin>
+                            <Column expand>
                               {file.fileMetadata.lastModifiedDate && (
                                 <Text noMargin>
                                   {i18n.date(
@@ -175,14 +175,21 @@ const BuildSection = ({
                             </Column>
                           </LineStackLayout>
                         ) : (
-                          <ListItemText
-                            primary={file.fileMetadata.fileIdentifier}
-                            secondary={
-                              file.fileMetadata.lastModifiedDate
-                                ? i18n.date(file.fileMetadata.lastModifiedDate)
-                                : undefined
-                            }
-                          />
+                          <Column>
+                            <ListItemText
+                              primary={
+                                file.fileMetadata.name ||
+                                file.fileMetadata.fileIdentifier
+                              }
+                              secondary={
+                                file.fileMetadata.lastModifiedDate
+                                  ? i18n.date(
+                                      file.fileMetadata.lastModifiedDate
+                                    )
+                                  : undefined
+                              }
+                            />
+                          </Column>
                         )}
                       </ListItem>
                     ))}

@@ -885,8 +885,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeScene.addObject(movingObjectWithOtherBehavior);
 
       /** @type {BehaviorTest | null} */
-      const behaviorTest =
-        movingObjectWithOtherBehavior.getBehavior('BehaviorTest');
+      const behaviorTest = movingObjectWithOtherBehavior.getBehavior(
+        'BehaviorTest'
+      );
       if (!behaviorTest) {
         throw new Error('Test behavior not found, test cannot be run.');
       }
@@ -894,8 +895,9 @@ describe('Physics2RuntimeBehavior', () => {
       staticObject.setPosition(0, 25);
       movingObjectWithOtherBehavior.setPosition(0, 0);
       const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      const movingObjectBehavior =
-        movingObjectWithOtherBehavior.getBehavior('Physics2');
+      const movingObjectBehavior = movingObjectWithOtherBehavior.getBehavior(
+        'Physics2'
+      );
       if (!staticObjectBehavior || !movingObjectBehavior) {
         throw new Error('Behaviors not found, test cannot be run.');
       }

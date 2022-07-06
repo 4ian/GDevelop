@@ -49,11 +49,11 @@ export const CardWidget = ({ children, onClick, size }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
 
   const widgetMaxWidth =
-    size === 'small'
+    windowWidth === 'small'
+      ? undefined
+      : size === 'small'
       ? SMALL_WIDGET_SIZE
-      : windowWidth !== 'small'
-      ? LARGE_WIDGET_SIZE
-      : undefined;
+      : LARGE_WIDGET_SIZE;
 
   return (
     <ButtonBase

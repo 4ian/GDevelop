@@ -78,7 +78,7 @@ const TutorialListItem = ({ tutorial }: Props) => {
           <Line expand>
             <Column expand>
               <ResponsiveLineStackLayout noMargin alignItems="baseline" expand>
-                <Text noMargin displayInlineAsSpan>
+                <Text noMargin displayInlineAsSpan size="sub-title">
                   {tutorial.title}
                 </Text>
               </ResponsiveLineStackLayout>

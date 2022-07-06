@@ -2,7 +2,6 @@
 import * as React from 'react';
 import Text from '../../../UI/Text';
 import { Trans } from '@lingui/macro';
-import TextButton from '../../../UI/TextButton';
 import Window from '../../../Utils/Window';
 import Discord from '../../../UI/CustomSvgIcons/Discord';
 import { ColumnStackLayout } from '../../../UI/Layout';
@@ -13,6 +12,14 @@ import Twitter from '../../../UI/CustomSvgIcons/Twitter';
 import Facebook from '../../../UI/CustomSvgIcons/Facebook';
 import TikTok from '../../../UI/CustomSvgIcons/TikTok';
 import SectionContainer from './SectionContainer';
+import { ListItem } from '../../../UI/List';
+import List from '@material-ui/core/List';
+
+const styles = {
+  list: {
+    width: '100%',
+  },
+};
 
 const communityItems = [
   {
@@ -54,26 +61,30 @@ const communityItems = [
   },
 ];
 
-const CommunitySection = () => (
-  <SectionContainer title={<Trans>Community</Trans>}>
-    <ColumnStackLayout alignItems="start" noMargin>
-      <Text size="title">
-        <Trans>Join the conversation</Trans>
-      </Text>
-      {communityItems.map((item, index) => (
-        <TextButton
-          key={index}
-          onClick={item.onClick}
-          icon={item.icon}
-          label={
-            <Text noMargin size="body">
-              {item.label}
-            </Text>
-          }
-        />
-      ))}
-    </ColumnStackLayout>
-  </SectionContainer>
-);
+const CommunitySection = () => {
+  return (
+    <SectionContainer title={<Trans>Community</Trans>}>
+      <ColumnStackLayout alignItems="start" noMargin expand>
+        <Text size="title">
+          <Trans>Join the conversation</Trans>
+        </Text>
+        <List style={styles.list}>
+          {communityItems.map((item, index) => (
+            <ListItem
+              leftIcon={item.icon}
+              key={index}
+              primaryText={
+                <Text noMargin size="body">
+                  {item.label}
+                </Text>
+              }
+              onClick={item.onClick}
+            />
+          ))}
+        </List>
+      </ColumnStackLayout>
+    </SectionContainer>
+  );
+};
 
 export default CommunitySection;

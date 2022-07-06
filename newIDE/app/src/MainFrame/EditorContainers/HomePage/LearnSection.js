@@ -19,8 +19,16 @@ import {
   type WidthType,
 } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import { CardWidget, SMALL_WIDGET_SIZE } from './CardWidget';
-import { GridList, GridListTile } from '@material-ui/core';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import { makeStyles } from '@material-ui/core/styles';
 const electron = optionalRequire('electron');
+
+const useStyles = makeStyles({
+  tile: {
+    width: '100%',
+  },
+});
 
 const styles = {
   grid: {
@@ -28,7 +36,10 @@ const styles = {
     textAlign: 'center',
     maxWidth: SMALL_WIDGET_SIZE * 4 + 100, // Avoid tiles taking too much space on large screens.
   },
-  gridListTile: { display: 'flex', justifyContent: 'flex-start' },
+  gridListTile: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+  },
   helpItem: {
     padding: 10,
   },
@@ -62,6 +73,7 @@ const LearnSection = ({
   onTabChange,
   onOpenHelpFinder,
 }: Props) => {
+  const classes = useStyles();
   const windowWidth = useResponsiveWindowWidth();
   const showTourHelpItem = !electron && !isMobile() && !isUserflowRunning;
   const helpItems = [
@@ -109,7 +121,11 @@ const LearnSection = ({
           spacing={10}
         >
           {helpItems.map((helpItem, index) => (
-            <GridListTile key={index} style={styles.gridListTile}>
+            <GridListTile
+              key={index}
+              style={styles.gridListTile}
+              classes={{ tile: classes.tile }}
+            >
               <CardWidget onClick={helpItem.action} key={index} size="small">
                 <div style={styles.helpItem}>
                   <Column alignItems="center">

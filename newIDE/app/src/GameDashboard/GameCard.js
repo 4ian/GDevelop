@@ -23,6 +23,7 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import ShareDialog from './ShareDialog';
 
 import {
+  deleteGame,
   getGameUrl,
   updateGame,
   type Game,
@@ -94,6 +95,7 @@ export const GameCard = ({
     editedProperty,
     setEditedProperty,
   ] = React.useState<?TogglableProperties>(null);
+  const [isDeletingGame, setIsDeletingGame] = React.useState(false);
 
   const { getAuthorizationHeader, profile } = React.useContext(
     AuthenticatedUserContext
@@ -119,12 +121,60 @@ export const GameCard = ({
     } catch (error) {
       console.error(`Unable to update property ${property}`, error);
       showErrorBox({
-        message: i18n._(t`Unable to update game.`),
+        message:
+          i18n._(t`Unable to update game.`) +
+          ' ' +
+          i18n._(t`Verify your internet connection or try again later.`),
         rawError: error,
         errorId: 'game-dashboard-update-game-error',
       });
     }
     setEditedProperty(null);
+  };
+
+  const unregisterGame = async (i18n: I18nType) => {
+    const answer = Window.showConfirmDialog(
+      i18n._(t`Are you sure you want to unregister this game?`) +
+        '\n\n' +
+        i18n._(
+          t`It will disappear from your games dashboard and you won't get access to analytics, unless you register it again.`
+        )
+    );
+    if (!answer) return;
+
+    if (!profile) return;
+    const { id } = profile;
+    setIsDeletingGame(true);
+
+    try {
+      await deleteGame(getAuthorizationHeader, id, game.id);
+      await onUpdateGame();
+    } catch (error) {
+      console.error('Unable to delete the game:', error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.code === 'game-deletion/leaderboards-exist'
+      ) {
+        showErrorBox({
+          message: i18n._(
+            t`You cannot unregister a game that has active leaderboards. To delete them, go in the Leaderboards tab, and delete them one by one.`
+          ),
+          rawError: error,
+          errorId: 'game-dashboard-unregister-game-active-leaderboards-error',
+        });
+      } else {
+        showErrorBox({
+          message:
+            i18n._(t`Unable to delete the game.`) +
+            ' ' +
+            i18n._(t`Verify your internet connection or try again later.`),
+          rawError: error,
+          errorId: 'game-dashboard-unregister-game-active-leaderboards-error',
+        });
+      }
+      setIsDeletingGame(false);
+    }
   };
 
   return (
@@ -136,30 +186,37 @@ export const GameCard = ({
             cardCornerAction={
               <ElementWithMenu
                 element={
-                  <IconButton size="small">
+                  <IconButton size="small" disabled={isDeletingGame}>
                     <MoreVert />
                   </IconButton>
                 }
                 buildMenuTemplate={(i18n: I18nType) => [
                   {
-                    label: i18n._(t`Open details`),
+                    label: i18n._(t`Game details`),
                     click: () => onOpenGameManager('details'),
                   },
                   {
-                    label: i18n._(t`See builds`),
+                    label: i18n._(t`Game builds`),
                     click: () => onOpenGameManager('builds'),
                   },
                   {
-                    label: i18n._(t`See feedbacks`),
+                    label: i18n._(t`Game feedbacks`),
                     click: () => onOpenGameManager('feedback'),
                   },
                   {
-                    label: i18n._(t`Open analytics`),
+                    label: i18n._(t`Game analytics`),
                     click: () => onOpenGameManager('analytics'),
                   },
                   {
-                    label: i18n._(t`Manage leaderboards`),
+                    label: i18n._(t`Game leaderboards`),
                     click: () => onOpenGameManager('leaderboards'),
+                  },
+                  { type: 'separator' },
+                  {
+                    label: i18n._(t`Unregister game`),
+                    click: () => {
+                      unregisterGame(i18n);
+                    },
                   },
                 ]}
               />
@@ -215,9 +272,9 @@ export const GameCard = ({
                       noColumnMargin
                     >
                       <FlatButton
-                        label={<Trans>Access feedback</Trans>}
-                        onClick={() => onOpenGameManager('feedback')}
-                        disabled={!game.publicWebBuildId}
+                        label={<Trans>Manage game</Trans>}
+                        onClick={() => onOpenGameManager('details')}
+                        disabled={!game.publicWebBuildId || isDeletingGame}
                       />
                       <LineStackLayout noMargin>
                         <Column noMargin expand>
@@ -225,12 +282,12 @@ export const GameCard = ({
                             label={<Trans>Open in browser</Trans>}
                             onClick={openGameUrl}
                             primary
-                            disabled={!game.publicWebBuildId}
+                            disabled={!game.publicWebBuildId || isDeletingGame}
                           />
                         </Column>
                         <IconButton
                           size="small"
-                          disabled={!game.publicWebBuildId}
+                          disabled={!game.publicWebBuildId || isDeletingGame}
                           onClick={() => setShowShareDialog(true)}
                           tooltip={t`Share`}
                         >
@@ -248,7 +305,9 @@ export const GameCard = ({
                     }}
                     toggled={!!game.discoverable}
                     label={<Trans>Make discoverable on Liluo.io</Trans>}
-                    disabled={editedProperty === 'discoverable'}
+                    disabled={
+                      editedProperty === 'discoverable' || isDeletingGame
+                    }
                   />
                   <Toggle
                     labelPosition="left"
@@ -263,7 +322,9 @@ export const GameCard = ({
                     label={
                       <Trans>Show feedback banner on Liluo.io game page</Trans>
                     }
-                    disabled={editedProperty === 'acceptsGameComments'}
+                    disabled={
+                      editedProperty === 'acceptsGameComments' || isDeletingGame
+                    }
                   />
                   <Toggle
                     labelPosition="left"
@@ -276,7 +337,10 @@ export const GameCard = ({
                     }}
                     toggled={!!game.acceptsBuildComments}
                     label={<Trans>Ask for feedback on all build pages</Trans>}
-                    disabled={editedProperty === 'acceptsBuildComments'}
+                    disabled={
+                      editedProperty === 'acceptsBuildComments' ||
+                      isDeletingGame
+                    }
                   />
                 </Column>
               </Column>

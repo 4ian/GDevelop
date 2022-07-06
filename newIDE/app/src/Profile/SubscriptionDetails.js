@@ -16,7 +16,7 @@ const SubscriptionDetails = ({ subscription, onChangeSubscription }: Props) =>
   subscription ? (
     <Column>
       <Line alignItems="center">
-        <Text size="title">My online services subscriptions</Text>
+        <Text size="block-title">My online services subscriptions</Text>
       </Line>
       {subscription.planId ? (
         <>

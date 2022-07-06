@@ -28,7 +28,10 @@ import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStoragePr
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
 import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
-import { onCreateFromExampleShortHeader, onCreateBlank } from './ProjectCreation/services/BrowserCreation';
+import {
+  onCreateFromExampleShortHeader,
+  onCreateBlank,
+} from './ProjectCreation/services/BrowserCreation';
 
 export const create = (authentication: Authentication) => {
   Window.setUpContextMenu();
@@ -85,9 +88,10 @@ export const create = (authentication: Authentication) => {
                   open={props.open}
                   onClose={props.onClose}
                   onOpen={props.onOpen}
-                  initialTab={props.initialTab}
                   onCreateBlank={onCreateBlank}
-                  onCreateFromExampleShortHeader={onCreateFromExampleShortHeader}
+                  onCreateFromExampleShortHeader={
+                    onCreateFromExampleShortHeader
+                  }
                 />
               )}
               storageProviders={storageProviders}

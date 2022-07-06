@@ -51,7 +51,7 @@ function ExtensionsProperties(props: Props) {
 
     propertyList.push(
       <ColumnStackLayout key={extension.getName()} noMargin>
-        <Text size="title">{extension.getFullName()}</Text>
+        <Text size="block-title">{extension.getFullName()}</Text>
         <PropertiesEditor
           schema={propertiesSchema}
           instances={[extension.getAllProperties()]}

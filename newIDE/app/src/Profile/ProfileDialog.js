@@ -87,6 +87,7 @@ const ProfileDialog = ({
           <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
         </Tabs>
       }
+      flexColumnBody
     >
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
@@ -105,7 +106,7 @@ const ProfileDialog = ({
             </Column>
           </Line>
         ) : (
-          <Column>
+          <Column noMargin expand justifyContent="center">
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}
@@ -120,7 +121,7 @@ const ProfileDialog = ({
             </ColumnStackLayout>
           </Line>
         ) : (
-          <Column>
+          <Column noMargin expand justifyContent="center">
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}

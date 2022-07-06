@@ -99,6 +99,7 @@ const GetStartedSection = ({
     {
       key: 'games',
       title: <Trans>Explore games made by others</Trans>,
+      subText: '🎮',
       description: <Trans>Get inspired and have fun</Trans>,
       action: () => onTabChange('play'),
       imagePath: 'res/homepage/explore-games.png',

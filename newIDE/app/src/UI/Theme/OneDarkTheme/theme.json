@@ -194,6 +194,11 @@
       }
     },
     "home": {
+      "header": {
+        "background-color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      },
       "separator": {
         "color": {
           "value": "#32323B"

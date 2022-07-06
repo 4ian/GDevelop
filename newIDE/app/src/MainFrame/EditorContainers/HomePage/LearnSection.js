@@ -109,11 +109,6 @@ const LearnSection = ({
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
       <Line noMargin>
-        <Text size="sub-title">
-          <Trans>Shortcuts</Trans>
-        </Text>
-      </Line>
-      <Line noMargin>
         <GridList
           cols={getColumnsFromWidth(windowWidth, showTourHelpItem)}
           style={styles.grid}

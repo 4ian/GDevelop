@@ -26,7 +26,7 @@ import {
 const getRecentProjectFiles = (count: number) =>
   new Array(count).fill(0).map((_, index) => ({
     fileMetadata: {
-      fileIdentifier: `Users/Gdevelop/project ${index}`,
+      fileIdentifier: `Users/me/Desktop/Gdevelop/project ${index}`,
       lastModifiedDate: Math.floor(Math.random() * 1656942410477) + 1,
     },
     storageProviderName: 'test',

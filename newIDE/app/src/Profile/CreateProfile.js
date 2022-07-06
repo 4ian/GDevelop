@@ -6,8 +6,14 @@ import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
 import { Column, LargeSpacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import Container from '@material-ui/core/Container';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
+
+const styles = {
+  container: {
+    maxWidth: '480px',
+    whiteSpace: 'normal',
+  },
+};
 
 type Props = {
   message?: React.Node,
@@ -23,12 +29,7 @@ const CreateProfile = ({
   justifyContent,
 }: Props) => (
   <Column alignItems="center">
-    <Container
-      style={{
-        maxWidth: '480px',
-        whiteSpace: 'normal',
-      }}
-    >
+    <div style={styles.container}>
       <Column>
         <Text>
           {message || (
@@ -49,7 +50,7 @@ const CreateProfile = ({
           <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
         </ResponsiveLineStackLayout>
       </Column>
-    </Container>
+    </div>
   </Column>
 );
 

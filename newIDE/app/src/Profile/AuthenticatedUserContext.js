@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import { type Profile } from '../Utils/GDevelopServices/Authentication';
+import { type CloudProjectWithUserAccessInfo } from '../Utils/GDevelopServices/Project';
 import { User as FirebaseUser } from 'firebase/auth';
 import { type Badge } from '../Utils/GDevelopServices/Badge';
 import {
@@ -15,6 +16,7 @@ export type AuthenticatedUser = {|
   profile: ?Profile,
   loginState: 'justOpened' | 'loading' | 'done',
   badges: ?Array<Badge>,
+  cloudProjects: ?Array<CloudProjectWithUserAccessInfo>,
   limits: ?Limits,
   usages: ?Usages,
   subscription: ?Subscription,
@@ -37,6 +39,7 @@ export const initialAuthenticatedUser = {
   profile: null,
   loginState: 'justOpened',
   badges: null,
+  cloudProjects: null,
   subscription: null,
   usages: null,
   limits: null,

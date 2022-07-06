@@ -12,7 +12,7 @@ import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
-import SectionContainer from './SectionContainer';
+import SectionContainer, { SectionRow } from './SectionContainer';
 import FlatButton from '../../../UI/FlatButton';
 import {
   useResponsiveWindowWidth,
@@ -32,7 +32,6 @@ const useStyles = makeStyles({
 
 const styles = {
   grid: {
-    marginBottom: 50,
     textAlign: 'center',
     maxWidth: SMALL_WIDGET_SIZE * 4 + 100, // Avoid tiles taking too much space on large screens.
   },
@@ -42,9 +41,6 @@ const styles = {
   },
   helpItem: {
     padding: 10,
-  },
-  tutorialsContainer: {
-    marginTop: 30,
   },
 };
 
@@ -108,70 +104,74 @@ const LearnSection = ({
 
   return (
     <SectionContainer title={<Trans>Help and guides</Trans>}>
-      <Line noMargin>
-        <GridList
-          cols={getColumnsFromWidth(windowWidth, showTourHelpItem)}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={10}
+      <SectionRow>
+        <Line noMargin>
+          <GridList
+            cols={getColumnsFromWidth(windowWidth, showTourHelpItem)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={10}
+          >
+            {helpItems.map((helpItem, index) => (
+              <GridListTile
+                key={index}
+                style={styles.gridListTile}
+                classes={{ tile: classes.tile }}
+              >
+                <CardWidget onClick={helpItem.action} key={index} size="small">
+                  <div style={styles.helpItem}>
+                    <Column alignItems="center">
+                      <Text size="block-title">{helpItem.title}</Text>
+                      <Text size="body" color="secondary">
+                        {helpItem.description}
+                      </Text>
+                    </Column>
+                  </div>
+                </CardWidget>
+              </GridListTile>
+            ))}
+          </GridList>
+        </Line>
+      </SectionRow>
+      <SectionRow>
+        <LineStackLayout
+          justifyContent="space-between"
+          alignItems="center"
+          noMargin
+          expand
         >
-          {helpItems.map((helpItem, index) => (
-            <GridListTile
-              key={index}
-              style={styles.gridListTile}
-              classes={{ tile: classes.tile }}
-            >
-              <CardWidget onClick={helpItem.action} key={index} size="small">
-                <div style={styles.helpItem}>
-                  <Column alignItems="center">
-                    <Text size="block-title">{helpItem.title}</Text>
-                    <Text size="body" color="secondary">
-                      {helpItem.description}
-                    </Text>
-                  </Column>
-                </div>
-              </CardWidget>
-            </GridListTile>
-          ))}
-        </GridList>
-      </Line>
-      <LineStackLayout
-        justifyContent="space-between"
-        alignItems="center"
-        noMargin
-        expand
-      >
-        <Column noMargin>
-          <Text size="title">
-            <Trans>Guides and tutorials</Trans>
+          <Column noMargin>
+            <Text size="title">
+              <Trans>Guides and tutorials</Trans>
+            </Text>
+          </Column>
+          <Column noMargin>
+            {windowWidth === 'large' && (
+              <FlatButton
+                key="submit-example"
+                onClick={() => {
+                  Window.openExternalURL(
+                    'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
+                  );
+                }}
+                primary
+                icon={<PublishIcon />}
+                label={<Trans>Submit your project as an example</Trans>}
+              />
+            )}
+          </Column>
+        </LineStackLayout>
+        <Line noMargin>
+          <Text noMargin>
+            <Trans>Learn by doing</Trans>
           </Text>
-        </Column>
-        <Column noMargin>
-          {windowWidth === 'large' && (
-            <FlatButton
-              key="submit-example"
-              onClick={() => {
-                Window.openExternalURL(
-                  'https://github.com/GDevelopApp/GDevelop-examples/issues/new/choose'
-                );
-              }}
-              primary
-              icon={<PublishIcon />}
-              label={<Trans>Submit your project as an example</Trans>}
-            />
-          )}
-        </Column>
-      </LineStackLayout>
-      <Line noMargin>
-        <Text size="sub-title" noMargin>
-          <Trans>Learn by doing</Trans>
-        </Text>
-      </Line>
-      <div style={styles.tutorialsContainer}>
+        </Line>
+      </SectionRow>
+      <SectionRow>
         <ResponsiveLineStackLayout expand noMargin>
           <TutorialsList />
         </ResponsiveLineStackLayout>
-      </div>
+      </SectionRow>
     </SectionContainer>
   );
 };

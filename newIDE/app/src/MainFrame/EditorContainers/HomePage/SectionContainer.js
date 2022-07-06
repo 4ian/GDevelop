@@ -6,18 +6,19 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import Text from '../../../UI/Text';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 
+export const SECTION_PADDING = 30;
+
 const styles = {
   mobileScrollContainer: {
     padding: 5,
   },
   desktopScrollContainer: {
-    paddingTop: 30,
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: 10,
+    paddingTop: SECTION_PADDING,
+    paddingLeft: SECTION_PADDING,
+    paddingRight: SECTION_PADDING,
   },
-  titleContainer: {
-    paddingBottom: 20,
+  rowContainer: {
+    paddingBottom: SECTION_PADDING,
   },
   scrollContainer: {
     flex: 1,
@@ -48,7 +49,7 @@ const SectionContainer = ({ children, title, subtitle }: Props) => {
         square
       >
         <Column expand>
-          <div style={styles.titleContainer}>
+          <SectionRow>
             <Line noMargin>
               <Text size="bold-title" noMargin>
                 {title}
@@ -59,12 +60,16 @@ const SectionContainer = ({ children, title, subtitle }: Props) => {
                 <Text noMargin>{subtitle}</Text>
               </Line>
             )}
-          </div>
+          </SectionRow>
           {children}
         </Column>
       </Paper>
     </Column>
   );
 };
+
+export const SectionRow = ({ children }: { children: React.Node }) => (
+  <div style={styles.rowContainer}>{children}</div>
+);
 
 export default SectionContainer;

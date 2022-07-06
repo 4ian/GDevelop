@@ -80,7 +80,7 @@ const scorePreviewMaxValue = 999999999;
 const precisionMinValue = -3;
 const precisionMaxValue = 3;
 const displayedEntriesMinNumber = 1;
-const displayedEntriesMaxNumber = 25;
+const displayedEntriesMaxNumber = 50;
 
 function LeaderboardAppearanceDialog({
   open,

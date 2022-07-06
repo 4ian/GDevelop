@@ -11,7 +11,16 @@ namespace gdjs {
      * Every instance with the same files path in properties will
      * share the same {@link EditableTileMap} and {@link TileTextureCache}.
      *
-     * @see {@link TileMapRuntimeManager}
+     * To use a tile map with collisions, a user can create 4 objects:
+     * - one for the the rendering
+     * - one for the solid platforms
+     * - one for the jumpthrus
+     * - one for the ladders
+     *
+     * To avoid to have 4 copies of the same tile map in memory, this manager
+     * puts the tile map in cache and avoid unnecessary parsing.
+     *
+     * @see {@link TileMapManager}
      */
     export class TileMapRuntimeManager {
       private _runtimeScene: gdjs.RuntimeScene;

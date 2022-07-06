@@ -254,7 +254,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_BASED_BEHAVIOR_CLIPBOARD_KIND),
-        click: () => this._pasteEventsBasedBehavior(index),
+        click: () => this._pasteEventsBasedBehavior(index + 1),
       },
     ];
   };

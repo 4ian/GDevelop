@@ -213,6 +213,8 @@ export default class EventsBasedBehaviorsList extends React.Component<
     newEventsBasedBehavior.setName(newName);
 
     this._onEventsBasedBehaviorModified();
+    this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
+    this._editName(newEventsBasedBehavior)
   };
 
   _renderEventsBasedBehaviorMenuTemplate = (i18n: I18nType) => (

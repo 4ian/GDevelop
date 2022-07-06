@@ -502,6 +502,8 @@ describe("TiledTileMapLoader", function () {
       expect(layer.get(2, 1)).to.be(undefined);
       expect(layer.get(3, 1)).to.be(4);
       expect(layer.isFlippedVertically(3, 1)).to.be(true);
+      expect(layer.isFlippedHorizontally(3, 1)).to.be(false);
+      expect(layer.isFlippedDiagonally(3, 1)).to.be(false);
     });
 
     it("can detect that a point is in a tile that contains a mask with a given tag", function () {

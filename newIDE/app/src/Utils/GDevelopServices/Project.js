@@ -20,7 +20,7 @@ type CloudProject = {|
   deletedAt?: string,
 |};
 
-type CloudProjectWithUserAccessInfo = {|
+export type CloudProjectWithUserAccessInfo = {|
   ...CloudProject,
   lastModifiedAt: string,
 |};
@@ -132,13 +132,10 @@ export const commitVersion = async (
   return response.data;
 };
 
-export const listUserCloudProject = async (
-  authenticatedUser: AuthenticatedUser
-): Promise<?Array<CloudProjectWithUserAccessInfo>> => {
-  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser) return;
-
-  const { uid: userId } = firebaseUser;
+export const listUserCloudProjects = async (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<CloudProjectWithUserAccessInfo>> => {
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.get(`${GDevelopProjectApi.baseUrl}/project`, {
     headers: { Authorization: authorizationHeader },

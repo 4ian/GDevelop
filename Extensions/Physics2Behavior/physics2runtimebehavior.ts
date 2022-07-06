@@ -281,28 +281,39 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
-    // Array containing the beginning of contacts reported by onContactBegin. Each contact
-    // should be unique to avoid recording glitches where the object loses and regain
-    // contact between two frames. The array is updated each time the method
-    // onContactBegin is called by the listener, which is only called when stepping
-    // the world i.e. in the first preEvent called by a physics behavior. This array is
-    // cleared just before stepping the world.
+
+    /**
+     * Array containing the beginning of contacts reported by onContactBegin. Each contact
+     * should be unique to avoid recording glitches where the object loses and regain
+     * contact between two frames. The array is updated each time the method
+     * onContactBegin is called by the listener, which is only called when stepping
+     * the world i.e. in the first preEvent called by a physics behavior. This array is
+     * cleared just before stepping the world.
+     */
     contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
-    // Array containing the end of contacts reported by onContactEnd. The array is updated
-    // each time the method onContactEnd is called by the listener, which can be called at
-    // any time. This array is cleared just before stepping the world.
+
+    /**
+     * Array containing the end of contacts reported by onContactEnd. The array is updated
+     * each time the method onContactEnd is called by the listener, which can be called at
+     * any time. This array is cleared just before stepping the world.
+     */
     contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
-    // Array containing the exact current contacts with the objects. It is updated
-    // each time the methods onContactBegin and onContactEnd are called by the contact
-    // listener.
+
+    /**
+     * Array containing the exact current contacts with the objects. It is updated
+     * each time the methods onContactBegin and onContactEnd are called by the contact
+     * listener.
+     */
     currentContacts: Array<Physics2RuntimeBehavior>;
     destroyedDuringFrameLogic: boolean;
     _body: any = null;
     _tempb2Vec2: any;
 
-    // sharedData is a reference to the shared data of the scene, that registers
-    // every physics behavior that is created so that collisions can be cleared
-    // before stepping the world.
+    /**
+     * sharedData is a reference to the shared data of the scene, that registers
+     * every physics behavior that is created so that collisions can be cleared
+     * before stepping the world.
+     */
     _sharedData: Physics2SharedData;
     // Avoid creating new vectors all the time
     _tempb2Vec2Sec: any;

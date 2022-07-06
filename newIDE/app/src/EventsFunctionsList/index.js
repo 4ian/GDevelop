@@ -271,6 +271,27 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this._editName(newEventsFunction);
   };
 
+  _duplicateEventsFunction = (
+    eventsFunction: gdEventsFunction,
+    newFunctionIndex: number
+  ) => {
+    const { eventsFunctionsContainer } = this.props;
+    const newName = newNameGenerator(eventsFunction.getName(), name =>
+      eventsFunctionsContainer.hasEventsFunctionNamed(name)
+    );
+    let newEventsFunction = eventsFunction.clone();
+    newEventsFunction.setName(newName);
+    newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
+      newEventsFunction,
+      newFunctionIndex
+    );
+    this.props.onEventsFunctionAdded(newEventsFunction);
+
+    this._onEventsFunctionModified();
+    this.props.onSelectEventsFunction(newEventsFunction);
+    this._editName(newEventsFunction);
+  };
+
   _onEventsFunctionModified() {
     if (this.props.unsavedChanges)
       this.props.unsavedChanges.triggerUnsavedChanges();
@@ -315,7 +336,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       {
         label: i18n._(t`Paste`),
         enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
-        click: () => this._pasteEventsFunction(index),
+        click: () => this._pasteEventsFunction(index + 1),
+      },
+      {
+        label: i18n._(t`Duplicate`),
+        click: () => this._duplicateEventsFunction(eventsFunction, index + 1),
       },
     ];
   };

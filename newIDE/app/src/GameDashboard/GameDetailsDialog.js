@@ -496,7 +496,13 @@ export const GameDetailsDialog = ({
                     <FlatButton
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
-                          "Are you sure you want to unregister this game? \n\nIt will disappear from your games dashboard and you won't get access to analytics, unless you register it again."
+                          i18n._(
+                            t`Are you sure you want to unregister this game?`
+                          ) +
+                            '\n\n' +
+                            i18n._(
+                              t`It will disappear from your games dashboard and you won't get access to analytics, unless you register it again.`
+                            )
                         );
 
                         if (!answer) return;

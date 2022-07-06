@@ -219,7 +219,7 @@ function LeaderboardAppearanceDialog({
             onSaveSettings(i18n);
           }}
         >
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Table settings</Trans>
           </Text>
           <Line>
@@ -249,7 +249,7 @@ function LeaderboardAppearanceDialog({
               }}
             />
           </Line>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Score column settings</Trans>
           </Text>
           <Line>

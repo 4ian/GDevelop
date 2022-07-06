@@ -20,6 +20,11 @@ type CloudProject = {|
   deletedAt?: string,
 |};
 
+type CloudProjectWithUserAccessInfo = {|
+  ...CloudProject,
+  lastModifiedAt: string,
+|};
+
 const reAuthenticateAndRetryIfFailed = async <T>(
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
@@ -129,7 +134,7 @@ export const commitVersion = async (
 
 export const listUserCloudProject = async (
   authenticatedUser: AuthenticatedUser
-): Promise<?Array<CloudProject>> => {
+): Promise<?Array<CloudProjectWithUserAccessInfo>> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;
 

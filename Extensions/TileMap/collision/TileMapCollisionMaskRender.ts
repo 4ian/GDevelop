@@ -34,7 +34,6 @@ namespace gdjs {
           this._object._outlineOpacity / 255
         );
         for (const polygon of this._object.getHitBoxes()) {
-          //console.log("polygon: " + polygon);
           const vertices = polygon.vertices;
           if (vertices.length === 0) continue;
 
@@ -43,22 +42,12 @@ namespace gdjs {
             this._object._fillOpacity / 255
           );
           this._graphics.moveTo(vertices[0][0], vertices[0][1]);
-          //console.log("");
-          //console.log("moveTo: " + vertices[0][0] + " " + vertices[0][1]);
           for (let index = 1; index < vertices.length; index++) {
             this._graphics.lineTo(vertices[index][0], vertices[index][1]);
-            //console.log("lineTo: " + vertices[index][0] + " " + vertices[index][1]);
           }
           this._graphics.closePath();
           this._graphics.endFill();
         }
-
-        // console.log(
-        //   'getLocalBounds: ' +
-        //     this._graphics.getLocalBounds().width +
-        //     ' ' +
-        //     this._graphics.getLocalBounds().height
-        // );
       }
 
       getRendererObject() {

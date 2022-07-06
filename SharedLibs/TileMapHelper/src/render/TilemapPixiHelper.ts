@@ -234,7 +234,7 @@ export class PixiTileMapHelper {
             if (!tileDefinition) {
               continue;
             }
-            const hitboxes = tileDefinition.getHiBoxes(typeFilter);
+            const hitboxes = tileDefinition.getHitBoxes(typeFilter);
             if (!hitboxes) {
               continue;
             }

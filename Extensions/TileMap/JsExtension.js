@@ -1098,8 +1098,6 @@ module.exports = {
       .getValue() / 255;
     const outlineSize = 1;
 
-    // console.log("CollisionMask._loadTileMapWithTileset: " + typeFilter);
-
       const manager = TilemapHelper.TileMapManager.getManager(this._project);
       manager.getOrLoadTileMap(
         this._loadTiledMapWithCallback.bind(this),

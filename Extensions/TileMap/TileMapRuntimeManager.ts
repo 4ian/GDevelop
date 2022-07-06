@@ -6,7 +6,7 @@ namespace gdjs {
     const logger = new gdjs.Logger('Tilemap object');
 
     /**
-     * An holder to share tile maps across the 2 extension objects.
+     * A holder to share tile maps across the 2 extension objects.
      *
      * Every instance with the same files path in properties will
      * share the same {@link EditableTileMap} and {@link TileTextureCache}.
@@ -16,7 +16,9 @@ namespace gdjs {
     export class TileMapRuntimeManager {
       private _runtimeScene: gdjs.RuntimeScene;
       /**
-       * Delegate
+       * Delegate that actually manage the caches without anything specific to
+       * GDJS.
+       * It allows to factorize code with the IDE.
        */
       private _manager: TileMapHelper.TileMapManager;
       /**

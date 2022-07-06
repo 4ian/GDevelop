@@ -254,18 +254,6 @@ namespace gdjs {
           )
         );
 
-        // this.test++;
-        // if (this.test > 300) {
-        // // console.log("dim: " + this.dimX() + " " + this.dimY());
-        // // console.log("transformation: " + this.transformation);
-        // // console.log("inverse: " + this.inverseTransformation);
-        // // console.log("zone: " + left + " " + top + " " + right + " " + bottom);
-        // // console.log("getHitboxes: " + xMin + " " + yMin + " " + xMax + " " + yMax);
-        // const arr = Array.from(this.getHitboxes(tag, xMin, yMin, xMax, yMax));
-        // console.log(tag + " hitboxes length: " + arr.length);
-        // this.test = 0;
-        // }
-
         return this.getHitboxes(tag, xMin, yMin, xMax, yMax);
       }
 
@@ -338,7 +326,6 @@ namespace gdjs {
         xMax: integer,
         yMax: integer
       ) {
-        //console.log("CollisionMaskIterable: " + xMax + " " + yMax);
         this.map = map;
         this.tag = tag;
         this.xMin = xMin;
@@ -494,7 +481,6 @@ namespace gdjs {
         xMax: integer,
         yMax: integer
       ): Iterable<gdjs.Polygon> {
-        //console.log("getHitboxes layer: " + this._source.id);
         return new LayerCollisionMaskIterable(
           this,
           tag,
@@ -555,7 +541,6 @@ namespace gdjs {
         xMax: integer,
         yMax: integer
       ) {
-        //console.log("CollisionMaskIterable: " + xMax + " " + yMax);
         this.layer = layer;
         this.tag = tag;
         this.xMin = xMin;
@@ -591,7 +576,6 @@ namespace gdjs {
                 continue;
               }
               const definition = tile.getDefinition();
-              //console.log("Check: " + x + " " + y + " tile: " + (tile ? tile.getTag(): tile));
               if (!definition) {
                 continue;
               }
@@ -649,7 +633,7 @@ namespace gdjs {
         // TODO only for the right tag?
         if (definition) {
           const tag = this.layer.tileMap.tag;
-          const definitionHitboxes = definition.getHiBoxes(tag);
+          const definitionHitboxes = definition.getHitBoxes(tag);
           if (definitionHitboxes) {
             this.hitBoxes.length = definitionHitboxes.length;
             for (
@@ -696,7 +680,6 @@ namespace gdjs {
        * @returns The hitboxes of this tile in the scene basis.
        */
       getHitboxes(): Polygon[] {
-        //console.log("getPolygons");
         if (this._isHitboxesUpToDate()) {
           return this.hitBoxes;
         }
@@ -709,7 +692,7 @@ namespace gdjs {
           return this.hitBoxes;
         }
         const tag = this.layer.tileMap.tag;
-        const definitionHitboxes = definition.getHiBoxes(tag);
+        const definitionHitboxes = definition.getHitBoxes(tag);
         if (!definitionHitboxes) {
           this._setHitboxesUpToDate();
           // It should already be []
@@ -755,7 +738,6 @@ namespace gdjs {
             tileTransformation.transform(defVertex, vertex);
           }
         }
-        //console.log("polygonsAreUpToDate");
         this._setHitboxesUpToDate();
         return this.hitBoxes;
       }

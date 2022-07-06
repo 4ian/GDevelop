@@ -393,7 +393,7 @@ describe("TiledTileMapLoader", function () {
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(true);
       expect(tileDefinition.hasTag("lava")).to.be(false);
-      expect(tileDefinition.getHiBoxes("obstacle")).to.be.eql([
+      expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
           [0, 8],
@@ -416,7 +416,7 @@ describe("TiledTileMapLoader", function () {
         expect(tileDefinition).to.be.ok();
         expect(tileDefinition.hasTag("obstacle")).to.be(true);
         expect(tileDefinition.hasTag("lava")).to.be(false);
-        expect(tileDefinition.getHiBoxes("obstacle")).to.be.eql([
+        expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
           [
             [0, 8],
             [8, 0],
@@ -431,7 +431,7 @@ describe("TiledTileMapLoader", function () {
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(true);
       expect(tileDefinition.hasTag("lava")).to.be(false);
-      expect(tileDefinition.getHiBoxes("obstacle")).to.be.eql([
+      expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
           [4, 4],
@@ -450,14 +450,14 @@ describe("TiledTileMapLoader", function () {
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(true);
       expect(tileDefinition.hasTag("lava")).to.be(true);
-      expect(tileDefinition.getHiBoxes("obstacle")).to.be.eql([
+      expect(tileDefinition.getHitBoxes("obstacle")).to.be.eql([
         [
           [0, 0],
           [0, 8],
           [8, 0],
         ],
       ]);
-      expect(tileDefinition.getHiBoxes("lava")).to.be.eql([
+      expect(tileDefinition.getHitBoxes("lava")).to.be.eql([
         [
           [8, 8],
           [8, 0],
@@ -471,7 +471,7 @@ describe("TiledTileMapLoader", function () {
       expect(tileDefinition).to.be.ok();
       expect(tileDefinition.hasTag("obstacle")).to.be(false);
       expect(tileDefinition.hasTag("lava")).to.be(true);
-      expect(tileDefinition.getHiBoxes("lava")).to.be.eql([
+      expect(tileDefinition.getHitBoxes("lava")).to.be.eql([
         [
           [0, 0],
           [0, 8],

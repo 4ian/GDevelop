@@ -317,7 +317,7 @@ export declare class TileDefinition {
    * @param tag
    * @returns The hit boxes for this tile.
    */
-  getHiBoxes(tag: string): PolygonVertices[] | undefined;
+  getHitBoxes(tag: string): PolygonVertices[] | undefined;
   /**
    * Animated tiles have a limitation:
    * they are only able to use frames arranged horizontally one next

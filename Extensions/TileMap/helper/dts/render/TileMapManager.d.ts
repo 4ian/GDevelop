@@ -3,7 +3,7 @@ import { EditableTileMap } from '../model/TileMapModel';
 import { TileTextureCache } from './TileTextureCache';
 import PIXI = GlobalPIXIModule.PIXI;
 /**
- * An holder to share tile maps across the 2 extension objects.
+ * A holder to share tile maps across the 2 extension objects.
  *
  * Every instance with the same files path in properties will
  * share the same {@link EditableTileMap} and {@link TileTextureCache}.

@@ -8,6 +8,7 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { type Profile } from '../../Utils/GDevelopServices/Authentication';
 import { type Release } from '../../Utils/GDevelopServices/Release';
 import { type Build } from '../../Utils/GDevelopServices/Build';
+import { type CloudProjectWithUserAccessInfo } from '../../Utils/GDevelopServices/Project';
 import {
   type ExtensionShortHeader,
   type ExtensionHeader,
@@ -40,6 +41,21 @@ export const indieVerifiedFirebaseUser: FirebaseUser = {
   email: 'indie-user@example.com',
   emailVerified: true,
 };
+
+export const cloudProjectsForIndieUser: Array<CloudProjectWithUserAccessInfo> = [
+  {
+    id: 'af7a8282-746d-4d3a-8cb8-bb8cd9372143',
+    name: 'Worms 2D',
+    createdAt: '2022-02-05T00:36:53.972Z',
+    lastModifiedAt: '2022-02-07T00:36:53.972Z',
+  },
+  {
+    id: 'fb4d878a-1935-4916-b681-f9235475d35c',
+    name: 'Crash Bandicoot',
+    createdAt: '2020-01-24T00:36:53.972Z',
+    lastModifiedAt: '2020-02-06T00:36:53.972Z',
+  },
+];
 
 export const indieUserProfile: Profile = {
   id: 'indie-user',
@@ -105,6 +121,7 @@ export const fakeIndieAuthenticatedUser: AuthenticatedUser = {
   profile: indieUserProfile,
   loginState: 'done',
   badges: null,
+  cloudProjects: null,
   firebaseUser: indieFirebaseUser,
   subscription: subscriptionForIndieUser,
   usages: usagesForIndieUser,
@@ -135,6 +152,7 @@ export const fakeNoSubscriptionAuthenticatedUser: AuthenticatedUser = {
   profile: indieUserProfile,
   loginState: 'done',
   badges: null,
+  cloudProjects: cloudProjectsForIndieUser,
   firebaseUser: indieFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -165,6 +183,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
   profile: indieUserProfile,
   loginState: 'done',
   badges: null,
+  cloudProjects: cloudProjectsForIndieUser,
   firebaseUser: indieVerifiedFirebaseUser,
   subscription: noSubscription,
   usages: usagesForIndieUser,
@@ -195,6 +214,7 @@ export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   profile: null,
   loginState: 'loading',
   badges: null,
+  cloudProjects: null,
   firebaseUser: null,
   subscription: null,
   usages: null,
@@ -225,6 +245,7 @@ export const fakeNotAuthenticatedAuthenticatedUser: AuthenticatedUser = {
   profile: null,
   loginState: 'done',
   badges: null,
+  cloudProjects: null,
   firebaseUser: null,
   subscription: null,
   usages: null,

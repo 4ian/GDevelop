@@ -57,7 +57,7 @@ const ProfileDetails = ({
               <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
               <Spacer />
               <Text
-                size="title"
+                size="block-title"
                 style={{
                   opacity: profile.username ? 1.0 : 0.5,
                 }}

@@ -279,12 +279,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     const newName = newNameGenerator(eventsFunction.getName(), name =>
       eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
-    let newEventsFunction = eventsFunction.clone();
-    newEventsFunction.setName(newName);
-    newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
-      newEventsFunction,
+    const newEventsFunction = eventsFunctionsContainer.insertEventsFunction(
+      eventsFunction,
       newFunctionIndex
     );
+    newEventsFunction.setName(newName);
     this.props.onEventsFunctionAdded(newEventsFunction);
 
     this._onEventsFunctionModified();

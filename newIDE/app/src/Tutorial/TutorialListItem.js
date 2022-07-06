@@ -29,13 +29,12 @@ const styles = {
     textAlign: 'left',
     overflow: 'hidden',
     width: '100%',
-    animation: 'fadein 0.5s',
-    paddingTop: 8,
-    paddingBottom: 8,
     flex: 1,
   },
   listItem: {
     padding: 0,
+    marginTop: 8,
+    marginBottom: 8,
   },
 };
 
@@ -43,7 +42,7 @@ type Props = {|
   tutorial: Tutorial,
 |};
 
-export const TutorialListItem = ({ tutorial }: Props) => {
+const TutorialListItem = ({ tutorial }: Props) => {
   const containerRef = React.useRef<?HTMLDivElement>(null);
   const isImageLoadingRef = React.useRef(true);
 
@@ -94,3 +93,5 @@ export const TutorialListItem = ({ tutorial }: Props) => {
     </ListItem>
   );
 };
+
+export default TutorialListItem;

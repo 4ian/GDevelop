@@ -6,7 +6,7 @@ import { Column } from '../UI/Grid';
 import PlaceholderError from '../UI/PlaceholderError';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import { TutorialContext } from './TutorialContext';
-import { TutorialListItem } from './TutorialListItem';
+import TutorialListItem from './TutorialListItem';
 
 type Props = {};
 

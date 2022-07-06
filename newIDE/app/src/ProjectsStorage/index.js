@@ -12,6 +12,7 @@ export type FileMetadata = {|
   /** The file id, path or local path according to the provider. */
   fileIdentifier: string,
   lastModifiedDate?: number,
+  name?: string,
 |};
 
 export type FileMetadataAndStorageProviderName = {

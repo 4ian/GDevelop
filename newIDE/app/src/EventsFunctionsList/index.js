@@ -268,6 +268,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     this._onEventsFunctionModified();
     this.props.onSelectEventsFunction(newEventsFunction);
+    this._editName(newEventsFunction);
   };
 
   _onEventsFunctionModified() {

@@ -429,11 +429,18 @@ describe('Physics2RuntimeBehavior', () => {
         stepIndex++;
       }
 
-      // Should be cleared at next step.
       assertCollision(movingObject, staticObject, {
         started: true,
         collision: true,
         stopped: true,
+      });
+
+      runtimeScene.setEventsFunction(() => {});
+      runtimeScene.renderAndStep(1000 / fps);
+      assertCollision(movingObject, staticObject, {
+        started: false,
+        collision: false,
+        stopped: false,
       });
 
       if (!hasBounced) {
@@ -740,7 +747,7 @@ describe('Physics2RuntimeBehavior', () => {
         movingObject.deleteFromScene(runtimeScene);
 
         // Collision should be reset on destroyed object and
-        // added to contactsStoppedThisFrame array of the other object.
+        // added to contactsEndedThisFrame array of the other object.
         assertCollision(movingObject, staticObject, {
           started: false,
           collision: false,
@@ -945,11 +952,24 @@ describe('Physics2RuntimeBehavior', () => {
         stepIndex++;
       }
 
-      // Should be cleared at next step.
       assertCollision(movingObjectWithOtherBehavior, staticObject, {
         started: true,
         collision: true,
         stopped: true,
+      });
+
+      runtimeScene.setEventsFunction(() => {
+        behaviorTest.setExpectedCollisions({
+          started: false,
+          collision: false,
+          stopped: false,
+        });
+      });
+      runtimeScene.renderAndStep(1000 / fps);
+      assertCollision(movingObjectWithOtherBehavior, staticObject, {
+        started: false,
+        collision: false,
+        stopped: false,
       });
 
       if (!hasBounced) {

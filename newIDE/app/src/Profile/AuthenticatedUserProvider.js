@@ -29,6 +29,7 @@ import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
+import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
 
 type Props = {|
   authentication: Authentication,
@@ -252,6 +253,21 @@ export default class AuthenticatedUserProvider extends React.Component<
         })),
       error => {
         console.error('Error while loading user limits:', error);
+      }
+    );
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
       }
     );
     this._fetchUserBadges();

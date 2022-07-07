@@ -7,23 +7,28 @@ import UnsavedChangesContext from './UnsavedChangesContext';
 
 type Props = {|
   fileMetadata: ?FileMetadata,
+  customTitle: ?string,
 |};
 
 /**
  * Update the title bar according to the project and the current theme.
  */
-export default function ProjectTitlebar({ fileMetadata }: Props) {
+export default function ProjectTitlebar({ fileMetadata, customTitle }: Props) {
   const gdevelopTheme = React.useContext(ThemeContext);
   const unsavedChanges = React.useContext(UnsavedChangesContext);
   const hasUnsavedChanges = unsavedChanges.hasUnsavedChanges;
+  const suffix = hasUnsavedChanges ? ' *' : '';
+  const projectIdentifier = customTitle
+    ? customTitle
+    : fileMetadata
+    ? fileMetadata.fileIdentifier
+    : '';
 
   React.useEffect(
     () => {
       const title = [
         'GDevelop 5',
-        fileMetadata
-          ? fileMetadata.fileIdentifier + (hasUnsavedChanges ? ' *' : '')
-          : '',
+        projectIdentifier ? `${projectIdentifier}${suffix}` : '',
       ]
         .filter(Boolean)
         .join(' - ');
@@ -31,7 +36,12 @@ export default function ProjectTitlebar({ fileMetadata }: Props) {
       Window.setTitle(title);
       Window.setTitleBarColor(gdevelopTheme.toolbar.backgroundColor);
     },
-    [fileMetadata, hasUnsavedChanges, gdevelopTheme.toolbar.backgroundColor]
+    [
+      projectIdentifier,
+      suffix,
+      hasUnsavedChanges,
+      gdevelopTheme.toolbar.backgroundColor,
+    ]
   );
 
   return null;

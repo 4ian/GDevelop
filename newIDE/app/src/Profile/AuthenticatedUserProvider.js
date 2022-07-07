@@ -29,6 +29,7 @@ import EmailVerificationPendingDialog from './EmailVerificationPendingDialog';
 import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
+import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
 
 type Props = {|
   authentication: Authentication,
@@ -109,6 +110,12 @@ export default class AuthenticatedUserProvider extends React.Component<
         'Fetching user profile as authenticated user found at startup...'
       );
       this._automaticallyUpdateUserProfile = false;
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          loginState: 'justOpened',
+        },
+      }));
       this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
@@ -186,10 +193,25 @@ export default class AuthenticatedUserProvider extends React.Component<
   _fetchUserProfile = async () => {
     const { authentication } = this.props;
 
+    this.setState(({ authenticatedUser }) => ({
+      authenticatedUser: {
+        ...authenticatedUser,
+        loginState: 'loading',
+      },
+    }));
+
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
     const firebaseUser = await this._reloadFirebaseProfile();
-    if (!firebaseUser) return;
+    if (!firebaseUser) {
+      this.setState(({ authenticatedUser }) => ({
+        authenticatedUser: {
+          ...authenticatedUser,
+          loginState: 'done',
+        },
+      }));
+      return;
+    }
 
     // Fetching user profile related information, but independently from
     // the user profile itself, to not block in case one of these calls
@@ -233,6 +255,21 @@ export default class AuthenticatedUserProvider extends React.Component<
         console.error('Error while loading user limits:', error);
       }
     );
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
     this._fetchUserBadges();
 
     // Load and wait for the user profile to be fetched.
@@ -245,6 +282,7 @@ export default class AuthenticatedUserProvider extends React.Component<
       authenticatedUser: {
         ...authenticatedUser,
         profile: userProfile,
+        loginState: 'done',
       },
     }));
   };

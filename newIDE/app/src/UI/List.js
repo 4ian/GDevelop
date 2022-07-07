@@ -36,6 +36,12 @@ const styles = {
     // not handling this by default?)
     wordBreak: 'break-word',
   },
+  listWithGap: {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: 10,
+    flexDirection: 'column',
+  },
 };
 
 type DoubleClickMouseEvent = {| button: 0 | 1 | 2 |};
@@ -300,17 +306,20 @@ type ListProps = {|
     flex?: 1,
     padding?: number,
   |},
+  useGap?: boolean,
 |};
 
 /**
  * List based on Material-UI List.
  */
-export class List extends React.Component<ListProps, {||}> {
-  render() {
-    return (
-      <MUIList style={this.props.style} dense={useDenseLists}>
-        {this.props.children}
-      </MUIList>
-    );
+export const List = (props: ListProps) => {
+  let listStyle = { ...props.style };
+  if (props.useGap) {
+    listStyle = { ...listStyle, ...styles.listWithGap };
   }
-}
+  return (
+    <MUIList style={listStyle} dense={useDenseLists}>
+      {props.children}
+    </MUIList>
+  );
+};

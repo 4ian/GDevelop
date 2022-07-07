@@ -113,8 +113,9 @@ describe('Physics2RuntimeBehavior', () => {
     });
 
     it('should not leave a living body after removing an object', () => {
-      const { object, behavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
+      const { object, behavior } = createObjectWithPhysicsBehavior(
+        runtimeScene
+      );
 
       // First render to have the behavior set up
       runtimeScene.renderAndStep(1000 / 60);
@@ -142,8 +143,9 @@ describe('Physics2RuntimeBehavior', () => {
     });
 
     it("doesn't raise errors if an object with a deactivated physics2 behavior is removed", () => {
-      const { object, behavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
+      const { object, behavior } = createObjectWithPhysicsBehavior(
+        runtimeScene
+      );
 
       // First render to have the behavior set up
       runtimeScene.renderAndStep(1000 / 60);
@@ -168,8 +170,9 @@ describe('Physics2RuntimeBehavior', () => {
     });
 
     it("should not recreate object's body when setting or getting behavior properties", () => {
-      const { object, behavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
+      const { object, behavior } = createObjectWithPhysicsBehavior(
+        runtimeScene
+      );
 
       // First render to have the behavior set up
       runtimeScene.renderAndStep(1000 / 60);
@@ -206,16 +209,20 @@ describe('Physics2RuntimeBehavior', () => {
       };
 
       // Create objects not in contact
-      const { object: object1, behavior: object1Behavior } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Dynamic',
-        });
+      const {
+        object: object1,
+        behavior: object1Behavior,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Dynamic',
+      });
       object1.setPosition(100, 0);
-      const { object: object2, behavior: object2Behavior } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-          restitution: 0,
-        });
+      const {
+        object: object2,
+        behavior: object2Behavior,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
       object1.setPosition(0, 0);
 
       expect(object1Behavior.getBody()).not.to.be(null);
@@ -307,12 +314,16 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const { object: movingObject, behavior: movingObjectBehavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
-      const { object: staticObject, behavior: staticObjectBehavior } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-        });
+      const {
+        object: movingObject,
+        behavior: movingObjectBehavior,
+      } = createObjectWithPhysicsBehavior(runtimeScene);
+      const {
+        object: staticObject,
+        behavior: staticObjectBehavior,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+      });
       staticObject.setPosition(0, 25);
       movingObject.setPosition(0, 0);
       movingObjectBehavior.setLinearVelocityY(40000);
@@ -365,12 +376,16 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const { behavior: movingObjectBehavior, object: movingObject } =
-        createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: staticObjectBehavior, object: staticObject } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-        });
+      const {
+        behavior: movingObjectBehavior,
+        object: movingObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene);
+      const {
+        behavior: staticObjectBehavior,
+        object: staticObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+      });
       staticObject.setPosition(0, 25);
       movingObject.setPosition(0, 0);
       movingObjectBehavior.setLinearVelocityY(40000);
@@ -436,13 +451,17 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const { behavior: movingObjectBehavior, object: movingObject } =
-        createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: staticObjectBehavior, object: staticObject } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-          restitution: 0,
-        });
+      const {
+        behavior: movingObjectBehavior,
+        object: movingObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene);
+      const {
+        behavior: staticObjectBehavior,
+        object: staticObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
       staticObject.setPosition(0, 9);
       movingObject.setPosition(0, 0);
 
@@ -480,13 +499,17 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const { behavior: movingObjectBehavior, object: movingObject } =
-        createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: staticObjectBehavior, object: staticObject } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-          restitution: 0,
-        });
+      const {
+        behavior: movingObjectBehavior,
+        object: movingObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene);
+      const {
+        behavior: staticObjectBehavior,
+        object: staticObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
       staticObject.setPosition(0, 4);
       movingObject.setPosition(0, 0);
       runtimeScene.renderAndStep(1000 / fps);
@@ -529,13 +552,17 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const { behavior: movingObjectBehavior, object: movingObject } =
-        createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: staticObjectBehavior, object: staticObject } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-          restitution: 0,
-        });
+      const {
+        behavior: movingObjectBehavior,
+        object: movingObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene);
+      const {
+        behavior: staticObjectBehavior,
+        object: staticObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
       staticObject.setPosition(0, 9);
       movingObject.setPosition(0, 0);
       runtimeScene.renderAndStep(1000 / fps);
@@ -573,13 +600,17 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const { behavior: movingObjectBehavior, object: movingObject } =
-        createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: staticObjectBehavior, object: staticObject } =
-        createObjectWithPhysicsBehavior(runtimeScene, {
-          bodyType: 'Static',
-          restitution: 0,
-        });
+      const {
+        behavior: movingObjectBehavior,
+        object: movingObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene);
+      const {
+        behavior: staticObjectBehavior,
+        object: staticObject,
+      } = createObjectWithPhysicsBehavior(runtimeScene, {
+        bodyType: 'Static',
+        restitution: 0,
+      });
       staticObject.setPosition(0, 9);
       movingObject.setPosition(0, 0);
 
@@ -624,8 +655,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeGame.setGameResolutionSize(1000, 1000);
 
       const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: otherBehavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: otherBehavior } = createObjectWithPhysicsBehavior(
+        runtimeScene
+      );
 
       behavior.onContactBegin(otherBehavior);
 
@@ -641,8 +673,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeGame.setGameResolutionSize(1000, 1000);
 
       const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: otherBehavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: otherBehavior } = createObjectWithPhysicsBehavior(
+        runtimeScene
+      );
 
       behavior.onContactBegin(otherBehavior);
 
@@ -666,8 +699,9 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeGame.setGameResolutionSize(1000, 1000);
 
       const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
-      const { behavior: otherBehavior } =
-        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: otherBehavior } = createObjectWithPhysicsBehavior(
+        runtimeScene
+      );
 
       behavior.onContactEnd(otherBehavior);
 

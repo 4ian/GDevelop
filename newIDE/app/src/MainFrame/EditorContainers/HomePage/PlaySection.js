@@ -25,7 +25,7 @@ const PlaySection = () => {
                 );
               }}
               primary
-              icon={<PublishIcon />}
+              leftIcon={<PublishIcon />}
               label={<Trans>Submit your game to the showcase</Trans>}
             />
             <RaisedButton

@@ -906,7 +906,7 @@ export const LeaderboardAdmin = ({
                       </List>
                       <Line justifyContent="space-between">
                         <FlatButton
-                          icon={<Delete />}
+                          leftIcon={<Delete />}
                           label={<Trans>Delete</Trans>}
                           disabled={isRequestPending || isEditingName}
                           onClick={() => onDeleteLeaderboard(i18n)}

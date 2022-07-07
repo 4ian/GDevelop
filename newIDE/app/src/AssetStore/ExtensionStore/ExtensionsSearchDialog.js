@@ -108,7 +108,7 @@ export default function ExtensionsSearchDialog({
             <HelpButton key="help" helpPagePath="/extensions/search" />,
             eventsFunctionsExtensionOpener ? (
               <FlatButton
-                icon={<CloudDownload />}
+                leftIcon={<CloudDownload />}
                 key="import"
                 label={<Trans>Import extension</Trans>}
                 onClick={() => {
@@ -122,7 +122,7 @@ export default function ExtensionsSearchDialog({
                 key="create-new"
                 onClick={onCreateNew}
                 label={<Trans>Create a new extension</Trans>}
-                icon={<Add />}
+                leftIcon={<Add />}
               />
             ) : null,
           ]}

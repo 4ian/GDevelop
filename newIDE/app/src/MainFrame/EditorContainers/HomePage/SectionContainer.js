@@ -5,6 +5,8 @@ import Paper from '@material-ui/core/Paper';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
+import IconButton from '../../../UI/IconButton';
 
 export const SECTION_PADDING = 30;
 
@@ -31,9 +33,10 @@ type Props = {|
   children: React.Node,
   title: React.Node,
   subtitle?: React.Node,
+  backAction?: () => void,
 |};
 
-const SectionContainer = ({ children, title, subtitle }: Props) => {
+const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -50,6 +53,13 @@ const SectionContainer = ({ children, title, subtitle }: Props) => {
       >
         <Column expand>
           <SectionRow>
+            {backAction && (
+              <Line>
+                <IconButton onClick={backAction} size="small">
+                  <ArrowLeft fontSize="small" />
+                </IconButton>
+              </Line>
+            )}
             <Line noMargin>
               <Text size="bold-title" noMargin>
                 {title}

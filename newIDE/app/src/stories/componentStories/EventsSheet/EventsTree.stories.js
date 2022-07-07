@@ -26,6 +26,7 @@ const eventsTreeTutorials = [
       'https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png',
     link: 'https://example.com/tutorial.html',
     type: 'video',
+    category: 'game-mechanic',
   },
 ];
 

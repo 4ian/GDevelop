@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 type textSize =
   | 'bold-title'
   | 'title'
+  | 'section-title'
   | 'block-title'
   | 'sub-title'
   | 'body'
@@ -57,6 +58,8 @@ const getVariantFromSize = (size: ?textSize) => {
       return 'h1';
     case 'title':
       return 'h2';
+    case 'section-title':
+      return 'h3';
     case 'block-title':
       return 'h4';
     case 'sub-title':

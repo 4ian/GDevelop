@@ -13,7 +13,8 @@ type Props = {|
   disabled?: boolean,
   keyboardFocused?: boolean,
   fullWidth?: boolean,
-  icon?: React.Node,
+  leftIcon?: React.Node,
+  rightIcon?: React.Node,
   style?: {|
     marginTop?: number,
     marginBottom?: number,
@@ -34,7 +35,8 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
     {
       label,
       primary,
-      icon,
+      leftIcon,
+      rightIcon,
       keyboardFocused,
       disabled,
       id,
@@ -62,9 +64,11 @@ const FlatButton = React.forwardRef<Props, ButtonInterface>(
         {...otherProps}
         ref={ref}
       >
-        {icon}
-        {icon && <Spacer />}
+        {leftIcon}
+        {leftIcon && <Spacer />}
         {label}
+        {rightIcon && <Spacer />}
+        {rightIcon}
       </Button>
     );
   }

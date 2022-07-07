@@ -3887,11 +3887,12 @@ namespace gdjs {
     }
 
     onContactBegin(otherBehavior: Physics2RuntimeBehavior) {
+      this.currentContacts.push(otherBehavior);
+
       // There might be contacts that end during the frame and
       // start again right away. It is considered a glitch
       // and should not be detected.
       let i = this.contactsEndedThisFrame.indexOf(otherBehavior);
-      this.currentContacts.push(otherBehavior);
       if (i !== -1) {
         this.contactsEndedThisFrame.splice(i, 1);
       } else {
@@ -3901,6 +3902,7 @@ namespace gdjs {
 
     onContactEnd(otherBehavior: Physics2RuntimeBehavior) {
       this.contactsEndedThisFrame.push(otherBehavior);
+
       const index = this.currentContacts.indexOf(otherBehavior);
       if (index !== -1) {
         this.currentContacts.splice(index, 1);

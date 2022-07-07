@@ -235,7 +235,7 @@ describe('Physics2RuntimeBehavior', () => {
         object1Behavior._sharedData._registeredBehaviors.has(object2Behavior)
       ).to.be(true);
 
-      // Put objects in contact and asset collision started during the frame
+      // Put objects in contact and assert collision started during the frame
       runtimeScene.setEventsFunction(() => {
         object1.setPosition(10, 0);
         object2.setPosition(20, 0);

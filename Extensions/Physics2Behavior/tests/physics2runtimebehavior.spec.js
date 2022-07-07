@@ -65,61 +65,7 @@ function createGameWithSceneWithPhysics2SharedData() {
   return [runtimeGame, runtimeScene];
 }
 
-class BehaviorTest extends gdjs.RuntimeBehavior {
-  collisionsStartedThisFrame = [];
-  collisionsEndedThisFrame = [];
-  currentCollisions = [];
-  other;
-  isPostEventActivated = false;
-  isPreEventActivated = false;
-
-  constructor(runtimeScene, behaviorData, owner) {
-    super(runtimeScene, behaviorData, owner);
-    this.collisionsStartedThisFrame = behaviorData.collisionsStartedThisFrame;
-    this.collisionsEndedThisFrame = behaviorData.collisionsEndedThisFrame;
-    this.currentCollisions = behaviorData.currentCollisions;
-    this.other = behaviorData.other;
-  }
-
-  activatePostEvent(activate) {
-    this.isPostEventActivated = activate;
-  }
-  activatePreEvent(activate) {
-    this.isPreEventActivated = activate;
-  }
-
-  setExpectedCollisions({ started, collision, stopped }) {
-    this.collisionsStartedThisFrame = started;
-    this.currentCollisions = collision;
-    this.collisionsEndedThisFrame = stopped;
-  }
-
-  doStepPreEvents() {
-    if (this.isPreEventActivated) {
-      const physicsBehavior = this.owner.getBehavior('Physics2');
-      assertCollision(this.owner, this.other, {
-        started: this.collisionsStartedThisFrame,
-        collision: this.currentCollisions,
-        stopped: this.collisionsEndedThisFrame,
-      });
-    }
-  }
-
-  doStepPostEvents() {
-    if (this.isPostEventActivated) {
-      const physicsBehavior = this.owner.getBehavior('Physics2');
-      assertCollision(this.owner, this.other, {
-        started: this.collisionsStartedThisFrame,
-        collision: this.currentCollisions,
-        stopped: this.collisionsEndedThisFrame,
-      });
-    }
-  }
-}
-
-gdjs.registerBehavior('Physics2::BehaviorTest', BehaviorTest);
-
-function createObject(runtimeScene, behaviorProperties) {
+function createObjectWithPhysicsBehavior(runtimeScene, behaviorProperties) {
   const object = new gdjs.TestRuntimeObject(runtimeScene, {
     name: 'obj1',
     type: '',
@@ -154,7 +100,8 @@ function createObject(runtimeScene, behaviorProperties) {
   });
   object.setCustomWidthAndHeight(10, 10);
   runtimeScene.addObject(object);
-  return object;
+  /** @type {{behavior: gdjs.Physics2RuntimeBehavior, object: gdjs.RuntimeObject}} */
+  return { object, behavior: object.getBehavior('Physics2') };
 }
 
 describe('Physics2RuntimeBehavior', () => {
@@ -166,13 +113,8 @@ describe('Physics2RuntimeBehavior', () => {
     });
 
     it('should not leave a living body after removing an object', () => {
-      const object = createObject(runtimeScene);
-
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const behavior = object.getBehavior('Physics2');
-      if (!behavior) {
-        throw new Error('Behavior not found, test cannot be run.');
-      }
+      const { object, behavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
 
       // First render to have the behavior set up
       runtimeScene.renderAndStep(1000 / 60);
@@ -200,13 +142,8 @@ describe('Physics2RuntimeBehavior', () => {
     });
 
     it("doesn't raise errors if an object with a deactivated physics2 behavior is removed", () => {
-      const object = createObject(runtimeScene);
-
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const behavior = object.getBehavior('Physics2');
-      if (!behavior) {
-        throw new Error('Behavior not found, test cannot be run.');
-      }
+      const { object, behavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
 
       // First render to have the behavior set up
       runtimeScene.renderAndStep(1000 / 60);
@@ -231,13 +168,8 @@ describe('Physics2RuntimeBehavior', () => {
     });
 
     it("should not recreate object's body when setting or getting behavior properties", () => {
-      const object = createObject(runtimeScene);
-
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const behavior = object.getBehavior('Physics2');
-      if (!behavior) {
-        throw new Error('Behavior not found, test cannot be run.');
-      }
+      const { object, behavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
 
       // First render to have the behavior set up
       runtimeScene.renderAndStep(1000 / 60);
@@ -274,21 +206,18 @@ describe('Physics2RuntimeBehavior', () => {
       };
 
       // Create objects not in contact
-      const object1 = createObject(runtimeScene, { bodyType: 'Dynamic' });
+      const { object: object1, behavior: object1Behavior } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Dynamic',
+        });
       object1.setPosition(100, 0);
-      const object2 = createObject(runtimeScene, {
-        bodyType: 'Static',
-        restitution: 0,
-      });
+      const { object: object2, behavior: object2Behavior } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+          restitution: 0,
+        });
       object1.setPosition(0, 0);
 
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const object1Behavior = object1.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const object2Behavior = object2.getBehavior('Physics2');
-      if (!object2Behavior || !object1Behavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
       expect(object1Behavior.getBody()).not.to.be(null);
       expect(object2Behavior.getBody()).not.to.be(null);
       expect(object1Behavior._sharedData._registeredBehaviors.size).to.be(2);
@@ -303,11 +232,6 @@ describe('Physics2RuntimeBehavior', () => {
       runtimeScene.setEventsFunction(() => {
         object1.setPosition(10, 0);
         object2.setPosition(20, 0);
-        assertCollision(object1, object2, {
-          started: true,
-          collision: true,
-          stopped: false,
-        });
       });
       runtimeScene.renderAndStep(1000 / fps);
 
@@ -358,13 +282,6 @@ describe('Physics2RuntimeBehavior', () => {
         object1Behavior._sharedData._registeredBehaviors.has(object2Behavior)
       ).to.be(true);
 
-      runtimeScene.setEventsFunction(() => {
-        assertCollision(object1, object2, {
-          started: true,
-          collision: true,
-          stopped: false,
-        });
-      });
       runtimeScene.renderAndStep(1000 / fps);
 
       assertCollision(object1, object2, {
@@ -382,24 +299,22 @@ describe('Physics2RuntimeBehavior', () => {
       [runtimeGame, runtimeScene] = createGameWithSceneWithPhysics2SharedData();
     });
 
-    it('should bounce during the frame (at low fps), collision should be detected, as well as start and stop of the collision', () => {
+    it('should detect a collision even if the contact stated and ended during the same frame', () => {
+      // Use a low fps to reproduce more easily.
       const fps = 2;
       runtimeGame.setGameResolutionSize(1000, 1000);
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
 
-      const movingObject = createObject(runtimeScene);
-      const staticObject = createObject(runtimeScene, { bodyType: 'Static' });
+      const { object: movingObject, behavior: movingObjectBehavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
+      const { object: staticObject, behavior: staticObjectBehavior } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+        });
       staticObject.setPosition(0, 25);
       movingObject.setPosition(0, 0);
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const movingObjectBehavior = movingObject.getBehavior('Physics2');
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
       movingObjectBehavior.setLinearVelocityY(40000);
 
       let hasBounced = false;
@@ -429,12 +344,6 @@ describe('Physics2RuntimeBehavior', () => {
         stepIndex++;
       }
 
-      assertCollision(movingObject, staticObject, {
-        started: true,
-        collision: true,
-        stopped: true,
-      });
-
       runtimeScene.setEventsFunction(() => {});
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
@@ -448,24 +357,22 @@ describe('Physics2RuntimeBehavior', () => {
       }
     });
 
-    it('should begin to bounce during the frame (at high fps), collision should be detected, as well as start of the collision, but not the end', () => {
+    it("should detect a collision when the contact doesn't end the same frame it started", () => {
+      // Use a high fps to reproduce more easily.
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
 
-      const movingObject = createObject(runtimeScene);
-      const staticObject = createObject(runtimeScene, { bodyType: 'Static' });
+      const { behavior: movingObjectBehavior, object: movingObject } =
+        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: staticObjectBehavior, object: staticObject } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+        });
       staticObject.setPosition(0, 25);
       movingObject.setPosition(0, 0);
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const movingObjectBehavior = movingObject.getBehavior('Physics2');
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
       movingObjectBehavior.setLinearVelocityY(40000);
 
       let hasBegunBouncing = false;
@@ -522,27 +429,23 @@ describe('Physics2RuntimeBehavior', () => {
       }
     });
 
-    it('should not detect a contact while already in contact as a new one (the contact jittered).', () => {
+    it('should not detect a new contact while already in contact with that same object (the contact jittered).', () => {
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
       runtimeScene._timeManager.getElapsedTime = function () {
         return (1 / fps) * 1000;
       };
 
-      const movingObject = createObject(runtimeScene);
-      const staticObject = createObject(runtimeScene, {
-        bodyType: 'Static',
-        restitution: 0,
-      });
+      const { behavior: movingObjectBehavior, object: movingObject } =
+        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: staticObjectBehavior, object: staticObject } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+          restitution: 0,
+        });
       staticObject.setPosition(0, 9);
       movingObject.setPosition(0, 0);
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const movingObjectBehavior = movingObject.getBehavior('Physics2');
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
+
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: true,
@@ -552,16 +455,10 @@ describe('Physics2RuntimeBehavior', () => {
 
       runtimeScene.setEventsFunction(() => {
         // Manually call onContactEnd and onContactBegin methods to simulate
-        // a loss of contact followed by a contact beginning during the event.
+        // a loss of contact followed by a contact beginning during the preEvent.
         movingObject
           .getBehavior('Physics2')
           .onContactEnd(staticObject.getBehavior('Physics2'));
-
-        assertCollision(movingObject, staticObject, {
-          started: false,
-          collision: false,
-          stopped: true,
-        });
 
         movingObject
           .getBehavior('Physics2')
@@ -583,20 +480,15 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const movingObject = createObject(runtimeScene);
-      const staticObject = createObject(runtimeScene, {
-        bodyType: 'Static',
-        restitution: 0,
-      });
+      const { behavior: movingObjectBehavior, object: movingObject } =
+        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: staticObjectBehavior, object: staticObject } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+          restitution: 0,
+        });
       staticObject.setPosition(0, 4);
       movingObject.setPosition(0, 0);
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const movingObjectBehavior = movingObject.getBehavior('Physics2');
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
       runtimeScene.renderAndStep(1000 / fps);
 
       assertCollision(movingObject, staticObject, {
@@ -612,26 +504,15 @@ describe('Physics2RuntimeBehavior', () => {
         movingObject
           .getBehavior('Physics2')
           .onContactEnd(staticObject.getBehavior('Physics2'));
-        assertCollision(movingObject, staticObject, {
-          started: false,
-          collision: false,
-          stopped: true,
-        });
 
         movingObject
           .getBehavior('Physics2')
           .onContactBegin(staticObject.getBehavior('Physics2'));
 
-        // Started is false because it is like the jittered contact case.
-        assertCollision(movingObject, staticObject, {
-          started: false,
-          collision: true,
-          stopped: false,
-        });
-
         movingObject
           .getBehavior('Physics2')
           .onContactEnd(staticObject.getBehavior('Physics2'));
+
         assertCollision(movingObject, staticObject, {
           started: false,
           collision: false,
@@ -648,26 +529,15 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const movingObject = createObject(runtimeScene);
-      const staticObject = createObject(runtimeScene, {
-        bodyType: 'Static',
-        restitution: 0,
-      });
+      const { behavior: movingObjectBehavior, object: movingObject } =
+        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: staticObjectBehavior, object: staticObject } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+          restitution: 0,
+        });
       staticObject.setPosition(0, 9);
       movingObject.setPosition(0, 0);
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      const movingObjectBehavior = movingObject.getBehavior('Physics2');
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
-
-      runtimeScene.setEventsFunction(() => {
-        assertCollision(movingObject, staticObject, {
-          started: true,
-          collision: true,
-          stopped: false,
-        });
-      });
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: true,
@@ -675,16 +545,9 @@ describe('Physics2RuntimeBehavior', () => {
         stopped: false,
       });
 
-      // Resize (postEvent operation).
+      // Resize.
       runtimeScene.setEventsFunction(() => {
         movingObject.setCustomWidthAndHeight(5, 5);
-
-        // Body should be updated next frame.
-        assertCollision(movingObject, staticObject, {
-          started: false,
-          collision: true,
-          stopped: false,
-        });
       });
 
       runtimeScene.renderAndStep(1000 / fps);
@@ -693,13 +556,8 @@ describe('Physics2RuntimeBehavior', () => {
         collision: true,
         stopped: false,
       });
-      runtimeScene.setEventsFunction(() => {
-        assertCollision(movingObject, staticObject, {
-          started: false,
-          collision: false,
-          stopped: true,
-        });
-      });
+
+      runtimeScene.setEventsFunction(() => {});
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: false,
@@ -715,26 +573,16 @@ describe('Physics2RuntimeBehavior', () => {
         return (1 / fps) * 1000;
       };
 
-      const movingObject = createObject(runtimeScene);
-      const staticObject = createObject(runtimeScene, {
-        bodyType: 'Static',
-        restitution: 0,
-      });
+      const { behavior: movingObjectBehavior, object: movingObject } =
+        createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: staticObjectBehavior, object: staticObject } =
+        createObjectWithPhysicsBehavior(runtimeScene, {
+          bodyType: 'Static',
+          restitution: 0,
+        });
       staticObject.setPosition(0, 9);
       movingObject.setPosition(0, 0);
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      const movingObjectBehavior = movingObject.getBehavior('Physics2');
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
 
-      runtimeScene.setEventsFunction(() => {
-        assertCollision(movingObject, staticObject, {
-          started: true,
-          collision: true,
-          stopped: false,
-        });
-      });
       runtimeScene.renderAndStep(1000 / fps);
       assertCollision(movingObject, staticObject, {
         started: true,
@@ -745,22 +593,12 @@ describe('Physics2RuntimeBehavior', () => {
       // Destroy (postEvent operation).
       runtimeScene.setEventsFunction(() => {
         movingObject.deleteFromScene(runtimeScene);
-
-        // Collision should be reset on destroyed object and
-        // added to contactsEndedThisFrame array of the other object.
-        assertCollision(movingObject, staticObject, {
-          started: false,
-          collision: false,
-          stopped: false,
-        });
-        assertCollision(staticObject, movingObject, {
-          started: false,
-          collision: false,
-          stopped: true,
-        });
       });
 
       runtimeScene.renderAndStep(1000 / fps);
+
+      // Collision should be reset on destroyed object and
+      // added to contactsEndedThisFrame array of the other object.
       assertCollision(movingObject, staticObject, {
         started: false,
         collision: false,
@@ -785,16 +623,9 @@ describe('Physics2RuntimeBehavior', () => {
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
 
-      const object = createObject(runtimeScene);
-      const otherObject = createObject(runtimeScene);
-
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const behavior = object.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const otherBehavior = otherObject.getBehavior('Physics2');
-      if (!behavior || !otherBehavior) {
-        throw new Error('Behavior not found, test cannot be run.');
-      }
+      const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: otherBehavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
 
       behavior.onContactBegin(otherBehavior);
 
@@ -809,16 +640,9 @@ describe('Physics2RuntimeBehavior', () => {
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
 
-      const object = createObject(runtimeScene);
-      const otherObject = createObject(runtimeScene);
-
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const behavior = object.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const otherBehavior = otherObject.getBehavior('Physics2');
-      if (!behavior || !otherBehavior) {
-        throw new Error('Behavior not found, test cannot be run.');
-      }
+      const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: otherBehavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
 
       behavior.onContactBegin(otherBehavior);
 
@@ -841,16 +665,9 @@ describe('Physics2RuntimeBehavior', () => {
       const fps = 50;
       runtimeGame.setGameResolutionSize(1000, 1000);
 
-      const object = createObject(runtimeScene);
-      const otherObject = createObject(runtimeScene);
-
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const behavior = object.getBehavior('Physics2');
-      /** @type {gdjs.Physics2RuntimeBehavior | null} */
-      const otherBehavior = otherObject.getBehavior('Physics2');
-      if (!behavior || !otherBehavior) {
-        throw new Error('Behavior not found, test cannot be run.');
-      }
+      const { behavior } = createObjectWithPhysicsBehavior(runtimeScene);
+      const { behavior: otherBehavior } =
+        createObjectWithPhysicsBehavior(runtimeScene);
 
       behavior.onContactEnd(otherBehavior);
 
@@ -862,119 +679,6 @@ describe('Physics2RuntimeBehavior', () => {
 
       expect(behavior.contactsStartedThisFrame.length).to.be(0);
       expect(behavior.contactsEndedThisFrame.length).to.be(0);
-    });
-  });
-
-  describe('Behavior interaction with other objects behaviors and extensions.', () => {
-    let runtimeGame;
-    let runtimeScene;
-    beforeEach(() => {
-      [runtimeGame, runtimeScene] = createGameWithSceneWithPhysics2SharedData();
-    });
-    it('BehaviorTest should have access to current started and ended contacts in postEvent.', () => {
-      const fps = 2;
-      runtimeGame.setGameResolutionSize(1000, 1000);
-      runtimeScene._timeManager.getElapsedTime = function () {
-        return (1 / fps) * 1000;
-      };
-
-      const staticObject = createObject(runtimeScene, {
-        bodyType: 'Static',
-      });
-      // Creating the object with the other behavior after the Physics2 only one
-      // should make its behavior's post event play after the Physics2 post event.
-      const movingObjectWithOtherBehavior = createObject(runtimeScene);
-      movingObjectWithOtherBehavior.addNewBehavior({
-        name: 'BehaviorTest',
-        type: 'Physics2::BehaviorTest',
-        other: staticObject,
-      });
-      runtimeScene.addObject(movingObjectWithOtherBehavior);
-
-      /** @type {BehaviorTest | null} */
-      const behaviorTest = movingObjectWithOtherBehavior.getBehavior(
-        'BehaviorTest'
-      );
-      if (!behaviorTest) {
-        throw new Error('Test behavior not found, test cannot be run.');
-      }
-
-      staticObject.setPosition(0, 25);
-      movingObjectWithOtherBehavior.setPosition(0, 0);
-      const staticObjectBehavior = staticObject.getBehavior('Physics2');
-      const movingObjectBehavior = movingObjectWithOtherBehavior.getBehavior(
-        'Physics2'
-      );
-      if (!staticObjectBehavior || !movingObjectBehavior) {
-        throw new Error('Behaviors not found, test cannot be run.');
-      }
-
-      movingObjectBehavior.setLinearVelocityY(40000);
-      let hasBounced = false;
-      let stepIndex = 0;
-      behaviorTest.activatePostEvent(true);
-
-      runtimeScene.setEventsFunction(() => {
-        if (movingObjectBehavior.getLinearVelocityY() > 0) {
-          const expectedCollisionTest = {
-            started: false,
-            collision: false,
-            stopped: false,
-          };
-          // If the moving object has a positive velocity, it hasn't bounced
-          // on the static object
-          assertCollision(
-            movingObjectWithOtherBehavior,
-            staticObject,
-            expectedCollisionTest
-          );
-          behaviorTest.setExpectedCollisions(expectedCollisionTest);
-        } else {
-          hasBounced = true;
-          const expectedCollisionTest = {
-            started: true,
-            collision: true,
-            stopped: true,
-          };
-          expect(
-            movingObjectWithOtherBehavior.getY() < staticObject.getY()
-          ).to.be(true);
-          assertCollision(
-            movingObjectWithOtherBehavior,
-            staticObject,
-            expectedCollisionTest
-          );
-          behaviorTest.setExpectedCollisions(expectedCollisionTest);
-        }
-      });
-      while (stepIndex < 10 && !hasBounced) {
-        runtimeScene.renderAndStep(1000 / fps);
-        stepIndex++;
-      }
-
-      assertCollision(movingObjectWithOtherBehavior, staticObject, {
-        started: true,
-        collision: true,
-        stopped: true,
-      });
-
-      runtimeScene.setEventsFunction(() => {
-        behaviorTest.setExpectedCollisions({
-          started: false,
-          collision: false,
-          stopped: false,
-        });
-      });
-      runtimeScene.renderAndStep(1000 / fps);
-      assertCollision(movingObjectWithOtherBehavior, staticObject, {
-        started: false,
-        collision: false,
-        stopped: false,
-      });
-
-      if (!hasBounced) {
-        throw new Error('Contact did not happen, nothing was tested.');
-      }
     });
   });
 });

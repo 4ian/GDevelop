@@ -75,7 +75,6 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/LinkedObjects/linkedobjects.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventory.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventorytools.js',
-      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/utils.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/box2d.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2runtimebehavior.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2tools.js',

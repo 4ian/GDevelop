@@ -1,110 +1,110 @@
-function assertCollision(object1, object2, options) {
-  expect(
-    gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(
-      object1,
-      object2,
-      'Physics2'
-    )
-  ).to.be(options.started);
-  expect(
-    gdjs.Physics2RuntimeBehavior.areObjectsColliding(
-      object1,
-      object2,
-      'Physics2'
-    )
-  ).to.be(options.collision);
-  expect(
-    gdjs.Physics2RuntimeBehavior.hasCollisionStoppedBetween(
-      object1,
-      object2,
-      'Physics2'
-    )
-  ).to.be(options.stopped);
-}
-
-function createGameWithSceneWithPhysics2SharedData() {
-  const runtimeGame = new gdjs.RuntimeGame({
-    variables: [],
-    resources: { resources: [] },
-    properties: { windowWidth: 1000, windowHeight: 1000 },
-  });
-  const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
-  runtimeScene.loadFromScene({
-    layers: [
-      {
-        name: '',
-        visibility: true,
-        cameras: [],
-        effects: [],
-        ambientLightColorR: 127,
-        ambientLightColorB: 127,
-        ambientLightColorG: 127,
-        isLightingLayer: false,
-        followBaseLayerCamera: false,
-      },
-    ],
-    variables: [],
-    r: 0,
-    v: 0,
-    b: 0,
-    mangledName: 'Scene1',
-    name: 'Scene1',
-    stopSoundsOnStartup: false,
-    title: '',
-    behaviorsSharedData: [],
-    objects: [],
-    instances: [],
-  });
-
-  runtimeScene.setInitialSharedDataForBehavior('Physics2', {
-    gravityX: 0,
-    gravityY: 0,
-    scaleX: 1,
-    scaleY: 1,
-  });
-  return [runtimeGame, runtimeScene];
-}
-
-function createObjectWithPhysicsBehavior(runtimeScene, behaviorProperties) {
-  const object = new gdjs.TestRuntimeObject(runtimeScene, {
-    name: 'obj1',
-    type: '',
-    behaviors: [
-      {
-        name: 'Physics2',
-        type: 'Physics2::Physics2Behavior',
-        bodyType: 'Dynamic',
-        bullet: false,
-        fixedRotation: true,
-        canSleep: false,
-        shape: 'Box',
-        shapeDimensionA: 0,
-        shapeDimensionB: 0,
-        shapeOffsetX: 0,
-        shapeOffsetY: 0,
-        polygonOrigin: 'Center',
-        vertices: [],
-        density: 1.0,
-        friction: 0.01,
-        restitution: 1,
-        linearDamping: 0,
-        angularDamping: 0.1,
-        gravityScale: 1,
-        layers: 1,
-        masks: 1,
-        ...behaviorProperties,
-      },
-    ],
-    variables: [],
-    effects: [],
-  });
-  object.setCustomWidthAndHeight(10, 10);
-  runtimeScene.addObject(object);
-  /** @type {{behavior: gdjs.Physics2RuntimeBehavior, object: gdjs.RuntimeObject}} */
-  return { object, behavior: object.getBehavior('Physics2') };
-}
-
 describe('Physics2RuntimeBehavior', () => {
+  function assertCollision(object1, object2, options) {
+    expect(
+      gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(
+        object1,
+        object2,
+        'Physics2'
+      )
+    ).to.be(options.started);
+    expect(
+      gdjs.Physics2RuntimeBehavior.areObjectsColliding(
+        object1,
+        object2,
+        'Physics2'
+      )
+    ).to.be(options.collision);
+    expect(
+      gdjs.Physics2RuntimeBehavior.hasCollisionStoppedBetween(
+        object1,
+        object2,
+        'Physics2'
+      )
+    ).to.be(options.stopped);
+  }
+
+  function createGameWithSceneWithPhysics2SharedData() {
+    const runtimeGame = new gdjs.RuntimeGame({
+      variables: [],
+      resources: { resources: [] },
+      properties: { windowWidth: 1000, windowHeight: 1000 },
+    });
+    const runtimeScene = new gdjs.RuntimeScene(runtimeGame);
+    runtimeScene.loadFromScene({
+      layers: [
+        {
+          name: '',
+          visibility: true,
+          cameras: [],
+          effects: [],
+          ambientLightColorR: 127,
+          ambientLightColorB: 127,
+          ambientLightColorG: 127,
+          isLightingLayer: false,
+          followBaseLayerCamera: false,
+        },
+      ],
+      variables: [],
+      r: 0,
+      v: 0,
+      b: 0,
+      mangledName: 'Scene1',
+      name: 'Scene1',
+      stopSoundsOnStartup: false,
+      title: '',
+      behaviorsSharedData: [],
+      objects: [],
+      instances: [],
+    });
+
+    runtimeScene.setInitialSharedDataForBehavior('Physics2', {
+      gravityX: 0,
+      gravityY: 0,
+      scaleX: 1,
+      scaleY: 1,
+    });
+    return [runtimeGame, runtimeScene];
+  }
+
+  function createObjectWithPhysicsBehavior(runtimeScene, behaviorProperties) {
+    const object = new gdjs.TestRuntimeObject(runtimeScene, {
+      name: 'obj1',
+      type: '',
+      behaviors: [
+        {
+          name: 'Physics2',
+          type: 'Physics2::Physics2Behavior',
+          bodyType: 'Dynamic',
+          bullet: false,
+          fixedRotation: true,
+          canSleep: false,
+          shape: 'Box',
+          shapeDimensionA: 0,
+          shapeDimensionB: 0,
+          shapeOffsetX: 0,
+          shapeOffsetY: 0,
+          polygonOrigin: 'Center',
+          vertices: [],
+          density: 1.0,
+          friction: 0.01,
+          restitution: 1,
+          linearDamping: 0,
+          angularDamping: 0.1,
+          gravityScale: 1,
+          layers: 1,
+          masks: 1,
+          ...behaviorProperties,
+        },
+      ],
+      variables: [],
+      effects: [],
+    });
+    object.setCustomWidthAndHeight(10, 10);
+    runtimeScene.addObject(object);
+    /** @type {{behavior: gdjs.Physics2RuntimeBehavior, object: gdjs.RuntimeObject}} */
+    return { object, behavior: object.getBehavior('Physics2') };
+  }
+
   describe('Behavior activation and reactivation', () => {
     let runtimeGame;
     let runtimeScene;

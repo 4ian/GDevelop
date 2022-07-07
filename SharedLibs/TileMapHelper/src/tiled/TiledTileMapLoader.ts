@@ -4,7 +4,7 @@ import {
   TileDefinition,
   TileObject,
 } from "../model/TileMapModel";
-import { TiledMap } from "./Tiled";
+import { TiledMap } from "./TiledFormat";
 import {
   extractTileUidFlippedStates,
   decodeBase64LayerData,

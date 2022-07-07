@@ -98,7 +98,7 @@ namespace gdjs {
         );
       }
 
-      _loadTiledMap(
+      private _loadTiledMap(
         tilemapJsonFile: string,
         tilesetJsonFile: string,
         callback: (tiledMap: TileMapHelper.TiledMap | null) => void

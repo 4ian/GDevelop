@@ -718,7 +718,8 @@ namespace gdjs {
         }
         tileTransformation.preConcatenate(layerTransformation);
 
-        // TODO To handle tile map modification, update lengths.
+        // The tile map can't change at runtime so the existing arrays can be
+        // reused safely.
         for (
           let polygonIndex = 0;
           polygonIndex < this.hitBoxes.length;

@@ -1,5 +1,5 @@
 import { integer, float } from "../model/CommonTypes";
-import { TiledMap } from "../tiled/Tiled";
+import { TiledMap } from "../tiled/TiledFormat";
 import {
   EditableObjectLayer,
   EditableTileMap,
@@ -11,21 +11,19 @@ import PIXI = GlobalPIXIModule.PIXI;
 
 export class PixiTileMapHelper {
   /**
-   * Parse a Tiled map JSON file,
-   * exported from Tiled (https://www.mapeditor.org/)
-   * into a generic tile map data (`GenericPixiTileMapData`).
+   * Split an atlas image into Pixi textures.
    *
-   * @param tiledData A JS object representing a map exported from Tiled.
-   * @param atlasTexture
+   * @param tiledMap A tile map exported from Tiled.
+   * @param atlasTexture The texture containing the whole tile set.
    * @param getTexture A getter to load a texture. Used if atlasTexture is not specified.
    * @returns A textures cache.
    */
   static parseAtlas(
-    tiledData: TiledMap,
+    tiledMap: TiledMap,
     atlasTexture: PIXI.BaseTexture<PIXI.Resource> | null,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>
   ): TileTextureCache | null {
-    if (!tiledData.tiledversion) {
+    if (!tiledMap.tiledversion) {
       console.warn(
         "The loaded Tiled map does not contain a 'tiledversion' key. Are you sure this file has been exported from Tiled (mapeditor.org)?"
       );
@@ -34,7 +32,7 @@ export class PixiTileMapHelper {
     }
 
     // We only handle tileset embedded in the tilemap. Warn if it's not the case.
-    if (!tiledData.tilesets.length || "source" in tiledData.tilesets[0]) {
+    if (!tiledMap.tilesets.length || "source" in tiledMap.tilesets[0]) {
       console.warn(
         "The loaded Tiled map seems not to contain any tileset data (nothing in 'tilesets' key)."
       );
@@ -45,12 +43,11 @@ export class PixiTileMapHelper {
       tilewidth,
       tileheight,
       tilecount,
-      tiles,
       image,
       columns,
       spacing,
       margin,
-    } = tiledData.tilesets[0];
+    } = tiledMap.tilesets[0];
     if (!atlasTexture) atlasTexture = getTexture(image);
 
     // We try to detect what size Tiled is expecting.
@@ -102,12 +99,12 @@ export class PixiTileMapHelper {
   }
 
   /**
-   * Re-renders the tilemap whenever its rendering settings have been changed
+   * Re-renders the tile map whenever its rendering settings have been changed
    *
-   * @param pixiTileMap
-   * @param tileMap
-   * @param textureCache
-   * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everyhing (`all`).
+   * @param pixiTileMap the tile map renderer
+   * @param tileMap the tile map model
+   * @param textureCache the tile set textures
+   * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everything (`all`).
    * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
    */
   static updatePixiTileMap(

@@ -54,10 +54,10 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
       objects: [],
       instances: [],
     });
-    setFramePerSecond(runtimeScene, framePerSecond);
+    setFramesPerSecond(runtimeScene, framePerSecond);
     return runtimeScene;
   };
-  const setFramePerSecond = (runtimeScene, framePerSecond) => {
+  const setFramesPerSecond = (runtimeScene, framePerSecond) => {
     runtimeScene._timeManager.getElapsedTime = function () {
       return 1000 / framePerSecond;
     };
@@ -169,7 +169,7 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     );
   });
 
-  it('can check collisions an object on empty tiles without any issue', function () {
+  it('can check collisions with an object on empty tiles without any issue', function () {
     tileMap.setPosition(100, 200);
 
     const object = addObject(runtimeScene);

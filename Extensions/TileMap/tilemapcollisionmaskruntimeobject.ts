@@ -7,9 +7,9 @@ namespace gdjs {
    * @extends gdjs.RuntimeObject
    */
   export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
-    _tilemapJsonFile: string;
-    _tilesetJsonFile: string;
-    _renderer: gdjs.TileMap.TileMapCollisionMaskRender;
+    private _tilemapJsonFile: string;
+    private _tilesetJsonFile: string;
+    private _renderer: gdjs.TileMap.TileMapCollisionMaskRender;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
     /**
      * The tiles are filtered according to this tag.
@@ -18,8 +18,8 @@ namespace gdjs {
      * for the same tile map.
      * For instance, platforms, jumpthru, ladder, spike, water...
      */
-    _typeFilter: string;
-    _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
+    private _collisionMaskTag: string;
+    private _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
 
     /**
      * When set to true, the hitboxes will be shown.
@@ -35,13 +35,13 @@ namespace gdjs {
      * If the owner moves, the hitboxes vertices
      * will have to be transformed again.
      */
-    _transformationIsUpToDate: boolean = false;
+    private _transformationIsUpToDate: boolean = false;
 
     constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
-      this._typeFilter = objectData.content.typeFilter;
+      this._collisionMaskTag = objectData.content.typeFilter;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = this.rgbToNumber(
         gdjs.rgbOrHexToRGBColor(objectData.content.fillColor)
@@ -55,7 +55,7 @@ namespace gdjs {
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene
       );
-      const collisionTileMap = new TileMapHelper.EditableTileMap(
+      const editableTileMap = new TileMapHelper.EditableTileMap(
         1,
         1,
         0,
@@ -63,8 +63,8 @@ namespace gdjs {
         new Map()
       );
       this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
-        collisionTileMap,
-        this._typeFilter
+        editableTileMap,
+        this._collisionMaskTag
       );
       this._renderer = new gdjs.TileMap.TileMapCollisionMaskRender(
         this,
@@ -155,12 +155,12 @@ namespace gdjs {
 
           this._collisionTileMap = new gdjs.TileMap.TransformedCollisionTileMap(
             tileMap,
-            this._typeFilter
+            this._collisionMaskTag
           );
           // The tile map polygons always keep the same references.
           // TODO Update them if an action modify the tile map.
           this.hitBoxes = Array.from(
-            this._collisionTileMap.getAllHitboxes(this._typeFilter)
+            this._collisionTileMap.getAllHitboxes(this._collisionMaskTag)
           );
           this.updateHitBoxes();
         }
@@ -170,9 +170,13 @@ namespace gdjs {
     updateHitBoxes(): void {
       this.updateTransformation();
       for (const hitboxes of this._collisionTileMap.getAllHitboxes(
-        this._typeFilter
+        this._collisionMaskTag
       )) {
-        // just make them refresh
+        // RuntimeObject.hitBoxes point to the same polygons as the hitboxes
+        // from the grid. The hitboxes from the grid are updated according to
+        // the transformation at demand.
+        // This force all the hitboxes to update.
+        // TODO This is hacky, find an elegant way.
       }
       this.hitBoxesDirty = false;
       this._renderer.redrawCollisionMask();
@@ -221,13 +225,15 @@ namespace gdjs {
     // This implementation doesn't use updateHitBoxes.
     // It's important for good performances.
     getHitBoxesAround(left: float, top: float, right: float, bottom: float) {
+      // TODO Check why it's needed (the tests won't pass without it)
       if (this.hitBoxesDirty) {
         this.updateHitBoxes();
         this.updateAABB();
         this.hitBoxesDirty = false;
       }
+
       return this._collisionTileMap.getHitboxesAround(
-        this._typeFilter,
+        this._collisionMaskTag,
         left,
         top,
         right,
@@ -243,7 +249,11 @@ namespace gdjs {
     insideObject(x: float, y: float): boolean {
       this.updateTransformation();
       // This is more precise than the default implementation.
-      return this._collisionTileMap.pointIsInsideTile(x, y, this._typeFilter);
+      return this._collisionTileMap.pointIsInsideTile(
+        x,
+        y,
+        this._collisionMaskTag
+      );
     }
 
     // This implementation doesn't use updateHitBoxes.

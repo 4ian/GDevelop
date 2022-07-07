@@ -1,5 +1,5 @@
 import { integer } from '../model/CommonTypes';
-import { TiledLayer } from './Tiled';
+import { TiledLayer } from './TiledFormat';
 /**
  * Decodes a layer data, which can sometimes be store as a compressed base64 string
  * by Tiled.

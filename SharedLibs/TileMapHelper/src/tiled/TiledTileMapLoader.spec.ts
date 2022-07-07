@@ -1,5 +1,5 @@
 import { EditableTileMap, EditableTileMapLayer } from "../model/TileMapModel";
-import { TiledMap } from "./Tiled";
+import { TiledMap } from "./TiledFormat";
 import { TiledTileMapLoader } from "./TiledTileMapLoader";
 
 describe("TiledTileMapLoader", function () {

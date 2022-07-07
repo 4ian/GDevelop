@@ -1,5 +1,5 @@
 import { ResourceCache } from "./ResourceCache";
-import { TiledMap } from "../tiled/Tiled";
+import { TiledMap } from "../tiled/TiledFormat";
 import { TiledTileMapLoader } from "../tiled/TiledTileMapLoader";
 import { EditableTileMap } from "../model/TileMapModel";
 import { TileTextureCache } from "./TileTextureCache";

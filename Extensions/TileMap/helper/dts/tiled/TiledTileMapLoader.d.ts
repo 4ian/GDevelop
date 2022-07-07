@@ -1,5 +1,5 @@
 import { EditableTileMap } from '../model/TileMapModel';
-import { TiledMap } from './Tiled';
+import { TiledMap } from './TiledFormat';
 /**
  * It creates a {@link EditableTileMap} from a Tiled JSON.
  */

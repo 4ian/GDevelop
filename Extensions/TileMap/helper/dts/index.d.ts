@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module TileMapHelper
  */
-import { TiledMap, TiledTileset } from './tiled/Tiled';
+import { TiledMap, TiledTileset } from './tiled/TiledFormat';
 import {
   EditableTileMap,
   EditableTileMapLayer,

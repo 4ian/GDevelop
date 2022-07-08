@@ -34,7 +34,7 @@ const ShareButton = ({ url }: Props) => {
       <FlatButton
         label={<Trans>Share</Trans>}
         onClick={onShare}
-        icon={<Share />}
+        leftIcon={<Share />}
       />
     </Line>
   );

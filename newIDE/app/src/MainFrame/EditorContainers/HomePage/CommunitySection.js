@@ -11,7 +11,7 @@ import Reddit from '../../../UI/CustomSvgIcons/Reddit';
 import Twitter from '../../../UI/CustomSvgIcons/Twitter';
 import Facebook from '../../../UI/CustomSvgIcons/Facebook';
 import TikTok from '../../../UI/CustomSvgIcons/TikTok';
-import SectionContainer from './SectionContainer';
+import SectionContainer, { SectionRow } from './SectionContainer';
 import { ListItem } from '../../../UI/List';
 import List from '@material-ui/core/List';
 
@@ -64,25 +64,27 @@ const communityItems = [
 const CommunitySection = () => {
   return (
     <SectionContainer title={<Trans>Community</Trans>}>
-      <ColumnStackLayout alignItems="start" noMargin expand>
-        <Text size="title">
-          <Trans>Join the conversation</Trans>
-        </Text>
-        <List style={styles.list}>
-          {communityItems.map((item, index) => (
-            <ListItem
-              leftIcon={item.icon}
-              key={index}
-              primaryText={
-                <Text noMargin size="body">
-                  {item.label}
-                </Text>
-              }
-              onClick={item.onClick}
-            />
-          ))}
-        </List>
-      </ColumnStackLayout>
+      <SectionRow>
+        <ColumnStackLayout alignItems="start" noMargin expand>
+          <Text size="title">
+            <Trans>Join the conversation</Trans>
+          </Text>
+          <List style={styles.list}>
+            {communityItems.map((item, index) => (
+              <ListItem
+                leftIcon={item.icon}
+                key={index}
+                primaryText={
+                  <Text noMargin size="body">
+                    {item.label}
+                  </Text>
+                }
+                onClick={item.onClick}
+              />
+            ))}
+          </List>
+        </ColumnStackLayout>
+      </SectionRow>
     </SectionContainer>
   );
 };

@@ -20,7 +20,9 @@ export default function HotReloadPreviewButton({
 }: HotReloadPreviewButtonProps) {
   return (
     <FlatButton
-      icon={hasPreviewsRunning ? <HotReloadPreviewIcon /> : <NewPreviewIcon />}
+      leftIcon={
+        hasPreviewsRunning ? <HotReloadPreviewIcon /> : <NewPreviewIcon />
+      }
       label={
         hasPreviewsRunning ? (
           <Trans>Apply changes to preview</Trans>

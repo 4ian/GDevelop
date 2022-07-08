@@ -630,7 +630,6 @@ namespace gdjs {
         this.y = y;
         const definition = this.getDefinition();
         this.hitBoxes = [];
-        // TODO only for the right tag?
         if (definition) {
           const tag = this.layer.tileMap.tag;
           const definitionHitboxes = definition.getHitBoxes(tag);

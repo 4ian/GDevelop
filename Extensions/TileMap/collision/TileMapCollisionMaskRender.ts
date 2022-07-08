@@ -22,7 +22,6 @@ namespace gdjs {
           .addRendererObject(this._graphics, runtimeObject.getZOrder());
       }
 
-      // TODO It should only invalidate the view and redraw when asked.
       redrawCollisionMask() {
         this._graphics.clear();
         if (!this._object._debugMode) {

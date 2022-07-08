@@ -13,6 +13,17 @@ import {
 import { CorsAwareImage } from '../../../../UI/CorsAwareImage';
 import Text from '../../../../UI/Text';
 import { shortenString } from '../../../../Utils/StringHelpers';
+import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
+import Window from '../../../../Utils/Window';
+import { Trans } from '@lingui/macro';
+
+const secondsToMinutesAndSeconds = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  const formattedRemainingSeconds =
+    remainingSeconds < 10 ? `0${remainingSeconds}` : remainingSeconds;
+  return `${minutes}:${formattedRemainingSeconds}`;
+};
 
 const styles = {
   tutorialsContainer: {
@@ -23,6 +34,19 @@ const styles = {
   },
   buttonStyle: {
     textAlign: 'left',
+    width: '100%',
+  },
+  imageContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  duration: {
+    position: 'absolute',
+    right: 8,
+    bottom: 8,
+    background: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 4,
+    padding: '2px 6px',
   },
   titleContainer: {
     // Fix min height to ensure the content stays aligned.
@@ -36,6 +60,9 @@ const styles = {
     width: 'calc(100% - 2px)', // Not full because of border.
     borderRadius: 8,
     border: '1px solid lightgrey',
+    // Prevent cumulative layout shift by enforcing
+    // the 16:9 ratio.
+    aspectRatio: '16 / 9',
   },
 };
 
@@ -44,6 +71,7 @@ const useStylesForTile = makeStyles(theme =>
   createStyles({
     tile: {
       borderRadius: 8,
+      padding: 4,
       '&:focus': {
         backgroundColor: theme.palette.action.hover,
       },
@@ -83,17 +111,34 @@ const TutorialsGrid = ({ tutorials, limit }: TutorialsGridProps) => {
           cols={getColumnsFromWidth(windowWidth)}
           style={styles.grid}
           cellHeight="auto"
-          spacing={10}
+          spacing={16}
         >
           {tutorialsToDisplay.map((tutorial, index) => (
             <GridListTile key={index} classes={tileClasses}>
-              <ButtonBase style={styles.buttonStyle}>
+              <ButtonBase
+                style={styles.buttonStyle}
+                onClick={() => {
+                  sendTutorialOpened(tutorial.id);
+                  Window.openExternalURL(tutorial.link);
+                }}
+              >
                 <Column noMargin>
-                  <CorsAwareImage
-                    style={styles.thumbnailImageWithDescription}
-                    src={tutorial.thumbnailUrl}
-                    alt={tutorial.title}
-                  />
+                  <div style={styles.imageContainer}>
+                    <CorsAwareImage
+                      style={styles.thumbnailImageWithDescription}
+                      src={tutorial.thumbnailUrl}
+                      alt={tutorial.title}
+                    />
+                    <div style={styles.duration}>
+                      <Text size="body" noMargin>
+                        {tutorial.duration ? (
+                          secondsToMinutesAndSeconds(tutorial.duration)
+                        ) : (
+                          <Trans>Text</Trans>
+                        )}
+                      </Text>
+                    </div>
+                  </div>
                   <div style={styles.titleContainer}>
                     <Text size="sub-title">{tutorial.title}</Text>
                   </div>

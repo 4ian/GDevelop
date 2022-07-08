@@ -31,6 +31,9 @@ const styles = {
   },
   image: {
     width: '100%',
+    // Prevent cumulative layout shift by enforcing
+    // the 2 ratio.
+    aspectRatio: '2',
   },
 };
 
@@ -62,8 +65,17 @@ const GetStartedSection = ({
   setShowGetStartedSection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const items = [
-    !electron && !isMobile() && !isUserflowRunning
+  const shouldShowOnboardingButton = !electron && !isMobile();
+  const items: {
+    key: string,
+    title: React.Node,
+    subText?: React.Node,
+    description: React.Node,
+    action: () => void,
+    imagePath: string,
+    disabled?: boolean,
+  }[] = [
+    shouldShowOnboardingButton
       ? {
           key: 'tour',
           title: <Trans>Take the tour</Trans>,
@@ -74,6 +86,7 @@ const GetStartedSection = ({
             onOpenOnboardingDialog();
           },
           imagePath: 'res/homepage/take-the-tour.png',
+          disabled: isUserflowRunning,
         }
       : undefined,
     {
@@ -126,7 +139,12 @@ const GetStartedSection = ({
           >
             {items.map((item, index) => (
               <GridListTile key={index} style={styles.gridListTile}>
-                <CardWidget onClick={item.action} key={index} size="large">
+                <CardWidget
+                  onClick={item.action}
+                  key={index}
+                  size="large"
+                  disabled={item.disabled}
+                >
                   <Column noMargin expand>
                     <img
                       alt={item.key}

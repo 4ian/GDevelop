@@ -6,7 +6,8 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 import Text from '../../../UI/Text';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
 import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
-import IconButton from '../../../UI/IconButton';
+import TextButton from '../../../UI/TextButton';
+import { Trans } from '@lingui/macro';
 
 export const SECTION_PADDING = 30;
 
@@ -55,9 +56,11 @@ const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
           <SectionRow>
             {backAction && (
               <Line>
-                <IconButton onClick={backAction} size="small">
-                  <ArrowLeft fontSize="small" />
-                </IconButton>
+                <TextButton
+                  onClick={backAction}
+                  icon={<ArrowLeft fontSize="small" />}
+                  label={<Trans>Back</Trans>}
+                />
               </Line>
             )}
             <Line noMargin>

@@ -15,6 +15,7 @@ export type Tutorial = {|
   description: string,
   type: 'video' | 'text',
   category: TutorialCategory,
+  duration?: number,
   link: string,
   thumbnailUrl: string,
 |};

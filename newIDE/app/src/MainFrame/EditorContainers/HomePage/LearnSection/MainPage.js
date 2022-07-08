@@ -79,9 +79,14 @@ const MainPage = ({
 }: Props) => {
   const classes = useStyles();
   const windowWidth = useResponsiveWindowWidth();
-  const showTourHelpItem = !electron && !isMobile() && !isUserflowRunning;
-  const helpItems = [
-    showTourHelpItem
+  const shouldShowOnboardingButton = !electron && !isMobile();
+  const helpItems: {
+    title: React.Node,
+    description: React.Node,
+    action: () => void,
+    disabled?: boolean,
+  }[] = [
+    shouldShowOnboardingButton
       ? {
           title: <Trans>Guided Tour</Trans>,
           description: (
@@ -91,6 +96,7 @@ const MainPage = ({
             sendOnboardingManuallyOpened();
             onOpenOnboardingDialog();
           },
+          disabled: isUserflowRunning,
         }
       : undefined,
     {
@@ -115,7 +121,7 @@ const MainPage = ({
       <SectionRow>
         <Line noMargin>
           <GridList
-            cols={getColumnsFromWidth(windowWidth, showTourHelpItem)}
+            cols={getColumnsFromWidth(windowWidth, shouldShowOnboardingButton)}
             style={styles.grid}
             cellHeight="auto"
             spacing={10}
@@ -126,7 +132,12 @@ const MainPage = ({
                 style={styles.gridListTile}
                 classes={{ tile: classes.tile }}
               >
-                <CardWidget onClick={helpItem.action} key={index} size="small">
+                <CardWidget
+                  onClick={helpItem.action}
+                  key={index}
+                  size="small"
+                  disabled={helpItem.disabled}
+                >
                   <div style={styles.helpItem}>
                     <Column alignItems="center">
                       <Text size="block-title">{helpItem.title}</Text>
@@ -224,7 +235,6 @@ const MainPage = ({
           />
         </SectionRow>
       </>
-      )}
     </SectionContainer>
   );
 };

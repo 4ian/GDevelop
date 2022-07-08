@@ -8,6 +8,7 @@ import { Trans } from '@lingui/macro';
 import { TutorialContext } from '../../../../Tutorial/TutorialContext';
 import PlaceholderError from '../../../../UI/PlaceholderError';
 import PlaceholderLoader from '../../../../UI/PlaceholderLoader';
+import { Paper } from '@material-ui/core';
 
 export const TUTORIAL_CATEGORY_TEXTS = {
   'full-game': {
@@ -18,7 +19,7 @@ export const TUTORIAL_CATEGORY_TEXTS = {
     title: <Trans>Specific game mechanics</Trans>,
     description: (
       <Trans>
-        Find how to implement the most common game mechanics and more!
+        Find how to implement the most common game mechanics and more
       </Trans>
     ),
   },
@@ -35,6 +36,13 @@ export const TUTORIAL_CATEGORY_TEXTS = {
   'official-advanced': {
     title: <Trans>Advanced course</Trans>,
     description: <Trans>The icing on the cake</Trans>,
+  },
+};
+
+const styles = {
+  paper: {
+    flex: 1,
+    display: 'flex',
   },
 };
 
@@ -71,12 +79,14 @@ const LearnSection = ({
 
   if (tutorialLoadingError)
     return (
-      <PlaceholderError onRetry={fetchTutorials}>
-        <Trans>
-          Can't load the tutorials. Verify your internet connection or retry
-          later.
-        </Trans>
-      </PlaceholderError>
+      <Paper square style={styles.paper}>
+        <PlaceholderError onRetry={fetchTutorials}>
+          <Trans>
+            Can't load the tutorials. Verify your internet connection or retry
+            later.
+          </Trans>
+        </PlaceholderError>
+      </Paper>
     );
 
   if (!tutorials) return <PlaceholderLoader />;

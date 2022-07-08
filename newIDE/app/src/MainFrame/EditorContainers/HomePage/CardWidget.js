@@ -31,6 +31,9 @@ const useStylesForWidget = makeStyles(theme =>
       '&:hover': {
         backgroundColor: theme.palette.action.hover,
       },
+      '&:disabled': {
+        backgroundColor: theme.palette.action.disabled,
+      },
     },
   })
 );
@@ -42,9 +45,10 @@ type Props = {|
   children: React.Node,
   onClick: () => void,
   size: 'small' | 'large',
+  disabled?: boolean,
 |};
 
-export const CardWidget = ({ children, onClick, size }: Props) => {
+export const CardWidget = ({ children, onClick, size, disabled }: Props) => {
   const classes = useStylesForWidget();
   const windowWidth = useResponsiveWindowWidth();
 
@@ -71,6 +75,7 @@ export const CardWidget = ({ children, onClick, size }: Props) => {
           onClick();
         }
       }}
+      disabled={disabled}
     >
       <div style={styles.contentWrapper}>{children}</div>
     </ButtonBase>

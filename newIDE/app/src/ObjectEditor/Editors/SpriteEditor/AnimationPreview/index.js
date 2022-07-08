@@ -227,12 +227,12 @@ const AnimationPreview = ({
             style={styles.timeField}
           />
           <FlatButton
-            icon={<Replay />}
+            leftIcon={<Replay />}
             label={<Trans>Replay</Trans>}
             onClick={replay}
           />
           <FlatButton
-            icon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
+            leftIcon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
             label={!!pausedRef.current ? 'Play' : 'Pause'}
             onClick={() => {
               pausedRef.current = !pausedRef.current;

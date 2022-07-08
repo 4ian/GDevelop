@@ -61,7 +61,7 @@ const VerticalTabButton = ({
             : styles.iconWrapperWithLabel
         }
       >
-        {getIcon(isActive ? 'default' : 'secondary')}
+        {getIcon(isActive ? 'inherit' : 'secondary')}
       </div>
       {!hideLabel && (
         <>

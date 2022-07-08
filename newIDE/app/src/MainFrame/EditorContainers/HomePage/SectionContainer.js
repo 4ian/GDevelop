@@ -21,6 +21,8 @@ const styles = {
     paddingRight: SECTION_PADDING,
   },
   rowContainer: {
+    display: 'flex',
+    flexDirection: 'column',
     paddingBottom: SECTION_PADDING,
   },
   scrollContainer: {
@@ -81,8 +83,18 @@ const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
   );
 };
 
-export const SectionRow = ({ children }: { children: React.Node }) => (
-  <div style={styles.rowContainer}>{children}</div>
+export const SectionRow = ({
+  children,
+  expand,
+}: {
+  children: React.Node,
+  expand?: boolean,
+}) => (
+  <div
+    style={{ ...styles.rowContainer, ...(expand ? { flex: 1 } : undefined) }}
+  >
+    {children}
+  </div>
 );
 
 export default SectionContainer;

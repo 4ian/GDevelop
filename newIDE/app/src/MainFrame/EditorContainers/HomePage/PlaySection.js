@@ -14,7 +14,7 @@ const PlaySection = () => {
   const windowWidth = useResponsiveWindowWidth();
   return (
     <SectionContainer title={<Trans>Showcased games</Trans>}>
-      <SectionRow>
+      <SectionRow expand>
         {windowWidth === 'large' && (
           <LineStackLayout noMargin justifyContent="flex-end">
             <FlatButton

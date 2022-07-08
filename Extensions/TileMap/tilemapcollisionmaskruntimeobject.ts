@@ -158,17 +158,17 @@ namespace gdjs {
             this._collisionMaskTag
           );
           // The tile map polygons always keep the same references.
-          // TODO Update them if an action modify the tile map.
+          // It works because the tilemap is never modified.
           this.hitBoxes = Array.from(
             this._collisionTileMap.getAllHitboxes(this._collisionMaskTag)
           );
-          this.updateHitBoxes();
         }
       );
     }
 
     updateHitBoxes(): void {
       this.updateTransformation();
+      // Update the RuntimeObject hitboxes.
       for (const hitboxes of this._collisionTileMap.getAllHitboxes(
         this._collisionMaskTag
       )) {
@@ -176,14 +176,18 @@ namespace gdjs {
         // from the grid. The hitboxes from the grid are updated according to
         // the transformation at demand.
         // This force all the hitboxes to update.
-        // TODO This is hacky, find an elegant way.
+        // The hitboxes array is built by _updateTileMap().
       }
       this.hitBoxesDirty = false;
       this._renderer.redrawCollisionMask();
       this.updateAABB();
     }
 
-    updateTransformation() {
+    /**
+     * Update the affine transformation according to the object position, size
+     *  and angle.
+     */
+    updateTransformation(): void {
       if (this._transformationIsUpToDate) {
         return;
       }
@@ -222,15 +226,12 @@ namespace gdjs {
       return this.hitBoxes;
     }
 
-    // This implementation doesn't use updateHitBoxes.
-    // It's important for good performances.
     getHitBoxesAround(left: float, top: float, right: float, bottom: float) {
-      // TODO Check why it's needed (the tests won't pass without it)
-      if (this.hitBoxesDirty) {
-        this.updateHitBoxes();
-        this.updateAABB();
-        this.hitBoxesDirty = false;
-      }
+      // This implementation doesn't call updateHitBoxes.
+      // It's important for good performances because there is no need to
+      // update the whole collision mask where only a few hitboxes must be
+      // checked.
+      this.updateTransformation();
 
       return this._collisionTileMap.getHitboxesAround(
         this._collisionMaskTag,

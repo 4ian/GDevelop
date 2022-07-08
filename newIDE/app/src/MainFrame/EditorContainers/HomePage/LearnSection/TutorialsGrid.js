@@ -16,6 +16,7 @@ import { shortenString } from '../../../../Utils/StringHelpers';
 import { sendTutorialOpened } from '../../../../Utils/Analytics/EventSender';
 import Window from '../../../../Utils/Window';
 import { Trans } from '@lingui/macro';
+import { Typography } from '@material-ui/core';
 
 const secondsToMinutesAndSeconds = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -40,7 +41,7 @@ const styles = {
     position: 'relative',
     width: '100%',
   },
-  duration: {
+  overlay: {
     position: 'absolute',
     right: 8,
     bottom: 8,
@@ -48,8 +49,10 @@ const styles = {
     borderRadius: 4,
     padding: '2px 6px',
   },
-  durationText: {
+  overlayText: {
     color: 'white', // Same color for all themes.
+    marginTop: 0,
+    marginBottom: 0,
   },
   titleContainer: {
     // Fix min height to ensure the content stays aligned.
@@ -97,6 +100,14 @@ const getColumnsFromWidth = (width: WidthType) => {
   }
 };
 
+const ImageOverlay = ({ text }) => (
+  <div style={styles.overlay}>
+    <Typography variant="body1" style={styles.overlayText}>
+      {text ? secondsToMinutesAndSeconds(text) : <Trans>Text</Trans>}
+    </Typography>
+  </div>
+);
+
 type TutorialsGridProps = {|
   tutorials: Array<Tutorial>,
   limit?: number,
@@ -132,15 +143,7 @@ const TutorialsGrid = ({ tutorials, limit }: TutorialsGridProps) => {
                       src={tutorial.thumbnailUrl}
                       alt={tutorial.title}
                     />
-                    <div style={styles.duration}>
-                      <Text size="body" noMargin style={styles.durationText}>
-                        {tutorial.duration ? (
-                          secondsToMinutesAndSeconds(tutorial.duration)
-                        ) : (
-                          <Trans>Text</Trans>
-                        )}
-                      </Text>
-                    </div>
+                    <ImageOverlay text={tutorial.duration} />
                   </div>
                   <div style={styles.titleContainer}>
                     <Text size="sub-title">{tutorial.title}</Text>

@@ -194,7 +194,7 @@ export const updateCloudProject = async (
 
 export const deleteCloudProject = async (
   authenticatedUser: AuthenticatedUser,
-  cloudProjectId: string,
+  cloudProjectId: string
 ): Promise<?CloudProject> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) return;

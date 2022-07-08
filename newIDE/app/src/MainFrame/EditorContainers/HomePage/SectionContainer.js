@@ -5,19 +5,23 @@ import Paper from '@material-ui/core/Paper';
 import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindowMeasurer';
 import Text from '../../../UI/Text';
 import GDevelopThemeContext from '../../../UI/Theme/ThemeContext';
+import ArrowLeft from '../../../UI/CustomSvgIcons/ArrowLeft';
+import TextButton from '../../../UI/TextButton';
+import { Trans } from '@lingui/macro';
+
+export const SECTION_PADDING = 30;
 
 const styles = {
   mobileScrollContainer: {
     padding: 5,
   },
   desktopScrollContainer: {
-    paddingTop: 30,
-    paddingLeft: 30,
-    paddingRight: 30,
-    paddingBottom: 10,
+    paddingTop: SECTION_PADDING,
+    paddingLeft: SECTION_PADDING,
+    paddingRight: SECTION_PADDING,
   },
-  titleContainer: {
-    paddingBottom: 20,
+  rowContainer: {
+    paddingBottom: SECTION_PADDING,
   },
   scrollContainer: {
     flex: 1,
@@ -30,9 +34,10 @@ type Props = {|
   children: React.Node,
   title: React.Node,
   subtitle?: React.Node,
+  backAction?: () => void,
 |};
 
-const SectionContainer = ({ children, title, subtitle }: Props) => {
+const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -48,7 +53,16 @@ const SectionContainer = ({ children, title, subtitle }: Props) => {
         square
       >
         <Column expand>
-          <div style={styles.titleContainer}>
+          <SectionRow>
+            {backAction && (
+              <Line>
+                <TextButton
+                  onClick={backAction}
+                  icon={<ArrowLeft fontSize="small" />}
+                  label={<Trans>Back</Trans>}
+                />
+              </Line>
+            )}
             <Line noMargin>
               <Text size="bold-title" noMargin>
                 {title}
@@ -59,12 +73,16 @@ const SectionContainer = ({ children, title, subtitle }: Props) => {
                 <Text noMargin>{subtitle}</Text>
               </Line>
             )}
-          </div>
+          </SectionRow>
           {children}
         </Column>
       </Paper>
     </Column>
   );
 };
+
+export const SectionRow = ({ children }: { children: React.Node }) => (
+  <div style={styles.rowContainer}>{children}</div>
+);
 
 export default SectionContainer;

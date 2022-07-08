@@ -311,7 +311,7 @@ export default function NewBehaviorDialog({
                     {!showDeprecated ? (
                       <FlatButton
                         key="toggle-experimental"
-                        icon={<Visibility />}
+                        leftIcon={<Visibility />}
                         primary={false}
                         onClick={() => {
                           setShowDeprecated(true);
@@ -321,7 +321,7 @@ export default function NewBehaviorDialog({
                     ) : (
                       <FlatButton
                         key="toggle-experimental"
-                        icon={<VisibilityOff />}
+                        leftIcon={<VisibilityOff />}
                         primary={false}
                         onClick={() => {
                           setShowDeprecated(false);
@@ -332,7 +332,7 @@ export default function NewBehaviorDialog({
                   </Line>
                   <Line justifyContent="center" alignItems="center">
                     <FlatButton
-                      icon={<Create />}
+                      leftIcon={<Create />}
                       primary={false}
                       onClick={() =>
                         Window.openExternalURL(

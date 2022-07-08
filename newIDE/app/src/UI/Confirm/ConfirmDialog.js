@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { I18n } from '@lingui/react';
 import { Trans } from '@lingui/macro';
+import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 
 import Dialog, { DialogPrimaryButton } from '../Dialog';
 import FlatButton from '../FlatButton';
@@ -9,8 +10,8 @@ import Text from '../Text';
 
 type Props = {|
   open: boolean,
-  title: string,
-  message: string,
+  title: MessageDescriptor,
+  message: MessageDescriptor,
   onConfirm: () => void,
   onDismiss: () => void,
   // TODO: Add notion of level (info, warning, error)

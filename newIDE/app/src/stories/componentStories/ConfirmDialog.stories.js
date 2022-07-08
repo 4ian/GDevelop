@@ -10,11 +10,12 @@ import confirmDecorator from '../ConfirmDecorator';
 import RaisedButton from '../../UI/RaisedButton';
 import ConfirmDialog from '../../UI/Confirm/ConfirmDialog';
 import useConfirmDialog from '../../UI/Confirm/useConfirmDialog';
+import { Column, LargeSpacer } from '../../UI/Grid';
 
 export const Default = () => {
-  const { getConfirmation } = useConfirmDialog();
+  const { getConfirmation, getDeleteConfirmation } = useConfirmDialog();
 
-  const onOpenDialog = async () => {
+  const onOpenConfirmDialog = async () => {
     const answer = await getConfirmation({
       title: t`You are about to delete an object`,
       message: t`Do you want to continue?`,
@@ -23,7 +24,27 @@ export const Default = () => {
     else action('Dismissed')();
   };
 
-  return <RaisedButton label="Open dialog" onClick={onOpenDialog} />;
+  const onOpenConfirmDeleteDialog = async () => {
+    const answer = await getDeleteConfirmation({
+      title: t`Do you really want to permanently delete your account?`,
+      message: t`You’re about to permanently delete your GDevelop account username@mail.com. You will no longer be able to log into the app with this email address.`,
+      fieldMessage: t`Type your email address to delete your account:`,
+      confirmText: 'username@mail.com',
+    });
+    if (answer) action('Delete Confirmed')();
+    else action('Delete Dismissed')();
+  };
+
+  return (
+    <Column alignItems="flex-start">
+      <RaisedButton label="Open confirm dialog" onClick={onOpenConfirmDialog} />
+      <LargeSpacer />
+      <RaisedButton
+        label="Open confirm delete dialog"
+        onClick={onOpenConfirmDeleteDialog}
+      />
+    </Column>
+  );
 };
 
 export default {

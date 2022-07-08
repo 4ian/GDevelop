@@ -1,22 +1,31 @@
 // @flow
 import * as React from 'react';
 import ConfirmContext from './ConfirmContext';
-import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
-
-export type ConfirmProps = {|
-  title: MessageDescriptor,
-  message: MessageDescriptor,
-|};
+import {
+  type ShowConfirmDeleteDialogOptions,
+  type ShowConfirmDialogOptions,
+} from './ConfirmContext';
 
 const useConfirmDialog = () => {
-  const { showConfirmDialog } = React.useContext(ConfirmContext);
+  const { showConfirmDialog, showConfirmDeleteDialog } = React.useContext(
+    ConfirmContext
+  );
 
-  const getConfirmation = (options: ConfirmProps): Promise<boolean> =>
+  const getConfirmation = (
+    options: ShowConfirmDialogOptions
+  ): Promise<boolean> =>
     new Promise((resolve, reject) => {
-      showConfirmDialog({ actionCallback: resolve, ...options });
+      showConfirmDialog({ callback: resolve, ...options });
     });
 
-  return { getConfirmation };
+  const getDeleteConfirmation = (
+    options: ShowConfirmDeleteDialogOptions
+  ): Promise<boolean> =>
+    new Promise((resolve, reject) => {
+      showConfirmDeleteDialog({ callback: resolve, ...options });
+    });
+
+  return { getConfirmation, getDeleteConfirmation };
 };
 
 export default useConfirmDialog;

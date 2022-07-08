@@ -24,6 +24,8 @@ import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../UI/Menu/ContextMenu';
 import { type MenuItemTemplate } from '../../../UI/Menu/Menu.flow';
+import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
+import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
 
 const styles = {
   listItem: {
@@ -53,6 +55,7 @@ const BuildSection = ({
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
+  const { getConfirmation, getDeleteConfirmation } = useConfirmDialog();
   const [
     selectedFile,
     setSelectedFile,
@@ -68,17 +71,20 @@ const BuildSection = ({
 
   if (cloudProjects) {
     projectFiles = projectFiles.concat(
-      cloudProjects.map(cloudProject => {
-        const file: FileMetadataAndStorageProviderName = {
-          storageProviderName: 'Cloud',
-          fileMetadata: {
-            fileIdentifier: cloudProject.id,
-            lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-            name: cloudProject.name,
-          },
-        };
-        return file;
-      })
+      cloudProjects
+        .map(cloudProject => {
+          if (cloudProject.deletedAt) return null;
+          const file: FileMetadataAndStorageProviderName = {
+            storageProviderName: 'Cloud',
+            fileMetadata: {
+              fileIdentifier: cloudProject.id,
+              lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
+              name: cloudProject.name,
+            },
+          };
+          return file;
+        })
+        .filter(Boolean)
     );
   }
 
@@ -98,6 +104,39 @@ const BuildSection = ({
     }
   };
 
+  const onDeleteProject = async ({
+    fileMetadata,
+    storageProviderName,
+  }: FileMetadataAndStorageProviderName) => {
+    if (storageProviderName !== 'Cloud') return;
+    const projectName = fileMetadata.name;
+    if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
+
+    const answer = await getConfirmation({
+      title: t`Delete project ${projectName}?`,
+      message: t`Are you sure you want to delete this project?`,
+    });
+    if (!answer) return;
+
+    const deleteAnswer = await getDeleteConfirmation({
+      title: t`Do you really want to permanently delete your project ${projectName}?`,
+      message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
+      fieldMessage: t`Type your project name to delete it:`,
+      confirmText: projectName,
+    });
+    if (!deleteAnswer) return;
+
+    try {
+      await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
+      authenticatedUser.onCloudProjectsChanged();
+    } catch (error) {
+      console.error(
+        `An error occurred when deleting cloud project ${projectName}. Please try again later.`,
+        error
+      );
+    }
+  };
+
   const buildContextMenu = (
     i18n: I18nType,
     file: ?FileMetadataAndStorageProviderName
@@ -108,7 +147,10 @@ const BuildSection = ({
       // { label: i18n._(t`Duplicate`), click: () => console.log('duplicate') },
       { type: 'separator' },
       // { label: i18n._(t`Manage game`), click: () => console.log('Manage game') },
-      { label: i18n._(t`Delete`), click: () => console.log('Delete') },
+      {
+        label: i18n._(t`Delete`),
+        click: () => onDeleteProject(file),
+      },
     ];
   };
 

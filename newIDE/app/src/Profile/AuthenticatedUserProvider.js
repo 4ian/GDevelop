@@ -130,6 +130,7 @@ export default class AuthenticatedUserProvider extends React.Component<
         ...initialAuthenticatedUser,
         onLogout: this._doLogout,
         onBadgesChanged: this._fetchUserBadges,
+        onCloudProjectsChanged: this._fetchUserCloudProjects,
         onLogin: () => this.openLoginDialog(true),
         onEdit: () => this.openEditProfileDialog(true),
         onChangeEmail: () => this.openChangeEmailDialog(true),
@@ -285,6 +286,28 @@ export default class AuthenticatedUserProvider extends React.Component<
         loginState: 'done',
       },
     }));
+  };
+
+  _fetchUserCloudProjects = async () => {
+    const { authentication } = this.props;
+    const { firebaseUser } = this.state.authenticatedUser;
+    if (!firebaseUser) return;
+
+    listUserCloudProjects(
+      authentication.getAuthorizationHeader,
+      firebaseUser.uid
+    ).then(
+      cloudProjects =>
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            cloudProjects,
+          },
+        })),
+      error => {
+        console.error('Error while loading user cloud projects:', error);
+      }
+    );
   };
 
   _fetchUserBadges = async () => {

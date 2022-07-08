@@ -1,5 +1,8 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
+  export interface RuntimeScene {
+    tileMapCollisionMaskManager: gdjs.TileMap.TileMapRuntimeManager;
+  }
   export namespace TileMap {
     import PIXI = GlobalPIXIModule.PIXI;
 
@@ -42,16 +45,16 @@ namespace gdjs {
        * @param instanceHolder Where to set the manager instance.
        * @returns The shared manager.
        */
-      static getManager(runtimeScene: gdjs.RuntimeScene) {
+      static getManager(
+        runtimeScene: gdjs.RuntimeScene
+      ): TileMapRuntimeManager {
         // @ts-ignore
         if (!runtimeScene.tileMapCollisionMaskManager) {
           //Create the shared manager if necessary.
-          // @ts-ignore
           runtimeScene.tileMapCollisionMaskManager = new TileMapRuntimeManager(
             runtimeScene
           );
         }
-        // @ts-ignore
         return runtimeScene.tileMapCollisionMaskManager;
       }
 
@@ -102,7 +105,7 @@ namespace gdjs {
         tilemapJsonFile: string,
         tilesetJsonFile: string,
         callback: (tiledMap: TileMapHelper.TiledMap | null) => void
-      ) {
+      ): void {
         this._runtimeScene
           .getGame()
           .getJsonManager()

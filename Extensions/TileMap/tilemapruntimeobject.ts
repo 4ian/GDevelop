@@ -5,9 +5,6 @@ namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
   /**
    * Displays a Tilemap object (mapeditor.org supported).
-   * @memberof gdjs
-   * @class TileMapRuntimeObject
-   * @extends gdjs.RuntimeObject
    */
   export class TileMapRuntimeObject extends gdjs.RuntimeObject {
     _frameElapsedTime: float = 0;
@@ -22,7 +19,7 @@ namespace gdjs {
     _tileMapManager: gdjs.TileMap.TileMapRuntimeManager;
     _renderer: gdjs.TileMapRuntimeObjectPixiRenderer;
 
-    constructor(runtimeScene, objectData) {
+    constructor(runtimeScene: gdjs.RuntimeScene, objectData) {
       super(runtimeScene, objectData);
       this._opacity = objectData.content.opacity;
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
@@ -49,7 +46,7 @@ namespace gdjs {
       return this._renderer.getRendererObject();
     }
 
-    update(runtimeScene): void {
+    update(runtimeScene: gdjs.RuntimeScene): void {
       if (this._animationSpeedScale <= 0 || this._animationFps === 0) {
         return;
       }
@@ -112,7 +109,7 @@ namespace gdjs {
     /**
      * Initialize the extra parameters that could be set for an instance.
      */
-    extraInitializationFromInitialInstance(initialInstanceData) {
+    extraInitializationFromInitialInstance(initialInstanceData): void {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
@@ -154,45 +151,50 @@ namespace gdjs {
     /**
      * Set the Tilemap json file to display.
      */
-    setTilemapJsonFile(tilemapJsonFile): void {
+    setTilemapJsonFile(tilemapJsonFile: string): void {
       this._tilemapJsonFile = tilemapJsonFile;
       this._updateTileMap();
     }
 
-    getTilemapJsonFile() {
+    getTilemapJsonFile(): string {
       return this._tilemapJsonFile;
     }
 
-    isTilemapJsonFile(selectedTilemapJsonFile): boolean {
+    isTilemapJsonFile(selectedTilemapJsonFile: string): boolean {
       return this._tilemapJsonFile === selectedTilemapJsonFile;
     }
 
-    setTilesetJsonFile(tilesetJsonFile) {
+    setTilesetJsonFile(tilesetJsonFile: string): void {
       this._tilesetJsonFile = tilesetJsonFile;
       this._updateTileMap();
     }
-    getTilesetJsonFile() {
+
+    getTilesetJsonFile(): string {
       return this._tilesetJsonFile;
     }
-    setAnimationFps(animationFps) {
+
+    setAnimationFps(animationFps: float) {
       this._animationFps = animationFps;
     }
-    getAnimationFps() {
+
+    getAnimationFps(): float {
       return this._animationFps;
     }
-    isTilesetJsonFile(selectedTilesetJsonFile) {
+
+    isTilesetJsonFile(selectedTilesetJsonFile: string): boolean {
       return this._tilesetJsonFile === selectedTilesetJsonFile;
     }
-    isDisplayMode(selectedDisplayMode) {
+
+    isDisplayMode(selectedDisplayMode: string): boolean {
       return this._displayMode === selectedDisplayMode;
     }
 
-    setDisplayMode(displayMode): void {
+    setDisplayMode(displayMode: string): void {
       this._displayMode = displayMode;
       this._updateTileMap();
     }
 
-    getDisplayMode() {
+    getDisplayMode(): string {
       return this._displayMode;
     }
 
@@ -201,7 +203,7 @@ namespace gdjs {
       this._updateTileMap();
     }
 
-    getLayerIndex() {
+    getLayerIndex(): integer {
       return this._layerIndex;
     }
 
@@ -209,7 +211,7 @@ namespace gdjs {
       this._animationSpeedScale = animationSpeedScale;
     }
 
-    getAnimationSpeedScale() {
+    getAnimationSpeedScale(): float {
       return this._animationSpeedScale;
     }
 
@@ -274,7 +276,7 @@ namespace gdjs {
     /**
      * Get object opacity.
      */
-    getOpacity() {
+    getOpacity(): float {
       return this._opacity;
     }
 

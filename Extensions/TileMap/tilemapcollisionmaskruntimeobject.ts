@@ -136,7 +136,7 @@ namespace gdjs {
     /**
      * Initialize the extra parameters that could be set for an instance.
      */
-    extraInitializationFromInitialInstance(initialInstanceData) {
+    extraInitializationFromInitialInstance(initialInstanceData): void {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
         this.setHeight(initialInstanceData.height);
@@ -335,7 +335,7 @@ namespace gdjs {
       this._updateTileMap();
     }
 
-    getTilemapJsonFile() {
+    getTilemapJsonFile(): string {
       return this._tilemapJsonFile;
     }
 
@@ -348,11 +348,11 @@ namespace gdjs {
       this._updateTileMap();
     }
 
-    getTilesetJsonFile() {
+    getTilesetJsonFile(): string {
       return this._tilesetJsonFile;
     }
 
-    isTilesetJsonFile(selectedTilesetJsonFile: string) {
+    isTilesetJsonFile(selectedTilesetJsonFile: string): boolean {
       return this._tilesetJsonFile === selectedTilesetJsonFile;
     }
 
@@ -391,7 +391,7 @@ namespace gdjs {
       this._outlineSize = size;
     }
 
-    getOutlineSize() {
+    getOutlineSize(): float {
       return this._outlineSize;
     }
 
@@ -407,7 +407,7 @@ namespace gdjs {
      *
      * @returns an opacity value from 0 to 255.
      */
-    getFillOpacity() {
+    getFillOpacity(): float {
       return this._fillOpacity;
     }
 
@@ -423,7 +423,7 @@ namespace gdjs {
      *
      * @returns an opacity value from 0 to 255.
      */
-    getOutlineOpacity() {
+    getOutlineOpacity(): float {
       return this._outlineOpacity;
     }
 

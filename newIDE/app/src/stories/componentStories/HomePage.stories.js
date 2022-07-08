@@ -22,6 +22,19 @@ import {
   fakeIndieAuthenticatedUser,
   indieUserProfile,
 } from '../../fixtures/GDevelopServicesTestData';
+import { GDevelopAssetApi } from '../../Utils/GDevelopServices/ApiConfigs';
+import withMock from 'storybook-addon-mock';
+
+const apiDataServerSideError = {
+  mockData: [
+    {
+      url: `${GDevelopAssetApi.baseUrl}/tutorial`,
+      method: 'GET',
+      status: 500,
+      response: { data: 'status' },
+    },
+  ],
+};
 
 const getRecentProjectFiles = (count: number) =>
   new Array(count).fill(0).map((_, index) => ({
@@ -167,3 +180,13 @@ export const NotConnected = () => (
     user={initialAuthenticatedUser}
   />
 );
+
+export const NetworkError = () => (
+  <WrappedHomePage
+    project={testProject.project}
+    recentProjectFiles={getRecentProjectFiles(20)}
+    user={fakeIndieAuthenticatedUser}
+  />
+);
+NetworkError.decorators = [withMock];
+NetworkError.parameters = apiDataServerSideError;

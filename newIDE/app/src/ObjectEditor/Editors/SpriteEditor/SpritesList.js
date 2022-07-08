@@ -58,7 +58,7 @@ const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
           <FlatButton
             onClick={onAdd}
             label={<Trans>Add</Trans>}
-            icon={<Add />}
+            leftIcon={<Add />}
           />
         </div>
       )}

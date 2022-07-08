@@ -48,6 +48,9 @@ const styles = {
     borderRadius: 4,
     padding: '2px 6px',
   },
+  durationText: {
+    color: 'white', // Same color for all themes.
+  },
   titleContainer: {
     // Fix min height to ensure the content stays aligned.
     // 2 line heights (20) + 2 text paddings (6)
@@ -130,7 +133,7 @@ const TutorialsGrid = ({ tutorials, limit }: TutorialsGridProps) => {
                       alt={tutorial.title}
                     />
                     <div style={styles.duration}>
-                      <Text size="body" noMargin>
+                      <Text size="body" noMargin style={styles.durationText}>
                         {tutorial.duration ? (
                           secondsToMinutesAndSeconds(tutorial.duration)
                         ) : (

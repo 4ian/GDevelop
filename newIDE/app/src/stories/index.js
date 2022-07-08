@@ -270,7 +270,7 @@ storiesOf('UI Building Blocks/Buttons', module)
       <LineStackLayout noMargin>
         <FlatButton label="Flat button" onClick={action('onClick')} />
         <FlatButton
-          icon={<CloudDownload />}
+          leftIcon={<CloudDownload />}
           label="Flat button"
           onClick={action('onClick')}
         />
@@ -280,7 +280,7 @@ storiesOf('UI Building Blocks/Buttons', module)
           onClick={action('onClick')}
         />
         <FlatButton
-          icon={<CloudDownload />}
+          leftIcon={<CloudDownload />}
           label="Primary Flat button"
           primary
           onClick={action('onClick')}

@@ -8,7 +8,7 @@ import { isUserflowRunning } from '../../Onboarding/OnboardingDialog';
 import { isMobile } from '../../../Utils/Platform';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { sendOnboardingManuallyOpened } from '../../../Utils/Analytics/EventSender';
-import SectionContainer from './SectionContainer';
+import SectionContainer, { SectionRow } from './SectionContainer';
 import {
   useResponsiveWindowWidth,
   type WidthType,
@@ -20,13 +20,9 @@ const electron = optionalRequire('electron');
 
 const styles = {
   grid: {
-    marginTop: 30,
     textAlign: 'center',
     maxWidth: LARGE_WIDGET_SIZE * 4, // Avoid tiles taking too much space on large screens.
     overflow: 'hidden',
-  },
-  tutorialsContainer: {
-    marginTop: 30,
   },
   gridListTile: { display: 'flex', justifyContent: 'flex-start' },
   cardTextContainer: {
@@ -35,6 +31,9 @@ const styles = {
   },
   image: {
     width: '100%',
+    // Prevent cumulative layout shift by enforcing
+    // the 2 ratio.
+    aspectRatio: '2',
   },
 };
 
@@ -66,8 +65,17 @@ const GetStartedSection = ({
   setShowGetStartedSection,
 }: Props) => {
   const windowWidth = useResponsiveWindowWidth();
-  const items = [
-    !electron && !isMobile() && !isUserflowRunning
+  const shouldShowOnboardingButton = !electron && !isMobile();
+  const items: {
+    key: string,
+    title: React.Node,
+    subText?: React.Node,
+    description: React.Node,
+    action: () => void,
+    imagePath: string,
+    disabled?: boolean,
+  }[] = [
+    shouldShowOnboardingButton
       ? {
           key: 'tour',
           title: <Trans>Take the tour</Trans>,
@@ -78,6 +86,7 @@ const GetStartedSection = ({
             onOpenOnboardingDialog();
           },
           imagePath: 'res/homepage/take-the-tour.png',
+          disabled: isUserflowRunning,
         }
       : undefined,
     {
@@ -111,44 +120,53 @@ const GetStartedSection = ({
       title={<Trans>Get started!</Trans>}
       subtitle={<Trans>Our recommended first steps for newcomers</Trans>}
     >
-      <Line>
-        <Checkbox
-          label={<Trans>Don't show this screen on next startup</Trans>}
-          checked={!showGetStartedSection}
-          onCheck={(e, checked) => setShowGetStartedSection(!checked)}
-        />
-      </Line>
-      <Line noMargin>
-        <GridList
-          cols={getColumnsFromWidth(windowWidth)}
-          style={styles.grid}
-          cellHeight="auto"
-          spacing={10}
-        >
-          {items.map((item, index) => (
-            <GridListTile key={index} style={styles.gridListTile}>
-              <CardWidget onClick={item.action} key={index} size="large">
-                <Column noMargin expand>
-                  <img
-                    alt={item.key}
-                    src={item.imagePath}
-                    style={styles.image}
-                  />
-                  <div style={styles.cardTextContainer}>
-                    <Text size="block-title">{item.title}</Text>
-                    {item.subText && (
-                      <Text size="body" color="secondary">
-                        {item.subText}
-                      </Text>
-                    )}
-                    <Text size="body">{item.description}</Text>
-                  </div>
-                </Column>
-              </CardWidget>
-            </GridListTile>
-          ))}
-        </GridList>
-      </Line>
+      <SectionRow>
+        <Line>
+          <Checkbox
+            label={<Trans>Don't show this screen on next startup</Trans>}
+            checked={!showGetStartedSection}
+            onCheck={(e, checked) => setShowGetStartedSection(!checked)}
+          />
+        </Line>
+      </SectionRow>
+      <SectionRow>
+        <Line noMargin>
+          <GridList
+            cols={getColumnsFromWidth(windowWidth)}
+            style={styles.grid}
+            cellHeight="auto"
+            spacing={10}
+          >
+            {items.map((item, index) => (
+              <GridListTile key={index} style={styles.gridListTile}>
+                <CardWidget
+                  onClick={item.action}
+                  key={index}
+                  size="large"
+                  disabled={item.disabled}
+                >
+                  <Column noMargin expand>
+                    <img
+                      alt={item.key}
+                      src={item.imagePath}
+                      style={styles.image}
+                    />
+                    <div style={styles.cardTextContainer}>
+                      <Text size="block-title">{item.title}</Text>
+                      {item.subText && (
+                        <Text size="body" color="secondary">
+                          {item.subText}
+                        </Text>
+                      )}
+                      <Text size="body">{item.description}</Text>
+                    </div>
+                  </Column>
+                </CardWidget>
+              </GridListTile>
+            ))}
+          </GridList>
+        </Line>
+      </SectionRow>
     </SectionContainer>
   );
 };

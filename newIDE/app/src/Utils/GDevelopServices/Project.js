@@ -192,6 +192,27 @@ export const updateCloudProject = async (
   return response.data;
 };
 
+export const deleteCloudProject = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string,
+): Promise<?CloudProject> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser) return;
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.delete(
+    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  return response.data;
+};
+
 export const getProjectFileAsZipBlob = async (
   cloudProject: CloudProject
 ): Promise<Blob> => {

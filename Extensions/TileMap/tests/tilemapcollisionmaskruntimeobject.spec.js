@@ -110,7 +110,16 @@ describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
     runtimeScene = createScene();
     tileMap = addTileMapCollisionMask(runtimeScene);
     // TODO find a clean way to wait for the json to be read.
-    await delay(10);
+    for (
+      let index = 0;
+      index < 200 && tileMap._collisionTileMap.getDimensionX() === 0;
+      index++
+    ) {
+      await delay(5);
+    }
+    if (tileMap._collisionTileMap.getDimensionX() === 0) {
+      throw new Error('Timeout reading the tile map JSON file.');
+    }
   });
 
   it('can be measured', function () {

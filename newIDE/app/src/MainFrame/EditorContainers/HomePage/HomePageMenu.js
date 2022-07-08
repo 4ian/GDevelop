@@ -94,16 +94,15 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
               <DoubleChevronArrowRight />
             </IconButton>
           )}
-          {tabs.map(({ label, tab, getIcon }) => (
-            <>
-              <VerticalTabButton
-                label={label}
-                onClick={() => setActiveTab(tab)}
-                getIcon={getIcon}
-                isActive={activeTab === tab}
-                hideLabel={windowWidth !== 'large'}
-              />
-            </>
+          {tabs.map(({ label, tab, getIcon }, index) => (
+            <VerticalTabButton
+              key={index}
+              label={label}
+              onClick={() => setActiveTab(tab)}
+              getIcon={getIcon}
+              isActive={activeTab === tab}
+              hideLabel={windowWidth !== 'large'}
+            />
           ))}
         </Column>
       </Paper>
@@ -131,8 +130,9 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
               <DoubleChevronArrowLeft />
             </IconButton>
           </Line>
-          {tabs.map(({ label, tab, getIcon }) => (
+          {tabs.map(({ label, tab, getIcon }, index) => (
             <VerticalTabButton
+              key={index}
               label={label}
               onClick={() => {
                 setActiveTab(tab);

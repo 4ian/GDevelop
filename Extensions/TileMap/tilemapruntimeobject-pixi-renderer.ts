@@ -1,7 +1,6 @@
 /// <reference path="helper/TileMapHelper.d.ts" />
+/// <reference path="pixi-tilemap/dist/pixi-tilemap.d.ts" />
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   const logger = new gdjs.Logger('Tilemap object');
 
   /**
@@ -13,8 +12,7 @@ namespace gdjs {
     _object: any;
     _runtimeScene: gdjs.RuntimeScene;
 
-    // @ts-ignore - pixi-tilemap types to be added.
-    _pixiObject: any;
+    _pixiObject: PIXI.tilemap.CompositeRectTileLayer;
 
     /**
      * @param runtimeObject The object to render
@@ -28,10 +26,7 @@ namespace gdjs {
       this._runtimeScene = runtimeScene;
 
       // Load (or reset)
-      if (this._pixiObject === undefined) {
-        // @ts-ignore - pixi-tilemap types to be added.
-        this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
-      }
+      this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
       this._pixiObject.tileAnim = [0, 0];
 
       runtimeScene
@@ -47,7 +42,7 @@ namespace gdjs {
       return this._pixiObject;
     }
 
-    incrementAnimationFrameX(runtimeScene) {
+    incrementAnimationFrameX(runtimeScene: gdjs.RuntimeScene) {
       this._pixiObject.tileAnim[0] += 1;
     }
 

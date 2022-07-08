@@ -1,4 +1,7 @@
 // @flow
+
+/// <reference path="helper/TileMapHelper.d.ts" />
+
 /**
  * This is a declaration of an extension for GDevelop 5.
  *
@@ -862,6 +865,7 @@ module.exports = {
         .get('displayMode')
         .getValue();
 
+      /** @type {TileMapHelper.TileMapManager} */
       const manager = TilemapHelper.TileMapManager.getManager(this._project);
       manager.getOrLoadTileMap(
         this._loadTiledMapWithCallback.bind(this),
@@ -874,6 +878,7 @@ module.exports = {
             return;
           }
 
+          /** @type {TileMapHelper.TileTextureCache} */
           const textureCache = manager.getOrLoadTextureCache(
             this._loadTiledMapWithCallback.bind(this),
             (textureName) =>
@@ -1098,6 +1103,7 @@ module.exports = {
       .getValue() / 255;
     const outlineSize = 1;
 
+      /** @type {TileMapHelper.TileMapManager} */
       const manager = TilemapHelper.TileMapManager.getManager(this._project);
       manager.getOrLoadTileMap(
         this._loadTiledMapWithCallback.bind(this),

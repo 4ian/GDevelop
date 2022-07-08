@@ -1,5 +1,5 @@
 // @ts-check
-describe('gdjs.TileMapCollisionMaskRuntimeObject', function () {
+describe.only('gdjs.TileMapCollisionMaskRuntimeObject', function () {
   const createScene = (framePerSecond = 60) => {
     const runtimeGame = new gdjs.RuntimeGame({
       variables: [],

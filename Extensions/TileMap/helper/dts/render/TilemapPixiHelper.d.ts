@@ -23,11 +23,15 @@ export declare class PixiTileMapHelper {
    * @param pixiTileMap the tile map renderer
    * @param tileMap the tile map model
    * @param textureCache the tile set textures
-   * @param displayMode What to display: only a single layer (`index`), only visible layers (`visible`) or everything (`all`).
-   * @param layerIndex If `displayMode` is set to `index`, the layer index to be displayed.
+   * @param displayMode What to display:
+   * - only a single layer (`index`)
+   * - only visible layers (`visible`)
+   * - everything (`all`).
+   * @param layerIndex If `displayMode` is set to `index`, the layer index to be
+   * displayed.
    */
   static updatePixiTileMap(
-    pixiTileMap: any,
+    untypedPixiTileMap: any,
     tileMap: EditableTileMap,
     textureCache: TileTextureCache,
     displayMode: 'index' | 'visible' | 'all',

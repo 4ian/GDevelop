@@ -33,7 +33,10 @@ type Props = {|
   children: ({
     storageProviders: Array<StorageProvider>,
     getStorageProviderOperations: (
-      newStorageProvider: ?StorageProvider
+      ?{
+        storageProvider: StorageProvider,
+        doNotKeepForNextOperations?: boolean,
+      }
     ) => StorageProviderOperations,
     initialFileMetadataToOpen: ?FileMetadata,
     getStorageProvider: () => StorageProvider,
@@ -102,32 +105,49 @@ const ProjectStorageProviders = (props: Props) => {
   };
 
   const getStorageProviderOperations = (
-    newStorageProvider: ?StorageProvider
+    options: ?{
+      storageProvider: StorageProvider,
+      doNotKeepForNextOperations?: boolean,
+    }
   ): StorageProviderOperations => {
+    if (!options) {
+      if (!storageProviderOperations.current) {
+        currentStorageProvider.current = emptyStorageProvider;
+        storageProviderOperations.current = emptyStorageProvider.createOperations(
+          {
+            setDialog,
+            closeDialog,
+            authenticatedUser,
+          }
+        );
+      }
+      return storageProviderOperations.current;
+    }
+
+    const {
+      storageProvider: newStorageProvider,
+      doNotKeepForNextOperations,
+    } = options;
+
     // Avoid creating a new storageProviderOperations
     // if we're not changing the storage provider.
     if (
-      !newStorageProvider ||
-      newStorageProvider === currentStorageProvider.current
+      newStorageProvider === currentStorageProvider.current &&
+      storageProviderOperations.current
     ) {
-      if (storageProviderOperations.current) {
-        return storageProviderOperations.current;
-      }
+      return storageProviderOperations.current;
     }
 
-    const storageProviderToUse: StorageProvider =
-      newStorageProvider ||
-      currentStorageProvider.current ||
-      emptyStorageProvider;
-    const storageProviderOperationsToUse = storageProviderToUse.createOperations(
-      {
-        setDialog,
-        closeDialog,
-        authenticatedUser,
-      }
-    );
-    currentStorageProvider.current = storageProviderToUse;
-    storageProviderOperations.current = storageProviderOperationsToUse;
+    const storageProviderOperationsToUse = newStorageProvider.createOperations({
+      setDialog,
+      closeDialog,
+      authenticatedUser,
+    });
+
+    if (!doNotKeepForNextOperations) {
+      currentStorageProvider.current = newStorageProvider;
+      storageProviderOperations.current = storageProviderOperationsToUse;
+    }
 
     return storageProviderOperationsToUse;
   };

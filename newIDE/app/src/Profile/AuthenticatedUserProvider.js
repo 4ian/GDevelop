@@ -203,15 +203,26 @@ export default class AuthenticatedUserProvider extends React.Component<
 
     // First ensure the Firebase authenticated user is up to date
     // (and let the error propagate if any).
-    const firebaseUser = await this._reloadFirebaseProfile();
-    if (!firebaseUser) {
+    let firebaseUser;
+    try {
+      firebaseUser = await this._reloadFirebaseProfile();
+      if (!firebaseUser) {
+        this.setState(({ authenticatedUser }) => ({
+          authenticatedUser: {
+            ...authenticatedUser,
+            loginState: 'done',
+          },
+        }));
+        return;
+      }
+    } catch (error) {
       this.setState(({ authenticatedUser }) => ({
         authenticatedUser: {
           ...authenticatedUser,
           loginState: 'done',
         },
       }));
-      return;
+      throw error;
     }
 
     // Fetching user profile related information, but independently from

@@ -164,7 +164,6 @@ const findStorageProviderFor = (
   )[0];
 
   if (!storageProvider) {
-    const { storageProviderName } = fileMetadataAndStorageProviderName;
     showErrorBox({
       message: i18n._(
         t`Unable to open the project because this provider is unknown: ${storageProviderName}. Try to open the project again from another location.`
@@ -219,7 +218,12 @@ export type Props = {
   ) => React.Element<PreviewLauncherComponent>,
   onEditObject?: gdObject => void,
   storageProviders: Array<StorageProvider>,
-  getStorageProviderOperations: (?StorageProvider) => StorageProviderOperations,
+  getStorageProviderOperations: (
+    ?{
+      storageProvider: StorageProvider,
+      doNotKeepForNextOperations?: boolean,
+    }
+  ) => StorageProviderOperations,
   getStorageProvider: () => StorageProvider,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -451,11 +455,10 @@ const MainFrame = (props: Props) => {
           if (!storageProvider) return;
           if (storageProvider.needUserAuthentication && loginState !== 'done')
             return;
-          console.log('LOGIN STATE OK');
 
-          const storageProviderOperations = getStorageProviderOperations(
-            storageProvider
-          );
+          const storageProviderOperations = getStorageProviderOperations({
+            storageProvider,
+          });
           const proceed = await ensureInteractionHappened(
             storageProviderOperations
           );
@@ -644,9 +647,9 @@ const MainFrame = (props: Props) => {
     async (project: gdProject, fileMetadata: ?FileMetadata): Promise<State> => {
       if (fileMetadata) {
         const storageProvider = getStorageProvider();
-        const storageProviderOperations = getStorageProviderOperations(
-          storageProvider
-        );
+        const storageProviderOperations = getStorageProviderOperations({
+          storageProvider,
+        });
         const { onSaveProject } = storageProviderOperations;
 
         // Only save the project in the recent files if the storage provider
@@ -1728,7 +1731,7 @@ const MainFrame = (props: Props) => {
 
       if (!storageProvider) return;
 
-      getStorageProviderOperations(storageProvider);
+      getStorageProviderOperations({ storageProvider });
       openFromFileMetadata(fileMetadata)
         .then(state => {
           if (state)
@@ -1764,12 +1767,22 @@ const MainFrame = (props: Props) => {
   );
 
   const saveProjectAsWithStorageProvider = React.useCallback(
-    (context?: 'duplicateCurrentProject') => {
+    (
+      options: ?{
+        context?: 'duplicateCurrentProject',
+        storageProviderOperationsGetOptions?: {
+          storageProvider: StorageProvider,
+          doNotKeepForNextOperations?: boolean,
+        },
+      }
+    ) => {
       if (!currentProject) return;
 
       saveUiSettings(state.editorTabs);
 
-      const storageProviderOperations = getStorageProviderOperations();
+      const storageProviderOperations = getStorageProviderOperations(
+        options ? options.storageProviderOperationsGetOptions : null
+      );
 
       const { onSaveProjectAs } = storageProviderOperations;
       if (!onSaveProjectAs) {
@@ -1785,7 +1798,7 @@ const MainFrame = (props: Props) => {
       setIsSavingProject(true);
 
       onSaveProjectAs(currentProject, currentFileMetadata, {
-        context,
+        context: options ? options.context : undefined,
         onStartSaving: () => _showSnackMessage(i18n._(t`Saving...`)),
       })
         .then(
@@ -2074,7 +2087,7 @@ const MainFrame = (props: Props) => {
     let state: ?State;
     if (project) state = await loadFromProject(project, fileMetadata);
     else if (!!fileMetadata) {
-      if (storageProvider) getStorageProviderOperations(storageProvider);
+      if (storageProvider) getStorageProviderOperations({ storageProvider });
       state = await openFromFileMetadata(fileMetadata);
     }
 
@@ -2097,7 +2110,7 @@ const MainFrame = (props: Props) => {
     });
 
     const storageProviderOperations = getStorageProviderOperations(
-      storageProvider
+      storageProvider ? { storageProvider } : null
     );
 
     const { onSaveProject } = storageProviderOperations;
@@ -2544,7 +2557,7 @@ const MainFrame = (props: Props) => {
           storageProviders={props.storageProviders}
           onChooseProvider={storageProvider => {
             openOpenFromStorageProviderDialog(false);
-            props.getStorageProviderOperations(storageProvider);
+            getStorageProviderOperations({ storageProvider });
             chooseProjectWithStorageProviderPicker();
           }}
         />
@@ -2556,13 +2569,18 @@ const MainFrame = (props: Props) => {
           onChooseProvider={storageProvider => {
             const currentStorageProvider = getStorageProvider();
             openSaveToStorageProviderDialog(false);
-            props.getStorageProviderOperations(storageProvider);
-            saveProjectAsWithStorageProvider(
-              storageProvider.internalName ===
+            saveProjectAsWithStorageProvider({
+              context:
+                storageProvider.internalName ===
                 currentStorageProvider.internalName
-                ? 'duplicateCurrentProject'
-                : undefined
-            );
+                  ? 'duplicateCurrentProject'
+                  : undefined,
+              storageProviderOperationsGetOptions: {
+                storageProvider,
+                doNotKeepForNextOperations:
+                  storageProvider.internalName === 'DownloadFile',
+              },
+            });
           }}
         />
       )}

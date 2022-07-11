@@ -89,7 +89,7 @@ export const ReplacePromptDialog = ({
           <Text>
             <Trans>
               You can still do this operation manually later from the
-              leaderboard configuration pannel.
+              leaderboard configuration panel.
             </Trans>
           </Text>
         </ColumnStackLayout>
@@ -343,6 +343,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
           (): RetryOrAbandonCallback => () => {
             // Abandon: resolve immediately, closing the dialog
             setErroredLeaderboards([]);
+            setShouldReplace(false);
             setLeaderboardsToReplace(null);
             resolve({ someLeaderboardsWereDuplicated: true });
           }

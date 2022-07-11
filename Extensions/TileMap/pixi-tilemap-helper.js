@@ -10,11 +10,6 @@
     factory((root.PixiTileMapHelper = {}));
   }
 })(typeof self !== 'undefined' ? self : this, function (exports) {
-  /** @typedef {GlobalPIXIModule.PIXI.Texture} PIXI.Texture */
-  /** @typedef {GlobalPIXIModule.PIXI.BaseTexture} PIXI.BaseTexture */
-  /** @typedef {GlobalPIXIModule.PIXI.Rectangle} PIXI.Rectangle */
-  const PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * Information about one or more tiles. Loosely based on
    * https://doc.mapeditor.org/en/stable/reference/json-map-format/#tile-definition.

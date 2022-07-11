@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export interface BulgePinchFilterOptions {
     center?: PIXI.Point | [number, number];
     radius?: number;

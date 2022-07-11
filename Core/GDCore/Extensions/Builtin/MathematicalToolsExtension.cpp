@@ -262,7 +262,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("cos",
                      _("Cosine"),
                      _("Cosine of an angle (in radian). "
-                       "`ToRad` allows to use degrees."),
+                       "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -405,7 +405,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("sin",
                      _("Sine"),
                      _("Sine of an angle (in radian). "
-                       "`ToRad` allows to use degrees."),
+                       "If you want to use degrees, use`ToRad`: `sin(ToRad(45))`."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));
@@ -430,7 +430,7 @@ BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(
       .AddExpression("tan",
                      _("Tangent"),
                      _("Tangent of an angle (in radian). "
-                       "`ToRad` allows to use degrees."),
+                       "If you want to use degrees, use`ToRad`: `tan(ToRad(45))`."),
                      "",
                      "res/mathfunction.png")
       .AddParameter("expression", _("Expression"));

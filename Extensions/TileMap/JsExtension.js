@@ -450,8 +450,8 @@ const defineCollisionMask = function (
       objectContent.tilesetJsonFile = newValue;
       return true;
     }
-    if (propertyName === 'typeFilter') {
-      objectContent.typeFilter = newValue;
+    if (propertyName === 'collisionMaskTag') {
+      objectContent.collisionMaskTag = newValue;
       return true;
     }
     if (propertyName === 'debugMode') {
@@ -508,8 +508,8 @@ const defineCollisionMask = function (
         )
     );
     objectProperties.set(
-      'typeFilter',
-      new gd.PropertyDescriptor(objectContent.typeFilter)
+      'collisionMaskTag',
+      new gd.PropertyDescriptor(objectContent.collisionMaskTag)
         .setType('string')
         .setLabel(_('Type filter'))
         .setDescription(
@@ -566,7 +566,7 @@ const defineCollisionMask = function (
     JSON.stringify({
       tilemapJsonFile: '',
       tilesetJsonFile: '',
-      typeFilter: '',
+      collisionMaskTag: '',
       debugMode: false,
       fillColor: '255;255;255',
       outlineColor: '255;255;255',
@@ -1077,9 +1077,9 @@ module.exports = {
       .getProperties(this.project)
       .get('tilesetJsonFile')
       .getValue();
-    const typeFilter = this._associatedObject
+    const collisionMaskTag = this._associatedObject
       .getProperties(this.project)
-      .get('typeFilter')
+      .get('collisionMaskTag')
       .getValue();
     const outlineColor = objectsRenderingService.rgbOrHexToHexNumber(
       this._associatedObject
@@ -1121,7 +1121,7 @@ module.exports = {
           TilemapHelper.PixiTileMapHelper.updatePixiCollisionMask(
             this._pixiObject,
             tileMap,
-            typeFilter,
+            collisionMaskTag,
             outlineSize,
             outlineColor,
             outlineOpacity,
@@ -1143,7 +1143,7 @@ module.exports = {
 
           //     let tileId = -1;
           //     for (const definition of tileMap.getTileDefinitions()) {
-          //       if (definition.getTag() === typeFilter) {
+          //       if (definition.getTag() === collisionMaskTag) {
           //         tileId = definition.getTag();
           //       }
           //     }

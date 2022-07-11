@@ -41,7 +41,7 @@ namespace gdjs {
       super(runtimeScene, objectData);
       this._tilemapJsonFile = objectData.content.tilemapJsonFile;
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
-      this._collisionMaskTag = objectData.content.typeFilter;
+      this._collisionMaskTag = objectData.content.collisionMaskTag;
       this._debugMode = objectData.content.debugMode;
       this._fillColor = this.rgbToNumber(
         gdjs.rgbOrHexToRGBColor(objectData.content.fillColor)

@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator('Displacement', {
     makePIXIFilter: function (target, effectData) {
       const displacementMapTexture = target

@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class DotFilter extends PIXI.Filter {
     constructor(scale?: number, angle?: number);
     angle: number;

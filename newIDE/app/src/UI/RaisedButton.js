@@ -44,7 +44,7 @@ const RaisedButton = React.forwardRef<Props, ButtonInterface>(
         variant="contained"
         size="small"
         disableElevation
-        color={primary ? 'primary' : 'default'}
+        color={primary ? 'secondary' : 'default'}
         focusRipple={focusRipple}
         {...otherProps}
         ref={ref}

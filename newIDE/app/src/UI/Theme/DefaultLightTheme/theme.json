@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#6A3BEB",
-        "comment": "Palette/Purple/60"
+        "value": "#42229B",
+        "comment": "Palette/Purple/70"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"

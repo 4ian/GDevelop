@@ -2,8 +2,8 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#6A3BEB",
-        "comment": "Palette/Purple/60"
+        "value": "#B094FF",
+        "comment": "Palette/Purple/40"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"
@@ -11,8 +11,8 @@
     },
     "secondary": {
       "color": {
-        "value": "#B094FF",
-        "comment": "Palette/Purple/40"
+        "value": "#6A3BEB",
+        "comment": "Palette/Purple/60"
       },
       "text-contrast-color": {
         "value": "#FFFFFF"

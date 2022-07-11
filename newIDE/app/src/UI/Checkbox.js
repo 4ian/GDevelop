@@ -54,7 +54,6 @@ const Checkbox = (props: Props) => {
       }
       icon={props.uncheckedIcon}
       checkedIcon={props.checkedIcon}
-      color="secondary"
       style={props.label ? undefined : props.style}
     />
   );

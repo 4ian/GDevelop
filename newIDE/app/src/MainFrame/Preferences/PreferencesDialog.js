@@ -138,7 +138,6 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                     );
                     event.preventDefault();
                   }}
-                  color="secondary"
                 >
                   create your own themes
                 </Link>

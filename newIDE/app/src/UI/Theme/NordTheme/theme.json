@@ -2,7 +2,7 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#5E81AC"
+        "value": "#88C0D0"
       },
       "text-contrast-color": {
         "value": "#fff"
@@ -10,7 +10,7 @@
     },
     "secondary": {
       "color": {
-        "value": "#88C0D0"
+        "value": "#5E81AC"
       },
       "text-contrast-color": {
         "value": "#fff"

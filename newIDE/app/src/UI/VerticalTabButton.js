@@ -52,7 +52,7 @@ const VerticalTabButton = ({
       }}
       fullWidth
       onClick={onClick}
-      color={isActive ? 'secondary' : 'default'}
+      color={isActive ? 'primary' : 'default'}
     >
       <div
         style={

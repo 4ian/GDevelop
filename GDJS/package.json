@@ -35,11 +35,11 @@
   },
   "scripts": {
     "postinstall": "patch-package && npm run type-gen",
-    "type-gen": "node scripts/generate-esm-types.js && prettier --write \"Runtime/types/auto-generated/*.ts\"",
+    "type-gen": "node scripts/generate-esm-types.js && prettier --write \"Runtime/types/auto-generated/*.d.ts\"",
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm run test-benchmark",
-    "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.d.ts\" \"../Extensions/**/*.spec.js\"",
+    "format": "prettier --write \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "check-format": "prettier --list-different \"Runtime/**/*.ts\" \"../Extensions/**/*.ts\" \"../Extensions/**/*.spec.js\"",
     "generate-doc": "typedoc --options docs/typedoc.json"
   }

@@ -265,11 +265,14 @@ export default class EventsBasedBehaviorsList extends React.Component<
     const name = newNameGenerator('MyBehavior', name =>
       eventsBasedBehaviorsList.has(name)
     );
-    eventsBasedBehaviorsList.insertNew(
+    const newEventsBasedBehavior = eventsBasedBehaviorsList.insertNew(
       name,
       eventsBasedBehaviorsList.getCount()
     );
     this._onEventsBasedBehaviorModified();
+
+    this.props.onSelectEventsBasedBehavior(newEventsBasedBehavior);
+    this._editName(newEventsBasedBehavior);
   };
 
   _onEventsBasedBehaviorModified() {

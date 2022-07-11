@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class GlitchFilter extends PIXI.Filter {
     constructor(options?: GlitchFilterOptions);
     slices: number;

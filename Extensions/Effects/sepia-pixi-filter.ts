@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator('Sepia', {
     makePIXIFilter: function (target, effectData) {
       const colorMatrixFilter = new PIXI.filters.ColorMatrixFilter();

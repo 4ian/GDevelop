@@ -43,12 +43,11 @@ const reAuthenticateAndRetryIfFailed = async <T>(
   }
 };
 
-const generateUUID = (a): string => {
-  return a
-    ? // eslint-disable-next-line
-      (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
-    : // $FlowFixMe
-      ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, generateUUID);
+const getVersionIdFromPath = (path: string): string => {
+  const pathWithoutSignature = path.substring(0, path.indexOf('?'));
+  const filenameStartIndex = pathWithoutSignature.lastIndexOf('/') + 1;
+  const filenameEndIndex = pathWithoutSignature.indexOf('.zip');
+  return path.substring(filenameStartIndex, filenameEndIndex);
 };
 
 export const getCredentialsForProject = async (
@@ -102,15 +101,15 @@ export const commitVersion = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // generate uuid
-  const uuid = generateUUID();
-  // fetch pre signed url TODO
+  const presignedUrl = await getPresignedUrlForVersionUpload(
+    authenticatedUser,
+    cloudProjectId
+  );
+  const newVersion = getVersionIdFromPath(presignedUrl);
   // upload zipped project
   await reAuthenticateAndRetryIfFailed(authenticatedUser, cloudProjectId, () =>
     projectResourcesClient.post(
-      `${
-        GDevelopProjectResourcesStorage.baseUrl
-      }/${cloudProjectId}/versions/${uuid}.zip`,
+      `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`,
       zippedProject,
       {
         headers: { 'content-type': 'application/zip' },
@@ -121,7 +120,7 @@ export const commitVersion = async (
   // inform backend new version uploaded
   const response = await axios.post(
     `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/commit`,
-    { newVersion: uuid },
+    { newVersion },
     {
       headers: {
         Authorization: authorizationHeader,
@@ -211,6 +210,35 @@ export const deleteCloudProject = async (
     }
   );
   return response.data;
+};
+
+export const getPresignedUrlForVersionUpload = async (
+  authenticatedUser: AuthenticatedUser,
+  cloudProjectId: string
+): Promise<string> => {
+  const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+  if (!firebaseUser)
+    throw new Error(
+      'Presigned url is could not be created, user not authenticated.'
+    );
+
+  const { uid: userId } = firebaseUser;
+  const authorizationHeader = await getAuthorizationHeader();
+  const response = await axios.post(
+    `${
+      GDevelopProjectApi.baseUrl
+    }/project/${cloudProjectId}/action/create-presigned-urls`,
+    { resources: ['newProjectVersion'] },
+    {
+      headers: {
+        Authorization: authorizationHeader,
+      },
+      params: { userId },
+    }
+  );
+  if (!response.data || !response.data[0])
+    throw new Error('Presigned url is empty');
+  return response.data[0];
 };
 
 export const getProjectFileAsZipBlob = async (

@@ -23,7 +23,6 @@ import ToolbarIcon from '../../../UI/ToolbarIcon';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import IconButton from '../../../UI/IconButton';
 
-
 const buildFakeMenuTemplate = () => [
   {
     label: 'Option 1',

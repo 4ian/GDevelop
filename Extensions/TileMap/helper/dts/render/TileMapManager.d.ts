@@ -13,51 +13,43 @@ import PIXI = GlobalPIXIModule.PIXI;
 export declare class TileMapManager {
   private _tileMapCache;
   private _textureCacheCaches;
-  /**
-   *
-   */
   constructor();
   /**
-   * @param instanceHolder Where to set the manager instance.
-   * @returns The shared manager.
-   */
-  static getManager(instanceHolder: Object): TileMapManager;
-  /**
    * @param loadTiledMap The method that loads the Tiled JSON file in memory.
-   * @param tilemapJsonFile
-   * @param tilesetJsonFile
+   * @param tileMapJsonResourceName The resource name of the tile map.
+   * @param tileSetJsonResourceName The resource name of the tile set.
    * @param pako The zlib library.
-   * @param callback
+   * @param callback A function called when the tile map is parsed.
    */
   getOrLoadTileMap(
     loadTiledMap: (
-      tilemapJsonFile: string,
-      tilesetJsonFile: string,
+      tileMapJsonResourceName: string,
+      tileSetJsonResourceName: string,
       callback: (tiledMap: TiledMap | null) => void
     ) => void,
-    tilemapJsonFile: string,
-    tilesetJsonFile: string,
+    tileMapJsonResourceName: string,
+    tileSetJsonResourceName: string,
     pako: any,
     callback: (tileMap: EditableTileMap | null) => void
   ): void;
   /**
    * @param loadTiledMap The method that loads the Tiled JSON file in memory.
    * @param getTexture The method that loads the atlas image file in memory.
-   * @param atlasImageResourceName
-   * @param tilemapJsonFile
-   * @param tilesetJsonFile
-   * @param callback
+   * @param atlasImageResourceName The resource name of the atlas image.
+   * @param tileMapJsonResourceName The resource name of the tile map.
+   * @param tileSetJsonResourceName The resource name of the tile set.
+   * @param callback A function called when the tiles textures are split.
    */
   getOrLoadTextureCache(
     loadTiledMap: (
-      tilemapJsonFile: string,
-      tilesetJsonFile: string,
+      tileMapJsonResourceName: string,
+      tileSetJsonResourceName: string,
       callback: (tiledMap: TiledMap | null) => void
     ) => void,
     getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
     atlasImageResourceName: string,
-    tilemapJsonFile: string,
-    tilesetJsonFile: string,
+    tileMapJsonResourceName: string,
+    tileSetJsonResourceName: string,
     callback: (textureCache: TileTextureCache | null) => void
   ): void;
 }

@@ -25,9 +25,9 @@ export declare class TileTextureCache {
    * (see https://doc.mapeditor.org/en/stable/reference/tmx-map-format/).
    *
    * @param tileId The tile identifier
-   * @param flippedHorizontally
-   * @param flippedVertically
-   * @param flippedDiagonally
+   * @param flippedHorizontally true if the tile is flipped horizontally.
+   * @param flippedVertically true if the tile is flipped vertically.
+   * @param flippedDiagonally true if the tile is flipped diagonally.
    * @returns The texture for the given tile identifier and orientation.
    */
   findTileTexture(
@@ -36,6 +36,9 @@ export declare class TileTextureCache {
     flippedVertically: boolean,
     flippedDiagonally: boolean
   ): PIXI.Texture | undefined;
+  /**
+   * @return the Tiled tile global uniq identifier.
+   */
   private _getGlobalId;
 }
 //# sourceMappingURL=TileTextureCache.d.ts.map

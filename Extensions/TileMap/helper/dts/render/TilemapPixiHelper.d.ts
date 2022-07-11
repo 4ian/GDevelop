@@ -39,15 +39,6 @@ export declare class PixiTileMapHelper {
   ): void;
   /**
    * Re-renders the collision mask
-   *
-   * @param pixiGraphics
-   * @param tileMap
-   * @param typeFilter
-   * @param outlineSize
-   * @param outlineColor
-   * @param outlineOpacity
-   * @param fillColor
-   * @param fillOpacity
    */
   static updatePixiCollisionMask(
     pixiGraphics: PIXI.Graphics,
@@ -60,4 +51,4 @@ export declare class PixiTileMapHelper {
     fillOpacity: float
   ): void;
 }
-//# sourceMappingURL=TilemapPixiHelper.d.ts.map
+//# sourceMappingURL=TileMapPixiHelper.d.ts.map

@@ -12,7 +12,7 @@ import {
 
 import { TileMapManager } from "./render/TileMapManager";
 import { TileTextureCache } from "./render/TileTextureCache";
-import { PixiTileMapHelper } from "./render/TilemapPixiHelper";
+import { PixiTileMapHelper } from "./render/TileMapPixiHelper";
 
 export * from "./model/CommonTypes";
 

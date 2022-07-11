@@ -64,7 +64,8 @@ namespace gdjs {
       }
 
       /**
-       * @param transformation
+       * @param transformation the transformation from the time map coordinate
+       * (in pixels) to the scene coordinate (in pixels).
        */
       setTransformation(transformation: gdjs.AffineTransformation) {
         this._transformation = transformation;
@@ -132,8 +133,8 @@ namespace gdjs {
       }
 
       /**
-       * @param layerId
-       * @returns The layer identifier.
+       * @param layerId The layer identifier.
+       * @returns the layer
        */
       getLayer(layerId: integer): TransformedCollisionTileMapLayer | undefined {
         return this._layers.get(layerId);

@@ -191,9 +191,6 @@ abstract class AbstractEditableLayer {
     this.id = id;
   }
 
-  /**
-   * @param visible
-   */
   setVisible(visible: boolean): void {
     this.visible = visible;
   }
@@ -221,9 +218,6 @@ export class EditableObjectLayer extends AbstractEditableLayer {
     this.objects = [];
   }
 
-  /**
-   * @param object
-   */
   add(object: TileObject): void {
     this.objects.push(object);
   }
@@ -264,9 +258,6 @@ export class TileObject {
     return FlippingHelper.getTileId(this.tileId);
   }
 
-  /**
-   * @param flippedHorizontally
-   */
   setFlippedHorizontally(flippedHorizontally: boolean): void {
     this.tileId = FlippingHelper.setFlippedHorizontally(
       this.tileId,
@@ -274,9 +265,6 @@ export class TileObject {
     );
   }
 
-  /**
-   * @param flippedVertically
-   */
   setFlippedVertically(flippedVertically: boolean): void {
     this.tileId = FlippingHelper.setFlippedVertically(
       this.tileId,
@@ -284,9 +272,6 @@ export class TileObject {
     );
   }
 
-  /**
-   * @param flippedDiagonally
-   */
   setFlippedDiagonally(flippedDiagonally: boolean): void {
     this.tileId = FlippingHelper.setFlippedDiagonally(
       this.tileId,
@@ -424,7 +409,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @param flippedHorizontally
+   * @param flippedHorizontally true if the tile is flipped horizontally.
    */
   setFlippedHorizontally(
     x: integer,
@@ -444,7 +429,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @param flippedVertically
+   * @param flippedVertically true if the tile is flipped vertically.
    */
   setFlippedVertically(
     x: integer,
@@ -464,7 +449,7 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   /**
    * @param x The layer column.
    * @param y The layer row.
-   * @param flippedDiagonally
+   * @param flippedDiagonally true if the tile is flipped diagonally.
    */
   setFlippedDiagonally(
     x: integer,
@@ -575,9 +560,9 @@ export class TileDefinition {
   }
 
   /**
-   * Add a polygon
-   * @param tag
-   * @param polygon
+   * Add a polygon for the collision layer
+   * @param tag The tag to allow collision layer filtering.
+   * @param polygon The polygon to use for collisions.
    */
   add(tag: string, polygon: PolygonVertices): void {
     let taggedHitBox = this.taggedHitBoxes.find((hitbox) => hitbox.tag === tag);
@@ -591,8 +576,8 @@ export class TileDefinition {
   /**
    * This property is used by {@link TransformedCollisionTileMap}
    * to make collision classes.
-   * @param tag
-   * @returns The tag that is used to filter tiles.
+   * @param tag  The tag to allow collision layer filtering.
+   * @returns true if this tile contains any polygon with the given tag.
    */
   hasTag(tag: string): boolean {
     return this.taggedHitBoxes.some((hitbox) => hitbox.tag === tag);
@@ -600,7 +585,7 @@ export class TileDefinition {
 
   /**
    * The hitboxes positioning is done by {@link TransformedCollisionTileMap}.
-   * @param tag
+   * @param tag  The tag to allow collision layer filtering.
    * @returns The hit boxes for this tile.
    */
   getHitBoxes(tag: string): PolygonVertices[] | undefined {

@@ -20,7 +20,7 @@ export declare type TiledGID = {
 };
 /**
  * Extract information about the rotation of a tile from the tile id.
- * @param globalTileUid
+ * @param globalTileUid The Tiled tile global uniq identifier.
  * @returns The tile identifier and orientation.
  */
 export declare const extractTileUidFlippedStates: (

@@ -34,7 +34,7 @@ namespace gdjs {
        */
       private _manager: TileMapHelper.TileMapManager;
       /**
-       * @param object The object
+       * @param runtimeScene The scene.
        */
       private constructor(runtimeScene: gdjs.RuntimeScene) {
         this._runtimeScene = runtimeScene;
@@ -42,15 +42,14 @@ namespace gdjs {
       }
 
       /**
-       * @param instanceHolder Where to set the manager instance.
+       * @param runtimeScene Where to set the manager instance.
        * @returns The shared manager.
        */
       static getManager(
         runtimeScene: gdjs.RuntimeScene
       ): TileMapRuntimeManager {
-        // @ts-ignore
         if (!runtimeScene.tileMapCollisionMaskManager) {
-          //Create the shared manager if necessary.
+          // Create the shared manager if necessary.
           runtimeScene.tileMapCollisionMaskManager = new TileMapRuntimeManager(
             runtimeScene
           );
@@ -59,19 +58,19 @@ namespace gdjs {
       }
 
       /**
-       * @param tilemapJsonFile
-       * @param tilesetJsonFile
-       * @param callback
+       * @param tileMapJsonResourceName The resource name of the tile map.
+       * @param tileSetJsonResourceName The resource name of the tile set.
+       * @param callback A function called when the tile map is parsed.
        */
       getOrLoadTileMap(
-        tilemapJsonFile: string,
-        tilesetJsonFile: string,
+        tileMapJsonResourceName: string,
+        tileSetJsonResourceName: string,
         callback: (tileMap: TileMapHelper.EditableTileMap | null) => void
       ): void {
         this._manager.getOrLoadTileMap(
           this._loadTiledMap.bind(this),
-          tilemapJsonFile,
-          tilesetJsonFile,
+          tileMapJsonResourceName,
+          tileSetJsonResourceName,
           pako,
           callback
         );
@@ -79,37 +78,41 @@ namespace gdjs {
 
       /**
        * @param getTexture The method that loads the atlas image file in memory.
-       * @param atlasImageResourceName
-       * @param tilemapJsonFile
-       * @param tilesetJsonFile
-       * @param callback
+       * @param atlasImageResourceName The resource name of the atlas image.
+       * @param tileMapJsonResourceName The resource name of the tile map.
+       * @param tileSetJsonResourceName The resource name of the tile set.
+       * @param callback A function called when the tiles textures are split.
        */
       getOrLoadTextureCache(
         getTexture: (textureName: string) => PIXI.BaseTexture<PIXI.Resource>,
         atlasImageResourceName: string,
-        tilemapJsonFile: string,
-        tilesetJsonFile: string,
+        tileMapJsonResourceName: string,
+        tileSetJsonResourceName: string,
         callback: (textureCache: TileMapHelper.TileTextureCache | null) => void
       ): void {
         this._manager.getOrLoadTextureCache(
           this._loadTiledMap.bind(this),
           getTexture,
           atlasImageResourceName,
-          tilemapJsonFile,
-          tilesetJsonFile,
+          tileMapJsonResourceName,
+          tileSetJsonResourceName,
           callback
         );
       }
 
+      /**
+       * Parse both JSON and set the content of the tile set in the right
+       * attribute in the tile map to merge both parsed data.
+       */
       private _loadTiledMap(
-        tilemapJsonFile: string,
-        tilesetJsonFile: string,
+        tileMapJsonResourceName: string,
+        tileSetJsonResourceName: string,
         callback: (tiledMap: TileMapHelper.TiledMap | null) => void
       ): void {
         this._runtimeScene
           .getGame()
           .getJsonManager()
-          .loadJson(tilemapJsonFile, (error, tileMapJsonData) => {
+          .loadJson(tileMapJsonResourceName, (error, tileMapJsonData) => {
             if (error) {
               logger.error(
                 'An error happened while loading a Tilemap JSON data:',
@@ -119,11 +122,11 @@ namespace gdjs {
               return;
             }
             const tiledMap = tileMapJsonData as TileMapHelper.TiledMap;
-            if (tilesetJsonFile) {
+            if (tileSetJsonResourceName) {
               this._runtimeScene
                 .getGame()
                 .getJsonManager()
-                .loadJson(tilesetJsonFile, (error, tilesetJsonData) => {
+                .loadJson(tileSetJsonResourceName, (error, tileSetJsonData) => {
                   if (error) {
                     logger.error(
                       'An error happened while loading Tileset JSON data:',
@@ -132,7 +135,7 @@ namespace gdjs {
                     callback(null);
                     return;
                   }
-                  const tileSet = tilesetJsonData as TileMapHelper.TiledTileset;
+                  const tileSet = tileSetJsonData as TileMapHelper.TiledTileset;
                   tileSet.firstgid = tiledMap.tilesets[0].firstgid;
                   tiledMap.tilesets = [tileSet];
                   callback(tiledMap);

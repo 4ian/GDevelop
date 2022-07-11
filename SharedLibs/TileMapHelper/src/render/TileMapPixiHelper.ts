@@ -194,15 +194,6 @@ export class PixiTileMapHelper {
 
   /**
    * Re-renders the collision mask
-   *
-   * @param pixiGraphics
-   * @param tileMap
-   * @param typeFilter
-   * @param outlineSize
-   * @param outlineColor
-   * @param outlineOpacity
-   * @param fillColor
-   * @param fillOpacity
    */
   static updatePixiCollisionMask(
     pixiGraphics: PIXI.Graphics,

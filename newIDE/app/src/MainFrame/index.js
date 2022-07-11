@@ -135,6 +135,7 @@ import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import optionalRequire from '../Utils/OptionalRequire';
 import { isMobile } from '../Utils/Platform';
 import { getProgramOpeningCount } from '../Utils/Analytics/LocalStats';
+import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 const electron = optionalRequire('electron');
 const isDev = Window.isDev();
 
@@ -324,6 +325,10 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher();
+  const {
+    findLeaderboardsToReplace,
+    renderLeaderboardReplacerDialog,
+  } = useLeaderboardReplacer();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -2002,14 +2007,16 @@ const MainFrame = (props: Props) => {
     if (!state) return;
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
-
+    const oldProjectId = currentProject.getProjectUuid();
     currentProject.resetProjectUuid();
+
     currentProject.setVersion('1.0.0');
     currentProject.getAuthorIds().clear();
     currentProject.setAuthor('');
     if (templateSlug) currentProject.setTemplateSlug(templateSlug);
     if (projectName) currentProject.setName(projectName);
 
+    findLeaderboardsToReplace(currentProject, oldProjectId);
     openSceneOrProjectManager({
       currentProject: currentProject,
       editorTabs: editorTabs,
@@ -2473,6 +2480,7 @@ const MainFrame = (props: Props) => {
         />
       )}
       {renderOpenConfirmDialog()}
+      {renderLeaderboardReplacerDialog()}
       {renderResourceFetcherDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}

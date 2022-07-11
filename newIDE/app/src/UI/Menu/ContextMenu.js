@@ -3,7 +3,6 @@ import React from 'react';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import { type MenuItemTemplate } from './Menu.flow';
-import { makeStyles } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
@@ -18,12 +17,6 @@ export type ContextMenuInterface = {|
 type ContextMenuProps = {|
   buildMenuTemplate: (i18n: I18nType, options: any) => Array<MenuItemTemplate>,
 |};
-
-const useMenuClasses = makeStyles(theme => ({
-  paper: {
-    backgroundColor: theme.palette.background.alternate,
-  },
-}));
 
 const MaterialUIContextMenu = React.forwardRef<
   ContextMenuProps,
@@ -50,14 +43,11 @@ const MaterialUIContextMenu = React.forwardRef<
     open,
   }));
 
-  const menuClasses = useMenuClasses();
-
   return openMenu ? (
     <I18n>
       {({ i18n }) => (
         <Menu
           open
-          classes={menuClasses}
           anchorPosition={{
             left: anchorPosition[0],
             top: anchorPosition[1],

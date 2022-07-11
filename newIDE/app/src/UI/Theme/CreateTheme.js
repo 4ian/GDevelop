@@ -23,7 +23,8 @@ export function getMuiOverrides(
   appBarBackgroundColor: string,
   appBarTextColor: string,
   iconColor: string,
-  outlinedButtonBorderColor: string
+  outlinedButtonBorderColor: string,
+  alternateCanvasBackgroundColor: string
 ) {
   return {
     MuiTypography: {
@@ -256,6 +257,11 @@ export function getMuiOverrides(
         flexGrow: 0,
       },
     },
+    MuiMenu: {
+      paper: {
+        backgroundColor: alternateCanvasBackgroundColor,
+      },
+    },
   };
 }
 
@@ -457,7 +463,8 @@ export function createGdevelopTheme({
         styles['MosaicToolbarBackgroundColor'],
         styles['MosaicTitleColor'],
         styles['ThemeTextDefaultColor'],
-        styles['ThemeTextDefaultColor']
+        styles['ThemeTextDefaultColor'],
+        styles['ThemeSurfaceAlternateCanvasBackgroundColor']
       ),
     },
   };

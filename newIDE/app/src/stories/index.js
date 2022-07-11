@@ -285,6 +285,7 @@ storiesOf('UI Building Blocks/SelectField', module)
   ));
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => {
     const [value, setValue] = React.useState('Hello World');

@@ -15,6 +15,11 @@ export declare class TileMapManager {
   private _textureCacheCaches;
   constructor();
   /**
+   * @param instanceHolder Where to set the manager instance.
+   * @returns The shared manager.
+   */
+  static getManager(instanceHolder: Object): TileMapManager;
+  /**
    * @param loadTiledMap The method that loads the Tiled JSON file in memory.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.

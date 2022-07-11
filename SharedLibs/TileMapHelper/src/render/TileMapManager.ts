@@ -25,6 +25,21 @@ export class TileMapManager {
   }
 
   /**
+   * @param instanceHolder Where to set the manager instance.
+   * @returns The shared manager.
+   */
+   static getManager(instanceHolder: Object): TileMapManager {
+    // @ts-ignore
+    if (!instanceHolder.tileMapCollisionMaskManager) {
+      //Create the shared manager if necessary.
+      // @ts-ignore
+      instanceHolder.tileMapCollisionMaskManager = new TileMapManager();
+    }
+    // @ts-ignore
+    return instanceHolder.tileMapCollisionMaskManager;
+  }
+
+  /**
    * @param loadTiledMap The method that loads the Tiled JSON file in memory.
    * @param tileMapJsonResourceName The resource name of the tile map.
    * @param tileSetJsonResourceName The resource name of the tile set.

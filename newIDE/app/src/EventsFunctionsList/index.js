@@ -366,6 +366,11 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
         eventsFunction.setFunctionType(parameters.functionType);
         this.props.onEventsFunctionAdded(eventsFunction);
         this._onEventsFunctionModified();
+
+        this.props.onSelectEventsFunction(eventsFunction);
+        if (this.props.canRename(eventsFunction)) {
+          this._editName(eventsFunction);
+        }
       }
     );
   };

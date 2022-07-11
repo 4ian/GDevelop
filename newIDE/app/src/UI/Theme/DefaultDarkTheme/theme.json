@@ -175,17 +175,20 @@
     "message": {
       "warning": {
         "color": {
-          "value": "#C27400"
+          "value": "#FFBC57",
+          "comment": "Palette/Yellow/40"
         }
       },
       "error": {
         "color": {
-          "value": "#C92906"
+          "value": "#FF8569",
+          "comment": "Palette/Red/40"
         }
       },
       "valid": {
         "color": {
-          "value": "#007D58"
+          "value": "#45D9A1",
+          "comment": "Palette/Green/40"
         }
       },
       "empty-shadow": {
@@ -237,12 +240,14 @@
       },
       "warning": {
         "color": {
-          "value": "#E5C07B"
+          "value": "#FFBC57",
+          "comment": "Palette/Yellow/40"
         }
       },
       "error": {
         "color": {
-          "value": "#E06C75"
+          "value": "#FF8569",
+          "comment": "Palette/Red/40"
         }
       }
     },

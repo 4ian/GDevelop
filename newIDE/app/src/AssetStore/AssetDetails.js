@@ -234,7 +234,6 @@ export const AssetDetails = ({
                             Window.openExternalURL(author.website);
                             event.preventDefault();
                           }}
-                          color="secondary"
                         >
                           {author.name}
                         </Link>
@@ -427,7 +426,6 @@ export const AssetDetails = ({
                             Window.openExternalURL(assetLicense.website);
                             event.preventDefault();
                           }}
-                          color="secondary"
                         >
                           {assetLicense.name}
                         </Link>

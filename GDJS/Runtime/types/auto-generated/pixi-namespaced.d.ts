@@ -46,6 +46,4 @@ export namespace filters {
   };
 }
 
-
-
-export as namespace PIXI
+export as namespace PIXI;

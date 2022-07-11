@@ -274,7 +274,6 @@ export const GameCard = ({
                       <FlatButton
                         label={<Trans>Manage game</Trans>}
                         onClick={() => onOpenGameManager('details')}
-                        disabled={!game.publicWebBuildId || isDeletingGame}
                       />
                       <LineStackLayout noMargin>
                         <Column noMargin expand>

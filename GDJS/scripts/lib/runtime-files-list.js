@@ -22,7 +22,6 @@ const transformExcludedExtensions = ['.min.js', '.d.ts'];
 // be built with esbuild, but simply copied.
 const untransformedPaths = [
   // GDJS prebuilt files:
-  'GDJS/Runtime/pixi-renderers/pixi.js',
   'GDJS/Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
   'GDJS/Runtime/Cordova',
   'GDJS/Runtime/Electron',
@@ -44,6 +43,21 @@ const untransformedPaths = [
   'Extensions/TweenBehavior/shifty.js',
   'Extensions/JsExtensionTypes.flow.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
+
+/**
+ * The list of modules that are not namespaced typescript but ES Modules to be bundled as a namespace.
+ * The key is the path to the module relative to the GDevelop root path, and the value is the name of
+ * the namespace where to put all exports of the ES Module.
+ * @type {Record<string, string>}
+ */
+const ESModulesList = Object.fromEntries(
+  Object.entries({
+    'GDJS/Runtime/pixi-renderers/pixi.ts': 'PIXI',
+  }).map(([untransformedPath, namespace]) => [
+    path.resolve(gdevelopRootPath, untransformedPath),
+    namespace,
+  ])
+);
 
 /**
  * Check if a file is not a source file (should not be included in the built Runtime).
@@ -78,12 +92,11 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
  * @param {string} filePath
  */
 const isJsExtensionDeclaration = (filePath) => {
-  return (
-    path.basename(filePath) === 'JsExtension.js'
-  );
+  return path.basename(filePath) === 'JsExtension.js';
 };
 
 /** @typedef {{inPath: string; outPath: string;}} InOutPath */
+/** @typedef {{inPath: string; outPath: string; namespace: string;}} ESMInOutPath */
 
 /** Returns a function to generate the file paths in the bundled runtime. */
 const getInOutPaths = (basePath, bundledOutPath) => (inPath) => {
@@ -93,6 +106,13 @@ const getInOutPaths = (basePath, bundledOutPath) => (inPath) => {
     outPath: path.join(bundledOutPath, relativePath),
   };
 };
+
+/**
+ * Returns true if a path should be treated as an ES Module.
+ * @param {string} inPath
+ * @returns {boolean}
+ */
+const isESM = (inPath) => ESModulesList.hasOwnProperty(inPath);
 
 module.exports = {
   /**
@@ -118,8 +138,8 @@ module.exports = {
   },
   /**
    * Get the list of all files part of the runtime, and their destination file when the runtime is bundled.
-   * @param {{bundledOutPath: string}} options
-   * @returns {Promise<{allGDJSInOutFilePaths: InOutPath[]; allExtensionsInOutFilePaths: InOutPath[];}>}
+   * @param {{bundledOutPath: string, esm:boolean}} options
+   * @returns {Promise<{allNamespacedInOutFilePaths: InOutPath[]; allESMInOutFilePaths: ESMInOutPath[];}>}
    */
   getAllInOutFilePaths: async (options) => {
     // List all the files of the runtime
@@ -139,6 +159,25 @@ module.exports = {
       getInOutPaths(gdevelopRootPath, options.bundledOutPath)
     );
 
-    return { allGDJSInOutFilePaths, allExtensionsInOutFilePaths };
+    const allInOutFilePaths = [
+      ...allGDJSInOutFilePaths,
+      ...allExtensionsInOutFilePaths,
+    ];
+
+    /** @type {Array<InOutPath} */
+    const allNamespacedInOutFilePaths = [];
+    /** @type {Array<ESMInOutPath} */
+    const allESMInOutFilePaths = [];
+
+    for (const inOutFilePath of allInOutFilePaths) {
+      if (isESM(inOutFilePath.inPath)) {
+        allESMInOutFilePaths.push({
+          ...inOutFilePath,
+          namespace: ESModulesList[inOutFilePath.inPath],
+        });
+      } else allNamespacedInOutFilePaths.push(inOutFilePath);
+    }
+
+    return { allNamespacedInOutFilePaths, allESMInOutFilePaths };
   },
 };

@@ -1,8 +1,6 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Video object PIXI renderer');
 
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The PIXI.js renderer for the VideoRuntimeObject.
    */

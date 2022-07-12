@@ -32,8 +32,8 @@
         "comment": "Palette/Purple/20"
       },
       "text-contrast-color": {
-        "value": "#1D1D26",
-        "comment": "Palette/Grey/100"
+        "value": "#FAFAFA",
+        "comment": "Palette/Grey/00"
       }
     },
     "success": {

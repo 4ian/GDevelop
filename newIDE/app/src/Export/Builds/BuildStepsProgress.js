@@ -7,17 +7,16 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import { Line, Spacer, Column } from '../../UI/Grid';
 import BuildProgressAndActions from './BuildProgressAndActions';
 import { type Build } from '../../Utils/GDevelopServices/Build';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
+import LinearProgress from '../../UI/LinearProgress';
 
 const styles = {
   stepper: { flex: 1 },
-  linearProgress: { flex: 1 },
 };
 
 export type BuildStep =
@@ -97,7 +96,6 @@ const BuildStepsProgress = ({
               </Text>
               <Line expand>
                 <LinearProgress
-                  style={styles.linearProgress}
                   value={
                     stepMaxProgress > 0
                       ? (stepCurrentProgress / stepMaxProgress) * 100
@@ -113,7 +111,7 @@ const BuildStepsProgress = ({
                 <Trans>Export in progress...</Trans>
               </Text>
               <Line expand>
-                <LinearProgress style={styles.linearProgress} />
+                <LinearProgress />
               </Line>
             </Column>
           )}
@@ -143,7 +141,6 @@ const BuildStepsProgress = ({
             ) : (
               <Line alignItems="center" expand>
                 <LinearProgress
-                  style={styles.linearProgress}
                   value={
                     stepMaxProgress > 0
                       ? (stepCurrentProgress / stepMaxProgress) * 100

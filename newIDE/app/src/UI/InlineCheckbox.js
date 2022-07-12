@@ -53,7 +53,7 @@ const InlineCheckbox = ({
       }
       icon={uncheckedIcon}
       checkedIcon={checkedIcon}
-      color="primary"
+      color="secondary"
     />
   );
   return label ? (

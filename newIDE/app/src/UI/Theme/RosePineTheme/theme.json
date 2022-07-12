@@ -182,6 +182,18 @@
           "value": "{theme.surface.canvas.background-color.value}"
         }
       }
+    },
+    "home": {
+      "header": {
+        "background-color": {
+          "value": "{theme.surface.canvas.background-color.value}"
+        }
+      },
+      "separator": {
+        "color": {
+          "value": "#32323B"
+        }
+      }
     }
   },
   "input": {
@@ -338,18 +350,6 @@
       "cannot-drop": {
         "border-top-color": {
           "value": "#eb6f92"
-        }
-      }
-    },
-    "home": {
-      "header": {
-        "background-color": {
-          "value": "{theme.surface.canvas.background-color.value}"
-        }
-      },
-      "separator": {
-        "color": {
-          "value": "#32323B"
         }
       }
     },

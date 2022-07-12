@@ -2,15 +2,15 @@
   "theme": {
     "primary": {
       "dark": {
-        "value": "#592ADA",
+        "value": "#37238F",
         "comment": "Palette/Purple/50"
       },
       "color": {
-        "value": "#784BF2",
+        "value": "#4F28CD",
         "comment": "Palette/Purple/40"
       },
       "light": {
-        "value": "#A588FC",
+        "value": "#7046EC",
         "comment": "Palette/Purple/30"
       },
       "text-contrast-color": {
@@ -20,15 +20,15 @@
     },
     "secondary": {
       "dark": {
-        "value": "#784BF2",
+        "value": "#4F28CD",
         "comment": "Palette/Purple/40"
       },
       "color": {
-        "value": "#A588FC",
+        "value": "#7046EC",
         "comment": "Palette/Purple/30"
       },
       "light": {
-        "value": "#C9B6FC",
+        "value": "#9979F1",
         "comment": "Palette/Purple/20"
       },
       "text-contrast-color": {

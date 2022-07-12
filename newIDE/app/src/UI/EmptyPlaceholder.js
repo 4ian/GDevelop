@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 import Container from '@material-ui/core/Container';
-import { CircularProgress } from '@material-ui/core';
 import Add from '@material-ui/icons/Add';
 import { ColumnStackLayout } from './Layout';
 import RaisedButton from '../UI/RaisedButton';
@@ -10,6 +9,7 @@ import { Column, LargeSpacer } from './Grid';
 import HelpButton from '../UI/HelpButton';
 import Text from '../UI/Text';
 import TutorialButton from './TutorialButton';
+import CircularProgress from './CircularProgress';
 
 type Props = {|
   title: React.Node,

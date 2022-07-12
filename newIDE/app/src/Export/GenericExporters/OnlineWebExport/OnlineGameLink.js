@@ -12,7 +12,6 @@ import {
 } from '../../../Utils/GDevelopServices/Build';
 import { type BuildStep } from '../../Builds/BuildStepsProgress';
 import InfoBar from '../../../UI/Messages/InfoBar';
-import { CircularProgress } from '@material-ui/core';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import {
@@ -35,6 +34,7 @@ import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
 import LinearProgress from '../../../UI/LinearProgress';
+import CircularProgress from '../../../UI/CircularProgress';
 
 type OnlineGameLinkProps = {|
   build: ?Build,

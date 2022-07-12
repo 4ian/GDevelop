@@ -35,7 +35,9 @@ export const ReplacePromptDialog = ({
   onClose,
   onTriggerReplace,
 }: ReplacePromptDialogProps) => {
-  const { authenticated, onLogin } = React.useContext(AuthenticatedUserContext);
+  const { authenticated, onCreateAccount } = React.useContext(
+    AuthenticatedUserContext
+  );
 
   return (
     <Dialog
@@ -65,12 +67,12 @@ export const ReplacePromptDialog = ({
               <DialogPrimaryButton
                 label={<Trans>Login now</Trans>}
                 primary
-                onClick={() => onLogin()}
+                onClick={() => onCreateAccount()}
                 key="login-now"
               />,
             ]
       }
-      title={<Trans>Leaderboards detected!</Trans>}
+      title={<Trans>Set up new leaderboards for this game</Trans>}
       noMargin
       open
       maxWidth="sm"
@@ -80,16 +82,15 @@ export const ReplacePromptDialog = ({
         <ColumnStackLayout>
           <Text>
             <Trans>
-              We detected leaderboards that are not yet valid. Registering this
-              project with your GDevelop account would allow us to create them
-              in your stead so that your project is ready to use and publish
-              with minimal efforts.
+              This game is using leaderboards. GDevelop will create new
+              leaderboards for this game in your account, so that the game is
+              ready to be played and players can send their scores.
             </Trans>
           </Text>
           <Text>
             <Trans>
-              You can still do this operation manually later from the
-              leaderboard configuration panel.
+              If you skip this step, you can still do it manually later from the
+              leaderboards panel in your Games Dashboard.
             </Trans>
           </Text>
         </ColumnStackLayout>
@@ -143,10 +144,11 @@ export const LeaderboardReplacerProgressDialog = ({
           <Text>
             {hasErrors && progress === 100 ? (
               <Trans>
-                There were errors when duplicating leaderboards for the project.
+                There were errors when preparing new leaderboards for the
+                project.
               </Trans>
             ) : (
-              <Trans>Leaderboards are duplicated...</Trans>
+              <Trans>Preparing the leaderboard for your game...</Trans>
             )}
           </Text>
           <LinearProgress variant="determinate" value={progress} />
@@ -227,7 +229,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
     async () => {
       const { getAuthorizationHeader, profile } = authenticatedUser;
       if (!leaderboardsToReplace || !project || !gameId) {
-        throw new Error('No leaderboards fetched from events sheet.');
+        throw new Error('No leaderboards found in events sheet.');
       }
       if (!profile) {
         throw new Error('User is not connected.');
@@ -244,7 +246,9 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
       setOnAbandon(null);
       setErroredLeaderboards([]);
 
-      // Register game.
+      // Register game. The error will silently be caught if the game already exists,
+      // but user will be able to retry if it doesn't because leaderboards copy will
+      // fail.
       try {
         await registerGame(getAuthorizationHeader, profile.id, {
           gameId: project.getProjectUuid(),
@@ -257,10 +261,10 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
       }
       setProgress(progressStep);
 
-      const duplicateLeaderboardAndProgress = async (
+      const duplicateLeaderboardAndStepProgress = async (
         authenticatedUser: AuthenticatedUser,
         leaderboardId: string
-      ) => {
+      ): Promise<?ErroredLeaderboard> => {
         try {
           const duplicatedLeaderboard = await duplicateLeaderboard(
             authenticatedUser,
@@ -273,30 +277,31 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
           replacedLeaderboardsMap[leaderboardId] = `"${
             duplicatedLeaderboard.id
           }"`;
+          setProgress(previousProgress => previousProgress + progressStep);
+          return null;
         } catch (error) {
           console.error(
             `Could not duplicate leaderboard ${leaderboardId}`,
             error
           );
-          setErroredLeaderboards(prevErroredLeaderboards =>
-            prevErroredLeaderboards.concat([
-              {
-                leaderboardId,
-                error: error,
-              },
-            ])
-          );
-        } finally {
           setProgress(previousProgress => previousProgress + progressStep);
+          return {
+            leaderboardId,
+            error: error,
+          };
         }
       };
 
       // Duplicate leaderboards.
-      await Promise.all(
+      const responseLeaderboardsWithErrors = await Promise.all(
         Array.from(leaderboardsToReplace).map(async leaderboardId =>
-          duplicateLeaderboardAndProgress(authenticatedUser, leaderboardId)
+          duplicateLeaderboardAndStepProgress(authenticatedUser, leaderboardId)
         )
       );
+      const leaderboardsWithErrors = responseLeaderboardsWithErrors.filter(
+        Boolean
+      );
+      setErroredLeaderboards(leaderboardsWithErrors);
 
       // Replace leaderboards in events.
       if (Object.keys(replacedLeaderboardsMap).length) {
@@ -312,9 +317,8 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
         eventsLeaderboardReplacer.delete();
       }
       setProgress(100);
-      console.log(erroredLeaderboards);
 
-      if (erroredLeaderboards.length === 0) {
+      if (leaderboardsWithErrors.length === 0) {
         // No error happened: finish normally, closing the dialog.
         setShouldReplace(false);
         setLeaderboardsToReplace(null);
@@ -329,7 +333,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
             // Keep only the errored leaderboards.
             setLeaderboardsToReplace(
               leaderboardsToReplace.filter(id =>
-                erroredLeaderboards.some(
+                leaderboardsWithErrors.some(
                   erroredLeaderboard => erroredLeaderboard.leaderboardId === id
                 )
               )
@@ -350,13 +354,7 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
         );
       });
     },
-    [
-      authenticatedUser,
-      erroredLeaderboards,
-      gameId,
-      leaderboardsToReplace,
-      project,
-    ]
+    [authenticatedUser, gameId, leaderboardsToReplace, project]
   );
 
   /**

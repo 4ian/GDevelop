@@ -10,14 +10,12 @@ import {
 } from '../../../Leaderboard/useLeaderboardReplacer';
 import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 import { fakeIndieAuthenticatedUser } from '../../../fixtures/GDevelopServicesTestData';
-import { makeTestProject } from '../../../fixtures/TestProject';
 
 export default {
   title: 'Leaderboard/LeaderboardReplacerDialog',
   component: LeaderboardReplacerProgressDialog,
   decorators: [paperDecorator, muiDecorator],
 };
-const { project } = makeTestProject(global.gd);
 
 export const IsReplacingLeaderboards = () => (
   <LeaderboardReplacerProgressDialog
@@ -41,7 +39,7 @@ export const WithErrors = () => (
   />
 );
 
-export const ReplacerPromptAuthentificatedUser = () => (
+export const ReplacerPromptAuthenticatedUser = () => (
   <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
     <ReplacePromptDialog
       leaderboardsToReplace={['leadeboard-to-replace']}
@@ -51,10 +49,14 @@ export const ReplacerPromptAuthentificatedUser = () => (
   </AuthenticatedUserContext.Provider>
 );
 
-export const ReplacerPromptNotAuthentificatedUser = () => (
-  <ReplacePromptDialog
-    leaderboardsToReplace={['leadeboard-to-replace']}
-    onClose={action('onClose')}
-    onTriggerReplace={action('onTriggerReplace')}
-  />
+export const ReplacerPromptNotAuthenticatedUser = () => (
+  <AuthenticatedUserContext.Provider
+    value={{ ...fakeIndieAuthenticatedUser, authenticated: false }}
+  >
+    <ReplacePromptDialog
+      leaderboardsToReplace={['leadeboard-to-replace']}
+      onClose={action('onClose')}
+      onTriggerReplace={action('onTriggerReplace')}
+    />
+  </AuthenticatedUserContext.Provider>
 );

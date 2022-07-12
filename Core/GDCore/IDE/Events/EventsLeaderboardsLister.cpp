@@ -21,13 +21,11 @@ namespace gd {
 
 bool EventsLeaderboardsLister::DoVisitInstruction(gd::Instruction& instruction,
                                                   bool isCondition) {
-  if (isCondition) {
-    return false;
-  };
-
   const gd::InstructionMetadata& instrInfo =
-      MetadataProvider::GetActionMetadata(project.GetCurrentPlatform(),
-                                          instruction.GetType());
+      isCondition ? MetadataProvider::GetConditionMetadata(
+                        project.GetCurrentPlatform(), instruction.GetType())
+                  : MetadataProvider::GetActionMetadata(
+                        project.GetCurrentPlatform(), instruction.GetType());
 
   for (int i = 0; i < instruction.GetParametersCount() &&
                   i < instrInfo.GetParametersCount();

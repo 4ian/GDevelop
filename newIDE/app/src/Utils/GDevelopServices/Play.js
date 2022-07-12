@@ -208,7 +208,7 @@ export const createLeaderboard = async (
   return response.data;
 };
 
-type DuplicateLeaderboardBody = {|
+type LeaderboardDuplicationPayload = {|
   sourceLeaderboardId: string,
   sourceGameId: string,
 |};
@@ -216,7 +216,7 @@ type DuplicateLeaderboardBody = {|
 export const duplicateLeaderboard = async (
   authenticatedUser: AuthenticatedUser,
   gameId: string,
-  { sourceLeaderboardId, sourceGameId }: DuplicateLeaderboardBody
+  payload: LeaderboardDuplicationPayload
 ): Promise<Leaderboard> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser) throw new Error('User is not authenticated.');
@@ -225,10 +225,7 @@ export const duplicateLeaderboard = async (
   const authorizationHeader = await getAuthorizationHeader();
   const response = await axios.post(
     `${GDevelopPlayApi.baseUrl}/game/${gameId}/leaderboard/action/copy`,
-    {
-      sourceLeaderboardId,
-      sourceGameId,
-    },
+    payload,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },

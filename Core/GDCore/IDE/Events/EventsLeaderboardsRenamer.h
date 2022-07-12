@@ -14,11 +14,7 @@
 #include "GDCore/String.h"
 namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class EventsList;
 }
 

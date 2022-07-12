@@ -19,8 +19,8 @@
 
 namespace gd {
 
-bool EventsLeaderboardsRenamer::DoVisitInstruction(
-    gd::Instruction& instruction, bool isCondition) {
+bool EventsLeaderboardsRenamer::DoVisitInstruction(gd::Instruction& instruction,
+                                                   bool isCondition) {
   const gd::InstructionMetadata& instrInfo =
       isCondition ? MetadataProvider::GetConditionMetadata(
                         project.GetCurrentPlatform(), instruction.GetType())
@@ -30,10 +30,11 @@ bool EventsLeaderboardsRenamer::DoVisitInstruction(
   for (int i = 0; i < instruction.GetParametersCount() &&
                   i < instrInfo.GetParametersCount();
        ++i) {
-    gd::ParameterMetadata parameter = instrInfo.GetParameter(i);
+    const gd::ParameterMetadata parameter = instrInfo.GetParameter(i);
 
     if (parameter.type == "leaderboardId") {
-      gd::String leaderboardId = instruction.GetParameter(i).GetPlainString();
+      const gd::String leaderboardId =
+          instruction.GetParameter(i).GetPlainString();
 
       if (leaderboardIdMap.find(leaderboardId) != leaderboardIdMap.end()) {
         instruction.SetParameter(i, leaderboardIdMap[leaderboardId]);

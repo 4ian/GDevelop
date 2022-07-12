@@ -428,7 +428,10 @@ export function createGdevelopTheme({
         fontFamily: styles['GdevelopModernFontFamily'],
         tooltipBackgroundColor:
           styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
-        dataColor1: styles['ThemePrimaryColor'],
+        dataColor1:
+          paletteType === 'dark'
+            ? lighten(styles['ThemePrimaryColor'], 0.3)
+            : styles['ThemePrimaryColor'],
         textColor: styles['ThemeTextDefaultColor'],
         gridColor: styles['ThemeTextDisabledColor'],
       },

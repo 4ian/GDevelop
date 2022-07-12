@@ -183,6 +183,34 @@ export const getSignedUrl = (params: {|
     .then(response => response.data);
 };
 
+export const getRedirectToSubscriptionPortalUrl = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<string> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.post(
+        `${GDevelopUsageApi.baseUrl}/subscription-v2/action/redirect-to-portal`,
+        {},
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data)
+    .then(({ sessionPortalUrl }) => {
+      if (!sessionPortalUrl || typeof sessionPortalUrl !== 'string')
+        throw new Error('Could not find the session portal url.');
+
+      return sessionPortalUrl;
+    });
+};
+
 export const getRedirectToCheckoutUrl = (
   planId: string,
   uid: string,

@@ -6,8 +6,8 @@ describe('Physics2RuntimeBehavior', () => {
       super(runtimeScene, behaviorData, owner);
     }
 
-    shouldAutoRemoveInPreEvent() {
-      this.shouldDeleteInPreEvent = true;
+    setShouldAutoRemoveInPreEvent(shouldDeleteInPreEvent) {
+      this.shouldDeleteInPreEvent = shouldDeleteInPreEvent;
     }
 
     doStepPreEvents(runtimeScene) {
@@ -373,7 +373,7 @@ describe('Physics2RuntimeBehavior', () => {
         true
       );
 
-      fakeAutoRemoverBehavior.shouldAutoRemoveInPreEvent();
+      fakeAutoRemoverBehavior.setShouldAutoRemoveInPreEvent(true);
       runtimeScene.renderAndStep(1000 / 60);
 
       expect(behavior.destroyedDuringFrameLogic).to.be(true);

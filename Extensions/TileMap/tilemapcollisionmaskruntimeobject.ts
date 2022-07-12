@@ -125,9 +125,6 @@ namespace gdjs {
       return true;
     }
 
-    /**
-     * Initialize the extra parameters that could be set for an instance.
-     */
     extraInitializationFromInitialInstance(initialInstanceData): void {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
@@ -212,6 +209,10 @@ namespace gdjs {
       this._transformationIsUpToDate = true;
     }
 
+    /**
+     * This method is expensive and should not be called.
+     * Prefer using {@link getHitBoxesAround} rather than getHitBoxes.
+     */
     getHitBoxes(): gdjs.Polygon[] {
       if (this.hitBoxesDirty) {
         this.updateHitBoxes();
@@ -439,10 +440,6 @@ namespace gdjs {
 
     // TODO allow size changes from events?
 
-    /**
-     * Set the width of the object.
-     * @param width The new width.
-     */
     setWidth(width: float): void {
       if (this._renderer.getWidth() === width) return;
 
@@ -451,10 +448,6 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    /**
-     * Set the height of the object.
-     * @param height The new height.
-     */
     setHeight(height: float): void {
       if (this._renderer.getHeight() === height) return;
 
@@ -463,16 +456,10 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    /**
-     * Get the width of the object.
-     */
     getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    /**
-     * Get the height of the object.
-     */
     getHeight(): float {
       return this._renderer.getHeight();
     }

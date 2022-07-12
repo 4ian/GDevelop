@@ -106,9 +106,6 @@ namespace gdjs {
       return true;
     }
 
-    /**
-     * Initialize the extra parameters that could be set for an instance.
-     */
     extraInitializationFromInitialInstance(initialInstanceData): void {
       if (initialInstanceData.customSize) {
         this.setWidth(initialInstanceData.width);
@@ -215,10 +212,6 @@ namespace gdjs {
       return this._animationSpeedScale;
     }
 
-    /**
-     * Set the width of the object.
-     * @param width The new width.
-     */
     setWidth(width: float): void {
       if (this._renderer.getWidth() === width) return;
 
@@ -226,10 +219,6 @@ namespace gdjs {
       this.hitBoxesDirty = true;
     }
 
-    /**
-     * Set the height of the object.
-     * @param height The new height.
-     */
     setHeight(height: float): void {
       if (this._renderer.getHeight() === height) return;
 
@@ -237,28 +226,16 @@ namespace gdjs {
       this.hitBoxesDirty = true;
     }
 
-    /**
-     * Set object position on X axis.
-     * @param x The new position X of the object.
-     */
     setX(x: float): void {
       super.setX(x);
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set object position on Y axis.
-     * @param y The new position Y of the object.
-     */
     setY(y: float): void {
       super.setY(y);
       this._renderer.updatePosition();
     }
 
-    /**
-     * Set the angle of the object.
-     * @param angle The new angle of the object.
-     */
     setAngle(angle: float): void {
       super.setAngle(angle);
       this._renderer.updateAngle();
@@ -280,16 +257,10 @@ namespace gdjs {
       return this._opacity;
     }
 
-    /**
-     * Get the width of the object.
-     */
     getWidth(): float {
       return this._renderer.getWidth();
     }
 
-    /**
-     * Get the height of the object.
-     */
     getHeight(): float {
       return this._renderer.getHeight();
     }

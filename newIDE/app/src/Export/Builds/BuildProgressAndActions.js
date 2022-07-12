@@ -8,7 +8,6 @@ import RaisedButton from '../../UI/RaisedButton';
 import { Spacer, Line, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 import differenceInSeconds from 'date-fns/differenceInSeconds';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import Text from '../../UI/Text';
 import {
   getBuildArtifactUrl,
@@ -25,6 +24,7 @@ import Download from '../../UI/CustomSvgIcons/Download';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import OpenInNew from '@material-ui/icons/OpenInNew';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
+import LinearProgress from '../../UI/LinearProgress';
 
 const buildTypesConfig = {
   'cordova-build': {
@@ -212,7 +212,6 @@ const BuildProgressAndActions = ({
               {(isStillWithinEstimatedTime || hasJustOverrun) && (
                 <>
                   <LinearProgress
-                    style={{ flex: 1 }}
                     value={
                       isStillWithinEstimatedTime
                         ? ((estimatedTime - estimatedRemainingTime) /

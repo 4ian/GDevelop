@@ -52,7 +52,7 @@ const VerticalTabButton = ({
       }}
       fullWidth
       onClick={onClick}
-      color={isActive ? 'secondary' : 'default'}
+      color={isActive ? 'primary' : 'default'}
     >
       <div
         style={
@@ -61,7 +61,7 @@ const VerticalTabButton = ({
             : styles.iconWrapperWithLabel
         }
       >
-        {getIcon(isActive ? 'inherit' : 'primary')}
+        {getIcon(isActive ? 'inherit' : 'secondary')}
       </div>
       {!hideLabel && (
         <>

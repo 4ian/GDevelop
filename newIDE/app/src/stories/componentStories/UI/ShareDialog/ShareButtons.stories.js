@@ -6,9 +6,9 @@ import paperDecorator from '../../../PaperDecorator';
 import SocialShareButtons from '../../../../UI/ShareDialog/SocialShareButtons';
 
 export default {
-  title: 'UI/ShareDialog/SocialShareButtons',
+  title: 'UI Building Blocks/ShareDialog/SocialShareButtons',
   component: SocialShareButtons,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const DefaultSocialShareButtons = () => (

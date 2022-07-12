@@ -52,7 +52,7 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
     <ButtonGroup
       variant={primary ? 'contained' : 'outlined'}
       disableElevation
-      color={primary ? 'secondary' : 'primary'}
+      color={primary ? 'primary' : 'secondary'}
       disabled={disabled}
       size="small"
       style={props.style}

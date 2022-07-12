@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';
@@ -8,7 +7,6 @@ import paperDecorator from '../../PaperDecorator';
 
 import SliderComponent from '../../../UI/Slider';
 import ValueStateHolder from '../../ValueStateHolder';
-import { Line } from '../../../UI/Grid';
 
 export default {
   title: 'Slider',

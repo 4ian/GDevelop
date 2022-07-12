@@ -5,11 +5,14 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import SliderComponent from '../../../UI/Slider';
-
 import Brush from '@material-ui/icons/Brush';
 import FilterList from '@material-ui/icons/FilterList';
 import CloudDownload from '@material-ui/icons/CloudDownload';
+import Delete from '@material-ui/icons/Delete';
+import AddCircle from '@material-ui/icons/AddCircle';
+import Home from '../../../UI/CustomSvgIcons/Home';
+import Crown from '../../../UI/CustomSvgIcons/Crown';
+import Cut from '../../../UI/CustomSvgIcons/Cut';
 
 import { ColumnStackLayout, LineStackLayout } from '../../../UI/Layout';
 import Text from '../../../UI/Text';
@@ -22,6 +25,7 @@ import ElementWithMenu from '../../../UI/Menu/ElementWithMenu';
 import ToolbarIcon from '../../../UI/ToolbarIcon';
 import MiniToolbar, { MiniToolbarText } from '../../../UI/MiniToolbar';
 import IconButton from '../../../UI/IconButton';
+import { Column, Line } from '../../../UI/Grid';
 
 const buildFakeMenuTemplate = () => [
   {
@@ -37,14 +41,13 @@ const buildFakeMenuTemplate = () => [
 
 export default {
   title: 'UI Building Blocks/Buttons',
-  component: SliderComponent,
   decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => (
   <ColumnStackLayout>
     <LineStackLayout noMargin>
-      <Text>Buttons:</Text>
+      <Text size="block-title">Buttons:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
       <RaisedButton label="Raised button" onClick={action('onClick')()} />
@@ -104,7 +107,7 @@ export const Default = () => (
       />
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <Text>Buttons with split menus:</Text>
+      <Text size="block-title">Buttons with split menus:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
       <RaisedButton
@@ -137,7 +140,7 @@ export const Default = () => (
       />
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <Text>Buttons with menus:</Text>
+      <Text size="block-title">Buttons with menus:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
       <RaisedButton
@@ -161,7 +164,7 @@ export const Default = () => (
       />
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <Text>Icons with menu:</Text>
+      <Text size="block-title">Icons with menu:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
       <ElementWithMenu
@@ -183,7 +186,58 @@ export const Default = () => (
       />
     </LineStackLayout>
     <LineStackLayout noMargin>
-      <Text>In a mini toolbar:</Text>
+      <Text size="block-title">Icons</Text>
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <Column expand>
+        <Text>A few Material UI icon buttons</Text>
+        <Line noMargin>
+          <IconButton>
+            <Brush />
+          </IconButton>
+          <IconButton>
+            <Brush fontSize="small" />
+          </IconButton>
+          <IconButton>
+            <Delete />
+          </IconButton>
+          <IconButton>
+            <Delete fontSize="small" />
+          </IconButton>
+          <IconButton>
+            <AddCircle />
+          </IconButton>
+          <IconButton>
+            <AddCircle fontSize="small" />
+          </IconButton>
+        </Line>
+      </Column>
+      <Column expand>
+        <Text>A few SVG icon buttons</Text>
+        <Line noMargin>
+          <IconButton>
+            <Home />
+          </IconButton>
+          <IconButton>
+            <Home fontSize="small" />
+          </IconButton>
+          <IconButton>
+            <Cut />
+          </IconButton>
+          <IconButton>
+            <Cut fontSize="small" />
+          </IconButton>
+          <IconButton>
+            <Crown />
+          </IconButton>
+          <IconButton>
+            <Crown fontSize="small" />
+          </IconButton>
+        </Line>
+      </Column>
+    </LineStackLayout>
+    <LineStackLayout noMargin>
+      <Text size="block-title">In a mini toolbar:</Text>
     </LineStackLayout>
     <LineStackLayout noMargin>
       <MiniToolbar>

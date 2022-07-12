@@ -9,6 +9,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 import Fade from '@material-ui/core/Fade';
 
+const styles = {
+  menuItemWithSubMenu: { justifyContent: 'space-between' },
+};
+
 const SubMenuItem = ({ item, buildFromTemplate }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const anchorElement = useRef(null);
@@ -20,6 +24,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
     <React.Fragment>
       <MenuItem
         dense
+        style={styles.menuItemWithSubMenu}
         key={item.label}
         disabled={item.enabled === false}
         onClick={event => {
@@ -35,7 +40,7 @@ const SubMenuItem = ({ item, buildFromTemplate }) => {
         }}
       >
         {item.label}
-        <ArrowRightIcon />
+        <ArrowRightIcon ref={anchorElement} />
       </MenuItem>
       <Menu
         open={menuOpen}

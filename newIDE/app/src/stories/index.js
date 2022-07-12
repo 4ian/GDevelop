@@ -1381,6 +1381,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
   ));
 
 storiesOf('UI Building Blocks/EditorNavigator', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <EditorMosaicPlayground
@@ -1448,14 +1449,17 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
   ));
 
 storiesOf('UI Building Blocks/HelpButton', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
 
 storiesOf('UI Building Blocks/HelpIcon', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 storiesOf('HelpFinder', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpFinder open onClose={action('close')} />);
 

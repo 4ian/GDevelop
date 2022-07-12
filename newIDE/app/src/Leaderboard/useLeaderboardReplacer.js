@@ -46,22 +46,22 @@ export const ReplacePromptDialog = ({
           ? [
               <FlatButton
                 primary
-                key="register-game-later"
-                label={<Trans>Register later</Trans>}
+                key="register-close"
+                label={<Trans>Close</Trans>}
                 onClick={onClose}
               />,
               <DialogPrimaryButton
                 primary
                 key="register-game-now"
-                label={<Trans>Register now</Trans>}
+                label={<Trans>Create new leaderboards now</Trans>}
                 onClick={onTriggerReplace}
               />,
             ]
           : [
               <FlatButton
                 primary
-                key="login-later"
-                label={<Trans>Login later</Trans>}
+                key="login-close"
+                label={<Trans>Close</Trans>}
                 onClick={onClose}
               />,
               <DialogPrimaryButton
@@ -380,29 +380,25 @@ export const useLeaderboardReplacer = (): UseLeaderboardReplacerOutput => {
   const renderLeaderboardReplacerDialog = () => {
     if (!leaderboardsToReplace || !leaderboardsToReplace.length) return null;
 
-    return (
-      <>
-        {gameId &&
-        project &&
-        shouldReplace &&
-        authenticatedUser.authenticated ? (
-          <LeaderboardReplacerProgressDialog
-            erroredLeaderboards={erroredLeaderboards}
-            onRetry={onRetry}
-            onAbandon={onAbandon}
-            progress={progress}
-          />
-        ) : (
-          <ReplacePromptDialog
-            leaderboardsToReplace={leaderboardsToReplace}
-            onClose={() => setLeaderboardsToReplace(null)}
-            onTriggerReplace={() => {
-              setShouldReplace(true);
-              ensureLeaderboardsAreReplaced();
-            }}
-          />
-        )}
-      </>
+    return gameId &&
+      project &&
+      shouldReplace &&
+      authenticatedUser.authenticated ? (
+      <LeaderboardReplacerProgressDialog
+        erroredLeaderboards={erroredLeaderboards}
+        onRetry={onRetry}
+        onAbandon={onAbandon}
+        progress={progress}
+      />
+    ) : (
+      <ReplacePromptDialog
+        leaderboardsToReplace={leaderboardsToReplace}
+        onClose={() => setLeaderboardsToReplace(null)}
+        onTriggerReplace={() => {
+          setShouldReplace(true);
+          ensureLeaderboardsAreReplaced();
+        }}
+      />
     );
   };
 

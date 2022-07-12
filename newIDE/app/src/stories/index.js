@@ -225,6 +225,7 @@ const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
 };
 
 storiesOf('Welcome', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('to Storybook', () => <Welcome />);
 

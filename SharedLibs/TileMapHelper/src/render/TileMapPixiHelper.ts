@@ -40,6 +40,7 @@ export class PixiTileMapHelper {
       return null;
     }
 
+    const tiledSet = tiledMap.tilesets[0];
     const {
       tilewidth,
       tileheight,
@@ -48,8 +49,8 @@ export class PixiTileMapHelper {
       columns,
       spacing,
       margin,
-      firstgid,
-    } = tiledMap.tilesets[0];
+    } = tiledSet;
+    const firstGid = tiledSet.firstgid === undefined ? 1 : tiledSet.firstgid;
     if (!atlasTexture) atlasTexture = getTexture(image);
 
     // We try to detect what size Tiled is expecting.
@@ -83,7 +84,7 @@ export class PixiTileMapHelper {
       const rowMultiplier = Math.floor(tileSetIndex / columns);
       const x = margin + columnMultiplier * (tilewidth + spacing);
       const y = margin + rowMultiplier * (tileheight + spacing);
-      const tileId = getTileIdFromTiledGUI((firstgid || 1) + tileSetIndex);
+      const tileId = getTileIdFromTiledGUI(firstGid + tileSetIndex);
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);

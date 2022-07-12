@@ -26,6 +26,7 @@ export class TiledTileMapLoader {
 
     const definitions = new Map<integer, TileDefinition>();
     for (const tiledSet of tiledMap.tilesets) {
+      const firstGid = tiledSet.firstgid === undefined ? 1 : tiledSet.firstgid;
       if (tiledSet.tiles) {
         for (const tile of tiledSet.tiles) {
           const tileDefinition = new TileDefinition(
@@ -86,14 +87,14 @@ export class TiledTileMapLoader {
             tileDefinition.add(tile.type, polygon);
           }
           definitions.set(
-            getTileIdFromTiledGUI((tiledSet.firstgid || 1) + tile.id),
+            getTileIdFromTiledGUI(firstGid + tile.id),
             tileDefinition
           );
         }
       }
       for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
         const tileId = getTileIdFromTiledGUI(
-          (tiledSet.firstgid || 1) + tileIndex
+          firstGid + tileIndex
         );
         if (!definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));

@@ -8,6 +8,7 @@ import {
 import { TileTextureCache } from "./TileTextureCache";
 
 import PIXI = GlobalPIXIModule.PIXI;
+import { getTileIdFromTiledGUI } from "../tiled/TiledLoaderHelper";
 
 export class PixiTileMapHelper {
   /**
@@ -47,6 +48,7 @@ export class PixiTileMapHelper {
       columns,
       spacing,
       margin,
+      firstgid,
     } = tiledMap.tilesets[0];
     if (!atlasTexture) atlasTexture = getTexture(image);
 
@@ -76,17 +78,18 @@ export class PixiTileMapHelper {
     // Note that this cache can be augmented later with rotated/flipped
     // versions of the tile textures.
     const textureCache = new TileTextureCache();
-    for (let frame = 0; frame < tilecount; frame++) {
-      const columnMultiplier = Math.floor(frame % columns);
-      const rowMultiplier = Math.floor(frame / columns);
+    for (let tileSetIndex = 0; tileSetIndex < tilecount; tileSetIndex++) {
+      const columnMultiplier = Math.floor(tileSetIndex % columns);
+      const rowMultiplier = Math.floor(tileSetIndex / columns);
       const x = margin + columnMultiplier * (tilewidth + spacing);
       const y = margin + rowMultiplier * (tileheight + spacing);
+      const tileId = getTileIdFromTiledGUI(firstgid + tileSetIndex);
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
         const texture = new PIXI.Texture(atlasTexture!, rect);
 
-        textureCache.setTexture(frame, false, false, false, texture);
+        textureCache.setTexture(tileId, false, false, false, texture);
       } catch (error) {
         console.error(
           "An error occurred while creating a PIXI.Texture to be used in a TileMap:",
@@ -157,34 +160,37 @@ export class PixiTileMapHelper {
             const xPos = tileWidth * x;
             const yPos = tileLayer.tileMap.getTileHeight() * y;
 
-            const tileId = tileLayer.get(x, y)!;
-
+            const tileId = tileLayer.get(x, y);
+            if (tileId === undefined) {
+              continue;
+            }
             const tileTexture = textureCache.findTileTexture(
               tileId,
               tileLayer.isFlippedHorizontally(x, y),
               tileLayer.isFlippedVertically(x, y),
               tileLayer.isFlippedDiagonally(x, y)
             );
-            if (tileTexture) {
-              const pixiTilemapFrame = pixiTileMap.addFrame(
-                tileTexture,
-                xPos,
-                yPos
-              );
+            if (!tileTexture) {
+              continue;
+            }
+            const pixiTilemapFrame = pixiTileMap.addFrame(
+              tileTexture,
+              xPos,
+              yPos
+            );
 
-              const tileDefinition = tileLayer.tileMap.getTileDefinition(
-                tileId
-              );
+            const tileDefinition = tileLayer.tileMap.getTileDefinition(
+              tileId
+            );
 
-              // Animated tiles have a limitation:
-              // they are only able to use frames arranged horizontally one next
-              // to each other on the atlas.
-              if (tileDefinition && tileDefinition.getAnimationLength() > 0) {
-                pixiTilemapFrame.tileAnimX(
-                  tileWidth,
-                  tileDefinition.getAnimationLength()
-                );
-              }
+            // Animated tiles have a limitation:
+            // they are only able to use frames arranged horizontally one next
+            // to each other on the atlas.
+            if (tileDefinition && tileDefinition.getAnimationLength() > 0) {
+              pixiTilemapFrame.tileAnimX(
+                tileWidth,
+                tileDefinition.getAnimationLength()
+              );
             }
           }
         }

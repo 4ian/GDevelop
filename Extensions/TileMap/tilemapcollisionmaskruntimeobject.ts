@@ -151,6 +151,7 @@ namespace gdjs {
           this.hitBoxes = Array.from(
             this._collisionTileMap.getAllHitboxes(this._collisionMaskTag)
           );
+          this._renderer.redrawCollisionMask();
         }
       );
     }
@@ -228,7 +229,6 @@ namespace gdjs {
       // update the whole collision mask where only a few hitboxes must be
       // checked.
       this.updateTransformation();
-
       return this._collisionTileMap.getHitboxesAround(
         this._collisionMaskTag,
         left,

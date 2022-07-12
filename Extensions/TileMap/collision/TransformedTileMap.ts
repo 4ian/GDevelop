@@ -43,11 +43,11 @@ namespace gdjs {
         this._layers = new Map<integer, TransformedCollisionTileMapLayer>();
         for (const sourceLayer of source.getLayers()) {
           // TODO A visitor could be used to avoid a cast.
-          const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
-          if (!tileLayer) {
+          if (!(sourceLayer instanceof TileMapHelper.EditableTileMapLayer)) {
             // TODO Collision mask for object layers is not handled.
             continue;
           }
+          const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
           this._layers.set(
             tileLayer.id,
             new TransformedCollisionTileMapLayer(this, tileLayer)

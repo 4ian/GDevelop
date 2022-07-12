@@ -58,7 +58,6 @@ export class TileTextureCache {
       flippedVertically,
       flippedDiagonally
     );
-    if (globalTileUid === 0) return undefined;
 
     if (this._textures.has(globalTileUid)) {
       return this._textures.get(globalTileUid);

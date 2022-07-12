@@ -8,6 +8,7 @@ import { TiledMap } from "./TiledFormat";
 import {
   extractTileUidFlippedStates,
   decodeBase64LayerData,
+  getTileIdFromTiledGUI,
 } from "./TiledLoaderHelper";
 
 /**
@@ -24,55 +25,70 @@ export class TiledTileMapLoader {
     }
 
     const definitions = new Map<integer, TileDefinition>();
-    const tiledSet = tiledMap.tilesets[0];
-    if (tiledSet.tiles) {
-      for (const tile of tiledSet.tiles) {
-        const tileDefinition = new TileDefinition(
-          tile.animation ? tile.animation.length : 0
-        );
-        if (tile.objectgroup) {
-          for (const object of tile.objectgroup.objects) {
-            let polygon: PolygonVertices | null = null;
-            if (object.polygon) {
-              const angle = (object.rotation * Math.PI) / 180;
-              let cos = Math.cos(angle);
-              let sin = Math.sin(angle);
-              // Avoid rounding errors around 0.
-              if (cos === -1 || cos === 1) {
-                sin = 0;
+    for (const tiledSet of tiledMap.tilesets) {
+      if (tiledSet.tiles) {
+        for (const tile of tiledSet.tiles) {
+          const tileDefinition = new TileDefinition(
+            tile.animation ? tile.animation.length : 0
+          );
+          if (tile.objectgroup) {
+            for (const object of tile.objectgroup.objects) {
+              const tag = object.type || tile.type;
+              if (!tag || tag.length === 0) {
+                continue;
               }
-              if (sin === -1 || sin === 1) {
-                cos = 0;
+              let polygon: PolygonVertices | null = null;
+              if (object.polygon) {
+                const angle = (object.rotation * Math.PI) / 180;
+                let cos = Math.cos(angle);
+                let sin = Math.sin(angle);
+                // Avoid rounding errors around 0.
+                if (cos === -1 || cos === 1) {
+                  sin = 0;
+                }
+                if (sin === -1 || sin === 1) {
+                  cos = 0;
+                }
+                polygon = object.polygon.map((point) => [
+                  object.x + point.x * cos - point.y * sin,
+                  object.y + point.x * sin + point.y * cos,
+                ]);
+                //TODO check that polygons are convex or split them?
               }
-              polygon = object.polygon.map((point) => [
-                object.x + point.x * cos - point.y * sin,
-                object.y + point.x * sin + point.y * cos,
-              ]);
-              //TODO check that polygons are convex or split them?
+              // TODO handle ellipses by creating a polygon?
+              // Make an object property for the number of vertices or always create 8 ones?
+              // Will the user need the same vertices number for every ellipse?
+              else if (object.x !== undefined && object.y !== undefined && object.width !== undefined && object.height !== undefined) {
+                polygon = [
+                  [object.x, object.y],
+                  [object.x, object.y + object.height],
+                  [object.x + object.width, object.y + object.height],
+                  [object.x + object.width, object.y],
+                ];
+              }
+              if (polygon) {
+                tileDefinition.add(tag, polygon);
+              }
             }
-            // TODO handle ellipses by creating a polygon?
-            // Make an object property for the number of vertices or always create 8 ones?
-            // Will the user need the same vertices number for every ellipse?
-            else {
-              polygon = [
-                [object.x, object.y],
-                [object.x, object.y + object.height],
-                [object.x + object.width, object.y + object.height],
-                [object.x + object.width, object.y],
-              ];
-            }
-            tileDefinition.add(object.type || tile.type, polygon);
           }
+          else if (tile.type && tile.type.length > 0) {
+            // When there is no shape, default to the whole tile.
+            const polygon: PolygonVertices = [
+              [0, 0],
+              [0, tiledMap.tileheight],
+              [tiledMap.tilewidth, tiledMap.tileheight],
+              [tiledMap.tilewidth, 0],
+            ];
+            tileDefinition.add(tile.type, polygon);
+          }
+          definitions.set(getTileIdFromTiledGUI(tiledSet.firstgid + tile.id), tileDefinition);
         }
-        definitions.set(tile.id, tileDefinition);
       }
-    }
-    for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
-      // Tiled use 0 as null, we do too but it's black boxed.
-      // This is why -1 is used here.
-      const tileId = tiledSet.firstgid - 1 + tileIndex;
-      if (!definitions.has(tileId)) {
-        definitions.set(tileId, new TileDefinition(0));
+      for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
+        const tileId = getTileIdFromTiledGUI(tiledSet.firstgid + tileIndex);
+        if (!definitions.has(tileId)) {
+          definitions.set(tileId, new TileDefinition(0));
+        }
       }
     }
     const collisionTileMap = new EditableTileMap(
@@ -88,7 +104,7 @@ export class TiledTileMapLoader {
         const objectLayer = collisionTileMap.addObjectLayer(tiledLayer.id);
         objectLayer.setVisible(tiledLayer.visible);
         for (const tiledObject of tiledLayer.objects) {
-          if (!tiledObject.visible) {
+          if (!tiledObject.visible || !tiledObject.gid) {
             // Objects layer are nice to put decorations but dynamic objects
             // must be done with GDevelop objects.
             // So, there is no point to load it as there won't be any action to
@@ -132,8 +148,8 @@ export class TiledTileMapLoader {
               const globalTileUid = layerData[tileSlotIndex];
               // Extract the tile UID and the texture.
               const tileUid = extractTileUidFlippedStates(globalTileUid);
-              if (tileUid.id > 0) {
-                collisionTileLayer.setTile(x, y, tileUid.id - 1);
+              if (tileUid.id !== undefined) {
+                collisionTileLayer.setTile(x, y, tileUid.id);
                 collisionTileLayer.setFlippedHorizontally(
                   x,
                   y,
@@ -160,3 +176,4 @@ export class TiledTileMapLoader {
     return collisionTileMap;
   }
 }
+

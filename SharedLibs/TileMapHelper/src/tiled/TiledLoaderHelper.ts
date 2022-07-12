@@ -81,13 +81,13 @@ export const extractTileUidFlippedStates = (
   const flippedHorizontally = globalTileUid & FLIPPED_HORIZONTALLY_FLAG;
   const flippedVertically = globalTileUid & FLIPPED_VERTICALLY_FLAG;
   const flippedDiagonally = globalTileUid & FLIPPED_DIAGONALLY_FLAG;
-  const tileUid =
+  const tileUid = getTileIdFromTiledGUI(
     globalTileUid &
     ~(
       FLIPPED_HORIZONTALLY_FLAG |
       FLIPPED_VERTICALLY_FLAG |
       FLIPPED_DIAGONALLY_FLAG
-    );
+    ));
 
   return {
     id: tileUid,
@@ -96,3 +96,10 @@ export const extractTileUidFlippedStates = (
     flippedDiagonally: !!flippedDiagonally,
   };
 };
+
+/**
+ * Tiled use 0 as null, we do too but it's black boxed.
+ * This is why the id needs to be decremented.
+ * @return the tile identifier used in {@link TilMapModel}.
+ */
+export const getTileIdFromTiledGUI = (tiledGUI: number | undefined): number | undefined => tiledGUI === 0 ? undefined : tiledGUI - 1;

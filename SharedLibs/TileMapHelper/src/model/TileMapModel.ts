@@ -391,7 +391,8 @@ export class EditableTileMapLayer extends AbstractEditableLayer {
   setTile(x: integer, y: integer, tileId: integer): void {
     const definition = this.tileMap.getTileDefinition(tileId);
     if (!definition) {
-      throw new Error(`Invalid tile definition index: ${tileId}`);
+      console.error(`Invalid tile definition index: ${tileId}`);
+      return;
     }
     // +1 because 0 mean null
     this._tiles[y][x] = tileId + 1;

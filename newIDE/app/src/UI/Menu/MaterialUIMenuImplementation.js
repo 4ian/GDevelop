@@ -11,6 +11,7 @@ import Fade from '@material-ui/core/Fade';
 
 const styles = {
   menuItemWithSubMenu: { justifyContent: 'space-between' },
+  divider: { marginLeft: 16, marginRight: 16 },
 };
 
 const SubMenuItem = ({ item, buildFromTemplate }) => {
@@ -84,8 +85,7 @@ export default class MaterialUIMenuImplementation {
         //   : undefined;
 
         if (item.type === 'separator') {
-          return <Divider key={'separator' + id} />;
-          // return null;
+          return <Divider key={'separator' + id} style={styles.divider} />;
         } else if (item.type === 'checkbox') {
           return (
             <MenuItem

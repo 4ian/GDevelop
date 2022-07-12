@@ -113,9 +113,9 @@ export class TileTextureCache {
     return flippedTexture;
   }
 
-/**
- * @return the Tiled tile global uniq identifier.
- */
+  /**
+   * @return the Tiled tile global uniq identifier.
+   */
   private _getGlobalId(
     tileId: integer,
     flippedHorizontally: boolean,

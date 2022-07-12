@@ -28,7 +28,7 @@ export class TileMapManager {
    * @param instanceHolder Where to set the manager instance.
    * @returns The shared manager.
    */
-   static getManager(instanceHolder: Object): TileMapManager {
+  static getManager(instanceHolder: Object): TileMapManager {
     // @ts-ignore
     if (!instanceHolder.tileMapCollisionMaskManager) {
       //Create the shared manager if necessary.
@@ -101,7 +101,11 @@ export class TileMapManager {
     callback: (textureCache: TileTextureCache | null) => void
   ): void {
     const key =
-      tileMapJsonResourceName + "|" + tileSetJsonResourceName + "|" + atlasImageResourceName;
+      tileMapJsonResourceName +
+      "|" +
+      tileSetJsonResourceName +
+      "|" +
+      atlasImageResourceName;
 
     this._textureCacheCaches.getOrLoad(
       key,

@@ -83,11 +83,12 @@ export const extractTileUidFlippedStates = (
   const flippedDiagonally = globalTileUid & FLIPPED_DIAGONALLY_FLAG;
   const tileUid = getTileIdFromTiledGUI(
     globalTileUid &
-    ~(
-      FLIPPED_HORIZONTALLY_FLAG |
-      FLIPPED_VERTICALLY_FLAG |
-      FLIPPED_DIAGONALLY_FLAG
-    ));
+      ~(
+        FLIPPED_HORIZONTALLY_FLAG |
+        FLIPPED_VERTICALLY_FLAG |
+        FLIPPED_DIAGONALLY_FLAG
+      )
+  );
 
   return {
     id: tileUid,
@@ -102,4 +103,6 @@ export const extractTileUidFlippedStates = (
  * This is why the id needs to be decremented.
  * @return the tile identifier used in {@link TilMapModel}.
  */
-export const getTileIdFromTiledGUI = (tiledGUI: number | undefined): number | undefined => tiledGUI === 0 ? undefined : tiledGUI - 1;
+export const getTileIdFromTiledGUI = (
+  tiledGUI: number | undefined
+): number | undefined => (tiledGUI === 0 ? undefined : tiledGUI - 1);

@@ -58,7 +58,12 @@ export class TiledTileMapLoader {
               // TODO handle ellipses by creating a polygon?
               // Make an object property for the number of vertices or always create 8 ones?
               // Will the user need the same vertices number for every ellipse?
-              else if (object.x !== undefined && object.y !== undefined && object.width !== undefined && object.height !== undefined) {
+              else if (
+                object.x !== undefined &&
+                object.y !== undefined &&
+                object.width !== undefined &&
+                object.height !== undefined
+              ) {
                 polygon = [
                   [object.x, object.y],
                   [object.x, object.y + object.height],
@@ -70,8 +75,7 @@ export class TiledTileMapLoader {
                 tileDefinition.add(tag, polygon);
               }
             }
-          }
-          else if (tile.type && tile.type.length > 0) {
+          } else if (tile.type && tile.type.length > 0) {
             // When there is no shape, default to the whole tile.
             const polygon: PolygonVertices = [
               [0, 0],
@@ -81,16 +85,22 @@ export class TiledTileMapLoader {
             ];
             tileDefinition.add(tile.type, polygon);
           }
-          definitions.set(getTileIdFromTiledGUI(tiledSet.firstgid + tile.id), tileDefinition);
+          definitions.set(
+            getTileIdFromTiledGUI((tiledSet.firstgid || 1) + tile.id),
+            tileDefinition
+          );
         }
       }
       for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
-        const tileId = getTileIdFromTiledGUI(tiledSet.firstgid + tileIndex);
+        const tileId = getTileIdFromTiledGUI(
+          (tiledSet.firstgid || 1) + tileIndex
+        );
         if (!definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));
         }
       }
     }
+
     const collisionTileMap = new EditableTileMap(
       tiledMap.tilewidth,
       tiledMap.tileheight,
@@ -176,4 +186,3 @@ export class TiledTileMapLoader {
     return collisionTileMap;
   }
 }
-

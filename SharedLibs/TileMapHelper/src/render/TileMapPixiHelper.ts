@@ -83,7 +83,7 @@ export class PixiTileMapHelper {
       const rowMultiplier = Math.floor(tileSetIndex / columns);
       const x = margin + columnMultiplier * (tilewidth + spacing);
       const y = margin + rowMultiplier * (tileheight + spacing);
-      const tileId = getTileIdFromTiledGUI(firstgid + tileSetIndex);
+      const tileId = getTileIdFromTiledGUI((firstgid || 1) + tileSetIndex);
 
       try {
         const rect = new PIXI.Rectangle(x, y, tilewidth, tileheight);
@@ -179,9 +179,7 @@ export class PixiTileMapHelper {
               yPos
             );
 
-            const tileDefinition = tileLayer.tileMap.getTileDefinition(
-              tileId
-            );
+            const tileDefinition = tileLayer.tileMap.getTileDefinition(tileId);
 
             // Animated tiles have a limitation:
             // they are only able to use frames arranged horizontally one next

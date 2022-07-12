@@ -1,6 +1,6 @@
 import React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { Dialog, DialogContent } from '@material-ui/core';
+import CircularProgress from './CircularProgress';
 
 const loaderSize = 50;
 

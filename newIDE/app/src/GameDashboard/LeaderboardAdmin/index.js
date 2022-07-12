@@ -5,7 +5,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import Avatar from '@material-ui/core/Avatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -44,6 +43,7 @@ import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
 import SelectField from '../../UI/SelectField';
+import CircularProgress from '../../UI/CircularProgress';
 import SelectOption from '../../UI/SelectOption';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import {

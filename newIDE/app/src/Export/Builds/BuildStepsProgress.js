@@ -6,7 +6,6 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { Line, Spacer, Column } from '../../UI/Grid';
 import BuildProgressAndActions from './BuildProgressAndActions';
 import { type Build } from '../../Utils/GDevelopServices/Build';
@@ -14,6 +13,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
 import LinearProgress from '../../UI/LinearProgress';
+import CircularProgress from '../../UI/CircularProgress';
 
 const styles = {
   stepper: { flex: 1 },

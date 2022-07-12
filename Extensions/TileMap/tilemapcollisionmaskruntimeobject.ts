@@ -9,7 +9,7 @@ namespace gdjs {
   export class TileMapCollisionMaskRuntimeObject extends gdjs.RuntimeObject {
     private _tilemapJsonFile: string;
     private _tilesetJsonFile: string;
-    private _renderer: gdjs.TileMap.TileMapCollisionMaskRender;
+    private _renderer: gdjs.TileMap.TileMapCollisionMaskRenderer;
     _collisionTileMap: gdjs.TileMap.TransformedCollisionTileMap;
     /**
      * The tiles are filtered according to this tag.
@@ -43,11 +43,11 @@ namespace gdjs {
       this._tilesetJsonFile = objectData.content.tilesetJsonFile;
       this._collisionMaskTag = objectData.content.collisionMaskTag;
       this._debugMode = objectData.content.debugMode;
-      this._fillColor = this.rgbToNumber(
-        gdjs.rgbOrHexToRGBColor(objectData.content.fillColor)
+      this._fillColor = gdjs.rgbOrHexStringToNumber(
+        objectData.content.fillColor
       );
-      this._outlineColor = this.rgbToNumber(
-        gdjs.rgbOrHexToRGBColor(objectData.content.outlineColor)
+      this._outlineColor = gdjs.rgbOrHexStringToNumber(
+        objectData.content.outlineColor
       );
       this._fillOpacity = objectData.content.fillOpacity;
       this._outlineOpacity = objectData.content.outlineOpacity;
@@ -66,7 +66,7 @@ namespace gdjs {
         editableTileMap,
         this._collisionMaskTag
       );
-      this._renderer = new gdjs.TileMap.TileMapCollisionMaskRender(
+      this._renderer = new gdjs.TileMap.TileMapCollisionMaskRenderer(
         this,
         runtimeScene
       );
@@ -75,10 +75,6 @@ namespace gdjs {
       // *ALWAYS* call `this.onCreated()` at the very end of your object constructor.
       this.onCreated();
     }
-
-    rgbToNumber = function (components: [integer, integer, integer]): integer {
-      return (components[0] << 16) + (components[1] << 8) + components[2];
-    };
 
     getRendererObject() {
       return this._renderer.getRendererObject();
@@ -106,9 +102,7 @@ namespace gdjs {
       }
       if (oldObjectData.content.fillColor !== newObjectData.content.fillColor) {
         this.setFillColor(
-          this.rgbToNumber(
-            gdjs.rgbOrHexToRGBColor(newObjectData.content.fillColor)
-          )
+          gdjs.rgbOrHexStringToNumber(newObjectData.content.fillColor)
         );
       }
       if (
@@ -116,9 +110,7 @@ namespace gdjs {
         newObjectData.content.outlineColor
       ) {
         this.setOutlineColor(
-          this.rgbToNumber(
-            gdjs.rgbOrHexToRGBColor(newObjectData.content.outlineColor)
-          )
+          gdjs.rgbOrHexStringToNumber(newObjectData.content.outlineColor)
         );
       }
       if (oldObjectData.fillOpacity !== newObjectData.fillOpacity) {
@@ -175,7 +167,7 @@ namespace gdjs {
         // RuntimeObject.hitBoxes point to the same polygons as the hitboxes
         // from the grid. The hitboxes from the grid are updated according to
         // the transformation at demand.
-        // This force all the hitboxes to update.
+        // This forces all the hitboxes to update.
         // The hitboxes array is built by _updateTileMap().
       }
       this.hitBoxesDirty = false;

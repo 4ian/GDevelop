@@ -96,6 +96,15 @@ namespace gdjs {
   };
 
   /**
+   * Convert a RGB string ("rrr;ggg;bbb") or a Hex string ("#rrggbb") to a RGB color number.
+   * @param rgbOrHexString The color as a RGB string or Hex string
+   */
+  export const rgbOrHexStringToNumber = (rgbOrHexString: string): integer => {
+    const components = gdjs.rgbOrHexToRGBColor(rgbOrHexString);
+    return gdjs.rgbToHexNumber(components[0], components[1], components[2]);
+  };
+
+  /**
    * Convert a RGB object to a Hex number.
    * @param r Red
    * @param g Green

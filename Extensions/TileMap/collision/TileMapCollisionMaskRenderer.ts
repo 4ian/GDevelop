@@ -6,7 +6,7 @@ namespace gdjs {
      * This render is only useful for debugging purposes.
      * @see {@link PixiTileMapHelper.updatePixiCollisionMask}, the render used by the GUI.
      */
-    export class TileMapCollisionMaskRender {
+    export class TileMapCollisionMaskRenderer {
       _object: gdjs.TileMapCollisionMaskRuntimeObject;
       _graphics: PIXI.Graphics;
 

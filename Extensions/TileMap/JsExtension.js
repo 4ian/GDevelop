@@ -615,7 +615,7 @@ const defineCollisionMask = function (
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js')
     .addIncludeFile('Extensions/TileMap/collision/TransformedTileMap.js')
     .addIncludeFile(
-      'Extensions/TileMap/collision/TileMapCollisionMaskRender.js'
+      'Extensions/TileMap/collision/TileMapCollisionMaskRenderer.js'
     );
 
   object

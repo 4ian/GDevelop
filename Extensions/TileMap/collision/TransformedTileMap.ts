@@ -45,7 +45,7 @@ namespace gdjs {
           // TODO should there be a visitor to avoid a cast?
           const tileLayer = sourceLayer as TileMapHelper.EditableTileMapLayer;
           if (!tileLayer) {
-            // TODO Handle collision mask on object layers?.
+            // TODO Collision mask for object layers is not handled.
             continue;
           }
           this._layers.set(

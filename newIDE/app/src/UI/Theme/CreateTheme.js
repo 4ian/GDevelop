@@ -102,9 +102,6 @@ export function getMuiOverrides(
       secondaryAction: {
         paddingRight: 40,
       },
-      gutters: {
-        paddingRight: 8,
-      },
     },
     MuiListItemSecondaryAction: {
       root: {

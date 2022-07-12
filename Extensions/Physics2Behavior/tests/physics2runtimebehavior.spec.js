@@ -1,4 +1,27 @@
 describe('Physics2RuntimeBehavior', () => {
+  class FakeAutoRemoveBehavior extends gdjs.RuntimeBehavior {
+    shouldDeleteInPreEvent = false;
+
+    constructor(runtimeScene, behaviorData, owner) {
+      super(runtimeScene, behaviorData, owner);
+    }
+
+    shouldAutoRemoveInPreEvent() {
+      this.shouldDeleteInPreEvent = true;
+    }
+
+    doStepPreEvents(runtimeScene) {
+      if (this.shouldDeleteInPreEvent) {
+        this.owner.deleteFromScene(runtimeScene);
+      }
+    }
+  }
+
+  gdjs.registerBehavior(
+    'Physics2::FakeAutoRemoveBehavior',
+    FakeAutoRemoveBehavior
+  );
+
   function assertCollision(object1, object2, options) {
     expect(
       gdjs.Physics2RuntimeBehavior.hasCollisionStartedBetween(
@@ -296,6 +319,66 @@ describe('Physics2RuntimeBehavior', () => {
         collision: true,
         stopped: false,
       });
+    });
+
+    it('should not raise an error if the object is deleted before its physics2 pre-event is run', () => {
+      const object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          // Make FakeAutoRemover run before the Physics2 behavior.
+          {
+            name: 'FakeAutoRemover',
+            type: 'Physics2::FakeAutoRemoveBehavior',
+          },
+          {
+            name: 'Physics2',
+            type: 'Physics2::Physics2Behavior',
+            bodyType: 'Dynamic',
+            bullet: false,
+            fixedRotation: true,
+            canSleep: false,
+            shape: 'Box',
+            shapeDimensionA: 0,
+            shapeDimensionB: 0,
+            shapeOffsetX: 0,
+            shapeOffsetY: 0,
+            polygonOrigin: 'Center',
+            vertices: [],
+            density: 1.0,
+            friction: 0.01,
+            restitution: 1,
+            linearDamping: 0,
+            angularDamping: 0.1,
+            gravityScale: 1,
+            layers: 1,
+            masks: 1,
+          },
+        ],
+        variables: [],
+        effects: [],
+      });
+      object.setCustomWidthAndHeight(10, 10);
+      runtimeScene.addObject(object);
+
+      /** @type {FakeAutoRemoveBehavior} */
+      const fakeAutoRemoverBehavior = object.getBehavior('FakeAutoRemover');
+      const behavior = object.getBehavior('Physics2');
+
+      // First render to have the behavior set up
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.getBody()).not.to.be(null);
+      expect(behavior._sharedData._registeredBehaviors.size).to.be(1);
+      expect(behavior._sharedData._registeredBehaviors.has(behavior)).to.be(
+        true
+      );
+
+      fakeAutoRemoverBehavior.shouldAutoRemoveInPreEvent();
+      runtimeScene.renderAndStep(1000 / 60);
+
+      expect(behavior.destroyedDuringFrameLogic).to.be(true);
+      expect(behavior.getBody()).to.be(null);
+      expect(behavior._sharedData._registeredBehaviors.size).to.be(0);
     });
   });
 

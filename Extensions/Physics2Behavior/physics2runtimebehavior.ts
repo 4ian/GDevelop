@@ -808,20 +808,26 @@ namespace gdjs {
         );
       }
 
-      // Copy transform from body to the GD object
-      this.owner.setX(
-        this._body.GetPosition().get_x() * this._sharedData.scaleX -
-          this.owner.getWidth() / 2 +
-          this.owner.getX() -
-          this.owner.getDrawableX()
-      );
-      this.owner.setY(
-        this._body.GetPosition().get_y() * this._sharedData.scaleY -
-          this.owner.getHeight() / 2 +
-          this.owner.getY() -
-          this.owner.getDrawableY()
-      );
-      this.owner.setAngle(gdjs.toDegrees(this._body.GetAngle()));
+      // Copy transform from body to the GD object.
+      // It's possible the behavior was either deactivated or the object deleted
+      // just before this doStepPreEvents (for example, another behavior deleted
+      // the object during its own doStepPreEvents). If the body is null, we just
+      // don't do anything (but still run the physics simulation - this is independent).
+      if (this._body !== null) {
+        this.owner.setX(
+          this._body.GetPosition().get_x() * this._sharedData.scaleX -
+            this.owner.getWidth() / 2 +
+            this.owner.getX() -
+            this.owner.getDrawableX()
+        );
+        this.owner.setY(
+          this._body.GetPosition().get_y() * this._sharedData.scaleY -
+            this.owner.getHeight() / 2 +
+            this.owner.getY() -
+            this.owner.getDrawableY()
+        );
+        this.owner.setAngle(gdjs.toDegrees(this._body.GetAngle()));
+      }
 
       // Update cached transform.
       this._objectOldX = this.owner.getX();

@@ -150,6 +150,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
                 />
                 {screenType !== 'touch' && (
                   <Slider
+                    color="secondary"
                     value={
                       ((this.state.xValue - this.state.xMin) /
                         (this.state.xMax - this.state.xMin)) *
@@ -163,6 +164,7 @@ export default class FullSizeInstancesEditorWithScrollbars extends Component<
                 )}
                 {screenType !== 'touch' && (
                   <Slider
+                    color="secondary"
                     value={
                       ((this.state.yValue - this.state.yMin) /
                         (this.state.yMax - this.state.yMin)) *

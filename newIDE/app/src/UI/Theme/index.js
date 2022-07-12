@@ -4,7 +4,7 @@ import { isLtr } from '../../Utils/i18n/RtlLanguages';
 import memoize from '../../Utils/Memoize';
 
 import DefaultLightTheme from './DefaultLightTheme';
-import { themes as themeList } from './ThemeRegistry';
+import { themes } from './ThemeRegistry';
 
 import 'react-virtualized/styles.css';
 // Styles
@@ -16,8 +16,9 @@ import './Global/Mosaic.css';
 import './Global/Table.css';
 import './Global/Font.css';
 
+export { themes } from './ThemeRegistry';
+
 export type Theme = $Exact<typeof DefaultLightTheme>;
-export const themes = themeList;
 
 export type GDevelopTheme = $PropertyType<Theme, 'gdevelopTheme'>;
 type ActualTheme = {| gdevelopTheme: GDevelopTheme, muiTheme: Object |};

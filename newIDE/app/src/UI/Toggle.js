@@ -42,6 +42,7 @@ const Toggle = (props: Props) => {
       }
       labelPlacement={props.labelPosition === 'right' ? 'end' : 'start'}
       label={props.label}
+      color="secondary"
       disabled={props.disabled}
       classes={classes}
       style={{

@@ -2,10 +2,9 @@
 
 import * as React from 'react';
 
-import LinearProgress from '@material-ui/core/LinearProgress';
-
 import Text from '../../UI/Text';
-import { Column } from '../../UI/Grid';
+import { Column, Line } from '../../UI/Grid';
+import LinearProgress from '../../UI/LinearProgress';
 
 type Props = {
   value: number,
@@ -17,11 +16,13 @@ const Rating = ({ value, label }: Props) => {
   return (
     <Column expand noMargin>
       <Text size="body2">{label}</Text>
-      <LinearProgress
-        variant="determinate"
-        value={value * 10}
-        style={{ height: 8, borderRadius: 8 }}
-      />
+      <Line noMargin expand>
+        <LinearProgress
+          variant="determinate"
+          value={value * 10}
+          style={{ height: 8, borderRadius: 8 }}
+        />
+      </Line>
     </Column>
   );
 };

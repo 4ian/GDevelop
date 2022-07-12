@@ -12,7 +12,6 @@ import {
 } from '../../../Utils/GDevelopServices/Build';
 import { type BuildStep } from '../../Builds/BuildStepsProgress';
 import InfoBar from '../../../UI/Messages/InfoBar';
-import { CircularProgress, LinearProgress } from '@material-ui/core';
 import FlatButton from '../../../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import {
@@ -34,6 +33,8 @@ import { type PartialGameChange } from '../../../GameDashboard/PublicGamePropert
 import ShareLink from '../../../UI/ShareDialog/ShareLink';
 import SocialShareButtons from '../../../UI/ShareDialog/SocialShareButtons';
 import ShareButton from '../../../UI/ShareDialog/ShareButton';
+import LinearProgress from '../../../UI/LinearProgress';
+import CircularProgress from '../../../UI/CircularProgress';
 
 type OnlineGameLinkProps = {|
   build: ?Build,
@@ -290,7 +291,9 @@ const OnlineGameLink = ({
               <Text>
                 <Trans>Just a few seconds while we generate the link...</Trans>
               </Text>
-              <LinearProgress />
+              <Line expand>
+                <LinearProgress />
+              </Line>
             </>
           )}
           {isShareDialogOpen && (

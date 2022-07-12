@@ -11,17 +11,11 @@ import TextButton from '../UI/TextButton';
 import RaisedButton from '../UI/RaisedButton';
 import RaisedButtonWithSplitMenu from '../UI/RaisedButtonWithSplitMenu';
 import { Column, Line } from '../UI/Grid';
-import { LinearProgress } from '@material-ui/core';
 import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
-
-const styles = {
-  linearProgress: {
-    flex: 1,
-  },
-};
+import LinearProgress from '../UI/LinearProgress';
 
 type Props = {|
   assetPack: AssetPack,
@@ -129,7 +123,7 @@ export const AssetPackDialog = ({
               <Trans>Installing assets...</Trans>
             </Text>
             <Line expand>
-              <LinearProgress style={styles.linearProgress} />
+              <LinearProgress />
             </Line>
           </>
         ),

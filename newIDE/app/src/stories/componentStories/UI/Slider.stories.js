@@ -5,20 +5,20 @@ import { action } from '@storybook/addon-actions';
 import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 
-import SliderComponent from '../../../UI/Slider';
+import Slider from '../../../UI/Slider';
 import ValueStateHolder from '../../ValueStateHolder';
 
 export default {
   title: 'Slider',
-  component: SliderComponent,
+  component: Slider,
   decorators: [paperDecorator, muiDecorator],
 };
 
-export const Slider = () => (
+export const Default = () => (
   <ValueStateHolder
     initialValue={1}
     render={(value, onChange) => (
-      <SliderComponent
+      <Slider
         onChange={newValue => {
           action('onChange')(newValue);
           onChange(newValue);

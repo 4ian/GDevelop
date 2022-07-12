@@ -12,6 +12,7 @@ type Props = {|
 
 const Slider = (props: Props) => (
   <MuiSlider
+    color="secondary"
     value={props.value}
     track={false}
     onChange={(e, newValue) => props.onChange(newValue)}

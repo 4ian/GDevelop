@@ -2,18 +2,18 @@
   "theme": {
     "primary": {
       "color": {
-        "value": "#61AFEF"
-      },
-      "text-contrast-color": {
-        "value": "#FFFFFF"
-      }
-    },
-    "secondary": {
-      "color": {
         "value": "#D6DEEC"
       },
       "text-contrast-color": {
         "value": "#282C34"
+      }
+    },
+    "secondary": {
+      "color": {
+        "value": "#61AFEF"
+      },
+      "text-contrast-color": {
+        "value": "#FFFFFF"
       }
     },
     "surface": {

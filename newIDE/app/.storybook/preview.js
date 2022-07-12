@@ -11,7 +11,15 @@ export const globalTypes = {
     toolbar: {
       icon: 'circlehollow',
       // See theme names in ThemeRegistry.js
-      items: ['GDevelop default Dark', 'GDevelop default Light', 'Blue Dark', 'Nord', 'Solarized Dark', 'One Dark'],
+      items: [
+        'GDevelop default Dark',
+        'GDevelop default Light',
+        'Blue Dark',
+        'Nord',
+        'Solarized Dark',
+        'One Dark',
+        'Rosé Pine',
+      ],
       showName: true,
     },
   },
@@ -21,7 +29,7 @@ export const parameters = {
   // Disable controls and docs, included in @storybook/addon-essentials,
   // that we don't use.
   controls: { hideNoControlsWarning: true },
-  docs: { disable: true }
+  docs: { disable: true },
 };
 
 addDecorator(i18nProviderDecorator);

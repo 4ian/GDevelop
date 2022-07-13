@@ -62,6 +62,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           renderInput={params => (
             <TextField
               {...params}
+              color="secondary"
               InputProps={{
                 ...params.InputProps,
                 placeholder: props.hintText && i18n._(props.hintText),

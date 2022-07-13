@@ -230,6 +230,7 @@ storiesOf('Welcome', module)
   .add('to Storybook', () => <Welcome />);
 
 storiesOf('UI Building Blocks/SelectField', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
@@ -248,7 +249,7 @@ storiesOf('UI Building Blocks/SelectField', module)
       )}
     />
   ))
-  .add('default, with (markdown) helper text', () => (
+  .add('default, with (markdown) helper text and floating label', () => (
     <ValueStateHolder
       initialValue={'1'}
       render={(value, onChange) => (
@@ -257,6 +258,7 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
           helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+          floatingLabelText="This is a floating label"
         >
           <SelectOption value="1" primaryText="Choice 1" />
           <SelectOption value="2" primaryText="Choice 2" />
@@ -424,6 +426,7 @@ storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
 ));
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default, with text', () => (
     <ValueStateHolder
@@ -653,9 +656,30 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
         </React.Fragment>
       )}
     />
+  ))
+  .add('with a floating label', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            floatingLabelText="This is a floating label"
+            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
   ));
 
 storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
@@ -823,6 +847,7 @@ storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
   ));
 
 storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('Empty text field', () => (
     <TextFieldWithButtonLayout
@@ -4183,6 +4208,7 @@ storiesOf('GamesShowcase/ShowcasedGameListItem', module)
   ));
 
 storiesOf('ProjectPropertiesDialog', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ProjectPropertiesDialog
@@ -4199,6 +4225,7 @@ storiesOf('ProjectPropertiesDialog', module)
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor

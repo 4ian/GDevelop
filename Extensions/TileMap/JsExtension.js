@@ -605,7 +605,7 @@ const defineCollisionMask = function (
       _(
         'An invisible object that allows to handle collisions with parts of a tilemap.'
       ),
-      'JsPlatform/Extensions/tile_map_collision_mask.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject
     )
     .setCategoryFullName(_('Advanced'))
@@ -625,8 +625,8 @@ const defineCollisionMask = function (
       _('Check the Tilemap JSON file being used.'),
       _('The Tilemap JSON file of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg'
+      'JsPlatform/Extensions/tile_map_collision_mask24.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
@@ -642,8 +642,8 @@ const defineCollisionMask = function (
       ),
       _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg'
+      'JsPlatform/Extensions/tile_map_collision_mask24.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
@@ -657,8 +657,8 @@ const defineCollisionMask = function (
       _('Check the tileset JSON file being used.'),
       _('The tileset JSON file of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg'
+      'JsPlatform/Extensions/tile_map_collision_mask24.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
@@ -674,8 +674,8 @@ const defineCollisionMask = function (
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg',
-      'JsPlatform/Extensions/tile_map_collision_mask.svg'
+      'JsPlatform/Extensions/tile_map_collision_mask24.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
@@ -1057,7 +1057,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return 'JsPlatform/Extensions/tile_map_collision_mask.svg';
+      return 'JsPlatform/Extensions/tile_map_collision_mask24.svg';
     };
 
     /**

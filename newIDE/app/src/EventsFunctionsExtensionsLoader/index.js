@@ -200,7 +200,12 @@ const generateEventsFunctionExtension = (
         })
       )
     )
-    .then(() => extension);
+    .then(functionInfos => {
+      if (!options.skipCodeGeneration) {
+        applyFunctionIncludeFilesDependencyTransitivity(functionInfos);
+      }
+      return extension;
+    });
 };
 
 const generateFreeFunction = (
@@ -210,7 +215,10 @@ const generateFreeFunction = (
   eventsFunction: gdEventsFunction,
   options: Options,
   codeGenerationContext: CodeGenerationContext
-): Promise<void> => {
+): Promise<{
+  functionFile: string,
+  functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+}> => {
   const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extension,
     eventsFunctionsExtension,
@@ -234,10 +242,11 @@ const generateFreeFunction = (
   const functionName = codeNamespace + '.func';
 
   const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
+  const functionFile = options.eventsFunctionCodeWriter.getIncludeFileFor(
+    functionName
+  );
   codeExtraInformation
-    .setIncludeFile(
-      options.eventsFunctionCodeWriter.getIncludeFileFor(functionName)
-    )
+    .setIncludeFile(functionFile)
     .setFunctionName(functionName);
 
   // Always include the extension include files when using a free function.
@@ -272,16 +281,84 @@ const generateFreeFunction = (
 
     includeFiles.delete();
 
-    return options.eventsFunctionCodeWriter.writeFunctionCode(
-      functionName,
-      code
-    );
+    return options.eventsFunctionCodeWriter
+      .writeFunctionCode(functionName, code)
+      .then(() => ({
+        functionFile: functionFile,
+        functionMetadata: instructionOrExpression,
+      }));
   } else {
     // Skip code generation if no events function writer is provided.
     // This is the case during the "first pass", where all events functions extensions
     // are loaded as extensions but not code generated, as events in functions could
     // themselves be using functions that are not yet available in extensions.
-    return Promise.resolve();
+    return Promise.resolve({
+      functionFile: functionFile,
+      functionMetadata: instructionOrExpression,
+    });
+  }
+};
+
+/**
+ * Add dependencies between functions according to transitivity.
+ * @param functionInfos free function metadatas
+ */
+const applyFunctionIncludeFilesDependencyTransitivity = (
+  functionInfos: Array<{
+    functionFile: string,
+    functionMetadata: gdInstructionMetadata | gdExpressionMetadata,
+  }>
+): void => {
+  // Note that the iteration order doesn't matter, for instance for:
+  // a -> b
+  // b -> c
+  // c -> d
+  //
+  // going from a to c:
+  // a -> (b -> c)
+  // b -> c
+  // c -> d
+  //
+  // or from c to a:
+  // a -> b
+  // b -> (c -> d)
+  // c -> d
+  //
+  // give the same result:
+  // a -> (b -> (c -> d))
+  // b -> (c -> d)
+  // c -> d
+  const includeFileSets = functionInfos.map(
+    functionInfo =>
+      new Set(
+        functionInfo.functionMetadata
+          .getCodeExtraInformation()
+          .getIncludeFiles()
+          .toJSArray()
+      )
+  );
+  // For any function A of the extension...
+  for (let index = 0; index < functionInfos.length; index++) {
+    const includeFiles = includeFileSets[index];
+    const functionIncludeFile = functionInfos[index].functionFile;
+
+    // ...and any function B of the extension...
+    for (let otherIndex = 0; otherIndex < functionInfos.length; otherIndex++) {
+      const otherCodeExtraInformation = functionInfos[
+        otherIndex
+      ].functionMetadata.getCodeExtraInformation();
+      const otherIncludeFileSet = includeFileSets[otherIndex];
+      // ...where function B depends on function A...
+      if (otherIncludeFileSet.has(functionIncludeFile)) {
+        // ...add function A dependencies to the function B ones.
+        includeFiles.forEach(includeFile => {
+          if (!otherIncludeFileSet.has(includeFile)) {
+            otherIncludeFileSet.add(includeFile);
+            otherCodeExtraInformation.addIncludeFile(includeFile);
+          }
+        });
+      }
+    }
   }
 };
 

@@ -2,11 +2,20 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 
+export type TutorialCategory =
+  | 'game-mechanic'
+  | 'full-game'
+  | 'official-beginner'
+  | 'official-intermediate'
+  | 'official-advanced';
+
 export type Tutorial = {|
   id: string,
   title: string,
   description: string,
   type: 'video' | 'text',
+  category: TutorialCategory,
+  duration?: number,
   link: string,
   thumbnailUrl: string,
 |};
@@ -84,6 +93,9 @@ export const getInstructionTutorialIds = (type: string): Array<string> => {
     case 'ChangeAnimation':
     case 'ChangeAnimationName':
       return ['intermediate-changing-animations'];
+    case 'PopStartedTouch':
+    case 'MouseButtonPressed':
+      return ['intermediate-touchscreen-controls'];
     default:
       return [];
   }

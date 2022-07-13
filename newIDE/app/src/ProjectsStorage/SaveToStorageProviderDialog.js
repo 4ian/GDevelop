@@ -13,13 +13,16 @@ type Props = {|
   onClose: () => void,
 |};
 
-export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
+const SaveToStorageProviderDialog = ({
+  onClose,
+  storageProviders,
+  onChooseProvider,
+}: Props) => {
   return (
     <I18n>
       {({ i18n }) => (
         <Dialog
           title={<Trans>Choose where to save the project to</Trans>}
-          onRequestClose={onClose}
           actions={[
             <FlatButton
               label={<Trans>Cancel</Trans>}
@@ -28,7 +31,7 @@ export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
               onClick={onClose}
             />,
           ]}
-          cannotBeDismissed={true}
+          onRequestClose={onClose}
           open
           noMargin
           maxWidth="sm"
@@ -55,3 +58,5 @@ export default ({ onClose, storageProviders, onChooseProvider }: Props) => {
     </I18n>
   );
 };
+
+export default SaveToStorageProviderDialog;

@@ -6,7 +6,6 @@
 
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
 
-#include <SFML/Graphics.hpp>
 #include <algorithm>
 
 #include "GDCore/CommonTools.h"

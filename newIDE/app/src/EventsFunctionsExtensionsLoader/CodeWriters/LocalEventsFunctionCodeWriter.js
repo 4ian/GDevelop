@@ -3,8 +3,8 @@ import {
   type EventsFunctionCodeWriter,
   type EventsFunctionCodeWriterCallbacks,
 } from '..';
-import optionalRequire from '../../Utils/OptionalRequire.js';
-import { getUID } from '../../Utils/LocalUserInfo.js';
+import optionalRequire from '../../Utils/OptionalRequire';
+import { getUID } from '../../Utils/LocalUserInfo';
 import slugs from 'slugs';
 const path = optionalRequire('path');
 const os = optionalRequire('os');

@@ -11,7 +11,7 @@ import { type Field } from '.';
  * @param {*} getProperties The function called to read again the properties
  * @param {*} onUpdateProperty The function called to update a property of an object
  */
-export default (
+const propertiesMapToSchema = (
   properties: gdMapStringPropertyDescriptor,
   getProperties: (instance: Instance) => any,
   onUpdateProperty: (
@@ -241,3 +241,5 @@ export default (
     children: fieldsByGroups.get(groupName) || [],
   }));
 };
+
+export default propertiesMapToSchema;

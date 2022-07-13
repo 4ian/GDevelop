@@ -1,6 +1,6 @@
 // @flow
 
-import optionalRequire from './OptionalRequire.js';
+import optionalRequire from './OptionalRequire';
 import optionalLazyRequire from '../Utils/OptionalLazyRequire';
 const fs = optionalRequire('fs');
 const lazyRequireArchiver = optionalLazyRequire('archiver');

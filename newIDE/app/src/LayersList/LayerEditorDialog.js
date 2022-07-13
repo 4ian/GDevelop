@@ -2,7 +2,7 @@
 import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import ColorField from '../UI/ColorField';
 import { ColumnStackLayout } from '../UI/Layout';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -74,7 +74,6 @@ const LayerEditorDialog = (props: Props) => {
 
   return (
     <Dialog
-      onApply={onClose}
       noMargin
       open
       title={<Trans>Edit Layer Properties</Trans>}
@@ -94,15 +93,15 @@ const LayerEditorDialog = (props: Props) => {
           onClick={onCancelChanges}
           key={'Cancel'}
         />,
-        <FlatButton
+        <DialogPrimaryButton
           label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onClose}
           key={'Apply'}
         />,
       ]}
       onRequestClose={onCancelChanges}
+      onApply={onClose}
       fullHeight
       flexBody
     >
@@ -155,7 +154,7 @@ const LayerEditorDialog = (props: Props) => {
             />
             {layer.isLightingLayer() ? (
               <React.Fragment>
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Lighting settings</Trans>
                 </Text>
                 <InlineCheckbox

@@ -1,10 +1,10 @@
 import { createPathEditorHeader, fileExists } from '../utils/path-editor.js';
 
 const electron = require('electron');
-const electronWindow = electron.remote.getCurrentWindow();
+const remote = require('@electron/remote');
+const electronWindow = remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
-const remote = electron.remote;
 
 let yarn = null;
 
@@ -25,6 +25,7 @@ window.addEventListener('yarnReady', e => {
   yarn = e;
   yarn.app.fs = fs;
   yarn.app.electron = electron;
+  yarn.app.remote = remote;
   yarn.data.restoreFromLocalStorage(false);
   ipcRenderer.send('yarn-ready');
 });

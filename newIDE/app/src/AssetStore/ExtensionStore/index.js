@@ -1,7 +1,7 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import SearchBar from '../../UI/SearchBar';
-import { Column } from '../../UI/Grid';
 import { type ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 import { ExtensionStoreContext } from './ExtensionStoreContext';
 import { ListSearchResults } from '../../UI/Search/ListSearchResults';
@@ -9,17 +9,15 @@ import { ExtensionListItem } from './ExtensionListItem';
 import { ResponsiveWindowMeasurer } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import Toggle from '../../UI/Toggle';
 import {
   sendExtensionDetailsOpened,
   sendExtensionAddedToProject,
 } from '../../Utils/Analytics/EventSender';
-
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
+import useDismissableTutorialMessage from '../../Hints/useDismissableTutorialMessage';
+import { t } from '@lingui/macro';
+import { ColumnStackLayout } from '../../UI/Layout';
+import PreferencesContext from '../../MainFrame/Preferences/PreferencesContext';
 
 type Props = {|
   isInstalling: boolean,
@@ -37,6 +35,7 @@ export const ExtensionStore = ({
   onInstall,
   showOnlyWithBehaviors,
 }: Props) => {
+  const preferences = React.useContext(PreferencesContext);
   const [
     selectedExtensionShortHeader,
     setSelectedExtensionShortHeader,
@@ -85,19 +84,38 @@ export const ExtensionStore = ({
     return extensionMatches ? extensionMatches.matches : [];
   };
 
+  const { DismissableTutorialMessage } = useDismissableTutorialMessage(
+    'intro-behaviors-and-functions'
+  );
+
   return (
     <React.Fragment>
       <ResponsiveWindowMeasurer>
         {windowWidth => (
-          <Column expand noMargin useFullHeight>
-            <SearchBar
-              value={searchText}
-              onChange={setSearchText}
-              onRequestSearch={() => {}}
-              style={styles.searchBar}
-              tagsHandler={tagsHandler}
-              tags={filters && filters.allTags}
-            />
+          <ColumnStackLayout expand noMargin useFullHeight>
+            <ColumnStackLayout>
+              <SearchBar
+                value={searchText}
+                onChange={setSearchText}
+                onRequestSearch={() => {}}
+                tagsHandler={tagsHandler}
+                tags={filters && filters.allTags}
+                placeholder={t`Search extensions`}
+              />
+              <Toggle
+                onToggle={(e, check) =>
+                  preferences.setShowCommunityExtensions(check)
+                }
+                toggled={preferences.values.showCommunityExtensions}
+                labelPosition="right"
+                label={
+                  <Trans>
+                    Show community extensions (not officially reviewed)
+                  </Trans>
+                }
+              />
+              {DismissableTutorialMessage}
+            </ColumnStackLayout>
             <ListSearchResults
               disableAutoTranslate // Search results text highlighting conflicts with dom handling by browser auto-translations features. Disables auto translation to prevent crashes.
               onRetry={fetchExtensionsAndFilters}
@@ -121,7 +139,7 @@ export const ExtensionStore = ({
                 />
               )}
             />
-          </Column>
+          </ColumnStackLayout>
         )}
       </ResponsiveWindowMeasurer>
       {!!selectedExtensionShortHeader && (

@@ -21,9 +21,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/timers-and-time");
-  extension.AddInstructionOrExpressionGroupMetadata(
-      _("Timers and time")
-  )
+  extension.AddInstructionOrExpressionGroupMetadata(_("Timers and time"))
       .SetIcon("res/conditions/timer24.png");
 
   // Deprecated and replaced by CompareTimer
@@ -158,8 +156,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                  "res/timer.svg",
                  "res/timer.svg")
       .AddParameter("expression", "Time to wait in seconds")
-      .SetHelpPath("/all-features/timers-and-time/wait-action")
-      .SetAsync();
+      .SetHelpPath("/all-features/timers-and-time/wait-action");
 
   extension
       .AddExpression("TimeDelta",

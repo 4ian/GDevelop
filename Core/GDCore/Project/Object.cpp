@@ -12,9 +12,7 @@
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Project/PropertyDescriptor.h"
-#endif
 
 namespace gd {
 
@@ -24,6 +22,7 @@ Object::Object(const gd::String& name_) : name(name_) {}
 
 void Object::Init(const gd::Object& object) {
   name = object.name;
+  assetStoreId = object.assetStoreId;
   type = object.type;
   objectVariables = object.objectVariables;
   tags = object.tags;
@@ -80,13 +79,12 @@ gd::BehaviorContent& Object::AddBehavior(
   return *behaviors[behaviorName];
 }
 
-#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties() const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }
 
-gd::BehaviorContent* Object::AddNewBehavior(gd::Project& project,
+gd::BehaviorContent* Object::AddNewBehavior(const gd::Project& project,
                                             const gd::String& type,
                                             const gd::String& name) {
   const gd::BehaviorMetadata& behaviorMetadata =
@@ -109,11 +107,11 @@ Object::GetInitialInstanceProperties(const gd::InitialInstance& instance,
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }
-#endif
 
 void Object::UnserializeFrom(gd::Project& project,
                              const SerializerElement& element) {
   type = element.GetStringAttribute("type");
+  assetStoreId = element.GetStringAttribute("assetStoreId");
   name = element.GetStringAttribute("name", name, "nom");
   tags = element.GetStringAttribute("tags");
 
@@ -184,9 +182,9 @@ void Object::UnserializeFrom(gd::Project& project,
   DoUnserializeFrom(project, element);
 }
 
-#if defined(GD_IDE_ONLY)
 void Object::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", GetName());
+  element.SetAttribute("assetStoreId", GetAssetStoreId());
   element.SetAttribute("type", GetType());
   element.SetAttribute("tags", GetTags());
   objectVariables.SerializeTo(element.AddChild("variables"));
@@ -209,6 +207,5 @@ void Object::SerializeTo(SerializerElement& element) const {
 
   DoSerializeTo(element);
 }
-#endif
 
 }  // namespace gd

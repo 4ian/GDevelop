@@ -1,9 +1,8 @@
 // @flow
 
 import * as React from 'react';
-import RaisedButton from '../UI/RaisedButton';
 import FlatButton from '../UI/FlatButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import Star from '@material-ui/icons/Star';
 import Favorite from '@material-ui/icons/Favorite';
 import AuthenticatedUserContext, {
@@ -78,7 +77,7 @@ export class SubscriptionCheckDialog extends React.Component<
       <Dialog
         actions={[
           onChangeSubscription && (
-            <RaisedButton
+            <DialogPrimaryButton
               label={<Trans>Get a subscription or login</Trans>}
               key="subscribe"
               primary
@@ -103,7 +102,6 @@ export class SubscriptionCheckDialog extends React.Component<
             onClick={this._closeDialog}
           />,
         ]}
-        cannotBeDismissed={false}
         onRequestClose={this._closeDialog}
         open={open}
         title={

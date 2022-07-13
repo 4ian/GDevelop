@@ -95,10 +95,11 @@ export const GamesList = (props: Props) => {
           key={game.id}
           isCurrentGame={!!projectUuid && game.id === projectUuid}
           game={game}
-          onOpenGameManager={() => {
-            setOpenedGameInitialTab('details');
+          onOpenGameManager={(tab: GamesDetailsTab) => {
+            setOpenedGameInitialTab(tab);
             setOpenedGame(game);
           }}
+          onUpdateGame={loadGames}
         />
       ))}
       {openedGame && (

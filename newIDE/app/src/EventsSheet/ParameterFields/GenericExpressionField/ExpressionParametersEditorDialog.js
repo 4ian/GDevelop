@@ -1,10 +1,9 @@
 // @flow
+import React from 'react';
 import { Trans } from '@lingui/macro';
 import { type EventsScope } from '../../../InstructionOrExpression/EventsScope.flow';
-import React, { Component } from 'react';
-import FlatButton from '../../../UI/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
-import Dialog from '../../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../../UI/Dialog';
 import Text from '../../../UI/Text';
 import { Column } from '../../../UI/Grid';
 
@@ -34,69 +33,59 @@ type Props = {
   },
 };
 
-type State = {
-  parameterValues: ParameterValues,
+const ExpressionParametersEditorDialog = ({
+  project,
+  scope,
+  onDone,
+  onRequestClose,
+  globalObjectsContainer,
+  objectsContainer,
+  expressionMetadata,
+  parameterRenderingService,
+}: Props) => {
+  const [parameterValues, setParameterValues] = React.useState<Array<string>>(
+    Array(expressionMetadata.getParametersCount()).fill('')
+  );
+
+  return (
+    <Dialog
+      title={<Trans>Enter the expression parameters</Trans>}
+      open
+      actions={[
+        <DialogPrimaryButton
+          key="apply"
+          label={<Trans>Apply</Trans>}
+          primary
+          onClick={() => onDone(parameterValues)}
+        />,
+      ]}
+      noMargin
+      onRequestClose={onRequestClose}
+      onApply={() => onDone(parameterValues)}
+    >
+      <Column>
+        <div style={styles.minHeightContainer}>
+          <Text>{expressionMetadata.getDescription()}</Text>
+          <ExpressionParametersEditor
+            project={project}
+            scope={scope}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            expressionMetadata={expressionMetadata}
+            parameterValues={parameterValues}
+            onChangeParameter={(editedIndex, value) => {
+              setParameterValues(
+                parameterValues.map((oldValue, index) =>
+                  index === editedIndex ? value : oldValue
+                )
+              );
+            }}
+            parameterRenderingService={parameterRenderingService}
+          />
+        </div>
+      </Column>
+    </Dialog>
+  );
 };
 
-export default class ExpressionParametersEditorDialog extends Component<
-  Props,
-  State
-> {
-  state = {
-    parameterValues: Array(
-      this.props.expressionMetadata.getParametersCount()
-    ).fill(''),
-  };
-
-  render() {
-    const {
-      project,
-      scope,
-      globalObjectsContainer,
-      objectsContainer,
-      expressionMetadata,
-      parameterRenderingService,
-    } = this.props;
-
-    return (
-      <Dialog
-        title={<Trans>Enter the expression parameters</Trans>}
-        cannotBeDismissed={true}
-        open
-        actions={[
-          <FlatButton
-            key="apply"
-            label={<Trans>Apply</Trans>}
-            primary
-            onClick={() => this.props.onDone(this.state.parameterValues)}
-          />,
-        ]}
-        noMargin
-        onRequestClose={this.props.onRequestClose}
-      >
-        <Column>
-          <div style={styles.minHeightContainer}>
-            <Text>{expressionMetadata.getDescription()}</Text>
-            <ExpressionParametersEditor
-              project={project}
-              scope={scope}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              expressionMetadata={expressionMetadata}
-              parameterValues={this.state.parameterValues}
-              onChangeParameter={(editedIndex, value) => {
-                this.setState({
-                  parameterValues: this.state.parameterValues.map(
-                    (oldValue, index) =>
-                      index === editedIndex ? value : oldValue
-                  ),
-                });
-              }}
-              parameterRenderingService={parameterRenderingService}
-            />
-          </div>
-        </Column>
-      </Dialog>
-    );
-  }
-}
+export default ExpressionParametersEditorDialog;

@@ -3,8 +3,7 @@ import { Trans, t } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import {
   type EditForm,
   type AuthError,
@@ -74,7 +73,7 @@ export default class EditDialog extends Component<Props, State> {
         onClick={onClose}
       />,
       <LeftLoader isLoading={editInProgress} key="edit">
-        <RaisedButton
+        <DialogPrimaryButton
           label={<Trans>Save</Trans>}
           primary
           onClick={this._onEdit}
@@ -87,12 +86,10 @@ export default class EditDialog extends Component<Props, State> {
       <Dialog
         title={<Trans>Edit your GDevelop profile</Trans>}
         actions={actions}
-        onRequestClose={() => {
-          if (!editInProgress) onClose();
-        }}
         maxWidth="sm"
+        cannotBeDismissed={editInProgress}
+        onRequestClose={onClose}
         onApply={this._onEdit}
-        cannotBeDismissed={true}
         open
       >
         <ColumnStackLayout noMargin>

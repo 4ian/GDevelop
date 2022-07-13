@@ -5,7 +5,6 @@ import { type I18n } from '@lingui/core';
 import List from '@material-ui/core/List';
 import Text from '../UI/Text';
 import DetectShortcutDialog from './DetectShortcutDialog';
-import { Line } from '../UI/Grid';
 import RaisedButton from '../UI/RaisedButton';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 import { type ShortcutMap } from './DefaultShortcuts';
@@ -17,6 +16,7 @@ import commandsList, {
   type CommandName,
   commandAreas,
 } from '../CommandPalette/CommandsList';
+import { ColumnStackLayout } from '../UI/Layout';
 
 /**
  * Get shortcut string to be displayed after patching the default
@@ -102,26 +102,26 @@ const ShortcutsList = (props: Props) => {
   );
 
   return (
-    <>
-      <Line>
-        <DismissableAlertMessage
-          kind="info"
-          identifier="command-palette-shortcut"
-        >
-          <Trans>You can open the command palette by pressing</Trans>{' '}
-          {commandPaletteShortcut}
-        </DismissableAlertMessage>
-      </Line>
-      <Line>
-        <RaisedButton
-          label={<Trans>Reset all shortcuts to default</Trans>}
-          onClick={resetAllShortcutsToDefault}
-        />
-      </Line>
+    <ColumnStackLayout noMargin>
+      <DismissableAlertMessage
+        kind="info"
+        identifier="command-palette-shortcut"
+      >
+        <Trans>
+          You can open the command palette by pressing {commandPaletteShortcut}.
+        </Trans>
+      </DismissableAlertMessage>
+      <RaisedButton
+        label={<Trans>Reset all shortcuts to default</Trans>}
+        onClick={resetAllShortcutsToDefault}
+        fullWidth
+      />
       <List>
         {Object.keys(areaWiseCommands).map(areaName => (
           <React.Fragment key={areaName}>
-            <Text size="title">{props.i18n._(commandAreas[areaName])}</Text>
+            <Text size="block-title">
+              {props.i18n._(commandAreas[areaName])}
+            </Text>
             {areaWiseCommands[areaName].map(commandName => {
               // Get default and user-set shortcuts
               const userShortcut = props.userShortcutMap[commandName];
@@ -162,7 +162,7 @@ const ShortcutsList = (props: Props) => {
           }}
         />
       )}
-    </>
+    </ColumnStackLayout>
   );
 };
 

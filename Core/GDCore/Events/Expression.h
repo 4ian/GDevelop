@@ -6,7 +6,15 @@
 
 #ifndef GDCORE_EXPRESSION_H
 #define GDCORE_EXPRESSION_H
+
 #include "GDCore/String.h"
+#include <memory>
+
+namespace gd {
+class ExpressionParser2;
+class ObjectsContainer;
+struct ExpressionNode;
+}  // namespace gd
 
 namespace gd {
 
@@ -24,17 +32,27 @@ class GD_CORE_API Expression {
   /**
    * \brief Construct an empty expression
    */
-  Expression(){};
+  Expression();
 
   /**
    * \brief Construct an expression from a string
    */
-  Expression(gd::String plainString_) : plainString(plainString_){};
+  Expression(gd::String plainString_);
 
   /**
    * \brief Construct an expression from a const char *
    */
-  Expression(const char* plainString_) : plainString(plainString_){};
+  Expression(const char* plainString_);
+
+  /**
+   * \brief Copy construct an expression.
+   */
+  Expression(const Expression& copy);
+
+  /**
+   * \brief Expression affectation overriding.
+   */
+  Expression& operator=(const Expression& expression);
 
   /**
    * \brief Get the plain string representing the expression
@@ -42,14 +60,21 @@ class GD_CORE_API Expression {
   inline const gd::String& GetPlainString() const { return plainString; };
 
   /**
+   * @brief Get the expression node.
+   * @return std::unique_ptr<gd::ExpressionNode>
+   */
+  gd::ExpressionNode* GetRootNode() const;
+
+  /**
    * \brief Mimics std::string::c_str
    */
   inline const char* c_str() const { return plainString.c_str(); };
 
-  virtual ~Expression(){};
+  virtual ~Expression();
 
  private:
   gd::String plainString;  ///< The expression string
+  mutable std::unique_ptr<gd::ExpressionNode> node;
 };
 
 }  // namespace gd

@@ -1,6 +1,6 @@
 // @flow
 import { type ExpressionAutocompletion } from '../ExpressionAutocompletion';
-import { type EnumeratedExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedExpressionMetadata } from '../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { mapVector } from '../Utils/MapFor';
 
 const makeNewFakeExtension = (gd: libGDevelop) => {
@@ -63,6 +63,7 @@ export const makeFakeExactExpressionAutocompletion = () => {
         extension,
         expressionMetadata
       ),
+      shouldConvertToString: false,
     },
   ];
 };
@@ -137,6 +138,7 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
         extension,
         expressionWithoutParamsMetadata
       ),
+      shouldConvertToString: false,
     },
     {
       kind: 'Expression',
@@ -148,6 +150,19 @@ export const makeFakeExpressionAutocompletions = (): Array<ExpressionAutocomplet
         extension,
         expressionMetadata
       ),
+      shouldConvertToString: false,
+    },
+    {
+      kind: 'Expression',
+      completion: 'MyFunctionThatShouldBeConvertedToString',
+      addParenthesis: true,
+      isExact: false,
+      enumeratedExpressionMetadata: makeFakeEnumeratedExpressionMetadata(
+        'MyFunction',
+        extension,
+        expressionMetadata
+      ),
+      shouldConvertToString: true,
     },
   ];
 };

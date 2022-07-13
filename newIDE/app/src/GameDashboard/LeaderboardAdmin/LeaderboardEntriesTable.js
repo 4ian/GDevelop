@@ -106,24 +106,22 @@ const LeaderboardEntriesTable = ({
                   </TableCell>
                   <TableCell>
                     <Line>
-                      <Tooltip title={'Remove entry'}>
+                      <IconButton
+                        size="small"
+                        onClick={() => onDeleteEntry(entry.id)}
+                        disabled={isLoading}
+                        tooltip={t`Remove entry`}
+                      >
+                        <DeleteOutline size={20} />
+                      </IconButton>
+                      {erroredEntry && erroredEntry.entryId === entry.id ? (
                         <IconButton
                           size="small"
-                          onClick={() => onDeleteEntry(entry.id)}
-                          disabled={isLoading}
+                          onClick={() => {}} // wrap in icon button to match above icon padding
+                          tooltip={erroredEntry.message}
                         >
-                          <DeleteOutline size={20} />
+                          <Error size={20} color="error" />
                         </IconButton>
-                      </Tooltip>
-                      {erroredEntry && erroredEntry.entryId === entry.id ? (
-                        <Tooltip title={erroredEntry.message}>
-                          <IconButton
-                            size="small"
-                            onClick={() => {}} // wrap in icon button to match above icon padding
-                          >
-                            <Error size={20} color="error" />
-                          </IconButton>
-                        </Tooltip>
                       ) : null}
                     </Line>
                   </TableCell>

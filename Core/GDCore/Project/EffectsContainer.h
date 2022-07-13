@@ -7,6 +7,7 @@
 #define GDCORE_EFFECTS_CONTAINER_H
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "GDCore/String.h"
 
@@ -88,6 +89,11 @@ class GD_CORE_API EffectsContainer {
    * Remove the specified effect.
    */
   void RemoveEffect(const gd::String& name);
+
+  /**
+   * \brief Move the specified effect at a new position in the list.
+   */
+  void MoveEffect(std::size_t oldIndex, std::size_t newIndex);
 
   /**
    * Swap the position of two effects.

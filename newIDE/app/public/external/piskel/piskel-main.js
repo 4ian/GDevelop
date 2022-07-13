@@ -1,11 +1,11 @@
 import { createPathEditorHeader } from '../utils/path-editor.js';
 const electron = require('electron');
-const electronWindow = electron.remote.getCurrentWindow();
+const remote = require('@electron/remote');
+const electronWindow = remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const async = require('async');
 const path = require('path');
-const remote = electron.remote;
 
 let piskelOptions; // The options received from GDevelop
 const updateFrameElements = () => {

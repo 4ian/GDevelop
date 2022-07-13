@@ -104,6 +104,7 @@ declare class libGDevelop {
   Serializer: Class<gdSerializer>;
   InstructionsList: Class<gdInstructionsList>;
   Instruction: Class<gdInstruction>;
+  Expression: Class<gdExpression>;
   VectorPairStringTextFormatting: Class<gdVectorPairStringTextFormatting>;
   TextFormatting: Class<gdTextFormatting>;
   InstructionSentenceFormatter: Class<gdInstructionSentenceFormatter>;
@@ -155,6 +156,8 @@ declare class libGDevelop {
   ExpressionCompletionDescription: Class<gdExpressionCompletionDescription>;
   VectorExpressionCompletionDescription: Class<gdVectorExpressionCompletionDescription>;
   ExpressionCompletionFinder: Class<gdExpressionCompletionFinder>;
+  ExpressionNodeLocationFinder: Class<gdExpressionNodeLocationFinder>;
+  ExpressionTypeFinder: Class<gdExpressionTypeFinder>;
   ExpressionNode: Class<gdExpressionNode>;
   UniquePtrExpressionNode: Class<gdUniquePtrExpressionNode>;
   ExpressionParser2: Class<gdExpressionParser2>;
@@ -169,6 +172,8 @@ declare class libGDevelop {
   AbstractFileSystemJS: Class<gdAbstractFileSystemJS>;
   ProjectResourcesAdder: Class<gdProjectResourcesAdder>;
   ArbitraryEventsWorker: Class<gdArbitraryEventsWorker>;
+  EventsLeaderboardsLister: Class<gdEventsLeaderboardsLister>;
+  EventsLeaderboardsRenamer: Class<gdEventsLeaderboardsRenamer>;
   EventsParametersLister: Class<gdEventsParametersLister>;
   EventsPositionFinder: Class<gdEventsPositionFinder>;
   EventsTypesLister: Class<gdEventsTypesLister>;

@@ -27,7 +27,7 @@ type PropsType = {|
 /**
  * The icon that can be used in any dialog to open a help page
  */
-export default (props: PropsType) => {
+const HelpIcon = (props: PropsType) => {
   const { helpPagePath } = props;
   if (!helpPagePath) return null;
 
@@ -42,3 +42,5 @@ export default (props: PropsType) => {
     </IconButton>
   );
 };
+
+export default HelpIcon;

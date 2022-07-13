@@ -43,6 +43,8 @@ type Props = {|
 
   id?: ?string,
   onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
+  commitOnInputChange?: boolean,
   onRequestClose?: () => void,
   onApply?: () => void,
   errorText?: React.Node,
@@ -55,6 +57,7 @@ type Props = {|
   textFieldStyle?: Object,
   openOnFocus?: boolean,
   style?: Object,
+  inputStyle?: Object,
 |};
 
 export type SemiControlledAutoCompleteInterface = {|
@@ -203,6 +206,7 @@ const getDefaultStylingProps = (params: Object, props: Props): Object => {
       ...InputProps,
       className: null,
       endAdornment: null,
+      style: props.inputStyle,
     },
     inputProps: {
       ...inputProps,
@@ -261,6 +265,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
     ): void => {
       setInputValue(value);
       if (!isMenuOpen) setIsMenuOpen(true);
+      if (props.commitOnInputChange) props.onChange(value);
     };
 
     return (
@@ -305,6 +310,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
               } = getDefaultStylingProps(params, props);
               return (
                 <TextField
+                  color="secondary"
                   InputProps={{
                     ...InputProps,
                     placeholder:
@@ -314,6 +320,7 @@ export default React.forwardRef<Props, SemiControlledAutoCompleteInterface>(
                   }}
                   inputProps={{
                     ...inputProps,
+                    onClick: props.onClick,
                     onFocus: (
                       event: SyntheticFocusEvent<HTMLInputElement>
                     ): void => {

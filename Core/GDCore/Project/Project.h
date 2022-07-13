@@ -162,6 +162,18 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::String& GetPackageName() const { return packageName; }
 
+    /**
+   * \brief Change the slug of the template from which the project is created.
+   */
+  void SetTemplateSlug(const gd::String& templateSlug_) {
+    templateSlug = templateSlug_;
+  };
+
+  /**
+   * \brief Get the slug of the template from which the project is created.
+   */
+  const gd::String& GetTemplateSlug() const { return templateSlug; }
+
   /**
    * \brief Change the project orientation (in particular when exported with
    * Cordova). This has no effect on desktop and web browsers. \param
@@ -983,6 +995,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   bool isPlayableWithGamepad;  ///< The project is playable with a gamepad.
   bool isPlayableWithMobile;   ///< The project is playable on a mobile.
   gd::String packageName;  ///< Game package name
+  gd::String templateSlug; ///< The slug of the template from which the game is
+                           ///< created.
   gd::String orientation;  ///< Lock game orientation (on mobile devices).
                            ///< "default", "landscape" or "portrait".
   bool

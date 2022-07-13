@@ -2,7 +2,7 @@
 import React from 'react';
 import GDevelopThemeContext from '../UI/Theme/ThemeContext';
 
-export default () => {
+const ToolbarSeparator = () => {
   const theme = React.useContext(GDevelopThemeContext);
   return (
     <span
@@ -17,3 +17,5 @@ export default () => {
     />
   );
 };
+
+export default ToolbarSeparator;

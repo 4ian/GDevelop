@@ -50,8 +50,9 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
 
   return (
     <ButtonGroup
-      variant="contained"
-      color={primary ? 'primary' : 'default'}
+      variant={primary ? 'contained' : 'outlined'}
+      disableElevation
+      color={primary ? 'primary' : 'secondary'}
       disabled={disabled}
       size="small"
       style={props.style}
@@ -62,7 +63,7 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
         style={styles.mainButton}
       >
         {icon}
-        {icon && <Spacer />}
+        {!!icon && !!label && <Spacer />}
         {label}
       </Button>
       <ElementWithMenu

@@ -1,6 +1,6 @@
 import React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { Dialog, DialogContent } from '@material-ui/core';
+import CircularProgress from './CircularProgress';
 
 const loaderSize = 50;
 
@@ -15,7 +15,7 @@ const styles = {
 
 const transitionDuration = { enter: 0, exit: 150 };
 
-export default props => {
+const LoaderModal = props => {
   return (
     <Dialog open={props.show} transitionDuration={transitionDuration}>
       <DialogContent style={styles.dialogContent}>
@@ -28,3 +28,5 @@ export default props => {
     </Dialog>
   );
 };
+
+export default LoaderModal;

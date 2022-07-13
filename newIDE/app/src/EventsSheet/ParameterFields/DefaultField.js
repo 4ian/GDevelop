@@ -39,12 +39,16 @@ export default class DefaultField extends React.Component<
 
 export const renderInlineDefaultField = ({
   value,
+  expressionIsValid,
   parameterMetadata,
+  InvalidParameterValue,
   MissingParameterValue,
 }: ParameterInlineRendererProps) => {
   if (!value && !parameterMetadata.isOptional()) {
     return <MissingParameterValue />;
   }
-
+  if (!expressionIsValid) {
+    return <InvalidParameterValue>{value}</InvalidParameterValue>;
+  }
   return value;
 };

@@ -1,7 +1,7 @@
 // @flow
 import { type Exporter } from '../ExportDialog';
-import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport.js';
-import { browserOnlineElectronExportPipeline } from './BrowserOnlineElectronExport.js';
+import { browserOnlineCordovaExportPipeline } from './BrowserOnlineCordovaExport';
+import { browserOnlineElectronExportPipeline } from './BrowserOnlineElectronExport';
 import { browserOnlineWebExportPipeline } from './BrowserOnlineWebExport';
 import { browserHTML5ExportPipeline } from './BrowserHTML5Export';
 import { browserCordovaExportPipeline } from './BrowserCordovaExport';

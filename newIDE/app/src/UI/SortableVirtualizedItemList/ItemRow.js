@@ -38,6 +38,14 @@ type Props<Item> = {|
 class ItemRow<Item> extends React.Component<Props<Item>> {
   textField: ?TextField;
 
+  componentDidMount() {
+    if (this.props.editingName) {
+      setTimeout(() => {
+        if (this.textField) this.textField.focus();
+      }, 100);
+    }
+  }
+
   componentDidUpdate(prevProps: Props<Item>) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {

@@ -47,6 +47,7 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
       projectName,
       fileMetadata: {
         fileIdentifier: example.projectFileUrl,
+        lastModifiedDate: Date.now(),
       },
     };
   } catch (error) {

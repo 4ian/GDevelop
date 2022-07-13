@@ -7,7 +7,7 @@ import Menu from '@material-ui/core/Menu';
 import Fade from '@material-ui/core/Fade';
 import ElectronMenuImplementation from './ElectronMenuImplementation';
 import MaterialUIMenuImplementation from './MaterialUIMenuImplementation';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 
 export type ContextMenuInterface = {|
@@ -47,7 +47,7 @@ const MaterialUIContextMenu = React.forwardRef<
     <I18n>
       {({ i18n }) => (
         <Menu
-          open={open}
+          open
           anchorPosition={{
             left: anchorPosition[0],
             top: anchorPosition[1],

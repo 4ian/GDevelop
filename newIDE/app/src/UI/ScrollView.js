@@ -15,6 +15,7 @@ type Props = {|
    */
   autoHideScrollbar?: ?boolean,
   style?: ?Object,
+  onScroll?: () => void,
 |};
 
 export type ScrollViewInterface = {|
@@ -23,7 +24,7 @@ export type ScrollViewInterface = {|
 |};
 
 export default React.forwardRef<Props, ScrollViewInterface>(
-  ({ children, autoHideScrollbar, style }: Props, ref) => {
+  ({ children, autoHideScrollbar, style, onScroll }: Props, ref) => {
     const scrollView = React.useRef((null: ?HTMLDivElement));
     React.useImperativeHandle(ref, () => ({
       /**
@@ -64,6 +65,7 @@ export default React.forwardRef<Props, ScrollViewInterface>(
           overflowY: autoHideScrollbar ? 'auto' : 'scroll',
           ...style,
         }}
+        onScroll={onScroll}
         ref={scrollView}
       >
         {children}

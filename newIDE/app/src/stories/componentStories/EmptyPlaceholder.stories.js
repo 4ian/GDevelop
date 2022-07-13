@@ -24,7 +24,7 @@ export const Default = () => (
       description="You can use events to create cause and effect."
       actionLabel="Add something"
       helpPagePath="/objects/tiled_sprite"
-      onAdd={action('onAdd')}
+      onAction={action('onAdd')}
     />
   </FixedHeightFlexContainer>
 );

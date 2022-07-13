@@ -803,6 +803,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onCreateEventsFunction={this.onCreateEventsFunction}
                 onOpenSettings={this._editOptions}
                 unsavedChanges={this.props.unsavedChanges}
+                isActive={true}
               />
             </Background>
           ) : (

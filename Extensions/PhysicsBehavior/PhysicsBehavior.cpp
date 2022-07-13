@@ -33,7 +33,7 @@ void PhysicsBehavior::InitializeContent(
   behaviorContent.SetAttribute("polygonWidth", 200);
   behaviorContent.SetAttribute("polygonHeight", 200);
 
-  std::vector<sf::Vector2f> polygonCoords;
+  std::vector<gd::Vector2f> polygonCoords;
   behaviorContent.SetAttribute(
       "coordsList",
       PhysicsBehavior::GetStringFromCoordsVector(polygonCoords, '/', ';'));
@@ -128,7 +128,7 @@ bool PhysicsBehavior::UpdateProperty(gd::SerializerElement &behaviorContent,
 #endif
 
 gd::String PhysicsBehavior::GetStringFromCoordsVector(
-    const std::vector<sf::Vector2f> &vec,
+    const std::vector<gd::Vector2f> &vec,
     char32_t coordsSep,
     char32_t composantSep) {
   gd::String coordsStr;

@@ -232,6 +232,7 @@ type Props = {|
   selectedCompletionIndex: number,
   anchorEl: Element,
   onChoose: (chosenExpressionAutocompletion: ExpressionAutocompletion) => void,
+  onScroll: () => void,
   parameterRenderingService: ParameterRenderingServiceType,
 |};
 
@@ -269,6 +270,7 @@ export default function ExpressionAutocompletionsDisplayer({
   selectedCompletionIndex,
   anchorEl,
   onChoose,
+  onScroll,
   parameterRenderingService,
 }: Props) {
   const scrollView = React.useRef((null: ?ScrollViewInterface));
@@ -302,7 +304,7 @@ export default function ExpressionAutocompletionsDisplayer({
           }
         >
           <Paper variant="outlined" square style={styles.container}>
-            <ScrollView autoHideScrollbar ref={scrollView}>
+            <ScrollView ref={scrollView} onScroll={onScroll}>
               {expressionAutocompletions.map(
                 (expressionAutocompletion, index) => {
                   const isSelected = selectedCompletionIndex === index;
@@ -353,7 +355,7 @@ export default function ExpressionAutocompletionsDisplayer({
               )}
               {remainingCount > 0 && (
                 <Column justifyContent="flex-start">
-                  <Text>And {remainingCount} others...</Text>
+                  <Text>And others...</Text>
                 </Column>
               )}
             </ScrollView>

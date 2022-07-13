@@ -91,6 +91,9 @@ class GD_CORE_API ExpressionParser2NodePrinter
   }
   void OnVisitIdentifierNode(IdentifierNode& node) override {
     output += node.identifierName;
+    if (!node.childIdentifierName.empty()) {
+      output += "." + node.childIdentifierName;
+    }
   }
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {
     if (!node.behaviorFunctionName.empty()) {

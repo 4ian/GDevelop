@@ -9,6 +9,8 @@ import { IconContainer } from '../../UI/IconContainer';
 import { UserPublicProfileChip } from '../../UI/User/UserPublicProfileChip';
 import HighlightedText from '../../UI/Search/HighlightedText';
 import { type SearchMatch } from '../../UI/Search/UseSearchStructuredItem';
+import Chip from '../../UI/Chip';
+import { LineStackLayout } from '../../UI/Layout';
 
 const styles = {
   button: { width: '100%' },
@@ -72,10 +74,24 @@ export const ExtensionListItem = ({
             size={64}
           />
           <Column expand>
-            <Text noMargin>
-              {renderExtensionField('fullName')}{' '}
-              {alreadyInstalled && <Trans> (already installed)</Trans>}
-            </Text>
+            <LineStackLayout noMargin alignItems="baseline">
+              <Text noMargin>{renderExtensionField('fullName')} </Text>
+              {alreadyInstalled && (
+                <Chip
+                  size="small"
+                  label={<Trans>Already installed</Trans>}
+                  color="secondary"
+                  variant="outlined"
+                />
+              )}
+              {extensionShortHeader.tier === 'community' && (
+                <Chip
+                  size="small"
+                  label={<Trans>Community extension</Trans>}
+                  color="primary"
+                />
+              )}
+            </LineStackLayout>
             {extensionShortHeader.authors && (
               <Line>
                 {extensionShortHeader.authors.map(author => (

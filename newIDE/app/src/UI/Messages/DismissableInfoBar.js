@@ -8,6 +8,7 @@ import PreferencesContext, {
 } from '../../MainFrame/Preferences/PreferencesContext';
 import { useScreenType } from '../Reponsive/ScreenTypeMeasurer';
 import { isUserflowRunning } from '../../MainFrame/Onboarding/OnboardingDialog';
+import GDevelopThemeContext from '../Theme/ThemeContext';
 
 type Props = {|
   identifier: AlertMessageIdentifier,
@@ -23,6 +24,7 @@ const DismissableInfoBar = ({
   message,
 }: Props) => {
   const preferences = React.useContext(PreferencesContext);
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
   const screenType = useScreenType();
 
   return isUserflowRunning ? null : (
@@ -36,7 +38,9 @@ const DismissableInfoBar = ({
       action={
         <Button
           key="undo"
-          color="primary"
+          color={
+            gdevelopTheme.palette.type === 'light' ? 'secondary' : 'primary'
+          }
           size="small"
           onClick={() => {
             preferences.showAlertMessage(identifier, false);

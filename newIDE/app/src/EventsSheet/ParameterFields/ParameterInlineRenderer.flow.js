@@ -12,6 +12,7 @@ export type InvalidParameterValueProps = {|
 export type ParameterInlineRendererProps = {|
   parameterMetadata: gdParameterMetadata,
   value: string,
+  expressionIsValid: boolean,
   renderObjectThumbnail: string => React.Node,
   InvalidParameterValue: InvalidParameterValueProps => React.Node,
   MissingParameterValue: () => React.Node,

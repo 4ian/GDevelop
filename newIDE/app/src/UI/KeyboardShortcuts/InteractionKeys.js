@@ -43,6 +43,13 @@ export const shouldSubmit = (event: SupportedEvent) => {
 };
 
 /**
+ * Check if the user wants to zoom when scrolling.
+ */
+export const shouldZoom = (event: SupportedEvent) => {
+  return event.metaKey || event.ctrlKey;
+};
+
+/**
  * Check if the user asked to go to the next field.
  * Note that in most case, this should be automatically handled by the browser
  * (or material-ui), and using this should not be needed.

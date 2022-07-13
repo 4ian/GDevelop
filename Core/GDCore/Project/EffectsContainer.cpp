@@ -117,6 +117,16 @@ void EffectsContainer::SwapEffects(std::size_t firstEffectIndex,
   effects[secondEffectIndex] = temp;
 }
 
+void EffectsContainer::MoveEffect(std::size_t oldIndex, std::size_t newIndex) {
+  if (oldIndex >= effects.size() || newIndex >= effects.size() ||
+      newIndex == oldIndex)
+    return;
+
+  auto effect = effects[oldIndex];
+  effects.erase(effects.begin() + oldIndex);
+  effects.insert(effects.begin() + newIndex, effect);
+}
+
 void EffectsContainer::SerializeTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("effect");
   for (std::size_t i = 0; i < GetEffectsCount(); ++i) {

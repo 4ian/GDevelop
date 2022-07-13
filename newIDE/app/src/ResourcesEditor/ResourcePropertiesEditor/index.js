@@ -129,7 +129,6 @@ export default class ResourcePropertiesEditor extends React.Component<
     return (
       <ResourcePreview
         resourceName={resources[0].getName()}
-        resourcePath={resources[0].getFile()}
         resourcesLoader={resourcesLoader}
         project={project}
       />

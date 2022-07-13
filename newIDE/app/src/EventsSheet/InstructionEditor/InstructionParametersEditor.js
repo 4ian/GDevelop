@@ -323,9 +323,12 @@ export default class InstructionParametersEditor extends React.Component<
                         instruction={instruction}
                         parameterMetadata={parameterMetadata}
                         parameterIndex={i}
-                        value={instruction.getParameter(i)}
+                        value={instruction.getParameter(i).getPlainString()}
                         onChange={value => {
-                          if (instruction.getParameter(i) !== value) {
+                          if (
+                            instruction.getParameter(i).getPlainString() !==
+                            value
+                          ) {
                             instruction.setParameter(i, value);
                             this.setState({
                               isDirty: true,
@@ -368,6 +371,23 @@ export default class InstructionParametersEditor extends React.Component<
                     style={styles.invertToggle}
                     onToggle={(e, enabled) => {
                       instruction.setInverted(enabled);
+                      this.forceUpdate();
+                    }}
+                  />
+                )}
+                {instructionMetadata.isOptionallyAsync() && (
+                  <Toggle
+                    label={
+                      <Trans>
+                        Wait for the action to end before executing the actions
+                        (and subevents) following it
+                      </Trans>
+                    }
+                    labelPosition="right"
+                    toggled={instruction.isAwaited()}
+                    style={styles.invertToggle}
+                    onToggle={(e, enabled) => {
+                      instruction.setAwaited(enabled);
                       this.forceUpdate();
                     }}
                   />

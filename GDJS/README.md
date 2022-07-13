@@ -3,7 +3,7 @@
 GDevelop JavaScript Platform (GDJS) is the game engine for making
 _HTML5/Javascript_ based games with GDevelop.
 
-> 📚 **Game developer, searching for the documentation?** Go to the **[GDJS Runtime (game engine) documentation](https://docs.gdevelop-app.com/GDJS%20Documentation)**.
+> 📚 **Game developer, searching for the documentation?** Go to the **[GDJS Runtime (game engine) documentation](https://docs.gdevelop.io/GDJS%20Documentation)**.
 
 ## 1) Installation 💻
 
@@ -20,7 +20,7 @@ GDJS is composed of two parts:
 
 The game engine is in the _Runtime_ folder. If you want to work on the engine directly, follow the [GDevelop 5 README about the development of the game engine](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-game-engine).
 
-- To use the game engine, you can look into the **[GDJS Runtime (game engine) documentation](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation)**.
+- To use the game engine, you can look into the **[GDJS Runtime (game engine) documentation](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation)**.
 
 - To run tests for the game engine, go to `GDJS/tests`, run `npm install` and `npm test`. More information in the [README for the tests](https://github.com/4ian/GDevelop/tree/master/GDJS/tests).
 
@@ -28,7 +28,7 @@ The game engine is in the _Runtime_ folder. If you want to work on the engine di
 
 ### GDJS Platform (exporters, code generation...)
 
-Check the [GDJS Platform](https://docs.gdevelop-app.com/GDJS%20Documentation/index.html) documentation or the [full GDevelop developers documentation](https://docs.gdevelop-app.com/).
+Check the [GDJS Platform](https://docs.gdevelop.io/GDJS%20Documentation/index.html) documentation or the [full GDevelop developers documentation](https://docs.gdevelop.io/).
 
 ## 3) How to contribute 😎
 

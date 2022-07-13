@@ -4,8 +4,10 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
+
 #include <iostream>
 #include <vector>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Sprite.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -28,6 +30,15 @@ void Direction::AddSprite(const Sprite& sprite) { sprites.push_back(sprite); }
 const Sprite& Direction::GetSprite(std::size_t nb) const { return sprites[nb]; }
 
 Sprite& Direction::GetSprite(std::size_t nb) { return sprites[nb]; }
+
+const std::vector<gd::String>& Direction::GetSpriteNames() const {
+  static std::vector<gd::String> spriteNames;
+  spriteNames.clear();
+  for (std::size_t i = 0; i < sprites.size(); ++i) {
+    spriteNames.push_back(sprites[i].GetImageName());
+  }
+  return spriteNames;
+}
 
 void Direction::RemoveSprite(std::size_t index) {
   if (index < sprites.size()) sprites.erase(sprites.begin() + index);
@@ -121,7 +132,7 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
             polygonElement.GetChild(k);
 
         polygon.vertices.push_back(
-            sf::Vector2f(verticeElement.GetDoubleAttribute("x"),
+            gd::Vector2f(verticeElement.GetDoubleAttribute("x"),
                          verticeElement.GetDoubleAttribute("y")));
       }
 

@@ -92,7 +92,7 @@ export default function OptionsEditorDialog({
         <HelpButton key="help" helpPagePath="/extensions/create" />,
         eventsFunctionsExtensionWriter ? (
           <FlatButton
-            icon={<CloudUpload />}
+            leftIcon={<CloudUpload />}
             key="export"
             label={<Trans>Export extension</Trans>}
             onClick={() => {
@@ -107,12 +107,11 @@ export default function OptionsEditorDialog({
           label={<Trans>Close</Trans>}
           primary={true}
           keyboardFocused={true}
-          onClick={() => onClose()}
+          onClick={onClose}
           disabled={isLoading}
           key={'close'}
         />,
       ]}
-      cannotBeDismissed={true}
       open={open}
       noTitleMargin
       title={
@@ -121,6 +120,7 @@ export default function OptionsEditorDialog({
           <Tab label={<Trans>Dependencies</Trans>} value="dependencies" />
         </Tabs>
       }
+      cannotBeDismissed={isLoading}
       onRequestClose={isLoading ? () => {} : onClose}
     >
       {currentTab === 'options' && (
@@ -147,11 +147,10 @@ export default function OptionsEditorDialog({
               onClick={() => {
                 setExportDialogOpen(false);
               }}
-              key={'close'}
+              key="close"
             />,
           ]}
           open
-          cannotBeDismissed={false}
           onRequestClose={() => {
             setExportDialogOpen(false);
           }}

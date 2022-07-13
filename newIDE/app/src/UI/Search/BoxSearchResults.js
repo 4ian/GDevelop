@@ -13,6 +13,10 @@ type Props<SearchItem> = {|
   error: ?Error,
   onRetry: () => void,
   baseSize: number,
+  // If true, the grid will take the whole height of the container without scroll,
+  // so make sure to limit the number of items to a reasonable number for performance.
+  noScroll?: boolean,
+  noResultPlaceholder?: React.Node,
 |};
 
 const styles = {
@@ -26,6 +30,8 @@ export const BoxSearchResults = <SearchItem>({
   error,
   onRetry,
   baseSize,
+  noResultPlaceholder,
+  noScroll,
 }: Props<SearchItem>) => {
   if (!searchItems) {
     if (!error) return <PlaceholderLoader />;
@@ -41,12 +47,14 @@ export const BoxSearchResults = <SearchItem>({
     }
   } else if (searchItems.length === 0) {
     return (
-      <EmptyMessage>
-        <Trans>
-          No results returned for your search. Try something else, browse the
-          categories or create your object from scratch!
-        </Trans>
-      </EmptyMessage>
+      noResultPlaceholder || (
+        <EmptyMessage>
+          <Trans>
+            No results returned for your search. Try something else, browse the
+            categories or create your object from scratch!
+          </Trans>
+        </EmptyMessage>
+      )
     );
   }
 
@@ -55,14 +63,15 @@ export const BoxSearchResults = <SearchItem>({
       <div style={styles.container}>
         <AutoSizer>
           {({ width, height }) => {
-            if (!width || !height) return null;
-
             const columnCount = Math.max(Math.floor((width - 5) / baseSize), 1);
             const columnWidth = Math.max(Math.floor(width / columnCount), 30);
             const rowCount = Math.max(
               1,
               Math.ceil(searchItems.length / columnCount)
             );
+            const rowHeight = columnWidth; // Square items.
+            const gridHeight = noScroll ? rowHeight * rowCount : height;
+            const gridWidth = width;
 
             function cellRenderer({ columnIndex, key, rowIndex, style }) {
               const indexInList = rowIndex * columnCount + columnIndex;
@@ -82,11 +91,11 @@ export const BoxSearchResults = <SearchItem>({
 
             return (
               <Grid
-                width={width}
-                height={height}
+                width={gridWidth}
+                height={gridHeight}
                 columnCount={columnCount}
                 columnWidth={columnWidth}
-                rowHeight={columnWidth}
+                rowHeight={rowHeight}
                 rowCount={rowCount}
                 cellRenderer={cellRenderer}
                 style={styles.grid}

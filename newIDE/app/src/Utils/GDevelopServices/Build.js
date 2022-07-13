@@ -14,10 +14,14 @@ export type TargetName =
   | 'androidAppBundle'
   | 's3';
 
+export type BuildType = 'cordova-build' | 'electron-build' | 'web-build';
+
 export type Build = {
   id: string,
   gameId?: string, // not defined for old builds.
   userId: string,
+  name?: string,
+  description?: string,
   bucket?: string,
   logsKey?: string,
   apkKey?: string,
@@ -28,7 +32,7 @@ export type Build = {
   linuxAppImageKey?: string,
   s3Key?: string,
   status: 'pending' | 'complete' | 'error',
-  type: 'cordova-build' | 'electron-build' | 'web-build',
+  type: BuildType,
   targets?: Array<TargetName>,
   createdAt: number,
   updatedAt: number,
@@ -223,6 +227,49 @@ export const getBuilds = (
         params: {
           userId,
           gameId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
+    .then(response => response.data);
+};
+
+export const updateBuild = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  buildId: string,
+  { name, description }: { name?: string, description?: string }
+): Promise<Build> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.patch(
+        `${GDevelopBuildApi.baseUrl}/build/${buildId}`,
+        { name, description },
+        {
+          params: {
+            userId,
+          },
+          headers: {
+            Authorization: authorizationHeader,
+          },
+        }
+      )
+    )
+    .then(response => response.data);
+};
+
+export const deleteBuild = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string,
+  buildId: string
+): Promise<Build> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.delete(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
+        params: {
+          userId,
         },
         headers: {
           Authorization: authorizationHeader,

@@ -74,6 +74,19 @@ export default class JsCodeEvent extends React.Component<
   };
 
   _input: ?any;
+  _inlineCodeBeforeChanges: ?string;
+
+  onFocus = () => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    this._inlineCodeBeforeChanges = jsCodeEvent.getInlineCode();
+  };
+
+  onBlur = () => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    const inlineCodeAfterChanges = jsCodeEvent.getInlineCode();
+    if (this._inlineCodeBeforeChanges !== inlineCodeAfterChanges)
+      this.props.onEndEditingEvent();
+  };
 
   onChange = (newValue: string) => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
@@ -125,7 +138,11 @@ export default class JsCodeEvent extends React.Component<
     // Put back the focus after closing the inline popover.
     // $FlowFixMe
     if (anchorEl) anchorEl.focus();
-
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    const { editingPreviousValue } = this.state;
+    if (editingPreviousValue !== jsCodeEvent.getParameterObjects()) {
+      this.props.onEndEditingEvent();
+    }
     this.setState({
       editingObject: false,
       editingPreviousValue: null,
@@ -249,7 +266,11 @@ export default class JsCodeEvent extends React.Component<
               onChange={this.onChange}
               width={contentRect.bounds.width - 5}
               height={this._getCodeEditorHeight()}
-              onEditorMounted={() => this.props.onUpdate()}
+              onEditorMounted={() => {
+                this.props.onUpdate();
+              }}
+              onFocus={this.onFocus}
+              onBlur={this.onBlur}
             />
             {functionEnd}
             <Button onClick={this.toggleExpanded} fullWidth size="small">

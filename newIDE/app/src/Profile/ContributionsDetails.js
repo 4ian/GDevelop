@@ -161,7 +161,7 @@ type Props = {|
   userId: string,
 |};
 
-export default ({ userId }: Props) => {
+const ContributionDetails = ({ userId }: Props) => {
   const [
     extensions,
     setExtensions,
@@ -222,7 +222,7 @@ export default ({ userId }: Props) => {
     <>
       <Column>
         <Line alignItems="center">
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Contributions</Trans>
           </Text>
         </Line>
@@ -252,3 +252,5 @@ export default ({ userId }: Props) => {
     </>
   );
 };
+
+export default ContributionDetails;

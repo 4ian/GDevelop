@@ -27,7 +27,7 @@ GDevelop is a full-featured, no-code, open-source game development software. You
 
 To learn more about GDevelop Architecture, read the [architecture overview here](Core/GDevelop-Architecture-Overview.md).
 
-Pre-generated documentation of the Core library, C++ and TypeScript game engines is [available here](https://docs.gdevelop-app.com).
+Pre-generated documentation of the Core library, C++ and TypeScript game engines is [available here](https://docs.gdevelop.io).
 
 Status of the tests and builds: [![macOS and Linux build status](https://circleci.com/gh/4ian/GDevelop.svg?style=shield)](https://app.circleci.com/pipelines/github/4ian/GDevelop) [![Fast tests status](https://gdevelop.semaphoreci.com/badges/GDevelop/branches/master.svg?style=shields)](https://gdevelop.semaphoreci.com/projects/GDevelop) [![All tests status](https://www.travis-ci.com/4ian/GDevelop.svg?branch=master)](https://www.travis-ci.com/github/4ian/GDevelop) [![Windows Build status](https://ci.appveyor.com/api/projects/status/84uhtdox47xp422x/branch/master?svg=true)](https://ci.appveyor.com/project/4ian/gdevelop/branch/master) [![https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg](https://good-labs.github.io/greater-good-affirmation/assets/images/badge.svg)](https://good-labs.github.io/greater-good-affirmation)
 
@@ -35,7 +35,7 @@ Status of the tests and builds: [![macOS and Linux build status](https://circlec
 
 ### Community
 
--   [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/gdevelop).
+-   [GDevelop forums](https://forum.gdevelop.io) and [Discord chat](https://discord.gg/gdevelop).
 -   [GDevelop homepage](https://gdevelop.io)
 -   [GDevelop wiki (documentation)](https://wiki.gdevelop.io/gdevelop5/start)
 -   Help translate GDevelop in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).

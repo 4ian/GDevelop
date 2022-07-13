@@ -3,7 +3,7 @@ import axios from 'axios';
 import { t } from '@lingui/macro';
 
 import LocalFileStorageProvider from '../../ProjectsStorage/LocalFileStorageProvider';
-import optionalRequire from '../../Utils/OptionalRequire.js';
+import optionalRequire from '../../Utils/OptionalRequire';
 import { getExample } from '../../Utils/GDevelopServices/Example';
 import { sendNewGameCreated } from '../../Utils/Analytics/EventSender';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
@@ -44,7 +44,7 @@ export const onCreateBlank: OnCreateBlankFunction = async ({
   return {
     project,
     storageProvider: LocalFileStorageProvider,
-    fileMetadata: { fileIdentifier: filePath },
+    fileMetadata: { fileIdentifier: filePath, lastModifiedDate: Date.now() },
     projectName,
   };
 };
@@ -79,7 +79,10 @@ export const onCreateFromExampleShortHeader: OnCreateFromExampleShortHeaderFunct
     });
     return {
       storageProvider: LocalFileStorageProvider,
-      fileMetadata: { fileIdentifier: localFilePath },
+      fileMetadata: {
+        fileIdentifier: localFilePath,
+        lastModifiedDate: Date.now(),
+      },
       projectName,
     };
   } catch (error) {

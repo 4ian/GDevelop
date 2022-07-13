@@ -7,7 +7,6 @@
 #include "EventsVariablesFinder.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
@@ -32,10 +31,16 @@ namespace gd {
 class GD_CORE_API ExpressionParameterSearcher
     : public ExpressionParser2NodeWorker {
  public:
-  ExpressionParameterSearcher(std::set<gd::String>& results_,
+  ExpressionParameterSearcher(const gd::Platform &platform_,
+                              const gd::ObjectsContainer &globalObjectsContainer_,
+                              const gd::ObjectsContainer &objectsContainer_,
+                              std::set<gd::String>& results_,
                               const gd::String& parameterType_,
                               const gd::String& objectName_ = "")
-      : results(results_),
+      : platform(platform_),
+        globalObjectsContainer(globalObjectsContainer_),
+        objectsContainer(objectsContainer_),
+        results(results_),
         parameterType(parameterType_),
         objectName(objectName_){};
   virtual ~ExpressionParameterSearcher(){};
@@ -68,10 +73,22 @@ class GD_CORE_API ExpressionParameterSearcher
   void OnVisitObjectFunctionNameNode(ObjectFunctionNameNode& node) override {}
   void OnVisitFunctionCallNode(FunctionCallNode& node) override {
     bool considerFunction = objectName.empty() || node.objectName == objectName;
+
+    const gd::ExpressionMetadata &metadata = node.objectName.empty() ?
+          MetadataProvider::GetAnyExpressionMetadata(platform, node.functionName) :
+            MetadataProvider::GetObjectAnyExpressionMetadata(
+                platform,
+                GetTypeOfObject(globalObjectsContainer, objectsContainer, objectName),
+                node.functionName);
+
+    if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
+      return;
+    }
+    
     for (size_t i = 0; i < node.parameters.size() &&
-                       i < node.expressionMetadata.parameters.size();
+                       i < metadata.parameters.size();
          ++i) {
-      auto& parameterMetadata = node.expressionMetadata.parameters[i];
+      auto& parameterMetadata = metadata.parameters[i];
       if (considerFunction && parameterMetadata.GetType() == parameterType) {
         // Store the value of the parameter
         results.insert(
@@ -84,6 +101,10 @@ class GD_CORE_API ExpressionParameterSearcher
   void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
+  const gd::Platform &platform;
+  const gd::ObjectsContainer &globalObjectsContainer;
+  const gd::ObjectsContainer &objectsContainer;
+
   std::set<gd::String>& results;  ///< Reference to the std::set where argument
                                   ///< values must be stored.
   gd::String parameterType;  ///< The type of the parameters to be searched for.
@@ -165,24 +186,18 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
       }
       // Search in expressions
       else if (ParameterMetadata::IsExpression(
-                   "number", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", instructions[aId].GetParameter(pNb).GetPlainString());
-
-        ExpressionParameterSearcher searcher(
-            results, parameterType, objectName);
-        node->Visit(searcher);
-      }
-      // Search in gd::String expressions
-      else if (ParameterMetadata::IsExpression(
+                   "number", instrInfos.parameters[pNb].type) ||
+               ParameterMetadata::IsExpression(
                    "string", instrInfos.parameters[pNb].type)) {
-        gd::ExpressionParser2 parser(platform, project, layout);
-        auto node = parser.ParseExpression(
-            "number", instructions[aId].GetParameter(pNb).GetPlainString());
+        auto node = instructions[aId].GetParameter(pNb).GetRootNode();
 
         ExpressionParameterSearcher searcher(
-            results, parameterType, objectName);
+            platform,
+            project,
+            layout,
+            results,
+            parameterType,
+            objectName);
         node->Visit(searcher);
       }
       // Remember the value of the last "object" parameter.

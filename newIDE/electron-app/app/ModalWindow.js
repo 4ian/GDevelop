@@ -38,12 +38,18 @@ const loadModalWindow = ({
     center: true,
     webPreferences: {
       webSecurity: false,
+      // Allow Node.js API access in renderer process, as long
+      // as we've not removed dependency on it and on "@electron/remote".
       nodeIntegration: true,
+      contextIsolation: false,
     },
   };
 
   modalWindow = new BrowserWindow(windowOptions);
   modalWindow.setMenu(null);
+
+  // Enable `@electron/remote` module for renderer process
+  require('@electron/remote/main').enable(modalWindow.webContents);
 
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {
@@ -67,11 +73,11 @@ const loadModalWindow = ({
     }
   });
 
-  //Prevent opening any website or url inside Electron.
-  modalWindow.webContents.on('new-window', (e, url) => {
-    console.info('Opening in browser (because of new-window): ', url);
-    e.preventDefault();
-    electron.shell.openExternal(url);
+  // Prevent opening any website or url inside Electron
+  modalWindow.webContents.setWindowOpenHandler(details => {
+    console.info('Opening in browser (because of new window): ', details.url);
+    electron.shell.openExternal(details.url);
+    return { action: 'deny' };
   });
 
   modalWindow.on('closed', event => {

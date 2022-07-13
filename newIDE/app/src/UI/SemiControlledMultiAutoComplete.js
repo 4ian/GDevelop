@@ -4,6 +4,7 @@ import { I18n } from '@lingui/react';
 import TextField from '@material-ui/core/TextField';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { makeStyles } from '@material-ui/core';
 
 export type AutocompleteOption = {|
   text: string, // The text displayed
@@ -12,12 +13,14 @@ export type AutocompleteOption = {|
 
 export type DataSource = Array<?AutocompleteOption>;
 
-const styles = {
-  chip: {
-    // Make the chips smaller to fit the input
-    height: 25,
+const useChipStyles = makeStyles({
+  root: {
+    height: 25, // Make the chips smaller to fit the input.
   },
-};
+  deleteIcon: {
+    cursor: 'default', // Hover is enough, no need for a different cursor.
+  },
+});
 
 type Props = {|
   value: Array<AutocompleteOption>,
@@ -36,6 +39,7 @@ type Props = {|
 |};
 
 export default function SemiControlledMultiAutoComplete(props: Props) {
+  const chipStyles = useChipStyles();
   return (
     <I18n>
       {({ i18n }) => (
@@ -58,6 +62,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           renderInput={params => (
             <TextField
               {...params}
+              color="secondary"
               InputProps={{
                 ...params.InputProps,
                 placeholder: props.hintText && i18n._(props.hintText),
@@ -72,7 +77,7 @@ export default function SemiControlledMultiAutoComplete(props: Props) {
           fullWidth={props.fullWidth}
           disabled={props.loading}
           ChipProps={{
-            style: styles.chip,
+            classes: chipStyles,
           }}
         />
       )}

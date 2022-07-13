@@ -47,6 +47,7 @@ type Props = {|
 
   tooltip?: MessageDescriptor,
   acceleratorString?: string,
+  'aria-label'?: string,
 |};
 
 /**
@@ -56,7 +57,7 @@ type Props = {|
 export default class IconButton extends React.Component<Props, {||}> {
   render() {
     const { tooltip, acceleratorString, ...otherProps } = this.props;
-    const iconButton = <MUIIconButton {...otherProps} />;
+    const iconButton = <MUIIconButton {...otherProps} color="secondary" />;
 
     return tooltip && !this.props.disabled ? (
       <I18n>

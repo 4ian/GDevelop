@@ -307,7 +307,7 @@ module.exports = {
       .setLabel(_('Color map texture for the effect'))
       .setDescription(
         _(
-          'You can change colors of pixels by modifing a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
+          'You can change colors of pixels by modifing a reference color image, containing each colors, called the *Color Map Texture*. To get started, **download** [a default color map texture here](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layer-effects).'
         )
       );
     colorMapProperties
@@ -442,7 +442,7 @@ module.exports = {
       .setLabel(_('Displacement map texture'))
       .setDescription(
         _(
-          'Displacement map texture for the effect. To get started, **download** [a default displacement map texture here](http://wiki.compilgames.net/doku.php/gdevelop5/interface/scene-editor/layer-effects).'
+          'Displacement map texture for the effect. To get started, **download** [a default displacement map texture here](https://wiki.gdevelop.io/gdevelop5/interface/scene-editor/layer-effects).'
         )
       );
     displacementProperties

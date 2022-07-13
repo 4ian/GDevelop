@@ -76,6 +76,7 @@ const PublicProfileDialog = ({ userId, onClose }: Props) => {
           onClick={onClose}
         />,
       ]}
+      onRequestClose={onClose}
     >
       <ProfileDetails
         profile={profile}

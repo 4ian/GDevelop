@@ -15,6 +15,8 @@ class ExpressionMetadata;
 class ExpressionMetadata;
 class Platform;
 class PlatformExtension;
+struct FunctionCallNode;
+struct ExpressionNode;
 }  // namespace gd
 
 namespace gd {
@@ -233,6 +235,26 @@ class GD_CORE_API MetadataProvider {
    */
   static const gd::ExpressionMetadata& GetObjectAnyExpressionMetadata(
       const gd::Platform& platform, gd::String objectType, gd::String exprType);
+
+  static const gd::ExpressionMetadata& GetFunctionCallMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& node);
+
+  static const gd::ParameterMetadata* GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    ExpressionNode& parameter);
+
+  static const gd::ParameterMetadata* GetFunctionCallParameterMetadata(
+    const gd::Platform& platform, 
+    const gd::ObjectsContainer &globalObjectsContainer,
+    const gd::ObjectsContainer &objectsContainer,
+    FunctionCallNode& functionCall,
+    int parameterIndex);
 
   /**
    * Get information about an expression from its type.

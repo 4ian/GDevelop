@@ -29,6 +29,7 @@ import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import { ColumnStackLayout, ResponsiveLineStackLayout } from '../../UI/Layout';
 import { getLastObjectParameterObjectType } from '../../EventsSheet/ParameterFields/ParameterMetadataTools';
 import StringArrayEditor from '../../StringArrayEditor';
+import newNameGenerator from '../../Utils/NewNameGenerator';
 
 const gd: libGDevelop = global.gd;
 
@@ -112,9 +113,16 @@ export default class EventsFunctionParametersEditor extends React.Component<
   _addParameter = () => {
     const { eventsFunction } = this.props;
     const parameters = eventsFunction.getParameters();
+    const existingParameterNames = mapVector(parameters, parameterMetadata =>
+      parameterMetadata.getName()
+    );
 
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
+    const newName = newNameGenerator('Parameter', name =>
+      existingParameterNames.includes(name)
+    );
+    newParameter.setName(newName);
     parameters.push_back(newParameter);
     newParameter.delete();
     this.forceUpdate();

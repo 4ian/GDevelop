@@ -35,7 +35,6 @@ const ChangelogDialog = ({ open, onClose }: Props) => {
       actions={actions}
       open={open}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
     >
       <Text>
         <Trans>

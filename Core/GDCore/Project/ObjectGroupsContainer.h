@@ -7,6 +7,7 @@
 #ifndef GDCORE_OBJECTGROUPSCONTAINER_H
 #define GDCORE_OBJECTGROUPSCONTAINER_H
 #include <vector>
+#include <algorithm>
 #include "GDCore/Project/ObjectGroup.h"
 #include "GDCore/String.h"
 namespace gd {

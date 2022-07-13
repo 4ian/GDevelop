@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { ListItem } from '../../../UI/List';
 import ListIcon from '../../../UI/ListIcon';
-import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata.js';
+import { type EnumeratedInstructionOrExpressionMetadata } from '../../../InstructionOrExpression/EnumeratedInstructionOrExpressionMetadata';
 import { getInstructionListItemValue, getInstructionListItemKey } from './Keys';
 import { type SearchMatch } from '../../../UI/Search/UseSearchStructuredItem';
 import HighlightedText from '../../../UI/Search/HighlightedText';

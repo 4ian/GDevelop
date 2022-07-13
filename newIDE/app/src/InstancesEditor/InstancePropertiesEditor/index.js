@@ -10,7 +10,6 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import { type Schema } from '../../PropertiesEditor';
-import VariablesList from '../../VariablesList';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from '../../UI/IconButton';
 import { Line, Column } from '../../UI/Grid';
@@ -19,6 +18,9 @@ import Text from '../../UI/Text';
 import { type UnsavedChanges } from '../../MainFrame/UnsavedChangesContext';
 import ScrollView from '../../UI/ScrollView';
 import EventsRootVariablesFinder from '../../Utils/EventsRootVariablesFinder';
+import VariablesList, {
+  type HistoryHandler,
+} from '../../VariablesList/VariablesList';
 
 type Props = {|
   project: gdProject,
@@ -29,10 +31,10 @@ type Props = {|
   editInstanceVariables: gdInitialInstance => void,
   unsavedChanges?: ?UnsavedChanges,
   i18n: I18nType,
+  historyHandler?: HistoryHandler,
 |};
 
 export default class InstancePropertiesEditor extends React.Component<Props> {
-  _instanceVariablesList: { current: null | VariablesList } = React.createRef();
   schema: Schema = [
     {
       name: this.props.i18n._(t`Object`),
@@ -162,33 +164,34 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
           .map((instance: gdInitialInstance) => '' + instance.ptr)
           .join(';')}
       >
-        <Line>
-          <Column expand noMargin>
-            <Column>
-              <PropertiesEditor
-                unsavedChanges={this.props.unsavedChanges}
-                schema={this.schema.concat(instanceSchema)}
-                instances={instances}
-                onInstancesModified={this.props.onInstancesModified}
-              />
-              <Line alignItems="center" justifyContent="space-between">
-                <Text>
-                  <Trans>Instance Variables</Trans>
-                </Text>
-                <IconButton
-                  onClick={() => {
-                    this.props.editInstanceVariables(instance);
-                  }}
-                >
-                  <OpenInNew />
-                </IconButton>
-              </Line>
-            </Column>
+        <Column expand noMargin>
+          <Column>
+            <PropertiesEditor
+              unsavedChanges={this.props.unsavedChanges}
+              schema={this.schema.concat(instanceSchema)}
+              instances={instances}
+              onInstancesModified={this.props.onInstancesModified}
+            />
+            <Line alignItems="center" justifyContent="space-between">
+              <Text>
+                <Trans>Instance Variables</Trans>
+              </Text>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  this.props.editInstanceVariables(instance);
+                }}
+              >
+                <OpenInNew />
+              </IconButton>
+            </Line>
+          </Column>
+          {object ? (
             <VariablesList
-              inheritedVariablesContainer={
-                object ? object.getVariables() : null
-              }
+              commitChangesOnBlur={false}
+              inheritedVariablesContainer={object.getVariables()}
               variablesContainer={instance.getVariables()}
+              size="small"
               onComputeAllVariableNames={() =>
                 object
                   ? EventsRootVariablesFinder.findAllObjectVariables(
@@ -199,10 +202,10 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
                     )
                   : []
               }
-              ref={this._instanceVariablesList}
+              historyHandler={this.props.historyHandler}
             />
-          </Column>
-        </Line>
+          ) : null}
+        </Column>
       </ScrollView>
     );
   }

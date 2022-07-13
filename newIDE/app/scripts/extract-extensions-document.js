@@ -33,10 +33,26 @@ const generateExtensionFooterText = fullName => {
   return (
     `
 ---
-*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop-app.com/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
+*This page is an auto-generated reference page about the **${fullName}** extension, made by the community of [[https://gdevelop.io/|GDevelop, the open-source, cross-platform game engine designed for everyone]].*` +
     ' ' +
     'Learn more about [[gdevelop5:extensions|all GDevelop community-made extensions here]].'
   );
+};
+
+/**
+ * @param {{id: string, username: string}[]} authors
+ */
+const generateAuthorNamesWithLinks = authors => {
+  const authorAndLinks = authors
+    .map(author => {
+      if (!author.username) return null;
+
+      return `[${author.username}](https://liluo.io/${author.username})`;
+    })
+    .filter(Boolean)
+    .join(', ');
+
+  return authorAndLinks ? authorAndLinks : '(not specified)';
 };
 
 /**
@@ -89,9 +105,9 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
       const folderName = getExtensionFolderName(extension.name);
       const referencePageUrl = `${gdevelopWikiUrlRoot}/extensions/${folderName}/reference`;
       const helpPageUrl = getHelpLink(extension.helpPath) || referencePageUrl;
-      const authorUsernames = (extensionShortHeader.authors || [])
-        .map(author => author.username || null)
-        .filter(Boolean);
+      const authorNamesWithLinks = generateAuthorNamesWithLinks(
+        extensionShortHeader.authors || []
+      );
 
       const referencePageContent =
         `# ${extension.fullName}` +
@@ -100,9 +116,7 @@ GDevelop is built in a flexible way. In addition to [[gdevelop5:all-features|cor
         '\n' +
         `${extension.shortDescription}\n` +
         '\n' +
-        `**Authors and contributors** to this community extension: ${
-          authorUsernames.length ? authorUsernames.join(', ') : 'not specified'
-        }.\n` +
+        `**Authors and contributors** to this community extension: ${authorNamesWithLinks}.\n` +
         '\n' +
         '---\n' +
         '\n' +

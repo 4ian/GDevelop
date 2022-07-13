@@ -109,11 +109,14 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
 
   endEditing = () => {
     const { anchorEl } = this.state;
+    const linkEvent = gd.asLinkEvent(this.props.event);
 
     // Put back the focus after closing the inline popover.
     // $FlowFixMe
     if (anchorEl) anchorEl.focus();
-
+    if (this.state.editingPreviousValue !== linkEvent.getTarget()) {
+      this.props.onEndEditingEvent();
+    }
     this.setState({
       editing: false,
       editingPreviousValue: null,

@@ -291,9 +291,11 @@ export const ExtensionOptionsEditor = ({
                   }}
                 />,
               ]}
-              cannotBeDismissed={false}
               open
               noMargin
+              onRequestClose={() => {
+                setResourceStoreOpen(false);
+              }}
             >
               <ResourceStore
                 onChoose={resource => {

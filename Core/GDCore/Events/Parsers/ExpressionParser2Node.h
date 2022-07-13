@@ -17,6 +17,7 @@ class ObjectsContainer;
 class Platform;
 class ParameterMetadata;
 class ExpressionMetadata;
+struct FunctionCallNode;
 }  // namespace gd
 
 namespace gd {
@@ -59,6 +60,10 @@ struct GD_CORE_API ExpressionParserDiagnostic {
 struct GD_CORE_API ExpressionParserError : public ExpressionParserDiagnostic {
   ExpressionParserError(const gd::String &type_,
                         const gd::String &message_,
+                        const ExpressionParserLocation &location_)
+      : type(type_), message(message_), location(location_){};
+  ExpressionParserError(const gd::String &type_,
+                        const gd::String &message_,
                         size_t position_)
       : type(type_), message(message_), location(position_){};
   ExpressionParserError(const gd::String &type_,
@@ -86,7 +91,7 @@ struct GD_CORE_API ExpressionParserError : public ExpressionParserDiagnostic {
  * an expression inherits from.
  */
 struct GD_CORE_API ExpressionNode {
-  ExpressionNode(const gd::String &type_) : type(type_){};
+  ExpressionNode() : parent(nullptr) {};
   virtual ~ExpressionNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker){};
 
@@ -97,17 +102,12 @@ struct GD_CORE_API ExpressionNode {
                                       /// function can store the position of the
                                       /// object name, the dot, the function
                                       /// name, etc...
-
-  gd::String type;  // Actual type of the node.
-                    // "string", "number", type supported by
-                    // gd::ParameterMetadata::IsObject, types supported by
-                    // gd::ParameterMetadata::IsExpression or "unknown".
+  ExpressionNode *parent;
 };
 
 struct GD_CORE_API SubExpressionNode : public ExpressionNode {
-  SubExpressionNode(const gd::String &type_,
-                    std::unique_ptr<ExpressionNode> expression_)
-      : ExpressionNode(type_), expression(std::move(expression_)){};
+  SubExpressionNode(std::unique_ptr<ExpressionNode> expression_)
+      : ExpressionNode(), expression(std::move(expression_)){};
   virtual ~SubExpressionNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitSubExpressionNode(*this);
@@ -120,8 +120,8 @@ struct GD_CORE_API SubExpressionNode : public ExpressionNode {
  * \brief An operator node. For example: "lhs + rhs".
  */
 struct GD_CORE_API OperatorNode : public ExpressionNode {
-  OperatorNode(const gd::String &type_, gd::String::value_type op_)
-      : ExpressionNode(type_), op(op_){};
+  OperatorNode(gd::String::value_type op_)
+      : ExpressionNode(), op(op_){};
   virtual ~OperatorNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitOperatorNode(*this);
@@ -136,8 +136,8 @@ struct GD_CORE_API OperatorNode : public ExpressionNode {
  * \brief A unary operator node. For example: "-2".
  */
 struct GD_CORE_API UnaryOperatorNode : public ExpressionNode {
-  UnaryOperatorNode(const gd::String &type_, gd::String::value_type op_)
-      : ExpressionNode(type_), op(op_){};
+  UnaryOperatorNode(gd::String::value_type op_)
+      : ExpressionNode(), op(op_){};
   virtual ~UnaryOperatorNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitUnaryOperatorNode(*this);
@@ -153,7 +153,7 @@ struct GD_CORE_API UnaryOperatorNode : public ExpressionNode {
  */
 struct GD_CORE_API NumberNode : public ExpressionNode {
   NumberNode(const gd::String &number_)
-      : ExpressionNode("number"), number(number_){};
+      : ExpressionNode(), number(number_){};
   virtual ~NumberNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitNumberNode(*this);
@@ -168,7 +168,7 @@ struct GD_CORE_API NumberNode : public ExpressionNode {
  * Its `type` is always "string".
  */
 struct GD_CORE_API TextNode : public ExpressionNode {
-  TextNode(const gd::String &text_) : ExpressionNode("string"), text(text_){};
+  TextNode(const gd::String &text_) : ExpressionNode(), text(text_){};
   virtual ~TextNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitTextNode(*this);
@@ -177,32 +177,88 @@ struct GD_CORE_API TextNode : public ExpressionNode {
   gd::String text;
 };
 
+struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
+    : public ExpressionNode {
+  IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode()
+      : ExpressionNode(){};
+};
+
+/**
+ * \brief An identifier node, usually representing an object or a variable
+ * with an optional function name or child variable name respectively.
+ *
+ * The name of a function to call on an object or the behavior,
+ * for example: "MyObject.Function" or "MyObject.Physics".
+ * 
+ * A variable, potentially with accessor to its child,
+ * for example: MyVariable or MyVariable.MyChild
+ */
+struct GD_CORE_API IdentifierNode
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
+  IdentifierNode(
+  const gd::String &identifierName_)
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(),
+        identifierName(identifierName_),
+        childIdentifierName(""){};
+  IdentifierNode(
+  const gd::String &identifierName_,
+  const gd::String &childIdentifierName_)
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(),
+        identifierName(identifierName_),
+        childIdentifierName(childIdentifierName_){};
+  virtual ~IdentifierNode(){};
+  virtual void Visit(ExpressionParser2NodeWorker &worker) {
+    worker.OnVisitIdentifierNode(*this);
+  };
+
+  gd::String identifierName;  ///< The object or variable name.
+  gd::String childIdentifierName;  ///< The object function or variable child name.
+
+
+  ExpressionParserLocation
+      identifierNameLocation;  ///< Location of the object or variable name.
+  ExpressionParserLocation
+      identifierNameDotLocation;  ///< Location of the "." after the object or variable name.
+  ExpressionParserLocation childIdentifierNameLocation;  ///< Location of object
+                                                         /// function, behavior or
+                                                         /// child variable name.
+};
+
+struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
+    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
+  FunctionCallOrObjectFunctionNameOrEmptyNode()
+      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(){};
+  virtual ~FunctionCallOrObjectFunctionNameOrEmptyNode(){};
+  void Visit(ExpressionParser2NodeWorker &worker) override{};
+};
+
 struct GD_CORE_API VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
-  VariableAccessorOrVariableBracketAccessorNode() : ExpressionNode(""){};
+  VariableAccessorOrVariableBracketAccessorNode() : ExpressionNode(){};
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode> child;
 };
 
 /**
- * \brief A variable, potentially with accessor to its children.
+ * \brief A variable with bracket accessor or at least 2 "dot" accessors.
  *
- * Example: MyVariable or MyVariable.MyChildren
- *
+ * Example: MyVariable[MyChildren] or MyVariable.MyChildren.MyGranChildren.
+ * 
+ * Other cases like "MyVariable" or "MyVariable.MyChildren" are IdentifierNode
+ * to allow handling ambiguities.
+ * 
+ * \see gd::IdentifierNode
  * \see gd::VariableAccessorNode
  * \see gd::VariableBracketAccessorNode
  */
-struct GD_CORE_API VariableNode : public ExpressionNode {
-  VariableNode(const gd::String &type_,
-               const gd::String &name_,
-               const gd::String &objectName_)
-      : ExpressionNode(type_), name(name_), objectName(objectName_){};
+struct GD_CORE_API VariableNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
+  VariableNode(const gd::String &name_)
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(), name(name_){};
   virtual ~VariableNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitVariableNode(*this);
   };
 
   gd::String name;
-  gd::String objectName;
 
   std::unique_ptr<VariableAccessorOrVariableBracketAccessorNode>
       child;  // Can be nullptr if no accessor
@@ -216,7 +272,8 @@ struct GD_CORE_API VariableNode : public ExpressionNode {
  */
 struct GD_CORE_API VariableAccessorNode
     : public VariableAccessorOrVariableBracketAccessorNode {
-  VariableAccessorNode(const gd::String &name_) : name(name_){};
+  VariableAccessorNode(const gd::String &name_)
+      : VariableAccessorOrVariableBracketAccessorNode(), name(name_){};
   virtual ~VariableAccessorNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitVariableAccessorNode(*this);
@@ -234,7 +291,7 @@ struct GD_CORE_API VariableAccessorNode
 struct GD_CORE_API VariableBracketAccessorNode
     : public VariableAccessorOrVariableBracketAccessorNode {
   VariableBracketAccessorNode(std::unique_ptr<ExpressionNode> expression_)
-      : expression(std::move(expression_)){};
+      : VariableAccessorOrVariableBracketAccessorNode(), expression(std::move(expression_)){};
   virtual ~VariableBracketAccessorNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitVariableBracketAccessorNode(*this);
@@ -243,55 +300,26 @@ struct GD_CORE_API VariableBracketAccessorNode
   std::unique_ptr<ExpressionNode> expression;
 };
 
-struct GD_CORE_API IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode
-    : public ExpressionNode {
-  IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(
-      const gd::String &type)
-      : ExpressionNode(type){};
-};
-
-/**
- * \brief An identifier node, usually representing an object or a function name.
- */
-struct GD_CORE_API IdentifierNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
-  IdentifierNode(const gd::String &identifierName_, const gd::String &type_)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type_),
-        identifierName(identifierName_){};
-  virtual ~IdentifierNode(){};
-  virtual void Visit(ExpressionParser2NodeWorker &worker) {
-    worker.OnVisitIdentifierNode(*this);
-  };
-
-  gd::String identifierName;
-};
-
-struct GD_CORE_API FunctionCallOrObjectFunctionNameOrEmptyNode
-    : public IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode {
-  FunctionCallOrObjectFunctionNameOrEmptyNode(const gd::String &type)
-      : IdentifierOrFunctionCallOrObjectFunctionNameOrEmptyNode(type){};
-  virtual ~FunctionCallOrObjectFunctionNameOrEmptyNode(){};
-  void Visit(ExpressionParser2NodeWorker &worker) override{};
-};
-
 /**
  * \brief The name of a function to call on an object or the behavior
- * For example: "MyObject.Function" or "MyObject.Physics" or
- * "MyObject.Physics::LinearVelocity".
+ * For example: "MyObject.Physics::LinearVelocity".
+ * 
+ * Other cases like "MyObject.Function" or "MyObject.Physics" are IdentifierNode
+ * to allow handling ambiguities.
+ * 
+ * \see gd::IdentifierNode
  */
 struct GD_CORE_API ObjectFunctionNameNode
     : public FunctionCallOrObjectFunctionNameOrEmptyNode {
-  ObjectFunctionNameNode(const gd::String &type_,
-                         const gd::String &objectName_,
+  ObjectFunctionNameNode(const gd::String &objectName_,
                          const gd::String &objectFunctionOrBehaviorName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(),
         objectName(objectName_),
         objectFunctionOrBehaviorName(objectFunctionOrBehaviorName_) {}
-  ObjectFunctionNameNode(const gd::String &type_,
-                         const gd::String &objectName_,
+  ObjectFunctionNameNode(const gd::String &objectName_,
                          const gd::String &behaviorName_,
                          const gd::String &behaviorFunctionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(),
         objectName(objectName_),
         objectFunctionOrBehaviorName(behaviorName_),
         behaviorFunctionName(behaviorFunctionName_) {}
@@ -334,39 +362,24 @@ struct GD_CORE_API ObjectFunctionNameNode
  */
 struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
   /** \brief Construct a free function call node. */
-  FunctionCallNode(const gd::String &type_,
-                   std::vector<std::unique_ptr<ExpressionNode>> parameters_,
-                   const ExpressionMetadata &expressionMetadata_,
-                   const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
-        parameters(std::move(parameters_)),
-        expressionMetadata(expressionMetadata_),
+  FunctionCallNode(const gd::String &functionName_)
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(),
         functionName(functionName_){};
 
   /** \brief Construct an object function call node. */
-  FunctionCallNode(const gd::String &type_,
-                   const gd::String &objectName_,
-                   std::vector<std::unique_ptr<ExpressionNode>> parameters_,
-                   const ExpressionMetadata &expressionMetadata_,
+  FunctionCallNode(const gd::String &objectName_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(),
         objectName(objectName_),
-        parameters(std::move(parameters_)),
-        expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
 
   /** \brief Construct a behavior function call node. */
-  FunctionCallNode(const gd::String &type_,
-                   const gd::String &objectName_,
+  FunctionCallNode(const gd::String &objectName_,
                    const gd::String &behaviorName_,
-                   std::vector<std::unique_ptr<ExpressionNode>> parameters_,
-                   const ExpressionMetadata &expressionMetadata_,
                    const gd::String &functionName_)
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_),
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(),
         objectName(objectName_),
         behaviorName(behaviorName_),
-        parameters(std::move(parameters_)),
-        expressionMetadata(expressionMetadata_),
         functionName(functionName_){};
   virtual ~FunctionCallNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
@@ -376,7 +389,6 @@ struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrE
   gd::String objectName;
   gd::String behaviorName;
   std::vector<std::unique_ptr<ExpressionNode>> parameters;
-  const ExpressionMetadata &expressionMetadata;
   gd::String functionName;
 
   ExpressionParserLocation
@@ -401,8 +413,8 @@ struct GD_CORE_API FunctionCallNode : public FunctionCallOrObjectFunctionNameOrE
  * encountered and any other node could not make sense.
  */
 struct GD_CORE_API EmptyNode : public FunctionCallOrObjectFunctionNameOrEmptyNode {
-  EmptyNode(const gd::String &type_, const gd::String &text_ = "")
-      : FunctionCallOrObjectFunctionNameOrEmptyNode(type_), text(text_){};
+  EmptyNode(const gd::String &text_ = "")
+      : FunctionCallOrObjectFunctionNameOrEmptyNode(), text(text_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);

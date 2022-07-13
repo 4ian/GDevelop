@@ -6,7 +6,7 @@ type Props = {|
   children: React.Node,
 |};
 
-export default (props: Props) => {
+const PlaceholderMessage = (props: Props) => {
   return (
     <div
       style={{
@@ -33,3 +33,5 @@ export default (props: Props) => {
     </div>
   );
 };
+
+export default PlaceholderMessage;

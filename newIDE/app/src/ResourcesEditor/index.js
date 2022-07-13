@@ -17,7 +17,7 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource';
-import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils.js';
+import { getResourceFilePathStatus } from '../ResourcesList/ResourceUtils';
 
 const gd: libGDevelop = global.gd;
 
@@ -182,7 +182,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
 
   openProjectFolder = () => {
     const project = this.props.project;
-    if (shell) shell.openItem(path.dirname(project.getProjectFile()));
+    if (shell) shell.openPath(path.dirname(project.getProjectFile()));
   };
 
   openProperties = () => {

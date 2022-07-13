@@ -1,12 +1,12 @@
 /* eslint-disable */
- 
+
 /*!
  * pixi-tilemap - v2.1.3
  * Compiled Sun, 18 Oct 2020 17:08:58 UTC
  *
  * pixi-tilemap is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
- * 
+ *
  * Copyright 2019-2020, Ivan Popelyshev, All Rights Reserved
  */
 this.PIXI = this.PIXI || {};
@@ -969,4 +969,5 @@ void main(void){
 
 })));
 if (typeof pixi_tilemap !== 'undefined') { Object.assign(this.PIXI.tilemap, pixi_tilemap); }
-//# sourceMappingURL=pixi-tilemap.umd.js.map
+// Disabled to avoid warnings in Chrome (see https://github.com/4ian/GDevelop/pull/3947)
+// //# sourceMappingURL=pixi-tilemap.umd.js.map

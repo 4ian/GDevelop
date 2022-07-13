@@ -14,6 +14,9 @@ import ContributionsDetails from './ContributionsDetails';
 import AuthenticatedUserContext from './AuthenticatedUserContext';
 import { GamesList } from '../GameDashboard/GamesList';
 import { ColumnStackLayout } from '../UI/Layout';
+import { getRedirectToSubscriptionPortalUrl } from '../Utils/GDevelopServices/Usage';
+import Window from '../Utils/Window';
+import { showErrorBox } from '../UI/Messages/MessageBox';
 
 type Props = {|
   currentProject: ?gdProject,
@@ -33,11 +36,33 @@ const ProfileDialog = ({
   const [currentTab, setCurrentTab] = React.useState<string>(initialTab);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
 
-  const _onChangeTab = React.useCallback(
-    (newTab: string) => {
-      setCurrentTab(newTab);
+  const [
+    isManageSubscriptionLoading,
+    setIsManageSubscriptionLoading,
+  ] = React.useState(false);
+  const onManageSubscription = React.useCallback(
+    async () => {
+      const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
+      if (!firebaseUser) return;
+
+      try {
+        setIsManageSubscriptionLoading(true);
+        const url = await getRedirectToSubscriptionPortalUrl(
+          getAuthorizationHeader,
+          firebaseUser.uid
+        );
+        Window.openExternalURL(url);
+      } catch (error) {
+        showErrorBox({
+          message: 'Unable to load the portal to manage your subscription.',
+          rawError: error,
+          errorId: 'subscription-portal-error',
+        });
+      } finally {
+        setIsManageSubscriptionLoading(false);
+      }
     },
-    [setCurrentTab]
+    [authenticatedUser]
   );
 
   React.useEffect(
@@ -77,34 +102,38 @@ const ProfileDialog = ({
         ),
       ]}
       onRequestClose={onClose}
-      cannotBeDismissed={false}
       open={open}
       noMargin
       fullHeight
       noTitleMargin
       title={
-        <Tabs value={currentTab} onChange={_onChangeTab}>
+        <Tabs value={currentTab} onChange={setCurrentTab}>
           <Tab label={<Trans>My Profile</Trans>} value="profile" />
           <Tab label={<Trans>Games Dashboard</Trans>} value="games-dashboard" />
         </Tabs>
       }
+      flexColumnBody
     >
       {currentTab === 'profile' &&
         (authenticatedUser.authenticated && authenticatedUser.profile ? (
-          <Column noMargin>
-            <AuthenticatedUserProfileDetails
-              authenticatedUser={authenticatedUser}
-              onEditProfile={authenticatedUser.onEdit}
-              onChangeEmail={authenticatedUser.onChangeEmail}
-            />
-            <SubscriptionDetails
-              subscription={authenticatedUser.subscription}
-              onChangeSubscription={onChangeSubscription}
-            />
-            <ContributionsDetails userId={authenticatedUser.profile.id} />
-          </Column>
+          <Line>
+            <Column expand>
+              <AuthenticatedUserProfileDetails
+                authenticatedUser={authenticatedUser}
+                onEditProfile={authenticatedUser.onEdit}
+                onChangeEmail={authenticatedUser.onChangeEmail}
+              />
+              <SubscriptionDetails
+                subscription={authenticatedUser.subscription}
+                onChangeSubscription={onChangeSubscription}
+                onManageSubscription={onManageSubscription}
+                isManageSubscriptionLoading={isManageSubscriptionLoading}
+              />
+              <ContributionsDetails userId={authenticatedUser.profile.id} />
+            </Column>
+          </Line>
         ) : (
-          <Column>
+          <Column noMargin expand justifyContent="center">
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}
@@ -119,7 +148,7 @@ const ProfileDialog = ({
             </ColumnStackLayout>
           </Line>
         ) : (
-          <Column>
+          <Column noMargin expand justifyContent="center">
             <CreateProfile
               onLogin={authenticatedUser.onLogin}
               onCreateAccount={authenticatedUser.onCreateAccount}

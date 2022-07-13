@@ -1,4 +1,4 @@
-export default {
+const styles = {
   coordinateColumn: {
     width: 96,
   },
@@ -6,3 +6,5 @@ export default {
     width: 48,
   },
 };
+
+export default styles;

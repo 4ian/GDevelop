@@ -4,9 +4,16 @@ import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import FlatButton from '../UI/FlatButton';
 import RaisedButton from '../UI/RaisedButton';
-import { Column, Line, Spacer } from '../UI/Grid';
+import { Column, LargeSpacer } from '../UI/Grid';
 import Text from '../UI/Text';
-import BackgroundText from '../UI/BackgroundText';
+import { ResponsiveLineStackLayout } from '../UI/Layout';
+
+const styles = {
+  container: {
+    maxWidth: '480px',
+    whiteSpace: 'normal',
+  },
+};
 
 type Props = {
   message?: React.Node,
@@ -15,35 +22,36 @@ type Props = {
   justifyContent?: 'center',
 };
 
-export default ({
+const CreateProfile = ({
   message,
   onLogin,
   onCreateAccount,
   justifyContent,
 }: Props) => (
-  <Column noMargin>
-    <Line justifyContent={justifyContent}>
-      <Text>
-        {message || (
-          <Trans>
-            You are not connected. Create an account to build your game for
-            Android, Windows, macOS and Linux in one click, and get access to
-            metrics for your game.
-          </Trans>
-        )}
-      </Text>
-    </Line>
-    <Line justifyContent="center" alignItems="baseline">
-      <RaisedButton
-        label={<Trans>Create my account</Trans>}
-        onClick={onCreateAccount}
-        primary
-      />
-      <Spacer />
-      <Spacer />
-      <BackgroundText>or</BackgroundText>
-      <Spacer />
-      <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
-    </Line>
+  <Column alignItems="center">
+    <div style={styles.container}>
+      <Column>
+        <Text>
+          {message || (
+            <Trans>
+              You are not connected. Create an account to build your game for
+              Android, Windows, macOS and Linux in one click, and get access to
+              metrics for your game.
+            </Trans>
+          )}
+        </Text>
+        <LargeSpacer />
+        <ResponsiveLineStackLayout justifyContent="center" noMargin>
+          <RaisedButton
+            label={<Trans>Create my account</Trans>}
+            onClick={onCreateAccount}
+            primary
+          />
+          <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
+        </ResponsiveLineStackLayout>
+      </Column>
+    </div>
   </Column>
 );
+
+export default CreateProfile;

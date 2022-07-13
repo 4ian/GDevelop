@@ -73,13 +73,8 @@ export const OnlineGamePropertiesDialog = ({
   );
   const thumbnailUrl = getWebBuildThumbnailUrl(project, buildId);
 
-  const saveProjectAndPublish = async () => {
-    await onSaveProject();
-    await onPublish();
-  };
-
-  const onPublish = async () => {
-    // Update the project with the new properties before updating the game.
+  const onPublish = async ({ saveProject }: { saveProject: boolean }) => {
+    // First update the project with the new properties.
     if (
       applyPublicPropertiesToProject(project, {
         name,
@@ -92,6 +87,11 @@ export const OnlineGamePropertiesDialog = ({
         orientation: orientation || 'default',
       })
     ) {
+      // If the project has been modified, then save it.
+      if (saveProject) {
+        await onSaveProject();
+      }
+      // Then, call the top function with the partial game updates.
       await onApply({ discoverable, userSlug, gameSlug });
     }
   };
@@ -99,7 +99,6 @@ export const OnlineGamePropertiesDialog = ({
   return (
     <Dialog
       title={<Trans>Verify your game info before publishing</Trans>}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           label={<Trans>Back</Trans>}
@@ -113,18 +112,22 @@ export const OnlineGamePropertiesDialog = ({
           key="publish"
           primary
           onClick={() => {
-            saveProjectAndPublish();
+            onPublish({ saveProject: true });
           }}
           disabled={isLoading}
           buildMenuTemplate={i18n => [
             {
               label: i18n._(t`Publish without saving project`),
-              click: onPublish,
+              click: () => onPublish({ saveProject: false }),
             },
           ]}
         />,
       ]}
       cannotBeDismissed={isLoading}
+      onRequestClose={onClose}
+      onApply={() => {
+        onPublish({ saveProject: true });
+      }}
       open
     >
       <PublicGameProperties
@@ -153,6 +156,7 @@ export const OnlineGamePropertiesDialog = ({
         setDiscoverable={setDiscoverable}
         displayThumbnail
         thumbnailUrl={thumbnailUrl}
+        disabled={isLoading}
       />
     </Dialog>
   );

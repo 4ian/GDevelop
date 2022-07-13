@@ -2,9 +2,7 @@
  * It mimics the Material UI Tables style. */
 
 .gd-table {
-  /* Use the fonts provided by the operating system(s) as possible. */
-  /* If you update this font list, be sure to do it in all the other places using fonts in the codebase. */
-  font-family: var(--gdevelop-font-family);
+  font-family: var(--gdevelop-classic-font-family);
   color: var(--table-text-color);
 }
 

@@ -20,20 +20,39 @@ CameraExtension::CameraExtension() {
   GetAllActions()["CameraY"]  // Deprecated
       .SetFunctionName("gdjs.evtTools.camera.setCameraY")
       .SetGetter("gdjs.evtTools.camera.getCameraY");
-  GetAllActions()["SetCameraX"]
+  GetAllActions()["SetCameraX"]  // Deprecated
       .SetFunctionName("gdjs.evtTools.camera.setCameraX")
       .SetGetter("gdjs.evtTools.camera.getCameraX");
-  GetAllActions()["SetCameraY"]
+  GetAllActions()["SetCameraY"]  // Deprecated
       .SetFunctionName("gdjs.evtTools.camera.setCameraY")
       .SetGetter("gdjs.evtTools.camera.getCameraY");
+  GetAllActions()["SetCameraCenterX"]
+      .SetFunctionName("gdjs.evtTools.camera.setCameraX")
+      .SetGetter("gdjs.evtTools.camera.getCameraX");
+  GetAllActions()["SetCameraCenterY"]
+      .SetFunctionName("gdjs.evtTools.camera.setCameraY")
+      .SetGetter("gdjs.evtTools.camera.getCameraY");
+
   GetAllConditions()["CameraX"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraX");
+      "gdjs.evtTools.camera.getCameraX");  // Deprecated
   GetAllConditions()["CameraY"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraY");  // Deprecated
+  GetAllConditions()["CameraCenterX"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraX");
+  GetAllConditions()["CameraCenterY"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraY");
   GetAllConditions()["CameraWidth"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraWidth");
   GetAllConditions()["CameraHeight"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraHeight");
+  GetAllConditions()["CameraBorderLeft"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderLeft");
+  GetAllConditions()["CameraBorderRight"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderRight");
+  GetAllConditions()["CameraBorderTop"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderTop");
+  GetAllConditions()["CameraBorderBottom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderBottom");
   GetAllActions()["ShowLayer"].SetFunctionName(
       "gdjs.evtTools.camera.showLayer");
   GetAllActions()["HideLayer"].SetFunctionName(
@@ -52,13 +71,25 @@ CameraExtension::CameraExtension() {
       "gdjs.evtTools.camera.setCameraZoom");
 
   GetAllExpressions()["CameraX"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraX");
+      "gdjs.evtTools.camera.getCameraX");  // Deprecated
   GetAllExpressions()["VueX"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraX");
+      "gdjs.evtTools.camera.getCameraX");  // Deprecated
   GetAllExpressions()["CameraY"].SetFunctionName(
-      "gdjs.evtTools.camera.getCameraY");
+      "gdjs.evtTools.camera.getCameraY");  // Deprecated
   GetAllExpressions()["VueY"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraY");  // Deprecated
+  GetAllExpressions()["CameraCenterY"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraY");
+  GetAllExpressions()["CameraCenterX"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraX");
+  GetAllExpressions()["CameraBorderLeft"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderLeft");
+  GetAllExpressions()["CameraBorderRight"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderRight");
+  GetAllExpressions()["CameraBorderTop"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderTop");
+  GetAllExpressions()["CameraBorderBottom"].SetFunctionName(
+      "gdjs.evtTools.camera.getCameraBorderBottom");
   GetAllExpressions()["CameraAngle"].SetFunctionName(
       "gdjs.evtTools.camera.getCameraRotation");
   GetAllExpressions()["CameraRotation"].SetFunctionName(

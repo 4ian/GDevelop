@@ -15,6 +15,7 @@ namespace gdjs {
     _rightEdgeDistance: number = 0;
     _topEdgeDistance: number = 0;
     _bottomEdgeDistance: number = 0;
+    _useLegacyBottomAndRightAnchors: boolean = false;
 
     constructor(runtimeScene, behaviorData, owner) {
       super(runtimeScene, behaviorData, owner);
@@ -23,6 +24,10 @@ namespace gdjs {
       this._rightEdgeAnchor = behaviorData.rightEdgeAnchor;
       this._topEdgeAnchor = behaviorData.topEdgeAnchor;
       this._bottomEdgeAnchor = behaviorData.bottomEdgeAnchor;
+      this._useLegacyBottomAndRightAnchors =
+        behaviorData.useLegacyBottomAndRightAnchors === undefined
+          ? true
+          : behaviorData.useLegacyBottomAndRightAnchors;
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -39,6 +44,13 @@ namespace gdjs {
         oldBehaviorData.bottomEdgeAnchor !== newBehaviorData.bottomEdgeAnchor
       ) {
         this._bottomEdgeAnchor = newBehaviorData.bottomEdgeAnchor;
+      }
+      if (
+        oldBehaviorData.useLegacyTrajectory !==
+        newBehaviorData.useLegacyTrajectory
+      ) {
+        this._useLegacyBottomAndRightAnchors =
+          newBehaviorData.useLegacyBottomAndRightAnchors;
       }
       if (
         oldBehaviorData.relativeToOriginalWindowSize !==
@@ -262,28 +274,94 @@ namespace gdjs {
           bottomPixel
         );
 
-        //Move and resize the object according to the anchors
-        if (
-          this._rightEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
-        ) {
-          this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
+        // Compatibility with GD <= 5.0.133
+        if (this._useLegacyBottomAndRightAnchors) {
+          //Move and resize the object according to the anchors
+          if (
+            this._rightEdgeAnchor !==
+            AnchorRuntimeBehavior.HorizontalAnchor.NONE
+          ) {
+            this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
+          }
+          if (
+            this._bottomEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
+          ) {
+            this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
+          }
+          if (
+            this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
+          ) {
+            this.owner.setX(
+              topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX()
+            );
+          }
+          if (
+            this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
+          ) {
+            this.owner.setY(
+              topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY()
+            );
+          }
         }
-        if (
-          this._bottomEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
-        ) {
-          this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
-        }
-        if (
-          this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
-        ) {
-          this.owner.setX(
-            topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX()
-          );
-        }
-        if (this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE) {
-          this.owner.setY(
-            topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY()
-          );
+        // End of compatibility code
+        else {
+          // Resize if right and left anchors are set
+          if (
+            this._rightEdgeAnchor !==
+              AnchorRuntimeBehavior.HorizontalAnchor.NONE &&
+            this._leftEdgeAnchor !== AnchorRuntimeBehavior.HorizontalAnchor.NONE
+          ) {
+            this.owner.setWidth(bottomRightCoord[0] - topLeftCoord[0]);
+            this.owner.setX(topLeftCoord[0]);
+          } else {
+            if (
+              this._leftEdgeAnchor !==
+              AnchorRuntimeBehavior.HorizontalAnchor.NONE
+            ) {
+              this.owner.setX(
+                topLeftCoord[0] + this.owner.getX() - this.owner.getDrawableX()
+              );
+            }
+            if (
+              this._rightEdgeAnchor !==
+              AnchorRuntimeBehavior.HorizontalAnchor.NONE
+            ) {
+              this.owner.setX(
+                bottomRightCoord[0] +
+                  this.owner.getX() -
+                  this.owner.getDrawableX() -
+                  this.owner.getWidth()
+              );
+            }
+          }
+          // Resize if top and bottom anchors are set
+          if (
+            this._bottomEdgeAnchor !==
+              AnchorRuntimeBehavior.VerticalAnchor.NONE &&
+            this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
+          ) {
+            this.owner.setHeight(bottomRightCoord[1] - topLeftCoord[1]);
+            this.owner.setY(topLeftCoord[1]);
+          } else {
+            if (
+              this._topEdgeAnchor !== AnchorRuntimeBehavior.VerticalAnchor.NONE
+            ) {
+              this.owner.setY(
+                topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY()
+              );
+            }
+            if (
+              this._bottomEdgeAnchor !==
+              AnchorRuntimeBehavior.VerticalAnchor.NONE
+            ) {
+              this.owner.setY(
+                bottomRightCoord[1] +
+                  this.owner.getY() -
+                  this.owner.getDrawableY() -
+                  this.owner.getHeight()
+              );
+            }
+          }
         }
       }
     }

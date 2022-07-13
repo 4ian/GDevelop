@@ -3,9 +3,8 @@ import { Trans } from '@lingui/macro';
 import Refresh from '@material-ui/icons/Refresh';
 import * as React from 'react';
 
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
 import { Column, Spacer } from '../UI/Grid';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import TextField from '../UI/TextField';
@@ -14,9 +13,10 @@ import generateName from '../Utils/ProjectNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
+import IconButton from '../UI/IconButton';
 
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 
 type Props = {|
   open: boolean,
@@ -67,11 +67,10 @@ const ProjectPreCreationDialog = ({
 
   return (
     <Dialog
+      id="project-pre-creation-dialog"
       title={<Trans>New Project</Trans>}
       maxWidth="sm"
       open={open}
-      onApply={onValidate}
-      onRequestClose={onClose}
       actions={[
         <FlatButton
           disabled={isOpening}
@@ -79,7 +78,7 @@ const ProjectPreCreationDialog = ({
           label={<Trans>Cancel</Trans>}
           onClick={onClose}
         />,
-        <RaisedButton
+        <DialogPrimaryButton
           primary
           disabled={isOpening}
           key="create"
@@ -88,7 +87,9 @@ const ProjectPreCreationDialog = ({
           id="create-project-button"
         />,
       ]}
-      id="project-pre-creation-dialog"
+      cannotBeDismissed={isOpening}
+      onRequestClose={onClose}
+      onApply={onValidate}
     >
       <Column noMargin>
         <TextField
@@ -99,7 +100,12 @@ const ProjectPreCreationDialog = ({
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
           endAdornment={
-            <Refresh onClick={() => setProjectName(generateName())} />
+            <IconButton
+              size="small"
+              onClick={() => setProjectName(generateName())}
+            >
+              <Refresh />
+            </IconButton>
           }
         />
         {app && (

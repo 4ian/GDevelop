@@ -70,7 +70,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
     if (this._autoComplete) this._autoComplete.focus(selectAll);
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (nextProps.initialResourceName !== this.props.initialResourceName) {
       this.setState({
         resourceName: nextProps.initialResourceName || '',

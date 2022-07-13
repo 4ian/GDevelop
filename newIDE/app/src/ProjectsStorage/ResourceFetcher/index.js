@@ -1,11 +1,10 @@
 // @flow
 import { Trans } from '@lingui/macro';
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import {
   Table,
   TableBody,
@@ -14,8 +13,8 @@ import {
   TableRow,
   TableRowColumn,
 } from '../../UI/Table';
-import RaisedButton from '../../UI/RaisedButton';
 import { ColumnStackLayout } from '../../UI/Layout';
+import LinearProgress from '../../UI/LinearProgress';
 
 export type FetchedResources = {|
   erroredResources: Array<{|
@@ -67,7 +66,7 @@ export const ResourceFetcherDialog = ({
     <Dialog
       actions={[
         onRetry ? (
-          <RaisedButton
+          <DialogPrimaryButton
             label={<Trans>Retry</Trans>}
             primary
             onClick={onRetry}
@@ -83,7 +82,7 @@ export const ResourceFetcherDialog = ({
           key="close"
         />,
       ]}
-      cannotBeDismissed={true}
+      cannotBeDismissed={!hasErrors}
       noMargin
       open
       maxWidth="sm"
@@ -93,13 +92,17 @@ export const ResourceFetcherDialog = ({
           <Text>
             {hasErrors ? (
               <Trans>
-                There were errors when fetching resources for the project.
+                There were errors when fetching resources for the project. You
+                can retry (recommended) or continue despite the errors. In this
+                case, the project will be missing some resources.
               </Trans>
             ) : (
-              <Trans>Resources needed for the project are downloaded...</Trans>
+              <Trans>Resources needed for the project are fetched...</Trans>
             )}
           </Text>
-          <LinearProgress variant="determinate" value={progress} />
+          <Line noMargin expand>
+            <LinearProgress variant="determinate" value={progress} />
+          </Line>
           {hasErrors && fetchedResources ? (
             <Table>
               <TableHeader>

@@ -119,6 +119,7 @@ describe('ResourceUtils', () => {
         .getActions()
         .get(0)
         .getParameter(1)
+        .getPlainString()
     ).toBe('Audio1');
   });
 });

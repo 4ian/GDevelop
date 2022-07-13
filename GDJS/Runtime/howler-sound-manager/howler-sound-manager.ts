@@ -761,7 +761,8 @@ namespace gdjs {
         }
       }
 
-      const totalCount = Object.keys(files).length;
+      const filesToLoad = Object.keys(files);
+      const totalCount = filesToLoad.length;
       if (totalCount === 0) return onComplete(totalCount); // Nothing to load.
 
       let loadedCount: integer = 0;
@@ -775,6 +776,7 @@ namespace gdjs {
         if (loadedCount === totalCount) return onComplete(totalCount);
 
         onProgress(loadedCount, totalCount);
+        loadNextFile();
       };
 
       const preloadAudioFile = (
@@ -796,29 +798,47 @@ namespace gdjs {
         );
       };
 
-      for (let file in files) {
-        if (files.hasOwnProperty(file)) {
-          const fileData = files[file][0];
-          if (!fileData.preloadAsSound && !fileData.preloadAsMusic) {
-            onLoad();
-          } else if (fileData.preloadAsSound && fileData.preloadAsMusic) {
-            let loadedOnce = false;
-            const callback = (_, error) => {
-              if (!loadedOnce) {
-                loadedOnce = true;
-                return;
-              }
-              onLoad(_, error);
-            };
+      const loadNextFile = () => {
+        if (!filesToLoad.length) return;
+        const file = filesToLoad.shift()!;
+        const fileData = files[file][0];
 
-            preloadAudioFile(file, callback, /* isMusic= */ true);
-            preloadAudioFile(file, callback, /* isMusic= */ false);
-          } else if (fileData.preloadAsSound) {
-            preloadAudioFile(file, onLoad, /* isMusic= */ false);
-          } else if (fileData.preloadAsMusic)
-            preloadAudioFile(file, onLoad, /* isMusic= */ true);
+        let loadCounter = 0;
+        const callback = (_?: any, error?: string) => {
+          loadCounter--;
+          if (!loadCounter) {
+            onLoad(_, error);
+          }
+        };
+
+        if (fileData.preloadAsMusic) {
+          loadCounter++;
+          preloadAudioFile(file, callback, /* isMusic= */ true);
         }
-      }
+
+        if (fileData.preloadAsSound) {
+          loadCounter++;
+          preloadAudioFile(file, callback, /* isMusic= */ false);
+        } else if (fileData.preloadInCache) {
+          // preloading as sound already does a XHR request, hence "else if"
+          loadCounter++;
+          const sound = new XMLHttpRequest();
+          sound.addEventListener('load', callback);
+          sound.addEventListener('error', (_) =>
+            callback(_, 'XHR error: ' + file)
+          );
+          sound.addEventListener('abort', (_) =>
+            callback(_, 'XHR abort: ' + file)
+          );
+          sound.open('GET', file);
+          sound.send();
+        }
+
+        if (!loadCounter) {
+          onLoad();
+        }
+      };
+      loadNextFile();
     }
   }
 

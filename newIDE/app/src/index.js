@@ -10,8 +10,8 @@ import {
 import { installRaven } from './Utils/Analytics/Raven';
 import { register } from './serviceWorker';
 import './UI/icomoon-font.css'; // Styles for Icomoon font.
-import optionalRequire from './Utils/OptionalRequire.js';
-import { loadScript } from './Utils/LoadScript.js';
+import optionalRequire from './Utils/OptionalRequire';
+import { loadScript } from './Utils/LoadScript';
 import { showErrorBox } from './UI/Messages/MessageBox';
 import VersionMetadata from './Version/VersionMetadata';
 import { loadPreferencesFromLocalStorage } from './MainFrame/Preferences/PreferencesProvider';
@@ -99,6 +99,7 @@ class Bootstrapper extends Component<{}, State> {
           'libGD.js initialization done',
           performance.now(),
         ]);
+        sendProgramOpening();
 
         if (electron) {
           import(/* webpackChunkName: "local-app" */ './LocalApp')
@@ -160,4 +161,3 @@ if (rootElement) {
 
 // registerServiceWorker();
 register();
-sendProgramOpening();

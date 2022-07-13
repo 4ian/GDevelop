@@ -11,6 +11,8 @@ import {
   shouldCloseOrCancel,
   shouldSubmit,
 } from '../KeyboardShortcuts/InteractionKeys';
+import { LineStackLayout } from '../Layout';
+import RaisedButton from '../RaisedButton';
 
 const styles = {
   defaultBody: {
@@ -57,15 +59,21 @@ type Props = {|
    * of changes.
    */
   onRequestClose?: () => void,
+
   /**
    * If specified, will be called when the dialog is dismissed in a way where changes
    * must be kept or when using the submit keyboard shortcut.
    * This is not applicable to all dialogs. Some dialogs may have no `onApply` and just a
    * single `onRequestClose`.
    */
-  onApply?: ?() => void,
+  onApply?: ?() => void | Promise<void>,
 
-  cannotBeDismissed?: boolean, // Currently unused.
+  /**
+   * If specified, allows to prevent closing the dialog by clicking outside.
+   * This is useful for dialogs that either are in a loading state so we don't want to allow closing it,
+   * or for dialogs that may apply significant changes and we don't want the user to misclick.
+   */
+  cannotBeDismissed?: boolean,
 
   children: React.Node, // The content of the dialog
 
@@ -92,11 +100,13 @@ type DialogContentStyle = {
   flexDirection?: 'row' | 'column',
 };
 
+export const DialogPrimaryButton = RaisedButton;
+
 /**
  * A enhanced material-ui Dialog that can have optional secondary actions
  * and no margins if required.
  */
-export default (props: Props) => {
+const Dialog = (props: Props) => {
   const {
     onApply,
     secondaryActions,
@@ -112,6 +122,7 @@ export default (props: Props) => {
     fullHeight,
     noTitleMargin,
     id,
+    cannotBeDismissed,
   } = props;
 
   const preferences = React.useContext(PreferencesContext);
@@ -122,9 +133,15 @@ export default (props: Props) => {
     () => (
       <React.Fragment>
         {secondaryActions && (
-          <div key="secondary-actions">{secondaryActions}</div>
+          <LineStackLayout key="secondary-actions" noMargin>
+            {secondaryActions}
+          </LineStackLayout>
         )}
-        <div key="actions">{actions}</div>
+        {actions && (
+          <LineStackLayout key="actions" noMargin>
+            {actions}
+          </LineStackLayout>
+        )}
       </React.Fragment>
     ),
     [actions, secondaryActions]
@@ -138,6 +155,7 @@ export default (props: Props) => {
 
   const onCloseDialog = React.useCallback(
     (event: any, reason: string) => {
+      if (!!cannotBeDismissed) return;
       if (reason === 'escapeKeyDown') {
         if (onRequestClose) onRequestClose();
       } else if (reason === 'backdropClick') {
@@ -151,7 +169,7 @@ export default (props: Props) => {
         }
       }
     },
-    [onRequestClose, onApply, backdropClickBehavior]
+    [onRequestClose, onApply, backdropClickBehavior, cannotBeDismissed]
   );
 
   const handleKeyDown = React.useCallback(
@@ -207,3 +225,5 @@ export default (props: Props) => {
     </DialogMaterialUI>
   );
 };
+
+export default Dialog;

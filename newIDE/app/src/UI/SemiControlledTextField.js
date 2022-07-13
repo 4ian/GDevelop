@@ -25,7 +25,7 @@ type Props = {|
   type?: 'text' | 'number',
 
   // Some TextField props that can be reused:
-  onClick?: () => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
   onKeyPress?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<HTMLInputElement>) => void,
@@ -39,6 +39,7 @@ type Props = {|
   helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,
+  maxLength?: number,
   max?: number,
   min?: number,
   multiline?: boolean,

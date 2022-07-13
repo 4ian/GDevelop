@@ -120,8 +120,8 @@ export function ExampleDialog({
           />
         </LeftLoader>,
       ]}
-      cannotBeDismissed={false}
       open
+      cannotBeDismissed={isOpening}
       onRequestClose={onClose}
       onApply={onOpenExample}
     >
@@ -136,10 +136,13 @@ export function ExampleDialog({
         )}
         <Line alignItems="center" noMargin>
           {hasIcon ? (
-            <ExampleIcon exampleShortHeader={exampleShortHeader} size={40} />
+            <ExampleIcon
+              exampleShortHeader={exampleShortHeader}
+              type="thumbnail"
+            />
           ) : null}
           <Column expand noMargin={!hasIcon}>
-            <Text noMargin size="title">
+            <Text noMargin size="block-title">
               {exampleShortHeader.name}
             </Text>
           </Column>

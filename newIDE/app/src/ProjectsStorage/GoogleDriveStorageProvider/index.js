@@ -388,7 +388,14 @@ export default ({
             fileMetadata: newFileMetadata,
           }));
       },
-      onSaveProjectAs: (project: gdProject, fileMetadata: ?FileMetadata) => {
+      onSaveProjectAs: (
+        project: gdProject,
+        fileMetadata: ?FileMetadata,
+        options?: {
+          context?: 'duplicateCurrentProject',
+          onStartSaving: () => void,
+        }
+      ) => {
         return new Promise(resolve => {
           setDialog(() => (
             <GoogleDriveSaveAsDialog
@@ -399,6 +406,8 @@ export default ({
               }}
               onSave={({ selectedFileOrFolder, newFileName }) => {
                 const content = serializeToJSON(project);
+
+                if (options && options.onStartSaving) options.onStartSaving();
 
                 if (selectedFileOrFolder.type === 'FOLDER') {
                   return authenticate().then(googleUser =>

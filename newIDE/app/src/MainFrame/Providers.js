@@ -36,6 +36,7 @@ import {
 } from '../ProjectsStorage/ResourceFetcher';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { TutorialStateProvider } from '../Tutorial/TutorialContext';
+import ConfirmProvider from '../UI/Confirm/ConfirmProvider';
 
 // Add the rtl plugin to the JSS instance to support RTL languages in material-ui components.
 const jss = create({
@@ -102,25 +103,27 @@ export default class Providers extends React.Component<Props, {||}> {
                                       eventsFunctionsExtensionOpener
                                     }
                                   >
-                                    <CommandsContextProvider>
-                                      <AssetStoreStateProvider>
-                                        <ResourceStoreStateProvider>
-                                          <ExampleStoreStateProvider>
-                                            <ExtensionStoreStateProvider>
-                                              <GamesShowcaseStateProvider>
-                                                <TutorialStateProvider>
-                                                  <ResourceFetcherContext.Provider
-                                                    value={resourceFetcher}
-                                                  >
-                                                    {children({ i18n })}
-                                                  </ResourceFetcherContext.Provider>
-                                                </TutorialStateProvider>
-                                              </GamesShowcaseStateProvider>
-                                            </ExtensionStoreStateProvider>
-                                          </ExampleStoreStateProvider>
-                                        </ResourceStoreStateProvider>
-                                      </AssetStoreStateProvider>
-                                    </CommandsContextProvider>
+                                    <ConfirmProvider>
+                                      <CommandsContextProvider>
+                                        <AssetStoreStateProvider>
+                                          <ResourceStoreStateProvider>
+                                            <ExampleStoreStateProvider>
+                                              <ExtensionStoreStateProvider>
+                                                <GamesShowcaseStateProvider>
+                                                  <TutorialStateProvider>
+                                                    <ResourceFetcherContext.Provider
+                                                      value={resourceFetcher}
+                                                    >
+                                                      {children({ i18n })}
+                                                    </ResourceFetcherContext.Provider>
+                                                  </TutorialStateProvider>
+                                                </GamesShowcaseStateProvider>
+                                              </ExtensionStoreStateProvider>
+                                            </ExampleStoreStateProvider>
+                                          </ResourceStoreStateProvider>
+                                        </AssetStoreStateProvider>
+                                      </CommandsContextProvider>
+                                    </ConfirmProvider>
                                   </EventsFunctionsExtensionsProvider>
                                 )}
                               </I18n>

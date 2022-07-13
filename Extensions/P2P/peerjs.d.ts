@@ -80,7 +80,7 @@ declare class Peer<T> {
    * @param event Event name
    * @param cb Callback Function
    */
-  on(event: 'error', cb: (err: any) => void): void;
+  on(event: 'error', cb: (err: string & { type: string }) => void): void;
   /**
    * Remove event listeners.(EventEmitter3)
    * @param {String} event The event we want to remove.

@@ -190,16 +190,19 @@ const BuildSection = ({
     file: ?FileMetadataAndStorageProviderName
   ): Array<MenuItemTemplate> => {
     if (!file) return [];
-    return [
+    let actions = [
       { label: i18n._(t`Open`), click: () => onOpenRecentFile(file) },
-      // { label: i18n._(t`Duplicate`), click: () => console.log('duplicate') },
-      { type: 'separator' },
-      // { label: i18n._(t`Manage game`), click: () => console.log('Manage game') },
-      {
-        label: i18n._(t`Delete`),
-        click: () => onDeleteProject(file),
-      },
     ];
+    if (file.storageProviderName === 'Cloud') {
+      actions = actions.concat([
+        { type: 'separator' },
+        {
+          label: i18n._(t`Delete`),
+          click: () => onDeleteProject(file),
+        },
+      ]);
+    }
+    return actions;
   };
 
   return (

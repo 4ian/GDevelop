@@ -511,10 +511,10 @@ const defineCollisionMask = function (
       'collisionMaskTag',
       new gd.PropertyDescriptor(objectContent.collisionMaskTag)
         .setType('string')
-        .setLabel(_('Type filter'))
+        .setLabel(_('Class filter'))
         .setDescription(
           _(
-            'Only the tiles with the given type (set in Tiled) will have hitboxes created.'
+            'Only the tiles with the given class (set in Tiled 1.9+) will have hitboxes created.'
           )
         )
     );
@@ -670,7 +670,7 @@ const defineCollisionMask = function (
       'SetTilesetJsonFile',
       _('Tileset JSON file'),
       _(
-        'Set the JSON file with the tileset data (sometimes that is embeded in the Tilemap, so not needed)'
+        'Set the JSON file with the tileset data (sometimes that is embedded in the Tilemap, so not needed)'
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',
@@ -708,7 +708,7 @@ module.exports = {
 
   /**
    * You can optionally add sanity tests that will check the basic working
-   * of your extension behaviors/objects by instanciating behaviors/objects
+   * of your extension behaviors/objects by instantiating behaviors/objects
    * and setting the property to a given value.
    *
    * If you don't have any tests, you can simply return an empty array like this:

@@ -34,7 +34,7 @@ export class TiledTileMapLoader {
           );
           if (tile.objectgroup) {
             for (const object of tile.objectgroup.objects) {
-              const tag = object.type || tile.type;
+              const tag = object.class || tile.class;
               if (!tag || tag.length === 0) {
                 continue;
               }
@@ -76,7 +76,7 @@ export class TiledTileMapLoader {
                 tileDefinition.add(tag, polygon);
               }
             }
-          } else if (tile.type && tile.type.length > 0) {
+          } else if (tile.class && tile.class.length > 0) {
             // When there is no shape, default to the whole tile.
             const polygon: PolygonVertices = [
               [0, 0],
@@ -84,7 +84,7 @@ export class TiledTileMapLoader {
               [tiledMap.tilewidth, tiledMap.tileheight],
               [tiledMap.tilewidth, 0],
             ];
-            tileDefinition.add(tile.type, polygon);
+            tileDefinition.add(tile.class, polygon);
           }
           definitions.set(
             getTileIdFromTiledGUI(firstGid + tile.id),

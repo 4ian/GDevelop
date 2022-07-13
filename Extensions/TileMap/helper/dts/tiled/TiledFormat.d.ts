@@ -111,6 +111,8 @@ export declare type TiledChunk = {
   y: integer;
 };
 export declare type TiledObject = {
+  /** The class of the object (renamed from type since 1.9, optional) */
+  class?: string;
   /** Used to mark an object as an ellipse */
   ellipse?: boolean;
   /** Global tile ID, only if object represents a tile */
@@ -135,8 +137,6 @@ export declare type TiledObject = {
   template?: string;
   /** Only used for text objects */
   text?: Text;
-  /** String assigned to type Tiledfield in editor */
-  type: string;
   /** Whether object is shown in editor. */
   visible: boolean;
   /** Width in pixels. */
@@ -251,6 +251,8 @@ export declare type TiledTransformations = {
 export declare type TiledTileDefinition = {
   /** Array of {@link TiledTiles} */
   animation?: Array<TiledTileDefinition>;
+  /** The class of the tile (renamed from type since 1.9, optional) */
+  class?: string;
   /** Local ID of the tile */
   id: integer;
   /** Image representing this tile (optional) */
@@ -267,8 +269,6 @@ export declare type TiledTileDefinition = {
   properties?: Array<TiledProperty>;
   /** Index of terrain for each corner of tile (optional) */
   terrain?: Array<integer>;
-  /** The type of the tile (optional) */
-  type?: string;
 };
 export declare type TiledFrame = {
   /** Frame duration in milliseconds */

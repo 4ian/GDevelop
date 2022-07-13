@@ -60,30 +60,39 @@ type Props = {|
   game: Game,
 |};
 
-const CustomTooltip = ({ payload, label, customStyle }) => (
-  <Paper style={customStyle}>
-    <ColumnStackLayout>
-      <Text size="sub-title" noMargin>
-        {label}
-      </Text>
-      {payload.length &&
-        payload.map(
-          (
-            {
-              name,
-              unit,
-              value,
-            }: { name: string, unit: ?string, value: number },
-            index
-          ) => (
-            <Text noMargin key={index}>{`${name}: ${
-              Number.isInteger(value) ? value.toString() : value.toFixed(2)
-            }${unit ? ` ${unit}` : ''}`}</Text>
-          )
-        )}
-    </ColumnStackLayout>
-  </Paper>
-);
+const CustomTooltip = ({
+  payload,
+  label,
+  customStyle,
+}: {|
+  payload: ?Array<any>,
+  label: string,
+  customStyle: Object,
+|}) =>
+  payload ? (
+    <Paper style={customStyle}>
+      <ColumnStackLayout>
+        <Text size="sub-title" noMargin>
+          {label}
+        </Text>
+        {payload.length &&
+          payload.map(
+            (
+              {
+                name,
+                unit,
+                value,
+              }: { name: string, unit: ?string, value: number },
+              index
+            ) => (
+              <Text noMargin key={index}>{`${name}: ${
+                Number.isInteger(value) ? value.toString() : value.toFixed(2)
+              }${unit ? ` ${unit}` : ''}`}</Text>
+            )
+          )}
+      </ColumnStackLayout>
+    </Paper>
+  ) : null;
 
 export const GameAnalyticsPanel = ({ game }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(

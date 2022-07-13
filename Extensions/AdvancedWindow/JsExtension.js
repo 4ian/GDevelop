@@ -45,6 +45,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Focus the window?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -61,6 +62,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -79,6 +81,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Show window?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -95,6 +98,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -113,6 +117,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Maximize window?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -129,6 +134,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -147,6 +153,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Minimize window?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -163,6 +170,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -181,6 +189,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Enable window?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -197,6 +206,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -215,6 +225,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow resizing?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -231,6 +242,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -249,6 +261,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow moving?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -265,6 +278,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -283,6 +297,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow maximizing?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -299,6 +314,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -317,6 +333,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow minimizing?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -333,6 +350,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -351,6 +369,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow full-screening?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -367,6 +386,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -385,6 +405,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow closing?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -401,6 +422,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -442,6 +464,7 @@ module.exports = {
           'above the taskbar on Windows. ' +
           'This parameter is ignored on linux.'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -458,6 +481,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -478,6 +502,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Enable kiosk mode?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -494,6 +519,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -512,6 +538,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Enable shadow?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -528,6 +555,7 @@ module.exports = {
         'res/actions/window24.png',
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -548,6 +576,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Enable content protection?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -566,6 +595,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Allow focus?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -584,6 +614,7 @@ module.exports = {
       )
       .addParameter('yesorno', _('Flash the window?'), '', false)
       .setDefaultValue('true')
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -604,6 +635,7 @@ module.exports = {
       .setParameterLongDescription(
         'A number between 0 (fully transparent) and 1 (fully opaque).'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -622,6 +654,7 @@ module.exports = {
       )
       .addParameter('expression', _('X position'), '', false)
       .addParameter('expression', _('Y position'), '', false)
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -636,6 +669,7 @@ module.exports = {
         _('Windows, Linux, macOS'),
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -650,6 +684,7 @@ module.exports = {
         _('Windows, Linux, macOS'),
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'
@@ -666,6 +701,7 @@ module.exports = {
         _('Windows, Linux, macOS'),
         'res/actions/window.png'
       )
+      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         'Extensions/AdvancedWindow/electron-advancedwindowtools.js'

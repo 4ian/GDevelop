@@ -10,6 +10,7 @@ export type TestProject = {|
   spriteObject: gdSpriteObject,
   spriteObjectWithBehaviors: gdSpriteObject,
   spriteObjectWithoutBehaviors: gdSpriteObject,
+  testSpriteObjectInstance: gdInitialInstance,
   testLayout: gdLayout,
   group1: gdObjectGroup,
   group2: gdObjectGroup,
@@ -115,6 +116,26 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   panelSpriteObject.setType('PanelSpriteObject::PanelSprite');
   const spriteObject = new gd.SpriteObject('MySpriteObject');
   spriteObject.setType('Sprite');
+  {
+    const variablesContainer = spriteObject.getVariables();
+    variablesContainer
+      .insert('ObjectVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherObjectVariable',
+      new gd.Variable(),
+      1
+    );
+    variable.setFolded(false);
+    variable.castTo('structure');
+    variable.getChild('ObjectChild1').setValue(564);
+    variable.getChild('ObjectChild2').setString('Guttentag');
+    variable.getChild('ObjectChild3').setBool(true);
+    const arrayVariable = variable.getChild('ObjectChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.setFolded(true);
+    arrayVariable.pushNew().setValue(856.5);
+  }
   const spriteObjectWithBehaviors = new gd.SpriteObject(
     'MySpriteObjectWithBehaviors'
   );
@@ -239,6 +260,30 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
 
+  const testSpriteObjectInstance = testLayout
+    .getInitialInstances()
+    .insertNewInitialInstance();
+  testSpriteObjectInstance.setObjectName(spriteObject.getName());
+
+  {
+    const variablesContainer = testSpriteObjectInstance.getVariables();
+    variablesContainer
+      .insert('InstanceVariable', new gd.Variable(), 0)
+      .setString('A multiline\nstr value');
+    const variable = variablesContainer.insert(
+      'OtherInstanceVariable',
+      new gd.Variable(),
+      1
+    );
+    variable.castTo('structure');
+    variable.getChild('InstanceChild1').setValue(1995);
+    variable.getChild('InstanceChild2').setString('Hallo');
+    variable.getChild('InstanceChild3').setBool(false);
+    const arrayVariable = variable.getChild('InstanceChild4');
+    arrayVariable.castTo('array');
+    arrayVariable.pushNew().setString('Bonjour');
+  }
+
   // Add layers
   testLayout.insertNewLayer('GUI', 0);
   testLayout.insertNewLayer('OtherLayer', 1);
@@ -255,10 +300,22 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
   variable3.getChild('Child1').setString('Child1 str value');
   variable3.getChild('Child2').setString('7891011');
   variable3
-    .getChild('Child3')
+    .getChild('FoldedChild')
     .getChild('SubChild1')
     .setString('Hello\nMultiline\nWorld');
+  variable3.getChild('FoldedChild').setFolded(true);
   testLayoutVariables.insert('Variable3', variable3, 2);
+  const variable4 = new gd.Variable();
+  variable4.getAtIndex(0).setString('String value\nwith Multiline');
+  variable4.getAtIndex(1).setValue(4539.42);
+  variable4.getAtIndex(2).setBool(true);
+  variable4.setFolded(true);
+  testLayoutVariables.insert('FoldedArray', variable4, 3);
+  const variable5 = new gd.Variable();
+  variable5.getAtIndex(0).setString('PlayerName');
+  variable5.getAtIndex(1).setValue(25);
+  variable5.getAtIndex(2).setBool(false);
+  testLayoutVariables.insert('OtherArray', variable5, 4);
 
   //Create a few events
   //Add a new "standard" event to the scene:
@@ -427,6 +484,17 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
 
   // Empty events list
   const emptyEventsList = new gd.EventsList();
+
+  // Events functions extension
+  const someAlreadyInstalledExtension = project.insertNewEventsFunctionsExtension(
+    'SomeAlreadyInstalledExtension',
+    0
+  );
+  someAlreadyInstalledExtension.setNamespace('SomeAlreadyInstalledExtension');
+  someAlreadyInstalledExtension.setName('SomeAlreadyInstalledExtension');
+  someAlreadyInstalledExtension.setFullName(
+    'Some fake already installed extension'
+  );
 
   // Events functions extension
   const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
@@ -647,6 +715,7 @@ export const makeTestProject = (gd /*: libGDevelop */) /*: TestProject */ => {
     tiledSpriteObject,
     panelSpriteObject,
     spriteObject,
+    testSpriteObjectInstance,
     spriteObjectWithBehaviors,
     spriteObjectWithoutBehaviors,
     testLayout,

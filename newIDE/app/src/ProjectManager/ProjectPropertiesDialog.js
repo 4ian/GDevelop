@@ -7,7 +7,7 @@ import FlatButton from '../UI/FlatButton';
 import Checkbox from '../UI/Checkbox';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import {
   getProjectPropertiesErrors,
@@ -234,7 +234,6 @@ function ProjectPropertiesDialog(props: Props) {
       {({ i18n }) => (
         <React.Fragment>
           <Dialog
-            onApply={onApply}
             actions={[
               <FlatButton
                 label={<Trans>Cancel</Trans>}
@@ -242,7 +241,7 @@ function ProjectPropertiesDialog(props: Props) {
                 onClick={onCancelChanges}
                 key="cancel"
               />,
-              <FlatButton
+              <DialogPrimaryButton
                 label={<Trans>Apply</Trans>}
                 primary={true}
                 onClick={onApply}
@@ -257,7 +256,7 @@ function ProjectPropertiesDialog(props: Props) {
               hotReloadPreviewButtonProps ? (
                 <FlatButton
                   key="hot-reload-preview-button"
-                  icon={<NewPreviewIcon />}
+                  leftIcon={<NewPreviewIcon />}
                   label={<Trans>Run a preview (with loading screen)</Trans>}
                   onClick={
                     hotReloadPreviewButtonProps.launchProjectWithLoadingScreenPreview
@@ -265,9 +264,10 @@ function ProjectPropertiesDialog(props: Props) {
                 />
               ) : null,
             ]}
+            onRequestClose={onCancelChanges}
+            onApply={onApply}
             noTitleMargin
             open={props.open}
-            onRequestClose={onCancelChanges}
             fullHeight
             flexBody
             title={
@@ -289,7 +289,7 @@ function ProjectPropertiesDialog(props: Props) {
           >
             {currentTab === 'properties' && (
               <ColumnStackLayout expand noMargin>
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Game Info</Trans>
                 </Text>
                 <PublicGameProperties
@@ -303,7 +303,7 @@ function ProjectPropertiesDialog(props: Props) {
                   orientation={orientation}
                   setOrientation={setOrientation}
                 />
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Packaging</Trans>
                 </Text>
                 <SemiControlledTextField
@@ -348,7 +348,7 @@ function ProjectPropertiesDialog(props: Props) {
                 />
                 {useDeprecatedZeroAsDefaultZOrder ? (
                   <React.Fragment>
-                    <Text size="title">
+                    <Text size="block-title">
                       <Trans>Z Order of objects created from events</Trans>
                     </Text>
                     <AlertMessage kind="info">
@@ -384,11 +384,11 @@ function ProjectPropertiesDialog(props: Props) {
                     />
                   </React.Fragment>
                 ) : null}
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Analytics</Trans>
                 </Text>
                 <GameRegistration project={project} />
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Resolution and rendering</Trans>
                 </Text>
                 <ResponsiveLineStackLayout noMargin>
@@ -553,7 +553,7 @@ function ProjectPropertiesDialog(props: Props) {
                   </DismissableAlertMessage>
                 )}
 
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Project files</Trans>
                 </Text>
                 <SelectField

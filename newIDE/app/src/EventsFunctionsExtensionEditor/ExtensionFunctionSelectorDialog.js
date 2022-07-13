@@ -78,7 +78,6 @@ export default function BehaviorMethodSelectorDialog({
           key={'close'}
         />,
       ]}
-      cannotBeDismissed={false}
       open
       noMargin
       title={<Trans>Choose a new extension function</Trans>}
@@ -278,14 +277,14 @@ export default function BehaviorMethodSelectorDialog({
       <Line justifyContent="center" alignItems="center">
         {!showAdvanced ? (
           <FlatButton
-            icon={<Visibility />}
+            leftIcon={<Visibility />}
             primary={false}
             onClick={() => setShowAdvanced(true)}
             label={<Trans>Show lifecycle functions (advanced)</Trans>}
           />
         ) : (
           <FlatButton
-            icon={<VisibilityOff />}
+            leftIcon={<VisibilityOff />}
             primary={false}
             onClick={() => setShowAdvanced(false)}
             label={<Trans>Hide lifecycle functions (advanced)</Trans>}

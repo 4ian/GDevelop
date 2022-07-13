@@ -19,7 +19,7 @@ namespace gdjs {
    * The renderer for a gdjs.RuntimeGame using Pixi.js.
    */
   export class RuntimeGamePixiRenderer {
-    _game: any;
+    _game: gdjs.RuntimeGame;
     _isFullPage: boolean = true;
 
     //Used to track if the canvas is displayed on the full page.
@@ -41,7 +41,6 @@ namespace gdjs {
     _marginTop: any;
     _marginRight: any;
     _marginBottom: any;
-    _notifySceneForResize: any;
 
     _nextFrameId: integer = 0;
 
@@ -137,7 +136,6 @@ namespace gdjs {
       window.addEventListener('resize', () => {
         this._game.onWindowInnerSizeChanged();
         this._resizeCanvas();
-        this._game._notifySceneForResize = true;
       });
 
       // Focus the canvas when created.
@@ -185,6 +183,7 @@ namespace gdjs {
             promise.catch(() => {});
           }
         } else {
+          // @ts-ignore
           window.screen.orientation.lock(gameOrientation).catch(() => {});
         }
       } catch (error) {
@@ -277,7 +276,6 @@ namespace gdjs {
       }
       this._keepRatio = enable;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -297,7 +295,6 @@ namespace gdjs {
       this._marginBottom = bottom;
       this._marginLeft = left;
       this._resizeCanvas();
-      this._game._notifySceneForResize = true;
     }
 
     /**
@@ -306,10 +303,10 @@ namespace gdjs {
      * @param height The new height, in pixels.
      */
     setWindowSize(width: float, height: float): void {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.setContentSize(width, height);
         }
@@ -322,10 +319,10 @@ namespace gdjs {
      * Center the window on screen.
      */
     centerWindow() {
-      const electron = this.getElectron();
-      if (electron) {
+      const remote = this.getElectronRemote();
+      if (remote) {
         // Use Electron BrowserWindow API
-        const browserWindow = electron.remote.getCurrentWindow();
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.center();
         }
@@ -343,10 +340,10 @@ namespace gdjs {
       }
       if (this._isFullscreen !== enable) {
         this._isFullscreen = !!enable;
-        const electron = this.getElectron();
-        if (electron) {
+        const remote = this.getElectronRemote();
+        if (remote) {
           // Use Electron BrowserWindow API
-          const browserWindow = electron.remote.getCurrentWindow();
+          const browserWindow = remote.getCurrentWindow();
           if (browserWindow) {
             browserWindow.setFullScreen(this._isFullscreen);
           }
@@ -392,7 +389,6 @@ namespace gdjs {
           }
         }
         this._resizeCanvas();
-        this._notifySceneForResize = true;
       }
     }
 
@@ -400,9 +396,9 @@ namespace gdjs {
      * Checks if the game is in full screen.
      */
     isFullScreen(): boolean {
-      const electron = this.getElectron();
-      if (electron) {
-        return electron.remote.getCurrentWindow().isFullScreen();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        return remote.getCurrentWindow().isFullScreen();
       }
 
       // Height check is used to detect user triggered full screen (for example F11 shortcut).
@@ -593,6 +589,46 @@ namespace gdjs {
       };
       canvas.onmouseenter = function (e) {
         manager.onMouseEnter();
+        // There is no mouse event when the cursor is outside of the canvas.
+        // We catchup what happened.
+        {
+          const leftIsPressed = (e.buttons & 1) !== 0;
+          const leftWasPressed = manager.isMouseButtonPressed(
+            gdjs.InputManager.MOUSE_LEFT_BUTTON
+          );
+          if (leftIsPressed && !leftWasPressed) {
+            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+          }
+          if (!leftIsPressed && leftWasPressed) {
+            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+          }
+        }
+        {
+          const rightIsPressed = (e.buttons & 2) !== 0;
+          const rightWasPressed = manager.isMouseButtonPressed(
+            gdjs.InputManager.MOUSE_RIGHT_BUTTON
+          );
+          if (rightIsPressed && !rightWasPressed) {
+            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
+          }
+          if (!rightIsPressed && rightWasPressed) {
+            manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
+          }
+        }
+        {
+          const middleIsPressed = (e.buttons & 4) !== 0;
+          const middleWasPressed = manager.isMouseButtonPressed(
+            gdjs.InputManager.MOUSE_MIDDLE_BUTTON
+          );
+          if (middleIsPressed && !middleWasPressed) {
+            manager.onMouseButtonPressed(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
+          }
+          if (!middleIsPressed && middleWasPressed) {
+            manager.onMouseButtonReleased(
+              gdjs.InputManager.MOUSE_MIDDLE_BUTTON
+            );
+          }
+        }
       };
       window.addEventListener(
         'click',
@@ -742,9 +778,9 @@ namespace gdjs {
     stopGame() {
       // Try to detect the environment to use the most adapted
       // way of closing the app
-      const electron = this.getElectron();
-      if (electron) {
-        const browserWindow = electron.remote.getCurrentWindow();
+      const remote = this.getElectronRemote();
+      if (remote) {
+        const browserWindow = remote.getCurrentWindow();
         if (browserWindow) {
           browserWindow.close();
         }
@@ -786,11 +822,36 @@ namespace gdjs {
      * Get the electron module, if running as a electron renderer process.
      */
     getElectron() {
-      if (typeof require !== 'undefined') {
+      if (typeof require === 'function') {
         return require('electron');
       }
       return null;
     }
+
+    /**
+     * Helper to get the electron remote module, if running on Electron.
+     * Note that is not guaranteed to be supported in the future - avoid if possible.
+     */
+    getElectronRemote = () => {
+      if (typeof require === 'function') {
+        const runtimeGameOptions = this._game.getAdditionalOptions();
+        const moduleId =
+          runtimeGameOptions && runtimeGameOptions.electronRemoteRequirePath
+            ? runtimeGameOptions.electronRemoteRequirePath
+            : '@electron/remote';
+
+        try {
+          return require(moduleId);
+        } catch (requireError) {
+          console.error(
+            `Could not load @electron/remote from "${moduleId}". Error is:`,
+            requireError
+          );
+        }
+      }
+
+      return null;
+    };
   }
 
   //Register the class to let the engine use it.

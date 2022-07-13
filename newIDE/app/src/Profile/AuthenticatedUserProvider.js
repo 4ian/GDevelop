@@ -76,7 +76,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this._resetAuthenticatedUser();
 
     // Listen to when the user log out so that we reset the user profile.
-    this.props.authentication.setOnUserLogoutCallback(
+    this.props.authentication.addUserLogoutListener(
       this._fetchUserProfileWithoutThrowingErrors
     );
 
@@ -89,7 +89,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     //   refresh.
     // - at any other moment (Firebase user was updated), in which case it's probably
     //   not a problem to fetch again the user profile.
-    this.props.authentication.setOnUserUpdateCallback(() => {
+    this.props.authentication.addUserUpdateListener(() => {
       if (this._automaticallyUpdateUserProfile) {
         console.info(
           'Fetching user profile as the authenticated user changed...'

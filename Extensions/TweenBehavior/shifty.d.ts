@@ -1,10 +1,9 @@
 // Shifty.js 2.16.0 type definitions by arthuro555
 declare namespace shifty {
-  // index.js
-
+  // index.ts
   type easingFunction = (position: number) => number;
-  type startFunction = (state: any, data?: any) => any;
-  type finishFunction = (promisedData: shifty.promisedData) => any;
+  type startFunction = (state: any, data?: any | undefined) => void;
+  type finishFunction = (promisedData: shifty.promisedData) => void;
   /**
    * Gets called for every tick of the tween.  This function is not called on the
    * final tick of the animation.
@@ -13,11 +12,11 @@ declare namespace shifty {
     state: any,
     data: any | undefined,
     timeElapsed: number
-  ) => any;
-  type scheduleFunction = (callback: Function, timeout: number) => any;
-  interface tweenConfig {
+  ) => void;
+  type scheduleFunction = (callback: Function, timeout: number) => void;
+  type tweenConfig = {
     /**
-     * Starting position.  If omitted, {@link * shifty.Tweenable#get} is used.
+     * Starting position.  If omitted, {@link * Tweenable#get} is used.
      */
     from?: any;
     /**
@@ -40,8 +39,8 @@ declare namespace shifty {
     start?: shifty.startFunction;
     /**
      * Executes when the tween
-     * completes. This will get overridden by {@link shifty.Tweenablethen } if that
-     * is called, and it will not fire if {@link shifty.Tweenablecancel } is
+     * completes. This will get overridden by {@link Tweenablethen } if that
+     * is called, and it will not fire if {@link Tweenablecancel } is
      * called.
      */
     finish?: shifty.finishFunction;
@@ -64,7 +63,7 @@ declare namespace shifty {
      * correspond to `to`/`from`.  You can learn more about this in the {@tutorial
      * easing-function-in-depth} tutorial.
      */
-    easing?: Record<string, easingFunction> | string | easingFunction;
+    easing?: any | string | shifty.easingFunction;
     /**
      * Data that is passed to {@link * shifty.startFunction}, {@link shifty.renderFunction }, and {@link * shifty.promisedData}. Legacy property name: `attachment`.
      */
@@ -74,7 +73,7 @@ declare namespace shifty {
      * to use Promise library or polyfill Promises in unsupported environments.
      */
     promise?: Function;
-  }
+  };
   type promisedData = {
     /**
      * The current state of the tween.
@@ -85,7 +84,7 @@ declare namespace shifty {
      */
     data: any;
     /**
-     * The {@link shifty.Tweenable } instance to
+     * The {@link Tweenable } instance to
      * which the tween belonged.
      */
     tweenable: Tweenable;
@@ -95,20 +94,20 @@ declare namespace shifty {
    * Filters are only added to a tween when it is created so that they are not
    * unnecessarily processed if they don't apply during an update tick.
    */
-  type doesApplyFilter = (tweenable: any) => boolean;
+  type doesApplyFilter = (tweenable: Tweenable) => boolean;
   /**
    * Is called when a tween is created.  This should perform any setup needed by
    * subsequent per-tick calls to {@link shifty.beforeTween } and {@link * shifty.afterTween}.
    */
-  type tweenCreatedFilter = (tweenable: any) => any;
+  type tweenCreatedFilter = (tweenable: Tweenable) => void;
   /**
    * Is called right before a tween is processed in a tick.
    */
-  type beforeTweenFilter = (tweenable: any) => any;
+  type beforeTweenFilter = (tweenable: Tweenable) => void;
   /**
    * Is called right after a tween is processed in a tick.
    */
-  type afterTweenFilter = (tweenable: any) => any;
+  type afterTweenFilter = (tweenable: Tweenable) => void;
   /**
    * An Object that contains functions that are called at key points in a tween's
    * lifecycle.  Shifty can only process `Number`s internally, but filters can
@@ -138,34 +137,321 @@ declare namespace shifty {
     afterTween: shifty.afterTweenFilter;
   };
 
-  // bezier.js
-
+  // bezier.ts
   export function setBezierFunction(
     name: string,
     x1: number,
     y1: number,
     x2: number,
     y2: number
-  ): any;
+  ): shifty.easingFunction;
   export function unsetBezierFunction(name: string): boolean;
 
-  // interpolate.js
+  // easing-function.ts
+  export namespace Tweenable {
+    /*!
+     * All equations are adapted from Thomas Fuchs'
+     * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/penner.js).
+     *
+     * Based on Easing Equations (c) 2003 [Robert
+     * Penner](http://www.robertpenner.com/), all rights reserved. This work is
+     * [subject to terms](http://www.robertpenner.com/easing_terms_of_use.html).
+     */
+    /*!
+     *  TERMS OF USE - EASING EQUATIONS
+     *  Open source under the BSD License.
+     *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
+     */
+    /**
+     * @member Tweenable.formulas
+     * @description A static Object of {@link shifty.easingFunction}s that can by
+     * used by Shifty. The default values are defined in
+     * [`easing-functions.js`](easing-functions.js.html), but you can add your own
+     * {@link shifty.easingFunction}s by defining them as keys to this Object.
+     *
+     * Shifty ships with an implementation of [Robert Penner's easing
+     * equations](http://robertpenner.com/easing/), as adapted from
+     * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/penner.js)'s
+     * implementation.
+     * <p data-height="934" data-theme-id="0" data-slug-hash="wqObdO"
+     * data-default-tab="js,result" data-user="jeremyckahn" data-embed-version="2"
+     * data-pen-title="Shifty - Easing formula names" class="codepen">See the Pen <a
+     * href="https://codepen.io/jeremyckahn/pen/wqObdO/">Shifty - Easing formula
+     * names</a> by Jeremy Kahn (<a
+     * href="https://codepen.io/jeremyckahn">@jeremyckahn</a>) on <a
+     * href="https://codepen.io">CodePen</a>.</p>
+     * <script async
+     * src="https://production-assets.codepen.io/assets/embed/ei.js"></script>
+     * @type {Object.<shifty.easingFunction>}
+     * @static
+     */
+    export namespace formulas {
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const linear: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInQuad: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutQuad: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutQuad: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInCubic: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutCubic: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutCubic: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInQuart: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutQuart: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutQuart: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInQuint: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutQuint: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutQuint: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInSine: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutSine: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutSine: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInExpo: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutExpo: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutExpo: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInCirc: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutCirc: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutCirc: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutBounce: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInBack: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeOutBack: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeInOutBack: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const elastic: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const swingFromTo: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const swingFrom: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const swingTo: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const bounce: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const bouncePast: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeFromTo: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeFrom: shifty.easingFunction;
+      /**
+       * @memberof Tweenable.formulas
+       * @type {shifty.easingFunction}
+       * @param {number} pos
+       * @returns {number}
+       */
+      export const easeTo: shifty.easingFunction;
+    }
+  }
 
-  export function interpolate<T extends Object>(
+  // interpolate.ts
+  export function interpolate<T>(
     from: T,
     to: T,
     position: number,
-    easing: Record<string, easingFunction> | string | easingFunction,
+    easing:
+      | Record<string, string | shifty.easingFunction>
+      | string
+      | shifty.easingFunction,
     delay?: number
   ): T;
 
-  // scene.js
-
+  // scene.ts
   export class Scene {
     /**
-     * The {@link shifty.Scene} class provides a way to control groups of {@link
-     * shifty.Tweenable}s. It is lightweight, minimalistic, and meant to provide
-     * performant {@link shifty.Tweenable} batch control that users of Shifty
+     * The {@link Scene} class provides a way to control groups of {@link
+     * Tweenable}s. It is lightweight, minimalistic, and meant to provide
+     * performant {@link Tweenable} batch control that users of Shifty
      * might otherwise have to implement themselves. It is **not** a robust
      * timeline solution, and it does **not** provide utilities for sophisticated
      * animation sequencing or orchestration. If that is what you need for your
@@ -173,10 +459,10 @@ declare namespace shifty {
      * [Rekapi](http://jeremyckahn.github.io/rekapi/doc/) (a timeline layer built
      * on top of Shifty).
      *
-     * Please be aware that {@link shifty.Scene} does **not** perform any
-     * automatic cleanup. If you want to remove a {@link shifty.Tweenable} from a
-     * {@link shifty.Scene}, you must do so explicitly with either {@link
-     * shifty.Scene#remove} or {@link shifty.Scene#empty}.
+     * Please be aware that {@link Scene} does **not** perform any
+     * automatic cleanup. If you want to remove a {@link Tweenable} from a
+     * {@link Scene}, you must do so explicitly with either {@link
+     * Scene#remove} or {@link Scene#empty}.
      *
      * <p class="codepen" data-height="677" data-theme-id="0" data-default-tab="js,result" data-user="jeremyckahn" data-slug-hash="qvZKbe" style="height: 677px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border: 2px solid black; margin: 1em 0; padding: 1em;" data-pen-title="Shifty Scene Demo">
      * <span>See the Pen <a href="https://codepen.io/jeremyckahn/pen/qvZKbe/">
@@ -184,25 +470,23 @@ declare namespace shifty {
      * on <a href="https://codepen.io">CodePen</a>.</span>
      * </p>
      * <script async src="https://static.codepen.io/assets/embed/ei.js"></script>
-     * @param {...shifty.Tweenable} tweenables
+     * @param {...Tweenable} tweenables
      * @see https://codepen.io/jeremyckahn/pen/qvZKbe
-     * @constructs shifty.Scene
+     * @constructs Scene
+     * @memberof shifty
      */
     constructor(...tweenables: Tweenable[]);
-
     /**
-     * A copy of the internal {@link shifty.Tweenable}s array.
-     * @member shifty.Scene#tweenables
-     * @type {Array.<shifty.Tweenable>}
-     * @readonly
+     * A copy of the internal {@link Tweenable}s array.
+     * @member Scene#tweenables
+     * @type {Array.<Tweenable>}
      */
     get tweenables(): Tweenable[];
-
     /**
-     * The {@link external:Promise}s for all {@link shifty.Tweenable}s in this
-     * {@link shifty.Scene} that have been configured with {@link
-     * shifty.Tweenable#setConfig}. Note that each call of {@link
-     * shifty.Scene#play} or {@link shifty.Scene#pause} creates new {@link
+     * The {@link external:Promise}s for all {@link Tweenable}s in this
+     * {@link Scene} that have been configured with {@link
+     * Tweenable#setConfig}. Note that each call of {@link
+     * Scene#play} or {@link Scene#pause} creates new {@link
      * external:Promise}s:
      *
      *     const scene = new Scene(new Tweenable());
@@ -214,87 +498,95 @@ declare namespace shifty {
      *       scene.play()
      *     );
      *
-     * @member shifty.Scene#promises
-     * @type {Array.<external:Promise>}
-     * @readonly
+     * @member Scene#promises
+     * @type {Array.<Promise<any>>}
      */
-    get promises(): Promise<Object>[];
-
+    get promises(): Promise<any>[];
     /**
-     * Add a {@link shifty.Tweenable} to be controlled by this {@link
-     * shifty.Scene}.
-     * @method shifty.Scene#add
-     * @param {shifty.Tweenable} tweenable
-     * @return {shifty.Tweenable} The {@link shifty.Tweenable} that was added.
+     * Add a {@link Tweenable} to be controlled by this {@link
+     * Scene}.
+     * @method Scene#add
+     * @param {Tweenable} tweenable
+     * @return {Tweenable} The {@link Tweenable} that was added.
      */
     add(tweenable: Tweenable): Tweenable;
-
     /**
-     * Remove a {@link shifty.Tweenable} that is controlled by this {@link
-     * shifty.Scene}.
-     * @method shifty.Scene#remove
-     * @param {shifty.Tweenable} tweenable
-     * @return {shifty.Tweenable} The {@link shifty.Tweenable} that was removed.
+     * Remove a {@link Tweenable} that is controlled by this {@link
+     * Scene}.
+     * @method Scene#remove
+     * @param {Tweenable} tweenable
+     * @return {Tweenable} The {@link Tweenable} that was removed.
      */
     remove(tweenable: Tweenable): Tweenable;
-
     /**
-     * [Remove]{@link shifty.Scene#remove} all {@link shifty.Tweenable}s in this {@link
-     * shifty.Scene}.
-     * @method shifty.Scene#empty
-     * @return {Array.<shifty.Tweenable>} The {@link shifty.Tweenable}s that were
+     * [Remove]{@link Scene#remove} all {@link Tweenable}s in this {@link
+     * Scene}.
+     * @method Scene#empty
+     * @return {Array.<Tweenable>} The {@link Tweenable}s that were
      * removed.
      */
     empty(): Array<Tweenable>;
-
     /**
-     * Is `true` if any {@link shifty.Tweenable} in this {@link shifty.Scene} is
+     * Is `true` if any {@link Tweenable} in this {@link Scene} is
      * playing.
-     * @method shifty.Scene#isPlaying
+     * @method Scene#isPlaying
      * @return {boolean}
      */
     isPlaying(): boolean;
-
     /**
-     * Play all {@link shifty.Tweenable}s from their beginning.
-     * @method shifty.Scene#play
-     * @return {shifty.Scene}
+     * Play all {@link Tweenable}s from their beginning.
+     * @method Scene#play
+     * @return {Scene}
      */
     play(): Scene;
-
     /**
-     * {@link shifty.Tweenable#pause} all {@link shifty.Tweenable}s in this
-     * {@link shifty.Scene}.
-     * @method shifty.Scene#pause
-     * @return {shifty.Scene}
+     * {@link Tweenable#pause} all {@link Tweenable}s in this
+     * {@link Scene}.
+     * @method Scene#pause
+     * @return {Scene}
      */
     pause(): Scene;
-
     /**
-     * {@link shifty.Tweenable#resume} all paused {@link shifty.Tweenable}s.
-     * @method shifty.Scene#resume
-     * @return {shifty.Scene}
+     * {@link Tweenable#resume} all paused {@link Tweenable}s.
+     * @method Scene#resume
+     * @return {Scene}
      */
     resume(): Scene;
-
     /**
-     * {@link shifty.Tweenable#stop} all {@link shifty.Tweenable}s in this {@link
-     * shifty.Scene}.
-     * @method shifty.Scene#stop
+     * {@link Tweenable#stop} all {@link Tweenable}s in this {@link
+     * Scene}.
+     * @method Scene#stop
      * @param {boolean} [gotoEnd]
-     * @return {shifty.Scene}
+     * @return {Scene}
      */
     stop(gotoEnd?: boolean): Scene;
   }
 
-  // tweenable.js
+  // token.ts
+  /**
+   * @memberof Tweenable.filters.token
+   * @param {Tweenable} tweenable
+   */
+  export function tweenCreated(tweenable: Tweenable): void;
+  /**
+   * @memberof Tweenable.filters.token
+   * @param {Tweenable} tweenable
+   */
+  export function beforeTween(tweenable: Tweenable): void;
+  /**
+   * @memberof Tweenable.filters.token
+   * @param {Tweenable} tweenable
+   */
+  export function afterTween(tweenable: Tweenable): void;
+  export function doesApply(tweenable: Tweenable): boolean;
 
+  // tweenable.ts
   /**
    * @method shifty.tween
    * @param {shifty.tweenConfig} [config={}]
    * @description Standalone convenience method that functions identically to
-   * {@link shifty.Tweenable#tween}.  You can use this to create tweens without
-   * needing to set up a {@link shifty.Tweenable} instance.
+   * {@link Tweenable#tween}.  You can use this to create tweens without
+   * needing to set up a {@link Tweenable} instance.
    *
    * ```
    * import { tween } from 'shifty';
@@ -304,9 +596,12 @@ declare namespace shifty {
    * );
    * ```
    *
-   * @returns {shifty.Tweenable} A new {@link shifty.Tweenable} instance.
+   * @returns {Tweenable} A new {@link Tweenable} instance.
    */
-  export function tween(config?: tweenConfig): Tweenable;
+  export function tween(config?: shifty.tweenConfig): Tweenable;
+  export function resetList(): void;
+  export function getListHead(): Tweenable;
+  export function getListTail(): Tweenable;
   export function tweenProps(
     forPosition: number,
     currentState: any,
@@ -314,18 +609,18 @@ declare namespace shifty {
     targetState: any,
     duration: number,
     timestamp: number,
-    easing: Record<any, string | Function>
-  ): Object;
+    easing: Record<string, string | Function>
+  ): any;
   export function processTweens(): void;
   export function scheduleUpdate(): void;
   export function composeEasingObject(
-    fromTweenParams: any,
+    fromTweenParams: Record<string, string | Function>,
     easing?: any | string | Function,
     composedEasing?: any
-  ): any | Function;
+  ): Record<string, string | Function> | Function;
   export class Tweenable {
     /**
-     * @method shifty.Tweenable.now
+     * @method Tweenable.now
      * @static
      * @returns {number} The current timestamp.
      */
@@ -333,180 +628,197 @@ declare namespace shifty {
     /**
      * @param {Object} [initialState={}] The values that the initial tween should
      * start at if a `from` value is not provided to {@link
-     * shifty.Tweenable#tween} or {@link shifty.Tweenable#setConfig}.
+     * Tweenable#tween} or {@link Tweenable#setConfig}.
      * @param {shifty.tweenConfig} [config] Configuration object to be passed to
-     * {@link shifty.Tweenable#setConfig}.
-     * @constructs shifty.Tweenable
+     * {@link Tweenable#setConfig}.
+     * @constructs Tweenable
+     * @memberof shifty
      */
-    constructor(initialState?: Object, config?: tweenConfig);
-    private _config: tweenConfig;
-    private _data: Object;
-    private _delay: number;
-    private _filters: filter[];
-    private _next: any;
-    private _previous: any;
-    private _timestamp: number;
-    private _resolve: any;
-    private _reject: (reason?: any) => void;
-    private _currentState: any;
-    private _originalState: Object;
-    private _targetState: Object;
-    private _start: () => void;
-    private _render: () => void;
-    private _promiseCtor: PromiseConstructor;
+    constructor(initialState?: any, config?: shifty.tweenConfig);
+    /** @private */
+    private _config;
+    /** @private */
+    private _data;
+    /** @private */
+    private _delay;
+    /** @private */
+    private _filters;
+    /** @private */
+    private _next;
+    /** @private */
+    private _previous;
+    /** @private */
+    private _timestamp;
+    /** @private */
+    private _hasEnded;
+    /** @private */
+    private _resolve;
+    /** @private */
+    private _reject;
+    /** @private */
+    private _currentState;
+    /** @private */
+    private _originalState;
+    /** @private */
+    private _targetState;
+    /** @private */
+    private _start;
+    /** @private */
+    private _render;
+    /** @private */
+    private _promiseCtor;
     /**
      * Applies a filter to Tweenable instance.
      * @param {string} filterName The name of the filter to apply.
      * @private
      */
     private _applyFilter;
-    private _isPlaying: boolean;
-    private _pausedAtTime: number;
-    private _duration: any;
-    private _scheduleId: any;
-    private _easing: any;
-
     /**
-     * Configure and start a tween. If this {@link shifty.Tweenable}'s instance
+     * Configure and start a tween. If this {@link Tweenable}'s instance
      * is already running, then it will stop playing the old tween and
      * immediately play the new one.
-     * @method shifty.Tweenable#tween
+     * @method Tweenable#tween
      * @param {shifty.tweenConfig} [config] Gets passed to {@link
-     * shifty.Tweenable#setConfig}.
-     * @return {shifty.Tweenable}
+     * Tweenable#setConfig}.
+     * @return {Tweenable}
      */
-    tween(config?: tweenConfig): this;
-
+    tween(config?: shifty.tweenConfig): Tweenable;
+    /** @private */
+    private _pausedAtTime;
     /**
      * Configure a tween that will start at some point in the future. Aside from
      * `delay`, `from`, and `to`, each configuration option will automatically
      * default to the same option used in the preceding tween of this {@link
-     * shifty.Tweenable} instance.
-     * @method shifty.Tweenable#setConfig
+     * Tweenable} instance.
+     * @method Tweenable#setConfig
      * @param {shifty.tweenConfig} [config={}]
-     * @return {shifty.Tweenable}
+     * @return {Tweenable}
      */
-    setConfig(config?: tweenConfig): this;
-
+    setConfig(config?: shifty.tweenConfig): Tweenable;
+    /** @private */
+    private _isPlaying;
+    /** @private */
+    private _scheduleId;
+    /** @private */
+    private _duration;
+    /** @private */
+    private _easing;
     /**
      * Overrides any `finish` function passed via a {@link shifty.tweenConfig}.
-     * @method shifty.Tweenable#then
+     * @method Tweenable#then
      * @param {function} onFulfilled Receives {@link shifty.promisedData} as the
      * first parameter.
      * @param {function} onRejected Receives {@link shifty.promisedData} as the
      * first parameter.
-     * @return {external:Promise}
+     * @return {Promise<Object>}
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then
      */
     then(onFulfilled: Function, onRejected?: Function): Promise<any>;
-
-    private _promise: Promise<any>;
-
+    /** @private */
+    private _promise;
     /**
-     * @method shifty.Tweenable#catch
+     * @method Tweenable#catch
      * @param {function} onRejected Receives {@link shifty.promisedData} as the
      * first parameter.
-     * @return {external:Promise}
+     * @return {Promise<Object>}
      * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/catch
      */
     catch(onRejected: Function): Promise<any>;
-
     /**
-     * @method shifty.Tweenable#get
+     * @method Tweenable#get
      * @return {Object} The current state.
      */
-    get(): Object;
-
+    get(): any;
     /**
      * Set the current state.
-     * @method shifty.Tweenable#set
+     * @method Tweenable#set
      * @param {Object} state The state to set.
      */
-    set(state: Object): void;
-
+    set(state: any): void;
     /**
      * Pause a tween. Paused tweens can be resumed from the point at which they
      * were paused. If a tween is not running, this is a no-op.
-     * @method shifty.Tweenable#pause
-     * @return {shifty.Tweenable}
+     * @method Tweenable#pause
+     * @return {Tweenable}
      */
-    pause(): this;
-
+    pause(): Tweenable;
     /**
      * Resume a paused tween.
-     * @method shifty.Tweenable#resume
-     * @return {shifty.Tweenable}
+     * @method Tweenable#resume
+     * @return {Tweenable}
      */
-    resume(): this;
-
-    private _resume(currentTime?: number): any;
-
+    resume(): Tweenable;
+    /**
+     * @private
+     * @param {number} currentTime
+     * @returns {Tweenable}
+     */
+    private _resume;
     /**
      * Move the state of the animation to a specific point in the tween's
      * timeline.  If the animation is not running, this will cause {@link
      * shifty.renderFunction} handlers to be called.
-     * @method shifty.Tweenable#seek
-     * @param {millisecond} millisecond The millisecond of the animation to seek
+     * @method Tweenable#seek
+     * @param {number} millisecond The millisecond of the animation to seek
      * to.  This must not be less than `0`.
-     * @return {shifty.Tweenable}
+     * @return {Tweenable}
      */
-    seek(millisecond: number): this;
-
+    seek(millisecond: number): Tweenable;
     /**
      * Stops a tween. If a tween is not running, this is a no-op. This method
      * does not cancel the tween {@link external:Promise}. For that, use {@link
-     * shifty.Tweenable#cancel}.
+     * Tweenable#cancel}.
      * @param {boolean} [gotoEnd] If `false`, the tween just stops at its current
      * state.  If `true`, the tweened object's values are instantly set to the
      * target values.
-     * @method shifty.Tweenable#stop
-     * @return {shifty.Tweenable}
+     * @method Tweenable#stop
+     * @return {Tweenable}
      */
-    stop(gotoEnd?: boolean): this;
-
+    stop(gotoEnd?: boolean): Tweenable;
     /**
-     * {@link shifty.Tweenable#stop}s a tween and also `reject`s its {@link
+     * {@link Tweenable#stop}s a tween and also `reject`s its {@link
      * external:Promise}. If a tween is not running, this is a no-op. Prevents
      * calling any provided `finish` function.
-     * @param {boolean} [gotoEnd] Is propagated to {@link shifty.Tweenable#stop}.
-     * @method shifty.Tweenable#cancel
-     * @return {shifty.Tweenable}
+     * @param {boolean} [gotoEnd] Is propagated to {@link Tweenable#stop}.
+     * @method Tweenable#cancel
+     * @return {Tweenable}
      * @see https://github.com/jeremyckahn/shifty/issues/122
      */
-    cancel(gotoEnd?: boolean): this;
-
+    cancel(gotoEnd?: boolean): Tweenable;
     /**
      * Whether or not a tween is running.
-     * @method shifty.Tweenable#isPlaying
+     * @method Tweenable#isPlaying
      * @return {boolean}
      */
     isPlaying(): boolean;
-
     /**
-     * @method shifty.Tweenable#setScheduleFunction
-     * @param {shifty.scheduleFunction} scheduleFunction
-     * @deprecated Will be removed in favor of {@link shifty.Tweenable.setScheduleFunction} in 3.0.
+     * Whether or not a tween has finished running.
+     * @method Tweenable#hasEnded
+     * @return {boolean}
      */
-    setScheduleFunction(scheduleFunction: scheduleFunction): void;
-
+    hasEnded(): boolean;
+    /**
+     * @method Tweenable#setScheduleFunction
+     * @param {shifty.scheduleFunction} scheduleFunction
+     * @deprecated Will be removed in favor of {@link Tweenable.setScheduleFunction} in 3.0.
+     */
+    setScheduleFunction(scheduleFunction: shifty.scheduleFunction): void;
     /**
      * Get and optionally set the data that gets passed as `data` to {@link
      * shifty.promisedData}, {@link shifty.startFunction} and {@link
      * shifty.renderFunction}.
      * @param {Object} [data]
-     * @method shifty.Tweenable#data
+     * @method Tweenable#data
      * @return {Object} The internally stored `data`.
      */
     data(data?: any): any;
-
     /**
      * `delete` all "own" properties.  Call this when the {@link
-     * shifty.Tweenable} instance is no longer needed to free memory.
-     * @method shifty.Tweenable#dispose
+     * Tweenable} instance is no longer needed to free memory.
+     * @method Tweenable#dispose
      */
     dispose(): void;
   }
-
   export namespace Tweenable {
     /**
      * Set a custom schedule function.
@@ -516,58 +828,12 @@ declare namespace shifty {
      * is used if available, otherwise
      * [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window.setTimeout)
      * is used.
-     * @method shifty.Tweenable.setScheduleFunction
+     * @method Tweenable.setScheduleFunction
      * @param {shifty.scheduleFunction} fn The function to be
      * used to schedule the next frame to be rendered.
      * @return {shifty.scheduleFunction} The function that was set.
      */
     export function setScheduleFunction(fn: scheduleFunction): scheduleFunction;
-    export const filters: any;
-
-    // easing-functions.js
-    export namespace formulas {
-      export function linear(pos: number): number;
-      export function easeInQuad(pos: any): number;
-      export function easeOutQuad(pos: any): number;
-      export function easeInOutQuad(pos: any): number;
-      export function easeInCubic(pos: any): number;
-      export function easeOutCubic(pos: any): number;
-      export function easeInOutCubic(pos: any): number;
-      export function easeInQuart(pos: any): number;
-      export function easeOutQuart(pos: any): number;
-      export function easeInOutQuart(pos: any): number;
-      export function easeInQuint(pos: any): number;
-      export function easeOutQuint(pos: any): number;
-      export function easeInOutQuint(pos: any): number;
-      export function easeInSine(pos: any): number;
-      export function easeOutSine(pos: any): number;
-      export function easeInOutSine(pos: any): number;
-      export function easeInExpo(pos: any): number;
-      export function easeOutExpo(pos: any): number;
-      export function easeInOutExpo(pos: any): number;
-      export function easeInCirc(pos: any): number;
-      export function easeOutCirc(pos: any): number;
-      export function easeInOutCirc(pos: any): number;
-      export function easeOutBounce(pos: any): number;
-      export function easeInBack(pos: any): number;
-      export function easeOutBack(pos: any): number;
-      export function easeInOutBack(pos: any): number;
-      export function elastic(pos: any): number;
-      export function swingFromTo(pos: any): number;
-      export function swingFrom(pos: any): number;
-      export function swingTo(pos: any): number;
-      export function bounce(pos: any): number;
-      export function bouncePast(pos: any): number;
-      export function easeFromTo(pos: any): number;
-      export function easeFrom(pos: any): number;
-      export function easeTo(pos: any): number;
-    }
+    export const filters: Record<string, shifty.filter>;
   }
-
-  // token.js
-
-  export function tweenCreated(tweenable: any): void;
-  export function beforeTween(tweenable: any): void;
-  export function afterTween(tweenable: any): void;
-  export function doesApply(tweenable: any): boolean;
 }

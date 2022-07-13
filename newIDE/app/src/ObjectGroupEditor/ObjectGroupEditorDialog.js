@@ -3,7 +3,7 @@ import { Trans } from '@lingui/macro';
 import React from 'react';
 import FlatButton from '../UI/FlatButton';
 import ObjectGroupEditor from '.';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { useSerializableObjectCancelableEditor } from '../Utils/SerializableObjectCancelableEditor';
 import useForceUpdate from '../Utils/UseForceUpdate';
 
@@ -32,7 +32,6 @@ const ObjectGroupEditorDialog = ({
 
   return (
     <Dialog
-      onApply={onApply}
       key={group.ptr}
       actions={[
         <FlatButton
@@ -41,17 +40,16 @@ const ObjectGroupEditorDialog = ({
           keyboardFocused
           onClick={onCancelChanges}
         />,
-        <FlatButton
+        <DialogPrimaryButton
           key="apply"
           label={<Trans>Apply</Trans>}
           primary
-          keyboardFocused
           onClick={onApply}
         />,
       ]}
       noMargin
-      cannotBeDismissed={true}
       onRequestClose={onCancelChanges}
+      onApply={onApply}
       open
       title={`Edit ${group.getName()} group`}
     >

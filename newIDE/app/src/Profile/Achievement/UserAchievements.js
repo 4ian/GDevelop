@@ -52,7 +52,7 @@ const UserAchievements = ({
       const achievements = await getAchievements();
       setAchievements(achievements);
     } catch (err) {
-      console.log(`Error when fetching achievements: ${err}`);
+      console.error(`Error when fetching achievements: ${err}`);
       setDisplayError(true);
     }
   }, []);
@@ -84,8 +84,8 @@ const UserAchievements = ({
                 padding: windowWidth === 'small' ? '0 20' : '20',
               }}
             >
-              <Trophy color="primary" fontSize="large" />
-              <Text size="title">
+              <Trophy color="secondary" fontSize="large" />
+              <Text size="block-title">
                 <Trans>
                   {badges.length}/{achievements.length} achievements
                 </Trans>

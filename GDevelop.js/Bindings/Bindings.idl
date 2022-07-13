@@ -214,6 +214,8 @@ interface Variable {
     double GetValue();
     void SetBool([Const] boolean val);
     boolean GetBool();
+    void SetFolded(boolean val);
+    boolean IsFolded();
 
     unsigned long GetChildrenCount();
     boolean Contains([Const, Ref] Variable variableToSearch, boolean recursive);
@@ -229,6 +231,9 @@ interface Variable {
     [Ref] Variable PushNew();
     void RemoveAtIndex([Const] unsigned long index);
     [Const, Ref] VectorVariable GetAllChildrenArray();
+    void MoveChildInArray([Const] unsigned long oldIndex, [Const] unsigned long newIndex);
+    boolean InsertAtIndex([Const, Ref] Variable variable, [Const] unsigned long index);
+    boolean InsertChild([Const] DOMString name, [Const, Ref] Variable variable);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -380,6 +385,8 @@ interface Project {
     void SetPlayableWithMobile(boolean playable);
     void SetPackageName([Const] DOMString packageName);
     [Const, Ref] DOMString GetPackageName();
+    void SetTemplateSlug([Const] DOMString templateSlug);
+    [Const, Ref] DOMString GetTemplateSlug();
     void SetOrientation([Const] DOMString orientation);
     [Const, Ref] DOMString GetOrientation();
     void SetProjectUuid([Const] DOMString projectUuid);
@@ -547,6 +554,8 @@ interface gdObject {
 
     void SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
+    void SetAssetStoreId([Const] DOMString assetStoreId);
+    [Const, Ref] DOMString GetAssetStoreId();
     void SetType([Const] DOMString type);
     [Const, Ref] DOMString GetType();
     void SetTags([Const] DOMString tags);
@@ -723,6 +732,7 @@ interface EffectsContainer {
   void InsertEffect([Const, Ref] Effect theEffect, unsigned long position);
   void RemoveEffect([Const] DOMString name);
   void SwapEffects(unsigned long firstEffectIndex, unsigned long secondEffectIndex);
+  void MoveEffect(unsigned long oldIndex, unsigned long newIndex);
 
   void SerializeTo([Ref] SerializerElement element);
   void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1067,11 +1077,18 @@ interface Instruction {
     [Const, Ref] DOMString GetType();
     void SetInverted(boolean inverted);
     boolean IsInverted();
+    void SetAwaited(boolean awaited);
+    boolean IsAwaited();
     void SetParameter(unsigned long id, [Const] DOMString value);
-    [Const, Ref] DOMString GetParameter(unsigned long id);
+    [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
     unsigned long GetParametersCount();
     [Ref] InstructionsList GetSubInstructions();
+};
+
+interface Expression {
+  [Const, Ref] DOMString GetPlainString();
+  ExpressionNode GetRootNode();
 };
 
 interface VectorPairStringTextFormatting {
@@ -1093,11 +1110,13 @@ interface InstructionSentenceFormatter {
 [Prefix="gd::InstructionMetadata::"]
 interface ExtraInformation {
     [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName_);
+    [Ref] ExtraInformation SetAsyncFunctionName([Const] DOMString functionName_);
     [Ref] ExtraInformation SetManipulatedType([Const] DOMString type_);
     [Ref] ExtraInformation SetGetter([Const] DOMString getter);
     [Ref] ExtraInformation SetMutators([Const, Ref] MapStringString mutators);
     [Ref] ExtraInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExtraInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface ExpressionCodeGenerationInformation {
@@ -1105,6 +1124,7 @@ interface ExpressionCodeGenerationInformation {
     [Ref] ExpressionCodeGenerationInformation SetStatic();
     [Ref] ExpressionCodeGenerationInformation SetIncludeFile([Const] DOMString includeFile);
     [Ref] ExpressionCodeGenerationInformation AddIncludeFile([Const] DOMString includeFile);
+    [Const, Ref] VectorString GetIncludeFiles();
 };
 
 interface InstructionMetadata {
@@ -1125,12 +1145,12 @@ interface InstructionMetadata {
     boolean IsHidden();
     boolean IsPrivate();
     boolean IsAsync();
+    boolean IsOptionallyAsync();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
     [Ref] InstructionMetadata SetPrivate();
-    [Ref] InstructionMetadata SetAsync();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -1259,6 +1279,7 @@ interface ParameterMetadata {
     [Ref] ParameterMetadata SetDefaultValue([Const] DOMString defaultValue_);
     boolean STATIC_IsObject([Const] DOMString param);
     boolean STATIC_IsBehavior([Const] DOMString param);
+    boolean STATIC_IsExpression([Const] DOMString type_, [Const] DOMString parameterType);
 
     void SerializeTo([Ref] SerializerElement element);
     void UnserializeFrom([Const, Ref] SerializerElement element);
@@ -1927,7 +1948,7 @@ interface VectorEventsSearchResult {
 interface EventsRefactorer {
     void STATIC_RenameObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString oldName, [Const] DOMString newName);
     void STATIC_RemoveObjectInEvents([Const, Ref] Platform platform, [Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString name);
-    void STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
+    [Value] VectorEventsSearchResult STATIC_ReplaceStringInEvents([Ref] ObjectsContainer project, [Ref] ObjectsContainer layout, [Ref] EventsList events, [Const] DOMString toReplace, [Const] DOMString newString, boolean matchCase, boolean inConditions, boolean inActions,  boolean inEventStrings);
     [Value] VectorEventsSearchResult STATIC_SearchInEvents([Const, Ref] Platform platform, [Ref] EventsList events, [Const] DOMString search, boolean matchCase, boolean inConditions, boolean inActions, boolean inEventStrings, boolean inEventSentences);
 };
 
@@ -2075,7 +2096,7 @@ interface ExpressionParser2NodeWorker {
 };
 
 interface ExpressionValidator {
-    void ExpressionValidator();
+    void ExpressionValidator([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType);
 
     [Const, Ref] VectorExpressionParserDiagnostic GetErrors();
 
@@ -2109,11 +2130,19 @@ interface VectorExpressionCompletionDescription {
 };
 
 interface ExpressionCompletionFinder {
-    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Ref] ExpressionNode node, unsigned long location);
+    [Value] VectorExpressionCompletionDescription STATIC_GetCompletionDescriptionsFor([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node, unsigned long location);
 
     [Const, Ref] VectorExpressionCompletionDescription GetCompletionDescriptions();
 
     //Inherited from ExpressionParser2NodeWorker:
+};
+
+interface ExpressionNodeLocationFinder {
+    ExpressionNode STATIC_GetNodeAtPosition([Ref] ExpressionNode node, unsigned long searchedPosition);
+};
+
+interface ExpressionTypeFinder {
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node);
 };
 
 interface ExpressionNode {
@@ -2125,9 +2154,9 @@ interface UniquePtrExpressionNode {
 };
 
 interface ExpressionParser2 {
-    void ExpressionParser2([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer);
+    void ExpressionParser2();
 
-    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString type, [Const] DOMString expression);
+    [Value] UniquePtrExpressionNode ParseExpression([Const] DOMString expression);
 };
 
 enum EventsFunction_FunctionType {
@@ -2317,6 +2346,21 @@ interface ArbitraryEventsWorker {
     void Launch([Ref] EventsList events);
 };
 
+interface EventsLeaderboardsLister {
+    void EventsLeaderboardsLister([Ref] Project project);
+    [Const, Ref] SetString GetLeaderboardIds();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsLeaderboardsRenamer {
+    void EventsLeaderboardsRenamer([Ref] Project project, [Const, Ref] MapStringString leaderboardIdMap);
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
 interface EventsParametersLister {
     void EventsParametersLister([Ref] Project project);
     [Const, Ref] MapStringString GetParametersAndTypes();
@@ -2499,6 +2543,7 @@ interface Direction {
     boolean IsLooping();
     void SetLoop(boolean enable);
     float GetTimeBetweenFrames();
+    [Const, Ref] VectorString GetSpriteNames();
     void SetTimeBetweenFrames(float time);
     void SwapSprites(unsigned long first, unsigned long second);
     void MoveSprite(unsigned long oldIndex, unsigned long newIndex);
@@ -2540,7 +2585,6 @@ interface SpriteObject {
 };
 SpriteObject implements gdObject;
 
-[Prefix="sf::"]
 interface Vector2f {
     void Vector2f();
 
@@ -2556,6 +2600,7 @@ interface VectorVector2f {
     [Ref] Vector2f at(unsigned long index);
     void WRAPPED_set(unsigned long index, [Const, Ref] Vector2f pt);
     void FREE_removeFromVectorVector2f(unsigned long index);
+    void FREE_moveVector2fInVector(unsigned long oldIndex, unsigned long newIndex);
     void clear();
 };
 
@@ -2789,6 +2834,7 @@ interface PreviewExportOptions {
     [Ref] PreviewExportOptions SetProjectDataOnlyExport(boolean enable);
     [Ref] PreviewExportOptions SetFullLoadingScreen(boolean enable);
     [Ref] PreviewExportOptions SetNonRuntimeScriptsCacheBurst(unsigned long value);
+    [Ref] PreviewExportOptions SetElectronRemoteRequirePath([Const] DOMString electronRemoteRequirePath);
 };
 
 [Prefix="gdjs::"]

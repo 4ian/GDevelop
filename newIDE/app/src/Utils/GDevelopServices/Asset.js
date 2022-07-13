@@ -46,6 +46,13 @@ export type AssetShortHeader = {|
   shortDescription: string,
   previewImageUrls: Array<string>,
   tags: Array<string>,
+  license: string,
+  objectType: string,
+  animationsCount: number,
+  maxFramesCount: number,
+  width: number,
+  height: number,
+  dominantColors: number[],
 |};
 
 export type AssetHeader = {|
@@ -62,9 +69,23 @@ export type Asset = {|
   objectAssets: Array<ObjectAsset>,
 |};
 
+export type AssetPack = {|
+  name: string,
+  tag: string,
+  thumbnailUrl: string,
+  assetsCount: number,
+  externalWebLink?: ?string,
+  userFriendlyPrice?: ?string,
+|};
+
+export type AssetPacks = {|
+  starterPacks: Array<AssetPack>,
+|};
+
 export type AllAssets = {|
   assetShortHeaders: Array<AssetShortHeader>,
   filters: Filters,
+  assetPacks: AssetPacks,
 |};
 
 export type Resource = {|
@@ -105,16 +126,18 @@ export const listAllAssets = (): Promise<AllAssets> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/asset`)
     .then(response => response.data)
-    .then(({ assetShortHeadersUrl, filtersUrl }) => {
-      if (!assetShortHeadersUrl || !filtersUrl) {
+    .then(({ assetShortHeadersUrl, filtersUrl, assetPacksUrl }) => {
+      if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
         throw new Error('Unexpected response from the resource endpoint.');
       }
       return Promise.all([
         axios.get(assetShortHeadersUrl).then(response => response.data),
         axios.get(filtersUrl).then(response => response.data),
-      ]).then(([assetShortHeaders, filters]) => ({
+        axios.get(assetPacksUrl).then(response => response.data),
+      ]).then(([assetShortHeaders, filters, assetPacks]) => ({
         assetShortHeaders,
         filters,
+        assetPacks,
       }));
     });
 };
@@ -177,8 +200,10 @@ export const listAllLicenses = (): Promise<Array<License>> => {
     .then(response => response.data);
 };
 
-export const isPixelArt = (assetShortHeader: AssetShortHeader) => {
-  return assetShortHeader.tags.some(tag => {
+export const isPixelArt = (
+  assetOrAssetShortHeader: AssetShortHeader | Asset
+): boolean => {
+  return assetOrAssetShortHeader.tags.some(tag => {
     return tag.toLowerCase() === 'pixel art';
   });
 };

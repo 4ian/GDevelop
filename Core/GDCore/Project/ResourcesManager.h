@@ -60,7 +60,7 @@ class GD_CORE_API Resource {
    * \see gd::Resource::GetFile
    * \see gd::Resource::SetFile
    */
-  virtual bool UseFile() { return false; }
+  virtual bool UseFile() const { return false; }
 
   /**
    * \brief Return, if applicable, the String containing the file used by the
@@ -184,7 +184,7 @@ class GD_CORE_API ImageResource : public Resource {
    */
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -223,7 +223,7 @@ class GD_CORE_API ImageResource : public Resource {
  */
 class GD_CORE_API AudioResource : public Resource {
  public:
-  AudioResource() : Resource(), preloadAsMusic(false), preloadAsSound(false) {
+  AudioResource() : Resource(), preloadAsMusic(false), preloadAsSound(false), preloadInCache(false) {
     SetKind("audio");
   };
   virtual ~AudioResource(){};
@@ -234,7 +234,7 @@ class GD_CORE_API AudioResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -263,10 +263,21 @@ class GD_CORE_API AudioResource : public Resource {
    */
   void SetPreloadAsSound(bool enable = true) { preloadAsSound = enable; }
 
+  /**
+   * \brief Return true if the audio resource should be preloaded in cache (without decoding into memory).
+   */
+  bool PreloadInCache() const { return preloadInCache; }
+
+  /**
+   * \brief Set if the audio resource should be preloaded in cache (without decoding into memory).
+   */
+  void SetPreloadInCache(bool enable = true) { preloadInCache = enable; }
+
  private:
   gd::String file;
   bool preloadAsSound;
   bool preloadAsMusic;
+  bool preloadInCache;
 };
 
 /**
@@ -286,7 +297,7 @@ class GD_CORE_API FontResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(const SerializerElement& element) override;
@@ -312,7 +323,7 @@ class GD_CORE_API VideoResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(const SerializerElement& element) override;
@@ -338,7 +349,7 @@ class GD_CORE_API JsonResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties() const override;
   bool UpdateProperty(const gd::String& name, const gd::String& value) override;
@@ -379,7 +390,7 @@ class GD_CORE_API BitmapFontResource : public Resource {
   virtual const gd::String& GetFile() const override { return file; };
   virtual void SetFile(const gd::String& newFile) override;
 
-  virtual bool UseFile() override { return true; }
+  virtual bool UseFile() const override { return true; }
   void SerializeTo(SerializerElement& element) const override;
 
   void UnserializeFrom(const SerializerElement& element) override;

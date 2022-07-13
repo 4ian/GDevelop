@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from './CircularProgress';
 
 const styles = {
   progress: { marginLeft: 8, verticalAlign: 'middle' },
 };
 
-export default ({
+const RightLoader = ({
   children,
   isLoading,
 }: {
@@ -18,3 +18,5 @@ export default ({
     {isLoading && <CircularProgress size={20} style={styles.progress} />}
   </span>
 );
+
+export default RightLoader;

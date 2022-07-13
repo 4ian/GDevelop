@@ -3,7 +3,6 @@ import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 import * as React from 'react';
-import { formatISO } from 'date-fns';
 import FlatButton from '../UI/FlatButton';
 import { Line, Spacer } from '../UI/Grid';
 import {
@@ -20,19 +19,13 @@ import Dialog from '../UI/Dialog';
 import { Tab, Tabs } from '../UI/Tabs';
 import { ColumnStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import {
-  type GameMetrics,
-  getGameMetrics,
-} from '../Utils/GDevelopServices/Analytics';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import { Chip, CircularProgress } from '@material-ui/core';
-import { Table, TableBody, TableRow, TableRowColumn } from '../UI/Table';
+import { Chip } from '@material-ui/core';
 import Builds from '../Export/Builds';
 import AlertMessage from '../UI/AlertMessage';
-import subDays from 'date-fns/subDays';
 import RaisedButton from '../UI/RaisedButton';
 import Window from '../Utils/Window';
 import HelpButton from '../UI/HelpButton';
@@ -49,16 +42,14 @@ import SmartphoneIcon from '@material-ui/icons/Smartphone';
 import Crown from '../UI/CustomSvgIcons/Crown';
 import { showErrorBox, showWarningBox } from '../UI/Messages/MessageBox';
 import LeaderboardAdmin from './LeaderboardAdmin';
-
-const styles = {
-  tableRowStatColumn: {
-    width: 100,
-  },
-};
+import { GameAnalyticsPanel } from './GameAnalyticsPanel';
+import GameFeedback from './Feedbacks/GameFeedback';
+import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasurer';
 
 export type GamesDetailsTab =
   | 'details'
   | 'builds'
+  | 'feedback'
   | 'analytics'
   | 'leaderboards';
 
@@ -83,24 +74,12 @@ export const GameDetailsDialog = ({
     AuthenticatedUserContext
   );
   const [currentTab, setCurrentTab] = React.useState(initialTab);
-  const [gameRollingMetrics, setGameMetrics] = React.useState<?GameMetrics>(
-    null
-  );
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [
     gameUnregisterErrorText,
     setGameUnregisterErrorText,
   ] = React.useState<?string>(null);
-  const [gameRollingMetricsError, setGameMetricsError] = React.useState<?Error>(
-    null
-  );
-  const [isGameMetricsLoading, setIsGameMetricsLoading] = React.useState(false);
   const [isGameUpdating, setIsGameUpdating] = React.useState(false);
-
-  const yesterdayIsoDate = formatISO(subDays(new Date(), 1), {
-    representation: 'date',
-  });
-  const [analyticsDate, setAnalyticsDate] = React.useState(yesterdayIsoDate);
 
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const [publicGame, setPublicGame] = React.useState<?PublicGame>(null);
@@ -110,37 +89,7 @@ export const GameDetailsDialog = ({
     setIsPublicGamePropertiesDialogOpen,
   ] = React.useState(false);
 
-  const loadGameMetrics = React.useCallback(
-    async () => {
-      if (!profile) return;
-
-      const { id } = profile;
-
-      setIsGameMetricsLoading(true);
-      setGameMetricsError(null);
-      try {
-        const gameRollingMetrics = await getGameMetrics(
-          getAuthorizationHeader,
-          id,
-          game.id,
-          analyticsDate
-        );
-        setGameMetrics(gameRollingMetrics);
-      } catch (err) {
-        console.error(`Unable to load game rolling metrics:`, err);
-        setGameMetricsError(err);
-      }
-      setIsGameMetricsLoading(false);
-    },
-    [getAuthorizationHeader, profile, game, analyticsDate]
-  );
-
-  React.useEffect(
-    () => {
-      loadGameMetrics();
-    },
-    [loadGameMetrics]
-  );
+  const windowWidth = useResponsiveWindowWidth();
 
   const loadPublicGame = React.useCallback(
     async () => {
@@ -365,9 +314,6 @@ export const GameDetailsDialog = ({
           noMargin
           flexColumnBody
           fullHeight={currentTab === 'leaderboards'}
-          onRequestClose={() => {
-            if (!isLoading) onClose();
-          }}
           maxWidth="md"
           actions={[
             <FlatButton
@@ -387,10 +333,17 @@ export const GameDetailsDialog = ({
               }
             />,
           ]}
+          onRequestClose={onClose}
+          cannotBeDismissed={isLoading}
         >
-          <Tabs value={currentTab} onChange={setCurrentTab}>
+          <Tabs
+            value={currentTab}
+            onChange={setCurrentTab}
+            variant={windowWidth !== 'large' ? 'scrollable' : undefined}
+          >
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
+            <Tab label={<Trans>Feedback</Trans>} value="feedback" />
             <Tab label={<Trans>Analytics</Trans>} value="analytics" />
             <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
@@ -543,7 +496,13 @@ export const GameDetailsDialog = ({
                     <FlatButton
                       onClick={() => {
                         const answer = Window.showConfirmDialog(
-                          "Are you sure you want to unregister this game? \n\nIt will disappear from your games dashboard and you won't get access to analytics, unless you register it again."
+                          i18n._(
+                            t`Are you sure you want to unregister this game?`
+                          ) +
+                            '\n\n' +
+                            i18n._(
+                              t`It will disappear from your games dashboard and you won't get access to analytics, unless you register it again.`
+                            )
                         );
 
                         if (!answer) return;
@@ -580,7 +539,7 @@ export const GameDetailsDialog = ({
                     />
                   </Line>
                   {gameUnregisterErrorText ? (
-                    <PlaceholderError kind="error">
+                    <PlaceholderError>
                       {gameUnregisterErrorText}
                     </PlaceholderError>
                   ) : null}
@@ -595,171 +554,14 @@ export const GameDetailsDialog = ({
               />
             ) : null}
             {currentTab === 'analytics' ? (
-              gameRollingMetricsError ? (
-                <PlaceholderError
-                  onRetry={() => {
-                    loadGameMetrics();
-                  }}
-                >
-                  <Trans>There was an issue getting the game analytics.</Trans>{' '}
-                  <Trans>
-                    Verify your internet connection or try again later.
-                  </Trans>
-                </PlaceholderError>
-              ) : (
-                <ColumnStackLayout expand>
-                  <Line noMargin alignItems="center">
-                    <Text size="title">
-                      <Trans>Consolidated metrics</Trans>
-                    </Text>
-                    <Spacer />
-                    {!publicGame && <CircularProgress size={20} />}
-                  </Line>
-                  <Table>
-                    <TableBody>
-                      <TableRow>
-                        <TableRowColumn>
-                          <Trans>Last week sessions count</Trans>
-                        </TableRowColumn>
-                        <TableRowColumn style={styles.tableRowStatColumn}>
-                          {publicGame && publicGame.cachedLastWeekSessionsCount
-                            ? publicGame.cachedLastWeekSessionsCount
-                            : '-'}
-                        </TableRowColumn>
-                      </TableRow>
-                      <TableRow>
-                        <TableRowColumn>
-                          <Trans>Last year sessions count</Trans>
-                        </TableRowColumn>
-                        <TableRowColumn style={styles.tableRowStatColumn}>
-                          {publicGame && publicGame.cachedLastYearSessionsCount
-                            ? publicGame.cachedLastYearSessionsCount
-                            : '-'}
-                        </TableRowColumn>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                  <Line noMargin alignItems="center">
-                    <Text size="title">
-                      <Trans>Daily metrics</Trans>
-                    </Text>
-                    <Spacer />
-                    {isGameMetricsLoading && <CircularProgress size={20} />}
-                  </Line>
-                  <Line noMargin>
-                    <SelectField
-                      fullWidth
-                      floatingLabelText={<Trans>Day</Trans>}
-                      value={analyticsDate}
-                      onChange={(_, _index, newIsoDate) => {
-                        setAnalyticsDate(newIsoDate);
-                      }}
-                    >
-                      {Array(5)
-                        .fill('')
-                        .map((_, index) => {
-                          const isoDate = formatISO(
-                            subDays(new Date(), index + 2),
-                            {
-                              representation: 'date',
-                            }
-                          );
-                          return (
-                            <SelectOption
-                              key={isoDate}
-                              value={isoDate}
-                              primaryText={isoDate}
-                            />
-                          );
-                        })
-                        .reverse()}
-                      <SelectOption
-                        value={yesterdayIsoDate}
-                        primaryText={t`Yesterday`}
-                      />
-                      <SelectOption
-                        value={formatISO(new Date(), {
-                          representation: 'date',
-                        })}
-                        primaryText={t`Today (so far, in real time)`}
-                      />
-                    </SelectField>
-                  </Line>
-                  {!isGameMetricsLoading && !gameRollingMetrics ? (
-                    <AlertMessage kind="warning">
-                      <Trans>
-                        There were no players or stored metrics for this day. Be
-                        sure to publish your game and get players to try it to
-                        see the collected anonymous analytics.
-                      </Trans>
-                    </AlertMessage>
-                  ) : null}
-                  <Table>
-                    <TableBody>
-                      <TableRow>
-                        <TableRowColumn>
-                          <Trans>Players count</Trans>
-                        </TableRowColumn>
-                        <TableRowColumn style={styles.tableRowStatColumn}>
-                          {gameRollingMetrics && gameRollingMetrics.players
-                            ? gameRollingMetrics.players.d0Players
-                            : '-'}
-                        </TableRowColumn>
-                      </TableRow>
-                      <TableRow>
-                        <TableRowColumn>
-                          <Trans>Sessions count</Trans>
-                        </TableRowColumn>
-                        <TableRowColumn style={styles.tableRowStatColumn}>
-                          {gameRollingMetrics && gameRollingMetrics.sessions
-                            ? gameRollingMetrics.sessions.d0Sessions
-                            : '-'}
-                        </TableRowColumn>
-                      </TableRow>
-                      <TableRow>
-                        <TableRowColumn>
-                          <Trans>New players count</Trans>
-                        </TableRowColumn>
-                        <TableRowColumn style={styles.tableRowStatColumn}>
-                          {gameRollingMetrics && gameRollingMetrics.players
-                            ? gameRollingMetrics.players.d0NewPlayers
-                            : '-'}
-                        </TableRowColumn>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                  {gameRollingMetrics &&
-                  (!gameRollingMetrics.retention ||
-                    !gameRollingMetrics.players) ? (
-                    <AlertMessage kind="info">
-                      Upgrade your account with a subscription to unlock all the
-                      metrics for your game.
-                    </AlertMessage>
-                  ) : null}
-                  <Table>
-                    <TableBody>
-                      {[1, 2, 3, 4, 5, 6, 7].map(dayIndex => (
-                        <TableRow key={dayIndex}>
-                          <TableRowColumn>
-                            <Trans>Day {dayIndex} retained players</Trans>
-                          </TableRowColumn>
-                          <TableRowColumn style={styles.tableRowStatColumn}>
-                            {gameRollingMetrics &&
-                            gameRollingMetrics.retention &&
-                            gameRollingMetrics.retention[
-                              `d${dayIndex}RetainedPlayers`
-                            ] != null
-                              ? gameRollingMetrics.retention[
-                                  `d${dayIndex}RetainedPlayers`
-                                ]
-                              : '-'}
-                          </TableRowColumn>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </ColumnStackLayout>
-              )
+              <GameAnalyticsPanel game={game} />
+            ) : null}
+            {currentTab === 'feedback' ? (
+              <GameFeedback
+                i18n={i18n}
+                authenticatedUser={authenticatedUser}
+                game={game}
+              />
             ) : null}
           </Line>
           {publicGame && project && isPublicGamePropertiesDialogOpen && (

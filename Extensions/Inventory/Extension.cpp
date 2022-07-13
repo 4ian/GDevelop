@@ -24,7 +24,6 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddInstructionOrExpressionGroupMetadata(_("Inventories"))
       .SetIcon("CppPlatform/Extensions/Inventoryicon.png");
 
-#if defined(GD_IDE_ONLY)
   extension
       .AddAction("Add",
                  _("Add an item"),
@@ -37,8 +36,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .SetFunctionName("InventoryTools::Add")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::Add");
 
   extension
       .AddAction("Remove",
@@ -52,8 +50,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .SetFunctionName("InventoryTools::Remove")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::Remove");
 
   extension
       .AddCondition("Count",
@@ -68,8 +65,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
       .UseStandardRelationalOperatorParameters("number")
-      .SetFunctionName("InventoryTools::Count")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::Count");
 
   extension
       .AddCondition("Has",
@@ -84,8 +80,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .SetFunctionName("InventoryTools::Has")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::Has");
 
   extension
       .AddAction("SetMaximum",
@@ -103,8 +98,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
       .AddParameter("expression", _("Maximum count"))
-      .SetFunctionName("InventoryTools::SetMaximum")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::SetMaximum");
 
   extension
       .AddAction("SetUnlimited",
@@ -121,8 +115,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
       .AddParameter("yesorno", _("Allow an unlimited amount?"))
-      .SetFunctionName("InventoryTools::SetUnlimited")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::SetUnlimited");
 
   extension
       .AddCondition("IsFull",
@@ -137,8 +130,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .SetFunctionName("InventoryTools::Has")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::Has");
 
   extension
       .AddAction("Equip",
@@ -154,8 +146,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
       .AddParameter("yesorno", _("Equip?"))
-      .SetFunctionName("InventoryTools::Equip")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::Equip");
 
   extension
       .AddCondition("IsEquipped",
@@ -169,8 +160,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .SetFunctionName("InventoryTools::IsEquipped")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::IsEquipped");
 
   extension
       .AddAction("SerializeToVariable",
@@ -185,8 +175,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("scenevar", _("Scene variable"))
-      .SetFunctionName("InventoryTools::SerializeToVariable")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::SerializeToVariable");
 
   extension
       .AddAction("UnserializeFromVariable",
@@ -200,8 +189,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("scenevar", _("Scene variable"))
-      .SetFunctionName("InventoryTools::UnserializeFromVariable")
-      .SetIncludeFile("Inventory/InventoryTools.h");
+      .SetFunctionName("InventoryTools::UnserializeFromVariable");
 
   extension
       .AddExpression("Count",
@@ -212,7 +200,5 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
-      .SetFunctionName("InventoryTools::Count")
-      .SetIncludeFile("Inventory/InventoryTools.h");
-#endif
+      .SetFunctionName("InventoryTools::Count");
 }

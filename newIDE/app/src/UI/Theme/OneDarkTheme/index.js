@@ -3,9 +3,10 @@ import { createGdevelopTheme } from '../CreateTheme';
 import styles from './OneDarkThemeVariables.json';
 import './OneDarkThemeVariables.css';
 
-export default createGdevelopTheme(
+export default createGdevelopTheme({
   styles,
-  'OneDarkTheme',
-  'dark',
-  'hue-rotate(-10deg) saturate(50%)'
-);
+
+  rootClassNameIdentifier: 'OneDarkTheme',
+  paletteType: 'dark',
+  gdevelopIconsCSSFilter: 'hue-rotate(-10deg) saturate(50%)',
+});

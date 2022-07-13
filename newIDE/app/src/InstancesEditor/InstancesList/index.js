@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import {
   AutoSizer,
@@ -75,11 +75,13 @@ export default class InstancesList extends Component<Props, State> {
   });
 
   componentDidMount() {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     if (useShouldAutofocusSearchbar() && this._searchBar.current)
       this._searchBar.current.focus();
   }
 
-  componentWillMount() {
+  // This should be updated, see https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html.
+  UNSAFE_componentWillMount() {
     // Functor used to display an instance row
     this.instanceRowRenderer = new gd.InitialInstanceJSFunctor();
     this.instanceRowRenderer.invoke = instancePtr => {
@@ -291,6 +293,8 @@ export default class InstancesList extends Component<Props, State> {
               }
               onRequestSearch={this._selectFirstInstance}
               ref={this._searchBar}
+              placeholder={t`Search instances`}
+              aspect="integrated-search-bar"
             />
           </div>
         )}

@@ -8,7 +8,7 @@ import {
   type ParameterFieldProps,
   type ParameterFieldInterface,
 } from './ParameterFieldCommons';
-import SelectField from '../../UI/SelectField';
+import SelectField, { type SelectFieldInterface } from '../../UI/SelectField';
 import SelectOption from '../../UI/SelectOption';
 import { TextFieldWithButtonLayout } from '../../UI/Layout';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
@@ -16,7 +16,7 @@ import { type Leaderboard } from '../../Utils/GDevelopServices/Play';
 import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
 import LeaderboardDialog from '../../Leaderboard/LeaderboardDialog';
 import GenericExpressionField from './GenericExpressionField';
-import { breakUuid } from '../../Utils/GDevelopServices/Play';
+import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 
 const getInlineParameterDisplayValue = (
@@ -57,9 +57,10 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
     const isOnline = useOnlineStatus();
     const leaderboards = useFetchLeaderboards();
     const [isAdminOpen, setIsAdminOpen] = React.useState(false);
-    const inputFieldRef = React.useRef<?(GenericExpressionField | SelectField)>(
-      null
-    );
+    const inputFieldRef = React.useRef<?(
+      | GenericExpressionField
+      | SelectFieldInterface
+    )>(null);
     React.useImperativeHandle(ref, () => ({
       focus: () => {
         if (inputFieldRef.current) {
@@ -98,7 +99,9 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 key={leaderboard.id}
                 value={`"${leaderboard.id}"`}
                 primaryText={`${leaderboard.name} ${
-                  leaderboard.id ? `(${breakUuid(leaderboard.id)})` : ''
+                  leaderboard.id
+                    ? `(${shortenUuidForDisplay(leaderboard.id)})`
+                    : ''
                 }`}
               />
             ))
@@ -191,6 +194,11 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                 onClose={() => setIsAdminOpen(false)}
                 open={isAdminOpen}
                 project={props.project}
+                leaderboardId={
+                  isCurrentValueInLeaderboardList
+                    ? props.value.replace(/"/g, '')
+                    : undefined
+                }
               />
             )}
           </>

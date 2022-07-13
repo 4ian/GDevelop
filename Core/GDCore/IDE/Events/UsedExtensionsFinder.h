@@ -31,6 +31,7 @@ class GD_CORE_API UsedExtensionsFinder
  private:
   UsedExtensionsFinder(gd::Project& project_) : project(project_){};
   gd::Project& project;
+  gd::String rootType;
   std::set<gd::String> usedExtensions;
 
   // Object Visitor

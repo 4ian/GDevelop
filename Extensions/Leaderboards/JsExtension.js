@@ -133,7 +133,7 @@ module.exports = {
         'LastSaveError',
         _('Error of last save attempt'),
         _('Get the error of the last save attempt.'),
-        _('Error of last save attempt in leaderboard _PARAM0_'),
+        _('Save score'),
         'JsPlatform/Extensions/leaderboard.svg'
       )
       .addParameter('leaderboardId', _('Leaderboard'), '', true)

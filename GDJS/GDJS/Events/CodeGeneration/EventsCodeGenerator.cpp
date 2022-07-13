@@ -33,7 +33,6 @@ using namespace std;
 namespace gdjs {
 
 gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
-    gd::Project& project,
     gdjs::EventsCodeGenerator& codeGenerator,
     gd::String fullyQualifiedFunctionName,
     gd::String functionArgumentsCode,
@@ -89,7 +88,7 @@ gd::String EventsCodeGenerator::GenerateEventsListCompleteFunctionCode(
 }
 
 gd::String EventsCodeGenerator::GenerateLayoutCode(
-    gd::Project& project,
+    const gd::Project& project,
     const gd::Layout& scene,
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
@@ -99,7 +98,6 @@ gd::String EventsCodeGenerator::GenerateLayoutCode(
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      project,
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       "runtimeScene",
@@ -128,7 +126,6 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      project,
       codeGenerator,
       codeGenerator.GetCodeNamespaceAccessor() + "func",
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
@@ -191,7 +188,6 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
           "Behavior");
 
   gd::String output = GenerateEventsListCompleteFunctionCode(
-      project,
       codeGenerator,
       fullyQualifiedFunctionName,
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
@@ -412,7 +408,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "    return null;\n" +
          "  },\n"
          // Function to count instances on the scene. We need it here because
-         // it needs the objects map to get the object names of the parent context.
+         // it needs the objects map to get the object names of the parent
+         // context.
          "  getInstancesCountOnScene: function(objectName) {\n"
          "    const objectsList = "
          "eventsFunctionContext._objectsMap[objectName];\n" +
@@ -683,6 +680,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::String& objectName,
     const gd::ObjectMetadata& objInfo,
+    const gd::String& functionCallName,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
@@ -701,25 +699,19 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
       call = GenerateOperatorCall(
           instrInfos,
           arguments,
-          objectPart + instrInfos.codeExtraInformation.functionCallName,
+          objectPart + functionCallName,
           objectPart +
               instrInfos.codeExtraInformation.optionalAssociatedInstruction,
           1);
     else if (instrInfos.codeExtraInformation.accessType ==
              gd::InstructionMetadata::ExtraInformation::Mutators)
       call = GenerateMutatorCall(
-          instrInfos,
-          arguments,
-          objectPart + instrInfos.codeExtraInformation.functionCallName,
-          1);
+          instrInfos, arguments, objectPart + functionCallName, 1);
     else
       call = GenerateCompoundOperatorCall(
-          instrInfos,
-          arguments,
-          objectPart + instrInfos.codeExtraInformation.functionCallName,
-          1);
+          instrInfos, arguments, objectPart + functionCallName, 1);
   } else {
-    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
+    call = objectPart + functionCallName + "(" +
            GenerateArgumentsList(arguments, 1) + ")";
   }
 
@@ -747,6 +739,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const gd::String& objectName,
     const gd::String& behaviorName,
     const gd::BehaviorMetadata& autoInfo,
+    const gd::String& functionCallName,
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context,
@@ -767,25 +760,19 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
       call = GenerateOperatorCall(
           instrInfos,
           arguments,
-          objectPart + instrInfos.codeExtraInformation.functionCallName,
+          objectPart + functionCallName,
           objectPart +
               instrInfos.codeExtraInformation.optionalAssociatedInstruction,
           2);
     else if (instrInfos.codeExtraInformation.accessType ==
              gd::InstructionMetadata::ExtraInformation::Mutators)
       call = GenerateMutatorCall(
-          instrInfos,
-          arguments,
-          objectPart + instrInfos.codeExtraInformation.functionCallName,
-          2);
+          instrInfos, arguments, objectPart + functionCallName, 2);
     else
       call = GenerateCompoundOperatorCall(
-          instrInfos,
-          arguments,
-          objectPart + instrInfos.codeExtraInformation.functionCallName,
-          2);
+          instrInfos, arguments, objectPart + functionCallName, 2);
   } else {
-    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
+    call = objectPart + functionCallName + "(" +
            GenerateArgumentsList(arguments, 2) + ")";
   }
 
@@ -837,30 +824,34 @@ gd::String EventsCodeGenerator::GenerateGetBehaviorNameCode(
 
 gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     gd::EventsCodeGenerationContext& context) {
-  auto declareObjectListFromParent = [this](gd::String object,
-                                  gd::EventsCodeGenerationContext& context) {
-    gd::String objectListName = GetObjectListName(object, context);
-    if (!context.GetParentContext()) {
-      std::cout << "ERROR: During code generation, a context tried to use an "
-                   "already declared object list without having a parent"
-                << std::endl;
-      return "/* Could not declare " + objectListName + " */";
-    }
+  auto declareObjectListFromParent =
+      [this](gd::String object, gd::EventsCodeGenerationContext& context) {
+        gd::String objectListName = GetObjectListName(object, context);
+        if (!context.GetParentContext()) {
+          std::cout
+              << "ERROR: During code generation, a context tried to use an "
+                 "already declared object list without having a parent"
+              << std::endl;
+          return "/* Could not declare " + objectListName + " */";
+        }
 
-    if (context.ShouldUseAsyncObjectsList(object)) {
-      gd::String copiedListName = "asyncObjectsList.getObjects(" + ConvertToStringExplicit(object) + ")";
-      return "gdjs.copyArray(" + copiedListName + ", " + objectListName + ");\n";
-    }
+        if (context.ShouldUseAsyncObjectsList(object)) {
+          gd::String copiedListName = "asyncObjectsList.getObjects(" +
+                                      ConvertToStringExplicit(object) + ")";
+          return "gdjs.copyArray(" + copiedListName + ", " + objectListName +
+                 ");\n";
+        }
 
-    //*Optimization*: Avoid expensive copy of the object list if we're using
-    // the same list as the one from the parent context.
-    if (context.IsSameObjectsList(object, *context.GetParentContext()))
-      return "/* Reuse " + objectListName + " */";
+        //*Optimization*: Avoid expensive copy of the object list if we're using
+        // the same list as the one from the parent context.
+        if (context.IsSameObjectsList(object, *context.GetParentContext()))
+          return "/* Reuse " + objectListName + " */";
 
-    gd::String copiedListName =
-        GetObjectListName(object, *context.GetParentContext());
-    return "gdjs.copyArray(" + copiedListName + ", " + objectListName + ");\n";
-  };
+        gd::String copiedListName =
+            GetObjectListName(object, *context.GetParentContext());
+        return "gdjs.copyArray(" + copiedListName + ", " + objectListName +
+               ");\n";
+      };
 
   gd::String declarationsCode;
   for (auto object : context.GetObjectsListsToBeDeclared()) {
@@ -981,7 +972,7 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
 }
 
 gd::String EventsCodeGenerator::GenerateParameterCodes(
-    const gd::String& parameter,
+    const gd::Expression& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
     const gd::String& lastObjectName,
@@ -1049,8 +1040,7 @@ gd::String EventsCodeGenerator::GenerateObject(
           objectsMapName += "Empty" + ManObjListName(objectName);
 
           if (!mapDeclaration.empty()) mapDeclaration += ", ";
-          mapDeclaration += "\"" + ConvertToString(objectName) +
-                            "\": []";
+          mapDeclaration += "\"" + ConvertToString(objectName) + "\": []";
         }
 
         // TODO: this should be de-duplicated.
@@ -1076,7 +1066,8 @@ gd::String EventsCodeGenerator::GenerateObject(
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;
   } else if (type == "objectListOrEmptyWithoutPicking") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(objectName, context);
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
 
     // Find the objects not yet declared, and handle them separately so they are
     // passed as empty object lists.
@@ -1091,7 +1082,8 @@ gd::String EventsCodeGenerator::GenerateObject(
       }
     }
 
-    gd::String objectsMapName = declareMapOfObjects(objectToBeDeclaredNames, context, objectNotYetDeclaredNames);
+    gd::String objectsMapName = declareMapOfObjects(
+        objectToBeDeclaredNames, context, objectNotYetDeclaredNames);
     output = objectsMapName;
   } else if (type == "objectPtr") {
     std::vector<gd::String> realObjects =
@@ -1224,7 +1216,7 @@ gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
          ConvertToStringExplicit(section) + "); }";
 }
 
-EventsCodeGenerator::EventsCodeGenerator(gd::Project& project,
+EventsCodeGenerator::EventsCodeGenerator(const gd::Project& project,
                                          const gd::Layout& layout)
     : gd::EventsCodeGenerator(project, layout, JsPlatform::Get()) {}
 

@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 #ifndef PATHFINDINGBEHAVIOR_H
 #define PATHFINDINGBEHAVIOR_H
-#include <SFML/System/Vector2.hpp>
+#include "GDCore/Vector2.h"
 #include <vector>
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/Object.h"

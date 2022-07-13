@@ -16,7 +16,6 @@ import Search from '@material-ui/icons/Search';
 import FilterList from '@material-ui/icons/FilterList';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import ElementWithMenu from './Menu/ElementWithMenu';
-import ThemeConsumer from './Theme/ThemeConsumer';
 import HelpIcon from './HelpIcon';
 import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import { useScreenType } from './Reponsive/ScreenTypeMeasurer';
@@ -24,6 +23,7 @@ import { shouldValidate } from './KeyboardShortcuts/InteractionKeys';
 import { Column, Line } from './Grid';
 import TagChips from './TagChips';
 import { I18n } from '@lingui/react';
+import GDevelopThemeContext from './Theme/ThemeContext';
 
 type TagsHandler = {|
   remove: string => void,
@@ -41,8 +41,8 @@ type Props = {|
   onChange?: string => void,
   /** Fired when the search icon is clicked. */
   onRequestSearch: string => void,
-  /** Override the inline-styles of the root element. */
-  style?: Object,
+  /** Set if rounding should be applied or not. */
+  aspect?: 'integrated-search-bar',
   /** The value of the text field. */
   value: string,
   /** The functions needed to interact with the list of tags displayed below search bar. */
@@ -102,7 +102,6 @@ const getStyles = (value: ?string, disabled?: boolean) => {
       width: '100%',
     },
     searchContainer: {
-      top: -1,
       position: 'relative',
       margin: 'auto 8px',
       width: '100%',
@@ -143,8 +142,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
       placeholder,
       onChange,
       onRequestSearch,
-      style,
       value: parentValue,
+      aspect,
       tagsHandler,
       tags,
       buildMenuTemplate,
@@ -166,6 +165,8 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
         textField.current.blur();
       }
     };
+
+    const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
     // This variable represents the content of the input (text field)
     const [value, setValue] = React.useState<string>(parentValue);
@@ -283,119 +284,112 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
     return (
       <I18n>
         {({ i18n }) => (
-          <ThemeConsumer>
-            {muiTheme => (
-              <Column noMargin>
-                <Line noMargin>
-                  <Paper
-                    style={{
-                      backgroundColor: muiTheme.searchBar.backgroundColor,
-                      ...styles.root,
-                      ...style,
-                    }}
-                    square
-                    elevation={1}
-                  >
-                    <div style={styles.searchContainer}>
-                      {tags ? (
-                        <Autocomplete
-                          id={id}
-                          options={tags.slice(0, 30)}
-                          groupBy={options => i18n._(t`Apply a filter`)}
-                          classes={autocompleteStyles}
-                          freeSolo
-                          fullWidth
-                          defaultValue=""
-                          inputValue={value}
-                          value={autocompleteValue}
-                          onChange={handleAutocompleteInput}
-                          onInputChange={handleAutocompleteInputChange}
-                          onKeyPress={handleKeyPressed}
-                          onBlur={handleBlur}
-                          renderOption={option => (
-                            <Typography>{option}</Typography>
-                          )}
-                          renderInput={params => (
-                            <MuiTextField
-                              margin="none"
-                              {...params}
-                              inputRef={textField}
-                              InputProps={{
-                                ...params.InputProps,
-                                disableUnderline: true,
-                                endAdornment: null,
-                                placeholder: i18n._(placeholder || t`Search`),
-                              }}
-                            />
-                          )}
-                        />
-                      ) : (
-                        <TextField
-                          id={id}
+          <Column noMargin>
+            <Line noMargin>
+              <Paper
+                style={{
+                  backgroundColor: gdevelopTheme.searchBar.backgroundColor,
+                  ...styles.root,
+                }}
+                square={aspect === 'integrated-search-bar'}
+                elevation={0}
+              >
+                <div style={styles.searchContainer}>
+                  {tags ? (
+                    <Autocomplete
+                      id={id}
+                      options={tags.slice(0, 30)}
+                      groupBy={options => i18n._(t`Apply a filter`)}
+                      classes={autocompleteStyles}
+                      freeSolo
+                      fullWidth
+                      defaultValue=""
+                      inputValue={value}
+                      value={autocompleteValue}
+                      onChange={handleAutocompleteInput}
+                      onInputChange={handleAutocompleteInputChange}
+                      onKeyPress={handleKeyPressed}
+                      onBlur={handleBlur}
+                      renderOption={option => <Typography>{option}</Typography>}
+                      renderInput={params => (
+                        <MuiTextField
                           margin="none"
-                          hintText={placeholder || t`Search`}
-                          onBlur={handleBlur}
-                          value={value}
-                          onChange={handleInput}
-                          onKeyUp={handleKeyPressed}
-                          fullWidth
-                          style={styles.input}
-                          underlineShow={false}
-                          disabled={disabled}
-                          ref={textField}
+                          {...params}
+                          inputRef={textField}
+                          InputProps={{
+                            ...params.InputProps,
+                            disableUnderline: true,
+                            endAdornment: null,
+                            placeholder: i18n._(placeholder || t`Search`),
+                          }}
                         />
                       )}
-                    </div>
-                    {buildMenuTemplate && (
-                      <ElementWithMenu
-                        element={
-                          <IconButton
-                            style={styles.iconButtonFilter.style}
-                            disabled={disabled}
-                            size="small"
-                          >
-                            <FilterList />
-                          </IconButton>
-                        }
-                        buildMenuTemplate={buildMenuTemplate}
-                      />
-                    )}
-                    {helpPagePath && (
-                      <HelpIcon
-                        disabled={disabled}
-                        helpPagePath={helpPagePath}
-                        style={styles.iconButtonHelp.style}
-                        size="small"
-                      />
-                    )}
-                    <IconButton
-                      style={styles.iconButtonSearch.style}
-                      disabled={disabled}
-                      size="small"
-                    >
-                      <Search style={styles.iconButtonSearch.iconStyle} />
-                    </IconButton>
-                    <IconButton
-                      onClick={handleCancel}
-                      style={styles.iconButtonClose.style}
-                      disabled={disabled}
-                      size="small"
-                    >
-                      <Close style={styles.iconButtonClose.iconStyle} />
-                    </IconButton>
-                  </Paper>
-                </Line>
-                {tagsHandler && (
-                  <Collapse in={tagsHandler.chosenTags.size > 0}>
-                    <TagChips
-                      tags={Array.from(tagsHandler.chosenTags)}
-                      onRemove={tag => tagsHandler.remove(tag)}
                     />
-                  </Collapse>
+                  ) : (
+                    <TextField
+                      id={id}
+                      margin="none"
+                      hintText={placeholder || t`Search`}
+                      onBlur={handleBlur}
+                      value={value}
+                      onChange={handleInput}
+                      onKeyUp={handleKeyPressed}
+                      fullWidth
+                      style={styles.input}
+                      underlineShow={false}
+                      disabled={disabled}
+                      ref={textField}
+                    />
+                  )}
+                </div>
+                {buildMenuTemplate && (
+                  <ElementWithMenu
+                    element={
+                      <IconButton
+                        style={styles.iconButtonFilter.style}
+                        disabled={disabled}
+                        size="small"
+                      >
+                        <FilterList />
+                      </IconButton>
+                    }
+                    buildMenuTemplate={buildMenuTemplate}
+                  />
                 )}
-              </Column>
+                {helpPagePath && (
+                  <HelpIcon
+                    disabled={disabled}
+                    helpPagePath={helpPagePath}
+                    style={styles.iconButtonHelp.style}
+                    size="small"
+                  />
+                )}
+                <IconButton
+                  style={styles.iconButtonSearch.style}
+                  disabled={disabled}
+                  size="small"
+                >
+                  <Search style={styles.iconButtonSearch.iconStyle} />
+                </IconButton>
+                <IconButton
+                  onClick={handleCancel}
+                  style={styles.iconButtonClose.style}
+                  disabled={disabled}
+                  size="small"
+                >
+                  <Close style={styles.iconButtonClose.iconStyle} />
+                </IconButton>
+              </Paper>
+            </Line>
+            {tagsHandler && (
+              <Collapse in={tagsHandler.chosenTags.size > 0}>
+                <TagChips
+                  tags={Array.from(tagsHandler.chosenTags)}
+                  onRemove={tag => tagsHandler.remove(tag)}
+                />
+              </Collapse>
             )}
-          </ThemeConsumer>
+          </Column>
         )}
       </I18n>
     );

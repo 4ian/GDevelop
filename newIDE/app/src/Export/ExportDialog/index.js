@@ -14,6 +14,7 @@ import { Tab, Tabs } from '../../UI/Tabs';
 import ExportHome from './ExportHome';
 import { getGame, type Game } from '../../Utils/GDevelopServices/Game';
 import { showWarningBox } from '../../UI/Messages/MessageBox';
+import TutorialButton from '../../UI/TutorialButton';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -149,8 +150,6 @@ const ExportDialog = ({
           <Trans>Build manually</Trans>
         ) : null
       }
-      onRequestClose={onClose}
-      cannotBeDismissed={false}
       actions={[
         chosenExporterSection !== 'home' && (
           <FlatButton
@@ -174,6 +173,14 @@ const ExportDialog = ({
       ]}
       secondaryActions={[
         <HelpButton key="help" helpPagePath={exporter.helpPage} />,
+        exporter.exportPipeline.name === 'local-html5' ||
+        exporter.exportPipeline.name === 'browser-html5' ? (
+          <TutorialButton
+            key="tutorial"
+            tutorialId="export-to-itch"
+            label="How to export to Itch.io"
+          />
+        ) : null,
         <FlatButton
           key="builds"
           label={<Trans>See this game builds</Trans>}
@@ -181,6 +188,7 @@ const ExportDialog = ({
           disabled={isNavigationDisabled}
         />,
       ]}
+      onRequestClose={onClose}
       open
       noMargin
     >

@@ -75,7 +75,8 @@ void BaseEvent::PreprocessAsyncActions(const gd::Platform& platform) {
       const auto& action = actionsList->at(aId);
       const gd::InstructionMetadata& actionMetadata =
           gd::MetadataProvider::GetActionMetadata(platform, action.GetType());
-      if (actionMetadata.IsAsync()) {
+      if (actionMetadata.IsAsync() &&
+          (!actionMetadata.IsOptionallyAsync() || action.IsAwaited())) {
         gd::InstructionsList remainingActions;
         remainingActions.InsertInstructions(
             *actionsList, aId + 1, actionsList->size() - 1);

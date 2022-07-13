@@ -31,8 +31,8 @@ Extensions do have the same distinction between the "**IDE**" part and the "**Ru
 
 In GDevelop, developers can associate and manipulate variables in their games. To represent them, we have two things:
 
--   The **editor** `gd::Variable` that is part of the structure of the game, so living in [GDCore in Variable.h](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_variable.html). This is what is shown in the editor, saved on disk in the project file.
--   The **game engine** variable, called `gdjs.Variable` in GDJS. [Documentation is in the GDJS **game engine**](https://docs.gdevelop-app.com/GDJS%20Runtime%20Documentation/Variable.html). This JavaScript class is what is used during a game.
+-   The **editor** `gd::Variable` that is part of the structure of the game, so living in [GDCore in Variable.h](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_variable.html). This is what is shown in the editor, saved on disk in the project file.
+-   The **game engine** variable, called `gdjs.Variable` in GDJS. [Documentation is in the GDJS **game engine**](https://docs.gdevelop.io/GDJS%20Runtime%20Documentation/classes/gdjs.Variable.html). This JavaScript class is what is used during a game.
 
 The editor `gd::Variable` **knows nothing** about the game engine class `gdjs.Variable`. And the `gdjs.Variable` class in the game engine knows almost nothing from `gd::Variable` (apart from how it's written in JSON, to be able to load a game default variables).
 
@@ -56,10 +56,10 @@ The game engine is in GDJS/Runtime and is all written in TypeScript.
 
 ## What about events?
 
-An "**event**" is by default something that [is mostly empty](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_base_event.html). In a more traditional programming language, an event can be seen as a scope or block (example: `{ some code here }` in a C style language like JavaScript, Java or C++).
+An "**event**" is by default something that [is mostly empty](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_base_event.html). In a more traditional programming language, an event can be seen as a scope or block (example: `{ some code here }` in a C style language like JavaScript, Java or C++).
 
 [Default events are defined](https://github.com/4ian/GDevelop/tree/master/Core/GDCore/Events/Builtin) in GDevelop Core.
-In particular, there is StandardEvent, which has conditions and actions. Conditions and actions are both a list of [`gd::Instruction`](https://docs.gdevelop-app.com/GDCore%20Documentation/classgd_1_1_instruction.html). A `gd::Instruction` is either a condition or an action (it depends only on the context where they are used).
+In particular, there is StandardEvent, which has conditions and actions. Conditions and actions are both a list of [`gd::Instruction`](https://docs.gdevelop.io/GDCore%20Documentation/classgd_1_1_instruction.html). A `gd::Instruction` is either a condition or an action (it depends only on the context where they are used).
 
 A `gd::Instruction` is "just" a type (the name of the action or condition), and some parameters. You can think of it as a function in a programming language (`add(2, 3)` is calling a function called "add" with parameters "2" and "3"). Conditions have the special thing that they are functions returning true or false (and potentially being used to do a filter on the objects being picked for next conditions and actions).
 

@@ -13,6 +13,7 @@ import Poki from '../../UI/CustomSvgIcons/Poki';
 import CrazyGames from '../../UI/CustomSvgIcons/CrazyGames';
 import NewsGround from '../../UI/CustomSvgIcons/NewsGround';
 import { useResponsiveWindowWidth } from '../../UI/Reponsive/ResponsiveWindowMeasurer';
+import DismissableTutorialMessage from '../../Hints/DismissableTutorialMessage';
 
 const getIconStyle = windowWidth => ({
   height: windowWidth === 'small' ? 30 : 48,
@@ -25,6 +26,7 @@ export const ExplanationHeader = () => {
   const iconStyle = getIconStyle(windowWidth);
   return (
     <Column noMargin>
+      <DismissableTutorialMessage tutorialId="export-to-itch" />
       <Line>
         <Text>
           <Trans>
@@ -75,16 +77,16 @@ export const DoneFooter = ({
         )
       }
       label={<Trans>Publish your game on Game Jolt</Trans>}
-      icon={<GameJolt />}
+      leftIcon={<GameJolt />}
     />
     <FlatButton
       fullWidth
       primary
       onClick={() =>
-        Window.openExternalURL('https://gdevelop-app.com/crazy-games')
+        Window.openExternalURL('https://gdevelop.io/page/crazy-games')
       }
       label={<Trans>Publish your game on CrazyGames.com</Trans>}
-      icon={<CrazyGames />}
+      leftIcon={<CrazyGames />}
     />
     <FlatButton
       fullWidth
@@ -103,14 +105,14 @@ export const DoneFooter = ({
         Window.openExternalURL(getHelpLink('/publishing/publishing-to-itch-io'))
       }
       label={<Trans>Publish your game on Itch.io</Trans>}
-      icon={<ItchIo />}
+      leftIcon={<ItchIo />}
     />
     <FlatButton
       fullWidth
       primary
-      onClick={() => Window.openExternalURL('https://gdevelop-app.com/poki')}
+      onClick={() => Window.openExternalURL('https://gdevelop.io/page/poki')}
       label={<Trans>Publish your game on Poki.com</Trans>}
-      icon={<Poki />}
+      leftIcon={<Poki />}
     />
     <FlatButton
       fullWidth

@@ -1,5 +1,5 @@
-import optionalRequire from '../../Utils/OptionalRequire.js';
-import { getUID } from '../../Utils/LocalUserInfo.js';
+import optionalRequire from '../../Utils/OptionalRequire';
+import { getUID } from '../../Utils/LocalUserInfo';
 var fs = optionalRequire('fs-extra');
 var path = optionalRequire('path');
 var os = optionalRequire('os');
@@ -11,7 +11,7 @@ const gd /* TODO: add flow in this file */ = global.gd;
  * (so that in exported games, paths are slashs, which is
  * supported everywhere).
  */
-export default {
+const LocalFileSystem = {
   mkDir: function(path) {
     try {
       fs.mkdirsSync(path);
@@ -158,3 +158,5 @@ export default {
     return filename;
   },
 };
+
+export default LocalFileSystem;

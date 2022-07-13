@@ -78,7 +78,7 @@ export const GameRegistration = ({
         setUnavailableReason(null);
         setGame(game);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         if (err.response) {
           if (err.response.status === 403) {
             setUnavailableReason('unauthorized');
@@ -106,6 +106,7 @@ export const GameRegistration = ({
           gameId: project.getProjectUuid(),
           authorName: project.getAuthor() || 'Unspecified publisher',
           gameName: project.getName() || 'Untitled game',
+          templateSlug: project.getTemplateSlug(),
         });
         loadGame();
         if (onGameRegistered) onGameRegistered();

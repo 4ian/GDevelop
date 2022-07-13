@@ -123,7 +123,7 @@ export const localHTML5ExportPipeline: ExportPipeline<
 
   renderDoneFooter: ({ exportState, onClose }) => {
     const openExportFolder = () => {
-      if (shell) shell.openItem(exportState.outputDir);
+      if (shell) shell.openPath(exportState.outputDir);
     };
 
     return (

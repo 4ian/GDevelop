@@ -131,6 +131,7 @@ const themeData = {
   },
 };
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   name: 'Solarized-Light',
   themeName: 'solarized-light',

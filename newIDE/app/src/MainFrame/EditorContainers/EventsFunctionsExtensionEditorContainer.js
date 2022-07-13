@@ -33,13 +33,10 @@ export class EventsFunctionsExtensionEditorContainer extends React.Component<Ren
   }
 
   shouldComponentUpdate(nextProps: RenderEditorContainerProps) {
-    // This optimization is a bit more cautious than the traditional one,
-    // to still be notified when isActive goes from true to false.
-    if (!this.props.isActive && !nextProps.isActive) {
-      return false;
-    }
-
-    return true;
+    // We stop updates when the component is inactive.
+    // If it's active, was active or becoming active again we let update propagate.
+    // Especially important to note that when becoming inactive, a "last" update is allowed.
+    return this.props.isActive || nextProps.isActive;
   }
 
   componentDidUpdate(prevProps: *) {

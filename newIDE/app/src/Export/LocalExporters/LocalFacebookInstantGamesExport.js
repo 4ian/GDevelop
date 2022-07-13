@@ -20,7 +20,8 @@ import {
 } from '../GenericExporters/FacebookInstantGamesExport';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
+const remote = optionalRequire('@electron/remote');
+const app = remote ? remote.app : null;
 const shell = electron ? electron.shell : null;
 
 const gd: libGDevelop = global.gd;
@@ -156,7 +157,7 @@ export const localFacebookInstantGamesExportPipeline: ExportPipeline<
   renderDoneFooter: ({ exportState, onClose }) => {
     const openExportFolder = () => {
       if (shell && path)
-        shell.openItem(path.dirname(exportState.archiveOutputFilename));
+        shell.openPath(path.dirname(exportState.archiveOutputFilename));
     };
 
     return (

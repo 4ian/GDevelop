@@ -1,21 +1,52 @@
 // @flow
 import * as React from 'react';
-import { type FiltersState, useFilters } from '../UI/Search/FiltersChooser';
 import { type Filters } from '../Utils/GDevelopServices/Filters';
 import {
   type AssetShortHeader,
+  type AssetPacks,
   type Author,
   type License,
   listAllAssets,
   listAllAuthors,
   listAllLicenses,
 } from '../Utils/GDevelopServices/Asset';
-import { useSearchItem } from '../UI/Search/UseSearchItem';
+import { useSearchItem, SearchFilter } from '../UI/Search/UseSearchItem';
+import {
+  TagAssetStoreSearchFilter,
+  AnimatedAssetStoreSearchFilter,
+  ObjectTypeAssetStoreSearchFilter,
+  ColorAssetStoreSearchFilter,
+  LicenseAssetStoreSearchFilter,
+  DimensionAssetStoreSearchFilter,
+} from './AssetStoreSearchFilter';
+import {
+  type NavigationState,
+  type AssetStorePageState,
+  useNavigation,
+  assetStoreHomePageState,
+} from './AssetStoreNavigator';
+import { type ChosenCategory } from '../UI/Search/FiltersChooser';
 
 const defaultSearchText = '';
 
+export type AssetFiltersState = {|
+  animatedFilter: AnimatedAssetStoreSearchFilter,
+  setAnimatedFilter: AnimatedAssetStoreSearchFilter => void,
+  viewpointFilter: TagAssetStoreSearchFilter,
+  setViewpointFilter: TagAssetStoreSearchFilter => void,
+  dimensionFilter: DimensionAssetStoreSearchFilter,
+  setDimensionFilter: DimensionAssetStoreSearchFilter => void,
+  objectTypeFilter: ObjectTypeAssetStoreSearchFilter,
+  setObjectTypeFilter: ObjectTypeAssetStoreSearchFilter => void,
+  colorFilter: ColorAssetStoreSearchFilter,
+  setColorFilter: ColorAssetStoreSearchFilter => void,
+  licenseFilter: LicenseAssetStoreSearchFilter,
+  setLicenseFilter: LicenseAssetStoreSearchFilter => void,
+|};
+
 type AssetStoreState = {|
   filters: ?Filters,
+  assetPacks: ?AssetPacks,
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   searchResults: ?Array<AssetShortHeader>,
@@ -23,11 +54,20 @@ type AssetStoreState = {|
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
-  filtersState: FiltersState,
+  assetFiltersState: AssetFiltersState,
+  navigationState: NavigationState,
+  currentPage: AssetStorePageState,
+  useSearchItem: (
+    searchText: string,
+    chosenCategory: ?ChosenCategory,
+    chosenFilters: ?Set<string>,
+    searchFilters: Array<SearchFilter<AssetShortHeader>>
+  ) => ?Array<AssetShortHeader>,
 |};
 
 export const AssetStoreContext = React.createContext<AssetStoreState>({
   filters: null,
+  assetPacks: null,
   authors: null,
   licenses: null,
   searchResults: null,
@@ -35,13 +75,35 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   error: null,
   searchText: '',
   setSearchText: () => {},
-  filtersState: {
-    chosenFilters: new Set(),
-    addFilter: () => {},
-    removeFilter: () => {},
-    chosenCategory: null,
-    setChosenCategory: () => {},
+  assetFiltersState: {
+    animatedFilter: new AnimatedAssetStoreSearchFilter(),
+    setAnimatedFilter: filter => {},
+    viewpointFilter: new TagAssetStoreSearchFilter(),
+    setViewpointFilter: filter => {},
+    dimensionFilter: new DimensionAssetStoreSearchFilter(),
+    setDimensionFilter: filter => {},
+    objectTypeFilter: new ObjectTypeAssetStoreSearchFilter(),
+    setObjectTypeFilter: filter => {},
+    colorFilter: new ColorAssetStoreSearchFilter(),
+    setColorFilter: filter => {},
+    licenseFilter: new LicenseAssetStoreSearchFilter(),
+    setLicenseFilter: filter => {},
   },
+  navigationState: {
+    previousPages: [assetStoreHomePageState],
+    getCurrentPage: () => assetStoreHomePageState,
+    backToPreviousPage: () => {},
+    openHome: () => {},
+    clearHistory: () => {},
+    openSearchIfNeeded: () => {},
+    activateTextualSearch: () => {},
+    openTagPage: string => {},
+    openPackPage: AssetPack => {},
+    openDetailPage: stAssetShortHeaderring => {},
+  },
+  currentPage: assetStoreHomePageState,
+  useSearchItem: (searchText, chosenCategory, chosenFilters, searchFilters) =>
+    null,
 });
 
 type AssetStoreStateProviderProps = {|
@@ -65,13 +127,71 @@ export const AssetStoreStateProvider = ({
     [string]: AssetShortHeader,
   }>(null);
   const [filters, setFilters] = React.useState<?Filters>(null);
+  const [assetPacks, setAssetPacks] = React.useState<?AssetPacks>(null);
   const [authors, setAuthors] = React.useState<?Array<Author>>(null);
   const [licenses, setLicenses] = React.useState<?Array<License>>(null);
   const [error, setError] = React.useState<?Error>(null);
   const isLoading = React.useRef<boolean>(false);
 
   const [searchText, setSearchText] = React.useState(defaultSearchText);
-  const filtersState = useFilters();
+  const navigationState = useNavigation();
+
+  const [
+    animatedFilter,
+    setAnimatedFilter,
+  ] = React.useState<AnimatedAssetStoreSearchFilter>(
+    new AnimatedAssetStoreSearchFilter()
+  );
+  const [
+    viewpointFilter,
+    setViewpointFilter,
+  ] = React.useState<TagAssetStoreSearchFilter>(
+    new TagAssetStoreSearchFilter()
+  );
+  const [
+    dimensionFilter,
+    setDimensionFilter,
+  ] = React.useState<DimensionAssetStoreSearchFilter>(
+    new DimensionAssetStoreSearchFilter()
+  );
+  const [
+    objectTypeFilter,
+    setObjectTypeFilter,
+  ] = React.useState<ObjectTypeAssetStoreSearchFilter>(
+    new ObjectTypeAssetStoreSearchFilter()
+  );
+  const [
+    colorFilter,
+    setColorFilter,
+  ] = React.useState<ColorAssetStoreSearchFilter>(
+    new ColorAssetStoreSearchFilter()
+  );
+  const [
+    licenseFilter,
+    setLicenseFilter,
+  ] = React.useState<LicenseAssetStoreSearchFilter>(
+    new LicenseAssetStoreSearchFilter()
+  );
+  // When one of the filter change, we need to rebuild the array
+  // for the search.
+  const searchFilters = React.useMemo<Array<SearchFilter<AssetShortHeader>>>(
+    () => [
+      animatedFilter,
+      viewpointFilter,
+      dimensionFilter,
+      objectTypeFilter,
+      colorFilter,
+      licenseFilter,
+    ],
+    [
+      animatedFilter,
+      viewpointFilter,
+      dimensionFilter,
+      objectTypeFilter,
+      colorFilter,
+      licenseFilter,
+    ]
+  );
 
   const fetchAssetsAndFilters = React.useCallback(
     () => {
@@ -84,7 +204,11 @@ export const AssetStoreStateProvider = ({
         isLoading.current = true;
 
         try {
-          const { assetShortHeaders, filters } = await listAllAssets();
+          const {
+            assetShortHeaders,
+            filters,
+            assetPacks,
+          } = await listAllAssets();
           const authors = await listAllAuthors();
           const licenses = await listAllLicenses();
 
@@ -98,6 +222,7 @@ export const AssetStoreStateProvider = ({
           );
           setAssetShortHeadersById(assetShortHeadersById);
           setFilters(filters);
+          setAssetPacks(assetPacks);
           setAuthors(authors);
           setLicenses(licenses);
         } catch (error) {
@@ -129,13 +254,15 @@ export const AssetStoreStateProvider = ({
     [fetchAssetsAndFilters, assetShortHeadersById, isLoading]
   );
 
-  const { chosenCategory, chosenFilters } = filtersState;
+  const currentPage = navigationState.getCurrentPage();
+  const { chosenCategory, chosenFilters } = currentPage.filtersState;
   const searchResults: ?Array<AssetShortHeader> = useSearchItem(
     assetShortHeadersById,
     getAssetShortHeaderSearchTerms,
-    searchText,
+    currentPage.ignoreTextualSearch ? '' : searchText,
     chosenCategory,
-    chosenFilters
+    chosenFilters,
+    searchFilters
   );
 
   const assetStoreState = React.useMemo(
@@ -143,22 +270,62 @@ export const AssetStoreStateProvider = ({
       searchResults,
       fetchAssetsAndFilters,
       filters,
+      assetPacks,
       authors,
       licenses,
       error,
+      navigationState,
+      currentPage,
       searchText,
       setSearchText,
-      filtersState,
+      assetFiltersState: {
+        animatedFilter,
+        setAnimatedFilter,
+        viewpointFilter,
+        setViewpointFilter,
+        dimensionFilter,
+        setDimensionFilter,
+        objectTypeFilter,
+        setObjectTypeFilter,
+        colorFilter,
+        setColorFilter,
+        licenseFilter,
+        setLicenseFilter,
+      },
+      useSearchItem: (
+        searchText,
+        chosenCategory,
+        chosenFilters,
+        searchFilters
+      ) =>
+        useSearchItem(
+          assetShortHeadersById,
+          getAssetShortHeaderSearchTerms,
+          searchText,
+          chosenCategory,
+          chosenFilters,
+          searchFilters
+        ),
     }),
     [
       searchResults,
-      error,
+      fetchAssetsAndFilters,
       filters,
+      assetPacks,
       authors,
       licenses,
+      error,
+      navigationState,
+      currentPage,
       searchText,
-      filtersState,
-      fetchAssetsAndFilters,
+      animatedFilter,
+      viewpointFilter,
+      dimensionFilter,
+      objectTypeFilter,
+      colorFilter,
+      licenseFilter,
+      setLicenseFilter,
+      assetShortHeadersById,
     ]
   );
 

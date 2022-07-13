@@ -47,7 +47,7 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
   return true;
 };
 
-export default (props: Props) => (
+const RuntimeObjectInspector = (props: Props) => (
   <React.Fragment>
     <Text>
       <Trans>General:</Trans>
@@ -79,3 +79,5 @@ export default (props: Props) => (
     />
   </React.Fragment>
 );
+
+export default RuntimeObjectInspector;

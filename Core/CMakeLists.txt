@@ -14,7 +14,6 @@ set(GDCORE_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SY
 
 #Dependencies on external libraries:
 ###
-include_directories(${sfml_include_dir})
 
 #Defines
 ###
@@ -68,14 +67,6 @@ set(LIBRARY_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMA
 set(ARCHIVE_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 set(RUNTIME_OUTPUT_PATH ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME})
 
-#Linker files
-###
-IF(EMSCRIPTEN)
-	#Nothing.
-ELSE()
-	target_link_libraries(GDCore ${sfml_LIBRARIES})
-ENDIF()
-
 #Tests
 ###
 if(BUILD_TESTS)
@@ -88,5 +79,5 @@ if(BUILD_TESTS)
 	add_executable(GDCore_tests ${test_source_files})
 	set_target_properties(GDCore_tests PROPERTIES BUILD_WITH_INSTALL_RPATH FALSE) #Allow finding dependencies directly from build path on Mac OS X.
 	target_link_libraries(GDCore_tests GDCore)
-	target_link_libraries(GDCore_tests ${sfml_LIBRARIES})
+	target_link_libraries(GDCore_tests ${CMAKE_DL_LIBS})
 endif()

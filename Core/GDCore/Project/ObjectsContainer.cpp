@@ -76,7 +76,7 @@ std::size_t ObjectsContainer::GetObjectsCount() const {
   return initialObjects.size();
 }
 #if defined(GD_IDE_ONLY)
-gd::Object& ObjectsContainer::InsertNewObject(gd::Project& project,
+gd::Object& ObjectsContainer::InsertNewObject(const gd::Project& project,
                                               const gd::String& objectType,
                                               const gd::String& name,
                                               std::size_t position) {

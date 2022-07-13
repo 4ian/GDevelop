@@ -32,7 +32,7 @@ class GD_CORE_API EventsFunctionTools {
    * generation for example.
    */
   static void FreeEventsFunctionToObjectsContainer(
-      gd::Project& project,
+      const gd::Project& project,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);
@@ -46,7 +46,7 @@ class GD_CORE_API EventsFunctionTools {
    * generation for example.
    */
   static void BehaviorEventsFunctionToObjectsContainer(
-      gd::Project& project,
+      const gd::Project& project,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::EventsFunction& eventsFunction,
       gd::ObjectsContainer& outputGlobalObjectsContainer,

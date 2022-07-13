@@ -4,8 +4,7 @@ import { t } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
-import RaisedButton from '../UI/RaisedButton';
-import Dialog from '../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import TextField from '../UI/TextField';
 import {
   type RegisterForm,
@@ -115,7 +114,7 @@ export default class CreateAccountDialog extends Component<Props, State> {
             onClick={onClose}
           />,
           <LeftLoader isLoading={createAccountInProgress} key="create-account">
-            <RaisedButton
+            <DialogPrimaryButton
               label={<Trans>Create my account</Trans>}
               primary
               disabled={!this._canCreateAccount()}
@@ -131,18 +130,18 @@ export default class CreateAccountDialog extends Component<Props, State> {
             onClick={onGoToLogin}
           />,
         ]}
+        cannotBeDismissed={createAccountInProgress}
         onApply={this._onCreateAccount}
         onRequestClose={() => {
           if (!createAccountInProgress) onClose();
         }}
         maxWidth="sm"
-        cannotBeDismissed={true}
         open
       >
         <ColumnStackLayout noMargin>
           <BackgroundText>
             <MarkdownText
-              translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop-app.com/legal/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
+              translatableSource={t`By creating an account and using GDevelop, you agree to the [Terms and Conditions](https://gdevelop.io/page/terms-and-conditions). Having an account allows you to export your game on Android or as a Desktop app and it unlocks other services for your project!`}
             />
           </BackgroundText>
           <UsernameField

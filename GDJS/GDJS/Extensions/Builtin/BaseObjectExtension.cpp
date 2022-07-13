@@ -367,14 +367,16 @@ BaseObjectExtension::BaseObjectExtension() {
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(2).GetPlainString());
+                  instruction.GetParameter(2).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String expression2Code =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(4).GetPlainString());
+                  instruction.GetParameter(4).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
           gd::String newX =
@@ -422,14 +424,16 @@ BaseObjectExtension::BaseObjectExtension() {
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(2).GetPlainString());
+                  instruction.GetParameter(2).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String expression2Code =
               gd::ExpressionCodeGenerator::GenerateExpressionCode(
                   codeGenerator,
                   context,
                   "number",
-                  instruction.GetParameter(4).GetPlainString());
+                  instruction.GetParameter(4).GetPlainString(),
+                  instruction.GetParameter(0).GetPlainString());
 
           gd::String op1 = instruction.GetParameter(1).GetPlainString();
           gd::String newX = isNotAssignmentOperator(op1)

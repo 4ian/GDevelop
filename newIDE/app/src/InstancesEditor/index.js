@@ -418,7 +418,8 @@ export default class InstancesEditor extends Component<Props> {
     this.pixiRenderer.destroy();
   }
 
-  componentWillReceiveProps(nextProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (
       nextProps.width !== this.props.width ||
       nextProps.height !== this.props.height

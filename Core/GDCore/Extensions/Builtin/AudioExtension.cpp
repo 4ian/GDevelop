@@ -14,14 +14,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
   extension
       .SetExtensionInformation(
           "BuiltinAudio",
-          _("Sounds and musics"),
+          _("Sounds and music"),
           _("GDevelop provides several conditions and actions to play audio "
-            "files. They can be either long musics or short sound effects."),
+            "files. They can be either long music or short sound effects."),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/audio")
       .SetCategory("Audio");
-  extension.AddInstructionOrExpressionGroupMetadata(_("Sounds and musics"))
+  extension.AddInstructionOrExpressionGroupMetadata(_("Sounds and music"))
       .SetIcon("res/actions/music24.png");
 
   extension

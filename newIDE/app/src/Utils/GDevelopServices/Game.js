@@ -36,6 +36,8 @@ export type Game = {
   description?: string,
   thumbnailUrl?: string,
   discoverable?: boolean,
+  acceptsBuildComments?: boolean,
+  acceptsGameComments?: boolean,
 };
 
 export type GameSlug = {
@@ -179,10 +181,12 @@ export const registerGame = (
     gameId,
     gameName,
     authorName,
+    templateSlug,
   }: {|
     gameId: string,
     gameName: string,
     authorName: string,
+    templateSlug: string,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -192,6 +196,7 @@ export const registerGame = (
         {
           gameName,
           authorName,
+          templateSlug,
         },
         {
           params: {
@@ -222,6 +227,8 @@ export const updateGame = (
     orientation,
     thumbnailUrl,
     discoverable,
+    acceptsBuildComments,
+    acceptsGameComments,
   }: {|
     gameName?: string,
     categories?: string[],
@@ -234,6 +241,8 @@ export const updateGame = (
     orientation?: string,
     thumbnailUrl?: ?string,
     discoverable?: boolean,
+    acceptsBuildComments?: boolean,
+    acceptsGameComments?: boolean,
   |}
 ): Promise<Game> => {
   return getAuthorizationHeader()
@@ -252,6 +261,8 @@ export const updateGame = (
           orientation,
           thumbnailUrl,
           discoverable,
+          acceptsBuildComments,
+          acceptsGameComments,
         },
         {
           params: {

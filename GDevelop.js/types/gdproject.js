@@ -19,6 +19,8 @@ declare class gdProject extends gdObjectsContainer {
   setPlayableWithMobile(playable: boolean): void;
   setPackageName(packageName: string): void;
   getPackageName(): string;
+  setTemplateSlug(templateSlug: string): void;
+  getTemplateSlug(): string;
   setOrientation(orientation: string): void;
   getOrientation(): string;
   setProjectUuid(projectUuid: string): void;

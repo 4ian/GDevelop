@@ -47,7 +47,7 @@ type Props = {|
   }) => void,
 
   // Advanced DOM events, for exceptional usage:
-  onClick?: () => void,
+  onClick?: (event: SyntheticPointerEvent<HTMLInputElement>) => void,
   onKeyPress?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
@@ -203,6 +203,7 @@ export default class TextField extends React.Component<Props, {||}> {
       <I18n>
         {({ i18n }) => (
           <MUITextField
+            color="secondary"
             // Value and change handling:
             type={props.type !== undefined ? props.type : undefined}
             value={props.value !== undefined ? props.value : undefined}

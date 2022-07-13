@@ -21,7 +21,7 @@ TEST_CASE("ExpressionParser2 - Naughty strings", "[common][events]") {
   auto &layout1 = project.InsertNewLayout("Layout1", 0);
   layout1.InsertNewObject(project, "MyExtension::Sprite", "MySpriteObject", 0);
 
-  gd::ExpressionParser2 parser(platform, project, layout1);
+  gd::ExpressionParser2 parser;
 
   SECTION("Check that no naughty string crash the parser") {
     std::string inputFile = std::string(__FILE__) + "-blns.txt";
@@ -31,9 +31,9 @@ TEST_CASE("ExpressionParser2 - Naughty strings", "[common][events]") {
       std::string line;
       size_t count = 0;
       while ( std::getline (myfile,line) ) {
-        auto node1 = parser.ParseExpression("string", line.c_str());
+        auto node1 = parser.ParseExpression(line.c_str());
         REQUIRE(node1 != nullptr);
-        auto node2 = parser.ParseExpression("number", line.c_str());
+        auto node2 = parser.ParseExpression(line.c_str());
         REQUIRE(node2 != nullptr);
 
         count++;

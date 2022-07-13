@@ -121,6 +121,11 @@ bool Exporter::ExportWholePixiProject(
         fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
+    // Export a WebManifest with project metadata
+    if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
+                        helper.GenerateWebManifest(exportedProject)))
+      gd::LogError("Unable to export WebManifest.");
+
     helper.ExportIncludesAndLibs(includesFiles, exportDir, false);
 
     gd::String source = gdjsRoot + "/Runtime/index.html";

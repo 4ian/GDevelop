@@ -468,6 +468,12 @@ class GD_CORE_API PlatformExtension {
   BehaviorMetadata& GetBehaviorMetadata(const gd::String& behaviorType);
 
   /**
+   * \brief Return true if the extension contains a behavior associated to \a
+   * behaviorType
+   */
+  bool HasBehavior(const gd::String& behaviorType) const;
+
+  /**
    * \brief Return the metadata for the effect with the given name.
    */
   EffectMetadata& GetEffectMetadata(const gd::String& effectName);

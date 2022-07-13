@@ -38,6 +38,7 @@ const ShowcasedGameDialog = ({
           onClick={onClose}
         />,
       ]}
+      onRequestClose={onClose}
     >
       <Column noMargin expand>
         <CorsAwareImage

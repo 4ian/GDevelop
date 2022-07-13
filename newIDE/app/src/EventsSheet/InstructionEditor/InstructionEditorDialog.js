@@ -2,9 +2,9 @@
 import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
-import Dialog from '../../UI/Dialog';
+import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
-import InstructionEditor from './index.js';
+import InstructionEditor from '.';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -58,22 +58,20 @@ export default class InstructionEditorDialog extends React.Component<
         primary={false}
         onClick={onCancel}
       />,
-      <FlatButton
+      <DialogPrimaryButton
         key="ok"
         label={<Trans>Ok</Trans>}
         primary={true}
-        keyboardFocused={false}
         onClick={onSubmit}
       />,
     ];
 
     return (
       <Dialog
-        onApply={onSubmit}
         actions={actions}
         open={open}
-        cannotBeDismissed={true}
         onRequestClose={onCancel}
+        onApply={onSubmit}
         maxWidth={false}
         flexBody
         noMargin

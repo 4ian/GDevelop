@@ -2,19 +2,32 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 
+type textSize =
+  | 'bold-title'
+  | 'title'
+  | 'section-title'
+  | 'block-title'
+  | 'sub-title'
+  | 'body'
+  | 'body2';
+
+type textColor = 'error' | 'primary' | 'secondary';
+
 type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: 'body' | 'body2' | 'title' | 'bold-title',
+  size?: textSize,
   /** Color of the text */
-  color?: 'error' | 'primary' | 'secondary',
+  color?: textColor,
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
   noShrink?: boolean,
   /** Remove the margin around the text. */
   noMargin?: boolean,
+  /** Allow user to select content */
+  allowSelection?: boolean,
   /** By default the text is a paragraph (`p`). It can be shown inline  */
   displayInlineAsSpan?: boolean,
   /** A limited set of styling is supported. */
@@ -39,6 +52,39 @@ type Props = {|
 
 type Interface = {||};
 
+const getVariantFromSize = (size: ?textSize) => {
+  switch (size) {
+    case 'bold-title':
+      return 'h1';
+    case 'title':
+      return 'h2';
+    case 'section-title':
+      return 'h3';
+    case 'block-title':
+      return 'h4';
+    case 'sub-title':
+      return 'h5';
+    case 'body2':
+      return 'body2';
+    case 'body':
+    default:
+      return 'body1';
+  }
+};
+
+const getTextColorFromColor = (color: ?textColor) => {
+  switch (color) {
+    case 'error':
+      return 'error';
+    case 'primary':
+      return 'textPrimary';
+    case 'secondary':
+      return 'textSecondary';
+    default:
+      return 'textPrimary';
+  }
+};
+
 // A Text to be displayed in the app. Prefer using this
 // than a `<p>`/`<span>` or `<div>` as this will help to maintain
 // consistency of text in the whole app.
@@ -52,23 +98,16 @@ const Text = React.forwardRef<Props, Interface>(
       align,
       noShrink,
       noMargin,
+      allowSelection,
       displayInlineAsSpan,
       ...otherProps // Used by possible parent element (such as Tooltip) to pass down props.
     },
     ref
   ) => (
     <Typography
-      variant={
-        size === 'bold-title'
-          ? 'h5'
-          : size === 'title'
-          ? 'h6'
-          : size === 'body2'
-          ? 'body2'
-          : 'body1'
-      }
+      variant={getVariantFromSize(size)}
       ref={ref}
-      color={color}
+      color={getTextColorFromColor(color)}
       component={displayInlineAsSpan ? 'span' : undefined}
       style={{
         ...style,
@@ -76,6 +115,8 @@ const Text = React.forwardRef<Props, Interface>(
         flexShrink: noShrink ? 0 : undefined,
         marginTop: noMargin ? 0 : 6,
         marginBottom: noMargin ? 0 : 6,
+        userSelect: allowSelection ? 'text' : undefined,
+        cursor: allowSelection ? 'text' : undefined,
       }}
       align={align || 'inherit'}
       {...otherProps}

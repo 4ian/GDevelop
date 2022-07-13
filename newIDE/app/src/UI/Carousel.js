@@ -386,7 +386,7 @@ const Carousel = <ThumbnailType: Thumbnail>({
                 (browseAllLink ? openLinkCallback(browseAllLink) : () => {})
               }
               label={browseAllLabel}
-              icon={<ListOutlined />}
+              leftIcon={<ListOutlined />}
             />
           </Line>
         </Line>

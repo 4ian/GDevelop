@@ -44,7 +44,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    *
    * \return JavaScript code
    */
-  static gd::String GenerateLayoutCode(gd::Project& project,
+  static gd::String GenerateLayoutCode(const gd::Project& project,
                                        const gd::Layout& scene,
                                        const gd::String& codeNamespace,
                                        std::set<gd::String>& includeFiles,
@@ -174,7 +174,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
  protected:
   virtual gd::String GenerateParameterCodes(
-      const gd::String& parameter,
+      const gd::Expression& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
       const gd::String& lastObjectName,
@@ -227,6 +227,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
+      const gd::String& functionCallName,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
@@ -236,6 +237,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& objectName,
       const gd::String& behaviorName,
       const gd::BehaviorMetadata& autoInfo,
+      const gd::String& functionCallName,
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context,
@@ -289,7 +291,6 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
  private:
   static gd::String GenerateEventsListCompleteFunctionCode(
-      gd::Project& project,
       gdjs::EventsCodeGenerator& codeGenerator,
       gd::String fullyQualifiedFunctionName,
       gd::String functionArgumentsCode,
@@ -352,7 +353,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   /**
    * \brief Construct a code generator for the specified project and layout.
    */
-  EventsCodeGenerator(gd::Project& project, const gd::Layout& layout);
+  EventsCodeGenerator(const gd::Project& project, const gd::Layout& layout);
 
   /**
    * \brief Construct a code generator for the specified objects and groups.

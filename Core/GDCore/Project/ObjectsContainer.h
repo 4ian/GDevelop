@@ -94,7 +94,7 @@ class GD_CORE_API ObjectsContainer {
    * \note The object is created using the project's current platform.
    * \return A reference to the object in the list.
    */
-  gd::Object& InsertNewObject(gd::Project& project,
+  gd::Object& InsertNewObject(const gd::Project& project,
                               const gd::String& objectType,
                               const gd::String& name,
                               std::size_t position);

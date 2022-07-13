@@ -1032,6 +1032,7 @@ namespace gdjs {
         ) {
           continue;
         }
+
         if (
           gdjs.RuntimeObject.collisionTest(
             this.owner,

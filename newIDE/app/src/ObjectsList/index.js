@@ -218,6 +218,8 @@ export default class ObjectsList extends React.Component<Props, State> {
 
     object.setTags(getStringFromTags(this.props.selectedObjectTags));
     onObjectCreated(object);
+
+    this.forceUpdateList();
   };
 
   onAddNewObject = () => {
@@ -693,6 +695,8 @@ export default class ObjectsList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          aspect="integrated-search-bar"
+          placeholder={t`Search objects`}
         />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog

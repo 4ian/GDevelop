@@ -20,6 +20,7 @@ import {
   listGameActiveLeaderboards,
 } from '../Utils/GDevelopServices/Play';
 import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
+import { useInterval } from '../Utils/UseInterval';
 
 type Props = {| gameId: string, children: React.Node |};
 
@@ -70,9 +71,14 @@ const reducer = (state: ReducerState, action: ReducerAction): ReducerState => {
       const primaryLeaderboard = leaderboards.find(
         leaderboard => leaderboard.primary
       );
+      const currentLeaderboardUpdated = state.currentLeaderboard
+        ? leaderboardsByIds[state.currentLeaderboard.id]
+        : undefined;
+      const fallBackLeaderboard =
+        currentLeaderboardUpdated || state.currentLeaderboard;
       const newCurrentLeaderboard = shouldDefineCurrentLeaderboardIfNoneSelected
         ? primaryLeaderboard || leaderboards[0]
-        : state.currentLeaderboard;
+        : fallBackLeaderboard;
       return {
         ...state,
         leaderboardsByIds,
@@ -202,11 +208,12 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
   });
 
   const listLeaderboards = React.useCallback(
-    async () => {
+    async (options: ?{ shouldClearBeforeFetching?: boolean }) => {
       if (!isListingLeaderboards.current) {
         isListingLeaderboards.current = true;
         try {
-          dispatch({ type: 'SET_LEADERBOARDS', payload: null });
+          if (options && options.shouldClearBeforeFetching)
+            dispatch({ type: 'SET_LEADERBOARDS', payload: null });
           const fetchedLeaderboards = await listGameActiveLeaderboards(
             authenticatedUser,
             gameId
@@ -393,11 +400,45 @@ const LeaderboardProvider = ({ gameId, children }: Props) => {
 
   React.useEffect(
     () => {
-      if (!currentLeaderboardId) return;
+      if (!currentLeaderboardId || !gameId) return;
       dispatch({ type: 'PURGE_NAVIGATION' });
       fetchEntries();
     },
-    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries]
+    [currentLeaderboardId, displayOnlyBestEntry, fetchEntries, gameId]
+  );
+
+  const previousCurrentLeaderboardId = React.useRef<?string>(null);
+  const previousCurrentLeaderboardResetLaunchedAt = React.useRef<?string>(null);
+
+  React.useEffect(
+    () => {
+      if (
+        previousCurrentLeaderboardId.current === currentLeaderboardId &&
+        !!previousCurrentLeaderboardResetLaunchedAt.current &&
+        !!currentLeaderboard &&
+        !currentLeaderboard.resetLaunchedAt
+      ) {
+        fetchEntries();
+      }
+      previousCurrentLeaderboardId.current = currentLeaderboardId;
+      previousCurrentLeaderboardResetLaunchedAt.current = currentLeaderboard
+        ? currentLeaderboard.resetLaunchedAt
+        : null;
+    },
+    [currentLeaderboard, currentLeaderboardId, fetchEntries]
+  );
+
+  useInterval(
+    () => {
+      listLeaderboards({ shouldClearBeforeFetching: false });
+    },
+    !leaderboardsByIds ||
+      Object.values(leaderboardsByIds).every(
+        // $FlowFixMe
+        (leaderboard: Leaderboard) => !leaderboard.resetLaunchedAt
+      )
+      ? null
+      : 5000
   );
 
   return (

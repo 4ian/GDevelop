@@ -29,9 +29,6 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                                       "CppPlatform/Extensions/textentry.png")
           .SetCategoryFullName(_("Advanced"));
 
-#if defined(GD_IDE_ONLY)
-  obj.SetIncludeFile("TextEntryObject/TextEntryObject.h");
-
   obj.AddAction("String",
                 _("Text in memory"),
                 _("Modify text in memory of the object"),
@@ -43,8 +40,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TextEntry")
       .UseStandardOperatorParameters("string")
       .SetFunctionName("SetString")
-      .SetGetter("GetString")
-      .SetIncludeFile("TextEntryObject/TextEntryObject.h");
+      .SetGetter("GetString");
 
   obj.AddCondition("String",
                    _("Text in memory"),
@@ -56,8 +52,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "TextEntry")
       .UseStandardRelationalOperatorParameters("string")
-      .SetFunctionName("GetString")
-      .SetIncludeFile("TextEntryObject/TextEntryObject.h");
+      .SetFunctionName("GetString");
 
   obj.AddAction(
          "Activate",
@@ -71,8 +66,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"), "TextEntry")
       .AddParameter("yesorno", _("Activate"))
-      .SetFunctionName("Activate")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("Activate");
 
   obj.AddCondition("Activated",
                    _("Text input"),
@@ -83,8 +77,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                    "CppPlatform/Extensions/textentryicon.png")
 
       .AddParameter("object", _("Object"), "TextEntry")
-      .SetFunctionName("IsActivated")
-      .SetIncludeFile("TextObject/TextObject.h");
+      .SetFunctionName("IsActivated");
 
   obj.AddStrExpression("String",
                        _("Text entered with keyboard"),
@@ -92,7 +85,5 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                        _("Text entered with keyboard"),
                        "res/texteicon.png")
       .AddParameter("object", _("Object"), "TextEntry")
-      .SetFunctionName("GetString")
-      .SetIncludeFile("TextObject/TextObject.h");
-#endif
+      .SetFunctionName("GetString");
 }

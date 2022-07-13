@@ -4,6 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/Serialization.h"
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
@@ -232,7 +233,8 @@ void EventsListSerialization::SerializeEventsTo(const EventsList& list,
     const gd::BaseEvent& event = list.GetEvent(j);
     SerializerElement& eventElem = events.AddChild("event");
 
-    if (event.IsDisabled()) eventElem.SetAttribute("disabled", event.IsDisabled());
+    if (event.IsDisabled())
+      eventElem.SetAttribute("disabled", event.IsDisabled());
     if (event.IsFolded()) eventElem.SetAttribute("folded", event.IsFolded());
     eventElem.AddChild("type").SetValue(event.GetType());
 
@@ -266,6 +268,9 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
     instruction.SetInverted(
         instrElement.GetChild("type", 0, "Type")
             .GetBoolAttribute("inverted", false, "Contraire"));
+
+    instruction.SetAwaited(
+        instrElement.GetChild("type", 0, "Type").GetBoolAttribute("await"));
 
     // Read parameters
     vector<gd::Expression> parameters;
@@ -340,9 +345,12 @@ void gd::EventsListSerialization::SerializeInstructionsTo(
   instructions.ConsiderAsArrayOf("instruction");
   for (std::size_t k = 0; k < list.size(); k++) {
     SerializerElement& instruction = instructions.AddChild("instruction");
-    instruction.AddChild("type")
-        .SetAttribute("value", list[k].GetType())
-        .SetAttribute("inverted", list[k].IsInverted());
+    instruction.AddChild("type").SetAttribute("value", list[k].GetType());
+
+    if (list[k].IsInverted())
+      instruction.GetChild("type").SetAttribute("inverted", true);
+    if (list[k].IsAwaited())
+      instruction.GetChild("type").SetAttribute("await", true);
 
     // Parameters
     SerializerElement& parameters = instruction.AddChild("parameters");
@@ -352,9 +360,10 @@ void gd::EventsListSerialization::SerializeInstructionsTo(
           .SetValue(list[k].GetParameter(l).GetPlainString());
 
     // Sub instructions
-    SerializerElement& subInstructions =
-        instruction.AddChild("subInstructions");
-    SerializeInstructionsTo(list[k].GetSubInstructions(), subInstructions);
+    if (!list[k].GetSubInstructions().empty()) {
+      SerializeInstructionsTo(list[k].GetSubInstructions(),
+                              instruction.AddChild("subInstructions"));
+    }
   }
 }
 

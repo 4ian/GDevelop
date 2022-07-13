@@ -9,24 +9,32 @@ type TabsProps<TabName> = {|
   value?: TabName,
   onChange: TabName => void,
   children: React.Node, // Should be Tab
+
+  variant?: 'scrollable',
 |};
 
 /**
  * Tabs based on Material-UI Tabs.
  */
-export class Tabs<TabName> extends React.Component<TabsProps<TabName>, {||}> {
-  render() {
-    return (
-      <MUITabs
-        variant="fullWidth"
-        textColor="primary"
-        value={this.props.value}
-        onChange={(e, newValue) => this.props.onChange(newValue)}
-      >
-        {this.props.children}
-      </MUITabs>
-    );
-  }
+export function Tabs<TabName>({
+  value,
+  onChange,
+  children,
+  variant,
+}: TabsProps<TabName>) {
+  return (
+    <MUITabs
+      variant={variant || 'fullWidth'}
+      textColor="primary"
+      indicatorColor="secondary"
+      value={value}
+      onChange={(e, newValue) => onChange(newValue)}
+      allowScrollButtonsMobile={!!variant}
+      scrollButtons={variant ? 'on' : 'off'}
+    >
+      {children}
+    </MUITabs>
+  );
 }
 
 // We support a subset of the props supported by Material-UI v0.x Tabs

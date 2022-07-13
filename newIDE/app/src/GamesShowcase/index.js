@@ -9,19 +9,18 @@ import { ListSearchResults } from '../UI/Search/ListSearchResults';
 import { GamesShowcaseContext } from './GamesShowcaseContext';
 import { ShowcasedGameListItem } from './ShowcasedGameListItem';
 import { ResponsiveWindowMeasurer } from '../UI/Reponsive/ResponsiveWindowMeasurer';
-import { Trans } from '@lingui/macro';
+import { t, Trans } from '@lingui/macro';
 import Subheader from '../UI/Subheader';
 import { CategoryChooser } from '../UI/Search/CategoryChooser';
 
-const styles = {
-  searchBar: {
-    // TODO: Can we put this in the search bar by default?
-    flexShrink: 0,
-  },
-};
-
 const getShowcasedGameTitle = (showcasedGame: ShowcasedGame) =>
   showcasedGame.title;
+
+const styles = {
+  categories: {
+    width: 250,
+  },
+};
 
 type Props = {};
 
@@ -47,35 +46,38 @@ export const GamesShowcase = (props: Props) => {
     <ResponsiveWindowMeasurer>
       {windowWidth => (
         <Column expand noMargin useFullHeight>
-          <SearchBar
-            value={searchText}
-            onChange={setSearchText}
-            onRequestSearch={() => {}}
-            style={styles.searchBar}
-          />
+          <Line>
+            <Column expand noMargin>
+              <SearchBar
+                value={searchText}
+                onChange={setSearchText}
+                onRequestSearch={() => {}}
+                placeholder={t`Search games`}
+              />
+            </Column>
+          </Line>
           <Line
             expand
             overflow={
               'hidden' /* Somehow required on Chrome/Firefox to avoid children growing (but not on Safari) */
             }
+            noMargin
           >
-            <Background
-              noFullHeight
-              noExpand
-              width={windowWidth === 'small' ? 150 : 250}
-            >
-              <ScrollView>
-                <Subheader>
-                  <Trans>Categories</Trans>
-                </Subheader>
-                <CategoryChooser
-                  allItemsLabel={<Trans>All games</Trans>}
-                  allFilters={filters}
-                  filtersState={filtersState}
-                  error={error}
-                />
-              </ScrollView>
-            </Background>
+            {windowWidth !== 'small' /* Hide categories on small screens */ && (
+              <Background noFullHeight noExpand width={styles.categories.width}>
+                <ScrollView>
+                  <Subheader>
+                    <Trans>Categories</Trans>
+                  </Subheader>
+                  <CategoryChooser
+                    allItemsLabel={<Trans>All games</Trans>}
+                    allFilters={filters}
+                    filtersState={filtersState}
+                    error={error}
+                  />
+                </ScrollView>
+              </Background>
+            )}
             <ListSearchResults
               onRetry={fetchShowcasedGamesAndFilters}
               error={error}

@@ -94,22 +94,8 @@ export const NewResourceDialog = ({
   return (
     <Dialog
       open
-      onRequestClose={onClose}
       fullHeight
       flexBody
-      secondaryActions={[
-        !electron && screenType !== 'touch' ? (
-          <FlatButton
-            key="download-gdevelop"
-            label={
-              <Trans>Download GDevelop to use images from your computer</Trans>
-            }
-            onClick={() =>
-              Window.openExternalURL('https://gdevelop-app.com/download')
-            }
-          />
-        ) : null,
-      ]}
       actions={[
         <FlatButton
           key="close"
@@ -118,6 +104,20 @@ export const NewResourceDialog = ({
           onClick={onClose}
         />,
       ]}
+      secondaryActions={[
+        !electron && screenType !== 'touch' ? (
+          <FlatButton
+            key="download-gdevelop"
+            label={
+              <Trans>Download GDevelop to use images from your computer</Trans>
+            }
+            onClick={() =>
+              Window.openExternalURL('https://gdevelop.io/download')
+            }
+          />
+        ) : null,
+      ]}
+      onRequestClose={onClose}
       noMargin
     >
       <Column expand noMargin>
@@ -152,7 +152,7 @@ export const NewResourceDialog = ({
             <ColumnStackLayout expand>
               {importTabResourceSources.map(source => (
                 <React.Fragment key={source.name}>
-                  <Text size="title">{i18n._(source.displayName)}</Text>
+                  <Text size="block-title">{i18n._(source.displayName)}</Text>
                   {source.renderComponent({
                     i18n,
                     options,

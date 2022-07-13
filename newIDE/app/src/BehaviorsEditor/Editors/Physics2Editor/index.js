@@ -8,11 +8,13 @@ import Checkbox from '../../../UI/Checkbox';
 import SelectField from '../../../UI/SelectField';
 import SelectOption from '../../../UI/SelectOption';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
+import ImagePreview, {
+  isProjectImageResourceSmooth,
+} from '../../../ResourcesList/ResourcePreview/ImagePreview';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
-import ShapePreview from './ShapePreview.js';
-import PolygonEditor from './PolygonEditor.js';
+import ShapePreview from './ShapePreview';
+import PolygonEditor from './PolygonEditor';
 import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 import Text from '../../../UI/Text';
 import DismissableAlertMessage from '../../../UI/DismissableAlertMessage';
@@ -358,7 +360,15 @@ const Physics2Editor = (props: Props) => {
             <ImagePreview
               resourceName={image}
               project={props.project}
-              resourcesLoader={resourcesLoader}
+              imageResourceSource={resourcesLoader.getResourceFullUrl(
+                props.project,
+                image,
+                {}
+              )}
+              isImageResourceSmooth={isProjectImageResourceSmooth(
+                props.project,
+                image
+              )}
               fixedHeight={200}
               renderOverlay={overlayProps => {
                 // The result from `getProperties` is temporary, and because this renderOverlay

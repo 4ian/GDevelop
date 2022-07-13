@@ -5,7 +5,9 @@ Copyright (c) 2016 Victor Levasseur (victorlevasseur52@gmail.com)
 This project is released under the MIT License.
 */
 #include "AnchorBehavior.h"
+
 #include <map>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/Project/PropertyDescriptor.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -20,6 +22,7 @@ void AnchorBehavior::InitializeContent(gd::SerializerElement& content) {
   content.SetAttribute("topEdgeAnchor", static_cast<int>(ANCHOR_VERTICAL_NONE));
   content.SetAttribute("bottomEdgeAnchor",
                        static_cast<int>(ANCHOR_VERTICAL_NONE));
+  content.SetAttribute("useLegacyBottomAndRightAnchors", false);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -68,7 +71,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window left"))
       .AddExtraInfo(_("Window right"))
       .AddExtraInfo(_("Proportional"))
-      .SetDescription(_("Use this to anchor the object on X axis."));
+      .SetDescription(_("Anchor the left edge of the object on X axis."));
 
   properties[_("Right edge anchor")]
       .SetValue(GetAnchorAsString(static_cast<HorizontalAnchor>(
@@ -77,7 +80,8 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window left"))
       .AddExtraInfo(_("Window right"))
-      .AddExtraInfo(_("Proportional"));
+      .AddExtraInfo(_("Proportional"))
+      .SetDescription(_("Anchor the right edge of the object on X axis."));
 
   properties[_("Top edge anchor")]
       .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
@@ -87,7 +91,7 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("Window top"))
       .AddExtraInfo(_("Window bottom"))
       .AddExtraInfo(_("Proportional"))
-      .SetDescription(_("Use this to anchor the object on Y axis."));
+      .SetDescription(_("Anchor the top edge of the object on Y axis."));
 
   properties[_("Bottom edge anchor")]
       .SetValue(GetAnchorAsString(static_cast<VerticalAnchor>(
@@ -96,7 +100,20 @@ std::map<gd::String, gd::PropertyDescriptor> AnchorBehavior::GetProperties(
       .AddExtraInfo(_("No anchor"))
       .AddExtraInfo(_("Window top"))
       .AddExtraInfo(_("Window bottom"))
-      .AddExtraInfo(_("Proportional"));
+      .AddExtraInfo(_("Proportional"))
+      .SetDescription(_("Anchor the bottom edge of the object on Y axis."));
+
+  properties[("useLegacyBottomAndRightAnchors")]
+      .SetLabel(_(
+          "Stretch object when anchoring right or bottom ledge (deprecated, "
+          "it's recommended to let this unchecked and anchor both sides if you "
+          "want Sprite to stretch instead.)"))
+      .SetGroup(_("Deprecated options (advanced)"))
+      .SetValue(behaviorContent.GetBoolAttribute(
+                    "useLegacyBottomAndRightAnchors", true)
+                    ? "true"
+                    : "false")
+      .SetType("Boolean");
 
   return properties;
 }
@@ -147,6 +164,9 @@ bool AnchorBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
     behaviorContent.SetAttribute(
         "bottomEdgeAnchor",
         static_cast<int>(GetVerticalAnchorFromString(value)));
+  else if (name == "useLegacyBottomAndRightAnchors")
+    behaviorContent.SetAttribute("useLegacyBottomAndRightAnchors",
+                                 (value == "1"));
   else
     return false;
 

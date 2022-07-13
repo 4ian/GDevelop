@@ -11,12 +11,12 @@ import SearchBar from '../UI/SearchBar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import { mapVector } from '../Utils/MapFor';
-import optionalRequire from '../Utils/OptionalRequire.js';
+import optionalRequire from '../Utils/OptionalRequire';
 import {
   applyResourceDefaults,
   getLocalResourceFullPath,
   getResourceFilePathStatus,
-} from './ResourceUtils.js';
+} from './ResourceUtils';
 import { type MenuItemTemplate } from '../UI/Menu/Menu.flow';
 import {
   type ResourceKind,
@@ -97,10 +97,11 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _locateResourceFile = (resource: gdResource) => {
-    const resourceFolderPath = path.dirname(
-      getLocalResourceFullPath(this.props.project, resource.getName())
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getName()
     );
-    electron.shell.openItem(resourceFolderPath);
+    electron.shell.showItemInFolder(path.resolve(resourceFilePath));
   };
 
   _openResourceFile = (resource: gdResource) => {
@@ -108,7 +109,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       this.props.project,
       resource.getName()
     );
-    electron.shell.openItem(resourceFilePath);
+    electron.shell.openPath(path.resolve(resourceFilePath));
   };
 
   _copyResourceFilePath = (resource: gdResource) => {
@@ -116,7 +117,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       this.props.project,
       resource.getName()
     );
-    electron.clipboard.writeText(resourceFilePath);
+    electron.clipboard.writeText(path.resolve(resourceFilePath));
   };
 
   _scanForNewResources = (
@@ -291,12 +292,25 @@ export default class ResourcesList extends React.Component<Props, State> {
       { type: 'separator' },
       {
         label: i18n._(t`Remove unused...`),
-        submenu: allResourceKindsAndMetadata.map(({ displayName, kind }) => ({
-          label: i18n._(displayName),
-          click: () => {
-            this.props.onRemoveUnusedResources(kind);
-          },
-        })),
+        submenu: allResourceKindsAndMetadata
+          .map(({ displayName, kind }) => ({
+            label: i18n._(displayName),
+            click: () => {
+              this.props.onRemoveUnusedResources(kind);
+            },
+          }))
+          .concat([
+            {
+              label: i18n._(t`Resources (any kind)`),
+              click: () => {
+                allResourceKindsAndMetadata.forEach(resourceKindAndMetadata => {
+                  this.props.onRemoveUnusedResources(
+                    resourceKindAndMetadata.kind
+                  );
+                });
+              },
+            },
+          ]),
       },
       {
         label: i18n._(t`Remove Resources with Invalid Path`),
@@ -380,6 +394,8 @@ export default class ResourcesList extends React.Component<Props, State> {
               searchText: text,
             })
           }
+          placeholder={t`Search resources`}
+          aspect="integrated-search-bar"
         />
       </Background>
     );

@@ -26,7 +26,8 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
     searchText: '',
   };
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (newProps.open && !this.props.open) {
       sendHelpFinderOpened();
     }
@@ -49,7 +50,6 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
     return (
       <Dialog
         title={<Trans>Help!</Trans>}
-        onRequestClose={onClose}
         actions={[
           <FlatButton
             label={<Trans>Close</Trans>}
@@ -72,13 +72,13 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
             primary={false}
             onClick={() => {
               Window.openExternalURL(
-                'http://wiki.compilgames.net/doku.php/gdevelop5/start'
+                'https://wiki.gdevelop.io/gdevelop5/start'
               );
             }}
             label={<Trans>Browse the documentation</Trans>}
           />,
         ]}
-        cannotBeDismissed={false}
+        onRequestClose={onClose}
         open={open}
       >
         <DocSearchArea

@@ -2,25 +2,12 @@
  * \mainpage GDevelop JS Platform
  * \image html gdlogo.png
  * \section welcome Welcome
- * This is the help file for the GDevelop JS Platform, which contains a reference of all the features provided
- * by the JS Platform and explains how to create <b>extensions</b> for this platform.<br>
- * Writing extensions requires to know Javascript and you need to write a bit of C++ code: Do not worry, everything is explained
- * here.
- *
- * ### Game engine documentation
- * Note that the documentation of the Javascript game engine of this platform is available [here](../GDJS Runtime Documentation/index.html).
- *
- * \section gettingstarted Getting started
- * Please refer to the getting started guide in the [GDCore documentation](../GDCore Documentation/index.html).<br>
- * You can then read the \subpage OverviewOfGDJS.
- */
-
-/**
- * \page OverviewOfGDJS Overview of the JS Platform
+ * This is the help file for the "GDevelop JS Platform", which is the **JavaScript code generator** and game engine
+ * included in GDevelop.
  *
  * The JS platform is composed of two parts:
  * - The first one is the *C++ part* exposing the platform to the IDE (and this is its documentation).
- * - The second part is the *Javascript game engine* which is in the *GDJS/Runtime* directory.
+ * - The second part is the *JavaScript game engine* which is in the *GDJS/Runtime* directory. The documentation of this JavaScript game engine is available [here](../GDJS Runtime Documentation/index.html).
  *
- * You can read the documentation of the *Javascript game engine* [here](../GDJS Runtime Documentation/index.html).
+ * If you want to [create extensions for GDevelop, refer to this documentation instead](https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md).
  */

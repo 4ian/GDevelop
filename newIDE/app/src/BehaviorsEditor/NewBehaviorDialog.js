@@ -230,7 +230,7 @@ export default function NewBehaviorDialog({
             <HelpButton helpPagePath="/behaviors" key="help" />,
           ]}
           open
-          cannotBeDismissed={false}
+          onRequestClose={onClose}
           flexBody
           noMargin
           fullHeight
@@ -246,18 +246,26 @@ export default function NewBehaviorDialog({
             </Tabs>
             {currentTab === 'installed' && (
               <React.Fragment>
-                <SearchBar
-                  value={searchText}
-                  onRequestSearch={() => {
-                    if (behaviors.length) {
-                      chooseBehavior(i18n, behaviors[0]);
-                    } else if (showDeprecated && deprecatedBehaviors.length) {
-                      chooseBehavior(i18n, deprecatedBehaviors[0]);
-                    }
-                  }}
-                  onChange={setSearchText}
-                  ref={searchBar}
-                />
+                <Line>
+                  <Column expand>
+                    <SearchBar
+                      value={searchText}
+                      onRequestSearch={() => {
+                        if (behaviors.length) {
+                          chooseBehavior(i18n, behaviors[0]);
+                        } else if (
+                          showDeprecated &&
+                          deprecatedBehaviors.length
+                        ) {
+                          chooseBehavior(i18n, deprecatedBehaviors[0]);
+                        }
+                      }}
+                      onChange={setSearchText}
+                      ref={searchBar}
+                      placeholder={t`Search installed behaviors`}
+                    />
+                  </Column>
+                </Line>
                 {hasSearchNoResult && (
                   <EmptyMessage>
                     <Trans>
@@ -303,7 +311,7 @@ export default function NewBehaviorDialog({
                     {!showDeprecated ? (
                       <FlatButton
                         key="toggle-experimental"
-                        icon={<Visibility />}
+                        leftIcon={<Visibility />}
                         primary={false}
                         onClick={() => {
                           setShowDeprecated(true);
@@ -313,7 +321,7 @@ export default function NewBehaviorDialog({
                     ) : (
                       <FlatButton
                         key="toggle-experimental"
-                        icon={<VisibilityOff />}
+                        leftIcon={<VisibilityOff />}
                         primary={false}
                         onClick={() => {
                           setShowDeprecated(false);
@@ -324,7 +332,7 @@ export default function NewBehaviorDialog({
                   </Line>
                   <Line justifyContent="center" alignItems="center">
                     <FlatButton
-                      icon={<Create />}
+                      leftIcon={<Create />}
                       primary={false}
                       onClick={() =>
                         Window.openExternalURL(
@@ -338,14 +346,18 @@ export default function NewBehaviorDialog({
               </React.Fragment>
             )}
             {currentTab === 'search' && (
-              <ExtensionStore
-                project={project}
-                isInstalling={isInstalling}
-                onInstall={async extensionShortHeader =>
-                  onInstallExtension(i18n, extensionShortHeader)
-                }
-                showOnlyWithBehaviors
-              />
+              <Line expand>
+                <Column expand noMargin>
+                  <ExtensionStore
+                    project={project}
+                    isInstalling={isInstalling}
+                    onInstall={async extensionShortHeader =>
+                      onInstallExtension(i18n, extensionShortHeader)
+                    }
+                    showOnlyWithBehaviors
+                  />
+                </Column>
+              </Line>
             )}
           </Column>
           <DismissableInfoBar

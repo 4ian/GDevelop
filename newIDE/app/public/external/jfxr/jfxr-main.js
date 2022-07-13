@@ -1,10 +1,10 @@
 import { createPathEditorHeader } from '../utils/path-editor.js';
 
 const electron = require('electron');
-const electronWindow = electron.remote.getCurrentWindow();
+const remote = require('@electron/remote');
+const electronWindow = remote.getCurrentWindow();
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
-const remote = electron.remote;
 
 let jfxr = null;
 

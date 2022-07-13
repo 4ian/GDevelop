@@ -34,9 +34,6 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
               "CppPlatform/Extensions/TiledSpriteIcon.png")
           .SetCategoryFullName(_("General"));
 
-#if defined(GD_IDE_ONLY)
-  obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
   obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of a Tiled Sprite, between 0 (fully "
@@ -92,8 +89,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetWidth")
-      .SetGetter("GetWidth")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetGetter("GetWidth");
 
   obj.AddCondition("Width",
                    _("Width"),
@@ -105,8 +101,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
-      .SetFunctionName("GetWidth")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetFunctionName("GetWidth");
 
   obj.AddAction("Height",
                 _("Height"),
@@ -119,8 +114,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardOperatorParameters("number")
       .SetFunctionName("SetHeight")
-      .SetGetter("GetHeight")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetGetter("GetHeight");
 
   obj.AddCondition("Height",
                    _("Height"),
@@ -132,8 +126,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
-      .SetFunctionName("GetHeight")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetFunctionName("GetHeight");
 
   obj.AddAction("SetSize",
                 _("Size"),
@@ -146,8 +139,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .AddParameter("expression", _("Width"))
       .AddParameter("expression", _("Height"))
-      .SetFunctionName("SetSize")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetFunctionName("SetSize");
 
   // Deprecated: now available for all objects.
   obj.AddAction("Angle",
@@ -187,8 +179,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetXOffset")
-      .SetGetter("GetXOffset")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetGetter("GetXOffset");
 
   obj.AddCondition(
          "XOffset",
@@ -201,8 +192,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
-      .SetFunctionName("GetXOffset")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetFunctionName("GetXOffset");
 
   obj.AddAction(
          "YOffset",
@@ -216,8 +206,7 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .UseStandardOperatorParameters("number")
       .MarkAsAdvanced()
       .SetFunctionName("SetYOffset")
-      .SetGetter("GetYOffset")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+      .SetGetter("GetYOffset");
 
   obj.AddCondition(
          "YOffset",
@@ -230,7 +219,5 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"), "TiledSprite")
       .UseStandardRelationalOperatorParameters("number")
       .MarkAsAdvanced()
-      .SetFunctionName("GetYOffset")
-      .SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-#endif
+      .SetFunctionName("GetYOffset");
 }

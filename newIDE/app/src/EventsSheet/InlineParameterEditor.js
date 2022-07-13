@@ -52,7 +52,8 @@ export default class InlineParameterEditor extends React.Component<
 
   _field: ?any;
 
-  componentWillReceiveProps(newProps: Props) {
+  // To be updated, see https://reactjs.org/docs/react-component.html#unsafe_componentwillreceiveprops.
+  UNSAFE_componentWillReceiveProps(newProps: Props) {
     if (
       (newProps.open && !this.props.open) ||
       newProps.instruction !== this.props.instruction
@@ -122,7 +123,7 @@ export default class InlineParameterEditor extends React.Component<
         instruction,
         instructionMetadata,
         objectParameterIndex !== -1
-          ? instruction.getParameter(objectParameterIndex)
+          ? instruction.getParameter(objectParameterIndex).getPlainString()
           : null
       );
     }
@@ -149,7 +150,9 @@ export default class InlineParameterEditor extends React.Component<
           instructionMetadata={this.state.instructionMetadata}
           parameterMetadata={this.state.parameterMetadata}
           parameterIndex={this.props.parameterIndex}
-          value={instruction.getParameter(this.props.parameterIndex)}
+          value={instruction
+            .getParameter(this.props.parameterIndex)
+            .getPlainString()}
           onChange={this.props.onChange}
           onRequestClose={this.props.onRequestClose}
           onApply={this._onApply}

@@ -87,7 +87,6 @@ export const create = (authentication: Authentication) => {
                   open={props.open}
                   onClose={props.onClose}
                   onOpen={props.onOpen}
-                  initialTab={props.initialTab}
                   onCreateBlank={onCreateBlank}
                   onCreateFromExampleShortHeader={
                     onCreateFromExampleShortHeader

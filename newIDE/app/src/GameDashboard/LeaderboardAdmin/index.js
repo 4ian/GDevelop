@@ -5,7 +5,6 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import Avatar from '@material-ui/core/Avatar';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -13,7 +12,6 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Paper from '@material-ui/core/Paper';
-import Switch from '@material-ui/core/Switch';
 import Tooltip from '@material-ui/core/Tooltip';
 
 import Add from '@material-ui/icons/Add';
@@ -37,13 +35,14 @@ import Loop from '@material-ui/icons/Loop';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import PlaceholderLoader from '../../UI/PlaceholderLoader';
 import { EmptyPlaceholder } from '../../UI/EmptyPlaceholder';
-import { Column, Line, Spacer } from '../../UI/Grid';
+import { Column, LargeSpacer, Line, Spacer } from '../../UI/Grid';
 import IconButton from '../../UI/IconButton';
 import PlaceholderError from '../../UI/PlaceholderError';
 import AlertMessage from '../../UI/AlertMessage';
 import RaisedButton from '../../UI/RaisedButton';
 import TextField from '../../UI/TextField';
 import SelectField from '../../UI/SelectField';
+import CircularProgress from '../../UI/CircularProgress';
 import SelectOption from '../../UI/SelectOption';
 import { useOnlineStatus } from '../../Utils/OnlineStatus';
 import {
@@ -67,6 +66,7 @@ import FlatButton from '../../UI/FlatButton';
 import LeaderboardSortOptionsDialog from './LeaderboardSortOptionsDialog';
 import { type LeaderboardSortOption } from '../../Utils/GDevelopServices/Play';
 import { formatScore } from '../../Leaderboard/LeaderboardScoreFormatter';
+import Toggle from '../../UI/Toggle';
 
 type Props = {|
   onLoading: boolean => void,
@@ -946,22 +946,26 @@ export const LeaderboardAdmin = ({
               }}
             >
               <Line alignItems="center" justifyContent="flex-end">
-                <Tooltip
-                  title={i18n._(
-                    t`When checked, will only display the best score of each player (only for the display below).`
-                  )}
-                >
-                  <Text size="body2">
-                    <Trans>Player best entry</Trans>
-                  </Text>
-                </Tooltip>
-                <Switch
-                  color="primary"
+                <Toggle
                   size="small"
-                  checked={displayOnlyBestEntry}
-                  onClick={() => setDisplayOnlyBestEntry(!displayOnlyBestEntry)}
+                  labelPosition="left"
+                  toggled={displayOnlyBestEntry}
+                  onToggle={(e, newValue) => setDisplayOnlyBestEntry(newValue)}
+                  label={
+                    <Tooltip
+                      title={i18n._(
+                        t`When checked, will only display the best score of each player (only for the display below).`
+                      )}
+                    >
+                      <Text size="body2">
+                        <Trans>Player best entry</Trans>
+                      </Text>
+                    </Tooltip>
+                  }
                 />
+                <LargeSpacer />
                 <Divider orientation="vertical" />
+                <Spacer />
                 <IconButton
                   onClick={onFetchLeaderboardEntries}
                   disabled={isRequestPending || isEditingName}

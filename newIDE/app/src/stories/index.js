@@ -3303,12 +3303,24 @@ storiesOf('SubscriptionDetails', module)
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
       onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
     />
   ))
-  .add('limit reached', () => (
+  .add('no subscription', () => (
     <SubscriptionDetails
       subscription={noSubscription}
       onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  ))
+  .add('loading manage subscription', () => (
+    <SubscriptionDetails
+      subscription={subscriptionForIndieUser}
+      onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={true}
     />
   ));
 

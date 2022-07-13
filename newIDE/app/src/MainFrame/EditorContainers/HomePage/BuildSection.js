@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Trans, t } from '@lingui/macro';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -23,6 +22,7 @@ import SectionContainer, { SectionRow } from './SectionContainer';
 import ContextMenu, {
   type ContextMenuInterface,
 } from '../../../UI/Menu/ContextMenu';
+import CircularProgress from '../../../UI/CircularProgress';
 import { type MenuItemTemplate } from '../../../UI/Menu/Menu.flow';
 import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
 import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
@@ -105,7 +105,7 @@ const BuildSection = ({
     selectedFile,
     setSelectedFile,
   ] = React.useState<?FileMetadataAndStorageProviderName>(null);
-
+  const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const windowWidth = useResponsiveWindowWidth();
 
   let projectFiles: Array<FileMetadataAndStorageProviderName> = getRecentProjectFiles().filter(
@@ -175,6 +175,7 @@ const BuildSection = ({
     if (!deleteAnswer) return;
 
     try {
+      setPendingProject(fileMetadata.fileIdentifier);
       await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
       authenticatedUser.onCloudProjectsChanged();
     } catch (error) {
@@ -182,6 +183,8 @@ const BuildSection = ({
         `An error occurred when deleting cloud project ${projectName}. Please try again later.`,
         error
       );
+    } finally {
+      setPendingProject(null);
     }
   };
 
@@ -294,10 +297,19 @@ const BuildSection = ({
                                 expand
                               >
                                 <Column expand>
-                                  <Text noMargin>
-                                    {file.fileMetadata.name ||
-                                      file.fileMetadata.fileIdentifier}
-                                  </Text>
+                                  <Line noMargin alignItems="center">
+                                    <Text noMargin>
+                                      {file.fileMetadata.name ||
+                                        file.fileMetadata.fileIdentifier}
+                                    </Text>
+                                    {pendingProject ===
+                                      file.fileMetadata.fileIdentifier && (
+                                      <>
+                                        <Spacer />
+                                        <CircularProgress size={16} />
+                                      </>
+                                    )}
+                                  </Line>
                                 </Column>
                                 <Column expand>
                                   {file.fileMetadata.lastModifiedDate && (
@@ -311,24 +323,34 @@ const BuildSection = ({
                                 </Column>
                               </LineStackLayout>
                             ) : (
-                              <Column>
-                                <ListItemText
-                                  primary={
-                                    file.fileMetadata.name ||
-                                    file.fileMetadata.fileIdentifier
-                                  }
-                                  secondary={
-                                    file.fileMetadata.lastModifiedDate
-                                      ? getRelativeOrAbsoluteDisplayDate(
-                                          i18n,
-                                          file.fileMetadata.lastModifiedDate
-                                        )
-                                      : undefined
-                                  }
-                                  onContextMenu={event =>
-                                    openContextMenu(event, file)
-                                  }
-                                />
+                              <Column expand>
+                                <Line
+                                  noMargin
+                                  alignItems="center"
+                                  justifyContent="space-between"
+                                >
+                                  <ListItemText
+                                    primary={
+                                      file.fileMetadata.name ||
+                                      file.fileMetadata.fileIdentifier
+                                    }
+                                    secondary={
+                                      file.fileMetadata.lastModifiedDate
+                                        ? getRelativeOrAbsoluteDisplayDate(
+                                            i18n,
+                                            file.fileMetadata.lastModifiedDate
+                                          )
+                                        : undefined
+                                    }
+                                    onContextMenu={event =>
+                                      openContextMenu(event, file)
+                                    }
+                                  />
+                                  {pendingProject ===
+                                    file.fileMetadata.fileIdentifier && (
+                                    <CircularProgress size={24} />
+                                  )}
+                                </Line>
                               </Column>
                             )}
                           </ListItem>

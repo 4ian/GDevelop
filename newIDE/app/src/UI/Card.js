@@ -44,7 +44,7 @@ const Card = ({
         ...(isHighlighted
           ? {
               borderLeftWidth: 4,
-              borderLeftColor: gdevelopTheme.palette.primary,
+              borderLeftColor: gdevelopTheme.palette.secondary,
             }
           : {}),
       }}

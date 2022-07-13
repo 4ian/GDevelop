@@ -103,6 +103,7 @@ const SelectField = React.forwardRef<Props, SelectFieldInterface>(
         {({ i18n }) => (
           <TextField
             select
+            color="secondary"
             {...computeTextFieldStyleProps(props)}
             disabled={props.disabled}
             fullWidth={props.fullWidth}

@@ -6,19 +6,32 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import StepContent from '@material-ui/core/StepContent';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import { Line, Spacer, Column } from '../../UI/Grid';
 import BuildProgressAndActions from './BuildProgressAndActions';
 import { type Build } from '../../Utils/GDevelopServices/Build';
 import EmptyMessage from '../../UI/EmptyMessage';
 import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
+import LinearProgress from '../../UI/LinearProgress';
+import CircularProgress from '../../UI/CircularProgress';
+import { makeStyles } from '@material-ui/styles';
+import { StepIcon } from '@material-ui/core';
 
 const styles = {
   stepper: { flex: 1 },
-  linearProgress: { flex: 1 },
 };
+
+// We are obliged to override the StepIcon colors through StepLabel
+// since it is not customizable from Stepper props.
+const useStepLabelStyles = makeStyles(theme => ({
+  text: { fill: theme.palette.secondary.contrastText },
+  completed: {
+    fill: theme.palette.secondary.main,
+  },
+  active: {
+    fill: theme.palette.secondary.main,
+  },
+}));
 
 export type BuildStep =
   | ''
@@ -40,6 +53,20 @@ type Props = {|
   showSeeAllMyBuildsExplanation?: boolean,
   hasBuildStep: boolean,
 |};
+
+const CustomStepLabel = (props: { children: React.Node }) => {
+  const classes = useStepLabelStyles();
+  return (
+    <StepLabel
+      {...props}
+      StepIconComponent={iconProps => (
+        <StepIcon {...iconProps} classes={classes} />
+      )}
+    >
+      {props.children}
+    </StepLabel>
+  );
+};
 
 /**
  * Can be used in an exporter to show the overall progress of a build
@@ -79,9 +106,9 @@ const BuildStepsProgress = ({
       style={styles.stepper}
     >
       <Step>
-        <StepLabel>
+        <CustomStepLabel>
           <Trans>Game export</Trans>
-        </StepLabel>
+        </CustomStepLabel>
         <StepContent>
           {errored ? (
             <AlertMessage kind="error">
@@ -97,7 +124,6 @@ const BuildStepsProgress = ({
               </Text>
               <Line expand>
                 <LinearProgress
-                  style={styles.linearProgress}
                   value={
                     stepMaxProgress > 0
                       ? (stepCurrentProgress / stepMaxProgress) * 100
@@ -113,7 +139,7 @@ const BuildStepsProgress = ({
                 <Trans>Export in progress...</Trans>
               </Text>
               <Line expand>
-                <LinearProgress style={styles.linearProgress} />
+                <LinearProgress />
               </Line>
             </Column>
           )}
@@ -121,9 +147,9 @@ const BuildStepsProgress = ({
       </Step>
       {hasBuildStep && (
         <Step>
-          <StepLabel>
+          <CustomStepLabel>
             <Trans>Upload to build service</Trans>
-          </StepLabel>
+          </CustomStepLabel>
           <StepContent>
             {errored ? (
               <AlertMessage kind="error">
@@ -143,7 +169,6 @@ const BuildStepsProgress = ({
             ) : (
               <Line alignItems="center" expand>
                 <LinearProgress
-                  style={styles.linearProgress}
                   value={
                     stepMaxProgress > 0
                       ? (stepCurrentProgress / stepMaxProgress) * 100
@@ -158,9 +183,9 @@ const BuildStepsProgress = ({
       )}
       {hasBuildStep && (
         <Step>
-          <StepLabel>
+          <CustomStepLabel>
             <Trans>Build and download</Trans>
-          </StepLabel>
+          </CustomStepLabel>
           <StepContent>
             {errored && (
               <AlertMessage kind="error">
@@ -190,9 +215,9 @@ const BuildStepsProgress = ({
       )}
       {!hasBuildStep && (
         <Step>
-          <StepLabel>
+          <CustomStepLabel>
             <Trans>Done</Trans>
-          </StepLabel>
+          </CustomStepLabel>
           <StepContent />
         </Step>
       )}

@@ -5,7 +5,6 @@ import Dialog, { DialogPrimaryButton } from '../../UI/Dialog';
 import FlatButton from '../../UI/FlatButton';
 import { Line } from '../../UI/Grid';
 import Text from '../../UI/Text';
-import LinearProgress from '@material-ui/core/LinearProgress';
 import {
   Table,
   TableBody,
@@ -15,6 +14,7 @@ import {
   TableRowColumn,
 } from '../../UI/Table';
 import { ColumnStackLayout } from '../../UI/Layout';
+import LinearProgress from '../../UI/LinearProgress';
 
 export type FetchedResources = {|
   erroredResources: Array<{|
@@ -100,7 +100,9 @@ export const ResourceFetcherDialog = ({
               <Trans>Resources needed for the project are fetched...</Trans>
             )}
           </Text>
-          <LinearProgress variant="determinate" value={progress} />
+          <Line noMargin expand>
+            <LinearProgress variant="determinate" value={progress} />
+          </Line>
           {hasErrors && fetchedResources ? (
             <Table>
               <TableHeader>

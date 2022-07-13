@@ -43,9 +43,9 @@ const reAuthenticateAndRetryIfFailed = async <T>(
   }
 };
 
-const getVersionIdFromPath = (path) => {
+const getVersionIdFromPath = (path: string): string => {
   let cleanedPath = path;
-  const searchParamsStartIndex = path.indexOf('?')
+  const searchParamsStartIndex = path.indexOf('?');
   if (searchParamsStartIndex >= 0) {
     cleanedPath = path.substring(0, searchParamsStartIndex);
   }

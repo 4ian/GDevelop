@@ -14,10 +14,24 @@ import Text from '../../UI/Text';
 import AlertMessage from '../../UI/AlertMessage';
 import LinearProgress from '../../UI/LinearProgress';
 import CircularProgress from '../../UI/CircularProgress';
+import { makeStyles } from '@material-ui/styles';
+import { StepIcon } from '@material-ui/core';
 
 const styles = {
   stepper: { flex: 1 },
 };
+
+// We are obliged to override the StepIcon colors through StepLabel
+// since it is not customizable from Stepper props.
+const useStepLabelStyles = makeStyles(theme => ({
+  text: { fill: theme.palette.secondary.contrastText },
+  completed: {
+    fill: theme.palette.secondary.main,
+  },
+  active: {
+    fill: theme.palette.secondary.main,
+  },
+}));
 
 export type BuildStep =
   | ''
@@ -39,6 +53,20 @@ type Props = {|
   showSeeAllMyBuildsExplanation?: boolean,
   hasBuildStep: boolean,
 |};
+
+const CustomStepLabel = (props: { children: React.Node }) => {
+  const classes = useStepLabelStyles();
+  return (
+    <StepLabel
+      {...props}
+      StepIconComponent={iconProps => (
+        <StepIcon {...iconProps} classes={classes} />
+      )}
+    >
+      {props.children}
+    </StepLabel>
+  );
+};
 
 /**
  * Can be used in an exporter to show the overall progress of a build
@@ -78,9 +106,9 @@ const BuildStepsProgress = ({
       style={styles.stepper}
     >
       <Step>
-        <StepLabel>
+        <CustomStepLabel>
           <Trans>Game export</Trans>
-        </StepLabel>
+        </CustomStepLabel>
         <StepContent>
           {errored ? (
             <AlertMessage kind="error">
@@ -119,9 +147,9 @@ const BuildStepsProgress = ({
       </Step>
       {hasBuildStep && (
         <Step>
-          <StepLabel>
+          <CustomStepLabel>
             <Trans>Upload to build service</Trans>
-          </StepLabel>
+          </CustomStepLabel>
           <StepContent>
             {errored ? (
               <AlertMessage kind="error">
@@ -155,9 +183,9 @@ const BuildStepsProgress = ({
       )}
       {hasBuildStep && (
         <Step>
-          <StepLabel>
+          <CustomStepLabel>
             <Trans>Build and download</Trans>
-          </StepLabel>
+          </CustomStepLabel>
           <StepContent>
             {errored && (
               <AlertMessage kind="error">
@@ -187,9 +215,9 @@ const BuildStepsProgress = ({
       )}
       {!hasBuildStep && (
         <Step>
-          <StepLabel>
+          <CustomStepLabel>
             <Trans>Done</Trans>
-          </StepLabel>
+          </CustomStepLabel>
           <StepContent />
         </Step>
       )}

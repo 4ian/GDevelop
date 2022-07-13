@@ -181,7 +181,7 @@ const defineTileMap = function (
       _(
         'Displays a tiled-based map, made with the Tiled editor (download it separately on https://www.mapeditor.org/).'
       ),
-      'JsPlatform/Extensions/tile_map32.png',
+      'JsPlatform/Extensions/tile_map.svg',
       objectTileMap
     )
     .setCategoryFullName(_('Advanced'))
@@ -203,8 +203,8 @@ const defineTileMap = function (
       _('Check the Tilemap JSON file being used.'),
       _('The Tilemap JSON file of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
@@ -220,8 +220,8 @@ const defineTileMap = function (
       ),
       _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
@@ -235,8 +235,8 @@ const defineTileMap = function (
       _('Check the tileset JSON file being used.'),
       _('The tileset JSON file of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
@@ -252,8 +252,8 @@ const defineTileMap = function (
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
@@ -267,8 +267,8 @@ const defineTileMap = function (
       _('Compare the value of the display mode.'),
       _('The display mode of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter(
@@ -287,8 +287,8 @@ const defineTileMap = function (
       _('Set the display mode'),
       _('Set the display mode of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter(
@@ -307,8 +307,8 @@ const defineTileMap = function (
       _('Compare the value of the layer index.'),
       _('the layer index'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .useStandardRelationalOperatorParameters('number')
@@ -322,8 +322,8 @@ const defineTileMap = function (
       _('Set the layer index of the Tilemap.'),
       _('the layer index'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .useStandardOperatorParameters('number')
@@ -337,7 +337,7 @@ const defineTileMap = function (
       _('Layer index'),
       _('Get the layer index being displayed'),
       '',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .getCodeExtraInformation()
@@ -350,8 +350,8 @@ const defineTileMap = function (
       _('Compare the animation speed scale.'),
       _('the animation speed scale'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .useStandardRelationalOperatorParameters('number')
@@ -365,8 +365,8 @@ const defineTileMap = function (
       _('Set the animation speed scale of the Tilemap (1 by default).'),
       _('the animation speed scale'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .useStandardOperatorParameters('number')
@@ -380,7 +380,7 @@ const defineTileMap = function (
       _('Animation speed scale'),
       _('Get the Animation speed scale'),
       '',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .getCodeExtraInformation()
@@ -393,8 +393,8 @@ const defineTileMap = function (
       _('Compare the animation speed (in frames per second).'),
       _('the animation speed (FPS)'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .useStandardRelationalOperatorParameters('number')
@@ -408,8 +408,8 @@ const defineTileMap = function (
       _('Set the animation speed (in frames per second) of the Tilemap.'),
       _('the animation speed (FPS)'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg',
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .useStandardOperatorParameters('number')
@@ -423,7 +423,7 @@ const defineTileMap = function (
       _('Animation speed (FPS)'),
       _('Get the animation speed (in frames per second)'),
       '',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .getCodeExtraInformation()
@@ -605,7 +605,7 @@ const defineCollisionMask = function (
       _(
         'An invisible object that allows to handle collisions with parts of a tilemap.'
       ),
-      'JsPlatform/Extensions/tile_map32.png',
+      'JsPlatform/Extensions/tile_map_collision_mask.svg',
       collisionMaskObject
     )
     .setCategoryFullName(_('Advanced'))
@@ -625,8 +625,8 @@ const defineCollisionMask = function (
       _('Check the Tilemap JSON file being used.'),
       _('The Tilemap JSON file of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map_collision_mask.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
@@ -642,8 +642,8 @@ const defineCollisionMask = function (
       ),
       _('Set the Tilemap JSON file of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map_collision_mask.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
@@ -657,8 +657,8 @@ const defineCollisionMask = function (
       _('Check the tileset JSON file being used.'),
       _('The tileset JSON file of _PARAM0_ is _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map_collision_mask.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
@@ -674,8 +674,8 @@ const defineCollisionMask = function (
       ),
       _('Set the tileset JSON file of _PARAM0_ to _PARAM1_'),
       '',
-      'JsPlatform/Extensions/tile_map24.png',
-      'JsPlatform/Extensions/tile_map32.png'
+      'JsPlatform/Extensions/tile_map_collision_mask.svg',
+      'JsPlatform/Extensions/tile_map_collision_mask.svg'
     )
     .addParameter('object', 'TileMap', 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
@@ -833,7 +833,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return 'JsPlatform/Extensions/tile_map32.png';
+      return 'JsPlatform/Extensions/tile_map.svg';
     };
 
     /**
@@ -1057,7 +1057,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return 'JsPlatform/Extensions/tile_map32.png';
+      return 'JsPlatform/Extensions/tile_map_collision_mask.svg';
     };
 
     /**

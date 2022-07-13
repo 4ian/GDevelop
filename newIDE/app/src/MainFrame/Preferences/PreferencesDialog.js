@@ -20,7 +20,7 @@ import { Tabs, Tab } from '../../UI/Tabs';
 import RaisedButton from '../../UI/RaisedButton';
 import ShortcutsList from '../../KeyboardShortcuts/ShortcutsList';
 import LanguageSelector from './LanguageSelector';
-import Link from '@material-ui/core/Link';
+import Link from '../../UI/Link';
 const electron = optionalRequire('electron');
 
 type Props = {|
@@ -132,12 +132,11 @@ const PreferencesDialog = ({ i18n, onClose }: Props) => {
                   href={
                     'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
                   }
-                  onClick={event => {
+                  onClick={() =>
                     Window.openExternalURL(
                       'https://github.com/4ian/GDevelop/blob/master/newIDE/README-themes.md'
-                    );
-                    event.preventDefault();
-                  }}
+                    )
+                  }
                 >
                   create your own themes
                 </Link>

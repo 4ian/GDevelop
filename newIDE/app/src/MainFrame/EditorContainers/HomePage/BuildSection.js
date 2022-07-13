@@ -90,6 +90,20 @@ const getRelativeOrAbsoluteDisplayDate = (
   return i18n.date(date);
 };
 
+const PrettyBreakablePath = ({ path }: { path: string }) => {
+  const separatorIndices = Array.from(path)
+    .map((char, index) => (['/', '\\'].includes(char) ? index : null))
+    .filter(Boolean);
+  return separatorIndices.reduce((acc, separatorIndex, listIndex) => {
+    const nextSeparatorIndex = separatorIndices[listIndex + 1];
+    return [
+      ...acc,
+      <wbr key={separatorIndex} />,
+      path.substring(separatorIndex, nextSeparatorIndex || path.length),
+    ];
+  }, []);
+};
+
 const BuildSection = ({
   project,
   canOpen,
@@ -299,9 +313,15 @@ const BuildSection = ({
                                 <Column expand>
                                   <Line noMargin alignItems="center">
                                     <Text noMargin>
-                                      {file.fileMetadata.name ||
-                                        file.fileMetadata.fileIdentifier}
+                                      {file.fileMetadata.name || (
+                                        <PrettyBreakablePath
+                                          path={
+                                            file.fileMetadata.fileIdentifier
+                                          }
+                                        />
+                                      )}
                                     </Text>
+
                                     {pendingProject ===
                                       file.fileMetadata.fileIdentifier && (
                                       <>
@@ -331,8 +351,13 @@ const BuildSection = ({
                                 >
                                   <ListItemText
                                     primary={
-                                      file.fileMetadata.name ||
-                                      file.fileMetadata.fileIdentifier
+                                      file.fileMetadata.name || (
+                                        <PrettyBreakablePath
+                                          path={
+                                            file.fileMetadata.fileIdentifier
+                                          }
+                                        />
+                                      )
                                     }
                                     secondary={
                                       file.fileMetadata.lastModifiedDate

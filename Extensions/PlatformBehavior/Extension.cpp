@@ -778,7 +778,7 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
         "PlatformBehavior",
         _("Platform"),
         "Platform",
-        _("Flag objects as being platforms where characters can run on."),
+        _("Flag objects as being platforms which characters can run on."),
         "",
         "CppPlatform/Extensions/platformicon.png",
         "PlatformBehavior",

@@ -6,9 +6,7 @@ import muiDecorator from '../../ThemeDecorator';
 import paperDecorator from '../../PaperDecorator';
 import { LeaderboardAdmin } from '../../../GameDashboard/LeaderboardAdmin';
 import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
-import {
-  type Leaderboard,
-} from '../../../Utils/GDevelopServices/Play';
+import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
 import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 
 export default {

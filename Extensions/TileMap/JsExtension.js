@@ -601,7 +601,7 @@ const defineCollisionMask = function (
   const object = extension
     .addObject(
       'CollisionMask',
-      _('Tilemap collision mask'),
+      _('Tilemap collision mask (experimental)'),
       _(
         'Invisible object handling collisions with parts of a tilemap.'
       ),

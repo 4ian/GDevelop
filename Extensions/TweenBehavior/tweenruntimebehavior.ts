@@ -76,6 +76,18 @@ namespace gdjs {
     ];
   }
 
+  class TweenAwaiterTask extends gdjs.AsyncTask {
+    tween: TweenRuntimeBehavior.TweenInstance;
+    constructor(tween: TweenRuntimeBehavior.TweenInstance) {
+      super();
+      this.tween = tween;
+    }
+
+    update(runtimeScene: RuntimeScene) {
+      return this.tween.hasFinished;
+    }
+  }
+
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens: Record<string, TweenRuntimeBehavior.TweenInstance> = {};
     private _runtimeScene: gdjs.RuntimeScene;
@@ -912,11 +924,19 @@ namespace gdjs {
       if (!this._tweenExists(identifier)) return;
 
       this._tweens[identifier].instance.stop();
+      // Since once removed it cannot play again, consider it has finished playing (for {this.awaitTween})
+      this._tweens[identifier].hasFinished = true;
       if (this._runtimeScene.shiftyJsScene)
         this._runtimeScene.shiftyJsScene.remove(
           this._tweens[identifier].instance
         );
       delete this._tweens[identifier];
+    }
+
+    awaitTween(identifier: string) {
+      return this._tweenExists(identifier)
+        ? new TweenAwaiterTask(this._tweens[identifier])
+        : new gdjs.ResolveTask();
     }
 
     /**

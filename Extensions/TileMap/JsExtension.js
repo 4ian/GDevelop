@@ -740,7 +740,7 @@ module.exports = {
     objectsEditorService.registerEditorConfiguration(
       'TileMap::CollisionMask',
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor({
-        helpPagePath: '/objects/tile_map_object',
+        helpPagePath: '/objects/tilemap',
       })
     );
   },

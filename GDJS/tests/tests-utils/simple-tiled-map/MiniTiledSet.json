@@ -21,7 +21,7 @@
                      "id":1,
                      "name":"",
                      "rotation":0,
-                     "type":"",
+                     "class":"",
                      "visible":true,
                      "width":8,
                      "x":0,
@@ -33,7 +33,7 @@
              "x":0,
              "y":0
             },
-         "type":"obstacle"
+         "class":"obstacle"
         }, 
         {
          "id":2,
@@ -60,7 +60,7 @@
                              "y":-8
                             }],
                      "rotation":0,
-                     "type":"",
+                     "class":"",
                      "visible":true,
                      "width":0,
                      "x":0,
@@ -72,7 +72,7 @@
              "x":0,
              "y":0
             },
-         "type":"obstacle"
+         "class":"obstacle"
         }, 
         {
          "id":3,
@@ -100,7 +100,7 @@
                              "y":0
                             }],
                      "rotation":0,
-                     "type":"",
+                     "class":"",
                      "visible":true,
                      "width":0,
                      "x":0,
@@ -124,7 +124,7 @@
                              "y":0
                             }],
                      "rotation":180,
-                     "type":"",
+                     "class":"",
                      "visible":true,
                      "width":0,
                      "x":8,
@@ -136,7 +136,7 @@
              "x":0,
              "y":0
             },
-         "type":"obstacle"
+         "class":"obstacle"
         }, 
         {
          "id":4,
@@ -164,7 +164,7 @@
                              "y":0
                             }],
                      "rotation":0,
-                     "type":"obstacle",
+                     "class":"obstacle",
                      "visible":true,
                      "width":0,
                      "x":0,
@@ -188,7 +188,7 @@
                              "y":0
                             }],
                      "rotation":180,
-                     "type":"lava",
+                     "class":"lava",
                      "visible":true,
                      "width":0,
                      "x":8,
@@ -214,7 +214,7 @@
                      "id":1,
                      "name":"",
                      "rotation":0,
-                     "type":"",
+                     "class":"",
                      "visible":true,
                      "width":8,
                      "x":0,
@@ -226,7 +226,7 @@
              "x":0,
              "y":0
             },
-         "type":"lava"
+         "class":"lava"
         }],
  "tilewidth":8,
  "type":"tileset",

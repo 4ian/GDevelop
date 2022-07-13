@@ -229,9 +229,7 @@ export const GameCard = ({
                       {game.discoverable ? (
                         <Trans>Public on Liluo.io</Trans>
                       ) : (
-                        <Trans>
-                          Build version only (non visible on Liluo.io)
-                        </Trans>
+                        <Trans>Not visible on Liluo.io</Trans>
                       )}
                     </Text>
                     <Spacer />

@@ -344,7 +344,7 @@ const MainFrame = (props: Props) => {
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
-  ] = React.useState<?number>(null);
+  ] = React.useState<number>(0);
   const [
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
@@ -733,7 +733,7 @@ const MainFrame = (props: Props) => {
   );
 
   const onFileOpeningProgress = (
-    progress: ?number,
+    progress: number,
     message: ?MessageDescriptor
   ) => {
     setFileMetadataOpeningProgress(progress);
@@ -818,7 +818,7 @@ const MainFrame = (props: Props) => {
           if (!verifyProjectContent(i18n, content)) {
             // The content is not recognized and the user was warned. Abort the opening.
             setIsLoadingProject(false);
-            onFileOpeningProgress(null, null);
+            onFileOpeningProgress(0, null);
             return;
           }
 
@@ -853,7 +853,7 @@ const MainFrame = (props: Props) => {
             rawError: error,
           });
           setIsLoadingProject(false);
-          onFileOpeningProgress(null, null);
+          onFileOpeningProgress(0, null);
           return Promise.reject(error);
         });
     },
@@ -1389,7 +1389,7 @@ const MainFrame = (props: Props) => {
         editorTabs: tabsWithSceneAndEventsEditors,
       }));
       setIsLoadingProject(false);
-      onFileOpeningProgress(null, null);
+      onFileOpeningProgress(0, null);
       openProjectManager(false);
     },
     [i18n, setState, state.editorTabs]

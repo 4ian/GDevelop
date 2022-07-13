@@ -603,7 +603,7 @@ const defineCollisionMask = function (
       'CollisionMask',
       _('Tilemap collision mask'),
       _(
-        'An invisible object that allows to handle collisions with parts of a tilemap.'
+        'Invisible object handling collisions with parts of a tilemap.'
       ),
       'JsPlatform/Extensions/tile_map_collision_mask32.svg',
       collisionMaskObject

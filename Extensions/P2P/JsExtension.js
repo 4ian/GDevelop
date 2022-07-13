@@ -151,24 +151,8 @@ module.exports = {
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/P2P/A_peer.js')
       .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .setFunctionName('gdjs.evtTools.p2p.connect');
-
-    extension
-      .addAction(
-        'ConnectAsync',
-        _('Connect to another client (async)'),
-        _('Connects the current client to another client using its id. Continue executing events after the connection either fails or succeeds.'),
-        _('Start and wait for connection to P2P client _PARAM0_'),
-        '',
-        'JsPlatform/Extensions/p2picon.svg',
-        'JsPlatform/Extensions/p2picon.svg'
-      )
-      .addParameter('string', _('ID of the other client'), '', false)
-      .setAsync()
-      .getCodeExtraInformation()
-      .setIncludeFile('Extensions/P2P/A_peer.js')
-      .addIncludeFile('Extensions/P2P/B_p2ptools.js')
-      .setFunctionName('gdjs.evtTools.p2p.connectAsync');
+      .setFunctionName('gdjs.evtTools.p2p.connect')
+      .setAsyncFunctionName('gdjs.evtTools.p2p.connectAsync');
 
     extension
       .addAction(

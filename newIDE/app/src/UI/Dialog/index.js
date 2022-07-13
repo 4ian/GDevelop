@@ -48,9 +48,9 @@ const useDangerousStyles = makeStyles(theme => ({
       content: '""',
       height: 60,
       background: `repeating-linear-gradient(110deg, ${
+        theme.palette.error.dark
+      }, ${theme.palette.error.dark} 25px, ${theme.palette.error.main} 25px, ${
         theme.palette.error.main
-      }, ${theme.palette.error.main} 25px, ${theme.palette.error.light} 25px, ${
-        theme.palette.error.light
       } 40px)`,
     },
   },

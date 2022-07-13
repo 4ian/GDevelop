@@ -20,7 +20,7 @@ type Props = {|
   onToggle: (e: {||}, toggled: boolean) => void,
   disabled?: boolean,
   labelPosition: 'right' | 'left',
-  size: 'small',
+  size?: 'small',
 
   style?: {|
     marginTop?: number,

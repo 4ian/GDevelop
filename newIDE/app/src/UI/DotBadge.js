@@ -11,7 +11,7 @@ type Props = {|
 |};
 
 const DotBadge = (props: Props) => (
-  <MuiBadge color="primary" variant="dot" {...props} />
+  <MuiBadge color="secondary" variant="dot" {...props} />
 );
 
 export default DotBadge;

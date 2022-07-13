@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../ThemeDecorator';
 
@@ -8,11 +7,12 @@ import TextField from '../../UI/TextField';
 import IconButton from '../../UI/IconButton';
 import Copy from '../../UI/CustomSvgIcons/Copy';
 import { ColumnStackLayout } from '../../UI/Layout';
+import paperDecorator from '../PaperDecorator';
 
 export default {
   title: 'UI Building Blocks/TextField',
   component: TextField,
-  decorators: [muiDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const Default = () => {
@@ -55,7 +55,7 @@ export const EndAdornment = () => {
         margin="none"
         value={value}
         onChange={(_, text) => setValue(text)}
-        floatingLabelText="Text field label"
+        floatingLabelText="Text field label (with no margin)"
         endAdornment={
           <IconButton edge="end">
             <Copy />

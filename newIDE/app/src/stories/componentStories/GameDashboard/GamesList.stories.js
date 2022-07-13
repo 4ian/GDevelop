@@ -19,7 +19,7 @@ import { GamesList } from '../../../GameDashboard/GamesList';
 export default {
   title: 'GameDashboard/GamesList',
   component: GamesList,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const WithoutAProjectOpened = () => {

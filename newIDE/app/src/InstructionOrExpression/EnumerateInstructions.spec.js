@@ -70,10 +70,10 @@ describe('EnumerateInstructions', () => {
         },
       },
       Audio: {
-        'Sounds and musics': {
+        'Sounds and music': {
           'Global volume': {
             displayedName: 'Global volume',
-            fullGroupName: 'Audio/Sounds and musics',
+            fullGroupName: 'Audio/Sounds and music',
             type: 'GlobalVolume',
           },
         },

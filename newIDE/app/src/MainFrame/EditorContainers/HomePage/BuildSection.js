@@ -26,6 +26,10 @@ import ContextMenu, {
 import { type MenuItemTemplate } from '../../../UI/Menu/Menu.flow';
 import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
 import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
+import optionalRequire from '../../../Utils/OptionalRequire';
+const electron = optionalRequire('electron');
+
+const isWebApp = !electron;
 
 const styles = {
   listItem: {
@@ -108,25 +112,28 @@ const BuildSection = ({
     file => file.fileMetadata
   );
 
-  const { cloudProjects } = authenticatedUser;
+  // Only show cloud projects on the web app
+  if (isWebApp) {
+    const { cloudProjects } = authenticatedUser;
 
-  if (cloudProjects) {
-    projectFiles = projectFiles.concat(
-      cloudProjects
-        .map(cloudProject => {
-          if (cloudProject.deletedAt) return null;
-          const file: FileMetadataAndStorageProviderName = {
-            storageProviderName: 'Cloud',
-            fileMetadata: {
-              fileIdentifier: cloudProject.id,
-              lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
-              name: cloudProject.name,
-            },
-          };
-          return file;
-        })
-        .filter(Boolean)
-    );
+    if (cloudProjects) {
+      projectFiles = projectFiles.concat(
+        cloudProjects
+          .map(cloudProject => {
+            if (cloudProject.deletedAt) return null;
+            const file: FileMetadataAndStorageProviderName = {
+              storageProviderName: 'Cloud',
+              fileMetadata: {
+                fileIdentifier: cloudProject.id,
+                lastModifiedDate: Date.parse(cloudProject.lastModifiedAt),
+                name: cloudProject.name,
+              },
+            };
+            return file;
+          })
+          .filter(Boolean)
+      );
+    }
   }
 
   projectFiles.sort((a, b) => {

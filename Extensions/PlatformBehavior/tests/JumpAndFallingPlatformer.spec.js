@@ -1606,4 +1606,98 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       expect(object.getY()).to.be(-30);
     });
   });
+
+  describe('(jump against a wall)', function () {
+    /** @type {gdjs.RuntimeScene} */
+    let runtimeScene;
+    /** @type {gdjs.RuntimeObject} */
+    let object;
+    /** @type {gdjs.PlatformerObjectRuntimeBehavior} */
+    let behavior;
+
+    beforeEach(function () {
+      runtimeScene = makePlatformerTestRuntimeScene();
+
+      // Put a platformer object on a platform
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 1500,
+            maxFallingSpeed: 1500,
+            acceleration: 500,
+            deceleration: 1500,
+            maxSpeed: 500,
+            jumpSpeed: 900,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+            jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
+          },
+        ],
+        effects: [],
+      });
+      behavior = object.getBehavior('auto1');
+      object.setCustomWidthAndHeight(10, 20);
+      runtimeScene.addObject(object);
+      // The object is in the corner of the platform.
+      object.setPosition(80 - 10, 80 - 20);
+
+      // Put a platform.
+    });
+
+    [
+      {
+        wallBeing: 'distinct from the floor',
+        createPlatforms: (runtimeScene) => {
+          const floor = addPlatformObject(runtimeScene);
+          floor.setPosition(0, 80);
+          floor.setCustomWidthAndHeight(100, 20);
+
+          const wall = addPlatformObject(runtimeScene);
+          wall.setPosition(80, 0);
+          wall.setCustomWidthAndHeight(20, 100);
+        },
+      },
+      {
+        wallBeing: 'merged with the floor',
+        createPlatforms: (runtimeScene) => {
+          const platform = addFloorAndWallPlatformObject(runtimeScene);
+          platform.setPosition(0, 0);
+        },
+      },
+    ].forEach(({ wallBeing, createPlatforms }) => {
+      it(`can jump while moving against a wall ${wallBeing}`, function () {
+        createPlatforms(runtimeScene);
+
+        // The object stays on the platform.
+        for (let i = 0; i < 5; ++i) {
+          runtimeScene.renderAndStep(1000 / 60);
+        }
+        expect(object.getY()).to.within(60 - epsilon, 60 + epsilon);
+        expect(behavior.isFalling()).to.be(false);
+        expect(behavior.isFallingWithoutJumping()).to.be(false);
+        expect(behavior.isMoving()).to.be(false);
+
+        // Jump without sustain.
+        behavior.simulateJumpKey();
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(behavior.isJumping()).to.be(true);
+        // The object is jumping and get higher.
+        for (let i = 0; i < 5; ++i) {
+          const oldY = object.getY();
+          behavior.simulateRightKey();
+          runtimeScene.renderAndStep(1000 / 60);
+          expect(behavior.isJumping()).to.be(true);
+          expect(object.getX()).to.be(80 - 10);
+          expect(object.getY()).to.be.lessThan(oldY);
+        }
+      });
+    });
+  });
 });

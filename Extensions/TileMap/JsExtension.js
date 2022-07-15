@@ -1027,15 +1027,11 @@ module.exports = {
         this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
         // Check if the point is inside the object bounds
-        const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-        const originalHeight =
-          this._pixiObject.height / this._pixiObject.scale.y;
-
         return (
           localPosition.x >= 0 &&
-          localPosition.x < originalWidth &&
+          localPosition.x < this.width &&
           localPosition.y >= 0 &&
-          localPosition.y < originalHeight
+          localPosition.y < this.height
         );
       };
       this._pixiContainer.addChild(this._pixiObject);

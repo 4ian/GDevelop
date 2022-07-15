@@ -1646,8 +1646,6 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
       runtimeScene.addObject(object);
       // The object is in the corner of the platform.
       object.setPosition(80 - 10, 80 - 20);
-
-      // Put a platform.
     });
 
     [
@@ -1698,6 +1696,93 @@ describe('gdjs.PlatformerObjectRuntimeBehavior', function () {
           expect(object.getY()).to.be.lessThan(oldY);
         }
       });
+    });
+  });
+
+  describe('(jump from slopes)', function () {
+    /** @type {gdjs.RuntimeScene} */
+    let runtimeScene;
+    /** @type {gdjs.RuntimeObject} */
+    let object;
+    /** @type {gdjs.PlatformerObjectRuntimeBehavior} */
+    let behavior;
+
+    beforeEach(function () {
+      runtimeScene = makePlatformerTestRuntimeScene();
+
+      // Put a platformer object on a platform
+      object = new gdjs.TestRuntimeObject(runtimeScene, {
+        name: 'obj1',
+        type: '',
+        behaviors: [
+          {
+            type: 'PlatformBehavior::PlatformerObjectBehavior',
+            name: 'auto1',
+            gravity: 150,
+            maxFallingSpeed: 1500,
+            acceleration: 1000000,
+            deceleration: 1500,
+            maxSpeed: 2000,
+            // This is a very low speed relatively to other properties.
+            // This is not a playable configuration.
+            jumpSpeed: 100,
+            canGrabPlatforms: true,
+            ignoreDefaultControls: true,
+            slopeMaxAngle: 60,
+            jumpSustainTime: 0.2,
+            useLegacyTrajectory: false,
+          },
+        ],
+        effects: [],
+      });
+      behavior = object.getBehavior('auto1');
+      object.setCustomWidthAndHeight(10, 20);
+      runtimeScene.addObject(object);
+      // The object is in the slope.
+      object.setPosition(0, 70);
+
+      const platform = addUpSlopePlatformObject(runtimeScene);
+      platform.setPosition(0, 0);
+    });
+
+    // This is a edge case. The test can be changed if necessary.
+    // Usually characters jump speed is higher than the speed on Y following a
+    // slope.
+    it('can jump while moving up on a slope', function () {
+      // The object stays on the platform.
+      for (let i = 0; i < 5; ++i) {
+        runtimeScene.renderAndStep(1000 / 60);
+      }
+      expect(object.getY()).to.within(70, 70 + 1);
+      expect(behavior.isFalling()).to.be(false);
+      expect(behavior.isFallingWithoutJumping()).to.be(false);
+      expect(behavior.isMoving()).to.be(false);
+
+      behavior.simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+
+      // Jump without sustain.
+      behavior.simulateJumpKey();
+      behavior.simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.isJumping()).to.be(true);
+      // The object is jumping and is kind of sliding on the slope.
+      // This behavior is not expected but it avoid the character to be stuck
+      // into the floor in more common cases.
+      for (let i = 0; i < 19; ++i) {
+        const oldY = object.getY();
+        behavior.simulateRightKey();
+        runtimeScene.renderAndStep(1000 / 60);
+        expect(behavior.isJumping()).to.be(true);
+        expect(object.getY()).to.be.lessThan(oldY);
+        // As soon as: behavior.getCurrentJumpSpeed() - behavior.getCurrentFallSpeed()
+        // The character is in the falling step of the jump and it can land.
+        expect(behavior.isFalling()).to.be(false);
+      }
+      // The character lands.
+      behavior.simulateRightKey();
+      runtimeScene.renderAndStep(1000 / 60);
+      expect(behavior.isOnFloor()).to.be(true);
     });
   });
 });

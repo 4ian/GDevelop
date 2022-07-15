@@ -1723,14 +1723,15 @@ namespace gdjs {
       behavior._requestedDeltaX +=
         this._floorPlatform!.owner.getX() - this._floorLastX;
       // See `beforeUpdatingObstacles` for the logic for the Y axis.
+
+      //Jumping
+      behavior._checkTransitionJumping();
     }
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
       //Go on a ladder
       behavior._checkTransitionOnLadder();
-      //Jumping
-      behavior._checkTransitionJumping();
     }
 
     beforeMovingY(timeDelta: float, oldX: float) {

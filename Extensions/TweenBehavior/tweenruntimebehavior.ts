@@ -76,6 +76,18 @@ namespace gdjs {
     ];
   }
 
+  class TweenAwaiterTask extends gdjs.AsyncTask {
+    tween: TweenRuntimeBehavior.TweenInstance;
+    constructor(tween: TweenRuntimeBehavior.TweenInstance) {
+      super();
+      this.tween = tween;
+    }
+
+    update(runtimeScene: RuntimeScene) {
+      return this.tween.hasFinished;
+    }
+  }
+
   export class TweenRuntimeBehavior extends gdjs.RuntimeBehavior {
     private _tweens: Record<string, TweenRuntimeBehavior.TweenInstance> = {};
     private _runtimeScene: gdjs.RuntimeScene;
@@ -104,16 +116,10 @@ namespace gdjs {
     }
 
     onDestroy() {
-      const shiftyJsScene = this._runtimeScene.shiftyJsScene;
-      if (!shiftyJsScene) return;
-
       // Stop and delete all tweens of the behavior - otherwise they could:
       // - continue to point to the behavior, and so to the object (memory leak),
       // - affect the object in case it's recycled (wrong/hard to debug behavior).
-      for (const identifier in this._tweens) {
-        this._tweens[identifier].instance.stop();
-        shiftyJsScene.remove(this._tweens[identifier].instance);
-      }
+      for (const identifier in this._tweens) this.removeTween(identifier);
     }
 
     private _addTween(
@@ -912,11 +918,19 @@ namespace gdjs {
       if (!this._tweenExists(identifier)) return;
 
       this._tweens[identifier].instance.stop();
+      // Since once removed it cannot play again, consider it has finished playing (for {this.awaitTween})
+      this._tweens[identifier].hasFinished = true;
       if (this._runtimeScene.shiftyJsScene)
         this._runtimeScene.shiftyJsScene.remove(
           this._tweens[identifier].instance
         );
       delete this._tweens[identifier];
+    }
+
+    awaitTween(identifier: string) {
+      return this._tweenExists(identifier)
+        ? new TweenAwaiterTask(this._tweens[identifier])
+        : new gdjs.ResolveTask();
     }
 
     /**

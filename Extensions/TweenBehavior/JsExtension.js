@@ -874,6 +874,22 @@ module.exports = {
       .setFunctionName('removeTween');
 
     behavior
+      .addAction(
+        'AwaitTween',
+        _('Await the end of a tween'),
+        _('Waits until a tween has finished before continuing the execution of events.'),
+        _('Wait for tween _PARAM2_ of _PARAM0_ to end'),
+        '',
+        'JsPlatform/Extensions/tween_behavior24.png',
+        'JsPlatform/Extensions/tween_behavior32.png'
+      )
+      .addParameter('object', _('Object'), '', false)
+      .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
+      .addParameter('string', _('Tween Identifier'), '', false)
+      .getCodeExtraInformation()
+      .setAsyncFunctionName('awaitTween');
+
+    behavior
       .addExpression(
         'Progress',
         _('Progress of a tween'),

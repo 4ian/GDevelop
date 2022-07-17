@@ -886,9 +886,8 @@ module.exports = {
       .addParameter('object', _('Object'), '', false)
       .addParameter('behavior', _('Behavior'), 'TweenBehavior', false)
       .addParameter('string', _('Tween Identifier'), '', false)
-      .setAsync()
       .getCodeExtraInformation()
-      .setFunctionName('awaitTween');
+      .setAsyncFunctionName('awaitTween');
 
     behavior
       .addExpression(

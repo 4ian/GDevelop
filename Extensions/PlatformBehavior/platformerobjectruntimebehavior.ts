@@ -1721,7 +1721,7 @@ namespace gdjs {
       // follow up a slope when moving Y (it enter inside it).
       // When the current floor and the wall the character is facing is part of
       // the same instance, the wall is also ignored when moving on X, but the
-      // wall is to high to follow and it is seen as colliding an obstacle
+      // wall is too high to follow and it is seen as colliding an obstacle
       // from behind.
       // Moving against a wall before jumping in this configuration was making
       // jumps being aborted.

@@ -1715,6 +1715,17 @@ namespace gdjs {
         behavior._overlappedJumpThru.push(this._floorPlatform!);
         behavior._setFalling();
       }
+
+      // It was originally in checkTransitionBeforeY.
+      // The character is ignoring the floor when moving on X to be able to
+      // follow up a slope when moving Y (it enter inside it).
+      // When the current floor and the wall the character is facing is part of
+      // the same instance, the wall is also ignored when moving on X, but the
+      // wall is to high to follow and it is seen as colliding an obstacle
+      // from behind.
+      // Moving against a wall before jumping in this configuration was making
+      // jumps being aborted.
+      behavior._checkTransitionJumping();
     }
 
     beforeMovingX() {
@@ -1723,14 +1734,11 @@ namespace gdjs {
       behavior._requestedDeltaX +=
         this._floorPlatform!.owner.getX() - this._floorLastX;
       // See `beforeUpdatingObstacles` for the logic for the Y axis.
-
-      //Jumping
-      behavior._checkTransitionJumping();
     }
 
     checkTransitionBeforeY(timeDelta: float) {
       const behavior = this._behavior;
-      //Go on a ladder
+      // Go on a ladder
       behavior._checkTransitionOnLadder();
     }
 

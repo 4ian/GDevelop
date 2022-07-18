@@ -54,7 +54,7 @@ const ProfileDialog = ({
         Window.openExternalURL(url);
       } catch (error) {
         showErrorBox({
-          message: 'Unable to load the portal to manage your subscription.',
+          message: 'Unable to load the portal to manage your subscription. Please contact us on billing@gdevelop.io',
           rawError: error,
           errorId: 'subscription-portal-error',
         });

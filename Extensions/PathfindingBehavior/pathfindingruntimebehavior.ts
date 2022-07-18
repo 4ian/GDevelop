@@ -648,6 +648,7 @@ namespace gdjs {
         while (this._openNodes.length !== 0) {
           //Make sure we do not search forever.
           if (iterationCount++ > maxIterationCount) {
+            console.warn(`No path was found after covering ${maxIterationCount} cells.`);
             return false;
           }
 

@@ -29,7 +29,6 @@ export function Tabs<TabName>({
       indicatorColor="secondary"
       value={value}
       onChange={(e, newValue) => onChange(newValue)}
-      allowScrollButtonsMobile={!!variant}
       scrollButtons={variant ? 'on' : 'off'}
     >
       {children}

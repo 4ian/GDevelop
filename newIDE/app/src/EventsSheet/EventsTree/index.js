@@ -555,6 +555,7 @@ export default class ThemableEventsTree extends Component<
                 actionLabel={<Trans>Add an event</Trans>}
                 helpPagePath="/events"
                 tutorialId="intro-event-system"
+                actionButtonId="add-event-button"
                 onAction={() =>
                   this.props.onAddNewEvent(
                     'BuiltinCommonInstructions::Standard',

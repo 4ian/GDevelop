@@ -27,7 +27,7 @@ type Props = {|
   onChange: AutocompleteOption => void,
   dataSource: DataSource,
   inputValue: ?string,
-  onInputChange: string => void,
+  onInputChange: (event: Object, value: string, reason: string) => void,
 
   floatingLabelText?: React.Node,
   hintText?: MessageDescriptor,

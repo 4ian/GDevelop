@@ -23,11 +23,11 @@ blocks:
                 cache store newIDE-app-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum newIDE/app/package-lock.json) newIDE/app/node_modules
               fi
             - |-
-              if ! cache has_key TileMap-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum Extensions/TileMap/package-lock.json); then
-                cd Extensions/TileMap
+              if ! cache has_key TileMapHelper-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum Extensions/TileMap/helper/package-lock.json); then
+                cd Extensions/TileMap/helper
                 npm ci
-                cd ../..
-                cache store TileMap-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum Extensions/TileMap/package-lock.json) Extensions/TileMap/node_modules
+                cd ../../..
+                cache store TileMapHelper-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum Extensions/TileMap/helper/package-lock.json) Extensions/TileMap/helper/node_modules
               fi
             - |-
               if ! cache has_key GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json); then

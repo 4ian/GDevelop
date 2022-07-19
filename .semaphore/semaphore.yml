@@ -64,6 +64,7 @@ blocks:
           commands:
             - checkout
             - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cache restore TileMapHelper-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum Extensions/TileMap/helper/package-lock.json)
             - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
             - cd GDJS
             - npm run check-types
@@ -107,6 +108,7 @@ blocks:
           commands:
             - checkout
             - cache restore GDJS-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/package-lock.json)
+            - cache restore TileMapHelper-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum Extensions/TileMap/helper/package-lock.json)
             - cache restore GDJS-tests-node_modules-$SEMAPHORE_GIT_BRANCH-revision-$(checksum GDJS/tests/package-lock.json)
             - cd GDJS
             - npm run build

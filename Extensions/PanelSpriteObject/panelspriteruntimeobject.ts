@@ -108,7 +108,7 @@ namespace gdjs {
       return true;
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Container {
       return this._renderer.getRendererObject();
     }
 

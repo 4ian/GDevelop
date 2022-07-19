@@ -17,5 +17,7 @@ module.exports = {
       minify: true,
       bundle: true,
       sourcemap: true,
+      // Make bundles importable via CommonJS for usage in electron
+      footer: { js: `if(typeof module === "object") module.exports = ${namespaceName};` },
     }),
 };

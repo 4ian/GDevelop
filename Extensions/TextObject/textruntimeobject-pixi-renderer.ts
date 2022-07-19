@@ -26,7 +26,7 @@ namespace gdjs {
       this.updatePosition();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Text {
       return this._text;
     }
 

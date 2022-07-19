@@ -35,7 +35,7 @@ namespace gdjs {
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Graphics {
       return this._graphics;
     }
 

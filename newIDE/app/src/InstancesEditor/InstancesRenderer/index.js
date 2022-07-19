@@ -1,7 +1,7 @@
 // @flow
 import LayerRenderer from './LayerRenderer';
 import ViewPosition from '../ViewPosition';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../../PIXI';
 import Rectangle from '../../Utils/Rectangle';
 
 export default class InstancesRenderer {

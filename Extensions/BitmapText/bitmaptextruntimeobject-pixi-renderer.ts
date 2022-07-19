@@ -51,7 +51,7 @@ namespace gdjs {
       this.updateTint();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.BitmapText {
       return this._pixiObject;
     }
 

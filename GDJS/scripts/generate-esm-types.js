@@ -9,9 +9,22 @@ const { getAllInOutFilePaths } = require('./lib/runtime-files-list');
     bundledOutPath: __dirname, // Dummy directory name, since we do not care about compilation destination.
   });
 
+  const entryPointsForNamespace = new Map();
+  for (const { inPath, namespace } of allESMInOutFilePaths) {
+    const entryPoints = entryPointsForNamespace.get(namespace) || [];
+    entryPoints.push(inPath);
+    entryPointsForNamespace.set(namespace, entryPoints);
+  }
+
+  const namespacesWithEntryPoints = Array.from(
+    entryPointsForNamespace.entries()
+  );
+
   await Promise.all(
-    allESMInOutFilePaths.map(({ inPath, namespace }) =>
-      compileESModuleTypeDefinitions(inPath, namespace)
+    namespacesWithEntryPoints.map(([namespace, entryPoints]) =>
+      compileESModuleTypeDefinitions(entryPoints, namespace).catch((e) =>
+        console.error('Error while creating type definitions! ', e)
+      )
     )
   );
 })();

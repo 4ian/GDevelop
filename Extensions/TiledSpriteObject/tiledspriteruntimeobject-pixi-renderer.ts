@@ -25,7 +25,7 @@ namespace gdjs {
       this.updateYOffset();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.TilingSprite {
       return this._tiledSprite;
     }
 

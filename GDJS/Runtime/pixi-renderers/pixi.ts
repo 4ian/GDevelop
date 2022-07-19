@@ -44,6 +44,8 @@ export * from '@pixi/canvas-mesh';
 
 export * from '@pixi/text-bitmap';
 
+export * as tilemap from '@pixi/tilemap';
+
 // Extras
 export * from '@pixi/loaders';
 import '@pixi/mixin-cache-as-bitmap';
@@ -87,7 +89,8 @@ import { DisplacementFilter } from '@pixi/filter-displacement';
 import { FXAAFilter } from '@pixi/filter-fxaa';
 import { NoiseFilter } from '@pixi/filter-noise';
 
-// A namespace is needed for the type definitions to merge, but exporting a namespcae makes typescript think this is a namespaced file instead of a module.
+// A namespace is needed for the type definitions to merge,
+// but exporting a namespace makes typescript think this is a namespaced file instead of a module.
 // Replace the defintions automatically in the build script.
 /** TYPES_REPLACE */
 var filters = {

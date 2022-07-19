@@ -44,6 +44,14 @@ const untransformedPaths = [
   'Extensions/JsExtensionTypes.flow.js',
 ].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
 
+// Files under these paths (relative to the GDevelop root path) will be completely
+// ignored. This is useful for example for ESM source files, where only the
+// entrypoint should be compiled.
+const ignoredPaths = [
+  // TileMapHelper source files:
+  'Extensions/TileMap/TileMapHelper/src',
+].map((untransformedPath) => path.resolve(gdevelopRootPath, untransformedPath));
+
 /**
  * The list of modules that are not namespaced typescript but ES Modules to be bundled as a namespace.
  * The key is the path to the module relative to the GDevelop root path, and the value is the name of
@@ -53,6 +61,7 @@ const untransformedPaths = [
 const ESModulesList = Object.fromEntries(
   Object.entries({
     'GDJS/Runtime/pixi-renderers/pixi.ts': 'PIXI',
+    'Extensions/TileMap/helper/TileMapHelper.ts': 'TileMapHelper',
   }).map(([untransformedPath, namespace]) => [
     path.resolve(gdevelopRootPath, untransformedPath),
     namespace,
@@ -85,6 +94,16 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
     directoryName === 'tests' ||
     directoryName === '__tests__'
   );
+};
+
+/**
+ * Check if a folder or directory should be ignored.
+ * @param {string} fileOrDirectoryPath
+ * @param {fs.Stats} stats
+ */
+const isIgnoredFileOrDirectory = (fileOrDirectoryPath, stats) => {
+  const resolvedPath = path.resolve(fileOrDirectoryPath);
+  return ignoredPaths.includes(resolvedPath);
 };
 
 /**
@@ -145,9 +164,11 @@ module.exports = {
     // List all the files of the runtime
     const allGDJSInFilePaths = await recursive(gdjsRuntimePath, [
       isNotAllowedExtension,
+      isIgnoredFileOrDirectory,
     ]);
     const allExtensionsInFilePaths = await recursive(extensionsRuntimePath, [
       isNotAllowedExtension,
+      isIgnoredFileOrDirectory,
       isTestDirectory,
     ]);
 

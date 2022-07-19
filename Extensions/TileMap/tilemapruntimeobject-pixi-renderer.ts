@@ -1,5 +1,3 @@
-/// <reference path="helper/TileMapHelper.d.ts" />
-/// <reference path="pixi-tilemap/dist/pixi-tilemap.d.ts" />
 namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
 
@@ -26,6 +24,8 @@ namespace gdjs {
       this._runtimeScene = runtimeScene;
 
       // Load (or reset)
+      //TODO: Fix this error
+      //@ts-ignore
       this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
       this._pixiObject.tileAnim = [0, 0];
 
@@ -101,5 +101,6 @@ namespace gdjs {
   }
   export const TileMapRuntimeObjectRenderer =
     gdjs.TileMapRuntimeObjectPixiRenderer;
-  export type TileMapRuntimeObjectRenderer = gdjs.TileMapRuntimeObjectPixiRenderer;
+  export type TileMapRuntimeObjectRenderer =
+    gdjs.TileMapRuntimeObjectPixiRenderer;
 }

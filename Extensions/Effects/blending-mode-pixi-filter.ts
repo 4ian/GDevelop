@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   gdjs.PixiFiltersTools.registerFilterCreator('BlendingMode', {
     makePIXIFilter: function (target, effectData) {
       const blendingModeFilter = new PIXI.filters.AlphaFilter();

@@ -190,9 +190,6 @@ const defineTileMap = function (
     .addIncludeFile(
       'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
     )
-    .addIncludeFile(
-      'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
-    )
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
 
   object

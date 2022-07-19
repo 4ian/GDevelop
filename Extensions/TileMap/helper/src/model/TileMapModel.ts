@@ -1,4 +1,4 @@
-import { PolygonVertices, integer, float } from "./CommonTypes";
+import { PolygonVertices, integer, float } from './CommonTypes';
 
 /**
  * A tile map model.

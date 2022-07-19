@@ -110,7 +110,7 @@ const jsExtensions = [
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/JsExtension.js'),
     objectsRenderingServiceModules: {
       // $FlowExpectedError - this path is ignored for Flow.
-      "helper/TileMapHelper": require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
+      'helper/TileMapHelper': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
     },
   },
   {

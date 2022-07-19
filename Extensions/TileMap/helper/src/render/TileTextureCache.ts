@@ -1,5 +1,5 @@
-import { integer } from "../model/CommonTypes";
-import type { Texture } from "GDJS/Runtime/pixi-renderers/pixi";
+import { integer } from '../model/CommonTypes';
+import type { Texture } from 'GDJS/Runtime/pixi-renderers/pixi';
 
 /**
  * A cache to access the tile images.

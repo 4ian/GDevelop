@@ -1,4 +1,4 @@
-import { float, integer } from "../model/CommonTypes";
+import { float, integer } from '../model/CommonTypes';
 
 /**
  * Tiled JSON format (https://www.mapeditor.org/).

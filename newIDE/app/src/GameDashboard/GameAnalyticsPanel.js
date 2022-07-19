@@ -35,6 +35,7 @@ import {
   daysShownForYear,
   durationValues,
 } from './GameAnalyticsEvaluator';
+import Paper from '@material-ui/core/Paper';
 
 const chartMargins = {
   top: 5,
@@ -58,6 +59,40 @@ const percentFormatter = value => {
 type Props = {|
   game: Game,
 |};
+
+const CustomTooltip = ({
+  payload,
+  label,
+  customStyle,
+}: {|
+  payload: ?Array<any>,
+  label: string,
+  customStyle: Object,
+|}) =>
+  payload ? (
+    <Paper style={customStyle}>
+      <ColumnStackLayout>
+        <Text size="sub-title" noMargin>
+          {label}
+        </Text>
+        {payload.length &&
+          payload.map(
+            (
+              {
+                name,
+                unit,
+                value,
+              }: { name: string, unit: ?string, value: number },
+              index
+            ) => (
+              <Text noMargin key={index}>{`${name}: ${
+                Number.isInteger(value) ? value.toString() : value.toFixed(2)
+              }${unit ? ` ${unit}` : ''}`}</Text>
+            )
+          )}
+      </ColumnStackLayout>
+    </Paper>
+  ) : null;
 
 export const GameAnalyticsPanel = ({ game }: Props) => {
   const { getAuthorizationHeader, profile } = React.useContext(
@@ -123,8 +158,8 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
     },
     tooltipContent: {
       backgroundColor: gdevelopTheme.chart.tooltipBackgroundColor,
-      border: 0,
-      fontFamily: gdevelopTheme.chart.fontFamily,
+      color: gdevelopTheme.chart.textColor,
+      padding: 10,
     },
     tickLabel: {
       fontFamily: gdevelopTheme.chart.fontFamily,
@@ -224,7 +259,14 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         stroke={gdevelopTheme.chart.textColor}
                         style={styles.tickLabel}
                       />
-                      <Tooltip contentStyle={styles.tooltipContent} />
+                      <Tooltip
+                        content={props =>
+                          CustomTooltip({
+                            ...props,
+                            customStyle: styles.tooltipContent,
+                          })
+                        }
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </Column>
@@ -261,7 +303,14 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         stroke={gdevelopTheme.chart.textColor}
                         style={styles.tickLabel}
                       />
-                      <Tooltip contentStyle={styles.tooltipContent} />
+                      <Tooltip
+                        content={props =>
+                          CustomTooltip({
+                            ...props,
+                            customStyle: styles.tooltipContent,
+                          })
+                        }
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </Column>
@@ -306,7 +355,14 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         stroke={gdevelopTheme.chart.textColor}
                         style={styles.tickLabel}
                       />
-                      <Tooltip contentStyle={styles.tooltipContent} />
+                      <Tooltip
+                        content={props =>
+                          CustomTooltip({
+                            ...props,
+                            customStyle: styles.tooltipContent,
+                          })
+                        }
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </Column>
@@ -358,7 +414,14 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         stroke={gdevelopTheme.chart.gridColor}
                         strokeDasharray="3 3"
                       />
-                      <Tooltip contentStyle={styles.tooltipContent} />
+                      <Tooltip
+                        content={props =>
+                          CustomTooltip({
+                            ...props,
+                            customStyle: styles.tooltipContent,
+                          })
+                        }
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </Column>
@@ -455,7 +518,14 @@ export const GameAnalyticsPanel = ({ game }: Props) => {
                         style={styles.tickLabel}
                         unit={' %'}
                       />
-                      <Tooltip contentStyle={styles.tooltipContent} />
+                      <Tooltip
+                        content={props =>
+                          CustomTooltip({
+                            ...props,
+                            customStyle: styles.tooltipContent,
+                          })
+                        }
+                      />
                     </AreaChart>
                   </ResponsiveContainer>
                 </Column>

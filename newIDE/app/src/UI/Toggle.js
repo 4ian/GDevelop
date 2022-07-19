@@ -20,6 +20,7 @@ type Props = {|
   onToggle: (e: {||}, toggled: boolean) => void,
   disabled?: boolean,
   labelPosition: 'right' | 'left',
+  size?: 'small',
 
   style?: {|
     marginTop?: number,
@@ -37,7 +38,8 @@ const Toggle = (props: Props) => {
         <Switch
           checked={props.toggled}
           onChange={event => props.onToggle(event, event.target.checked)}
-          color="primary"
+          color="secondary"
+          size={props.size}
         />
       }
       labelPlacement={props.labelPosition === 'right' ? 'end' : 'start'}

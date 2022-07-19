@@ -63,7 +63,7 @@ const BuildSection = ({
                   label={<Trans>Create a project</Trans>}
                   onClick={onCreateProject}
                   icon={<AddIcon />}
-                  id="home-create-blank-project-button"
+                  id="home-create-project-button"
                 />
                 {canOpen && (
                   <>

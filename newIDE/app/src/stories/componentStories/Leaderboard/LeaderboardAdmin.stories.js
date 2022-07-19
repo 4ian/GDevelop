@@ -2,15 +2,12 @@
 import * as React from 'react';
 import { action } from '@storybook/addon-actions';
 
-import muiDecorator from '../ThemeDecorator';
-import paperDecorator from '../PaperDecorator';
-import { LeaderboardAdmin } from '../../GameDashboard/LeaderboardAdmin';
-import LeaderboardContext from '../../Leaderboard/LeaderboardContext';
-import {
-  type Leaderboard,
-  type LeaderboardSortOption,
-} from '../../Utils/GDevelopServices/Play';
-import FixedHeightFlexContainer from '../FixedHeightFlexContainer';
+import muiDecorator from '../../ThemeDecorator';
+import paperDecorator from '../../PaperDecorator';
+import { LeaderboardAdmin } from '../../../GameDashboard/LeaderboardAdmin';
+import LeaderboardContext from '../../../Leaderboard/LeaderboardContext';
+import { type Leaderboard } from '../../../Utils/GDevelopServices/Play';
+import FixedHeightFlexContainer from '../../FixedHeightFlexContainer';
 
 export default {
   title: 'LeaderboardAdmin',
@@ -53,7 +50,6 @@ const MockLeaderboardProvider = ({ children }: {| children: React.Node |}) => {
     currentLeaderboard,
     setCurrentLeaderboard,
   ] = React.useState<Leaderboard>(mockedLeaderboards[3]);
-  const [sort, setSort] = React.useState<LeaderboardSortOption>('ASC');
   return (
     <LeaderboardContext.Provider
       value={{

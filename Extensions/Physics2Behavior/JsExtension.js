@@ -420,7 +420,6 @@ module.exports = {
       )
       .setIncludeFile('Extensions/Physics2Behavior/physics2runtimebehavior.js')
       .addIncludeFile('Extensions/Physics2Behavior/box2d.js')
-      .addIncludeFile('Extensions/Physics2Behavior/utils.js');
 
     // Global
     aut

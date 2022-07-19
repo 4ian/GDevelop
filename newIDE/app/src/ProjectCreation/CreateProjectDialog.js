@@ -84,6 +84,7 @@ const CreateProjectDialog = ({
       />,
       <DialogPrimaryButton
         key="create-blank"
+        id="create-blank-project-button"
         label={<Trans>Create a blank project</Trans>}
         primary
         onClick={() => setPreCreationDialogOpen(true)}

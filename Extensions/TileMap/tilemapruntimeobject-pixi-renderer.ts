@@ -1,3 +1,5 @@
+/// <reference path="helper/TileMapHelper.d.ts" />
+/// <reference path="pixi-tilemap/dist/pixi-tilemap.d.ts" />
 namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
 
@@ -10,8 +12,7 @@ namespace gdjs {
     _object: any;
     _runtimeScene: gdjs.RuntimeScene;
 
-    // @ts-ignore - pixi-tilemap types to be added.
-    _pixiObject: any;
+    _pixiObject: PIXI.tilemap.CompositeRectTileLayer;
 
     /**
      * @param runtimeObject The object to render
@@ -25,10 +26,7 @@ namespace gdjs {
       this._runtimeScene = runtimeScene;
 
       // Load (or reset)
-      if (this._pixiObject === undefined) {
-        // @ts-ignore - pixi-tilemap types to be added.
-        this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
-      }
+      this._pixiObject = new PIXI.tilemap.CompositeRectTileLayer(0);
       this._pixiObject.tileAnim = [0, 0];
 
       runtimeScene
@@ -37,7 +35,6 @@ namespace gdjs {
         .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
       this.updateAngle();
       this.updateOpacity();
-      this.updateTileMap();
       this.updatePosition();
     }
 
@@ -45,74 +42,21 @@ namespace gdjs {
       return this._pixiObject;
     }
 
-    incrementAnimationFrameX(runtimeScene) {
+    incrementAnimationFrameX(runtimeScene: gdjs.RuntimeScene) {
       this._pixiObject.tileAnim[0] += 1;
     }
 
-    _loadTileMapWithTileset(tileMapJsonData, tilesetJsonData) {
-      // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-      const pixiTileMapData = PixiTileMapHelper.loadPixiTileMapData(
-        (textureName) =>
-          this._runtimeScene
-            .getGame()
-            .getImageManager()
-            .getPIXITexture(textureName),
-        tilesetJsonData
-          ? { ...tileMapJsonData, tilesets: [tilesetJsonData] }
-          : tileMapJsonData,
-        this._object._tilemapAtlasImage,
-        this._object._tilemapJsonFile,
-        this._object._tilesetJsonFile
+    updatePixiTileMap(
+      tileMap: TileMapHelper.EditableTileMap,
+      textureCache: TileMapHelper.TileTextureCache
+    ) {
+      TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
+        this._pixiObject,
+        tileMap,
+        textureCache,
+        this._object._displayMode,
+        this._object._layerIndex
       );
-      if (pixiTileMapData) {
-        // @ts-ignore - TODO: Add typings for pixi-tilemap-helper.
-        PixiTileMapHelper.updatePixiTileMap(
-          this._pixiObject,
-          pixiTileMapData,
-          this._object._displayMode,
-          this._object._layerIndex,
-          // @ts-ignore - TODO: Add typings for pako.
-          pako
-        );
-      }
-    }
-
-    updateTileMap(): void {
-      this._runtimeScene
-        .getGame()
-        .getJsonManager()
-        .loadJson(this._object._tilemapJsonFile, (error, tileMapJsonData) => {
-          if (error) {
-            logger.error(
-              'An error happened while loading a Tilemap JSON data:',
-              error
-            );
-            return;
-          }
-          if (this._object._tilesetJsonFile) {
-            this._runtimeScene
-              .getGame()
-              .getJsonManager()
-              .loadJson(
-                this._object._tilesetJsonFile,
-                (error, tilesetJsonData) => {
-                  if (error) {
-                    logger.error(
-                      'An error happened while loading Tileset JSON data:',
-                      error
-                    );
-                    return;
-                  }
-                  this._loadTileMapWithTileset(
-                    tileMapJsonData,
-                    tilesetJsonData
-                  );
-                }
-              );
-          } else {
-            this._loadTileMapWithTileset(tileMapJsonData, null);
-          }
-        });
     }
 
     updatePosition(): void {
@@ -135,13 +79,13 @@ namespace gdjs {
       this._pixiObject.alpha = this._object._opacity / 255;
     }
 
-    setWidth(width): void {
+    setWidth(width: float): void {
       this._pixiObject.width = width / this._pixiObject.scale.x;
       this._pixiObject.pivot.x = width / 2;
       this.updatePosition();
     }
 
-    setHeight(height): void {
+    setHeight(height: float): void {
       this._pixiObject.height = height / this._pixiObject.scale.y;
       this._pixiObject.pivot.y = height / 2;
       this.updatePosition();

@@ -135,6 +135,7 @@ import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
 import optionalRequire from '../Utils/OptionalRequire';
 import { isMobile } from '../Utils/Platform';
 import { getProgramOpeningCount } from '../Utils/Analytics/LocalStats';
+import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
 const electron = optionalRequire('electron');
 const isDev = Window.isDev();
 
@@ -324,6 +325,10 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher();
+  const {
+    findLeaderboardsToReplace,
+    renderLeaderboardReplacerDialog,
+  } = useLeaderboardReplacer();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
@@ -1553,6 +1558,10 @@ const MainFrame = (props: Props) => {
     [setState]
   );
 
+  // When opening a project, we always open a scene to avoid confusing the user.
+  // If it has no scene (new project), we create one and open it.
+  // If it has one scene, we open it.
+  // If it has more than one scene, we open the first one and we also open the project manager.
   const openSceneOrProjectManager = React.useCallback(
     (newState: {|
       currentProject: ?gdProject,
@@ -1561,30 +1570,22 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() <= 1) {
-        if (currentProject.getLayoutsCount() === 0)
-          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+      if (currentProject.getLayoutsCount() === 0)
+        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
 
-        openLayout(
-          currentProject.getLayoutAt(0).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      } else {
-        setState(state => ({
-          ...state,
-          currentProject,
-          editorTabs,
-        })).then(() => {
-          setIsLoadingProject(false);
-          openProjectManager(true);
-        });
+      openLayout(
+        currentProject.getLayoutAt(0).getName(),
+        {
+          openSceneEditor: true,
+          openEventsEditor: true,
+        },
+        editorTabs
+      );
+      if (currentProject.getLayoutsCount() > 1) {
+        openProjectManager(true);
       }
     },
-    [openLayout, setState, i18n]
+    [openLayout, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -2002,14 +2003,16 @@ const MainFrame = (props: Props) => {
     if (!state) return;
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
-
+    const oldProjectId = currentProject.getProjectUuid();
     currentProject.resetProjectUuid();
+
     currentProject.setVersion('1.0.0');
     currentProject.getAuthorIds().clear();
     currentProject.setAuthor('');
     if (templateSlug) currentProject.setTemplateSlug(templateSlug);
     if (projectName) currentProject.setName(projectName);
 
+    findLeaderboardsToReplace(currentProject, oldProjectId);
     openSceneOrProjectManager({
       currentProject: currentProject,
       editorTabs: editorTabs,
@@ -2473,6 +2476,7 @@ const MainFrame = (props: Props) => {
         />
       )}
       {renderOpenConfirmDialog()}
+      {renderLeaderboardReplacerDialog()}
       {renderResourceFetcherDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}

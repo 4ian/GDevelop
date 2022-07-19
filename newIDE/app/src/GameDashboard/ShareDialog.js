@@ -2,8 +2,6 @@
 import * as React from 'react';
 import { Trans } from '@lingui/macro';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
-
 import Dialog from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Column, Line } from '../UI/Grid';
@@ -20,6 +18,7 @@ import {
 } from '../Utils/GDevelopServices/Game';
 import AlertMessage from '../UI/AlertMessage';
 import ShareButton from '../UI/ShareDialog/ShareButton';
+import CircularProgress from '../UI/CircularProgress';
 
 type Props = {| game: Game, onClose: () => void |};
 

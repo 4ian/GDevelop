@@ -21,7 +21,6 @@ import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEd
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
-import Link from '@material-ui/core/Link';
 import Window from '../Utils/Window';
 import Paper from '@material-ui/core/Paper';
 import SelectField from '../UI/SelectField';
@@ -36,6 +35,7 @@ import { AssetCard } from './AssetCard';
 import { SimilarAssetStoreSearchFilter } from './AssetStoreSearchFilter';
 import EmptyMessage from '../UI/EmptyMessage';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
+import Link from '../UI/Link';
 
 const FIXED_HEIGHT = 250;
 const FIXED_WIDTH = 300;
@@ -230,10 +230,7 @@ export const AssetDetails = ({
                         <Link
                           key={author.name}
                           href={author.website}
-                          onClick={event => {
-                            Window.openExternalURL(author.website);
-                            event.preventDefault();
-                          }}
+                          onClick={() => Window.openExternalURL(author.website)}
                         >
                           {author.name}
                         </Link>
@@ -422,10 +419,9 @@ export const AssetDetails = ({
                       {
                         <Link
                           href={assetLicense.website}
-                          onClick={event => {
-                            Window.openExternalURL(assetLicense.website);
-                            event.preventDefault();
-                          }}
+                          onClick={() =>
+                            Window.openExternalURL(assetLicense.website)
+                          }
                         >
                           {assetLicense.name}
                         </Link>

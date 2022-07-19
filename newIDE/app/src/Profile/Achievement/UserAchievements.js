@@ -84,7 +84,7 @@ const UserAchievements = ({
                 padding: windowWidth === 'small' ? '0 20' : '20',
               }}
             >
-              <Trophy color="primary" fontSize="large" />
+              <Trophy color="secondary" fontSize="large" />
               <Text size="block-title">
                 <Trans>
                   {badges.length}/{achievements.length} achievements

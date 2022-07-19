@@ -5,7 +5,6 @@ import { t, Trans } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
 import { differenceInCalendarDays, format } from 'date-fns';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
 import PhoneIphone from '@material-ui/icons/PhoneIphone';
 import LaptopMac from '@material-ui/icons/LaptopMac';
 import MoreVert from '@material-ui/icons/MoreVert';
@@ -38,6 +37,7 @@ import { type Game } from '../../Utils/GDevelopServices/Game';
 import { shortenUuidForDisplay } from '../../Utils/GDevelopServices/Play';
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import Window from '../../Utils/Window';
+import CircularProgress from '../../UI/CircularProgress';
 
 const styles = {
   icon: {

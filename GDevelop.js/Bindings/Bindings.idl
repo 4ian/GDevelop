@@ -2346,6 +2346,21 @@ interface ArbitraryEventsWorker {
     void Launch([Ref] EventsList events);
 };
 
+interface EventsLeaderboardsLister {
+    void EventsLeaderboardsLister([Ref] Project project);
+    [Const, Ref] SetString GetLeaderboardIds();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsLeaderboardsRenamer {
+    void EventsLeaderboardsRenamer([Ref] Project project, [Const, Ref] MapStringString leaderboardIdMap);
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
 interface EventsParametersLister {
     void EventsParametersLister([Ref] Project project);
     [Const, Ref] MapStringString GetParametersAndTypes();

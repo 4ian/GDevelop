@@ -26,10 +26,9 @@ export function Tabs<TabName>({
     <MUITabs
       variant={variant || 'fullWidth'}
       textColor="primary"
-      indicatorColor={'primary'}
+      indicatorColor="secondary"
       value={value}
       onChange={(e, newValue) => onChange(newValue)}
-      allowScrollButtonsMobile={!!variant}
       scrollButtons={variant ? 'on' : 'off'}
     >
       {children}

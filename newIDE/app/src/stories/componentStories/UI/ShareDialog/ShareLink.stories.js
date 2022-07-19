@@ -6,9 +6,9 @@ import paperDecorator from '../../../PaperDecorator';
 import ShareLink from '../../../../UI/ShareDialog/ShareLink';
 
 export default {
-  title: 'UI/ShareDialog/ShareLink',
+  title: 'UI Building Blocks/ShareDialog/ShareLink',
   component: ShareLink,
-  decorators: [muiDecorator, paperDecorator],
+  decorators: [paperDecorator, muiDecorator],
 };
 
 export const DefaultShareLink = () => (

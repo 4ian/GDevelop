@@ -20,7 +20,13 @@ namespace gdjs {
     // Start with 1 so the user is safe from default variables value (0)
     joints: any = {};
 
+    // List of physics behavior in the runtimeScene. It should be updated
+    // when a new physics object is created (constructor), on destruction (onDestroy),
+    // on behavior activation (onActivate) and on behavior deactivation (onDeActivate).
+    _registeredBehaviors: Set<Physics2RuntimeBehavior>;
+
     constructor(runtimeScene, sharedData) {
+      this._registeredBehaviors = new Set();
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
       this.scaleX = sharedData.scaleX === 0 ? 100 : sharedData.scaleX;
@@ -102,6 +108,40 @@ namespace gdjs {
         );
       }
       return runtimeScene.physics2SharedData;
+    }
+
+    /**
+     * Add a physics object to the list of existing object.
+     */
+    addToBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior) {
+      this._registeredBehaviors.add(physicsBehavior);
+    }
+
+    /**
+     * Remove a physics object to the list of existing object.
+     */
+    removeFromBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior) {
+      this._registeredBehaviors.delete(physicsBehavior);
+    }
+
+    /**
+     * Reset all contactsStartedThisFrame and contactsEndedThisFrame of all
+     * registered physics behavior.
+     */
+    resetStartedAndEndedCollisions() {
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.contactsStartedThisFrame.length = 0;
+        physicsBehavior.contactsEndedThisFrame.length = 0;
+      }
+    }
+
+    /**
+     * Update all registered body.
+     */
+    updateBodiesFromObjects() {
+      for (const physicsBehavior of this._registeredBehaviors) {
+        physicsBehavior.updateBodyFromObject();
+      }
     }
 
     step(deltaTime) {
@@ -241,13 +281,40 @@ namespace gdjs {
     layers: any;
     masks: any;
     shapeScale: number = 1;
+
+    /**
+     * Array containing the beginning of contacts reported by onContactBegin. Each contact
+     * should be unique to avoid recording glitches where the object loses and regain
+     * contact between two frames. The array is updated each time the method
+     * onContactBegin is called by the listener, which is only called when stepping
+     * the world i.e. in the first preEvent called by a physics behavior. This array is
+     * cleared just before stepping the world.
+     */
     contactsStartedThisFrame: Array<Physics2RuntimeBehavior>;
+
+    /**
+     * Array containing the end of contacts reported by onContactEnd. The array is updated
+     * each time the method onContactEnd is called by the listener, which can be called at
+     * any time. This array is cleared just before stepping the world.
+     */
     contactsEndedThisFrame: Array<Physics2RuntimeBehavior>;
+
+    /**
+     * Array containing the exact current contacts with the objects. It is updated
+     * each time the methods onContactBegin and onContactEnd are called by the contact
+     * listener.
+     */
     currentContacts: Array<Physics2RuntimeBehavior>;
+    destroyedDuringFrameLogic: boolean;
     _body: any = null;
-    _sharedData: any;
     _tempb2Vec2: any;
 
+    /**
+     * sharedData is a reference to the shared data of the scene, that registers
+     * every physics behavior that is created so that collisions can be cleared
+     * before stepping the world.
+     */
+    _sharedData: Physics2SharedData;
     // Avoid creating new vectors all the time
     _tempb2Vec2Sec: any;
 
@@ -287,12 +354,14 @@ namespace gdjs {
       this.contactsEndedThisFrame = [];
       this.currentContacts = [];
       this.currentContacts.length = 0;
+      this.destroyedDuringFrameLogic = false;
       this._sharedData = Physics2SharedData.getSharedData(
         runtimeScene,
         behaviorData.name
       );
       this._tempb2Vec2 = new Box2D.b2Vec2();
       this._tempb2Vec2Sec = new Box2D.b2Vec2();
+      this._sharedData.addToBehaviorsList(this);
     }
 
     // Stores a Box2D pointer of created vertices
@@ -377,6 +446,7 @@ namespace gdjs {
     }
 
     onDeActivate() {
+      this._sharedData.removeFromBehaviorsList(this);
       if (this._body !== null) {
         // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
         this._sharedData.clearBodyJoints(this._body);
@@ -391,9 +461,22 @@ namespace gdjs {
         this._sharedData.world.DestroyBody(this._body);
         this._body = null;
       }
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
+    }
+
+    onActivate() {
+      this._sharedData.addToBehaviorsList(this);
+
+      this.contactsEndedThisFrame.length = 0;
+      this.contactsStartedThisFrame.length = 0;
+      this.currentContacts.length = 0;
+      this.updateBodyFromObject();
     }
 
     onDestroy() {
+      this.destroyedDuringFrameLogic = true;
       this.onDeActivate();
     }
 
@@ -641,8 +724,7 @@ namespace gdjs {
     recreateShape() {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Destroy the old shape
@@ -673,7 +755,8 @@ namespace gdjs {
       return this._body;
     }
 
-    createBody() {
+    createBody(): boolean {
+      if (!this.activated() || this.destroyedDuringFrameLogic) return false;
       // Generate the body definition
       const bodyDef = new Box2D.b2BodyDef();
 
@@ -711,67 +794,60 @@ namespace gdjs {
       // Update cached size
       this._objectOldWidth = this.owner.getWidth();
       this._objectOldHeight = this.owner.getHeight();
+      return true;
     }
 
     doStepPreEvents(runtimeScene) {
-      // Create a body if there is not one
-      if (this._body === null) {
-        this.createBody();
-      }
-
       // Step the world if not done this frame yet
       if (!this._sharedData.stepped) {
+        // Reset started and ended contacts array for all physics instances.
+        this._sharedData.resetStartedAndEndedCollisions();
+        this._sharedData.updateBodiesFromObjects();
         this._sharedData.step(
           runtimeScene.getTimeManager().getElapsedTime() / 1000.0
         );
       }
 
-      // Copy transform from body to the GD object
-      this.owner.setX(
-        this._body.GetPosition().get_x() * this._sharedData.scaleX -
-          this.owner.getWidth() / 2 +
-          this.owner.getX() -
-          this.owner.getDrawableX()
-      );
-      this.owner.setY(
-        this._body.GetPosition().get_y() * this._sharedData.scaleY -
-          this.owner.getHeight() / 2 +
-          this.owner.getY() -
-          this.owner.getDrawableY()
-      );
-      this.owner.setAngle(gdjs.toDegrees(this._body.GetAngle()));
+      // Copy transform from body to the GD object.
+      // It's possible the behavior was either deactivated or the object deleted
+      // just before this doStepPreEvents (for example, another behavior deleted
+      // the object during its own doStepPreEvents). If the body is null, we just
+      // don't do anything (but still run the physics simulation - this is independent).
+      if (this._body !== null) {
+        this.owner.setX(
+          this._body.GetPosition().get_x() * this._sharedData.scaleX -
+            this.owner.getWidth() / 2 +
+            this.owner.getX() -
+            this.owner.getDrawableX()
+        );
+        this.owner.setY(
+          this._body.GetPosition().get_y() * this._sharedData.scaleY -
+            this.owner.getHeight() / 2 +
+            this.owner.getY() -
+            this.owner.getDrawableY()
+        );
+        this.owner.setAngle(gdjs.toDegrees(this._body.GetAngle()));
+      }
 
-      // Update cached transform
+      // Update cached transform.
       this._objectOldX = this.owner.getX();
       this._objectOldY = this.owner.getY();
       this._objectOldAngle = this.owner.getAngle();
-
-      gdjs.physics2.computeCurrentContactsFromStartedAndEndedContacts(
-        this.currentContacts,
-        this.contactsStartedThisFrame,
-        this.contactsEndedThisFrame
-      );
     }
 
     doStepPostEvents(runtimeScene) {
-      this._updateBodyFromObject();
-
-      // Reset contacts that happened this frame
-      this.contactsStartedThisFrame.length = 0;
-      this.contactsEndedThisFrame.length = 0;
-
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }
 
     onObjectHotReloaded() {
-      this._updateBodyFromObject();
+      this.updateBodyFromObject();
     }
 
-    _updateBodyFromObject() {
+    updateBodyFromObject() {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // The object size has changed, recreate the shape.
@@ -868,8 +944,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body type
@@ -892,8 +967,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body type
@@ -916,8 +990,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body type
@@ -940,8 +1013,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update body bullet flag
@@ -955,8 +1027,7 @@ namespace gdjs {
     setFixedRotation(enable): void {
       this.fixedRotation = enable;
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
       this._body.SetFixedRotation(this.fixedRotation);
     }
@@ -968,8 +1039,7 @@ namespace gdjs {
     setSleepingAllowed(enable): void {
       this.canSleep = enable;
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
       this._body.SetSleepingAllowed(this.canSleep);
     }
@@ -977,7 +1047,7 @@ namespace gdjs {
     isSleeping(): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return true;
       }
 
       // Get the body sleeping state
@@ -1004,8 +1074,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body density
@@ -1033,8 +1102,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body friction
@@ -1068,8 +1136,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body restitution
@@ -1098,8 +1165,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body linear damping
@@ -1121,8 +1187,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body angular damping
@@ -1144,8 +1209,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body gravity scale
@@ -1181,8 +1245,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body layers
@@ -1220,8 +1283,7 @@ namespace gdjs {
 
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return;
+        if (!this.createBody()) return;
       }
 
       // Update the body masks
@@ -1233,8 +1295,7 @@ namespace gdjs {
     getLinearVelocityX(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return 0;
+        if (!this.createBody()) return 0;
       }
 
       // Get the linear velocity on X
@@ -1244,7 +1305,7 @@ namespace gdjs {
     setLinearVelocityX(linearVelocityX): void {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set the linear velocity on X
@@ -1259,8 +1320,7 @@ namespace gdjs {
     getLinearVelocityY(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return 0;
+        if (!this.createBody()) return 0;
       }
 
       // Get the linear velocity on Y
@@ -1270,7 +1330,7 @@ namespace gdjs {
     setLinearVelocityY(linearVelocityY): void {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set the linear velocity on Y
@@ -1282,11 +1342,10 @@ namespace gdjs {
       );
     }
 
-    getLinearVelocityLength() {
+    getLinearVelocityLength(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return 0;
+        if (!this.createBody()) return 0;
       }
 
       // Get the linear velocity length
@@ -1296,10 +1355,10 @@ namespace gdjs {
       ).Length();
     }
 
-    getAngularVelocity() {
+    getAngularVelocity(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Get the angular velocity
@@ -1309,7 +1368,7 @@ namespace gdjs {
     setAngularVelocity(angularVelocity): void {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set the angular velocity
@@ -1319,7 +1378,7 @@ namespace gdjs {
     applyForce(forceX, forceY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1338,7 +1397,7 @@ namespace gdjs {
     applyPolarForce(angle, length, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1358,7 +1417,7 @@ namespace gdjs {
     applyForceTowardPosition(length, towardX, towardY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1381,7 +1440,7 @@ namespace gdjs {
     applyImpulse(impulseX, impulseY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1400,7 +1459,7 @@ namespace gdjs {
     applyPolarImpulse(angle, length, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1420,7 +1479,7 @@ namespace gdjs {
     applyImpulseTowardPosition(length, towardX, towardY, positionX, positionY) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1443,7 +1502,7 @@ namespace gdjs {
     applyTorque(torque) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1456,7 +1515,7 @@ namespace gdjs {
     applyAngularImpulse(angularImpulse) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Wake up the object
@@ -1469,7 +1528,7 @@ namespace gdjs {
     getMass(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Wake up the object
@@ -1481,7 +1540,7 @@ namespace gdjs {
     getInertia(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Wake up the object
@@ -1493,7 +1552,7 @@ namespace gdjs {
     getMassCenterX(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Get the mass center on X
@@ -1503,7 +1562,7 @@ namespace gdjs {
     getMassCenterY(): float {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return 0;
       }
 
       // Get the mass center on Y
@@ -1514,8 +1573,7 @@ namespace gdjs {
     isJointFirstObject(jointId): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return false;
+        if (!this.createBody()) return false;
       }
 
       // Get the joint
@@ -1533,8 +1591,7 @@ namespace gdjs {
     isJointSecondObject(jointId): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
-        return false;
+        if (!this.createBody()) return false;
       }
 
       // Get the joint
@@ -1647,7 +1704,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -1818,7 +1875,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set joint settings
@@ -1887,7 +1944,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -2178,7 +2235,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -2503,7 +2560,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -2677,7 +2734,7 @@ namespace gdjs {
     addGearJoint(jointId1, jointId2, ratio, collideConnected, variable) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Get the first joint
@@ -2798,7 +2855,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // Set joint settings
@@ -2973,7 +3030,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3249,7 +3306,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3383,7 +3440,7 @@ namespace gdjs {
     addRopeJoint(x1, y1, other, x2, y2, maxLength, collideConnected, variable) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3490,7 +3547,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3618,7 +3675,7 @@ namespace gdjs {
     ) {
       // If there is no body, set a new one
       if (this._body === null) {
-        this.createBody();
+        if (!this.createBody()) return;
       }
 
       // If there is no second object or it doesn't share the behavior, return
@@ -3836,6 +3893,8 @@ namespace gdjs {
     }
 
     onContactBegin(otherBehavior: Physics2RuntimeBehavior) {
+      this.currentContacts.push(otherBehavior);
+
       // There might be contacts that end during the frame and
       // start again right away. It is considered a glitch
       // and should not be detected.
@@ -3849,6 +3908,11 @@ namespace gdjs {
 
     onContactEnd(otherBehavior: Physics2RuntimeBehavior) {
       this.contactsEndedThisFrame.push(otherBehavior);
+
+      const index = this.currentContacts.indexOf(otherBehavior);
+      if (index !== -1) {
+        this.currentContacts.splice(index, 1);
+      }
     }
 
     /**

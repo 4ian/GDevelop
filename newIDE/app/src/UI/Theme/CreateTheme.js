@@ -23,7 +23,8 @@ export function getMuiOverrides(
   appBarBackgroundColor: string,
   appBarTextColor: string,
   iconColor: string,
-  outlinedButtonBorderColor: string
+  outlinedButtonBorderColor: string,
+  alternateCanvasBackgroundColor: string
 ) {
   return {
     MuiTypography: {
@@ -100,9 +101,6 @@ export function getMuiOverrides(
     MuiListItem: {
       secondaryAction: {
         paddingRight: 40,
-      },
-      gutters: {
-        paddingRight: 8,
       },
     },
     MuiListItemSecondaryAction: {
@@ -256,15 +254,76 @@ export function getMuiOverrides(
         flexGrow: 0,
       },
     },
+    MuiMenu: {
+      paper: {
+        backgroundColor: alternateCanvasBackgroundColor,
+      },
+    },
   };
 }
 
-export function getThemeMode(color: string, contrastText: string) {
+function getThemeModeFromMainColor(color: string, contrastText: string) {
   return {
     light: lighten(color, 0.05),
     main: color,
     dark: darken(color, 0.05),
     contrastText: contrastText,
+  };
+}
+
+function getThemeColors(styles: any) {
+  // If there is no dark variant on the primary color, we consider:
+  // - light and dark variants have to be computed from the main color
+  // - the theme will use Material UI default values for Success, Info, Warning and Error colors.
+  if (!styles['ThemePrimaryDark'])
+    return {
+      primary: getThemeModeFromMainColor(
+        styles['ThemePrimaryColor'],
+        styles['ThemePrimaryTextContrastColor']
+      ),
+      secondary: getThemeModeFromMainColor(
+        styles['ThemeSecondaryColor'],
+        styles['ThemeSecondaryTextContrastColor']
+      ),
+    };
+
+  return {
+    primary: {
+      light: styles['ThemePrimaryLight'],
+      main: styles['ThemePrimaryColor'],
+      dark: styles['ThemePrimaryDark'],
+      contrastText: styles['ThemePrimaryTextContrastColor'],
+    },
+    secondary: {
+      light: styles['ThemeSecondaryLight'],
+      main: styles['ThemeSecondaryColor'],
+      dark: styles['ThemeSecondaryDark'],
+      contrastText: styles['ThemeSecondaryTextContrastColor'],
+    },
+    success: {
+      light: styles['ThemeSuccessLight'],
+      main: styles['ThemeSuccessColor'],
+      dark: styles['ThemeSuccessDark'],
+      contrastText: styles['ThemeSuccessTextContrastColor'],
+    },
+    info: {
+      light: styles['ThemeInfoLight'],
+      main: styles['ThemeInfoColor'],
+      dark: styles['ThemeInfoDark'],
+      contrastText: styles['ThemeInfoTextContrastColor'],
+    },
+    warning: {
+      light: styles['ThemeWarningLight'],
+      main: styles['ThemeWarningColor'],
+      dark: styles['ThemeWarningDark'],
+      contrastText: styles['ThemeWarningTextContrastColor'],
+    },
+    error: {
+      light: styles['ThemeErrorLight'],
+      main: styles['ThemeErrorColor'],
+      dark: styles['ThemeErrorDark'],
+      contrastText: styles['ThemeErrorTextContrastColor'],
+    },
   };
 }
 
@@ -366,7 +425,10 @@ export function createGdevelopTheme({
         fontFamily: styles['GdevelopModernFontFamily'],
         tooltipBackgroundColor:
           styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
-        dataColor1: styles['ThemePrimaryColor'],
+        dataColor1:
+          paletteType === 'dark'
+            ? lighten(styles['ThemePrimaryColor'], 0.3)
+            : styles['ThemePrimaryColor'],
         textColor: styles['ThemeTextDefaultColor'],
         gridColor: styles['ThemeTextDisabledColor'],
       },
@@ -384,15 +446,9 @@ export function createGdevelopTheme({
         background: {
           paper: styles['ThemeSurfaceCanvasBackgroundColor'],
           default: styles['ThemeSurfaceWindowBackgroundColor'],
+          alternate: styles['ThemeSurfaceAlternateCanvasBackgroundColor'],
         },
-        primary: getThemeMode(
-          styles['ThemePrimaryColor'],
-          styles['ThemePrimaryTextContrastColor']
-        ),
-        secondary: getThemeMode(
-          styles['ThemeSecondaryColor'],
-          styles['ThemeSecondaryTextContrastColor']
-        ),
+        ...getThemeColors(styles),
         text: {
           primary: styles['ThemeTextDefaultColor'],
           secondary: styles['ThemeTextSecondaryColor'],
@@ -407,7 +463,8 @@ export function createGdevelopTheme({
         styles['MosaicToolbarBackgroundColor'],
         styles['MosaicTitleColor'],
         styles['ThemeTextDefaultColor'],
-        styles['ThemeTextDefaultColor']
+        styles['ThemeTextDefaultColor'],
+        styles['ThemeSurfaceAlternateCanvasBackgroundColor']
       ),
     },
   };

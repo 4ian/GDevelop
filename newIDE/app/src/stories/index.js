@@ -216,18 +216,6 @@ addDecorator(GDevelopJsInitializerDecorator);
 
 // No i18n in this file
 
-const buildFakeMenuTemplate = () => [
-  {
-    label: 'Option 1',
-    click: action('click option 1'),
-  },
-  { type: 'separator' },
-  {
-    label: 'Option 2',
-    click: action('click option 2'),
-  },
-];
-
 const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
@@ -237,186 +225,12 @@ const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
 };
 
 storiesOf('Welcome', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('to Storybook', () => <Welcome />);
 
-storiesOf('UI Building Blocks/Buttons', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ColumnStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Buttons:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <RaisedButton label="Raised button" onClick={action('onClick')} />
-        <RaisedButton
-          icon={<CloudDownload />}
-          label="Raised button"
-          onClick={action('onClick')}
-        />
-        <RaisedButton
-          label="Primary Raised button"
-          primary
-          onClick={action('onClick')}
-        />
-        <RaisedButton
-          icon={<CloudDownload />}
-          label="Primary Raised button"
-          primary
-          onClick={action('onClick')}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <FlatButton label="Flat button" onClick={action('onClick')} />
-        <FlatButton
-          leftIcon={<CloudDownload />}
-          label="Flat button"
-          onClick={action('onClick')}
-        />
-        <FlatButton
-          label="Primary Flat button"
-          primary
-          onClick={action('onClick')}
-        />
-        <FlatButton
-          leftIcon={<CloudDownload />}
-          label="Primary Flat button"
-          primary
-          onClick={action('onClick')}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <TextButton label="Text button" onClick={action('onClick')} />
-        <TextButton
-          icon={<CloudDownload />}
-          label="Text button"
-          onClick={action('onClick')}
-        />
-        <TextButton
-          primary
-          label="Primary Text button"
-          onClick={action('onClick')}
-        />
-        <TextButton
-          icon={<CloudDownload />}
-          primary
-          label="Primary Text button"
-          onClick={action('onClick')}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Buttons with split menus:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <RaisedButton
-          label="Traditional Raised button"
-          onClick={action('onClick')}
-        />
-        <RaisedButtonWithSplitMenu
-          label="Button with split menu"
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithSplitMenu
-          label="Primary button with split menu"
-          primary
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithSplitMenu
-          label="... and with icon"
-          icon={<Brush />}
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithSplitMenu
-          label="... and disabled"
-          icon={<Brush />}
-          disabled
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Buttons with menus:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <RaisedButton
-          label="Traditional Raised button"
-          onClick={action('onClick')}
-        />
-        <RaisedButtonWithMenu
-          label="Button with menu"
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithMenu
-          label="... and with icon"
-          icon={<Brush />}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithMenu
-          label="... and disabled"
-          icon={<Brush />}
-          disabled
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Icons with menu:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <ElementWithMenu
-          element={
-            <ToolbarIcon
-              src="res/ribbon_default/bug32.png"
-              tooltip={'ToolbarIcon with menu'}
-            />
-          }
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <ElementWithMenu
-          element={
-            <IconButton>
-              <FilterList />
-            </IconButton>
-          }
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>In a mini toolbar:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <MiniToolbar>
-          <MiniToolbarText firstChild>Some text:</MiniToolbarText>
-          <IconButton>
-            <Brush />
-          </IconButton>
-          <ElementWithMenu
-            element={
-              <IconButton>
-                <FilterList />
-              </IconButton>
-            }
-            buildMenuTemplate={() => [
-              {
-                label: 'Option 1',
-                click: action('click option 1'),
-              },
-              { type: 'separator' },
-              {
-                label: 'Option 2',
-                click: action('click option 2'),
-              },
-            ]}
-          />
-        </MiniToolbar>
-      </LineStackLayout>
-    </ColumnStackLayout>
-  ));
-
 storiesOf('UI Building Blocks/SelectField', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
@@ -435,7 +249,7 @@ storiesOf('UI Building Blocks/SelectField', module)
       )}
     />
   ))
-  .add('default, with (markdown) helper text', () => (
+  .add('default, with (markdown) helper text and floating label', () => (
     <ValueStateHolder
       initialValue={'1'}
       render={(value, onChange) => (
@@ -444,6 +258,7 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
           helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+          floatingLabelText="This is a floating label"
         >
           <SelectOption value="1" primaryText="Choice 1" />
           <SelectOption value="2" primaryText="Choice 2" />
@@ -473,6 +288,7 @@ storiesOf('UI Building Blocks/SelectField', module)
   ));
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => {
     const [value, setValue] = React.useState('Hello World');
@@ -610,6 +426,7 @@ storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
 ));
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default, with text', () => (
     <ValueStateHolder
@@ -839,9 +656,30 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
         </React.Fragment>
       )}
     />
+  ))
+  .add('with a floating label', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            floatingLabelText="This is a floating label"
+            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
   ));
 
 storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
@@ -1009,6 +847,7 @@ storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
   ));
 
 storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('Empty text field', () => (
     <TextFieldWithButtonLayout
@@ -1567,6 +1406,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
   ));
 
 storiesOf('UI Building Blocks/EditorNavigator', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <EditorMosaicPlayground
@@ -1634,18 +1474,22 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
   ));
 
 storiesOf('UI Building Blocks/HelpButton', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
 
 storiesOf('UI Building Blocks/HelpIcon', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 storiesOf('HelpFinder', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('PropertiesEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <PropertiesEditor
@@ -3303,12 +3147,24 @@ storiesOf('SubscriptionDetails', module)
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
       onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
     />
   ))
-  .add('limit reached', () => (
+  .add('no subscription', () => (
     <SubscriptionDetails
       subscription={noSubscription}
       onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  ))
+  .add('loading manage subscription', () => (
+    <SubscriptionDetails
+      subscription={subscriptionForIndieUser}
+      onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={true}
     />
   ));
 
@@ -4352,6 +4208,7 @@ storiesOf('GamesShowcase/ShowcasedGameListItem', module)
   ));
 
 storiesOf('ProjectPropertiesDialog', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ProjectPropertiesDialog
@@ -4368,6 +4225,7 @@ storiesOf('ProjectPropertiesDialog', module)
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor

@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class TiltShiftFilter extends PIXI.Filter {
     constructor(
       blur?: number,

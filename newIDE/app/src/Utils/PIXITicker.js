@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 
 // PIXI has a ticker that is used by PIXI InteractionManager, and which
 // frequently check if interaction happened. We may want to disable it

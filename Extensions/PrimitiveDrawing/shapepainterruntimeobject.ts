@@ -95,7 +95,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Graphics {
       return this._renderer.getRendererObject();
     }
 

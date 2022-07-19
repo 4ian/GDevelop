@@ -1,11 +1,8 @@
-/// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
   export interface RuntimeScene {
     tileMapCollisionMaskManager: gdjs.TileMap.TileMapRuntimeManager;
   }
   export namespace TileMap {
-    import PIXI = GlobalPIXIModule.PIXI;
-
     const logger = new gdjs.Logger('Tilemap object');
 
     /**
@@ -71,7 +68,6 @@ namespace gdjs {
           this._loadTiledMap.bind(this),
           tileMapJsonResourceName,
           tileSetJsonResourceName,
-          pako,
           callback
         );
       }

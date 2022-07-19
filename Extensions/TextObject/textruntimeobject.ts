@@ -127,7 +127,7 @@ namespace gdjs {
       return true;
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Text {
       return this._renderer.getRendererObject();
     }
 

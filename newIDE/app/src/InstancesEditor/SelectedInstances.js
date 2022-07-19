@@ -1,7 +1,7 @@
 // @flow
 import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 import { type ScreenType } from '../UI/Reponsive/ScreenTypeMeasurer';
 import InstancesSelection from './InstancesSelection';
 import {

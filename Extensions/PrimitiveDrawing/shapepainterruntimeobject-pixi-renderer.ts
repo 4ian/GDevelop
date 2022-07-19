@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class ShapePainterRuntimeObjectPixiRenderer {
     _object: gdjs.ShapePainterRuntimeObject;
     _graphics: PIXI.Graphics;
@@ -37,7 +35,7 @@ namespace gdjs {
         .addRendererObject(this._graphics, runtimeObject.getZOrder());
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Graphics {
       return this._graphics;
     }
 

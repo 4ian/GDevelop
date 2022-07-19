@@ -1,5 +1,4 @@
 declare namespace PIXI.filters {
-  import PIXI = GlobalPIXIModule.PIXI;
   export class BevelFilter extends PIXI.Filter {
     constructor(options?: BevelOptions);
     rotation: number;

@@ -1,5 +1,5 @@
 // @flow
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 
 type Props = {
   getLastCursorSceneCoordinates: () => [number, number],

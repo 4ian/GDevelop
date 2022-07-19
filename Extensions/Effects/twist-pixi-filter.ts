@@ -1,13 +1,8 @@
 namespace gdjs {
-  // Use a different name for PIXI to avoid confusing Typescript between the
-  // PIXI module, and the PIXI "namespace" where filters are added. Could maybe
-  // be removed when filters typings are reworked.
-  import PIXI_ = GlobalPIXIModule.PIXI;
-
   gdjs.PixiFiltersTools.registerFilterCreator('Twist', {
     makePIXIFilter: function (target, effectData) {
       const twistFilter = new PIXI.filters.TwistFilter();
-      twistFilter.offset = new PIXI_.Point(0, 0);
+      twistFilter.offset = new PIXI.Point(0, 0);
       return twistFilter;
     },
     updatePreRender: function (filter, target) {

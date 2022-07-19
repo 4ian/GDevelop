@@ -4,8 +4,6 @@
  * This project is released under the MIT License.
  */
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   type RendererEffects = Record<string, PixiFiltersTools.Filter>;
 
   export interface EffectsTarget {

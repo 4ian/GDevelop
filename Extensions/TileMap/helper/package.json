@@ -1,0 +1,8 @@
+{
+  "name": "gdevelop-tilemap",
+  "private": true,
+  "devDependencies": {
+    "@types/pako": "^2.0.0",
+    "pako": "^2.0.4"
+  }
+}

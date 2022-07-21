@@ -21,7 +21,8 @@ const electron = optionalRequire('electron');
 const styles = {
   grid: {
     textAlign: 'center',
-    maxWidth: LARGE_WIDGET_SIZE * 4, // Avoid tiles taking too much space on large screens.
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: LARGE_WIDGET_SIZE * 3 + 5 * 6, // 3 widgets + 5 padding per side
     overflow: 'hidden',
   },
   gridListTile: { display: 'flex', justifyContent: 'flex-start' },

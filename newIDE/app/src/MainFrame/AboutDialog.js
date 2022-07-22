@@ -204,6 +204,7 @@ const contributors = [
   {
     name: 'VegeTato',
     description: 'Extensions for GDevelop',
+    link: 'https://twitter.com/VegeTato_',
   },
   {
     name: 'Leo Red',

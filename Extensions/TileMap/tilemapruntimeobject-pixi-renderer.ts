@@ -62,15 +62,17 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      const width = this.getWidth();
-      const height = this.getHeight();
-      const originalWidth = width / this._pixiObject.scale.x;
-      const originalHeight = height / this._pixiObject.scale.y;
+      const tileMap = this._tileMap;
+      const originalWidth = tileMap ? tileMap.getWidth() : 20;
+      const originalHeight = tileMap ? tileMap.getHeight() : 20;
+
       this._pixiObject.pivot.x = originalWidth / 2;
       this._pixiObject.pivot.y = originalHeight / 2;
 
-      this._pixiObject.position.x = this._object.x + width / 2;
+      const width = this.getWidth();
+      const height = this.getHeight();
 
+      this._pixiObject.position.x = this._object.x + width / 2;
       this._pixiObject.position.y = this._object.y + height / 2;
     }
 
@@ -86,14 +88,14 @@ namespace gdjs {
       const tileMap = this._tileMap;
       const originalHeight = tileMap ? tileMap.getWidth() : 20;
       this._pixiObject.scale.x = width / originalHeight;
-      this._pixiObject.pivot.x = width / 2;
+      this._pixiObject.position.x = this._object.x + width / 2;
     }
 
     setHeight(height: float): void {
       const tileMap = this._tileMap;
       const originalHeight = tileMap ? tileMap.getHeight() : 20;
       this._pixiObject.scale.y = height / originalHeight;
-      this._pixiObject.pivot.y = height / 2;
+      this._pixiObject.position.y = this._object.y + height / 2;
     }
 
     getWidth(): float {

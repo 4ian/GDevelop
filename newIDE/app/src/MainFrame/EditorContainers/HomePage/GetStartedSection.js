@@ -18,10 +18,23 @@ import Checkbox from '../../../UI/Checkbox';
 import { GridList, GridListTile } from '@material-ui/core';
 const electron = optionalRequire('electron');
 
+const getColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 2;
+    case 'large':
+    default:
+      return 3;
+  }
+};
+const MAX_COLUMNS = getColumnsFromWidth('large');
 const styles = {
   grid: {
     textAlign: 'center',
-    maxWidth: LARGE_WIDGET_SIZE * 4, // Avoid tiles taking too much space on large screens.
+    // Avoid tiles taking too much space on large screens.
+    maxWidth: (LARGE_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS, // widget size + 5 padding per side
     overflow: 'hidden',
   },
   gridListTile: { display: 'flex', justifyContent: 'flex-start' },
@@ -35,18 +48,6 @@ const styles = {
     // the 2 ratio.
     aspectRatio: '2',
   },
-};
-
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 1;
-    case 'medium':
-      return 2;
-    case 'large':
-    default:
-      return 3;
-  }
 };
 
 type Props = {|

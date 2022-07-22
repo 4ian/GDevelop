@@ -5,8 +5,6 @@
  */
 
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   /**
    * The renderer for a gdjs.Layer using Pixi.js.
    */
@@ -219,7 +217,7 @@ namespace gdjs {
         false
       );
       this._pixiRenderer.renderTexture.bind(
-        oldRenderTexture,
+        oldRenderTexture || undefined,
         oldSourceFrame,
         undefined
       );

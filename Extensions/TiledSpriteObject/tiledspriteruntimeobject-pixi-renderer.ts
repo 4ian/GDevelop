@@ -1,6 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
-
   class TiledSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.TiledSpriteRuntimeObject;
     _tiledSprite: PIXI.TilingSprite;
@@ -27,7 +25,7 @@ namespace gdjs {
       this.updateYOffset();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.TilingSprite {
       return this._tiledSprite;
     }
 

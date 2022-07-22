@@ -98,7 +98,9 @@ export default class InstancePropertiesEditor extends React.Component<Props> {
     {
       name: this.props.i18n._(t`Layer`),
       valueType: 'string',
-      getChoices: () => enumerateLayers(this.props.layout),
+      getChoices: () =>
+        enumerateLayers(this.props.layout, this.props.i18n._(t`Base layer`)),
+      areUserDefinedValues: true,
       getValue: (instance: gdInitialInstance) => instance.getLayer(),
       setValue: (instance: gdInitialInstance, newValue: string) =>
         instance.setLayer(newValue),

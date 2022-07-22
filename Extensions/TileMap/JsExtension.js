@@ -954,16 +954,16 @@ module.exports = {
       // Place the center of rotation in the center of the object. Because pivot position in Pixi
       // is in the **local coordinates of the object**, we need to find back the original width
       // and height of the object before scaling (then divide by 2 to find the center)
-      const originalWidth = this.width / this._pixiObject.scale.x;
-      const originalHeight = this.height / this._pixiObject.scale.y;
+      const originalWidth = this.width;
+      const originalHeight = this.height;
       this._pixiObject.pivot.x = originalWidth / 2;
       this._pixiObject.pivot.y = originalHeight / 2;
 
       // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
       // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
       // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-      this._pixiObject.x = this._instance.getX() + this.width / 2;
-      this._pixiObject.y = this._instance.getY() + this.height / 2;
+      this._pixiObject.x = this._instance.getX() + this._pixiObject.pivot.x * this._pixiObject.scale.x;
+      this._pixiObject.y = this._instance.getY() + this._pixiObject.pivot.y * this._pixiObject.scale.y;
 
       // Rotation works as intended because we put the pivot in the center
       this._pixiObject.rotation = RenderedInstance.toRad(
@@ -1202,16 +1202,16 @@ module.exports = {
       // Place the center of rotation in the center of the object. Because pivot position in Pixi
       // is in the **local coordinates of the object**, we need to find back the original width
       // and height of the object before scaling (then divide by 2 to find the center)
-      const originalWidth = this.width / this._pixiObject.scale.x;
-      const originalHeight = this.height / this._pixiObject.scale.y;
+      const originalWidth = this.width;
+      const originalHeight = this.height;
       this._pixiObject.pivot.x = originalWidth / 2;
       this._pixiObject.pivot.y = originalHeight / 2;
 
       // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
       // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
       // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-      this._pixiObject.x = this._instance.getX() + this.width / 2;
-      this._pixiObject.y = this._instance.getY() + this.height / 2;
+      this._pixiObject.x = this._instance.getX() + this._pixiObject.pivot.x * this._pixiObject.scale.x;
+      this._pixiObject.y = this._instance.getY() + this._pixiObject.pivot.y * this._pixiObject.scale.y;
 
       // Rotation works as intended because we put the pivot in the center
       this._pixiObject.rotation = RenderedInstance.toRad(

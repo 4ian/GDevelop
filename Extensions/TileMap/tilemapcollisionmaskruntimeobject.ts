@@ -213,8 +213,8 @@ namespace gdjs {
       const angleInRadians = (this.angle * Math.PI) / 180;
       transformation.rotateAround(
         angleInRadians,
-        this.getCenterX() * absScaleX,
-        this.getCenterY() * absScaleY
+        this.getCenterX(),
+        this.getCenterY()
       );
 
       // Scale

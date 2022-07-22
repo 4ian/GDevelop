@@ -944,8 +944,8 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
+        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.y = this._instance.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;
@@ -975,14 +975,14 @@ module.exports = {
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return this.width / this._pixiObject.scale.x;
+      return this.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return this.height / this._pixiObject.scale.y;
+      return this.height;
     };
 
     objectsRenderingService.registerInstanceRenderer(

@@ -103,10 +103,16 @@
     background-image: url('./unfold.png');
     background-position: 11px 3px !important;
 }
+.gd-events-sheet .DefaultLightTheme .rst__expandButton {
+    background-image: url('./unfoldDark.png');
+}
 
 .gd-events-sheet  .rst__collapseButton {
     background-image: url('./fold.png');
     background-position: center 7px !important;
+}
+.gd-events-sheet .DefaultLightTheme .rst__collapseButton {
+    background-image: url('./foldDark.png');
 }
 
 /**

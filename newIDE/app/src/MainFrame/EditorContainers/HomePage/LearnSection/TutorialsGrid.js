@@ -26,12 +26,26 @@ const secondsToMinutesAndSeconds = (seconds: number) => {
   return `${minutes}:${formattedRemainingSeconds}`;
 };
 
+const getColumnsFromWidth = (width: WidthType) => {
+  switch (width) {
+    case 'small':
+      return 1;
+    case 'medium':
+      return 3;
+    case 'large':
+    default:
+      return 5;
+  }
+};
+const MAX_COLUMNS = getColumnsFromWidth('large');
+const MAX_TILE_SIZE = 300;
+
 const styles = {
   tutorialsContainer: {
     marginTop: 25,
   },
   grid: {
-    maxWidth: 1200, // Avoid tiles taking too much space on large screens.
+    maxWidth: (MAX_TILE_SIZE + 2 * 8) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
   },
   buttonStyle: {
     textAlign: 'left',
@@ -87,18 +101,6 @@ const useStylesForTile = makeStyles(theme =>
     },
   })
 );
-
-const getColumnsFromWidth = (width: WidthType) => {
-  switch (width) {
-    case 'small':
-      return 1;
-    case 'medium':
-      return 3;
-    case 'large':
-    default:
-      return 5;
-  }
-};
 
 const ImageOverlay = ({ text }) => (
   <div style={styles.overlay}>

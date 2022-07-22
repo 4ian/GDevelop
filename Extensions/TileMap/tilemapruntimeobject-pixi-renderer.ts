@@ -9,10 +9,11 @@ namespace gdjs {
    * @class TileMapRuntimeObjectPixiRenderer
    */
   export class TileMapRuntimeObjectPixiRenderer {
-    _object: any;
-    _runtimeScene: gdjs.RuntimeScene;
+    private _object: any;
+    private _runtimeScene: gdjs.RuntimeScene;
+    private _tileMap: TileMapHelper.EditableTileMap | null = null;
 
-    _pixiObject: PIXI.tilemap.CompositeRectTileLayer;
+    private _pixiObject: PIXI.tilemap.CompositeRectTileLayer;
 
     /**
      * @param runtimeObject The object to render
@@ -50,6 +51,7 @@ namespace gdjs {
       tileMap: TileMapHelper.EditableTileMap,
       textureCache: TileMapHelper.TileTextureCache
     ) {
+      this._tileMap = tileMap;
       TileMapHelper.PixiTileMapHelper.updatePixiTileMap(
         this._pixiObject,
         tileMap,
@@ -60,15 +62,16 @@ namespace gdjs {
     }
 
     updatePosition(): void {
-      const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-      const originalHeight = this._pixiObject.height / this._pixiObject.scale.y;
+      const width = this.getWidth();
+      const height = this.getHeight();
+      const originalWidth = width / this._pixiObject.scale.x;
+      const originalHeight = height / this._pixiObject.scale.y;
       this._pixiObject.pivot.x = originalWidth / 2;
       this._pixiObject.pivot.y = originalHeight / 2;
 
-      this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
+      this._pixiObject.position.x = this._object.x + width / 2;
 
-      this._pixiObject.position.y =
-        this._object.y + this._pixiObject.height / 2;
+      this._pixiObject.position.y = this._object.y + height / 2;
     }
 
     updateAngle(): void {
@@ -80,23 +83,29 @@ namespace gdjs {
     }
 
     setWidth(width: float): void {
-      this._pixiObject.width = width / this._pixiObject.scale.x;
+      const tileMap = this._tileMap;
+      const originalHeight = tileMap ? tileMap.getWidth() : 20;
+      this._pixiObject.scale.x = width / originalHeight;
       this._pixiObject.pivot.x = width / 2;
-      this.updatePosition();
     }
 
     setHeight(height: float): void {
-      this._pixiObject.height = height / this._pixiObject.scale.y;
+      const tileMap = this._tileMap;
+      const originalHeight = tileMap ? tileMap.getHeight() : 20;
+      this._pixiObject.scale.y = height / originalHeight;
       this._pixiObject.pivot.y = height / 2;
-      this.updatePosition();
     }
 
     getWidth(): float {
-      return this._pixiObject.width;
+      const tileMap = this._tileMap;
+      const originalWidth = tileMap ? tileMap.getWidth() : 20;
+      return originalWidth * this._pixiObject.scale.x;
     }
 
     getHeight(): float {
-      return this._pixiObject.height;
+      const tileMap = this._tileMap;
+      const originalHeight = tileMap ? tileMap.getHeight() : 20;
+      return originalHeight * this._pixiObject.scale.y;
     }
   }
   export const TileMapRuntimeObjectRenderer =

@@ -112,7 +112,7 @@ const jsExtensions = [
       // $FlowExpectedError - this path is ignored for Flow.
       'pixi-tilemap/dist/pixi-tilemap.umd': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd'),
       // $FlowExpectedError - this path is ignored for Flow.
-      TileMapHelper: require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
+      'helper/TileMapHelper': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/helper/TileMapHelper.js'),
       // $FlowExpectedError - this path is ignored for Flow.
       'pako/dist/pako.min': require('GDJS-for-web-app-only/Runtime/Extensions/TileMap/pako/dist/pako.min'),
     },

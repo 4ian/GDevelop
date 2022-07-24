@@ -188,10 +188,19 @@ const Instruction = (props: Props) => {
               .getParameter(parameterIndex)
               .getPlainString();
             expressionIsValid =
-              globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
-              objectsContainer.hasObjectNamed(objectOrGroupName) ||
-              globalObjectsContainer.getObjectGroups().has(objectOrGroupName) ||
-              objectsContainer.getObjectGroups().has(objectOrGroupName);
+              (globalObjectsContainer.hasObjectNamed(objectOrGroupName) ||
+                objectsContainer.hasObjectNamed(objectOrGroupName) ||
+                globalObjectsContainer
+                  .getObjectGroups()
+                  .has(objectOrGroupName) ||
+                objectsContainer.getObjectGroups().has(objectOrGroupName)) &&
+              (!parameterMetadata.getExtraInfo() ||
+                gd.getTypeOfObject(
+                  globalObjectsContainer,
+                  objectsContainer,
+                  objectOrGroupName,
+                  /*searchInGroups=*/ true
+                ) === parameterMetadata.getExtraInfo());
           }
 
           return (

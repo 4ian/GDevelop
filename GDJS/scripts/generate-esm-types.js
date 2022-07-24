@@ -1,3 +1,4 @@
+//@ts-check
 const {
   compileESModuleTypeDefinitions,
 } = require('./lib/build-esm-library-types');
@@ -11,20 +12,16 @@ const { getAllInOutFilePaths } = require('./lib/runtime-files-list');
 
   const entryPointsForNamespace = new Map();
   for (const { inPath, namespace } of allESMInOutFilePaths) {
-    const entryPoints = entryPointsForNamespace.get(namespace) || [];
+    let entryPoints = entryPointsForNamespace.get(namespace);
+    if (!entryPoints) {
+      entryPoints = [];
+      entryPointsForNamespace.set(namespace, entryPoints);
+    }
     entryPoints.push(inPath);
-    entryPointsForNamespace.set(namespace, entryPoints);
   }
 
-  const namespacesWithEntryPoints = Array.from(
-    entryPointsForNamespace.entries()
-  );
-
-  await Promise.all(
-    namespacesWithEntryPoints.map(([namespace, entryPoints]) =>
-      compileESModuleTypeDefinitions(entryPoints, namespace).catch((e) =>
-        console.error('Error while creating type definitions! ', e)
-      )
-    )
-  );
+  for (const [namespace, entryPoints] of entryPointsForNamespace.entries())
+    compileESModuleTypeDefinitions(entryPoints, namespace).catch((e) =>
+      console.error('Error while creating type definitions! ', e)
+    );
 })();

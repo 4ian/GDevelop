@@ -1,3 +1,4 @@
+//@ts-check
 const { build } = require('esbuild');
 const path = require('path');
 const shell = require('shelljs');

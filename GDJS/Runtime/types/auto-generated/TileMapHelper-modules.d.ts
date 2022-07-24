@@ -1,4 +1,4 @@
-// Autogenereted types, see GDJS/scripts/lib/build-esm-library-types.js to modify those.
+// Auto-generated types, see GDJS/scripts/lib/build-esm-library-types.js to modify those.
 declare module 'TileMapHelper/src/model/CommonTypes' {
   export type integer = number;
   export type float = number;

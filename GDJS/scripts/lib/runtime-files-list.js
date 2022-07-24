@@ -1,3 +1,4 @@
+//@ts-check
 const path = require('path');
 const recursive = require('recursive-readdir');
 const fs = require('fs').promises;
@@ -56,22 +57,40 @@ const ignoredPaths = [
  * The list of modules that are not namespaced typescript but ES Modules to be bundled as a namespace.
  * The key is the path to the module relative to the GDevelop root path, and the value is the name of
  * the namespace where to put all exports of the ES Module.
- * @type {Record<string, string>}
+ * @type {Array<{filePath:string, namespace: string}>}
  */
-const ESModulesList = Object.fromEntries(
-  Object.entries({
-    'GDJS/Runtime/pixi-renderers/pixi.ts': 'PIXI',
-    'Extensions/TileMap/helper/TileMapHelper.ts': 'TileMapHelper',
-  }).map(([untransformedPath, namespace]) => [
-    path.resolve(gdevelopRootPath, untransformedPath),
+const esModulesAndNamespaces = [
+  {
+    filePath: 'GDJS/Runtime/pixi-renderers/pixi.ts',
+    namespace: 'PIXI',
+  },
+  {
+    filePath: 'Extensions/TileMap/helper/TileMapHelper.ts',
+    namespace: 'TileMapHelper',
+  },
+];
+
+const esModulesPathsWithNamespaces = new Map(
+  esModulesAndNamespaces.map(({ filePath, namespace }) => [
+    path.resolve(gdevelopRootPath, filePath),
     namespace,
   ])
 );
 
+/*
+const esModulesAndNamespaces = Object.entries({
+  'GDJS/Runtime/pixi-renderers/pixi.ts': 'PIXI',
+  'Extensions/TileMap/helper/TileMapHelper.ts': 'TileMapHelper',
+}).map(([untransformedPath, namespace]) => ({
+  path: path.resolve(gdevelopRootPath, untransformedPath),
+  namespace,
+}));
+*/
+
 /**
  * Check if a file is not a source file (should not be included in the built Runtime).
  * @param {string} fileOrDirectoryPath
- * @param {fs.Stats} stats
+ * @param {import("fs").Stats} stats
  */
 const isNotAllowedExtension = (fileOrDirectoryPath, stats) => {
   return (
@@ -83,7 +102,7 @@ const isNotAllowedExtension = (fileOrDirectoryPath, stats) => {
 /**
  * Check if a folder is a test folder (should not be included in the built Runtime).
  * @param {string} fileOrDirectoryPath
- * @param {fs.Stats} stats
+ * @param {import("fs").Stats} stats
  */
 const isTestDirectory = (fileOrDirectoryPath, stats) => {
   if (!stats.isDirectory()) return false;
@@ -99,7 +118,7 @@ const isTestDirectory = (fileOrDirectoryPath, stats) => {
 /**
  * Check if a folder or directory should be ignored.
  * @param {string} fileOrDirectoryPath
- * @param {fs.Stats} stats
+ * @param {import("fs").Stats} stats
  */
 const isIgnoredFileOrDirectory = (fileOrDirectoryPath, stats) => {
   const resolvedPath = path.resolve(fileOrDirectoryPath);
@@ -131,7 +150,7 @@ const getInOutPaths = (basePath, bundledOutPath) => (inPath) => {
  * @param {string} inPath
  * @returns {boolean}
  */
-const isESM = (inPath) => ESModulesList.hasOwnProperty(inPath);
+const isESM = (inPath) => esModulesPathsWithNamespaces.has(inPath);
 
 module.exports = {
   /**
@@ -157,7 +176,7 @@ module.exports = {
   },
   /**
    * Get the list of all files part of the runtime, and their destination file when the runtime is bundled.
-   * @param {{bundledOutPath: string, esm:boolean}} options
+   * @param {{bundledOutPath: string}} options
    * @returns {Promise<{allNamespacedInOutFilePaths: InOutPath[]; allESMInOutFilePaths: ESMInOutPath[];}>}
    */
   getAllInOutFilePaths: async (options) => {
@@ -185,16 +204,16 @@ module.exports = {
       ...allExtensionsInOutFilePaths,
     ];
 
-    /** @type {Array<InOutPath} */
+    /** @type {Array<InOutPath>} */
     const allNamespacedInOutFilePaths = [];
-    /** @type {Array<ESMInOutPath} */
+    /** @type {Array<ESMInOutPath>} */
     const allESMInOutFilePaths = [];
 
     for (const inOutFilePath of allInOutFilePaths) {
       if (isESM(inOutFilePath.inPath)) {
         allESMInOutFilePaths.push({
           ...inOutFilePath,
-          namespace: ESModulesList[inOutFilePath.inPath],
+          namespace: esModulesPathsWithNamespaces.get(inOutFilePath.inPath),
         });
       } else allNamespacedInOutFilePaths.push(inOutFilePath);
     }

@@ -37,7 +37,7 @@
   },
   "scripts": {
     "postinstall": "patch-package && cd ../Extensions/TileMap/helper && npm i",
-    "type-gen": "node scripts/generate-esm-types.js && prettier --write \"Runtime/types/auto-generated/*.d.ts\"",
+    "generate-types": "node scripts/generate-esm-types.js && prettier --write \"Runtime/types/auto-generated/*.d.ts\"",
     "check-types": "tsc",
     "build": "node scripts/build.js",
     "test": "cd tests && npm run test-benchmark",

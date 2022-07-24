@@ -1,5 +1,4 @@
 namespace gdjs {
-  import PIXI = GlobalPIXIModule.PIXI;
   class PanelSpriteRuntimeObjectPixiRenderer {
     _object: gdjs.PanelSpriteRuntimeObject;
     /**
@@ -71,7 +70,7 @@ namespace gdjs {
         .addRendererObject(this._wrapperContainer, runtimeObject.getZOrder());
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Container {
       return this._wrapperContainer;
     }
 

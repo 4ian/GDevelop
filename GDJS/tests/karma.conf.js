@@ -101,7 +101,6 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TileMapCollisionMaskRenderer.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
-      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
       
       // Test extensions:
       './tests/Extensions/**.js',

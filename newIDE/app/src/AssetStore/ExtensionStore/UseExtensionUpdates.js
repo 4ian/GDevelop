@@ -50,8 +50,7 @@ const getUpdateMetadataFromVersions = (
 
 export const useExtensionUpdate = (
   project: gdProject,
-  extension: ExtensionShortHeader,
-  forceRefresh: Array<any> = []
+  extension: ExtensionShortHeader
 ): UpdateMetadata | null => {
   const installedVersionOrNull =
     project.hasEventsFunctionsExtensionNamed(extension.name) &&

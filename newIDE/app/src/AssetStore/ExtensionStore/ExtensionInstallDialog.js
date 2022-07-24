@@ -62,9 +62,7 @@ const ExtensionInstallDialog = ({
   const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
     extensionShortHeader.name
   );
-  const extensionUpdate = useExtensionUpdate(project, extensionShortHeader, [
-    isInstalling,
-  ]);
+  const extensionUpdate = useExtensionUpdate(project, extensionShortHeader);
 
   const [error, setError] = React.useState<?Error>(null);
   const [

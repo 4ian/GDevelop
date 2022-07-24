@@ -579,7 +579,7 @@ const PropertiesEditor = ({
           );
           if (field.title) {
             return [
-              <Text key={field.name + '-title'} size="title">
+              <Text key={field.name + '-title'} size="block-title">
                 {field.title}
               </Text>,
               contentView,

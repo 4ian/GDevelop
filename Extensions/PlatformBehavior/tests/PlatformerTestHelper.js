@@ -136,7 +136,7 @@
 
   const addTunnelPlatformObject = (runtimeScene) => {
     const platform = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
-      name: 'slope',
+      name: 'tunnel',
       type: '',
       behaviors: [
         {
@@ -172,6 +172,68 @@
                       { x: 0, y: 300 },
                       { x: 100, y: 300 },
                       { x: 100, y: 200 },
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    runtimeScene.addObject(platform);
+    platform.setUnscaledWidthAndHeight(100, 300);
+    platform.setCustomWidthAndHeight(100, 300);
+
+    return platform;
+  };
+
+  /**
+   * @returns A platform with 2 hitboxes that can act as a floor and a wall at
+   * the same time.
+   * It can happen when a tile map collision mask object is used because all
+   * the platforms are part of the same object instance.
+   */
+  const addFloorAndWallPlatformObject = (runtimeScene) => {
+    const platform = new gdjs.TestSpriteRuntimeObject(runtimeScene, {
+      name: 'elbow',
+      type: '',
+      behaviors: [
+        {
+          type: 'PlatformBehavior::PlatformBehavior',
+          name: 'Platform',
+          canBeGrabbed: true,
+        },
+      ],
+      effects: [],
+      animations: [
+        {
+          name: 'animation',
+          directions: [
+            {
+              sprites: [
+                {
+                  originPoint: { x: 0, y: 0 },
+                  centerPoint: { x: 50, y: 50 },
+                  points: [
+                    { name: 'Origin', x: 0, y: 0 },
+                    { name: 'Center', x: 50, y: 50 },
+                  ],
+                  hasCustomCollisionMask: true,
+                  customCollisionMask: [
+                    // Wall
+                    [
+                      { x: 80, y: 0 },
+                      { x: 80, y: 100 },
+                      { x: 100, y: 100 },
+                      { x: 100, y: 0 },
+                    ],
+                    // Floor
+                    [
+                      { x: 0, y: 80 },
+                      { x: 0, y: 100 },
+                      { x: 100, y: 100 },
+                      { x: 100, y: 80 },
                     ],
                   ],
                 },

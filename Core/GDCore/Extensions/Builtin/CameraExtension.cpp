@@ -195,7 +195,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
           "number",
           "CameraAngle",
           _("Angle of a camera of a layer"),
-          _("the angle of rotation of a camera"),
+          _("the angle of rotation of a camera (in degrees)"),
           _("the angle of camera (layer: _PARAM3_, camera: _PARAM4_)"),
           "",
           "res/conditions/camera24.png")

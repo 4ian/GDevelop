@@ -15,11 +15,11 @@ import {
   ColorAssetStoreSearchFilter,
 } from './AssetStoreSearchFilter';
 import { type AssetFiltersState } from './AssetStoreContext';
-import Slider from '@material-ui/core/Slider';
 import FlatButton from '../UI/FlatButton';
 import { Line, Column } from '../UI/Grid';
 import { type RGBColor } from '../Utils/ColorTransformer';
 import { HexColorField } from './HexColorField';
+import Slider from '../UI/Slider';
 
 type Choice = {|
   label: React.Node,
@@ -169,7 +169,7 @@ const RangeFilter = ({
                   scale={scale}
                   marks={true}
                   valueLabelDisplay="auto"
-                  onChange={(event, newValue) => setRange(newValue)}
+                  onChange={newValue => setRange(newValue)}
                 />
               </Line>
             </Column>

@@ -802,24 +802,41 @@ namespace gdjs {
         if (!filesToLoad.length) return;
         const file = filesToLoad.shift()!;
         const fileData = files[file][0];
-        if (!fileData.preloadAsSound && !fileData.preloadAsMusic) {
-          onLoad();
-        } else if (fileData.preloadAsSound && fileData.preloadAsMusic) {
-          let loadedOnce = false;
-          const callback = (_, error) => {
-            if (!loadedOnce) {
-              loadedOnce = true;
-              return;
-            }
-            onLoad(_, error);
-          };
 
+        let loadCounter = 0;
+        const callback = (_?: any, error?: string) => {
+          loadCounter--;
+          if (!loadCounter) {
+            onLoad(_, error);
+          }
+        };
+
+        if (fileData.preloadAsMusic) {
+          loadCounter++;
           preloadAudioFile(file, callback, /* isMusic= */ true);
+        }
+
+        if (fileData.preloadAsSound) {
+          loadCounter++;
           preloadAudioFile(file, callback, /* isMusic= */ false);
-        } else if (fileData.preloadAsSound) {
-          preloadAudioFile(file, onLoad, /* isMusic= */ false);
-        } else if (fileData.preloadAsMusic)
-          preloadAudioFile(file, onLoad, /* isMusic= */ true);
+        } else if (fileData.preloadInCache) {
+          // preloading as sound already does a XHR request, hence "else if"
+          loadCounter++;
+          const sound = new XMLHttpRequest();
+          sound.addEventListener('load', callback);
+          sound.addEventListener('error', (_) =>
+            callback(_, 'XHR error: ' + file)
+          );
+          sound.addEventListener('abort', (_) =>
+            callback(_, 'XHR abort: ' + file)
+          );
+          sound.open('GET', file);
+          sound.send();
+        }
+
+        if (!loadCounter) {
+          onLoad();
+        }
       };
       loadNextFile();
     }

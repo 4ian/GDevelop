@@ -15,7 +15,6 @@ import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
 import AboutDialog from '../MainFrame/AboutDialog';
-import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import DragHandle from '../UI/DragHandle';
 import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
@@ -49,10 +48,8 @@ import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
 import SerializedObjectDisplay from './SerializedObjectDisplay';
-import EventsTree from '../EventsSheet/EventsTree';
 import ExternalPropertiesDialog from '../MainFrame/EditorContainers/ExternalPropertiesDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
-import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
 import ObjectGroupEditor from '../ObjectGroupEditor';
 import ObjectGroupsList from '../ObjectGroupsList';
@@ -62,7 +59,6 @@ import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
 import DragAndDropContextProvider from '../UI/DragAndDrop/DragAndDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
-import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
@@ -76,9 +72,6 @@ import {
   limitsForIndieUser,
   limitsReached,
   noSubscription,
-  usagesForIndieUser,
-  indieFirebaseUser,
-  indieUserProfile,
   fakeNoSubscriptionAuthenticatedUser,
   fakeIndieAuthenticatedUser,
   fakeNotAuthenticatedAuthenticatedUser,
@@ -87,21 +80,11 @@ import {
   release,
   releaseWithBreakingChange,
   releaseWithoutDescription,
-  fakeAssetShortHeader1,
-  game1,
-  game2,
-  gameRollingMetrics1,
-  gameRollingMetricsWithoutPlayersAndRetention1,
   showcasedGame1,
-  exampleFromFutureVersion,
   geometryMonsterExampleShortHeader,
   fireBulletExtensionShortHeader,
   flashExtensionShortHeader,
 } from '../fixtures/GDevelopServicesTestData';
-import {
-  GDevelopAnalyticsApi,
-  GDevelopGameApi,
-} from '../Utils/GDevelopServices/ApiConfigs';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutputsTestData from '../fixtures/ProfilerOutputsTestData.json';
 import consoleTestData from '../fixtures/ConsoleTestData';
@@ -123,8 +106,6 @@ import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import ObjectField from '../EventsSheet/ParameterFields/ObjectField';
-import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
@@ -146,7 +127,6 @@ import SemiControlledAutoComplete from '../UI/SemiControlledAutoComplete';
 import SemiControlledMultiAutoComplete from '../UI/SemiControlledMultiAutoComplete';
 import SceneNameField from '../EventsSheet/ParameterFields/SceneNameField';
 import InstructionOrObjectSelector from '../EventsSheet/InstructionEditor/InstructionOrObjectSelector';
-import SearchBar from '../UI/SearchBar';
 import NewInstructionEditorDialog from '../EventsSheet/InstructionEditor/NewInstructionEditorDialog';
 import NewInstructionEditorMenu from '../EventsSheet/InstructionEditor/NewInstructionEditorMenu';
 import { PopoverButton } from './PopoverButton';
@@ -188,7 +168,6 @@ import {
 } from '../UI/Layout';
 import SelectField from '../UI/SelectField';
 import SelectOption from '../UI/SelectOption';
-import TextField from '../UI/TextField';
 import ExpressionAutocompletionsDisplayer from '../EventsSheet/ParameterFields/GenericExpressionField/ExpressionAutocompletionsDisplayer';
 import {
   getFakePopperJsAnchorElement,
@@ -208,15 +187,8 @@ import HotReloadLogsDialog from '../HotReload/HotReloadLogsDialog';
 import ScrollView from '../UI/ScrollView';
 import '../UI/Theme/Global/Scrollbar.css';
 import '../UI/Theme/Global/Animation.css';
-import { ExampleStoreStateProvider } from '../AssetStore/ExampleStore/ExampleStoreContext';
 import { ExtensionStoreStateProvider } from '../AssetStore/ExtensionStore/ExtensionStoreContext';
 import { ResourceFetcherDialog } from '../ProjectsStorage/ResourceFetcher';
-import { GameCard } from '../GameDashboard/GameCard';
-import { GameDetailsDialog } from '../GameDashboard/GameDetailsDialog';
-import { GamesList } from '../GameDashboard/GamesList';
-import { GameRegistrationWidget } from '../GameDashboard/GameRegistration';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import { GamesShowcase } from '../GamesShowcase';
 import { GamesShowcaseStateProvider } from '../GamesShowcase/GamesShowcaseContext';
 import { ShowcasedGameListItem } from '../GamesShowcase/ShowcasedGameListItem';
@@ -228,13 +200,11 @@ import {
 } from '../UI/Accordion';
 import ProjectPropertiesDialog from '../ProjectManager/ProjectPropertiesDialog';
 import { LoadingScreenEditor } from '../ProjectManager/LoadingScreenEditor';
-import { UserPublicProfileChip } from '../UI/User/UserPublicProfileChip';
 import {
   ExtensionsAccordion,
   ExamplesAccordion,
 } from '../Profile/ContributionsDetails';
 import ListIcon from '../UI/ListIcon';
-import { initialPreferences } from '../MainFrame/Preferences/PreferencesContext';
 import CloudDownload from '@material-ui/icons/CloudDownload';
 
 configureActions({
@@ -246,18 +216,6 @@ addDecorator(GDevelopJsInitializerDecorator);
 
 // No i18n in this file
 
-const buildFakeMenuTemplate = () => [
-  {
-    label: 'Option 1',
-    click: action('click option 1'),
-  },
-  { type: 'separator' },
-  {
-    label: 'Option 2',
-    click: action('click option 2'),
-  },
-];
-
 const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
   hasPreviewsRunning: false,
   launchProjectDataOnlyPreview: action('launchProjectDataOnlyPreview'),
@@ -267,186 +225,12 @@ const hotReloadPreviewButtonProps: HotReloadPreviewButtonProps = {
 };
 
 storiesOf('Welcome', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('to Storybook', () => <Welcome />);
 
-storiesOf('UI Building Blocks/Buttons', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ColumnStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Buttons:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <RaisedButton label="Raised button" onClick={action('onClick')} />
-        <RaisedButton
-          icon={<CloudDownload />}
-          label="Raised button"
-          onClick={action('onClick')}
-        />
-        <RaisedButton
-          label="Primary Raised button"
-          primary
-          onClick={action('onClick')}
-        />
-        <RaisedButton
-          icon={<CloudDownload />}
-          label="Primary Raised button"
-          primary
-          onClick={action('onClick')}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <FlatButton label="Flat button" onClick={action('onClick')} />
-        <FlatButton
-          icon={<CloudDownload />}
-          label="Flat button"
-          onClick={action('onClick')}
-        />
-        <FlatButton
-          label="Primary Flat button"
-          primary
-          onClick={action('onClick')}
-        />
-        <FlatButton
-          icon={<CloudDownload />}
-          label="Primary Flat button"
-          primary
-          onClick={action('onClick')}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <TextButton label="Text button" onClick={action('onClick')} />
-        <TextButton
-          icon={<CloudDownload />}
-          label="Text button"
-          onClick={action('onClick')}
-        />
-        <TextButton
-          primary
-          label="Primary Text button"
-          onClick={action('onClick')}
-        />
-        <TextButton
-          icon={<CloudDownload />}
-          primary
-          label="Primary Text button"
-          onClick={action('onClick')}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Buttons with split menus:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <RaisedButton
-          label="Traditional Raised button"
-          onClick={action('onClick')}
-        />
-        <RaisedButtonWithSplitMenu
-          label="Button with split menu"
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithSplitMenu
-          label="Primary button with split menu"
-          primary
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithSplitMenu
-          label="... and with icon"
-          icon={<Brush />}
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithSplitMenu
-          label="... and disabled"
-          icon={<Brush />}
-          disabled
-          onClick={action('onClick')}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Buttons with menus:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <RaisedButton
-          label="Traditional Raised button"
-          onClick={action('onClick')}
-        />
-        <RaisedButtonWithMenu
-          label="Button with menu"
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithMenu
-          label="... and with icon"
-          icon={<Brush />}
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <RaisedButtonWithMenu
-          label="... and disabled"
-          icon={<Brush />}
-          disabled
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>Icons with menu:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <ElementWithMenu
-          element={
-            <ToolbarIcon
-              src="res/ribbon_default/bug32.png"
-              tooltip={'ToolbarIcon with menu'}
-            />
-          }
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-        <ElementWithMenu
-          element={
-            <IconButton>
-              <FilterList />
-            </IconButton>
-          }
-          buildMenuTemplate={buildFakeMenuTemplate}
-        />
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <Text>In a mini toolbar:</Text>
-      </LineStackLayout>
-      <LineStackLayout noMargin>
-        <MiniToolbar>
-          <MiniToolbarText firstChild>Some text:</MiniToolbarText>
-          <IconButton>
-            <Brush />
-          </IconButton>
-          <ElementWithMenu
-            element={
-              <IconButton>
-                <FilterList />
-              </IconButton>
-            }
-            buildMenuTemplate={() => [
-              {
-                label: 'Option 1',
-                click: action('click option 1'),
-              },
-              { type: 'separator' },
-              {
-                label: 'Option 2',
-                click: action('click option 2'),
-              },
-            ]}
-          />
-        </MiniToolbar>
-      </LineStackLayout>
-    </ColumnStackLayout>
-  ));
-
 storiesOf('UI Building Blocks/SelectField', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
@@ -465,7 +249,7 @@ storiesOf('UI Building Blocks/SelectField', module)
       )}
     />
   ))
-  .add('default, with (markdown) helper text', () => (
+  .add('default, with (markdown) helper text and floating label', () => (
     <ValueStateHolder
       initialValue={'1'}
       render={(value, onChange) => (
@@ -474,6 +258,7 @@ storiesOf('UI Building Blocks/SelectField', module)
           onChange={(e, i, newValue: string) => onChange(newValue)}
           fullWidth
           helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+          floatingLabelText="This is a floating label"
         >
           <SelectOption value="1" primaryText="Choice 1" />
           <SelectOption value="2" primaryText="Choice 2" />
@@ -503,6 +288,7 @@ storiesOf('UI Building Blocks/SelectField', module)
   ));
 
 storiesOf('UI Building Blocks/SemiControlledTextField', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => {
     const [value, setValue] = React.useState('Hello World');
@@ -640,6 +426,7 @@ storiesOf('UI Building Blocks/DragAndDrop', module).add('test bed', () => (
 ));
 
 storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default, with text', () => (
     <ValueStateHolder
@@ -869,9 +656,30 @@ storiesOf('UI Building Blocks/SemiControlledAutoComplete', module)
         </React.Fragment>
       )}
     />
+  ))
+  .add('with a floating label', () => (
+    <ValueStateHolder
+      initialValue={'Choice 6'}
+      render={(value, onChange) => (
+        <React.Fragment>
+          <SemiControlledAutoComplete
+            value={value}
+            onChange={onChange}
+            floatingLabelText="This is a floating label"
+            helperMarkdownText="This is some help text that can be written in **markdown**. This is *very* useful for emphasis and can even be used to add [links](http://example.com)."
+            dataSource={[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({
+              text: `Choice ${i}`,
+              value: `Choice ${i}`,
+            }))}
+          />
+          <p>State value is {value}</p>
+        </React.Fragment>
+      )}
+    />
   ));
 
 storiesOf('UI Building Blocks/SemiControlledMultiAutoComplete', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ValueStateHolder
@@ -1039,6 +847,7 @@ storiesOf('UI Building Blocks/Layout/ResponsiveLineStackLayout', module)
   ));
 
 storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('Empty text field', () => (
     <TextFieldWithButtonLayout
@@ -1597,6 +1406,7 @@ storiesOf('UI Building Blocks/EditorMosaic', module)
   ));
 
 storiesOf('UI Building Blocks/EditorNavigator', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <EditorMosaicPlayground
@@ -1664,18 +1474,22 @@ storiesOf('UI Building Blocks/EditorNavigator', module)
   ));
 
 storiesOf('UI Building Blocks/HelpButton', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
 
 storiesOf('UI Building Blocks/HelpIcon', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 storiesOf('HelpFinder', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('PropertiesEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <PropertiesEditor
@@ -2463,33 +2277,6 @@ storiesOf('AboutDialog', module)
     />
   ));
 
-storiesOf('Project Creation/CreateProjectDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <ExampleStoreStateProvider>
-      <CreateProjectDialog
-        open
-        onClose={action('onClose')}
-        onOpen={action('On open project after it is created')}
-        initialTab="examples"
-        onCreateBlank={() => action('create blank project')}
-        onCreateFromExampleShortHeader={() => action('create from example')}
-      />
-    </ExampleStoreStateProvider>
-  ))
-  .add('Games showcase as initial tab', () => (
-    <ExampleStoreStateProvider>
-      <CreateProjectDialog
-        open
-        onClose={action('onClose')}
-        onOpen={action('On open project after it is created')}
-        initialTab="games-showcase"
-        onCreateBlank={() => action('create blank project')}
-        onCreateFromExampleShortHeader={() => action('create from example')}
-      />
-    </ExampleStoreStateProvider>
-  ));
-
 storiesOf('OpenFromStorageProviderDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -2660,32 +2447,6 @@ storiesOf('SearchPanel', module)
       onCloseSearchPanel={() => {}}
       searchFocusOffset={1}
     />
-  ));
-
-storiesOf('ExpressionSelector', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('number (with focusOnMount) (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExpressionSelector
-        selectedType=""
-        expressionType="number"
-        onChoose={action('Expression chosen')}
-        focusOnMount
-        scope={{}}
-      />
-    </FixedHeightFlexContainer>
-  ))
-  .add('string (with focusOnMount) (no scope)', () => (
-    <FixedHeightFlexContainer height={400}>
-      <ExpressionSelector
-        selectedType=""
-        expressionType="string"
-        onChoose={action('(String) Expression chosen')}
-        focusOnMount
-        scope={{}}
-      />
-    </FixedHeightFlexContainer>
   ));
 
 storiesOf('InstructionSelector', module)
@@ -3386,12 +3147,24 @@ storiesOf('SubscriptionDetails', module)
     <SubscriptionDetails
       subscription={subscriptionForIndieUser}
       onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
     />
   ))
-  .add('limit reached', () => (
+  .add('no subscription', () => (
     <SubscriptionDetails
       subscription={noSubscription}
       onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={false}
+    />
+  ))
+  .add('loading manage subscription', () => (
+    <SubscriptionDetails
+      subscription={subscriptionForIndieUser}
+      onChangeSubscription={action('change subscription')}
+      onManageSubscription={action('manage subscription')}
+      isManageSubscriptionLoading={true}
     />
   ));
 
@@ -4415,203 +4188,6 @@ storiesOf('ResourceFetcher/ResourceFetcherDialog', module)
     />
   ));
 
-storiesOf('GameDashboard/GamesList', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('without a project opened', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopGameApi.baseUrl}/game`)
-      .reply(200, [game1, game2])
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GamesList project={null} />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('without a project opened, long loading', () => {
-    const mock = new MockAdapter(axios, { delayResponse: 2500 });
-    mock
-      .onGet(`${GDevelopGameApi.baseUrl}/game`)
-      .reply(200, [game1, game2])
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GamesList project={null} />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('with an error', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopGameApi.baseUrl}/game`)
-      .reply(500)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GamesList project={null} />
-      </AuthenticatedUserContext.Provider>
-    );
-  });
-
-storiesOf('GameDashboard/GameCard', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <GameCard
-      game={game1}
-      isCurrentGame={false}
-      onOpenGameManager={action('onOpenGameManager')}
-    />
-  ))
-  .add('current game', () => (
-    <GameCard
-      game={game1}
-      isCurrentGame={true}
-      onOpenGameManager={action('onOpenGameManager')}
-    />
-  ));
-
-storiesOf('GameDashboard/GameDetailsDialog', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('Error loading analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(500)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('Missing analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(404)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('With partial analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetricsWithoutPlayersAndRetention1)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('With analytics', () => {
-    const mock = new MockAdapter(axios);
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetrics1)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  })
-  .add('With analytics, long loading', () => {
-    const mock = new MockAdapter(axios, { delayResponse: 2000 });
-    mock
-      .onGet(`${GDevelopAnalyticsApi.baseUrl}/game-metrics`)
-      .reply(200, gameRollingMetrics1)
-      .onAny()
-      .reply(config => {
-        console.error(`Unexpected call to ${config.url} (${config.method})`);
-        return [504, null];
-      });
-
-    return (
-      <AuthenticatedUserContext.Provider value={fakeIndieAuthenticatedUser}>
-        <GameDetailsDialog
-          game={game1}
-          project={null}
-          initialTab="analytics"
-          onClose={action('onClose')}
-          onGameUpdated={action('onGameUpdated')}
-          onGameDeleted={action('onGameDeleted')}
-        />
-      </AuthenticatedUserContext.Provider>
-    );
-  });
-
 storiesOf('GamesShowcase', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -4632,6 +4208,7 @@ storiesOf('GamesShowcase/ShowcasedGameListItem', module)
   ));
 
 storiesOf('ProjectPropertiesDialog', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ProjectPropertiesDialog
@@ -4648,6 +4225,7 @@ storiesOf('ProjectPropertiesDialog', module)
   ));
 
 storiesOf('ProjectPropertiesDialog/LoadingScreenEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LoadingScreenEditor

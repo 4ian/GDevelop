@@ -13,6 +13,7 @@ import generateName from '../Utils/ProjectNameGenerator';
 import optionalRequire from '../Utils/OptionalRequire';
 import { findEmptyPathInDefaultFolder } from './LocalPathFinder';
 import { type ProjectCreationSettings } from './CreateProjectDialog';
+import IconButton from '../UI/IconButton';
 
 const remote = optionalRequire('@electron/remote');
 const app = remote ? remote.app : null;
@@ -99,7 +100,12 @@ const ProjectPreCreationDialog = ({
           onChange={_onChangeProjectName}
           floatingLabelText={<Trans>Project name</Trans>}
           endAdornment={
-            <Refresh onClick={() => setProjectName(generateName())} />
+            <IconButton
+              size="small"
+              onClick={() => setProjectName(generateName())}
+            >
+              <Refresh />
+            </IconButton>
           }
         />
         {app && (

@@ -10,14 +10,7 @@ const gd: libGDevelop = global.gd;
 
 const GROUP_DELIMITER = '/';
 
-// Support enumerate expressions that can be string, number or both ("number|string").
-// "number|string" has limited support in the codebase, enough to be used in expressions but not
-// in parameters and this is not a generic feature (you can't do "string|variable" or this kind of things).
-// This may be improved in the future if really necessary.
-const isPotentiallyStringType = (type: string) =>
-  type === 'string' || type === 'number|string';
-const isPotentiallyNumberType = (type: string) =>
-  type === 'number' || type === 'number|string';
+const shouldOnlyBeNumberType = (type: string) => type === 'number';
 
 const enumerateExpressionMetadataMap = (
   prefix: string,
@@ -70,8 +63,6 @@ export const enumerateFreeExpressions = (
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();
-  const returnNumber = isPotentiallyNumberType(type);
-  const returnString = isPotentiallyStringType(type);
 
   return flatten(
     mapVector(allExtensions, extension => {
@@ -83,20 +74,18 @@ export const enumerateFreeExpressions = (
       };
 
       return [
-        ...(returnString
+        ...(!shouldOnlyBeNumberType(type)
           ? enumerateExpressionMetadataMap(
               prefix,
               extension.getAllStrExpressions(),
               scope
             )
           : []),
-        ...(returnNumber
-          ? enumerateExpressionMetadataMap(
-              prefix,
-              extension.getAllExpressions(),
-              scope
-            )
-          : []),
+        ...enumerateExpressionMetadataMap(
+          prefix,
+          extension.getAllExpressions(),
+          scope
+        ),
       ];
     })
   );
@@ -116,20 +105,18 @@ export const enumerateObjectExpressions = (
   const scope = { extension, objectMetadata };
 
   let objectsExpressions = [
-    ...(isPotentiallyStringType(type)
+    ...(!shouldOnlyBeNumberType(type)
       ? enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForObject(objectType),
           scope
         )
       : []),
-    ...(isPotentiallyNumberType(type)
-      ? enumerateExpressionMetadataMap(
-          '',
-          extension.getAllExpressionsForObject(objectType),
-          scope
-        )
-      : []),
+    ...enumerateExpressionMetadataMap(
+      '',
+      extension.getAllExpressionsForObject(objectType),
+      scope
+    ),
   ];
 
   const baseObjectType = ''; /* An empty string means the base object */
@@ -142,20 +129,18 @@ export const enumerateObjectExpressions = (
 
     objectsExpressions = [
       ...objectsExpressions,
-      ...(isPotentiallyStringType(type)
+      ...(!shouldOnlyBeNumberType(type)
         ? enumerateExpressionMetadataMap(
             '',
             extension.getAllStrExpressionsForObject(baseObjectType),
             scope
           )
         : []),
-      ...(isPotentiallyNumberType(type)
-        ? enumerateExpressionMetadataMap(
-            '',
-            extension.getAllExpressionsForObject(baseObjectType),
-            scope
-          )
-        : []),
+      ...enumerateExpressionMetadataMap(
+        '',
+        extension.getAllExpressionsForObject(baseObjectType),
+        scope
+      ),
     ];
   }
 
@@ -176,20 +161,18 @@ export const enumerateBehaviorExpressions = (
   const scope = { extension, behaviorMetadata };
 
   return [
-    ...(isPotentiallyStringType(type)
+    ...(!shouldOnlyBeNumberType(type)
       ? enumerateExpressionMetadataMap(
           '',
           extension.getAllStrExpressionsForBehavior(behaviorType),
           scope
         )
       : []),
-    ...(isPotentiallyNumberType(type)
-      ? enumerateExpressionMetadataMap(
-          '',
-          extension.getAllExpressionsForBehavior(behaviorType),
-          scope
-        )
-      : []),
+    ...enumerateExpressionMetadataMap(
+      '',
+      extension.getAllExpressionsForBehavior(behaviorType),
+      scope
+    ),
   ];
 };
 
@@ -197,9 +180,6 @@ export const enumerateBehaviorExpressions = (
 export const enumerateAllExpressions = (
   type: string
 ): Array<EnumeratedExpressionMetadata> => {
-  const returnNumber = isPotentiallyNumberType(type);
-  const returnString = isPotentiallyStringType(type);
-
   const objectsExpressions = [];
   const behaviorsExpressions = [];
   const freeExpressions = enumerateFreeExpressions(type);
@@ -215,7 +195,7 @@ export const enumerateAllExpressions = (
       const objectMetadata = extension.getObjectMetadata(objectType);
       const scope = { extension, objectMetadata };
 
-      if (returnString)
+      if (!shouldOnlyBeNumberType(type))
         objectsExpressions.push.apply(
           objectsExpressions,
           enumerateExpressionMetadataMap(
@@ -224,15 +204,14 @@ export const enumerateAllExpressions = (
             scope
           )
         );
-      if (returnNumber)
-        objectsExpressions.push.apply(
-          objectsExpressions,
-          enumerateExpressionMetadataMap(
-            prefix,
-            extension.getAllExpressionsForObject(objectType),
-            scope
-          )
-        );
+      objectsExpressions.push.apply(
+        objectsExpressions,
+        enumerateExpressionMetadataMap(
+          prefix,
+          extension.getAllExpressionsForObject(objectType),
+          scope
+        )
+      );
     });
 
     //Behaviors expressions:
@@ -240,7 +219,7 @@ export const enumerateAllExpressions = (
       const behaviorMetadata = extension.getBehaviorMetadata(behaviorType);
       const scope = { extension, behaviorMetadata };
 
-      if (returnString)
+      if (!shouldOnlyBeNumberType(type))
         behaviorsExpressions.push.apply(
           behaviorsExpressions,
           enumerateExpressionMetadataMap(
@@ -249,15 +228,14 @@ export const enumerateAllExpressions = (
             scope
           )
         );
-      if (returnNumber)
-        behaviorsExpressions.push.apply(
-          behaviorsExpressions,
-          enumerateExpressionMetadataMap(
-            prefix,
-            extension.getAllExpressionsForBehavior(behaviorType),
-            scope
-          )
-        );
+      behaviorsExpressions.push.apply(
+        behaviorsExpressions,
+        enumerateExpressionMetadataMap(
+          prefix,
+          extension.getAllExpressionsForBehavior(behaviorType),
+          scope
+        )
+      );
     });
   });
 

@@ -5,6 +5,7 @@ import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import EventsTree from './EventsTree';
+import { getInstructionMetadata } from './InstructionEditor/NewInstructionEditor';
 import NewInstructionEditorDialog from './InstructionEditor/NewInstructionEditorDialog';
 import InstructionEditorDialog from './InstructionEditor/InstructionEditorDialog';
 import NewInstructionEditorMenu from './InstructionEditor/NewInstructionEditorMenu';
@@ -543,6 +544,11 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
       label: i18n._(t`Invert Condition`),
       click: () => this._invertSelectedConditions(),
       visible: hasSelectedAtLeastOneCondition(this.state.selection),
+    },
+    {
+      label: i18n._(t`Toggle Wait the Action to End`),
+      click: () => this._toggleAwaitingActions(),
+      visible: this._hasSelectedOptionallyAsyncActions(),
     },
   ];
 
@@ -1131,6 +1137,60 @@ export class EventsSheetComponentWithoutHandle extends React.Component<
           instructionContext.instruction.setInverted(
             !instructionContext.instruction.isInverted()
           );
+        }
+      }
+    );
+
+    const locatingEvent = getSelectedInstructionsLocatingEvents(
+      this.state.selection
+    );
+    const positions = this._getChangedEventRows(locatingEvent);
+    this._saveChangesToHistory(
+      'EDIT',
+      {
+        positionsBeforeAction: positions,
+        positionAfterAction: positions,
+      },
+      () => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      }
+    );
+  };
+
+  _hasSelectedOptionallyAsyncActions = (): boolean => {
+    return getSelectedInstructionsContexts(this.state.selection).some(
+      instructionContext => {
+        if (!instructionContext.isCondition) {
+          const instructionMetadata = getInstructionMetadata({
+            instructionType: instructionContext.instruction.getType(),
+            project: this.props.project,
+            isCondition: false,
+          });
+
+          if (instructionMetadata && instructionMetadata.isOptionallyAsync()) {
+            return true;
+          }
+        }
+        return false;
+      }
+    );
+  };
+
+  _toggleAwaitingActions = () => {
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        if (!instructionContext.isCondition) {
+          const instructionMetadata = getInstructionMetadata({
+            instructionType: instructionContext.instruction.getType(),
+            project: this.props.project,
+            isCondition: false,
+          });
+
+          if (instructionMetadata && instructionMetadata.isOptionallyAsync()) {
+            instructionContext.instruction.setAwaited(
+              !instructionContext.instruction.isAwaited()
+            );
+          }
         }
       }
     );

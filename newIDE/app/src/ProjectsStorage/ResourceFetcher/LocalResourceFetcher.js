@@ -17,6 +17,12 @@ const isFetchableUrl = (filename: string) => {
   );
 };
 
+/**
+ * On the desktop app, try to download all URLs into local files, put
+ * next to the project file (in a "assets" directory). This is helpful
+ * to continue working on a game started on the web-app (using public URLs
+ * for resources).
+ */
 const getResourcesToFetch = (project: gdProject): Array<string> => {
   const resourcesManager = project.getResourcesManager();
 

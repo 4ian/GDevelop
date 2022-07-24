@@ -6,11 +6,11 @@ import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import { type AuthenticatedUser } from './AuthenticatedUserContext';
 import { Column, Line, Spacer } from '../UI/Grid';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import BackgroundText from '../UI/BackgroundText';
 import VerifiedUser from '@material-ui/icons/VerifiedUser';
 import Text from '../UI/Text';
 import { useInterval } from '../Utils/UseInterval';
+import CircularProgress from '../UI/CircularProgress';
 
 type Props = {|
   onClose: () => void,

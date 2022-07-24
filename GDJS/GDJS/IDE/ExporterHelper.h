@@ -117,11 +117,12 @@ struct PreviewExportOptions {
 
   /**
    * Set the path to use for the game engine to require "@electron/remote".
-   * This is because the preview is run in a folder without any node_module, but this
-   * is still required for now for some features.
-   * This should be removed once the dependency to "@electron/remote" is removed.
+   * This is because the preview is run in a folder without any node_module, but
+   * this is still required for now for some features. This should be removed
+   * once the dependency to "@electron/remote" is removed.
    */
-  PreviewExportOptions &SetElectronRemoteRequirePath(const gd::String& electronRemoteRequirePath_) {
+  PreviewExportOptions &SetElectronRemoteRequirePath(
+      const gd::String &electronRemoteRequirePath_) {
     electronRemoteRequirePath = electronRemoteRequirePath_;
     return *this;
   }
@@ -302,6 +303,15 @@ class ExporterHelper {
                          const std::vector<gd::String> &includesFiles,
                          unsigned int nonRuntimeScriptsCacheBurst,
                          gd::String additionalSpec);
+
+  /**
+   * \brief Generates a WebManifest, a metadata file that allow to make the
+   * exported game a working PWA.
+   *
+   * \param project The project containing the game properties to generate the
+   * manifest from.
+   */
+  const gd::String GenerateWebManifest(const gd::Project &project);
 
   /**
    * \brief Generate the Cordova configuration file and save it to the export

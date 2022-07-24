@@ -29,6 +29,7 @@ const ObjectGroupEditor = ({
   onSizeUpdated,
 }: Props) => {
   const [newObjectName, setNewObjectName] = React.useState<string>('');
+  const objectsInGroup = group.getAllObjectsNames().toJSArray();
 
   const removeObject = (objectName: string) => {
     group.removeObject(objectName);
@@ -44,19 +45,16 @@ const ObjectGroupEditor = ({
 
   const renderExplanation = () => {
     let type = undefined;
-    group
-      .getAllObjectsNames()
-      .toJSArray()
-      .forEach(objectName => {
-        const objectType = gd.getTypeOfObject(
-          globalObjectsContainer,
-          objectsContainer,
-          objectName,
-          false
-        );
-        if (type === undefined || objectType === type) type = objectType;
-        else type = '';
-      });
+    objectsInGroup.forEach(objectName => {
+      const objectType = gd.getTypeOfObject(
+        globalObjectsContainer,
+        objectsContainer,
+        objectName,
+        false
+      );
+      if (type === undefined || objectType === type) type = objectType;
+      else type = '';
+    });
 
     let message = '';
     if (type === undefined) {
@@ -98,6 +96,7 @@ const ObjectGroupEditor = ({
             globalObjectsContainer={globalObjectsContainer}
             objectsContainer={objectsContainer}
             value={newObjectName}
+            excludedObjectOrGroupNames={objectsInGroup}
             onChange={setNewObjectName}
             onChoose={addObject}
             openOnFocus

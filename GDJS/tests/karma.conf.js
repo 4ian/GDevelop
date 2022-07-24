@@ -66,6 +66,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/stringtools.js',
       '../../newIDE/app/resources/GDJS/Runtime/events-tools/windowtools.js',
       '../../newIDE/app/resources/GDJS/Runtime/debugger-client/hot-reloader.js',
+      '../../newIDE/app/resources/GDJS/Runtime/affinetransformation.js',
 
       //Extensions:
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/DraggableBehavior/draggableruntimebehavior.js',
@@ -75,6 +76,9 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/LinkedObjects/linkedobjects.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventory.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Inventory/inventorytools.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/box2d.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2runtimebehavior.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/Physics2Behavior/physics2tools.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Leaderboards/leaderboardstools.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Lighting/lightruntimeobject-pixi-renderer.js',
@@ -90,7 +94,15 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Firebase/B_firebasetools/*.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/kawase-blur-pixi-filter.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/Effects/pixi-filters/filter-kawase-blur.js',
-
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapcollisionmaskruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/TileMapRuntimeManager.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/tilemapruntimeobject.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TileMapCollisionMaskRenderer.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
+      '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/pako/dist/pako.min.js',
+      
       // Test extensions:
       './tests/Extensions/**.js',
 
@@ -104,6 +116,13 @@ module.exports = function (config) {
       // Assets
       {
         pattern: './tests-utils/assets/*.jpg',
+        watched: false,
+        included: false,
+        served: true,
+        nocache: false,
+      },
+      {
+        pattern: './tests-utils/simple-tiled-map/*.json',
         watched: false,
         included: false,
         served: true,

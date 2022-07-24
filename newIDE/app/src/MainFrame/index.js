@@ -5,7 +5,7 @@ import * as React from 'react';
 import './MainFrame.css';
 import Drawer from '@material-ui/core/Drawer';
 import Snackbar from '@material-ui/core/Snackbar';
-import HomeIcon from '@material-ui/icons/Home';
+import HomeIcon from '../UI/CustomSvgIcons/Home';
 import Toolbar, { type ToolbarInterface } from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
@@ -83,10 +83,7 @@ import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
 import { getFunctionNameFromType } from '../EventsFunctionsExtensionsLoader';
 import { type ExportDialogWithoutExportsProps } from '../Export/ExportDialog';
-import {
-  type CreateProjectDialogWithComponentsProps,
-  type CreateProjectDialogTabs,
-} from '../ProjectCreation/CreateProjectDialog';
+import { type CreateProjectDialogWithComponentsProps } from '../ProjectCreation/CreateProjectDialog';
 import {
   type OnCreateFromExampleShortHeaderFunction,
   type OnCreateBlankFunction,
@@ -135,6 +132,12 @@ import AuthenticatedUserContext from '../Profile/AuthenticatedUserContext';
 import OnboardingDialog from './Onboarding/OnboardingDialog';
 import LeaderboardProvider from '../Leaderboard/LeaderboardProvider';
 import { sendEventsExtractedAsFunction } from '../Utils/Analytics/EventSender';
+import optionalRequire from '../Utils/OptionalRequire';
+import { isMobile } from '../Utils/Platform';
+import { getProgramOpeningCount } from '../Utils/Analytics/LocalStats';
+import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
+const electron = optionalRequire('electron');
+const isDev = Window.isDev();
 
 const GD_STARTUP_TIMES = global.GD_STARTUP_TIMES || [];
 
@@ -274,6 +277,9 @@ const MainFrame = (props: Props) => {
   const [languageDialogOpen, openLanguageDialog] = React.useState<boolean>(
     false
   );
+  const [onboardingDialogOpen, openOnboardingDialog] = React.useState<boolean>(
+    false
+  );
   const [helpFinderDialogOpen, openHelpFinderDialog] = React.useState<boolean>(
     false
   );
@@ -319,14 +325,14 @@ const MainFrame = (props: Props) => {
     ensureResourcesAreFetched,
     renderResourceFetcherDialog,
   } = useResourceFetcher();
+  const {
+    findLeaderboardsToReplace,
+    renderLeaderboardReplacerDialog,
+  } = useLeaderboardReplacer();
   const eventsFunctionsExtensionsState = React.useContext(
     EventsFunctionsExtensionsContext
   );
   const unsavedChanges = React.useContext(UnsavedChangesContext);
-  const [
-    createDialogInitialTab,
-    setCreateDialogInitialTab,
-  ] = React.useState<CreateProjectDialogTabs>('examples');
 
   // This is just for testing, to check if we're getting the right state
   // and gives us an idea about the number of re-renders.
@@ -357,6 +363,16 @@ const MainFrame = (props: Props) => {
     renderGDJSDevelopmentWatcher,
     renderMainMenu,
   } = props;
+
+  // Open onboarding modal if this is the first time the user opens the web app.
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!electron && getProgramOpeningCount() <= 1 && !isMobile() && !isDev) {
+        openOnboardingDialog(true);
+      }
+    }, 3000); // Timeout to avoid showing the dialog while the app is still loading.
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   React.useEffect(
     () => {
@@ -1394,7 +1410,8 @@ const MainFrame = (props: Props) => {
       setState(state => ({
         ...state,
         editorTabs: openEditorTab(state.editorTabs, {
-          icon: <HomeIcon role="img" titleAccess="Home" />,
+          icon: <HomeIcon titleAccess="Home" fontSize="small" />,
+          label: i18n._(t`Home`),
           projectItemName: null,
           renderEditorContainer: renderHomePageContainer,
           key: 'start page',
@@ -1402,7 +1419,7 @@ const MainFrame = (props: Props) => {
         }),
       }));
     },
-    [setState]
+    [setState, i18n]
   );
 
   const _openDebugger = React.useCallback(
@@ -1522,8 +1539,7 @@ const MainFrame = (props: Props) => {
   };
 
   const openCreateProjectDialog = React.useCallback(
-    (tab: CreateProjectDialogTabs) => (open: boolean = true) => {
-      setCreateDialogInitialTab(tab);
+    (open: boolean = true) => {
       setState(state => ({ ...state, createDialogOpen: open }));
     },
     [setState]
@@ -1531,18 +1547,6 @@ const MainFrame = (props: Props) => {
   const closeCreateDialog = () => {
     setState(state => ({ ...state, createDialogOpen: false }));
   };
-  const onOpenTutorials = React.useMemo(
-    () => openCreateProjectDialog('tutorials'),
-    [openCreateProjectDialog]
-  );
-  const onOpenExamples = React.useMemo(
-    () => openCreateProjectDialog('examples'),
-    [openCreateProjectDialog]
-  );
-  const onOpenGamesShowcase = React.useMemo(
-    () => openCreateProjectDialog('games-showcase'),
-    [openCreateProjectDialog]
-  );
 
   const openOpenFromStorageProviderDialog = React.useCallback(
     (open: boolean = true) => {
@@ -1554,6 +1558,10 @@ const MainFrame = (props: Props) => {
     [setState]
   );
 
+  // When opening a project, we always open a scene to avoid confusing the user.
+  // If it has no scene (new project), we create one and open it.
+  // If it has one scene, we open it.
+  // If it has more than one scene, we open the first one and we also open the project manager.
   const openSceneOrProjectManager = React.useCallback(
     (newState: {|
       currentProject: ?gdProject,
@@ -1562,30 +1570,22 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() <= 1) {
-        if (currentProject.getLayoutsCount() === 0)
-          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+      if (currentProject.getLayoutsCount() === 0)
+        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
 
-        openLayout(
-          currentProject.getLayoutAt(0).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      } else {
-        setState(state => ({
-          ...state,
-          currentProject,
-          editorTabs,
-        })).then(() => {
-          setIsLoadingProject(false);
-          openProjectManager(true);
-        });
+      openLayout(
+        currentProject.getLayoutAt(0).getName(),
+        {
+          openSceneEditor: true,
+          openEventsEditor: true,
+        },
+        editorTabs
+      );
+      if (currentProject.getLayoutsCount() > 1) {
+        openProjectManager(true);
       }
     },
-    [openLayout, setState, i18n]
+    [openLayout, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(
@@ -1653,6 +1653,16 @@ const MainFrame = (props: Props) => {
     (
       fileMetadataAndStorageProviderName: FileMetadataAndStorageProviderName
     ) => {
+      if (unsavedChanges && unsavedChanges.hasUnsavedChanges) {
+        const answer = Window.showConfirmDialog(
+          i18n._(
+            t`Open a new project? Any changes that have not been saved will be lost.`
+          )
+        );
+        if (!answer) return;
+        unsavedChanges.sealUnsavedChanges();
+      }
+
       const { fileMetadata } = fileMetadataAndStorageProviderName;
       const storageProvider = findStorageProviderFor(
         i18n,
@@ -1682,6 +1692,7 @@ const MainFrame = (props: Props) => {
       openSceneOrProjectManager,
       props.storageProviders,
       getStorageProviderOperations,
+      unsavedChanges,
     ]
   );
 
@@ -1818,7 +1829,7 @@ const MainFrame = (props: Props) => {
 
       try {
         const saveStartTime = performance.now();
-        const { wasSaved } = await onSaveProject(
+        const { wasSaved, fileMetadata } = await onSaveProject(
           currentProject,
           currentFileMetadata
         );
@@ -1827,6 +1838,15 @@ const MainFrame = (props: Props) => {
           console.info(
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
+          preferences.insertRecentProjectFile({
+            fileMetadata,
+            storageProviderName: getStorageProvider().internalName,
+          });
+
+          setState(state => ({
+            ...state,
+            currentFileMetadata: fileMetadata,
+          }));
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
           _showSnackMessage(i18n._(t`Project properly saved`));
         }
@@ -1852,6 +1872,9 @@ const MainFrame = (props: Props) => {
       unsavedChanges,
       saveProjectAs,
       state.editorTabs,
+      getStorageProvider,
+      preferences,
+      setState,
     ]
   );
 
@@ -1980,14 +2003,16 @@ const MainFrame = (props: Props) => {
     if (!state) return;
     const { currentProject, editorTabs } = state;
     if (!currentProject) return;
-
+    const oldProjectId = currentProject.getProjectUuid();
     currentProject.resetProjectUuid();
+
     currentProject.setVersion('1.0.0');
     currentProject.getAuthorIds().clear();
     currentProject.setAuthor('');
     if (templateSlug) currentProject.setTemplateSlug(templateSlug);
     if (projectName) currentProject.setName(projectName);
 
+    findLeaderboardsToReplace(currentProject, oldProjectId);
     openSceneOrProjectManager({
       currentProject: currentProject,
       editorTabs: editorTabs,
@@ -2033,6 +2058,14 @@ const MainFrame = (props: Props) => {
       : () => {}
   );
 
+  const onUserflowRunningUpdate = () => {
+    // Userflow dialog has a variable exported which knows if the
+    // onboarding is running or not.
+    // To ensure all components are aware of this variable when it changes,
+    // we need to force a re-render.
+    forceUpdate();
+  };
+
   useMainFrameCommands({
     i18n,
     project: state.currentProject,
@@ -2048,7 +2081,7 @@ const MainFrame = (props: Props) => {
     onLaunchDebugPreview: launchDebuggerAndPreview,
     onLaunchNetworkPreview: launchNetworkPreview,
     onOpenHomePage: openHomePage,
-    onCreateProject: onOpenExamples,
+    onCreateProject: openCreateProjectDialog,
     onOpenProject: chooseProject,
     onSaveProject: saveProject,
     onSaveProjectAs: saveProjectAs,
@@ -2087,7 +2120,7 @@ const MainFrame = (props: Props) => {
           onCloseProject: askToCloseProject,
           onCloseApp: closeApp,
           onExportProject: () => openExportDialog(true),
-          onCreateProject: onOpenExamples,
+          onCreateProject: openCreateProjectDialog,
           onOpenProjectManager: () => openProjectManager(true),
           onOpenHomePage: openHomePage,
           onOpenDebugger: openDebugger,
@@ -2261,12 +2294,11 @@ const MainFrame = (props: Props) => {
                     onOpenProjectAfterCreation: onOpenProjectAfterCreation,
                     onOpenProjectManager: () => openProjectManager(true),
                     onCloseProject: () => askToCloseProject(),
-                    onOpenTutorials: () => onOpenTutorials(),
-                    onOpenGamesShowcase: () => onOpenGamesShowcase(),
-                    onOpenExamples: () => onOpenExamples(),
+                    onCreateProject: () => openCreateProjectDialog(true),
                     onOpenProfile: () => openProfileDialogWithTab('profile'),
                     onOpenHelpFinder: () => openHelpFinderDialog(true),
                     onOpenLanguageDialog: () => openLanguageDialog(true),
+                    onOpenOnboardingDialog: () => openOnboardingDialog(true),
                     onLoadEventsFunctionsExtensions: () =>
                       eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
                         currentProject
@@ -2327,7 +2359,6 @@ const MainFrame = (props: Props) => {
         state.createDialogOpen &&
         renderCreateDialog({
           open: state.createDialogOpen,
-          initialTab: createDialogInitialTab,
           onClose: closeCreateDialog,
           onOpen: onOpenProjectAfterCreation,
         })}
@@ -2445,6 +2476,7 @@ const MainFrame = (props: Props) => {
         />
       )}
       {renderOpenConfirmDialog()}
+      {renderLeaderboardReplacerDialog()}
       {renderResourceFetcherDialog()}
       <CloseConfirmDialog
         shouldPrompt={!!state.currentProject}
@@ -2453,7 +2485,15 @@ const MainFrame = (props: Props) => {
         hasUnsavedChanges={!!unsavedChanges && unsavedChanges.hasUnsavedChanges}
       />
       <ChangelogDialogContainer />
-      <OnboardingDialog />
+      {onboardingDialogOpen && (
+        <OnboardingDialog
+          open
+          onClose={() => {
+            openOnboardingDialog(false);
+          }}
+          onUserflowRunningUpdate={onUserflowRunningUpdate}
+        />
+      )}
       {state.gdjsDevelopmentWatcherEnabled &&
         renderGDJSDevelopmentWatcher &&
         renderGDJSDevelopmentWatcher()}

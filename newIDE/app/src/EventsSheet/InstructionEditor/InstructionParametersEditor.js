@@ -375,6 +375,23 @@ export default class InstructionParametersEditor extends React.Component<
                     }}
                   />
                 )}
+                {instructionMetadata.isOptionallyAsync() && (
+                  <Toggle
+                    label={
+                      <Trans>
+                        Wait for the action to end before executing the actions
+                        (and subevents) following it
+                      </Trans>
+                    }
+                    labelPosition="right"
+                    toggled={instruction.isAwaited()}
+                    style={styles.invertToggle}
+                    onToggle={(e, enabled) => {
+                      instruction.setAwaited(enabled);
+                      this.forceUpdate();
+                    }}
+                  />
+                )}
               </div>
               <Line>
                 {!noHelpButton && helpPage && (

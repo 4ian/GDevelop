@@ -2,11 +2,20 @@
 import axios from 'axios';
 import { GDevelopAssetApi } from './ApiConfigs';
 
+export type TutorialCategory =
+  | 'game-mechanic'
+  | 'full-game'
+  | 'official-beginner'
+  | 'official-intermediate'
+  | 'official-advanced';
+
 export type Tutorial = {|
   id: string,
   title: string,
   description: string,
   type: 'video' | 'text',
+  category: TutorialCategory,
+  duration?: number,
   link: string,
   thumbnailUrl: string,
 |};

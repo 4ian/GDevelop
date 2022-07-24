@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import MUICheckbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
+import MUICheckbox from '@material-ui/core/Checkbox';
 
 // Reduce checkbox size to avoid overlapping with other checkboxes.
 const useStyles = makeStyles({
@@ -10,6 +11,12 @@ const useStyles = makeStyles({
     marginLeft: 9,
     marginRight: 9,
     padding: 0,
+  },
+});
+
+const useFormGroupStyles = makeStyles({
+  root: {
+    display: 'block',
   },
 });
 
@@ -36,6 +43,7 @@ type Props = {|
 const Checkbox = (props: Props) => {
   const { onCheck } = props;
   const classes = useStyles();
+  const formGroupClasses = useFormGroupStyles();
   const checkbox = (
     <MUICheckbox
       className={classes.root}
@@ -46,16 +54,20 @@ const Checkbox = (props: Props) => {
       }
       icon={props.uncheckedIcon}
       checkedIcon={props.checkedIcon}
-      color="primary"
       style={props.label ? undefined : props.style}
     />
   );
   return props.label ? (
-    <FormControlLabel
-      control={checkbox}
-      label={props.label}
-      style={props.style}
-    />
+    <FormGroup classes={formGroupClasses}>
+      <FormControlLabel
+        control={checkbox}
+        label={props.label}
+        style={{
+          ...props.style,
+          cursor: 'default',
+        }}
+      />
+    </FormGroup>
   ) : (
     checkbox
   );

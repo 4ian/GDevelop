@@ -80,7 +80,7 @@ const scorePreviewMaxValue = 999999999;
 const precisionMinValue = -3;
 const precisionMaxValue = 3;
 const displayedEntriesMinNumber = 1;
-const displayedEntriesMaxNumber = 25;
+const displayedEntriesMaxNumber = 50;
 
 function LeaderboardAppearanceDialog({
   open,
@@ -219,7 +219,7 @@ function LeaderboardAppearanceDialog({
             onSaveSettings(i18n);
           }}
         >
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Table settings</Trans>
           </Text>
           <Line>
@@ -249,7 +249,7 @@ function LeaderboardAppearanceDialog({
               }}
             />
           </Line>
-          <Text size="title">
+          <Text size="block-title">
             <Trans>Score column settings</Trans>
           </Text>
           <Line>

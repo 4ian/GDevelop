@@ -7,7 +7,6 @@ import ButtonGroup from '@material-ui/core/ButtonGroup';
 import Button from '@material-ui/core/Button';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import { Spacer } from './Grid';
-import GDevelopThemeContext from './Theme/ThemeContext';
 
 type Props = {|
   label?: React.Node,
@@ -49,21 +48,11 @@ const RaisedButtonWithSplitMenu = (props: Props) => {
   // always visible to be sure we're getting focusing right.
   const focusRipple = true;
 
-  const gdevelopTheme = React.useContext(GDevelopThemeContext);
-
   return (
     <ButtonGroup
       variant={primary ? 'contained' : 'outlined'}
-      disableElevation={gdevelopTheme.isModern}
-      color={
-        gdevelopTheme.isModern
-          ? primary
-            ? 'secondary'
-            : 'primary'
-          : primary
-          ? 'primary'
-          : 'default'
-      }
+      disableElevation
+      color={primary ? 'primary' : 'secondary'}
       disabled={disabled}
       size="small"
       style={props.style}

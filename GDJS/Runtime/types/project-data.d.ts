@@ -220,6 +220,7 @@ declare interface ResourceData {
   disablePreload?: boolean;
   preloadAsSound?: boolean;
   preloadAsMusic?: boolean;
+  preloadInCache?: boolean;
 }
 
 declare type ResourceKind =

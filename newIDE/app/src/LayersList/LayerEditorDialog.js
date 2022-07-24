@@ -154,7 +154,7 @@ const LayerEditorDialog = (props: Props) => {
             />
             {layer.isLightingLayer() ? (
               <React.Fragment>
-                <Text size="title">
+                <Text size="block-title">
                   <Trans>Lighting settings</Trans>
                 </Text>
                 <InlineCheckbox

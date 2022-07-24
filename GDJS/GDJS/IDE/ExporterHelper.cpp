@@ -9,6 +9,7 @@
 #include <emscripten.h>
 #endif
 #include <algorithm>
+#include <array>
 #include <fstream>
 #include <functional>
 #include <sstream>
@@ -552,6 +553,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "oncetriggers.js");
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
+  InsertUnique(includesFiles, "affinetransformation.js");
 
   // Common includes for events only.
   InsertUnique(includesFiles, "events-tools/commontools.js");
@@ -843,5 +845,75 @@ void ExporterHelper::AddDeprecatedFontFilesToFontResources(
   }
   // end of compatibility code
 }
+
+const std::array<int, 20> IOS_ICONS_SIZES = {
+    180, 60,  120, 76, 152, 40, 80, 57,  114, 72,
+    144, 167, 29,  58, 87,  50, 20, 100, 167, 1024,
+};
+const std::array<int, 6> ANDROID_ICONS_SIZES = {36, 48, 72, 96, 144, 192};
+
+const gd::String ExporterHelper::GenerateWebManifest(
+    const gd::Project &project) {
+  const gd::String &orientation = project.GetOrientation();
+  gd::String icons = "[";
+
+  {
+    std::map<int, gd::String> resourcesForSizes;
+    const auto getFileNameForIcon = [&project](const gd::String &platform,
+                                               const int size) {
+      const gd::String iconName = "icon-" + gd::String::From(size);
+      return project.GetPlatformSpecificAssets().Has(platform, iconName)
+                 ? project.GetResourcesManager()
+                       .GetResource(project.GetPlatformSpecificAssets().Get(
+                           platform, iconName))
+                       .GetFile()
+                 : "";
+    };
+
+    for (const int size : IOS_ICONS_SIZES) {
+      const auto iconFile = getFileNameForIcon("ios", size);
+      if (!iconFile.empty()) resourcesForSizes[size] = iconFile;
+    };
+
+    for (const int size : ANDROID_ICONS_SIZES) {
+      const auto iconFile = getFileNameForIcon("android", size);
+      if (!iconFile.empty()) resourcesForSizes[size] = iconFile;
+    };
+
+    const auto desktopIconFile = getFileNameForIcon("desktop", 512);
+    if (!desktopIconFile.empty()) resourcesForSizes[512] = desktopIconFile;
+
+    for (const auto &sizeAndFile : resourcesForSizes) {
+      icons +=
+          gd::String(R"({
+        "src": "{FILE}",
+        "sizes": "{SIZE}x{SIZE}" 
+      },)")
+              .FindAndReplace("{SIZE}", gd::String::From(sizeAndFile.first))
+              .FindAndReplace("{FILE}", sizeAndFile.second);
+    }
+  }
+
+  icons = icons.RightTrim(",") + "]";
+
+  return gd::String(R"webmanifest({
+  "name": "{NAME}",
+  "short_name": "{NAME}",
+  "id": "{PACKAGE_ID}",
+  "description": "{DESCRIPTION}",
+  "orientation": "{ORIENTATION}",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": {ICONS}
+})webmanifest")
+      .FindAndReplace("{NAME}", project.GetName())
+      .FindAndReplace("{PACKAGE_ID}", project.GetPackageName())
+      .FindAndReplace("{DESCRIPTION}", project.GetDescription())
+      .FindAndReplace("{ORIENTATION}",
+                      orientation == "default" ? "any" : orientation)
+      .FindAndReplace("{ICONS}", icons);
+};
 
 }  // namespace gdjs

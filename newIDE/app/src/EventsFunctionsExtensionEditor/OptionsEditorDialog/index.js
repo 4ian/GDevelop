@@ -92,7 +92,7 @@ export default function OptionsEditorDialog({
         <HelpButton key="help" helpPagePath="/extensions/create" />,
         eventsFunctionsExtensionWriter ? (
           <FlatButton
-            icon={<CloudUpload />}
+            leftIcon={<CloudUpload />}
             key="export"
             label={<Trans>Export extension</Trans>}
             onClick={() => {

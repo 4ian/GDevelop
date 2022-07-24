@@ -119,7 +119,9 @@ const ShortcutsList = (props: Props) => {
       <List>
         {Object.keys(areaWiseCommands).map(areaName => (
           <React.Fragment key={areaName}>
-            <Text size="title">{props.i18n._(commandAreas[areaName])}</Text>
+            <Text size="block-title">
+              {props.i18n._(commandAreas[areaName])}
+            </Text>
             {areaWiseCommands[areaName].map(commandName => {
               // Get default and user-set shortcuts
               const userShortcut = props.userShortcutMap[commandName];

@@ -80,7 +80,6 @@ export default function BottomButtons({
                       onClick={() =>
                         onAddEvent('BuiltinCommonInstructions::Standard')
                       }
-                      id="add-event-button"
                     >
                       <Trans>Add a new event</Trans>
                     </button>

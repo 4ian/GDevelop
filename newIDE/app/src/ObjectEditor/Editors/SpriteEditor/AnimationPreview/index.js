@@ -36,6 +36,7 @@ type Props = {|
   hideControls?: boolean,
   initialZoom?: number,
   fixedHeight?: number,
+  fixedWidth?: number,
 |};
 
 const AnimationPreview = ({
@@ -50,6 +51,7 @@ const AnimationPreview = ({
   hideControls,
   initialZoom,
   fixedHeight,
+  fixedWidth,
 }: Props) => {
   const forceUdpate = useForceUpdate();
 
@@ -171,6 +173,7 @@ const AnimationPreview = ({
         hideCheckeredBackground={hideCheckeredBackground}
         hideControls={hideControls}
         fixedHeight={fixedHeight}
+        fixedWidth={fixedWidth}
       />
       {!hideControls && (
         <LineStackLayout noMargin alignItems="center">
@@ -224,12 +227,12 @@ const AnimationPreview = ({
             style={styles.timeField}
           />
           <FlatButton
-            icon={<Replay />}
+            leftIcon={<Replay />}
             label={<Trans>Replay</Trans>}
             onClick={replay}
           />
           <FlatButton
-            icon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
+            leftIcon={!!pausedRef.current ? <PlayArrow /> : <Pause />}
             label={!!pausedRef.current ? 'Play' : 'Pause'}
             onClick={() => {
               pausedRef.current = !pausedRef.current;

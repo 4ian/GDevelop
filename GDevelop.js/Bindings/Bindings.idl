@@ -1077,6 +1077,8 @@ interface Instruction {
     [Const, Ref] DOMString GetType();
     void SetInverted(boolean inverted);
     boolean IsInverted();
+    void SetAwaited(boolean awaited);
+    boolean IsAwaited();
     void SetParameter(unsigned long id, [Const] DOMString value);
     [Const, Ref] Expression GetParameter(unsigned long id);
     void SetParametersCount(unsigned long count);
@@ -1108,6 +1110,7 @@ interface InstructionSentenceFormatter {
 [Prefix="gd::InstructionMetadata::"]
 interface ExtraInformation {
     [Ref] ExtraInformation SetFunctionName([Const] DOMString functionName_);
+    [Ref] ExtraInformation SetAsyncFunctionName([Const] DOMString functionName_);
     [Ref] ExtraInformation SetManipulatedType([Const] DOMString type_);
     [Ref] ExtraInformation SetGetter([Const] DOMString getter);
     [Ref] ExtraInformation SetMutators([Const, Ref] MapStringString mutators);
@@ -1142,12 +1145,12 @@ interface InstructionMetadata {
     boolean IsHidden();
     boolean IsPrivate();
     boolean IsAsync();
+    boolean IsOptionallyAsync();
 
     [Ref] InstructionMetadata SetCanHaveSubInstructions();
     [Ref] InstructionMetadata SetHelpPath([Const] DOMString helpPath);
     [Ref] InstructionMetadata SetHidden();
     [Ref] InstructionMetadata SetPrivate();
-    [Ref] InstructionMetadata SetAsync();
     [Ref] InstructionMetadata AddParameter([Const] DOMString type,
                                         [Const] DOMString description,
                                         [Const] DOMString optionalObjectType,
@@ -2134,6 +2137,14 @@ interface ExpressionCompletionFinder {
     //Inherited from ExpressionParser2NodeWorker:
 };
 
+interface ExpressionNodeLocationFinder {
+    ExpressionNode STATIC_GetNodeAtPosition([Ref] ExpressionNode node, unsigned long searchedPosition);
+};
+
+interface ExpressionTypeFinder {
+    [Const, Ref] DOMString STATIC_GetType([Const, Ref] Platform platform, [Const, Ref] ObjectsContainer globalObjectsContainer, [Const, Ref] ObjectsContainer objectsContainer, [Const] DOMString rootType, [Ref] ExpressionNode node);
+};
+
 interface ExpressionNode {
     void Visit([Ref] ExpressionParser2NodeWorker worker);
 };
@@ -2332,6 +2343,21 @@ interface ProjectResourcesAdder {
 };
 
 interface ArbitraryEventsWorker {
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsLeaderboardsLister {
+    void EventsLeaderboardsLister([Ref] Project project);
+    [Const, Ref] SetString GetLeaderboardIds();
+
+    //Inherited from ArbitraryEventsWorker
+    void Launch([Ref] EventsList events);
+};
+
+interface EventsLeaderboardsRenamer {
+    void EventsLeaderboardsRenamer([Ref] Project project, [Const, Ref] MapStringString leaderboardIdMap);
+
+    //Inherited from ArbitraryEventsWorker
     void Launch([Ref] EventsList events);
 };
 

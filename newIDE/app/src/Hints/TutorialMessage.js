@@ -30,9 +30,9 @@ const TutorialMessage = ({ tutorial }: Props) => {
             <img
               alt=""
               style={{
-                maxWidth: 128,
-                maxHeight: 128,
+                width: 128,
                 borderRadius: 4,
+                aspectRatio: '16 / 9',
               }}
               src={tutorial.thumbnailUrl}
             />

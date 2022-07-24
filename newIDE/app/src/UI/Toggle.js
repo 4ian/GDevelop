@@ -8,6 +8,8 @@ const useStyles = makeStyles({
   root: {
     cursor: 'default',
   },
+  labelPlacementStart: { marginLeft: 0 },
+  label: { flex: 1 },
 });
 
 // We support a subset of the props supported by Material-UI v0.x Toggle
@@ -17,7 +19,8 @@ type Props = {|
   toggled: boolean,
   onToggle: (e: {||}, toggled: boolean) => void,
   disabled?: boolean,
-  labelPosition: 'right',
+  labelPosition: 'right' | 'left',
+  size?: 'small',
 
   style?: {|
     marginTop?: number,
@@ -35,13 +38,17 @@ const Toggle = (props: Props) => {
         <Switch
           checked={props.toggled}
           onChange={event => props.onToggle(event, event.target.checked)}
-          color="primary"
+          color="secondary"
+          size={props.size}
         />
       }
+      labelPlacement={props.labelPosition === 'right' ? 'end' : 'start'}
       label={props.label}
       disabled={props.disabled}
       classes={classes}
-      style={props.style}
+      style={{
+        ...props.style,
+      }}
     />
   );
 };

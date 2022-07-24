@@ -337,23 +337,24 @@ const Instruction = (props: Props) => {
                 alt="Condition is negated"
               />
             )}
-            {metadata.isAsync() && (
-              <Tooltip
-                title={
-                  <Trans>
-                    Next actions (and sub-events) will wait for this action to
-                    be finished before running.
-                  </Trans>
-                }
-                placement="top"
-              >
-                <AsyncIcon
-                  className={classNames({
-                    [icon]: true,
-                  })}
-                />
-              </Tooltip>
-            )}
+            {metadata.isAsync() &&
+              (!metadata.isOptionallyAsync() || instruction.isAwaited()) && (
+                <Tooltip
+                  title={
+                    <Trans>
+                      Next actions (and sub-events) will wait for this action to
+                      be finished before running.
+                    </Trans>
+                  }
+                  placement="top"
+                >
+                  <AsyncIcon
+                    className={classNames({
+                      [icon]: true,
+                    })}
+                  />
+                </Tooltip>
+              )}
             <img
               className={classNames({
                 [icon]: true,

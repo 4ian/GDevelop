@@ -4,7 +4,7 @@ import { t, Trans } from '@lingui/macro';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import Tune from '@material-ui/icons/Tune';
 import SearchBar, { useShouldAutofocusSearchbar } from '../UI/SearchBar';
-import DoubleChevronArrow from '../UI/CustomSvgIcons/DoubleChevronArrow';
+import DoubleChevronArrowLeft from '../UI/CustomSvgIcons/DoubleChevronArrowLeft';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
@@ -263,7 +263,7 @@ export const AssetStore = ({
                   alignItems="center"
                 >
                   {isOnHomePage ? (
-                    <Text size="title">
+                    <Text size="block-title">
                       <Trans>Discover</Trans>
                     </Text>
                   ) : (
@@ -285,7 +285,7 @@ export const AssetStore = ({
                       {!openedAssetPack && filtersState.chosenCategory && (
                         <>
                           <Column expand alignItems="center">
-                            <Text size="title" noMargin>
+                            <Text size="block-title" noMargin>
                               {capitalize(
                                 filtersState.chosenCategory.node.name
                               )}
@@ -298,7 +298,7 @@ export const AssetStore = ({
                       {openedAssetPack && (
                         <>
                           <Column expand alignItems="center">
-                            <Text size="title" noMargin>
+                            <Text size="block-title" noMargin>
                               {openedAssetPack.name}
                             </Text>
                           </Column>
@@ -361,7 +361,7 @@ export const AssetStore = ({
                           <IconButton
                             onClick={() => setIsFiltersPanelOpen(false)}
                           >
-                            <DoubleChevronArrow />
+                            <DoubleChevronArrowLeft />
                           </IconButton>
                         </Line>
                         <Line

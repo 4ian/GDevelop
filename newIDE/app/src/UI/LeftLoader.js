@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from './CircularProgress';
 
 const styles = {
   progress: { marginRight: 8, verticalAlign: 'middle' },

@@ -37,7 +37,6 @@ import '@pixi/canvas-particle-container';
 
 export * from '@pixi/graphics';
 export * from '@pixi/canvas-graphics';
-//import '@pixi/graphics-extras';
 
 export * from '@pixi/mesh';
 export * from '@pixi/canvas-mesh';

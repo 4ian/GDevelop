@@ -1,5 +1,10 @@
+/** @param {import("karma").Config} config */
 module.exports = function (config) {
-  const testFiles = ['../../Extensions/**/tests/**.spec.js', './tests/**/*.js'];
+  const testFiles = [
+    '../../Extensions/**/tests/**.spec.js',
+    '../../Extensions/**/*.spec.ts',
+    './tests/**/*.js',
+  ];
 
   const benchmarkFiles = [
     './benchmarks/init.js',
@@ -16,6 +21,7 @@ module.exports = function (config) {
       require('@chiragrupani/karma-chromium-edge-launcher'),
       require('karma-firefox-launcher'),
       require('karma-mocha'),
+      require('karma-esbuild'),
     ],
     client: {
       mocha: {
@@ -23,6 +29,7 @@ module.exports = function (config) {
         timeout: 10000, // Give a bit more time for CIs (the default 2s can be too low sometimes, as a real browser is involved).
       },
     },
+    preprocessors: { '../../Extensions/**/*.ts': 'esbuild' },
     files: [
       'node_modules/expect.js/index.js',
 
@@ -101,7 +108,7 @@ module.exports = function (config) {
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TileMapCollisionMaskRenderer.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/collision/TransformedTileMap.js',
       '../../newIDE/app/resources/GDJS/Runtime/Extensions/TileMap/helper/TileMapHelper.js',
-      
+
       // Test extensions:
       './tests/Extensions/**.js',
 

@@ -261,7 +261,9 @@ module.exports = {
       .addAction(
         'RemoveSceneTween',
         _('Remove a scene tween'),
-        _('Remove the scene tween. Call this when the tween is no longer needed to free memory.'),
+        _(
+          'Remove the scene tween. Call this when the tween is no longer needed to free memory.'
+        ),
         _('Remove the scene tween _PARAM1_'),
         _('Scene Tweens'),
         'JsPlatform/Extensions/tween_behavior24.png',
@@ -334,7 +336,7 @@ module.exports = {
       .addParameter('expression', _('To value'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -364,7 +366,7 @@ module.exports = {
       .addParameter('expression', _('To Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -393,7 +395,7 @@ module.exports = {
       .addParameter('expression', _('To X'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -422,7 +424,7 @@ module.exports = {
       .addParameter('expression', _('To width'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -451,7 +453,7 @@ module.exports = {
       .addParameter('expression', _('To height'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -480,7 +482,7 @@ module.exports = {
       .addParameter('expression', _('To Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -509,7 +511,7 @@ module.exports = {
       .addParameter('expression', _('To angle (in degrees)'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -541,7 +543,7 @@ module.exports = {
       .addParameter('expression', _('To scale Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -574,7 +576,7 @@ module.exports = {
       .addParameter('expression', _('To scale X'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -607,7 +609,7 @@ module.exports = {
       .addParameter('expression', _('To scale Y'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -640,7 +642,7 @@ module.exports = {
       .addParameter('expression', _('To character size'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -671,7 +673,7 @@ module.exports = {
       .addParameter('expression', _('To opacity'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -702,7 +704,7 @@ module.exports = {
       .addParameter('color', _('To color'), '', false)
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),
@@ -749,7 +751,7 @@ module.exports = {
       .setDefaultValue('-1')
       .addParameter('stringWithSelector', _('Easing'), easingChoices, false)
       .setDefaultValue('linear')
-      .addParameter('expression', _('Duration'), '', false)
+      .addParameter('expression', _('Duration, in milliseconds'), '', false)
       .addParameter(
         'yesorno',
         _('Destroy this object when tween finishes'),

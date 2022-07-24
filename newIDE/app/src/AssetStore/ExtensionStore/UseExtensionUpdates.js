@@ -1,5 +1,6 @@
 //@flow
-import diff from 'semver/functions/diff';
+import getVersionUpdateType from 'semver/functions/diff';
+import versionGreaterThan from 'semver/functions/gt';
 import { useMemo } from 'react';
 import type { ExtensionShortHeader } from '../../Utils/GDevelopServices/Extension';
 
@@ -8,6 +9,7 @@ type UpdateMetadata = {|
   type: UpdateType,
   currentVersion: string,
   newestVersion: string,
+  isDowngrade: boolean,
 |};
 
 const getUpdateMetadataFromVersions = (
@@ -15,12 +17,17 @@ const getUpdateMetadataFromVersions = (
   newestVersion: string
 ): UpdateMetadata | null => {
   try {
-    const versionDiff: UpdateType = diff(currentVersion, newestVersion);
+    const versionDiff: UpdateType = getVersionUpdateType(
+      currentVersion,
+      newestVersion
+    );
+    const isDowngrade = versionGreaterThan(currentVersion, newestVersion);
     if (['patch', 'minor', 'major'].includes(versionDiff)) {
       return {
         type: versionDiff,
         currentVersion,
         newestVersion,
+        isDowngrade,
       };
     }
   } catch {
@@ -33,6 +40,7 @@ const getUpdateMetadataFromVersions = (
         type: 'unknown',
         currentVersion,
         newestVersion,
+        isDowngrade: false,
       };
     }
   }
@@ -42,8 +50,12 @@ const getUpdateMetadataFromVersions = (
 
 export const useExtensionUpdate = (
   project: gdProject,
-  extension: ExtensionShortHeader
+  extension: ExtensionShortHeader,
+  forceRefresh: Array<any> = []
 ): UpdateMetadata | null => {
+  const installedVersionOrNull =
+    project.hasEventsFunctionsExtensionNamed(extension.name) &&
+    project.getEventsFunctionsExtension(extension.name).getVersion();
   return useMemo<UpdateMetadata | null>(
     () =>
       project.hasEventsFunctionsExtensionNamed(extension.name)
@@ -52,6 +64,8 @@ export const useExtensionUpdate = (
             extension.version
           )
         : null,
-    [project, extension]
+    // installedVersionOrNull is unused inside the function, but necessary to make
+    // the UpdateMetadata be reprocessed whenever the extension version has changed.
+    [project, extension, installedVersionOrNull] // eslint-disable-line react-hooks/exhaustive-deps
   );
 };

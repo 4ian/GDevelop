@@ -199,7 +199,7 @@ const Instruction = (props: Props) => {
                   globalObjectsContainer,
                   objectsContainer,
                   objectOrGroupName,
-                  false
+                  /*searchInGroups=*/ true
                 ) === parameterMetadata.getExtraInfo());
           }
 

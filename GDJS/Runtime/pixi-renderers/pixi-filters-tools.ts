@@ -1,6 +1,5 @@
 namespace gdjs {
   const logger = new gdjs.Logger('Filters');
-  import PIXI = GlobalPIXIModule.PIXI;
 
   export namespace PixiFiltersTools {
     export const clampValue = function (value, min, max) {

@@ -1,3 +1,4 @@
+//@ts-check
 const { build } = require('esbuild');
 const path = require('path');
 const shell = require('shelljs');
@@ -5,6 +6,7 @@ const {
   getAllInOutFilePaths,
   isUntransformedFile,
 } = require('./lib/runtime-files-list');
+const { compileESModuleToNamespace } = require('./lib/build-esm-library');
 const args = require('minimist')(process.argv.slice(2), {
   string: ['out'],
 });
@@ -28,39 +30,48 @@ shell.mkdir('-p', bundledOutPath);
 (async () => {
   // Generate the output file paths
   const {
-    allGDJSInOutFilePaths,
-    allExtensionsInOutFilePaths,
+    allNamespacedInOutFilePaths,
+    allESMInOutFilePaths,
   } = await getAllInOutFilePaths({ bundledOutPath });
 
   // Build (or copy) all the files
   let errored = false;
   const startTime = Date.now();
-  await Promise.all(
-    [...allGDJSInOutFilePaths, ...allExtensionsInOutFilePaths].map(
-      async ({ inPath, outPath }) => {
-        if (isUntransformedFile(inPath)) {
-          try {
-            await fs.mkdir(path.dirname(outPath), { recursive: true });
-            await fs.copyFile(inPath, outPath);
-          } catch (err) {
-            shell.echo(`❌ Error while copying "${inPath}":` + err);
-            errored = true;
-          }
-          return;
-        }
-
-        return build({
-          sourcemap: true,
-          entryPoints: [inPath],
-          minify: true,
-          outfile: renameBuiltFile(outPath),
-        }).catch(() => {
-          // Error is already logged by esbuild.
+  await Promise.all([
+    ...allNamespacedInOutFilePaths.map(async ({ inPath, outPath }) => {
+      if (isUntransformedFile(inPath)) {
+        try {
+          await fs.mkdir(path.dirname(outPath), { recursive: true });
+          await fs.copyFile(inPath, outPath);
+        } catch (err) {
+          shell.echo(`❌ Error while copying "${inPath}":` + err);
           errored = true;
-        });
+        }
+        return;
       }
-    )
-  );
+
+      return build({
+        sourcemap: true,
+        entryPoints: [inPath],
+        minify: true,
+        outfile: renameBuiltFile(outPath),
+      }).catch(() => {
+        // Error is already logged by esbuild.
+        errored = true;
+      });
+    }),
+
+    ...allESMInOutFilePaths.map(async ({ inPath, outPath, namespace }) =>
+      compileESModuleToNamespace(
+        inPath,
+        renameBuiltFile(outPath),
+        namespace
+      ).catch(() => {
+        // Error is already logged by esbuild.
+        errored = true;
+      })
+    ),
+  ]);
 
   const buildDuration = Date.now() - startTime;
   if (!errored) shell.echo(`✅ GDJS built in ${buildDuration}ms`);

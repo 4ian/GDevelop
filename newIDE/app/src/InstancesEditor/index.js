@@ -18,7 +18,7 @@ import Grid from './Grid';
 import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import BackgroundColor from './BackgroundColor';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 import StatusBar from './StatusBar';

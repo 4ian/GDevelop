@@ -52,7 +52,7 @@ export const useExtensionUpdate = (
   project: gdProject,
   extension: ExtensionShortHeader
 ): UpdateMetadata | null => {
-  const installedVersionOrNull =
+  const installedVersionOrUndefined =
     project.hasEventsFunctionsExtensionNamed(extension.name) &&
     project.getEventsFunctionsExtension(extension.name).getVersion();
   return useMemo<UpdateMetadata | null>(
@@ -65,6 +65,6 @@ export const useExtensionUpdate = (
         : null,
     // installedVersionOrNull is unused inside the function, but necessary to make
     // the UpdateMetadata be reprocessed whenever the extension version has changed.
-    [project, extension, installedVersionOrNull] // eslint-disable-line react-hooks/exhaustive-deps
+    [project, extension, installedVersionOrUndefined] // eslint-disable-line react-hooks/exhaustive-deps
   );
 };

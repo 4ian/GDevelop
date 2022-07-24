@@ -54,7 +54,7 @@ namespace gdjs {
       return [(hexNumber >> 16) & 255, (hexNumber >> 8) & 255, hexNumber & 255];
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Mesh | null | PIXI.Container {
       return this._renderer.getRendererObject();
     }
 

@@ -80,7 +80,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.BitmapText {
       return this._renderer.getRendererObject();
     }
 

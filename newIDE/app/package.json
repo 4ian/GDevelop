@@ -39,6 +39,7 @@
     "@material-ui/core": "4.11.0",
     "@material-ui/icons": "4.9.1",
     "@material-ui/lab": "4.0.0-alpha.56",
+    "@pixi/tilemap": "^3.2.2",
     "@supercharge/promise-pool": "^1.6.0",
     "algoliasearch": "3.33.0",
     "axios": "^0.18.1",

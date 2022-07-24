@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../../PIXI';
 const gd /* TODO: add flow in this file */ = global.gd;
 
 /**

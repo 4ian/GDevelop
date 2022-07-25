@@ -212,17 +212,61 @@ namespace gdjs {
       return this._animationSpeedScale;
     }
 
+    /**
+     * Change the width of the object. This changes the scale on X axis of the object.
+     *
+     * @param width The new width of the object, in pixels.
+     */
     setWidth(width: float): void {
-      if (this._renderer.getWidth() === width) return;
+      if (this.getWidth() === width) return;
 
       this._renderer.setWidth(width);
       this.hitBoxesDirty = true;
     }
 
+    /**
+     * Change the height of the object. This changes the scale on Y axis of the object.
+     *
+     * @param height The new height of the object, in pixels.
+     */
     setHeight(height: float): void {
-      if (this._renderer.getHeight() === height) return;
+      if (this.getHeight() === height) return;
 
       this._renderer.setHeight(height);
+      this.hitBoxesDirty = true;
+    }
+
+    /**
+     * Change the scale on X and Y axis of the object.
+     *
+     * @param scale The new scale (must be greater than 0).
+     */
+    setScale(scale: float): void {
+      this.setScaleX(scale);
+      this.setScaleY(scale);
+    }
+
+    /**
+     * Change the scale on X axis of the object (changing its width).
+     *
+     * @param scaleX The new scale (must be greater than 0).
+     */
+    setScaleX(scaleX: float): void {
+      if (this.getScaleX() === scaleX) return;
+
+      this._renderer.setScaleX(scaleX);
+      this.hitBoxesDirty = true;
+    }
+
+    /**
+     * Change the scale on Y axis of the object (changing its width).
+     *
+     * @param scaleY The new scale (must be greater than 0).
+     */
+    setScaleY(scaleY: float): void {
+      if (this.getScaleY() === scaleY) return;
+
+      this._renderer.setScaleY(scaleY);
       this.hitBoxesDirty = true;
     }
 
@@ -263,6 +307,14 @@ namespace gdjs {
 
     getHeight(): float {
       return this._renderer.getHeight();
+    }
+
+    getScaleX(): float {
+      return this._renderer.getScaleX();
+    }
+
+    getScaleY(): float {
+      return this._renderer.getScaleY();
     }
   }
   gdjs.registerObject('TileMap::TileMap', gdjs.TileMapRuntimeObject);

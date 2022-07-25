@@ -206,7 +206,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
@@ -223,7 +223,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
@@ -238,7 +238,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilesetJsonFile');
@@ -255,7 +255,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
@@ -270,7 +270,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter(
       'stringWithSelector',
       _('Display mode'),
@@ -290,7 +290,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .addParameter(
       'stringWithSelector',
       _('Display mode'),
@@ -310,7 +310,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardRelationalOperatorParameters('number')
     .getCodeExtraInformation()
     .setFunctionName('getLayerIndex');
@@ -325,7 +325,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters('number')
     .getCodeExtraInformation()
     .setFunctionName('setLayerIndex')
@@ -339,7 +339,7 @@ const defineTileMap = function (
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getLayerIndex');
 
@@ -353,7 +353,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardRelationalOperatorParameters('number')
     .getCodeExtraInformation()
     .setFunctionName('getAnimationSpeedScale');
@@ -368,7 +368,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters('number')
     .getCodeExtraInformation()
     .setFunctionName('setAnimationSpeedScale')
@@ -382,7 +382,7 @@ const defineTileMap = function (
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getAnimationSpeedScale');
 
@@ -396,7 +396,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardRelationalOperatorParameters('number')
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
@@ -411,7 +411,7 @@ const defineTileMap = function (
       'JsPlatform/Extensions/tile_map.svg',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .useStandardOperatorParameters('number')
     .getCodeExtraInformation()
     .setFunctionName('setAnimationFps')
@@ -425,9 +425,89 @@ const defineTileMap = function (
       '',
       'JsPlatform/Extensions/tile_map.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map'), 'TileMap', false)
     .getCodeExtraInformation()
     .setFunctionName('getAnimationFps');
+
+  object.addAction(
+    "Scale",
+    _("Scale"),
+    _("Modify the scale of the specified object."),
+    _("the scale"),
+    _("Size"),
+    "res/actions/scale24.png",
+    "res/actions/scale.png"
+  )
+  .addParameter('object', _('Tile map'), 'TileMap', false)
+  .useStandardOperatorParameters("number")
+  .markAsAdvanced()
+  .getCodeExtraInformation()
+  .setFunctionName('setScale');
+
+object
+  .addExpressionAndConditionAndAction(
+    "number",
+    "ScaleX",
+    _("Scale on X axis"),
+    _("the width's scale of an object"),
+    _("the width's scale"),
+    _("Size"),
+    "res/actions/scaleWidth24.png"
+  )
+  .addParameter('object', _('Tile map'), 'TileMap', false)
+  .useStandardParameters("number")
+  .markAsAdvanced()
+  .setFunctionName('setScaleX')
+  .setGetter('getScaleX');
+
+object
+  .addExpressionAndConditionAndAction(
+    "number",
+    "ScaleY",
+    _("Scale on Y axis"),
+    _("the height's scale of an object"),
+    _("the height's scale"),
+    _("Size"),
+    "res/actions/scaleHeight24.png"
+  )
+  .addParameter('object', _('Tile map'), 'TileMap', false)
+  .useStandardParameters("number")
+  .markAsAdvanced()
+  .setFunctionName('setScaleY')
+  .setGetter('getScaleY');
+
+  object
+    .addAction(
+      "Width",
+      _("Width"),
+      _("Change the width of an object."),
+      _("the width"),
+      _("Size"),
+      "res/actions/scaleWidth24.png",
+      "res/actions/scale.png"
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters("number")
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setWidth');
+
+  object
+    .addAction(
+      "Height",
+      _("Height"),
+      _("Change the height of an object."),
+      _("the height"),
+      _("Size"),
+      "res/actions/scaleHeight24.png",
+      "res/actions/scale.png"
+    )
+    .addParameter('object', _('Tile map'), 'TileMap', false)
+    .useStandardOperatorParameters("number")
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setHeight');
+
 };
 
 const defineCollisionMask = function (
@@ -628,7 +708,7 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilemapJsonFile');
@@ -645,7 +725,7 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .addParameter('jsonResource', _('Tilemap JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilemapJsonFile');
@@ -660,7 +740,7 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('isTilesetJsonFile');
@@ -677,10 +757,90 @@ const defineCollisionMask = function (
       'JsPlatform/Extensions/tile_map_collision_mask24.svg',
       'JsPlatform/Extensions/tile_map_collision_mask32.svg'
     )
-    .addParameter('object', 'TileMap', 'TileMap', false)
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
     .addParameter('jsonResource', _('Tileset JSON file'), '', false)
     .getCodeExtraInformation()
     .setFunctionName('setTilesetJsonFile');
+
+    object.addAction(
+      "Scale",
+      _("Scale"),
+      _("Modify the scale of the specified object."),
+      _("the scale"),
+      _("Size"),
+      "res/actions/scale24.png",
+      "res/actions/scale.png"
+    )
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
+    .useStandardOperatorParameters("number")
+    .markAsAdvanced()
+    .getCodeExtraInformation()
+    .setFunctionName('setScale');
+  
+  object
+    .addExpressionAndConditionAndAction(
+      "number",
+      "ScaleX",
+      _("Scale on X axis"),
+      _("the width's scale of an object"),
+      _("the width's scale"),
+      _("Size"),
+      "res/actions/scaleWidth24.png"
+    )
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
+    .useStandardParameters("number")
+    .markAsAdvanced()
+    .setFunctionName('setScaleX')
+    .setGetter('getScaleX');
+
+  object
+    .addExpressionAndConditionAndAction(
+      "number",
+      "ScaleY",
+      _("Scale on Y axis"),
+      _("the height's scale of an object"),
+      _("the height's scale"),
+      _("Size"),
+      "res/actions/scaleHeight24.png"
+    )
+    .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
+    .useStandardParameters("number")
+    .markAsAdvanced()
+    .setFunctionName('setScaleY')
+    .setGetter('getScaleY');
+
+    object
+      .addAction(
+        "Width",
+        _("Width"),
+        _("Change the width of an object."),
+        _("the width"),
+        _("Size"),
+        "res/actions/scaleWidth24.png",
+        "res/actions/scale.png"
+      )
+      .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
+      .useStandardOperatorParameters("number")
+      .markAsAdvanced()
+      .getCodeExtraInformation()
+      .setFunctionName('setWidth');
+  
+    object
+      .addAction(
+        "Height",
+        _("Height"),
+        _("Change the height of an object."),
+        _("the height"),
+        _("Size"),
+        "res/actions/scaleHeight24.png",
+        "res/actions/scale.png"
+      )
+      .addParameter('object', _('Tile map collision mask'), 'CollisionMask', false)
+      .useStandardOperatorParameters("number")
+      .markAsAdvanced()
+      .getCodeExtraInformation()
+      .setFunctionName('setHeight');
+  
 };
 
 module.exports = {

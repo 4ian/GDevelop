@@ -96,12 +96,32 @@ namespace gdjs {
       this._pixiObject.position.y = this._object.y + height / 2;
     }
 
+    setScaleX(scaleX: float): void {
+      this._pixiObject.scale.x = scaleX;
+      const width = scaleX * this.getTileMapWidth();
+      this._pixiObject.position.x = this._object.x + width / 2;
+    }
+
+    setScaleY(scaleY: float): void {
+      this._pixiObject.scale.y = scaleY;
+      const height = scaleY * this.getTileMapHeight();
+      this._pixiObject.position.y = this._object.y + height / 2;
+    }
+
     getWidth(): float {
       return this.getTileMapWidth() * this._pixiObject.scale.x;
     }
 
     getHeight(): float {
       return this.getTileMapHeight() * this._pixiObject.scale.y;
+    }
+
+    getScaleX(): float {
+      return this._pixiObject.scale.x;
+    }
+
+    getScaleY(): float {
+      return this._pixiObject.scale.y;
     }
   }
   export const TileMapRuntimeObjectRenderer =

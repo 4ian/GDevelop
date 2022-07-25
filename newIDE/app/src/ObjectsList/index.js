@@ -65,6 +65,7 @@ const objectTypeToDefaultName = {
   'BitmapText::BitmapTextObject': 'NewBitmapText',
   'TextEntryObject::TextEntry': 'NewTextEntry',
   'TileMap::TileMap': 'NewTileMap',
+  'TileMap::CollisionMask': 'NewTileMapMask',
   'MyDummyExtension::DummyObject': 'NewDummyObject',
   'Lighting::LightObject': 'NewLight',
   'TextInput::TextInputObject': 'NewTextInput',

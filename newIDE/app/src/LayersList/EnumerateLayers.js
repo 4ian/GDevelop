@@ -5,6 +5,7 @@ const enumerateLayers = layersContainer =>
     return {
       value: layersContainer.getLayerAt(i).getName(),
       label: layersContainer.getLayerAt(i).getName() || 'Base layer',
+      labelIsUserDefined: layersContainer.getLayerAt(i).getName(),
     };
   });
 

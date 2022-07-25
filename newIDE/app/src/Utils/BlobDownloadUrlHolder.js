@@ -8,17 +8,17 @@ type Props = {
 
 export const BlobDownloadUrlHolder = ({ blob, children }: Props) => {
   const [blobDownloadUrl, setBlobDownloadUrl] = React.useState('');
-  const [stateBlob, setStateBlob] = React.useState(null);
+  const [currentBlob, setCurrentBlob] = React.useState<?Blob>(null);
   React.useEffect(
     () => {
       // This effect function does not look at the blobDownloadUrl, to avoid infinite loops.
       // It is only in charge of updating the Url when the blob changes.
-      if (blob && blob !== stateBlob) {
+      if (blob && blob !== currentBlob) {
         setBlobDownloadUrl(URL.createObjectURL(blob));
-        setStateBlob(blob);
+        setCurrentBlob(blob);
       }
     },
-    [blob, stateBlob]
+    [blob, currentBlob]
   );
 
   React.useEffect(

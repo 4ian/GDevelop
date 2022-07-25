@@ -1,6 +1,4 @@
 import { Trans } from '@lingui/macro';
-import { type I18n as I18nType } from '@lingui/core';
-import { t } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from '../UI/FlatButton';
 import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
@@ -10,7 +8,6 @@ import Text from '../UI/Text';
 import enumerateLayers from './EnumerateLayers';
 
 type Props = {|
-  i18n: I18nType,
   open: boolean,
   layersContainer: any,
   layerRemoved: string,
@@ -58,20 +55,17 @@ export default class LayerRemoveDialog extends Component {
       />,
     ];
 
-    const layers = enumerateLayers(
-      this.props.layersContainer,
-      this.props.i18n._(t`Base layer`)
-    );
+    const layers = enumerateLayers(this.props.layersContainer);
     const choices = layers
       .filter(({ value }) => {
         return value !== this.props.layerRemoved;
       })
-      .map(({ value, label }) => (
+      .map(({ value, label, labelIsUserDefined }) => (
         <SelectOption
           key={value}
           value={value}
           primaryText={label}
-          areUserDefinedValues
+          primaryTextIsUserDefined={labelIsUserDefined}
         />
       ));
 

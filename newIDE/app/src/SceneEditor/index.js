@@ -1564,17 +1564,12 @@ export default class SceneEditor extends React.Component<Props, State> {
             />
           )}
         {!!this.state.layerRemoveDialogOpen && (
-          <I18n>
-            {({ i18n }) => (
-              <LayerRemoveDialog
-                i18n={i18n}
-                open
-                layersContainer={layout}
-                layerRemoved={this.state.layerRemoved}
-                onClose={this.state.onCloseLayerRemoveDialog}
-              />
-            )}
-          </I18n>
+          <LayerRemoveDialog
+            open
+            layersContainer={layout}
+            layerRemoved={this.state.layerRemoved}
+            onClose={this.state.onCloseLayerRemoveDialog}
+          />
         )}
         {!!this.state.editedLayer && (
           <LayerEditorDialog

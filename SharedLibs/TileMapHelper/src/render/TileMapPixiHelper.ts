@@ -214,7 +214,7 @@ export class PixiTileMapHelper {
     pixiGraphics.clear();
 
     pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
-    pixiGraphics.drawRect(0, 0, tileMap.getWidth() || 20, tileMap.getHeight() || 20);
+    pixiGraphics.drawRect(0, 0, tileMap.getWidth(), tileMap.getHeight());
 
     for (const layer of tileMap.getLayers()) {
       const tileWidth = tileMap.getTileWidth();

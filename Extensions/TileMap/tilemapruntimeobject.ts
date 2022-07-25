@@ -252,6 +252,9 @@ namespace gdjs {
      * @param scaleX The new scale (must be greater than 0).
      */
     setScaleX(scaleX: float): void {
+      if (scaleX < 0) {
+        scaleX = 0;
+      }
       if (this.getScaleX() === scaleX) return;
 
       this._renderer.setScaleX(scaleX);
@@ -264,6 +267,9 @@ namespace gdjs {
      * @param scaleY The new scale (must be greater than 0).
      */
     setScaleY(scaleY: float): void {
+      if (scaleY < 0) {
+        scaleY = 0;
+      }
       if (this.getScaleY() === scaleY) return;
 
       this._renderer.setScaleY(scaleY);

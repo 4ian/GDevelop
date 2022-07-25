@@ -213,6 +213,9 @@ export class PixiTileMapHelper {
     if (!pixiGraphics) return;
     pixiGraphics.clear();
 
+    pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
+    pixiGraphics.drawRect(0, 0, tileMap.getWidth() || 20, tileMap.getHeight() || 20);
+
     for (const layer of tileMap.getLayers()) {
       const tileWidth = tileMap.getTileWidth();
       const tileHeight = tileMap.getTileHeight();
@@ -237,7 +240,6 @@ export class PixiTileMapHelper {
             if (!hitboxes) {
               continue;
             }
-            pixiGraphics.lineStyle(outlineSize, outlineColor, outlineOpacity);
             for (const vertices of hitboxes) {
               if (vertices.length === 0) continue;
 

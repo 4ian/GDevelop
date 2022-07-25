@@ -794,7 +794,8 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
+      this.tileMapPixiObject = new Tilemap.CompositeRectTileLayer(0);
+      this._pixiObject = this.tileMapPixiObject;
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
@@ -812,8 +813,8 @@ module.exports = {
         );
       };
       this._pixiContainer.addChild(this._pixiObject);
-      this.width = 20;
-      this.height = 20;
+      this.width = 48;
+      this.height = 48;
       this.update();
       this.updateTileMap();
     }
@@ -821,6 +822,22 @@ module.exports = {
     RenderedTileMapInstance.prototype = Object.create(
       RenderedInstance.prototype
     );
+
+    RenderedTileMapInstance.prototype.onLoadingError = function (
+    ) {
+      this.errorPixiObject = this.errorPixiObject || new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+      this._pixiContainer.addChild(this.errorPixiObject);
+      this._pixiObject = this.errorPixiObject;
+    };
+
+    RenderedTileMapInstance.prototype.onLoadingSuccess = function (
+    ) {
+      if (this.errorPixiObject) {
+        this._pixiContainer.removeChild(this.errorPixiObject);
+        this.errorPixiObject = null;
+        this._pixiObject = this.tileMapPixiObject;
+      }
+    };
 
     /**
      * Return the path to the thumbnail of the specified object.
@@ -871,6 +888,7 @@ module.exports = {
         pako,
         (tileMap) => {
           if (!tileMap) {
+            this.onLoadingError();
             // _loadTiledMapWithCallback already log errors
             return;
           }
@@ -885,14 +903,16 @@ module.exports = {
             tilesetJsonFile,
             (textureCache) => {
               if (!textureCache) {
+                this.onLoadingError();
                 // getOrLoadTextureCache already log warns and errors.
                 return;
               }
+              this.onLoadingSuccess();
 
               this.width = tileMap.getWidth();
               this.height = tileMap.getHeight();
               TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                this._pixiObject,
+                this.tileMapPixiObject,
                 tileMap,
                 textureCache,
                 displayMode,
@@ -917,12 +937,13 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile) {
 
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+        let tileMapJsonData = null;
+        try {
+        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
 
-        try {
         const tilesetJsonData = tilesetJsonFile
           ? await this._pixiResourcesLoader.getResourceJsonData(
               this._project,
@@ -1015,7 +1036,8 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new PIXI.Graphics();
+      this.tileMapPixiObject = new PIXI.Graphics();
+      this._pixiObject = this.tileMapPixiObject;
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
@@ -1034,8 +1056,8 @@ module.exports = {
         );
       };
       this._pixiContainer.addChild(this._pixiObject);
-      this.width = 20;
-      this.height = 20;
+      this.width = 48;
+      this.height = 48;
       this.update();
       this.updateTileMap();
     }
@@ -1043,6 +1065,22 @@ module.exports = {
     RenderedCollisionMaskInstance.prototype = Object.create(
       RenderedInstance.prototype
     );
+
+    RenderedCollisionMaskInstance.prototype.onLoadingError = function (
+    ) {
+      this.errorPixiObject = this.errorPixiObject || new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+      this._pixiContainer.addChild(this.errorPixiObject);
+      this._pixiObject = this.errorPixiObject;
+    };
+
+    RenderedCollisionMaskInstance.prototype.onLoadingSuccess = function (
+    ) {
+      if (this.errorPixiObject) {
+        this._pixiContainer.removeChild(this.errorPixiObject);
+        this.errorPixiObject = null;
+        this._pixiObject = this.tileMapPixiObject;
+      }
+    };
 
     /**
      * Return the path to the thumbnail of the specified object.
@@ -1107,9 +1145,11 @@ module.exports = {
         pako,
         (tileMap) => {
           if (!tileMap) {
+            this.onLoadingError();
             // _loadTiledMapWithCallback already log errors
             return;
           }
+          this.onLoadingSuccess();
 
           this.width = tileMap.getWidth();
           this.height = tileMap.getHeight();
@@ -1165,12 +1205,13 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile) {
 
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+        let tileMapJsonData = null;
+        try {
+        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
 
-        try {
         const tilesetJsonData = tilesetJsonFile
           ? await this._pixiResourcesLoader.getResourceJsonData(
               this._project,

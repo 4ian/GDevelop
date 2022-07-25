@@ -823,15 +823,14 @@ module.exports = {
       RenderedInstance.prototype
     );
 
-    RenderedTileMapInstance.prototype.onLoadingError = function (
-    ) {
-      this.errorPixiObject = this.errorPixiObject || new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+    RenderedTileMapInstance.prototype.onLoadingError = function () {
+      this.errorPixiObject = this.errorPixiObject ||
+          new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
       this._pixiContainer.addChild(this.errorPixiObject);
       this._pixiObject = this.errorPixiObject;
     };
 
-    RenderedTileMapInstance.prototype.onLoadingSuccess = function (
-    ) {
+    RenderedTileMapInstance.prototype.onLoadingSuccess = function () {
       if (this.errorPixiObject) {
         this._pixiContainer.removeChild(this.errorPixiObject);
         this.errorPixiObject = null;
@@ -1066,15 +1065,14 @@ module.exports = {
       RenderedInstance.prototype
     );
 
-    RenderedCollisionMaskInstance.prototype.onLoadingError = function (
-    ) {
-      this.errorPixiObject = this.errorPixiObject || new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+    RenderedCollisionMaskInstance.prototype.onLoadingError = function () {
+      this.errorPixiObject = this.errorPixiObject ||
+          new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
       this._pixiContainer.addChild(this.errorPixiObject);
       this._pixiObject = this.errorPixiObject;
     };
 
-    RenderedCollisionMaskInstance.prototype.onLoadingSuccess = function (
-    ) {
+    RenderedCollisionMaskInstance.prototype.onLoadingSuccess = function () {
       if (this.errorPixiObject) {
         this._pixiContainer.removeChild(this.errorPixiObject);
         this.errorPixiObject = null;

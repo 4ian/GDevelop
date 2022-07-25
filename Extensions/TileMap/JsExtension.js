@@ -936,8 +936,8 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile) {
 
-        let tileMapJsonData = null;
-        try {
+      let tileMapJsonData = null;
+      try {
         tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
@@ -1203,8 +1203,8 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile) {
 
-        let tileMapJsonData = null;
-        try {
+      let tileMapJsonData = null;
+      try {
         tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile

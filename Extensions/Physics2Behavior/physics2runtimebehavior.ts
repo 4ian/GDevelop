@@ -25,7 +25,6 @@ namespace gdjs {
     contactListener: Box2D.JSContactListener;
     _nextJointId: number = 1;
 
-    // TODO Define the type: { [key: string]: Box2D.b2Joint }
     /** Start with 1 so the user is safe from default variables value (0) */
     joints: { [key: string]: Box2D.b2Joint } = {};
 

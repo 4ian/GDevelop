@@ -780,7 +780,8 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new Tilemap.CompositeRectTileLayer(0);
+      this.tileMapPixiObject = new Tilemap.CompositeRectTileLayer(0);
+      this._pixiObject = this.tileMapPixiObject;
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
@@ -790,19 +791,16 @@ module.exports = {
         const localPosition = new PIXI.Point();
         this._pixiObject.worldTransform.applyInverse(position, localPosition);
 
-        // Check if the point is inside the object bounds
-        const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-        const originalHeight =
-          this._pixiObject.height / this._pixiObject.scale.y;
-
         return (
           localPosition.x >= 0 &&
-          localPosition.x < originalWidth &&
+          localPosition.x < this.width &&
           localPosition.y >= 0 &&
-          localPosition.y < originalHeight
+          localPosition.y < this.height
         );
       };
       this._pixiContainer.addChild(this._pixiObject);
+      this.width = 48;
+      this.height = 48;
       this.update();
       this.updateTileMap();
     }
@@ -810,6 +808,21 @@ module.exports = {
     RenderedTileMapInstance.prototype = Object.create(
       RenderedInstance.prototype
     );
+
+    RenderedTileMapInstance.prototype.onLoadingError = function () {
+      this.errorPixiObject = this.errorPixiObject ||
+          new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+      this._pixiContainer.addChild(this.errorPixiObject);
+      this._pixiObject = this.errorPixiObject;
+    };
+
+    RenderedTileMapInstance.prototype.onLoadingSuccess = function () {
+      if (this.errorPixiObject) {
+        this._pixiContainer.removeChild(this.errorPixiObject);
+        this.errorPixiObject = null;
+        this._pixiObject = this.tileMapPixiObject;
+      }
+    };
 
     /**
      * Return the path to the thumbnail of the specified object.
@@ -859,6 +872,7 @@ module.exports = {
         tilesetJsonFile,
         (tileMap) => {
           if (!tileMap) {
+            this.onLoadingError();
             // _loadTiledMapWithCallback already log errors
             return;
           }
@@ -873,12 +887,16 @@ module.exports = {
             tilesetJsonFile,
             (textureCache) => {
               if (!textureCache) {
+                this.onLoadingError();
                 // getOrLoadTextureCache already log warns and errors.
                 return;
               }
+              this.onLoadingSuccess();
 
+              this.width = tileMap.getWidth();
+              this.height = tileMap.getHeight();
               TilemapHelper.PixiTileMapHelper.updatePixiTileMap(
-                this._pixiObject,
+                this.tileMapPixiObject,
                 tileMap,
                 textureCache,
                 displayMode,
@@ -903,12 +921,13 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile) {
 
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+      let tileMapJsonData = null;
+      try {
+        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
 
-        try {
         const tilesetJsonData = tilesetJsonFile
           ? await this._pixiResourcesLoader.getResourceJsonData(
               this._project,
@@ -930,8 +949,8 @@ module.exports = {
      */
     RenderedTileMapInstance.prototype.update = function () {
       if (this._instance.hasCustomSize()) {
-        this._pixiObject.width = this._instance.getCustomWidth();
-        this._pixiObject.height = this._instance.getCustomHeight();
+        this._pixiObject.scale.x = this._instance.getCustomWidth() / this.width;
+        this._pixiObject.scale.y = this._instance.getCustomHeight() / this.height;
       } else {
         this._pixiObject.scale.x = 1;
         this._pixiObject.scale.y = 1;
@@ -940,16 +959,16 @@ module.exports = {
       // Place the center of rotation in the center of the object. Because pivot position in Pixi
       // is in the **local coordinates of the object**, we need to find back the original width
       // and height of the object before scaling (then divide by 2 to find the center)
-      const originalWidth = this._pixiObject.width / this._pixiObject.scale.x;
-      const originalHeight = this._pixiObject.height / this._pixiObject.scale.y;
+      const originalWidth = this.width;
+      const originalHeight = this.height;
       this._pixiObject.pivot.x = originalWidth / 2;
       this._pixiObject.pivot.y = originalHeight / 2;
 
       // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
       // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
       // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-      this._pixiObject.x = this._instance.getX() + this._pixiObject.width / 2;
-      this._pixiObject.y = this._instance.getY() + this._pixiObject.height / 2;
+      this._pixiObject.x = this._instance.getX() + this._pixiObject.pivot.x * this._pixiObject.scale.x;
+      this._pixiObject.y = this._instance.getY() + this._pixiObject.pivot.y * this._pixiObject.scale.y;
 
       // Rotation works as intended because we put the pivot in the center
       this._pixiObject.rotation = RenderedInstance.toRad(
@@ -961,14 +980,14 @@ module.exports = {
      * Return the width of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultWidth = function () {
-      return this._pixiObject.width / this._pixiObject.scale.x;
+      return this.width;
     };
 
     /**
      * Return the height of the instance, when it's not resized.
      */
     RenderedTileMapInstance.prototype.getDefaultHeight = function () {
-      return this._pixiObject.height / this._pixiObject.scale.y;
+      return this.height;
     };
 
     objectsRenderingService.registerInstanceRenderer(
@@ -1001,7 +1020,8 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      this._pixiObject = new PIXI.Graphics();
+      this.tileMapPixiObject = new PIXI.Graphics();
+      this._pixiObject = this.tileMapPixiObject;
 
       // Implement `containsPoint` so that we can set `interactive` to true and
       // the Tilemap will properly emit events when hovered/clicked.
@@ -1020,8 +1040,8 @@ module.exports = {
         );
       };
       this._pixiContainer.addChild(this._pixiObject);
-      this.width = 20;
-      this.height = 20;
+      this.width = 48;
+      this.height = 48;
       this.update();
       this.updateTileMap();
     }
@@ -1029,6 +1049,21 @@ module.exports = {
     RenderedCollisionMaskInstance.prototype = Object.create(
       RenderedInstance.prototype
     );
+
+    RenderedCollisionMaskInstance.prototype.onLoadingError = function () {
+      this.errorPixiObject = this.errorPixiObject ||
+          new PIXI.Sprite(this._pixiResourcesLoader.getInvalidPIXITexture());
+      this._pixiContainer.addChild(this.errorPixiObject);
+      this._pixiObject = this.errorPixiObject;
+    };
+
+    RenderedCollisionMaskInstance.prototype.onLoadingSuccess = function () {
+      if (this.errorPixiObject) {
+        this._pixiContainer.removeChild(this.errorPixiObject);
+        this.errorPixiObject = null;
+        this._pixiObject = this.tileMapPixiObject;
+      }
+    };
 
     /**
      * Return the path to the thumbnail of the specified object.
@@ -1092,9 +1127,11 @@ module.exports = {
         tilesetJsonFile,
         (tileMap) => {
           if (!tileMap) {
+            this.onLoadingError();
             // _loadTiledMapWithCallback already log errors
             return;
           }
+          this.onLoadingSuccess();
 
           this.width = tileMap.getWidth();
           this.height = tileMap.getHeight();
@@ -1150,12 +1187,13 @@ module.exports = {
       tilemapJsonFile,
       tilesetJsonFile) {
 
-        const tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
+      let tileMapJsonData = null;
+      try {
+        tileMapJsonData = await this._pixiResourcesLoader.getResourceJsonData(
           this._project,
           tilemapJsonFile
         );
 
-        try {
         const tilesetJsonData = tilesetJsonFile
           ? await this._pixiResourcesLoader.getResourceJsonData(
               this._project,
@@ -1187,16 +1225,16 @@ module.exports = {
       // Place the center of rotation in the center of the object. Because pivot position in Pixi
       // is in the **local coordinates of the object**, we need to find back the original width
       // and height of the object before scaling (then divide by 2 to find the center)
-      const originalWidth = this.width / this._pixiObject.scale.x;
-      const originalHeight = this.height / this._pixiObject.scale.y;
+      const originalWidth = this.width;
+      const originalHeight = this.height;
       this._pixiObject.pivot.x = originalWidth / 2;
       this._pixiObject.pivot.y = originalHeight / 2;
 
       // Modifying the pivot position also has an impact on the transform. The instance (X,Y) position
       // of this object refers to the top-left point, but now in Pixi, as we changed the pivot, the Pixi
       // object (X,Y) position refers to the center. So we add an offset to convert from top-left to center.
-      this._pixiObject.x = this._instance.getX() + this.width / 2;
-      this._pixiObject.y = this._instance.getY() + this.height / 2;
+      this._pixiObject.x = this._instance.getX() + this._pixiObject.pivot.x * this._pixiObject.scale.x;
+      this._pixiObject.y = this._instance.getY() + this._pixiObject.pivot.y * this._pixiObject.scale.y;
 
       // Rotation works as intended because we put the pivot in the center
       this._pixiObject.rotation = RenderedInstance.toRad(

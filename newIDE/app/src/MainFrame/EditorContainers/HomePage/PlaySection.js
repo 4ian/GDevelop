@@ -13,7 +13,7 @@ import { useResponsiveWindowWidth } from '../../../UI/Reponsive/ResponsiveWindow
 const PlaySection = () => {
   const windowWidth = useResponsiveWindowWidth();
   return (
-    <SectionContainer title={<Trans>Showcased games</Trans>}>
+    <SectionContainer title={<Trans>Showcased games</Trans>} flexBody>
       <SectionRow expand>
         {windowWidth === 'large' && (
           <LineStackLayout noMargin justifyContent="flex-end">

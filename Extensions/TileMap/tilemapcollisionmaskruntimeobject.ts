@@ -30,6 +30,11 @@ namespace gdjs {
     _outlineOpacity: float;
     _outlineSize: float;
 
+    _width: float;
+    _height: float;
+    _scaleX: float;
+    _scaleY: float;
+
     /**
      * If the owner moves, the hitboxes vertices
      * will have to be transformed again.
@@ -54,6 +59,12 @@ namespace gdjs {
       this._tileMapManager = gdjs.TileMap.TileMapRuntimeManager.getManager(
         runtimeScene
       );
+
+      // The actual size is set when the tile map file is loaded.
+      this._width = 0;
+      this._height = 0;
+      this._scaleX = 1;
+      this._scaleY = 1;
       const editableTileMap = new TileMapHelper.EditableTileMap(
         1,
         1,
@@ -65,6 +76,7 @@ namespace gdjs {
         editableTileMap,
         this._collisionMaskTag
       );
+
       this._renderer = new gdjs.TileMap.TileMapCollisionMaskRenderer(
         this,
         runtimeScene
@@ -151,6 +163,9 @@ namespace gdjs {
             this._collisionTileMap.getAllHitboxes(this._collisionMaskTag)
           );
           this._renderer.redrawCollisionMask();
+
+          this._width = this._collisionTileMap.getWidth() * this._scaleX;
+          this._height = this._collisionTileMap.getHeight() * this._scaleY;
         }
       );
     }
@@ -185,8 +200,8 @@ namespace gdjs {
       }
       const transformation = this._collisionTileMap.getTransformation();
 
-      const absScaleX = Math.abs(this._renderer.getScaleX());
-      const absScaleY = Math.abs(this._renderer.getScaleY());
+      const absScaleX = Math.abs(this._scaleX);
+      const absScaleY = Math.abs(this._scaleY);
 
       transformation.setToIdentity();
 
@@ -197,8 +212,8 @@ namespace gdjs {
       const angleInRadians = (this.angle * Math.PI) / 180;
       transformation.rotateAround(
         angleInRadians,
-        this.getCenterX() * absScaleX,
-        this.getCenterY() * absScaleY
+        this.getCenterX(),
+        this.getCenterY()
       );
 
       // Scale
@@ -440,27 +455,27 @@ namespace gdjs {
     // TODO allow size changes from events?
 
     setWidth(width: float): void {
-      if (this._renderer.getWidth() === width) return;
-
-      this._renderer.setWidth(width);
+      if (this._width === width) return;
+      this._scaleX = width / this._collisionTileMap.getWidth();
+      this._width = width;
       this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
     }
 
     setHeight(height: float): void {
-      if (this._renderer.getHeight() === height) return;
-
-      this._renderer.setHeight(height);
+      if (this._height === height) return;
+      this._scaleY = height / this._collisionTileMap.getHeight();
+      this._height = height;
       this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
     }
 
     getWidth(): float {
-      return this._renderer.getWidth();
+      return this._width;
     }
 
     getHeight(): float {
-      return this._renderer.getHeight();
+      return this._height;
     }
   }
   gdjs.registerObject(

@@ -10,6 +10,7 @@ type Props = {|
   value: string | number | boolean,
   primaryText: MessageDescriptor,
   disabled?: boolean,
+  primaryTextIsUserDefined?: boolean,
 |};
 
 /**
@@ -29,7 +30,9 @@ const SelectOption = (props: Props) => {
             backgroundColor: muiTheme.palette.background.paper,
           }}
         >
-          {i18n._(props.primaryText)}
+          {props.primaryTextIsUserDefined
+            ? props.primaryText
+            : i18n._(props.primaryText)}
         </option>
       )}
     </I18n>

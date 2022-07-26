@@ -59,7 +59,11 @@ export type PrimitiveValueField =
       valueType: 'string',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
-      getChoices?: ?() => Array<{| value: string, label: string |}>,
+      getChoices?: ?() => Array<{|
+        value: string,
+        label: string,
+        labelIsUserDefined?: boolean,
+      |}>,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -390,8 +394,13 @@ const PropertiesEditor = ({
 
       const children = field
         .getChoices()
-        .map(({ value, label }) => (
-          <SelectOption key={value} value={value} primaryText={label} />
+        .map(({ value, label, labelIsUserDefined }) => (
+          <SelectOption
+            key={value}
+            value={value}
+            primaryText={label}
+            primaryTextIsUserDefined={labelIsUserDefined}
+          />
         ));
 
       if (field.valueType === 'number') {

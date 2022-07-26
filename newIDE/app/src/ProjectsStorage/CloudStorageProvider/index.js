@@ -19,6 +19,7 @@ export default ({
   internalName: 'Cloud',
   name: t`GDevelop cloud storage`,
   renderIcon: () => <Cloud />,
+  hiddenInOpenDialog: true,
   needUserAuthentication: true,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;

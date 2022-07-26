@@ -30,6 +30,7 @@ const styles = {
     padding: 8,
   },
   button: {
+    alignItems: 'flex-start',
     textAlign: 'left',
     flex: 1,
   },

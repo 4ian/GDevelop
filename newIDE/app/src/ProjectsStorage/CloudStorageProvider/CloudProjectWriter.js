@@ -5,7 +5,7 @@ import { type FileMetadata } from '..';
 import {
   commitVersion,
   createCloudProject,
-  getCredentialsForProject,
+  getCredentialsForCloudProject,
   updateCloudProject,
 } from '../../Utils/GDevelopServices/Project';
 import { serializeToJSON } from '../../Utils/Serializer';
@@ -105,7 +105,7 @@ const createCloudProjectAndInitCommit = async (
       name,
     });
     if (!cloudProject) return;
-    await getCredentialsForProject(authenticatedUser, cloudProject.id);
+    await getCredentialsForCloudProject(authenticatedUser, cloudProject.id);
     const newVersion = await zipProjectAndCommitVersion({
       authenticatedUser,
       project,

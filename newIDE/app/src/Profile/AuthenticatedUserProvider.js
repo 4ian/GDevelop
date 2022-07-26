@@ -30,6 +30,7 @@ import PreferencesContext, {
   type PreferencesValues,
 } from '../MainFrame/Preferences/PreferencesContext';
 import { listUserCloudProjects } from '../Utils/GDevelopServices/Project';
+import { clearCloudProjectCookies } from '../ProjectsStorage/CloudStorageProvider/CloudProjectCookies';
 
 type Props = {|
   authentication: Authentication,
@@ -340,6 +341,7 @@ export default class AuthenticatedUserProvider extends React.Component<
   _doLogout = () => {
     if (this.props.authentication) this.props.authentication.logout();
     this._resetAuthenticatedUser();
+    clearCloudProjectCookies();
   };
 
   _doLogin = async (form: LoginForm) => {

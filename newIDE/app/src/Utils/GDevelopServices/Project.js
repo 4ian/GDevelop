@@ -35,7 +35,7 @@ const refetchCredentialsForProjectAndRetryIfFailed = async <T>(
     return response;
   } catch (error) {
     if (error.response && error.response.status === 403) {
-      await getCredentialsForProject(authenticatedUser, cloudProjectId);
+      await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
       const response = await apiCall();
       return response;
     }
@@ -54,7 +54,7 @@ const getVersionIdFromPath = (path: string): string => {
   return path.substring(filenameStartIndex, filenameEndIndex);
 };
 
-export const getCredentialsForProject = async (
+export const getCredentialsForCloudProject = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
 ): Promise<boolean> => {
@@ -73,6 +73,12 @@ export const getCredentialsForProject = async (
     }
   );
   return response.status >= 200 && response.status < 400;
+};
+
+export const clearCloudProjectCredentials = async (): Promise<void> => {
+  await axios.get(`${GDevelopProjectApi.baseUrl}/action/clear-authorization`, {
+    withCredentials: true, // Necessary to save cookie returned by the server.
+  });
 };
 
 export const createCloudProject = async (

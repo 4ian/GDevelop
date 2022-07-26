@@ -3,7 +3,7 @@
 import { t } from '@lingui/macro';
 import {
   getCloudProject,
-  getCredentialsForProject,
+  getCredentialsForCloudProject,
   getProjectFileAsZipBlob,
 } from '../../Utils/GDevelopServices/Project';
 import { initializeZipJs } from '../../Utils/Zip.js';
@@ -39,7 +39,7 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
   if (!cloudProject) throw new Error("Cloud project couldn't be fetched.");
 
   onProgress && onProgress((2 / 4) * 100, t`Getting cookie`);
-  await getCredentialsForProject(authenticatedUser, cloudProjectId);
+  await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
   onProgress && onProgress((3 / 4) * 100, t`Downloading project`);
   const zippedSerializedProject = await getProjectFileAsZipBlob(cloudProject);
   onProgress && onProgress((4 / 4) * 100, t`Unzipping project`);

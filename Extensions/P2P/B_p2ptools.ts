@@ -484,7 +484,7 @@ namespace gdjs {
       /**
        * A JavaScript-only function to get the raw P2P DataConnection.
        * This can be useful for example when you want to use a binary protocol
-       * instead if GDevelop variables for high-performance networking.
+       * instead of GDevelop variables for high-performance networking.
        */
       export const getConnectionInstance = (peerID: string) =>
         connections.get(peerID);

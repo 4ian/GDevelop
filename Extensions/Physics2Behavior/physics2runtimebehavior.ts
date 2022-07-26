@@ -485,7 +485,6 @@ namespace gdjs {
         }
 
         // Delete the body
-        this._body.gdjsAssociatedBehavior = null;
         this._sharedData.world.DestroyBody(this._body);
         this._body = null;
       }

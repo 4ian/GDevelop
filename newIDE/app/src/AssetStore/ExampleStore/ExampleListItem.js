@@ -13,7 +13,7 @@ import { Trans } from '@lingui/macro';
 import { Column, Line } from '../../UI/Grid';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import { getIDEVersion } from '../../Version';
-import { ExampleIcon } from './ExampleIcon';
+import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import optionalRequire from '../../Utils/OptionalRequire';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { openExampleInWebApp } from './ExampleDialog';
@@ -30,6 +30,7 @@ const styles = {
     padding: 8,
   },
   button: {
+    alignItems: 'flex-start',
     textAlign: 'left',
     flex: 1,
   },
@@ -103,10 +104,7 @@ export const ExampleListItem = ({
       <Line noMargin expand>
         <ButtonBase style={styles.button} onClick={onChoose} focusRipple>
           {!!exampleShortHeader.previewImageUrls.length && (
-            <ExampleIcon
-              exampleShortHeader={exampleShortHeader}
-              type="preview"
-            />
+            <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           )}
           <Column expand>
             <Text noMargin>{renderExampleField('name')} </Text>

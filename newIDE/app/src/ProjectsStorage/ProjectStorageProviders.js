@@ -156,6 +156,9 @@ const ProjectStorageProviders = (props: Props) => {
     return currentStorageProvider.current || emptyStorageProvider;
   };
 
+  // Some storage providers might need the current authenticated user
+  // to create their operations. This effect makes sure operations are always
+  // up to date with the current authenticated user.
   React.useEffect(
     () => {
       const { current: storageProvider } = currentStorageProvider;

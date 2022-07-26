@@ -251,10 +251,12 @@ namespace gdjs {
               // Must check pointers because gears store non-casted joints (b2Joint)
               if (
                 this.joints[jId].GetType() === Box2D.e_gearJoint &&
-                (Box2D.getPointer((this.joints[jId] as Box2D.b2GearJoint).GetJoint1()) ===
-                  Box2D.getPointer(joint) ||
-                  Box2D.getPointer((this.joints[jId] as Box2D.b2GearJoint).GetJoint2()) ===
-                    Box2D.getPointer(joint))
+                (Box2D.getPointer(
+                  (this.joints[jId] as Box2D.b2GearJoint).GetJoint1()
+                ) === Box2D.getPointer(joint) ||
+                  Box2D.getPointer(
+                    (this.joints[jId] as Box2D.b2GearJoint).GetJoint2()
+                  ) === Box2D.getPointer(joint))
               ) {
                 // We could pass it a string, but lets do it right
                 this.removeJoint(parseInt(jId, 10));
@@ -2452,7 +2454,9 @@ namespace gdjs {
 
     getPrismaticJointAxisAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2470,7 +2474,9 @@ namespace gdjs {
 
     getPrismaticJointReferenceAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2483,7 +2489,9 @@ namespace gdjs {
 
     getPrismaticJointTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2496,7 +2504,9 @@ namespace gdjs {
 
     getPrismaticJointSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2509,7 +2519,9 @@ namespace gdjs {
 
     isPrismaticJointLimitsEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2525,7 +2537,9 @@ namespace gdjs {
       enable: boolean
     ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2538,7 +2552,9 @@ namespace gdjs {
 
     getPrismaticJointMinTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2551,7 +2567,9 @@ namespace gdjs {
 
     getPrismaticJointMaxTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2568,7 +2586,9 @@ namespace gdjs {
       upperTranslation: float
     ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2595,7 +2615,9 @@ namespace gdjs {
 
     isPrismaticJointMotorEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2611,7 +2633,9 @@ namespace gdjs {
       enable: boolean
     ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2624,7 +2648,9 @@ namespace gdjs {
 
     getPrismaticJointMotorSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2637,7 +2663,9 @@ namespace gdjs {
 
     setPrismaticJointMotorSpeed(jointId: integer | string, speed): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2650,7 +2678,9 @@ namespace gdjs {
 
     getPrismaticJointMaxMotorForce(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2668,7 +2698,9 @@ namespace gdjs {
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2681,7 +2713,9 @@ namespace gdjs {
 
     getPrismaticJointMotorForce(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
+      const joint = this._sharedData.getJoint(
+        jointId
+      ) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {

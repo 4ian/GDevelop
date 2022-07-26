@@ -126,7 +126,7 @@ const BuildSection = ({
     file => file.fileMetadata
   );
 
-  // Only show cloud projects on the web app
+  // Show cloud projects on the web app only.
   if (isWebApp) {
     const { cloudProjects } = authenticatedUser;
 

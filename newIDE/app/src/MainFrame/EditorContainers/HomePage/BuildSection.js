@@ -27,6 +27,7 @@ import { type MenuItemTemplate } from '../../../UI/Menu/Menu.flow';
 import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
 import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
 import optionalRequire from '../../../Utils/OptionalRequire';
+import { showErrorBox } from '../../../UI/Messages/MessageBox';
 const electron = optionalRequire('electron');
 
 const isWebApp = !electron;
@@ -166,10 +167,10 @@ const BuildSection = ({
     }
   };
 
-  const onDeleteProject = async ({
-    fileMetadata,
-    storageProviderName,
-  }: FileMetadataAndStorageProviderName) => {
+  const onDeleteProject = async (
+    i18n: I18nType,
+    { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName
+  ) => {
     if (storageProviderName !== 'Cloud') return;
     const projectName = fileMetadata.name;
     if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
@@ -193,10 +194,13 @@ const BuildSection = ({
       await deleteCloudProject(authenticatedUser, fileMetadata.fileIdentifier);
       authenticatedUser.onCloudProjectsChanged();
     } catch (error) {
-      console.error(
-        `An error occurred when deleting cloud project ${projectName}. Please try again later.`,
-        error
-      );
+      showErrorBox({
+        message: i18n._(
+          t`An error occurred when deleting cloud project ${projectName}. Please try again later.`
+        ),
+        rawError: error,
+        errorId: 'cloud-project-delete-error',
+      });
     } finally {
       setPendingProject(null);
     }
@@ -215,7 +219,7 @@ const BuildSection = ({
         { type: 'separator' },
         {
           label: i18n._(t`Delete`),
-          click: () => onDeleteProject(file),
+          click: () => onDeleteProject(i18n, file),
         },
       ]);
     }

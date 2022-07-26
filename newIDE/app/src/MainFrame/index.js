@@ -1558,6 +1558,10 @@ const MainFrame = (props: Props) => {
     [setState]
   );
 
+  // When opening a project, we always open a scene to avoid confusing the user.
+  // If it has no scene (new project), we create one and open it.
+  // If it has one scene, we open it.
+  // If it has more than one scene, we open the first one and we also open the project manager.
   const openSceneOrProjectManager = React.useCallback(
     (newState: {|
       currentProject: ?gdProject,
@@ -1566,30 +1570,22 @@ const MainFrame = (props: Props) => {
       const { currentProject, editorTabs } = newState;
       if (!currentProject) return;
 
-      if (currentProject.getLayoutsCount() <= 1) {
-        if (currentProject.getLayoutsCount() === 0)
-          currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
+      if (currentProject.getLayoutsCount() === 0)
+        currentProject.insertNewLayout(i18n._(t`Untitled scene`), 0);
 
-        openLayout(
-          currentProject.getLayoutAt(0).getName(),
-          {
-            openSceneEditor: true,
-            openEventsEditor: true,
-          },
-          editorTabs
-        );
-      } else {
-        setState(state => ({
-          ...state,
-          currentProject,
-          editorTabs,
-        })).then(() => {
-          setIsLoadingProject(false);
-          openProjectManager(true);
-        });
+      openLayout(
+        currentProject.getLayoutAt(0).getName(),
+        {
+          openSceneEditor: true,
+          openEventsEditor: true,
+        },
+        editorTabs
+      );
+      if (currentProject.getLayoutsCount() > 1) {
+        openProjectManager(true);
       }
     },
-    [openLayout, setState, i18n]
+    [openLayout, i18n]
   );
 
   const chooseProjectWithStorageProviderPicker = React.useCallback(

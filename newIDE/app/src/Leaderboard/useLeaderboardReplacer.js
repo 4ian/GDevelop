@@ -5,7 +5,7 @@ import Dialog, { DialogPrimaryButton } from '../UI/Dialog';
 import FlatButton from '../UI/FlatButton';
 import { Line } from '../UI/Grid';
 import Text from '../UI/Text';
-import LinearProgress from '@material-ui/core/LinearProgress';
+import LinearProgress from '../UI/LinearProgress';
 import {
   Table,
   TableBody,
@@ -151,7 +151,9 @@ export const LeaderboardReplacerProgressDialog = ({
               <Trans>Preparing the leaderboard for your game...</Trans>
             )}
           </Text>
-          <LinearProgress variant="determinate" value={progress} />
+          <Line noMargin expand>
+            <LinearProgress variant="determinate" value={progress} />
+          </Line>
           {hasErrors && progress === 100 ? (
             <Table>
               <TableHeader>

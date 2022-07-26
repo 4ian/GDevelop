@@ -27,7 +27,6 @@ const styles = {
   },
   scrollContainer: {
     flex: 1,
-    display: 'flex',
     overflowY: 'auto',
   },
 };
@@ -37,9 +36,16 @@ type Props = {|
   title: React.Node,
   subtitle?: React.Node,
   backAction?: () => void,
+  flexBody?: boolean,
 |};
 
-const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
+const SectionContainer = ({
+  children,
+  title,
+  subtitle,
+  backAction,
+  flexBody,
+}: Props) => {
   const windowWidth = useResponsiveWindowWidth();
   const GDevelopTheme = React.useContext(GDevelopThemeContext);
   return (
@@ -47,6 +53,7 @@ const SectionContainer = ({ children, title, subtitle, backAction }: Props) => {
       <Paper
         style={{
           ...styles.scrollContainer,
+          display: flexBody ? 'flex' : 'block',
           borderLeft: `1px solid ${GDevelopTheme.home.separator.color}`,
           ...(windowWidth === 'small'
             ? styles.mobileScrollContainer

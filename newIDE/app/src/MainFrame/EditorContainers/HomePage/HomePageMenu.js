@@ -38,30 +38,36 @@ const tabs: {
   label: React.Node,
   tab: HomeTab,
   getIcon: (color: string) => React.Node,
+  id: string,
 }[] = [
   {
     label: <Trans>Get Started</Trans>,
     tab: 'get-started',
+    id: 'home-get-started-tab',
     getIcon: color => <Sun fontSize="small" color={color} />,
   },
   {
     label: <Trans>Build</Trans>,
     tab: 'build',
+    id: 'home-build-tab',
     getIcon: color => <PickAxeIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Learn</Trans>,
     tab: 'learn',
+    id: 'home-learn-tab',
     getIcon: color => <SchoolIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Play</Trans>,
     tab: 'play',
+    id: 'home-play-tab',
     getIcon: color => <GoogleControllerIcon fontSize="small" color={color} />,
   },
   {
     label: <Trans>Community</Trans>,
     tab: 'community',
+    id: 'home-community-tab',
     getIcon: color => <WebIcon fontSize="small" color={color} />,
   },
 ];
@@ -94,14 +100,15 @@ export const HomePageMenu = ({ setActiveTab, activeTab }: Props) => {
               <DoubleChevronArrowRight />
             </IconButton>
           )}
-          {tabs.map(({ label, tab, getIcon }, index) => (
+          {tabs.map(({ label, tab, getIcon, id }) => (
             <VerticalTabButton
-              key={index}
+              key={id}
               label={label}
               onClick={() => setActiveTab(tab)}
               getIcon={getIcon}
               isActive={activeTab === tab}
               hideLabel={windowWidth !== 'large'}
+              id={id}
             />
           ))}
         </Column>

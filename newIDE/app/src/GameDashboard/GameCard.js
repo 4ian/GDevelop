@@ -201,7 +201,7 @@ export const GameCard = ({
                   },
                   {
                     label: i18n._(t`Game feedbacks`),
-                    click: () => onOpenGameManager('feedback'),
+                    click: () => onOpenGameManager('feedbacks'),
                   },
                   {
                     label: i18n._(t`Game analytics`),
@@ -229,9 +229,7 @@ export const GameCard = ({
                       {game.discoverable ? (
                         <Trans>Public on Liluo.io</Trans>
                       ) : (
-                        <Trans>
-                          Build version only (non visible on Liluo.io)
-                        </Trans>
+                        <Trans>Not visible on Liluo.io</Trans>
                       )}
                     </Text>
                     <Spacer />

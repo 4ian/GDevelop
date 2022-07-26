@@ -34,20 +34,6 @@ const useStyles = makeStyles({
   },
 });
 
-const styles = {
-  grid: {
-    textAlign: 'center',
-    maxWidth: SMALL_WIDGET_SIZE * 4 + 100, // Avoid tiles taking too much space on large screens.
-  },
-  gridListTile: {
-    display: 'flex',
-    justifyContent: 'flex-start',
-  },
-  helpItem: {
-    padding: 10,
-  },
-};
-
 const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
   switch (width) {
     case 'small':
@@ -58,6 +44,21 @@ const getColumnsFromWidth = (width: WidthType, showTourHelpItem: boolean) => {
     default:
       return showTourHelpItem ? 4 : 3;
   }
+};
+
+const MAX_COLUMNS = getColumnsFromWidth('large', true);
+const styles = {
+  grid: {
+    textAlign: 'center',
+    maxWidth: (SMALL_WIDGET_SIZE + 2 * 5) * MAX_COLUMNS, // Avoid tiles taking too much space on large screens.
+  },
+  gridListTile: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+  },
+  helpItem: {
+    padding: 10,
+  },
 };
 
 type Props = {|

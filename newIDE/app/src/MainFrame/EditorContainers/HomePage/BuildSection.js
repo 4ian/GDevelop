@@ -226,6 +226,8 @@ const BuildSection = ({
     return actions;
   };
 
+  const isWindowWidthMediumOrLager = windowWidth !== 'small';
+
   return (
     <I18n>
       {({ i18n }) => (
@@ -247,7 +249,7 @@ const BuildSection = ({
                   />
                   {canOpen && (
                     <>
-                      {windowWidth !== 'small' && (
+                      {isWindowWidthMediumOrLager && (
                         <>
                           <Text>
                             <Trans>or</Trans>
@@ -282,7 +284,7 @@ const BuildSection = ({
                 projectFiles.length > 0 && (
                   <Line>
                     <Column noMargin expand>
-                      {windowWidth !== 'small' && (
+                      {isWindowWidthMediumOrLager && (
                         <LineStackLayout justifyContent="space-between">
                           <Column expand>
                             <Text color="secondary">
@@ -309,7 +311,7 @@ const BuildSection = ({
                               openContextMenu(event, file)
                             }
                           >
-                            {windowWidth !== 'small' ? (
+                            {isWindowWidthMediumOrLager ? (
                               <LineStackLayout
                                 justifyContent="flex-start"
                                 expand

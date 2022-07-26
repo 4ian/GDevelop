@@ -1,31 +1,42 @@
+namespace Box2D {
+  export interface b2Body {
+    gdjsAssociatedBehavior: gdjs.Physics2RuntimeBehavior | null;
+  }
+}
 namespace gdjs {
+  export interface RuntimeScene {
+    physics2SharedData: gdjs.Physics2SharedData | null;
+  }
   export class Physics2SharedData {
-    gravityX: any;
-    gravityY: any;
-    scaleX: any;
-    scaleY: any;
-    invScaleX: any;
-    invScaleY: any;
-    timeStep: any;
+    gravityX: float;
+    gravityY: float;
+    scaleX: float;
+    scaleY: float;
+    invScaleX: float;
+    invScaleY: float;
+    timeStep: float;
     frameTime: float = 0;
     stepped: boolean = false;
     timeScale: float = 1;
-    world: any;
-    staticBody: any;
+    world: Box2D.b2World;
+    staticBody: Box2D.b2Body;
 
-    // Contact listener to keep track of current collisions
-    contactListener: any;
+    /** Contact listener to keep track of current collisions */
+    contactListener: Box2D.JSContactListener;
     _nextJointId: number = 1;
 
-    // Start with 1 so the user is safe from default variables value (0)
-    joints: any = {};
+    // TODO Define the type: { [key: string]: Box2D.b2Joint }
+    /** Start with 1 so the user is safe from default variables value (0) */
+    joints: { [key: string]: Box2D.b2Joint } = {};
 
-    // List of physics behavior in the runtimeScene. It should be updated
-    // when a new physics object is created (constructor), on destruction (onDestroy),
-    // on behavior activation (onActivate) and on behavior deactivation (onDeActivate).
+    /**
+     * List of physics behavior in the runtimeScene. It should be updated
+     * when a new physics object is created (constructor), on destruction (onDestroy),
+     * on behavior activation (onActivate) and on behavior deactivation (onDeActivate).
+     */
     _registeredBehaviors: Set<Physics2RuntimeBehavior>;
 
-    constructor(runtimeScene, sharedData) {
+    constructor(runtimeScene: gdjs.RuntimeScene, sharedData) {
       this._registeredBehaviors = new Set();
       this.gravityX = sharedData.gravityX;
       this.gravityY = sharedData.gravityY;
@@ -35,14 +46,16 @@ namespace gdjs {
       this.invScaleY = 1 / this.scaleY;
       this.timeStep = 1 / 60;
       this.world = new Box2D.b2World(
-        new Box2D.b2Vec2(this.gravityX, this.gravityY),
-        true
+        new Box2D.b2Vec2(this.gravityX, this.gravityY)
       );
       this.staticBody = this.world.CreateBody(new Box2D.b2BodyDef());
       this.contactListener = new Box2D.JSContactListener();
       this.contactListener.BeginContact = function (contactPtr) {
         // Get the contact
-        const contact = Box2D.wrapPointer(contactPtr, Box2D.b2Contact);
+        const contact = Box2D.wrapPointer(
+          contactPtr as number,
+          Box2D.b2Contact
+        );
 
         // There is no body, return
         if (
@@ -54,9 +67,9 @@ namespace gdjs {
 
         // Get associated behaviors
         const behaviorA = contact.GetFixtureA().GetBody()
-          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
+          .gdjsAssociatedBehavior;
         const behaviorB = contact.GetFixtureB().GetBody()
-          .gdjsAssociatedBehavior as Physics2RuntimeBehavior | null;
+          .gdjsAssociatedBehavior;
 
         if (!behaviorA || !behaviorB) {
           return;
@@ -67,7 +80,10 @@ namespace gdjs {
       };
       this.contactListener.EndContact = function (contactPtr) {
         // Get the contact
-        const contact = Box2D.wrapPointer(contactPtr, Box2D.b2Contact);
+        const contact = Box2D.wrapPointer(
+          contactPtr as number,
+          Box2D.b2Contact
+        );
 
         // There is no body, return
         if (
@@ -96,7 +112,10 @@ namespace gdjs {
     }
 
     // (string)jointId -> (b2Joint)b2Joint
-    static getSharedData(runtimeScene, behaviorName) {
+    static getSharedData(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorName: string
+    ): gdjs.Physics2SharedData {
       // Create one if needed
       if (!runtimeScene.physics2SharedData) {
         const initialData = runtimeScene.getInitialSharedDataForBehavior(
@@ -113,14 +132,16 @@ namespace gdjs {
     /**
      * Add a physics object to the list of existing object.
      */
-    addToBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior) {
+    addToBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior): void {
       this._registeredBehaviors.add(physicsBehavior);
     }
 
     /**
      * Remove a physics object to the list of existing object.
      */
-    removeFromBehaviorsList(physicsBehavior: gdjs.Physics2RuntimeBehavior) {
+    removeFromBehaviorsList(
+      physicsBehavior: gdjs.Physics2RuntimeBehavior
+    ): void {
       this._registeredBehaviors.delete(physicsBehavior);
     }
 
@@ -128,7 +149,7 @@ namespace gdjs {
      * Reset all contactsStartedThisFrame and contactsEndedThisFrame of all
      * registered physics behavior.
      */
-    resetStartedAndEndedCollisions() {
+    resetStartedAndEndedCollisions(): void {
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.contactsStartedThisFrame.length = 0;
         physicsBehavior.contactsEndedThisFrame.length = 0;
@@ -138,13 +159,13 @@ namespace gdjs {
     /**
      * Update all registered body.
      */
-    updateBodiesFromObjects() {
+    updateBodiesFromObjects(): void {
       for (const physicsBehavior of this._registeredBehaviors) {
         physicsBehavior.updateBodyFromObject();
       }
     }
 
-    step(deltaTime) {
+    step(deltaTime: float): void {
       this.frameTime += deltaTime;
       if (this.frameTime >= this.timeStep) {
         let numberOfSteps = Math.floor(this.frameTime / this.timeStep);
@@ -160,7 +181,7 @@ namespace gdjs {
       this.stepped = true;
     }
 
-    clearBodyJoints(body) {
+    clearBodyJoints(body: Box2D.b2Body): void {
       // Iterate through all the joints
       for (const jointId in this.joints) {
         if (this.joints.hasOwnProperty(jointId)) {
@@ -175,7 +196,7 @@ namespace gdjs {
       }
     }
 
-    addJoint(joint) {
+    addJoint(joint: Box2D.b2Joint): integer {
       // Add the joint to the list
       this.joints[this._nextJointId.toString(10)] = joint;
 
@@ -183,7 +204,7 @@ namespace gdjs {
       return this._nextJointId++;
     }
 
-    getJoint(jointId) {
+    getJoint(jointId: integer | string): Box2D.b2Joint | null {
       // Cast to string
       jointId = jointId.toString(10);
 
@@ -196,7 +217,7 @@ namespace gdjs {
       return null;
     }
 
-    getJointId(joint): integer {
+    getJointId(joint: Box2D.b2Joint): integer {
       // Search the joint in the list and return the ID
       for (const jointId in this.joints) {
         if (this.joints.hasOwnProperty(jointId)) {
@@ -210,7 +231,7 @@ namespace gdjs {
       return 0;
     }
 
-    removeJoint(jointId) {
+    removeJoint(jointId: integer | string) {
       // Cast to string
       jointId = jointId.toString(10);
 
@@ -227,12 +248,12 @@ namespace gdjs {
         ) {
           for (const jId in this.joints) {
             if (this.joints.hasOwnProperty(jId)) {
-              // Must check pointers becuase gears store non-casted joints (b2Joint)
+              // Must check pointers because gears store non-casted joints (b2Joint)
               if (
                 this.joints[jId].GetType() === Box2D.e_gearJoint &&
-                (Box2D.getPointer(this.joints[jId].GetJoint1()) ===
+                (Box2D.getPointer((this.joints[jId] as Box2D.b2GearJoint).GetJoint1()) ===
                   Box2D.getPointer(joint) ||
-                  Box2D.getPointer(this.joints[jId].GetJoint2()) ===
+                  Box2D.getPointer((this.joints[jId] as Box2D.b2GearJoint).GetJoint2()) ===
                     Box2D.getPointer(joint))
               ) {
                 // We could pass it a string, but lets do it right
@@ -261,25 +282,25 @@ namespace gdjs {
   });
 
   export class Physics2RuntimeBehavior extends gdjs.RuntimeBehavior {
-    bodyType: any;
-    bullet: any;
+    bodyType: string;
+    bullet: boolean;
     fixedRotation: boolean;
-    canSleep: any;
-    shape: any;
+    canSleep: boolean;
+    shape: string;
     shapeDimensionA: any;
     shapeDimensionB: any;
-    shapeOffsetX: any;
-    shapeOffsetY: any;
-    polygonOrigin: any;
-    polygon: any;
-    density: any;
-    friction: any;
-    restitution: any;
-    linearDamping: any;
-    angularDamping: any;
-    gravityScale: any;
-    layers: any;
-    masks: any;
+    shapeOffsetX: float;
+    shapeOffsetY: float;
+    polygonOrigin: string;
+    polygon: gdjs.Polygon | null;
+    density: float;
+    friction: float;
+    restitution: float;
+    linearDamping: float;
+    angularDamping: float;
+    gravityScale: float;
+    layers: integer;
+    masks: integer;
     shapeScale: number = 1;
 
     /**
@@ -306,8 +327,9 @@ namespace gdjs {
      */
     currentContacts: Array<Physics2RuntimeBehavior>;
     destroyedDuringFrameLogic: boolean;
-    _body: any = null;
-    _tempb2Vec2: any;
+    _body: Box2D.b2Body | null = null;
+    /** Avoid creating new vectors all the time */
+    _tempb2Vec2: Box2D.b2Vec2;
 
     /**
      * sharedData is a reference to the shared data of the scene, that registers
@@ -315,10 +337,9 @@ namespace gdjs {
      * before stepping the world.
      */
     _sharedData: Physics2SharedData;
-    // Avoid creating new vectors all the time
-    _tempb2Vec2Sec: any;
+    /** Sometimes two vectors are needed on the same function call */
+    _tempb2Vec2Sec: Box2D.b2Vec2;
 
-    // Sometimes two vectors are needed on the same function call
     _objectOldX: number = 0;
     _objectOldY: number = 0;
     _objectOldAngle: float = 0;
@@ -326,7 +347,11 @@ namespace gdjs {
     _objectOldHeight: float = 0;
     _verticesBuffer: integer = 0;
 
-    constructor(runtimeScene, behaviorData, owner) {
+    constructor(
+      runtimeScene: gdjs.RuntimeScene,
+      behaviorData,
+      owner: gdjs.RuntimeObject
+    ) {
       super(runtimeScene, behaviorData, owner);
       this.bodyType = behaviorData.bodyType;
       this.bullet = behaviorData.bullet;
@@ -365,13 +390,13 @@ namespace gdjs {
     }
 
     // Stores a Box2D pointer of created vertices
-    b2Vec2(x, y) {
+    b2Vec2(x: float, y: float): Box2D.b2Vec2 {
       this._tempb2Vec2.set_x(x);
       this._tempb2Vec2.set_y(y);
       return this._tempb2Vec2;
     }
 
-    b2Vec2Sec(x, y) {
+    b2Vec2Sec(x: float, y: float): Box2D.b2Vec2 {
       this._tempb2Vec2Sec.set_x(x);
       this._tempb2Vec2Sec.set_y(y);
       return this._tempb2Vec2Sec;
@@ -458,6 +483,7 @@ namespace gdjs {
         }
 
         // Delete the body
+        this._body.gdjsAssociatedBehavior = null;
         this._sharedData.world.DestroyBody(this._body);
         this._body = null;
       }
@@ -480,7 +506,7 @@ namespace gdjs {
       this.onDeActivate();
     }
 
-    static getPolygon(verticesData) {
+    static getPolygon(verticesData: Box2D.b2Vec2[]): gdjs.Polygon | null {
       if (!verticesData) {
         return null;
       }
@@ -496,7 +522,7 @@ namespace gdjs {
       return polygon;
     }
 
-    static isPolygonConvex(polygon) {
+    static isPolygonConvex(polygon: gdjs.Polygon): boolean {
       if (!polygon.isConvex()) {
         return false;
       }
@@ -526,7 +552,7 @@ namespace gdjs {
       return true;
     }
 
-    createShape() {
+    createShape(): Box2D.b2FixtureDef {
       // Get the scaled offset
       const offsetX = this.shapeOffsetX
         ? this.shapeOffsetX * this.shapeScale * this._sharedData.invScaleX
@@ -721,38 +747,39 @@ namespace gdjs {
       return fixDef;
     }
 
-    recreateShape() {
+    recreateShape(): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Destroy the old shape
-      this._body.DestroyFixture(this._body.GetFixtureList());
-      this._body.CreateFixture(this.createShape());
+      body.DestroyFixture(body.GetFixtureList());
+      body.CreateFixture(this.createShape());
 
       // Update cached size
       this._objectOldWidth = this.owner.getWidth();
       this._objectOldHeight = this.owner.getHeight();
     }
 
-    getShapeScale() {
+    getShapeScale(): float {
       return this.shapeScale;
     }
 
-    setShapeScale(shapeScale): void {
+    setShapeScale(shapeScale: float): void {
       if (shapeScale !== this.shapeScale && shapeScale > 0) {
         this.shapeScale = shapeScale;
         this.recreateShape();
       }
     }
 
-    getBody() {
+    getBody(): Box2D.b2Body {
       // If there is no body, set a new one
       if (this._body === null) {
         this.createBody();
       }
-      return this._body;
+      return this._body!;
     }
 
     createBody(): boolean {
@@ -797,7 +824,7 @@ namespace gdjs {
       return true;
     }
 
-    doStepPreEvents(runtimeScene) {
+    doStepPreEvents(runtimeScene: gdjs.RuntimeScene) {
       // Step the world if not done this frame yet
       if (!this._sharedData.stepped) {
         // Reset started and ended contacts array for all physics instances.
@@ -835,7 +862,7 @@ namespace gdjs {
       this._objectOldAngle = this.owner.getAngle();
     }
 
-    doStepPostEvents(runtimeScene) {
+    doStepPostEvents(runtimeScene: gdjs.RuntimeScene) {
       // Reset world step to update next frame
       this._sharedData.stepped = false;
     }
@@ -849,6 +876,7 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // The object size has changed, recreate the shape.
       // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
@@ -877,8 +905,8 @@ namespace gdjs {
           (this.owner.getDrawableY() + this.owner.getHeight() / 2) *
             this._sharedData.invScaleY
         );
-        this._body.SetTransform(pos, gdjs.toRad(this.owner.getAngle()));
-        this._body.SetAwake(true);
+        body.SetTransform(pos, gdjs.toRad(this.owner.getAngle()));
+        body.SetAwake(true);
       }
     }
 
@@ -890,7 +918,7 @@ namespace gdjs {
       return this._sharedData.gravityY;
     }
 
-    setGravity(x, y): void {
+    setGravity(x: float, y: float): void {
       // Check if there is no modification
       if (this._sharedData.gravityX === x && this._sharedData.gravityY === y) {
         return;
@@ -909,7 +937,7 @@ namespace gdjs {
       return this._sharedData.timeScale;
     }
 
-    setTimeScale(timeScale): void {
+    setTimeScale(timeScale: float): void {
       // Invalid value
       if (timeScale < 0) {
         return;
@@ -946,10 +974,11 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update body type
-      this._body.SetType(Box2D.b2_dynamicBody);
-      this._body.SetAwake(true);
+      body.SetType(Box2D.b2_dynamicBody);
+      body.SetAwake(true);
     }
 
     isStatic(): boolean {
@@ -969,10 +998,11 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update body type
-      this._body.SetType(Box2D.b2_staticBody);
-      this._body.SetAwake(true);
+      body.SetType(Box2D.b2_staticBody);
+      body.SetAwake(true);
     }
 
     isKinematic(): boolean {
@@ -992,17 +1022,18 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update body type
-      this._body.SetType(Box2D.b2_kinematicBody);
-      this._body.SetAwake(true);
+      body.SetType(Box2D.b2_kinematicBody);
+      body.SetAwake(true);
     }
 
     isBullet(): boolean {
       return this.bullet;
     }
 
-    setBullet(enable): void {
+    setBullet(enable: boolean): void {
       // Check if there is no modification
       if (this.bullet === enable) {
         return;
@@ -1015,33 +1046,36 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update body bullet flag
-      this._body.SetBullet(this.bullet);
+      body.SetBullet(this.bullet);
     }
 
     hasFixedRotation(): boolean {
       return this.fixedRotation;
     }
 
-    setFixedRotation(enable): void {
+    setFixedRotation(enable: boolean): void {
       this.fixedRotation = enable;
       if (this._body === null) {
         if (!this.createBody()) return;
       }
-      this._body.SetFixedRotation(this.fixedRotation);
+      const body = this._body!;
+      body.SetFixedRotation(this.fixedRotation);
     }
 
     isSleepingAllowed(): boolean {
       return this.canSleep;
     }
 
-    setSleepingAllowed(enable): void {
+    setSleepingAllowed(enable: boolean): void {
       this.canSleep = enable;
       if (this._body === null) {
         if (!this.createBody()) return;
       }
-      this._body.SetSleepingAllowed(this.canSleep);
+      const body = this._body!;
+      body.SetSleepingAllowed(this.canSleep);
     }
 
     isSleeping(): boolean {
@@ -1049,16 +1083,17 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return true;
       }
+      const body = this._body!;
 
       // Get the body sleeping state
-      return !this._body.IsAwake();
+      return !body.IsAwake();
     }
 
     getDensity() {
       return this.density;
     }
 
-    setDensity(density): void {
+    setDensity(density: float): void {
       // Non-negative values only
       if (density < 0) {
         density = 0;
@@ -1076,13 +1111,14 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body density
-      this._body.GetFixtureList().SetDensity(this.density);
-      this._body.ResetMassData();
+      body.GetFixtureList().SetDensity(this.density);
+      body.ResetMassData();
     }
 
-    getFriction() {
+    getFriction(): float {
       return this.friction;
     }
 
@@ -1104,23 +1140,24 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body friction
-      this._body.GetFixtureList().SetFriction(this.friction);
+      body.GetFixtureList().SetFriction(this.friction);
 
       // Update contacts
-      let contact = this._body.GetContactList();
+      let contact = body.GetContactList();
       while (Box2D.getPointer(contact)) {
         contact.get_contact().ResetFriction();
         contact = contact.get_next();
       }
     }
 
-    getRestitution() {
+    getRestitution(): float {
       return this.restitution;
     }
 
-    setRestitution(restitution): void {
+    setRestitution(restitution: float): void {
       // Non-negative values only
       if (restitution < 0) {
         restitution = 0;
@@ -1138,23 +1175,24 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body restitution
-      this._body.GetFixtureList().SetRestitution(this.restitution);
+      body.GetFixtureList().SetRestitution(this.restitution);
 
       // Update contacts
-      let contact = this._body.GetContactList();
+      let contact = body.GetContactList();
       while (Box2D.getPointer(contact)) {
         contact.get_contact().ResetRestitution();
         contact = contact.get_next();
       }
     }
 
-    getLinearDamping() {
+    getLinearDamping(): float {
       return this.linearDamping;
     }
 
-    setLinearDamping(linearDamping): void {
+    setLinearDamping(linearDamping: float): void {
       // Check if there is no modification
       if (this.linearDamping === linearDamping) {
         return;
@@ -1167,16 +1205,17 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body linear damping
-      this._body.SetLinearDamping(this.linearDamping);
+      body.SetLinearDamping(this.linearDamping);
     }
 
-    getAngularDamping() {
+    getAngularDamping(): float {
       return this.angularDamping;
     }
 
-    setAngularDamping(angularDamping): void {
+    setAngularDamping(angularDamping: float): void {
       // Check if there is no modification
       if (this.angularDamping === angularDamping) {
         return;
@@ -1189,16 +1228,17 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body angular damping
-      this._body.SetAngularDamping(this.angularDamping);
+      body.SetAngularDamping(this.angularDamping);
     }
 
-    getGravityScale() {
+    getGravityScale(): float {
       return this.gravityScale;
     }
 
-    setGravityScale(gravityScale): void {
+    setGravityScale(gravityScale: float): void {
       // Check if there is no modification
       if (this.gravityScale === gravityScale) {
         return;
@@ -1211,12 +1251,13 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body gravity scale
-      this._body.SetGravityScale(this.gravityScale);
+      body.SetGravityScale(this.gravityScale);
     }
 
-    layerEnabled(layer) {
+    layerEnabled(layer: integer) {
       // Layer must be an integer
       layer = Math.floor(layer);
 
@@ -1227,7 +1268,7 @@ namespace gdjs {
       return !!(this.layers & (1 << (layer - 1)));
     }
 
-    enableLayer(layer, enable): void {
+    enableLayer(layer: integer, enable: boolean): void {
       // Layer must be an integer
       layer = Math.floor(layer);
 
@@ -1247,14 +1288,15 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body layers
-      const filter = this._body.GetFixtureList().GetFilterData();
+      const filter = body.GetFixtureList().GetFilterData();
       filter.set_categoryBits(this.layers);
-      this._body.GetFixtureList().SetFilterData(filter);
+      body.GetFixtureList().SetFilterData(filter);
     }
 
-    maskEnabled(mask) {
+    maskEnabled(mask: integer): boolean {
       // Mask must be an integer
       mask = Math.floor(mask);
 
@@ -1265,7 +1307,7 @@ namespace gdjs {
       return !!(this.masks & (1 << (mask - 1)));
     }
 
-    enableMask(mask, enable): void {
+    enableMask(mask: integer, enable: boolean): void {
       // Mask must be an integer
       mask = Math.floor(mask);
 
@@ -1285,11 +1327,12 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Update the body masks
-      const filter = this._body.GetFixtureList().GetFilterData();
+      const filter = body.GetFixtureList().GetFilterData();
       filter.set_maskBits(this.masks);
-      this._body.GetFixtureList().SetFilterData(filter);
+      body.GetFixtureList().SetFilterData(filter);
     }
 
     getLinearVelocityX(): float {
@@ -1297,22 +1340,24 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Get the linear velocity on X
-      return this._body.GetLinearVelocity().get_x() * this._sharedData.scaleX;
+      return body.GetLinearVelocity().get_x() * this._sharedData.scaleX;
     }
 
-    setLinearVelocityX(linearVelocityX): void {
+    setLinearVelocityX(linearVelocityX: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Set the linear velocity on X
-      this._body.SetLinearVelocity(
+      body.SetLinearVelocity(
         this.b2Vec2(
           linearVelocityX * this._sharedData.invScaleX,
-          this._body.GetLinearVelocity().get_y()
+          body.GetLinearVelocity().get_y()
         )
       );
     }
@@ -1322,21 +1367,23 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Get the linear velocity on Y
-      return this._body.GetLinearVelocity().get_y() * this._sharedData.scaleY;
+      return body.GetLinearVelocity().get_y() * this._sharedData.scaleY;
     }
 
-    setLinearVelocityY(linearVelocityY): void {
+    setLinearVelocityY(linearVelocityY: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Set the linear velocity on Y
-      this._body.SetLinearVelocity(
+      body.SetLinearVelocity(
         this.b2Vec2(
-          this._body.GetLinearVelocity().get_x(),
+          body.GetLinearVelocity().get_x(),
           linearVelocityY * this._sharedData.invScaleY
         )
       );
@@ -1347,11 +1394,12 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Get the linear velocity length
       return this.b2Vec2(
-        this._body.GetLinearVelocity().get_x() * this._sharedData.scaleX,
-        this._body.GetLinearVelocity().get_y() * this._sharedData.scaleY
+        body.GetLinearVelocity().get_x() * this._sharedData.scaleX,
+        body.GetLinearVelocity().get_y() * this._sharedData.scaleY
       ).Length();
     }
 
@@ -1360,169 +1408,231 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Get the angular velocity
-      return gdjs.toDegrees(this._body.GetAngularVelocity());
+      return gdjs.toDegrees(body.GetAngularVelocity());
     }
 
-    setAngularVelocity(angularVelocity): void {
+    setAngularVelocity(angularVelocity: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Set the angular velocity
-      this._body.SetAngularVelocity(gdjs.toRad(angularVelocity));
+      body.SetAngularVelocity(gdjs.toRad(angularVelocity));
     }
 
-    applyForce(forceX, forceY, positionX, positionY) {
+    applyForce(
+      forceX: float,
+      forceY: float,
+      positionX: float,
+      positionY: float
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the force
-      this._body.ApplyForce(
+      body.ApplyForce(
         this.b2Vec2(forceX, forceY),
         this.b2Vec2Sec(
           positionX * this._sharedData.invScaleX,
           positionY * this._sharedData.invScaleY
-        )
+        ),
+        // TODO Should let Box2d awake the object itself.
+        false
       );
     }
 
-    applyPolarForce(angle, length, positionX, positionY) {
+    applyPolarForce(
+      angle: float,
+      length: float,
+      positionX: float,
+      positionY: float
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the force
       angle = gdjs.toRad(angle);
-      this._body.ApplyForce(
+      body.ApplyForce(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
           positionX * this._sharedData.invScaleX,
           positionY * this._sharedData.invScaleY
-        )
+        ),
+        // TODO Should let Box2d awake the object itself.
+        false
       );
     }
 
-    applyForceTowardPosition(length, towardX, towardY, positionX, positionY) {
+    applyForceTowardPosition(
+      length: float,
+      towardX: float,
+      towardY: float,
+      positionX: float,
+      positionY: float
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the force
       const angle = Math.atan2(
-        towardY * this._sharedData.invScaleY - this._body.GetPosition().get_y(),
-        towardX * this._sharedData.invScaleX - this._body.GetPosition().get_x()
+        towardY * this._sharedData.invScaleY - body.GetPosition().get_y(),
+        towardX * this._sharedData.invScaleX - body.GetPosition().get_x()
       );
-      this._body.ApplyForce(
+      body.ApplyForce(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
           positionX * this._sharedData.invScaleX,
           positionY * this._sharedData.invScaleY
-        )
+        ),
+        // TODO Should let Box2d awake the object itself.
+        false
       );
     }
 
-    applyImpulse(impulseX, impulseY, positionX, positionY) {
+    applyImpulse(
+      impulseX: float,
+      impulseY: float,
+      positionX: float,
+      positionY: float
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the impulse
-      this._body.ApplyLinearImpulse(
+      body.ApplyLinearImpulse(
         this.b2Vec2(impulseX, impulseY),
         this.b2Vec2Sec(
           positionX * this._sharedData.invScaleX,
           positionY * this._sharedData.invScaleY
-        )
+        ),
+        // TODO Should let Box2d awake the object itself.
+        false
       );
     }
 
-    applyPolarImpulse(angle, length, positionX, positionY) {
+    applyPolarImpulse(
+      angle: float,
+      length: float,
+      positionX: float,
+      positionY: float
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the impulse
       angle = gdjs.toRad(angle);
-      this._body.ApplyLinearImpulse(
+      body.ApplyLinearImpulse(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
           positionX * this._sharedData.invScaleX,
           positionY * this._sharedData.invScaleY
-        )
+        ),
+        // TODO Should let Box2d awake the object itself.
+        false
       );
     }
 
-    applyImpulseTowardPosition(length, towardX, towardY, positionX, positionY) {
+    applyImpulseTowardPosition(
+      length: float,
+      towardX: float,
+      towardY: float,
+      positionX: float,
+      positionY: float
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the impulse
       const angle = Math.atan2(
-        towardY * this._sharedData.invScaleY - this._body.GetPosition().get_y(),
-        towardX * this._sharedData.invScaleX - this._body.GetPosition().get_x()
+        towardY * this._sharedData.invScaleY - body.GetPosition().get_y(),
+        towardX * this._sharedData.invScaleX - body.GetPosition().get_x()
       );
-      this._body.ApplyLinearImpulse(
+      body.ApplyLinearImpulse(
         this.b2Vec2(length * Math.cos(angle), length * Math.sin(angle)),
         this.b2Vec2Sec(
           positionX * this._sharedData.invScaleX,
           positionY * this._sharedData.invScaleY
-        )
+        ),
+        // TODO Should let Box2d awake the object itself.
+        false
       );
     }
 
-    applyTorque(torque) {
+    applyTorque(torque: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the torque
-      this._body.ApplyTorque(torque);
+      body.ApplyTorque(
+        torque,
+        // TODO Should let Box2d awake the object itself.
+        false
+      );
     }
 
-    applyAngularImpulse(angularImpulse) {
+    applyAngularImpulse(angularImpulse: float): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
       // Apply the angular impulse
-      this._body.ApplyAngularImpulse(angularImpulse);
+      body.ApplyAngularImpulse(
+        angularImpulse,
+        // TODO Should let Box2d awake the object itself.
+        false
+      );
     }
 
     getMass(): float {
@@ -1530,11 +1640,12 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
-      return this._body.GetMass();
+      return body.GetMass();
     }
 
     getInertia(): float {
@@ -1542,11 +1653,12 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Wake up the object
-      this._body.SetAwake(true);
+      body.SetAwake(true);
 
-      return this._body.GetInertia();
+      return body.GetInertia();
     }
 
     getMassCenterX(): float {
@@ -1554,9 +1666,10 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Get the mass center on X
-      return this._body.GetWorldCenter().get_x() * this._sharedData.scaleX;
+      return body.GetWorldCenter().get_x() * this._sharedData.scaleX;
     }
 
     getMassCenterY(): float {
@@ -1564,13 +1677,14 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return 0;
       }
+      const body = this._body!;
 
       // Get the mass center on Y
-      return this._body.GetWorldCenter().get_y() * this._sharedData.scaleY;
+      return body.GetWorldCenter().get_y() * this._sharedData.scaleY;
     }
 
     // Joints
-    isJointFirstObject(jointId): boolean {
+    isJointFirstObject(jointId: integer | string): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return false;
@@ -1588,7 +1702,7 @@ namespace gdjs {
       return joint.GetBodyA() === this._body;
     }
 
-    isJointSecondObject(jointId): boolean {
+    isJointSecondObject(jointId: integer | string): boolean {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return false;
@@ -1606,7 +1720,7 @@ namespace gdjs {
       return joint.GetBodyB() === this._body;
     }
 
-    getJointFirstAnchorX(jointId): float {
+    getJointFirstAnchorX(jointId: integer | string): float {
       // Get the joint
       const joint = this._sharedData.getJoint(jointId);
 
@@ -1616,10 +1730,11 @@ namespace gdjs {
       }
 
       // Get the joint anchor
+      // @ts-ignore GetLocalAnchorA is implemented by any joint but is not in the interface.
       return joint.GetBodyA().GetWorldPoint(joint.GetLocalAnchorA()).get_x();
     }
 
-    getJointFirstAnchorY(jointId): float {
+    getJointFirstAnchorY(jointId: integer | string): float {
       // Get the joint
       const joint = this._sharedData.getJoint(jointId);
 
@@ -1629,10 +1744,11 @@ namespace gdjs {
       }
 
       // Get the joint anchor
+      // @ts-ignore GetLocalAnchorA is implemented by any joint but is not in the interface.
       return joint.GetBodyA().GetWorldPoint(joint.GetLocalAnchorA()).get_y();
     }
 
-    getJointSecondAnchorX(jointId): float {
+    getJointSecondAnchorX(jointId: integer | string): float {
       // Get the joint
       const joint = this._sharedData.getJoint(jointId);
 
@@ -1642,10 +1758,11 @@ namespace gdjs {
       }
 
       // Get the joint anchor
+      // @ts-ignore GetLocalAnchorA is implemented by any joint but is not in the interface.
       return joint.GetBodyB().GetWorldPoint(joint.GetLocalAnchorB()).get_x();
     }
 
-    getJointSecondAnchorY(jointId): float {
+    getJointSecondAnchorY(jointId: integer | string): float {
       // Get the joint
       const joint = this._sharedData.getJoint(jointId);
 
@@ -1655,10 +1772,11 @@ namespace gdjs {
       }
 
       // Get the joint anchor
+      // @ts-ignore GetLocalAnchorA is implemented by any joint but is not in the interface.
       return joint.GetBodyB().GetWorldPoint(joint.GetLocalAnchorB()).get_y();
     }
 
-    getJointReactionForce(jointId) {
+    getJointReactionForce(jointId: integer | string): float {
       // Get the joint
       const joint = this._sharedData.getJoint(jointId);
 
@@ -1671,7 +1789,7 @@ namespace gdjs {
       return joint.GetReactionForce(1 / this._sharedData.timeStep).Length();
     }
 
-    getJointReactionTorque(jointId) {
+    getJointReactionTorque(jointId: integer | string): float {
       // Get the joint
       const joint = this._sharedData.getJoint(jointId);
 
@@ -1684,28 +1802,29 @@ namespace gdjs {
       return joint.GetReactionTorque(1 / this._sharedData.timeStep);
     }
 
-    removeJoint(jointId) {
+    removeJoint(jointId: integer | string): void {
       // Just let the sharedData to manage and delete the joint
       this._sharedData.removeJoint(jointId);
     }
 
     // Distance joint
     addDistanceJoint(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      length,
-      frequency,
-      dampingRatio,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      length: float,
+      frequency: float,
+      dampingRatio: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // If there is no second object or it doesn't share the behavior, return
       if (other == null || !other.hasBehavior(this.name)) {
@@ -1713,7 +1832,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -1722,9 +1843,9 @@ namespace gdjs {
 
       // Set joint settings
       const jointDef = new Box2D.b2DistanceJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -1764,9 +1885,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getDistanceJointLength(jointId) {
+    getDistanceJointLength(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2DistanceJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_distanceJoint) {
@@ -1777,14 +1898,14 @@ namespace gdjs {
       return joint.GetLength() * this._sharedData.scaleX;
     }
 
-    setDistanceJointLength(jointId, length): void {
+    setDistanceJointLength(jointId: integer | string, length: float): void {
       // Invalid value
       if (length <= 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2DistanceJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_distanceJoint) {
@@ -1799,9 +1920,9 @@ namespace gdjs {
       joint.GetBodyB().SetAwake(true);
     }
 
-    getDistanceJointFrequency(jointId) {
+    getDistanceJointFrequency(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2DistanceJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_distanceJoint) {
@@ -1812,14 +1933,17 @@ namespace gdjs {
       return joint.GetFrequency();
     }
 
-    setDistanceJointFrequency(jointId, frequency): void {
+    setDistanceJointFrequency(
+      jointId: integer | string,
+      frequency: float
+    ): void {
       // Invalid value
       if (frequency < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2DistanceJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_distanceJoint) {
@@ -1830,9 +1954,9 @@ namespace gdjs {
       joint.SetFrequency(frequency);
     }
 
-    getDistanceJointDampingRatio(jointId) {
+    getDistanceJointDampingRatio(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2DistanceJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_distanceJoint) {
@@ -1843,14 +1967,17 @@ namespace gdjs {
       return joint.GetDampingRatio();
     }
 
-    setDistanceJointDampingRatio(jointId, dampingRatio): void {
+    setDistanceJointDampingRatio(
+      jointId: integer | string,
+      dampingRatio: float
+    ): void {
       // Invalid value
       if (dampingRatio < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2DistanceJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_distanceJoint) {
@@ -1862,21 +1989,22 @@ namespace gdjs {
 
     // Revolute joint
     addRevoluteJoint(
-      x,
-      y,
-      enableLimit,
-      referenceAngle,
-      lowerAngle,
-      upperAngle,
-      enableMotor,
-      motorSpeed,
-      maxMotorTorque,
-      variable
-    ) {
+      x: float,
+      y: float,
+      enableLimit: boolean,
+      referenceAngle: float,
+      lowerAngle: float,
+      upperAngle: float,
+      enableMotor: boolean,
+      motorSpeed: float,
+      maxMotorTorque: float,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Set joint settings
       const jointDef = new Box2D.b2RevoluteJointDef();
@@ -1889,9 +2017,9 @@ namespace gdjs {
           )
         )
       );
-      jointDef.set_bodyB(this._body);
+      jointDef.set_bodyB(body);
       jointDef.set_localAnchorB(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x * this._sharedData.invScaleX,
             y * this._sharedData.invScaleY
@@ -1927,21 +2055,21 @@ namespace gdjs {
     }
 
     addRevoluteJointBetweenTwoBodies(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      enableLimit,
-      referenceAngle,
-      lowerAngle,
-      upperAngle,
-      enableMotor,
-      motorSpeed,
-      maxMotorTorque,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      enableLimit: boolean,
+      referenceAngle: float,
+      lowerAngle: float,
+      upperAngle: float,
+      enableMotor: boolean,
+      motorSpeed: float,
+      maxMotorTorque: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
@@ -1953,18 +2081,21 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
         return;
       }
+      const body = this._body!;
 
       // Set joint settings
       const jointDef = new Box2D.b2RevoluteJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -2008,9 +2139,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getRevoluteJointReferenceAngle(jointId): float {
+    getRevoluteJointReferenceAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2021,9 +2152,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetReferenceAngle());
     }
 
-    getRevoluteJointAngle(jointId): float {
+    getRevoluteJointAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2034,9 +2165,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetJointAngle());
     }
 
-    getRevoluteJointSpeed(jointId) {
+    getRevoluteJointSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2047,9 +2178,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetJointSpeed());
     }
 
-    isRevoluteJointLimitsEnabled(jointId): boolean {
+    isRevoluteJointLimitsEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2060,9 +2191,12 @@ namespace gdjs {
       return joint.IsLimitEnabled();
     }
 
-    enableRevoluteJointLimits(jointId, enable): void {
+    enableRevoluteJointLimits(
+      jointId: integer | string,
+      enable: boolean
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2073,9 +2207,9 @@ namespace gdjs {
       joint.EnableLimit(enable);
     }
 
-    getRevoluteJointMinAngle(jointId): float {
+    getRevoluteJointMinAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2086,9 +2220,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetLowerLimit());
     }
 
-    getRevoluteJointMaxAngle(jointId): float {
+    getRevoluteJointMaxAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2099,9 +2233,13 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetUpperLimit());
     }
 
-    setRevoluteJointLimits(jointId, lowerAngle, upperAngle): void {
+    setRevoluteJointLimits(
+      jointId: integer | string,
+      lowerAngle: float,
+      upperAngle: float
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2119,9 +2257,9 @@ namespace gdjs {
       joint.SetLimits(gdjs.toRad(lowerAngle), gdjs.toRad(upperAngle));
     }
 
-    isRevoluteJointMotorEnabled(jointId): boolean {
+    isRevoluteJointMotorEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2132,9 +2270,9 @@ namespace gdjs {
       return joint.IsMotorEnabled();
     }
 
-    enableRevoluteJointMotor(jointId, enable): void {
+    enableRevoluteJointMotor(jointId: integer | string, enable): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2145,9 +2283,9 @@ namespace gdjs {
       joint.EnableMotor(enable);
     }
 
-    getRevoluteJointMotorSpeed(jointId) {
+    getRevoluteJointMotorSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2158,9 +2296,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetMotorSpeed());
     }
 
-    setRevoluteJointMotorSpeed(jointId, speed): void {
+    setRevoluteJointMotorSpeed(jointId: integer | string, speed): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2171,9 +2309,9 @@ namespace gdjs {
       joint.SetMotorSpeed(gdjs.toRad(speed));
     }
 
-    getRevoluteJointMaxMotorTorque(jointId) {
+    getRevoluteJointMaxMotorTorque(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2184,14 +2322,14 @@ namespace gdjs {
       return joint.GetMaxMotorTorque();
     }
 
-    setRevoluteJointMaxMotorTorque(jointId, maxTorque): void {
+    setRevoluteJointMaxMotorTorque(jointId: integer | string, maxTorque): void {
       // Invalid value
       if (maxTorque < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2202,9 +2340,9 @@ namespace gdjs {
       joint.SetMaxMotorTorque(maxTorque);
     }
 
-    getRevoluteJointMotorTorque(jointId) {
+    getRevoluteJointMotorTorque(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RevoluteJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_revoluteJoint) {
@@ -2217,22 +2355,22 @@ namespace gdjs {
 
     // Prismatic joint
     addPrismaticJoint(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      axisAngle,
-      referenceAngle,
-      enableLimit,
-      lowerTranslation,
-      upperTranslation,
-      enableMotor,
-      motorSpeed,
-      maxMotorForce,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      axisAngle: float,
+      referenceAngle: float,
+      enableLimit: boolean,
+      lowerTranslation: float,
+      upperTranslation: float,
+      enableMotor: boolean,
+      motorSpeed: float,
+      maxMotorForce: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
@@ -2244,18 +2382,21 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
         return;
       }
+      const body = this._body!;
 
       // Set joint settings
       const jointDef = new Box2D.b2PrismaticJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -2271,7 +2412,7 @@ namespace gdjs {
           )
         )
       );
-      axisAngle = gdjs.toRad(axisAngle) - this._body.GetAngle();
+      axisAngle = gdjs.toRad(axisAngle) - body.GetAngle();
       jointDef.set_localAxisA(
         this.b2Vec2(Math.cos(axisAngle), Math.sin(axisAngle))
       );
@@ -2309,9 +2450,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getPrismaticJointAxisAngle(jointId): float {
+    getPrismaticJointAxisAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2327,9 +2468,9 @@ namespace gdjs {
       );
     }
 
-    getPrismaticJointReferenceAngle(jointId): float {
+    getPrismaticJointReferenceAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2340,9 +2481,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetReferenceAngle());
     }
 
-    getPrismaticJointTranslation(jointId) {
+    getPrismaticJointTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2353,9 +2494,9 @@ namespace gdjs {
       return joint.GetJointTranslation() * this._sharedData.scaleX;
     }
 
-    getPrismaticJointSpeed(jointId) {
+    getPrismaticJointSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2366,9 +2507,9 @@ namespace gdjs {
       return joint.GetJointSpeed() * this._sharedData.scaleX;
     }
 
-    isPrismaticJointLimitsEnabled(jointId): boolean {
+    isPrismaticJointLimitsEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2379,9 +2520,12 @@ namespace gdjs {
       return joint.IsLimitEnabled();
     }
 
-    enablePrismaticJointLimits(jointId, enable): void {
+    enablePrismaticJointLimits(
+      jointId: integer | string,
+      enable: boolean
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2392,9 +2536,9 @@ namespace gdjs {
       joint.EnableLimit(enable);
     }
 
-    getPrismaticJointMinTranslation(jointId) {
+    getPrismaticJointMinTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2405,9 +2549,9 @@ namespace gdjs {
       return joint.GetLowerLimit() * this._sharedData.scaleX;
     }
 
-    getPrismaticJointMaxTranslation(jointId) {
+    getPrismaticJointMaxTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2418,9 +2562,13 @@ namespace gdjs {
       return joint.GetUpperLimit() * this._sharedData.scaleX;
     }
 
-    setPrismaticJointLimits(jointId, lowerTranslation, upperTranslation): void {
+    setPrismaticJointLimits(
+      jointId: integer | string,
+      lowerTranslation: float,
+      upperTranslation: float
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2445,9 +2593,9 @@ namespace gdjs {
       );
     }
 
-    isPrismaticJointMotorEnabled(jointId): boolean {
+    isPrismaticJointMotorEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2458,9 +2606,12 @@ namespace gdjs {
       return joint.IsMotorEnabled();
     }
 
-    enablePrismaticJointMotor(jointId, enable): void {
+    enablePrismaticJointMotor(
+      jointId: integer | string,
+      enable: boolean
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2471,9 +2622,9 @@ namespace gdjs {
       joint.EnableMotor(enable);
     }
 
-    getPrismaticJointMotorSpeed(jointId) {
+    getPrismaticJointMotorSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2484,9 +2635,9 @@ namespace gdjs {
       return joint.GetMotorSpeed() * this._sharedData.scaleX;
     }
 
-    setPrismaticJointMotorSpeed(jointId, speed): void {
+    setPrismaticJointMotorSpeed(jointId: integer | string, speed): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2497,9 +2648,9 @@ namespace gdjs {
       joint.SetMotorSpeed(speed * this._sharedData.invScaleX);
     }
 
-    getPrismaticJointMaxMotorForce(jointId) {
+    getPrismaticJointMaxMotorForce(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2510,14 +2661,14 @@ namespace gdjs {
       return joint.GetMaxMotorForce();
     }
 
-    setPrismaticJointMaxMotorForce(jointId, maxForce): void {
+    setPrismaticJointMaxMotorForce(jointId: integer | string, maxForce): void {
       // Invalid value
       if (maxForce < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2528,9 +2679,9 @@ namespace gdjs {
       joint.SetMaxMotorForce(maxForce);
     }
 
-    getPrismaticJointMotorForce(jointId) {
+    getPrismaticJointMotorForce(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PrismaticJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_prismaticJoint) {
@@ -2543,25 +2694,26 @@ namespace gdjs {
 
     // Pulley joint
     addPulleyJoint(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      groundX1,
-      groundY1,
-      groundX2,
-      groundY2,
-      lengthA,
-      lengthB,
-      ratio,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      groundX1: float,
+      groundY1: float,
+      groundX2: float,
+      groundY2: float,
+      lengthA: float,
+      lengthB: float,
+      ratio: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // If there is no second object or it doesn't share the behavior, return
       if (other == null || !other.hasBehavior(this.name)) {
@@ -2569,7 +2721,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -2578,9 +2732,9 @@ namespace gdjs {
 
       // Set joint settings
       const jointDef = new Box2D.b2PulleyJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -2639,9 +2793,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getPulleyJointFirstGroundAnchorX(jointId): float {
+    getPulleyJointFirstGroundAnchorX(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2652,9 +2806,9 @@ namespace gdjs {
       return joint.GetGroundAnchorA().get_x() * this._sharedData.scaleX;
     }
 
-    getPulleyJointFirstGroundAnchorY(jointId): float {
+    getPulleyJointFirstGroundAnchorY(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2665,9 +2819,9 @@ namespace gdjs {
       return joint.GetGroundAnchorA().get_y() * this._sharedData.scaleY;
     }
 
-    getPulleyJointSecondGroundAnchorX(jointId): float {
+    getPulleyJointSecondGroundAnchorX(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2678,9 +2832,9 @@ namespace gdjs {
       return joint.GetGroundAnchorB().get_x() * this._sharedData.scaleX;
     }
 
-    getPulleyJointSecondGroundAnchorY(jointId): float {
+    getPulleyJointSecondGroundAnchorY(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2691,9 +2845,9 @@ namespace gdjs {
       return joint.GetGroundAnchorB().get_y() * this._sharedData.scaleY;
     }
 
-    getPulleyJointFirstLength(jointId) {
+    getPulleyJointFirstLength(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2704,9 +2858,9 @@ namespace gdjs {
       return joint.GetCurrentLengthA() * this._sharedData.scaleX;
     }
 
-    getPulleyJointSecondLength(jointId) {
+    getPulleyJointSecondLength(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2717,9 +2871,9 @@ namespace gdjs {
       return joint.GetCurrentLengthB() * this._sharedData.scaleX;
     }
 
-    getPulleyJointRatio(jointId) {
+    getPulleyJointRatio(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2PulleyJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_pulleyJoint) {
@@ -2736,6 +2890,7 @@ namespace gdjs {
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Get the first joint
       const joint1 = this._sharedData.getJoint(jointId1);
@@ -2770,7 +2925,7 @@ namespace gdjs {
       // Set gear joint bodies is not necessary at first, as the gear get the bodies from the two child joints
       // But we must pass two different bodies to bypass a test inherited from b2Joint
       jointDef.set_bodyA(this._sharedData.staticBody);
-      jointDef.set_bodyB(this._body);
+      jointDef.set_bodyB(body);
       jointDef.set_joint1(joint1);
       jointDef.set_joint2(joint2);
       jointDef.set_ratio(ratio);
@@ -2788,9 +2943,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getGearJointFirstJoint(jointId) {
+    getGearJointFirstJoint(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2GearJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_gearJoint) {
@@ -2801,9 +2956,9 @@ namespace gdjs {
       return this._sharedData.getJointId(joint.GetJoint1());
     }
 
-    getGearJointSecondJoint(jointId) {
+    getGearJointSecondJoint(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2GearJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_gearJoint) {
@@ -2814,9 +2969,9 @@ namespace gdjs {
       return this._sharedData.getJointId(joint.GetJoint2());
     }
 
-    getGearJointRatio(jointId) {
+    getGearJointRatio(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2GearJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_gearJoint) {
@@ -2827,9 +2982,9 @@ namespace gdjs {
       return joint.GetRatio();
     }
 
-    setGearJointRatio(jointId, ratio): void {
+    setGearJointRatio(jointId: integer | string, ratio: float): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2GearJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_gearJoint) {
@@ -2846,22 +3001,23 @@ namespace gdjs {
 
     // Mouse joint
     addMouseJoint(
-      targetX,
-      targetY,
-      maxForce,
-      frequency,
-      dampingRatio,
-      variable
-    ) {
+      targetX: float,
+      targetY: float,
+      maxForce: float,
+      frequency: float,
+      dampingRatio: float,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // Set joint settings
       const jointDef = new Box2D.b2MouseJointDef();
       jointDef.set_bodyA(this._sharedData.staticBody);
-      jointDef.set_bodyB(this._body);
+      jointDef.set_bodyB(body);
       jointDef.set_target(
         this.b2Vec2(
           targetX * this._sharedData.invScaleX,
@@ -2884,8 +3040,8 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getMouseJointTargetX(jointId): float {
-      const joint = this._sharedData.getJoint(jointId);
+    getMouseJointTargetX(jointId: integer | string): float {
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2896,8 +3052,8 @@ namespace gdjs {
       return joint.GetTarget().get_x() * this._sharedData.scaleX;
     }
 
-    getMouseJointTargetY(jointId): float {
-      const joint = this._sharedData.getJoint(jointId);
+    getMouseJointTargetY(jointId: integer | string): float {
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2908,8 +3064,12 @@ namespace gdjs {
       return joint.GetTarget().get_y() * this._sharedData.scaleY;
     }
 
-    setMouseJointTarget(jointId, targetX, targetY): void {
-      const joint = this._sharedData.getJoint(jointId);
+    setMouseJointTarget(
+      jointId: integer | string,
+      targetX: float,
+      targetY: float
+    ): void {
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2928,8 +3088,8 @@ namespace gdjs {
       joint.GetBodyB().SetAwake(true);
     }
 
-    getMouseJointMaxForce(jointId) {
-      const joint = this._sharedData.getJoint(jointId);
+    getMouseJointMaxForce(jointId: integer | string): float {
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2940,12 +3100,12 @@ namespace gdjs {
       return joint.GetMaxForce();
     }
 
-    setMouseJointMaxForce(jointId, maxForce): void {
+    setMouseJointMaxForce(jointId: integer | string, maxForce: float): void {
       // Invalid value
       if (maxForce < 0) {
         return;
       }
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2956,8 +3116,8 @@ namespace gdjs {
       joint.SetMaxForce(maxForce);
     }
 
-    getMouseJointFrequency(jointId) {
-      const joint = this._sharedData.getJoint(jointId);
+    getMouseJointFrequency(jointId: integer | string): float {
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2968,12 +3128,12 @@ namespace gdjs {
       return joint.GetFrequency();
     }
 
-    setMouseJointFrequency(jointId, frequency): void {
+    setMouseJointFrequency(jointId: integer | string, frequency: float): void {
       // Invalid value
       if (frequency <= 0) {
         return;
       }
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2984,8 +3144,8 @@ namespace gdjs {
       joint.SetFrequency(frequency);
     }
 
-    getMouseJointDampingRatio(jointId) {
-      const joint = this._sharedData.getJoint(jointId);
+    getMouseJointDampingRatio(jointId: integer | string): float {
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -2996,12 +3156,15 @@ namespace gdjs {
       return joint.GetDampingRatio();
     }
 
-    setMouseJointDampingRatio(jointId, dampingRatio): void {
+    setMouseJointDampingRatio(
+      jointId: integer | string,
+      dampingRatio: float
+    ): void {
       // Invalid value
       if (dampingRatio < 0) {
         return;
       }
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MouseJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_mouseJoint) {
@@ -3014,24 +3177,25 @@ namespace gdjs {
 
     // Wheel joint
     addWheelJoint(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      axisAngle,
-      frequency,
-      dampingRatio,
-      enableMotor,
-      motorSpeed,
-      maxMotorTorque,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      axisAngle: float,
+      frequency: float,
+      dampingRatio: float,
+      enableMotor: boolean,
+      motorSpeed: float,
+      maxMotorTorque: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // If there is no second object or it doesn't share the behavior, return
       if (other == null || !other.hasBehavior(this.name)) {
@@ -3039,7 +3203,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3048,9 +3214,9 @@ namespace gdjs {
 
       // Set joint settings
       const jointDef = new Box2D.b2WheelJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -3066,7 +3232,7 @@ namespace gdjs {
           )
         )
       );
-      axisAngle = gdjs.toRad(axisAngle) - this._body.GetAngle();
+      axisAngle = gdjs.toRad(axisAngle) - body.GetAngle();
       jointDef.set_localAxisA(
         this.b2Vec2(Math.cos(axisAngle), Math.sin(axisAngle))
       );
@@ -3089,9 +3255,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getWheelJointAxisAngle(jointId): float {
+    getWheelJointAxisAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3107,9 +3273,9 @@ namespace gdjs {
       );
     }
 
-    getWheelJointTranslation(jointId) {
+    getWheelJointTranslation(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3120,9 +3286,9 @@ namespace gdjs {
       return joint.GetJointTranslation() * this._sharedData.scaleX;
     }
 
-    getWheelJointSpeed(jointId) {
+    getWheelJointSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3133,9 +3299,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetJointSpeed());
     }
 
-    isWheelJointMotorEnabled(jointId): boolean {
+    isWheelJointMotorEnabled(jointId: integer | string): boolean {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3146,9 +3312,9 @@ namespace gdjs {
       return joint.IsMotorEnabled();
     }
 
-    enableWheelJointMotor(jointId, enable): void {
+    enableWheelJointMotor(jointId: integer | string, enable): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3159,9 +3325,9 @@ namespace gdjs {
       joint.EnableMotor(enable);
     }
 
-    getWheelJointMotorSpeed(jointId) {
+    getWheelJointMotorSpeed(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3172,9 +3338,9 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetMotorSpeed());
     }
 
-    setWheelJointMotorSpeed(jointId, speed): void {
+    setWheelJointMotorSpeed(jointId: integer | string, speed): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3185,9 +3351,9 @@ namespace gdjs {
       joint.SetMotorSpeed(gdjs.toRad(speed));
     }
 
-    getWheelJointMaxMotorTorque(jointId) {
+    getWheelJointMaxMotorTorque(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3198,14 +3364,17 @@ namespace gdjs {
       return joint.GetMaxMotorTorque();
     }
 
-    setWheelJointMaxMotorTorque(jointId, maxTorque): void {
+    setWheelJointMaxMotorTorque(
+      jointId: integer | string,
+      maxTorque: float
+    ): void {
       // Invalid value
       if (maxTorque < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3216,9 +3385,9 @@ namespace gdjs {
       joint.SetMaxMotorTorque(maxTorque);
     }
 
-    getWheelJointMotorTorque(jointId) {
+    getWheelJointMotorTorque(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3229,9 +3398,9 @@ namespace gdjs {
       return joint.GetMotorTorque(1 / this._sharedData.timeStep);
     }
 
-    getWheelJointFrequency(jointId) {
+    getWheelJointFrequency(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3242,14 +3411,14 @@ namespace gdjs {
       return joint.GetSpringFrequencyHz();
     }
 
-    setWheelJointFrequency(jointId, frequency): void {
+    setWheelJointFrequency(jointId: integer | string, frequency): void {
       // Invalid value
       if (frequency < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3260,9 +3429,9 @@ namespace gdjs {
       joint.SetSpringFrequencyHz(frequency);
     }
 
-    getWheelJointDampingRatio(jointId) {
+    getWheelJointDampingRatio(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3273,14 +3442,14 @@ namespace gdjs {
       return joint.GetSpringDampingRatio();
     }
 
-    setWheelJointDampingRatio(jointId, dampingRatio): void {
+    setWheelJointDampingRatio(jointId: integer | string, dampingRatio): void {
       // Invalid value
       if (dampingRatio < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WheelJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) {
@@ -3293,17 +3462,17 @@ namespace gdjs {
 
     // Weld joint
     addWeldJoint(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      referenceAngle,
-      frequency,
-      dampingRatio,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      referenceAngle: float,
+      frequency: float,
+      dampingRatio: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
@@ -3315,18 +3484,21 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
         return;
       }
+      const body = this._body!;
 
       // Set joint settings
       const jointDef = new Box2D.b2WeldJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -3353,30 +3525,30 @@ namespace gdjs {
         Box2D.b2WeldJoint
       );
 
-      // b2WeldJoint.GetReferenceAngle() is not binded, store it manually
+      // @ts-ignore b2WeldJoint.GetReferenceAngle() is not binded, store it manually
       joint.referenceAngle = jointDef.get_referenceAngle();
 
       // Store the id in the variable
       variable.setNumber(this._sharedData.addJoint(joint));
     }
 
-    getWeldJointReferenceAngle(jointId): float {
+    getWeldJointReferenceAngle(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WeldJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_weldJoint) {
         return 0;
       }
 
-      // b2WeldJoint.GetReferenceAngle() is not binded
-      // return gdjs.toDegrees(joint.GetReferenceAngle());
+      // @ts-ignore b2WeldJoint.GetReferenceAngle() is not binded
       return gdjs.toDegrees(joint.referenceAngle);
+      // return gdjs.toDegrees(joint.GetReferenceAngle());
     }
 
-    getWeldJointFrequency(jointId) {
+    getWeldJointFrequency(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WeldJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_weldJoint) {
@@ -3387,14 +3559,14 @@ namespace gdjs {
       return joint.GetFrequency();
     }
 
-    setWeldJointFrequency(jointId, frequency): void {
+    setWeldJointFrequency(jointId: integer | string, frequency: float): void {
       // Invalid value
       if (frequency < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WeldJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_weldJoint) {
@@ -3405,9 +3577,9 @@ namespace gdjs {
       joint.SetFrequency(frequency);
     }
 
-    getWeldJointDampingRatio(jointId) {
+    getWeldJointDampingRatio(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WeldJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_weldJoint) {
@@ -3418,14 +3590,17 @@ namespace gdjs {
       return joint.GetDampingRatio();
     }
 
-    setWeldJointDampingRatio(jointId, dampingRatio): void {
+    setWeldJointDampingRatio(
+      jointId: integer | string,
+      dampingRatio: float
+    ): void {
       // Invalid value
       if (dampingRatio < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2WeldJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_weldJoint) {
@@ -3437,11 +3612,21 @@ namespace gdjs {
     }
 
     // Rope joint
-    addRopeJoint(x1, y1, other, x2, y2, maxLength, collideConnected, variable) {
+    addRopeJoint(
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      maxLength: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // If there is no second object or it doesn't share the behavior, return
       if (other == null || !other.hasBehavior(this.name)) {
@@ -3449,7 +3634,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3458,9 +3645,9 @@ namespace gdjs {
 
       // Set joint settings
       const jointDef = new Box2D.b2RopeJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -3498,9 +3685,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getRopeJointMaxLength(jointId) {
+    getRopeJointMaxLength(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RopeJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_ropeJoint) {
@@ -3511,14 +3698,14 @@ namespace gdjs {
       return joint.GetMaxLength() * this._sharedData.scaleX;
     }
 
-    setRopeJointMaxLength(jointId, maxLength): void {
+    setRopeJointMaxLength(jointId: integer | string, maxLength: float): void {
       // Invalid value
       if (maxLength < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2RopeJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_ropeJoint) {
@@ -3535,16 +3722,16 @@ namespace gdjs {
 
     // Friction joint
     addFrictionJoint(
-      x1,
-      y1,
-      other,
-      x2,
-      y2,
-      maxForce,
-      maxTorque,
-      collideConnected,
-      variable
-    ) {
+      x1: float,
+      y1: float,
+      other: gdjs.RuntimeObject,
+      x2: float,
+      y2: float,
+      maxForce: float,
+      maxTorque: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
@@ -3556,18 +3743,21 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
         return;
       }
+      const body = this._body!;
 
       // Set joint settings
       const jointDef = new Box2D.b2FrictionJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_localAnchorA(
-        this._body.GetLocalPoint(
+        body.GetLocalPoint(
           this.b2Vec2(
             x1 * this._sharedData.invScaleX,
             y1 * this._sharedData.invScaleY
@@ -3599,9 +3789,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getFrictionJointMaxForce(jointId) {
+    getFrictionJointMaxForce(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2FrictionJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_frictionJoint) {
@@ -3612,14 +3802,14 @@ namespace gdjs {
       return joint.GetMaxForce();
     }
 
-    setFrictionJointMaxForce(jointId, maxForce): void {
+    setFrictionJointMaxForce(jointId: integer | string, maxForce: float): void {
       // Invalid value
       if (maxForce < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2FrictionJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_frictionJoint) {
@@ -3630,9 +3820,9 @@ namespace gdjs {
       joint.SetMaxForce(maxForce);
     }
 
-    getFrictionJointMaxTorque(jointId) {
+    getFrictionJointMaxTorque(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2FrictionJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_frictionJoint) {
@@ -3643,14 +3833,17 @@ namespace gdjs {
       return joint.GetMaxTorque();
     }
 
-    setFrictionJointMaxTorque(jointId, maxTorque): void {
+    setFrictionJointMaxTorque(
+      jointId: integer | string,
+      maxTorque: float
+    ): void {
       // Invalid value
       if (maxTorque < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2FrictionJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_frictionJoint) {
@@ -3663,20 +3856,21 @@ namespace gdjs {
 
     // Motor joint
     addMotorJoint(
-      other,
-      offsetX,
-      offsetY,
-      offsetAngle,
-      maxForce,
-      maxTorque,
-      correctionFactor,
-      collideConnected,
-      variable
-    ) {
+      other: gdjs.RuntimeObject,
+      offsetX: float,
+      offsetY: float,
+      offsetAngle: float,
+      maxForce: float,
+      maxTorque: float,
+      correctionFactor: float,
+      collideConnected: boolean,
+      variable: gdjs.Variable
+    ): void {
       // If there is no body, set a new one
       if (this._body === null) {
         if (!this.createBody()) return;
       }
+      const body = this._body!;
 
       // If there is no second object or it doesn't share the behavior, return
       if (other == null || !other.hasBehavior(this.name)) {
@@ -3684,7 +3878,9 @@ namespace gdjs {
       }
 
       // Get the second body
-      const otherBody = other.getBehavior(this.name).getBody();
+      const otherBody = (other.getBehavior(
+        this.name
+      ) as gdjs.Physics2RuntimeBehavior).getBody();
 
       // If the first and second objects/bodies are the same, return
       if (this._body === otherBody) {
@@ -3693,7 +3889,7 @@ namespace gdjs {
 
       // Set joint settings
       const jointDef = new Box2D.b2MotorJointDef();
-      jointDef.set_bodyA(this._body);
+      jointDef.set_bodyA(body);
       jointDef.set_bodyB(otherBody);
       jointDef.set_linearOffset(
         this.b2Vec2(
@@ -3721,9 +3917,9 @@ namespace gdjs {
       variable.setNumber(jointId);
     }
 
-    getMotorJointOffsetX(jointId): float {
+    getMotorJointOffsetX(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3734,9 +3930,9 @@ namespace gdjs {
       return joint.GetLinearOffset().get_x() * this._sharedData.scaleX;
     }
 
-    getMotorJointOffsetY(jointId): float {
+    getMotorJointOffsetY(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3747,9 +3943,13 @@ namespace gdjs {
       return joint.GetLinearOffset().get_y() * this._sharedData.scaleY;
     }
 
-    setMotorJointOffset(jointId, offsetX, offsetY): void {
+    setMotorJointOffset(
+      jointId: integer | string,
+      offsetX: float,
+      offsetY: float
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3765,9 +3965,9 @@ namespace gdjs {
       );
     }
 
-    getMotorJointAngularOffset(jointId) {
+    getMotorJointAngularOffset(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3778,9 +3978,12 @@ namespace gdjs {
       return gdjs.toDegrees(joint.GetAngularOffset());
     }
 
-    setMotorJointAngularOffset(jointId, offsetAngle): void {
+    setMotorJointAngularOffset(
+      jointId: integer | string,
+      offsetAngle: float
+    ): void {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3791,9 +3994,9 @@ namespace gdjs {
       joint.SetAngularOffset(gdjs.toRad(offsetAngle));
     }
 
-    getMotorJointMaxForce(jointId) {
+    getMotorJointMaxForce(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3804,14 +4007,14 @@ namespace gdjs {
       return joint.GetMaxForce();
     }
 
-    setMotorJointMaxForce(jointId, maxForce): void {
+    setMotorJointMaxForce(jointId: integer | string, maxForce: float): void {
       // Invalid value
       if (maxForce < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3822,9 +4025,9 @@ namespace gdjs {
       joint.SetMaxForce(maxForce);
     }
 
-    getMotorJointMaxTorque(jointId) {
+    getMotorJointMaxTorque(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3835,14 +4038,14 @@ namespace gdjs {
       return joint.GetMaxTorque();
     }
 
-    setMotorJointMaxTorque(jointId, maxTorque): void {
+    setMotorJointMaxTorque(jointId: integer | string, maxTorque: float): void {
       // Invalid value
       if (maxTorque < 0) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3857,9 +4060,9 @@ namespace gdjs {
       joint.GetBodyB().SetAwake(true);
     }
 
-    getMotorJointCorrectionFactor(jointId) {
+    getMotorJointCorrectionFactor(jointId: integer | string): float {
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3870,14 +4073,17 @@ namespace gdjs {
       return joint.GetCorrectionFactor();
     }
 
-    setMotorJointCorrectionFactor(jointId, correctionFactor): void {
+    setMotorJointCorrectionFactor(
+      jointId: integer | string,
+      correctionFactor: float
+    ): void {
       // Invalid value
       if (correctionFactor < 0 || correctionFactor > 1) {
         return;
       }
 
       // Get the joint
-      const joint = this._sharedData.getJoint(jointId);
+      const joint = this._sharedData.getJoint(jointId) as Box2D.b2MotorJoint;
 
       // Joint not found or has wrong type
       if (joint === null || joint.GetType() !== Box2D.e_motorJoint) {
@@ -3892,7 +4098,7 @@ namespace gdjs {
       joint.GetBodyB().SetAwake(true);
     }
 
-    onContactBegin(otherBehavior: Physics2RuntimeBehavior) {
+    onContactBegin(otherBehavior: Physics2RuntimeBehavior): void {
       this.currentContacts.push(otherBehavior);
 
       // There might be contacts that end during the frame and
@@ -3906,7 +4112,7 @@ namespace gdjs {
       }
     }
 
-    onContactEnd(otherBehavior: Physics2RuntimeBehavior) {
+    onContactEnd(otherBehavior: Physics2RuntimeBehavior): void {
       this.contactsEndedThisFrame.push(otherBehavior);
 
       const index = this.currentContacts.indexOf(otherBehavior);

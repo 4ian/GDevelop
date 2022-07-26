@@ -104,14 +104,16 @@ const createCloudProjectAndInitCommit = async (
     const cloudProject = await createCloudProject(authenticatedUser, {
       name,
     });
-    if (!cloudProject) return;
+    if (!cloudProject)
+      throw new Error('No cloud project was returned from creation api call.');
     await getCredentialsForCloudProject(authenticatedUser, cloudProject.id);
     const newVersion = await zipProjectAndCommitVersion({
       authenticatedUser,
       project,
       cloudProjectId: cloudProject.id,
     });
-    if (!newVersion) return;
+    if (!newVersion)
+      throw new Error('No version id was returned from committing api call.');
     return cloudProject.id;
   } catch (error) {
     console.error('An error occurred while creating a cloud project', error);

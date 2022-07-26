@@ -11,18 +11,23 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 import { type FileMetadata } from '..';
 
-const unzipProject = async (zippedProject: any) => {
+const unzipProject = async (zippedProject: Blob) => {
   const zipJs: ZipJs = await initializeZipJs();
 
   return new Promise((resolve, reject) => {
-    zipJs.createReader(new zipJs.BlobReader(zippedProject), zipReader => {
-      zipReader.getEntries(entries => {
-        // Reading only the first entry since the zip should only contain the project json file
-        entries[0].getData(new zipJs.TextWriter(), result => {
-          resolve(result);
+    try {
+      zipJs.createReader(new zipJs.BlobReader(zippedProject), zipReader => {
+        zipReader.getEntries(entries => {
+          // Reading only the first entry since the zip should only contain the project json file
+          entries[0].getData(new zipJs.TextWriter(), result => {
+            resolve(result);
+          });
         });
       });
-    });
+    } catch (error) {
+      console.error('An error occurred when unzipping archived project', error);
+      reject(error);
+    }
   });
 };
 

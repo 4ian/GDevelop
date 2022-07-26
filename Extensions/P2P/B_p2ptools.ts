@@ -14,8 +14,11 @@ namespace gdjs {
         data: string;
       };
 
-      const isValidNetworkEvent = (event: any): event is NetworkEvent =>
-        typeof event.eventName === 'string' && typeof event.data === 'string';
+      const isValidNetworkEvent = (event: unknown): event is NetworkEvent =>
+        typeof event === 'object' &&
+        event !== null &&
+        typeof event['eventName'] === 'string' &&
+        typeof event['data'] === 'string';
 
       /**
        * The data bound to an event that got triggered.

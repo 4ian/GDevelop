@@ -25,7 +25,7 @@ export type CloudProjectWithUserAccessInfo = {|
   lastModifiedAt: string,
 |};
 
-const reAuthenticateAndRetryIfFailed = async <T>(
+const refetchCredentialsForProjectAndRetryIfFailed = async <T>(
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   apiCall: () => Promise<T>
@@ -112,15 +112,18 @@ export const commitVersion = async (
   );
   const newVersion = getVersionIdFromPath(presignedUrl);
   // upload zipped project
-  await reAuthenticateAndRetryIfFailed(authenticatedUser, cloudProjectId, () =>
-    projectResourcesClient.post(
-      `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`,
-      zippedProject,
-      {
-        headers: { 'content-type': 'application/zip' },
-        withCredentials: true,
-      }
-    )
+  await refetchCredentialsForProjectAndRetryIfFailed(
+    authenticatedUser,
+    cloudProjectId,
+    () =>
+      projectResourcesClient.post(
+        `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`,
+        zippedProject,
+        {
+          headers: { 'content-type': 'application/zip' },
+          withCredentials: true,
+        }
+      )
   );
   // inform backend new version uploaded
   const response = await axios.post(

@@ -340,7 +340,7 @@ function ProjectPropertiesDialog(props: Props) {
                 <SemiControlledTextField
                   floatingLabelText={<Trans>Publisher name</Trans>}
                   fullWidth
-                  hintText={t`Your name`}
+                  translatableHintText={t`Your name`}
                   helperMarkdownText={i18n._(
                     t`This will be used when packaging and submitting your application to the stores.`
                   )}

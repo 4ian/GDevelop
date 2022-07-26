@@ -59,7 +59,7 @@ const CloudSaveAsDialog = (props: Props) => {
             fullWidth
             maxLength={CLOUD_PROJECT_NAME_MAX_LENGTH}
             errorText={error}
-            hintText={t`Project name`}
+            translatableHintText={t`Project name`}
             type="text"
             value={name}
             onChange={(e, newName) => {

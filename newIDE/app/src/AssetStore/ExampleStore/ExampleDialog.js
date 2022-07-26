@@ -20,7 +20,7 @@ import { getIDEVersion } from '../../Version';
 import { Column, Line } from '../../UI/Grid';
 import { Divider } from '@material-ui/core';
 import { ColumnStackLayout } from '../../UI/Layout';
-import { ExampleIcon } from './ExampleIcon';
+import { ExampleThumbnailOrIcon } from './ExampleThumbnailOrIcon';
 import RaisedButtonWithSplitMenu from '../../UI/RaisedButtonWithSplitMenu';
 import Window from '../../Utils/Window';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -136,10 +136,7 @@ export function ExampleDialog({
         )}
         <Line alignItems="center" noMargin>
           {hasIcon ? (
-            <ExampleIcon
-              exampleShortHeader={exampleShortHeader}
-              type="thumbnail"
-            />
+            <ExampleThumbnailOrIcon exampleShortHeader={exampleShortHeader} />
           ) : null}
           <Column expand noMargin={!hasIcon}>
             <Text noMargin size="block-title">

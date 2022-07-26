@@ -1,8 +1,9 @@
 // TODO: Improve type checking by using proper typings for Box2D.
-// It comes from a typescript port of box2d 2.4.1: https://github.com/Birch-san/box2d-wasm
+// It comes from a TypeScript port of box2d 2.4.1: https://github.com/Birch-san/box2d-wasm
 // We use a port of box2d 2.3.1 from: https://github.com/kripken/box2d.js/tree/b0e491ce91f05b5390d86655ad6cf3102fabdb95/build
 
-// As the versions doesn't match, it's not completely and the sources must be check if there is a doubt.
+// As the versions don't match, some adaptations were made.
+// Sources must be checked if there is any doubt.
 
 declare namespace Box2D {
   export function _free(object: any): void;

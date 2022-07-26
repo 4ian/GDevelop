@@ -114,7 +114,7 @@ const BuildSection = ({
   const { getRecentProjectFiles } = React.useContext(PreferencesContext);
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
-  const { getConfirmation, getDeleteConfirmation } = useConfirmDialog();
+  const { showConfirmation, showDeleteConfirmation } = useConfirmDialog();
   const [
     selectedFile,
     setSelectedFile,
@@ -174,13 +174,13 @@ const BuildSection = ({
     const projectName = fileMetadata.name;
     if (!projectName) return; // Only cloud projects can be deleted, and all cloud projects have names.
 
-    const answer = await getConfirmation({
+    const answer = await showConfirmation({
       title: t`Delete project ${projectName}?`,
       message: t`Are you sure you want to delete this project?`,
     });
     if (!answer) return;
 
-    const deleteAnswer = await getDeleteConfirmation({
+    const deleteAnswer = await showDeleteConfirmation({
       title: t`Do you really want to permanently delete your project ${projectName}?`,
       message: t`You’re about to permanently delete your project ${projectName}. You will no longer be able to access it.`,
       fieldMessage: t`Type your project name to delete it:`,

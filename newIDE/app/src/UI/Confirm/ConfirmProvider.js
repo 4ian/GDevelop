@@ -39,26 +39,6 @@ function ConfirmProvider({ children }: Props) {
     setConfirmDeleteDialogConfig(options);
   };
 
-  const onConfirm = ({ deleteDialog }: { deleteDialog: boolean }) => {
-    if (deleteDialog) {
-      setConfirmDeleteDialogOpen(false);
-      confirmDeleteDialogConfig && confirmDeleteDialogConfig.callback(true);
-    } else {
-      setConfirmDialogOpen(false);
-      confirmDialogConfig && confirmDialogConfig.callback(true);
-    }
-  };
-
-  const onDismiss = ({ deleteDialog }: { deleteDialog: boolean }) => {
-    if (deleteDialog) {
-      setConfirmDeleteDialogOpen(false);
-      confirmDeleteDialogConfig && confirmDeleteDialogConfig.callback(false);
-    } else {
-      setConfirmDialogOpen(false);
-      confirmDialogConfig && confirmDialogConfig.callback(false);
-    }
-  };
-
   return (
     <ConfirmContext.Provider
       value={{
@@ -70,8 +50,14 @@ function ConfirmProvider({ children }: Props) {
       {confirmDialogConfig && (
         <ConfirmDialog
           open={confirmDialogOpen}
-          onConfirm={() => onConfirm({ deleteDialog: false })}
-          onDismiss={() => onDismiss({ deleteDialog: false })}
+          onConfirm={() => {
+            setConfirmDialogOpen(false);
+            confirmDialogConfig.callback(true);
+          }}
+          onDismiss={() => {
+            setConfirmDialogOpen(false);
+            confirmDialogConfig.callback(false);
+          }}
           title={confirmDialogConfig.title}
           message={confirmDialogConfig.message}
         />
@@ -79,8 +65,14 @@ function ConfirmProvider({ children }: Props) {
       {confirmDeleteDialogConfig && (
         <ConfirmDeleteDialog
           open={confirmDeleteDialogOpen}
-          onConfirm={() => onConfirm({ deleteDialog: true })}
-          onDismiss={() => onDismiss({ deleteDialog: true })}
+          onConfirm={() => {
+            setConfirmDeleteDialogOpen(false);
+            confirmDeleteDialogConfig.callback(true);
+          }}
+          onDismiss={() => {
+            setConfirmDeleteDialogOpen(false);
+            confirmDeleteDialogConfig.callback(false);
+          }}
           title={confirmDeleteDialogConfig.title}
           message={confirmDeleteDialogConfig.message}
           fieldMessage={confirmDeleteDialogConfig.fieldMessage}

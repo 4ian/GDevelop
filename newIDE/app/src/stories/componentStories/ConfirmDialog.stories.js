@@ -13,10 +13,10 @@ import useConfirmDialog from '../../UI/Confirm/useConfirmDialog';
 import { Column, LargeSpacer } from '../../UI/Grid';
 
 export const Default = () => {
-  const { getConfirmation, getDeleteConfirmation } = useConfirmDialog();
+  const { showConfirmation, showDeleteConfirmation } = useConfirmDialog();
 
   const onOpenConfirmDialog = async () => {
-    const answer = await getConfirmation({
+    const answer = await showConfirmation({
       title: t`You are about to delete an object`,
       message: t`Do you want to continue?`,
     });
@@ -25,7 +25,7 @@ export const Default = () => {
   };
 
   const onOpenConfirmDeleteDialog = async () => {
-    const answer = await getDeleteConfirmation({
+    const answer = await showDeleteConfirmation({
       title: t`Do you really want to permanently delete your account?`,
       message: t`You’re about to permanently delete your GDevelop account username@mail.com. You will no longer be able to log into the app with this email address.`,
       fieldMessage: t`Type your email address to delete your account:`,

@@ -11,21 +11,21 @@ const useConfirmDialog = () => {
     ConfirmContext
   );
 
-  const getConfirmation = (
+  const showConfirmation = (
     options: ShowConfirmDialogOptions
   ): Promise<boolean> =>
-    new Promise((resolve, reject) => {
+    new Promise(resolve => {
       showConfirmDialog({ callback: resolve, ...options });
     });
 
-  const getDeleteConfirmation = (
+  const showDeleteConfirmation = (
     options: ShowConfirmDeleteDialogOptions
   ): Promise<boolean> =>
-    new Promise((resolve, reject) => {
+    new Promise(resolve => {
       showConfirmDeleteDialog({ callback: resolve, ...options });
     });
 
-  return { getConfirmation, getDeleteConfirmation };
+  return { showConfirmation, showDeleteConfirmation };
 };
 
 export default useConfirmDialog;

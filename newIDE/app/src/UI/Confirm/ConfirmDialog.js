@@ -27,6 +27,7 @@ function ConfirmDialog(props: Props) {
           actions={[
             <FlatButton
               key="dismiss"
+              keyboardFocused
               label={<Trans>Cancel</Trans>}
               onClick={props.onDismiss}
             />,

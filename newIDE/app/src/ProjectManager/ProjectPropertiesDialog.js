@@ -565,6 +565,9 @@ function ProjectPropertiesDialog(props: Props) {
                   onChange={(e, i, value: string) =>
                     setIsFolderProject(value === 'folder-project')
                   }
+                  helperMarkdownText={i18n._(
+                    t`Note that this option will only have an effect when saving your project on your computer's filesystem from the desktop app.`
+                  )}
                 >
                   <SelectOption
                     value={'single-file'}

@@ -21,11 +21,12 @@
       ]
     },
     "baseUrl": "./",
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise"],
+    "lib": ["DOM", "ES5", "ScriptHost", "ES2015.Iterable", "ES2015.Promise", "es2020"],
     "typeRoots": ["GDJS/node_modules/@types/"]
   },
   "include": [
     "GDJS/Runtime/**/*",
+    "GDJS/scripts/**/*.js",
     "Extensions/**/*.js",
     "Extensions/**/*.ts",
     "GDJS/tests/tests/**/*.js",

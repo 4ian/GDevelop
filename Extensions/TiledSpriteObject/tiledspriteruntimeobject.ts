@@ -65,7 +65,7 @@ namespace gdjs {
       return true;
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.TilingSprite {
       return this._renderer.getRendererObject();
     }
 

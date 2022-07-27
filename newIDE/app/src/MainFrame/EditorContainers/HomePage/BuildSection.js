@@ -28,6 +28,7 @@ import useConfirmDialog from '../../../UI/Confirm/useConfirmDialog';
 import { deleteCloudProject } from '../../../Utils/GDevelopServices/Project';
 import optionalRequire from '../../../Utils/OptionalRequire';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
+import { getRelativeOrAbsoluteDisplayDate } from '../../../Utils/DateDisplay';
 const electron = optionalRequire('electron');
 
 const isWebApp = !electron;
@@ -50,48 +51,7 @@ type Props = {|
   onCreateProject: () => void,
 |};
 
-const getRelativeOrAbsoluteDisplayDate = (
-  i18n: I18nType,
-  dateAsNumber: number
-): React.Node => {
-  const nowAsNumber = Date.now();
-  if (nowAsNumber - dateAsNumber < 60 * 1000) {
-    return i18n._(t`Now`);
-  }
-  const now = new Date(nowAsNumber);
-  const date = new Date(dateAsNumber);
-
-  if (
-    now.getFullYear() === date.getFullYear() &&
-    now.getMonth() === date.getMonth() &&
-    now.getDate() === date.getDate()
-  ) {
-    return i18n._(t`Today`);
-  }
-  const yesterdayAtSameTime = new Date(now);
-  yesterdayAtSameTime.setDate(now.getDate() - 1);
-  if (
-    now.getFullYear() === date.getFullYear() &&
-    now.getMonth() === date.getMonth() &&
-    yesterdayAtSameTime.getDate() === date.getDate()
-  ) {
-    return i18n._(t`Yesterday`);
-  }
-
-  const sevenDaysAgoAtFirstHour = new Date(now);
-  sevenDaysAgoAtFirstHour.setDate(now.getDate() - 7);
-  sevenDaysAgoAtFirstHour.setHours(0, 0, 0, 0);
-  if (
-    now.getFullYear() === date.getFullYear() &&
-    now.getMonth() === date.getMonth() &&
-    sevenDaysAgoAtFirstHour.getTime() <= date.getTime()
-  ) {
-    return i18n._(t`This week`);
-  }
-  return i18n.date(date);
-};
-
-const PrettyBreakablePath = ({ path }: { path: string }) => {
+const PrettyBreakablePath = ({ path }: {| path: string |}) => {
   const separatorIndices = Array.from(path)
     .map((char, index) => (['/', '\\'].includes(char) ? index : null))
     .filter(Boolean);

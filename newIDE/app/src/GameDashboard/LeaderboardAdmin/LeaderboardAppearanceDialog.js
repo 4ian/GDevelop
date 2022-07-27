@@ -304,7 +304,7 @@ function LeaderboardAppearanceDialog({
                         floatingLabelText={<Trans>Prefix</Trans>}
                         maxLength={10}
                         value={prefix}
-                        hintText={t`Ex: $`}
+                        translatableHintText={t`Ex: $`}
                         onChange={(e, newValue) => {
                           setPrefix(newValue);
                         }}
@@ -317,7 +317,7 @@ function LeaderboardAppearanceDialog({
                         floatingLabelText={<Trans>Suffix</Trans>}
                         maxLength={10}
                         value={suffix}
-                        hintText={t`Ex: coins`}
+                        translatableHintText={t`Ex: coins`}
                         onChange={(e, newValue) => {
                           setSuffix(newValue);
                         }}

@@ -111,13 +111,13 @@ export const commitVersion = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  // get presigned url to upload new version (that contains new version id)
+  // Get a presigned url to upload a new version (the URL will contain the new version id).
   const presignedUrl = await getPresignedUrlForVersionUpload(
     authenticatedUser,
     cloudProjectId
   );
   const newVersion = getVersionIdFromPath(presignedUrl);
-  // upload zipped project
+  // Upload zipped project.
   await refetchCredentialsForProjectAndRetryIfFailed(
     authenticatedUser,
     cloudProjectId,
@@ -131,7 +131,7 @@ export const commitVersion = async (
         }
       )
   );
-  // inform backend new version uploaded
+  // Inform backend a new version has been uploaded.
   const response = await axios.post(
     `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/commit`,
     { newVersion },

@@ -2455,7 +2455,7 @@ const MainFrame = (props: Props) => {
       />
       <Snackbar
         open={state.snackMessageOpen}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={_closeSnackMessage}
         ContentProps={{
           'aria-describedby': 'snackbar-message',

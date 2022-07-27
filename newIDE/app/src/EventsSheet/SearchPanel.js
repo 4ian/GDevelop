@@ -154,6 +154,10 @@ const SearchPanel = (
     [currentTab]
   );
 
+  const shouldDisableSearch = !searchText;
+  const shouldDisableReplace =
+    !replaceText || !searchText || (!hasEventSelected && searchInSelection);
+
   return (
     <Background noFullHeight noExpand>
       <Tabs value={currentTab} onChange={setCurrentTab}>
@@ -188,7 +192,7 @@ const SearchPanel = (
                   if (!searchResultsDirty) {
                     onGoToNextSearchResult();
                   } else {
-                    launchSearchIfResultsDirty();
+                    if (!shouldDisableSearch) launchSearchIfResultsDirty();
                   }
                 }
               }}
@@ -202,7 +206,7 @@ const SearchPanel = (
             />
             <Spacer />
             <RaisedButton
-              disabled={!searchText}
+              disabled={shouldDisableSearch}
               primary
               label={<Trans>Search</Trans>}
               onClick={() => {
@@ -225,7 +229,7 @@ const SearchPanel = (
                 }}
                 onKeyPress={event => {
                   if (shouldValidate(event)) {
-                    launchReplace();
+                    if (!shouldDisableReplace) launchReplace();
                   }
                 }}
                 onKeyUp={event => {
@@ -238,11 +242,7 @@ const SearchPanel = (
               />
               <Spacer />
               <RaisedButton
-                disabled={
-                  !replaceText ||
-                  !searchText ||
-                  (!hasEventSelected && searchInSelection)
-                }
+                disabled={shouldDisableReplace}
                 label={<Trans>Replace</Trans>}
                 onClick={launchReplace}
               />

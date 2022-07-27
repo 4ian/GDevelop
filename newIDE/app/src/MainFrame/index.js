@@ -1678,7 +1678,7 @@ const MainFrame = (props: Props) => {
         .catch(error => {
           const errorMessage = storageProviderOperations.getOpenErrorMessage
             ? storageProviderOperations.getOpenErrorMessage(error)
-            : t`Verify that you have the authorizations for reading the file you're trying to access.`;
+            : t`Verify that you have the authorization for reading the file you're trying to access.`;
           showErrorBox({
             message: [
               i18n._(t`Unable to open the project.`),

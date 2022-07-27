@@ -39,7 +39,7 @@ export default ({
     ),
     onChangeProjectProperty: generateOnChangeProjectProperty(authenticatedUser),
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
-      return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorizations to open it.`;
+      return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;
     },
   }),
 }: StorageProvider);

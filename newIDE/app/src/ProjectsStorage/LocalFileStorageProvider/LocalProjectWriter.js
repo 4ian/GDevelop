@@ -143,7 +143,8 @@ export const onSaveProject = (
 
 export const onSaveProjectAs = (
   project: gdProject,
-  fileMetadata: ?FileMetadata
+  fileMetadata: ?FileMetadata,
+  options?: { context?: 'duplicateCurrentProject', onStartSaving: () => void }
 ): Promise<{|
   wasSaved: boolean,
   fileMetadata: ?FileMetadata,
@@ -151,7 +152,7 @@ export const onSaveProjectAs = (
   const defaultPath = fileMetadata ? fileMetadata.fileIdentifier : '';
   const fileSystem = assignIn(new gd.AbstractFileSystemJS(), localFileSystem);
   const browserWindow = remote.getCurrentWindow();
-  const options = {
+  const saveDialogOptions = {
     defaultPath,
     filters: [{ name: 'GDevelop 5 project', extensions: ['json'] }],
   };
@@ -159,11 +160,13 @@ export const onSaveProjectAs = (
   if (!dialog) {
     return Promise.reject('Unsupported');
   }
-  const filePath = dialog.showSaveDialogSync(browserWindow, options);
+  const filePath = dialog.showSaveDialogSync(browserWindow, saveDialogOptions);
   if (!filePath) {
     return Promise.resolve({ wasSaved: false, fileMetadata });
   }
   const projectPath = path.dirname(filePath);
+
+  if (options && options.onStartSaving) options.onStartSaving();
 
   // TODO: Ideally, errors while copying resources should be reported.
   gd.ProjectResourcesCopier.copyAllResourcesTo(

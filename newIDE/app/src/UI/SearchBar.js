@@ -329,7 +329,7 @@ const SearchBar = React.forwardRef<Props, SearchBarInterface>(
                     <TextField
                       id={id}
                       margin="none"
-                      hintText={placeholder || t`Search`}
+                      translatableHintText={placeholder || t`Search`}
                       onBlur={handleBlur}
                       value={value}
                       onChange={handleInput}

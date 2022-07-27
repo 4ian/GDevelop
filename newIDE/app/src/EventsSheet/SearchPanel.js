@@ -173,7 +173,7 @@ const SearchPanel = (
               ref={searchTextField}
               type="search"
               margin="dense"
-              hintText={
+              translatableHintText={
                 isSearchAndReplaceTab()
                   ? t`Text to search in parameters`
                   : t`Text to search in event sentences`
@@ -219,7 +219,7 @@ const SearchPanel = (
               <TextField
                 type="search"
                 margin="dense"
-                hintText={t`Text to replace in parameters`}
+                translatableHintText={t`Text to replace in parameters`}
                 onChange={(e, replaceText) => {
                   setReplaceText(replaceText);
                 }}

@@ -194,7 +194,7 @@ const InnerDialog = (props: InnerDialogProps) => {
                 floatingLabelText={<Trans>Object name</Trans>}
                 floatingLabelFixed
                 value={newObjectName}
-                hintText={t`Object Name`}
+                translatableHintText={t`Object Name`}
                 onChange={text => {
                   if (text === newObjectName) return;
 

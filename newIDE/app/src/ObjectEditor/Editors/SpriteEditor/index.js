@@ -96,7 +96,7 @@ class Animation extends React.Component<AnimationProps, void> {
               commitOnBlur
               margin="none"
               value={animation.getName()}
-              hintText={t`Optional animation name`}
+              translatableHintText={t`Optional animation name`}
               onChange={text => onChangeName(text)}
               fullWidth
             />

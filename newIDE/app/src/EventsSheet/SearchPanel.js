@@ -188,7 +188,7 @@ const SearchPanel = (
                   if (!searchResultsDirty) {
                     onGoToNextSearchResult();
                   } else {
-                    launchSearchIfResultsDirty();
+                    if (searchText) launchSearchIfResultsDirty();
                   }
                 }
               }}

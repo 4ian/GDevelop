@@ -14,6 +14,7 @@ import FlatButton from '../UI/FlatButton';
 
 import { type StorageProvider } from '.';
 import { makeStyles } from '@material-ui/styles';
+import { t } from '@lingui/macro';
 
 type Props = {|
   storageProvider: StorageProvider,
@@ -68,13 +69,13 @@ const StorageProviderListItem = ({
               {shouldDisplayAuthenticationButtons && (
                 <Line noMargin>
                   <FlatButton
-                    label={'Create an Account'}
+                    label={i18n._(t`Create an Account`)}
                     onClick={() => authenticatedUser.onCreateAccount()}
                   />
                   <Spacer />
                   <RaisedButton
                     primary
-                    label={'Log-in to GDevelop'}
+                    label={i18n._(t`Log-in to GDevelop`)}
                     onClick={() => authenticatedUser.onLogin()}
                   />
                 </Line>

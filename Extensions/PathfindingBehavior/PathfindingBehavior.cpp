@@ -24,6 +24,7 @@ void PathfindingBehavior::InitializeContent(
   behaviorContent.SetAttribute("gridOffsetX", 0);
   behaviorContent.SetAttribute("gridOffsetY", 0);
   behaviorContent.SetAttribute("extraBorder", 0);
+  behaviorContent.SetAttribute("collisionMethod", "HitBoxes");
 }
 
 #if defined(GD_IDE_ONLY)
@@ -58,6 +59,21 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
   properties[_("Extra border size")].SetGroup(_("Collision")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
 
+  gd::String collisionMethod = behaviorContent.GetStringAttribute("collisionMethod");
+  gd::String collisionMethodStr = _("Collision method");
+  if (collisionMethod == "Legacy")
+    collisionMethodStr = _("Legacy");
+  else if (collisionMethod == "AABB")
+    collisionMethodStr = _("AABB");
+  else if (collisionMethod == "HitBoxes")
+    collisionMethodStr = _("Hit boxes");
+  properties[_("Collision method")]
+      .SetValue(collisionMethodStr)
+      .SetType("Choice")
+      .AddExtraInfo(_("Legacy"))
+      .AddExtraInfo(_("AABB"))
+      .AddExtraInfo(_("Hit boxes"));
+
   return properties;
 }
 
@@ -74,6 +90,15 @@ bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
   }
   if (name == _("Extra border size")) {
     behaviorContent.SetAttribute("extraBorder", value.To<float>());
+    return true;
+  }
+  if (name == _("Collision method")) {
+    if (value == _("AABB"))
+      behaviorContent.SetAttribute("collisionMethod", "AABB");
+    else if (value == _("Hit boxes"))
+      behaviorContent.SetAttribute("collisionMethod", "HitBoxes");
+    else
+      behaviorContent.SetAttribute("collisionMethod", "Legacy");
     return true;
   }
 

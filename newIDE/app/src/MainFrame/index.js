@@ -309,6 +309,7 @@ const MainFrame = (props: Props) => {
   ] = React.useState<boolean>(false);
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
   const preferences = React.useContext(PreferencesContext);
+  const { setHasProjectOpened } = preferences;
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
   const [previewState, setPreviewState] = React.useState(initialPreviewState);
   const commandPaletteRef = React.useRef((null: ?CommandPaletteInterface));
@@ -616,7 +617,7 @@ const MainFrame = (props: Props) => {
 
   const closeProject = React.useCallback(
     (): Promise<void> => {
-      preferences.setHasProjectOpened(false);
+      setHasProjectOpened(false);
       setPreviewState(initialPreviewState);
       return setState(state => {
         if (!currentProject) {
@@ -640,7 +641,12 @@ const MainFrame = (props: Props) => {
         };
       }).then(() => {});
     },
-    [currentProject, eventsFunctionsExtensionsState, preferences, setState]
+    [
+      currentProject,
+      eventsFunctionsExtensionsState,
+      setHasProjectOpened,
+      setState,
+    ]
   );
 
   const loadFromProject = React.useCallback(
@@ -671,8 +677,6 @@ const MainFrame = (props: Props) => {
       // for another resource with the same name in the new project.
       ResourcesLoader.burstAllUrlsCache();
       // TODO: Pixi cache should also be burst
-
-      preferences.setHasProjectOpened(true);
 
       const state = await setState(state => ({
         ...state,
@@ -1659,12 +1663,16 @@ const MainFrame = (props: Props) => {
           if (!fileMetadata) return;
 
           return openFromFileMetadata(fileMetadata).then(state => {
-            if (state)
+            if (state) {
               openSceneOrProjectManager({
                 currentProject: state.currentProject,
                 editorTabs: state.editorTabs,
               });
-            //addRecentFile(fileMetadata);
+              const currentStorageProvider = getStorageProvider();
+              if (currentStorageProvider.internalName === 'LocalFile') {
+                setHasProjectOpened(true);
+              }
+            }
           });
         })
         .catch(error => {
@@ -1686,6 +1694,8 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations,
       openFromFileMetadata,
       openSceneOrProjectManager,
+      getStorageProvider,
+      setHasProjectOpened,
     ]
   );
 
@@ -1734,11 +1744,16 @@ const MainFrame = (props: Props) => {
       getStorageProviderOperations({ storageProvider });
       openFromFileMetadata(fileMetadata)
         .then(state => {
-          if (state)
+          if (state) {
             openSceneOrProjectManager({
               currentProject: state.currentProject,
               editorTabs: state.editorTabs,
             });
+            const currentStorageProvider = getStorageProvider();
+            if (currentStorageProvider.internalName === 'LocalFile') {
+              setHasProjectOpened(true);
+            }
+          }
         })
         .catch(error => {
           /* Ignore error, it was already surfaced to the user. */
@@ -1751,6 +1766,8 @@ const MainFrame = (props: Props) => {
       props.storageProviders,
       getStorageProviderOperations,
       unsavedChanges,
+      getStorageProvider,
+      setHasProjectOpened,
     ]
   );
 
@@ -2118,6 +2135,10 @@ const MainFrame = (props: Props) => {
 
         if (wasSaved) {
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();
+          const currentStorageProvider = getStorageProvider();
+          if (currentStorageProvider.internalName === 'LocalFile') {
+            preferences.setHasProjectOpened(true);
+          }
         }
       } catch (rawError) {
         // Do not prevent creating the project.

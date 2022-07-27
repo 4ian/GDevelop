@@ -121,7 +121,7 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
   bool hasDoneRenaming;
   const gd::String& objectName;
   const gd::String& objectNewName;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
@@ -216,7 +216,7 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  private:
   bool hasObject;
   const gd::String& objectName;
-  
+
   const gd::Platform &platform;
   const gd::ObjectsContainer &globalObjectsContainer;
   const gd::ObjectsContainer &objectsContainer;
@@ -565,6 +565,8 @@ std::vector<EventsSearchResult> EventsRefactorer::ReplaceStringInEvents(
     bool inActions,
     bool inEventStrings) {
   vector<EventsSearchResult> modifiedEvents;
+  if (toReplace.empty()) return modifiedEvents;
+
   for (std::size_t i = 0; i < events.size(); ++i) {
     bool eventModified = false;
     if (inConditions) {

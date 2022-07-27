@@ -344,7 +344,7 @@ const MainFrame = (props: Props) => {
   const [
     fileMetadataOpeningProgress,
     setFileMetadataOpeningProgress,
-  ] = React.useState<number>(0);
+  ] = React.useState<?number>(null);
   const [
     fileMetadataOpeningMessage,
     setFileMetadataOpeningMessage,
@@ -732,8 +732,8 @@ const MainFrame = (props: Props) => {
     [loadFromProject]
   );
 
-  const onFileOpeningProgress = (
-    progress: number,
+  const setLoaderModalProgress = (
+    progress: ?number,
     message: ?MessageDescriptor
   ) => {
     setFileMetadataOpeningProgress(progress);
@@ -803,7 +803,7 @@ const MainFrame = (props: Props) => {
       // Try to find an autosave (and ask user if found)
       return delay(150)
         .then(() => checkForAutosave())
-        .then(fileMetadata => onOpen(fileMetadata, onFileOpeningProgress))
+        .then(fileMetadata => onOpen(fileMetadata, setLoaderModalProgress))
         .catch(err => {
           // onOpen failed, tried to find again an autosave
           return checkForAutosaveAfterFailure().then(fileMetadata => {
@@ -818,7 +818,7 @@ const MainFrame = (props: Props) => {
           if (!verifyProjectContent(i18n, content)) {
             // The content is not recognized and the user was warned. Abort the opening.
             setIsLoadingProject(false);
-            onFileOpeningProgress(0, null);
+            setLoaderModalProgress(null, null);
             return;
           }
 
@@ -853,7 +853,7 @@ const MainFrame = (props: Props) => {
             rawError: error,
           });
           setIsLoadingProject(false);
-          onFileOpeningProgress(0, null);
+          setLoaderModalProgress(null, null);
           return Promise.reject(error);
         });
     },
@@ -1389,7 +1389,7 @@ const MainFrame = (props: Props) => {
         editorTabs: tabsWithSceneAndEventsEditors,
       }));
       setIsLoadingProject(false);
-      onFileOpeningProgress(0, null);
+      setLoaderModalProgress(null, null);
       openProjectManager(false);
     },
     [i18n, setState, state.editorTabs]

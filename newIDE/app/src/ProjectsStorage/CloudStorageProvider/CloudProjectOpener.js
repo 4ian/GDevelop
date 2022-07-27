@@ -15,19 +15,24 @@ const unzipProject = async (zippedProject: Blob) => {
   const zipJs: ZipJs = await initializeZipJs();
 
   return new Promise((resolve, reject) => {
-    try {
-      zipJs.createReader(new zipJs.BlobReader(zippedProject), zipReader => {
+    zipJs.createReader(
+      new zipJs.BlobReader(zippedProject),
+      zipReader => {
         zipReader.getEntries(entries => {
           // Reading only the first entry since the zip should only contain the project json file
           entries[0].getData(new zipJs.TextWriter(), result => {
             resolve(result);
           });
         });
-      });
-    } catch (error) {
-      console.error('An error occurred when unzipping archived project', error);
-      reject(error);
-    }
+      },
+      error => {
+        console.error(
+          'An error occurred when unzipping archived project',
+          error
+        );
+        reject(error);
+      }
+    );
   });
 };
 

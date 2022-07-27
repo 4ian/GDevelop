@@ -18,18 +18,20 @@ const zipProject = async (project: gdProject) => {
   const textReader = new zipJs.TextReader(projectJson);
 
   return new Promise((resolve, reject) => {
-    try {
-      zipJs.createWriter(new zipJs.BlobWriter('application/zip'), zipWriter => {
+    zipJs.createWriter(
+      new zipJs.BlobWriter('application/zip'),
+      zipWriter => {
         zipWriter.add('game.json', textReader, () => {
           zipWriter.close(blob => {
             resolve(blob);
           });
         });
-      });
-    } catch (error) {
-      console.error('An error occurred when zipping project', error);
-      reject(error);
-    }
+      },
+      error => {
+        console.error('An error occurred when zipping project', error);
+        reject(error);
+      }
+    );
   });
 };
 

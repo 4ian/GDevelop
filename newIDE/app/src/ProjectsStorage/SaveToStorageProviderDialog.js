@@ -9,6 +9,8 @@ import { List } from '../UI/List';
 import StorageProviderListItem from './StorageProviderListItem';
 import { type StorageProvider } from '.';
 
+const styles = { list: { padding: 20 } };
+
 type Props = {|
   storageProviders: Array<StorageProvider>,
   onChooseProvider: StorageProvider => void,
@@ -36,7 +38,7 @@ const SaveToStorageProviderDialog = ({
       noMargin
       maxWidth="sm"
     >
-      <List style={{ padding: 20 }} useGap>
+      <List style={styles.list} useGap>
         {storageProviders
           .filter(storageProvider => !storageProvider.hiddenInSaveDialog)
           .map(storageProvider => (

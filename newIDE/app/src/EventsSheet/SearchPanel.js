@@ -156,7 +156,7 @@ const SearchPanel = (
 
   const shouldDisableSearch = !searchText;
   const shouldDisableReplace =
-    !replaceText || !searchText || (!hasEventSelected && searchInSelection);
+    !searchText || (!hasEventSelected && searchInSelection);
 
   return (
     <Background noFullHeight noExpand>

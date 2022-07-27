@@ -91,7 +91,7 @@ export default class EditTagsDialog extends React.Component<Props, State> {
             })
           }
           floatingLabelText="Tag(s) (comma-separated)"
-          hintText={t`For example: player, spaceship, inventory...`}
+          translatableHintText={t`For example: player, spaceship, inventory...`}
           onKeyPress={event => {
             if (shouldValidate(event)) {
               onEdit(tags);

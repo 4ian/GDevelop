@@ -83,6 +83,7 @@ const styles = {
 
 type Props = {|
   project: gdProject,
+  onChangeProjectName: string => Promise<void>,
   onDeleteLayout: gdLayout => void,
   onDeleteExternalEvents: gdExternalEvents => void,
   onDeleteExternalLayout: gdExternalLayout => void,
@@ -561,6 +562,18 @@ export default class ProjectManager extends React.Component<Props, State> {
       openedExtensionShortHeader: extensionShortHeader,
       openedExtensionName: name,
     });
+  };
+
+  _onApplyProjectProperties = (options: { newName?: string }) => {
+    if (this.props.unsavedChanges) {
+      this.props.unsavedChanges.triggerUnsavedChanges();
+    }
+
+    if (options.newName) {
+      this.props.onChangeProjectName(options.newName);
+    }
+
+    this.setState({ projectPropertiesDialogOpen: false });
   };
 
   _renderMenu() {
@@ -1111,11 +1124,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 onClose={() =>
                   this.setState({ projectPropertiesDialogOpen: false })
                 }
-                onApply={() => {
-                  if (this.props.unsavedChanges)
-                    this.props.unsavedChanges.triggerUnsavedChanges();
-                  this.setState({ projectPropertiesDialogOpen: false });
-                }}
+                onApply={this._onApplyProjectProperties}
                 onChangeSubscription={this.props.onChangeSubscription}
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}

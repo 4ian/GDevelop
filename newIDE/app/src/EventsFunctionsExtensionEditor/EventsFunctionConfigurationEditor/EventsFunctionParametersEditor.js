@@ -295,7 +295,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
                           <SemiControlledTextField
                             commitOnBlur
                             margin="none"
-                            hintText={t`Enter the parameter name (mandatory)`}
+                            translatableHintText={t`Enter the parameter name (mandatory)`}
                             value={parameter.getName()}
                             onChange={text => {
                               if (!validateParameterName(i18n, text)) return;

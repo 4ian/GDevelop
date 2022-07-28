@@ -470,7 +470,7 @@ export const GameDetailsDialog = ({
                     fullWidth
                     floatingLabelText={<Trans>Game description</Trans>}
                     floatingLabelFixed={true}
-                    hintText={t`No description set.`}
+                    translatableHintText={t`No description set.`}
                     multiline
                     rows={5}
                   />

@@ -27,6 +27,7 @@ import GoogleDriveStorageProvider from './ProjectsStorage/GoogleDriveStorageProv
 import DownloadFileStorageProvider from './ProjectsStorage/DownloadFileStorageProvider';
 import DropboxStorageProvider from './ProjectsStorage/DropboxStorageProvider';
 import OneDriveStorageProvider from './ProjectsStorage/OneDriveStorageProvider';
+import CloudStorageProvider from './ProjectsStorage/CloudStorageProvider';
 import { BrowserResourceFetcher } from './ProjectsStorage/ResourceFetcher/BrowserResourceFetcher';
 import {
   onCreateFromExampleShortHeader,
@@ -53,6 +54,7 @@ export const create = (authentication: Authentication) => {
           appArguments={appArguments}
           storageProviders={[
             UrlStorageProvider,
+            CloudStorageProvider,
             GoogleDriveStorageProvider,
             DropboxStorageProvider,
             OneDriveStorageProvider,

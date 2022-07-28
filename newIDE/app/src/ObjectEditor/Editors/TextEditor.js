@@ -119,7 +119,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 floatingLabelText={<Trans>Initial text to display</Trans>}
                 floatingLabelFixed
                 commitOnBlur
-                hintText={t`Enter the text to be displayed by the object`}
+                translatableHintText={t`Enter the text to be displayed by the object`}
                 fullWidth
                 multiline
                 rows={8}

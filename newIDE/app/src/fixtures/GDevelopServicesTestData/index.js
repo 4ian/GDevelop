@@ -215,7 +215,7 @@ export const fakeAuthenticatedAndEmailVerifiedUser: AuthenticatedUser = {
 export const fakeAuthenticatedButLoadingAuthenticatedUser: AuthenticatedUser = {
   authenticated: true,
   profile: null,
-  loginState: 'loading',
+  loginState: 'loggingIn',
   badges: null,
   cloudProjects: null,
   firebaseUser: null,

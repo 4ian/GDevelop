@@ -226,7 +226,7 @@ const BuildSection = ({
                   )}
                 </ResponsiveLineStackLayout>
               </Line>
-              {authenticatedUser.loginState === 'loading' ? (
+              {authenticatedUser.loginState === 'loggingIn' ? (
                 <Column
                   useFullHeight
                   expand

@@ -111,12 +111,6 @@ export default class AuthenticatedUserProvider extends React.Component<
         'Fetching user profile as authenticated user found at startup...'
       );
       this._automaticallyUpdateUserProfile = false;
-      this.setState(({ authenticatedUser }) => ({
-        authenticatedUser: {
-          ...authenticatedUser,
-          loginState: 'justOpened',
-        },
-      }));
       this._fetchUserProfileWithoutThrowingErrors();
       this._automaticallyUpdateUserProfile = true;
     } else {
@@ -198,7 +192,7 @@ export default class AuthenticatedUserProvider extends React.Component<
     this.setState(({ authenticatedUser }) => ({
       authenticatedUser: {
         ...authenticatedUser,
-        loginState: 'loading',
+        loginState: 'loggingIn',
       },
     }));
 

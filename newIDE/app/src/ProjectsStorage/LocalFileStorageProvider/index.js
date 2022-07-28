@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react';
 import { t } from '@lingui/macro';
 import { type StorageProvider } from '../index';
 import {
@@ -17,6 +18,7 @@ import {
   POSITIONAL_ARGUMENTS_KEY,
 } from '../../Utils/Window';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
+import Computer from '../../UI/CustomSvgIcons/Computer';
 
 /**
  * Use the Electron APIs to provide access to the native
@@ -25,6 +27,7 @@ import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow'
 export default ({
   internalName: 'LocalFile',
   name: t`Local file system`,
+  renderIcon: () => <Computer />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY].length) return null;

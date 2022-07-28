@@ -31,7 +31,7 @@ type Props = {|
 const transitionDuration = { enter: 0, exit: 150 };
 
 const LoaderModal = (props: Props) => {
-  const isInfinite = !props.progress && props.progress !== 0;
+  const isInfinite = props.progress === null || props.progress === undefined;
   return (
     <I18n>
       {({ i18n }) => (

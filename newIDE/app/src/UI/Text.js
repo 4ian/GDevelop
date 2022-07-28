@@ -11,7 +11,7 @@ type textSize =
   | 'body'
   | 'body2';
 
-type textColor = 'error' | 'primary' | 'secondary';
+type textColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
 type Props = {|
   /** The text to display. */
@@ -80,6 +80,8 @@ const getTextColorFromColor = (color: ?textColor) => {
       return 'textPrimary';
     case 'secondary':
       return 'textSecondary';
+    case 'inherit':
+      return 'inherit';
     default:
       return 'textPrimary';
   }

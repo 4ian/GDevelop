@@ -130,7 +130,7 @@ export default React.forwardRef<ParameterFieldProps, ParameterFieldInterface>(
                     margin={props.isInline ? 'none' : 'dense'}
                     fullWidth
                     floatingLabelText={fieldLabel}
-                    hintText={
+                    translatableHintText={
                       gameHasLeaderboards
                         ? props.parameterMetadata &&
                           props.parameterMetadata.isOptional()

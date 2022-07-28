@@ -20,6 +20,7 @@ import { ExampleStoreContext } from '../../../AssetStore/ExampleStore/ExampleSto
 import { HomePageHeader } from './HomePageHeader';
 import { HomePageMenu, type HomeTab } from './HomePageMenu';
 import PreferencesContext from '../../Preferences/PreferencesContext';
+import AuthenticatedUserContext from '../../../Profile/AuthenticatedUserContext';
 
 type Props = {|
   project: ?gdProject,
@@ -72,9 +73,13 @@ export const HomePage = React.memo<Props>(
         onOpenProfile,
         setToolbar,
         onOpenOnboardingDialog,
+        isActive,
       }: Props,
       ref
     ) => {
+      const { authenticated, onCloudProjectsChanged } = React.useContext(
+        AuthenticatedUserContext
+      );
       const { fetchTutorials } = React.useContext(TutorialContext);
       const { fetchShowcasedGamesAndFilters } = React.useContext(
         GamesShowcaseContext
@@ -93,6 +98,16 @@ export const HomePage = React.memo<Props>(
           fetchTutorials();
         },
         [fetchExamplesAndFilters, fetchShowcasedGamesAndFilters, fetchTutorials]
+      );
+
+      // Fetch user cloud projects when home page becomes active
+      React.useEffect(
+        () => {
+          if (isActive && authenticated) {
+            onCloudProjectsChanged();
+          }
+        },
+        [isActive, authenticated, onCloudProjectsChanged]
       );
 
       const getProject = () => {

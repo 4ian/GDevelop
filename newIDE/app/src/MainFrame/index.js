@@ -420,7 +420,8 @@ const MainFrame = (props: Props) => {
           /* Ignore errors */
         });
     },
-    // eslint-disable-next-line
+    // We want to run this effect only when the component did mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 

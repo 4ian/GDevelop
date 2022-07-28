@@ -3783,6 +3783,7 @@ storiesOf('ProjectManager', module)
   .add('default', () => (
     <ProjectManager
       project={testProject.project}
+      onSaveProjectProperties={async () => true}
       onChangeProjectName={action('onChangeProjectName')}
       onOpenExternalEvents={action('onOpenExternalEvents')}
       onOpenLayout={action('onOpenLayout')}
@@ -3825,6 +3826,7 @@ storiesOf('ProjectManager', module)
   .add('Error in functions', () => (
     <ProjectManager
       project={testProject.project}
+      onSaveProjectProperties={async () => true}
       onChangeProjectName={action('onChangeProjectName')}
       onOpenExternalEvents={action('onOpenExternalEvents')}
       onOpenLayout={action('onOpenLayout')}
@@ -4144,7 +4146,8 @@ storiesOf('ProjectPropertiesDialog', module)
       initialTab="properties"
       project={testProject.project}
       onClose={action('onClose')}
-      onApply={action('onApply')}
+      onApply={async () => true}
+      onPropertiesApplied={action('onPropertiesApplied')}
       onChangeSubscription={action('onChangeSubscription')}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('unimplemented')}

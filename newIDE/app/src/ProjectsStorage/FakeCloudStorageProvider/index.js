@@ -1,8 +1,8 @@
 // @flow
 import { t } from '@lingui/macro';
 import * as React from 'react';
+import Cloud from '../../UI/CustomSvgIcons/Cloud';
 import { type StorageProvider, type FileMetadata } from '../index';
-import Cloud from '@material-ui/icons/Cloud';
 
 /**
  * A storage that is using OneDrive to open and store files.

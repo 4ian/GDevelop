@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';
-import Cloud from '@material-ui/icons/Cloud';
 import { type StorageProvider } from '../index';
 import {
   generateOnChangeProjectProperty,
@@ -14,6 +13,7 @@ import {
 } from '../../Utils/Window';
 import { type MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { generateOnOpen } from './CloudProjectOpener';
+import Cloud from '../../UI/CustomSvgIcons/Cloud';
 
 export default ({
   internalName: 'Cloud',

@@ -9,7 +9,17 @@ import { type AuthenticatedUser } from '../../Profile/AuthenticatedUserContext';
 export const CLOUD_PROJECT_NAME_MAX_LENGTH = 50;
 
 const projectResourcesClient = axios.create({
+  baseURL: GDevelopProjectResourcesStorage.baseUrl,
   withCredentials: true,
+});
+
+const apiClient = axios.create({
+  baseURL: GDevelopProjectApi.baseUrl,
+});
+
+const projectResourcesCredentialsApiClient = axios.create({
+  baseURL: GDevelopProjectApi.baseUrl,
+  withCredentials: true, // Necessary to save cookie returned by the server.
 });
 
 type CloudProject = {|
@@ -63,22 +73,19 @@ export const getCredentialsForCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/authorize`,
+  const response = await projectResourcesCredentialsApiClient.get(
+    `/project/${cloudProjectId}/action/authorize`,
     {
       headers: { Authorization: authorizationHeader },
       params: { userId },
       validateStatus: status => true,
-      withCredentials: true, // Necessary to save cookie returned by the server.
     }
   );
   return response.status >= 200 && response.status < 400;
 };
 
 export const clearCloudProjectCredentials = async (): Promise<void> => {
-  await axios.get(`${GDevelopProjectApi.baseUrl}/action/clear-authorization`, {
-    withCredentials: true, // Necessary to save cookie returned by the server.
-  });
+  await projectResourcesCredentialsApiClient.get('/action/clear-authorization');
 };
 
 export const createCloudProject = async (
@@ -90,8 +97,8 @@ export const createCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${GDevelopProjectApi.baseUrl}/project`,
+  const response = await apiClient.post(
+    '/project',
     cloudProjectCreationPayload,
     {
       headers: { Authorization: authorizationHeader },
@@ -122,18 +129,13 @@ export const commitVersion = async (
     authenticatedUser,
     cloudProjectId,
     () =>
-      projectResourcesClient.post(
-        `${GDevelopProjectResourcesStorage.baseUrl}${presignedUrl}`,
-        zippedProject,
-        {
-          headers: { 'content-type': 'application/zip' },
-          withCredentials: true,
-        }
-      )
+      projectResourcesClient.post(presignedUrl, zippedProject, {
+        headers: { 'content-type': 'application/zip' },
+      })
   );
   // Inform backend a new version has been uploaded.
-  const response = await axios.post(
-    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}/action/commit`,
+  const response = await apiClient.post(
+    `/project/${cloudProjectId}/action/commit`,
     { newVersion },
     {
       headers: {
@@ -150,7 +152,7 @@ export const listUserCloudProjects = async (
   userId: string
 ): Promise<Array<CloudProjectWithUserAccessInfo>> => {
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(`${GDevelopProjectApi.baseUrl}/project`, {
+  const response = await apiClient.get('project', {
     headers: { Authorization: authorizationHeader },
     params: { userId },
   });
@@ -166,15 +168,12 @@ export const getCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.get(
-    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
-    {
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      params: { userId },
-    }
-  );
+  const response = await apiClient.get(`/project/${cloudProjectId}`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId },
+  });
   return response.data;
 };
 
@@ -192,8 +191,8 @@ export const updateCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.patch(
-    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
+  const response = await apiClient.patch(
+    `/project/${cloudProjectId}`,
     cleanedAttributes,
     {
       headers: {
@@ -214,15 +213,12 @@ export const deleteCloudProject = async (
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.delete(
-    `${GDevelopProjectApi.baseUrl}/project/${cloudProjectId}`,
-    {
-      headers: {
-        Authorization: authorizationHeader,
-      },
-      params: { userId },
-    }
-  );
+  const response = await apiClient.delete(`/project/${cloudProjectId}`, {
+    headers: {
+      Authorization: authorizationHeader,
+    },
+    params: { userId },
+  });
   return response.data;
 };
 
@@ -233,15 +229,13 @@ export const getPresignedUrlForVersionUpload = async (
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
   if (!firebaseUser)
     throw new Error(
-      'Presigned url is could not be created, user not authenticated.'
+      'Presigned url could not be created, user not authenticated.'
     );
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
-  const response = await axios.post(
-    `${
-      GDevelopProjectApi.baseUrl
-    }/project/${cloudProjectId}/action/create-presigned-urls`,
+  const response = await apiClient.post(
+    `/project/${cloudProjectId}/action/create-presigned-urls`,
     { resources: ['newProjectVersion'] },
     {
       headers: {
@@ -262,9 +256,7 @@ export const getProjectFileAsZipBlob = async (
     throw new Error('Opening of project without current version not handled');
   }
   const response = await projectResourcesClient.get(
-    `${GDevelopProjectResourcesStorage.baseUrl}/${cloudProject.id}/versions/${
-      cloudProject.currentVersion
-    }.zip`,
+    `/${cloudProject.id}/versions/${cloudProject.currentVersion}.zip`,
     { responseType: 'blob' }
   );
   return response.data;

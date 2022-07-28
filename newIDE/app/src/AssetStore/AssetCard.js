@@ -81,10 +81,10 @@ export const AssetCard = ({ assetShortHeader, onOpenDetails, size }: Props) => {
           />
         </div>
         <div style={styles.titleContainer}>
-          <Text noMargin style={styles.title}>
+          <Text noMargin style={styles.title} color="inherit">
             {assetShortHeader.name}
           </Text>
-          <Text noMargin style={styles.title} size="body2">
+          <Text noMargin style={styles.title} size="body2" color="inherit">
             {assetShortHeader.shortDescription}
           </Text>
         </div>

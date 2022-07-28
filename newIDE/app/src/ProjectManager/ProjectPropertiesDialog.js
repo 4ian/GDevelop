@@ -43,7 +43,8 @@ type Props = {|
   open: boolean,
   initialTab: 'properties' | 'loading-screen',
   onClose: () => void,
-  onApply: (options: { newName?: string }) => void,
+  onApply: (options: { newName?: string }) => Promise<boolean>,
+  onPropertiesApplied: (options: { newName?: string }) => void,
   onChangeSubscription: () => void,
   hotReloadPreviewButtonProps?: ?HotReloadPreviewButtonProps,
 
@@ -204,7 +205,13 @@ function ProjectPropertiesDialog(props: Props) {
     onCancel: onCancelLoadingScreenChanges,
   });
 
-  const onApply = () => {
+  const onApply = async () => {
+    const specialPropertiesChanged =
+      name !== initialProperties.name ? { newName: name } : {};
+
+    const proceed = await props.onApply(specialPropertiesChanged);
+    if (!proceed) return;
+
     const wasProjectPropertiesApplied = applyPropertiesToProject(project, {
       gameResolutionWidth,
       gameResolutionHeight,
@@ -224,8 +231,9 @@ function ProjectPropertiesDialog(props: Props) {
       isFolderProject,
       useDeprecatedZeroAsDefaultZOrder,
     });
+
     if (wasProjectPropertiesApplied) {
-      props.onApply(name !== initialProperties.name ? { newName: name } : {});
+      props.onPropertiesApplied(specialPropertiesChanged);
     }
   };
 

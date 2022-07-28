@@ -137,6 +137,7 @@ import optionalRequire from '../Utils/OptionalRequire';
 import { isMobile } from '../Utils/Platform';
 import { getProgramOpeningCount } from '../Utils/Analytics/LocalStats';
 import { useLeaderboardReplacer } from '../Leaderboard/useLeaderboardReplacer';
+import useConfirmDialog from '../UI/Confirm/useConfirmDialog';
 const electron = optionalRequire('electron');
 const isDev = Window.isDev();
 
@@ -308,6 +309,7 @@ const MainFrame = (props: Props) => {
     openSubscriptionDialog,
   ] = React.useState<boolean>(false);
   const [exportDialogOpen, openExportDialog] = React.useState<boolean>(false);
+  const { showConfirmation } = useConfirmDialog();
   const preferences = React.useContext(PreferencesContext);
   const { setHasProjectOpened } = preferences;
   const [previewLoading, setPreviewLoading] = React.useState<boolean>(false);
@@ -2058,6 +2060,19 @@ const MainFrame = (props: Props) => {
     }
   };
 
+  const onSaveProjectProperties = async (options: {
+    newName?: string,
+  }): Promise<boolean> => {
+    const storageProvider = getStorageProvider();
+    if (storageProvider.internalName === 'Cloud' && options.newName) {
+      return showConfirmation({
+        title: t`Project name changed`,
+        message: t`Your project name has changed, this will also save the whole project, continue?`,
+      });
+    }
+    return true;
+  };
+
   const onChooseResource: ChooseResourceFunction = (
     options: ChooseResourceOptions
   ) => {
@@ -2269,6 +2284,7 @@ const MainFrame = (props: Props) => {
           <ProjectManager
             project={currentProject}
             onChangeProjectName={onChangeProjectName}
+            onSaveProjectProperties={onSaveProjectProperties}
             onOpenExternalEvents={openExternalEvents}
             onOpenLayout={openLayout}
             onOpenExternalLayout={openExternalLayout}

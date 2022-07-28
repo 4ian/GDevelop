@@ -123,6 +123,7 @@ export const commitVersion = async (
     authenticatedUser,
     cloudProjectId
   );
+  if (!presignedUrl) return;
   const newVersion = getVersionIdFromPath(presignedUrl);
   // Upload zipped project.
   await refetchCredentialsForProjectAndRetryIfUnauthorized(
@@ -225,12 +226,9 @@ export const deleteCloudProject = async (
 export const getPresignedUrlForVersionUpload = async (
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string
-): Promise<string> => {
+): Promise<?string> => {
   const { getAuthorizationHeader, firebaseUser } = authenticatedUser;
-  if (!firebaseUser)
-    throw new Error(
-      'Presigned url could not be created, user not authenticated.'
-    );
+  if (!firebaseUser) return;
 
   const { uid: userId } = firebaseUser;
   const authorizationHeader = await getAuthorizationHeader();
@@ -244,8 +242,7 @@ export const getPresignedUrlForVersionUpload = async (
       params: { userId },
     }
   );
-  if (!response.data || !response.data[0])
-    throw new Error('Presigned url is empty');
+  if (!response.data || !response.data[0]) return;
   return response.data[0];
 };
 

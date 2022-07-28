@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import { Trans } from '@lingui/macro';
 import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../ThemeDecorator';

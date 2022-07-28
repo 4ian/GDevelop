@@ -145,7 +145,7 @@ export default class CommentEvent extends React.Component<
             margin="none"
             ref={textField => (this._textField = textField)}
             value={commentEvent.getComment()}
-            hintText={t`<Enter comment>`}
+            translatableHintText={t`<Enter comment>`}
             onBlur={this.endEditing}
             onChange={this.onEvent}
             style={styles.commentTextField}

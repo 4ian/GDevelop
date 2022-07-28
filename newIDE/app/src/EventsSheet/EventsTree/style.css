@@ -133,6 +133,11 @@
     font: inherit;
     cursor: pointer;
     opacity: 0.6;
+
+    /** Ensure the links are not growing outside of their parents on small screens. */
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 .gd-events-sheet .add-link:hover {
     opacity: 0.9;

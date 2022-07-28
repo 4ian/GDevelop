@@ -452,20 +452,78 @@ namespace gdjs {
       this._transformationIsUpToDate = false;
     }
 
-    // TODO allow size changes from events?
-
+    /**
+     * Change the width of the object. This changes the scale on X axis of the object.
+     *
+     * @param width The new width of the object, in pixels.
+     */
     setWidth(width: float): void {
-      if (this._width === width) return;
+      if (this._width === width) {
+        return;
+      }
       this._scaleX = width / this._collisionTileMap.getWidth();
       this._width = width;
       this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
     }
 
+    /**
+     * Change the height of the object. This changes the scale on Y axis of the object.
+     *
+     * @param height The new height of the object, in pixels.
+     */
     setHeight(height: float): void {
-      if (this._height === height) return;
+      if (this._height === height) {
+        return;
+      }
       this._scaleY = height / this._collisionTileMap.getHeight();
       this._height = height;
+      this.hitBoxesDirty = true;
+      this._transformationIsUpToDate = false;
+    }
+
+    /**
+     * Change the scale on X and Y axis of the object.
+     *
+     * @param scale The new scale (must be greater than 0).
+     */
+    setScale(scale: float): void {
+      this.setScaleX(scale);
+      this.setScaleY(scale);
+    }
+
+    /**
+     * Change the scale on X axis of the object (changing its width).
+     *
+     * @param scaleX The new scale (must be greater than 0).
+     */
+    setScaleX(scaleX: float): void {
+      if (scaleX < 0) {
+        scaleX = 0;
+      }
+      if (this._scaleX === scaleX) {
+        return;
+      }
+      this._scaleX = scaleX;
+      this._width = scaleX * this._collisionTileMap.getWidth();
+      this.hitBoxesDirty = true;
+      this._transformationIsUpToDate = false;
+    }
+
+    /**
+     * Change the scale on Y axis of the object (changing its width).
+     *
+     * @param scaleY The new scale (must be greater than 0).
+     */
+    setScaleY(scaleY: float): void {
+      if (scaleY < 0) {
+        scaleY = 0;
+      }
+      if (this._scaleY === scaleY) {
+        return;
+      }
+      this._scaleY = scaleY;
+      this._height = scaleY * this._collisionTileMap.getHeight();
       this.hitBoxesDirty = true;
       this._transformationIsUpToDate = false;
     }
@@ -476,6 +534,14 @@ namespace gdjs {
 
     getHeight(): float {
       return this._height;
+    }
+
+    getScaleX(): float {
+      return this._scaleX;
+    }
+
+    getScaleY(): float {
+      return this._scaleY;
     }
   }
   gdjs.registerObject(

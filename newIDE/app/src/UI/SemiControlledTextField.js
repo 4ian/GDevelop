@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react';
+import { type MessageDescriptor } from '../Utils/i18n/MessageDescriptor.flow';
 import TextField from './TextField';
 
 type State = {|
@@ -35,7 +36,8 @@ type Props = {|
   floatingLabelFixed?: boolean,
   floatingLabelText?: React.Node,
   fullWidth?: boolean,
-  hintText?: React.Node,
+  translatableHintText?: MessageDescriptor,
+  hintText?: string,
   helperMarkdownText?: ?string,
   id?: string,
   inputStyle?: Object,

@@ -197,7 +197,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
               <SemiControlledTextField
                 commitOnBlur
                 floatingLabelText={<Trans>Full name displayed in editor</Trans>}
-                hintText={getFullNameHintText(type)}
+                translatableHintText={getFullNameHintText(type)}
                 value={eventsFunction.getFullName()}
                 onChange={text => {
                   eventsFunction.setFullName(text);
@@ -235,7 +235,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 floatingLabelText={
                   <Trans>Description, displayed in editor</Trans>
                 }
-                hintText={getDescriptionHintText(type)}
+                translatableHintText={getDescriptionHintText(type)}
                 fullWidth
                 multiline
                 value={eventsFunction.getDescription()}
@@ -252,7 +252,7 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                 <SemiControlledTextField
                   commitOnBlur
                   floatingLabelText={<Trans>Sentence in Events Sheet</Trans>}
-                  hintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
+                  translatableHintText={t`Note: write _PARAMx_ for parameters, e.g: Flash _PARAM1_ for 5 seconds`}
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={text => {

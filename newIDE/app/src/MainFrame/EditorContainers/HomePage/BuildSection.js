@@ -72,7 +72,9 @@ const BuildSection = ({
   onCreateProject,
   onOpenRecentFile,
 }: Props) => {
-  const { getRecentProjectFiles } = React.useContext(PreferencesContext);
+  const { getRecentProjectFiles, removeRecentProjectFile } = React.useContext(
+    PreferencesContext
+  );
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const { showDeleteConfirmation } = useConfirmDialog();
@@ -127,7 +129,7 @@ const BuildSection = ({
     }
   };
 
-  const onDeleteProject = async (
+  const onDeleteCloudProject = async (
     i18n: I18nType,
     { fileMetadata, storageProviderName }: FileMetadataAndStorageProviderName
   ) => {
@@ -160,6 +162,10 @@ const BuildSection = ({
     }
   };
 
+  const onRemoveFromRecentFiles = file => {
+    removeRecentProjectFile(file);
+  };
+
   const buildContextMenu = (
     i18n: I18nType,
     file: ?FileMetadataAndStorageProviderName
@@ -173,7 +179,15 @@ const BuildSection = ({
         { type: 'separator' },
         {
           label: i18n._(t`Delete`),
-          click: () => onDeleteProject(i18n, file),
+          click: () => onDeleteCloudProject(i18n, file),
+        },
+      ]);
+    } else if (file.storageProviderName === 'LocalFile') {
+      actions = actions.concat([
+        { type: 'separator' },
+        {
+          label: i18n._(t`Remove from list`),
+          click: () => onRemoveFromRecentFiles(file),
         },
       ]);
     }

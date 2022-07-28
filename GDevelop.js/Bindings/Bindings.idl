@@ -1487,6 +1487,7 @@ interface BehaviorMetadata {
 
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
+    [Ref] BehaviorMetadata AddRequiredFile([Const] DOMString resourceFile);
 
     [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
     [Const, Ref] DOMString GetObjectType();

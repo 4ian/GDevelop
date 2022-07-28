@@ -77,6 +77,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
   fs.MkDir(options.exportPath);
   fs.ClearDir(options.exportPath);
   std::vector<gd::String> includesFiles;
+  std::vector<gd::String> resourcesFiles;
 
   // TODO Try to remove side effects to avoid the copy
   // that destroys the AST in cache.
@@ -114,6 +115,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Export files for object and behaviors
   ExportObjectAndBehaviorsIncludes(immutableProject, includesFiles);
+  ExportObjectAndBehaviorsRequiredFiles(immutableProject, resourcesFiles);
 
   // Export effects (after engine libraries as they auto-register themselves to
   // the engine)
@@ -184,6 +186,7 @@ bool ExporterHelper::ExportProjectForPixiPreview(
 
   // Copy all the dependencies and their source maps
   ExportIncludesAndLibs(includesFiles, options.exportPath, true);
+  ExportIncludesAndLibs(resourcesFiles, options.exportPath, true);
 
   // Create the index file
   if (!ExportPixiIndexFile(exportedProject,
@@ -805,6 +808,46 @@ void ExporterHelper::ExportObjectAndBehaviorsIncludes(
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
     const gd::Layout &layout = project.GetLayout(i);
     addObjectsIncludeFiles(layout);
+  }
+}
+
+void ExporterHelper::ExportObjectAndBehaviorsRequiredFiles(
+    const gd::Project &project, std::vector<gd::String> &requiredFiles) {
+  auto addRequiredFiles = [&](const std::vector<gd::String> &newRequiredFiles) {
+    for (const auto &requiredFile : newRequiredFiles) {
+      
+      std::cout << "include as resource: " << requiredFile
+                << std::endl;
+      InsertUnique(requiredFiles, requiredFile);
+    }
+  };
+
+  auto addObjectRequiredFiles = [&](const gd::Object &object) {
+    // Ensure needed files are included for the object type and its behaviors.
+
+    // TODO Do the same for objects once we have a case to test it.
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata &metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      addRequiredFiles(metadata.requiredFiles);
+    }
+  };
+
+  auto addObjectsRequiredFiles =
+      [&](const gd::ObjectsContainer &objectsContainer) {
+        for (std::size_t i = 0; i < objectsContainer.GetObjectsCount(); ++i) {
+          addObjectRequiredFiles(objectsContainer.GetObject(i));
+        }
+      };
+
+  addObjectsRequiredFiles(project);
+  for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
+    const gd::Layout &layout = project.GetLayout(i);
+    addObjectsRequiredFiles(layout);
   }
 }
 

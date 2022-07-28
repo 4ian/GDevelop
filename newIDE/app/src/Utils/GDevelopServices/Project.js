@@ -25,7 +25,7 @@ export type CloudProjectWithUserAccessInfo = {|
   lastModifiedAt: string,
 |};
 
-const refetchCredentialsForProjectAndRetryIfFailed = async <T>(
+const refetchCredentialsForProjectAndRetryIfUnauthorized = async <T>(
   authenticatedUser: AuthenticatedUser,
   cloudProjectId: string,
   apiCall: () => Promise<T>
@@ -118,7 +118,7 @@ export const commitVersion = async (
   );
   const newVersion = getVersionIdFromPath(presignedUrl);
   // Upload zipped project.
-  await refetchCredentialsForProjectAndRetryIfFailed(
+  await refetchCredentialsForProjectAndRetryIfUnauthorized(
     authenticatedUser,
     cloudProjectId,
     () =>

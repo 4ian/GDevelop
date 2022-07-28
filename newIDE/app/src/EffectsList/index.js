@@ -274,7 +274,7 @@ export default function EffectsList(props: Props) {
                                         margin="none"
                                         commitOnBlur
                                         errorText={nameErrors[effect.ptr]}
-                                        hintText={t`Enter the effect name`}
+                                        translatableHintText={t`Enter the effect name`}
                                         value={effect.getName()}
                                         onChange={newName => {
                                           renameEffect(effect, newName);
@@ -301,7 +301,7 @@ export default function EffectsList(props: Props) {
                                           )
                                         }
                                         fullWidth
-                                        hintText={t`Choose the effect to apply`}
+                                        translatableHintText={t`Choose the effect to apply`}
                                       >
                                         {allEffectMetadata.map(
                                           effectMetadata => (

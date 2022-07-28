@@ -66,7 +66,7 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
           margin="dense"
           style={styles.textField}
           type="text"
-          hintText={t`Choose a file`}
+          translatableHintText={t`Choose a file`}
           value={this.props.value}
           onChange={(event, value) => this.props.onChange(value)}
         />

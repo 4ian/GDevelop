@@ -225,7 +225,7 @@ const BehaviorsEditor = (props: Props) => {
                     <Column expand>
                       <TextField
                         value={behaviorName}
-                        hintText={t`Behavior name`}
+                        translatableHintText={t`Behavior name`}
                         margin="none"
                         fullWidth
                         disabled

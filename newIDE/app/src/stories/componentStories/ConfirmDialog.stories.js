@@ -1,4 +1,3 @@
-/* eslint-disable import/no-anonymous-default-export */
 // @flow
 import * as React from 'react';
 import { t } from '@lingui/macro';

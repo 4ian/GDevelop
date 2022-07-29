@@ -10,16 +10,9 @@ import Background from '../UI/Background';
 import ScrollView from '../UI/ScrollView';
 import Window from '../Utils/Window';
 import {
-  sendAssetAddedToProject,
   sendAssetOpened,
   sendAssetPackOpened,
 } from '../Utils/Analytics/EventSender';
-import RaisedButton from '../UI/RaisedButton';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type AssetShortHeader } from '../Utils/GDevelopServices/Asset';
 import { BoxSearchResults } from '../UI/Search/BoxSearchResults';
 import { type SearchBarInterface } from '../UI/SearchBar';
@@ -37,38 +30,14 @@ import TextButton from '../UI/TextButton';
 import Text from '../UI/Text';
 import IconButton from '../UI/IconButton';
 import { AssetDetails } from './AssetDetails';
-import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { installAsset } from './InstallAsset';
-import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
-import { showErrorBox } from '../UI/Messages/MessageBox';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import { enumerateObjects } from '../ObjectsList/EnumerateObjects';
-import { AssetPackDialog } from './AssetPackDialog';
 import Home from '@material-ui/icons/Home';
 
-type Props = {
+type Props = {|
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  events: gdEventsList,
-  focusOnMount?: boolean,
-  onObjectAddedFromAsset: (object: gdObject) => void,
-  layout: ?gdLayout,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseResource: ChooseResourceFunction,
-};
+|};
 
-export const AssetStore = ({
-  project,
-  objectsContainer,
-  events,
-  focusOnMount,
-  onObjectAddedFromAsset,
-  layout,
-  resourceSources,
-  resourceExternalEditors,
-  onChooseResource,
-}: Props) => {
+export const AssetStore = ({ project }: Props) => {
   const {
     assetPacks,
     searchResults,
@@ -96,25 +65,6 @@ export const AssetStore = ({
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = React.useState(false);
-  const [
-    isAssetPackDialogInstallOpen,
-    setIsAssetPackDialogInstallOpen,
-  ] = React.useState(false);
-  const [
-    isAssetBeingInstalled,
-    setIsAssetBeingInstalled,
-  ] = React.useState<boolean>(false);
-
-  const { containerObjectsList } = enumerateObjects(project, objectsContainer);
-  const addedAssetIds = containerObjectsList
-    .map(({ object }) => object.getAssetStoreId())
-    .filter(Boolean);
-
-  const eventsFunctionsExtensionsState = React.useContext(
-    EventsFunctionsExtensionsContext
-  );
-
-  const resourcesFetcher = useResourceFetcher();
 
   const onOpenDetails = (assetShortHeader: AssetShortHeader) => {
     sendAssetOpened({
@@ -123,53 +73,6 @@ export const AssetStore = ({
     });
     navigationState.openDetailPage(assetShortHeader);
   };
-
-  const onInstallAsset = React.useCallback(
-    (assetShortHeader: AssetShortHeader) => {
-      setIsAssetBeingInstalled(true);
-      (async () => {
-        try {
-          const installOutput = await installAsset({
-            assetShortHeader,
-            eventsFunctionsExtensionsState,
-            project,
-            objectsContainer,
-            events,
-          });
-          sendAssetAddedToProject({
-            id: assetShortHeader.id,
-            name: assetShortHeader.name,
-          });
-          console.log('Asset successfully installed.');
-
-          installOutput.createdObjects.forEach(object => {
-            onObjectAddedFromAsset(object);
-          });
-
-          await resourcesFetcher.ensureResourcesAreFetched(project);
-        } catch (error) {
-          console.error('Error while installing the asset:', error);
-          showErrorBox({
-            message: `There was an error while installing the asset "${
-              assetShortHeader.name
-            }". Verify your internet connection or try again later.`,
-            rawError: error,
-            errorId: 'install-asset-error',
-          });
-        }
-
-        setIsAssetBeingInstalled(false);
-      })();
-    },
-    [
-      resourcesFetcher,
-      eventsFunctionsExtensionsState,
-      project,
-      objectsContainer,
-      events,
-      onObjectAddedFromAsset,
-    ]
-  );
 
   // When a pack is selected from the home page,
   // we set it as the chosen category and open the filters panel.
@@ -212,11 +115,11 @@ export const AssetStore = ({
 
   React.useEffect(
     () => {
-      if (focusOnMount && shouldAutofocusSearchbar && searchBar.current) {
+      if (shouldAutofocusSearchbar && searchBar.current) {
         searchBar.current.focus();
       }
     },
-    [shouldAutofocusSearchbar, focusOnMount]
+    [shouldAutofocusSearchbar]
   );
 
   return (
@@ -282,38 +185,21 @@ export const AssetStore = ({
                           }}
                         />
                       </Column>
-                      {!openedAssetPack && filtersState.chosenCategory && (
+                      {(openedAssetPack || filtersState.chosenCategory) && (
                         <>
                           <Column expand alignItems="center">
                             <Text size="block-title" noMargin>
-                              {capitalize(
-                                filtersState.chosenCategory.node.name
-                              )}
+                              {filtersState.chosenCategory
+                                ? capitalize(
+                                    filtersState.chosenCategory.node.name
+                                  )
+                                : openedAssetPack
+                                ? openedAssetPack.name
+                                : ''}
                             </Text>
                           </Column>
                           {/* to center the title */}
                           <Column expand alignItems="flex-end" noMargin />
-                        </>
-                      )}
-                      {openedAssetPack && (
-                        <>
-                          <Column expand alignItems="center">
-                            <Text size="block-title" noMargin>
-                              {openedAssetPack.name}
-                            </Text>
-                          </Column>
-                          <Column expand alignItems="flex-end" noMargin>
-                            <RaisedButton
-                              primary
-                              label={<Trans>Add all assets to my scene</Trans>}
-                              onClick={() =>
-                                setIsAssetPackDialogInstallOpen(true)
-                              }
-                              disabled={
-                                !searchResults || searchResults.length === 0
-                              }
-                            />
-                          </Column>
                         </>
                       )}
                     </>
@@ -409,38 +295,13 @@ export const AssetStore = ({
                 {openedAssetShortHeader && (
                   <AssetDetails
                     project={project}
-                    objectsContainer={objectsContainer}
-                    resourceSources={resourceSources}
-                    resourceExternalEditors={resourceExternalEditors}
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
-                    onAdd={() => onInstallAsset(openedAssetShortHeader)}
-                    onClose={() => navigationState.backToPreviousPage()}
-                    isAddedToScene={addedAssetIds.includes(
-                      openedAssetShortHeader.id
-                    )}
-                    isBeingAddedToScene={isAssetBeingInstalled}
                     onOpenDetails={onOpenDetails}
                   />
                 )}
               </Line>
             </Column>
-            {resourcesFetcher.renderResourceFetcherDialog()}
-            {isAssetPackDialogInstallOpen && searchResults && openedAssetPack && (
-              <AssetPackDialog
-                assetPack={openedAssetPack}
-                assetShortHeaders={searchResults}
-                addedAssetIds={addedAssetIds}
-                onClose={() => setIsAssetPackDialogInstallOpen(false)}
-                onAssetsAdded={() => {
-                  setIsAssetPackDialogInstallOpen(false);
-                }}
-                project={project}
-                objectsContainer={objectsContainer}
-                events={events}
-                onObjectAddedFromAsset={onObjectAddedFromAsset}
-              />
-            )}
           </>
         )}
       </ResponsiveWindowMeasurer>

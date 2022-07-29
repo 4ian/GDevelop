@@ -78,10 +78,6 @@ const BuildSection = ({
   const authenticatedUser = React.useContext(AuthenticatedUserContext);
   const contextMenu = React.useRef<?ContextMenuInterface>(null);
   const { showDeleteConfirmation } = useConfirmDialog();
-  const [
-    selectedFile,
-    setSelectedFile,
-  ] = React.useState<?FileMetadataAndStorageProviderName>(null);
   const [pendingProject, setPendingProject] = React.useState<?string>(null);
   const windowWidth = useResponsiveWindowWidth();
 
@@ -123,9 +119,8 @@ const BuildSection = ({
     event: MouseEvent,
     file: FileMetadataAndStorageProviderName
   ) => {
-    setSelectedFile(file);
     if (contextMenu.current) {
-      contextMenu.current.open(event.clientX, event.clientY);
+      contextMenu.current.open(event.clientX, event.clientY, { file });
     }
   };
 
@@ -162,7 +157,9 @@ const BuildSection = ({
     }
   };
 
-  const onRemoveFromRecentFiles = file => {
+  const onRemoveFromRecentFiles = (
+    file: FileMetadataAndStorageProviderName
+  ) => {
     removeRecentProjectFile(file);
   };
 
@@ -363,7 +360,9 @@ const BuildSection = ({
           </SectionContainer>
           <ContextMenu
             ref={contextMenu}
-            buildMenuTemplate={_i18n => buildContextMenu(_i18n, selectedFile)}
+            buildMenuTemplate={(_i18n, { file }) =>
+              buildContextMenu(_i18n, file)
+            }
           />
         </>
       )}

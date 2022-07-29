@@ -26,7 +26,7 @@ import Computer from '../../UI/CustomSvgIcons/Computer';
  */
 export default ({
   internalName: 'LocalFile',
-  name: t`Local file system`,
+  name: t`Your computer`,
   renderIcon: () => <Computer />,
   getFileMetadataFromAppArguments: (appArguments: AppArguments) => {
     if (!appArguments[POSITIONAL_ARGUMENTS_KEY]) return null;

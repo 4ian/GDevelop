@@ -67,7 +67,7 @@ const CreateProjectDialog = ({
   const [isOpening, setIsOpening] = React.useState<boolean>(false);
   const [
     selectedExampleShortHeader,
-    setSelectedExampleShortShortHeader,
+    setSelectedExampleShortHeader,
   ] = React.useState<?ExampleShortHeader>(null);
   const [
     preCreationDialogOpen,
@@ -88,7 +88,7 @@ const CreateProjectDialog = ({
         label={<Trans>Create a blank project</Trans>}
         primary
         onClick={() => {
-          setSelectedExampleShortShortHeader(null);
+          setSelectedExampleShortHeader(null);
           setPreCreationDialogOpen(true);
         }}
       />,
@@ -123,7 +123,7 @@ const CreateProjectDialog = ({
       if (!projectMetadata) return;
 
       setPreCreationDialogOpen(false);
-      setSelectedExampleShortShortHeader(null);
+      setSelectedExampleShortHeader(null);
       onOpen({ ...projectMetadata });
     } finally {
       setIsOpening(false);
@@ -150,7 +150,7 @@ const CreateProjectDialog = ({
                   focusOnMount
                   isOpening={isOpening}
                   onOpen={async (example: ?ExampleShortHeader) => {
-                    setSelectedExampleShortShortHeader(example);
+                    setSelectedExampleShortHeader(example);
                     setPreCreationDialogOpen(true);
                   }}
                 />

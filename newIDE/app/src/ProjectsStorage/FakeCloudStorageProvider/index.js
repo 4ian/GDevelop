@@ -5,7 +5,7 @@ import Cloud from '../../UI/CustomSvgIcons/Cloud';
 import { type StorageProvider, type FileMetadata } from '../index';
 
 /**
- * A storage that is using OneDrive to open and store files.
+ * A storage that is announcing the upcoming Cloud storage on the desktop app.
  */
 const FakeCloudStorageProvider = ({
   internalName: 'FakeCloud',

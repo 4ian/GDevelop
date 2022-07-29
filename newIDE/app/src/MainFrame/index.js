@@ -667,7 +667,9 @@ const MainFrame = (props: Props) => {
         // (like locally or on Google Drive).
         if (onSaveProject) {
           preferences.insertRecentProjectFile({
-            fileMetadata,
+            fileMetadata: fileMetadata.name
+              ? fileMetadata
+              : { ...fileMetadata, name: project.getName() },
             storageProviderName: storageProvider.internalName,
           });
         }
@@ -1829,7 +1831,9 @@ const MainFrame = (props: Props) => {
 
               if (fileMetadata) {
                 preferences.insertRecentProjectFile({
-                  fileMetadata,
+                  fileMetadata: fileMetadata.name
+                    ? fileMetadata
+                    : { ...fileMetadata, name: currentProject.getName() },
                   storageProviderName: getStorageProvider().internalName,
                 });
 
@@ -1933,7 +1937,9 @@ const MainFrame = (props: Props) => {
             `Project saved in ${performance.now() - saveStartTime}ms.`
           );
           preferences.insertRecentProjectFile({
-            fileMetadata,
+            fileMetadata: fileMetadata.name
+              ? fileMetadata
+              : { ...fileMetadata, name: currentProject.getName() },
             storageProviderName: getStorageProvider().internalName,
           });
 
@@ -2118,8 +2124,16 @@ const MainFrame = (props: Props) => {
       await setState(state => ({ ...state, createDialogOpen: false }));
 
     let state: ?State;
-    if (project) state = await loadFromProject(project, fileMetadata);
-    else if (!!fileMetadata) state = await openFromFileMetadata(fileMetadata);
+    let enrichedFileMetadata: FileMetadata;
+    if (project) {
+      if (projectName) project.setName(projectName);
+      state = await loadFromProject(project, fileMetadata);
+    } else if (!!fileMetadata) {
+      enrichedFileMetadata = projectName
+        ? { ...fileMetadata, name: projectName }
+        : fileMetadata;
+      state = await openFromFileMetadata(enrichedFileMetadata);
+    }
 
     if (!state) return;
     const { currentProject, editorTabs } = state;
@@ -2145,9 +2159,12 @@ const MainFrame = (props: Props) => {
 
     const { onSaveProject } = storageProviderOperations;
 
-    if (onSaveProject && fileMetadata) {
+    if (onSaveProject && enrichedFileMetadata) {
       try {
-        const { wasSaved } = await onSaveProject(currentProject, fileMetadata);
+        const { wasSaved } = await onSaveProject(
+          currentProject,
+          enrichedFileMetadata
+        );
 
         if (wasSaved) {
           if (unsavedChanges) unsavedChanges.sealUnsavedChanges();

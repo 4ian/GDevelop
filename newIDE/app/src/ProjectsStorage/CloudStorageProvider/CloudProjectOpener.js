@@ -44,15 +44,15 @@ export const generateOnOpen = (authenticatedUser: AuthenticatedUser) => async (
 |}> => {
   const cloudProjectId = fileMetadata.fileIdentifier;
 
-  onProgress && onProgress((1 / 4) * 100, t`Fetching project metadata`);
+  onProgress && onProgress((1 / 4) * 100, t`Calibrating sensors`);
   const cloudProject = await getCloudProject(authenticatedUser, cloudProjectId);
   if (!cloudProject) throw new Error("Cloud project couldn't be fetched.");
 
-  onProgress && onProgress((2 / 4) * 100, t`Getting cookie`);
+  onProgress && onProgress((2 / 4) * 100, t`Starting engine`);
   await getCredentialsForCloudProject(authenticatedUser, cloudProjectId);
-  onProgress && onProgress((3 / 4) * 100, t`Downloading project`);
+  onProgress && onProgress((3 / 4) * 100, t`Checking tools`);
   const zippedSerializedProject = await getProjectFileAsZipBlob(cloudProject);
-  onProgress && onProgress((4 / 4) * 100, t`Unzipping project`);
+  onProgress && onProgress((4 / 4) * 100, t`Opening portal`);
   const serializedProject = await unzipProject(zippedSerializedProject);
 
   return {

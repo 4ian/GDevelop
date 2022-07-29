@@ -1529,7 +1529,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
             "object will become the only one taken into account.\nIf "
             "the condition is inverted, the object to be intersected "
             "will be the farthest one within the ray radius."),
-          _("Cast a ray from from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
+          _("Cast a ray from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ "
             "against _PARAM0_, and save the "
             "result in _PARAM5_, _PARAM6_"),
           "",

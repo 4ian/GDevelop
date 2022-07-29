@@ -10,7 +10,7 @@ import {
 } from '../../../ProjectCreation/CreateProjectDialog';
 import { type FileMetadataAndStorageProviderName } from '../../../ProjectsStorage';
 import GetStartedSection from './GetStartedSection';
-import BuildSection from './BuildSection';
+import BuildSection, { type BuildSectionInterface } from './BuildSection';
 import LearnSection from './LearnSection';
 import PlaySection from './PlaySection';
 import CommunitySection from './CommunitySection';
@@ -89,6 +89,7 @@ export const HomePage = React.memo<Props>(
         values: { showGetStartedSection },
         setShowGetStartedSection,
       } = React.useContext(PreferencesContext);
+      const buildSectionRef = React.useRef<?BuildSectionInterface>(null);
 
       // Load everything when the user opens the home page, to avoid future loading times.
       React.useEffect(
@@ -108,6 +109,19 @@ export const HomePage = React.memo<Props>(
           }
         },
         [isActive, authenticated, onCloudProjectsChanged]
+      );
+
+      // Refresh build section when homepage becomes active
+      React.useEffect(
+        () => {
+          if (isActive && activeTab === 'build' && buildSectionRef.current) {
+            buildSectionRef.current.forceUpdate();
+          }
+        },
+        // Active tab is excluded from the dependencies because switching tab
+        // mounts and unmounts section, so the data is already up to date.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [isActive]
       );
 
       const getProject = () => {
@@ -159,6 +173,7 @@ export const HomePage = React.memo<Props>(
                   )}
                   {activeTab === 'build' && (
                     <BuildSection
+                      ref={buildSectionRef}
                       project={project}
                       canOpen={canOpen}
                       onOpen={onOpen}

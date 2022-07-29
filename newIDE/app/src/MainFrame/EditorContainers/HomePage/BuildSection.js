@@ -31,6 +31,7 @@ import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { getRelativeOrAbsoluteDisplayDate } from '../../../Utils/DateDisplay';
 import useForceUpdate from '../../../Utils/UseForceUpdate';
 const electron = optionalRequire('electron');
+const path = optionalRequire('path');
 
 const isWebApp = !electron;
 
@@ -165,10 +166,12 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
       }
     };
 
-    const onRemoveFromRecentFiles = (
-      file: FileMetadataAndStorageProviderName
-    ) => {
-      removeRecentProjectFile(file);
+    const onRemoveFromRecentFiles = removeRecentProjectFile;
+
+    const locateProjectFile = (file: FileMetadataAndStorageProviderName) => {
+      electron.shell.showItemInFolder(
+        path.resolve(file.fileMetadata.fileIdentifier)
+      );
     };
 
     const buildContextMenu = (
@@ -189,6 +192,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
         ]);
       } else if (file.storageProviderName === 'LocalFile') {
         actions = actions.concat([
+          {
+            label: i18n._(t`Show in local folder`),
+            click: () => locateProjectFile(file),
+            enabled: !isWebApp,
+          },
           { type: 'separator' },
           {
             label: i18n._(t`Remove from list`),

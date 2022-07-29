@@ -4,7 +4,6 @@ import * as React from 'react';
 import { Column, Line, Spacer } from '../UI/Grid';
 import Text from '../UI/Text';
 import Chip from '../UI/Chip';
-import RaisedButton from '../UI/RaisedButton';
 import {
   type AssetShortHeader,
   type Asset,
@@ -13,11 +12,8 @@ import {
   getAsset,
   isPixelArt,
 } from '../Utils/GDevelopServices/Asset';
-import LeftLoader from '../UI/LeftLoader';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderError from '../UI/PlaceholderError';
-import { type ResourceSource } from '../ResourcesList/ResourceSource';
-import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { ResponsiveLineStackLayout } from '../UI/Layout';
 import { CorsAwareImage } from '../UI/CorsAwareImage';
 import { AssetStoreContext } from './AssetStoreContext';
@@ -80,16 +76,8 @@ const makeFirstLetterUppercase = (str: string) =>
 
 type Props = {|
   project: gdProject,
-  objectsContainer: gdObjectsContainer,
-  resourceSources: Array<ResourceSource>,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
   onTagSelection: (tag: string) => void,
-
   assetShortHeader: AssetShortHeader,
-  onAdd: () => void,
-  onClose: () => void,
-  isAddedToScene: boolean,
-  isBeingAddedToScene: boolean,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
 |};
 
@@ -107,15 +95,8 @@ const getObjectAssetResourcesByName = (
 
 export const AssetDetails = ({
   project,
-  objectsContainer,
-  resourceSources,
-  resourceExternalEditors,
   onTagSelection,
   assetShortHeader,
-  onAdd,
-  onClose,
-  isAddedToScene,
-  isBeingAddedToScene,
   onOpenDetails,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
@@ -159,14 +140,6 @@ export const AssetDetails = ({
       loadAsset();
     },
     [loadAsset]
-  );
-
-  const canAddAsset = !isBeingAddedToScene && !!asset;
-  const onAddAsset = React.useCallback(
-    () => {
-      if (canAddAsset) onAdd();
-    },
-    [onAdd, canAddAsset]
   );
 
   const assetAuthors: ?Array<Author> =
@@ -270,28 +243,6 @@ export const AssetDetails = ({
                 )}
               </div>
             </Line>
-          </Column>
-          <Column alignItems="center" justifyContent="center">
-            <LeftLoader
-              isLoading={isBeingAddedToScene || (!asset && !error)}
-              key="install"
-            >
-              <RaisedButton
-                primary={!isAddedToScene}
-                label={
-                  isBeingAddedToScene ? (
-                    <Trans>Adding...</Trans>
-                  ) : isAddedToScene ? (
-                    <Trans>Add again</Trans>
-                  ) : (
-                    <Trans>Add to the scene</Trans>
-                  )
-                }
-                onClick={onAddAsset}
-                disabled={!canAddAsset}
-                id="add-asset-button"
-              />
-            </LeftLoader>
           </Column>
         </Line>
         <ResponsiveLineStackLayout noMargin>

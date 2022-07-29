@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import withMock from 'storybook-addon-mock';
-import { action } from '@storybook/addon-actions';
 
 import muiDecorator from '../../../ThemeDecorator';
 import paperDecorator from '../../../PaperDecorator';
@@ -40,17 +39,7 @@ const apiDataFakePacks = {
 
 export const Default = () => (
   <AssetStoreStateProvider>
-    <AssetStore
-      onOpenDetails={action('onOpenDetails')}
-      events={testProject.testLayout.getEvents()}
-      project={testProject.project}
-      layout={testProject.testLayout}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceSources={[]}
-      onObjectAddedFromAsset={() => {}}
-      resourceExternalEditors={[]}
-      objectsContainer={testProject.testLayout}
-    />
+    <AssetStore project={testProject.project} />
   </AssetStoreStateProvider>
 );
 Default.decorators = [withMock];
@@ -58,17 +47,7 @@ Default.parameters = apiDataFakePacks;
 
 export const LoadingError = () => (
   <AssetStoreStateProvider>
-    <AssetStore
-      onOpenDetails={action('onOpenDetails')}
-      events={testProject.testLayout.getEvents()}
-      project={testProject.project}
-      layout={testProject.testLayout}
-      onChooseResource={() => Promise.reject('unimplemented')}
-      resourceSources={[]}
-      onObjectAddedFromAsset={() => {}}
-      resourceExternalEditors={[]}
-      objectsContainer={testProject.testLayout}
-    />
+    <AssetStore project={testProject.project} />
   </AssetStoreStateProvider>
 );
 LoadingError.decorators = [withMock];

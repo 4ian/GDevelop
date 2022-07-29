@@ -87,7 +87,10 @@ const CreateProjectDialog = ({
         id="create-blank-project-button"
         label={<Trans>Create a blank project</Trans>}
         primary
-        onClick={() => setPreCreationDialogOpen(true)}
+        onClick={() => {
+          setSelectedExampleShortShortHeader(null);
+          setPreCreationDialogOpen(true);
+        }}
       />,
     ],
     [onClose, setPreCreationDialogOpen]
@@ -160,6 +163,11 @@ const CreateProjectDialog = ({
               isOpening={isOpening}
               onClose={() => setPreCreationDialogOpen(false)}
               onCreate={projectName => createProject(i18n, projectName)}
+              sourceExampleName={
+                selectedExampleShortHeader
+                  ? selectedExampleShortHeader.name
+                  : undefined
+              }
             />
           )}
         </>

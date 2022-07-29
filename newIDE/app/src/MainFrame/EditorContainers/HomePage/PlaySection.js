@@ -36,6 +36,7 @@ const PlaySection = () => {
           src={`https://liluo.io/embedded/${paletteType}`}
           title="Liluo"
           style={{ ...styles.iframe, height: iframeHeight }}
+          scrolling="no" // This is deprecated, but this is the only way to disable the scrollbar.
         />
         {!iframeHeight && <PlaceHolderLoader />}
       </SectionRow>

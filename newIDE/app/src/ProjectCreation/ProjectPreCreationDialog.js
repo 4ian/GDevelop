@@ -23,19 +23,26 @@ type Props = {|
   isOpening?: boolean,
   onClose: () => void,
   onCreate: ProjectCreationSettings => void | Promise<void>,
+  sourceExampleName?: string,
 |};
+
+const generateProjectName = (sourceExampleName: ?string) =>
+  sourceExampleName
+    ? `${generateName()} (${sourceExampleName})`
+    : generateName();
 
 const ProjectPreCreationDialog = ({
   open,
   isOpening,
   onClose,
   onCreate,
+  sourceExampleName,
 }: Props): React.Node => {
   const [projectNameError, setProjectNameError] = React.useState<?React.Node>(
     null
   );
   const [projectName, setProjectName] = React.useState<string>(() =>
-    generateName()
+    generateProjectName(sourceExampleName)
   );
   const [outputPath, setOutputPath] = React.useState<string>(() =>
     app ? findEmptyPathInDefaultFolder(app) : ''
@@ -102,7 +109,9 @@ const ProjectPreCreationDialog = ({
           endAdornment={
             <IconButton
               size="small"
-              onClick={() => setProjectName(generateName())}
+              onClick={() =>
+                setProjectName(generateProjectName(sourceExampleName))
+              }
             >
               <Refresh />
             </IconButton>

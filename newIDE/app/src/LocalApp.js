@@ -32,6 +32,7 @@ import {
   onCreateFromExampleShortHeader,
   onCreateBlank,
 } from './ProjectCreation/services/LocalCreation';
+import FakeCloudStorageProvider from './ProjectsStorage/FakeCloudStorageProvider';
 
 const gd: libGDevelop = global.gd;
 
@@ -55,7 +56,7 @@ export const create = (authentication: Authentication) => {
           appArguments={appArguments}
           storageProviders={
             // Add Url provider
-            [LocalFileStorageProvider]
+            [LocalFileStorageProvider, FakeCloudStorageProvider]
           }
           defaultStorageProvider={LocalFileStorageProvider}
         >

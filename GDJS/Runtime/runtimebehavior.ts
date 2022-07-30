@@ -126,6 +126,17 @@ namespace gdjs {
     }
 
     /**
+     * Called once during the rending of debug traces. Call doDebugRendering.<br>
+     * Behaviors writers: Please do not redefine this method. Redefine doDebugRendering instead.
+     * @param runtimeScene The runtimeScene owning the object
+     */
+    onDebugRendering(runtimeScene: RuntimeScene): void {
+      if (this._activated) {
+        this.doDebugRendering(runtimeScene);
+      }
+    }
+
+    /**
      * De/Activate the behavior
      * @param enable true to enable the behavior, false to disable it
      */
@@ -180,6 +191,16 @@ namespace gdjs {
      * @param runtimeScene The runtimeScene owning the object
      */
     doStepPostEvents(runtimeScene: gdjs.RuntimeScene): void {}
+
+    /**
+     * This method is Called once during the rending of debug traces.
+     *
+     * The debug traces must be drawn on this Graphics:
+     * `runtimeScene.getRenderer().getDebugRenderer()`
+     *
+     * @param runtimeScene The runtimeScene owning the object
+     */
+    doDebugRendering(runtimeScene: RuntimeScene): void {}
 
     /**
      * This method is called when the owner of the behavior

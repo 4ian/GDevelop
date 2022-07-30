@@ -658,7 +658,8 @@ const declarePathfindingBehavior = function (
 const declareObstacleBehavior = function (
   _ /*: (string) => string */,
   gd /*: libGDevelop */,
-  extension /*: gdPlatformExtension */
+  extension /*: gdPlatformExtension */,
+  sharedData /*: gdBehaviorSharedDataJsImplementation */
 ) {
   const pathfindingObstacleBehavior = new gd.BehaviorJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
@@ -677,7 +678,32 @@ const declareObstacleBehavior = function (
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   pathfindingObstacleBehavior.initializeContent = function (behaviorContent) {};
 
-  var sharedData = new gd.BehaviorSharedDataJsImplementation();
+  extension
+    .addBehavior(
+      'NavMeshPathfindingObstacleBehavior',
+      _('Obstacle for pathfinding (polygonal mesh based, experimental)'),
+      'NavMeshPathfindingObstacleBehavior',
+      _('Flag the object as being an obstacle for pathfinding.'),
+      '',
+      'CppPlatform/Extensions/pathfindingobstacleicon.png',
+      'NavMeshPathfindingObstacleBehavior',
+      pathfindingObstacleBehavior,
+      sharedData
+    )
+    .setIncludeFile(
+      'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingobstacleruntimebehavior.js'
+    )
+    .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js')
+    .addIncludeFile(
+      'Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js'
+    );
+};
+
+const declareSharedData = function (
+  _ /*: (string) => string */,
+  gd /*: libGDevelop */,
+) {
+  const sharedData = new gd.BehaviorSharedDataJsImplementation();
   // $FlowExpectedError - ignore Flow warning as we're creating a behavior
   sharedData.updateProperty = function (sharedContent, propertyName, newValue) {
     if (propertyName === 'viewpoint') {
@@ -803,26 +829,8 @@ const declareObstacleBehavior = function (
     behaviorContent.setDoubleAttribute('areaBottomBound', 0);
   };
 
-  extension
-    .addBehavior(
-      'NavMeshPathfindingObstacleBehavior',
-      _('Obstacle for pathfinding (polygonal mesh based, experimental)'),
-      'NavMeshPathfindingObstacleBehavior',
-      _('Flag the object as being an obstacle for pathfinding.'),
-      '',
-      'CppPlatform/Extensions/pathfindingobstacleicon.png',
-      'NavMeshPathfindingObstacleBehavior',
-      pathfindingObstacleBehavior,
-      sharedData
-    )
-    .setIncludeFile(
-      'Extensions/NavMeshPathfindingBehavior/navmeshpathfindingobstacleruntimebehavior.js'
-    )
-    .addIncludeFile('Extensions/NavMeshPathfindingBehavior/A_navmeshall.js')
-    .addIncludeFile(
-      'Extensions/NavMeshPathfindingBehavior/A_navmeshgenerator.js'
-    );
-};
+  return sharedData;
+}
 
 module.exports = {
   createExtension: function (
@@ -965,7 +973,8 @@ module.exports = {
       .setFunctionName('gdjs.NavMeshPathfindingObstaclesManager.getCellSize');
 
     declarePathfindingBehavior(_, gd, extension);
-    declareObstacleBehavior(_, gd, extension);
+    const sharedData = declareSharedData(_, gd);
+    declareObstacleBehavior(_, gd, extension, sharedData);
 
     return extension;
   },

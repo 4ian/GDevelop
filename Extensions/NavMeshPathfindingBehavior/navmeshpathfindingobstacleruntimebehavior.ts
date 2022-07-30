@@ -3,6 +3,9 @@ GDevelop - NavMesh Pathfinding Behavior Extension
 Copyright (c) 2013-2021 Florian Rival (Florian.Rival@gmail.com)
  */
 namespace gdjs {
+  export interface RuntimeScene {
+    navMeshPathfindingObstaclesManager: gdjs.NavMeshPathfindingObstaclesManager;
+  }
   /**
    * PathfindingObstaclesManager manages the common objects shared by objects having a
    * pathfinding behavior: In particular, the obstacles behaviors are required to declare
@@ -74,12 +77,23 @@ namespace gdjs {
     /**
      * Get the obstacles manager of a scene.
      */
-    static getManager(runtimeScene: any): NavMeshPathfindingObstaclesManager {
+    static getManager(
+      runtimeScene: gdjs.RuntimeScene
+    ): NavMeshPathfindingObstaclesManager {
       if (!runtimeScene.navMeshPathfindingObstaclesManager) {
         const initialData = runtimeScene.getInitialSharedDataForBehavior(
           'NavMeshPathfindingObstacleBehavior'
-        );
-        //Create the shared manager if necessary.
+        ) || {
+          // Use the default configuration if there is no object with the
+          // obstacle behavior.
+          viewpoint: 'Top-Down',
+          cellSize: 10,
+          areaLeftBound: 0,
+          areaTopBound: 0,
+          areaRightBound: 0,
+          areaBottomBound: 0,
+        };
+        // Create the shared manager if necessary.
         runtimeScene.navMeshPathfindingObstaclesManager = new gdjs.NavMeshPathfindingObstaclesManager(
           runtimeScene,
           initialData

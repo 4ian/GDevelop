@@ -102,7 +102,6 @@ import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
-import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
@@ -144,10 +143,6 @@ import EditorMosaicPlayground from './EditorMosaicPlayground';
 import EditorNavigator from '../UI/EditorMosaic/EditorNavigator';
 import ChooseEventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor/ChooseEventsFunctionsExtensionEditor';
 import PropertiesEditor from '../PropertiesEditor';
-import OpenFromStorageProviderDialog from '../ProjectsStorage/OpenFromStorageProviderDialog';
-import GoogleDriveStorageProvider from '../ProjectsStorage/GoogleDriveStorageProvider';
-import LocalFileStorageProvider from '../ProjectsStorage/LocalFileStorageProvider';
-import GoogleDriveSaveAsDialog from '../ProjectsStorage/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog';
 import { OpenConfirmDialog } from '../ProjectsStorage/OpenConfirmDialog';
 import CreateAccountDialog from '../Profile/CreateAccountDialog';
 import BrowserPreviewErrorDialog from '../Export/BrowserExporters/BrowserS3PreviewLauncher/BrowserPreviewErrorDialog';
@@ -1065,11 +1060,6 @@ storiesOf('UI Building Blocks/Layout/TextFieldWithButtonLayout', module)
 storiesOf('UI Building Blocks/Background', module)
   .addDecorator(muiDecorator)
   .add('default', () => <Background>Hello world</Background>);
-
-storiesOf('UI Building Blocks/LoaderModal', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <LoaderModal show />);
 
 storiesOf('UI Building Blocks/Accordion', module)
   .addDecorator(paperDecorator)
@@ -2274,70 +2264,6 @@ storiesOf('AboutDialog', module)
       open
       onClose={action('close')}
       updateStatus={{ message: '', status: 'unknown' }}
-    />
-  ));
-
-storiesOf('OpenFromStorageProviderDialog', module)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <OpenFromStorageProviderDialog
-      storageProviders={[GoogleDriveStorageProvider, LocalFileStorageProvider]}
-      onChooseProvider={action('onChooseProvider')}
-      onClose={action('onClose')}
-    />
-  ));
-
-storiesOf(
-  'StorageProviders/GoogleDriveStorageProvider/GoogleDriveSaveAsDialog',
-  module
-)
-  .addDecorator(muiDecorator)
-  .add('default, fake picked file, save working', () => (
-    <GoogleDriveSaveAsDialog
-      onShowFilePicker={() =>
-        Promise.resolve({
-          type: 'FILE',
-          id: 'fake-id',
-          name: 'Fake Google Drive file',
-          parentId: 'fake-parent-id',
-        })
-      }
-      onCancel={action('cancel')}
-      onSave={() => Promise.resolve()}
-    />
-  ))
-  .add('default, fake picked folder, save working', () => (
-    <GoogleDriveSaveAsDialog
-      onShowFilePicker={() =>
-        Promise.resolve({
-          type: 'FOLDER',
-          id: 'fake-id',
-          name: 'Fake Google Drive file',
-        })
-      }
-      onCancel={action('cancel')}
-      onSave={() => Promise.resolve()}
-    />
-  ))
-  .add('default, error when picking file/folder', () => (
-    <GoogleDriveSaveAsDialog
-      onShowFilePicker={() => Promise.reject(new Error('fake-error'))}
-      onCancel={action('cancel')}
-      onSave={() => Promise.resolve()}
-    />
-  ))
-  .add('default, error while saving', () => (
-    <GoogleDriveSaveAsDialog
-      onShowFilePicker={() =>
-        Promise.resolve({
-          type: 'FILE',
-          id: 'fake-id',
-          name: 'Fake Google Drive file',
-          parentId: 'fake-parent-id',
-        })
-      }
-      onCancel={action('cancel')}
-      onSave={() => Promise.reject(new Error('fake-error'))}
     />
   ));
 
@@ -3857,6 +3783,8 @@ storiesOf('ProjectManager', module)
   .add('default', () => (
     <ProjectManager
       project={testProject.project}
+      onSaveProjectProperties={async () => true}
+      onChangeProjectName={action('onChangeProjectName')}
       onOpenExternalEvents={action('onOpenExternalEvents')}
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
@@ -3898,6 +3826,8 @@ storiesOf('ProjectManager', module)
   .add('Error in functions', () => (
     <ProjectManager
       project={testProject.project}
+      onSaveProjectProperties={async () => true}
+      onChangeProjectName={action('onChangeProjectName')}
       onOpenExternalEvents={action('onOpenExternalEvents')}
       onOpenLayout={action('onOpenLayout')}
       onOpenExternalLayout={action('onOpenExternalLayout')}
@@ -4216,7 +4146,8 @@ storiesOf('ProjectPropertiesDialog', module)
       initialTab="properties"
       project={testProject.project}
       onClose={action('onClose')}
-      onApply={action('onApply')}
+      onApply={async () => true}
+      onPropertiesApplied={action('onPropertiesApplied')}
       onChangeSubscription={action('onChangeSubscription')}
       resourceSources={[]}
       onChooseResource={() => Promise.reject('unimplemented')}

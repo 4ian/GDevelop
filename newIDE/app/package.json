@@ -134,7 +134,18 @@
           ]
         }
       ]
-    }
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/stories/componentStories/*.stories.js",
+          "src/stories/*.stories.js"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
   },
   "flow-coverage-report": {
     "includeGlob": [

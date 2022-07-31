@@ -238,10 +238,11 @@ namespace gdjs {
         if (peer === null) return;
         const connection = peer.connect(id);
         connection.on('open', () => {
-          // See line 158 for the failure case.
+          // See peer.on('error', () => ... for the failure case.
           lastConnectionSucessful = true;
           _onConnection(connection);
         });
+        connection.on('error', console.error);
       };
 
       class P2PConnectionTask extends gdjs.AsyncTask {
@@ -265,16 +266,17 @@ namespace gdjs {
             }
           }
 
-          const connected =
-            this.peerConnection.connectionState !== 'connecting' &&
-            this.peerConnection.connectionState !== 'new';
+          const connectionAttemptEnded =
+            this.peerConnection.iceConnectionState !== 'new' &&
+            this.peerConnection.iceConnectionState !== 'checking';
 
-          if (connected)
-            // Only set it now, so that we can assure that the callback will see the value for this connection.
+          if (connectionAttemptEnded)
+            // Only set it now, so that we can assure that the callback will see the value for this specifc connection attempt.
             lastConnectionSucessful =
-              this.peerConnection.connectionState === 'connected';
+              this.peerConnection.iceConnectionState === 'connected' ||
+              this.peerConnection.iceConnectionState === 'completed';
 
-          return connected;
+          return connectionAttemptEnded;
         }
       }
 

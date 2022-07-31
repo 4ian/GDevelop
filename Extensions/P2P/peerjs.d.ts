@@ -170,9 +170,7 @@ declare namespace Peer {
     validateId(id: string): boolean;
     pack: any;
     unpack: any;
-    chunk(
-      blob: Blob
-    ): {
+    chunk(blob: Blob): {
       __peerData: number;
       n: number;
       total: number;
@@ -406,7 +404,7 @@ declare namespace Peer {
     /**
      * Errors on the peer are almost always fatal and will destroy the peer.
      */
-    error: (error: Error) => void;
+    error: (error: Error & { type: string }) => void;
   };
 }
 

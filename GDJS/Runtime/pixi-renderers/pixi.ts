@@ -45,6 +45,9 @@ export * from '@pixi/text-bitmap';
 
 export * as tilemap from '@pixi/tilemap';
 
+import MultiStyleText from 'pixi-multistyle-text';
+export { MultiStyleText };
+
 // Extras
 export * from '@pixi/loaders';
 import '@pixi/mixin-cache-as-bitmap';

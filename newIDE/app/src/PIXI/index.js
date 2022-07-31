@@ -31,6 +31,8 @@ import { NoiseFilter } from '@pixi/filter-noise';
 import { Loader } from '@pixi/loaders';
 import { BitmapFontLoader } from '@pixi/text-bitmap';
 
+import MultiStyleText from 'pixi-multistyle-text';
+
 export * from '@pixi/core';
 export * from '@pixi/constants';
 export * from '@pixi/math';
@@ -56,6 +58,7 @@ export * from '@pixi/mesh';
 export * from '@pixi/canvas-mesh';
 export * from '@pixi/text-bitmap';
 export * as tilemap from '@pixi/tilemap';
+export { MultiStyleText };
 
 export * from '@pixi/loaders';
 

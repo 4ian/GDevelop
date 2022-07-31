@@ -99,10 +99,7 @@ const jsExtensions = [
     name: 'BBText',
     // $FlowExpectedError - this path is ignored for Flow.
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/BBText/JsExtension.js'),
-    objectsRenderingServiceModules: {
-      // $FlowExpectedError - this path is ignored for Flow.
-      'pixi-multistyle-text/dist/pixi-multistyle-text.umd': require('GDJS-for-web-app-only/Runtime/Extensions/BBText/pixi-multistyle-text/dist/pixi-multistyle-text.umd'),
-    },
+    objectsRenderingServiceModules: {},
   },
   {
     name: 'TileMap',

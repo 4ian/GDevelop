@@ -1,4 +1,3 @@
-/// <reference path="helper/TileMapHelper.d.ts" />
 namespace gdjs {
   const logger = new gdjs.Logger('Tilemap object');
 
@@ -88,7 +87,7 @@ namespace gdjs {
       this.onCreated();
     }
 
-    getRendererObject() {
+    getRendererObject(): PIXI.Graphics {
       return this._renderer.getRendererObject();
     }
 

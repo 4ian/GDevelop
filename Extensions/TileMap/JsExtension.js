@@ -190,10 +190,6 @@ const defineTileMap = function (
     .addIncludeFile(
       'Extensions/TileMap/tilemapruntimeobject-pixi-renderer.js'
     )
-    .addIncludeFile(
-      'Extensions/TileMap/pixi-tilemap/dist/pixi-tilemap.umd.js'
-    )
-    .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js');
 
   object
@@ -691,7 +687,6 @@ const defineCollisionMask = function (
     .setCategoryFullName(_('Advanced'))
     .setIncludeFile('Extensions/TileMap/tilemapcollisionmaskruntimeobject.js')
     .addIncludeFile('Extensions/TileMap/TileMapRuntimeManager.js')
-    .addIncludeFile('Extensions/TileMap/pako/dist/pako.min.js')
     .addIncludeFile('Extensions/TileMap/helper/TileMapHelper.js')
     .addIncludeFile('Extensions/TileMap/collision/TransformedTileMap.js')
     .addIncludeFile(
@@ -914,19 +909,10 @@ module.exports = {
   ) {
     const RenderedInstance = objectsRenderingService.RenderedInstance;
     const PIXI = objectsRenderingService.PIXI;
-
-    const Tilemap = objectsRenderingService.requireModule(
-      __dirname,
-      'pixi-tilemap/dist/pixi-tilemap.umd'
-    );
+    const Tilemap = PIXI.tilemap;
     const TilemapHelper = objectsRenderingService.requireModule(
       __dirname,
       'helper/TileMapHelper'
-    );
-    // required for decoding tiled zlib compressed layer data
-    const pako = objectsRenderingService.requireModule(
-      __dirname,
-      'pako/dist/pako.min'
     );
 
     /**
@@ -1044,7 +1030,6 @@ module.exports = {
         this._loadTiledMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
-        pako,
         (tileMap) => {
           if (!tileMap) {
             this.onLoadingError();
@@ -1300,7 +1285,6 @@ module.exports = {
         this._loadTiledMapWithCallback.bind(this),
         tilemapJsonFile,
         tilesetJsonFile,
-        pako,
         (tileMap) => {
           if (!tileMap) {
             this.onLoadingError();

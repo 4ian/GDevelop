@@ -1,5 +1,5 @@
 // @flow
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../PIXI';
 import Rectangle from '../Utils/Rectangle';
 const gd: libGDevelop = global.gd;
 

@@ -1,5 +1,5 @@
 // @flow
-import * as PIXI from 'pixi.js-legacy';
+import * as PIXI from '../../PIXI';
 
 const moveTolerance = 10; // px
 const doubleClickDelay = 500; //ms

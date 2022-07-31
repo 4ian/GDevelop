@@ -88,6 +88,14 @@ namespace gdjs {
       this.onCreated();
     }
 
+    updatePreRender(runtimeScene: gdjs.RuntimeScene) {
+      super.updatePreRender(runtimeScene);
+
+      if (this._debugMode && this.hitBoxesDirty) {
+        this.updateHitBoxes();
+      }
+    }
+
     getRendererObject() {
       return this._renderer.getRendererObject();
     }

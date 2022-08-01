@@ -49,7 +49,7 @@ import { useResponsiveWindowWidth } from '../UI/Reponsive/ResponsiveWindowMeasur
 export type GamesDetailsTab =
   | 'details'
   | 'builds'
-  | 'feedbacks'
+  | 'feedback'
   | 'analytics'
   | 'leaderboards';
 
@@ -343,8 +343,8 @@ export const GameDetailsDialog = ({
           >
             <Tab label={<Trans>Details</Trans>} value="details" />
             <Tab label={<Trans>Builds</Trans>} value="builds" />
-            <Tab label={<Trans>Feedbacks</Trans>} value="feedbacks" />
-            <Tab label={<Trans>Analytics</Trans>} value="analytics" />
+            <Tab label={<Trans>Player Feedback</Trans>} value="feedback" />
+            <Tab label={<Trans>Statistics</Trans>} value="analytics" />
             <Tab label={<Trans>Leaderboards</Trans>} value="leaderboards" />
           </Tabs>
           <Line expand>
@@ -556,7 +556,7 @@ export const GameDetailsDialog = ({
             {currentTab === 'analytics' ? (
               <GameAnalyticsPanel game={game} />
             ) : null}
-            {currentTab === 'feedbacks' ? (
+            {currentTab === 'feedback' ? (
               <GameFeedback
                 i18n={i18n}
                 authenticatedUser={authenticatedUser}

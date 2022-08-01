@@ -40,7 +40,7 @@ type Props = {|
 |};
 
 const RETRIEVED_COMMENT_TYPE = 'FEEDBACK';
-const filterUnsolvedComments = (comments: Array<Comment>) => {
+const filterUnprocessedComments = (comments: Array<Comment>) => {
   return comments.filter((comment: Comment) => !comment.processedAt);
 };
 
@@ -83,7 +83,7 @@ const groupFeedbacks = (
 const getDisplayedFeedbacks = (
   i18n: I18nType,
   feedbacks: ?Array<Comment>,
-  showUnsolved: boolean,
+  showUnprocessed: boolean,
   sortByDate: boolean,
   filter: string
 ): ?{ [buildIdOrDate: string]: Array<Comment> } => {
@@ -97,23 +97,23 @@ const getDisplayedFeedbacks = (
     );
   }
 
-  const filteredFeedbacksByBuildAndUnsolved = showUnsolved
-    ? filterUnsolvedComments(filteredFeedbacksByBuild)
+  const filteredFeedbacksByBuildAndUnprocessed = showUnprocessed
+    ? filterUnprocessedComments(filteredFeedbacksByBuild)
     : filteredFeedbacksByBuild;
 
   return sortByDate
-    ? groupFeedbacks(i18n, filteredFeedbacksByBuildAndUnsolved, {
+    ? groupFeedbacks(i18n, filteredFeedbacksByBuildAndUnprocessed, {
         build: false,
         date: true,
       })
-    : groupFeedbacks(i18n, filteredFeedbacksByBuildAndUnsolved, {
+    : groupFeedbacks(i18n, filteredFeedbacksByBuildAndUnprocessed, {
         build: true,
         date: false,
       });
 };
 
 const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
-  const [showUnsolved, setShowUnsolved] = React.useState(false);
+  const [showProcessed, setShowProcessed] = React.useState(false);
   const [sortByDate, setSortByDate] = React.useState(true);
   const [feedbacks, setFeedbacks] = React.useState<?Array<Comment>>(null);
   const [buildsByIds, setBuildsByIds] = React.useState<?{
@@ -125,7 +125,7 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
   const displayedFeedbacks = getDisplayedFeedbacks(
     i18n,
     feedbacks,
-    showUnsolved,
+    showProcessed,
     sortByDate,
     filter
   );
@@ -254,11 +254,11 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
                   />
                   <Spacer />
                   <Checkbox
-                    checked={showUnsolved}
+                    checked={showProcessed}
                     onCheck={(_event, checked) => {
-                      setShowUnsolved(checked);
+                      setShowProcessed(checked);
                     }}
-                    label={<Trans>Show unsolved feedbacks only</Trans>}
+                    label={<Trans>Show unread feedbacks only</Trans>}
                   />
                 </LineStackLayout>
               </Column>
@@ -299,9 +299,9 @@ const GameFeedback = ({ i18n, authenticatedUser, game }: Props) => {
             </ResponsiveLineStackLayout>
             {Object.keys(displayedFeedbacks).length === 0 && (
               <EmptyMessage>
-                {showUnsolved ? (
+                {showProcessed ? (
                   <Trans>
-                    You don't have any unsolved feedback for this game.
+                    You don't have any unread feedback for this game.
                   </Trans>
                 ) : (
                   <Trans>You don't have any feedback for this game.</Trans>

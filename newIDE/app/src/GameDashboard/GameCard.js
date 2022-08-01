@@ -201,7 +201,7 @@ export const GameCard = ({
                   },
                   {
                     label: i18n._(t`Game feedbacks`),
-                    click: () => onOpenGameManager('feedbacks'),
+                    click: () => onOpenGameManager('feedback'),
                   },
                   {
                     label: i18n._(t`Game analytics`),

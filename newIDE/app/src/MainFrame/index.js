@@ -1791,7 +1791,10 @@ const MainFrame = (props: Props) => {
         options ? options.storageProviderOperationsGetOptions : null
       );
 
-      const { onSaveProjectAs } = storageProviderOperations;
+      const {
+        onSaveProjectAs,
+        getWriteErrorMessage,
+      } = storageProviderOperations;
       if (!onSaveProjectAs) {
         return;
       }
@@ -1830,10 +1833,11 @@ const MainFrame = (props: Props) => {
             }
           },
           rawError => {
+            const errorMessage = getWriteErrorMessage
+              ? getWriteErrorMessage(rawError)
+              : t`An error occurred when saving the project. Please try again later.`;
             showErrorBox({
-              message: i18n._(
-                t`Unable to save as the project! Please try again by choosing another location.`
-              ),
+              message: i18n._(errorMessage),
               rawError,
               errorId: 'project-save-as-error',
             });

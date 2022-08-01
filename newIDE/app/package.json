@@ -138,7 +138,7 @@
     "overrides": [
       {
         "files": [
-          "src/stories/componentStories/*.stories.js",
+          "src/stories/componentStories/**/*.stories.js",
           "src/stories/*.stories.js"
         ],
         "rules": {

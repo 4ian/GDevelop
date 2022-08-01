@@ -1211,11 +1211,11 @@ export const fakeAssetPacks: AssetPacks = {
   ],
 };
 
-export const commentUnsolved: Comment = {
-  id: 'comment-unsolved-id',
+export const commentUnprocessed: Comment = {
+  id: 'comment-unprocessed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {
@@ -1230,11 +1230,11 @@ export const commentUnsolved: Comment = {
   updatedAt: 1515084393000,
 };
 
-export const commentSolved: Comment = {
-  id: 'comment-solved-id',
+export const commentProcessed: Comment = {
+  id: 'comment-processed-id',
   type: 'FEEDBACK',
-  gameId: 'game-id',
-  buildId: 'build-id',
+  gameId: 'complete-game-id',
+  buildId: 'complete-build-id',
   text:
     "This is my honest feedback: I think the art is cute. Specially on the screen when it jumps over the chickens. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. ",
   ratings: {

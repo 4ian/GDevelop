@@ -93,9 +93,7 @@ export class TiledTileMapLoader {
         }
       }
       for (let tileIndex = 0; tileIndex < tiledSet.tilecount; tileIndex++) {
-        const tileId = getTileIdFromTiledGUI(
-          firstGid + tileIndex
-        );
+        const tileId = getTileIdFromTiledGUI(firstGid + tileIndex);
         if (!definitions.has(tileId)) {
           definitions.set(tileId, new TileDefinition(0));
         }

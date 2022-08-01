@@ -68,8 +68,7 @@ export default function SubscriptionPendingDialog({
               {'❤️'}
               <b>
                 <Trans>
-                  Your browser will now open to enter your payment details
-                  (handled securely by Stripe.com).
+                  Your browser will now open to enter your payment details.
                 </Trans>
               </b>
             </Text>

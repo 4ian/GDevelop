@@ -6,6 +6,7 @@ import {
   generateOnChangeProjectProperty,
   generateOnSaveProject,
   generateOnSaveProjectAs,
+  getWriteErrorMessage,
 } from './CloudProjectWriter';
 import {
   type AppArguments,
@@ -41,5 +42,6 @@ export default ({
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`An error occurred when opening the project. Check that your internet connection is working and that your browser allows the use of cookies.`;
     },
+    getWriteErrorMessage,
   }),
 }: StorageProvider);

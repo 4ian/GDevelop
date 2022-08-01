@@ -33,6 +33,7 @@ export type StorageProviderOperations = {|
     content: Object,
   |}>,
   getOpenErrorMessage?: (error: Error) => MessageDescriptor,
+  getWriteErrorMessage?: (error: Error) => MessageDescriptor,
 
   // If set to true, opening a project at startup with this storage provider
   // will trigger a confirmation modal (so that a user interaction happen).

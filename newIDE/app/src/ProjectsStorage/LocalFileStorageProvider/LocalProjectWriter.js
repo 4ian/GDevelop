@@ -7,8 +7,10 @@ import {
   splitPaths,
   getSlugifiedUniqueNameFromProperty,
 } from '../../Utils/ObjectSplitter';
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import localFileSystem from '../../Export/LocalExporters/LocalFileSystem';
 import assignIn from 'lodash/assignIn';
+import { t } from '@lingui/macro';
 
 const gd: libGDevelop = global.gd;
 
@@ -205,3 +207,6 @@ export const onAutoSaveProject = (
     }
   );
 };
+
+export const getWriteErrorMessage = (error: Error): MessageDescriptor =>
+  t`An error occurred when saving the project. Please try again by choosing another location.`;

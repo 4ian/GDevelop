@@ -12,6 +12,7 @@ import {
   onSaveProject,
   onSaveProjectAs,
   onAutoSaveProject,
+  getWriteErrorMessage,
 } from './LocalProjectWriter';
 import {
   type AppArguments,
@@ -47,5 +48,6 @@ export default ({
     getOpenErrorMessage: (error: Error): MessageDescriptor => {
       return t`Check that the file exists, that this file is a proper game created with GDevelop and that you have the authorization to open it.`;
     },
+    getWriteErrorMessage,
   }),
 }: StorageProvider);

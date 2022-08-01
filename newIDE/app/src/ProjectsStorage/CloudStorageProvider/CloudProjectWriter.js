@@ -8,9 +8,12 @@ import {
   getCredentialsForCloudProject,
   updateCloudProject,
 } from '../../Utils/GDevelopServices/Project';
+import type { $AxiosError } from 'axios';
+import type { MessageDescriptor } from '../../Utils/i18n/MessageDescriptor.flow';
 import { serializeToJSON } from '../../Utils/Serializer';
 import { initializeZipJs } from '../../Utils/Zip.js';
 import CloudSaveAsDialog from './CloudSaveAsDialog';
+import { t } from '@lingui/macro';
 
 const zipProject = async (project: gdProject) => {
   const zipJs: ZipJs = await initializeZipJs();
@@ -124,8 +127,21 @@ const createCloudProjectAndInitCommit = async (
     return cloudProject.id;
   } catch (error) {
     console.error('An error occurred while creating a cloud project', error);
-    return;
+    throw error;
   }
+};
+
+export const getWriteErrorMessage = (
+  error: Error | $AxiosError<any>
+): MessageDescriptor => {
+  if (
+    error.response &&
+    error.response.data &&
+    error.response.data.code === 'project-creation/too-many-projects'
+  ) {
+    return t`You've reached the limit of cloud projects you can have. Delete some existing cloud projects of yours before trying again.`;
+  }
+  return t`An error occurred when saving the project, please verify your internet connection or try again later.`;
 };
 
 export const generateOnSaveProjectAs = (

@@ -2,7 +2,7 @@
 import * as React from 'react';
 import Typography from '@material-ui/core/Typography';
 
-type textSize =
+type TextSize =
   | 'bold-title'
   | 'title'
   | 'section-title'
@@ -11,15 +11,15 @@ type textSize =
   | 'body'
   | 'body2';
 
-type textColor = 'error' | 'primary' | 'secondary' | 'inherit';
+type TextColor = 'error' | 'primary' | 'secondary' | 'inherit';
 
 type Props = {|
   /** The text to display. */
   children: ?React.Node,
   /** Size of the text. `body` if not specified. */
-  size?: textSize,
+  size?: TextSize,
   /** Color of the text */
-  color?: textColor,
+  color?: TextColor,
   /** The text alignment. */
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify',
   /** Don't shrink the text if there is not enough place in a flex container. */
@@ -52,7 +52,7 @@ type Props = {|
 
 type Interface = {||};
 
-const getVariantFromSize = (size: ?textSize) => {
+const getVariantFromSize = (size: ?TextSize) => {
   switch (size) {
     case 'bold-title':
       return 'h1';
@@ -72,7 +72,7 @@ const getVariantFromSize = (size: ?textSize) => {
   }
 };
 
-const getTextColorFromColor = (color: ?textColor) => {
+const getTextColorFromColor = (color: ?TextColor) => {
   switch (color) {
     case 'error':
       return 'error';

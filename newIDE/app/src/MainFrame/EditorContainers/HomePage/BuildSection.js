@@ -309,6 +309,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                             </Column>
                             <Column expand>
                               <Text color="secondary">
+                                <Trans>Location</Trans>
+                              </Text>
+                            </Column>
+                            <Column expand>
+                              <Text color="secondary">
                                 <Trans>Last edited</Trans>
                               </Text>
                             </Column>
@@ -352,6 +357,11 @@ const BuildSection = React.forwardRef<Props, BuildSectionInterface>(
                                         </>
                                       )}
                                     </Line>
+                                  </Column>
+                                  <Column expand>
+                                    <Text noMargin>
+                                      {file.storageProviderName}
+                                    </Text>
                                   </Column>
                                   <Column expand>
                                     {file.fileMetadata.lastModifiedDate && (

@@ -70,7 +70,7 @@ bool Exporter::ExportWholePixiProject(
 
     // Export the resources (before generating events as some resources
     // filenames may be updated)
-    helper.ExportResources(fs, exportedProject, exportDir);
+    const auto resourcesNames = helper.ExportResources(fs, exportedProject, exportDir);
 
     // Compatibility with GD <= 5.0-beta56
     // Stay compatible with text objects declaring their font as just a filename
@@ -121,6 +121,11 @@ bool Exporter::ExportWholePixiProject(
         fs, exportedProject, codeOutputDir + "/data.js", noRuntimeGameOptions);
     includesFiles.push_back(codeOutputDir + "/data.js");
 
+    // Export a ServiceWorker for caching
+    if (!fs.WriteToFile(exportDir + "/sw.js",
+                        helper.GenerateServiceWorker(includesFiles, resourcesNames)))
+      gd::LogError("Unable to export Service Worker.");
+    
     // Export a WebManifest with project metadata
     if (!fs.WriteToFile(exportDir + "/manifest.webmanifest",
                         helper.GenerateWebManifest(exportedProject)))

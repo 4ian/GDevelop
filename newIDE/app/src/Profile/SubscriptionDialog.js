@@ -48,6 +48,14 @@ const styles = {
   },
 };
 
+const renderPrice = (plan: PlanDetails) => {
+  return !plan.monthlyPriceInEuros ? (
+    <Trans>Free</Trans>
+  ) : (
+    <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
+  );
+};
+
 const cancelConfirmationTexts = {
   title: t`Cancel your subscription`,
   message: t`Are you sure you want to cancel your subscription?`,
@@ -92,7 +100,7 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
     if (!profile || !subscription) return;
     sendChoosePlanClicked(plan.planId);
 
-    // Subscribing from an account with a subscription.
+    // Subscribing from an account without a subscription.
     if (
       !subscription.stripeSubscriptionId &&
       !subscription.paypalSubscriptionId
@@ -196,14 +204,6 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
     }
   };
 
-  const renderPrice = React.useCallback((plan: PlanDetails) => {
-    return !plan.monthlyPriceInEuros ? (
-      <Trans>Free</Trans>
-    ) : (
-      <Trans>{plan.monthlyPriceInEuros}€/month</Trans>
-    );
-  }, []);
-
   const isLoading =
     !authenticatedUser.subscription ||
     !authenticatedUser.profile ||
@@ -230,11 +230,10 @@ export default function SubscriptionDialog({ open, onClose }: Props) {
               <img src="res/diamond.svg" style={styles.diamondIcon} alt="" />
               <Text>
                 <Trans>
-                  Get a subscription to gain more one-click exports, remove the
-                  GDevelop splashscreen and messages asking you to get a
-                  subscription. With a subscription, you're also supporting the
-                  development of GDevelop, which is an open-source software
-                  maintained by volunteers in their free time.
+                  Get a subscription to unlock more one-click exports and other
+                  exclusive features as a premium creator in our community. With
+                  a subscription, you're also supporting the development of
+                  GDevelop, which is an open-source software.
                 </Trans>
               </Text>
             </Line>

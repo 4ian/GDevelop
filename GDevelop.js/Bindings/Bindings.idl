@@ -2434,12 +2434,12 @@ interface ResourcesRenamer {
 ResourcesRenamer implements ArbitraryResourceWorker;
 
 interface ProjectResourcesCopier {
-    boolean STATIC_CopyAllResourcesTo([Ref] Project project,
-                                 [Ref] AbstractFileSystem fs,
-                                 [Const] DOMString destinationDirectory,
-                                 boolean updateOriginalProject,
-                                 boolean preserveAbsoluteFilenames,
-                                 boolean preserveDirectoryStructure);
+    [Const, Value] VectorString STATIC_CopyAllResourcesTo([Ref] Project project,
+                                                   [Ref] AbstractFileSystem fs,
+                                                   [Const] DOMString destinationDirectory,
+                                                   boolean updateOriginalProject,
+                                                   boolean preserveAbsoluteFilenames,
+                                                   boolean preserveDirectoryStructure);
 };
 
 interface ResourcesInUseHelper {

@@ -4,7 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "ProjectResourcesCopier.h"
+
 #include <map>
+
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ResourcesAbsolutePathChecker.h"
@@ -17,7 +19,7 @@ using namespace std;
 
 namespace gd {
 
-bool ProjectResourcesCopier::CopyAllResourcesTo(
+const std::vector<gd::String> ProjectResourcesCopier::CopyAllResourcesTo(
     gd::Project& originalProject,
     AbstractFileSystem& fs,
     gd::String destinationDirectory,
@@ -37,8 +39,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   resourcesMergingHelper.SetBaseDirectory(projectDirectory);
   resourcesMergingHelper.PreserveDirectoriesStructure(
       preserveDirectoryStructure);
-  resourcesMergingHelper.PreserveAbsoluteFilenames(
-      preserveAbsoluteFilenames);
+  resourcesMergingHelper.PreserveAbsoluteFilenames(preserveAbsoluteFilenames);
 
   if (updateOriginalProject) {
     originalProject.ExposeResources(resourcesMergingHelper);
@@ -48,6 +49,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   }
 
   // Copy resources
+  std::vector<gd::String> resourcesNames;
   map<gd::String, gd::String>& resourcesNewFilename =
       resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
   unsigned int i = 0;
@@ -68,13 +70,17 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
       if (!fs.CopyFile(it->first, destinationFile)) {
         gd::LogWarning(_("Unable to copy \"") + it->first + _("\" to \"") +
                        destinationFile + _("\"."));
+      } else {
+        // If the copy succeeded add it to the list of resources names
+        fs.MakeRelative(destinationFile, destinationDirectory);
+        resourcesNames.push_back(destinationFile);
       }
     }
 
     ++i;
   }
 
-  return true;
+  return resourcesNames;
 }
 
 }  // namespace gd

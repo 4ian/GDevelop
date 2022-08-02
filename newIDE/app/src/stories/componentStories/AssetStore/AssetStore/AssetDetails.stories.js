@@ -21,6 +21,7 @@ export const Default = () => (
       onTagSelection={() => {}}
       assetShortHeader={fakeAssetShortHeader1}
       onOpenDetails={assetShortHeader => {}}
+      showStagingAssets={false}
     />
   </AssetStoreStateProvider>
 );

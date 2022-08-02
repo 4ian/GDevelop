@@ -34,6 +34,7 @@ import { installAsset } from './InstallAsset';
 import EventsFunctionsExtensionsContext from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import { useResourceFetcher } from '../ProjectsStorage/ResourceFetcher';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+const isDev = process.env.NODE_ENV === 'development';
 
 const ObjectListItem = ({
   objectMetadata,
@@ -126,13 +127,16 @@ export default function NewObjectDialog({
     'intro-object-types'
   );
 
-  const { searchResults, navigationState } = React.useContext(
-    AssetStoreContext
-  );
+  const {
+    searchResults,
+    navigationState,
+    fetchAssetsAndFilters,
+  } = React.useContext(AssetStoreContext);
   const {
     openedAssetPack,
     openedAssetShortHeader,
   } = navigationState.getCurrentPage();
+  const { showStagingAssets, toggleStagingAssets } = navigationState;
   const [
     isAssetPackDialogInstallOpen,
     setIsAssetPackDialogInstallOpen,
@@ -164,6 +168,7 @@ export default function NewObjectDialog({
             project,
             objectsContainer,
             events,
+            isStagingAsset: showStagingAssets,
           });
           sendAssetAddedToProject({
             id: openedAssetShortHeader.id,
@@ -198,6 +203,7 @@ export default function NewObjectDialog({
       events,
       onObjectAddedFromAsset,
       openedAssetShortHeader,
+      showStagingAssets,
     ]
   );
 
@@ -225,6 +231,21 @@ export default function NewObjectDialog({
       onClick={onInstallAsset}
       disabled={isAssetBeingInstalled}
       id="add-asset-button"
+    />
+  ) : isDev ? (
+    <RaisedButton
+      key="show-dev-assets"
+      label={
+        showStagingAssets ? (
+          <Trans>Show live assets</Trans>
+        ) : (
+          <Trans>Show dev assets</Trans>
+        )
+      }
+      onClick={() => {
+        fetchAssetsAndFilters(!showStagingAssets);
+        toggleStagingAssets();
+      }}
     />
   ) : (
     undefined
@@ -312,6 +333,7 @@ export default function NewObjectDialog({
           objectsContainer={objectsContainer}
           events={events}
           onObjectAddedFromAsset={onObjectAddedFromAsset}
+          showStagingAssets={showStagingAssets}
         />
       )}
       {resourcesFetcher.renderResourceFetcherDialog()}

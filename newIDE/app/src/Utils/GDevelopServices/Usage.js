@@ -19,6 +19,8 @@ export type Subscription = {|
   updatedAt: number,
   stripeSubscriptionId?: string,
   stripeCustomerId?: string,
+  paypalSubscriptionId?: string,
+  paypalPayerId?: string,
 |};
 
 export type Limit = {|
@@ -169,6 +171,12 @@ export const changeUserSubscription = (
     .then(response => response.data);
 };
 
+export const canSeamlesslyChangeSubscription = (subscription: Subscription) => {
+  // If the subscription is on Stripe, it can be upgraded/downgraded seamlessly.
+  // Otherwise (Paypal), it needs to be cancelled first.
+  return !!subscription.stripeSubscriptionId;
+};
+
 type UploadType = 'build' | 'preview';
 
 export const getSignedUrl = (params: {|
@@ -213,14 +221,14 @@ export const getRedirectToSubscriptionPortalUrl = (
 
 export const getRedirectToCheckoutUrl = (
   planId: string,
-  uid: string,
-  email: string
+  userId: string,
+  userEmail: string
 ): string => {
   return `${
     GDevelopUsageApi.baseUrl
-  }/subscription-v2/redirect-to-checkout?planId=${encodeURIComponent(
+  }/subscription-v2/action/redirect-to-checkout?planId=${encodeURIComponent(
     planId
-  )}&clientReferenceId=${encodeURIComponent(
-    uid
-  )}&customerEmail=${encodeURIComponent(email)}`;
+  )}&userId=${encodeURIComponent(userId)}&customerEmail=${encodeURIComponent(
+    userEmail
+  )}`;
 };

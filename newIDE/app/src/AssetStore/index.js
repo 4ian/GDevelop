@@ -54,13 +54,7 @@ export const AssetStore = ({ project }: Props) => {
     openedAssetShortHeader,
     filtersState,
   } = navigationState.getCurrentPage();
-
-  React.useEffect(
-    () => {
-      fetchAssetsAndFilters();
-    },
-    [fetchAssetsAndFilters]
-  );
+  const showStagingAssets = navigationState.showStagingAssets;
 
   const searchBar = React.useRef<?SearchBarInterface>(null);
   const shouldAutofocusSearchbar = useShouldAutofocusSearchbar();
@@ -275,7 +269,7 @@ export const AssetStore = ({ project }: Props) => {
                 {!isOnHomePage && !openedAssetShortHeader && (
                   <BoxSearchResults
                     baseSize={128}
-                    onRetry={fetchAssetsAndFilters}
+                    onRetry={() => fetchAssetsAndFilters(showStagingAssets)}
                     error={error}
                     searchItems={searchResults}
                     renderSearchItem={(assetShortHeader, size) => (
@@ -298,6 +292,7 @@ export const AssetStore = ({ project }: Props) => {
                     onTagSelection={selectTag}
                     assetShortHeader={openedAssetShortHeader}
                     onOpenDetails={onOpenDetails}
+                    showStagingAssets={showStagingAssets}
                   />
                 )}
               </Line>

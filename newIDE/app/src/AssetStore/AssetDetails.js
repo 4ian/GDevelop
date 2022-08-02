@@ -79,6 +79,7 @@ type Props = {|
   onTagSelection: (tag: string) => void,
   assetShortHeader: AssetShortHeader,
   onOpenDetails: (assetShortHeader: AssetShortHeader) => void,
+  showStagingAssets: boolean,
 |};
 
 const getObjectAssetResourcesByName = (
@@ -98,6 +99,7 @@ export const AssetDetails = ({
   onTagSelection,
   assetShortHeader,
   onOpenDetails,
+  showStagingAssets,
 }: Props) => {
   const gdevelopTheme = React.useContext(ThemeContext);
   const { authors, licenses } = React.useContext(AssetStoreContext);
@@ -113,7 +115,9 @@ export const AssetDetails = ({
         try {
           // Reinitialise asset to trigger a loader and recalculate all parameters. (for instance zoom)
           setAsset(null);
-          const loadedAsset = await getAsset(assetShortHeader);
+          const loadedAsset = await getAsset(assetShortHeader, {
+            isStagingAsset: showStagingAssets,
+          });
           setAsset(loadedAsset);
           if (loadedAsset.objectType === 'sprite') {
             // Only sprites have animations and we select the first one.
@@ -127,7 +131,7 @@ export const AssetDetails = ({
         }
       })();
     },
-    [assetShortHeader]
+    [assetShortHeader, showStagingAssets]
   );
 
   const isImageResourceSmooth = React.useMemo(
@@ -269,8 +273,7 @@ export const AssetDetails = ({
                       fixedWidth={FIXED_WIDTH}
                     />
                   )}
-                {(asset.objectType === 'tiled' ||
-                  asset.objectType === '9patch') && (
+                {asset.objectType !== 'sprite' && (
                   <div style={styles.previewBackground}>
                     <CorsAwareImage
                       style={styles.previewImage}
@@ -404,7 +407,7 @@ export const AssetDetails = ({
             <Line expand noMargin justifyContent="center">
               <BoxSearchResults
                 baseSize={128}
-                onRetry={fetchAssetsAndFilters}
+                onRetry={() => fetchAssetsAndFilters(showStagingAssets)}
                 error={filterError}
                 searchItems={truncatedSearchResults}
                 renderSearchItem={(assetShortHeader, size) => (

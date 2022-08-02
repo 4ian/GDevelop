@@ -50,7 +50,7 @@ type AssetStoreState = {|
   authors: ?Array<Author>,
   licenses: ?Array<License>,
   searchResults: ?Array<AssetShortHeader>,
-  fetchAssetsAndFilters: () => void,
+  fetchAssetsAndFilters: (showStagingAssets: boolean) => void,
   error: ?Error,
   searchText: string,
   setSearchText: string => void,
@@ -71,7 +71,7 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
   authors: null,
   licenses: null,
   searchResults: null,
-  fetchAssetsAndFilters: () => {},
+  fetchAssetsAndFilters: showStagingAssets => {},
   error: null,
   searchText: '',
   setSearchText: () => {},
@@ -93,6 +93,8 @@ export const AssetStoreContext = React.createContext<AssetStoreState>({
     previousPages: [assetStoreHomePageState],
     getCurrentPage: () => assetStoreHomePageState,
     backToPreviousPage: () => {},
+    showStagingAssets: false,
+    toggleStagingAssets: () => {},
     openHome: () => {},
     clearHistory: () => {},
     openSearchIfNeeded: () => {},
@@ -194,10 +196,8 @@ export const AssetStoreStateProvider = ({
   );
 
   const fetchAssetsAndFilters = React.useCallback(
-    () => {
-      // Don't attempt to load again assets and filters if they
-      // were loaded already.
-      if (assetShortHeadersById || isLoading.current) return;
+    (showStagingAssets: boolean) => {
+      if (isLoading.current) return;
 
       (async () => {
         setError(null);
@@ -208,7 +208,7 @@ export const AssetStoreStateProvider = ({
             assetShortHeaders,
             filters,
             assetPacks,
-          } = await listAllAssets();
+          } = await listAllAssets(showStagingAssets);
           const authors = await listAllAuthors();
           const licenses = await listAllLicenses();
 
@@ -236,7 +236,7 @@ export const AssetStoreStateProvider = ({
         isLoading.current = false;
       })();
     },
-    [assetShortHeadersById, isLoading]
+    [isLoading]
   );
 
   React.useEffect(
@@ -247,7 +247,7 @@ export const AssetStoreStateProvider = ({
 
       const timeoutId = setTimeout(() => {
         console.info('Pre-fetching assets from asset store...');
-        fetchAssetsAndFilters();
+        fetchAssetsAndFilters(false);
       }, 6000);
       return () => clearTimeout(timeoutId);
     },

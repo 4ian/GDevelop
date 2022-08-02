@@ -23,6 +23,11 @@ namespace gdjs {
     _gridOffsetX: float;
     _gridOffsetY: float;
     _extraBorder: float;
+    // @ts-ignore The setter "setCollisionMethod" is not detected as an affectation.
+    _collisionMethod: integer;
+    static LEGACY_COLLISION = 0;
+    static HITBOX_COLLISION = 1;
+    static AABB_COLLISION = 2;
 
     //Attributes used for traveling on the path:
     _pathFound: boolean = false;
@@ -36,6 +41,12 @@ namespace gdjs {
     _searchContext: PathfindingRuntimeBehavior.SearchContext;
 
     _movementAngle: float = 0;
+
+    // @ts-ignore The setter "setViewpoint" is not detected as an affectation.
+    _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation;
+    // @ts-ignore same
+    _viewpoint: string;
+    _temporaryPointForTransformations: FloatPoint = [0, 0];
 
     constructor(
       runtimeScene: gdjs.RuntimeScene,
@@ -64,6 +75,12 @@ namespace gdjs {
       this._searchContext = new gdjs.PathfindingRuntimeBehavior.SearchContext(
         this._manager
       );
+      this._setViewpoint(
+        behaviorData.viewpoint,
+        behaviorData.cellWidth,
+        behaviorData.cellHeight
+      );
+      this.setCollisionMethod(behaviorData.collisionMethod);
     }
 
     updateFromBehaviorData(oldBehaviorData, newBehaviorData): boolean {
@@ -85,12 +102,6 @@ namespace gdjs {
       if (oldBehaviorData.angleOffset !== newBehaviorData.angleOffset) {
         this.setAngleOffset(newBehaviorData.angleOffset);
       }
-      if (oldBehaviorData.cellWidth !== newBehaviorData.cellWidth) {
-        this.setCellWidth(newBehaviorData.cellWidth);
-      }
-      if (oldBehaviorData.cellHeight !== newBehaviorData.cellHeight) {
-        this.setCellHeight(newBehaviorData.cellHeight);
-      }
       if (oldBehaviorData.gridOffsetX !== newBehaviorData.gridOffsetX) {
         this._gridOffsetX = newBehaviorData.gridOffsetX;
       }
@@ -100,19 +111,72 @@ namespace gdjs {
       if (oldBehaviorData.extraBorder !== newBehaviorData.extraBorder) {
         this.setExtraBorder(newBehaviorData.extraBorder);
       }
+      if (
+        oldBehaviorData.viewpoint !== newBehaviorData.viewpoint ||
+        oldBehaviorData.cellWidth !== newBehaviorData.cellWidth ||
+        oldBehaviorData.cellHeight !== newBehaviorData.cellHeight
+      ) {
+        this._setViewpoint(
+          newBehaviorData.platformType,
+          newBehaviorData.cellWidth,
+          newBehaviorData.cellHeight
+        );
+      }
+      if (oldBehaviorData.collisionMethod !== newBehaviorData.collisionMethod) {
+        this.setCollisionMethod(newBehaviorData.collisionMethod);
+      }
       return true;
     }
 
-    setCellWidth(width: float): void {
-      this._cellWidth = width;
+    _setViewpoint(
+      viewpoint: string,
+      cellWidth: float,
+      cellHeight: float
+    ): void {
+      this._viewpoint = viewpoint;
+      if (viewpoint == 'Isometry') {
+        if (cellHeight >= cellWidth) {
+          throw new RangeError(
+            `The cell height (${cellHeight}) must be smaller than the cell width (${cellHeight}) for isometry.`
+          );
+        }
+        this._basisTransformation = new PathfindingRuntimeBehavior.IsometryTransformation(
+          Math.atan(cellHeight / cellWidth)
+        );
+        // calculate the square size from the diagonalX of the projected square
+        // the square is 45° rotated, so 2 side length at 45° is:
+        // 2*cos(pi/4) == sqrt(2)
+        const isometricCellSize = cellWidth / Math.sqrt(2);
+        // the ratio gives the isometry angle so it's always a square
+        this._cellWidth = isometricCellSize;
+        this._cellHeight = isometricCellSize;
+      } else {
+        this._basisTransformation = new PathfindingRuntimeBehavior.IdentityTransformation();
+        this._cellWidth = cellWidth;
+        this._cellHeight = cellHeight;
+      }
+    }
+
+    setCollisionMethod(collisionMethod: string): void {
+      if (collisionMethod == 'AABB') {
+        this._collisionMethod = PathfindingRuntimeBehavior.AABB_COLLISION;
+      } else if (collisionMethod == 'HitBoxes') {
+        this._collisionMethod = PathfindingRuntimeBehavior.HITBOX_COLLISION;
+      } else {
+        this._collisionMethod = PathfindingRuntimeBehavior.LEGACY_COLLISION;
+      }
+    }
+
+    setCellWidth(cellWidth: float): void {
+      this._setViewpoint(this._viewpoint, cellWidth, this._cellHeight);
     }
 
     getCellWidth(): float {
       return this._cellWidth;
     }
 
-    setCellHeight(height: float): void {
-      this._cellHeight = height;
+    setCellHeight(cellHeight: float): void {
+      this._setViewpoint(this._viewpoint, this._cellWidth, cellHeight);
     }
 
     getCellHeight(): float {
@@ -317,16 +381,18 @@ namespace gdjs {
       const owner = this.owner;
 
       //First be sure that there is a path to compute.
-      const targetCellX = Math.round((x - this._gridOffsetX) / this._cellWidth);
-      const targetCellY = Math.round(
-        (y - this._gridOffsetY) / this._cellHeight
-      );
-      const startCellX = Math.round(
-        (owner.getX() - this._gridOffsetX) / this._cellWidth
-      );
-      const startCellY = Math.round(
-        (owner.getY() - this._gridOffsetY) / this._cellHeight
-      );
+      const target = this._temporaryPointForTransformations;
+      target[0] = x - this._gridOffsetX;
+      target[1] = y - this._gridOffsetY;
+      this._basisTransformation.toWorld(target);
+      const targetCellX = Math.round(target[0] / this._cellWidth);
+      const targetCellY = Math.round(target[1] / this._cellHeight);
+      const start = this._temporaryPointForTransformations;
+      start[0] = owner.getX() - this._gridOffsetX;
+      start[1] = owner.getY() - this._gridOffsetY;
+      this._basisTransformation.toWorld(start);
+      const startCellX = Math.round(start[0] / this._cellWidth);
+      const startCellY = Math.round(start[1] / this._cellHeight);
       if (startCellX == targetCellX && startCellY == targetCellY) {
         this._path.length = 0;
         this._path.push([owner.getX(), owner.getY()]);
@@ -342,16 +408,38 @@ namespace gdjs {
       this._searchContext.setCellSize(this._cellWidth, this._cellHeight);
       this._searchContext.setGridOffset(this._gridOffsetX, this._gridOffsetY);
       this._searchContext.setStartPosition(owner.getX(), owner.getY());
-      this._searchContext.setObjectSize(
-        owner.getX() - owner.getDrawableX() + this._extraBorder,
-        owner.getY() - owner.getDrawableY() + this._extraBorder,
-        owner.getWidth() -
-          (owner.getX() - owner.getDrawableX()) +
-          this._extraBorder,
-        owner.getHeight() -
-          (owner.getY() - owner.getDrawableY()) +
-          this._extraBorder
-      );
+      this._searchContext.setBasisTransformation(this._basisTransformation);
+      this._searchContext.setCollisionMethod(this._collisionMethod);
+      if (
+        this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION
+      ) {
+        this._searchContext.setObjectSize(
+          owner.getX() - owner.getDrawableX() + this._extraBorder,
+          owner.getY() - owner.getDrawableY() + this._extraBorder,
+          owner.getWidth() -
+            (owner.getX() - owner.getDrawableX()) +
+            this._extraBorder,
+          owner.getHeight() -
+            (owner.getY() - owner.getDrawableY()) +
+            this._extraBorder
+        );
+      } else {
+        const copyHitboxes = PathfindingRuntimeBehavior.deepCloneHitboxes(
+          owner.getHitBoxes()
+        );
+        for (let pi = 0; pi < copyHitboxes.length; ++pi) {
+          copyHitboxes[pi].move(-owner.getX(), -owner.getY());
+        }
+        this._searchContext.setObjectHitBoxes(copyHitboxes);
+
+        const aabb = owner.getAABB();
+        this._searchContext.setObjectSize(
+          owner.getX() - aabb.min[0] + this._extraBorder,
+          owner.getY() - aabb.min[1] + this._extraBorder,
+          aabb.max[0] - owner.getX() + this._extraBorder,
+          aabb.max[1] - owner.getY() + this._extraBorder
+        );
+      }
       if (this._searchContext.computePathTo(x, y)) {
         //Path found: memorize it
         let node = this._searchContext.getFinalNode();
@@ -360,10 +448,11 @@ namespace gdjs {
           if (finalPathLength === this._path.length) {
             this._path.push([0, 0]);
           }
-          this._path[finalPathLength][0] =
-            node.pos[0] * this._cellWidth + this._gridOffsetX;
-          this._path[finalPathLength][1] =
-            node.pos[1] * this._cellHeight + this._gridOffsetY;
+          this._path[finalPathLength][0] = node.pos[0] * this._cellWidth;
+          this._path[finalPathLength][1] = node.pos[1] * this._cellHeight;
+          this._basisTransformation.toScreen(this._path[finalPathLength]);
+          this._path[finalPathLength][0] += this._gridOffsetX;
+          this._path[finalPathLength][1] += this._gridOffsetY;
           node = node.parent;
           finalPathLength++;
         }
@@ -378,6 +467,14 @@ namespace gdjs {
 
       //Not path found
       this._pathFound = false;
+    }
+
+    static deepCloneHitboxes(hitboxes: Polygon[]): Polygon[] {
+      const copyHitboxes = new Array<gdjs.Polygon>(hitboxes.length);
+      for (let pi = 0; pi < hitboxes.length; ++pi) {
+        copyHitboxes[pi] = gdjs.Polygon.deepClone(hitboxes[pi]);
+      }
+      return copyHitboxes;
     }
 
     _enterSegment(segmentNumber: integer) {
@@ -534,10 +631,22 @@ namespace gdjs {
       _gridOffsetX: float = 0;
       _gridOffsetY: float = 0;
 
+      _collisionMethod: integer = PathfindingRuntimeBehavior.LEGACY_COLLISION;
+
+      // for rectangular collision methods
       _leftBorder: integer = 0;
       _rightBorder: integer = 0;
       _topBorder: integer = 0;
       _bottomBorder: integer = 0;
+      _aabb: AABB = { min: [0, 0], max: [0, 0] };
+
+      // for hitbox collision method
+      _objectHitboxes: Polygon[] = [];
+      _stampHitboxes: Polygon[] = [];
+
+      _basisTransformation: PathfindingRuntimeBehavior.BasisTransformation = new IdentityTransformation();
+      _temporaryPointForTransformations: FloatPoint = [0, 0];
+
       _distanceFunction: (pt1: FloatPoint, pt2: FloatPoint) => float;
       //An array of array. Nodes are indexed by their x position, and then by their y position.
       _allNodes: Node[][] = [];
@@ -581,6 +690,16 @@ namespace gdjs {
         return this;
       }
 
+      /**
+       * Set one of these 3 methods
+       * * PathfindingRuntimeBehavior.LEGACY_COLLISION
+       * * PathfindingRuntimeBehavior.HITBOX_COLLISION
+       * * PathfindingRuntimeBehavior.AABB_COLLISION
+       */
+      setCollisionMethod(collisionMethod: integer) {
+        this._collisionMethod = collisionMethod;
+      }
+
       setObjectSize(
         leftBorder: integer,
         topBorder: integer,
@@ -592,6 +711,13 @@ namespace gdjs {
         this._topBorder = topBorder;
         this._bottomBorder = bottomBorder;
         return this;
+      }
+
+      setObjectHitBoxes(objectHitboxes: Polygon[]) {
+        this._objectHitboxes = objectHitboxes;
+        this._stampHitboxes = PathfindingRuntimeBehavior.deepCloneHitboxes(
+          this._objectHitboxes
+        );
       }
 
       setCellSize(
@@ -612,6 +738,12 @@ namespace gdjs {
         return this;
       }
 
+      setBasisTransformation(
+        basisTransformation: PathfindingRuntimeBehavior.BasisTransformation
+      ) {
+        this._basisTransformation = basisTransformation;
+      }
+
       computePathTo(targetX: float, targetY: float) {
         if (this._obstacles === null) {
           logger.log(
@@ -619,18 +751,20 @@ namespace gdjs {
           );
           return;
         }
+        this._destination[0] = targetX - this._gridOffsetX;
+        this._destination[1] = targetY - this._gridOffsetY;
+        this._basisTransformation.toWorld(this._destination);
         this._destination[0] = Math.round(
-          (targetX - this._gridOffsetX) / this._cellWidth
+          this._destination[0] / this._cellWidth
         );
         this._destination[1] = Math.round(
-          (targetY - this._gridOffsetY) / this._cellHeight
+          this._destination[1] / this._cellHeight
         );
-        this._start[0] = Math.round(
-          (this._startX - this._gridOffsetX) / this._cellWidth
-        );
-        this._start[1] = Math.round(
-          (this._startY - this._gridOffsetY) / this._cellHeight
-        );
+        this._start[0] = this._startX - this._gridOffsetX;
+        this._start[1] = this._startY - this._gridOffsetY;
+        this._basisTransformation.toWorld(this._start);
+        this._start[0] = Math.round(this._start[0] / this._cellWidth);
+        this._start[1] = Math.round(this._start[1] / this._cellHeight);
 
         //Initialize the algorithm
         this._freeAllNodes();
@@ -772,52 +906,94 @@ namespace gdjs {
           newNode = new Node(xPos, yPos);
         }
 
-        const nodeCenterX = xPos * this._cellWidth + this._gridOffsetX;
-        const nodeCenterY = yPos * this._cellHeight + this._gridOffsetY;
+        const nodeCenter = this._temporaryPointForTransformations;
+        nodeCenter[0] = xPos * this._cellWidth;
+        nodeCenter[1] = yPos * this._cellHeight;
+        this._basisTransformation.toScreen(nodeCenter);
+        nodeCenter[0] += this._gridOffsetX;
+        nodeCenter[1] += this._gridOffsetY;
 
         //...and update its cost according to obstacles
         let objectsOnCell = false;
-        const radius =
-          this._cellHeight > this._cellWidth
-            ? this._cellHeight * 2
-            : this._cellWidth * 2;
-        this._obstacles.getAllObstaclesAround(
-          nodeCenterX,
-          nodeCenterY,
-          radius,
-          this._closeObstacles
-        );
+
+        if (
+          this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION
+        ) {
+          const radius =
+            this._cellHeight > this._cellWidth
+              ? this._cellHeight * 2
+              : this._cellWidth * 2;
+          this._obstacles.getAllObstaclesAround(
+            nodeCenter[0],
+            nodeCenter[1],
+            radius,
+            this._closeObstacles
+          );
+        } else {
+          this._aabb.min[0] = nodeCenter[0] - this._leftBorder;
+          this._aabb.min[1] = nodeCenter[1] - this._topBorder;
+          this._aabb.max[0] = nodeCenter[0] + this._rightBorder;
+          this._aabb.max[1] = nodeCenter[1] + this._bottomBorder;
+          this._obstacles.getAllObstaclesAroundAABB(
+            this._aabb,
+            this._closeObstacles
+          );
+        }
+
         for (let k = 0; k < this._closeObstacles.length; ++k) {
           const obj = this._closeObstacles[k].owner;
-          const topLeftCellX = Math.floor(
-            (obj.getDrawableX() - this._rightBorder - this._gridOffsetX) /
-              this._cellWidth
-          );
-          const topLeftCellY = Math.floor(
-            (obj.getDrawableY() - this._bottomBorder - this._gridOffsetY) /
-              this._cellHeight
-          );
-          const bottomRightCellX = Math.ceil(
-            (obj.getDrawableX() +
-              obj.getWidth() +
-              this._leftBorder -
-              this._gridOffsetX) /
-              this._cellWidth
-          );
-          const bottomRightCellY = Math.ceil(
-            (obj.getDrawableY() +
-              obj.getHeight() +
-              this._topBorder -
-              this._gridOffsetY) /
-              this._cellHeight
-          );
+
           if (
-            topLeftCellX < xPos &&
-            xPos < bottomRightCellX &&
-            topLeftCellY < yPos &&
-            yPos < bottomRightCellY
+            this._collisionMethod == PathfindingRuntimeBehavior.LEGACY_COLLISION
           ) {
-            objectsOnCell = true;
+            const topLeftCellX = Math.floor(
+              (obj.getDrawableX() - this._rightBorder - this._gridOffsetX) /
+                this._cellWidth
+            );
+            const topLeftCellY = Math.floor(
+              (obj.getDrawableY() - this._bottomBorder - this._gridOffsetY) /
+                this._cellHeight
+            );
+            const bottomRightCellX = Math.ceil(
+              (obj.getDrawableX() +
+                obj.getWidth() +
+                this._leftBorder -
+                this._gridOffsetX) /
+                this._cellWidth
+            );
+            const bottomRightCellY = Math.ceil(
+              (obj.getDrawableY() +
+                obj.getHeight() +
+                this._topBorder -
+                this._gridOffsetY) /
+                this._cellHeight
+            );
+
+            objectsOnCell =
+              topLeftCellX < xPos &&
+              xPos < bottomRightCellX &&
+              topLeftCellY < yPos &&
+              yPos < bottomRightCellY;
+          } else {
+            if (
+              this._collisionMethod ==
+              PathfindingRuntimeBehavior.HITBOX_COLLISION
+            ) {
+              this._moveStampHitBoxesTo(nodeCenter[0], nodeCenter[1]);
+              objectsOnCell = this._checkCollisionWithStamp(obj.getHitBoxes());
+            } else if (
+              this._collisionMethod == PathfindingRuntimeBehavior.AABB_COLLISION
+            ) {
+              // this is needed to exclude touching edges
+              const obstacleAABB = obj.getAABB();
+              objectsOnCell =
+                obstacleAABB.min[0] < this._aabb.max[0] &&
+                obstacleAABB.max[0] > this._aabb.min[0] &&
+                obstacleAABB.min[1] < this._aabb.max[1] &&
+                obstacleAABB.max[1] > this._aabb.min[1];
+            }
+          }
+          if (objectsOnCell) {
             if (this._closeObstacles[k].isImpassable()) {
               //The cell is impassable, stop here.
               newNode.cost = -1;
@@ -835,6 +1011,35 @@ namespace gdjs {
         //Default cost when no objects put on the cell.
         this._allNodes[xPos][yPos] = newNode;
         return newNode;
+      }
+
+      _moveStampHitBoxesTo(x: float, y: float) {
+        for (let pi = 0; pi < this._objectHitboxes.length; ++pi) {
+          const objectPolygon = this._objectHitboxes[pi];
+          const stampPolygon = this._stampHitboxes[pi];
+          for (let vi = 0; vi < objectPolygon.vertices.length; ++vi) {
+            const objectPoint = objectPolygon.vertices[vi];
+            const stampPoint = stampPolygon.vertices[vi];
+            stampPoint[0] = objectPoint[0] + x;
+            stampPoint[1] = objectPoint[1] + y;
+          }
+        }
+      }
+
+      _checkCollisionWithStamp(hitboxes: Polygon[]): boolean {
+        const hitBoxes1 = this._stampHitboxes;
+        const hitBoxes2 = hitboxes;
+        for (let k = 0, lenBoxes1 = hitBoxes1.length; k < lenBoxes1; ++k) {
+          for (let l = 0, lenBoxes2 = hitBoxes2.length; l < lenBoxes2; ++l) {
+            if (
+              gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l], true)
+                .collision
+            ) {
+              return true;
+            }
+          }
+        }
+        return false;
       }
 
       /**
@@ -900,6 +1105,96 @@ namespace gdjs {
             }
           }
         }
+      }
+    }
+
+    export interface BasisTransformation {
+      toScreen(worldPoint: FloatPoint, screenPoint: FloatPoint): void;
+
+      toWorld(screenPoint: FloatPoint, worldPoint: FloatPoint): void;
+
+      toScreen(worldPoint: FloatPoint): void;
+
+      toWorld(screenPoint: FloatPoint): void;
+    }
+
+    export class IdentityTransformation implements BasisTransformation {
+      toScreen(worldPoint: FloatPoint, screenPoint?: FloatPoint): void {
+        if (screenPoint) {
+          screenPoint[0] = worldPoint[0];
+          screenPoint[1] = worldPoint[1];
+        }
+      }
+
+      toWorld(screenPoint: FloatPoint, worldPoint?: FloatPoint): void {
+        if (worldPoint) {
+          worldPoint[0] = screenPoint[0];
+          worldPoint[1] = screenPoint[1];
+        }
+      }
+    }
+
+    export class IsometryTransformation implements BasisTransformation {
+      _screen: float[][];
+      _world: float[][];
+
+      /**
+       * @param angle between the x axis and the projected isometric x axis.
+       * @throws if the angle is not in ]0; pi/4[. Note that 0 is a front viewpoint and pi/4 a top-down viewpoint.
+       */
+      constructor(angle: float) {
+        if (angle <= 0 || angle >= Math.PI / 4)
+          throw new RangeError(
+            'An isometry angle must be in ]0; pi/4] but was: ' + angle
+          );
+
+        const alpha = Math.asin(Math.tan(angle));
+        const sinA = Math.sin(alpha);
+        const cosB = Math.cos(Math.PI / 4);
+        const sinB = Math.sin(Math.PI / 4);
+        /* https://en.wikipedia.org/wiki/Isometric_projection
+         *
+         *   / 1     0    0 \ / cosB 0 -sinB \ / 1 0  0 \
+         *   | 0  cosA sinA | |    0 1     0 | | 0 0 -1 |
+         *   \ 0 -sinA cosA / \ sinB 0  cosB / \ 0 1  0 /
+         */
+        this._screen = [
+          [cosB, -sinB],
+          [sinA * sinB, sinA * cosB],
+        ];
+        // invert
+        this._world = [
+          [cosB, sinB / sinA],
+          [-sinB, cosB / sinA],
+        ];
+      }
+
+      toScreen(worldPoint: FloatPoint, screenPoint?: FloatPoint): void {
+        if (!screenPoint) {
+          screenPoint = worldPoint;
+        }
+        const x =
+          this._screen[0][0] * worldPoint[0] +
+          this._screen[0][1] * worldPoint[1];
+        const y =
+          this._screen[1][0] * worldPoint[0] +
+          this._screen[1][1] * worldPoint[1];
+        screenPoint[0] = x;
+        screenPoint[1] = y;
+      }
+
+      toWorld(screenPoint: FloatPoint, worldPoint?: FloatPoint): void {
+        if (!worldPoint) {
+          worldPoint = screenPoint;
+        }
+        const x =
+          this._world[0][0] * screenPoint[0] +
+          this._world[0][1] * screenPoint[1];
+        const y =
+          this._world[1][0] * screenPoint[0] +
+          this._world[1][1] * screenPoint[1];
+        worldPoint[0] = x;
+        worldPoint[1] = y;
       }
     }
   }

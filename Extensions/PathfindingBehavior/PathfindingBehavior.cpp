@@ -24,6 +24,8 @@ void PathfindingBehavior::InitializeContent(
   behaviorContent.SetAttribute("gridOffsetX", 0);
   behaviorContent.SetAttribute("gridOffsetY", 0);
   behaviorContent.SetAttribute("extraBorder", 0);
+  behaviorContent.SetAttribute("viewpoint", "TopDown");
+  behaviorContent.SetAttribute("collisionMethod", "HitBoxes");
 }
 
 #if defined(GD_IDE_ONLY)
@@ -58,6 +60,33 @@ std::map<gd::String, gd::PropertyDescriptor> PathfindingBehavior::GetProperties(
   properties[_("Extra border size")].SetGroup(_("Collision")).SetValue(
       gd::String::From(behaviorContent.GetDoubleAttribute("extraBorder")));
 
+  gd::String viewpoint = behaviorContent.GetStringAttribute("viewpoint");
+  gd::String viewpointStr = _("Viewpoint");
+  if (viewpoint == "TopDown")
+    viewpointStr = _("Top-Down");
+  else if (viewpoint == "Isometry")
+    viewpointStr = _("Isometry");
+  properties[_("Viewpoint")]
+      .SetValue(viewpointStr)
+      .SetType("Choice")
+      .AddExtraInfo(_("Top-Down"))
+      .AddExtraInfo(_("Isometry"));
+
+  gd::String collisionMethod = behaviorContent.GetStringAttribute("collisionMethod");
+  gd::String collisionMethodStr = _("Collision method");
+  if (collisionMethod == "Legacy")
+    collisionMethodStr = _("Legacy");
+  else if (collisionMethod == "AABB")
+    collisionMethodStr = _("AABB");
+  else if (collisionMethod == "HitBoxes")
+    collisionMethodStr = _("Hit boxes");
+  properties[_("Collision method")]
+      .SetValue(collisionMethodStr)
+      .SetType("Choice")
+      .AddExtraInfo(_("Legacy"))
+      .AddExtraInfo(_("AABB"))
+      .AddExtraInfo(_("Hit boxes"));
+
   return properties;
 }
 
@@ -74,6 +103,29 @@ bool PathfindingBehavior::UpdateProperty(gd::SerializerElement& behaviorContent,
   }
   if (name == _("Extra border size")) {
     behaviorContent.SetAttribute("extraBorder", value.To<float>());
+    return true;
+  }
+  if (name == _("Viewpoint")) {
+    if (value == _("Isometry")) {
+      behaviorContent.SetAttribute("viewpoint", "Isometry");
+      const double width = behaviorContent.GetDoubleAttribute("cellWidth", 0);
+      const double height = behaviorContent.GetDoubleAttribute("cellHeight", 0);
+      // The isometric angle can't be 45° or more.
+      if (height >= width) {
+        behaviorContent.SetAttribute("cellHeight", width / 2);
+      }
+    }
+    else
+      behaviorContent.SetAttribute("viewpoint", "TopDown");
+    return true;
+  }
+  if (name == _("Collision method")) {
+    if (value == _("AABB"))
+      behaviorContent.SetAttribute("collisionMethod", "AABB");
+    else if (value == _("Hit boxes"))
+      behaviorContent.SetAttribute("collisionMethod", "HitBoxes");
+    else
+      behaviorContent.SetAttribute("collisionMethod", "Legacy");
     return true;
   }
 

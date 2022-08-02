@@ -122,7 +122,14 @@ export const isCompatibleWithAsset = (
       })
     : true;
 
-export const listAllAssets = (): Promise<AllAssets> => {
+const stagingBucket = 'https://resources.gdevelop-app.com/staging';
+const devAssetShortHeadersUrl = `${stagingBucket}/assets-database/assetShortHeaders.json`;
+const devFiltersUrl = `${stagingBucket}/assets-database/assetFilters.json`;
+const devAssetPacksUrl = `${stagingBucket}/assets-database/assetPacks.json`;
+
+export const listAllAssets = (
+  showStagingAssets: boolean
+): Promise<AllAssets> => {
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/asset`)
     .then(response => response.data)
@@ -130,10 +137,19 @@ export const listAllAssets = (): Promise<AllAssets> => {
       if (!assetShortHeadersUrl || !filtersUrl || !assetPacksUrl) {
         throw new Error('Unexpected response from the resource endpoint.');
       }
+
       return Promise.all([
-        axios.get(assetShortHeadersUrl).then(response => response.data),
-        axios.get(filtersUrl).then(response => response.data),
-        axios.get(assetPacksUrl).then(response => response.data),
+        axios
+          .get(
+            showStagingAssets ? devAssetShortHeadersUrl : assetShortHeadersUrl
+          )
+          .then(response => response.data),
+        axios
+          .get(showStagingAssets ? devFiltersUrl : filtersUrl)
+          .then(response => response.data),
+        axios
+          .get(showStagingAssets ? devAssetPacksUrl : assetPacksUrl)
+          .then(response => response.data),
       ]).then(([assetShortHeaders, filters, assetPacks]) => ({
         assetShortHeaders,
         filters,
@@ -143,8 +159,16 @@ export const listAllAssets = (): Promise<AllAssets> => {
 };
 
 export const getAsset = (
-  assetShortHeader: AssetShortHeader
+  assetShortHeader: AssetShortHeader,
+  { isStagingAsset }: { isStagingAsset: boolean }
 ): Promise<Asset> => {
+  if (isStagingAsset) {
+    return axios
+      .get(
+        `${stagingBucket}/assets-database/assets/${assetShortHeader.id}.json`
+      )
+      .then(response => response.data);
+  }
   return axios
     .get(`${GDevelopAssetApi.baseUrl}/asset/${assetShortHeader.id}`)
     .then(response => response.data)
